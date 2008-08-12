@@ -5,7 +5,7 @@ add_subdirectory( sqlite )
 
 INCLUDE (FindMySQL)
 IF (MYSQL_FOUND)
-   add_subdirectory( mySQL )
+   add_subdirectory( mysql )
 ENDIF (MYSQL_FOUND)
 
 INCLUDE (FindPostgreSQL)
