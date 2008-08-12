@@ -2,7 +2,6 @@
 add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
 add_subdirectory( sqlite )
-#ancient add_subdirectory( sqlite2 )
 
 INCLUDE (FindMySQL)
 IF (MYSQL_FOUND)
