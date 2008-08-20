@@ -120,7 +120,7 @@ public:
      For file-based drivers, \a dbName should be equal to the database
      filename (the same as specified for ConnectionData).
 
-     See doc/dev/kexidb_issues.txt document, chapter "Table schema, query schema, etc. storage"
+     See doc/dev/predicate_issues.txt document, chapter "Table schema, query schema, etc. storage"
      for database schema documentation (detailed description of kexi__* 'system' tables).
 
      \sa useDatabase() */

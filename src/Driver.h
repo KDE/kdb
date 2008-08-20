@@ -58,7 +58,7 @@ class DriverPrivate;
     - CLASS_NAME is actual driver's class name, e.g. MySqlDriver
     - INTERNAL_NAME is driver name's most significant part (without quotation marks), e.g. mysql
     Above information uses K_EXPORT_COMPONENT_FACTORY macro for KTrader to find the module's entry point.
-    For example, this line declares kexidb_mysqldriver.so module's entry point:
+    For example, this line declares predicate_mysqldriver.so module's entry point:
     \code
     PREDICATE_DRIVER_INFO( MySqlDriver, mysql );
     \endcode

@@ -20,7 +20,7 @@
 #include "Connection.h"
 
 #include "Error.h"
-#include "connection_p.h"
+#include "Connection_p.h"
 #include "ConnectionData.h"
 #include "Driver.h"
 #include "Driver_p.h"
@@ -292,7 +292,7 @@ bool takeTableEnabled : 1; //!< used by takeTable() needed because otherwise 'ta
 using namespace Predicate;
 
 //! static: list of internal Predicate system table names
-QStringList KexiDB_predicateSystemTableNames;
+QStringList Predicate_predicateSystemTableNames;
 
 Connection::Connection(Driver *driver, ConnectionData &conn_data)
         : QObject()
@@ -903,8 +903,8 @@ QStringList Connection::tableNames(bool also_system_tables)
 //! \todo (js): this will depend on Predicate lib version
 const QStringList& Connection::predicateSystemTableNames()
 {
-    if (KexiDB_predicateSystemTableNames.isEmpty()) {
-        KexiDB_predicateSystemTableNames
+    if (Predicate_predicateSystemTableNames.isEmpty()) {
+        Predicate_predicateSystemTableNames
         << "kexi__objects"
         << "kexi__objectdata"
         << "kexi__fields"
@@ -914,7 +914,7 @@ const QStringList& Connection::predicateSystemTableNames()
         << "kexi__db"
         ;
     }
-    return KexiDB_predicateSystemTableNames;
+    return Predicate_predicateSystemTableNames;
 }
 
 Predicate::ServerVersionInfo* Connection::serverVersion() const
@@ -1222,7 +1222,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
     uint internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
     number = 0;
     QList<QuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
-    QString kexidb_subquery_prefix("__kexidb_subquery_");
+    QString predicate_subquery_prefix("__predicate_subquery_");
     foreach(Field *f, *querySchema.fields()) {
         if (querySchema.isColumnVisible(number)) {
             if (!sql.isEmpty())
@@ -1277,7 +1277,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                         //add LEFT OUTER JOIN
                         if (!s_additional_joins.isEmpty())
                             s_additional_joins += QString::fromLatin1(" ");
-                        QString internalUniqueTableAlias(QString("__kexidb_") + lookupTable->name() + "_"
+                        QString internalUniqueTableAlias(QString("__predicate_") + lookupTable->name() + "_"
                                                          + QString::number(internalUniqueTableAliasNumber++));
                         s_additional_joins += QString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
                                               .arg(escapeIdentifier(lookupTable->name(), options.identifierEscaping))
@@ -1334,7 +1334,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += QString::fromLatin1(" ");
                     QString internalUniqueQueryAlias(
-                        kexidb_subquery_prefix + lookupQuery->name() + "_"
+                        predicate_subquery_prefix + lookupQuery->name() + "_"
                         + QString::number(internalUniqueQueryAliasNumber++));
                     s_additional_joins += QString("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
                                           .arg(selectStatement(*lookupQuery, params, options))
@@ -1418,7 +1418,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
             s_from += QString::fromLatin1("(");
             s_from += selectStatement(*subQuery, params, options);
             s_from += QString::fromLatin1(") AS %1%2")
-                      .arg(kexidb_subquery_prefix).arg(subqueries_for_lookup_data_counter++);
+                      .arg(predicate_subquery_prefix).arg(subqueries_for_lookup_data_counter++);
         }
         sql += s_from;
     }

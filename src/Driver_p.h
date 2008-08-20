@@ -242,6 +242,6 @@ public:
 //! with KLibFactory symbol declaration.
 #define PREDICATE_DRIVER_INFO( class_name, internal_name ) \
     DatabaseVersionInfo class_name::version() const { return PREDICATE_VERSION; } \
-    K_EXPORT_COMPONENT_FACTORY(kexidb_ ## internal_name ## driver, KGenericFactory<Predicate::class_name>( "predicate_" #internal_name ))
+    K_EXPORT_COMPONENT_FACTORY(predicate_ ## internal_name ## driver, KGenericFactory<Predicate::class_name>( "predicate_" #internal_name ))
 
 #endif

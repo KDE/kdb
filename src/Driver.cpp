@@ -36,7 +36,7 @@ using namespace Predicate;
 
 /*! @internal Used in Driver::defaultSQLTypeName(int)
  when we do not have Driver instance yet, or when we cannot get one */
-static const char* KexiDB_defaultSQLTypeNames[] = {
+static const char* Predicate_defaultSQLTypeNames[] = {
     "InvalidType",
     "Byte",
     "ShortInteger",
@@ -210,7 +210,7 @@ QString Driver::defaultSQLTypeName(int id_t)
 {
     if (id_t < 0 || id_t > (Field::LastType + 1))
         return QString::fromLatin1("Null");
-    return QString::fromLatin1(KexiDB_defaultSQLTypeNames[id_t]);
+    return QString::fromLatin1(Predicate_defaultSQLTypeNames[id_t]);
 }
 
 bool Driver::isSystemObjectName(const QString& n) const
@@ -354,11 +354,11 @@ bool Driver::isDriverSpecificKeyword(const QByteArray& word) const
 
 //---------------
 
-K_GLOBAL_STATIC_WITH_ARGS(Utils::StaticSetOfStrings, KexiDB_kexiSQLKeywords, (DriverPrivate::kexiSQLKeywords))
+K_GLOBAL_STATIC_WITH_ARGS(Utils::StaticSetOfStrings, Predicate_kexiSQLKeywords, (DriverPrivate::kexiSQLKeywords))
 
 PREDICATE_EXPORT bool Predicate::isKexiSQLKeyword(const QByteArray& word)
 {
-    return KexiDB_kexiSQLKeywords->contains(word);
+    return Predicate_kexiSQLKeywords->contains(word);
 }
 
 #include "driver.moc"

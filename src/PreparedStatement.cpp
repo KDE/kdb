@@ -19,7 +19,7 @@
 
 #include "PreparedStatement.h"
 #include "Connection.h"
-#include "connection_p.h"
+#include "Connection_p.h"
 #include <kdebug.h>
 
 using namespace Predicate;

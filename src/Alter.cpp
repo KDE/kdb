@@ -106,8 +106,8 @@ AlterTableHandler::FieldActionBase::~FieldActionBase()
 //--------------------------------------------------------
 
 //! @internal
-struct KexiDB_AlterTableHandlerStatic {
-    KexiDB_AlterTableHandlerStatic() {
+struct Predicate_AlterTableHandlerStatic {
+    Predicate_AlterTableHandlerStatic() {
 #define I(name, type) \
     types.insert(QByteArray(name).toLower(), (int)AlterTableHandler::type)
 #define I2(name, type1, type2) \
@@ -170,12 +170,12 @@ struct KexiDB_AlterTableHandlerStatic {
     QHash<QByteArray, int> types;
 };
 
-K_GLOBAL_STATIC(KexiDB_AlterTableHandlerStatic, KexiDB_alteringTypeForProperty)
+K_GLOBAL_STATIC(Predicate_AlterTableHandlerStatic, Predicate_alteringTypeForProperty)
 
 //! @internal
 int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
 {
-    const int res = KexiDB_alteringTypeForProperty->types[propertyName.toLower()];
+    const int res = Predicate_alteringTypeForProperty->types[propertyName.toLower()];
     if (res == 0) {
         if (Predicate::isExtendedTableFieldProperty(propertyName))
             return (int)ExtendedSchemaAlteringRequired;
@@ -184,7 +184,7 @@ int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
         .arg(QString(propertyName)) << endl;
     }
     return res;
-    return KexiDB_alteringTypeForProperty->types[propertyName.toLower()];
+    return Predicate_alteringTypeForProperty->types[propertyName.toLower()];
 }
 
 //---

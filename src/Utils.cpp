@@ -78,26 +78,26 @@ struct TypeCache {
     QHash< Field::TypeGroup, Field::Type > def_tlist;
 };
 
-K_GLOBAL_STATIC(TypeCache, KexiDB_typeCache)
+K_GLOBAL_STATIC(TypeCache, Predicate_typeCache)
 
 const TypeGroupList Predicate::typesForGroup(Predicate::Field::TypeGroup typeGroup)
 {
-    return KexiDB_typeCache->tlist.value(typeGroup);
+    return Predicate_typeCache->tlist.value(typeGroup);
 }
 
 QStringList Predicate::typeNamesForGroup(Predicate::Field::TypeGroup typeGroup)
 {
-    return KexiDB_typeCache->nlist.value(typeGroup);
+    return Predicate_typeCache->nlist.value(typeGroup);
 }
 
 QStringList Predicate::typeStringsForGroup(Predicate::Field::TypeGroup typeGroup)
 {
-    return KexiDB_typeCache->slist.value(typeGroup);
+    return Predicate_typeCache->slist.value(typeGroup);
 }
 
 Predicate::Field::Type Predicate::defaultTypeForGroup(Predicate::Field::TypeGroup typeGroup)
 {
-    return (typeGroup <= Field::LastTypeGroup) ? KexiDB_typeCache->def_tlist.value(typeGroup) : Field::InvalidType;
+    return (typeGroup <= Field::LastTypeGroup) ? Predicate_typeCache->def_tlist.value(typeGroup) : Field::InvalidType;
 }
 
 void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
@@ -641,8 +641,8 @@ static bool setIntToFieldType(Field& field, const QVariant& value)
 }
 
 //! @internal for Predicate::isBuiltinTableFieldProperty()
-struct KexiDB_BuiltinFieldProperties {
-    KexiDB_BuiltinFieldProperties() {
+struct Predicate_BuiltinFieldProperties {
+    Predicate_BuiltinFieldProperties() {
 #define ADD(name) set.insert(name)
         ADD("type");
         ADD("primaryKey");
@@ -667,12 +667,12 @@ struct KexiDB_BuiltinFieldProperties {
 };
 
 //! for Predicate::isBuiltinTableFieldProperty()
-K_GLOBAL_STATIC(KexiDB_BuiltinFieldProperties, KexiDB_builtinFieldProperties)
+K_GLOBAL_STATIC(Predicate_BuiltinFieldProperties, Predicate_builtinFieldProperties)
 
 
 bool Predicate::isBuiltinTableFieldProperty(const QByteArray& propertyName)
 {
-    return KexiDB_builtinFieldProperties->set.contains(propertyName);
+    return Predicate_builtinFieldProperties->set.contains(propertyName);
 }
 
 bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVariant>& values)
@@ -745,8 +745,8 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
 }
 
 //! @internal for isExtendedTableProperty()
-struct KexiDB_ExtendedProperties {
-    KexiDB_ExtendedProperties() {
+struct Predicate_ExtendedProperties {
+    Predicate_ExtendedProperties() {
 #define ADD(name) set.insert( name )
         ADD("visibledecimalplaces");
         ADD("rowsource");
@@ -765,11 +765,11 @@ struct KexiDB_ExtendedProperties {
 };
 
 //! for isExtendedTableProperty()
-K_GLOBAL_STATIC(KexiDB_ExtendedProperties, KexiDB_extendedProperties)
+K_GLOBAL_STATIC(Predicate_ExtendedProperties, Predicate_extendedProperties)
 
 bool Predicate::isExtendedTableFieldProperty(const QByteArray& propertyName)
 {
-    return KexiDB_extendedProperties->set.contains(QByteArray(propertyName).toLower());
+    return Predicate_extendedProperties->set.contains(QByteArray(propertyName).toLower());
 }
 
 bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, const QVariant& value)
@@ -959,8 +959,8 @@ QDomElement Predicate::saveBooleanElementToDom(QDomDocument& doc, QDomElement& p
 }
 
 //! @internal Used in Predicate::emptyValueForType()
-struct KexiDB_EmptyValueForTypeCache {
-    KexiDB_EmptyValueForTypeCache()
+struct Predicate_EmptyValueForTypeCache {
+    Predicate_EmptyValueForTypeCache()
             : values(int(Field::LastType) + 1) {
 #define ADD(t, value) values.insert(t, value);
         ADD(Field::Byte, 0);
@@ -980,11 +980,11 @@ struct KexiDB_EmptyValueForTypeCache {
 };
 
 //! Used in Predicate::emptyValueForType()
-K_GLOBAL_STATIC(KexiDB_EmptyValueForTypeCache, KexiDB_emptyValueForTypeCache)
+K_GLOBAL_STATIC(Predicate_EmptyValueForTypeCache, Predicate_emptyValueForTypeCache)
 
 QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
 {
-    const QVariant val(KexiDB_emptyValueForTypeCache->values.at(
+    const QVariant val(Predicate_emptyValueForTypeCache->values.at(
                            (type <= Field::LastType) ? type : Field::InvalidType));
     if (!val.isNull())
         return val;
@@ -1002,8 +1002,8 @@ QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
 }
 
 //! @internal Used in Predicate::notEmptyValueForType()
-struct KexiDB_NotEmptyValueForTypeCache {
-    KexiDB_NotEmptyValueForTypeCache()
+struct Predicate_NotEmptyValueForTypeCache {
+    Predicate_NotEmptyValueForTypeCache()
             : values(int(Field::LastType) + 1) {
 #define ADD(t, value) values.insert(t, value);
         // copy most of the values
@@ -1031,11 +1031,11 @@ struct KexiDB_NotEmptyValueForTypeCache {
     QVector<QVariant> values;
 };
 //! Used in Predicate::notEmptyValueForType()
-K_GLOBAL_STATIC(KexiDB_NotEmptyValueForTypeCache, KexiDB_notEmptyValueForTypeCache)
+K_GLOBAL_STATIC(Predicate_NotEmptyValueForTypeCache, Predicate_notEmptyValueForTypeCache)
 
 QVariant Predicate::notEmptyValueForType(Predicate::Field::Type type)
 {
-    const QVariant val(KexiDB_notEmptyValueForTypeCache->values.at(
+    const QVariant val(Predicate_notEmptyValueForTypeCache->values.at(
                            (type <= Field::LastType) ? type : Field::InvalidType));
     if (!val.isNull())
         return val;
