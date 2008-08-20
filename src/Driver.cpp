@@ -25,7 +25,7 @@
 #include "DriverManager.h"
 #include "Connection.h"
 #include "ConnectionData.h"
-#include "admin.h"
+#include "Admin.h"
 
 #include <klocale.h>
 #include <kdebug.h>

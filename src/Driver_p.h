@@ -34,7 +34,7 @@
 #include <KGenericFactory>
 
 #include "Connection.h"
-#include "admin.h"
+#include "Admin.h"
 #include <kexiutils/Utils.h>
 
 class KService;

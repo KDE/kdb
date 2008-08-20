@@ -20,7 +20,7 @@
 #ifndef PREDICATE_SQLITEADMIN_H
 #define PREDICATE_SQLITEADMIN_H
 
-#include <Predicate/admin.h>
+#include <Predicate/Admin.h>
 
 //! @short An interface containing a set of tools for SQLite database administration.
 class SQLiteAdminTools : public Predicate::AdminTools

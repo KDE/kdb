@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "admin.h"
+#include "Admin.h"
 #include "Driver_p.h"
 
 using namespace Predicate;
