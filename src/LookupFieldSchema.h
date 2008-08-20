@@ -17,33 +17,33 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef KEXIDB_LOOKUPFIELDSCHEMA_H
-#define KEXIDB_LOOKUPFIELDSCHEMA_H
+#ifndef PREDICATE_LOOKUPFIELDSCHEMA_H
+#define PREDICATE_LOOKUPFIELDSCHEMA_H
 
-#include "global.h"
+#include "Global.h"
 
 class QStringList;
 class QDomElement;
 class QDomDocument;
 class QVariant;
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! default value for LookupFieldSchema::columnHeadersVisible()
-#define KEXIDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE false
+#define PREDICATE_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE false
 
 //! default value for LookupFieldSchema::maximumListRows()
-#define KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS 8
+#define PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS 8
 
 //! maximum value for LookupFieldSchema::maximumListRows()
-#define KEXIDB_LOOKUP_FIELD_MAX_LIST_ROWS 100
+#define PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS 100
 
 //! default value for LookupFieldSchema::limitToList()
-#define KEXIDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST true
+#define PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST true
 
 //! default value for LookupFieldSchema::displayWidget()
-#define KEXIDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET KexiDB::LookupFieldSchema::ComboBox
+#define PREDICATE_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET Predicate::LookupFieldSchema::ComboBox
 
 
 //! @short Provides information about lookup field's setup.
@@ -53,12 +53,12 @@ namespace KexiDB
 
  @see LookupFieldSchema *TableSchema::lookupFieldSchema( Field& field ) const
 */
-class KEXI_DB_EXPORT LookupFieldSchema
+class PREDICATE_EXPORT LookupFieldSchema
 {
 public:
 
     //! Row source information that can be specified for the lookup field schema
-    class KEXI_DB_EXPORT RowSource
+    class PREDICATE_EXPORT RowSource
     {
     public:
         //! Row source type
@@ -168,13 +168,13 @@ public:
 
     /*! @return integer property specifying a maximum number of rows
      that can be displayed in a combo box popup or a list box. The default is
-     equal to KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS constant. */
+     equal to PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS constant. */
     uint maximumListRows() const;
 
     /*! Sets maximum number of rows that can be displayed in a combo box popup
-     or a list box. If \a rows is 0, KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS is set.
-     If \a rows is greater than KEXIDB_LOOKUP_FIELD_MAX_LIST_ROWS,
-     KEXIDB_LOOKUP_FIELD_MAX_LIST_ROWS is set. */
+     or a list box. If \a rows is 0, PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS is set.
+     If \a rows is greater than PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS,
+     PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS is set. */
     void setMaximumListRows(uint rows);
 
     /*! @return true if , only values present on the list can be selected using
@@ -223,6 +223,6 @@ protected:
     Private * const d;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

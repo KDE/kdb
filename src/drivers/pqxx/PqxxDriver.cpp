@@ -17,19 +17,19 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <kexidb/connection.h>
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver_p.h>
-#include <kexidb/utils.h>
-#include "pqxxdriver.h"
-#include "pqxxconnection.h"
+#include <Predicate/Connection.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver_p.h>
+#include <Predicate/Utils.h>
+#include "pqxxDriver.h"
+#include "pqxxConnection.h"
 #include <string>
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
-KEXIDB_DRIVER_INFO(pqxxSqlDriver, pqxxsql)
+PREDICATE_DRIVER_INFO(pqxxSqlDriver, pqxxsql)
 
 //==================================================================================
 //
@@ -95,7 +95,7 @@ pqxxSqlDriver::~pqxxSqlDriver()
 
 //==================================================================================
 //
-KexiDB::Connection*
+Predicate::Connection*
 pqxxSqlDriver::drv_createConnection(ConnectionData &conn_data)
 {
     return new pqxxSqlConnection(this, conn_data);
@@ -158,7 +158,7 @@ QByteArray pqxxSqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 //
 QString pqxxSqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KexiDB::escapeBLOB(array, KexiDB::BLOBEscapeOctal);
+    return Predicate::escapeBLOB(array, Predicate::BLOBEscapeOctal);
 }
 
 QString pqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const

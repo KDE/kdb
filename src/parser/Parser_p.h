@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_PARSER_P_H
-#define KEXIDB_PARSER_P_H
+#ifndef PREDICATE_PARSER_P_H
+#define PREDICATE_PARSER_P_H
 
 #include <QList>
 #include <QHash>
@@ -26,14 +26,14 @@
 #include <QCache>
 #include <QString>
 
-#include <kexidb/queryschema.h>
-#include <kexidb/tableschema.h>
-#include <kexidb/connection.h>
-#include <kexidb/expression.h>
-#include "sqltypes.h"
-#include "parser.h"
+#include <Predicate/QuerySchema.h>
+#include <Predicate/TableSchema.h>
+#include <Predicate/Connection.h>
+#include <Predicate/Expression.h>
+#include "SqlTypes.h"
+#include "Parser.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! @internal
@@ -74,14 +74,14 @@ public:
 void yyerror(const char *str);
 void setError(const QString& errName, const QString& errDesc);
 void setError(const QString& errDesc);
-//bool parseData(KexiDB::Parser *p, const char *data);
-bool addColumn(KexiDB::ParseInfo& parseInfo, KexiDB::BaseExpr* columnExpr);
-KexiDB::QuerySchema* buildSelectQuery(
-    KexiDB::QuerySchema* querySchema, KexiDB::NArgExpr* colViews,
-    KexiDB::NArgExpr* tablesList = 0, SelectOptionsInternal * options = 0); //KexiDB::BaseExpr* whereExpr = 0 );
+//bool parseData(Predicate::Parser *p, const char *data);
+bool addColumn(Predicate::ParseInfo& parseInfo, Predicate::BaseExpr* columnExpr);
+Predicate::QuerySchema* buildSelectQuery(
+    Predicate::QuerySchema* querySchema, Predicate::NArgExpr* colViews,
+    Predicate::NArgExpr* tablesList = 0, SelectOptionsInternal * options = 0); //Predicate::BaseExpr* whereExpr = 0 );
 
-extern KexiDB::Parser *parser;
-extern KexiDB::Field *field;
+extern Predicate::Parser *parser;
+extern Predicate::Field *field;
 
 
 #endif

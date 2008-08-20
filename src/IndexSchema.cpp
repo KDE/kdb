@@ -17,20 +17,20 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "indexschema.h"
-#include "driver.h"
-#include "connection.h"
-#include "tableschema.h"
+#include "IndexSchema.h"
+#include "Driver.h"
+#include "Connection.h"
+#include "TableSchema.h"
 
 #include <assert.h>
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 IndexSchema::IndexSchema(TableSchema *tableSchema)
         : FieldList(false)//fields are not owned by IndexSchema object
-        , SchemaData(KexiDB::IndexObjectType)
+        , SchemaData(Predicate::IndexObjectType)
         , m_tableSchema(tableSchema)
         , m_primary(false)
         , m_unique(false)
@@ -98,7 +98,7 @@ FieldList& IndexSchema::addField(Field *field)
 }
 
 
-KexiDB::TableSchema* IndexSchema::table() const
+Predicate::TableSchema* IndexSchema::table() const
 {
     return m_tableSchema;
 }

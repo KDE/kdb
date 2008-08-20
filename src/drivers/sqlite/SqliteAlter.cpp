@@ -19,12 +19,12 @@
 
 // ** bits of SQLiteConnection related to table altering **
 
-#include "sqliteconnection.h"
-#include <kexidb/utils.h>
+#include "sqliteConnection.h"
+#include <Predicate/Utils.h>
 #include <QHash>
-#include <kglobal.h>
+#include <kGlobal.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 enum SQLiteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
     NoAffinity = 0, IntAffinity = 1, TextAffinity = 2, BLOBAffinity = 3
@@ -67,7 +67,7 @@ tristate SQLiteConnection::drv_changeFieldProperty(TableSchema &table, Field& fi
       }*/
     if (propertyName == "type") {
         bool ok;
-        Field::Type type = KexiDB::intToFieldType(value.toUInt(&ok));
+        Field::Type type = Predicate::intToFieldType(value.toUInt(&ok));
         if (!ok || Field::InvalidType == type) {
             //! @todo msg
             return false;

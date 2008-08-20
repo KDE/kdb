@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SQLITEPREPAREDSTATEMENT_H
+#ifndef PREDICATE_SQLITEPREPAREDSTATEMENT_H
 //&& !defined SQLITE2
-#define KEXIDB_SQLITEPREPAREDSTATEMENT_H
+#define PREDICATE_SQLITEPREPAREDSTATEMENT_H
 
-#include <kexidb/preparedstatement.h>
-#include "sqliteconnection_p.h"
+#include <Predicate/PreparedStatement.h>
+#include "SqliteConnection_p.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! Implementation of prepared statements for SQLite driver. */

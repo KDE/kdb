@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CONNECTION_H
-#define KEXIDB_CONNECTION_H
+#ifndef PREDICATE_CONNECTION_H
+#define PREDICATE_CONNECTION_H
 
 #include <QObject>
 #include <QStringList>
@@ -27,18 +27,18 @@
 #include <QVariant>
 #include <QPointer>
 
-#include "object.h"
-#include "connectiondata.h"
-#include "tableschema.h"
-#include "queryschema.h"
-#include "queryschemaparameter.h"
-#include "transaction.h"
-#include "driver.h"
-#include "preparedstatement.h"
+#include "Object.h"
+#include "ConnectionData.h"
+#include "TableSchema.h"
+#include "QuerySchema.h"
+#include "QuerySchemaParameter.h"
+#include "Transaction.h"
+#include "Driver.h"
+#include "PreparedStatement.h"
 #include "RecordData.h"
 #include "Tristate.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Cursor;
@@ -53,7 +53,7 @@ class AlterTableHandler;
  It supports data queries and modification by creating client-side database cursors.
  Database transactions are supported.
 */
-class KEXI_DB_EXPORT Connection : public QObject, public KexiDB::Object
+class PREDICATE_EXPORT Connection : public QObject, public Predicate::Object
 {
     Q_OBJECT
 
@@ -159,39 +159,39 @@ public:
     */
     bool dropDatabase(const QString &dbName = QString());
 
-    /*! \return names of all the \a objecttype (see \a ObjectTypes in global.h)
-    schemas stored in currently used database. KexiDB::AnyObjectType can be passed
+    /*! \return names of all the \a objecttype (see \a ObjectTypes in Global.h)
+    schemas stored in currently used database. Predicate::AnyObjectType can be passed
     as \a objType to get names of objects of any type.
     If \a ok is not null then variable pointed by it will be set to the result.
     On error, the functions can return incomplete list. */
-    QStringList objectNames(int objType = KexiDB::AnyObjectType, bool* ok = 0);
+    QStringList objectNames(int objType = Predicate::AnyObjectType, bool* ok = 0);
 
     /*! \return names of all table schemas stored in currently
      used database. If \a also_system_tables is true,
-     internal KexiDB system table names (kexi__*) are also returned.
-     \sa kexiDBSystemTableNames() */
+     internal Predicate system table names (kexi__*) are also returned.
+     \sa predicateSystemTableNames() */
     QStringList tableNames(bool also_system_tables = false);
 
-    /*! \return list of internal KexiDB system table names
+    /*! \return list of internal Predicate system table names
      (kexi__*). This does not mean that these tables can be found
      in currently opened database. Just static list of table
      names is returned.
 
-     The list contents may depend on KexiDB library version;
+     The list contents may depend on Predicate library version;
      opened database can contain fewer 'system' tables than in current
-     KexiDB implementation, if the current one is newer than the one used
+     Predicate implementation, if the current one is newer than the one used
      to build the database. */
-    static const QStringList& kexiDBSystemTableNames();
+    static const QStringList& predicateSystemTableNames();
 
     /*! \return server version information for this connection.
      If database is not connected (i.e. isConnected() is false) 0 is returned. */
-    KexiDB::ServerVersionInfo* serverVersion() const;
+    Predicate::ServerVersionInfo* serverVersion() const;
 
     /*! \return version information for this connection.
      If database is not used (i.e. isDatabaseUsed() is false) 0 is returned.
-     It can be compared to drivers' and KexiDB library version to maintain
+     It can be compared to drivers' and Predicate library version to maintain
      backward/upward compatiblility. */
-    KexiDB::DatabaseVersionInfo* databaseVersion() const;
+    Predicate::DatabaseVersionInfo* databaseVersion() const;
 
     /*! \return DatabaseProperties object allowing to read and write global database properties
      for this connection. */
@@ -200,7 +200,7 @@ public:
     /*! \return ids of all table schema names stored in currently
      used database. These ids can be later used as argument for tableSchema().
      This is a shortcut for objectIds(TableObjectType).
-     Internal KexiDB system tables (kexi__*) are not available here
+     Internal Predicate system tables (kexi__*) are not available here
      because these have no identifiers assigned (more formally: id=-1).
 
      Note: the fact that given id is on the returned list does not mean
@@ -230,8 +230,8 @@ public:
      @see queryIds() */
     QList<int> objectIds(int objType);
 
-    /*! \brief Creates new transaction handle and starts a new transaction.
-     \return KexiDB::Transaction object if transaction has been started
+    /*! \brief Creates new Transaction.handle and starts a new transaction.
+     \return Predicate::Transaction object if Transaction.has been started
      successfully, otherwise null transaction.
      For drivers that allow single transaction per connection
      (Driver::features() && SingleTransactions) this method can be called one time,
@@ -282,7 +282,7 @@ public:
      started at all.
      Default transaction can be defined automatically for some drivers --
      see beginTransaction().
-     \sa KexiDB::Driver::transactionsSupported()
+     \sa Predicate::Driver::transactionsSupported()
     */
     Transaction& defaultTransaction() const;
 
@@ -309,11 +309,11 @@ public:
      For drivers that do not support transactions (see Driver::features())
      this method shouldn't be called because it does nothing ans always returns false.
 
-     No internal KexiDB object should changes this option, although auto commit's
+     No internal Predicate object should changes this option, although auto commit's
      behaviour depends on database engine's specifics. Engines that support only single
      transaction per connection (see Driver::SingleTransactions),
      use this single connection for autocommiting, so if there is already transaction
-     started by the KexiDB user program (with beginTransaction()), this transaction
+     started by the Predicate user program (with beginTransaction()), this transaction
      is committed before any sql functional statement execution. In this situation
      default transaction is also affected (see defaultTransaction()).
 
@@ -323,7 +323,7 @@ public:
      For other drivers set this option off if you need use transaction
      for grouping more statements together.
 
-     NOTE: nested transactions are not yet implemented in KexiDB API.
+     NOTE: nested transactions are not yet implemented in Predicate API.
     */
     bool autoCommit() const;
 
@@ -339,7 +339,7 @@ public:
     /*! Prepares SELECT query described by raw \a statement.
      \return opened cursor created for results of this query
      or NULL if there was any error. Cursor can have optionally applied \a cursor_options
-     (one of more selected from KexiDB::Cursor::Options).
+     (one of more selected from Predicate::Cursor::Options).
      Preparation means that returned cursor is created but not opened.
      Open this when you would like to do it with Cursor::open().
 
@@ -376,7 +376,7 @@ public:
      \return opened cursor created for results of this query
      or NULL if there was any error on the cursor creation or opening.
      Cursor can have optionally applied \a cursor_options
-     (one of more selected from KexiDB::Cursor::Options).
+     (one of more selected from Predicate::Cursor::Options).
      Identifiers in \a statement that are the same as keywords in Kexi
      SQL or the backend's SQL need to have been escaped.
      */
@@ -414,7 +414,7 @@ public:
     TableSchema* tableSchema(int tableId);
 
     /*! \return schema of a table pointed by \a tableName, retrieved from currently
-     used database. KexiDB system table schema can be also retrieved.
+     used database. Predicate system table schema can be also retrieved.
      \sa tableSchema( int tableId ) */
     TableSchema* tableSchema(const QString& tableName);
 
@@ -559,7 +559,7 @@ public:
     tristate dropTable(TableSchema* tableSchema);
 
     /*! It is a convenience function, does exactly the same as
-     bool dropTable( KexiDB::TableSchema* tableSchema ) */
+     bool dropTable( Predicate::TableSchema* tableSchema ) */
     tristate dropTable(const QString& table);
 
     /*! Alters \a tableSchema using \a newTableSchema in memory and on the db backend.
@@ -587,7 +587,7 @@ public:
     bool dropQuery(QuerySchema* querySchema);
 
     /*! It is a convenience function, does exactly the same as
-     bool dropQuery( KexiDB::QuerySchema* querySchema ) */
+     bool dropQuery( Predicate::QuerySchema* querySchema ) */
     bool dropQuery(const QString& query);
 
     /*! Removes information about object with \a objId
@@ -626,7 +626,7 @@ public:
     virtual QString anyAvailableDatabaseName();
 
     /*! Sets \a dbName as name of a database that can be accessible.
-     This is option that e.g. application that make use of KexiDB library can set
+     This is option that e.g. application that make use of Predicate library can set
      to tune connection's behaviour when it needs to temporary connect to any database
      in the server to do some work.
      You can pass empty dbName - then anyAvailableDatabaseName() will try return
@@ -680,7 +680,7 @@ public:
     bool executeSQL(const QString& statement);
 
     //! @short options used in selectStatement()
-    class KEXI_DB_EXPORT SelectStatementOptions
+    class PREDICATE_EXPORT SelectStatementOptions
     {
     public:
         SelectStatementOptions();
@@ -726,7 +726,7 @@ public:
     bool storeObjectSchemaData(SchemaData &sdata, bool newObject);
 
     /*! Added for convenience.
-     \sa setupObjectSchemaData( const KexiDB::RecordData &data, SchemaData &sdata ).
+     \sa setupObjectSchemaData( const Predicate::RecordData &data, SchemaData &sdata ).
      \return true on success, false on failure and cancelled when such object couldn't */
     tristate loadObjectSchemaData(int objectID, SchemaData &sdata);
 
@@ -757,7 +757,7 @@ public:
      \sa loadDataBlock() storeDataBlock(). */
     bool removeDataBlock(int objectID, const QString& dataID = QString());
 
-    class KEXI_DB_EXPORT TableSchemaChangeListenerInterface
+    class PREDICATE_EXPORT TableSchemaChangeListenerInterface
     {
     public:
         TableSchemaChangeListenerInterface() {}
@@ -848,7 +848,7 @@ public:
       Moved to public for KexiMigrate
       @todo fix this after refatoring
     */
-    KexiDB::Field* setupField(const RecordData &data);
+    Predicate::Field* setupField(const RecordData &data);
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
      This method is used for example in KexiProject to insert information about "kexi__blobs"
@@ -870,12 +870,12 @@ protected:
      Used (alsoRemoveSchema==false) on table altering:
      if recreating table can failed we're giving up and keeping
      the original table schema (even if it is no longer points to any real data). */
-    tristate dropTable(KexiDB::TableSchema* tableSchema, bool alsoRemoveSchema);
+    tristate dropTable(Predicate::TableSchema* tableSchema, bool alsoRemoveSchema);
 
     /*! For reimplemenation: connects to database. \a version should be set to real
      server's version.
       \return true on success. */
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version) = 0;
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version) = 0;
 
     /*! For reimplemenation: disconnects database
       \return true on success. */
@@ -933,7 +933,7 @@ protected:
      internal engine's database API,
      eg (a bit schematic):  my_connection_struct->isConnected()==true.
      Do not check things like Connection::isDatabaseUsed() here or other things
-     that "KexiDB already knows" at its level.
+     that "Predicate already knows" at its level.
      If you cannot test anything, just leave default implementation (that returns true).
 
      Result of this method is used as an addtional chance to check for isDatabaseUsed().
@@ -971,7 +971,7 @@ protected:
     /*!
      Creates table named by \a tableSchemaName. Schema object must be on
      schema tables' list before calling this method (otherwise false if returned).
-     Just uses drv_createTable( const KexiDB::TableSchema& tableSchema ).
+     Just uses drv_createTable( const Predicate::TableSchema& tableSchema ).
      Used internally, e.g. in createDatabase().
      \return true on success
     */
@@ -997,7 +997,7 @@ protected:
      do never call this method.
      Reimplement this method if you need to do something more
      (e.g. if you driver will support multiple transactions per connection).
-     Make subclass of TransactionData (declared in transaction.h)
+     Make subclass of TransactionData (declared in Transaction.h)
      and return object of this subclass.
      You should return NULL if any error occurred.
      Do not check anything in connection (isConnected(), etc.) - all is already done.
@@ -1094,10 +1094,10 @@ protected:
      A handle to a newly created transaction (or null on error) is passed
      to \a tg parameter.
 
-     Special case when used database driver has only single transaction support
+     Special case when used database Driver.has only single transaction support
      (Driver::SingleTransactions):
      and there is already transaction started, it is committed before
-     starting a new one, but only if this transaction has been started inside Connection object.
+     starting a new one, but only if this Transaction.has been started inside Connection object.
      (i.e. by beginAutoCommitTransaction()). Otherwise, a new transaction will not be started,
      but true will be returned immediately.
     */
@@ -1108,7 +1108,7 @@ protected:
      \return true on success or when no transactions are supported
      at all by the driver.
 
-     Special case when used database driver has only single transaction support
+     Special case when used database Driver.has only single transaction support
      (Driver::SingleTransactions): if \a trans has been started outside Connection object
      (i.e. not by beginAutoCommitTransaction()), the transaction will not be committed.
     */
@@ -1119,7 +1119,7 @@ protected:
      \return true on success or when no transactions are supported
      at all by the driver.
 
-     Special case when used database driver has only single transaction support
+     Special case when used database Driver.has only single transaction support
      (Driver::SingleTransactions): \a trans will not be rolled back
      if it has been started outside this Connection object.
     */
@@ -1156,7 +1156,7 @@ protected:
     /*! Delete all existing rows. */
     bool deleteAllRows(QuerySchema &query);
 
-    /*! Allocates all needed table KexiDB system objects for kexi__* KexiDB liblary's
+    /*! Allocates all needed table Predicate system objects for kexi__* Predicate library's
      system tables schema.
      These objects are used internally in this connection
      and are added to list of tables (by name,
@@ -1165,7 +1165,7 @@ protected:
     bool setupKexiDBSystemSchema();
 
     /*! used internally by setupKexiDBSystemSchema():
-     Allocates single table KexiDB system object named \a tsname
+     Allocates single table Predicate system object named \a tsname
      and adds this to list of such objects (for later removal on closeDatabase()).
     */
     TableSchema* newKexiDBSystemTableSchema(const QString& tsname);
@@ -1232,7 +1232,7 @@ protected:
      Changes value of field property.
      \return true on success, false on failure, cancelled if the action has been cancelled.
 
-     Note for driver developers: implement this if the driver has to supprot the altering. */
+     Note for driver developers: implement this if the Driver.has to supprot the altering. */
     virtual tristate drv_changeFieldProperty(TableSchema &table, Field& field,
             const QString& propertyName, const QVariant& value) {
         Q_UNUSED(table); Q_UNUSED(field); Q_UNUSED(propertyName); Q_UNUSED(value);
@@ -1240,10 +1240,10 @@ protected:
     }
 
     //! Used by Cursor class
-    void addCursor(KexiDB::Cursor& cursor);
+    void addCursor(Predicate::Cursor& cursor);
 
     //! Used by Cursor class
-    void takeCursor(KexiDB::Cursor& cursor);
+    void takeCursor(Predicate::Cursor& cursor);
 
 private:
     ConnectionPrivate* d; //!< @internal d-pointer class.
@@ -1251,15 +1251,15 @@ private:
 bool m_destructor_started : 1; //!< helper: true if destructor is started.
 bool m_insideCloseDatabase : 1; //!< helper: true while closeDatabase() is executed
 
-    friend class KexiDB::Driver;
-    friend class KexiDB::Cursor;
-    friend class KexiDB::TableSchema; //!< for removeMe()
-    friend class KexiDB::DatabaseProperties; //!< for setError()
+    friend class Predicate::Driver;
+    friend class Predicate::Cursor;
+    friend class Predicate::TableSchema; //!< for removeMe()
+    friend class Predicate::DatabaseProperties; //!< for setError()
     friend class ConnectionPrivate;
-    friend class KexiDB::AlterTableHandler;
+    friend class Predicate::AlterTableHandler;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif
 

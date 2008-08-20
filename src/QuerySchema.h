@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_QUERY_H
-#define KEXIDB_QUERY_H
+#ifndef PREDICATE_QUERY_H
+#define PREDICATE_QUERY_H
 
 #include <QVector>
 #include <QString>
@@ -26,12 +26,12 @@
 #include <QList>
 #include <QByteArray>
 
-#include "fieldlist.h"
-#include "schemadata.h"
-#include "tableschema.h"
-#include "relationship.h"
+#include "FieldList.h"
+#include "SchemaData.h"
+#include "TableSchema.h"
+#include "Relationship.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -47,7 +47,7 @@ typedef QList<QuerySchemaParameter> QuerySchemaParameterList;
   QueryColumnInfo::Vector is created and returned by QuerySchema::fieldsExpanded().
   It is efficiently cached within the QuerySchema object.
 */
-class KEXI_DB_EXPORT QueryColumnInfo
+class PREDICATE_EXPORT QueryColumnInfo
 {
 public:
     typedef QVector<QueryColumnInfo*> Vector;
@@ -108,9 +108,9 @@ private:
     QueryColumnInfo *m_foreignColumn;
 };
 
-//! @short KexiDB::OrderByColumn provides information about a single query column used for sorting
+//! @short Predicate::OrderByColumn provides information about a single query column used for sorting
 /*! The column can be expression or table field. */
-class KEXI_DB_EXPORT OrderByColumn
+class PREDICATE_EXPORT OrderByColumn
 {
 public:
     typedef QList<OrderByColumn*>::ConstIterator ListConstIterator;
@@ -173,11 +173,11 @@ protected:
 bool m_ascending : 1;
 };
 
-//! A base for KexiDB::OrderByColumnList
+//! A base for Predicate::OrderByColumnList
 typedef QList<OrderByColumn*> OrderByColumnListBase;
 
-//! @short KexiDB::OrderByColumnList provides list of sorted columns for a query schema
-class KEXI_DB_EXPORT OrderByColumnList : protected OrderByColumnListBase
+//! @short Predicate::OrderByColumnList provides list of sorted columns for a query schema
+class PREDICATE_EXPORT OrderByColumnList : protected OrderByColumnListBase
 {
 public:
     /*! Constructs empty list of ordered columns. */
@@ -185,7 +185,7 @@ public:
 
     ~OrderByColumnList();
 
-    class KEXI_DB_EXPORT const_iterator : public OrderByColumnListBase::const_iterator
+    class PREDICATE_EXPORT const_iterator : public OrderByColumnListBase::const_iterator
     {
     public:
         inline const_iterator()
@@ -194,7 +194,7 @@ public:
                 : OrderByColumnListBase::const_iterator(o) {}
     };
 
-    class KEXI_DB_EXPORT iterator : public OrderByColumnListBase::iterator
+    class PREDICATE_EXPORT iterator : public OrderByColumnListBase::iterator
     {
     public:
         inline iterator()
@@ -274,11 +274,11 @@ public:
                         Driver *drv = 0, int identifierEscaping = Driver::EscapeDriver | Driver::EscapeAsNecessary) const;
 };
 
-//! @short KexiDB::QuerySchema provides information about database query
+//! @short Predicate::QuerySchema provides information about database query
 /*! The query that can be executed using KexiDB-compatible SQL database engine
- or used as an introspection tool. KexiDB parser builds QuerySchema objects
+ or used as an introspection tool. Predicate parser builds QuerySchema objects
  by parsing SQL statements. */
-class KEXI_DB_EXPORT QuerySchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT QuerySchema : public FieldList, public SchemaData
 {
 public:
     /*! Creates empty query object (without columns). */
@@ -310,7 +310,7 @@ public:
      Inserted field will not be owned by this QuerySchema object,
      but still by corresponding TableSchema.
 
-     As \a field object you can also pass KexiDB::QueryAsterisk,
+     As \a field object you can also pass Predicate::QueryAsterisk,
      (see QueryAsterisk class description).
 
      Note: After inserting a field, corresponding table will be automatically
@@ -438,7 +438,7 @@ public:
      alternative for findTableField("mytable.myfield") but it can crash
      if "mytable" is not defined in the query.
 
-     @see KexiDB::splitToTableAndFieldParts()
+     @see Predicate::splitToTableAndFieldParts()
     */
     Field* findTableField(const QString &tableOrTableAndFieldName) const;
 
@@ -552,8 +552,8 @@ public:
      was found within the query. fieldsExpanded() method is used
      to lookup expanded list of the query fields, so queries with asterisks
      are processed well.
-     If a field has alias defined, name is not taken into account,
-     but only its alias. If a field has no alias:
+     If a Field.has alias defined, name is not taken into account,
+     but only its alias. If a Field.has no alias:
      - field's name is checked
      - field's table and field's name are checked in a form of "tablename.fieldname",
        so you can provide \a identifier in this form to avoid ambiguity.
@@ -632,14 +632,14 @@ public:
 
      If \a options is WithInternalFieldsAndRowID,
      one fake BigInteger column is appended to make space for ROWID column used
-     by KexiDB::Cursor implementations. For example, let persons be TABLE( surname, city_id ),
+     by Predicate::Cursor implementations. For example, let persons be TABLE( surname, city_id ),
      let city_number reference cities.is in TABLE cities( id, name ) and let query q be defined
      by "SELECT * FROM t" statement. If we want to display persons' city names instead of city_id's.
      To do this, cities.name has to be retrieved as well, so the following statement should be used:
      "SELECT * FROM persons, cities.name LEFT OUTER JOIN cities ON persons.city_id=cities.id".
      Thus, calling fieldsExpanded(WithInternalFieldsAndRowID) will return 4 elements instead of 2:
      persons.surname, persons.city_id, cities.name, {ROWID}. The {ROWID} item is the placeholder
-     used for fetching ROWID by KexiDB cursors.
+     used for fetching ROWID by Predicate cursors.
 
      By default, all fields are returned in the vector even
      if there are multiple occurrences of one or more (options == Default).
@@ -781,7 +781,7 @@ public:
     /*! Adds a part to WHERE expression.
      Simplifies creating of WHERE expression, if used instead
      of setWhereExpression(BaseExpr *expr). */
-    void addToWhereExpression(KexiDB::Field *field, const QVariant& value, int relation = '=');
+    void addToWhereExpression(Predicate::Field *field, const QVariant& value, int relation = '=');
 
     /*! Sets a list of columns for ORDER BY section of the query.
      Each name on the list must be a field or alias present within the query
@@ -816,7 +816,7 @@ protected:
     friend class QuerySchemaPrivate;
 };
 
-//! @short KexiDB::QueryAsterisk class encapsulates information about single asterisk in query definition
+//! @short Predicate::QueryAsterisk class encapsulates information about single asterisk in query definition
 /*! There are two types of query asterisks:
 
  1. "Single-table" asterisk, that references all fields of given table used
@@ -839,7 +839,7 @@ protected:
  There can be many asterisks of 1st type defined for given single query.
  There can be one asterisk of 2nd type defined for given single query.
 */
-class KEXI_DB_EXPORT QueryAsterisk : public Field
+class PREDICATE_EXPORT QueryAsterisk : public Field
 {
 public:
     /*! Constructs query asterisk definition object.
@@ -896,6 +896,6 @@ protected:
     friend class QuerySchema;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

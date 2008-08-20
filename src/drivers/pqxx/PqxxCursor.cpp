@@ -17,28 +17,28 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "pqxxcursor.h"
-#include "pqxxconnection.h"
-#include "pqxxconnection_p.h"
+#include "pqxxCursor.h"
+#include "pqxxConnection.h"
+#include "PqxxConnection_p.h"
 
-#include <kexidb/error.h>
-#include <kexidb/global.h>
+#include <Predicate/Error.h>
+#include <Predicate/Global.h>
 
 #include <klocale.h>
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 unsigned int pqxxSqlCursor_trans_num = 0; //!< debug helper
 
 static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
 {
-    return KexiDB::pgsqlByteaToByteArray(r.c_str(), r.size());
+    return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
 }
 
 //==================================================================================
 //Constructor based on query statement
-pqxxSqlCursor::pqxxSqlCursor(KexiDB::Connection* conn, const QString& statement, uint options):
+pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
         Cursor(conn, statement, options)
 {
 // KexiDBDrvDbg << "PQXXSQLCURSOR: constructor for query statement" << endl;
@@ -200,7 +200,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
         return QVariant();
     }
 
-    KexiDB::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
+    Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 // KexiDBDrvDbg << "pqxxSqlCursor::value(" << pos << ")" << endl;

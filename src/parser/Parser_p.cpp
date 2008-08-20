@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "parser_p.h"
-#include "sqlparser.h"
+#include "Parser_p.h"
+#include "sqlParser.h"
 
 #include <QRegExp>
 #include <QMutableListIterator>
@@ -28,7 +28,7 @@
 
 #include <assert.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 Parser *parser = 0;
 Field *field = 0;
@@ -62,7 +62,7 @@ void Parser::Private::clear()
 
 //-------------------------------------
 
-ParseInfo::ParseInfo(KexiDB::QuerySchema *query)
+ParseInfo::ParseInfo(Predicate::QuerySchema *query)
         : querySchema(query)
 {
 //Qt 4 repeatedTablesAndAliases.setAutoDelete(true);
@@ -138,7 +138,7 @@ void yyerror(const char *str)
             if (!lexerErr.isEmpty())
                 lexerErr.prepend(": ");
 
-            if (KexiDB::isKexiSQLKeyword(ctoken))
+            if (Predicate::isKexiSQLKeyword(ctoken))
                 parser->setError(ParserError(i18n("Syntax Error"),
                                              i18n("\"%1\" is a reserved keyword", QString(ctoken)) + lexerErr,
                                              ctoken, current));

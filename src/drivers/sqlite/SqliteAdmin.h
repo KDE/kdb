@@ -17,20 +17,20 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SQLITEADMIN_H
-#define KEXIDB_SQLITEADMIN_H
+#ifndef PREDICATE_SQLITEADMIN_H
+#define PREDICATE_SQLITEADMIN_H
 
-#include <kexidb/admin.h>
+#include <Predicate/admin.h>
 
 //! @short An interface containing a set of tools for SQLite database administration.
-class SQLiteAdminTools : public KexiDB::AdminTools
+class SQLiteAdminTools : public Predicate::AdminTools
 {
 public:
     SQLiteAdminTools();
     virtual ~SQLiteAdminTools();
 
     /*! Performs vacuum (compacting) for connection \a conn. */
-    virtual bool vacuum(const KexiDB::ConnectionData& data, const QString& databaseName);
+    virtual bool vacuum(const Predicate::ConnectionData& data, const QString& databaseName);
 };
 
 #endif

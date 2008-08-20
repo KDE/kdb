@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "lookupfieldschema.h"
-#include "utils.h"
+#include "LookupFieldSchema.h"
+#include "Utils.h"
 
 #include <QDomElement>
 #include <QVariant>
@@ -26,7 +26,7 @@
 
 #include <KDebug>
 
-namespace KexiDB
+namespace Predicate
 {
 //! @internal
 class LookupFieldSchema::RowSource::Private
@@ -46,10 +46,10 @@ class LookupFieldSchema::Private
 public:
     Private()
             : boundColumn(-1)
-            , maximumListRows(KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
-            , displayWidget(KEXIDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET)
-            , columnHeadersVisible(KEXIDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
-            , limitToList(KEXIDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
+            , maximumListRows(PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
+            , displayWidget(PREDICATE_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET)
+            , columnHeadersVisible(PREDICATE_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
+            , limitToList(PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
     }
 
     RowSource rowSource;
@@ -65,7 +65,7 @@ bool limitToList : 1;
 
 //----------------------------
 
-using namespace KexiDB;
+using namespace Predicate;
 
 LookupFieldSchema::RowSource::RowSource()
         : d(new Private)
@@ -180,9 +180,9 @@ void LookupFieldSchema::setRowSource(const LookupFieldSchema::RowSource& rowSour
 void LookupFieldSchema::setMaximumListRows(uint rows)
 {
     if (rows == 0)
-        d->maximumListRows = KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS;
-    else if (rows > KEXIDB_LOOKUP_FIELD_MAX_LIST_ROWS)
-        d->maximumListRows = KEXIDB_LOOKUP_FIELD_MAX_LIST_ROWS;
+        d->maximumListRows = PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS;
+    else if (rows > PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS)
+        d->maximumListRows = PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS;
     else
         d->maximumListRows = rows;
 }
@@ -249,7 +249,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             /* <bound-column>
                 <number>number</number> #in later implementation there can be more columns
                </bound-column> */
-            const QVariant val = KexiDB::loadPropertyValueFromDom(el.firstChild());
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
             if (val.type() == QVariant::Int)
                 lookupFieldSchema->setBoundColumn(val.toInt());
         } else if (name == "visible-column") {
@@ -260,7 +260,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
                </visible-column> */
             QList<uint> list;
             for (QDomNode childNode = el.firstChild(); !childNode.isNull(); childNode = childNode.nextSibling()) {
-                const QVariant val = KexiDB::loadPropertyValueFromDom(childNode);
+                const QVariant val = Predicate::loadPropertyValueFromDom(childNode);
                 if (val.type() == QVariant::Int)
                     list.append(val.toUInt());
             }
@@ -274,7 +274,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             QVariant val;
             QList<int> columnWidths;
             for (el = el.firstChild().toElement(); !el.isNull(); el = el.nextSibling().toElement()) {
-                QVariant val = KexiDB::loadPropertyValueFromDom(el);
+                QVariant val = Predicate::loadPropertyValueFromDom(el);
                 if (val.type() == QVariant::Int)
                     columnWidths.append(val.toInt());
             }
@@ -283,21 +283,21 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             /* <show-column-headers>
                 <bool>true/false</bool>
                </show-column-headers> */
-            const QVariant val = KexiDB::loadPropertyValueFromDom(el.firstChild());
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setColumnHeadersVisible(val.toBool());
         } else if (name == "list-rows") {
             /* <list-rows>
                 <number>1..100</number>
                </list-rows> */
-            const QVariant val = KexiDB::loadPropertyValueFromDom(el.firstChild());
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
             if (val.type() == QVariant::Int)
                 lookupFieldSchema->setMaximumListRows(val.toUInt());
         } else if (name == "limit-to-list") {
             /* <limit-to-list>
                 <bool>true/false</bool>
                </limit-to-list> */
-            const QVariant val = KexiDB::loadPropertyValueFromDom(el.firstChild());
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setLimitToList(val.toBool());
         } else if (name == "display-widget") {
@@ -342,7 +342,7 @@ void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument&
     }
 
     if (lookupSchema.boundColumn() >= 0)
-        KexiDB::saveNumberElementToDom(doc, lookupColumnEl, "bound-column", lookupSchema.boundColumn());
+        Predicate::saveNumberElementToDom(doc, lookupColumnEl, "bound-column", lookupSchema.boundColumn());
 
     QList<uint> visibleColumns(lookupSchema.visibleColumns());
     if (!visibleColumns.isEmpty()) {
@@ -366,14 +366,14 @@ void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument&
         }
     }
 
-    if (lookupSchema.columnHeadersVisible() != KEXIDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
-        KexiDB::saveBooleanElementToDom(doc, lookupColumnEl, "show-column-headers", lookupSchema.columnHeadersVisible());
-    if (lookupSchema.maximumListRows() != KEXIDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
-        KexiDB::saveNumberElementToDom(doc, lookupColumnEl, "list-rows", lookupSchema.maximumListRows());
-    if (lookupSchema.limitToList() != KEXIDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST)
-        KexiDB::saveBooleanElementToDom(doc, lookupColumnEl, "limit-to-list", lookupSchema.limitToList());
+    if (lookupSchema.columnHeadersVisible() != PREDICATE_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
+        Predicate::saveBooleanElementToDom(doc, lookupColumnEl, "show-column-headers", lookupSchema.columnHeadersVisible());
+    if (lookupSchema.maximumListRows() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
+        Predicate::saveNumberElementToDom(doc, lookupColumnEl, "list-rows", lookupSchema.maximumListRows());
+    if (lookupSchema.limitToList() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST)
+        Predicate::saveBooleanElementToDom(doc, lookupColumnEl, "limit-to-list", lookupSchema.limitToList());
 
-    if (lookupSchema.displayWidget() != KEXIDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET) {
+    if (lookupSchema.displayWidget() != PREDICATE_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET) {
         QDomElement displayWidgetEl(doc.createElement("display-widget"));
         lookupColumnEl.appendChild(displayWidgetEl);
         displayWidgetEl.appendChild(

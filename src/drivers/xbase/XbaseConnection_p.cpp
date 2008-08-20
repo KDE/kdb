@@ -24,12 +24,12 @@
 #include <KDebug>
 #include <KTemporaryFile>
 
-#include "xbaseconnection_p.h"
-#include "xbaseexport.h"
+#include "XbaseConnection_p.h"
+#include "XbaseExport.h"
 
-#include <kexidb/drivermanager.h>
-#include <kexidb/utils.h>
-#include <kexidb/connectiondata.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Utils.h>
+#include <Predicate/ConnectionData.h>
 #include <migration/keximigrate.h>
 #include <migration/migratemanager.h>
 
@@ -43,7 +43,7 @@
 
 using namespace NAMESPACE;
 
-xBaseConnectionInternal::xBaseConnectionInternal(KexiDB::Connection* connection, KexiDB::Driver* internalDriver )
+xBaseConnectionInternal::xBaseConnectionInternal(Predicate::Connection* connection, Predicate::Driver* internalDriver )
   : ConnectionInternal(connection),
   internalDriver(internalDriver)
 {
@@ -64,7 +64,7 @@ void xBaseConnectionInternal::storeResult()
 
 //bool xBaseConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool xBaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
+bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 {
   // we have to migrate the xbase source database into a .kexi file
   // xbase source database directory will be in connectiondata
@@ -84,11 +84,11 @@ bool xBaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 
         tempDatabase = temporaryKexiFile.fileName();
 
-  KexiDB::ConnectionData* kexiConnectionData = 0;
-  kexiConnectionData = new KexiDB::ConnectionData();
+  Predicate::ConnectionData* kexiConnectionData = 0;
+  kexiConnectionData = new Predicate::ConnectionData();
 
   // set destination file name here.
-  kexiConnectionData->driverName = KexiDB::defaultFileBasedDriverName();
+  kexiConnectionData->driverName = Predicate::defaultFileBasedDriverName();
   kexiConnectionData->setFileName( tempDatabase );
   kDebug() << "Current file name: " << tempDatabase << endl;
 
@@ -108,7 +108,7 @@ bool xBaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 
   // Setup XBase connection data from input connection data passed
   //! TODO Check sanity of this
-  md->source = new KexiDB::ConnectionData(data);
+  md->source = new Predicate::ConnectionData(data);
   md->sourceName = "";
 
   sourceDriver->setData(md);
@@ -154,7 +154,7 @@ bool xBaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 
 /*! Disconnects from the database.
 */
-bool xBaseConnectionInternal::db_disconnect(const KexiDB::ConnectionData& data)
+bool xBaseConnectionInternal::db_disconnect(const Predicate::ConnectionData& data)
 {
   //! Export back to xBase
   xBaseExport export2xBase;

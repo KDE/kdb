@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "pqxxconnection.h"
+#include "pqxxConnection.h"
 #include <qvariant.h>
 #include <qfile.h>
 #include <kdebug.h>
-#include <kexidb/error.h>
-#include <kexidb/global.h>
+#include <Predicate/Error.h>
+#include <Predicate/Global.h>
 #include <klocale.h>
 #include <string>
-#include "pqxxpreparedstatement.h"
-#include "pqxxconnection_p.h"
-using namespace KexiDB;
+#include "PqxxPreparedStatement.h"
+#include "PqxxConnection_p.h"
+using namespace Predicate;
 
 pqxxTransactionData::pqxxTransactionData(Connection *conn, bool nontransaction)
         : TransactionData(conn)
@@ -94,7 +94,7 @@ QString pqxxSqlConnection::escapeName(const QString &name) const
 //==================================================================================
 //Made this a noop
 //We tell kexi we are connected, but we wont actually connect until we use a database!
-bool pqxxSqlConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
     KexiDBDrvDbg << "pqxxSqlConnection::drv_connect" << endl;
     version.clear();
@@ -324,7 +324,7 @@ bool pqxxSqlConnection::drv_containsTable(const QString &tableName)
 
 bool pqxxSqlConnection::drv_getTablesList(QStringList &list)
 {
-    KexiDB::Cursor *cursor;
+    Predicate::Cursor *cursor;
     m_sql = "select lower(relname) from pg_class where relkind='r'";
     if (!(cursor = executeQuery(m_sql))) {
         KexiDBDrvWarn << "pqxxSqlConnection::drv_getTablesList(): !executeQuery()" << endl;

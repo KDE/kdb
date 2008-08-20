@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef KEXIDB_FIELD_H
-#define KEXIDB_FIELD_H
+#ifndef PREDICATE_FIELD_H
+#define PREDICATE_FIELD_H
 
 #include <QVariant>
 #include <QString>
@@ -29,10 +29,10 @@
 #include <QStringList>
 #include <QHash>
 
-#include <kexiutils/utils.h>
-#include "kexidb_export.h"
+#include <kexiutils/Utils.h>
+#include "predicate_export.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class TableSchema;
@@ -41,7 +41,7 @@ class FieldList;
 class BaseExpr;
 
 //! Meta-data for a field
-/*! KexiDB::Field provides information about single database field.
+/*! Predicate::Field provides information about single database field.
 
  Field class has defined following members:
  - name
@@ -55,7 +55,7 @@ class BaseExpr;
  - description (user readable name additional text, can be useful for developers)
  - width (a hint for displaying in tabular mode or as text box)
 
- Field can also have assigned expression (see KexiDB::BaseExpr class,
+ Field can also have assigned expression (see Predicate::BaseExpr class,
  and expression() method).
  If an expression is defined, then field's name is
 
@@ -63,8 +63,8 @@ class BaseExpr;
  because the same field can be used in different queries with different alias.
 
  Notes for advanced use: Field obeject is designed to be owned by a parent object.
- Such a parent object can be KexiDB::TableSchema, if the field defines single table column,
- or KexiDB::QuerySchema, if the field defines an expression (KexiDB::BaseExpr class).
+ Such a parent object can be Predicate::TableSchema, if the field defines single table column,
+ or Predicate::QuerySchema, if the field defines an expression (Predicate::BaseExpr class).
 
  Using expression class for fields allos to define expressions within queries like
  "SELECT AVG(price) FROM products"
@@ -74,10 +74,10 @@ class BaseExpr;
  calling setTable() or setQuery() later.
 
 */
-class KEXI_DB_EXPORT Field
+class PREDICATE_EXPORT Field
 {
 public:
-    typedef KexiUtils::AutodeletedList<Field*> List; //!< list of fields
+    typedef Utils::AutodeletedList<Field*> List; //!< list of fields
     typedef QVector<Field*> Vector; //!< vector of fields
     typedef QList<Field*>::ConstIterator ListIterator; //!< iterator for list of fields
     typedef QPair<Field*, Field*> Pair; //!< fields pair
@@ -463,7 +463,7 @@ public:
         return m_options & Unsigned;
     }
 
-    /*! \return true if this field has EMPTY property (i.e. it is of type
+    /*! \return true if this Field.has EMPTY property (i.e. it is of type
     string or is a BLOB). */
     inline bool hasEmptyProperty() const {
         return Field::hasEmptyProperty(type());
@@ -529,7 +529,7 @@ public:
     void setAutoIncrement(bool a);
 
     /*! Specifies whether the field is single-field primary key or not
-     (KexiDB::PrimeryKey item).
+     (Predicate::PrimeryKey item).
      Use this with caution. Setting this to true implies setting:
      - setUniqueKey(true)
      - setNotNull(true)
@@ -539,28 +539,28 @@ public:
      Setting this to false implies setting setAutoIncrement(false). */
     void setPrimaryKey(bool p);
 
-    /*! Specifies whether the field has single-field unique constraint or not
-     (KexiDB::Unique item). Setting this to true implies setting Indexed flag
+    /*! Specifies whether the Field.has single-field unique constraint or not
+     (Predicate::Unique item). Setting this to true implies setting Indexed flag
      to true (setIndexed(true)), because index is required it control unique constraint. */
     void setUniqueKey(bool u);
 
-    /*! Sets whether the field has to be declared with single-field foreign key.
+    /*! Sets whether the Field.has to be declared with single-field foreign key.
      Used in IndexSchema::setForeigKey(). */
     void setForeignKey(bool f);
 
-    /*! Specifies whether the field has single-field unique constraint or not
-     (KexiDB::NotNull item). Setting this to true implies setting Indexed flag
+    /*! Specifies whether the Field.has single-field unique constraint or not
+     (Predicate::NotNull item). Setting this to true implies setting Indexed flag
      to true (setIndexed(true)), because index is required it control
      not null constraint. */
     void setNotNull(bool n);
 
-    /*! Specifies whether the field has single-field unique constraint or not
-     (KexiDB::NotEmpty item). Setting this to true implies setting Indexed flag
+    /*! Specifies whether the Field.has single-field unique constraint or not
+     (Predicate::NotEmpty item). Setting this to true implies setting Indexed flag
      to true (setIndexed(true)), because index is required it control
      not empty constraint. */
     void setNotEmpty(bool n);
 
-    /*! Specifies whether the field is indexed (KexiDB::Indexed item)
+    /*! Specifies whether the field is indexed (Predicate::Indexed item)
      (by single-field implicit index) or not.
      Use this with caution. Since index is used to control unique,
      not null/empty constratins, setting this to false implies setting:
@@ -607,10 +607,10 @@ public:
     /*! Shows debug information about this field. */
     void debug();
 
-    /*! \return KexiDB::BaseExpr object if the field value is an
+    /*! \return Predicate::BaseExpr object if the field value is an
      expression.  Unless the expression is set with setExpression(), it is null.
     */
-    inline KexiDB::BaseExpr *expression() {
+    inline Predicate::BaseExpr *expression() {
         return m_expr;
     }
 
@@ -623,7 +623,7 @@ public:
      Because the field defines an expression, it should be assigned to a query,
      not to a table.
     */
-    void setExpression(KexiDB::BaseExpr *expr);
+    void setExpression(Predicate::BaseExpr *expr);
 
     /*! \return true if there is expression defined for this field.
      This method is provided for better readibility
@@ -692,11 +692,11 @@ protected:
     uint m_width;
     QVector<QString> m_hints;
 
-    KexiDB::BaseExpr *m_expr;
+    Predicate::BaseExpr *m_expr;
     CustomPropertiesMap* m_customProperties;
 
     //! @internal Used in m_typeNames member to handle i18n'd type names
-    class KEXI_DB_EXPORT FieldTypeNames : public QVector<QString>
+    class PREDICATE_EXPORT FieldTypeNames : public QVector<QString>
     {
     public:
         FieldTypeNames();
@@ -708,7 +708,7 @@ protected:
     };
 
     //! @internal Used in m_typeGroupNames member to handle i18n'd type group names
-    class KEXI_DB_EXPORT FieldTypeGroupNames : public QVector<QString>
+    class PREDICATE_EXPORT FieldTypeGroupNames : public QVector<QString>
     {
     public:
         FieldTypeGroupNames();
@@ -734,6 +734,6 @@ private:
     friend class QuerySchema;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

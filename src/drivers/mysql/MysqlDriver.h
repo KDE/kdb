@@ -22,16 +22,16 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef MYSQLDB_H
 #define MYSQLDB_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! MySQL database driver.
 class MySqlDriver : public Driver
 {
     Q_OBJECT
-    KEXIDB_DRIVER
+    PREDICATE_DRIVER
 
 public:
     MySqlDriver(QObject *parent, const QStringList &args = QStringList());

@@ -26,13 +26,13 @@
 //
 // Copyright: See COPYING file that comes with this distribution
 //
-#include "pqxxpreparedstatement.h"
+#include "PqxxPreparedStatement.h"
 #include <kdebug.h>
-using namespace KexiDB;
+using namespace Predicate;
 
 pqxxPreparedStatement::pqxxPreparedStatement(
     StatementType type, ConnectionInternal& conn, FieldList& fields)
-        : KexiDB::PreparedStatement(type, conn, fields)
+        : Predicate::PreparedStatement(type, conn, fields)
         , m_conn(conn.connection)
 {
 // KexiDBDrvDbg << "pqxxPreparedStatement: Construction" << endl;

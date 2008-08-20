@@ -24,10 +24,10 @@
 #include <QObject>
 #include <QVariant>
 
-#include <kexidb/field.h>
-#include <kexidb/expression.h>
+#include <Predicate/Field.h>
+#include <Predicate/Expression.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -37,7 +37,7 @@ class TableSchema;
 /**
  * Provides detailed i18n'ed error description about the \a Parser .
  */
-class KEXI_DB_EXPORT ParserError
+class PREDICATE_EXPORT ParserError
 {
 public:
 
@@ -51,8 +51,8 @@ public:
      *
      * \param type The errortype.
      * \param error A description of the error.
-     * \param hint Token where the error happend.
-     * \param at The position where the error happend.
+     * \param hint Token where the Error.happend.
+     * \param at The position where the Error.happend.
      */
     ParserError(const QString &type, const QString &error, const QString &hint, int at);
 
@@ -76,7 +76,7 @@ public:
     }
 
     /**
-     * \return position where the error happend.
+     * \return position where the Error.happend.
      */
     int at() {
         return m_at;
@@ -93,7 +93,7 @@ private:
 /**
  * Parser for SQL statements.
  *
- * The best and prefeerred way to run queries is using the KexiDB::Parser functionality
+ * The best and prefeerred way to run queries is using the Predicate::Parser functionality
  * and use the resulting QuerySchema object since this offers a database-backend-independent
  * way to deal with SQL statements on the one hand and offers high level
  * functionality on the other. Also BLOBs like images are handled that way.
@@ -106,12 +106,12 @@ private:
  * By using the \a QuerySchema::addRelationship and \a QuerySchema::addToWhereExpression methods
  * the SQL statement could be extended with relationships and WHERE expressions.
  *
- * For more, see \a KexiDB::PreparedStatement and \a Connection::selectStatement() . A more
+ * For more, see \a Predicate::PreparedStatement and \a Connection::selectStatement() . A more
  * complex example that looks at what the user has defined and carefully builds
- * \a KexiDB::QuerySchema object, including the WHERE expression can be found in
+ * \a Predicate::QuerySchema object, including the WHERE expression can be found in
  * the Query Designer's source code in the method \a KexiQueryDesignerGuiEditor::buildSchema().
  */
-class KEXI_DB_EXPORT Parser
+class PREDICATE_EXPORT Parser
 {
 public:
 

@@ -17,37 +17,37 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "xbasecursor.h"
-#include "xbaseconnection.h"
+#include "xbaseCursor.h"
+#include "xbaseConnection.h"
 
-#include <kexidb/error.h>
-#include <kexidb/utils.h>
+#include <Predicate/Error.h>
+#include <Predicate/Utils.h>
 #include <klocale.h>
 #include <kdebug.h>
 #include <limits.h>
 
 
-using namespace KexiDB;
+using namespace Predicate;
 
-class KexiDB::xBaseCursorData {
+class Predicate::xBaseCursorData {
   public:
-    explicit xBaseCursorData(KexiDB::Cursor* cursor = 0)
+    explicit xBaseCursorData(Predicate::Cursor* cursor = 0)
       : internalCursor(cursor)
     {
     }
 
-    KexiDB::Cursor* internalCursor;
+    Predicate::Cursor* internalCursor;
 
 };
 
-xBaseCursor::xBaseCursor(KexiDB::Connection* conn, KexiDB::Cursor* internalCursor, const QString& statement, uint cursor_options)
+xBaseCursor::xBaseCursor(Predicate::Connection* conn, Predicate::Cursor* internalCursor, const QString& statement, uint cursor_options)
   : Cursor(conn,statement,cursor_options)
   , d( new xBaseCursorData(internalCursor) )
 {
   init();
 }
 
-xBaseCursor::xBaseCursor(Connection* conn, KexiDB::Cursor* internalCursor, QuerySchema& query, uint options )
+xBaseCursor::xBaseCursor(Connection* conn, Predicate::Cursor* internalCursor, QuerySchema& query, uint options )
   : Cursor( conn, query, options )
   , d( new xBaseCursorData(internalCursor) )
 {

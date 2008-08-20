@@ -22,10 +22,10 @@
 
 #include <qstringlist.h>
 
-#include <kexidb/connection.h>
-#include "xbasecursor.h"
+#include <Predicate/Connection.h>
+#include "xbaseCursor.h"
 
-namespace KexiDB {
+namespace Predicate {
 
 class xBaseConnectionInternal;
 
@@ -52,7 +52,7 @@ class xBaseConnection : public Connection
     /*! Used by driver */
     xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data );
 
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList( QStringList &list );
     virtual bool drv_createDatabase( const QString &dbName = QString() );

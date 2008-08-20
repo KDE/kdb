@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SCHEMADATA_H
-#define KEXIDB_SCHEMADATA_H
+#ifndef PREDICATE_SCHEMADATA_H
+#define PREDICATE_SCHEMADATA_H
 
-#include "global.h"
-#include "field.h"
+#include "Global.h"
+#include "Field.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! Container class that stores common kexi object schema's properties like
@@ -31,10 +31,10 @@ namespace KexiDB
  By kexi object we mean in-db storable object like table schema or query schema.
 */
 
-class KEXI_DB_EXPORT SchemaData
+class PREDICATE_EXPORT SchemaData
 {
 public:
-    SchemaData(int obj_type = KexiDB::UnknownObjectType);
+    SchemaData(int obj_type = Predicate::UnknownObjectType);
     virtual ~SchemaData();
 
     int type() const {
@@ -110,6 +110,6 @@ bool m_native : 1;
     friend class Connection;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

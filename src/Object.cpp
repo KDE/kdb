@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "object.h"
-#include "error.h"
+#include "Object.h"
+#include "Error.h"
 #include "msghandler.h"
 
 #include <klocale.h>
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 #define ERRMSG(a) \
     { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
@@ -88,12 +88,12 @@ void Object::setError(const QString& title, const QString &msg)
     m_msgTitle = origMsgTitle; //revert
 }
 
-void Object::setError(KexiDB::Object *obj, const QString& prependMessage)
+void Object::setError(Predicate::Object *obj, const QString& prependMessage)
 {
     setError(obj, obj ? obj->errorNum() : ERR_OTHER, prependMessage);
 }
 
-void Object::setError(KexiDB::Object *obj, int code, const QString& prependMessage)
+void Object::setError(Predicate::Object *obj, int code, const QString& prependMessage)
 {
     if (obj && (obj->errorNum() != 0 || !obj->serverErrorMsg().isEmpty())) {
         STORE_PREV_ERR;

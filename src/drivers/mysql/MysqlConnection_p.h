@@ -17,13 +17,13 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_MYSQLCLIENT_P_H
-#define KEXIDB_MYSQLCLIENT_P_H
+#ifndef PREDICATE_MYSQLCLIENT_P_H
+#define PREDICATE_MYSQLCLIENT_P_H
 
-#include <kexidb/connection_p.h>
+#include <Predicate/connection_p.h>
 
 #ifdef Q_WS_WIN
-#include <my_global.h>
+#include <my_Global.h>
 #endif
 #include <mysql_version.h>
 #include <mysql.h>
@@ -37,7 +37,7 @@ typedef struct st_mysql MYSQL;
 #define NAMESPACE KexiDB
 #endif
 
-namespace KexiDB
+namespace Predicate
 {
 class ConnectionData;
 }
@@ -48,16 +48,16 @@ namespace NAMESPACE
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
     be shared by any module that needs direct access to the underlying
-    database.  Used by the KexiDB and KexiMigration drivers.
+    database.  Used by the Predicate and KexiMigration drivers.
  */
-class MySqlConnectionInternal : public KexiDB::ConnectionInternal
+class MySqlConnectionInternal : public Predicate::ConnectionInternal
 {
 public:
-    MySqlConnectionInternal(KexiDB::Connection* connection);
+    MySqlConnectionInternal(Predicate::Connection* connection);
     virtual ~MySqlConnectionInternal();
 
     //! Connects to a MySQL database
-    bool db_connect(const KexiDB::ConnectionData& data);
+    bool db_connect(const Predicate::ConnectionData& data);
 
     //! Disconnects from the database
     bool db_disconnect();
@@ -86,7 +86,7 @@ public:
 class MySqlCursorData : public MySqlConnectionInternal
 {
 public:
-    MySqlCursorData(KexiDB::Connection* connection);
+    MySqlCursorData(Predicate::Connection* connection);
     virtual ~MySqlCursorData();
 
     MYSQL_RES *mysqlres;

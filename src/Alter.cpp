@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "alter.h"
-#include "utils.h"
-#include <kexiutils/utils.h>
+#include "Alter.h"
+#include "Utils.h"
+#include <kexiutils/Utils.h>
 #include <qmap.h>
 #include <stdlib.h>
 
-namespace KexiDB
+namespace Predicate
 {
 class AlterTableHandler::Private
 {
@@ -35,7 +35,7 @@ public:
 };
 }
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //! a global instance used to when returning null is needed
 AlterTableHandler::ChangeFieldPropertyAction nullChangeFieldPropertyAction(true);
@@ -150,7 +150,7 @@ struct KexiDB_AlterTableHandlerStatic {
         I("visibleDecimalPlaces", ExtendedSchemaAlteringRequired);
 
         // lookup-field-related properties...
-        /*moved to KexiDB::isExtendedTableFieldProperty()
+        /*moved to Predicate::isExtendedTableFieldProperty()
             I("boundColumn", ExtendedSchemaAlteringRequired);
             I("rowSource", ExtendedSchemaAlteringRequired);
             I("rowSourceType", ExtendedSchemaAlteringRequired);
@@ -177,7 +177,7 @@ int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
 {
     const int res = KexiDB_alteringTypeForProperty->types[propertyName.toLower()];
     if (res == 0) {
-        if (KexiDB::isExtendedTableFieldProperty(propertyName))
+        if (Predicate::isExtendedTableFieldProperty(propertyName))
             return (int)ExtendedSchemaAlteringRequired;
         KexiDBWarn <<
         QString("AlterTableHandler::alteringTypeForProperty(): property \"%1\" not found!")
@@ -252,7 +252,7 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
         KexiDBDbg << debugString << endl;
 #ifdef KEXI_DEBUG_GUI
         if (simulate)
-            KexiUtils::addAlterTableActionDebug(debugString, nestingLevel);
+            Utils::addAlterTableActionDebug(debugString, nestingLevel);
 #endif
     }
 }
@@ -270,7 +270,7 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
     KexiDBDbg << dbg << endl;
 #ifdef KEXI_DEBUG_GUI
     if (simulate)
-        KexiUtils::addAlterTableActionDebug(dbg, 1);
+        Utils::addAlterTableActionDebug(dbg, 1);
 #endif
     for (;it != dict->constEnd(); ++it) {
         debugAction(it.value(), 2, simulate);
@@ -281,7 +281,7 @@ static void debugFieldActions(const AlterTableHandler::ActionDictDict &fieldActi
 {
 #ifdef KEXI_DEBUG_GUI
     if (simulate)
-        KexiUtils::addAlterTableActionDebug("** Simplified Field Actions:");
+        Utils::addAlterTableActionDebug("** Simplified Field Actions:");
 #endif
     for (AlterTableHandler::ActionDictDictIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
         debugActionDict(it.value(), it.key(), simulate);
@@ -391,7 +391,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(TableSc
     //1. Simpler cases first: changes that do not affect table schema at all
     // "caption", "description", "width", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
-        bool result = KexiDB::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
+        bool result = Predicate::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
         return result;
     }
 
@@ -419,7 +419,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection &conn,
     //1. Simpler cases first: changes that do not affect table schema at all
     // "caption", "description", "width", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
-        result = KexiDB::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
+        result = Predicate::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
         return result;
     }
 
@@ -461,7 +461,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection &conn,
          "autoIncrement", "indexed",
 
 
-      bool result = KexiDB::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
+      bool result = Predicate::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
     */
     return result;
 }
@@ -533,7 +533,7 @@ tristate AlterTableHandler::RemoveFieldAction::execute(Connection& conn, TableSc
 
 //--------------------------------------------------------
 
-AlterTableHandler::InsertFieldAction::InsertFieldAction(int fieldIndex, KexiDB::Field *field, int uid)
+AlterTableHandler::InsertFieldAction::InsertFieldAction(int fieldIndex, Predicate::Field *field, int uid)
         : FieldActionBase(field->name(), uid)
         , m_index(fieldIndex)
         , m_field(0)
@@ -546,7 +546,7 @@ AlterTableHandler::InsertFieldAction::InsertFieldAction(const InsertFieldAction&
         : FieldActionBase(action) //action.fieldName(), action.uid())
         , m_index(action.index())
 {
-    m_field = new KexiDB::Field(action.field());
+    m_field = new Predicate::Field(action.field());
 }
 
 AlterTableHandler::InsertFieldAction::InsertFieldAction(bool)
@@ -561,7 +561,7 @@ AlterTableHandler::InsertFieldAction::~InsertFieldAction()
     delete m_field;
 }
 
-void AlterTableHandler::InsertFieldAction::setField(KexiDB::Field* field)
+void AlterTableHandler::InsertFieldAction::setField(Predicate::Field* field)
 {
     if (m_field)
         delete m_field;
@@ -631,21 +631,21 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
         }
         if (!values.isEmpty()) {
             //update field, so it will be created as one step
-            KexiDB::Field *f = new KexiDB::Field(field());
-            if (KexiDB::setFieldProperties(*f, values)) {
+            Predicate::Field *f = new Predicate::Field(field());
+            if (Predicate::setFieldProperties(*f, values)) {
                 //field() = f;
                 setField(f);
                 field().debug();
 #ifdef KEXI_DEBUG_GUI
-                KexiUtils::addAlterTableActionDebug(
+                Utils::addAlterTableActionDebug(
                     QString("** Property-set actions moved to field definition itself:\n") + field().debugString(), 0);
 #endif
             } else {
 #ifdef KEXI_DEBUG_GUI
-                KexiUtils::addAlterTableActionDebug(
+                Utils::addAlterTableActionDebug(
                     QString("** Failed to set properties for field ") + field().debugString(), 0);
 #endif
-                KexiDBWarn << "AlterTableHandler::InsertFieldAction::simplifyActions(): KexiDB::setFieldProperties() failed!" << endl;
+                KexiDBWarn << "AlterTableHandler::InsertFieldAction::simplifyActions(): Predicate::setFieldProperties() failed!" << endl;
                 delete f;
             }
         }
@@ -886,14 +886,14 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
 
 #ifdef KEXI_DEBUG_GUI
     if (args.simulate)
-        KexiUtils::addAlterTableActionDebug(dbg, 0);
+        Utils::addAlterTableActionDebug(dbg, 0);
 #endif
     dbg = QString("** Ordered, simplified actions (%1, was %2):")
           .arg(currentActionsCount).arg(allActionsCount);
     KexiDBDbg << dbg << endl;
 #ifdef KEXI_DEBUG_GUI
     if (args.simulate)
-        KexiUtils::addAlterTableActionDebug(dbg, 0);
+        Utils::addAlterTableActionDebug(dbg, 0);
 #endif
     for (int i = 0; i < allActionsCount; i++) {
         debugAction(actionsVector.at(i), 1, args.simulate, QString("%1: ").arg(i + 1), args.debugString);
@@ -1014,7 +1014,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
                 //this field should be renamed
                 sourceSQLString = d->conn->escapeIdentifier(renamedFieldName);
             } else if (!f->defaultValue().isNull()) {
-                //this field has a default value defined
+                //this Field.has a default value defined
 //! @todo support expressions (eg. TODAY()) as a default value
 //! @todo this field can be notNull or notEmpty - check whether the default is ok
 //!       (or do this checking also in the Table Designer?)
@@ -1022,11 +1022,11 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
             } else if (f->isNotNull()) {
                 //this field cannot be null
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KexiDB::emptyValueForType(f->type()));
+                                      f->type(), Predicate::emptyValueForType(f->type()));
             } else if (f->isNotEmpty()) {
                 //this field cannot be empty - use any nonempty value..., e.g. " " for text or 0 for number
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KexiDB::notEmptyValueForType(f->type()));
+                                      f->type(), Predicate::notEmptyValueForType(f->type()));
             }
 //! @todo support unique, validatationRule, unsigned flags...
 //! @todo check for foreignKey values...

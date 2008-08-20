@@ -6,9 +6,9 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <driver_p.h>
+#include <Driver_p.h>
 
-namespace KexiDB
+namespace Predicate
 {
 const char* DriverPrivate::kexiSQLKeywords[] = {
     "AND",

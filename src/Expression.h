@@ -20,18 +20,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_EXPRESSION_H
-#define KEXIDB_EXPRESSION_H
+#ifndef PREDICATE_EXPRESSION_H
+#define PREDICATE_EXPRESSION_H
 
-#include "field.h"
-#include "queryschema.h"
+#include "Field.h"
+#include "QuerySchema.h"
 
 #include <kdebug.h>
-#include "global.h"
+#include "Global.h"
 #include <QList>
 #include <QByteArray>
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! classes
@@ -49,10 +49,10 @@ namespace KexiDB
 #define KexiDBExpr_QueryParameter 11
 
 //! Custom tokens are not used in parser but used as extension in expression classes.
-//#define KEXIDB_CUSTOM_TOKEN 0x1000
+//#define PREDICATE_CUSTOM_TOKEN 0x1000
 
 //! \return class name of class \a c
-KEXI_DB_EXPORT QString exprClassName(int c);
+PREDICATE_EXPORT QString exprClassName(int c);
 
 class ParseInfo;
 class NArgExpr;
@@ -66,7 +66,7 @@ class QuerySchemaParameterValueListIterator;
 //class QuerySchemaParameterList;
 
 //! A base class for all expressions
-class KEXI_DB_EXPORT BaseExpr
+class PREDICATE_EXPORT BaseExpr
 {
 public:
     typedef QList<BaseExpr*> List;
@@ -141,7 +141,7 @@ protected:
 };
 
 //! A base class N-argument operation
-class KEXI_DB_EXPORT NArgExpr : public BaseExpr
+class PREDICATE_EXPORT NArgExpr : public BaseExpr
 {
 public:
     NArgExpr(int aClass, int token);
@@ -161,7 +161,7 @@ public:
 };
 
 //! An unary argument operation: + - NOT (or !) ~ "IS NULL" "IS NOT NULL"
-class KEXI_DB_EXPORT UnaryExpr : public BaseExpr
+class PREDICATE_EXPORT UnaryExpr : public BaseExpr
 {
 public:
     UnaryExpr(int token, BaseExpr *arg);
@@ -189,7 +189,7 @@ public:
     * e.g. "f1 f2" : token == 0
     * e.g. "f1 AS f2" : token == AS
 */
-class KEXI_DB_EXPORT BinaryExpr : public BaseExpr
+class PREDICATE_EXPORT BinaryExpr : public BaseExpr
 {
 public:
     BinaryExpr(int aClass, BaseExpr *left_expr, int token, BaseExpr *right_expr);
@@ -217,7 +217,7 @@ public:
 /*! String, integer, float constants also includes NULL value.
  token can be: IDENTIFIER, SQL_NULL, CHARACTER_STRING_LITERAL,
  INTEGER_CONST, REAL_CONST */
-class KEXI_DB_EXPORT ConstExpr : public BaseExpr
+class PREDICATE_EXPORT ConstExpr : public BaseExpr
 {
 public:
     ConstExpr(int token, const QVariant& val);
@@ -235,7 +235,7 @@ public:
 
 //! Query parameter used to getting user input of constant values.
 //! It contains a message that is displayed to the user.
-class KEXI_DB_EXPORT QueryParameterExpr : public ConstExpr
+class PREDICATE_EXPORT QueryParameterExpr : public ConstExpr
 {
 public:
     QueryParameterExpr(const QString& message);
@@ -262,7 +262,7 @@ protected:
 };
 
 //! Variables like <i>fieldname</i> or <i>tablename</i>.<i>fieldname</i>
-class KEXI_DB_EXPORT VariableExpr : public BaseExpr
+class PREDICATE_EXPORT VariableExpr : public BaseExpr
 {
 public:
     VariableExpr(const QString& _name);
@@ -306,7 +306,7 @@ public:
 //! - aggregation functions like SUM, COUNT, MAX, ...
 //! - builtin functions like CURRENT_TIME()
 //! - user defined functions
-class KEXI_DB_EXPORT FunctionExpr : public BaseExpr
+class PREDICATE_EXPORT FunctionExpr : public BaseExpr
 {
 public:
     FunctionExpr(const QString& _name, NArgExpr* args_ = 0);
@@ -327,6 +327,6 @@ public:
     NArgExpr* args;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

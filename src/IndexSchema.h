@@ -17,18 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_INDEX_H
-#define KEXIDB_INDEX_H
+#ifndef PREDICATE_INDEX_H
+#define PREDICATE_INDEX_H
 
 #include <QList>
 #include <QString>
 #include <QSet>
 
-#include "fieldlist.h"
-#include "schemadata.h"
-#include "relationship.h"
+#include "FieldList.h"
+#include "SchemaData.h"
+#include "Relationship.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -42,7 +42,7 @@ class Relationship;
   defines this index and additional properties like: whether index is unique
   or primary key (requires unique). Single-field index can be also auto generated.
 */
-class KEXI_DB_EXPORT IndexSchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT IndexSchema : public FieldList, public SchemaData
 {
 public:
     typedef QList<IndexSchema*> List;
@@ -100,9 +100,9 @@ public:
     }
 
     /*! Attaches relationship definition \a rel to this IndexSchema object.
-     If \a rel relationship has this IndexSchema defined at the master-side,
+     If \a rel Relationship.has this IndexSchema defined at the master-side,
      \a rel is added to the list of master relationships (available with masterRelationships()).
-     If \a rel relationship has this IndexSchema defined at the details-side,
+     If \a rel Relationship.has this IndexSchema defined at the details-side,
      \a rel is added to the list of details relationships (available with detailsRelationships()).
      For the former case, attached \a rel object is now owned by this IndexSchema object.
 
@@ -123,7 +123,7 @@ public:
     /*! \return true if index is auto-generated.
       Auto-generated index is one-field index
       that was automatically generated
-      for CREATE TABLE statement when the field has
+      for CREATE TABLE statement when the Field.has
       UNIQUE or PRIMARY KEY constraint enabled.
 
       Any newly created IndexSchema object
@@ -209,6 +209,6 @@ bool m_isForeignKey : 1;
     friend class Relationship;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

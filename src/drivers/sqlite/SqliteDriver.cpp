@@ -17,30 +17,30 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <kexidb/connection.h>
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver_p.h>
-#include <kexidb/utils.h>
+#include <Predicate/Connection.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver_p.h>
+#include <Predicate/Utils.h>
 
 #include "sqlite.h"
-#include "sqlitedriver.h"
-#include "sqliteconnection.h"
-#include "sqliteconnection_p.h"
-#include "sqliteadmin.h"
+#include "sqliteDriver.h"
+#include "sqliteConnection.h"
+#include "SqliteConnection_p.h"
+#include "SqliteAdmin.h"
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 #ifdef SQLITE2
-KEXIDB_DRIVER_INFO(SQLiteDriver, sqlite2)
+PREDICATE_DRIVER_INFO(SQLiteDriver, sqlite2)
 #else
-KEXIDB_DRIVER_INFO(SQLiteDriver, sqlite3)
+PREDICATE_DRIVER_INFO(SQLiteDriver, sqlite3)
 #endif
 
 //! driver specific private data
 //! @internal
-class KexiDB::SQLiteDriverPrivate
+class Predicate::SQLiteDriverPrivate
 {
 public:
     SQLiteDriverPrivate() {
@@ -102,7 +102,7 @@ SQLiteDriver::~SQLiteDriver()
 }
 
 
-KexiDB::Connection*
+Predicate::Connection*
 SQLiteDriver::drv_createConnection(ConnectionData &conn_data)
 {
     return new SQLiteConnection(this, conn_data);
@@ -133,7 +133,7 @@ QByteArray SQLiteDriver::escapeString(const QByteArray& str) const
 
 QString SQLiteDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KexiDB::escapeBLOB(array, KexiDB::BLOBEscapeXHex);
+    return Predicate::escapeBLOB(array, Predicate::BLOBEscapeXHex);
 }
 
 QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const

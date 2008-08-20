@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "dbobjectnamevalidator.h"
+#include "DbObjectNameValidator.h"
 
-#include "driver.h"
+#include "Driver.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 using namespace KexiUtils;
 
 ObjectNameValidator::ObjectNameValidator(
-    KexiDB::Driver *drv, QObject * parent)
+    Predicate::Driver *drv, QObject * parent)
         : Validator(parent)
         , m_drv(drv)
 {
@@ -40,7 +40,7 @@ Validator::Result ObjectNameValidator::internalCheck(
     QString &message, QString &details)
 {
 
-    if (m_drv.isNull() ? !KexiDB::Driver::isKexiDBSystemObjectName(v.toString())
+    if (m_drv.isNull() ? !Predicate::Driver::isPredicateSystemObjectName(v.toString())
             : !m_drv->isSystemObjectName(v.toString()))
         return Validator::Ok;
     message = i18n("You cannot use name \"%1\" for your object.\n"

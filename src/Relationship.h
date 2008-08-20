@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef KEXIDB_RELATIONSHIP_H
-#define KEXIDB_RELATIONSHIP_H
+#ifndef PREDICATE_RELATIONSHIP_H
+#define PREDICATE_RELATIONSHIP_H
 
-#include <kexidb/field.h>
+#include "Field.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
-/*! KexiDB::Relationship provides information about one-to-many relationship between two tables.
+/*! Predicate::Relationship provides information about one-to-many relationship between two tables.
  Relationship is defined by a pair of (potentially multi-field) indices:
  - "one" or "master" side: unique key
  - "many" or "details" side: referenced foreign key
@@ -41,7 +41,7 @@ namespace KexiDB
  Note: some engines (e.g. MySQL with InnoDB) requires that indices at both sides
  have to be explicitly created.
 
- \todo (js) It is planned that this will be handled by KexiDB internally and transparently.
+ \todo (js) It is planned that this will be handled by Predicate internally and transparently.
 
  Each (of the two) key can be defined (just like index) as list of fields owned by one table.
  Indeed, relationship info can retrieved from Relationship object in two ways:
@@ -75,10 +75,10 @@ class IndexSchema;
 class TableSchema;
 class QuerySchema;
 
-class KEXI_DB_EXPORT Relationship
+class PREDICATE_EXPORT Relationship
 {
 public:
-    typedef KexiUtils::AutodeletedList<Relationship*> List;
+    typedef Utils::AutodeletedList<Relationship*> List;
     typedef QList<Relationship*>::ConstIterator ListIterator;
 
     /*! Creates uninitialized Relationship object.
@@ -160,6 +160,6 @@ bool m_detailsIndexOwned : 1;
     friend class IndexSchema;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

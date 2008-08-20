@@ -17,18 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_ALTER_H
-#define KEXIDB_ALTER_H
+#ifndef PREDICATE_ALTER_H
+#define PREDICATE_ALTER_H
 
-#include "connection.h"
+#include "Connection.h"
 
 #include <QList>
 #include <QHash>
 
 #include <KDebug>
-#include <kexiutils/utils.h>
+#include <kexiutils/Utils.h>
 
-namespace KexiDB
+namespace Predicate
 {
 class Connection;
 
@@ -108,7 +108,7 @@ class Connection;
 
  Actions for Alter
 */
-class KEXI_DB_EXPORT AlterTableHandler : public Object
+class PREDICATE_EXPORT AlterTableHandler : public Object
 {
 public:
     class ChangeFieldPropertyAction;
@@ -142,8 +142,8 @@ public:
 
     class ActionBase;
     //! For collecting actions related to a single field
-    typedef KexiUtils::AutodeletedHash<QByteArray, ActionBase*> ActionDict;
-    typedef KexiUtils::AutodeletedHash<int, ActionDict*> ActionDictDict; //!< for collecting groups of actions by field UID
+    typedef Utils::AutodeletedHash<QByteArray, ActionBase*> ActionDict;
+    typedef Utils::AutodeletedHash<int, ActionDict*> ActionDictDict; //!< for collecting groups of actions by field UID
     typedef QHash<QByteArray, ActionBase*>::ConstIterator ActionDictIterator;
     typedef QHash<int, ActionDict*>::ConstIterator ActionDictDictIterator;
     typedef QVector<ActionBase*> ActionsVector; //!< for collecting actions related to a single field
@@ -155,7 +155,7 @@ public:
     typedef QList<ActionBase*>::ConstIterator ActionListIterator;
 
     //! Abstract base class used for implementing all the AlterTable actions.
-    class KEXI_DB_EXPORT ActionBase
+    class PREDICATE_EXPORT ActionBase
     {
     public:
         ActionBase(bool null = false);
@@ -244,7 +244,7 @@ public:
     };
 
     //! Abstract base class used for implementing table field-related actions.
-    class KEXI_DB_EXPORT FieldActionBase : public ActionBase
+    class PREDICATE_EXPORT FieldActionBase : public ActionBase
     {
     public:
         FieldActionBase(const QString& fieldName, int uid);
@@ -290,7 +290,7 @@ public:
 
      More to come.
     */
-    class KEXI_DB_EXPORT ChangeFieldPropertyAction : public FieldActionBase
+    class PREDICATE_EXPORT ChangeFieldPropertyAction : public FieldActionBase
     {
     public:
         ChangeFieldPropertyAction(const QString& fieldName,
@@ -325,7 +325,7 @@ public:
     };
 
     //! Defines an action for removing a single table field.
-    class KEXI_DB_EXPORT RemoveFieldAction : public FieldActionBase
+    class PREDICATE_EXPORT RemoveFieldAction : public FieldActionBase
     {
     public:
         RemoveFieldAction(const QString& fieldName, int uid);
@@ -347,10 +347,10 @@ public:
     };
 
     //! Defines an action for inserting a single table field.
-    class KEXI_DB_EXPORT InsertFieldAction : public FieldActionBase
+    class PREDICATE_EXPORT InsertFieldAction : public FieldActionBase
     {
     public:
-        InsertFieldAction(int fieldIndex, KexiDB::Field *newField, int uid);
+        InsertFieldAction(int fieldIndex, Predicate::Field *newField, int uid);
         //copy ctor
         InsertFieldAction(const InsertFieldAction& action);
         InsertFieldAction(bool);
@@ -362,10 +362,10 @@ public:
         void setIndex(int index) {
             m_index = index;
         }
-        KexiDB::Field& field() const {
+        Predicate::Field& field() const {
             return *m_field;
         }
-        void setField(KexiDB::Field* field);
+        void setField(Predicate::Field* field);
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
 
         virtual void simplifyActions(ActionDictDict &fieldActions);
@@ -382,12 +382,12 @@ public:
         int m_index;
 
     private:
-        KexiDB::Field *m_field;
+        Predicate::Field *m_field;
     };
 
     /*! Defines an action for moving a single table field to a different
      position within table schema. */
-    class KEXI_DB_EXPORT MoveFieldPositionAction : public FieldActionBase
+    class PREDICATE_EXPORT MoveFieldPositionAction : public FieldActionBase
     {
     public:
         MoveFieldPositionAction(int fieldIndex, const QString& fieldName, int uid);
@@ -471,7 +471,7 @@ public:
      Implement this!
 
      Sets args.result to true on success, to false on failure or when the above requirements are not met
-     (then, you can get a detailed error message from KexiDB::Object).
+     (then, you can get a detailed error message from Predicate::Object).
      When the action has been cancelled (stopped), args.result is set to cancelled value.
      If args.debugString is not 0, it will be filled with debugging output.
      \return the new table schema object created as a result of schema altering.

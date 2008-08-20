@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "kexidb/queryschema.h"
-#include "kexidb/driver.h"
-#include "kexidb/connection.h"
-#include "kexidb/expression.h"
-#include "kexidb/parser/sqlparser.h"
-#include "utils.h"
-#include "lookupfieldschema.h"
+#include "QuerySchema.h"
+#include "Driver.h"
+#include "Connection.h"
+#include "Expression.h"
+#include "parser/sqlParser.h"
+#include "Utils.h"
+#include "LookupFieldSchema.h"
 
 #include <assert.h>
 
@@ -32,7 +32,7 @@
 #include <kdebug.h>
 #include <klocale.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 QueryColumnInfo::QueryColumnInfo(Field *f, const QByteArray& _alias, bool _visible,
                                  QueryColumnInfo *foreignColumn)
@@ -53,7 +53,7 @@ QString QueryColumnInfo::debugString() const
 }
 
 //=======================================
-namespace KexiDB
+namespace Predicate
 {
 //! @internal
 class QuerySchemaPrivate
@@ -555,7 +555,7 @@ QString OrderByColumnList::toSQLString(bool includeTableNames, Driver *drv, int 
 
 QuerySchema::QuerySchema()
         : FieldList(false)//fields are not owned by QuerySchema object
-        , SchemaData(KexiDB::QueryObjectType)
+        , SchemaData(Predicate::QueryObjectType)
         , d(new QuerySchemaPrivate(this))
 {
     init();
@@ -563,7 +563,7 @@ QuerySchema::QuerySchema()
 
 QuerySchema::QuerySchema(TableSchema& tableSchema)
         : FieldList(false)
-        , SchemaData(KexiDB::QueryObjectType)
+        , SchemaData(Predicate::QueryObjectType)
         , d(new QuerySchemaPrivate(this))
 {
     d->masterTable = &tableSchema;
@@ -598,7 +598,7 @@ QuerySchema::QuerySchema(const QuerySchema& querySchema)
         Field *copiedField;
         if (dynamic_cast<QueryAsterisk*>(f)) {
             copiedField = f->copy();
-            if (static_cast<const KexiDB::FieldList *>(f->m_parent) == &querySchema)
+            if (static_cast<const Predicate::FieldList *>(f->m_parent) == &querySchema)
                 copiedField->m_parent = this;
         } else
             copiedField = f;
@@ -613,7 +613,7 @@ QuerySchema::~QuerySchema()
 
 void QuerySchema::init()
 {
-    m_type = KexiDB::QueryObjectType;
+    m_type = Predicate::QueryObjectType;
 //m_fields_by_name.setAutoDelete( true ); //because we're using QueryColumnInfoEntry objects
 }
 
@@ -717,18 +717,18 @@ int QuerySchema::tableBoundToColumn(uint columnPosition) const
     return res;
 }
 
-KexiDB::FieldList& QuerySchema::addField(KexiDB::Field* field, bool visible)
+Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, bool visible)
 {
     return insertField(m_fields.count(), field, visible);
 }
 
-KexiDB::FieldList& QuerySchema::addField(KexiDB::Field* field, int bindToTable,
+Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, int bindToTable,
         bool visible)
 {
     return insertField(m_fields.count(), field, bindToTable, visible);
 }
 
-void QuerySchema::removeField(KexiDB::Field *field)
+void QuerySchema::removeField(Predicate::Field *field)
 {
     if (!field)
         return;
@@ -969,8 +969,8 @@ bool QuerySchema::contains(TableSchema *table) const
 Field* QuerySchema::findTableField(const QString &tableOrTableAndFieldName) const
 {
     QString tableName, fieldName;
-    if (!KexiDB::splitToTableAndFieldParts(tableOrTableAndFieldName,
-                                           tableName, fieldName, KexiDB::SetFieldNameIfNoTableName)) {
+    if (!Predicate::splitToTableAndFieldParts(tableOrTableAndFieldName,
+                                           tableName, fieldName, Predicate::SetFieldNameIfNoTableName)) {
         return 0;
     }
     if (tableName.isEmpty()) {
@@ -1654,7 +1654,7 @@ void QuerySchema::setWhereExpression(BaseExpr *expr)
     d->whereExpr = expr;
 }
 
-void QuerySchema::addToWhereExpression(KexiDB::Field *field, const QVariant& value, int relation)
+void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& value, int relation)
 {
     int token;
     if (value.isNull())
@@ -1687,7 +1687,7 @@ void QuerySchema::addToWhereExpression(KexiDB::Field *field, const QVariant& val
 }
 
 /*
-void QuerySchema::addToWhereExpression(KexiDB::Field *field, const QVariant& value)
+void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& value)
     switch (value.type()) {
     case Int: case UInt: case Bool: case LongLong: case ULongLong:
       token = INTEGER_CONST;

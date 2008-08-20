@@ -24,13 +24,13 @@
 //
 #ifndef PQXXPREPAREDSTATEMENT_H
 #define PQXXPREPAREDSTATEMENT_H
-#include <kexidb/preparedstatement.h>
-#include <kexidb/connection_p.h>
+#include <Predicate/PreparedStatement.h>
+#include <Predicate/connection_p.h>
 
 /**
   @author Adam Pigg <adam@piggz.co.uk>
 */
-namespace KexiDB
+namespace Predicate
 {
 class pqxxPreparedStatement : public PreparedStatement
 {

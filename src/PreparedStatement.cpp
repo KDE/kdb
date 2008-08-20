@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "preparedstatement.h"
-#include "connection.h"
+#include "PreparedStatement.h"
+#include "Connection.h"
 #include "connection_p.h"
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 PreparedStatement::PreparedStatement(StatementType type, ConnectionInternal& conn,
                                      FieldList& fields, const QStringList& where)

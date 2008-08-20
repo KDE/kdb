@@ -5,9 +5,9 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <sqlitedriver.h>
+#include <sqliteDriver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 const char* SQLiteDriver::keywords[] = {
     "ABORT",

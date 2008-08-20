@@ -32,15 +32,15 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "mysqldriver.h"
-#include "mysqlconnection.h"
-#include <kexidb/field.h>
-#include <kexidb/driver_p.h>
-#include <kexidb/utils.h>
+#include "mysqlDriver.h"
+#include "mysqlConnection.h"
+#include <Predicate/Field.h>
+#include <Predicate/Driver_p.h>
+#include <Predicate/Utils.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
-KEXIDB_DRIVER_INFO(MySqlDriver, mysql)
+PREDICATE_DRIVER_INFO(MySqlDriver, mysql)
 
 /* TODO: Implement buffered/unbuffered, rather than buffer everything.
    Each MYSQL connection can only handle at most one unbuffered cursor,
@@ -49,7 +49,7 @@ KEXIDB_DRIVER_INFO(MySqlDriver, mysql)
 
 /*!
  * Constructor sets database features and
- * maps the types in KexiDB::Field::Type to the MySQL types.
+ * maps the types in Predicate::Field::Type to the MySQL types.
  *
  * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
  */
@@ -96,7 +96,7 @@ MySqlDriver::~MySqlDriver()
 {
 }
 
-KexiDB::Connection*
+Predicate::Connection*
 MySqlDriver::drv_createConnection(ConnectionData &conn_data)
 {
     return new MySqlConnection(this, conn_data);
@@ -173,7 +173,7 @@ QString MySqlDriver::escapeString(const QString& str) const
 
 QString MySqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KexiDB::escapeBLOB(array, KexiDB::BLOBEscape0xHex);
+    return Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex);
 }
 
 QByteArray MySqlDriver::escapeString(const QByteArray& str) const

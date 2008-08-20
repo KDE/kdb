@@ -19,11 +19,11 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "drivermanager.h"
-#include "drivermanager_p.h"
-#include "driver.h"
-#include "driver_p.h"
-#include "error.h"
+#include "DriverManager.h"
+#include "DriverManager_p.h"
+#include "Driver.h"
+#include "Driver_p.h"
+#include "Error.h"
 
 #include <klibloader.h>
 #include <kservicetypetrader.h>
@@ -39,7 +39,7 @@
 #undef KexiDBDbg
 #define KexiDBDbg if (0) kDebug()
 
-using namespace KexiDB;
+using namespace Predicate;
 
 DriverManagerInternal* DriverManagerInternal::s_self = 0L;
 
@@ -50,7 +50,7 @@ DriverManagerInternal::DriverManagerInternal() /* protected */
         , m_refCount(0)
         , lookupDriversNeeded(true)
 {
-    setObjectName("KexiDB::DriverManager");
+    setObjectName("Predicate::DriverManager");
     m_serverResultNum = 0;
 }
 
@@ -101,16 +101,16 @@ bool DriverManagerInternal::lookupDrivers()
     KService::List::ConstIterator it(tlist.constBegin());
     for (; it != tlist.constEnd(); ++it) {
         KService::Ptr ptr = (*it);
-        if (!ptr->property("Library").toString().startsWith("kexidb_")) {
+        if (!ptr->property("Library").toString().startsWith("predicate_")) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
             " X-KDE-Library == " << ptr->property("Library").toString()
-            << ": no \"kexidb_\" prefix -- skipped to avoid potential conflicts!" << endl;
+            << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!" << endl;
             continue;
         }
         QString srv_name = ptr->property("X-Kexi-DriverName").toString().toLower();
         if (srv_name.isEmpty()) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
-            " X-Kexi-DriverName must be set for KexiDB driver \""
+            " X-Kexi-DriverName must be set for Predicate driver \""
             << ptr->property("Name").toString() << "\" service!\n -- skipped!" << endl;
             continue;
         }
@@ -133,15 +133,15 @@ bool DriverManagerInternal::lookupDrivers()
             << srv_name << "' driver's version -- skipping it!" << endl;
             continue;
         }
-        if (major_ver != KexiDB::version().major || minor_ver != KexiDB::version().minor) {
+        if (major_ver != Predicate::version().major || minor_ver != Predicate::version().minor) {
             KexiDBWarn << QString("DriverManagerInternal::lookupDrivers(): '%1' driver"
-                                  " has version '%2' but required KexiDB driver version is '%3.%4'\n"
+                                  " has version '%2' but required Predicate driver version is '%3.%4'\n"
                                   " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
-            .arg(KexiDB::version().major).arg(KexiDB::version().minor) << endl;
-            possibleProblems += QString("\"%1\" database driver has version \"%2\" "
+            .arg(Predicate::version().major).arg(Predicate::version().minor) << endl;
+            possibleProblems += QString("\"%1\" database Driver.has version \"%2\" "
                                         "but required driver version is \"%3.%4\"")
                                 .arg(srv_name).arg(srv_ver_str)
-                                .arg(KexiDB::version().major).arg(KexiDB::version().minor);
+                                .arg(Predicate::version().major).arg(Predicate::version().minor);
             continue;
         }
 
@@ -169,7 +169,7 @@ bool DriverManagerInternal::lookupDrivers()
         }
         m_services.insert(srv_name, ptr);
         m_services_lcase.insert(srv_name,  ptr);
-        KexiDBDbg << "KexiDB::DriverManager::lookupDrivers(): registered driver: "
+        KexiDBDbg << "Predicate::DriverManager::lookupDrivers(): registered driver: "
         << ptr->name() << "(" << ptr->library() << ")" << endl;
     }
 
@@ -180,9 +180,9 @@ bool DriverManagerInternal::lookupDrivers()
     return true;
 }
 
-KexiDB::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
+Predicate::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
 {
-    KexiDB::Driver::Info i = m_driversInfo[name.toLower()];
+    Predicate::Driver::Info i = m_driversInfo[name.toLower()];
     if (!error() && i.name.isEmpty())
         setError(ERR_DRIVERMANAGER, i18n("Could not find database driver \"%1\".", name));
     return i;
@@ -211,7 +211,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
     QString srv_name = ptr->property("X-Kexi-DriverName").toString();
 
     KexiDBDbg << "KexiDBInterfaceManager::driver(): library: " << ptr->library() << endl;
-    drv = KService::createInstance<KexiDB::Driver>(ptr,
+    drv = KService::createInstance<Predicate::Driver>(ptr,
             this,
             QStringList(),
             &m_serverResultNum);
@@ -256,7 +256,7 @@ void DriverManagerInternal::decRefCount()
     m_refCount--;
     KexiDBDbg << "DriverManagerInternal::decRefCount(): " << m_refCount << endl;
 // if (m_refCount<1) {
-//  KexiDBDbg<<"KexiDB::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
+//  KexiDBDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
 //  s_self=0;
 //  deleteLater();
 // }
@@ -278,7 +278,7 @@ DriverManager::DriverManager()
         , Object()
         , d_int(DriverManagerInternal::self())
 {
-    setObjectName("KexiDB::DriverManager");
+    setObjectName("Predicate::DriverManager");
     d_int->incRefCount();
 // if ( !s_self )
 //  s_self = this;
@@ -306,10 +306,10 @@ DriverManager::~DriverManager()
     KexiDBDbg << "DriverManager::~DriverManager() ok" << endl;
 }
 
-const KexiDB::Driver::InfoHash DriverManager::driversInfo()
+const Predicate::Driver::InfoHash DriverManager::driversInfo()
 {
     if (!d_int->lookupDrivers())
-        return KexiDB::Driver::InfoHash();
+        return Predicate::Driver::InfoHash();
 
     if (!d_int->m_driversInfo.isEmpty())
         return d_int->m_driversInfo;
@@ -340,10 +340,10 @@ const QStringList DriverManager::driverNames()
     return d_int->m_services.keys();
 }
 
-KexiDB::Driver::Info DriverManager::driverInfo(const QString &name)
+Predicate::Driver::Info DriverManager::driverInfo(const QString &name)
 {
     driversInfo();
-    KexiDB::Driver::Info i = d_int->driverInfo(name);
+    Predicate::Driver::Info i = d_int->driverInfo(name);
     if (d_int->error())
         setError(d_int);
     return i;

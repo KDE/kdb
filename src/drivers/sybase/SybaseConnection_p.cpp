@@ -25,9 +25,9 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <KDebug>
 #include <KTemporaryFile>
 
-#include "sybaseconnection_p.h"
+#include "SybaseConnection_p.h"
 
-#include <kexidb/connectiondata.h>
+#include <Predicate/ConnectionData.h>
 
 #ifdef SYBASEMIGRATE_H
 #define NAMESPACE KexiMigration
@@ -55,7 +55,7 @@ int connectionMessageHandler(DBPROCESS* dbproc, DBINT msgno, int msgstate, int s
 }
 
 /* ************************************************************************** */
-SybaseConnectionInternal::SybaseConnectionInternal(KexiDB::Connection* connection)
+SybaseConnectionInternal::SybaseConnectionInternal(Predicate::Connection* connection)
         : ConnectionInternal(connection)
         , dbProcess(0)
         , res(0)
@@ -101,7 +101,7 @@ void SybaseConnectionInternal::messageHandler(DBINT msgno, int msgstate, int sev
  */
 //bool SybaseConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool SybaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
+bool SybaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 {
     if (dbinit() == FAIL)
         return false;
@@ -120,7 +120,7 @@ bool SybaseConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
     }
 
 
-    // set error handlers
+    // set Error.handlers
     // set message handlers
 
     LOGINREC* login;
@@ -262,7 +262,7 @@ bool SybaseConnectionInternal::executeSQL(const QString& statement)
         return true;
     }
 
-    // error handling
+    // Error.handling
 
     storeResult();
     return false;
@@ -277,7 +277,7 @@ QString SybaseConnectionInternal::escapeIdentifier(const QString& str) const
 
 //--------------------------------------
 
-SybaseCursorData::SybaseCursorData(KexiDB::Connection* connection)
+SybaseCursorData::SybaseCursorData(Predicate::Connection* connection)
         : SybaseConnectionInternal(connection)
         , numRows(0)
 {

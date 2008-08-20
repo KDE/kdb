@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "dbproperties.h"
+#include "DbProperties.h"
 #include <klocale.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 DatabaseProperties::DatabaseProperties(Connection *conn)
-        : KexiDB::Object()
+        : Predicate::Object()
         , m_conn(conn)
 {
 }

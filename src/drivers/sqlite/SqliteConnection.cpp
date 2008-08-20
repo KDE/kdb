@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "sqliteconnection.h"
-#include "sqliteconnection_p.h"
-#include "sqlitecursor.h"
-#include "sqlitepreparedstatement.h"
+#include "sqliteConnection.h"
+#include "SqliteConnection_p.h"
+#include "sqliteCursor.h"
+#include "SqlitePreparedStatement.h"
 
 #include "sqlite.h"
 
@@ -28,10 +28,10 @@
 # include "kexisql.h" //for isReadOnly()
 #endif
 
-#include <kexidb/driver.h>
-#include <kexidb/cursor.h>
-#include <kexidb/error.h>
-#include <kexiutils/utils.h>
+#include <Predicate/Driver.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Error.h>
+#include <kexiutils/Utils.h>
 
 #include <qfile.h>
 #include <qdir.h>
@@ -44,7 +44,7 @@
 #undef KexiDBDrvDbg
 #define KexiDBDrvDbg if (0) kDebug()
 
-using namespace KexiDB;
+using namespace Predicate;
 
 SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
         : ConnectionInternal(connection)
@@ -99,7 +99,7 @@ SQLiteConnection::~SQLiteConnection()
     KexiDBDrvDbg << "SQLiteConnection::~SQLiteConnection() ok" << endl;
 }
 
-bool SQLiteConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
     KexiDBDrvDbg << "SQLiteConnection::connect()" << endl;
     version.string = QString(SQLITE_VERSION); //defined in sqlite3.h
@@ -134,7 +134,7 @@ bool SQLiteConnection::drv_containsTable(const QString &tableName)
 
 bool SQLiteConnection::drv_getTablesList(QStringList &list)
 {
-    KexiDB::Cursor *cursor;
+    Predicate::Cursor *cursor;
     m_sql = "select lower(name) from sqlite_master where type='table'";
     if (!(cursor = executeQuery(m_sql))) {
         KexiDBWarn << "Connection::drv_getTablesList(): !executeQuery()" << endl;
@@ -291,7 +291,7 @@ bool SQLiteConnection::drv_executeSQL(const QString& statement)
 #endif
 
 #ifdef KEXI_DEBUG_GUI
-    KexiUtils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement);
+    Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement);
 #endif
 
     d->res = sqlite_exec(
@@ -302,7 +302,7 @@ bool SQLiteConnection::drv_executeSQL(const QString& statement)
                  &d->errmsg_p);
     d->storeResult();
 #ifdef KEXI_DEBUG_GUI
-    KexiUtils::addKexiDBDebug(d->res == SQLITE_OK ? "  Success" : "  Failure");
+    Utils::addKexiDBDebug(d->res == SQLITE_OK ? "  Success" : "  Failure");
 #endif
     return d->res == SQLITE_OK;
 }

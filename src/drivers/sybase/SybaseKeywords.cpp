@@ -2,9 +2,9 @@
 * Currently copied from Mysql
 * Keywords. Pending.
 */
-#include <sybasedriver.h>
+#include <sybaseDriver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 const char* SybaseDriver::keywords[] = {
     "ACTION",

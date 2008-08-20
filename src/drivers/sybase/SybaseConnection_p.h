@@ -17,12 +17,12 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SYBASECLIENT_P_H
-#define KEXIDB_SYBASECLIENT_P_H
+#ifndef PREDICATE_SYBASECLIENT_P_H
+#define PREDICATE_SYBASECLIENT_P_H
 
 #include <QMap>
 
-#include <kexidb/connection_p.h>
+#include <Predicate/connection_p.h>
 
 //#include <config.h>
 #include <sqlfront.h>
@@ -35,7 +35,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #define NAMESPACE KexiDB
 #endif
 
-namespace KexiDB
+namespace Predicate
 {
 class ConnectionData;
 }
@@ -46,17 +46,17 @@ namespace NAMESPACE
 //! Internal Sybase connection data.
 /*! Provides a low-level API for accessing Sybase databases, that can
     be shared by any module that needs direct access to the underlying
-    database.  Used by the KexiDB and KexiMigration drivers.
+    database.  Used by the Predicate and KexiMigration drivers.
  */
-class SybaseConnectionInternal : public KexiDB::ConnectionInternal
+class SybaseConnectionInternal : public Predicate::ConnectionInternal
 {
 
 public:
-    SybaseConnectionInternal(KexiDB::Connection* connection);
+    SybaseConnectionInternal(Predicate::Connection* connection);
     virtual ~SybaseConnectionInternal();
 
     //! Connects to a Sybase database
-    bool db_connect(const KexiDB::ConnectionData& data);
+    bool db_connect(const Predicate::ConnectionData& data);
 
     //! Disconnects from the database
     bool db_disconnect();
@@ -95,7 +95,7 @@ public:
 class SybaseCursorData : public SybaseConnectionInternal
 {
 public:
-    SybaseCursorData(KexiDB::Connection* connection);
+    SybaseCursorData(Predicate::Connection* connection);
     virtual ~SybaseCursorData();
 
     //unsigned long *lengths;

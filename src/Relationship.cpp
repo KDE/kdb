@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "relationship.h"
-#include "indexschema.h"
-#include "tableschema.h"
-#include "queryschema.h"
-#include "driver.h"
+#include "Relationship.h"
+#include "IndexSchema.h"
+#include "TableSchema.h"
+#include "QuerySchema.h"
+#include "Driver.h"
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 Relationship::Relationship()
         : m_masterIndex(0)

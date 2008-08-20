@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "sqlitecursor.h"
+#include "sqliteCursor.h"
 
-#include "sqliteconnection.h"
-#include "sqliteconnection_p.h"
+#include "sqliteConnection.h"
+#include "SqliteConnection_p.h"
 
-#include <kexidb/error.h>
-#include <kexidb/driver.h>
-#include <kexiutils/utils.h>
+#include <Predicate/Error.h>
+#include <Predicate/Driver.h>
+#include <kexiutils/Utils.h>
 
 #include <assert.h>
 #include <string.h>
@@ -37,7 +37,7 @@
 #include <QDateTime>
 #include <QByteArray>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //! safer interpretations of boolean values for SQLite
 static bool sqliteStringToBool(const QString& s)
@@ -47,7 +47,7 @@ static bool sqliteStringToBool(const QString& s)
 
 //----------------------------------------------------
 
-class KexiDB::SQLiteCursorData : public SQLiteConnectionInternal
+class Predicate::SQLiteCursorData : public SQLiteConnectionInternal
 {
 public:
     SQLiteCursorData(Connection* conn)
@@ -143,7 +143,7 @@ public:
                     return QDate::fromString(GET_sqlite3_column_text, Qt::ISODate);
                 case Field::Time:
                     //QDateTime - a hack needed because QVariant(QTime) has broken isNull()
-                    return KexiUtils::stringToHackedQTime(GET_sqlite3_column_text);
+                    return Utils::stringToHackedQTime(GET_sqlite3_column_text);
                 case Field::DateTime: {
                     QString tmp(GET_sqlite3_column_text);
                     tmp[10] = 'T'; //for ISODate compatibility
@@ -482,7 +482,7 @@ bool SQLiteCursor::drv_storeCurrentRow(RecordData &data) const
                 break;
             case Field::Time:
                 //QDateTime - a hack needed because QVariant(QTime) has broken isNull()
-                data[i] = KexiUtils::stringToHackedQTime(QString::fromLatin1(*col));
+                data[i] = Utils::stringToHackedQTime(QString::fromLatin1(*col));
                 break;
             case Field::DateTime: {
                 QString tmp(QString::fromLatin1(*col));
@@ -509,8 +509,8 @@ QVariant SQLiteCursor::value(uint i)
     if (i > (m_fieldCount - 1)) //range checking
         return QVariant();
 //TODO: allow disable range checking! - performance reasons
-// const KexiDB::Field *f = m_query ? m_query->field(i) : 0;
-    KexiDB::Field *f = (m_fieldsExpanded && i < (uint)m_fieldsExpanded->count())
+// const Predicate::Field *f = m_query ? m_query->field(i) : 0;
+    Predicate::Field *f = (m_fieldsExpanded && i < (uint)m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(i)->field : 0;
 #ifdef SQLITE2
     //from most to least frequently used types:

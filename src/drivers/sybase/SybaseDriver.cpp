@@ -23,19 +23,19 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "sybasedriver.h"
-#include "sybaseconnection.h"
-#include <kexidb/field.h>
-#include <kexidb/driver_p.h>
-#include <kexidb/utils.h>
+#include "sybaseDriver.h"
+#include "sybaseConnection.h"
+#include <Predicate/Field.h>
+#include <Predicate/Driver_p.h>
+#include <Predicate/Utils.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
-KEXIDB_DRIVER_INFO(SybaseDriver, sybase)
+PREDICATE_DRIVER_INFO(SybaseDriver, sybase)
 
 /*!
  * Constructor sets database features and
- * maps the types in KexiDB::Field::Type to the Sybase types.
+ * maps the types in Predicate::Field::Type to the Sybase types.
  *
  */
 SybaseDriver::SybaseDriver(QObject *parent, const QStringList &args) :
@@ -106,7 +106,7 @@ SybaseDriver::~SybaseDriver()
 {
 }
 
-KexiDB::Connection*
+Predicate::Connection*
 SybaseDriver::drv_createConnection(ConnectionData &conn_data)
 {
     return new SybaseConnection(this, conn_data);
@@ -146,7 +146,7 @@ QString SybaseDriver::escapeString(const QString& str) const
 
 QString SybaseDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KexiDB::escapeBLOB(array, KexiDB::BLOBEscape0xHex);
+    return Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex);
 }
 
 QByteArray SybaseDriver::escapeString(const QByteArray& str) const

@@ -17,18 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "mysqlpreparedstatement.h"
+#include "MysqlPreparedStatement.h"
 #include <kdebug.h>
 #include <errmsg.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
 MySqlPreparedStatement::MySqlPreparedStatement(StatementType type, ConnectionInternal& conn,
         FieldList& fields)
-        : KexiDB::PreparedStatement(type, conn, fields)
+        : Predicate::PreparedStatement(type, conn, fields)
         , MySqlConnectionInternal(conn.connection)
 #ifdef KEXI_USE_MYSQL_STMT
         , m_statement(0)
@@ -39,7 +39,7 @@ MySqlPreparedStatement::MySqlPreparedStatement(StatementType type, ConnectionInt
 // KexiDBDrvDbg << "MySqlPreparedStatement: Construction" << endl;
 
     mysql_owned = false;
-    mysql = dynamic_cast<KexiDB::MySqlConnectionInternal&>(conn).mysql; //copy
+    mysql = dynamic_cast<Predicate::MySqlConnectionInternal&>(conn).mysql; //copy
     m_tempStatementString = generateStatementString();
 
     if (!init())
@@ -109,7 +109,7 @@ bool MySqlPreparedStatement::execute()
         return false;
     if (mysql_stmt_errno(m_statement) == CR_SERVER_LOST) {
         //sanity: connection lost: reconnect
-//! @todo KexiDB::Connection should be reconnected as well!
+//! @todo Predicate::Connection should be reconnected as well!
         done();
         if (!init()) {
             done();
@@ -144,7 +144,7 @@ bool MySqlPreparedStatement::execute()
     Field::ListIterator itFields(fieldList->constBegin());
     for (QList<QVariant>::ConstIterator it(m_args.constBegin());
             itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, arg++) {
-        KexiDB::Field *field = *itFields;
+        Predicate::Field *field = *itFields;
         if (it == m_args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
             BIND_NULL;
             continue;
@@ -160,18 +160,18 @@ bool MySqlPreparedStatement::execute()
             m_mysqlBind[arg].length = &str_length;
         } else {
             switch (field->type()) {
-            case KexiDB::Field::Byte:
-            case KexiDB::Field::ShortInteger:
-            case KexiDB::Field::Integer: {
+            case Predicate::Field::Byte:
+            case Predicate::Field::ShortInteger:
+            case Predicate::Field::Integer: {
                 //! @todo what about unsigned > INT_MAX ?
                 bool ok;
                 const int value = (*it).toInt(&ok);
                 if (ok) {
-                    if (field->type() == KexiDB::Field::Byte)
+                    if (field->type() == Predicate::Field::Byte)
                         m_mysqlBind[arg].buffer_type = MYSQL_TYPE_TINY;
-                    else if (field->type() == KexiDB::Field::ShortInteger)
+                    else if (field->type() == Predicate::Field::ShortInteger)
                         m_mysqlBind[arg].buffer_type = MYSQL_TYPE_SHORT;
-                    else if (field->type() == KexiDB::Field::Integer)
+                    else if (field->type() == Predicate::Field::Integer)
                         m_mysqlBind[arg].buffer_type = MYSQL_TYPE_LONG;
 
                     m_mysqlBind[arg].is_null = (my_bool*)0;
@@ -186,15 +186,15 @@ bool MySqlPreparedStatement::execute()
                     BIND_NULL;
                 break;
             }
-            case KexiDB::Field::Float:
-            case KexiDB::Field::Double:
+            case Predicate::Field::Float:
+            case Predicate::Field::Double:
                 res = sqlite3_bind_double(prepared_st_handle, arg, (*it).toDouble());
                 if (SQLITE_OK != res) {
                     //! @todo msg?
                     return false;
                 }
                 break;
-            case KexiDB::Field::BigInteger: {
+            case Predicate::Field::BigInteger: {
                 //! @todo what about unsigned > LLONG_MAX ?
                 bool ok;
                 qint64 value = (*it).toLongLong(&ok);
@@ -213,7 +213,7 @@ bool MySqlPreparedStatement::execute()
                 }
                 break;
             }
-            case KexiDB::Field::Boolean:
+            case Predicate::Field::Boolean:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         QString::number((*it).toBool() ? 1 : 0).toLatin1(),
                                         1, SQLITE_TRANSIENT /*??*/);
@@ -222,7 +222,7 @@ bool MySqlPreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::Time:
+            case Predicate::Field::Time:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toTime().toString(Qt::ISODate).toLatin1(),
                                         sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -231,7 +231,7 @@ bool MySqlPreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::Date:
+            case Predicate::Field::Date:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toDate().toString(Qt::ISODate).toLatin1(),
                                         sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
@@ -240,7 +240,7 @@ bool MySqlPreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::DateTime:
+            case Predicate::Field::DateTime:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toDateTime().toString(Qt::ISODate).toLatin1(),
                                         sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -249,7 +249,7 @@ bool MySqlPreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::BLOB: {
+            case Predicate::Field::BLOB: {
                 const QByteArray byteArray((*it).toByteArray());
                 res = sqlite3_bind_blob(prepared_st_handle, arg,
                                         (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);

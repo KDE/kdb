@@ -22,13 +22,13 @@
 
 #include <qstringlist.h>
 
-#include <kexidb/connection.h>
-#include "pqxxcursor.h"
+#include <Predicate/Connection.h>
+#include "pqxxCursor.h"
 
 
 
 
-namespace KexiDB
+namespace Predicate
 {
 
 class pqxxSqlConnectionInternal;
@@ -61,7 +61,7 @@ protected:
     pqxxSqlConnection(Driver *driver, ConnectionData &conn_data);
 
     virtual bool drv_isDatabaseUsed() const;
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList &list);
     virtual bool drv_createDatabase(const QString &dbName = QString());

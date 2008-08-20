@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "transaction.h"
-#include "connection.h"
+#include "Transaction.h"
+#include "Connection.h"
 
 #include <kdebug.h>
 
@@ -28,16 +28,16 @@
 #undef KexiDBDbg
 #define KexiDBDbg if (0) kDebug()
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //helper for debugging
-KEXI_DB_EXPORT int Transaction::globalcount = 0;
-KEXI_DB_EXPORT int Transaction::globalCount()
+PREDICATE_EXPORT int Transaction::globalcount = 0;
+PREDICATE_EXPORT int Transaction::globalCount()
 {
     return Transaction::globalcount;
 }
-KEXI_DB_EXPORT int TransactionData::globalcount = 0;
-KEXI_DB_EXPORT int TransactionData::globalCount()
+PREDICATE_EXPORT int TransactionData::globalcount = 0;
+PREDICATE_EXPORT int TransactionData::globalCount()
 {
     return TransactionData::globalcount;
 }
@@ -67,14 +67,14 @@ Transaction::Transaction()
         : QObject(0)
         , m_data(0)
 {
-// setObjectName("kexidb_transaction");
+// setObjectName("predicate_transaction");
 }
 
 Transaction::Transaction(const Transaction& trans)
         : QObject(0)
         , m_data(trans.m_data)
 {
-// setObjectName("kexidb_transaction");
+// setObjectName("predicate_transaction");
     if (m_data) {
         m_data->refcount++;
         Transaction::globalcount++;

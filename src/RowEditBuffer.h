@@ -17,21 +17,21 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_ROWEDITBUFFER_H
-#define KEXIDB_ROWEDITBUFFER_H
+#ifndef PREDICATE_ROWEDITBUFFER_H
+#define PREDICATE_ROWEDITBUFFER_H
 
 #include <qmap.h>
 
-#include "field.h"
-#include "queryschema.h"
+#include "Field.h"
+#include "QuerySchema.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*!  @short provides data for single edited database row
-  KexiDB::RowEditBuffer provides data for single edited row,
+  Predicate::RowEditBuffer provides data for single edited row,
   needed to perform update at the database backend.
-  Its advantage over pasing e.g. KexiDB::FieldList object is that
+  Its advantage over pasing e.g. Predicate::FieldList object is that
   EditBuffer contains only changed values.
 
   EditBuffer offers two modes: db-aware and not-db-aware.
@@ -48,7 +48,7 @@ namespace KexiDB
   buf.at("surname"); //returns "Black"
   buf.at(query->field("surname")); //returns "Black" too
   // Now you can use buf to add or edit records using
-  // KexiDB::Connection::updateRow(), KexiDB::Connection::insertRow()
+  // Predicate::Connection::updateRow(), Predicate::Connection::insertRow()
   </code>
 
   Example usage of db-aware buffer:
@@ -62,7 +62,7 @@ namespace KexiDB
   buf.at(*ci1); //returns "Joe"
   buf.at(*ci2); //returns "Black"
   // Now you can use buf to add or edit records using
-  // KexiDB::Connection::updateRow(), KexiDB::Connection::insertRow()
+  // Predicate::Connection::updateRow(), Predicate::Connection::insertRow()
   </code>
 
   You can use QMap::clear() to clear buffer contents,
@@ -72,7 +72,7 @@ namespace KexiDB
   Notes: added fields should come from the same (common) QuerySchema object.
   However, this isn't checked at QValue& EditBuffer::operator[]( const Field& f ) level.
 */
-class KEXI_DB_EXPORT RowEditBuffer
+class PREDICATE_EXPORT RowEditBuffer
 {
 public:
     typedef QMap<QString, QVariant> SimpleMap;
@@ -140,6 +140,6 @@ protected:
     QMap<QueryColumnInfo*, bool>::ConstIterator *m_defaultValuesDbBufferIt;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

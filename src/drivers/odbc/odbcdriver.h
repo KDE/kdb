@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_ODBC_H
-#define KEXIDB_DRIVER_ODBC_H
+#ifndef PREDICATE_DRIVER_ODBC_H
+#define PREDICATE_DRIVER_ODBC_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -35,7 +35,7 @@ class Connection;
 class ODBCDriver : public Driver
 {
     Q_OBJECT
-    KEXIDB_DRIVER
+    PREDICATE_DRIVER
 
 public:
     ODBCDriver(QObject *parent, const char *name, const QStringList &args = QStringList());

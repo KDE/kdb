@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef _KEXIDB_GLOBAL_H_
-#define _KEXIDB_GLOBAL_H_
+#ifndef _PREDICATE_GLOBAL_H_
+#define _PREDICATE_GLOBAL_H_
 
 #ifndef WARNING
 #ifdef _MSC_VER

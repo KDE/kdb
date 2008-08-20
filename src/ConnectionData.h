@@ -17,16 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CONNECTION_DATA_H
-#define KEXIDB_CONNECTION_DATA_H
+#ifndef PREDICATE_CONNECTION_DATA_H
+#define PREDICATE_CONNECTION_DATA_H
 
-#include "kexidb_export.h"
+#include "predicate_export.h"
 
 #include <QObject>
 #include <QString>
 #include <QList>
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! ConnectionDataBase is a helper class for ConnectionData.  It
@@ -68,8 +68,8 @@ public:
 
     Name (unique, not i18n'd) of driver that is used (or should be used) to
     create a connection. If you pass this ConnectionData object to
-    KexiDB::Driver::createConnection() to create connection, the @a driverName member
-    will be updated with a valid KexiDB driver name.
+    Predicate::Driver::createConnection() to create connection, the @a driverName member
+    will be updated with a valid Predicate driver name.
     In other situations the @a driverName member may be used to store information what
     driver should be used to perform connection, before we get an appropriate
     driver object from DriverManager.
@@ -122,7 +122,7 @@ public:
 
     Can be empty string or null. If it is empty (equal to ""), empty password is passed
     to the driver. If it is empty, no password is passed to the driver.
-    In this case, applications using KexiDB should ask for the password. */
+    In this case, applications using Predicate should ask for the password. */
     QString password;
 
     /*!
@@ -167,7 +167,7 @@ protected:
 //! Database specific connection data, e.g. host, port.
 /*! Connection data, once configured, can be later stored for reuse.
 */
-class KEXI_DB_EXPORT ConnectionData : public QObject, public ConnectionDataBase
+class PREDICATE_EXPORT ConnectionData : public QObject, public ConnectionDataBase
 {
 public:
     typedef QList<ConnectionData*> List;
@@ -248,6 +248,6 @@ protected:
     friend class Connection;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

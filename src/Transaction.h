@@ -17,23 +17,23 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_TRANSACTION_H
-#define KEXIDB_TRANSACTION_H
+#ifndef PREDICATE_TRANSACTION_H
+#define PREDICATE_TRANSACTION_H
 
 #include <qpointer.h>
 
-#include "kexidb_export.h"
+#include "predicate_export.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
 
-/*! Internal prototype for storing transaction handles for Transaction object.
+/*! Internal prototype for storing Transaction.handles for Transaction object.
  Only for driver developers: reimplement this class for driver that
- support transaction handles.
+ support Transaction.handles.
 */
-class KEXI_DB_EXPORT TransactionData
+class PREDICATE_EXPORT TransactionData
 {
 public:
     TransactionData(Connection *conn);
@@ -49,7 +49,7 @@ bool m_active : 1;
     uint refcount;
 };
 
-//! This class encapsulates transaction handle.
+//! This class encapsulates Transaction.handle.
 /*! Transaction handle is sql driver-dependent,
   but outside Transaction is visible as universal container
   for any handler implementation.
@@ -57,7 +57,7 @@ bool m_active : 1;
   Transaction object is value-based, internal data (handle) structure,
   reference-counted.
 */
-class KEXI_DB_EXPORT Transaction : public QObject
+class PREDICATE_EXPORT Transaction : public QObject
 {
 public:
     /*! Constructs uninitialised (null) transaction.
@@ -117,11 +117,11 @@ protected:
   }
   </code>
 */
-class KEXI_DB_EXPORT TransactionGuard
+class PREDICATE_EXPORT TransactionGuard
 {
 public:
     /*! Constructor #1: Starts new transaction constructor for \a connection.
-     Started transaction handle is available via transaction().*/
+     Started Transaction.handle is available via transaction().*/
     TransactionGuard(Connection& conn);
 
     /*! Constructor #2: Uses already started transaction. */
@@ -157,7 +157,7 @@ protected:
 bool m_doNothing : 1;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif
 

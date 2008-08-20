@@ -24,15 +24,15 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "sybasedriver.h"
-#include "sybaseconnection.h"
-#include "sybaseconnection_p.h"
-#include "sybasecursor.h"
-#include "sybasepreparedstatement.h"
-#include <kexidb/error.h>
+#include "sybaseDriver.h"
+#include "sybaseConnection.h"
+#include "SybaseConnection_p.h"
+#include "sybaseCursor.h"
+#include "SybasePreparedStatement.h"
+#include <Predicate/Error.h>
 
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //--------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ SybaseConnection::~SybaseConnection()
     destroy();
 }
 
-bool SybaseConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -190,7 +190,7 @@ PreparedStatement::Ptr SybaseConnection::prepareStatement(PreparedStatement::Sta
     return KSharedPtr<PreparedStatement>(new SybasePreparedStatement(type, *d, fields));
 }
 
-bool KexiDB::SybaseConnection::drv_beforeInsert(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList& fields)
 {
 
     if (fields.autoIncrementFields()->isEmpty())
@@ -201,7 +201,7 @@ bool KexiDB::SybaseConnection::drv_beforeInsert(const QString& table, FieldList&
 
 }
 
-bool KexiDB::SybaseConnection::drv_afterInsert(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldList& fields)
 {
     // should we instead just set a flag when an identity_insert has taken place and only check for that
     // flag here ?
@@ -214,7 +214,7 @@ bool KexiDB::SybaseConnection::drv_afterInsert(const QString& table, FieldList& 
 
 }
 
-bool KexiDB::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList& fields)
 {
     if (fields.autoIncrementFields()->isEmpty())
         return true;
@@ -223,7 +223,7 @@ bool KexiDB::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList&
     return drv_executeSQL(QString("SET IDENTITY_UPDATE %1 ON").arg(escapeIdentifier(table)));
 }
 
-bool KexiDB::SybaseConnection::drv_afterUpdate(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldList& fields)
 {
     // should we instead just set a flag when an identity_update has taken place and only check for that
     // flag here ?

@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "fieldvalidator.h"
-#include "field.h"
+#include "FieldValidator.h"
+#include "Field.h"
 
 #include <kexiutils/longlongvalidator.h>
 #include <knumvalidator.h>
 #include <qwidget.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 FieldValidator::FieldValidator(const Field &field, QWidget * parent)
-        : KexiUtils::MultiValidator(parent)
+        : Utils::MultiValidator(parent)
 {
 //! @todo merge this code with KexiTableEdit code!
 //! @todo set maximum length validator
@@ -48,7 +48,7 @@ FieldValidator::FieldValidator(const Field &field, QWidget * parent)
             top = u ? 0xffffffff : 0x7fffffff;
         } else if (t == Field::BigInteger) {
 //! @todo handle unsigned (using ULongLongValidator)
-            validator = new KexiUtils::LongLongValidator(0);
+            validator = new Utils::LongLongValidator(0);
         }
 
         if (!validator)

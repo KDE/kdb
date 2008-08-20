@@ -20,16 +20,16 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef SYBASEDB_H
 #define SYBASEDB_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! Sybase database driver.
 class SybaseDriver : public Driver
 {
     Q_OBJECT
-    KEXIDB_DRIVER
+    PREDICATE_DRIVER
 
 public:
     SybaseDriver(QObject *parent, const QStringList &args = QStringList());

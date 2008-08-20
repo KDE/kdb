@@ -19,11 +19,11 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "field.h"
-#include "connection.h"
-#include "driver.h"
-#include "expression.h"
-#include "utils.h"
+#include "Field.h"
+#include "Connection.h"
+#include "Driver.h"
+#include "Expression.h"
+#include "Utils.h"
 
 // we use here i18n() but this depends on kde libs: TODO: add #ifdefs
 #include <kdebug.h>
@@ -33,9 +33,9 @@
 
 #include <assert.h>
 
-#include "kexidb_global.h"
+#include "predicate_Global.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 Field::FieldTypeNames Field::m_typeNames;
 Field::FieldTypeGroupNames Field::m_typeGroupNames;
@@ -336,7 +336,7 @@ Field::setType(Type t)
 {
     if (m_expr) {
         KexiDBWarn << QString("Field::setType(%1)").arg(t)
-        << " could not set type because the field has expression assigned!" << endl;
+        << " could not set type because the Field.has expression assigned!" << endl;
         return;
     }
     m_type = t;
@@ -385,7 +385,7 @@ Field::setScale(uint s)
 void
 Field::setVisibleDecimalPlaces(int p)
 {
-    if (!KexiDB::supportsVisibleDecimalPlacesProperty(type()))
+    if (!Predicate::supportsVisibleDecimalPlacesProperty(type()))
         return;
     m_visibleDecimalPlaces = p < 0 ? -1 : p;
 }
@@ -600,7 +600,7 @@ void Field::setIndexed(bool s)
 
 QString Field::debugString() const
 {
-    KexiDB::Connection *conn = table() ? table()->connection() : 0;
+    Predicate::Connection *conn = table() ? table()->connection() : 0;
     QString dbg = (m_name.isEmpty() ? "<NONAME> " : m_name + " ");
     if (m_options & Field::Unsigned)
         dbg += " UNSIGNED ";
@@ -625,7 +625,7 @@ QString Field::debugString() const
     if (m_constraints & Field::NotEmpty)
         dbg += " NOTEMPTY";
     if (!m_defaultValue.isNull())
-        dbg += QString(" DEFAULT=[%1]").arg(m_defaultValue.typeName()) + KexiDB::variantToString(m_defaultValue);
+        dbg += QString(" DEFAULT=[%1]").arg(m_defaultValue.typeName()) + Predicate::variantToString(m_defaultValue);
     if (m_expr)
         dbg += " EXPRESSION=" + m_expr->debugString();
     if (m_customProperties && !m_customProperties->isEmpty()) {
@@ -649,7 +649,7 @@ void Field::debug()
     KexiDBDbg << debugString() << endl;
 }
 
-void Field::setExpression(KexiDB::BaseExpr *expr)
+void Field::setExpression(Predicate::BaseExpr *expr)
 {
     assert(!m_parent || dynamic_cast<QuerySchema*>(m_parent));
     if (m_expr == expr)

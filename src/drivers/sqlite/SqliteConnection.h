@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CONN_SQLITE_H
-#define KEXIDB_CONN_SQLITE_H
+#ifndef PREDICATE_CONN_SQLITE_H
+#define PREDICATE_CONN_SQLITE_H
 
 #include <qstringlist.h>
 
-#include <kexidb/connection.h>
+#include <Predicate/Connection.h>
 
 /*!
  */
 
-namespace KexiDB
+namespace Predicate
 {
 
 class SQLiteConnectionInternal;
@@ -55,7 +55,7 @@ protected:
     /*! Used by driver */
     SQLiteConnection(Driver *driver, ConnectionData &conn_data);
 
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList &list);
 
@@ -84,7 +84,7 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString());
 
-    //virtual bool drv_createTable( const KexiDB::Table& table );
+    //virtual bool drv_createTable( const Predicate::Table& table );
 
     virtual bool drv_executeSQL(const QString& statement);
 //  virtual bool drv_executeQuery( const QString& statement );

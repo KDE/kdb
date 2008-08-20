@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_P_H
-#define KEXIDB_DRIVER_P_H
+#ifndef PREDICATE_DRIVER_P_H
+#define PREDICATE_DRIVER_P_H
 
 #ifndef __PREDICATE__
 # error "Do not include: this is Predicate internal file"
@@ -33,13 +33,13 @@
 
 #include <KGenericFactory>
 
-#include "connection.h"
+#include "Connection.h"
 #include "admin.h"
-#include <kexiutils/utils.h>
+#include <kexiutils/Utils.h>
 
 class KService;
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! Detailed definition of driver's default behaviour.
@@ -47,7 +47,7 @@ namespace KexiDB
  Change these defaults in you Driver subclass
  constructor, if needed.
 */
-class KEXI_DB_EXPORT DriverBehaviour
+class PREDICATE_EXPORT DriverBehaviour
 {
 public:
     DriverBehaviour();
@@ -67,7 +67,7 @@ public:
     //! pgsql defines it as "SERIAL", sqlite defines it as "INTEGER"
     QString AUTO_INCREMENT_TYPE;
 
-    /*! True if autoincrement field has special definition
+    /*! True if autoincrement Field.has special definition
      e.g. like "INTEGER PRIMARY KEY" for SQLite.
      Special definition string should be stored in AUTO_INCREMENT_FIELD_OPTION.
      False by default. */
@@ -91,7 +91,7 @@ bool AUTO_INCREMENT_REQUIRES_PK : 1;
      not an implicit (internal) row number. Default value is false.
 
      Examples:
-     - PostgreSQL and SQLite engines have this flag set to false ('OID' field has
+     - PostgreSQL and SQLite engines have this flag set to false ('OID' Field.has
         it's own implicit value)
      - MySQL engine has this flag set to true (LAST_INSERT_ID() returns real value
      of last autoincremented field).
@@ -207,7 +207,7 @@ bool isDBOpenedAfterCreate : 1;
       need to be escaped before sending to the DB-backend which will have
       it's own parser.
     */
-    KexiUtils::StaticSetOfStrings driverSpecificSQLKeywords;
+    Utils::StaticSetOfStrings driverSpecificSQLKeywords;
 
     /*! Kexi SQL keywords that need to be escaped if used as an identifier (e.g.
     for a table or column name).  These keywords will be escaped by the
@@ -229,7 +229,7 @@ protected:
 #define BLOB_ESCAPING_TYPE_USE_0x    1 //!< escaping like 0xabcd0, used by mysql
 #define BLOB_ESCAPING_TYPE_USE_OCTAL 2 //!< escaping like 'abcd\\000', used by pgsql
 
-class KEXI_DB_EXPORT AdminTools::Private
+class PREDICATE_EXPORT AdminTools::Private
 {
 public:
     Private();
@@ -240,8 +240,8 @@ public:
 
 //! Driver's static version information (implementation),
 //! with KLibFactory symbol declaration.
-#define KEXIDB_DRIVER_INFO( class_name, internal_name ) \
-    DatabaseVersionInfo class_name::version() const { return KEXIDB_VERSION; } \
-    K_EXPORT_COMPONENT_FACTORY(kexidb_ ## internal_name ## driver, KGenericFactory<KexiDB::class_name>( "kexidb_" #internal_name ))
+#define PREDICATE_DRIVER_INFO( class_name, internal_name ) \
+    DatabaseVersionInfo class_name::version() const { return PREDICATE_VERSION; } \
+    K_EXPORT_COMPONENT_FACTORY(kexidb_ ## internal_name ## driver, KGenericFactory<Predicate::class_name>( "predicate_" #internal_name ))
 
 #endif

@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_XBASECLIENT_P_H
-#define KEXIDB_XBASECLIENT_P_H
+#ifndef PREDICATE_XBASECLIENT_P_H
+#define PREDICATE_XBASECLIENT_P_H
 
 #include <QPointer>
 
-#include <kexidb/connection_p.h>
+#include <Predicate/connection_p.h>
 
 #ifdef XBASEMIGRATE_H
 #define NAMESPACE KexiMigration
@@ -30,7 +30,7 @@
 #define NAMESPACE KexiDB
 #endif
 
-namespace KexiDB {
+namespace Predicate {
 class ConnectionData;
 }
 
@@ -39,19 +39,19 @@ namespace NAMESPACE {
 //! Internal xBase connection data.
 /*! Provides a low-level API for accessing xBase databases, that can
 be shared by any module that needs direct access to the underlying
-database.  Used by the KexiDB drivers.
+database.  Used by the Predicate drivers.
 */
-class xBaseConnectionInternal : public KexiDB::ConnectionInternal
+class xBaseConnectionInternal : public Predicate::ConnectionInternal
 {
   public:
-    xBaseConnectionInternal(KexiDB::Connection* connection, KexiDB::Driver* internalDriver);
+    xBaseConnectionInternal(Predicate::Connection* connection, Predicate::Driver* internalDriver);
     virtual ~xBaseConnectionInternal();
 
     //! Connects to a xBase database
-    bool db_connect(const KexiDB::ConnectionData& data);
+    bool db_connect(const Predicate::ConnectionData& data);
 
     //! Disconnects from the database
-    bool db_disconnect(const KexiDB::ConnectionData& data);
+    bool db_disconnect(const Predicate::ConnectionData& data);
 
     //! Selects a database that is about to be used
     bool useDatabase(const QString &dbName = QString());
@@ -62,8 +62,8 @@ class xBaseConnectionInternal : public KexiDB::ConnectionInternal
     //! Stores last operation's result
     virtual void storeResult();
 
-    QPointer<KexiDB::Driver> internalDriver;
-    QPointer<KexiDB::Connection> internalConn;
+    QPointer<Predicate::Driver> internalDriver;
+    QPointer<Predicate::Connection> internalConn;
     QString tempDatabase;
 
     QHash<QString,QString> dbMap;

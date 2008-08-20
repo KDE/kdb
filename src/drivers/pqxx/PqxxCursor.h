@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CURSOR_PQXX_H
-#define KEXIDB_CURSOR_PQXX_H
+#ifndef PREDICATE_CURSOR_PQXX_H
+#define PREDICATE_CURSOR_PQXX_H
 
-#include <kexidb/cursor.h>
-#include <kexidb/connection.h>
-#include <kexidb/utils.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Connection.h>
+#include <Predicate/Utils.h>
 
 #if 0
 #include <pqxx/all.h>
@@ -33,7 +33,7 @@
 #include <pqxx/binarystring>
 #include <migration/pqxx/pg_type.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class pqxxSqlCursor: public Cursor
@@ -97,7 +97,7 @@ inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
     case TIMESTAMPOID:
         return QString::fromUtf8(r.c_str(), r.size()); //TODO check formatting
     case BYTEAOID:
-        return KexiDB::pgsqlByteaToByteArray(r.c_str(), r.size());
+        return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
     case BPCHAROID:
     case VARCHAROID:
     case TEXTOID:

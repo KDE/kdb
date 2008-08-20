@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "sybasepreparedstatement.h"
+#include "SybasePreparedStatement.h"
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 SybasePreparedStatement::SybasePreparedStatement(StatementType type, ConnectionInternal& conn,
         FieldList& fields)
-        : KexiDB::PreparedStatement(type, conn, fields)
+        : Predicate::PreparedStatement(type, conn, fields)
         , m_resetRequired(false)
         , m_conn(conn.connection)
 {

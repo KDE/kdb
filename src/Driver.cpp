@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "driver.h"
-#include "driver_p.h"
-#include "drivermanager.h"
-#include "drivermanager_p.h"
-#include "error.h"
-#include "drivermanager.h"
-#include "connection.h"
-#include "connectiondata.h"
+#include "Driver.h"
+#include "Driver_p.h"
+#include "DriverManager.h"
+#include "DriverManager_p.h"
+#include "Error.h"
+#include "DriverManager.h"
+#include "Connection.h"
+#include "ConnectionData.h"
 #include "admin.h"
 
 #include <klocale.h>
@@ -32,7 +32,7 @@
 
 #include <assert.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 /*! @internal Used in Driver::defaultSQLTypeName(int)
  when we do not have Driver instance yet, or when we cannot get one */
@@ -104,14 +104,14 @@ Driver::~Driver()
 bool Driver::isValid()
 {
     clearError();
-    if (KexiDB::version().major != version().major
-            || KexiDB::version().minor != version().minor) {
+    if (Predicate::version().major != version().major
+            || Predicate::version().minor != version().minor) {
         setError(ERR_INCOMPAT_DRIVER_VERSION,
                  i18n(
                      "Incompatible database driver's \"%1\" version: found version %2, expected version %3.",
                      objectName(),
                      QString("%1.%2").arg(version().major).arg(version().minor),
-                     QString("%1.%2").arg(KexiDB::version().major).arg(KexiDB::version().minor)));
+                     QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor)));
         return false;
     }
 
@@ -215,15 +215,15 @@ QString Driver::defaultSQLTypeName(int id_t)
 
 bool Driver::isSystemObjectName(const QString& n) const
 {
-    return Driver::isKexiDBSystemObjectName(n);
+    return Driver::isPredicateSystemObjectName(n);
 }
 
-bool Driver::isKexiDBSystemObjectName(const QString& n)
+bool Driver::isPredicateSystemObjectName(const QString& n)
 {
     QString lcName = n.toLower();
     if (!lcName.startsWith("kexi__"))
         return false;
-    const QStringList list(Connection::kexiDBSystemTableNames());
+    const QStringList list(Connection::predicateSystemTableNames());
     return list.indexOf(lcName) != -1;
 }
 
@@ -320,7 +320,7 @@ QByteArray Driver::escapeIdentifier(const QByteArray& str, int options) const
         needOuterQuotes = true;
 
 // ... or if it's a keyword in Kexi's SQL dialect,
-    else if (KexiDB::isKexiSQLKeyword(str))
+    else if (Predicate::isKexiSQLKeyword(str))
         needOuterQuotes = true;
 
 // ... or if it's a keyword in the backends SQL dialect,
@@ -354,9 +354,9 @@ bool Driver::isDriverSpecificKeyword(const QByteArray& word) const
 
 //---------------
 
-K_GLOBAL_STATIC_WITH_ARGS(KexiUtils::StaticSetOfStrings, KexiDB_kexiSQLKeywords, (DriverPrivate::kexiSQLKeywords))
+K_GLOBAL_STATIC_WITH_ARGS(Utils::StaticSetOfStrings, KexiDB_kexiSQLKeywords, (DriverPrivate::kexiSQLKeywords))
 
-KEXI_DB_EXPORT bool KexiDB::isKexiSQLKeyword(const QByteArray& word)
+PREDICATE_EXPORT bool Predicate::isKexiSQLKeyword(const QByteArray& word)
 {
     return KexiDB_kexiSQLKeywords->contains(word);
 }

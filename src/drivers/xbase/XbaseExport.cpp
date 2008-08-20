@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "xbaseexport.h"
+#include "XbaseExport.h"
 
 #include <QHash>
 #include <QDir>
 
 #include <kdebug.h>
 
-#include <kexidb/field.h>
-#include <kexidb/RecordData.h>
-#include <kexidb/cursor.h>
-#include <kexidb/drivermanager.h>
+#include <Predicate/Field.h>
+#include <Predicate/RecordData.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/DriverManager.h>
 #include <core/kexi.h>
 #include <migration/keximigratedata.h>
 
@@ -35,63 +35,63 @@
 
 #include "xbase.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
-class KexiDB::xBaseExportPrivate {
+class Predicate::xBaseExportPrivate {
   public:
     xBaseExportPrivate() {
     }
 
     //! Converts kexidb field types to xbase types
-    char type(KexiDB::Field::Type fieldType);
+    char type(Predicate::Field::Type fieldType);
 
     //! Appends record to xbase table
-    bool appendRecord(const QString& sourceTableName , KexiDB::RecordData* recordData);
+    bool appendRecord(const QString& sourceTableName , Predicate::RecordData* recordData);
 
     //! Returns max fieldlengths for xBase table
-    int fieldLength(KexiDB::Field* f );
+    int fieldLength(Predicate::Field* f );
 
     //! converts QVariant data to a format understood by xBase
     QByteArray fieldData(QVariant data, char type);
 
     //! Creates xBase indexes for the table
-    bool createIndexes(const QString& sourceTableName, KexiDB::TableSchema* tableSchema);
+    bool createIndexes(const QString& sourceTableName, Predicate::TableSchema* tableSchema);
 
     xbXBase xbase;
     QHash<QString, QString> tableNamePathMap;
 };
 
-char xBaseExportPrivate::type(KexiDB::Field::Type fieldType)
+char xBaseExportPrivate::type(Predicate::Field::Type fieldType)
 {
   char xBaseType = '\0';
 
   switch( fieldType ) {
-    case KexiDB::Field::Text:
-    case KexiDB::Field::LongText:
+    case Predicate::Field::Text:
+    case Predicate::Field::LongText:
       xBaseType = XB_CHAR_FLD;
       break;
 
-    case KexiDB::Field::Boolean:
+    case Predicate::Field::Boolean:
       xBaseType = XB_LOGICAL_FLD;
       break;
 
-    case KexiDB::Field::Float:
-    case KexiDB::Field::Double:
+    case Predicate::Field::Float:
+    case Predicate::Field::Double:
       xBaseType = XB_FLOAT_FLD;
 
-    case KexiDB::Field::ShortInteger:
-    case KexiDB::Field::Integer:
-    case KexiDB::Field::BigInteger:
+    case Predicate::Field::ShortInteger:
+    case Predicate::Field::Integer:
+    case Predicate::Field::BigInteger:
       xBaseType = XB_NUMERIC_FLD;
       break;
 
-    case KexiDB::Field::DateTime:
-    case KexiDB::Field::Date:
-    case KexiDB::Field::Time:
+    case Predicate::Field::DateTime:
+    case Predicate::Field::Date:
+    case Predicate::Field::Time:
       xBaseType = XB_DATE_FLD;
       break;
 
-    case KexiDB::Field::BLOB:
+    case Predicate::Field::BLOB:
       xBaseType = XB_MEMO_FLD;
       break;
 
@@ -102,7 +102,7 @@ char xBaseExportPrivate::type(KexiDB::Field::Type fieldType)
   return xBaseType;
 }
 
-bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KexiDB::RecordData* recordData ) {
+bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicate::RecordData* recordData ) {
 
 // 	kDebug()<<recordData->debugString();
   QString pathName = tableNamePathMap.value( sourceTableName );
@@ -152,8 +152,8 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KexiDB::
   return true;
 }
 
-int xBaseExportPrivate::fieldLength(KexiDB::Field* f ) {
-  if ( f->type() == KexiDB::Field::Text ) {
+int xBaseExportPrivate::fieldLength(Predicate::Field* f ) {
+  if ( f->type() == Predicate::Field::Text ) {
     return f->length();
   }
   // return the max possible (string)length of the types
@@ -199,7 +199,7 @@ QByteArray xBaseExportPrivate::fieldData(QVariant data, char type) {
   }
 }
 
-bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KexiDB::TableSchema* tableSchema) {
+bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, Predicate::TableSchema* tableSchema) {
 
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toAscii();
@@ -209,7 +209,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KexiDB::T
   QString dirName = QFileInfo( pathName ).path();
 
   for (uint i=0; i< (uint)fieldCount ; ++i) {
-    KexiDB::Field* f = tableSchema->field(i);
+    Predicate::Field* f = tableSchema->field(i);
 
     int returnCode;
     QString fieldName = f->name();
@@ -256,7 +256,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     result->clearStatus();
 
 
-  KexiDB::DriverManager drvManager;
+  Predicate::DriverManager drvManager;
 
   if (!m_migrateData) {
     kDebug()<<"Migration Data not set yet !!";
@@ -264,7 +264,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return false;
   }
 
-  KexiDB::Driver *sourceDriver = drvManager.driver(
+  Predicate::Driver *sourceDriver = drvManager.driver(
     m_migrateData->source->driverName);
   if (!sourceDriver) {
     result->setStatus(&drvManager,
@@ -281,7 +281,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return false;
   }
 
-  KexiDB::Connection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
+  Predicate::Connection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
 
   if (!sourceConn || sourceDriver->error()) {
     kDebug()<<"Export failed";
@@ -317,7 +317,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
       return false;
     }
 
-    KexiDB::TableSchema *tableSchema = sourceConn->tableSchema( tableCaption );
+    Predicate::TableSchema *tableSchema = sourceConn->tableSchema( tableCaption );
 
     if (!dest_createTable(tableCaption, tableSchema)) {
       if (result)
@@ -343,7 +343,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return ok;
   }
 
-  // Finally: error handling
+  // Finally: Error.handling
   if (result && result->error())
     result->setStatus(sourceConn,
       i18n("Could not export data to \"%1\".",
@@ -370,7 +370,7 @@ bool xBaseExport::dest_disconnect() {
   return true;
 }
 
-bool xBaseExport::dest_createTable(const QString& originalName, KexiDB::TableSchema* tableSchema) {
+bool xBaseExport::dest_createTable(const QString& originalName, Predicate::TableSchema* tableSchema) {
   // Algorithm
   // 1. For each fields in the table schema.
   // 2.   Create a xbSchema entry and add it to xbSchema array.
@@ -383,7 +383,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, KexiDB::TableSch
 
   uint i = 0;
   for (i = 0; i < fieldCount ; ++i) {
-    KexiDB::Field* f = tableSchema->field(i);
+    Predicate::Field* f = tableSchema->field(i);
 
     QByteArray ba = f->name().toLatin1();
     //! TODO Fieldname can only be 11 characters
@@ -400,7 +400,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, KexiDB::TableSch
   xBaseTableSchema[i].FieldLen = 0;
   xBaseTableSchema[i].NoOfDecs = 0;
 
-  const KexiDB::ConnectionData* connData = m_migrateData->destination->connectionData();
+  const Predicate::ConnectionData* connData = m_migrateData->destination->connectionData();
   QString dirName = connData->fileName(); // this includes the forward slash after the dir name
 
   QString pathName = dirName + originalName + ".dbf";
@@ -423,15 +423,15 @@ bool xBaseExport::dest_createTable(const QString& originalName, KexiDB::TableSch
   return true;
 }
 
-bool xBaseExport::dest_copyTable(const QString& srcTableName, KexiDB::Connection *srcConn,
-        KexiDB::TableSchema* /*srcTable*/) {
+bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connection *srcConn,
+        Predicate::TableSchema* /*srcTable*/) {
   // Algorithm
   // 1. pick each row
   // 2. Insert it into the xBase table
 
   // using the tableSchema as argument automatically appends rowid
   // info to the recordData which we don't want. Hence we use SQL query
-  KexiDB::Cursor* cursor = srcConn->executeQuery(QString( "Select * from %1" ).arg(srcTableName));
+  Predicate::Cursor* cursor = srcConn->executeQuery(QString( "Select * from %1" ).arg(srcTableName));
 
   if (!cursor)
     return false;
@@ -440,7 +440,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, KexiDB::Connection
     return false;
 
   while (!cursor->eof()) {
-    KexiDB::RecordData *record = cursor->storeCurrentRow();
+    Predicate::RecordData *record = cursor->storeCurrentRow();
     if (!record) {
       return false;
     }

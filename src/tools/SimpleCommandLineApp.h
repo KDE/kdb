@@ -17,18 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SIMPLECMDLINEAPP_H
-#define KEXIDB_SIMPLECMDLINEAPP_H
+#ifndef PREDICATE_SIMPLECMDLINEAPP_H
+#define PREDICATE_SIMPLECMDLINEAPP_H
 
-#include "connection.h"
-#include "driver.h"
+#include "Connection.h"
+#include "Driver.h"
 
 #include <KAboutData>
 
 class KCmdLineOptions;
 class KComponentData;
 
-namespace KexiDB
+namespace Predicate
 {
 //! @short A skeleton for creating a simple command line database application.
 /*! This class creates a KComponentData object and automatically handles the following
@@ -44,7 +44,7 @@ namespace KexiDB
  a KexiDB-compatible database using command line arguments, do some data processing
  and close the database.
 */
-class KEXI_DB_EXPORT SimpleCommandLineApp : public KexiDB::Object
+class PREDICATE_EXPORT SimpleCommandLineApp : public Predicate::Object
 {
 public:
     SimpleCommandLineApp(
@@ -64,20 +64,20 @@ public:
      specified via the command line. \return true in success.
      In details: the database driver is loaded, the connection is opened
      and the database is used.
-     Use KexiDB::Object methods to get status of the operation on failure. */
+     Use Predicate::Object methods to get status of the operation on failure. */
     bool openDatabase(const QString& databaseName);
 
     /*! Closes database connection previously opened using openDatabase()
      \return true on success. This method is called on destruction.
-     Use KexiDB::Object methods to get status of the operation on failure. */
+     Use Predicate::Object methods to get status of the operation on failure. */
     bool closeDatabase();
 
     /*! \return connection data for this application. */
-    KexiDB::ConnectionData* connectionData() const;
+    Predicate::ConnectionData* connectionData() const;
 
     /*! \return connection object for this application or 0 if there is no properly
      opened connection. */
-    KexiDB::Connection* connection() const;
+    Predicate::Connection* connection() const;
 
 protected:
     class Private;

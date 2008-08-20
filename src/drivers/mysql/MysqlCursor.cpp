@@ -18,20 +18,20 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "mysqlcursor.h"
-#include "mysqlconnection.h"
-#include "mysqlconnection_p.h"
-#include <kexidb/error.h>
-#include <kexidb/utils.h>
+#include "mysqlCursor.h"
+#include "mysqlConnection.h"
+#include "MysqlConnection_p.h"
+#include <Predicate/Error.h>
+#include <Predicate/Utils.h>
 #include <klocale.h>
 #include <kdebug.h>
 #include <limits.h>
 
 #define BOOL bool
 
-using namespace KexiDB;
+using namespace Predicate;
 
-MySqlCursor::MySqlCursor(KexiDB::Connection* conn, const QString& statement, uint cursor_options)
+MySqlCursor::MySqlCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
         : Cursor(conn, statement, cursor_options)
         , d(new MySqlCursorData(conn))
 {
@@ -116,12 +116,12 @@ QVariant MySqlCursor::value(uint pos)
     if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
         return QVariant();
 
-    KexiDB::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
+    Predicate::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 //! @todo js: use MYSQL_FIELD::type here!
 
-    return KexiDB::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
+    return Predicate::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
     /* moved to cstringToVariant()
       //from most to least frequently used types:
       if (!f || f->isTextType())
@@ -138,7 +138,7 @@ QVariant MySqlCursor::value(uint pos)
 
 
 /* As with sqlite, the DB library returns all values (including numbers) as
-   strings. So just put that string in a QVariant and let KexiDB deal with it.
+   strings. So just put that string in a QVariant and let Predicate deal with it.
  */
 bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
 {
@@ -155,7 +155,7 @@ bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
         Field *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
-        data[i] = KexiDB::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
+        data[i] = Predicate::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
         /* moved to cstringToVariant()
             if (f && f->type()==Field::BLOB) {
               data[i] = QByteArray(d->mysqlrow[i], d->mysqlres->lengths[i]);

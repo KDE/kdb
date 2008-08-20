@@ -24,10 +24,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <qstringlist.h>
 
-#include <kexidb/connection.h>
-#include "mysqlcursor.h"
+#include <Predicate/Connection.h>
+#include "mysqlCursor.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class MySqlConnectionInternal;
@@ -55,7 +55,7 @@ protected:
     /*! Used by driver */
     MySqlConnection(Driver *driver, ConnectionData &conn_data);
 
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList &list);
     virtual bool drv_createDatabase(const QString &dbName = QString());

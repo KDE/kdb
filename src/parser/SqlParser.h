@@ -1,10 +1,10 @@
 #ifndef _SQLPARSER_H_
 #define _SQLPARSER_H_
-#include <kexidb/field.h>
-#include "parser.h"
-#include "sqltypes.h"
+#include <Predicate/Field.h>
+#include "Parser.h"
+#include "SqlTypes.h"
 
-bool parseData(KexiDB::Parser *p, const char *data);
+bool parseData(Predicate::Parser *p, const char *data);
 /* A Bison parser, made by GNU Bison 1.875b.  */
 
 /* Skeleton parser for Yacc-like parsing with Bison,
@@ -743,12 +743,12 @@ typedef union YYSTYPE {
     qint64 integerValue;
     bool booleanValue;
     struct realType realValue;
-    KexiDB::Field::Type colType;
-    KexiDB::Field *field;
-    KexiDB::BaseExpr *expr;
-    KexiDB::NArgExpr *exprList;
-    KexiDB::ConstExpr *constExpr;
-    KexiDB::QuerySchema *querySchema;
+    Predicate::Field::Type colType;
+    Predicate::Field *field;
+    Predicate::BaseExpr *expr;
+    Predicate::NArgExpr *exprList;
+    Predicate::ConstExpr *constExpr;
+    Predicate::QuerySchema *querySchema;
     SelectOptionsInternal *selectOptions;
     OrderByColumnInternal::List *orderByColumns;
     QVariant *variantValue;

@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <kexidb/global.h>
-#include "sqlitevacuum.h"
+#include <Predicate/Global.h>
+#include "SqliteVacuum.h"
 
 #include <kstandarddirs.h>
 #include <kprogressdialog.h>
@@ -27,13 +27,13 @@
 #include <ktemporaryfile.h>
 #include <kmessagebox.h>
 #include <qprogressbar.h>
-#include <kio/global.h>
+#include <kio/Global.h>
 
 #include <qfileinfo.h>
 #include <qdir.h>
 #include <qapplication.h>
 #include <q3process.h>
-#include <qcursor.h>
+#include <qCursor.h>
 
 #include <unistd.h>
 

@@ -24,9 +24,9 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <KDebug>
 
-#include "mysqlconnection_p.h"
+#include "MysqlConnection_p.h"
 
-#include <kexidb/connectiondata.h>
+#include <Predicate/ConnectionData.h>
 
 #ifdef MYSQLMIGRATE_H
 #define NAMESPACE KexiMigration
@@ -37,7 +37,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 using namespace NAMESPACE;
 
 /* ************************************************************************** */
-MySqlConnectionInternal::MySqlConnectionInternal(KexiDB::Connection* connection)
+MySqlConnectionInternal::MySqlConnectionInternal(Predicate::Connection* connection)
         : ConnectionInternal(connection)
         , mysql(0)
         , mysql_owned(true)
@@ -68,7 +68,7 @@ void MySqlConnectionInternal::storeResult()
  */
 //bool MySqlConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool MySqlConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
+bool MySqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
         return false;
@@ -156,7 +156,7 @@ QString MySqlConnectionInternal::escapeIdentifier(const QString& str) const
 
 //--------------------------------------
 
-MySqlCursorData::MySqlCursorData(KexiDB::Connection* connection)
+MySqlCursorData::MySqlCursorData(Predicate::Connection* connection)
         : MySqlConnectionInternal(connection)
         , mysqlres(0)
         , mysqlrow(0)

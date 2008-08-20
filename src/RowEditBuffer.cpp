@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "roweditbuffer.h"
-#include "utils.h"
+#include "RowEditBuffer.h"
+#include "Utils.h"
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 
 RowEditBuffer::RowEditBuffer(bool dbAwareBuffer)
@@ -56,7 +56,7 @@ const QVariant* RowEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPos
         result = &(*m_dbBufferIt).value();
     if (useDefaultValueIfPossible
             && (!result || result->isNull())
-            && ci.field && !ci.field->defaultValue().isNull() && KexiDB::isDefaultValueAllowed(ci.field)
+            && ci.field && !ci.field->defaultValue().isNull() && Predicate::isDefaultValueAllowed(ci.field)
             && !hasDefaultValueAt(ci)) {
         //no buffered or stored value: try to get a default value declared in a field, so user can modify it
         if (!result)

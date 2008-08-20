@@ -17,16 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CONNECTION_P_H
-#define KEXIDB_CONNECTION_P_H
+#ifndef PREDICATE_CONNECTION_P_H
+#define PREDICATE_CONNECTION_P_H
 
-#include "connection.h"
+#include "Connection.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! Interface for connection's internals, implemented within drivers
-class KEXI_DB_EXPORT ConnectionInternal
+class PREDICATE_EXPORT ConnectionInternal
 {
 public:
     ConnectionInternal(Connection *conn);
@@ -36,6 +36,6 @@ public:
     Connection* connection;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

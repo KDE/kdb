@@ -18,29 +18,29 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_TABLE_H
-#define KEXIDB_TABLE_H
+#ifndef PREDICATE_TABLE_H
+#define PREDICATE_TABLE_H
 
 #include <QList>
 #include <QString>
 #include <QPointer>
 #include <QVector>
 
-#include "fieldlist.h"
-#include "schemadata.h"
-#include "indexschema.h"
-#include "relationship.h"
+#include "FieldList.h"
+#include "SchemaData.h"
+#include "IndexSchema.h"
+#include "Relationship.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
 class LookupFieldSchema;
 
-/*! KexiDB::TableSchema provides information about native database table
-  that can be stored using KexiDB database engine.
+/*! Predicate::TableSchema provides information about native database table
+  that can be stored using Predicate database engine.
 */
-class KEXI_DB_EXPORT TableSchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT TableSchema : public FieldList, public SchemaData
 {
 public:
     typedef QList<TableSchema*> List; //!< Type of tables list
@@ -68,7 +68,7 @@ public:
     virtual FieldList& insertField(uint index, Field *field);
 
     /*! Reimplemented for internal reasons. */
-    virtual void removeField(KexiDB::Field *field);
+    virtual void removeField(Predicate::Field *field);
 
     /*! \return list of fields that are primary key of this table.
      This method never returns 0 value,
@@ -114,36 +114,36 @@ public:
       otherwise 0. */
     Connection* connection() const;
 
-    /*! \return true if this is KexiDB storage system's table
+    /*! \return true if this is Predicate storage system's table
      (used internally by KexiDB). This helps in hiding such tables
      in applications (if desired) and will also enable lookup of system
      tables for schema export/import functionality.
 
-     Any internal KexiDB system table's schema (kexi__*) has
+     Any internal Predicate system table's schema (kexi__*) has
      cleared its SchemaData part, e.g. id=-1 for such table,
      and no description, caption and so on. This is because
      it represents a native database table rather that extended Kexi table.
 
-     isKexiDBSystem()==true implies isNative()==true.
+     isPredicateSystem()==true implies isNative()==true.
 
      By default (after allocation), TableSchema object
      has this property set to false. */
-    bool isKexiDBSystem() const {
-        return m_isKexiDBSystem;
+    bool isPredicateSystem() const {
+        return m_isPredicateSystem;
     }
 
     /*! Sets KexiDBSystem flag to on or off. When on, native flag is forced to be on.
      When off, native flag is not affected.
-     \sa isKexiDBSystem() */
+     \sa isPredicateSystem() */
     void setKexiDBSystem(bool set);
 
     /*! \return true if this is schema of native database object,
-     When this is kexiDBSystem table, native flag is forced to be on. */
+     When this is predicateSystem table, native flag is forced to be on. */
     virtual bool isNative() const {
-        return m_native || m_isKexiDBSystem;
+        return m_native || m_isPredicateSystem;
     }
 
-    /* Sets native flag. Does not allow to set this off for system KexiDB table. */
+    /* Sets native flag. Does not allow to set this off for system Predicate table. */
     virtual void setNative(bool set);
 
     /*! \return query schema object that is defined by "select * from <this_table_name>"
@@ -163,7 +163,7 @@ public:
     bool setLookupFieldSchema(const QString& fieldName, LookupFieldSchema *lookupFieldSchema);
 
     /*! \return lookup field schema for \a field.
-     0 is returned if there is no such field in the table or this field has no lookup schema.
+     0 is returned if there is no such field in the table or this Field.has no lookup schema.
      Note that even id non-zero is returned here, you may want to check whether lookup field's
      rowSource().name() is empty (if so, the field should behave as there was no lookup field
      defined at all). */
@@ -198,7 +198,7 @@ private:
     //! Used by some ctors.
     void init(const TableSchema& ts, bool copyId);
 
-bool m_isKexiDBSystem : 1;
+bool m_isPredicateSystem : 1;
 
     friend class Connection;
 };
@@ -207,7 +207,7 @@ bool m_isKexiDBSystem : 1;
  Use Connection::createTable() to create a table using this schema.
  The table will not be visible as user table.
  For example, 'kexi__blobs' table is created this way by Kexi application. */
-class KEXI_DB_EXPORT InternalTableSchema : public TableSchema
+class PREDICATE_EXPORT InternalTableSchema : public TableSchema
 {
 public:
     InternalTableSchema(const QString& name);
@@ -215,6 +215,6 @@ public:
     virtual ~InternalTableSchema();
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

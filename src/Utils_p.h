@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_UTILS_P_H
-#define KEXIDB_UTILS_P_H
+#ifndef PREDICATE_UTILS_P_H
+#define PREDICATE_UTILS_P_H
 
 #include <qtimer.h>
 #include <qwaitcondition.h>
@@ -34,12 +34,12 @@ class ConnectionTestDialog : protected KProgressDialog
     Q_OBJECT
 public:
     ConnectionTestDialog(QWidget* parent,
-                         const KexiDB::ConnectionData& data, KexiDB::MessageHandler& msgHandler);
+                         const Predicate::ConnectionData& data, Predicate::MessageHandler& msgHandler);
     virtual ~ConnectionTestDialog();
 
     int exec();
 
-    void error(KexiDB::Object *obj);
+    void error(Predicate::Object *obj);
 
 protected slots:
     void slotTimeout();
@@ -47,11 +47,11 @@ protected slots:
 
 protected:
     ConnectionTestThread* m_thread;
-    KexiDB::ConnectionData m_connData;
+    Predicate::ConnectionData m_connData;
     QTimer m_timer;
-    KexiDB::MessageHandler* m_msgHandler;
+    Predicate::MessageHandler* m_msgHandler;
     uint m_elapsedTime;
-    KexiDB::Object *m_errorObj;
+    Predicate::Object *m_errorObj;
     QWaitCondition m_wait;
 bool m_stopWaiting : 1;
 };

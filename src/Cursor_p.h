@@ -17,18 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CURSOR_P_H
-#define KEXIDB_CURSOR_P_H
+#ifndef PREDICATE_CURSOR_P_H
+#define PREDICATE_CURSOR_P_H
 
 #include <qstring.h>
 
-#include "connection.h"
+#include "Connection.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 #if 0
-/*PRIVATE*/ class /*KEXI_DB_EXPORT*/ CursorData
+/*PRIVATE*/ class /*PREDICATE_EXPORT*/ CursorData
 {
 public:
     CursorData() {};
@@ -36,6 +36,6 @@ public:
 };
 #endif
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

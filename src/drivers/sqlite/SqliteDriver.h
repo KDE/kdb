@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_SQLITE_H
-#define KEXIDB_DRIVER_SQLITE_H
+#ifndef PREDICATE_DRIVER_SQLITE_H
+#define PREDICATE_DRIVER_SQLITE_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -32,7 +32,7 @@ class SQLiteDriverPrivate;
 class SQLiteDriver : public Driver
 {
     Q_OBJECT
-    KEXIDB_DRIVER
+    PREDICATE_DRIVER
 
 public:
     SQLiteDriver(QObject *parent, const QStringList &args = QStringList());

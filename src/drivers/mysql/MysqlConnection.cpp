@@ -27,15 +27,15 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "mysqldriver.h"
-#include "mysqlconnection.h"
-#include "mysqlconnection_p.h"
-#include "mysqlcursor.h"
-#include "mysqlpreparedstatement.h"
-#include <kexidb/error.h>
+#include "mysqlDriver.h"
+#include "mysqlConnection.h"
+#include "MysqlConnection_p.h"
+#include "mysqlCursor.h"
+#include "MysqlPreparedStatement.h"
+#include <Predicate/Error.h>
 
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //--------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ MySqlConnection::~MySqlConnection()
     destroy();
 }
 
-bool MySqlConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool MySqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)

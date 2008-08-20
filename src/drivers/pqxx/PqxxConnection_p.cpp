@@ -27,10 +27,10 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 //
-#include "pqxxconnection_p.h"
+#include "PqxxConnection_p.h"
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 pqxxSqlConnectionInternal::pqxxSqlConnectionInternal(Connection *conn)
         : ConnectionInternal(conn)
         , pqxxsql(0)

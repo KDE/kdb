@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "simplecommandlineapp.h"
+#include "SimpleCommandLineApp.h"
 
 #include <QFileInfo>
 #include <QTextStream>
@@ -27,11 +27,11 @@
 #include <KLocale>
 #include <KComponentData>
 
-#include "connectiondata.h"
-#include "drivermanager.h"
-#include "utils.h"
+#include "ConnectionData.h"
+#include "DriverManager.h"
+#include "Utils.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //-----------------------------------------
 
@@ -48,7 +48,7 @@ public:
         }
     }
 
-    KexiDB::DriverManager manager;
+    Predicate::DriverManager manager;
     KComponentData componentData;
     ConnectionData connData;
     QPointer<Connection> conn;
@@ -77,7 +77,7 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     KCmdLineOptions allOptions;
 
     // add predefined options
-    allOptions.add("drv", KLocalizedString(), KexiDB::defaultFileBasedDriverName().toUtf8());
+    allOptions.add("drv", KLocalizedString(), Predicate::defaultFileBasedDriverName().toUtf8());
     allOptions.add("driver <name>", ki18n("Database driver name"));
     allOptions.add("u");
     allOptions.add("user <name>", ki18n("Database user name"));
@@ -131,7 +131,7 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
         }
 
         //get the driver
-        KexiDB::Driver *driver = d->manager.driver(d->connData.driverName);
+        Predicate::Driver *driver = d->manager.driver(d->connData.driverName);
         if (!driver || d->manager.error()) {
             setError(&d->manager);
             return false;
@@ -185,12 +185,12 @@ const KComponentData &SimpleCommandLineApp::componentData() const
     return d->componentData;
 }
 
-KexiDB::ConnectionData* SimpleCommandLineApp::connectionData() const
+Predicate::ConnectionData* SimpleCommandLineApp::connectionData() const
 {
     return &d->connData;
 }
 
-KexiDB::Connection* SimpleCommandLineApp::connection() const
+Predicate::Connection* SimpleCommandLineApp::connection() const
 {
     return d->conn;
 }

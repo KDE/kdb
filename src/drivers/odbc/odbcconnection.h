@@ -17,21 +17,21 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CONN_ODBC_H
-#define KEXIDB_CONN_ODBC_H
+#ifndef PREDICATE_CONN_ODBC_H
+#define PREDICATE_CONN_ODBC_H
 
 #include <QStringList>
 
-#include <kexidb/connection.h>
-#include <kexidb/tableschema.h>
+#include <Predicate/Connection.h>
+#include <Predicate/TableSchema.h>
 
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
+#include <SqlTypes.h>
 
 class ODBCConnectionPrivate;
 
-namespace KexiDB
+namespace Predicate
 {
 class Driver;
 
@@ -75,7 +75,7 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString::null);
 
-    //virtual bool drv_createTable( const KexiDB::Table& table );
+    //virtual bool drv_createTable( const Predicate::Table& table );
 
     virtual bool drv_executeSQL(const QString& statement);
 

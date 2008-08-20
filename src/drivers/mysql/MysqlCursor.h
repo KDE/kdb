@@ -20,10 +20,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef _MYSQLCURSOR_H_
 #define _MYSQLCURSOR_H_
 
-#include <kexidb/cursor.h>
-#include <kexidb/connection.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Connection.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class MySqlCursorData;

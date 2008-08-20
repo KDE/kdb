@@ -17,22 +17,22 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "sqlitepreparedstatement.h"
+#include "SqlitePreparedStatement.h"
 
 #include <kdebug.h>
 #include <assert.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 SQLitePreparedStatement::SQLitePreparedStatement(StatementType type, ConnectionInternal& conn,
         FieldList& fields)
-        : KexiDB::PreparedStatement(type, conn, fields)
+        : Predicate::PreparedStatement(type, conn, fields)
         , SQLiteConnectionInternal(conn.connection)
         , prepared_st_handle(0)
         , m_resetRequired(false)
 {
     data_owned = false;
-    data = dynamic_cast<KexiDB::SQLiteConnectionInternal&>(conn).data; //copy
+    data = dynamic_cast<Predicate::SQLiteConnectionInternal&>(conn).data; //copy
 
     temp_st = generateStatementString();
 #ifdef SQLITE2
@@ -93,7 +93,7 @@ bool SQLitePreparedStatement::execute()
     Field::ListIterator itFields(fieldList->constBegin());
     for (QList<QVariant>::ConstIterator it = m_args.constBegin();
             itFields != fieldList->constEnd(); ++it, ++itFields, arg++) {
-        KexiDB::Field *field = *itFields;
+        Predicate::Field *field = *itFields;
         if (it == m_args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
             res = sqlite3_bind_null(prepared_st_handle, arg);
             if (SQLITE_OK != res) {
@@ -113,9 +113,9 @@ bool SQLitePreparedStatement::execute()
             }
         } else {
             switch (field->type()) {
-            case KexiDB::Field::Byte:
-            case KexiDB::Field::ShortInteger:
-            case KexiDB::Field::Integer: {
+            case Predicate::Field::Byte:
+            case Predicate::Field::ShortInteger:
+            case Predicate::Field::Integer: {
                 //! @todo what about unsigned > INT_MAX ?
                 bool ok;
                 const int value = (*it).toInt(&ok);
@@ -134,15 +134,15 @@ bool SQLitePreparedStatement::execute()
                 }
                 break;
             }
-            case KexiDB::Field::Float:
-            case KexiDB::Field::Double:
+            case Predicate::Field::Float:
+            case Predicate::Field::Double:
                 res = sqlite3_bind_double(prepared_st_handle, arg, (*it).toDouble());
                 if (SQLITE_OK != res) {
                     //! @todo msg?
                     return false;
                 }
                 break;
-            case KexiDB::Field::BigInteger: {
+            case Predicate::Field::BigInteger: {
                 //! @todo what about unsigned > LLONG_MAX ?
                 bool ok;
                 qint64 value = (*it).toLongLong(&ok);
@@ -161,7 +161,7 @@ bool SQLitePreparedStatement::execute()
                 }
                 break;
             }
-            case KexiDB::Field::Boolean:
+            case Predicate::Field::Boolean:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         QString::number((*it).toBool() ? 1 : 0).toLatin1(),
                                         1, SQLITE_TRANSIENT /*??*/);
@@ -170,7 +170,7 @@ bool SQLitePreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::Time:
+            case Predicate::Field::Time:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toTime().toString(Qt::ISODate).toLatin1(),
                                         sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -179,7 +179,7 @@ bool SQLitePreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::Date:
+            case Predicate::Field::Date:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toDate().toString(Qt::ISODate).toLatin1(),
                                         sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
@@ -188,7 +188,7 @@ bool SQLitePreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::DateTime:
+            case Predicate::Field::DateTime:
                 res = sqlite3_bind_text(prepared_st_handle, arg,
                                         (*it).toDateTime().toString(Qt::ISODate).toLatin1(),
                                         sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -197,7 +197,7 @@ bool SQLitePreparedStatement::execute()
                     return false;
                 }
                 break;
-            case KexiDB::Field::BLOB: {
+            case Predicate::Field::BLOB: {
                 const QByteArray byteArray((*it).toByteArray());
                 res = sqlite3_bind_blob(prepared_st_handle, arg,
                                         (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);

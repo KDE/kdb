@@ -17,21 +17,21 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_H
-#define KEXIDB_DRIVER_H
+#ifndef PREDICATE_DRIVER_H
+#define PREDICATE_DRIVER_H
 
 #include <QObject>
 #include <qdatetime.h>
 #include <QList>
 #include <QByteArray>
 
-#include "global.h"
-#include "object.h"
-#include "field.h"
+#include "Global.h"
+#include "Object.h"
+#include "Field.h"
 
 class KService;
 
-namespace KexiDB
+namespace Predicate
 {
 
 class AdminTools;
@@ -49,10 +49,10 @@ class DriverPrivate;
  Before destruction, all connections are destructed.
 
  Notes:
-  - driver must be provided within KDE module file named with "kexidb_" prefix
+  - driver must be provided within KDE module file named with "predicate_" prefix
   - following line should be placed in driver's implementation:
     \code
-    KEXIDB_DRIVER_INFO( CLASS_NAME, INTERNAL_NAME );
+    PREDICATE_DRIVER_INFO( CLASS_NAME, INTERNAL_NAME );
     \endcode
     where:
     - CLASS_NAME is actual driver's class name, e.g. MySqlDriver
@@ -60,18 +60,18 @@ class DriverPrivate;
     Above information uses K_EXPORT_COMPONENT_FACTORY macro for KTrader to find the module's entry point.
     For example, this line declares kexidb_mysqldriver.so module's entry point:
     \code
-    KEXIDB_DRIVER_INFO( MySqlDriver, mysql );
+    PREDICATE_DRIVER_INFO( MySqlDriver, mysql );
     \endcode
 
  \sa SQLiteDriver MySqlDriver, pqxxSqlDriver
 */
-class KEXI_DB_EXPORT Driver : public QObject, public KexiDB::Object
+class PREDICATE_EXPORT Driver : public QObject, public Predicate::Object
 {
     Q_OBJECT
 public:
     /*! Helpful for retrieving info about driver from using
-     KexiDB::DriverManager::driversInfo() without loading driver libraries. */
-    class KEXI_DB_EXPORT Info
+     Predicate::DriverManager::driversInfo() without loading driver libraries. */
+    class PREDICATE_EXPORT Info
     {
     public:
         Info();
@@ -79,7 +79,7 @@ public:
         //! true is the driver is for file-based database backend
     bool fileBased : 1;
         /*! true is the driver is for a backend that allows importing.
-         Defined by X-Kexi-DoNotAllowProjectImportingTo in "kexidb_driver" service type.
+         Defined by X-Kexi-DoNotAllowProjectImportingTo in "predicate_driver" service type.
          Used for migration. */
     bool allowImportingTo : 1;
     };
@@ -153,7 +153,7 @@ public:
      eg. name of build-in system table that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation.
-     By default calls Driver::isKexiDBSystemObjectName() static method.
+     By default calls Driver::isPredicateSystemObjectName() static method.
      Note for driver developers: Also call Driver::isSystemObjectName()
      from your reimplementation.
      \sa isSystemFieldName().
@@ -163,7 +163,7 @@ public:
     /*! \return true if \a n is a kexibd-related 'system' object's
      name, i.e. when \a n starts with "kexi__" prefix.
     */
-    static bool isKexiDBSystemObjectName(const QString& n);
+    static bool isPredicateSystemObjectName(const QString& n);
 
     /*! \return true if \a n is a system database's name,
      eg. name of build-in, system database that cannot be used or created by a user,
@@ -182,7 +182,7 @@ public:
     bool isSystemFieldName(const QString& n) const;
 
     /*! \return true if \a word is a driver-specific keyword.
-     @see KexiDB::isKexiSQLKeyword(const QByteArray&) */
+     @see Predicate::isKexiSQLKeyword(const QByteArray&) */
     bool isDriverSpecificKeyword(const QByteArray& word) const;
 
     /*! \return Driver's features that are combination of Driver::Features
@@ -212,8 +212,8 @@ public:
     virtual bool isValid();
 
     /*! Driver's static version information (major part), it is automatically defined
-     in implementation by KEXIDB_DRIVER macro (see driver_p.h)
-     It's usually compared to drivers' and KexiDB library version. */
+     in implementation by PREDICATE_DRIVER macro (see Driver_p.h)
+     It's usually compared to drivers' and Predicate library version. */
     virtual DatabaseVersionInfo version() const = 0;
 
     /*! Escapes and converts value \a v (for type \a ftype)
@@ -339,7 +339,7 @@ protected:
      tools for the driver. This is called once per driver.
 
      Note for driver developers: Reimplement this method by returning
-     KexiDB::AdminTools-derived object. Default implementation creates
+     Predicate::AdminTools-derived object. Default implementation creates
      empty admin tools.
      @see adminTools() */
     virtual AdminTools* drv_createAdminTools() const;
@@ -372,13 +372,13 @@ protected:
 
 /*! \return true if the \a word is an reserved KexiSQL's keyword
  (see keywords.cpp for a list of reserved keywords). */
-KEXI_DB_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
+PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
 
-} //namespace KexiDB
+} //namespace Predicate
 
-/*! Driver's static version information, automatically impemented for KexiDB drivers.
+/*! Driver's static version information, automatically impemented for Predicate drivers.
  Put this into driver class declaration just like Q_OBJECT macro. */
-#define KEXIDB_DRIVER \
+#define PREDICATE_DRIVER \
     public: \
     virtual DatabaseVersionInfo version() const;
 

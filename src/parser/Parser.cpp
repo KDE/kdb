@@ -18,11 +18,11 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <connection.h>
-#include <tableschema.h>
-#include "parser.h"
-#include "parser_p.h"
-#include "sqlparser.h"
+#include <Connection.h>
+#include <TableSchema.h>
+#include "Parser.h"
+#include "Parser_p.h"
+#include "sqlParser.h"
 
 /*moved to Driver
 #include "tokens.cpp"
@@ -31,7 +31,7 @@ K_GLOBAL_STATIC_WITH_ARGS(StaticSetOfStrings, _reservedKeywords, (_tokens))
 
 //--------------------
 
-using namespace KexiDB;
+using namespace Predicate;
 
 Parser::Parser(Connection *db)
         : d(new Private)
@@ -118,7 +118,7 @@ Parser::createTable(const char *t)
     if (d->table)
         return;
 
-    d->table = new KexiDB::TableSchema(t);
+    d->table = new Predicate::TableSchema(t);
 }
 
 void
@@ -151,8 +151,8 @@ Parser::parse(const QString &statement)
     clear();
     d->statement = statement;
 
-    KexiDB::Parser *oldParser = parser;
-    KexiDB::Field *oldField = field;
+    Predicate::Parser *oldParser = parser;
+    Predicate::Field *oldField = field;
     bool res = parseData(this, statement.toUtf8());
     parser = oldParser;
     field = oldField;

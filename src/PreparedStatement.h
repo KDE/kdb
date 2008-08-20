@@ -17,16 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_PREPAREDSTATEMENT_H
-#define KEXIDB_PREPAREDSTATEMENT_H
+#ifndef PREDICATE_PREPAREDSTATEMENT_H
+#define PREDICATE_PREPAREDSTATEMENT_H
 
 #include <QVariant>
 #include <QStringList>
 #include <KSharedPtr>
 
-#include "field.h"
+#include "Field.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class ConnectionInternal;
@@ -40,10 +40,10 @@ class FieldList;
   you can gain about 30% speedup compared to using multiple
   connection.insertRecord(*tabelSchema, dbRowBuffer).
 
-  To use PreparedStatement, create is using KexiDB::Connection:prepareStatement(),
+  To use PreparedStatement, create is using Predicate::Connection:prepareStatement(),
   providing table schema; set up arguments using operator << ( const QVariant& value );
   and call execute() when ready. PreparedStatement objects are accessed
-  using KDE shared pointers, i.e KexiDB::PreparedStatement::Ptr, so you do not need
+  using KDE shared pointers, i.e Predicate::PreparedStatement::Ptr, so you do not need
   to remember about destroying them. However, when underlying Connection object
   is destroyed, PreparedStatement should not be used.
 
@@ -51,10 +51,10 @@ class FieldList;
   Following code inserts 10000 records with random numbers and text strings
   obtained elsewhere using getText(i).
   \code
-  bool insertMultiple(KexiDB::Connection &conn, KexiDB::TableSchema& tableSchema)
+  bool insertMultiple(Predicate::Connection &conn, Predicate::TableSchema& tableSchema)
   {
-    KexiDB::PreparedStatement::Ptr prepared = conn.prepareStatement(
-      KexiDB::PreparedStatement::InsertStatement, tableSchema);
+    Predicate::PreparedStatement::Ptr prepared = conn.prepareStatement(
+      Predicate::PreparedStatement::InsertStatement, tableSchema);
     for (i=0; i<10000; i++) {
       prepared << rand() << getText(i);
       if (!prepared.execute())
@@ -72,7 +72,7 @@ class FieldList;
   Depending on database backend, you can avoid escaping BLOBs.
   See KexiFormView::storeData() for example use.
 */
-class KEXI_DB_EXPORT PreparedStatement : public KShared
+class PREDICATE_EXPORT PreparedStatement : public KShared
 {
 public:
     typedef KSharedPtr<PreparedStatement> Ptr;
@@ -83,7 +83,7 @@ public:
         InsertStatement  //!< INSERT statement will be prepared end executed
     };
 
-    //! Creates Prepared statement. In your code use KexiDB::Connection:prepareStatement() instead.
+    //! Creates Prepared statement. In your code use Predicate::Connection:prepareStatement() instead.
     PreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields,
                       const QStringList& where = QStringList());
 
@@ -100,7 +100,7 @@ public:
      A number arguments set up for the statement must be the same as a number of fields
      defined in the underlying database table.
      \return false on failure. Detailed error status can be obtained
-     from KexiDB::Connection object used to create this statement. */
+     from Predicate::Connection object used to create this statement. */
     virtual bool execute() = 0;
 
 protected:
@@ -114,6 +114,6 @@ protected:
     Field::List* m_whereFields;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

@@ -20,24 +20,24 @@
 #ifndef KEXI_DB_FIELDVALIDATOR_H
 #define KEXI_DB_FIELDVALIDATOR_H
 
-#include <kexidb/kexidb_export.h>
+#include "predicate_export.h"
 #include <kexiutils/validator.h>
 
 class QWidget;
 
-namespace KexiDB
+namespace Predicate
 {
 class Field;
 
-//! @short A validator for KexiDB data types
+//! @short A validator for Predicate data types
 /*! This can be used by QLineEdit or subclass to provide validated
   text entry. Curently is supports all integer types, floating point types and booleans.
-  Internal validators like KIntValidator or KexiUtils::LongLongValidator are used.
+  Internal validators like KIntValidator or Utils::LongLongValidator are used.
   'unsigned' and 'scale' parameters are taken into account when setting up internal validators.
   @todo date/time support for types
   @todo add validation of the maximum length and other field's properties
 */
-class KEXI_DB_EXPORT FieldValidator : public KexiUtils::MultiValidator
+class PREDICATE_EXPORT FieldValidator : public Utils::MultiValidator
 {
 public:
     //! Setups the validator for \a field. Does not keep a pointer to \a field.

@@ -25,17 +25,17 @@
 #include <kdebug.h>
 
 //Kexi Includes
-#include <kexidb/connection.h>
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver_p.h>
+#include <Predicate/Connection.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver_p.h>
 
 //ODBC Includes
-#include "odbcdriver.h"
-#include "odbcconnection.h"
+#include "odbcDriver.h"
+#include "odbcConnection.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
-KEXIDB_DRIVER_INFO(ODBCDriver, odbc)
+PREDICATE_DRIVER_INFO(ODBCDriver, odbc)
 
 ODBCDriver::ODBCDriver(QObject *parent, const char *name, const QStringList &args)
         : Driver(parent, name, args)
@@ -67,7 +67,7 @@ ODBCDriver::~ODBCDriver()
 {
 }
 
-KexiDB::Connection* ODBCDriver::drv_createConnection(ConnectionData &conn_data)
+Predicate::Connection* ODBCDriver::drv_createConnection(ConnectionData &conn_data)
 {
     Q_UNUSED(conn_data);
     return 0L;

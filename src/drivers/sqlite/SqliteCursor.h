@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SQLITECURSOR_H
-#define KEXIDB_SQLITECURSOR_H
+#ifndef PREDICATE_SQLITECURSOR_H
+#define PREDICATE_SQLITECURSOR_H
 
 #include <qstring.h>
 
-#include <kexidb/cursor.h>
-#include "connection.h"
+#include <Predicate/Cursor.h>
+#include "Connection.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class SQLiteCursorData;
@@ -86,7 +86,7 @@ protected:
     friend class SQLiteConnection;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif
 

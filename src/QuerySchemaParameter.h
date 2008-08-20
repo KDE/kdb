@@ -17,16 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_QUERYSCHEMAPARAMETER_H
-#define KEXIDB_QUERYSCHEMAPARAMETER_H
+#ifndef PREDICATE_QUERYSCHEMAPARAMETER_H
+#define PREDICATE_QUERYSCHEMAPARAMETER_H
 
-#include "queryschema.h"
+#include "QuerySchema.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! @short A single parameter of a query schema
-class KEXI_DB_EXPORT QuerySchemaParameter
+class PREDICATE_EXPORT QuerySchemaParameter
 {
 public:
     QuerySchemaParameter();
@@ -42,12 +42,12 @@ typedef QList<QuerySchemaParameter>::Iterator QuerySchemaParameterListIterator;
 typedef QList<QuerySchemaParameter>::ConstIterator QuerySchemaParameterListConstIterator;
 
 //! Shows debug information for \a list
-KEXI_DB_EXPORT void debug(const QuerySchemaParameterList& list);
+PREDICATE_EXPORT void debug(const QuerySchemaParameterList& list);
 
 //! @short An iteratof for a list of values of query schema parameters providing
 //! Allows to iterate over parameters and return QVariant value or well-formatted string.
 //! The iterator is initially set to the last item because of the parser requirements
-class KEXI_DB_EXPORT QuerySchemaParameterValueListIterator
+class PREDICATE_EXPORT QuerySchemaParameterValueListIterator
 {
 public:
     QuerySchemaParameterValueListIterator(
@@ -64,6 +64,6 @@ protected:
     Private * const d;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

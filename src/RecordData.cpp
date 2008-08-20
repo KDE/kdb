@@ -23,10 +23,10 @@
 */
 
 #include "RecordData.h"
-#include "global.h"
+#include "Global.h"
 #include <KDebug>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 QString RecordData::debugString() const
 {

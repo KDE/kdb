@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "cursor.h"
-#include "driver.h"
-#include "driver_p.h"
-#include "error.h"
-#include "roweditbuffer.h"
-#include "utils.h"
+#include "Cursor.h"
+#include "Driver.h"
+#include "Driver_p.h"
+#include "Error.h"
+#include "RowEditBuffer.h"
+#include "Utils.h"
 
 #include <kdebug.h>
 #include <klocale.h>
@@ -30,7 +30,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 #ifdef KEXI_DEBUG_GUI
 
@@ -44,7 +44,7 @@ Cursor::Cursor(Connection* conn, const QString& statement, uint options)
         , m_options(options)
 {
 #ifdef KEXI_DEBUG_GUI
-    KexiUtils::addKexiDBDebug(QString("Create cursor: ") + statement);
+    Utils::addKexiDBDebug(QString("Create cursor: ") + statement);
 #endif
     init();
 }
@@ -56,7 +56,7 @@ Cursor::Cursor(Connection* conn, QuerySchema& query, uint options)
         , m_options(options)
 {
 #ifdef KEXI_DEBUG_GUI
-    KexiUtils::addKexiDBDebug(QString("Create cursor for query \"%1\": ").arg(query.name()) + query.debugString());
+    Utils::addKexiDBDebug(QString("Create cursor for query \"%1\": ").arg(query.name()) + query.debugString());
 #endif
     init();
 }
@@ -109,9 +109,9 @@ Cursor::~Cursor()
 {
 #ifdef KEXI_DEBUG_GUI
     if (m_query)
-        KexiUtils::addKexiDBDebug(QString("~ Delete cursor for query"));
+        Utils::addKexiDBDebug(QString("~ Delete cursor for query"));
     else
-        KexiUtils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement);
+        Utils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement);
 #endif
     /* if (!m_query)
         KexiDBDbg << "Cursor::~Cursor() '" << m_rawStatement.toLatin1() << "'" << endl;

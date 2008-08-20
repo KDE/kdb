@@ -791,19 +791,19 @@ enum yytokentype {
 #include <KDebug>
 #include <KLocale>
 
-#include <kexidb/connection.h>
-#include <kexidb/queryschema.h>
-#include <kexidb/field.h>
-#include <kexidb/tableschema.h>
+#include <Predicate/Connection.h>
+#include <Predicate/QuerySchema.h>
+#include <Predicate/Field.h>
+#include <Predicate/TableSchema.h>
 
-#include "parser.h"
-#include "parser_p.h"
-#include "sqltypes.h"
+#include "Parser.h"
+#include "Parser_p.h"
+#include "SqlTypes.h"
 
 int yylex();
 
 // using namespace std;
-using namespace KexiDB;
+using namespace Predicate;
 
 #define YY_NO_UNPUT
 #define YYSTACK_USE_ALLOCA 1
@@ -846,12 +846,12 @@ typedef union YYSTYPE {
     qint64 integerValue;
     bool booleanValue;
     struct realType realValue;
-    KexiDB::Field::Type colType;
-    KexiDB::Field *field;
-    KexiDB::BaseExpr *expr;
-    KexiDB::NArgExpr *exprList;
-    KexiDB::ConstExpr *constExpr;
-    KexiDB::QuerySchema *querySchema;
+    Predicate::Field::Type colType;
+    Predicate::Field *field;
+    Predicate::BaseExpr *expr;
+    Predicate::NArgExpr *exprList;
+    Predicate::ConstExpr *constExpr;
+    Predicate::QuerySchema *querySchema;
     SelectOptionsInternal *selectOptions;
     OrderByColumnInternal::List *orderByColumns;
     QVariant *variantValue;

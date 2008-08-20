@@ -17,28 +17,28 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_GLOBAL_H
-#define KEXIDB_GLOBAL_H
+#ifndef PREDICATE_GLOBAL_H
+#define PREDICATE_GLOBAL_H
 
-#include "kexidb_export.h"
+#include "predicate_export.h"
 #include <qstring.h>
 
 //global public definitions
 
-/*! KexiDB implementation version.
+/*! Predicate implementation version.
  It is altered after every API change:
- - major number is increased after KexiDB storage format change,
+ - major number is increased after Predicate storage format change,
  - minor is increased after adding binary-incompatible change.
  In external code: do not use this to get library version information:
- use KexiDB::versionMajor() and KexiDB::versionMinor() instead to get real version.
+ use Predicate::versionMajor() and Predicate::versionMinor() instead to get real version.
 */
-#define KEXIDB_VERSION_MAJOR 1
-#define KEXIDB_VERSION_MINOR 9
+#define PREDICATE_VERSION_MAJOR 1
+#define PREDICATE_VERSION_MINOR 9
 
-/*! KexiDB implementation version. @see KEXIDB_VERSION_MAJOR, KEXIDB_VERSION_MINOR */
-#define KEXIDB_VERSION KexiDB::DatabaseVersionInfo(KEXIDB_VERSION_MAJOR, KEXIDB_VERSION_MINOR)
+/*! Predicate implementation version. @see PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR */
+#define PREDICATE_VERSION Predicate::DatabaseVersionInfo(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR)
 
-/*! \namespace KexiDB
+/*! \namespace Predicate
 \brief High-level database connectivity library with database backend drivers
 
 \section Framework
@@ -68,7 +68,7 @@ Drivers are loaded using DriverManager::driver(const QString& name).  The names
 of drivers are given in their drivers .desktop file in the
 X-Kexi-DriverName field.
 
-KexiDB supports two kinds of databases: file-based and network-based databases.
+Predicate supports two kinds of databases: file-based and network-based databases.
 The type of a driver is available from several places. The X-Kexi-DriverType
 field in the driver's .desktop file, is read by the DriverManager and
 available by calling DriverManager::driverInfo(const QString &name) and using
@@ -93,10 +93,10 @@ The cursor classes subclass Cursor, and implement cursor functionality specific
 to the database backend.
 
 */
-namespace KexiDB
+namespace Predicate
 {
 
-#define KexiDBDbg  kDebug(44000)   //! Debug area for core KexiDB code
+#define KexiDBDbg  kDebug(44000)   //! Debug area for core Predicate code
 #define KexiDBDrvDbg kDebug(44001) //! Debug area for KexiDB's drivers implementation code
 #define KexiDBWarn  kWarning(44000)
 #define KexiDBDrvWarn kWarning(44001)
@@ -104,7 +104,7 @@ namespace KexiDB
 
 /*! @short Contains database version information about a Kexi-compatible database.
  The version is stored as internal database properties. */
-class KEXI_DB_EXPORT DatabaseVersionInfo
+class PREDICATE_EXPORT DatabaseVersionInfo
 {
 public:
     DatabaseVersionInfo();
@@ -117,11 +117,11 @@ public:
     uint minor;
 };
 
-//! \return KexiDB version info
-KEXI_DB_EXPORT DatabaseVersionInfo version();
+//! \return Predicate version info
+PREDICATE_EXPORT DatabaseVersionInfo version();
 
 /*! @short Contains version information about a database backend. */
-class KEXI_DB_EXPORT ServerVersionInfo
+class PREDICATE_EXPORT ServerVersionInfo
 {
 public:
     ServerVersionInfo();

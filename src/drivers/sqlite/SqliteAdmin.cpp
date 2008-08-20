@@ -19,16 +19,16 @@
 
 #include <qdir.h>
 
-#include "sqliteadmin.h"
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver_p.h>
+#include "SqliteAdmin.h"
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver_p.h>
 
 #ifndef SQLITE2
-# include "sqlitevacuum.h"
+# include "SqliteVacuum.h"
 #endif
 
 SQLiteAdminTools::SQLiteAdminTools()
-        : KexiDB::AdminTools()
+        : Predicate::AdminTools()
 {
 }
 
@@ -36,7 +36,7 @@ SQLiteAdminTools::~SQLiteAdminTools()
 {
 }
 
-bool SQLiteAdminTools::vacuum(const KexiDB::ConnectionData& data, const QString& databaseName)
+bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
 {
     clearError();
 #ifdef SQLITE2
@@ -44,8 +44,8 @@ bool SQLiteAdminTools::vacuum(const KexiDB::ConnectionData& data, const QString&
     Q_UNUSED(databaseName);
     return false;
 #else
-    KexiDB::DriverManager manager;
-    KexiDB::Driver *drv = manager.driver(data.driverName);
+    Predicate::DriverManager manager;
+    Predicate::Driver *drv = manager.driver(data.driverName);
     QString title(i18n("Could not compact database \"%1\".", QDir::convertSeparators(databaseName)));
     if (!drv) {
         setError(&manager, title);

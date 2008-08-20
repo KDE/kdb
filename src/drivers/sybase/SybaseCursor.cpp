@@ -18,14 +18,14 @@
 */
 
 
-#include "sybasecursor.h"
-#include "sybaseconnection.h"
-#include "sybaseconnection_p.h"
+#include "sybaseCursor.h"
+#include "sybaseConnection.h"
+#include "SybaseConnection_p.h"
 
 #include <QtGlobal>
 
-#include <kexidb/error.h>
-#include <kexidb/utils.h>
+#include <Predicate/Error.h>
+#include <Predicate/Utils.h>
 #include <klocale.h>
 #include <kdebug.h>
 #include <limits.h>
@@ -33,9 +33,9 @@
 
 #include <sqldb.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
-SybaseCursor::SybaseCursor(KexiDB::Connection* conn, const QString& statement, uint cursor_options)
+SybaseCursor::SybaseCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
         : Cursor(conn, statement, cursor_options)
         , d(new SybaseCursorData(conn))
 {
@@ -146,7 +146,7 @@ QVariant SybaseCursor::value(uint pos)
     if (!d->dbProcess || pos >= m_fieldCount)
         return QVariant();
 
-    KexiDB::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
+    Predicate::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
     // db-library indexes its columns from 1
@@ -164,7 +164,7 @@ QVariant SybaseCursor::value(uint pos)
     // convert to string representation. All values are convertible to string
     dbconvert(d->dbProcess , dbcoltype(d->dbProcess , pos), dbdata(d->dbProcess , pos), columnDataLength , (SYBCHAR), columnValue, -2);
 
-    QVariant returnValue = KexiDB::cstringToVariant((const char*)columnValue , f, strlen((const char*)columnValue));
+    QVariant returnValue = Predicate::cstringToVariant((const char*)columnValue , f, strlen((const char*)columnValue));
 
     delete[] columnValue;
 
@@ -173,7 +173,7 @@ QVariant SybaseCursor::value(uint pos)
 
 
 /* As with sqlite, the DB library returns all values (including numbers) as
-   strings. So just put that string in a QVariant and let KexiDB deal with it.
+   strings. So just put that string in a QVariant and let Predicate deal with it.
  */
 bool SybaseCursor::drv_storeCurrentRow(RecordData& data) const
 {
@@ -200,7 +200,7 @@ bool SybaseCursor::drv_storeCurrentRow(RecordData& data) const
         // convert to string representation. All values are convertible to string
         dbconvert(d->dbProcess , dbcoltype(d->dbProcess , i + 1), dbdata(d->dbProcess , i + 1), columnDataLength , (SYBCHAR), columnValue, -2);
 
-        data[i] =  KexiDB::cstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
+        data[i] =  Predicate::cstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
 
         delete[] columnValue;
     }

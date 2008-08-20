@@ -5,9 +5,9 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <mysqldriver.h>
+#include <mysqlDriver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 const char* MySqlDriver::keywords[] = {
     "ACTION",

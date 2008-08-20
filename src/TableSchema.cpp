@@ -18,15 +18,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "tableschema.h"
-#include "driver.h"
-#include "connection.h"
-#include "lookupfieldschema.h"
+#include "TableSchema.h"
+#include "Driver.h"
+#include "Connection.h"
+#include "LookupFieldSchema.h"
 
 #include <assert.h>
 #include <kdebug.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! @internal
@@ -54,13 +54,13 @@ public:
 //-------------------------------------
 
 
-using namespace KexiDB;
+using namespace Predicate;
 
 TableSchema::TableSchema(const QString& name)
         : FieldList(true)
-        , SchemaData(KexiDB::TableObjectType)
+        , SchemaData(Predicate::TableObjectType)
         , m_query(0)
-        , m_isKexiDBSystem(false)
+        , m_isPredicateSystem(false)
 {
     m_name = name.toLower();
     init();
@@ -70,16 +70,16 @@ TableSchema::TableSchema(const SchemaData& sdata)
         : FieldList(true)
         , SchemaData(sdata)
         , m_query(0)
-        , m_isKexiDBSystem(false)
+        , m_isPredicateSystem(false)
 {
     init();
 }
 
 TableSchema::TableSchema()
         : FieldList(true)
-        , SchemaData(KexiDB::TableObjectType)
+        , SchemaData(Predicate::TableObjectType)
         , m_query(0)
-        , m_isKexiDBSystem(false)
+        , m_isPredicateSystem(false)
 {
     init();
 }
@@ -102,10 +102,10 @@ TableSchema::TableSchema(const TableSchema& ts, int setId)
 // used by Connection
 TableSchema::TableSchema(Connection *conn, const QString & name)
         : FieldList(true)
-        , SchemaData(KexiDB::TableObjectType)
+        , SchemaData(Predicate::TableObjectType)
         , m_conn(conn)
         , m_query(0)
-        , m_isKexiDBSystem(false)
+        , m_isPredicateSystem(false)
 {
 //moved d = new Private();
     assert(conn);
@@ -137,7 +137,7 @@ void TableSchema::init(const TableSchema& ts, bool copyId)
 {
     m_conn = ts.m_conn;
     m_query = 0; //not cached
-    m_isKexiDBSystem = false;
+    m_isPredicateSystem = false;
     d = new Private();
     m_name = ts.m_name;
 //Qt 4 m_indices.setAutoDelete( true );
@@ -217,7 +217,7 @@ FieldList& TableSchema::insertField(uint index, Field *field)
     return *this;
 }
 
-void TableSchema::removeField(KexiDB::Field *field)
+void TableSchema::removeField(Predicate::Field *field)
 {
     if (d->anyNonPKField && field == d->anyNonPKField) //d->anyNonPKField will be removed!
         d->anyNonPKField = 0;
@@ -226,7 +226,7 @@ void TableSchema::removeField(KexiDB::Field *field)
 }
 
 #if 0 //original  
-KexiDB::FieldList& TableSchema::addField(KexiDB::Field* field)
+Predicate::FieldList& TableSchema::addField(Predicate::Field* field)
 {
     assert(field);
     FieldList::addField(field);
@@ -306,10 +306,10 @@ bool TableSchema::hasPrimaryKeys() const
   }*/
 //}
 
-/*KexiDB::Field TableSchema::field(unsigned int id) const
+/*Predicate::Field TableSchema::field(unsigned int id) const
 {
   if (id<m_fields.count()) return m_fields[id];
-  return KexiDB::Field();
+  return Predicate::Field();
 }
 
 unsigned int TableSchema::fieldCount() const
@@ -346,14 +346,14 @@ void TableSchema::setKexiDBSystem(bool set)
 {
     if (set)
         m_native = true;
-    m_isKexiDBSystem = set;
+    m_isPredicateSystem = set;
 }
 
 void TableSchema::setNative(bool set)
 {
-    if (m_isKexiDBSystem && !set) {
+    if (m_isPredicateSystem && !set) {
         KexiDBWarn << "TableSchema::setNative(): cannot set native off"
-        " when KexiDB system flag is set on!" << endl;
+        " when Predicate system flag is set on!" << endl;
         return;
     }
     m_native = set;

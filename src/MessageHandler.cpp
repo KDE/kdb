@@ -19,7 +19,7 @@
 
 #include "msghandler.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 MessageTitle::MessageTitle(Object* o, const QString& msg)
         : m_obj(o)

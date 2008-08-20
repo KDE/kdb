@@ -17,16 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_CURSOR_H
-#define KEXIDB_CURSOR_H
+#ifndef PREDICATE_CURSOR_H
+#define PREDICATE_CURSOR_H
 
 #include <QString>
 #include <QVariant>
 
-#include "connection.h"
-#include "object.h"
+#include "Connection.h"
+#include "Object.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class RowEditBuffer;
@@ -62,7 +62,7 @@ class RowEditBuffer;
   instead.
   - QuerySchema object is not owned by Cursor object that uses it.
 */
-class KEXI_DB_EXPORT Cursor: public QObject, public Object
+class PREDICATE_EXPORT Cursor: public QObject, public Object
 {
     Q_OBJECT
 
@@ -183,7 +183,7 @@ public:
     /*! \return true if ROWID information is appended with every row.
      ROWID information is available
      if DriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
-     for a KexiDB database driver and the master table has no primary key defined.
+     for a Predicate database driver and the master table has no primary key defined.
      Phisically, ROWID value is returned after last returned field,
      so data vector's length is expanded by one. */
     inline bool containsROWIDInfo() const {
@@ -202,7 +202,7 @@ public:
     virtual const char ** rowData() const = 0;
 
     /*! Sets a list of columns for ORDER BY section of the query.
-     Only works when the cursor has been created using QuerySchema object
+     Only works when the Cursor.has been created using QuerySchema object
      (i.e. when query()!=0; does not work with raw statements).
      Each name on the list must be a field or alias present within the query
      and must not be covered by aliases. If one or more names cannot be found within
@@ -410,6 +410,6 @@ bool m_at_buffer : 1;             //!< true if we already point to the buffer wi
     Private *d;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

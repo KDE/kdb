@@ -20,31 +20,31 @@
 #ifndef KEXIDBOBJECTNAMEVALIDATOR_H
 #define KEXIDBOBJECTNAMEVALIDATOR_H
 
-#include "global.h"
+#include "Global.h"
 #include <kexiutils/validator.h>
 #include <qstring.h>
 #include <qpointer.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Driver;
 
 /*! Validates input:
  accepts if the name is not reserved for internal kexi objects. */
-class KEXI_DB_EXPORT ObjectNameValidator : public KexiUtils::Validator
+class PREDICATE_EXPORT ObjectNameValidator : public Utils::Validator
 {
 public:
-    /*! \a drv is a KexiDB driver on which isSystemObjectName() will be
-     called inside check(). If \a drv is 0, KexiDB::Driver::isKexiDBSystemObjectName()
+    /*! \a drv is a Predicate driver on which isSystemObjectName() will be
+     called inside check(). If \a drv is 0, Predicate::Driver::isPredicateSystemObjectName()
      static function is called instead. */
-    ObjectNameValidator(KexiDB::Driver *drv, QObject * parent = 0);
+    ObjectNameValidator(Predicate::Driver *drv, QObject * parent = 0);
     virtual ~ObjectNameValidator();
 
 protected:
-    virtual KexiUtils::Validator::Result internalCheck(const QString &valueName, const QVariant& v,
+    virtual Utils::Validator::Result internalCheck(const QString &valueName, const QVariant& v,
             QString &message, QString &details);
-    QPointer<KexiDB::Driver> m_drv;
+    QPointer<Predicate::Driver> m_drv;
 };
 }
 

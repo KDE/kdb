@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_ADMIN_H
-#define KEXIDB_ADMIN_H
+#ifndef PREDICATE_ADMIN_H
+#define PREDICATE_ADMIN_H
 
-#include "object.h"
+#include "Object.h"
 
-namespace KexiDB
+namespace Predicate
 {
 class Connection;
 class ConnectionData;
@@ -30,7 +30,7 @@ class ConnectionData;
 //! @short An interface containing a set of tools for database administration
 /*! Can be implemented in database drivers. @see Driver::adminTools
 */
-class KEXI_DB_EXPORT AdminTools : public Object
+class PREDICATE_EXPORT AdminTools : public Object
 {
 public:
     AdminTools();

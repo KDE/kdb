@@ -22,19 +22,19 @@
    Original Project: buX (www.bux.at)
 */
 
-#ifndef KEXIDB_RECORDDATA_H
-#define KEXIDB_RECORDDATA_H
+#ifndef PREDICATE_RECORDDATA_H
+#define PREDICATE_RECORDDATA_H
 
 #include <QVector>
 #include <QVariant>
-#include "kexidb_export.h"
+#include "predicate_export.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! @short Structure for storing single record with type information.
 //! @todo consider using something like QVector<QVariant*> ?
-class KEXI_DB_EXPORT RecordData : public QVector<QVariant>
+class PREDICATE_EXPORT RecordData : public QVector<QVariant>
 {
 public:
     /*! Creates a new record data with no columns. */

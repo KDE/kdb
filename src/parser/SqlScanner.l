@@ -19,11 +19,11 @@
 */
 
 %{
-#include <field.h>
-#include <expression.h>
+#include <Field.h>
+#include <Expression.h>
 
-#include "sqlparser.h"
-#include "sqltypes.h"
+#include "sqlParser.h"
+#include "SqlTypes.h"
 #include <iostream>
 #include <kdebug.h>
 #include <klocale.h>

@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_FIELDLIST_H
-#define KEXIDB_FIELDLIST_H
+#ifndef PREDICATE_FIELDLIST_H
+#define PREDICATE_FIELDLIST_H
 
 #include <QList>
 #include <QHash>
 #include <QString>
 
-#include "field.h"
-#include "driver.h"
+#include "Field.h"
+#include "Driver.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -35,7 +35,7 @@ class Connection;
 /*! Helper class that stores list of fields.
 */
 
-class KEXI_DB_EXPORT FieldList
+class PREDICATE_EXPORT FieldList
 {
 public:
     /*! Creates empty list of fields. If \a owner is true, the list will be
@@ -73,7 +73,7 @@ public:
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
-    virtual void removeField(KexiDB::Field *field);
+    virtual void removeField(Predicate::Field *field);
 
     /*! \return field id or NULL if there is no such a field. */
     inline Field* field(uint id) {
@@ -176,7 +176,7 @@ public:
 
     /*! @internal
      \overload void renameField(const QString& oldName, const QString& newName) */
-    void renameField(KexiDB::Field *field, const QString& newName);
+    void renameField(Predicate::Field *field, const QString& newName);
 
 protected:
     Field::List m_fields;
@@ -184,12 +184,12 @@ protected:
     Field::List *m_autoinc_fields;
 
 private:
-    void renameFieldInternal(KexiDB::Field *field, const QString& newNameLower);
+    void renameFieldInternal(Predicate::Field *field, const QString& newNameLower);
 
     //! cached
     QString m_sqlFields;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

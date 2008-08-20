@@ -20,10 +20,10 @@
 #ifndef _XBASECURSOR_H_
 #define _XBASECURSOR_H_
 
-#include <kexidb/cursor.h>
-#include <kexidb/connection.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Connection.h>
 
-namespace KexiDB {
+namespace Predicate {
 
 class xBaseCursorData;
 

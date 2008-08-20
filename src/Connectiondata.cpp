@@ -17,17 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "connectiondata.h"
-#include "drivermanager.h"
+#include "ConnectionData.h"
+#include "DriverManager.h"
 
 #include <qfileinfo.h>
 #include <qdir.h>
 
 #include <klocale.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
-namespace KexiDB
+namespace Predicate
 {
 //! @internal
 class ConnectionData::Private

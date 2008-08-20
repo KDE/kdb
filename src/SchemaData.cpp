@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "schemadata.h"
-#include "connection.h"
+#include "SchemaData.h"
+#include "Connection.h"
 
 #include <kdebug.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 SchemaData::SchemaData(int obj_type)
         : m_type(obj_type)

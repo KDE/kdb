@@ -17,22 +17,22 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_OBJECT_H
-#define KEXIDB_OBJECT_H
+#ifndef PREDICATE_OBJECT_H
+#define PREDICATE_OBJECT_H
 
-#include "error.h"
+#include "Error.h"
 #include <kmessagebox.h>
 #include <kstandardguiitem.h>
 #include <qstring.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class MessageHandler;
 
-/*! Prototype of KexiDB object, handles result of last operation.
+/*! Prototype of Predicate object, handles result of last operation.
 */
-class KEXI_DB_EXPORT Object
+class PREDICATE_EXPORT Object
 {
 public:
     /*! \return true if there was error during last operation on the object. */
@@ -70,7 +70,7 @@ public:
      but remember to also call Object::clearError(). */
     virtual void clearError();
 
-    /*! KexiDB library offers detailed error numbers using errorNum()
+    /*! Predicate library offers detailed error numbers using errorNum()
      and detailed error i18n'd messages using errorMsg() -
      this information is not engine-dependent (almost).
      Use this in your application to give users more information on what's up.
@@ -131,7 +131,7 @@ protected:
      although it is also adviced to set descriptive message \a msg.
      Eventually, if you omit all parameters, ERR_OTHER code will be set
      and default message for this will be set.
-     Use this in KexiDB::Object subclasses to informa the world about your
+     Use this in Predicate::Object subclasses to informa the world about your
      object's state. */
     virtual void setError(int code = ERR_OTHER, const QString &msg = QString());
 
@@ -145,17 +145,17 @@ protected:
       Also sets \a title. */
     virtual void setError(const QString &title, const QString &msg);
 
-    /*! Copies the (localized) error message and code from other KexiDB::Object. */
-    void setError(KexiDB::Object *obj, const QString& prependMessage = QString());
+    /*! Copies the (localized) error message and code from other Predicate::Object. */
+    void setError(Predicate::Object *obj, const QString& prependMessage = QString());
 
-    /*! Copies the (localized) error message and code from other KexiDB::Object
+    /*! Copies the (localized) error message and code from other Predicate::Object
      with custom error \a code. */
-    virtual void setError(KexiDB::Object *obj, int code,
+    virtual void setError(Predicate::Object *obj, int code,
                           const QString& prependMessage = QString());
 
     /*! Interactively asks a question. Console or GUI can be used for this,
      depending on installed message handler. For GUI version, KMessageBox class is used.
-     See KexiDB::MessageHandler::askQuestion() for details. */
+     See Predicate::MessageHandler::askQuestion() for details. */
     virtual int askQuestion(const QString& message,
                             KMessageBox::DialogType dlgType, KMessageBox::ButtonCode defaultResult,
                             const KGuiItem &buttonYes = KStandardGuiItem::yes(),
@@ -196,6 +196,6 @@ private:
     friend class MessageTitle;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

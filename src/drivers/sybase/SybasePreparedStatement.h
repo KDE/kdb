@@ -20,10 +20,10 @@
 #ifndef SYBASEPREPAREDSTATEMENT_H
 #define SYBASEPREPAREDSTATEMENT_H
 
-#include <kexidb/preparedstatement.h>
-#include <kexidb/connection_p.h>
+#include <Predicate/PreparedStatement.h>
+#include <Predicate/connection_p.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class SybasePreparedStatement : public PreparedStatement

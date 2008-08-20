@@ -17,20 +17,20 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_MNGR_P_H
-#define KEXIDB_DRIVER_MNGR_P_H
+#ifndef PREDICATE_DRIVER_MNGR_P_H
+#define PREDICATE_DRIVER_MNGR_P_H
 
-#include "object.h"
+#include "Object.h"
 
-#include <qobject.h>
+#include <qObject.h>
 #include <q3asciidict.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! Internal class of driver manager.
 */
-class KEXI_DB_EXPORT DriverManagerInternal : public QObject, public KexiDB::Object
+class PREDICATE_EXPORT DriverManagerInternal : public QObject, public Predicate::Object
 {
     Q_OBJECT
 public:
@@ -38,9 +38,9 @@ public:
 
     /*! Tries to load db driver \a name.
       \return db driver, or 0 if error (then error message is also set) */
-    KexiDB::Driver* driver(const QString& name);
+    Predicate::Driver* driver(const QString& name);
 
-    KexiDB::Driver::Info driverInfo(const QString &name);
+    Predicate::Driver::Info driverInfo(const QString &name);
 
     static DriverManagerInternal *self();
 
@@ -68,13 +68,13 @@ protected:
 
     bool lookupDrivers();
 
-    static KexiDB::DriverManagerInternal* s_self;
+    static Predicate::DriverManagerInternal* s_self;
 
     DriverManager::ServicesHash m_services; //! services map
     DriverManager::ServicesHash m_services_lcase; //! as above but service names in lowercase
     DriverManager::ServicesHash m_services_by_mimetype;
     Driver::InfoHash m_driversInfo; //! used to store drivers information
-    QHash<QString, KexiDB::Driver*> m_drivers;
+    QHash<QString, Predicate::Driver*> m_drivers;
     ulong m_refCount;
 
     QString m_serverErrMsg;

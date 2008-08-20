@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_PQXX_H
-#define KEXIDB_DRIVER_PQXX_H
+#ifndef PREDICATE_DRIVER_PQXX_H
+#define PREDICATE_DRIVER_PQXX_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class Connection;
@@ -31,7 +31,7 @@ class Connection;
 class pqxxSqlDriver : public Driver
 {
     Q_OBJECT
-    KEXIDB_DRIVER
+    PREDICATE_DRIVER
 
 public:
     pqxxSqlDriver(QObject *parent, const QStringList &args = QStringList());

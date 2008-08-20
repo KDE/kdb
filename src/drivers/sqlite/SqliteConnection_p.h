@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SQLITECONN_P_H
-#define KEXIDB_SQLITECONN_P_H
+#ifndef PREDICATE_SQLITECONN_P_H
+#define PREDICATE_SQLITECONN_P_H
 
-#include <kexidb/connection_p.h>
+#include <Predicate/connection_p.h>
 
 #include "sqlite.h"
 
@@ -43,7 +43,7 @@ typedef struct sqlite sqlite_struct;
 # define sqlite_free sqlite_freemem
 #endif
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! Internal SQLite connection data. Also used inside SQLiteCursor. */

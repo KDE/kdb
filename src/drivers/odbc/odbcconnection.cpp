@@ -20,7 +20,7 @@
 //unixODBC Includes
 #include <sql.h>
 #include <sqlext.h>
-#include <sqltypes.h>
+#include <SqlTypes.h>
 
 //QT Includes
 #include <qfile.h>
@@ -31,14 +31,14 @@
 #include <kdebug.h>
 
 //Kexi Includes
-#include <kexidb/driver.h>
-#include <kexidb/cursor.h>
-#include <kexidb/error.h>
+#include <Predicate/Driver.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Error.h>
 
 //Local Includes
-#include "odbcconnection.h"
+#include "odbcConnection.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //! @internal
 class ODBCConnectionPrivate
@@ -82,7 +82,7 @@ bool ODBCConnection::drv_connect()
     if (result != SQL_SUCCESS && result != SQL_SUCCESS_WITH_INFO)
         return false;
 
-    //We'll use ODBC 3.5 by default, so just get connection handle
+    //We'll use ODBC 3.5 by default, so just get Connection.handle
     result = SQLAllocHandle(SQL_HANDLE_DBC, d->envHandle, &d->connectionHandle);
     if (result != SQL_SUCCESS && result != SQL_SUCCESS_WITH_INFO) {
         SQLFreeHandle(SQL_HANDLE_ENV, d->envHandle);

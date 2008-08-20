@@ -17,12 +17,12 @@
 * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_XBASE_H
-#define KEXIDB_DRIVER_XBASE_H
+#ifndef PREDICATE_DRIVER_XBASE_H
+#define PREDICATE_DRIVER_XBASE_H
 
-#include <kexidb/driver.h>
+#include <Predicate/Driver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
 class xBaseDriverPrivate;
@@ -30,7 +30,7 @@ class xBaseDriverPrivate;
 class xBaseDriver : public Driver
 {
   Q_OBJECT
-  KEXIDB_DRIVER
+  PREDICATE_DRIVER
 
   public:
     xBaseDriver( QObject *parent, const QStringList &args = QStringList() );

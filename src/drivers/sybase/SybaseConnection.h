@@ -22,10 +22,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <qstringlist.h>
 
-#include <kexidb/connection.h>
-#include "sybasecursor.h"
+#include <Predicate/Connection.h>
+#include "sybaseCursor.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class SybaseConnectionInternal;
@@ -53,7 +53,7 @@ protected:
     /*! Used by driver */
     SybaseConnection(Driver *driver, ConnectionData &conn_data);
 
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList &list);
     virtual bool drv_createDatabase(const QString &dbName = QString());

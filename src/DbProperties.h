@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DBPROPERTIES_H
-#define KEXIDB_DBPROPERTIES_H
+#ifndef PREDICATE_DBPROPERTIES_H
+#define PREDICATE_DBPROPERTIES_H
 
-#include "connection.h"
+#include "Connection.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 //! @todo implement KConfigBase interface here?
@@ -30,9 +30,9 @@ namespace KexiDB
 //! A set of storable database properties.
 /*! This is a convenience class that allows to store global dabatase properties without a need
  for creating and maintain custom table.
- DatabaseProperties object is accessible only using KexiDB::Connection::databaseProperties() method.
+ DatabaseProperties object is accessible only using Predicate::Connection::databaseProperties() method.
  */
-class KEXI_DB_EXPORT DatabaseProperties : public KexiDB::Object
+class PREDICATE_EXPORT DatabaseProperties : public Predicate::Object
 {
 public:
     /*! Sets \a value for property \a name. Optional caption can be also set.

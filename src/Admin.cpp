@@ -18,9 +18,9 @@
 */
 
 #include "admin.h"
-#include "driver_p.h"
+#include "Driver_p.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 AdminTools::AdminTools()
         : Object()

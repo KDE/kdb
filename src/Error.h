@@ -22,10 +22,10 @@
 #define _KEXI_ERROR_H_
 
 #include <qstring.h>
-#include "global.h"
-#include "kexidb_export.h"
+#include "Global.h"
+#include "predicate_export.h"
 
-/*! Fine-grained KexiDB error codes */
+/*! Fine-grained Predicate error codes */
 
 #define ERR_NONE 0
 #define ERR_NO_NAME_SPECIFIED 9 //! used when name (e.g. for database) was not specified
@@ -33,10 +33,10 @@
 #define ERR_INVALID_IDENTIFIER 11 //! used when name (e.g. for database) was not specified
 #define ERR_MISSING_DB_LOCATION 20
 #define ERR_ALREADY_CONNECTED 30
-#define ERR_NO_CONNECTION 40 //!< when opened connection was expected using KexiDB::Connection
-#define ERR_CONNECTION_FAILED 41 //!< when connection has failed
+#define ERR_NO_CONNECTION 40 //!< when opened connection was expected using Predicate::Connection
+#define ERR_CONNECTION_FAILED 41 //!< when Connection.has failed
 #define ERR_CLOSE_FAILED 42 //!< when closing has failed
-#define ERR_NO_DB_USED 43 //!< when used database was expected in KexiDB::Connection
+#define ERR_NO_DB_USED 43 //!< when used database was expected in Predicate::Connection
 #define ERR_OBJECT_EXISTS 50
 #define ERR_OBJECT_THE_SAME 51
 #define ERR_OBJECT_NOT_FOUND 60
@@ -103,12 +103,12 @@
 #define ERR_OTHER 0xffff //!< use this if you have not (yet?) the name for given error 
 
 
-namespace KexiDB
+namespace Predicate
 {
 
 /*! This class contains a result information
  for various data manipulation operations, like cell/row updating/inserting. */
-class KEXI_DB_EXPORT ResultInfo
+class PREDICATE_EXPORT ResultInfo
 {
 public:
     ResultInfo() {

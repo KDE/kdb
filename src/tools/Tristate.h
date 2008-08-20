@@ -100,7 +100,7 @@ class tristate
 {
 public:
     /**
-     * Default constructor, object has \e cancelled value set.
+     * Default constructor, Object.has \e cancelled value set.
      */
     tristate()
             : m_value(Cancelled) {

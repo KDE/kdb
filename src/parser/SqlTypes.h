@@ -68,7 +68,7 @@ struct SelectOptionsInternal {
     ~SelectOptionsInternal() {
         delete orderByColumns; // delete because this is internal temp. structure
     }
-    KexiDB::BaseExpr* whereExpr;
+    Predicate::BaseExpr* whereExpr;
     OrderByColumnInternal::List* orderByColumns;
 };
 

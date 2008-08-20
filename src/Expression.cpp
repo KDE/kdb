@@ -20,17 +20,17 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "expression.h"
-#include "utils.h"
-#include "parser/sqlparser.h"
-#include "parser/parser_p.h"
+#include "Expression.h"
+#include "Utils.h"
+#include "parser/sqlParser.h"
+#include "parser/Parser_p.h"
 
 #include <ctype.h>
 
 #include <kdebug.h>
 #include <klocale.h>
 
-KEXI_DB_EXPORT QString KexiDB::exprClassName(int c)
+PREDICATE_EXPORT QString Predicate::exprClassName(int c)
 {
     if (c == KexiDBExpr_Unary)
         return "Unary";
@@ -58,7 +58,7 @@ KEXI_DB_EXPORT QString KexiDB::exprClassName(int c)
     return "Unknown";
 }
 
-using namespace KexiDB;
+using namespace Predicate;
 
 //=========================================
 
@@ -414,7 +414,7 @@ Field::Type BinaryExpr::type()
     const bool ltInt = Field::isIntegerType(lt);
     const bool rtInt = Field::isIntegerType(rt);
     if (ltInt && rtInt)
-        return KexiDB::maximumForIntegerTypes(lt, rt);
+        return Predicate::maximumForIntegerTypes(lt, rt);
 
     if (Field::isFPNumericType(lt) && (rtInt || lt == rt))
         return lt;

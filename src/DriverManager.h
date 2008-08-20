@@ -19,22 +19,22 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_DRIVER_MNGR_H
-#define KEXIDB_DRIVER_MNGR_H
+#ifndef PREDICATE_DRIVER_MNGR_H
+#define PREDICATE_DRIVER_MNGR_H
 
 #include <klibloader.h>
 #include <kservice.h>
 
-#include "driver.h"
+#include "Driver.h"
 
-namespace KexiDB
+namespace Predicate
 {
 
 class DriverManagerInternal;
 class Connection;
 
 //! Database driver management, e.g. finding and loading drivers.
-class KEXI_DB_EXPORT DriverManager : public QObject, public KexiDB::Object
+class PREDICATE_EXPORT DriverManager : public QObject, public Predicate::Object
 {
 public:
     typedef QHash<QString, KService::Ptr> ServicesHash;
@@ -53,13 +53,13 @@ public:
 
     /*! returns information list of available drivers.
       That drivers can be loaded by first use of driver() method. */
-    const KexiDB::Driver::InfoHash driversInfo();
+    const Predicate::Driver::InfoHash driversInfo();
 
     /*! \return information about driver's named with \a name.
       The name is case insensitive.
       You can check if driver information is not found calling
       Info::name.isEmpty() (then error message is also set). */
-    KexiDB::Driver::Info driverInfo(const QString &name);
+    Predicate::Driver::Info driverInfo(const QString &name);
 
     /*! \return service information about driver's named with \a name.
       The name is case insensitive.
@@ -94,6 +94,6 @@ private:
     DriverManagerInternal *d_int;
 };
 
-} //namespace KexiDB
+} //namespace Predicate
 
 #endif

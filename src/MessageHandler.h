@@ -17,29 +17,29 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_MSGHANDLER_H
-#define KEXIDB_MSGHANDLER_H
+#ifndef PREDICATE_MSGHANDLER_H
+#define PREDICATE_MSGHANDLER_H
 
-#include "object.h"
+#include "Object.h"
 #include <qpointer.h>
 #include <qwidget.h>
 
-namespace KexiDB
+namespace Predicate
 {
 
-/*! A helper class for setting temporary message title for an KexiDB::Object.
+/*! A helper class for setting temporary message title for an Predicate::Object.
  Message title is a text prepended to error or warning messages.
  Use it this way:
  \code
- KexiDB::MessageTitle title(myKexiDBObject, i18n("Terrible error occurred"));
+ Predicate::MessageTitle title(myKexiDBObject, i18n("Terrible error occurred"));
  \endcode
  After leaving current from code block, object's message title will be reverted
  to previous value.
 */
-class KEXI_DB_EXPORT MessageTitle
+class PREDICATE_EXPORT MessageTitle
 {
 public:
-    MessageTitle(KexiDB::Object* o, const QString& msg = QString());
+    MessageTitle(Predicate::Object* o, const QString& msg = QString());
     ~MessageTitle();
 
 protected:
@@ -48,9 +48,9 @@ protected:
 };
 
 /*! A prototype for Message Handler usable
- for reacting on messages sent by KexiDB::Object object(s).
+ for reacting on messages sent by Predicate::Object object(s).
 */
-class KEXI_DB_EXPORT MessageHandler
+class PREDICATE_EXPORT MessageHandler
 {
 public:
     enum MessageType { Error, Sorry, Warning };
@@ -76,7 +76,7 @@ public:
 
     /*! Shows error message with \a msg text. Existing error message from \a obj object
      is also copied, if present. */
-    virtual void showErrorMessage(KexiDB::Object *obj, const QString& msg = QString()) = 0;
+    virtual void showErrorMessage(Predicate::Object *obj, const QString& msg = QString()) = 0;
 
     /*! Interactively asks a question. For GUI version, KMessageBox class is used.
      See KMessageBox documentation for explanation of the parameters.

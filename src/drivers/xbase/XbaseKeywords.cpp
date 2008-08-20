@@ -1,7 +1,7 @@
 /* Copied from sqlite/sqlitekeywords.h */
-#include <xbasedriver.h>
+#include <xbaseDriver.h>
 
-namespace KexiDB {
+namespace Predicate {
   const char* xBaseDriver::keywords[] = {
     "ABORT",
     "ATTACH",

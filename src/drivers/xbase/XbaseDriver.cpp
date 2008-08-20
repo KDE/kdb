@@ -17,24 +17,24 @@
 * Boston, MA 02110-1301, USA.
 */
 
-#include <kexidb/connection.h>
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver_p.h>
-#include <kexidb/utils.h>
+#include <Predicate/Connection.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver_p.h>
+#include <Predicate/Utils.h>
 
 #include <kdebug.h>
 
-#include "kexidb/drivermanager.h"
-#include "kexidb/utils.h"
+#include "predicate/DriverManager.h"
+#include "predicate/Utils.h"
 
-#include "xbasedriver.h"
-#include "xbaseconnection.h"
+#include "xbaseDriver.h"
+#include "xbaseConnection.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
-KEXIDB_DRIVER_INFO( xBaseDriver , xbase )
+PREDICATE_DRIVER_INFO( xBaseDriver , xbase )
 
-class KexiDB::xBaseDriverPrivate {
+class Predicate::xBaseDriverPrivate {
 
 public:
   xBaseDriverPrivate()
@@ -42,7 +42,7 @@ public:
   {
   }
 
-  KexiDB::Driver* internalDriver;
+  Predicate::Driver* internalDriver;
 
 };
 
@@ -50,8 +50,8 @@ xBaseDriver::xBaseDriver( QObject *parent, const QStringList &args )
   : Driver( parent, args )
   ,dp( new xBaseDriverPrivate() )
 {
-  KexiDB::DriverManager manager;
-  dp->internalDriver = manager.driver(KexiDB::defaultFileBasedDriverName());
+  Predicate::DriverManager manager;
+  dp->internalDriver = manager.driver(Predicate::defaultFileBasedDriverName());
 
   d->isFileDriver = true ;
   d->isDBOpenedAfterCreate = true;
@@ -96,7 +96,7 @@ xBaseDriver::~xBaseDriver()
   delete dp;
 }
 
-KexiDB::Connection*
+Predicate::Connection*
 xBaseDriver::drv_createConnection( ConnectionData &conn_data )
 {
   if ( !dp->internalDriver ) {

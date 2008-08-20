@@ -17,16 +17,16 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
-#ifndef _KEXIDB_EXPORT_H_
-#define _KEXIDB_EXPORT_H_
+#ifndef _PREDICATE_EXPORT_H_
+#define _PREDICATE_EXPORT_H_
 
 #include <kdemacros.h>
 
-#ifndef KEXI_DB_EXPORT
+#ifndef PREDICATE_EXPORT
 # ifdef MAKE_KEXI_DB_LIB
-#  define KEXI_DB_EXPORT KDE_EXPORT
+#  define PREDICATE_EXPORT KDE_EXPORT
 # else
-#  define KEXI_DB_EXPORT KDE_IMPORT
+#  define PREDICATE_EXPORT KDE_IMPORT
 # endif
 #endif
 

@@ -30,13 +30,13 @@
 #ifndef PQXXSQLCONNECTIONINTERNAL_H
 #define PQXXSQLCONNECTIONINTERNAL_H
 
-#include <kexidb/connection_p.h>
+#include <Predicate/connection_p.h>
 #include <pqxx/pqxx>
 
 /**
   @author Adam Pigg <adam@piggz.co.uk>
 */
-namespace KexiDB
+namespace Predicate
 {
 class pqxxSqlConnectionInternal : public ConnectionInternal
 {
@@ -51,7 +51,7 @@ public:
     pqxx::connection* pqxxsql;
     pqxx::result* res;
 
-    KexiDB::ServerVersionInfo *version; //!< this is set in drv_connect(), so we can use it in drv_useDatabase()
+    Predicate::ServerVersionInfo *version; //!< this is set in drv_connect(), so we can use it in drv_useDatabase()
     //!< because pgsql really connects after "USE".
 
     QString errmsg; //!< server-specific message of last operation

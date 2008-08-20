@@ -5,9 +5,9 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <pqxxdriver.h>
+#include <pqxxDriver.h>
 
-namespace KexiDB
+namespace Predicate
 {
 const char* pqxxSqlDriver::keywords[] = {
     "ABORT",

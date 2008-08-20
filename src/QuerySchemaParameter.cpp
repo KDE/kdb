@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "queryschemaparameter.h"
-#include "driver.h"
+#include "QuerySchemaParameter.h"
+#include "Driver.h"
 
 #include <kdebug.h>
 #include <qpointer.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 QuerySchemaParameter::QuerySchemaParameter()
         : type(Field::InvalidType)
@@ -39,7 +39,7 @@ QString QuerySchemaParameter::debugString() const
     return QString("msg=\"%1\" type=\"%2\"").arg(Field::typeName(type)).arg(message);
 }
 
-void KexiDB::debug(const QuerySchemaParameterList& list)
+void Predicate::debug(const QuerySchemaParameterList& list)
 {
     KexiDBDbg << QString("Query parameters (%1):").arg(list.count()) << endl;
     foreach(const QuerySchemaParameter& parameter, list)

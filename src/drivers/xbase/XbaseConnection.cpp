@@ -24,14 +24,14 @@
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "xbasedriver.h"
-#include "xbasecursor.h"
-#include "xbaseconnection.h"
-#include "xbaseconnection_p.h"
-#include <kexidb/error.h>
+#include "xbaseDriver.h"
+#include "xbaseCursor.h"
+#include "xbaseConnection.h"
+#include "XbaseConnection_p.h"
+#include <Predicate/Error.h>
 
 
-using namespace KexiDB;
+using namespace Predicate;
 
 
 xBaseConnection::xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data )
@@ -44,7 +44,7 @@ xBaseConnection::~xBaseConnection() {
   destroy();
 }
 
-bool xBaseConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool xBaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
   const bool ok = d->db_connect(*data());
   if (!ok)

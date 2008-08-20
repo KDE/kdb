@@ -17,9 +17,9 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "global.h"
+#include "Global.h"
 
-using namespace KexiDB;
+using namespace Predicate;
 
 DatabaseVersionInfo::DatabaseVersionInfo()
 {
@@ -52,7 +52,7 @@ void ServerVersionInfo::clear()
 
 //------------------------
 
-DatabaseVersionInfo KexiDB::version()
+DatabaseVersionInfo Predicate::version()
 {
-    return KEXIDB_VERSION;
+    return PREDICATE_VERSION;
 }

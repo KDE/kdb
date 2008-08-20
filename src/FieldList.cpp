@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "fieldlist.h"
-#include "object.h"
+#include "FieldList.h"
+#include "Object.h"
 
 #include <kdebug.h>
 
 #include <assert.h>
 
-using namespace KexiDB;
+using namespace Predicate;
 
 FieldList::FieldList(bool owner)
         : m_fields(owner)
@@ -62,7 +62,7 @@ void FieldList::clear()
     m_sqlFields.clear();
 }
 
-FieldList& FieldList::insertField(uint index, KexiDB::Field *field)
+FieldList& FieldList::insertField(uint index, Predicate::Field *field)
 {
     assert(field);
     if (!field)
@@ -89,7 +89,7 @@ void FieldList::renameField(const QString& oldName, const QString& newName)
     renameFieldInternal(field, newName.toLower());
 }
 
-void FieldList::renameField(KexiDB::Field *field, const QString& newName)
+void FieldList::renameField(Predicate::Field *field, const QString& newName)
 {
     if (!field || field != m_fields_by_name.value(field->name().toLower())) {
         KexiDBFatal << "FieldList::renameField() no field found "
@@ -99,7 +99,7 @@ void FieldList::renameField(KexiDB::Field *field, const QString& newName)
     renameFieldInternal(field, newName.toLower());
 }
 
-void FieldList::renameFieldInternal(KexiDB::Field *field, const QString& newNameLower)
+void FieldList::renameFieldInternal(Predicate::Field *field, const QString& newNameLower)
 {
     m_fields_by_name.remove(field->name().toLower());
     field->setName(newNameLower);
@@ -107,12 +107,12 @@ void FieldList::renameFieldInternal(KexiDB::Field *field, const QString& newName
 }
 
 
-FieldList& FieldList::addField(KexiDB::Field *field)
+FieldList& FieldList::addField(Predicate::Field *field)
 {
     return insertField(m_fields.count(), field);
 }
 
-void FieldList::removeField(KexiDB::Field *field)
+void FieldList::removeField(Predicate::Field *field)
 {
     assert(field);
     if (!field)
