@@ -7,7 +7,7 @@
 #  MYSQL_FOUND, If false, do not try to use MySQL.
 #  MYSQL_EMBEDDED_FOUND, If false, do not try to use MySQL Embedded.
 
-# Copyright (c) 2006, Jaroslaw Staniek, <js@iidea.pl>
+# Copyright (c) 2006, Jarosław Staniek <staniek@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
