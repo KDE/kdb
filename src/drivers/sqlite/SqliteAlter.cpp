@@ -50,13 +50,13 @@ struct SQLiteTypeAffinityInternal {
     QHash<Field::Type, SQLiteTypeAffinity> affinity;
 };
 
-K_GLOBAL_STATIC(SQLiteTypeAffinityInternal, KexiDB_SQLite_affinityForType)
+K_GLOBAL_STATIC(SQLiteTypeAffinityInternal, Predicate_SQLite_affinityForType)
 
 //! \return SQLite type affinity for \a type
 //! See doc/dev/alter_table_type_conversions.ods, page 2 for more info
 static SQLiteTypeAffinity affinityForType(Field::Type type)
 {
-    return KexiDB_SQLite_affinityForType->affinity[type];
+    return Predicate_SQLite_affinityForType->affinity[type];
 }
 
 tristate SQLiteConnection::drv_changeFieldProperty(TableSchema &table, Field& field,

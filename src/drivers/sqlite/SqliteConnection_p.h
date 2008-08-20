@@ -20,7 +20,7 @@
 #ifndef PREDICATE_SQLITECONN_P_H
 #define PREDICATE_SQLITECONN_P_H
 
-#include <Predicate/connection_p.h>
+#include <Predicate/Connection_p.h>
 
 #include "sqlite.h"
 

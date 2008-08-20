@@ -30,7 +30,7 @@
 #ifndef PQXXSQLCONNECTIONINTERNAL_H
 #define PQXXSQLCONNECTIONINTERNAL_H
 
-#include <Predicate/connection_p.h>
+#include <Predicate/Connection_p.h>
 #include <pqxx/pqxx>
 
 /**

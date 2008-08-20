@@ -21,7 +21,7 @@
 #define SYBASEPREPAREDSTATEMENT_H
 
 #include <Predicate/PreparedStatement.h>
-#include <Predicate/connection_p.h>
+#include <Predicate/Connection_p.h>
 
 namespace Predicate
 {

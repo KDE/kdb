@@ -24,7 +24,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <KDebug>
 
-#include "Mysqlconnection_p.h"
+#include "MysqlConnection_p.h"
 
 #include <Predicate/ConnectionData.h>
 

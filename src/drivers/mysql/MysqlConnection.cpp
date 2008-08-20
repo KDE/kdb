@@ -29,7 +29,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include "Mysqlconnection_p.h"
+#include "MysqlConnection_p.h"
 #include "mysqlCursor.h"
 #include "MysqlPreparedStatement.h"
 #include <Predicate/Error.h>
