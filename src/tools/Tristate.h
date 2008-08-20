@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef _TRISTATE_TYPE_H_
-#define _TRISTATE_TYPE_H_
+#ifndef PREDICATE_TRISTATE_H
+#define PREDICATE_TRISTATE_H
 
-#include <qstring.h>
+#include <QtCore/QString>
 
 /**
  * \e cancelled value, in most cases usable if there is a need for returning
