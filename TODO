@@ -1,0 +1,6 @@
+Buildsystem:
+[ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
+
+Drivers:
+[ ] add SQLite driver for 3.6.1+ version (use FindSQLite.cmake) 
+    but also keep SQlite 3.2.8 for compatibility with Kexi 1.x
