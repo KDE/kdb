@@ -19,8 +19,8 @@
 */
 
 #include "mysqlCursor.h"
-#include "mysqlConnection.h"
-#include "MysqlConnection_p.h"
+#include "MysqlConnection.h"
+#include "Mysqlconnection_p.h"
 #include <Predicate/Error.h>
 #include <Predicate/Utils.h>
 #include <klocale.h>

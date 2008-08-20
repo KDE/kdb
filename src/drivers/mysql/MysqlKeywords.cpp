@@ -5,7 +5,7 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <mysqlDriver.h>
+#include <MysqlDriver.h>
 
 namespace Predicate
 {

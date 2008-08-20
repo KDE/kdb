@@ -32,8 +32,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "mysqlDriver.h"
-#include "mysqlConnection.h"
+#include "MysqlDriver.h"
+#include "MysqlConnection.h"
 #include <Predicate/Field.h>
 #include <Predicate/Driver_p.h>
 #include <Predicate/Utils.h>
