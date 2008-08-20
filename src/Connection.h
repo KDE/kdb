@@ -36,8 +36,7 @@
 #include "driver.h"
 #include "preparedstatement.h"
 #include "RecordData.h"
-
-#include <kexiutils/tristate.h>
+#include "Tristate.h"
 
 namespace KexiDB
 {

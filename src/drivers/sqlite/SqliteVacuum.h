@@ -23,7 +23,7 @@
 #include <qobject.h>
 #include <qstring.h>
 
-#include <kexiutils/tristate.h>
+#include "Tristate.h"
 
 class Q3Process;
 class KProgressDialog;
