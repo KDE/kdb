@@ -33,7 +33,7 @@ connection)
 	KexiDBDrvDbg << "OracleConnectionInternal::Constructor: "<< endl;
    try{
       env = Environment::createEnvironment();
-   }catch (&ea){
+   }catch (oracle::occi::SQLException ea){
       errno=ea.getErrorCode();
       errmsg=strdup(ea.what());
       KexiDBDrvDbg <<errmsg;
@@ -49,7 +49,7 @@ OracleConnectionInternal::~OracleConnectionInternal()
 	 	env=0;
 	 	KexiDBDrvDbg <<endl;
 	}
-	catch (&ea){
+	catch (oracle::occi::SQLException ea){
       errno=ea.getErrorCode();
       errmsg=strdup(ea.what());
       KexiDBDrvDbg <<errmsg;
@@ -91,7 +91,7 @@ bool OracleConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 	  stmt=oraconn->createStatement();
 	  return true;
   }
-  catch (&ea)
+  catch (oracle::occi::SQLException ea)
   {
      errno=ea.getErrorCode();
      errmsg=strdup(ea.what());
@@ -110,7 +110,7 @@ bool OracleConnectionInternal::db_disconnect()
     oraconn=0;
 	  return true;
 	  }
-	 catch (&ea)
+	 catch (oracle::occi::SQLException ea)
 	 {
 	  errmsg=ea.getMessage().c_str();
 	  KexiDBDrvDbg<<errmsg<<endl;
@@ -133,7 +133,7 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
 		rs=0;
 		return !user.compare(dbName);
 	}
-	catch (&ea)
+	catch (oracle::occi::SQLException ea)
   {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
@@ -153,7 +153,7 @@ bool OracleConnectionInternal::executeSQL(const QString& statement) {
       rs=stmt->getResultSet();
       return(true);
     }
-    catch (&ea)
+    catch (oracle::occi::SQLException ea)
     {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
@@ -162,7 +162,7 @@ bool OracleConnectionInternal::executeSQL(const QString& statement) {
     }
 }
 QString OracleConnectionInternal::escapeIdentifier(const QString& str) const {
-	return QString(str).replace('`', "'");
+	return QString(str).replace('`', "'").toUpper();
 }
 QString OracleConnectionInternal::getServerVersion()
 {
@@ -170,75 +170,37 @@ QString OracleConnectionInternal::getServerVersion()
 	{ 
 		return QString(oraconn->getServerVersion().c_str());
 	}
-	catch (&ea)
+	catch (oracle::occi::SQLException ea)
   {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
        return(NULL);
   }	
 }
-void OracleConnectionInternal::createSequences(){
+bool OracleConnectionInternal::createSequences(){
   KexiDBDrvDbg<<endl; 
-  string sq[5]={"ROW_ID", "BLOBS","OBJECTDATA","OBJECTS","PARTS"};
- 
-  KexiDBDrvDbg<<endl; 
-  for(int i=0;i<5;i++)
-  {
-    try
-    {
-        stmt->execute("CREATE SEQUENCE KEXI__SEQ__"+sq[i]);
-    }
-    catch (&ea)
-	  {
-	    KexiDBDrvDbg << ea.what()<< endl;
-	    return;
-	  }
-  }
-  //Needed to retrieve last generated number
-  executeSQL("ALTER SEQUENCE KEXI__SEQ__ROW_ID NOCACHE");
+  return executeSQL("CREATE SEQUENCE KEXI__SEQ__ROW_ID")&&
+         executeSQL("ALTER SEQUENCE KEXI__SEQ__ROW_ID NOCACHE");
 }
 	
-void OracleConnectionInternal::createTriggers()
+bool OracleConnectionInternal::createTrigger
+                                           (QString tableName, IndexSchema* ind)
 {
-  KexiDBDrvDbg <<endl;
-  string tg[4]={"BLOBS","OBJECTDATA","OBJECTS","PARTS"};
-  string o[4]={"O","O","O","P"};
-  string create="CREATE OR REPLACE TRIGGER KEXI__TG__";
-  string before="\nBEFORE INSERT ON KEXI__";
-  string begin="\nFOR EACH ROW\nBEGIN\nSELECT KEXI__SEQ__";
-  string nextval=".NEXTVAL INTO :NEW.";
-  string into="_ID FROM DUAL;\nEND;";
-  
-  string tgaux="CREATE OR REPLACE TRIGGER KEXI__TG__AUX\n";
-	      tgaux+="AFTER INSERT ON KEXI__OBJECTS FOR EACH ROW\nBEGIN\n";
-        tgaux+="INSERT INTO KEXI__AUX VALUES (:NEW.ROWID,SYSTIMESTAMP);\nEND;";
-  try
+  QString fieldName;
+  QString tg="CREATE OR REPLACE TRIGGER KEXI__TG__"+tableName+
+             "\nBEFORE INSERT ON "+tableName+
+             "\nFOR EACH ROW\n"+
+             "BEGIN\n";
+  for(int i=0; i<ind->fieldCount(); i++)
   {
-    for (int i=0;i<4;i++)
-    {
-      rs=stmt->executeQuery
-	        ("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME LIKE 'KEXI__"+tg[i]+"'");
-	    if(rs->next())
-	    {
-        stmt->execute(create+tg[i]+before+tg[i]+begin+tg[i]+nextval+o[i]+into);
-      }
-      stmt->closeResultSet(rs);
-      rs=0;
-    }
-    /*rs=stmt->executeQuery
-	        ("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME LIKE 'KEXI__PARTS'");
-	  if(rs->next())
-	  {  
-      KexiDBDrvDbg <<"AUX"<<endl;
-      KexiDBDrvDbg <<endl<<tgaux.c_str()<<endl;
-      //stmt->execute(tgaux);
-    }
-    */
-  }    
-	catch (&ea)
-	{
-	  KexiDBDrvDbg << ea.what()<< endl;
-	}
+      fieldName=ind->field(i)->name();          
+      tg=tg+"SELECT KEXI__SEQ__"+tableName/*+"__"+fieldName*/+".NEXTVAL "+
+            "INTO :NEW."+fieldName+" FROM DUAL;\n";
+  }
+  tg=tg+"END;";
+  KexiDBDrvDbg <<tg<<endl;
+  
+  return executeSQL(tg); 
 }
 //--------------------------------------
 

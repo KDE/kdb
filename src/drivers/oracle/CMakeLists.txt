@@ -6,6 +6,12 @@ include_directories(
 
 ADD_DEFINITIONS( -D__PREDICATE__= )
 
+if (MSVC)
+  ADD_DEFINITIONS(-EHsc)
+elif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
+  ADD_DEFINITIONS(-fexceptions)
+endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
+
 ########### next target ###############
 
 set(predicate_oracle_SRCS 

@@ -61,7 +61,7 @@ bool OracleConnection::drv_connect(ServerVersionInfo& version)
 	  version.release = versionRe.cap(3).toInt();
 	  return true;
 	 }
-	 catch ( &ea)
+	 catch (oracle::occi::SQLException ea)
 	 {
 	  KexiDBDrvDbg <<ea.what();
 	  return false;
@@ -111,14 +111,12 @@ bool OracleConnection::drv_getDatabasesList( QStringList &list )
 		d->stmt->closeResultSet(d->rs);
 		d->rs=0;
 		
-		//KexiDBDrvDbg <<list<<endl;
 		return true;
 	}
-	catch (&ea)
+	catch (oracle::occi::SQLException ea)
   {
-       //d->errno=ea.getErrorCode();
-       KexiDBDrvDbg << "error: "<<ea.what()<<"\n";
-       return(false);
+       KexiDBDrvDbg <<ea.what()<<"\n";
+       return false;
   }
   
 }
@@ -131,27 +129,21 @@ bool OracleConnection::drv_getDatabasesList( QStringList &list )
 bool OracleConnection::drv_createDatabase( const QString &dbName) {
 	KexiDBDrvDbg << dbName << endl;
 	QString user;
-	int res;
-
+  bool res;
 	try
 	{
 		d->rs=d->stmt->executeQuery("SELECT user FROM DUAL");
 		if(d->rs->next()) user=QString(d->rs->getString(1).c_str());
 		d->stmt->closeResultSet(d->rs);
 		d->rs=0;
-		res=!user.compare(dbName);
-		if(res)
-		{
-		  //d->stmt->execute
-		  //  ("CREATE TABLE KEXI__AUX (ID NUMBER PRIMARY KEY,CREATION TIMESTAMP)");
-		  d->createSequences();  
-		}
-    return res;
+		res=(!user.compare(dbName));
+		if (res) d->createSequences();
+		return res;
 	}
-	catch (&ea)
+	catch (oracle::occi::SQLException ea)
 	{
-	  KexiDBDrvDbg << ea.getMessage().c_str()<< endl;
-	  return(false);
+	  KexiDBDrvDbg << ea.what()<< endl;
+	  return false;
 	}
 }
 
@@ -172,7 +164,7 @@ bool OracleConnection::drv_databaseExists
 	  //KexiDBDrvDbg << dbName <<":"<<res<< endl;
     return res;
 	}
-	catch ( &ea)
+	catch ( oracle::occi::SQLException ea)
 	{
 	  KexiDBDrvDbg << ea.what()<< endl;
 	  return(false);
@@ -190,36 +182,10 @@ bool OracleConnection::drv_useDatabase(const QString &dbName,
   KexiDBDrvDbg <<endl;
 	Q_UNUSED(cancelled);
 	Q_UNUSED(msgHandler);
-	bool createtg;
+	
 //TODO is here escaping needed?
 	if( d->useDatabase(dbName))
 	{
-	  try
-	  {
-	    //KexiDBDrvDbg<<"Counting triggers"<<endl; 
-	    d->rs=d->stmt->executeQuery
-	   ("SELECT COUNT(*) FROM USER_OBJECTS WHERE OBJECT_NAME LIKE 'KEXI__TG__%'");
-	    createtg=!d->rs->next() || d->rs->getInt(1)<(SYSTABLES +1);
-	    d->stmt->closeResultSet(d->rs);
-	    d->rs=0;
-	    
-	    /*d->rs=d->stmt->executeQuery
-	    ("SELECT COUNT(*) FROM USER_OBJECTS WHERE OBJECT_NAME LIKE 'KEXI__SEQ%'");
-	    createsq=!d->rs->next() || d->rs->getInt(1)<SYSTABLES;
-	    d->stmt->closeResultSet(d->rs);
-	    d->rs=0;
-	    */
-	  }
-	  catch(&ea)
-	  {
-	    KexiDBDrvDbg <<ea.what()<<endl;
-	    return false;
-	  }
-	  //if(createsq)  d->createSequences();
-	  if(createtg){
-	    d->createTriggers();
-	  }
-
 	  active=true;
 	  return true;
 	}
@@ -276,7 +242,7 @@ bool OracleConnection::drv_dropDatabase( const QString& /*dbName*/)
 		d->stmt->execute(dropsq);
 	  return true;
 	}
-	catch (&ea)
+	catch (oracle::occi::SQLException ea)
 	{
 	  KexiDBDrvDbg <<ea.what()<<endl;
 	  return false;
@@ -304,9 +270,8 @@ bool OracleConnection::drv_setAutoCommit(bool on)
 	  d->stmt->setAutoCommit(on);
 	  KexiDBDrvDbg <<":true"<<endl;
 	  return true;
-	}catch ( &ea){
-	  KexiDBDrvDbg <<ea.getMessage().c_str();
-	  KexiDBDrvDbg <<":false"<<endl;
+	}catch ( oracle::occi::SQLException ea){
+	  KexiDBDrvDbg <<ea.what();
 	  return false;
 	}
 }
@@ -316,39 +281,126 @@ bool OracleConnection::drv_executeSQL( const QString& statement )
     return d->executeSQL(statement);
 }
 
-bool OracleConnection::drv_createTable( const TableSchema& tableSchema )
+bool OracleConnection::drv_createTable( const KexiDB::TableSchema& tableSchema )
 {
+  IndexSchema *ind; // Used to ask for the primary key
+  QString tableName;
+  QString fieldName;
+  QString sequenceName;
+
 	m_sql = createTableStatement(tableSchema);
-	KexiDBDbg<<"******** "<<m_sql<<endl;
-  //KexiDBDrvDbg << tableSchema.name() << endl;
-	return (executeSQL(m_sql) &&
-	        executeSQL("ALTER TABLE "+tableSchema.name()+" ADD ROW_ID NUMBER"));
+	//KexiDBDbg<<"******** "<<m_sql<<endl;
+  tableName = tableSchema.name();
+  KexiDBDrvDbg << tableName << endl;
+	
+	if(executeSQL(m_sql))
+	{
+    ind = tableSchema.primaryKey();
+    //KexiDBDrvDbg << "Number of fields in table: " << tableSchema.fieldCount() << endl;
+    //KexiDBDrvDbg << "Number of fields in pk: " << ind->fieldCount() << endl;
+    // TODO: is it ok to check this way? Would it be better using fieldCount == 0 ?
+    if(ind->isPrimaryKey())
+    {
+      // Primary keys may have many fields
+      //for(int i=0; i<ind->fieldCount(); i++)
+      //{
+        //KexiDBDrvDbg << "PK: " << ind->field(i)->name() << endl;
+        //fieldName = ind->field(i)->name();
+        sequenceName = "KEXI__SEQ__" + tableName;// + "__" + fieldName;
+        // Add custom sequence and trigger to manage it
+        if(!d->executeSQL("CREATE SEQUENCE "+sequenceName) ||
+                          !d->createTrigger(tableName,ind))
+        {
+          return false;
+        }
+      //}
+    }
+    return executeSQL("ALTER TABLE " + tableName + " ADD ROW_ID NUMBER");
+  }
+  return false;
 }
 
 bool OracleConnection::drv_afterInsert(const QString& table, FieldList& fields)
 {
    //Q_UNUSED(table);
    Q_UNUSED(fields);
-   /*Field* row_id=new Field("ROW_ID", 
-                            Field::BigInteger,
-                            Field::Unique,
-                            Field::Unsigned,
-                            0,
-                            0,
-                            "KEXI__SEQ__ROW_ID.NEXTVAL",
-                            QString(),
-                            QString(),
-                            0
-                          );
-   fields.insertField(0, row_id);
-   */
+   KexiDBDrvDbg << "Updating ROW_ID on " << table << endl;
    QString stat=QString("UPDATE "+table
              +" SET ROW_ID=KEXI__SEQ__ROW_ID.NEXTVAL WHERE ROW_ID IS NULL");
-             
-   return (d->executeSQL(stat)/*&&d->executeSQL("COMMIT")*/);
+   //KexiDBDrvDbg << stat << endl;
+   return (d->executeSQL(stat));
 
 }
 
+bool OracleConnection::drv_dropTable( const QString& name )
+{
+  /*QString drop="DROP TRIGGER KEXI__TG__"+name;
+  executeSQL(drop.latin1());
+  
+  QString dropsq="DECLARE";
+  dropsq=dropsq   +"CURSOR C_KEXI IS SELECT * FROM USER_OBJECTS\n"              
+	                +"WHERE OBJECT_NAME LIKE 'KEXI__SEQ__"+escapeIdentifer(name)                        
+	                +"%';\nBEGIN\n"                                                   
+	                +"FOR V_KEXI IN C_KEXI LOOP\n"                               
+	                +"EXECUTE IMMEDIATE 'DROP SEQUENCE ' || V_KEXI.OBJECT_NAME;\n"   
+                  +"END LOOP;\n"                                                   
+                  +"END;\n"; 
+  executeSQL(drop.latin1());
+  */
+  QString trig ="DROP TRIGGER KEXI__TG__"+ escapeIdentifier(name);
+  QString seq ="DROP SEQUENCE KEXI__SEQ__"+ escapeIdentifier(name);
+  m_sql = "DROP TABLE " + escapeIdentifier(name);
+  
+  return executeSQL(trig)&&executeSQL(seq)&&executeSQL(m_sql);
+}
+
+bool OracleConnection::drv_alterTableName
+                              (TableSchema& tableSchema, const QString& newName)
+{
+  QString oldTableName = tableSchema.name();
+  IndexSchema *ind = tableSchema.primaryKey();
+  QString fieldName;
+ 
+  if(ind->isPrimaryKey())
+  {
+    // Primary keys may have many fields
+    for(int i=0; i<ind->fieldCount(); i++)
+    {
+      fieldName=ind->field(i)->name();
+      QString sq="CREATE SEQUENCE KEXI__SEQ__" + newName + "__" + fieldName+
+                "START WITH KEXI__SEQ__"+oldTableName+"__"+fieldName+".NEXTVAL";
+      if(!executeSQL(sq.latin1())) return false;
+    }
+    
+    if (!d->createTrigger(newName,ind)) return false;
+    
+    QString drop="DROP TRIGGER KEXI__TG__";
+    drop=drop+oldTableName;
+    executeSQL(drop.latin1());
+    
+    QString dropsq="DECLARE";
+    dropsq=dropsq +"CURSOR C_KEXI IS SELECT * FROM USER_OBJECTS\n"              
+	                +"WHERE OBJECT_NAME LIKE 'KEXI__SEQ__"+oldTableName+"%';\n"                        
+	                +"BEGIN\n"                                                   
+	                +"FOR V_KEXI IN C_KEXI LOOP\n"                               
+	                +"EXECUTE IMMEDIATE 'DROP SEQUENCE ' || V_KEXI.OBJECT_NAME;\n"   
+                  +"END LOOP;\n"                                                   
+                  +"END;\n";
+                   
+    executeSQL(dropsq.latin1());
+  
+  }//end pk
+  
+  tableSchema.setName(newName);
+  if (!executeSQL(QString::fromLatin1("ALTER TABLE %1 RENAME TO %2")
+    .arg(escapeIdentifier(oldTableName)).arg(escapeIdentifier(newName))))
+  {
+    tableSchema.setName(oldTableName); //restore old name
+    return false;
+  }
+  return true;
+              
+}
 /**
  * RowID in Oracle is not a number, is an alphanumeric string
  */
@@ -366,11 +418,11 @@ Q_ULLONG OracleConnection::drv_lastInsertRowID()
     return res;
     
   }
-  catch(&ea)
+  catch(oracle::occi::SQLException ea)
   {
     KexiDBDrvDbg<<ea.what()<<endl;
+    return -1;
   }
-  return -1;
 }
 
 
