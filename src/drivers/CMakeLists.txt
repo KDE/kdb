@@ -1,5 +1,9 @@
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+  cmake_policy(SET CMP0005 NEW)
+endif(COMMAND cmake_policy)
 
-add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
+#TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
 add_subdirectory( sqlite )
 
@@ -26,26 +30,3 @@ ENDIF(XBASE_FOUND)
 
 #message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(pgsql_dir)")
 #message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(mysql_dir)")
-
-
-
-########### install files ###############
-
-
-
-
-
-
-#original Makefile.am contents follow:
-
-#if compile_mysql_plugin
-#mysql_dir=mySQL
-#endif
-#
-#
-#if compile_pgsql_plugin
-#pgsql_dir=pqxx
-#endif
-#
-#SUBDIRS =  sqlite sqlite2 $(pgsql_dir) $(mysql_dir)
-#

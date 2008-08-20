@@ -1,15 +1,28 @@
+# define the generic version of the Predicate libraries here
+# this makes it easy to advance it when the next Predicate release comes
+set(GENERIC_PREDICATE_LIB_VERSION "0.0.0")
+set(GENERIC_PREDICATE_LIB_SOVERSION "0")
 
-add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44000)
+find_package(Qt4 REQUIRED)
 
 add_subdirectory( drivers )
 
-include_directories( ${CMAKE_SOURCE_DIR}/kexi ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser ${KDE4_INCLUDES}  )
-
-ADD_DEFINITIONS( 
--D__KEXIDB__= 
--DMAKE_KEXI_DB_LIB
--DYYERROR_VERBOSE=1
+include_directories(
+  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}/src/parser
+  ${QT_INCLUDES}
 )
+
+ADD_DEFINITIONS(
+#TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
+  -D__PREDICATE__= 
+  -DMAKE_KEXI_DB_LIB
+  -DYYERROR_VERBOSE=1
+)
+
+if (WIN32)
+ set(CMAKE_DEBUG_POSTFIX "d")
+endif (WIN32)
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
@@ -19,79 +32,89 @@ ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
 
 # Create custom command for flex/lex (note the outputs)
 ADD_CUSTOM_COMMAND(
-COMMAND ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/generate_parser_code.sh
+COMMAND ${CMAKE_SOURCE_DIR}/src/parser/generate_parser_code.sh
 TARGET parser
-OUTPUTS ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlParser.h ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlParser.cpp ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlScanner.h ${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlScanner.cpp)
+OUTPUTS
+  ${CMAKE_SOURCE_DIR}/src/parser/SqlParser.h
+  ${CMAKE_SOURCE_DIR}/src/parser/SqlParser.cpp
+  ${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.h
+  ${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.cpp)
 
 # mark files as generated
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlParser.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlParser.cpp GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlScanner.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/kexi/kexidb/parser/SqlScanner.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlParser.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlParser.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.cpp GENERATED)
 
 ########### next target ###############
 
-set(kexidbparser_STAT_SRCS 
+set(predicate_parser_SRCS 
    parser/SqlScanner.cpp 
    parser/SqlParser.cpp 
    parser/Parser.cpp 
    parser/Parser_p.cpp )
 
-set(kexidb_LIB_SRCS 
-   ${kexidbparser_STAT_SRCS}
-   drivermanager.cpp 
-   driver.cpp 
-   driver_p.cpp 
-   connection.cpp 
+set(predicate_LIB_SRCS 
+   ${predicate_parser_SRCS}
+   DriverManager.cpp 
+   Driver.cpp 
+   Driver_p.cpp 
+   Connection.cpp 
    keywords.cpp 
-   object.cpp 
-   field.cpp 
-   utils.cpp 
-   expression.cpp 
-   connectiondata.cpp 
+   Object.cpp 
+   Field.cpp 
+   Utils.cpp 
+   Expression.cpp 
+   ConnectionData.cpp 
    RecordData.cpp
-   fieldlist.cpp 
-   tableschema.cpp 
-   cursor.cpp 
-   transaction.cpp 
-   indexschema.cpp 
-   queryschema.cpp 
-   queryschemaparameter.cpp
-   schemadata.cpp 
-   global.cpp 
-   relationship.cpp 
-   roweditbuffer.cpp 
-   msghandler.cpp 
-   dbobjectnamevalidator.cpp 
-   preparedstatement.cpp 
-   dbproperties.cpp 
-   admin.cpp 
-   lookupfieldschema.cpp 
-   simplecommandlineapp.cpp
-   fieldvalidator.cpp
-   alter.cpp
+   FieldList.cpp 
+   TableSchema.cpp 
+   Cursor.cpp 
+   Transaction.cpp 
+   IndexSchema.cpp 
+   QuerySchema.cpp 
+   QuerySchemaParameter.cpp
+   SchemaData.cpp 
+   Global.cpp 
+   Relationship.cpp 
+   RowEditBuffer.cpp 
+   MessageHandler.cpp 
+   DbObjectNameValidator.cpp 
+   PreparedStatement.cpp 
+   DbProperties.cpp 
+   Admin.cpp 
+   LookupFieldSchema.cpp 
+   FieldValidator.cpp
+   Alter.cpp
+#TODO tools/SimpleCommandLineApp.cpp
 )
 
-kde4_add_library(kexidb SHARED ${kexidb_LIB_SRCS})
-target_link_libraries(kexidb 
-   ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KPARTS_LIBS} kexiutils )
+add_library(predicate SHARED ${predicate_LIB_SRCS})
+target_link_libraries(predicate
+  ${QT_QTGUI_LIBRARY}
+#  kexiutils 
+)
 
-set_target_properties(kexidb PROPERTIES VERSION ${GENERIC_KOFFICE_LIB_VERSION} SOVERSION ${GENERIC_KOFFICE_LIB_SOVERSION} )
+set_target_properties(predicate PROPERTIES 
+  VERSION ${GENERIC_PREDICATE_LIB_VERSION}
+  SOVERSION ${GENERIC_PREDICATE_LIB_SOVERSION}
+)
 
 if(MSVC)
    # avoid LNK1169 errors
-   set_target_properties(kexidb PROPERTIES LINK_FLAGS /FORCE:MULTIPLE)
+   set_target_properties(predicate PROPERTIES LINK_FLAGS /FORCE:MULTIPLE)
 endif(MSVC)
 
-install(TARGETS kexidb  DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS predicate DESTINATION ${LIB_INSTALL_DIR})
 
 
 ########### install files ###############
 
-install( FILES  connection.h connectiondata.h cursor.h 
- driver.h drivermanager.h error.h expression.h field.h fieldlist.h global.h object.h 
- schemadata.h tableschema.h queryschema.h queryschemaparameter.h indexschema.h 
- relationship.h parser/parser.h parser/SqlParser.h transaction.h preparedstatement.h  
- RecordData.h utils.h
- kexidb_export.h kexidb_global.h DESTINATION ${INCLUDE_INSTALL_DIR}/kexidb)
-install( FILES  kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})
+install( FILES  Connection.h ConnectionData.h Cursor.h 
+ Driver.h DriveManager.h Error.h Expression.h Field.h FieldList.h Global.h Object.h 
+ SchemaData.h TableSchema.h QuerySchema.h QuerySchemaParameter.h IndexSchema.h 
+ Relationship.h parser/Parser.h parser/SqlParser.h Transaction.h PreparedStatement.h  
+ RecordData.h Utils.h
+ predicate_export.h predicate_global.h DESTINATION ${INCLUDE_INSTALL_DIR}/predicate)
+
+#TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})

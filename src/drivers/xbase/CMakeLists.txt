@@ -1,12 +1,14 @@
+include_directories(
+  ${XBase_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/src
+  ${QT_INCLUDES}
+)
 
-
-include_directories( ${XBase_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/kexi ${CMAKE_SOURCE_DIR}/kexi/kexidb ${KDE4_INCLUDES}  )
-
-ADD_DEFINITIONS( -D__KEXIDB__= )
+ADD_DEFINITIONS( -D__PREDICATE__= )
 
 ########### next target ###############
 
-set(kexidb_xbasedriver_PART_SRCS 
+set(predicate_xbase_SRCS 
    xbasedriver.cpp 
    xbaseconnection.cpp 
    xbaseconnection_p.cpp 
@@ -16,14 +18,16 @@ set(kexidb_xbasedriver_PART_SRCS
    )
 
 
-kde4_add_plugin(kexidb_xbasedriver ${kexidb_xbasedriver_PART_SRCS})
+add_library(predicate_xbase SHARED ${predicate_xbase_SRCS})
 
-target_link_libraries(kexidb_xbasedriver ${XBase_LIBRARIES} 
- ${KDE4_KDECORE_LIBS} ${KDE4_KPARTS_LIBS} kexidb keximigrate)
+target_link_libraries(predicate_xbase
+  ${XBase_LIBRARIES} 
+  predicate
+#TODO  keximigrate
+)
 
-install(TARGETS kexidb_xbasedriver  DESTINATION ${PLUGIN_INSTALL_DIR})
-
+install(TARGETS predicate_xbase DESTINATION ${PLUGIN_INSTALL_DIR})
 
 ########### install files ###############
 
-install( FILES  kexidb_xbasedriver.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+#TODO install( FILES predicate_xbase.desktop  DESTINATION ${SERVICES_INSTALL_DIR})

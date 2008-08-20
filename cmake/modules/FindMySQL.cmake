@@ -12,6 +12,8 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
+include(CheckCXXSourceCompiles)
+include(MacroPushRequiredVars)
 
 find_path(MYSQL_INCLUDE_DIR mysql.h
    /usr/include/mysql

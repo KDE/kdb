@@ -20,8 +20,8 @@
 #ifndef KEXIDB_DRIVER_P_H
 #define KEXIDB_DRIVER_P_H
 
-#ifndef __KEXIDB__
-# error "Do not include: this is KexiDB internal file"
+#ifndef __PREDICATE__
+# error "Do not include: this is Predicate internal file"
 #endif
 
 #include <QString>
