@@ -1,0 +1,5 @@
+Predicate is a database connectivity and creation library,
+a new iteration of KexiDB library developed within Kexi.
+
+It is Qt-only, so the plan is to provide it for wider audience.
+Kexi 2.x will use it too, thus deprecating KexiDB.
