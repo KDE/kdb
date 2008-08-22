@@ -83,14 +83,14 @@ Driver::Driver(QObject *parent, const QStringList &)
 Driver::~Driver()
 {
     DriverManagerInternal::self()->aboutDelete(this);
-// KexiDBDbg << "Driver::~Driver()" << endl;
+// PreDbg << "Driver::~Driver()" << endl;
     // make a copy because d->connections will be touched by ~Connection
     QSet<Connection*> connections(d->connections);
     qDeleteAll(connections);
     d->connections.clear();
     delete beh;
     delete d;
-// KexiDBDbg << "Driver::~Driver() ok" << endl;
+// PreDbg << "Driver::~Driver() ok" << endl;
 }
 
 bool Driver::isValid()
@@ -282,7 +282,7 @@ QString Driver::valueToSQL(uint ftype, const QVariant& v) const
     case Field::InvalidType:
         return "!INVALIDTYPE!";
     default:
-        KexiDBDbg << "Driver::valueToSQL(): UNKNOWN!" << endl;
+        PreDbg << "Driver::valueToSQL(): UNKNOWN!" << endl;
         return QString();
     }
     return QString();

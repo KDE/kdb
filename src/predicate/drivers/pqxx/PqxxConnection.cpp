@@ -101,7 +101,7 @@ QString pqxxSqlConnection::escapeName(const QString &name) const
 //We tell kexi we are connected, but we wont actually connect until we use a database!
 bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_connect" << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_connect" << endl;
     version.clear();
     d->version = &version; //remember for later...
 #ifdef __GNUC__
@@ -115,7 +115,7 @@ bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 //We tell kexi wehave disconnected, but it is actually handled by closeDatabse
 bool pqxxSqlConnection::drv_disconnect()
 {
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_disconnect: " << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_disconnect: " << endl;
     return true;
 }
 
@@ -123,7 +123,7 @@ bool pqxxSqlConnection::drv_disconnect()
 //Return a list of database names
 bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
 {
-// KexiDBDrvDbg << "pqxxSqlConnection::drv_getDatabaseList" << endl;
+// PreDrvDbg << "pqxxSqlConnection::drv_getDatabaseList" << endl;
 
     if (executeSQL("SELECT datname FROM pg_database WHERE datallowconn = TRUE")) {
         std::string N;
@@ -143,7 +143,7 @@ bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
 //Create a new database
 bool pqxxSqlConnection::drv_createDatabase(const QString &dbName)
 {
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_createDatabase: " << dbName << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_createDatabase: " << dbName << endl;
 
     if (executeSQL("CREATE DATABASE " + escapeName(dbName)))
         return true;
@@ -158,7 +158,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_useDatabase: " << dbName << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_useDatabase: " << dbName << endl;
 
     QString conninfo;
     QString socket;
@@ -204,7 +204,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
         }
         return true;
     } catch (const std::exception &e) {
-        KexiDBDrvDbg << "pqxxSqlConnection::drv_useDatabase:exception - " << e.what() << endl;
+        PreDrvDbg << "pqxxSqlConnection::drv_useDatabase:exception - " << e.what() << endl;
         d->errmsg = QString::fromUtf8(e.what());
 
     } catch (...) {
@@ -217,7 +217,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 //Here we close the database connection
 bool pqxxSqlConnection::drv_closeDatabase()
 {
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_closeDatabase" << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_closeDatabase" << endl;
 // if (isConnected())
 // {
     delete d->pqxxsql;
@@ -236,7 +236,7 @@ bool pqxxSqlConnection::drv_closeDatabase()
 //Drops the given database
 bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 {
-    KexiDBDrvDbg << "pqxxSqlConnection::drv_dropDatabase: " << dbName << endl;
+    PreDrvDbg << "pqxxSqlConnection::drv_dropDatabase: " << dbName << endl;
 
     //FIXME Maybe should check that dbname is no the currentdb
     if (executeSQL("DROP DATABASE " + escapeName(dbName)))
@@ -249,14 +249,14 @@ bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 //Execute an SQL statement
 bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
 {
-// KexiDBDrvDbg << "pqxxSqlConnection::drv_executeSQL: " << statement << endl;
+// PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: " << statement << endl;
     bool ok = false;
 
     // Clear the last result information...
     delete d->res;
     d->res = 0;
 
-// KexiDBDrvDbg << "About to try" << endl;
+// PreDrvDbg << "About to try" << endl;
     try {
         //Create a transaction
         const bool implicityStarted = !m_trans;
@@ -264,10 +264,10 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
             (void)new pqxxTransactionData(this, true);
 
         //  m_trans = new pqxx::nontransaction(*m_pqxxsql);
-//  KexiDBDrvDbg << "About to execute" << endl;
+//  PreDrvDbg << "About to execute" << endl;
         //Create a result object through the transaction
         d->res = new pqxx::result(m_trans->data->exec(std::string(statement.toUtf8())));
-//  KexiDBDrvDbg << "Executed" << endl;
+//  PreDrvDbg << "Executed" << endl;
         //Commit the transaction
         if (implicityStarted) {
             pqxxTransactionData *t = m_trans;
@@ -279,17 +279,17 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
         //If all went well then return true, errors picked up by the catch block
         ok = true;
     } catch (const pqxx::sql_error& sqlerr) {
-        KexiDBDrvDbg << "pqxxSqlConnection::drv_executeSQL: sql_error exception - " << sqlerr.query().c_str() << endl;
+        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: sql_error exception - " << sqlerr.query().c_str() << endl;
     } catch (const pqxx::broken_connection& bcerr) {
-        KexiDBDrvDbg << "pqxxSqlConnection::drv_executeSQL: broken_connection exception" << endl;
+        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: broken_connection exception" << endl;
     } catch (const std::exception &e) {
         //If an error ocurred then put the error description into _dbError
         d->errmsg = QString::fromUtf8(e.what());
-        KexiDBDrvDbg << "pqxxSqlConnection::drv_executeSQL:exception - " << e.what() << endl;
+        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL:exception - " << e.what() << endl;
     } catch (...) {
         d->errmsg = i18n("Unknown error.");
     }
-    //KexiDBDrvDbg << "EXECUTE SQL OK: OID was " << (d->res ? d->res->inserted_oid() : 0) << endl;
+    //PreDrvDbg << "EXECUTE SQL OK: OID was " << (d->res ? d->res->inserted_oid() : 0) << endl;
     return ok;
 }
 
@@ -332,7 +332,7 @@ bool pqxxSqlConnection::drv_getTablesList(QStringList &list)
     Predicate::Cursor *cursor;
     m_sql = "select lower(relname) from pg_class where relkind='r'";
     if (!(cursor = executeQuery(m_sql))) {
-        KexiDBDrvWarn << "pqxxSqlConnection::drv_getTablesList(): !executeQuery()" << endl;
+        PreDrvWarn << "pqxxSqlConnection::drv_getTablesList(): !executeQuery()" << endl;
         return false;
     }
     list.clear();

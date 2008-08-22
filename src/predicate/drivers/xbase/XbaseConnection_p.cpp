@@ -188,7 +188,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 */
 bool xBaseConnectionInternal::executeSQL(const QString& statement)
 {
-//	KexiDBDrvDbg << "xBaseConnectionInternal::executeSQL: "
+//	PreDrvDbg << "xBaseConnectionInternal::executeSQL: "
 //	             << statement << endl;
   if ( !internalConn ) {
     return false;

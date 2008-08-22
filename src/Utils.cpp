@@ -178,7 +178,7 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name)
     m_table = conn->tableSchema(QString(name));
     m_query = m_table ? 0 : conn->querySchema(QString(name));
     if (!m_table && !m_query)
-        KexiDBWarn << "TableOrQuery(FieldList &tableOrQuery) : "
+        PreWarn << "TableOrQuery(FieldList &tableOrQuery) : "
         " tableOrQuery is neither table nor query!" << endl;
 }
 
@@ -189,10 +189,10 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name,
         , m_query(table ? 0 : conn->querySchema(QString(name)))
 {
     if (table && !m_table)
-        KexiDBWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
+        PreWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
         "no table specified!" << endl;
     if (!table && !m_query)
-        KexiDBWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
+        PreWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
         "no query specified!" << endl;
 }
 
@@ -201,7 +201,7 @@ TableOrQuerySchema::TableOrQuerySchema(FieldList &tableOrQuery)
         , m_query(dynamic_cast<QuerySchema*>(&tableOrQuery))
 {
     if (!m_table && !m_query)
-        KexiDBWarn << "TableOrQuery(FieldList &tableOrQuery) : "
+        PreWarn << "TableOrQuery(FieldList &tableOrQuery) : "
         " tableOrQuery is nether table nor query!" << endl;
 }
 
@@ -210,7 +210,7 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, int id)
     m_table = conn->tableSchema(id);
     m_query = m_table ? 0 : conn->querySchema(id);
     if (!m_table && !m_query)
-        KexiDBWarn << "TableOrQuery(Connection *conn, int id) : no table or query found for id=="
+        PreWarn << "TableOrQuery(Connection *conn, int id) : no table or query found for id=="
         << id << "!" << endl;
 }
 
@@ -219,7 +219,7 @@ TableOrQuerySchema::TableOrQuerySchema(TableSchema* table)
         , m_query(0)
 {
     if (!m_table)
-        KexiDBWarn << "TableOrQuery(TableSchema* table) : no table specified!" << endl;
+        PreWarn << "TableOrQuery(TableSchema* table) : no table specified!" << endl;
 }
 
 TableOrQuerySchema::TableOrQuerySchema(QuerySchema* query)
@@ -227,7 +227,7 @@ TableOrQuerySchema::TableOrQuerySchema(QuerySchema* query)
         , m_query(query)
 {
     if (!m_query)
-        KexiDBWarn << "TableOrQuery(QuerySchema* query) : no query specified!" << endl;
+        PreWarn << "TableOrQuery(QuerySchema* query) : no query specified!" << endl;
 }
 
 uint TableOrQuerySchema::fieldCount() const
@@ -247,7 +247,7 @@ const QueryColumnInfo::Vector TableOrQuerySchema::columns(bool unique)
     if (m_query)
         return m_query->fieldsExpanded(unique ? QuerySchema::Unique : QuerySchema::Default);
 
-    KexiDBWarn << "TableOrQuery::fields() : no query or table specified!" << endl;
+    PreWarn << "TableOrQuery::fields() : no query or table specified!" << endl;
     return QueryColumnInfo::Vector();
 }
 
@@ -411,7 +411,7 @@ int ConnectionTestDialog::exec()
 
 void ConnectionTestDialog::slotTimeout()
 {
-// KexiDBDbg << "ConnectionTestDialog::slotTimeout() " << m_errorObj << endl;
+// PreDbg << "ConnectionTestDialog::slotTimeout() " << m_errorObj << endl;
     bool notResponding = false;
     if (m_elapsedTime >= 1000*5) {//5 seconds
         m_stopWaiting = true;
@@ -451,7 +451,7 @@ void ConnectionTestDialog::slotTimeout()
 
 void ConnectionTestDialog::error(Predicate::Object *obj)
 {
-    KexiDBDbg << "ConnectionTestDialog::error()" << endl;
+    PreDbg << "ConnectionTestDialog::error()" << endl;
     m_stopWaiting = true;
     m_errorObj = obj;
     /*  reject();
@@ -500,7 +500,7 @@ int Predicate::rowCount(const Predicate::TableSchema& tableSchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!tableSchema.connection()) {
-        KexiDBWarn << "Predicate::rowsCount(const Predicate::TableSchema&): no tableSchema.connection() !" << endl;
+        PreWarn << "Predicate::rowsCount(const Predicate::TableSchema&): no tableSchema.connection() !" << endl;
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -516,7 +516,7 @@ int Predicate::rowCount(Predicate::QuerySchema& querySchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!querySchema.connection()) {
-        KexiDBWarn << "Predicate::rowsCount(const Predicate::QuerySchema&): no querySchema.connection() !" << endl;
+        PreWarn << "Predicate::rowsCount(const Predicate::QuerySchema&): no querySchema.connection() !" << endl;
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -622,7 +622,7 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
 Predicate::Field::Type Predicate::intToFieldType(int type)
 {
     if (type < (int)Predicate::Field::InvalidType || type > (int)Predicate::Field::LastType) {
-        KexiDBWarn << "Predicate::intToFieldType(): invalid type " << type << endl;
+        PreWarn << "Predicate::intToFieldType(): invalid type " << type << endl;
         return Predicate::Field::InvalidType;
     }
     return (Predicate::Field::Type)type;
@@ -633,7 +633,7 @@ static bool setIntToFieldType(Field& field, const QVariant& value)
     bool ok;
     const int intType = value.toInt(&ok);
     if (!ok || Predicate::Field::InvalidType == intToFieldType(intType)) {//for sanity
-        KexiDBWarn << "Predicate::setFieldProperties(): invalid type" << endl;
+        PreWarn << "Predicate::setFieldProperties(): invalid type" << endl;
         return false;
     }
     field.setType((Predicate::Field::Type)intType);
@@ -800,7 +800,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
             GET_INT(setVisibleDecimalPlaces);
         } else {
             if (!field.table()) {
-                KexiDBWarn << QString(
+                PreWarn << QString(
                     "Predicate::setFieldProperty() Cannot set \"%1\" property - no table assinged for field!")
                 .arg(QString(propertyName)) << endl;
             } else {
@@ -873,7 +873,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         field.setCustomProperty(propertyName, value);
     }
 
-    KexiDBWarn << "Predicate::setFieldProperty() property \"" << propertyName << "\" not found!" << endl;
+    PreWarn << "Predicate::setFieldProperty() property \"" << propertyName << "\" not found!" << endl;
     return false;
 #undef SET_BOOLEAN_FLAG
 #undef GET_INT
@@ -931,7 +931,7 @@ QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node)
         return QVariant(text.toLower() == "true" || text == "1");
     }
 //! @todo add more QVariant types
-    KexiDBWarn << "loadPropertyValueFromDom(): unknown type '" << valueType << "'" << endl;
+    PreWarn << "loadPropertyValueFromDom(): unknown type '" << valueType << "'" << endl;
     return QVariant();
 }
 
@@ -996,7 +996,7 @@ QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
         if (type == Field::Time)
             return QTime::currentTime();
     }
-    KexiDBWarn << "Predicate::emptyValueForType() no value for type "
+    PreWarn << "Predicate::emptyValueForType() no value for type "
     << Field::typeName(type) << endl;
     return QVariant();
 }
@@ -1047,7 +1047,7 @@ QVariant Predicate::notEmptyValueForType(Predicate::Field::Type type)
         if (type == Field::Time)
             return QTime::currentTime();
     }
-    KexiDBWarn << "Predicate::notEmptyValueForType() no value for type "
+    PreWarn << "Predicate::notEmptyValueForType() no value for type "
     << Field::typeName(type) << endl;
     return QVariant();
 }
@@ -1065,7 +1065,7 @@ QString Predicate::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     QString str;
     str.reserve(escaped_length);
     if (str.capacity() < escaped_length) {
-        KexiDBWarn << "Predicate::Driver::escapeBLOB(): no enough memory (cannot allocate " <<
+        PreWarn << "Predicate::Driver::escapeBLOB(): no enough memory (cannot allocate " <<
         escaped_length << " chars)" << endl;
         return QString();
     }
@@ -1114,12 +1114,12 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
         const char* s = data;
         const char* end = s + length;
         if (pass == 1) {
-            KexiDBDbg << "processBinaryData(): real size == " << output << endl;
+            PreDbg << "processBinaryData(): real size == " << output << endl;
             array.resize(output);
             output = 0;
         }
         for (int input = 0; s < end; output++) {
-            //  KexiDBDbg<<(int)s[0]<<" "<<(int)s[1]<<" "<<(int)s[2]<<" "<<(int)s[3]<<" "<<(int)s[4]<<endl;
+            //  PreDbg<<(int)s[0]<<" "<<(int)s[1]<<" "<<(int)s[2]<<" "<<(int)s[3]<<" "<<(int)s[4]<<endl;
             if (s[0] == '\\' && (s + 1) < end) {
                 //special cases as in http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
                 if (s[1] == '\'') {// \'
@@ -1135,7 +1135,7 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
                         array[output] = char((int(s[1] - '0') * 8 + int(s[2] - '0')) * 8 + int(s[3] - '0'));
                     s += 4;
                 } else {
-                    KexiDBDrvWarn << "processBinaryData(): no octal value after backslash" << endl;
+                    PreDrvWarn << "processBinaryData(): no octal value after backslash" << endl;
                     s++;
                 }
             } else {
@@ -1143,7 +1143,7 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
                     array[output] = s[0];
                 s++;
             }
-            //  KexiDBDbg<<output<<": "<<(int)array[output]<<endl;
+            //  PreDbg<<output<<": "<<(int)array[output]<<endl;
         }
     }
     return array;
@@ -1173,7 +1173,7 @@ QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool 
         for (uint i = 0; i < (len - 1); i += 2) {
             int c = s.mid(i, 2).toInt(&ok, 16);
             if (!ok) {
-                KexiDBWarn << "Predicate::stringToVariant(): Error in digit " << i << endl;
+                PreWarn << "Predicate::stringToVariant(): Error in digit " << i << endl;
                 return QVariant();
             }
             ba[i/2] = (char)c;
@@ -1251,7 +1251,7 @@ QString Predicate::defaultFileBasedDriverIcon()
     KMimeType::Ptr mimeType(KMimeType::mimeType(
                                 Predicate::defaultFileBasedDriverMimeType()));
     if (mimeType.isNull()) {
-        KexiDBWarn << QString("'%1' mimetype not installed!")
+        PreWarn << QString("'%1' mimetype not installed!")
         .arg(Predicate::defaultFileBasedDriverMimeType());
         return QString();
     }

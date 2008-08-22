@@ -105,17 +105,17 @@ namespace Predicate
 #endif
 
 //! Debug command for the core Predicate code
-# define KexiDBDbg PREDICATE_DEBUG qDebug() << "Predicate:"
+# define PreDbg PREDICATE_DEBUG qDebug() << "Predicate:"
 //! Debug command for Predicate driver's code
-# define KexiDBDrvDbg PREDICATE_DEBUG qDebug() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+# define PreDrvDbg PREDICATE_DEBUG qDebug() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
 //! Warning command for the core Predicate code
-# define KexiDBWarn PREDICATE_DEBUG qWarning() << "Predicate:"
+# define PreWarn PREDICATE_DEBUG qWarning() << "Predicate:"
 //! Warning command for Predicate driver's code
-# define KexiDBDrvWarn PREDICATE_DEBUG qWarning() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+# define PreDrvWarn PREDICATE_DEBUG qWarning() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
 //! Fatal command for the core Predicate code
-# define KexiDBFatal PREDICATE_DEBUG qCritical() << "Predicate:"
+# define PreFatal PREDICATE_DEBUG qCritical() << "Predicate:"
 //! Fatal command for Predicate driver's code
-# define KexiDBDrvFatal PREDICATE_DEBUG qCritical() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+# define PreDrvFatal PREDICATE_DEBUG qCritical() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
 
 
 /*! @short Contains database version information about a Kexi-compatible database.

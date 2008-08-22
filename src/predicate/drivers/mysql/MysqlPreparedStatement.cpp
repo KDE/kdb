@@ -36,7 +36,7 @@ MySqlPreparedStatement::MySqlPreparedStatement(StatementType type, ConnectionInt
 #endif
         , m_resetRequired(false)
 {
-// KexiDBDrvDbg << "MySqlPreparedStatement: Construction" << endl;
+// PreDrvDbg << "MySqlPreparedStatement: Construction" << endl;
 
     mysql_owned = false;
     mysql = dynamic_cast<Predicate::MySqlConnectionInternal&>(conn).mysql; //copy
@@ -260,7 +260,7 @@ bool MySqlPreparedStatement::execute()
                 break;
             }
             default:
-                KexiDBWarn << "PreparedStatement::execute(): unsupported field type: "
+                PreWarn << "PreparedStatement::execute(): unsupported field type: "
                 << field->type() << " - NULL value bound to column #" << arg << endl;
                 res = sqlite3_bind_null(prepared_st_handle, arg);
                 if (SQLITE_OK != res) {

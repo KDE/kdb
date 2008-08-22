@@ -112,7 +112,7 @@ SimpleCommandLineApp::SimpleCommandLineApp(
 //! @todo make use of pty/tty here! (and care about portability)
         QTextStream cin(stdin, QIODevice::ReadOnly);
         cin >> d->connData.password;
-        KexiDBDbg << d->connData.password << endl;
+        PreDbg << d->connData.password << endl;
     }
 }
 

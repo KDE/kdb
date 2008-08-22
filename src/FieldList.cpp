@@ -68,7 +68,7 @@ FieldList& FieldList::insertField(uint index, Predicate::Field *field)
     if (!field)
         return *this;
     if (index > (uint)m_fields.count()) {
-        KexiDBFatal << "FieldList::insertField(): index (" << index << ") out of range" << endl;
+        PreFatal << "FieldList::insertField(): index (" << index << ") out of range" << endl;
         return *this;
     }
     m_fields.insert(index, field);
@@ -82,7 +82,7 @@ void FieldList::renameField(const QString& oldName, const QString& newName)
 {
     Field *field = m_fields_by_name.value(oldName.toLower());
     if (!field) {
-        KexiDBFatal << "FieldList::renameField() no field found "
+        PreFatal << "FieldList::renameField() no field found "
         << QString("\"%1\"").arg(oldName) << endl;
         return;
     }
@@ -92,7 +92,7 @@ void FieldList::renameField(const QString& oldName, const QString& newName)
 void FieldList::renameField(Predicate::Field *field, const QString& newName)
 {
     if (!field || field != m_fields_by_name.value(field->name().toLower())) {
-        KexiDBFatal << "FieldList::renameField() no field found "
+        PreFatal << "FieldList::renameField() no field found "
         << (field ? QString("\"%1\"").arg(field->name()) : QString()) << endl;
         return;
     }
@@ -147,14 +147,14 @@ QString FieldList::debugString()
 
 void FieldList::debug()
 {
-    KexiDBDbg << debugString() << endl;
+    PreDbg << debugString() << endl;
 }
 
 #define _ADD_FIELD(fname) \
     { \
         if (fname.isEmpty()) return fl; \
         f = m_fields_by_name.value(fname.toLower()); \
-        if (!f) { KexiDBWarn << subListWarning1(fname) << endl; delete fl; return 0; } \
+        if (!f) { PreWarn << subListWarning1(fname) << endl; delete fl; return 0; } \
         fl->addField(f); \
     }
 
@@ -215,7 +215,7 @@ FieldList* FieldList::subList(const QList<uint>& list)
     foreach(uint index, list) {
         f = field(index);
         if (!f) {
-            KexiDBWarn << QString("FieldList::subList() could not find field at position %1").arg(index) << endl;
+            PreWarn << QString("FieldList::subList() could not find field at position %1").arg(index) << endl;
             delete fl;
             return 0;
         }

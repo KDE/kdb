@@ -25,8 +25,8 @@
 #include <assert.h>
 
 //remove debug
-#undef KexiDBDbg
-#define KexiDBDbg if (0) kDebug()
+#undef PreDbg
+#define PreDbg if (0) kDebug()
 
 using namespace Predicate;
 
@@ -50,13 +50,13 @@ TransactionData::TransactionData(Connection *conn)
     assert(conn);
     Transaction::globalcount++; //because refcount(1) init.
     TransactionData::globalcount++;
-    KexiDBDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount << endl;
+    PreDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount << endl;
 }
 
 TransactionData::~TransactionData()
 {
     TransactionData::globalcount--;
-    KexiDBDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount << endl;
+    PreDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount << endl;
 }
 
 //---------------------------------------------------
@@ -86,13 +86,13 @@ Transaction::~Transaction()
     if (m_data) {
         m_data->refcount--;
         Transaction::globalcount--;
-        KexiDBDbg << "~Transaction(): m_data->refcount==" << m_data->refcount << endl;
+        PreDbg << "~Transaction(): m_data->refcount==" << m_data->refcount << endl;
         if (m_data->refcount == 0)
             delete m_data;
     } else {
-        KexiDBDbg << "~Transaction(): null" << endl;
+        PreDbg << "~Transaction(): null" << endl;
     }
-    KexiDBDbg << "-- Transaction::globalcount == " << Transaction::globalcount << endl;
+    PreDbg << "-- Transaction::globalcount == " << Transaction::globalcount << endl;
 }
 
 Transaction& Transaction::operator=(const Transaction & trans)
@@ -100,7 +100,7 @@ Transaction& Transaction::operator=(const Transaction & trans)
     if (m_data) {
         m_data->refcount--;
         Transaction::globalcount--;
-        KexiDBDbg << "Transaction::operator=: m_data->refcount==" << m_data->refcount << endl;
+        PreDbg << "Transaction::operator=: m_data->refcount==" << m_data->refcount << endl;
         if (m_data->refcount == 0)
             delete m_data;
     }

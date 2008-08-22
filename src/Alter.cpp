@@ -179,7 +179,7 @@ int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
     if (res == 0) {
         if (Predicate::isExtendedTableFieldProperty(propertyName))
             return (int)ExtendedSchemaAlteringRequired;
-        KexiDBWarn <<
+        PreWarn <<
         QString("AlterTableHandler::alteringTypeForProperty(): property \"%1\" not found!")
         .arg(QString(propertyName)) << endl;
     }
@@ -252,7 +252,7 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
         if (!debugString.isEmpty())
             *debugTarget += debugString + '\n';
     } else {
-        KexiDBDbg << debugString << endl;
+        PreDbg << debugString << endl;
 #ifdef KEXI_DEBUG_GUI
         if (simulate)
             Utils::addAlterTableActionDebug(debugString, nestingLevel);
@@ -270,7 +270,7 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
         fieldName = "??";
     QString dbg = QString("Action dict for field \"%1\" (%2, UID=%3):")
                   .arg(fieldName).arg(dict->count()).arg(fieldUID);
-    KexiDBDbg << dbg << endl;
+    PreDbg << dbg << endl;
 #ifdef KEXI_DEBUG_GUI
     if (simulate)
         Utils::addAlterTableActionDebug(dbg, 1);
@@ -345,7 +345,7 @@ void AlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDic
                     actionsLikeThis = createActionDict(fieldActions, uid());   //fieldName() );
                 AlterTableHandler::ChangeFieldPropertyAction* newRenameAction
                 = new AlterTableHandler::ChangeFieldPropertyAction(*this);
-                KexiDBDbg << "ChangeFieldPropertyAction::simplifyActions(): insert into '"
+                PreDbg << "ChangeFieldPropertyAction::simplifyActions(): insert into '"
                 << fieldName() << "' dict:"  << newRenameAction->debugString() << endl;
                 actionsLikeThis->insert(m_propertyName.toLatin1(), newRenameAction);
                 return;
@@ -648,7 +648,7 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
                 Utils::addAlterTableActionDebug(
                     QString("** Failed to set properties for field ") + field().debugString(), 0);
 #endif
-                KexiDBWarn << "AlterTableHandler::InsertFieldAction::simplifyActions(): Predicate::setFieldProperties() failed!" << endl;
+                PreWarn << "AlterTableHandler::InsertFieldAction::simplifyActions(): Predicate::setFieldProperties() failed!" << endl;
                 delete f;
             }
         }
@@ -775,7 +775,7 @@ void AlterTableHandler::setActions(const ActionList& actions)
 
 void AlterTableHandler::debug()
 {
-    KexiDBDbg << "AlterTableHandler's actions:" << endl;
+    PreDbg << "AlterTableHandler's actions:" << endl;
     foreach(ActionBase* action, d->actions)
     action->debug();
 }
@@ -878,7 +878,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
     }
     // - Debug
     QString dbg = QString("** Overall altering requirements: %1").arg(args.requirements);
-    KexiDBDbg << dbg << endl;
+    PreDbg << dbg << endl;
 
     if (args.onlyComputeRequirements) {
         args.result = true;
@@ -893,7 +893,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
 #endif
     dbg = QString("** Ordered, simplified actions (%1, was %2):")
           .arg(currentActionsCount).arg(allActionsCount);
-    KexiDBDbg << dbg << endl;
+    PreDbg << dbg << endl;
 #ifdef KEXI_DEBUG_GUI
     if (args.simulate)
         Utils::addAlterTableActionDebug(dbg, 0);
@@ -1046,7 +1046,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
             }
         }
         sql.append(QString(") SELECT ") + sourceFields + " FROM " + oldTable->name());
-        KexiDBDbg << " ** " << sql << endl;
+        PreDbg << " ** " << sql << endl;
         if (!d->conn->executeSQL(sql)) {
             setError(d->conn);
 //! @todo delete newTable...

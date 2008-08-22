@@ -56,7 +56,7 @@ PREDICATE_DRIVER_INFO(MySqlDriver, mysql)
 MySqlDriver::MySqlDriver(QObject *parent, const QStringList &args) :
         Driver(parent, args)
 {
-// KexiDBDrvDbg << "MySqlDriver::MySqlDriver()" << endl;
+// PreDrvDbg << "MySqlDriver::MySqlDriver()" << endl;
 
 //    d->isFileDriver = false;
     d->features = IgnoreTransactions | CursorForward;

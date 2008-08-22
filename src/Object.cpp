@@ -47,7 +47,7 @@ Object::~Object()
     m_previousServerResultName = m_previousServerResultName2; \
     m_previousServerResultNum2 = serverResult(); \
     m_previousServerResultName2 = serverResultName(); \
-    KexiDBDbg << "Object ERROR: " << m_previousServerResultNum2 << ": " \
+    PreDbg << "Object ERROR: " << m_previousServerResultNum2 << ": " \
     << m_previousServerResultName2
 
 void Object::setError(int code, const QString &msg)
@@ -158,16 +158,16 @@ QString Object::serverResultName()
 void Object::debugError()
 {
     if (error()) {
-        KexiDBDbg << "KEXIDB ERROR: " << errorMsg();
+        PreDbg << "KEXIDB ERROR: " << errorMsg();
         QString s = serverErrorMsg(), sn = serverResultName();
         if (!s.isEmpty())
-            KexiDBDbg << "KEXIDB SERVER ERRMSG: " << s;
+            PreDbg << "KEXIDB SERVER ERRMSG: " << s;
         if (!sn.isEmpty())
-            KexiDBDbg << "KEXIDB SERVER RESULT NAME: " << sn;
+            PreDbg << "KEXIDB SERVER RESULT NAME: " << sn;
         if (serverResult() != 0)
-            KexiDBDbg << "KEXIDB SERVER RESULT #: " << serverResult();
+            PreDbg << "KEXIDB SERVER RESULT #: " << serverResult();
     } else
-        KexiDBDbg << "KEXIDB OK.";
+        PreDbg << "KEXIDB OK.";
 }
 
 MessageHandler::ButtonCode Object::askQuestion(

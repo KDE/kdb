@@ -105,7 +105,7 @@ public:
     virtual void getQueryParameters(QuerySchemaParameterList& params) = 0;
 
     inline void debug() {
-        KexiDBDbg << debugString();
+        PreDbg << debugString();
     }
 
     virtual QString debugString();

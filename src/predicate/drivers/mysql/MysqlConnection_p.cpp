@@ -73,7 +73,7 @@ bool MySqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
     if (!(mysql = mysql_init(mysql)))
         return false;
 
-    KexiDBDrvDbg << "MySqlConnectionInternal::connect()" << endl;
+    PreDrvDbg << "MySqlConnectionInternal::connect()" << endl;
     QByteArray localSocket;
     QString hostName = data.hostName;
     if (hostName.isEmpty() || hostName.toLower() == "localhost") {
@@ -120,7 +120,7 @@ bool MySqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
     mysql = 0;
-    KexiDBDrvDbg << "MySqlConnection::disconnect()" << endl;
+    PreDrvDbg << "MySqlConnection::disconnect()" << endl;
     return true;
 }
 
@@ -137,7 +137,7 @@ bool MySqlConnectionInternal::useDatabase(const QString &dbName)
  */
 bool MySqlConnectionInternal::executeSQL(const QString& statement)
 {
-// KexiDBDrvDbg << "MySqlConnectionInternal::executeSQL: "
+// PreDrvDbg << "MySqlConnectionInternal::executeSQL: "
 //              << statement << endl;
     QByteArray queryStr(statement.toUtf8());
     const char *query = queryStr.constData();

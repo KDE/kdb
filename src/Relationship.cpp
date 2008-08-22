@@ -67,20 +67,20 @@ Relationship::~Relationship()
 void Relationship::createIndices(QuerySchema *query, Field *field1, Field *field2)
 {
     if (!field1 || !field2 || !query) {
-        KexiDBWarn << "Relationship::addRelationship(): !masterField || !detailsField || !query" << endl;
+        PreWarn << "Relationship::addRelationship(): !masterField || !detailsField || !query" << endl;
         return;
     }
     if (field1->isQueryAsterisk() || field2->isQueryAsterisk()) {
-        KexiDBWarn << "Relationship::addRelationship(): relationship's fields cannot be asterisks" << endl;
+        PreWarn << "Relationship::addRelationship(): relationship's fields cannot be asterisks" << endl;
         return;
     }
     if (field1->table() == field2->table()) {
-        KexiDBWarn << "Relationship::addRelationship(): fields cannot belong to the same table" << endl;
+        PreWarn << "Relationship::addRelationship(): fields cannot belong to the same table" << endl;
         return;
     }
 // if (!query->hasField(field1) && !query->hasField(field2)) {
     if (!query->contains(field1->table()) || !query->contains(field2->table())) {
-        KexiDBWarn << "Relationship::addRelationship(): fields do not belong to this query" << endl;
+        PreWarn << "Relationship::addRelationship(): fields do not belong to this query" << endl;
         return;
     }
 //@todo: check more things: -types
@@ -169,7 +169,7 @@ void Relationship::setIndices(IndexSchema* masterIndex, IndexSchema* detailsInde
         if (masterField->type() != detailsField->type()
                 && masterField->isIntegerType() != detailsField->isIntegerType()
                 && masterField->isTextType() != detailsField->isTextType()) {
-            KexiDBWarn << "Relationship::setIndices(INDEX on '" << masterIndex->table()->name()
+            PreWarn << "Relationship::setIndices(INDEX on '" << masterIndex->table()->name()
             << "',INDEX on " << detailsIndex->table()->name() << "): !equal field types: "
             << Driver::defaultSQLTypeName(masterField->type()) << " " << masterField->name() << ", "
             << Driver::defaultSQLTypeName(detailsField->type()) << " " << detailsField->name() << endl;
@@ -179,7 +179,7 @@ void Relationship::setIndices(IndexSchema* masterIndex, IndexSchema* detailsInde
 #if 0 //too STRICT!
         if ((masterField->isUnsigned() && !detailsField->isUnsigned())
                 || (!masterField->isUnsigned() && detailsField->isUnsigned())) {
-            KexiDBWarn << "Relationship::setIndices(INDEX on '" << masterIndex->table()->name()
+            PreWarn << "Relationship::setIndices(INDEX on '" << masterIndex->table()->name()
             << "',INDEX on " << detailsIndex->table()->name() << "): !equal signedness of field types: "
             << Driver::defaultSQLTypeName(masterField->type()) << " " << masterField->name() << ", "
             << Driver::defaultSQLTypeName(detailsField->type()) << " " << detailsField->name() << endl;

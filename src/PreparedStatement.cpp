@@ -67,7 +67,7 @@ QByteArray PreparedStatement::generateStatementString()
                 s.append(" AND ");
             Field *f = m_fields->field(whereItem);
             if (!f) {
-                KexiDBWarn << "PreparedStatement::generateStatementString(): no '"
+                PreWarn << "PreparedStatement::generateStatementString(): no '"
                 << whereItem << "' field found" << endl;
                 continue;
             }

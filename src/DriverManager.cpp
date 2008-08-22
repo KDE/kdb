@@ -40,8 +40,8 @@
 #include <QtDebug>
 
 //remove debug
-#undef KexiDBDbg
-#define KexiDBDbg if (0) qDebug()
+#undef PreDbg
+#define PreDbg if (0) qDebug()
 
 using namespace Predicate;
 
@@ -60,12 +60,12 @@ DriverManagerInternal::DriverManagerInternal() /* protected */
 
 DriverManagerInternal::~DriverManagerInternal()
 {
-    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal()";
+    PreDbg << "DriverManagerInternal::~DriverManagerInternal()";
     qDeleteAll(m_drivers);
     m_drivers.clear();
     if (s_self == this)
         s_self = 0;
-    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal() ok";
+    PreDbg << "DriverManagerInternal::~DriverManagerInternal() ok";
 }
 
 void DriverManagerInternal::slotAppQuits()
@@ -74,7 +74,7 @@ void DriverManagerInternal::slotAppQuits()
             && qApp->topLevelWidgets().first()->isVisible()) {
         return; //what a hack! - we give up when app is still there
     }
-    KexiDBDbg << "DriverManagerInternal::slotAppQuits(): let's clear drivers...";
+    PreDbg << "DriverManagerInternal::slotAppQuits(): let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
 }
@@ -125,7 +125,7 @@ bool DriverManagerInternal::lookupDrivers()
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
 //TODO: for QT-only version check for KComponentData wrapper
-//  KexiDBWarn << "DriverManagerInternal::lookupDrivers(): cannot work without KComponentData (KGlobal::mainComponent()==0)!";
+//  PreWarn << "DriverManagerInternal::lookupDrivers(): cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
     lookupDriversNeeded = false;
@@ -164,20 +164,20 @@ bool DriverManagerInternal::lookupDrivers()
     for (; it != tlist.constEnd(); ++it) {
         KService::Ptr ptr = (*it);
         if (!ptr->property("Library").toString().startsWith("predicate_")) {
-            KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
+            PreWarn << "DriverManagerInternal::lookupDrivers():"
             " X-KDE-Library == " << ptr->property("Library").toString()
             << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!";
             continue;
         }
         QString srv_name = ptr->property("X-Kexi-DriverName").toString().toLower();
         if (srv_name.isEmpty()) {
-            KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
+            PreWarn << "DriverManagerInternal::lookupDrivers():"
             " X-Kexi-DriverName must be set for Predicate driver \""
             << ptr->property("Name").toString() << "\" service!\n -- skipped!";
             continue;
         }
         if (m_services_lcase.contains(srv_name)) {
-            KexiDBWarn << "DriverManagerInternal::lookupDrivers(): more than one driver named '"
+            PreWarn << "DriverManagerInternal::lookupDrivers(): more than one driver named '"
             << srv_name << "'\n -- skipping this one!";
             continue;
         }
@@ -191,12 +191,12 @@ bool DriverManagerInternal::lookupDrivers()
         if (ok)
             minor_ver = lst[1].toUInt(&ok);
         if (!ok) {
-            KexiDBWarn << "DriverManagerInternal::lookupDrivers(): problem with detecting '"
+            PreWarn << "DriverManagerInternal::lookupDrivers(): problem with detecting '"
             << srv_name << "' driver's version -- skipping it!";
             continue;
         }
         if (major_ver != Predicate::version().major || minor_ver != Predicate::version().minor) {
-            KexiDBWarn << QString("DriverManagerInternal::lookupDrivers(): '%1' driver"
+            PreWarn << QString("DriverManagerInternal::lookupDrivers(): '%1' driver"
                                   " has version '%2' but required Predicate driver version is '%3.%4'\n"
                                   " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
             .arg(Predicate::version().major).arg(Predicate::version().minor);
@@ -224,14 +224,14 @@ bool DriverManagerInternal::lookupDrivers()
                 if (!m_services_by_mimetype.contains(mime)) {
                     m_services_by_mimetype.insert(mime, ptr);
                 } else {
-                    KexiDBWarn << "DriverManagerInternal::lookupDrivers(): more than one driver for '"
+                    PreWarn << "DriverManagerInternal::lookupDrivers(): more than one driver for '"
                     << mime << "' mime type!";
                 }
             }
         }
         m_services.insert(srv_name, ptr);
         m_services_lcase.insert(srv_name,  ptr);
-        KexiDBDbg << "Predicate::DriverManager::lookupDrivers(): registered driver: "
+        PreDbg << "Predicate::DriverManager::lookupDrivers(): registered driver: "
         << ptr->name() << "(" << ptr->library() << ")";
     }
 #endif
@@ -256,7 +256,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
         return 0;
 
     clearError();
-    KexiDBDbg << "DriverManagerInternal::driver(): loading " << name;
+    PreDbg << "DriverManagerInternal::driver(): loading " << name;
 
     Driver *drv = 0;
     if (!name.isEmpty())
@@ -305,15 +305,15 @@ Driver* DriverManagerInternal::driver(const QString& name)
 void DriverManagerInternal::incRefCount()
 {
     m_refCount++;
-    KexiDBDbg << "DriverManagerInternal::incRefCount(): " << m_refCount;
+    PreDbg << "DriverManagerInternal::incRefCount(): " << m_refCount;
 }
 
 void DriverManagerInternal::decRefCount()
 {
     m_refCount--;
-    KexiDBDbg << "DriverManagerInternal::decRefCount(): " << m_refCount;
+    PreDbg << "DriverManagerInternal::decRefCount(): " << m_refCount;
 // if (m_refCount<1) {
-//  KexiDBDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
+//  PreDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
 //  s_self=0;
 //  deleteLater();
 // }
@@ -344,7 +344,7 @@ DriverManager::DriverManager()
 
 DriverManager::~DriverManager()
 {
-    KexiDBDbg << "DriverManager::~DriverManager()";
+    PreDbg << "DriverManager::~DriverManager()";
     /* Connection *conn;
       for ( conn = m_connections.first(); conn ; conn = m_connections.next() ) {
         conn->disconnect();
@@ -360,7 +360,7 @@ DriverManager::~DriverManager()
     }
 // if ( s_self == this )
     //s_self = 0;
-    KexiDBDbg << "DriverManager::~DriverManager() ok";
+    PreDbg << "DriverManager::~DriverManager() ok";
 }
 
 Predicate::Driver::Info::Map DriverManager::driversInfo()

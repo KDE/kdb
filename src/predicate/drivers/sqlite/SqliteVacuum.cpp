@@ -63,7 +63,7 @@ tristate SQLiteVacuum::run()
     }
     QFileInfo fi(m_filePath);
     if (!fi.isReadable()) {
-        KexiDBDrvWarn << "SQLiteVacuum::run(): No such file" << m_filePath << endl;
+        PreDrvWarn << "SQLiteVacuum::run(): No such file" << m_filePath << endl;
         return false;
     }
     const uint origSize = fi.size();
@@ -110,7 +110,7 @@ void SQLiteVacuum::readFromStdout()
         if (s.isEmpty())
             break;
         m_dlg->progressBar()->setValue(m_percent);
-//  KexiDBDrvDbg << m_percent << " " << s << endl;
+//  PreDrvDbg << m_percent << " " << s << endl;
         if (s.startsWith("VACUUM: ")) {
             //set previously known progress
             m_dlg->progressBar()->setValue(m_percent);
@@ -131,7 +131,7 @@ void SQLiteVacuum::readFromStdout()
 
 void SQLiteVacuum::processExited()
 {
-// KexiDBDrvDbg << sender()->name() << " EXIT" << endl;
+// PreDrvDbg << sender()->name() << " EXIT" << endl;
     m_dlg->close();
     delete m_dlg;
     m_dlg = 0;

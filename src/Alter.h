@@ -190,7 +190,7 @@ public:
             Q_UNUSED(debugOptions); return "ActionBase";
         }
         void debug(const DebugOptions& debugOptions = DebugOptions()) {
-            KexiDBDbg << debugString(debugOptions)
+            PreDbg << debugString(debugOptions)
             << " (req = " << alteringRequirements() << ")";
         }
 

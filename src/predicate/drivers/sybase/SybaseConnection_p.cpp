@@ -72,7 +72,7 @@ SybaseConnectionInternal::~SybaseConnectionInternal()
 
 void SybaseConnectionInternal::storeResult()
 {
-    //KexiDBDrvDbg << "Store Result!!" << endl;
+    //PreDrvDbg << "Store Result!!" << endl;
     // all message numbers and message texts were handled in the messageHandler
     // so don't do anything here
 }
@@ -89,7 +89,7 @@ void SybaseConnectionInternal::messageHandler(DBINT msgno, int msgstate, int sev
     res = msgno;
     errmsg = QString::fromLatin1(msgtext);
 
-    KexiDBDrvDbg << "Message Handler" << res << errmsg;
+    PreDrvDbg << "Message Handler" << res << errmsg;
 }
 
 /* ************************************************************************** */
@@ -109,13 +109,13 @@ bool SybaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
     // set message handler
     dbmsghandle(connectionMessageHandler);
 
-    KexiDBDrvDbg << "SybaseConnectionInternal::connect()" << endl;
+    PreDrvDbg << "SybaseConnectionInternal::connect()" << endl;
     QByteArray localSocket;
     QString hostName = data.hostName;
 
 
     if (data.serverName.isEmpty()) {
-        KexiDBDrvDbg << "Can't connect without server name";
+        PreDrvDbg << "Can't connect without server name";
         return false;
     }
 
@@ -227,7 +227,7 @@ bool SybaseConnectionInternal::db_disconnect()
 
     dbclose(dbProcess);
     dbProcess = 0;
-    KexiDBDrvDbg << "SybaseConnection::disconnect()" << endl;
+    PreDrvDbg << "SybaseConnection::disconnect()" << endl;
     return true;
 }
 

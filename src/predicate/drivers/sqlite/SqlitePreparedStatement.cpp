@@ -208,7 +208,7 @@ bool SQLitePreparedStatement::execute()
                 break;
             }
             default:
-                KexiDBWarn << "PreparedStatement::execute(): unsupported field type: "
+                PreWarn << "PreparedStatement::execute(): unsupported field type: "
                 << field->type() << " - NULL value bound to column #" << arg << endl;
                 res = sqlite3_bind_null(prepared_st_handle, arg);
                 if (SQLITE_OK != res) {

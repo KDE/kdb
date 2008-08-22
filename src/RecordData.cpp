@@ -41,5 +41,5 @@ QString RecordData::debugString() const
 
 void RecordData::debug() const
 {
-    KexiDBDbg << debugString();
+    PreDbg << debugString();
 }

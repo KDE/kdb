@@ -41,9 +41,9 @@ QString QuerySchemaParameter::debugString() const
 
 void Predicate::debug(const QuerySchemaParameterList& list)
 {
-    KexiDBDbg << QString("Query parameters (%1):").arg(list.count()) << endl;
+    PreDbg << QString("Query parameters (%1):").arg(list.count()) << endl;
     foreach(const QuerySchemaParameter& parameter, list)
-    KexiDBDbg << " - " << parameter.debugString() << endl;
+    PreDbg << " - " << parameter.debugString() << endl;
 }
 
 //================================================
@@ -79,7 +79,7 @@ QuerySchemaParameterValueListIterator::~QuerySchemaParameterValueListIterator()
 QVariant QuerySchemaParameterValueListIterator::getPreviousValue()
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
-        KexiDBWarn << "QuerySchemaParameterValues::getPreviousValue() no prev value" << endl;
+        PreWarn << "QuerySchemaParameterValues::getPreviousValue() no prev value" << endl;
         return QVariant();
     }
     QVariant res(*d->paramsIt);
@@ -92,7 +92,7 @@ QVariant QuerySchemaParameterValueListIterator::getPreviousValue()
 QString QuerySchemaParameterValueListIterator::getPreviousValueAsString(Field::Type type)
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
-        KexiDBWarn << "QuerySchemaParameterValues::getPreviousValueAsString() no prev value" << endl;
+        PreWarn << "QuerySchemaParameterValues::getPreviousValueAsString() no prev value" << endl;
         return d->driver->valueToSQL(type, QVariant()); //"NULL"
     }
     QString res(d->driver->valueToSQL(type, *d->paramsIt));

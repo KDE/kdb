@@ -43,7 +43,7 @@ SybaseCursor::SybaseCursor(Predicate::Connection* conn, const QString& statement
     //m_options |= Buffered;
 
     d->dbProcess = static_cast<SybaseConnection*>(conn)->d->dbProcess;
-// KexiDBDrvDbg << "SybaseCursor: constructor for query statement" << endl;
+// PreDrvDbg << "SybaseCursor: constructor for query statement" << endl;
 }
 
 SybaseCursor::SybaseCursor(Connection* conn, QuerySchema& query, uint options)
@@ -53,7 +53,7 @@ SybaseCursor::SybaseCursor(Connection* conn, QuerySchema& query, uint options)
     //  m_options |= Buffered;
 
     d->dbProcess = static_cast<SybaseConnection*>(conn)->d->dbProcess;
-// KexiDBDrvDbg << "SybaseCursor: constructor for query statement" << endl;
+// PreDrvDbg << "SybaseCursor: constructor for query statement" << endl;
 }
 
 SybaseCursor::~SybaseCursor()
@@ -83,7 +83,7 @@ bool SybaseCursor::drv_open()
 
     // clear all previous results ( if remaining )
     if (dbcancel(d->dbProcess) == FAIL)
-        KexiDBDrvDbg << "drv_open" << "dead DBPROCESS ?";
+        PreDrvDbg << "drv_open" << "dead DBPROCESS ?";
 
     // insert into command buffer
     dbcmd(d->dbProcess, m_sql.toUtf8());
@@ -128,7 +128,7 @@ bool SybaseCursor::drv_close()
 
 void SybaseCursor::drv_getNextRecord()
 {
-// KexiDBDrvDbg << "SybaseCursor::drv_getNextRecord" << endl;
+// PreDrvDbg << "SybaseCursor::drv_getNextRecord" << endl;
 
     // no buffering , and we don't know how many rows are there in result set
 
@@ -177,7 +177,7 @@ QVariant SybaseCursor::value(uint pos)
  */
 bool SybaseCursor::drv_storeCurrentRow(RecordData& data) const
 {
-// KexiDBDrvDbg << "SybaseCursor::storeCurrentRow: Position is " << (long)m_at<< endl;
+// PreDrvDbg << "SybaseCursor::storeCurrentRow: Position is " << (long)m_at<< endl;
 // if (d->numRows<=0)
 //  return false;
 

@@ -35,7 +35,7 @@ pqxxPreparedStatement::pqxxPreparedStatement(
         : Predicate::PreparedStatement(type, conn, fields)
         , m_conn(conn.connection)
 {
-// KexiDBDrvDbg << "pqxxPreparedStatement: Construction" << endl;
+// PreDrvDbg << "pqxxPreparedStatement: Construction" << endl;
 }
 
 
@@ -45,7 +45,7 @@ pqxxPreparedStatement::~pqxxPreparedStatement()
 
 bool pqxxPreparedStatement::execute()
 {
-// KexiDBDrvDbg << "pqxxPreparedStatement::execute()" << endl;
+// PreDrvDbg << "pqxxPreparedStatement::execute()" << endl;
     m_resetRequired = true;
     if (m_conn->insertRecord(*m_fields, m_args)) {
         return true;

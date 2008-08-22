@@ -322,16 +322,16 @@ void SQLiteCursor::drv_getNextRecord()
     /*
       if ((int)m_result == (int)FetchOK && d->curr_coldata) {
         for (uint i=0;i<m_fieldCount;i++) {
-          KexiDBDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
+          PreDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)") <<endl;
         }
-    //  KexiDBDrvDbg << "SQLiteCursor::drv_getNextRecord(): "<<m_fieldCount<<" col(s) fetched"<<endl;
+    //  PreDrvDbg << "SQLiteCursor::drv_getNextRecord(): "<<m_fieldCount<<" col(s) fetched"<<endl;
       }*/
 }
 
 void SQLiteCursor::drv_appendCurrentRecordToBuffer()
 {
-// KexiDBDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer():" <<endl;
+// PreDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer():" <<endl;
     if (!d->curr_coldata)
         return;
     if (!d->cols_pointers_mem_size)
@@ -340,12 +340,12 @@ void SQLiteCursor::drv_appendCurrentRecordToBuffer()
     const char **src_col = d->curr_coldata;
     const char **dest_col = record;
     for (uint i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
-//  KexiDBDrvDbg << i <<": '" << *src_col << "'" <<endl;
-//  KexiDBDrvDbg << "src_col: " << src_col << endl;
+//  PreDrvDbg << i <<": '" << *src_col << "'" <<endl;
+//  PreDrvDbg << "src_col: " << src_col << endl;
         *dest_col = *src_col ? strdup(*src_col) : 0;
     }
     d->records[m_records_in_buf] = record;
-// KexiDBDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer() ok." <<endl;
+// PreDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer() ok." <<endl;
 }
 
 void SQLiteCursor::drv_bufferMovePointerNext()
@@ -396,7 +396,7 @@ void SQLiteCursor::drv_storeCurrentRecord()
   m_data->rec_stored = true;
   m_data->next_cols = m_data->curr_cols;
   for (int i=0;i<m_data->curr_cols;i++) {
-    KexiDBDrvDbg<<"[COPY] "<<i<<": "<< m_data->curr_coldata[i]<<endl;
+    PreDrvDbg<<"[COPY] "<<i<<": "<< m_data->curr_coldata[i]<<endl;
     if (m_data->curr_coldata[i])
       m_data->next_coldata[i] = strdup( m_data->curr_coldata[i] );
     else
@@ -452,7 +452,7 @@ bool SQLiteCursor::drv_storeCurrentRow(RecordData &data) const
         }
         //(m_logicalFieldCount introduced) Field *f = (m_containsROWIDInfo && i>=m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
         Field *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
-//  KexiDBDrvDbg << "SQLiteCursor::storeCurrentRow(): col=" << (col ? *col : 0) << endl;
+//  PreDrvDbg << "SQLiteCursor::storeCurrentRow(): col=" << (col ? *col : 0) << endl;
 
 #ifdef SQLITE2
         if (!*col)

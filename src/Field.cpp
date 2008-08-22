@@ -335,7 +335,7 @@ void
 Field::setType(Type t)
 {
     if (m_expr) {
-        KexiDBWarn << QString("Field::setType(%1)").arg(t)
+        PreWarn << QString("Field::setType(%1)").arg(t)
         << " could not set type because the Field.has expression assigned!" << endl;
         return;
     }
@@ -646,7 +646,7 @@ QString Field::debugString() const
 
 void Field::debug()
 {
-    KexiDBDbg << debugString() << endl;
+    PreDbg << debugString() << endl;
 }
 
 void Field::setExpression(Predicate::BaseExpr *expr)
