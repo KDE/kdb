@@ -9,7 +9,7 @@
 
 namespace Predicate
 {
-const char* pqxxSqlDriver::keywords[] = {
+const char* PqxxSqlDriver::keywords[] = {
     "ABORT",
     "ABSOLUTE",
     "ACCESS",

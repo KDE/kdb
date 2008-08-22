@@ -1,6 +1,6 @@
 include_directories(
   ${ORACLE_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

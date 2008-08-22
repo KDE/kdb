@@ -417,5 +417,3 @@ PreparedStatement::Ptr pqxxSqlConnection::prepareStatement(PreparedStatement::St
 {
     return PreparedStatement::Ptr(new pqxxPreparedStatement(type, *d, fields));
 }
-
-#include "PqxxConnection.moc"

@@ -196,5 +196,3 @@ PreparedStatement::Ptr MySqlConnection::prepareStatement(PreparedStatement::Stat
 {
     return PreparedStatement::Ptr(new MySqlPreparedStatement(type, *d, fields));
 }
-
-#include "MysqlConnection.moc"

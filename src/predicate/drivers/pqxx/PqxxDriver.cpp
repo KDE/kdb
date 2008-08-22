@@ -29,14 +29,14 @@
 
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO(pqxxSqlDriver, pqxxsql)
+PREDICATE_DRIVER_INFO(PqxxSqlDriver, pqxxsql)
 
 //==================================================================================
 //
-pqxxSqlDriver::pqxxSqlDriver(QObject *parent, const QStringList &args)
+PqxxSqlDriver::PqxxSqlDriver(QObject *parent, const QStringList &args)
         : Driver(parent, args)
 {
-    d->isFileDriver = false;
+//    d->isFileDriver = false;
     d->features = SingleTransactions | CursorForward | CursorBackward;
 //! @todo enable this when kexidb supports multiple: d->features = MultipleTransactions | CursorForward | CursorBackward;
 
@@ -71,7 +71,7 @@ pqxxSqlDriver::pqxxSqlDriver(QObject *parent, const QStringList &args)
 
 //==================================================================================
 //Override the default implementation to allow for NUMERIC type natively
-QString pqxxSqlDriver::sqlTypeName(int id_t, int p) const
+QString PqxxSqlDriver::sqlTypeName(int id_t, int p) const
 {
     if (id_t == Field::Null)
         return "NULL";
@@ -88,7 +88,7 @@ QString pqxxSqlDriver::sqlTypeName(int id_t, int p) const
 
 //==================================================================================
 //
-pqxxSqlDriver::~pqxxSqlDriver()
+PqxxSqlDriver::~PqxxSqlDriver()
 {
 // delete d;
 }
@@ -96,35 +96,35 @@ pqxxSqlDriver::~pqxxSqlDriver()
 //==================================================================================
 //
 Predicate::Connection*
-pqxxSqlDriver::drv_createConnection(ConnectionData &conn_data)
+PqxxSqlDriver::drv_createConnection(ConnectionData &conn_data)
 {
     return new pqxxSqlConnection(this, conn_data);
 }
 
 //==================================================================================
 //
-bool pqxxSqlDriver::isSystemObjectName(const QString& n) const
+bool PqxxSqlDriver::isSystemObjectName(const QString& n) const
 {
     return Driver::isSystemObjectName(n);
 }
 
 //==================================================================================
 //
-bool pqxxSqlDriver::drv_isSystemFieldName(const QString&) const
+bool PqxxSqlDriver::drv_isSystemFieldName(const QString&) const
 {
     return false;
 }
 
 //==================================================================================
 //
-bool pqxxSqlDriver::isSystemDatabaseName(const QString& n) const
+bool PqxxSqlDriver::isSystemDatabaseName(const QString& n) const
 {
     return n.toLower() == "template1" || n.toLower() == "template0";
 }
 
 //==================================================================================
 //
-QString pqxxSqlDriver::escapeString(const QString& str) const
+QString PqxxSqlDriver::escapeString(const QString& str) const
 {
     return QString::fromLatin1("'")
            + QString::fromAscii(pqxx::sqlesc(std::string(str.toAscii().constData())).c_str())
@@ -133,7 +133,7 @@ QString pqxxSqlDriver::escapeString(const QString& str) const
 
 //==================================================================================
 //
-QByteArray pqxxSqlDriver::escapeString(const QByteArray& str) const
+QByteArray PqxxSqlDriver::escapeString(const QByteArray& str) const
 {
     return QByteArray("'")
            + QByteArray(pqxx::sqlesc(str).c_str())
@@ -142,26 +142,26 @@ QByteArray pqxxSqlDriver::escapeString(const QByteArray& str) const
 
 //==================================================================================
 //
-QString pqxxSqlDriver::drv_escapeIdentifier(const QString& str) const
+QString PqxxSqlDriver::drv_escapeIdentifier(const QString& str) const
 {
     return QByteArray(str.toLatin1()).replace('"', "\"\"");
 }
 
 //==================================================================================
 //
-QByteArray pqxxSqlDriver::drv_escapeIdentifier(const QByteArray& str) const
+QByteArray PqxxSqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('"', "\"\"");
 }
 
 //==================================================================================
 //
-QString pqxxSqlDriver::escapeBLOB(const QByteArray& array) const
+QString PqxxSqlDriver::escapeBLOB(const QByteArray& array) const
 {
     return Predicate::escapeBLOB(array, Predicate::BLOBEscapeOctal);
 }
 
-QString pqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
+QString PqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
 {
     if (ftype == Field::Boolean) {
         // use SQL compliant TRUE or FALSE as described here
@@ -171,6 +171,3 @@ QString pqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
     }
     return Driver::valueToSQL(ftype, v);
 }
-
-
-#include "PqxxDriver.moc"

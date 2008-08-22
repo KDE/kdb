@@ -18,62 +18,62 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <KDebug>
 #include "Driver_p.h"
+
+#include <QtDebug>
 
 using namespace Predicate;
 
 DriverPrivate::DriverPrivate()
-        : isFileDriver(false)
-        , isDBOpenedAfterCreate(false)
+        : isDBOpenedAfterCreate(false)
         , features(Driver::NoFeatures)
 {
     adminTools = 0;
 
     properties["client_library_version"] = "";
     propertyCaptions["client_library_version"] =
-        i18n("Client library version");
+        QObject::tr("Client library version");
 
     properties["default_server_encoding"] = "";
     propertyCaptions["default_server_encoding"] =
-        i18n("Default character encoding on server");
+        QObject::tr("Default character encoding on server");
 }
 
 void DriverPrivate::initInternalProperties()
 {
-    properties["is_file_database"] = QVariant(isFileDriver);
-    propertyCaptions["is_file_database"] = i18n("File-based database driver");
-    if (isFileDriver) {
-        properties["file_database_mimetype"] = fileDBDriverMimeType;
-        propertyCaptions["file_database_mimetype"] = i18n("File-based database's MIME type");
+    properties["is_file_database"] = QVariant(info.isFileBased());
+    propertyCaptions["is_file_database"] = QObject::tr("File-based database driver");
+    if (info.isFileBased()) {
+        properties["file_database_mimetype"] = info.fileDBMimeType();
+        propertyCaptions["file_database_mimetype"] = QObject::tr("File-based database's MIME type");
     }
 
 #if 0
     QString str;
     if (features & Driver::SingleTransactions)
-        str = i18n("Single transactions");
+        str = QObject::tr("Single transactions");
     else if (features & Driver::MultipleTransactions)
-        str = i18n("Multiple transactions");
+        str = QObject::tr("Multiple transactions");
     else if (features & Driver::NestedTransactions)
-        str = i18n("Nested transactions");
+        str = QObject::tr("Nested transactions");
     else if (features & Driver::IgnoreTransactions)
-        str = i18n("Ignored");
+        str = QObject::tr("Ignored");
     else
-        str = i18n("None");
+        str = QObject::tr("None");
 #endif
 // properties["transaction_support"] = features & Driver::TransactionsMask;
-// propertyCaptions["transaction_support"] = i18n("Transaction support");
+// propertyCaptions["transaction_support"] = QObject::tr("Transaction support");
     properties["transaction_single"] = QVariant(features & Driver::SingleTransactions);
-    propertyCaptions["transaction_single"] = i18n("Single transactions support");
+    propertyCaptions["transaction_single"] = QObject::tr("Single transactions support");
     properties["transaction_multiple"] = QVariant(features & Driver::MultipleTransactions);
-    propertyCaptions["transaction_multiple"] = i18n("Multiple transactions support");
+    propertyCaptions["transaction_multiple"] = QObject::tr("Multiple transactions support");
     properties["transaction_nested"] = QVariant(features & Driver::NestedTransactions);
-    propertyCaptions["transaction_nested"] = i18n("Nested transactions support");
+    propertyCaptions["transaction_nested"] = QObject::tr("Nested transactions support");
 
     properties["predicate_driver_version"] =
         QString("%1.%2").arg(version().major).arg(version().minor);
     propertyCaptions["predicate_driver_version"] =
-        i18n("Predicate driver version");
+        QObject::tr("Predicate driver version");
 }
 
 DriverPrivate::~DriverPrivate()

@@ -53,7 +53,7 @@ xBaseDriver::xBaseDriver( QObject *parent, const QStringList &args )
   Predicate::DriverManager manager;
   dp->internalDriver = manager.driver(Predicate::defaultFileBasedDriverName());
 
-  d->isFileDriver = true ;
+//  d->isFileDriver = true ;
   d->isDBOpenedAfterCreate = true;
   d->features = SingleTransactions | CursorForward;
 
@@ -161,5 +161,3 @@ QByteArray xBaseDriver::drv_escapeIdentifier( const QByteArray& str) const
   }
   return dp->internalDriver->escapeIdentifier(str);
 }
-
-#include "XbaseDriver.moc"

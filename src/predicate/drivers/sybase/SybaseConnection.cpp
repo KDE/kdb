@@ -235,5 +235,3 @@ bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldLis
     return drv_executeSQL(QString("SET IDENTITY_UPDATE %1 OFF").arg(escapeIdentifier(table)));
 
 }
-
-#include "SybaseConnection.moc"

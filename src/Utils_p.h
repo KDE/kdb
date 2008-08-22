@@ -25,7 +25,7 @@
 
 #include <kprogressdialog.h>
 
-#include "msghandler.h"
+#include "MessageHandler.h"
 
 class ConnectionTestThread;
 

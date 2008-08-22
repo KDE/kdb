@@ -22,8 +22,8 @@
 #ifndef PREDICATE_DRIVER_MNGR_H
 #define PREDICATE_DRIVER_MNGR_H
 
-#include <klibloader.h>
-#include <kservice.h>
+//#include <klibloader.h>
+//#include <kservice.h>
 
 #include "Driver.h"
 
@@ -33,12 +33,10 @@ namespace Predicate
 class DriverManagerInternal;
 class Connection;
 
-//! Database driver management, e.g. finding and loading drivers.
+//! Database driver manager, provided for finding and loading drivers.
 class PREDICATE_EXPORT DriverManager : public QObject, public Predicate::Object
 {
 public:
-    typedef QHash<QString, KService::Ptr> ServicesHash;
-
     DriverManager();
     virtual ~DriverManager();
 
@@ -53,7 +51,7 @@ public:
 
     /*! returns information list of available drivers.
       That drivers can be loaded by first use of driver() method. */
-    const Predicate::Driver::InfoHash driversInfo();
+    Predicate::Driver::Info::Map driversInfo();
 
     /*! \return information about driver's named with \a name.
       The name is case insensitive.
@@ -64,10 +62,10 @@ public:
     /*! \return service information about driver's named with \a name.
       The name is case insensitive.
       In most cases you can use driverInfo() instead. */
-    KService::Ptr serviceInfo(const QString &name);
+//TODO    KService::Ptr serviceInfo(const QString &name);
 
-    /*! \return a hash structure of the services. Not necessary for everyday use. */
-    const ServicesHash& services();
+    /*! \return a hash structure of the driver infos. Not necessary for everyday use. */
+    Driver::Info::Map infoMap();
 
     /*! Looks up a drivers list by MIME type of database file.
      Only file-based database drivers are checked.
@@ -76,7 +74,7 @@ public:
     */
     QString lookupByMime(const QString &mimeType);
 
-    //! server error is set if there is error at KService level (useful for debugging)
+    //! server error is set if there is error related to loading the drivers (useful for debugging)
     virtual QString serverErrorMsg();
     virtual int serverResult();
     virtual QString serverResultName();

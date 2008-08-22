@@ -407,5 +407,3 @@ bool SQLiteConnection::drv_alterTableName(TableSchema& tableSchema, const QStrin
     return true;
 }
 #endif
-
-#include "sqliteconnection.moc"

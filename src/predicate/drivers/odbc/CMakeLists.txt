@@ -1,4 +1,4 @@
-include_directories( ${CMAKE_SOURCE_DIR}/src ${QT_INCLUDES}  )
+include_directories( ${CMAKE_SOURCE_DIR} ${QT_INCLUDES}  )
 
 ########### next target ###############
 

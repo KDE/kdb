@@ -1259,5 +1259,3 @@ QString Predicate::defaultFileBasedDriverName()
     DriverManager dm;
     return dm.lookupByMime(Predicate::defaultFileBasedDriverMimeType()).toLower();
 }
-
-#include "utils_p.moc"

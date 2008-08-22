@@ -23,7 +23,7 @@
 #include <kdemacros.h>
 
 #ifndef PREDICATE_EXPORT
-# ifdef MAKE_KEXI_DB_LIB
+# ifdef MAKE_PREDICATE_LIB
 #  define PREDICATE_EXPORT KDE_EXPORT
 # else
 #  define PREDICATE_EXPORT KDE_IMPORT

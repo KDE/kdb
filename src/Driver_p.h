@@ -31,8 +31,6 @@
 #include <QByteArray>
 #include <QSet>
 
-#include <KGenericFactory>
-
 #include "Connection.h"
 #include "Admin.h"
 #include <Predicate/tools/Utils.h>
@@ -146,21 +144,16 @@ public:
 
     QSet<Connection*> connections;
 
-//(js)now QObject::name() is reused:
-//  /*! The name equal to the service name (X-Kexi-DriverName)
-//   stored in given service .desktop file. Set this in subclasses. */
-//  QString m_driverName;
-
     /*! Name of MIME type of files handled by this driver
      if it is a file-based database's driver
      (equal X-Kexi-FileDBDriverMime service property) */
-    QString fileDBDriverMimeType;
+//moved to info:    QString fileDBDriverMimeType;
 
-    /*! Info about the driver as a service. */
-    KService *service;
+    /*! Info about the driver. */
+    Driver::Info info;
 
-    /*! Internal constant flag: Set this in subclass if driver is a file driver */
-bool isFileDriver : 1;
+//    /*! Internal constant flag: Set this in subclass if driver is a file driver */
+//moved to info bool isFileDriver : 1;
 
     /*! Internal constant flag: Set this in subclass if after successful
      drv_createDatabased() database is in opened state (as after useDatabase()).
@@ -217,11 +210,10 @@ bool isDBOpenedAfterCreate : 1;
     static const char* kexiSQLKeywords[];
 
 protected:
-    /*! Used by driver manager to initialize properties taken using internal
-        driver flags. */
+    /*! Used by Driver::setInfo() to initialize properties based on the info. */
     void initInternalProperties();
 
-    friend class DriverManagerInternal;
+    friend class Driver;
 };
 
 // escaping types for Driver::escapeBLOBInternal()
@@ -238,10 +230,16 @@ public:
 
 }
 
+//! Export the driver class @a driverName for the plugin specified by driverName.
+//! The resulting library file should be named "predicate_{driverName}".
+#define EXPORT_PREDICATE_DRIVER( driverName, driverClass ) \
+    Q_EXPORT_PLUGIN2( predicate_ ## pluginName, driverClass )
+
+/*
 //! Driver's static version information (implementation),
 //! with KLibFactory symbol declaration.
 #define PREDICATE_DRIVER_INFO( class_name, internal_name ) \
     DatabaseVersionInfo class_name::version() const { return PREDICATE_VERSION; } \
     K_EXPORT_COMPONENT_FACTORY(predicate_ ## internal_name ## driver, KGenericFactory<Predicate::class_name>( "predicate_" #internal_name ))
-
+*/
 #endif

@@ -58,7 +58,7 @@ MySqlDriver::MySqlDriver(QObject *parent, const QStringList &args) :
 {
 // KexiDBDrvDbg << "MySqlDriver::MySqlDriver()" << endl;
 
-    d->isFileDriver = false;
+//    d->isFileDriver = false;
     d->features = IgnoreTransactions | CursorForward;
 
     beh->ROW_ID_FIELD_NAME = "LAST_INSERT_ID()";
@@ -200,6 +200,3 @@ QByteArray MySqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('`', "'");
 }
-
-#include "MysqlDriver.moc"
-

@@ -16,6 +16,7 @@ include_directories(
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
   -D__PREDICATE__= 
+  -DMAKE_PREDICATE_LIB=1
   -DYYERROR_VERBOSE=1
 )
 
@@ -34,19 +35,19 @@ ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
 
 # Create custom command for flex/lex (note the outputs)
 ADD_CUSTOM_COMMAND(
-COMMAND ${CMAKE_SOURCE_DIR}/src/parser/generate_parser_code.sh
+COMMAND ${CMAKE_SOURCE_DIR}/Predicate/parser/generate_parser_code.sh
 TARGET parser
 OUTPUTS
-  ${CMAKE_SOURCE_DIR}/src/parser/SqlParser.h
-  ${CMAKE_SOURCE_DIR}/src/parser/SqlParser.cpp
-  ${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.h
-  ${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.cpp)
+  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.h
+  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp
+  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h
+  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp)
 
 # mark files as generated
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlParser.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlParser.cpp GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/src/parser/SqlScanner.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
 
 ########### next target ###############
 
@@ -93,6 +94,7 @@ set(predicate_LIB_SRCS
    tools/DbObjectNameValidator.cpp 
    tools/Identifier.cpp
    tools/Utils.cpp
+   tools/Static.cpp
    ${CMAKE_CURRENT_BINARY_DIR}/tools/transliteration/transliteration_table.cpp
 #TODO tools/debuggui.cpp
 #TODO tools/SimpleCommandLineApp.cpp

@@ -94,9 +94,9 @@ private:
 
 
 
-    friend class pqxxSqlDriver;
-    friend class pqxxSqlCursor;
-    friend class pqxxTransactionData;
+    friend class PqxxSqlDriver;
+    friend class PqxxSqlCursor;
+    friend class PqxxTransactionData;
 };
 }
 #endif

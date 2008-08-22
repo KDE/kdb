@@ -24,6 +24,7 @@
 #include <qdatetime.h>
 #include <QList>
 #include <QByteArray>
+#include <QSharedData>
 
 #include "Global.h"
 #include "Object.h"
@@ -42,48 +43,70 @@ class DriverManager;
 class DriverBehaviour;
 class DriverPrivate;
 
-//! Generic database abstraction.
-/*! This class is a prototype of the database driver for implementations.
- Driver allows new connections to be created, and groups
- these as a parent.
- Before destruction, all connections are destructed.
+//! Database driver's abstraction.
+/*! This class is a prototype of the database driver.
+ Driver allows new connections to be created, and groups as their parent.
+ Before destruction, all owned connections are destructed.
 
  Notes:
-  - driver must be provided within KDE module file named with "predicate_" prefix
-  - following line should be placed in driver's implementation:
-    \code
-    PREDICATE_DRIVER_INFO( CLASS_NAME, INTERNAL_NAME );
-    \endcode
-    where:
-    - CLASS_NAME is actual driver's class name, e.g. MySqlDriver
-    - INTERNAL_NAME is driver name's most significant part (without quotation marks), e.g. mysql
-    Above information uses K_EXPORT_COMPONENT_FACTORY macro for KTrader to find the module's entry point.
-    For example, this line declares predicate_mysqldriver.so module's entry point:
-    \code
-    PREDICATE_DRIVER_INFO( MySqlDriver, mysql );
-    \endcode
+FIXME - driver must be provided within KDE module file named with "predicate_" prefix
+  - EXPORT_PREDICATE_DRIVER should be placed in driver's implementation
 
- \sa SQLiteDriver MySqlDriver, pqxxSqlDriver
+ \sa SQLiteDriver MySqlDriver, PqxxSqlDriver, EXPORT_PREDICATE_DRIVER
 */
 class PREDICATE_EXPORT Driver : public QObject, public Predicate::Object
 {
     Q_OBJECT
 public:
-    /*! Helpful for retrieving info about driver from using
-     Predicate::DriverManager::driversInfo() without loading driver libraries. */
+    /*! Provides information about driver. */
     class PREDICATE_EXPORT Info
     {
     public:
-        Info();
-        QString name, caption, comment, fileDBMimeType;
-        //! true is the driver is for file-based database backend
-    bool fileBased : 1;
-        /*! true is the driver is for a backend that allows importing.
-         Defined by X-Kexi-DoNotAllowProjectImportingTo in "predicate_driver" service type.
+        typedef QMap<QString,Info> Map;
+
+        struct Data : public QSharedData {
+            Data()
+            : fileBased(false)
+            , importingAllowed(true) {}
+            QString name, caption, comment, fileDBMimeType, fileName;
+            bool fileBased : 1;
+            bool importingAllowed : 1;
+        };
+
+        //! Constructs an invalid info.
+        Info() : d( new Data() ) {}
+
+        //! @return true if the info is valid. Valid info provides at least name and filename.
+        //! @since 2.0
+        bool isValid() const { return !d->name.isEmpty() && !d->fileName.isEmpty(); }
+
+        QString name() const { return d->name; }
+        void setName(const QString& name) { d->name = name; }
+
+        QString caption() const { return d->caption; }
+        void setCaption(const QString& caption) { d->caption = caption; }
+        
+        QString comment() const { return d->comment; }
+        void setComment(const QString& comment) { d->comment = comment; }
+
+        QString fileDBMimeType() const { return d->fileDBMimeType; }
+        void setFileDBMimeType(const QString& fileDBMimeType) { d->fileDBMimeType = fileDBMimeType; }
+
+        QString fileName() const { return d->fileName; }
+        void setFileName(const QString& fileName) { d->fileName = fileName; }
+
+        //! @return true if the driver is for file-based database backend
+        bool isFileBased() const { return d->fileBased; }
+        void setFileBased(bool set) { d->fileBased = set; }
+
+        /*! @return true if the driver is for a backend that allows importing.
+         Defined by AllowImporting field in "predicate_*.desktop" information files.
          Used for migration. */
-    bool allowImportingTo : 1;
+        bool isImportingAllowed() const { return d->importingAllowed; }
+        void setImportingAllowed(bool set) { d->importingAllowed = set; }
+    private:
+        QSharedDataPointer<Data> d;
     };
-    typedef QHash<QString, Info> InfoHash;
 
     /*! Features supported by driver (sum of few Features enum items). */
     enum Features {
@@ -130,24 +153,29 @@ public:
     /*! \return Set of created connections. */
     const QSet<Connection*> connections() const;
 
-    /*! \return a name of the driver, equal to the service name (X-Kexi-DriverName)
-     stored in given service .desktop file. */
-    QString name() const {
-        return objectName();
-    }
+    //! \return a name of the driver (DriverName field of the .desktop info file).
+    //! Provided for convenience and optimization. This is the same as info().name().
+    QString name() const;
+
+    //! \return true if the the driver is file-based.
+    //! Provided for convenience and optimization. This is the same as info().isFileBased().
+    bool isFileBased() const;
 
     /*! \return a name of MIME type of files handled by this driver
      if it is a file-based database's driver
      (equal X-Kexi-FileDBDriverMime service property)
      otherwise returns null string. \sa isFileDriver()
     */
-    QString fileDBDriverMimeType() const;
+/* moved to info()
+    QString fileDBDriverMimeType() const;*/
 
-    /*! Info about the driver as a service. */
-    const KService* service() const;
+    /*! Info about the driver. */
+    Info info() const;
+//ported    const KService* service() const;
 
     /*! \return true if this driver is file-based */
-    bool isFileDriver() const;
+/* moved to info()
+    bool isFileDriver() const;*/
 
     /*! \return true if \a n is a system object's name,
      eg. name of build-in system table that cannot be used or created by a user,
@@ -300,7 +328,6 @@ protected:
      Note for driver developers: Reimplement this.
      In your reimplementation you should initialize:
      - d->typeNames - to types accepted by your engine
-     - d->isFileDriver - to true or false depending if your driver is file-based
      - d->features - to combination of selected values from Features enum
 
      You may also want to change options in DriverBehaviour *beh member.
@@ -362,6 +389,10 @@ protected:
         return add ? (sql + QString::fromLatin1(" LIMIT 1")) : sql;
     }
 
+protected:
+    /*! Used by the driver manager to set info for just loaded driver. */
+    void setInfo( const Driver::Info& info );
+
     friend class Connection;
     friend class Cursor;
     friend class DriverManagerInternal;
@@ -379,8 +410,14 @@ PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
 /*! Driver's static version information, automatically impemented for Predicate drivers.
  Put this into driver class declaration just like Q_OBJECT macro. */
 #define PREDICATE_DRIVER \
-    public: \
-    virtual DatabaseVersionInfo version() const;
+    Q_INTERFACES(Predicate::Driver)
+//    public: \
+//    virtual DatabaseVersionInfo version() const;
+
+//! Declare Interface for Predicate drivers, loadable as Qt 4 plugins
+Q_DECLARE_INTERFACE(Predicate::Driver,
+    "org.kde.Predicate.Driver/" 
+    PREDICATE_VERSION_MAJOR_STRING "." PREDICATE_VERSION_MINOR_STRING
+)
 
 #endif
-

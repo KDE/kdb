@@ -52,7 +52,7 @@ SQLiteDriver::SQLiteDriver(QObject *parent, const QStringList &args)
         : Driver(parent, args)
         , dp(new SQLiteDriverPrivate())
 {
-    d->isFileDriver = true;
+//    d->isFileDriver = true;
     d->isDBOpenedAfterCreate = true;
     d->features = SingleTransactions | CursorForward
 #ifndef SQLITE2
@@ -154,5 +154,3 @@ AdminTools* SQLiteDriver::drv_createAdminTools() const
     return new SQLiteAdminTools();
 #endif
 }
-
-#include "sqlitedriver.moc"

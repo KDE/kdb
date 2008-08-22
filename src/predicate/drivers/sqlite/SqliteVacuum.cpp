@@ -144,5 +144,3 @@ void SQLiteVacuum::cancelClicked()
         m_result = cancelled;
     }
 }
-
-#include "sqlitevacuum.moc"

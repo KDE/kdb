@@ -179,5 +179,3 @@ PreparedStatement::Ptr xBaseConnection::prepareStatement(PreparedStatement::Stat
   }
   return d->internalConn->prepareStatement( type, fields );
 }
-
-#include "XbaseConnection.moc"

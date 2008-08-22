@@ -1,6 +1,6 @@
 include_directories(
   ${CMAKE_SOURCE_DIR}/3rdparty/kexisql3/src
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

@@ -25,19 +25,23 @@
 #include "Driver_p.h"
 #include "Error.h"
 
-#include <klibloader.h>
-#include <kservicetypetrader.h>
-#include <kdebug.h>
-#include <klocale.h>
-#include <kservice.h>
+//#include <klibloader.h>
+//#include <kservicetypetrader.h>
+//#include <kdebug.h>
+//#include <klocale.h>
+//#include <kservice.h>
 
 #include <assert.h>
 
-#include <qapplication.h>
+#include <QApplication>
+#include <QDir>
+#include <QPluginLoader>
+#include <QSettings>
+#include <QtDebug>
 
 //remove debug
 #undef KexiDBDbg
-#define KexiDBDbg if (0) kDebug()
+#define KexiDBDbg if (0) qDebug()
 
 using namespace Predicate;
 
@@ -56,12 +60,12 @@ DriverManagerInternal::DriverManagerInternal() /* protected */
 
 DriverManagerInternal::~DriverManagerInternal()
 {
-    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal()" << endl;
+    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal()";
     qDeleteAll(m_drivers);
     m_drivers.clear();
     if (s_self == this)
         s_self = 0;
-    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal() ok" << endl;
+    KexiDBDbg << "DriverManagerInternal::~DriverManagerInternal() ok";
 }
 
 void DriverManagerInternal::slotAppQuits()
@@ -70,7 +74,7 @@ void DriverManagerInternal::slotAppQuits()
             && qApp->topLevelWidgets().first()->isVisible()) {
         return; //what a hack! - we give up when app is still there
     }
-    KexiDBDbg << "DriverManagerInternal::slotAppQuits(): let's clear drivers..." << endl;
+    KexiDBDbg << "DriverManagerInternal::slotAppQuits(): let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
 }
@@ -83,6 +87,35 @@ DriverManagerInternal *DriverManagerInternal::self()
     return s_self;
 }
 
+/*! Find driver's directory.
+ First, checks for existence of 'plugins' subdirectory.
+ Then reads "Plugins" entry from ~/predicate.ini (Windows) or ~/.predicate (Unix) files.
+*/
+static QString findPluginsDir()
+{
+    QString pluginsDir;
+    QString fname(
+#ifdef Q_WS_WIN
+        "predicate.ini"
+#else
+        ".predicate"
+#endif
+    );
+    if (qApp) {
+        pluginsDir = qApp->applicationDirPath() + "/plugins";
+        if (QDir(pluginsDir).exists())
+            return pluginsDir;
+    }
+    if (QFileInfo(QDir::homePath() + "/" + fname).isReadable()) {
+        // we have a config file - try to find plugins dir here
+        QSettings config(QDir::homePath() + "/" + fname, QSettings::IniFormat);
+        pluginsDir = config.value("Plugins").toString();
+        if (QDir(pluginsDir).exists())
+            return pluginsDir;
+    }
+    return QString::null;
+}
+
 bool DriverManagerInternal::lookupDrivers()
 {
     if (!lookupDriversNeeded)
@@ -92,11 +125,40 @@ bool DriverManagerInternal::lookupDrivers()
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
 //TODO: for QT-only version check for KComponentData wrapper
-//  KexiDBWarn << "DriverManagerInternal::lookupDrivers(): cannot work without KComponentData (KGlobal::mainComponent()==0)!" << endl;
+//  KexiDBWarn << "DriverManagerInternal::lookupDrivers(): cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
     lookupDriversNeeded = false;
     clearError();
+
+    m_pluginsDir = findPluginsDir();
+    if (m_pluginsDir.isEmpty()) {
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers.") );
+        return false;
+    }
+    
+    QDir dir(m_pluginsDir, "predicate_*.desktop");
+    const QFileInfoList infoFiles( dir.entryInfoList(QDir::Files|QDir::Readable) );
+    foreach (const QFileInfo& infoFile, infoFiles) {
+        QSettings config(infoFile.absoluteFilePath(), QSettings::IniFormat);
+        config.beginGroup("Desktop Entry");
+        Driver::Info info;
+        info.setName( config.value("DriverName").toString() );
+        info.setFileName( config.value("FileName").toString() );
+        info.setCaption( config.value("Name").toString() );
+//js TODO read translated [..]
+        info.setComment( config.value("Comment").toString() );
+        if (info.caption().isEmpty())
+            info.setCaption( info.name() );
+        info.setFileBased( config.value("DriverType", "Network").toString().toLower()=="file" );
+        if (info.isFileBased())
+            info.setFileDBMimeType( config.value("FileDBDriverMime").toString().toLower() );
+        info.setImportingAllowed( config.value("AllowImporting", true).toBool() );
+        m_driversInfo.insert(info.name().toLower(), info);
+    }
+
+
+#if 0 // todo?
     KService::List tlist = KServiceTypeTrader::self()->query("Kexi/DBDriver");
     KService::List::ConstIterator it(tlist.constBegin());
     for (; it != tlist.constEnd(); ++it) {
@@ -104,19 +166,19 @@ bool DriverManagerInternal::lookupDrivers()
         if (!ptr->property("Library").toString().startsWith("predicate_")) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
             " X-KDE-Library == " << ptr->property("Library").toString()
-            << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!" << endl;
+            << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!";
             continue;
         }
         QString srv_name = ptr->property("X-Kexi-DriverName").toString().toLower();
         if (srv_name.isEmpty()) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers():"
             " X-Kexi-DriverName must be set for Predicate driver \""
-            << ptr->property("Name").toString() << "\" service!\n -- skipped!" << endl;
+            << ptr->property("Name").toString() << "\" service!\n -- skipped!";
             continue;
         }
         if (m_services_lcase.contains(srv_name)) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers(): more than one driver named '"
-            << srv_name << "'\n -- skipping this one!" << endl;
+            << srv_name << "'\n -- skipping this one!";
             continue;
         }
 
@@ -130,14 +192,14 @@ bool DriverManagerInternal::lookupDrivers()
             minor_ver = lst[1].toUInt(&ok);
         if (!ok) {
             KexiDBWarn << "DriverManagerInternal::lookupDrivers(): problem with detecting '"
-            << srv_name << "' driver's version -- skipping it!" << endl;
+            << srv_name << "' driver's version -- skipping it!";
             continue;
         }
         if (major_ver != Predicate::version().major || minor_ver != Predicate::version().minor) {
             KexiDBWarn << QString("DriverManagerInternal::lookupDrivers(): '%1' driver"
                                   " has version '%2' but required Predicate driver version is '%3.%4'\n"
                                   " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
-            .arg(Predicate::version().major).arg(Predicate::version().minor) << endl;
+            .arg(Predicate::version().major).arg(Predicate::version().minor);
             possibleProblems += QString("\"%1\" database Driver.has version \"%2\" "
                                         "but required driver version is \"%3.%4\"")
                                 .arg(srv_name).arg(srv_ver_str)
@@ -163,18 +225,18 @@ bool DriverManagerInternal::lookupDrivers()
                     m_services_by_mimetype.insert(mime, ptr);
                 } else {
                     KexiDBWarn << "DriverManagerInternal::lookupDrivers(): more than one driver for '"
-                    << mime << "' mime type!" << endl;
+                    << mime << "' mime type!";
                 }
             }
         }
         m_services.insert(srv_name, ptr);
         m_services_lcase.insert(srv_name,  ptr);
         KexiDBDbg << "Predicate::DriverManager::lookupDrivers(): registered driver: "
-        << ptr->name() << "(" << ptr->library() << ")" << endl;
+        << ptr->name() << "(" << ptr->library() << ")";
     }
-
-    if (tlist.isEmpty()) {
-        setError(ERR_DRIVERMANAGER, i18n("Could not find any database drivers."));
+#endif
+    if (m_driversInfo.isEmpty()) {
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find any database drivers."));
         return false;
     }
     return true;
@@ -183,8 +245,8 @@ bool DriverManagerInternal::lookupDrivers()
 Predicate::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
 {
     Predicate::Driver::Info i = m_driversInfo[name.toLower()];
-    if (!error() && i.name.isEmpty())
-        setError(ERR_DRIVERMANAGER, i18n("Could not find database driver \"%1\".", name));
+    if (!error() && i.isValid())
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
     return i;
 }
 
@@ -194,7 +256,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
         return 0;
 
     clearError();
-    KexiDBDbg << "DriverManagerInternal::driver(): loading " << name << endl;
+    KexiDBDbg << "DriverManagerInternal::driver(): loading " << name;
 
     Driver *drv = 0;
     if (!name.isEmpty())
@@ -202,59 +264,54 @@ Driver* DriverManagerInternal::driver(const QString& name)
     if (drv)
         return drv; //cached
 
-    if (!m_services_lcase.contains(name.toLower())) {
-        setError(ERR_DRIVERMANAGER, i18n("Could not find database driver \"%1\".", name));
+    if (!m_driversInfo.contains(name.toLower())) {
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
         return 0;
     }
 
-    KService::Ptr ptr = m_services_lcase.value(name.toLower());
-    QString srv_name = ptr->property("X-Kexi-DriverName").toString();
+    const Driver::Info info = m_driversInfo[name.toLower()];
 
-    KexiDBDbg << "KexiDBInterfaceManager::driver(): library: " << ptr->library() << endl;
-    drv = KService::createInstance<Predicate::Driver>(ptr,
-            this,
-            QStringList(),
-            &m_serverResultNum);
-
+    QPluginLoader loader(m_pluginsDir + "/bin/" + info.fileName()
+#if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
+        + "_d"
+#endif
+    );
+    drv = qobject_cast<Driver*>(loader.instance());
     if (!drv) {
-        setError(ERR_DRIVERMANAGER, i18n("Could not load database driver \"%1\".", name));
-        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
+//! @todo
+/*        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
             m_componentLoadingErrors[KLibLoader::ErrNoServiceFound] = "ErrNoServiceFound";
             m_componentLoadingErrors[KLibLoader::ErrServiceProvidesNoLibrary] = "ErrServiceProvidesNoLibrary";
             m_componentLoadingErrors[KLibLoader::ErrNoLibrary] = "ErrNoLibrary";
             m_componentLoadingErrors[KLibLoader::ErrNoFactory] = "ErrNoFactory";
             m_componentLoadingErrors[KLibLoader::ErrNoComponent] = "ErrNoComponent";
         }
-        m_serverResultName = m_componentLoadingErrors[m_serverResultNum];
+        m_serverResultName = m_componentLoadingErrors[m_serverResultNum];*/
         return 0;
     }
-    KexiDBDbg << "DriverManagerInternal::driver(): loading succeed: " << name << endl;
-// KexiDBDbg << "drv="<<(long)drv <<endl;
 
-    drv->setObjectName(srv_name);
-    drv->d->service = ptr.data(); //store info
-    drv->d->fileDBDriverMimeType = ptr->property("X-Kexi-FileDBDriverMime").toString();
-    drv->d->initInternalProperties();
+    drv->setInfo( info );
 
     if (!drv->isValid()) {
         setError(drv);
         delete drv;
         return 0;
     }
-    m_drivers.insert(name.toLower(), drv); //cache it
+    m_drivers.insert(info.name().toLower(), drv); //cache it
     return drv;
 }
 
 void DriverManagerInternal::incRefCount()
 {
     m_refCount++;
-    KexiDBDbg << "DriverManagerInternal::incRefCount(): " << m_refCount << endl;
+    KexiDBDbg << "DriverManagerInternal::incRefCount(): " << m_refCount;
 }
 
 void DriverManagerInternal::decRefCount()
 {
     m_refCount--;
-    KexiDBDbg << "DriverManagerInternal::decRefCount(): " << m_refCount << endl;
+    KexiDBDbg << "DriverManagerInternal::decRefCount(): " << m_refCount;
 // if (m_refCount<1) {
 //  KexiDBDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
 //  s_self=0;
@@ -287,7 +344,7 @@ DriverManager::DriverManager()
 
 DriverManager::~DriverManager()
 {
-    KexiDBDbg << "DriverManager::~DriverManager()" << endl;
+    KexiDBDbg << "DriverManager::~DriverManager()";
     /* Connection *conn;
       for ( conn = m_connections.first(); conn ; conn = m_connections.next() ) {
         conn->disconnect();
@@ -297,36 +354,20 @@ DriverManager::~DriverManager()
       }*/
 
     d_int->decRefCount();
-    if (d_int->m_refCount == 0) {
+    if (d_int->refCount() == 0) {
         //delete internal drv manager!
         delete d_int;
     }
 // if ( s_self == this )
     //s_self = 0;
-    KexiDBDbg << "DriverManager::~DriverManager() ok" << endl;
+    KexiDBDbg << "DriverManager::~DriverManager() ok";
 }
 
-const Predicate::Driver::InfoHash DriverManager::driversInfo()
+Predicate::Driver::Info::Map DriverManager::driversInfo()
 {
     if (!d_int->lookupDrivers())
-        return Predicate::Driver::InfoHash();
+        return Predicate::Driver::Info::Map();
 
-    if (!d_int->m_driversInfo.isEmpty())
-        return d_int->m_driversInfo;
-    foreach(KService::Ptr ptr, d_int->m_services) {
-        Driver::Info info;
-        info.name = ptr->property("X-Kexi-DriverName").toString();
-        info.caption = ptr->property("Name").toString();
-        info.comment = ptr->property("Comment").toString();
-        if (info.caption.isEmpty())
-            info.caption = info.name;
-        info.fileBased = (ptr->property("X-Kexi-DriverType").toString().toLower() == "file");
-        if (info.fileBased)
-            info.fileDBMimeType = ptr->property("X-Kexi-FileDBDriverMime").toString().toLower();
-        QVariant v = ptr->property("X-Kexi-DoNotAllowProjectImportingTo");
-        info.allowImportingTo = v.isNull() ? true : !v.toBool();
-        d_int->m_driversInfo.insert(info.name.toLower(), info);
-    }
     return d_int->m_driversInfo;
 }
 
@@ -335,21 +376,21 @@ const QStringList DriverManager::driverNames()
     if (!d_int->lookupDrivers())
         return QStringList();
 
-    if (d_int->m_services.isEmpty() && d_int->error())
+    if (d_int->m_driversInfo.isEmpty() && d_int->error())
         return QStringList();
-    return d_int->m_services.keys();
+    return d_int->m_driversInfo.keys();
 }
 
 Predicate::Driver::Info DriverManager::driverInfo(const QString &name)
 {
-    driversInfo();
+    d_int->lookupDrivers();
     Predicate::Driver::Info i = d_int->driverInfo(name);
     if (d_int->error())
         setError(d_int);
     return i;
 }
 
-KService::Ptr DriverManager::serviceInfo(const QString &name)
+/*KService::Ptr DriverManager::serviceInfo(const QString &name)
 {
     if (!d_int->lookupDrivers()) {
         setError(d_int);
@@ -360,7 +401,7 @@ KService::Ptr DriverManager::serviceInfo(const QString &name)
     KService::Ptr ptr = d_int->m_services_lcase.value(name.toLower());
     if (ptr)
         return ptr;
-    setError(ERR_DRIVERMANAGER, i18n("No such driver service: \"%1\".", name));
+    setError(ERR_DRIVERMANAGER, QObject::tr("No such driver service: \"%1\".").arg(name));
     return KService::Ptr();
 }
 
@@ -368,7 +409,7 @@ const DriverManager::ServicesHash& DriverManager::services()
 {
     d_int->lookupDrivers();
     return d_int->m_services;
-}
+}*/
 
 QString DriverManager::lookupByMime(const QString &mimeType)
 {
@@ -377,10 +418,10 @@ QString DriverManager::lookupByMime(const QString &mimeType)
         return 0;
     }
 
-    KService::Ptr ptr = d_int->m_services_by_mimetype[mimeType.toLower()];
-    if (!ptr)
+    const Driver::Info info( d_int->m_infos_by_mimetype[mimeType.toLower()] );
+    if (!info.isValid())
         return QString();
-    return ptr->property("X-Kexi-DriverName").toString();
+    return info.name();
 }
 
 Driver* DriverManager::driver(const QString& name)
@@ -410,7 +451,7 @@ void DriverManager::drv_clearServerResult()
 {
     d_int->m_serverErrMsg.clear();
     d_int->m_serverResultNum = 0;
-    d_int->m_serverResultName.clear();
+//    d_int->m_serverResultName.clear();
 }
 
 QString DriverManager::possibleProblemsInfoMsg() const
@@ -419,14 +460,9 @@ QString DriverManager::possibleProblemsInfoMsg() const
         return QString();
     QString str;
     str.reserve(1024);
-    str = "<ul>";
-    for (QStringList::ConstIterator it = d_int->possibleProblems.constBegin();
-            it != d_int->possibleProblems.constEnd(); ++it) {
-        str += (QString::fromLatin1("<li>") + *it + QString::fromLatin1("</li>"));
-    }
-    str += "</ul>";
+    str = QLatin1String("<ul>");
+    foreach (const QString& problem, d_int->possibleProblems)
+        str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
+    str += QLatin1String("</ul>");
     return str;
 }
-
-#include "drivermanager_p.moc"
-

@@ -1,7 +1,7 @@
 include_directories(
   ${POSTGRESQL_INCLUDE_DIR}
   ${PQXX_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}/src
+  ${CMAKE_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

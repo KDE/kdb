@@ -2,6 +2,8 @@
    Copyright (C) 1999 Sirtaj Singh Kanq <taj@kde.org>
    Copyright (C) 2007 Matthias Kretz <kretz@kde.org>
 
+   Based on kdelibs/kdecore/kernel/kstatic.*
+
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License version 2 as published by the Free Software Foundation.
@@ -16,13 +18,16 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301, USA.
 */
-#ifndef _KGLOBAL_H
-#define _KGLOBAL_H
+#ifndef PREDICATE_TOOLS_STATIC_H
+#define PREDICATE_TOOLS_STATIC_H
 
-#include <kdecore_export.h>
 #include <QtCore/QAtomicPointer>
 #include <sys/types.h>
 
+namespace Predicate
+{
+namespace Utils
+{
 
 //
 // WARNING!!
@@ -35,16 +40,6 @@
 # define Q_BASIC_ATOMIC_INITIALIZER     Q_ATOMIC_INIT
 # define testAndSetOrdered              testAndSet
 #endif
-
-class KComponentData;
-class KCharsets;
-class KConfig;
-class KLocale;
-class KStandardDirs;
-class KSharedConfig;
-template <typename T>
-class KSharedPtr;
-typedef KSharedPtr<KSharedConfig> KSharedConfigPtr;
 
 /// @cond InternalDocs
 
@@ -286,7 +281,7 @@ static struct K_GLOBAL_STATIC_STRUCT_NAME(NAME)                                \
                 && _k_static_##NAME != x ) {                                   \
                 delete x;                                                      \
             } else {                                                           \
-                static KCleanUpGlobalStatic cleanUpObject = { destroy };       \
+                static Predicate::Utils::KCleanUpGlobalStatic cleanUpObject = { destroy };       \
             }                                                                  \
         }                                                                      \
         return _k_static_##NAME;                                               \
@@ -305,227 +300,44 @@ static struct K_GLOBAL_STATIC_STRUCT_NAME(NAME)                                \
 } NAME;
 
 /**
- * Access to the KDE global objects.
- * KGlobal provides you with pointers of many central
- * objects that exist only once in the process. It is also
- * responsible for managing instances of KStaticDeleterBase.
+ * Creates a static QString.
  *
- * @see KStaticDeleterBase
- * @author Sirtaj Singh Kang (taj@kde.org)
+ * To be used inside functions(!) like:
+ * @code
+ * static const QString &myString = KGlobal::staticQString("myText");
+ * @endcode
+ *
+ * @attention Do @b NOT use code such as:
+ * @code
+ * static QString myString = KGlobal::staticQString("myText");
+ * @endcode
+ * This creates a static object (instead of a static reference)
+ * and as you know static objects are EVIL.
+ * @param str the string to create
+ * @return the static string
  */
-namespace KGlobal
-{
+PREDICATE_EXPORT const QString& staticQString(const char *str); //krazy:exclude=constref (doesn't make sense otherwise)
 
-    /**
-     * Returns the global component data.  There is always at least
-     * one instance of a component in one application (in most
-     * cases the application itself).
-     * @return the global component data
-     */
-    KDECORE_EXPORT const KComponentData &mainComponent(); //krazy:exclude=constref (don't mess up ref-counting)
+/**
+ * Creates a static QString.
+ *
+ * To be used inside functions(!) like:
+ * @code
+ * static const QString &myString = KGlobal::staticQString(i18n("My Text"));
+ * @endcode
+ *
+ * @attention Do @b NOT use code such as:
+ * @code
+ * static QString myString = KGlobal::staticQString(i18n("myText"));
+ * @endcode
+ * This creates a static object (instead of a static reference)
+ * and as you know static objects are EVIL.
+ * @param str the string to create
+ * @return the static string
+ */
+PREDICATE_EXPORT const QString& staticQString(const QString &str); //krazy:exclude=constref (doesn't make sense otherwise)
 
-    /**
-     * @internal
-     * Returns whether a main KComponentData is available.
-     */
-    KDECORE_EXPORT bool hasMainComponent();
-
-    /**
-     * Returns the application standard dirs object.
-     * @return the global standard dir object
-     */
-    KDECORE_EXPORT KStandardDirs *dirs();
-
-    /**
-     * Returns the general config object.
-     * @return the global configuration object.
-     */
-    KDECORE_EXPORT KSharedConfigPtr config();
-
-    /**
-     * Returns the global locale object.
-     * @return the global locale object
-     */
-    KDECORE_EXPORT KLocale *locale();
-    /**
-     * @internal
-     * Returns whether KGlobal has a valid KLocale object
-     */
-    KDECORE_EXPORT bool hasLocale();
-
-    /**
-     * The global charset manager.
-     * @return the global charset manager
-     */
-    KDECORE_EXPORT KCharsets *charsets();
-
-    /**
-     * Returns the umask of the process.
-     * @return the umask of the process
-     */
-    KDECORE_EXPORT mode_t umask();
-
-    /**
-     * Creates a static QString.
-     *
-     * To be used inside functions(!) like:
-     * @code
-     * static const QString &myString = KGlobal::staticQString("myText");
-     * @endcode
-     *
-     * @attention Do @b NOT use code such as:
-     * @code
-     * static QString myString = KGlobal::staticQString("myText");
-     * @endcode
-     * This creates a static object (instead of a static reference)
-     * and as you know static objects are EVIL.
-     * @param str the string to create
-     * @return the static string
-     */
-    KDECORE_EXPORT const QString& staticQString(const char *str); //krazy:exclude=constref (doesn't make sense otherwise)
-
-    /**
-     * Creates a static QString.
-     *
-     * To be used inside functions(!) like:
-     * @code
-     * static const QString &myString = KGlobal::staticQString(i18n("My Text"));
-     * @endcode
-     *
-     * @attention Do @b NOT use code such as:
-     * @code
-     * static QString myString = KGlobal::staticQString(i18n("myText"));
-     * @endcode
-     * This creates a static object (instead of a static reference)
-     * and as you know static objects are EVIL.
-     * @param str the string to create
-     * @return the static string
-     */
-    KDECORE_EXPORT const QString& staticQString(const QString &str); //krazy:exclude=constref (doesn't make sense otherwise)
-
-    /**
-     * Tells KGlobal about one more operations that should be finished
-     * before the application exits. The standard behavior is to exit on the
-     * "last window closed" event, but some events should outlive the last window closed
-     * (e.g. a file copy for a file manager, or 'compacting folders on exit' for a mail client).
-     *
-     * We have some use cases that we want to take care of (the format is "action refcount"):
-     * - open window -> setAllowQuit(true) 1 ; close window 0 => EXIT
-     * - job start 1; job end 0 [don't exit yet]; open window -> setAllowQuit(true) 1 ; close window 0 => EXIT
-     * - job start 1; open window -> setAllowQuit(true) 2; close window 1; job end 0 => EXIT
-     * - job start 1; open window -> setAllowQuit(true) 2; job end 1; close window 0 => EXIT
-     * - open dialog 0; close dialog 0; => DO NOT EXIT
-     * - job start 1; job end 0; create two main objects 2; delete both main objects 0 => EXIT
-     * - open window -> setAllowQuit(true) 1; add systray icon 2; close window 1 => DO NOT EXIT
-     * - open window -> setAllowQuit(true) 1; add systray icon 2; remove systray icon 1; close window 0 => EXIT
-     *
-     * Note that for this to happen you must call qApp->setQuitOnLastWindowClosed(false),
-     * in main() for instance.
-     */
-    KDECORE_EXPORT void ref();
-
-    /**
-     * Tells KGlobal that one operation such as those described in ref() just finished.
-     * This call makes the QApplication quit if the counter is back to 0.
-     */
-    KDECORE_EXPORT void deref();
-
-    /**
-     * If refcounting reaches 0 (or less), and @p allowQuit is true, the instance of the application
-     * will automatically be exited. Otherwise, the application will not exit automatically.
-     * @since 4.2
-     */
-    KDECORE_EXPORT void setAllowQuit(bool allowQuit);
-
-    /**
-     * The component currently active (useful in a multi-component
-     * application, such as a KParts application).
-     * Don't use this - it's mainly for KAboutDialog and KBugReport.
-     * @internal
-     */
-    KDECORE_EXPORT KComponentData activeComponent();
-
-    /**
-     * @internal
-     * Returns whether an active KComponentData is available.
-     * @since 4.2
-     */
-    KDECORE_EXPORT bool hasActiveComponent();
-
-    /**
-     * Set the active component for use by KAboutDialog and KBugReport.
-     * To be used only by a multi-component (KParts) application.
-     *
-     * @see activeComponent()
-     */
-    KDECORE_EXPORT void setActiveComponent(const KComponentData &d);
-
-    /**
-     * Returns a text for the window caption.
-     *
-     * This may be set by
-     * "-caption", otherwise it will be equivalent to the name of the
-     * executable.
-     * @return the text for the window caption
-     */
-    KDECORE_EXPORT QString caption();
-
-    /**
-     * For setLocale
-     */
-    enum CopyCatalogs { DoCopyCatalogs, DontCopyCatalogs};
-
-    ///@internal
-    KDECORE_EXPORT void setLocale(KLocale *, CopyCatalogs copy = DoCopyCatalogs);
 }
-
-#ifdef KDE_SUPPORT
-/**
- * @relates KGlobal
- * A typesafe function to find the smaller of the two arguments.
- * @deprecated, used qMin instead
- */
-#define KMIN(a,b)	qMin(a,b)
-/**
- * @relates KGlobal
- * A typesafe function to find the larger of the two arguments.
- * @deprecated, used qMax instead
- */
-#define KMAX(a,b)	qMax(a,b)
-/**
- * \relates KGlobal
- * A typesafe function to determine the absolute value of the argument.
- * @deprecated, used qAbs instead
- */
-#define KABS(a)	qAbs(a)
-/**
- * @relates KGlobal
- * A typesafe function that returns x if it's between low and high values.
- * low if x is smaller than low and high if x is bigger than high.
- * @deprecated, used qBound instead. Warning, the argument order differs.
- */
-#define KCLAMP(x,low,high) qBound(low,x,high)
-
-#define kMin qMin
-#define kMax qMax
-#define kAbs qAbs
-
-/**
- * @relates KGlobal
- * A typesafe function that returns x if it's between low and high values.
- * low if x is smaller than low and high if x is bigger than high.
- * @deprecated, used qBound instead. Warning, the argument order differs.
- */
-
-template<class T>
-inline KDE_DEPRECATED T kClamp( const T& x, const T& low, const T& high )
-{
-    if ( x < low )       return low;
-    else if ( high < x ) return high;
-                         return x;
 }
-
-#endif
 
 #endif // _KGLOBAL_H
-

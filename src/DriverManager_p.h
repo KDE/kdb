@@ -20,16 +20,12 @@
 #ifndef PREDICATE_DRIVER_MNGR_P_H
 #define PREDICATE_DRIVER_MNGR_P_H
 
-#include "Object.h"
-
-#include <qObject.h>
-#include <q3asciidict.h>
+#include "Driver.h"
 
 namespace Predicate
 {
 
-/*! Internal class of driver manager.
-*/
+//! Internal class of the driver manager.
 class PREDICATE_EXPORT DriverManagerInternal : public QObject, public Predicate::Object
 {
     Q_OBJECT
@@ -70,22 +66,24 @@ protected:
 
     static Predicate::DriverManagerInternal* s_self;
 
-    DriverManager::ServicesHash m_services; //! services map
-    DriverManager::ServicesHash m_services_lcase; //! as above but service names in lowercase
-    DriverManager::ServicesHash m_services_by_mimetype;
-    Driver::InfoHash m_driversInfo; //! used to store drivers information
+    Driver::Info::Map m_infos_by_mimetype;
+    Driver::Info::Map m_driversInfo; //!< used to store drivers information
     QHash<QString, Predicate::Driver*> m_drivers;
-    ulong m_refCount;
+    QString m_pluginsDir;
 
     QString m_serverErrMsg;
     int m_serverResultNum;
     QString m_serverResultName;
-    //! result names for KParts::ComponentFactory::ComponentLoadingError
-    QHash<int, QString> m_componentLoadingErrors;
+//    //! result names for KParts::ComponentFactory::ComponentLoadingError
+//    QHash<int, QString> m_componentLoadingErrors;
 
     QStringList possibleProblems;
 
-bool lookupDriversNeeded : 1;
+    ulong refCount() const { return m_refCount; }
+
+private:
+    ulong m_refCount;
+    bool lookupDriversNeeded : 1;
 
     friend class DriverManager;
 };

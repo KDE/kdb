@@ -137,7 +137,7 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
             return false;
         }
 
-        if (driver->isFileDriver())
+        if (driver->isFileBased())
             d->connData.setFileName(databaseName);
 
         d->conn = driver->createConnection(d->connData);

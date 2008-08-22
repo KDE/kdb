@@ -28,14 +28,14 @@ namespace Predicate
 class Connection;
 
 //! PostgreSQL database driver.
-class pqxxSqlDriver : public Driver
+class PqxxSqlDriver : public Driver
 {
     Q_OBJECT
     PREDICATE_DRIVER
 
 public:
-    pqxxSqlDriver(QObject *parent, const QStringList &args = QStringList());
-    ~pqxxSqlDriver();
+    PqxxSqlDriver(QObject *parent, const QStringList &args = QStringList());
+    ~PqxxSqlDriver();
 
     virtual bool isSystemObjectName(const QString& n)const;
     virtual bool isSystemDatabaseName(const QString& n)const;

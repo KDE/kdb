@@ -20,8 +20,8 @@
 #ifndef PREDICATE_GLOBAL_H
 #define PREDICATE_GLOBAL_H
 
-#include "predicate_export.h"
-#include <qstring.h>
+#include <Predicate/predicate_export.h>
+#include <QtCore/QString>
 
 //global public definitions
 
@@ -32,8 +32,11 @@
  In external code: do not use this to get library version information:
  use Predicate::versionMajor() and Predicate::versionMinor() instead to get real version.
 */
-#define PREDICATE_VERSION_MAJOR 1
-#define PREDICATE_VERSION_MINOR 9
+#define PREDICATE_VERSION_MAJOR 2
+#define PREDICATE_VERSION_MINOR 0
+
+#define PREDICATE_VERSION_MAJOR_STRING "2"
+#define PREDICATE_VERSION_MINOR_STRING "0"
 
 /*! Predicate implementation version. @see PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR */
 #define PREDICATE_VERSION Predicate::DatabaseVersionInfo(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR)
@@ -65,15 +68,14 @@ Data representation
 \section Drivers
 
 Drivers are loaded using DriverManager::driver(const QString& name).  The names
-of drivers are given in their drivers .desktop file in the
-X-Kexi-DriverName field.
+of drivers are given in their drivers .desktop file in the DriverName field.
 
 Predicate supports two kinds of databases: file-based and network-based databases.
-The type of a driver is available from several places. The X-Kexi-DriverType
+The type of a driver is available from several places. The DriverType
 field in the driver's .desktop file, is read by the DriverManager and
 available by calling DriverManager::driverInfo(const QString &name) and using
 the Driver::Info#fileBased member from the result. Given a reference to a
-Driver, its type can also be found directly using Driver::isFileDriver() const.
+Driver, its type can also be found directly using Driver::isFileBased().
 
 Each database backend driver consists of three main classes: a driver,
 a connection and a cursor class, e.g SQLiteDriver, SQLiteConnection,
@@ -96,11 +98,25 @@ to the database backend.
 namespace Predicate
 {
 
-#define KexiDBDbg  kDebug(44000)   //! Debug area for core Predicate code
-#define KexiDBDrvDbg kDebug(44001) //! Debug area for KexiDB's drivers implementation code
-#define KexiDBWarn  kWarning(44000)
-#define KexiDBDrvWarn kWarning(44001)
-#define KexiDBFatal kFatal(44000)
+#if !defined(_DEBUG) && !defined(DEBUG)
+# define PREDICATE_DEBUG if (true); else
+#else
+# define PREDICATE_DEBUG
+#endif
+
+//! Debug command for the core Predicate code
+# define KexiDBDbg PREDICATE_DEBUG qDebug() << "Predicate:"
+//! Debug command for Predicate driver's code
+# define KexiDBDrvDbg PREDICATE_DEBUG qDebug() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+//! Warning command for the core Predicate code
+# define KexiDBWarn PREDICATE_DEBUG qWarning() << "Predicate:"
+//! Warning command for Predicate driver's code
+# define KexiDBDrvWarn PREDICATE_DEBUG qWarning() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+//! Fatal command for the core Predicate code
+# define KexiDBFatal PREDICATE_DEBUG qCritical() << "Predicate:"
+//! Fatal command for Predicate driver's code
+# define KexiDBDrvFatal PREDICATE_DEBUG qCritical() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+
 
 /*! @short Contains database version information about a Kexi-compatible database.
  The version is stored as internal database properties. */

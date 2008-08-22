@@ -146,6 +146,3 @@ ODBCConnection::~ODBCConnection()
     destroy();
     delete d;
 }
-
-#include "odbcconnection.moc"
-

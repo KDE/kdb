@@ -44,7 +44,7 @@ SybaseDriver::SybaseDriver(QObject *parent, const QStringList &args) :
 
 // KexiDBDrvDbg << "SybaseDriver::SybaseDriver()" << endl;
 
-    d->isFileDriver = false ;
+//    d->isFileDriver = false ;
 
     // Sybase supports Nested Transactions. Ignore for now
     d->features = IgnoreTransactions | CursorForward;
@@ -181,6 +181,3 @@ QString SybaseDriver::addLimitTo1(const QString& sql, bool add)
     QString returnString = sql.trimmed().insert(6, " TOP 1 ");
     return add ? returnString : sql;
 }
-
-#include "SybaseDriver.moc"
-

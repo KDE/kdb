@@ -26,9 +26,9 @@
 #include "Connection.h"
 #include "ConnectionData.h"
 #include "Admin.h"
+#include "tools/Static.h"
 
-#include <klocale.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 #include <assert.h>
 
@@ -71,14 +71,6 @@ DriverBehaviour::DriverBehaviour()
 
 //---------------------------------------------
 
-Driver::Info::Info()
-        : fileBased(false)
-        , allowImportingTo(true)
-{
-}
-
-//---------------------------------------------
-
 Driver::Driver(QObject *parent, const QStringList &)
         : QObject(parent)
         , Object()
@@ -107,19 +99,19 @@ bool Driver::isValid()
     if (Predicate::version().major != version().major
             || Predicate::version().minor != version().minor) {
         setError(ERR_INCOMPAT_DRIVER_VERSION,
-                 i18n(
-                     "Incompatible database driver's \"%1\" version: found version %2, expected version %3.",
-                     objectName(),
-                     QString("%1.%2").arg(version().major).arg(version().minor),
-                     QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor)));
+                 tr(
+                     "Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
+                 .arg(objectName(),
+                      QString("%1.%2").arg(version().major).arg(version().minor),
+                      QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor)));
         return false;
     }
 
-    QString inv_impl = i18n("Invalid database driver's \"%1\" implementation:\n", name());
-    KLocalizedString not_init = ki18n("Value of \"%1\" is not initialized for the driver.");
+    QString inv_impl( tr("Invalid database driver's \"%1\" implementation:\n").arg(name()) );
+    QString not_init( tr("Value of \"%1\" is not initialized for the driver.") );
     if (beh->ROW_ID_FIELD_NAME.isEmpty()) {
         setError(ERR_INVALID_DRIVER_IMPL,
-                 inv_impl + not_init.subs("DriverBehaviour::ROW_ID_FIELD_NAME").toString());
+                 inv_impl + not_init.arg("DriverBehaviour::ROW_ID_FIELD_NAME"));
         return false;
     }
 
@@ -131,19 +123,32 @@ const QSet<Connection*> Driver::connections() const
     return d->connections;
 }
 
+/* moved to info()
 QString Driver::fileDBDriverMimeType() const
 {
     return d->fileDBDriverMimeType;
-}
+}*/
 
-const KService* Driver::service() const
+//ported const KService* Driver::service() const
+Driver::Info Driver::info() const
 {
-    return d->service;
+    return d->info;
 }
 
+/* moved to info()
 bool Driver::isFileDriver() const
 {
     return d->isFileDriver;
+}*/
+
+QString Driver::name() const
+{
+    return d->info.name();
+}
+
+bool Driver::isFileBased() const
+{
+    return d->info.isFileBased();
 }
 
 int Driver::features() const
@@ -181,10 +186,10 @@ Connection *Driver::createConnection(ConnectionData &conn_data, int options)
     clearError();
     if (!isValid())
         return 0;
-    if (d->isFileDriver) {
+    if (d->info.isFileBased()) {
         if (conn_data.fileName().isEmpty()) {
             setError(ERR_MISSING_DB_LOCATION,
-                     i18n("File name expected for file-based database driver."));
+                     tr("File name expected for file-based database driver."));
             return 0;
         }
     }
@@ -209,8 +214,8 @@ Connection* Driver::removeConnection(Connection *conn)
 QString Driver::defaultSQLTypeName(int id_t)
 {
     if (id_t < 0 || id_t > (Field::LastType + 1))
-        return QString::fromLatin1("Null");
-    return QString::fromLatin1(Predicate_defaultSQLTypeNames[id_t]);
+        return QLatin1String("Null");
+    return QLatin1String(Predicate_defaultSQLTypeNames[id_t]);
 }
 
 bool Driver::isSystemObjectName(const QString& n) const
@@ -269,7 +274,7 @@ QString Driver::valueToSQL(uint ftype, const QVariant& v) const
         return dateTimeToSQL(v.toDateTime());
     case Field::BLOB: {
         if (v.toByteArray().isEmpty())
-            return QString::fromLatin1("NULL");
+            return QLatin1String("NULL");
         if (v.type() == QVariant::String)
             return escapeBLOB(v.toString().toUtf8());
         return escapeBLOB(v.toByteArray());
@@ -352,13 +357,21 @@ bool Driver::isDriverSpecificKeyword(const QByteArray& word) const
     return d->driverSpecificSQLKeywords.contains(word);
 }
 
+void Driver::setInfo( const Driver::Info& info )
+{
+    d->info = info;
+    setObjectName( info.name().toLower() );
+    d->initInternalProperties();
+}
+
 //---------------
 
-K_GLOBAL_STATIC_WITH_ARGS(Utils::StaticSetOfStrings, Predicate_kexiSQLKeywords, (DriverPrivate::kexiSQLKeywords))
+K_GLOBAL_STATIC_WITH_ARGS(
+    Utils::StaticSetOfStrings,
+    Predicate_kexiSQLKeywords,
+    (DriverPrivate::kexiSQLKeywords) )
 
 PREDICATE_EXPORT bool Predicate::isKexiSQLKeyword(const QByteArray& word)
 {
     return Predicate_kexiSQLKeywords->contains(word);
 }
-
-#include "driver.moc"

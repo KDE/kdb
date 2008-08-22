@@ -557,5 +557,3 @@ void Cursor::setQueryParameters(const QList<QVariant>& params)
     else
         *m_queryParameters = params;
 }
-
-#include "cursor.moc"

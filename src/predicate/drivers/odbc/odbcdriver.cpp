@@ -40,7 +40,7 @@ PREDICATE_DRIVER_INFO(ODBCDriver, odbc)
 ODBCDriver::ODBCDriver(QObject *parent, const char *name, const QStringList &args)
         : Driver(parent, name, args)
 {
-    d->isFileDriver = false;
+//    d->isFileDriver = false;
     d->isDBOpenedAfterCreate = true;
     d->features = SingleTransactions | CursorForward;
 
@@ -101,6 +101,3 @@ QByteArray ODBCDriver::escapeString(const QByteArray& str) const
 {
     return str;
 }
-
-#include "odbcdriver.moc"
-
