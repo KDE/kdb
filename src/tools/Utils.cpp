@@ -17,9 +17,9 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "utils.h"
-#include "utils_p.h"
-#include "kexiutils_global.h"
+#include "Utils.h"
+#include "Utils_p.h"
+//#include "kexiutils_global.h"
 
 #include <QRegExp>
 #include <QPainter>
@@ -31,77 +31,16 @@
 #include <QFile>
 #include <QStyle>
 
-#include <KDebug>
-#include <KCursor>
-#include <KApplication>
-#include <KIconEffect>
-#include <KIconLoader>
-#include <KGlobalSettings>
-#include <KAction>
+//#include <KDebug>
+//#include <KApplication>
+//#include <KIconEffect>
+//#include <KIconLoader>
+//#include <KGlobalSettings>
+//#include <KAction>
 
-using namespace KexiUtils;
+using namespace Predicate::Utils;
 
-DelayedCursorHandler::DelayedCursorHandler()
-        : startedOrActive(false)
-{
-    timer.setSingleShot(true);
-    connect(&timer, SIGNAL(timeout()), this, SLOT(show()));
-}
-void DelayedCursorHandler::start(bool noDelay)
-{
-    startedOrActive = true;
-    timer.start(noDelay ? 0 : 1000);
-}
-void DelayedCursorHandler::stop()
-{
-    startedOrActive = false;
-    timer.stop();
-    QApplication::restoreOverrideCursor();
-}
-void DelayedCursorHandler::show()
-{
-    QApplication::restoreOverrideCursor();
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-}
-
-K_GLOBAL_STATIC(DelayedCursorHandler, _delayedCursorHandler)
-
-void KexiUtils::setWaitCursor(bool noDelay)
-{
-    if (qApp->type() != QApplication::Tty)
-        _delayedCursorHandler->start(noDelay);
-}
-void KexiUtils::removeWaitCursor()
-{
-    if (qApp->type() != QApplication::Tty)
-        _delayedCursorHandler->stop();
-}
-
-WaitCursor::WaitCursor(bool noDelay)
-{
-    setWaitCursor(noDelay);
-}
-
-WaitCursor::~WaitCursor()
-{
-    removeWaitCursor();
-}
-
-WaitCursorRemover::WaitCursorRemover()
-{
-    m_reactivateCursor = _delayedCursorHandler->startedOrActive;
-    _delayedCursorHandler->stop();
-}
-
-WaitCursorRemover::~WaitCursorRemover()
-{
-    if (m_reactivateCursor)
-        _delayedCursorHandler->start(true);
-}
-
-//--------------------------------------------------------------------------------
-
-QObject* KexiUtils::findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName)
+QObject* Predicate::Utils::findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName)
 {
     if (!o)
         return 0;
@@ -119,7 +58,7 @@ QObject* KexiUtils::findFirstQObjectChild(QObject *o, const char* className /* c
     return 0;
 }
 
-int KexiUtils::indexOfPropertyWithSuperclasses(const QObject *object, const char* name)
+int Predicate::Utils::indexOfPropertyWithSuperclasses(const QObject *object, const char* name)
 {
     const QMetaObject *mobj = object->metaObject();
     while (true) {
@@ -131,7 +70,7 @@ int KexiUtils::indexOfPropertyWithSuperclasses(const QObject *object, const char
     return -1;
 }
 
-QMetaProperty KexiUtils::findPropertyWithSuperclasses(const QObject* object,
+QMetaProperty Predicate::Utils::findPropertyWithSuperclasses(const QObject* object,
         const char* name)
 {
     const QMetaObject *mobj = object->metaObject();
@@ -146,7 +85,7 @@ QMetaProperty KexiUtils::findPropertyWithSuperclasses(const QObject* object,
     return QMetaProperty();
 }
 
-QMetaProperty KexiUtils::findPropertyWithSuperclasses(const QObject* object,
+QMetaProperty Predicate::Utils::findPropertyWithSuperclasses(const QObject* object,
         int index)
 {
     const QMetaObject *mobj = object->metaObject();
@@ -159,7 +98,7 @@ QMetaProperty KexiUtils::findPropertyWithSuperclasses(const QObject* object,
     return QMetaProperty();
 }
 
-bool KexiUtils::objectIsA(QObject* object, const QList<QByteArray>& classNames)
+bool Predicate::Utils::objectIsA(QObject* object, const QList<QByteArray>& classNames)
 {
     foreach(const QByteArray& ba, classNames) {
         if (objectIsA(object, ba.constData()))
@@ -168,7 +107,7 @@ bool KexiUtils::objectIsA(QObject* object, const QList<QByteArray>& classNames)
     return false;
 }
 
-QList<QMetaMethod> KexiUtils::methodsForMetaObject(
+QList<QMetaMethod> Predicate::Utils::methodsForMetaObject(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types,
     QFlags<QMetaMethod::Access> access)
 {
@@ -182,7 +121,7 @@ QList<QMetaMethod> KexiUtils::methodsForMetaObject(
     return result;
 }
 
-QList<QMetaMethod> KexiUtils::methodsForMetaObjectWithParents(
+QList<QMetaMethod> Predicate::Utils::methodsForMetaObjectWithParents(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types,
     QFlags<QMetaMethod::Access> access)
 {
@@ -199,7 +138,7 @@ QList<QMetaMethod> KexiUtils::methodsForMetaObjectWithParents(
     return result;
 }
 
-QList<QMetaProperty> KexiUtils::propertiesForMetaObject(
+QList<QMetaProperty> Predicate::Utils::propertiesForMetaObject(
     const QMetaObject *metaObject)
 {
     const int count = metaObject ? metaObject->propertyCount() : 0;
@@ -209,7 +148,7 @@ QList<QMetaProperty> KexiUtils::propertiesForMetaObject(
     return result;
 }
 
-QList<QMetaProperty> KexiUtils::propertiesForMetaObjectWithInherited(
+QList<QMetaProperty> Predicate::Utils::propertiesForMetaObjectWithInherited(
     const QMetaObject *metaObject)
 {
     QList<QMetaProperty> result;
@@ -222,7 +161,7 @@ QList<QMetaProperty> KexiUtils::propertiesForMetaObjectWithInherited(
     return result;
 }
 
-QStringList KexiUtils::enumKeysForProperty(const QMetaProperty& metaProperty)
+QStringList Predicate::UtilsenumKeysForProperty(const QMetaProperty& metaProperty)
 {
     QStringList result;
     QMetaEnum enumerator(metaProperty.enumerator());
@@ -232,7 +171,9 @@ QStringList KexiUtils::enumKeysForProperty(const QMetaProperty& metaProperty)
     return result;
 }
 
-QString KexiUtils::fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat)
+#if 0
+//! @todo
+QString Predicate::Utils::fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat)
 {
     if (mime.isNull())
         return QString();
@@ -261,13 +202,13 @@ QString KexiUtils::fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFo
     return str;
 }
 
-QString KexiUtils::fileDialogFilterString(const QString& mimeString, bool kdeFormat)
+QString Predicate::Utils::fileDialogFilterString(const QString& mimeString, bool kdeFormat)
 {
     KMimeType::Ptr ptr = KMimeType::mimeType(mimeString);
     return fileDialogFilterString(ptr, kdeFormat);
 }
 
-QString KexiUtils::fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat)
+QString Predicate::Utils::fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat)
 {
     QString ret;
     QStringList::ConstIterator endIt = mimeStrings.constEnd();
@@ -275,8 +216,9 @@ QString KexiUtils::fileDialogFilterStrings(const QStringList& mimeStrings, bool 
         ret += fileDialogFilterString(*it, kdeFormat);
     return ret;
 }
+#endif
 
-QColor KexiUtils::blendedColors(const QColor& c1, const QColor& c2, int factor1, int factor2)
+QColor Predicate::Utils::blendedColors(const QColor& c1, const QColor& c2, int factor1, int factor2)
 {
     return QColor(
                int((c1.red()*factor1 + c2.red()*factor2) / (factor1 + factor2)),
@@ -284,7 +226,7 @@ QColor KexiUtils::blendedColors(const QColor& c1, const QColor& c2, int factor1,
                int((c1.blue()*factor1 + c2.blue()*factor2) / (factor1 + factor2)));
 }
 
-QColor KexiUtils::contrastColor(const QColor& c)
+QColor Predicate::Utils::contrastColor(const QColor& c)
 {
     int g = qGray(c.rgb());
     if (g > 110)
@@ -296,7 +238,7 @@ QColor KexiUtils::contrastColor(const QColor& c)
     return Qt::gray;
 }
 
-QColor KexiUtils::bleachedColor(const QColor& c, int factor)
+QColor Predicate::Utils::bleachedColor(const QColor& c, int factor)
 {
     int h, s, v;
     c.getHsv(&h, &s, &v);
@@ -311,12 +253,14 @@ QColor KexiUtils::bleachedColor(const QColor& c, int factor)
     return c2;
 }
 
-QIcon KexiUtils::colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette)
+#if 0
+//! @todo
+QIcon Predicate::Utils::colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette)
 {
 #ifdef __GNUC__
-#warning KexiUtils::colorizeIconToTextColor OK?
+#warning Predicate::Utils::colorizeIconToTextColor OK?
 #else
-#pragma WARNING(port KexiUtils::colorizeIconToTextColor OK?)
+#pragma WARNING(port Predicate::Utils::colorizeIconToTextColor OK?)
 #endif
     QPixmap pm(
         KIconEffect().apply(icon, KIconEffect::Colorize, 1.0f,
@@ -325,7 +269,7 @@ QIcon KexiUtils::colorizeIconToTextColor(const QPixmap& icon, const QPalette& pa
     return QIcon(pm);
 }
 
-QPixmap KexiUtils::emptyIcon(KIconLoader::Group iconGroup)
+QPixmap Predicate::Utils::emptyIcon(KIconLoader::Group iconGroup)
 {
     QPixmap noIcon(IconSize(iconGroup), IconSize(iconGroup));
     QBitmap bmpNoIcon(noIcon.size());
@@ -333,15 +277,16 @@ QPixmap KexiUtils::emptyIcon(KIconLoader::Group iconGroup)
     noIcon.setMask(bmpNoIcon);
     return noIcon;
 }
+#endif
 
-void KexiUtils::serializeMap(const QMap<QString, QString>& map, QByteArray& array)
+void Predicate::Utils::serializeMap(const QMap<QString, QString>& map, QByteArray& array)
 {
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
 }
 
-void KexiUtils::serializeMap(const QMap<QString, QString>& map, QString& string)
+void Predicate::Utils::serializeMap(const QMap<QString, QString>& map, QString& string)
 {
     QByteArray array;
     QDataStream ds(&array, QIODevice::WriteOnly);
@@ -356,7 +301,7 @@ void KexiUtils::serializeMap(const QMap<QString, QString>& map, QString& string)
     }
 }
 
-QMap<QString, QString> KexiUtils::deserializeMap(const QByteArray& array)
+QMap<QString, QString> Predicate::Utils::deserializeMap(const QByteArray& array)
 {
     QMap<QString, QString> map;
     QByteArray ba(array);
@@ -366,7 +311,7 @@ QMap<QString, QString> KexiUtils::deserializeMap(const QByteArray& array)
     return map;
 }
 
-QMap<QString, QString> KexiUtils::deserializeMap(const QString& string)
+QMap<QString, QString> Predicate::Utils::deserializeMap(const QString& string)
 {
     QByteArray array;
     const uint size = string.length();
@@ -381,32 +326,32 @@ QMap<QString, QString> KexiUtils::deserializeMap(const QString& string)
     return map;
 }
 
-QString KexiUtils::stringToFileName(const QString& string)
+QString Predicate::Utils::stringToFileName(const QString& string)
 {
     QString _string(string);
     _string.replace(QRegExp("[\\\\/:\\*?\"<>|]"), " ");
     return _string.simplified();
 }
 
-void KexiUtils::simpleCrypt(QString& string)
+void Predicate::Utils::simpleCrypt(QString& string)
 {
     for (int i = 0; i < string.length(); i++)
         string[i] = QChar(string[i].unicode() + 47 + i);
 }
 
-void KexiUtils::simpleDecrypt(QString& string)
+void Predicate::Utils::simpleDecrypt(QString& string)
 {
     for (int i = 0; i < string.length(); i++)
         string[i] = QChar(string[i].unicode() - 47 - i);
 }
 
-void KexiUtils::drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
+void Predicate::Utils::drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
                            const QPixmap& pixmap, Qt::Alignment alignment, bool scaledContents, bool keepAspectRatio)
 {
 #ifdef __GNUC__
-#warning TODO KexiUtils::drawPixmap
+#warning TODO Predicate::Utils::drawPixmap
 #else
-#pragma WARNING(TODO KexiUtils::drawPixmap)
+#pragma WARNING(TODO Predicate::Utils::drawPixmap)
 #endif
 #if 0 //todo
     if (pixmap.isNull())
@@ -493,7 +438,7 @@ void KexiUtils::drawPixmap(QPainter& p, const WidgetMargins& margins, const QRec
 #endif
 }
 
-QString KexiUtils::ptrToStringInternal(void* ptr, uint size)
+QString Predicate::Utils::ptrToStringInternal(void* ptr, uint size)
 {
     QString str;
     unsigned char* cstr_ptr = (unsigned char*) & ptr;
@@ -505,7 +450,7 @@ QString KexiUtils::ptrToStringInternal(void* ptr, uint size)
     return str;
 }
 
-void* KexiUtils::stringToPtrInternal(const QString& str, uint size)
+void* Predicate::Utils::stringToPtrInternal(const QString& str, uint size)
 {
     if ((str.length() / 2) < (int)size)
         return 0;
@@ -520,7 +465,7 @@ void* KexiUtils::stringToPtrInternal(const QString& str, uint size)
     return *(void**)(array.data());
 }
 
-void KexiUtils::setFocusWithReason(QWidget* widget, Qt::FocusReason reason)
+void Predicate::Utils::setFocusWithReason(QWidget* widget, Qt::FocusReason reason)
 {
     QFocusEvent fe(QEvent::FocusIn, reason);
     //QFocusEvent::setReason(reason);
@@ -528,7 +473,7 @@ void KexiUtils::setFocusWithReason(QWidget* widget, Qt::FocusReason reason)
     //QFocusEvent::resetReason();
 }
 
-void KexiUtils::unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason)
+void Predicate::Utils::unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason)
 {
     QFocusEvent fe(QEvent::FocusOut, reason);
     //QFocusEvent::setReason(reason);
@@ -538,38 +483,38 @@ void KexiUtils::unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason)
 
 //--------
 
-KexiUtils::WidgetMargins::WidgetMargins()
+Predicate::Utils::WidgetMargins::WidgetMargins()
         : left(0), top(0), right(0), bottom(0)
 {
 }
 
-KexiUtils::WidgetMargins::WidgetMargins(QWidget *widget)
+Predicate::Utils::WidgetMargins::WidgetMargins(QWidget *widget)
 {
     copyFromWidget(widget);
 }
 
-KexiUtils::WidgetMargins::WidgetMargins(int _left, int _top, int _right, int _bottom)
+Predicate::Utils::WidgetMargins::WidgetMargins(int _left, int _top, int _right, int _bottom)
         : left(_left), top(_top), right(_right), bottom(_bottom)
 {
 }
 
-KexiUtils::WidgetMargins::WidgetMargins(int commonMargin)
+Predicate::Utils::WidgetMargins::WidgetMargins(int commonMargin)
         : left(commonMargin), top(commonMargin), right(commonMargin), bottom(commonMargin)
 {
 }
 
-void KexiUtils::WidgetMargins::copyFromWidget(QWidget *widget)
+void Predicate::Utils::WidgetMargins::copyFromWidget(QWidget *widget)
 {
     Q_ASSERT(widget);
     widget->getContentsMargins(&left, &top, &right, &bottom);
 }
 
-void KexiUtils::WidgetMargins::copyToWidget(QWidget *widget)
+void Predicate::Utils::WidgetMargins::copyToWidget(QWidget *widget)
 {
     widget->setContentsMargins(left, top, right, bottom);
 }
 
-WidgetMargins& KexiUtils::WidgetMargins::operator+= (const WidgetMargins & margins)
+WidgetMargins& Predicate::Utils::WidgetMargins::operator+= (const WidgetMargins & margins)
 {
     left += margins.left;
     top += margins.top;
@@ -578,7 +523,7 @@ WidgetMargins& KexiUtils::WidgetMargins::operator+= (const WidgetMargins & margi
     return *this;
 }
 
-const WidgetMargins KexiUtils::operator+ (
+const WidgetMargins Predicate::Utils::operator+ (
     const WidgetMargins& margins1, const WidgetMargins & margins2)
 {
     return WidgetMargins(
@@ -592,7 +537,9 @@ const WidgetMargins KexiUtils::operator+ (
 
 K_GLOBAL_STATIC(QFont, _smallFont)
 
-QFont KexiUtils::smallFont(QWidget *init)
+#if 0
+//! @todo
+QFont Predicate::Utils::smallFont(QWidget *init)
 {
     if (init) {
         *_smallFont = init->font();
@@ -604,6 +551,7 @@ QFont KexiUtils::smallFont(QWidget *init)
     }
     return *_smallFont;
 }
+#endif
 
 //---------
 
@@ -675,5 +623,3 @@ void KTextEditorFrame::changeEvent(QEvent *event)
             setFrameStyle(QFrame::NoFrame);
     }
 }
-
-#include "utils_p.moc"

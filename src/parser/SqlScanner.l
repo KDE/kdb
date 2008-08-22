@@ -25,8 +25,6 @@
 #include "sqlParser.h"
 #include "SqlTypes.h"
 #include <iostream>
-#include <kdebug.h>
-#include <klocale.h>
 
 #define YY_NO_UNPUT
 #define ECOUNT current += yyleng; ctoken = yytext
@@ -95,7 +93,7 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 	bool ok;
 	yylval.integerValue = QString(yytext).toLongLong( &ok );
 	if (!ok) {
-		setError(i18n("Invalid integer number"),i18n("This integer number may be too large."));
+		setError(QObject::tr("Invalid integer number"),QObject::tr("This integer number may be too large."));
 		return SCAN_ERROR;
 	}
 //	yylval.integerValue = atol(yytext);
@@ -283,8 +281,8 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 	ECOUNT;
 	yylval.stringValue = new QString(QString::fromUtf8(yytext, yyleng));
 	if (yytext[0]>='0' && yytext[0]<='9') {
-		setError(i18n("Invalid identifier"),
-		  i18n("Identifiers should start with a letter or '_' character"));
+		setError(QObject::tr("Invalid identifier"),
+		  QObject::tr("Identifiers should start with a letter or '_' character"));
 		return SCAN_ERROR;
 	}
 	return IDENTIFIER;

@@ -29,16 +29,15 @@
 #include <QFont>
 #include <QFrame>
 
-#include <KMimeType>
-#include <kiconloader.h>
-
 class QColor;
 class QMetaProperty;
 class KAction;
 
-//! @short General Utils
-namespace KexiUtils
+namespace Predicate
 {
+namespace Utils
+{
+
 //! \return true if \a o has parent \a par.
 inline bool hasParent(QObject* par, QObject* o)
 {
@@ -150,46 +149,8 @@ inline QDateTime stringToHackedQTime(const QString& s)
     return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
 }
 
-/*! Sets "wait" cursor with 1 second delay (or 0 seconds if noDelay is true).
- Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-PREDICATE_EXPORT void setWaitCursor(bool noDelay = false);
-
-/*! Remove "wait" cursor previously set with \a setWaitCursor(),
- even if it's not yet visible.
- Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-PREDICATE_EXPORT void removeWaitCursor();
-
-/*! Helper class. Allocate it in your code block as follows:
- <code>
- KexiUtils::WaitCursor wait;
- </code>
- .. and wait cursor will be visible (with one second delay) until you're in this block, without
- a need to call removeWaitCursor() before exiting the block.
- Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-class PREDICATE_EXPORT WaitCursor
-{
-public:
-    WaitCursor(bool noDelay = false);
-    ~WaitCursor();
-};
-
-/*! Helper class. Allocate it in your code block as follows:
- <code>
- KexiUtils::WaitCursorRemover remover;
- </code>
- .. and the wait cursor will be hidden unless you leave this block, without
- a need to call setWaitCursor() before exiting the block. After leaving the codee block,
- the cursor will be visible again, if it was visible before creating the WaitCursorRemover object.
- Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-class PREDICATE_EXPORT WaitCursorRemover
-{
-public:
-    WaitCursorRemover();
-    ~WaitCursorRemover();
-private:
-bool m_reactivateCursor : 1;
-};
-
+#if 0
+//! @todo
 /*! \return filter string in QFileDialog format for a mime type pointed by \a mime
  If \a kdeFormat is true, QFileDialog-compatible filter string is generated,
  eg. "Image files (*.png *.xpm *.jpg)", otherwise KFileDialog -compatible
@@ -209,6 +170,7 @@ PREDICATE_EXPORT QString fileDialogFilterStrings(const QStringList& mimeStrings,
  The size of font is not smaller than he one returned by
  KGlobalSettings::smallestReadableFont(). */
 PREDICATE_EXPORT QFont smallFont(QWidget *init = 0);
+#endif
 
 /*! \return a color being a result of blending \a c1 with \a c2 with \a factor1
  and \a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
@@ -225,6 +187,8 @@ PREDICATE_EXPORT QColor contrastColor(const QColor& c);
  For black color the result is dark gray rather than black. */
 PREDICATE_EXPORT QColor bleachedColor(const QColor& c, int factor);
 
+#if 0
+//! @todo
 /*! \return icon set computed as a result of colorizing \a icon pixmap with "buttonText"
  color of \a palette palette. This function is useful for displaying monochromed icons
  on the list view or table view header, to avoid bloat, but still have the color compatible
@@ -233,6 +197,7 @@ PREDICATE_EXPORT QIcon colorizeIconToTextColor(const QPixmap& icon, const QPalet
 
 /*! \return empty (fully transparent) pixmap that can be used as a place for icon of size \a iconGroup */
 PREDICATE_EXPORT QPixmap emptyIcon(KIconLoader::Group iconGroup);
+#endif
 
 /*! Serializes \a map to \a array.
  KexiUtils::deserializeMap() can be used to deserialize this array back to map. */
@@ -262,22 +227,6 @@ PREDICATE_EXPORT void simpleCrypt(QString& string);
 /*! Performs a simple \a string decryption using rot47-like algorithm,
  using opposite operations to KexiUtils::simpleCrypt(). */
 PREDICATE_EXPORT void simpleDecrypt(QString& string);
-
-#ifdef KEXI_DEBUG_GUI
-//! Creates debug window for convenient debugging output
-PREDICATE_EXPORT QWidget *createDebugWindow(QWidget *parent);
-
-//! Adds debug line for for KexiDB database
-PREDICATE_EXPORT void addKexiDBDebug(const QString& text);
-
-//! Adds debug line for for Table Designer (Alter Table actions)
-PREDICATE_EXPORT void addAlterTableActionDebug(const QString& text, int nestingLevel = 0);
-
-//! Connects push button action to \a receiver and its \a slot. This allows to execute debug-related actions
-//! using buttons displayed in the debug window.
-PREDICATE_EXPORT void connectPushButtonActionForDebugWindow(const char* actionName,
-        const QObject *receiver, const char* slot);
-#endif
 
 //! @internal
 PREDICATE_EXPORT QString ptrToStringInternal(void* ptr, uint size);
@@ -540,6 +489,7 @@ public:
 protected:
     virtual void changeEvent(QEvent *event);
 };
+}
 }
 
 //! sometimes we leave a space in the form of empty QFrame and want to insert here

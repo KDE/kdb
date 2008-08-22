@@ -20,7 +20,10 @@ ADD_DEFINITIONS(
 )
 
 if (WIN32)
- set(CMAKE_DEBUG_POSTFIX "d")
+  set(CMAKE_DEBUG_POSTFIX "d")
+  ADD_DEFINITIONS(
+    -DYY_NO_UNISTD_H=1
+  )
 endif (WIN32)
 
 ########### generate parser/lexer files ###############

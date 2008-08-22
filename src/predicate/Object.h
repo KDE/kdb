@@ -20,10 +20,12 @@
 #ifndef PREDICATE_OBJECT_H
 #define PREDICATE_OBJECT_H
 
+#include <QtCore/QString>
+
 #include "Error.h"
-#include <kmessagebox.h>
-#include <kstandardguiitem.h>
-#include <qstring.h>
+
+//todo #include <kmessagebox.h>
+//todo #include <kstandardguiitem.h>
 
 namespace Predicate
 {
@@ -153,6 +155,8 @@ protected:
     virtual void setError(Predicate::Object *obj, int code,
                           const QString& prependMessage = QString());
 
+#if 0
+//! @todo
     /*! Interactively asks a question. Console or GUI can be used for this,
      depending on installed message handler. For GUI version, KMessageBox class is used.
      See Predicate::MessageHandler::askQuestion() for details. */
@@ -163,6 +167,7 @@ protected:
                             const QString &dontShowAskAgainName = QString(),
                             int options = KMessageBox::Notify,
                             MessageHandler* msgHandler = 0);
+#endif
 
     /*! Clears number of last server operation's result stored
      as a single integer. Formally, this integer should be set to value

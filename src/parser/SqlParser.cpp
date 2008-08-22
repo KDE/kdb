@@ -788,9 +788,6 @@ enum yytokentype {
 #include <QList>
 #include <QVariant>
 
-#include <KDebug>
-#include <KLocale>
-
 #include <Predicate/Connection.h>
 #include <Predicate/QuerySchema.h>
 #include <Predicate/Field.h>

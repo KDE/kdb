@@ -468,13 +468,10 @@
 #include <QList>
 #include <QVariant>
 
-#include <KDebug>
-#include <KLocale>
-
-#include "Connection.h"
-#include "QuerySchema.h"
-#include "Field.h"
-#include "TableSchema.h"
+#include <Predicate/Connection.h>
+#include <Predicate/QuerySchema.h>
+#include <Predicate/Field.h>
+#include <Predicate/TableSchema.h>
 
 #include "Parser.h"
 #include "Parser_p.h"
@@ -1201,7 +1198,7 @@ IDENTIFIER
 			Field *f = item->table()->field(item->name());
 			if(!f)
 			{
-				ParserError err(i18n("Field List Error"), i18n("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
+				ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
 				parser->setError(err);
 				yyerror("fieldlisterror");
 			}	
@@ -1360,7 +1357,7 @@ ColWildCard:
 {
 	$$ = new VariableExpr($1);
 	KexiDBDbg << "  Invalid identifier! " << $1 << endl;
-	setError(i18n("Invalid identifier \"%1\"",$1));
+	setError(QObject::tr("Invalid identifier \"%1\"",$1));
 }*/
 ;
 

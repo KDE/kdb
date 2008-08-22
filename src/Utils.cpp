@@ -25,19 +25,15 @@
 
 #include <QMap>
 #include <QHash>
-#include <qthread.h>
-#include <qdom.h>
-#include <qbuffer.h>
-#include <qpixmap.h>
+#include <QThread>
+#include <QDom>
+#include <QBuffer>
+#include <QPixmap>
 #include <QMutex>
 #include <QSet>
+#include <QProgressBar>
 
-#include <kdebug.h>
-#include <klocale.h>
 #include <kmessagebox.h>
-#include <klocale.h>
-#include <kiconloader.h>
-#include <qprogressbar.h>
 
 #include "Utils_p.h"
 
