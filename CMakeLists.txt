@@ -31,4 +31,4 @@ SET(PLUGIN_INSTALL_DIR
 )
 
 add_subdirectory( cmake )
-add_subdirectory( src )
+add_subdirectory( Predicate )
