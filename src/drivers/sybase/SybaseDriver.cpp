@@ -23,8 +23,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "sybaseDriver.h"
-#include "sybaseConnection.h"
+#include "SybaseDriver.h"
+#include "SybaseConnection.h"
 #include <Predicate/Field.h>
 #include <Predicate/Driver_p.h>
 #include <Predicate/Utils.h>
@@ -182,5 +182,5 @@ QString SybaseDriver::addLimitTo1(const QString& sql, bool add)
     return add ? returnString : sql;
 }
 
-#include "sybasedriver.moc"
+#include "SybaseDriver.moc"
 

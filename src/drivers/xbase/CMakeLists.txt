@@ -9,12 +9,12 @@ ADD_DEFINITIONS( -D__PREDICATE__= )
 ########### next target ###############
 
 set(predicate_xbase_SRCS 
-   xbasedriver.cpp 
-   xbaseconnection.cpp 
-   xbaseconnection_p.cpp 
-   xbasecursor.cpp 
-   xbasekeywords.cpp 
-   xbaseexport.cpp
+   XbaseDriver.cpp 
+   XbaseConnection.cpp 
+   XbaseConnection_p.cpp 
+   XbaseCursor.cpp 
+   XbaseKeywords.cpp 
+   XbaseExport.cpp
    )
 
 

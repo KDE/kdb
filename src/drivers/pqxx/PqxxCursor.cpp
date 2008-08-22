@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "pqxxCursor.h"
-#include "pqxxConnection.h"
+#include "PqxxCursor.h"
+#include "PqxxConnection.h"
 #include "PqxxConnection_p.h"
 
 #include <Predicate/Error.h>

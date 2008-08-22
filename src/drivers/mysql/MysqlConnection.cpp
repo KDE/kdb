@@ -30,7 +30,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
 #include "MysqlConnection_p.h"
-#include "mysqlCursor.h"
+#include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
 #include <Predicate/Error.h>
 
@@ -197,4 +197,4 @@ PreparedStatement::Ptr MySqlConnection::prepareStatement(PreparedStatement::Stat
     return KSharedPtr<PreparedStatement>(new MySqlPreparedStatement(type, *d, fields));
 }
 
-#include "mysqlconnection.moc"
+#include "MysqlConnection.moc"

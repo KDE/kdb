@@ -24,10 +24,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "sybaseDriver.h"
-#include "sybaseConnection.h"
+#include "SybaseDriver.h"
+#include "SybaseConnection.h"
 #include "SybaseConnection_p.h"
-#include "sybaseCursor.h"
+#include "SybaseCursor.h"
 #include "SybasePreparedStatement.h"
 #include <Predicate/Error.h>
 
@@ -236,4 +236,4 @@ bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldLis
 
 }
 
-#include "sybaseconnection.moc"
+#include "SybaseConnection.moc"

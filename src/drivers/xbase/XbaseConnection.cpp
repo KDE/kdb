@@ -24,9 +24,9 @@
 #include <kgenericfactory.h>
 #include <kdebug.h>
 
-#include "xbaseDriver.h"
-#include "xbaseCursor.h"
-#include "xbaseConnection.h"
+#include "XbaseDriver.h"
+#include "XbaseCursor.h"
+#include "XbaseConnection.h"
 #include "XbaseConnection_p.h"
 #include <Predicate/Error.h>
 
@@ -180,4 +180,4 @@ PreparedStatement::Ptr xBaseConnection::prepareStatement(PreparedStatement::Stat
   return d->internalConn->prepareStatement( type, fields );
 }
 
-#include "xbaseconnection.moc"
+#include "XbaseConnection.moc"

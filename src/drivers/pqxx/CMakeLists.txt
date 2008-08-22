@@ -18,12 +18,12 @@ endif (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_C_COMPILER MATCHES "icc")
 ########### next target ###############
 
 set(predicate_pqxx_SRCS 
-   pqxxdriver.cpp 
-   pqxxcursor.cpp 
-   pqxxconnection.cpp 
-   pqxxkeywords.cpp 
-   pqxxconnection_p.cpp 
-   pqxxpreparedstatement.cpp )
+   PqxxDriver.cpp 
+   PqxxCursor.cpp 
+   PqxxConnection.cpp 
+   PqxxKeywords.cpp 
+   PqxxConnection_p.cpp 
+   PqxxPreparedStatement.cpp )
 
 
 add_library(predicate_pqxx SHARED ${predicate_pqxx_SRCS})

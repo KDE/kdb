@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "xbaseCursor.h"
-#include "xbaseConnection.h"
+#include "XbaseCursor.h"
+#include "XbaseConnection.h"
 
 #include <Predicate/Error.h>
 #include <Predicate/Utils.h>

@@ -21,8 +21,8 @@
 #include <Predicate/DriverManager.h>
 #include <Predicate/Driver_p.h>
 #include <Predicate/Utils.h>
-#include "pqxxDriver.h"
-#include "pqxxConnection.h"
+#include "PqxxDriver.h"
+#include "PqxxConnection.h"
 #include <string>
 
 #include <kdebug.h>
@@ -173,4 +173,4 @@ QString pqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
 }
 
 
-#include "pqxxdriver.moc"
+#include "PqxxDriver.moc"

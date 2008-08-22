@@ -18,7 +18,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "mysqlCursor.h"
+#include "MysqlCursor.h"
 #include "MysqlConnection.h"
 #include "MysqlConnection_p.h"
 #include <Predicate/Error.h>

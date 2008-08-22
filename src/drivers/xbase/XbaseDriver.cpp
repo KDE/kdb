@@ -27,8 +27,8 @@
 #include "predicate/DriverManager.h"
 #include "predicate/Utils.h"
 
-#include "xbaseDriver.h"
-#include "xbaseConnection.h"
+#include "XbaseDriver.h"
+#include "XbaseConnection.h"
 
 using namespace Predicate;
 
@@ -162,4 +162,4 @@ QByteArray xBaseDriver::drv_escapeIdentifier( const QByteArray& str) const
   return dp->internalDriver->escapeIdentifier(str);
 }
 
-#include "xbasedriver.moc"
+#include "XbaseDriver.moc"

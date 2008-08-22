@@ -25,7 +25,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <qstringlist.h>
 
 #include <Predicate/Connection.h>
-#include "mysqlCursor.h"
+#include "MysqlCursor.h"
 
 namespace Predicate
 {

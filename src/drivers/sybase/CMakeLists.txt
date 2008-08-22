@@ -9,12 +9,12 @@ ADD_DEFINITIONS( -D__PREDICATE__= )
 ########### next target ###############
 
 set(predicate_sybase_SRCS 
-   sybasedriver.cpp 
-   sybaseconnection.cpp 
-   sybaseconnection_p.cpp 
-   sybasecursor.cpp 
-   sybasekeywords.cpp 
-   sybasepreparedstatement.cpp )
+   SybaseDriver.cpp 
+   SybaseConnection.cpp 
+   SybaseConnection_p.cpp 
+   SybaseCursor.cpp 
+   SybaseKeywords.cpp 
+   SybasePreparedStatement.cpp )
 
 
 add_library(predicate_sybase SHARED ${predicate_sybase_SRCS})

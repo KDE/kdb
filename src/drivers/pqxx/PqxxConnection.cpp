@@ -17,16 +17,21 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "pqxxConnection.h"
-#include <qvariant.h>
-#include <qfile.h>
-#include <kdebug.h>
-#include <Predicate/Error.h>
-#include <Predicate/Global.h>
-#include <klocale.h>
-#include <string>
+#include "PqxxConnection.h"
+
 #include "PqxxPreparedStatement.h"
 #include "PqxxConnection_p.h"
+#include <Predicate/Error.h>
+#include <Predicate/Global.h>
+
+#include <kdebug.h>
+#include <klocale.h>
+
+#include <qvariant.h>
+#include <qfile.h>
+
+#include <string>
+
 using namespace Predicate;
 
 pqxxTransactionData::pqxxTransactionData(Connection *conn, bool nontransaction)
@@ -412,4 +417,5 @@ PreparedStatement::Ptr pqxxSqlConnection::prepareStatement(PreparedStatement::St
 {
     return KSharedPtr<PreparedStatement>(new pqxxPreparedStatement(type, *d, fields));
 }
-#include "pqxxconnection.moc"
+
+#include "PqxxConnection.moc"

@@ -201,5 +201,5 @@ QByteArray MySqlDriver::drv_escapeIdentifier(const QByteArray& str) const
     return QByteArray(str).replace('`', "'");
 }
 
-#include "mysqldriver.moc"
+#include "MysqlDriver.moc"
 

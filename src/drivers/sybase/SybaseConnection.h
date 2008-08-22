@@ -23,7 +23,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <qstringlist.h>
 
 #include <Predicate/Connection.h>
-#include "sybaseCursor.h"
+#include "SybaseCursor.h"
 
 namespace Predicate
 {

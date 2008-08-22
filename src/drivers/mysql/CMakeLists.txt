@@ -9,12 +9,12 @@ ADD_DEFINITIONS( -D__PREDICATE__= )
 ########### next target ###############
 
 set(predicate_mysql_SRCS 
-   mysqldriver.cpp 
-   mysqlconnection.cpp 
-   mysqlconnection_p.cpp 
-   mysqlcursor.cpp 
-   mysqlkeywords.cpp 
-   mysqlpreparedstatement.cpp )
+   MysqlDriver.cpp 
+   MysqlConnection.cpp 
+   MysqlConnection_p.cpp 
+   MysqlCursor.cpp 
+   MysqlKeywords.cpp 
+   MysqlPreparedStatement.cpp )
 
 
 add_library(predicate_mysql SHARED ${predicate_mysql_SRCS})

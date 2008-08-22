@@ -18,8 +18,8 @@
 */
 
 
-#include "sybaseCursor.h"
-#include "sybaseConnection.h"
+#include "SybaseCursor.h"
+#include "SybaseConnection.h"
 #include "SybaseConnection_p.h"
 
 #include <QtGlobal>

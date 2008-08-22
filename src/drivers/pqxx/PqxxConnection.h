@@ -23,9 +23,7 @@
 #include <qstringlist.h>
 
 #include <Predicate/Connection.h>
-#include "pqxxCursor.h"
-
-
+#include "PqxxCursor.h"
 
 
 namespace Predicate
