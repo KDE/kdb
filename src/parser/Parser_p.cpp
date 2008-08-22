@@ -137,11 +137,13 @@ void yyerror(const char *str)
 
             if (Predicate::isKexiSQLKeyword(ctoken))
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("\"%1\" is a reserved keyword", QString(ctoken)) + lexerErr,
+                                             QObject::tr("\"%1\" is a reserved keyword")
+                                                .arg(QString(ctoken)) + lexerErr,
                                              ctoken, current));
             else
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("Syntax Error near \"%1\"", QString(ctoken)) + lexerErr,
+                                             QObject::tr("Syntax Error near \"%1\"")
+                                                .arg(QString(ctoken)) + lexerErr,
                                              ctoken, current));
         }
     }
@@ -278,8 +280,8 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
                         //ambiguous field name
                         setError(QObject::tr("Ambiguous field name"),
                                  QObject::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
-                                      "Use \"<tableName>.%4\" notation to specify table name."
-                                      , firstField->table()->name(), f->table()->name()
+                                      "Use \"<tableName>.%4\" notation to specify table name.")
+                                      .arg(firstField->table()->name(), f->table()->name()
                                       , fieldName, fieldName));
                         return false;
                     }
@@ -287,7 +289,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
             }
             if (!firstField) {
                 setError(QObject::tr("Field not found"),
-                         QObject::tr("Table containing \"%1\" field not found", fieldName));
+                         QObject::tr("Table containing \"%1\" field not found").arg(fieldName));
                 return false;
             }
             //ok
@@ -313,10 +315,10 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
             if (covered) {
                 setError(QObject::tr("Could not access the table directly using its name"),
                          QObject::tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
-                              "you can write \"%3\""
-                              , tableName
-                              , (tableName + "." + fieldName)
-                              , tableAlias + "." + fieldName.toLatin1()));
+                              "you can write \"%3\"")
+                              .arg( tableName
+                                , (tableName + "." + fieldName)
+                                , tableAlias + "." + fieldName.toLatin1()));
                 return false;
             }
         }
@@ -343,7 +345,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
             if (fieldName == "*") {
                 if (positionsList.count() > 1) {
                     setError(QObject::tr("Ambiguous \"%1.*\" expression", tableName),
-                             QObject::tr("More than one \"%1\" table or alias defined", tableName));
+                             QObject::tr("More than one \"%1\" table or alias defined").arg(tableName));
                     return false;
                 }
                 parseInfo.querySchema->addAsterisk(new QueryAsterisk(parseInfo.querySchema, ts));
@@ -359,17 +361,17 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
                         if (otherTS->field(fieldName))
                             numberOfTheSameFields++;
                         if (numberOfTheSameFields > 1) {
-                            setError(QObject::tr("Ambiguous \"%1.%2\" expression", tableName, fieldName),
-                                     QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field"
-                                          , tableName, fieldName));
+                            setError(QObject::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName),
+                                     QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field")
+                                          .arg(tableName, fieldName));
                             return false;
                         }
                     }
 
                     parseInfo.querySchema->addField(realField, tablePosition);
                 } else {
-                    setError(QObject::tr("Field not found"), QObject::tr("Table \"%1\" has no \"%2\" field"
-                                                           , tableName, fieldName));
+                    setError(QObject::tr("Field not found"), QObject::tr("Table \"%1\" has no \"%2\" field")
+                                                           .arg(tableName, fieldName));
                     return false;
                 }
             }
@@ -424,7 +426,7 @@ QuerySchema* buildSelectQuery(
             TableSchema *s = parser->db()->tableSchema(tname);
             if (!s) {
                 setError(//QObject::tr("Field List Error"),
-                    QObject::tr("Table \"%1\" does not exist", tname));
+                    QObject::tr("Table \"%1\" does not exist").arg(tname));
                 //   yyerror("fieldlisterror");
                 CLEANUP;
                 return 0;
@@ -484,8 +486,8 @@ QuerySchema* buildSelectQuery(
                 //   isFieldWithAlias = true;
                 aliasVariable = e->toBinary()->right()->toVariable();
                 if (!aliasVariable) {
-                    setError(QObject::tr("Invalid alias definition for column \"%1\"",
-                                  columnExpr->toString())); //ok?
+                    setError(QObject::tr("Invalid alias definition for column \"%1\"")
+                                  .arg(columnExpr->toString())); //ok?
                     break;
                 }
             }
@@ -512,7 +514,7 @@ QuerySchema* buildSelectQuery(
                 //take first (left) argument of the special binary expr, will be owned, do not destroy
                 e->toBinary()->m_larg = 0;
             } else {
-                setError(QObject::tr("Invalid \"%1\" column definition", e->toString())); //ok?
+                setError(QObject::tr("Invalid \"%1\" column definition").arg(e->toString())); //ok?
                 break;
             }
 
@@ -579,8 +581,8 @@ QuerySchema* buildSelectQuery(
                     if ((*it).columnNumber != -1) {
                         if (!orderByColumnList.appendColumn(*querySchema,
                                                             (*it).ascending, (*it).columnNumber - 1)) {
-                            setError(QObject::tr("Could not define sorting - no column at position %1",
-                                          (*it).columnNumber));
+                            setError(QObject::tr("Could not define sorting - no column at position %1")
+                                          .arg((*it).columnNumber));
                             CLEANUP;
                             return 0;
                         }
@@ -588,7 +590,7 @@ QuerySchema* buildSelectQuery(
                         Field * f = querySchema->findTableField((*it).aliasOrName);
                         if (!f) {
                             setError(QObject::tr("Could not define sorting - "
-                                          "column name or alias \"%1\" does not exist", (*it).aliasOrName));
+                                          "column name or alias \"%1\" does not exist").arg((*it).aliasOrName));
                             CLEANUP;
                             return 0;
                         }

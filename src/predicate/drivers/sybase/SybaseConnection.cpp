@@ -187,7 +187,7 @@ bool SybaseConnection::drv_getTablesList(QStringList &list)
 PreparedStatement::Ptr SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
         FieldList& fields)
 {
-    return KSharedPtr<PreparedStatement>(new SybasePreparedStatement(type, *d, fields));
+    return PreparedStatement::Ptr(new SybasePreparedStatement(type, *d, fields));
 }
 
 bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList& fields)

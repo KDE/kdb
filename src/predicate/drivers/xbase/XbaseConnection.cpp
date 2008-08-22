@@ -175,7 +175,7 @@ PreparedStatement::Ptr xBaseConnection::prepareStatement(PreparedStatement::Stat
 {
   if ( !d->internalConn ) {
     // return a null pointer
-    return KSharedPtr<PreparedStatement>();
+    return PreparedStatement::Ptr();
   }
   return d->internalConn->prepareStatement( type, fields );
 }

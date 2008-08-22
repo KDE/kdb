@@ -349,7 +349,7 @@ PreparedStatement::Ptr SQLiteConnection::prepareStatement(PreparedStatement::Sta
         FieldList& fields)
 {
 //#ifndef SQLITE2 //TEMP IFDEF!
-    return KSharedPtr<PreparedStatement>(new SQLitePreparedStatement(type, *d, fields));
+    return PreparedStatement::Ptr(new SQLitePreparedStatement(type, *d, fields));
 //#endif
 }
 

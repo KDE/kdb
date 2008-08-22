@@ -22,7 +22,7 @@
 
 #include <QVariant>
 #include <QStringList>
-#include <KSharedPtr>
+#include <Predicate/tools/SharedPtr.h>
 
 #include "Field.h"
 
@@ -72,10 +72,10 @@ class FieldList;
   Depending on database backend, you can avoid escaping BLOBs.
   See KexiFormView::storeData() for example use.
 */
-class PREDICATE_EXPORT PreparedStatement : public KShared
+class PREDICATE_EXPORT PreparedStatement : public Utils::Shared
 {
 public:
-    typedef KSharedPtr<PreparedStatement> Ptr;
+    typedef Utils::SharedPtr<PreparedStatement> Ptr;
 
     //! Defines type of the prepared statement.
     enum StatementType {

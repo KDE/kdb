@@ -36,7 +36,7 @@
 #include "Driver.h"
 #include "PreparedStatement.h"
 #include "RecordData.h"
-#include "Tristate.h"
+#include <Predicate/tools/Tristate.h>
 
 namespace Predicate
 {
