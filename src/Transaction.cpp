@@ -20,7 +20,7 @@
 #include "Transaction.h"
 #include "Connection.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 #include <assert.h>
 

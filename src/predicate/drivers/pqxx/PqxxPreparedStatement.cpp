@@ -27,7 +27,7 @@
 // Copyright: See COPYING file that comes with this distribution
 //
 #include "PqxxPreparedStatement.h"
-#include <kdebug.h>
+#include <QtDebug>
 using namespace Predicate;
 
 pqxxPreparedStatement::pqxxPreparedStatement(

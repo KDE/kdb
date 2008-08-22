@@ -28,7 +28,7 @@
 //
 //
 #include "PqxxConnection_p.h"
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 pqxxSqlConnectionInternal::pqxxSqlConnectionInternal(Connection *conn)

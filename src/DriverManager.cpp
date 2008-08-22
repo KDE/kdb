@@ -27,7 +27,7 @@
 
 //#include <klibloader.h>
 //#include <kservicetypetrader.h>
-//#include <kdebug.h>
+//#include <QtDebug>
 //#include <klocale.h>
 //#include <kservice.h>
 

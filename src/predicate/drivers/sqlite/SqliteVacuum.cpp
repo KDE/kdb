@@ -22,7 +22,7 @@
 
 #include <kstandarddirs.h>
 #include <kprogressdialog.h>
-#include <kdebug.h>
+#include <QtDebug>
 #include <klocale.h>
 #include <ktemporaryfile.h>
 #include <kmessagebox.h>

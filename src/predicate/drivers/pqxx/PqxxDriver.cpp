@@ -25,7 +25,7 @@
 #include "PqxxConnection.h"
 #include <string>
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

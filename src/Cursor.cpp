@@ -24,7 +24,7 @@
 #include "RowEditBuffer.h"
 #include "Utils.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <klocale.h>
 
 #include <assert.h>

@@ -21,7 +21,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <QFile>
 
 #include <kgenericfactory.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 #include "SybaseDriver.h"
 #include "SybaseConnection.h"

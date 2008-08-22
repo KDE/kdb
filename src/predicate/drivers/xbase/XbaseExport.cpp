@@ -22,7 +22,7 @@
 #include <QHash>
 #include <QDir>
 
-#include <kdebug.h>
+#include <QtDebug>
 
 #include <Predicate/Field.h>
 #include <Predicate/RecordData.h>

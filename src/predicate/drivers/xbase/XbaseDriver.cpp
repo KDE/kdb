@@ -22,7 +22,7 @@
 #include <Predicate/Driver_p.h>
 #include <Predicate/Utils.h>
 
-#include <kdebug.h>
+#include <QtDebug>
 
 #include "predicate/DriverManager.h"
 #include "predicate/Utils.h"

@@ -22,7 +22,7 @@
 #include <QRegExp>
 
 #include <kgenericfactory.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 #include "XbaseDriver.h"
 #include "XbaseCursor.h"

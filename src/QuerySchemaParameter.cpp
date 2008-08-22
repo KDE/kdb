@@ -20,7 +20,7 @@
 #include "QuerySchemaParameter.h"
 #include "Driver.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <qpointer.h>
 
 using namespace Predicate;

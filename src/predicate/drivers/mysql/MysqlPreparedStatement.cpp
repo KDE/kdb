@@ -18,7 +18,7 @@
 */
 
 #include "MysqlPreparedStatement.h"
-#include <kdebug.h>
+#include <QtDebug>
 #include <errmsg.h>
 
 using namespace Predicate;

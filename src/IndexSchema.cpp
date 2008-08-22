@@ -24,7 +24,7 @@
 
 #include <assert.h>
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

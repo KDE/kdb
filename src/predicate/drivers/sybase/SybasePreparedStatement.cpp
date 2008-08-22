@@ -18,7 +18,7 @@
 */
 
 #include "SybasePreparedStatement.h"
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

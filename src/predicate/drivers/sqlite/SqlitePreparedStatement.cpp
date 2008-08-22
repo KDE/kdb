@@ -19,7 +19,7 @@
 
 #include "SqlitePreparedStatement.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <assert.h>
 
 using namespace Predicate;

@@ -20,7 +20,7 @@
 #include "PreparedStatement.h"
 #include "Connection.h"
 #include "Connection_p.h"
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

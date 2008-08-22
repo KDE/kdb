@@ -24,7 +24,7 @@
 #include "LookupFieldSchema.h"
 
 #include <assert.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 namespace Predicate
 {

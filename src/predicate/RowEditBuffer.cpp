@@ -20,7 +20,7 @@
 #include "RowEditBuffer.h"
 #include "Utils.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

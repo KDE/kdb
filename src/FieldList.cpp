@@ -20,7 +20,7 @@
 #include "FieldList.h"
 #include "Object.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 #include <assert.h>
 

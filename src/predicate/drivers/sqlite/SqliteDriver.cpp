@@ -28,7 +28,7 @@
 #include "SqliteConnection_p.h"
 #include "SqliteAdmin.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

@@ -26,7 +26,7 @@
 #include "Utils.h"
 
 // we use here i18n() but this depends on kde libs: TODO: add #ifdefs
-#include <kdebug.h>
+#include <QtDebug>
 #include <klocale.h>
 
 #include <qdatetime.h>

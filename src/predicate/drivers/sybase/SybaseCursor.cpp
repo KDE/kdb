@@ -27,7 +27,7 @@
 #include <Predicate/Error.h>
 #include <Predicate/Utils.h>
 #include <klocale.h>
-#include <kdebug.h>
+#include <QtDebug>
 #include <limits.h>
 #include <cstring>
 

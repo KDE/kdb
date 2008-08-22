@@ -26,7 +26,7 @@
 #include "Field.h"
 #include "QuerySchema.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 #include "Global.h"
 #include <QList>
 #include <QByteArray>

@@ -30,7 +30,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <klocale.h>
 
 #include <QVector>

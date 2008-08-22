@@ -23,7 +23,7 @@
 #include "QuerySchema.h"
 #include "Driver.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

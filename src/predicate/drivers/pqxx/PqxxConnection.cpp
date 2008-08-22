@@ -24,7 +24,7 @@
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <klocale.h>
 
 #include <qvariant.h>

@@ -25,7 +25,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <QRegExp>
 
 #include <kgenericfactory.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"

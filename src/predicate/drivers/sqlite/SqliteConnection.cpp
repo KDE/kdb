@@ -38,7 +38,7 @@
 #include <qregexp.h>
 
 #include <kgenericfactory.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 //remove debug
 #undef PreDrvDbg

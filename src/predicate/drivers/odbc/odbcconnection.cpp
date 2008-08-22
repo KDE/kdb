@@ -28,7 +28,7 @@
 
 //KDE Includes
 #include <kgenericfactory.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 //Kexi Includes
 #include <Predicate/Driver.h>

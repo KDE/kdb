@@ -20,7 +20,7 @@
 #include "SchemaData.h"
 #include "Connection.h"
 
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

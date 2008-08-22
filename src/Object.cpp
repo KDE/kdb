@@ -22,7 +22,7 @@
 #include "MessageHandler.h"
 
 #include <klocale.h>
-#include <kdebug.h>
+#include <QtDebug>
 
 using namespace Predicate;
 

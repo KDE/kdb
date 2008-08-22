@@ -22,7 +22,7 @@
 #include <qdir.h>
 
 //KDE Includes
-#include <kdebug.h>
+#include <QtDebug>
 
 //Kexi Includes
 #include <Predicate/Connection.h>
