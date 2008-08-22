@@ -31,7 +31,7 @@
 #include <QFile>
 #include <QStyle>
 
-//#include <KDebug>
+//#include <QtDebug>
 //#include <KApplication>
 //#include <KIconEffect>
 //#include <KIconLoader>

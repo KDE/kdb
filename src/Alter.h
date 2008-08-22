@@ -25,7 +25,7 @@
 #include <QList>
 #include <QHash>
 
-#include <KDebug>
+#include <QtDebug>
 #include <Predicate/tools/Utils.h>
 
 namespace Predicate

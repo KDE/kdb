@@ -23,7 +23,7 @@
 #include <QTextStream>
 
 #include <KCmdLineArgs>
-#include <KDebug>
+#include <QtDebug>
 #include <KLocale>
 #include <KComponentData>
 

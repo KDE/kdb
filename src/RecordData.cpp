@@ -24,7 +24,7 @@
 
 #include "RecordData.h"
 #include "Global.h"
-#include <KDebug>
+#include <QtDebug>
 
 using namespace Predicate;
 

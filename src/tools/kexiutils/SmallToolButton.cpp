@@ -29,7 +29,7 @@
 #include <KIcon>
 #include <KIconLoader>
 #include <KGlobalSettings>
-#include <KDebug>
+#include <QtDebug>
 
 #include "utils.h"
 

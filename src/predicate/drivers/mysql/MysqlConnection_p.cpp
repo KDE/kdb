@@ -22,7 +22,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <QStringList>
 #include <QFile>
 
-#include <KDebug>
+#include <QtDebug>
 
 #include "MysqlConnection_p.h"
 
