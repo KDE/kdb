@@ -185,7 +185,7 @@ bool isDBOpenedAfterCreate : 1;
      Set available properties here in driver implementation. */
     QHash<QByteArray, QVariant> properties;
 
-    /*! i18n'd captions for properties. You do not need
+    /*! i18n-ed captions for properties. You do not need
      to set predefined properties' caption in driver implementation
      -it's done automatically. */
     QHash<QByteArray, QString> propertyCaptions;

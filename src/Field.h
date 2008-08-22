@@ -175,15 +175,15 @@ public:
     //! Converts type \a type to QVariant equivalent as accurate as possible
     static QVariant::Type variantType(uint type);
 
-    /*! \return a i18n'd type name for \a type (\a type has to be an element from Field::Type,
+    /*! \return a i18n-ed type name for \a type (\a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeName(uint type);
 
-    /*! \return list of all available i18n'd type names. */
+    /*! \return list of all available i18n-ed type names. */
     static QStringList typeNames();
 
     /*! \return type string for \a type, e.g. "Integer" for Integer type
-     (not-i18n'd, \a type has to be an element from Field::Type,
+     (not-i18n-ed, \a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeString(uint type);
 
@@ -196,15 +196,15 @@ public:
     /*! \return group for \a type */
     static TypeGroup typeGroup(uint type);
 
-    /*! \return a i18n'd group name for \a typeGroup
+    /*! \return a i18n-ed group name for \a typeGroup
      (\a typeGroup has to be an element from Field::TypeGroup) */
     static QString typeGroupName(uint typeGroup);
 
-    /*! \return list of all available i18n'd type group names. */
+    /*! \return list of all available i18n-ed type group names. */
     static QStringList typeGroupNames();
 
     /*! \return type group string for \a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
-     (not-i18n'd, \a type has to be an element from Field::Type,
+     (not-i18n-ed, \a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeGroupString(uint typeGroup);
 
@@ -336,7 +336,7 @@ public:
      type of the expression is returned instead. */
     Type type() const;
 
-    //! \return a i18n'd type name for this field
+    //! \return a i18n-ed type name for this field
     inline QString typeName() const {
         return Field::typeName(type());
     }
@@ -346,7 +346,7 @@ public:
         return Field::typeGroup(type());
     }
 
-    //! \return a i18n'd type group name for this field
+    //! \return a i18n-ed type group name for this field
     inline QString typeGroupName() const {
         return Field::typeGroupName(type());
     }
@@ -695,7 +695,7 @@ protected:
     Predicate::BaseExpr *m_expr;
     CustomPropertiesMap* m_customProperties;
 
-    //! @internal Used in m_typeNames member to handle i18n'd type names
+    //! @internal Used in m_typeNames member to handle i18n-ed type names
     class PREDICATE_EXPORT FieldTypeNames : public QVector<QString>
     {
     public:
@@ -707,7 +707,7 @@ protected:
     bool m_initialized : 1;
     };
 
-    //! @internal Used in m_typeGroupNames member to handle i18n'd type group names
+    //! @internal Used in m_typeGroupNames member to handle i18n-ed type group names
     class PREDICATE_EXPORT FieldTypeGroupNames : public QVector<QString>
     {
     public:
@@ -719,10 +719,10 @@ protected:
     bool m_initialized : 1;
     };
 
-    //! real i18n'd type names (and not-i18n'd type name strings)
+    //! real i18n-ed type names (and not-i18n-ed type name strings)
     static FieldTypeNames m_typeNames;
 
-    //! real i18n'd type group names (and not-i18n'd group name strings)
+    //! real i18n-ed type group names (and not-i18n-ed group name strings)
     static FieldTypeGroupNames m_typeGroupNames;
 
 private:

@@ -95,7 +95,7 @@ void ConnectionData::setFileName(const QString& fn)
 
 QString ConnectionData::serverInfoString(bool addUser) const
 {
-    const QString& i18nFile = i18n("file");
+    const QString& i18nFile = tr("file");
 
     if (!m_dbFileName.isEmpty())
         return i18nFile + ": " + (m_dbPath.isEmpty() ? "" : m_dbPath

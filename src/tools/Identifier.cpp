@@ -89,8 +89,8 @@ QString Predicate::Utils::string2Identifier(const QString &s)
 
 QString Predicate::Utils::identifierExpectedMessage(const QString &valueName, const QVariant& v)
 {
-    return "<p>" + i18n("Value of \"%1\" column must be an identifier.", valueName)
-           + "</p><p>" + i18n("\"%1\" is not a valid identifier.", v.toString()) + "</p>";
+    return "<p>" + tr("Value of \"%1\" column must be an identifier.", valueName)
+           + "</p><p>" + tr("\"%1\" is not a valid identifier.", v.toString()) + "</p>";
 }
 
 //--------------------------------------------------------------------------------

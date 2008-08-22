@@ -66,7 +66,7 @@ public:
     /*!
     \brief the name of the driver that should be used to create a connection
 
-    Name (unique, not i18n'd) of driver that is used (or should be used) to
+    Name (unique, not i18n-ed) of driver that is used (or should be used) to
     create a connection. If you pass this ConnectionData object to
     Predicate::Driver::createConnection() to create connection, the @a driverName member
     will be updated with a valid Predicate driver name.

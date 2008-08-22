@@ -68,8 +68,8 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     QFileInfo fi(argv[0]);
     QByteArray appName(fi.baseName().toLatin1());
     KCmdLineArgs::init(argc, argv,
-                       new KAboutData(appName, 0, ki18n(programName),
-                                      version, ki18n(shortDescription), licenseType, ki18n(copyrightStatement), ki18n(text),
+                       new KAboutData(appName, 0, ktr(programName),
+                                      version, ktr(shortDescription), licenseType, ktr(copyrightStatement), ktr(text),
                                       homePageAddress, bugsEmailAddress));
 
     d->componentData = KComponentData(appName);
@@ -78,16 +78,16 @@ SimpleCommandLineApp::SimpleCommandLineApp(
 
     // add predefined options
     allOptions.add("drv", KLocalizedString(), Predicate::defaultFileBasedDriverName().toUtf8());
-    allOptions.add("driver <name>", ki18n("Database driver name"));
+    allOptions.add("driver <name>", ktr("Database driver name"));
     allOptions.add("u");
-    allOptions.add("user <name>", ki18n("Database user name"));
+    allOptions.add("user <name>", ktr("Database user name"));
     allOptions.add("p");
-    allOptions.add("password", ki18n("Prompt for password"));
+    allOptions.add("password", ktr("Prompt for password"));
     allOptions.add("h");
-    allOptions.add("host <name>", ki18n("Host (server) name"));
-    allOptions.add("port <number>", ki18n("Server's port number"));
+    allOptions.add("host <name>", ktr("Host (server) name"));
+    allOptions.add("port <number>", ktr("Server's port number"));
     allOptions.add("s");
-    allOptions.add("local-socket <filename>", ki18n("Server's local socket filename"));
+    allOptions.add("local-socket <filename>", ktr("Server's local socket filename"));
 
     // add user options
     allOptions.add(options);
@@ -108,7 +108,7 @@ SimpleCommandLineApp::SimpleCommandLineApp(
             userAtHost += '@';
         userAtHost += (d->connData.hostName.isEmpty() ? "localhost" : d->connData.hostName);
         QTextStream cout(stdout, IO_WriteOnly);
-        cout << i18n("Enter password for %1: ", userAtHost);
+        cout << tr("Enter password for %1: ", userAtHost);
 //! @todo make use of pty/tty here! (and care about portability)
         QTextStream cin(stdin, QIODevice::ReadOnly);
         cin >> d->connData.password;

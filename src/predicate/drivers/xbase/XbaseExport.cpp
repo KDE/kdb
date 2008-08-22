@@ -260,7 +260,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   if (!m_migrateData) {
     kDebug()<<"Migration Data not set yet !!";
-    result->setStatus(&drvManager, i18n("Data not set for migration"));
+    result->setStatus(&drvManager, tr("Data not set for migration"));
     return false;
   }
 
@@ -268,7 +268,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     m_migrateData->source->driverName);
   if (!sourceDriver) {
     result->setStatus(&drvManager,
-      i18n("Could not export back to destination database"));
+      tr("Could not export back to destination database"));
     return false;
   }
 
@@ -276,7 +276,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   if (!dest_connect()) {
     kDebug()<<"Couldn't connect to destination database";
     if (result)
-      result->setStatus(i18n("Could not connect to data source \"%1\".",
+      result->setStatus(tr("Could not connect to data source \"%1\".",
         m_migrateData->destination->connectionData()->serverInfoString()), "");
     return false;
   }
@@ -304,7 +304,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     kDebug() << "There were no tables to export" << endl;
     if (result)
       result->setStatus(
-        i18n("No tables to export found in data source \"%1\".",
+        tr("No tables to export found in data source \"%1\".",
           m_migrateData->source->serverInfoString()), "");
     return false;
   }
@@ -321,7 +321,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
     if (!dest_createTable(tableCaption, tableSchema)) {
       if (result)
-        result->setStatus(i18n("Could not create table in destination \"%1\". Error reading table \"%2\".",	m_migrateData->destination->connectionData()->serverInfoString(), tableCaption), "");
+        result->setStatus(tr("Could not create table in destination \"%1\". Error reading table \"%2\".",	m_migrateData->destination->connectionData()->serverInfoString(), tableCaption), "");
       return false;
     }
 
@@ -330,7 +330,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
         kDebug() << "Failed to copy table " << tableCaption << endl;
         if (result)
           result->setStatus(sourceConn,
-              i18n("Could not copy table \"%1\" to destination database.", tableCaption));
+              tr("Could not copy table \"%1\" to destination database.", tableCaption));
       }
     }
 
@@ -346,7 +346,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   // Finally: Error.handling
   if (result && result->error())
     result->setStatus(sourceConn,
-      i18n("Could not export data to \"%1\".",
+      tr("Could not export data to \"%1\".",
         m_migrateData->source->serverInfoString()));
   dest_disconnect();
   if (sourceConn) {

@@ -39,7 +39,7 @@ static K3ListView* kexiAlterTableActionDebugPage = 0;
 
 QWidget *KexiUtils::createDebugWindow(QWidget *parent)
 {
-    // (this is internal code - do not use i18n() here)
+    // (this is internal code - do not use tr() here)
     debugWindow = new DebugWindowDialog(parent);
     debugWindow->setSizeGripEnabled(true);
     QBoxLayout *lyr = new QVBoxLayout(debugWindow);
@@ -55,7 +55,7 @@ QWidget *KexiUtils::createDebugWindow(QWidget *parent)
 
 void KexiUtils::addKexiDBDebug(const QString& text)
 {
-    // (this is internal code - do not use i18n() here)
+    // (this is internal code - do not use tr() here)
     if (!debugWindowTab)
         return;
     if (!kexiDBDebugPage) {
@@ -91,7 +91,7 @@ void KexiUtils::addKexiDBDebug(const QString& text)
 
 void KexiUtils::addAlterTableActionDebug(const QString& text, int nestingLevel)
 {
-    // (this is internal code - do not use i18n() here)
+    // (this is internal code - do not use tr() here)
     if (!debugWindowTab)
         return;
     if (!kexiAlterTableActionDebugPage) {

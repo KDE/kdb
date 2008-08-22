@@ -228,7 +228,7 @@ const QString &KGlobal::staticQString(const char *str)
  * Create a static QString
  *
  * To be used inside functions(!) like:
- * static const QString &myString = KGlobal::staticQString(i18n("My Text"));
+ * static const QString &myString = KGlobal::staticQString(tr("My Text"));
  */
 const QString &KGlobal::staticQString(const QString &str)
 {

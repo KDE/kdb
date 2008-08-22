@@ -121,9 +121,9 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         details += "<p>" + obj->errorMsg();
 
     if (!obj->serverErrorMsg().isEmpty())
-        details += "<p><b><nobr>" + i18n("Message from server:") + "</nobr></b><br>" + obj->serverErrorMsg();
+        details += "<p><b><nobr>" + tr("Message from server:") + "</nobr></b><br>" + obj->serverErrorMsg();
     if (!obj->recentSQLString().isEmpty())
-        details += "<p><b><nobr>" + i18n("SQL statement:") + QString("</nobr></b><br><tt>%1</tt>").arg(obj->recentSQLString());
+        details += "<p><b><nobr>" + tr("SQL statement:") + QString("</nobr></b><br><tt>%1</tt>").arg(obj->recentSQLString());
     int serverResult;
     QString serverResultName;
     if (obj->serverResult() != 0) {
@@ -134,10 +134,10 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         serverResultName = obj->previousServerResultName();
     }
     if (!serverResultName.isEmpty())
-        details += (QString("<p><b><nobr>") + i18n("Server result name:") + "</nobr></b><br>" + serverResultName);
+        details += (QString("<p><b><nobr>") + tr("Server result name:") + "</nobr></b><br>" + serverResultName);
     if (!details.isEmpty()
             && (!obj->serverErrorMsg().isEmpty() || !obj->recentSQLString().isEmpty() || !serverResultName.isEmpty() || serverResult != 0)) {
-        details += (QString("<p><b><nobr>") + i18n("Server result number:") + "</nobr></b><br>" + QString::number(serverResult));
+        details += (QString("<p><b><nobr>") + tr("Server result number:") + "</nobr></b><br>" + QString::number(serverResult));
     }
 
     if (!details.isEmpty() && !details.startsWith("<qt>")) {
@@ -372,8 +372,8 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         const Predicate::ConnectionData& data,
         Predicate::MessageHandler& msgHandler)
         : KProgressDialog(parent,
-                          i18n("Test Connection"),
-                          i18n("<qt>Testing connection to <b>%1</b> database server...</qt>",
+                          tr("Test Connection"),
+                          tr("<qt>Testing connection to <b>%1</b> database server...</qt>",
                                data.serverInfoString(true))
                          )
         , m_thread(new ConnectionTestThread(this, data))
@@ -438,7 +438,7 @@ void ConnectionTestDialog::slotTimeout()
                 QObject::tr("Test connection to \"%1\" database server established successfully.")
                     .arg(m_connData.serverInfoString(true)),
                 QString(),
-                i18n("Test Connection"));
+                tr("Test Connection"));
         }
 //  slotCancel();
 //  reject();
@@ -1233,10 +1233,10 @@ Field::Type Predicate::maximumForIntegerTypes(Field::Type t1, Field::Type t2)
 QString Predicate::simplifiedTypeName(const Field& field)
 {
     if (field.isNumericType())
-        return i18n("Number"); //simplify
+        return tr("Number"); //simplify
     else if (field.type() == Field::BLOB)
 //! @todo support names of other BLOB subtypes
-        return i18n("Image"); //simplify
+        return tr("Image"); //simplify
 
     return field.typeGroupName();
 }

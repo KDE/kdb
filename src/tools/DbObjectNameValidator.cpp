@@ -42,9 +42,9 @@ Validator::Result ObjectNameValidator::internalCheck(
     if (m_drv.isNull() ? !Predicate::Driver::isPredicateSystemObjectName(v.toString())
             : !m_drv->isSystemObjectName(v.toString()))
         return Validator::Ok;
-    message = i18n("You cannot use name \"%1\" for your object.\n"
+    message = tr("You cannot use name \"%1\" for your object.\n"
                    "It is reserved for internal objects. Please choose another name.",
                    v.toString());
-    details = i18n("Names of internal database objects are starting with \"kexi__\".");
+    details = tr("Names of internal database objects are starting with \"kexi__\".");
     return Validator::Error;
 }

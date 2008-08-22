@@ -199,7 +199,7 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
         if (MessageHandler::Continue !=
                 askQuestion(
                     MessageHandler::WarningContinueCancel,
-                    i18n("Do you want to open file \"%1\" as read-only?\n\n"
+                    tr("Do you want to open file \"%1\" as read-only?\n\n"
                         "The file is probably already open on this or another computer. "
                         "Could not gain exclusive access for writing the file.")
                     .arg(QDir::convertSeparators(data()->fileName())),
@@ -223,14 +223,14 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 
     if (d->res == SQLITE_CANTOPEN_WITH_LOCKED_READWRITE) {
         setError(ERR_ACCESS_RIGHTS,
-                 i18n("The file is probably already open on this or another computer.") + "\n\n"
-                 + i18n("Could not gain exclusive access for reading and writing the file.") + " "
-                 + i18n("Check the file's permissions and whether it is already opened and locked by another application."));
+                 tr("The file is probably already open on this or another computer.") + "\n\n"
+                 + tr("Could not gain exclusive access for reading and writing the file.") + " "
+                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
     } else if (d->res == SQLITE_CANTOPEN_WITH_LOCKED_WRITE) {
         setError(ERR_ACCESS_RIGHTS,
-                 i18n("The file is probably already open on this or another computer.") + "\n\n"
-                 + i18n("Could not gain exclusive access for writing the file.") + " "
-                 + i18n("Check the file's permissions and whether it is already opened and locked by another application."));
+                 tr("The file is probably already open on this or another computer.") + "\n\n"
+                 + tr("Could not gain exclusive access for writing the file.") + " "
+                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
     }
     return d->res == SQLITE_OK;
 #endif
@@ -253,7 +253,7 @@ bool SQLiteConnection::drv_closeDatabase()
     }
     if (SQLITE_BUSY == res) {
 #if 0 //this is ANNOYING, needs fixing (by closing cursors or waiting)
-        setError(ERR_CLOSE_FAILED, i18n("Could not close busy database."));
+        setError(ERR_CLOSE_FAILED, tr("Could not close busy database."));
 #else
         return true;
 #endif
@@ -267,9 +267,9 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     Q_UNUSED(dbName); // Each database is one single SQLite file.
     const QString filename = data()->fileName();
     if (QFile(filename).exists() && !QDir().remove(filename)) {
-        setError(ERR_ACCESS_RIGHTS, i18n("Could not remove file \"%1\".",
+        setError(ERR_ACCESS_RIGHTS, tr("Could not remove file \"%1\".",
                                          QDir::convertSeparators(filename)) + " "
-                 + i18n("Check the file's permissions and whether it is already opened and locked by another application."));
+                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
         return false;
     }
     return true;

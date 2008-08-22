@@ -265,7 +265,7 @@ public:
         return 0;
     }
 
-    /*! \return (not i18n'd) name of last executed operation's result at the server side.
+    /*! \return (not i18n-ed) name of last executed operation's result at the server side.
      Sometimes engines have predefined its result names that can be used e.g.
      to refer a documentation. SQLite is one of such engines.
      Note for driver developers: Leave the default implementation (null
@@ -274,7 +274,7 @@ public:
         return QString();
     }
 
-    /*! \return (not i18n'd) description text (message) of last operation's error/result.
+    /*! \return (not i18n-ed) description text (message) of last operation's error/result.
      In most cases engines do return such a messages, any user can then use this
      to refer a documentation.
      Note for driver developers: Leave the default implementation (null

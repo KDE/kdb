@@ -2817,7 +2817,7 @@ yyreduce:
                 Field *f = item->table()->field(item->name());
                 if(!f)
                 {
-                  ParserError err(i18n("Field List Error"), i18n("Unknown column '%1' in table '%2'").arg(item->name()).arg(schema->name()), ctoken, current);
+                  ParserError err(tr("Field List Error"), tr("Unknown column '%1' in table '%2'").arg(item->name()).arg(schema->name()), ctoken, current);
                   parser->setError(err);
                   yyerror("fieldlisterror");
                 }

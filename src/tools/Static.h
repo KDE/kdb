@@ -323,12 +323,12 @@ PREDICATE_EXPORT const QString& staticQString(const char *str); //krazy:exclude=
  *
  * To be used inside functions(!) like:
  * @code
- * static const QString &myString = KGlobal::staticQString(i18n("My Text"));
+ * static const QString &myString = KGlobal::staticQString(tr("My Text"));
  * @endcode
  *
  * @attention Do @b NOT use code such as:
  * @code
- * static QString myString = KGlobal::staticQString(i18n("myText"));
+ * static QString myString = KGlobal::staticQString(tr("myText"));
  * @endcode
  * This creates a static object (instead of a static reference)
  * and as you know static objects are EVIL.

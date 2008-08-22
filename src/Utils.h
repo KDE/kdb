@@ -89,10 +89,10 @@ typedef QList<uint> TypeGroupList;
 /*! \return list of types for type group \a typeGroup. */
 PREDICATE_EXPORT const TypeGroupList typesForGroup(Field::TypeGroup typeGroup);
 
-/*! \return list of i18n'd type names for type group \a typeGroup. */
+/*! \return list of i18n-ed type names for type group \a typeGroup. */
 PREDICATE_EXPORT QStringList typeNamesForGroup(Field::TypeGroup typeGroup);
 
-/*! \return list of (not-i18n'd) type names for type group \a typeGroup. */
+/*! \return list of (not-i18n-ed) type names for type group \a typeGroup. */
 PREDICATE_EXPORT QStringList typeStringsForGroup(Field::TypeGroup typeGroup);
 
 /*! \return default field type for type group \a typeGroup,
@@ -102,8 +102,8 @@ PREDICATE_EXPORT QStringList typeStringsForGroup(Field::TypeGroup typeGroup);
 PREDICATE_EXPORT Field::Type defaultTypeForGroup(Field::TypeGroup typeGroup);
 
 /*! \return a slightly simplified type name for \a field.
- For BLOB type it returns i18n'd "Image" string or other, depending on the mime type.
- For numbers (either floating-point or integer) it returns i18n'd "Number: string.
+ For BLOB type it returns i18n-ed "Image" string or other, depending on the mime type.
+ For numbers (either floating-point or integer) it returns i18n-ed "Number: string.
  For other types it the same string as Field::typeGroupName() is returned. */
 //! @todo support names of other BLOB subtypes
 PREDICATE_EXPORT QString simplifiedTypeName(const Field& field);

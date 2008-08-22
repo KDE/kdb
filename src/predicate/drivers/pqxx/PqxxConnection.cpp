@@ -208,7 +208,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
         d->errmsg = QString::fromUtf8(e.what());
 
     } catch (...) {
-        d->errmsg = i18n("Unknown error.");
+        d->errmsg = tr("Unknown error.");
     }
     return false;
 }
@@ -287,7 +287,7 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
         d->errmsg = QString::fromUtf8(e.what());
         PreDrvDbg << "pqxxSqlConnection::drv_executeSQL:exception - " << e.what() << endl;
     } catch (...) {
-        d->errmsg = i18n("Unknown error.");
+        d->errmsg = tr("Unknown error.");
     }
     //PreDrvDbg << "EXECUTE SQL OK: OID was " << (d->res ? d->res->inserted_oid() : 0) << endl;
     return ok;
@@ -384,7 +384,7 @@ bool pqxxSqlConnection::drv_rollbackTransaction(TransactionData *tdata)
 
         result = false;
     } catch (...) {
-        d->errmsg = i18n("Unknown error.");
+        d->errmsg = tr("Unknown error.");
         result = false;
     }
     if (m_trans == tdata)

@@ -46,7 +46,7 @@ bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QStri
 #else
     Predicate::DriverManager manager;
     Predicate::Driver *drv = manager.driver(data.driverName);
-    QString title(i18n("Could not compact database \"%1\".", QDir::convertSeparators(databaseName)));
+    QString title(tr("Could not compact database \"%1\".", QDir::convertSeparators(databaseName)));
     if (!drv) {
         setError(&manager, title);
         return false;

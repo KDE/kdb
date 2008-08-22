@@ -25,7 +25,7 @@
 #include "Expression.h"
 #include "Utils.h"
 
-// we use here i18n() but this depends on kde libs: TODO: add #ifdefs
+// we use here tr() but this depends on kde libs: TODO: add #ifdefs
 #include <QtDebug>
 #include <klocale.h>
 
@@ -702,20 +702,20 @@ void Field::FieldTypeNames::init()
     m_initialized = true;
     resize((Field::LastType + 1)*2);
 
-    ADDTYPE(InvalidType, i18n("Invalid Type"), "InvalidType");
-    ADDTYPE(Byte, i18n("Byte"), "Byte");
-    ADDTYPE(ShortInteger, i18n("Short Integer Number"), "ShortInteger");
-    ADDTYPE(Integer, i18n("Integer Number"), "Integer");
-    ADDTYPE(BigInteger, i18n("Big Integer Number"), "BigInteger");
-    ADDTYPE(Boolean, i18n("Yes/No Value"), "Boolean");
-    ADDTYPE(Date, i18n("Date"), "Date");
-    ADDTYPE(DateTime, i18n("Date and Time"), "DateTime");
-    ADDTYPE(Time, i18n("Time"), "Time");
-    ADDTYPE(Float, i18n("Single Precision Number"), "Float");
-    ADDTYPE(Double, i18n("Double Precision Number"), "Double");
-    ADDTYPE(Text, i18n("Text"), "Text");
-    ADDTYPE(LongText, i18n("Long Text"), "LongText");
-    ADDTYPE(BLOB, i18n("Object"), "BLOB");
+    ADDTYPE(InvalidType, tr("Invalid Type"), "InvalidType");
+    ADDTYPE(Byte, tr("Byte"), "Byte");
+    ADDTYPE(ShortInteger, tr("Short Integer Number"), "ShortInteger");
+    ADDTYPE(Integer, tr("Integer Number"), "Integer");
+    ADDTYPE(BigInteger, tr("Big Integer Number"), "BigInteger");
+    ADDTYPE(Boolean, tr("Yes/No Value"), "Boolean");
+    ADDTYPE(Date, tr("Date"), "Date");
+    ADDTYPE(DateTime, tr("Date and Time"), "DateTime");
+    ADDTYPE(Time, tr("Time"), "Time");
+    ADDTYPE(Float, tr("Single Precision Number"), "Float");
+    ADDTYPE(Double, tr("Double Precision Number"), "Double");
+    ADDTYPE(Text, tr("Text"), "Text");
+    ADDTYPE(LongText, tr("Long Text"), "LongText");
+    ADDTYPE(BLOB, tr("Object"), "BLOB");
 }
 
 //-------------------------------------------------------
@@ -733,13 +733,13 @@ void Field::FieldTypeGroupNames::init()
     m_initialized = true;
     resize((Field::LastTypeGroup + 1)*2);
 
-    ADDGROUP(InvalidGroup, i18n("Invalid Group"), "InvalidGroup");
-    ADDGROUP(TextGroup, i18n("Text"), "TextGroup");
-    ADDGROUP(IntegerGroup, i18n("Integer Number"), "IntegerGroup");
-    ADDGROUP(FloatGroup, i18n("Floating Point Number"), "FloatGroup");
-    ADDGROUP(BooleanGroup, i18n("Yes/No"), "BooleanGroup");
-    ADDGROUP(DateTimeGroup, i18n("Date/Time"), "DateTimeGroup");
-    ADDGROUP(BLOBGroup, i18n("Object"), "BLOBGroup");
+    ADDGROUP(InvalidGroup, tr("Invalid Group"), "InvalidGroup");
+    ADDGROUP(TextGroup, tr("Text"), "TextGroup");
+    ADDGROUP(IntegerGroup, tr("Integer Number"), "IntegerGroup");
+    ADDGROUP(FloatGroup, tr("Floating Point Number"), "FloatGroup");
+    ADDGROUP(BooleanGroup, tr("Yes/No"), "BooleanGroup");
+    ADDGROUP(DateTimeGroup, tr("Date/Time"), "DateTimeGroup");
+    ADDGROUP(BLOBGroup, tr("Object"), "BLOBGroup");
 }
 
 //-------------------------------------------------------

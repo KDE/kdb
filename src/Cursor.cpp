@@ -142,7 +142,7 @@ bool Cursor::open()
     else {
         if (!m_query) {
             PreDbg << "Cursor::open(): no query statement (or schema) defined!" << endl;
-            setError(ERR_SQL_EXECUTION_ERROR, i18n("No query statement or schema defined."));
+            setError(ERR_SQL_EXECUTION_ERROR, tr("No query statement or schema defined."));
             return false;
         }
         Connection::SelectStatementOptions options;
@@ -152,7 +152,7 @@ bool Cursor::open()
                         : m_conn->selectStatement(*m_query, options);
         if (m_conn->m_sql.isEmpty()) {
             PreDbg << "Cursor::open(): empty statement!" << endl;
-            setError(ERR_SQL_EXECUTION_ERROR, i18n("Query statement is empty."));
+            setError(ERR_SQL_EXECUTION_ERROR, tr("Query statement is empty."));
             return false;
         }
     }
@@ -162,7 +162,7 @@ bool Cursor::open()
     m_afterLast = false; //we are not @ the end
     m_at = 0; //we are before 1st rec
     if (!m_opened) {
-        setError(ERR_SQL_EXECUTION_ERROR, i18n("Error opening database cursor."));
+        setError(ERR_SQL_EXECUTION_ERROR, tr("Error opening database cursor."));
         return false;
     }
     m_validRecord = false;
@@ -407,7 +407,7 @@ bool Cursor::getNextRecord()
 //      return false;
 //     }
                     if ((FetchResult) m_result == FetchError) {
-                        setError(ERR_CURSOR_RECORD_FETCHING, i18n("Cannot fetch next record."));\
+                        setError(ERR_CURSOR_RECORD_FETCHING, tr("Cannot fetch next record."));\
                         return false;
                     }
                     return false; // in case of m_result = FetchEnd or m_result = -1
@@ -430,7 +430,7 @@ bool Cursor::getNextRecord()
                 if ((FetchResult) m_result == FetchEnd) {
                     return false;
                 }
-                setError(ERR_CURSOR_RECORD_FETCHING, i18n("Cannot fetch next record."));
+                setError(ERR_CURSOR_RECORD_FETCHING, tr("Cannot fetch next record."));
                 return false;
             }
         } else //we have a record that was read ahead: eat this

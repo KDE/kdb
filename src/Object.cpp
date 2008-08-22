@@ -57,7 +57,7 @@ void Object::setError(int code, const QString &msg)
     m_errno = code;
     m_errorSql = m_sql;
     if (m_errno == ERR_OTHER && msg.isEmpty())
-        m_errMsg = i18n("Unspecified error encountered");
+        m_errMsg = tr("Unspecified error encountered");
     else
         m_errMsg = msg;
     m_hasError = code != ERR_NONE;

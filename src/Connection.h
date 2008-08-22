@@ -767,7 +767,7 @@ public:
          a conflicting table schema. */
         virtual tristate closeListener() = 0;
 
-        /*! i18n'd string that can be displayed for user to inform about
+        /*! i18n-ed string that can be displayed for user to inform about
          e.g. conflicting listeners. */
         QString listenerInfoString;
     };

@@ -78,11 +78,11 @@ public:
     virtual void clearError();
 
     /*! Predicate library offers detailed error numbers using errorNum()
-     and detailed error i18n'd messages using errorMsg() -
+     and detailed error i18n-ed messages using errorMsg() -
      this information is not engine-dependent (almost).
      Use this in your application to give users more information on what's up.
 
-     This method returns (non-i18n'd !) engine-specific error message,
+     This method returns (non-i18n-ed !) engine-specific error message,
      if there was any error during last server-side operation,
      otherwise null string.
      Reimplement this for your driver
