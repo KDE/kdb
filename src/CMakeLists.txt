@@ -8,9 +8,8 @@ find_package(Qt4 REQUIRED)
 add_subdirectory( tools drivers )
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}/src
-  ${CMAKE_SOURCE_DIR}/src/parser
-  ${CMAKE_SOURCE_DIR}/src/tools
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/Predicate
   ${QT_INCLUDES}
 )
 
