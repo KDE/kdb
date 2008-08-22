@@ -17,21 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXI_VALIDATOR_H
-#define KEXI_VALIDATOR_H
+#ifndef PREDICATE_TOOLS_VALIDATOR_H
+#define PREDICATE_TOOLS_VALIDATOR_H
 
-#include "kexiutils_export.h"
+#include <predicate_export.h>
 
 #include <qvalidator.h>
 #include <qvariant.h>
 #include <qstring.h>
-//Added by qt3to4:
-#include <Q3ValueList>
-#include <Q3PtrList>
 
-#include <klocale.h>
-
-namespace KexiUtils
+namespace Predicate
+{
+namespace Utils
 {
 
 //! @short A validator extending QValidator with offline-checking for value's validity
@@ -46,7 +43,7 @@ namespace KexiUtils
  -  QValidator::State IdentifierValidator::validate( QString& input, int& pos ) const;
  -  Result check(const QString &valueName, QVariant v, QString &message, QString &details);
  */
-class KEXIUTILS_EXPORT Validator : public QValidator
+class PREDICATE_EXPORT Validator : public QValidator
 {
 public:
     enum Result { Error = 0, Ok = 1, Warning = 2 };
@@ -97,7 +94,7 @@ private:
 };
 
 //! @short A validator groupping multiple QValidators
-/*! MultiValidator behaves like normal KexiUtils::Validator,
+/*! MultiValidator behaves like normal Validator,
  but it allows to add define more than one different validator.
  Given validation is successful if every subvalidator accepted given value.
 
@@ -158,6 +155,7 @@ private:
     Private* const d;
 };
 
+}
 }
 
 #endif

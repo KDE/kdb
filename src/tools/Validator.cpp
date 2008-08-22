@@ -17,12 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "validator.h"
-//Added by qt3to4:
-#include <Q3ValueList>
+#include "Validator.h"
 
-namespace KexiUtils
+namespace Predicate
 {
+namespace Utils
+{
+
 class Validator::Private
 {
 public:
@@ -31,12 +32,9 @@ public:
     }
 bool acceptsEmptyValue : 1;
 };
-}
 
 //-----------------------------------------------------------
 
-namespace KexiUtils
-{
 class MultiValidator::Private
 {
 public:
@@ -51,10 +49,11 @@ public:
     QList<QValidator*> subValidators;
 };
 }
+}
 
 //-----------------------------------------------------------
 
-using namespace KexiUtils;
+using namespace Predicate::Utils;
 
 Validator::Validator(QObject * parent)
         : QValidator(parent)

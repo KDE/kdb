@@ -80,13 +80,15 @@ set(predicate_LIB_SRCS
    Relationship.cpp 
    RowEditBuffer.cpp 
    MessageHandler.cpp 
-   DbObjectNameValidator.cpp 
    PreparedStatement.cpp 
    DbProperties.cpp 
    Admin.cpp 
    LookupFieldSchema.cpp 
-   FieldValidator.cpp
    Alter.cpp
+
+   tools/Validator.cpp
+   tools/FieldValidator.cpp
+   tools/DbObjectNameValidator.cpp 
 #TODO tools/SimpleCommandLineApp.cpp
 )
 
