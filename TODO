@@ -1,9 +1,13 @@
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
+[ ] move *Validator classes from tools to a separate PredicateGui lib
 
 Drivers:
 [ ] add SQLite driver for 3.6.1+ version (use FindSQLite.cmake) 
     but also keep SQlite 3.2.8 for compatibility with Kexi 1.x
+
+Naming:
+[ ] what to do with kexi__ prefix for db objects (backward compat.)?
 
 TODO: port files:
   Admin.cpp

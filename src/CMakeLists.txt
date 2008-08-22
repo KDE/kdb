@@ -5,7 +5,7 @@ set(GENERIC_PREDICATE_LIB_SOVERSION "0")
 
 find_package(Qt4 REQUIRED)
 
-add_subdirectory( drivers )
+add_subdirectory( tools drivers )
 
 include_directories(
   ${CMAKE_SOURCE_DIR}/src
@@ -17,7 +17,6 @@ include_directories(
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
   -D__PREDICATE__= 
-  -DMAKE_KEXI_DB_LIB
   -DYYERROR_VERBOSE=1
 )
 
@@ -88,7 +87,12 @@ set(predicate_LIB_SRCS
 
    tools/Validator.cpp
    tools/FieldValidator.cpp
+   tools/LongLongValidator.cpp
    tools/DbObjectNameValidator.cpp 
+   tools/Identifier.cpp
+   tools/Utils.cpp
+   ${CMAKE_CURRENT_BINARY_DIR}/tools/transliteration/transliteration_table.cpp
+#TODO tools/debuggui.cpp
 #TODO tools/SimpleCommandLineApp.cpp
 )
 
