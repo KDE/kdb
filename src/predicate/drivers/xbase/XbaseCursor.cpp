@@ -22,7 +22,7 @@
 
 #include <Predicate/Error.h>
 #include <Predicate/Utils.h>
-#include <klocale.h>
+
 #include <QtDebug>
 #include <limits.h>
 

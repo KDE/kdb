@@ -25,7 +25,7 @@
 #include "Utils.h"
 
 #include <QtDebug>
-#include <klocale.h>
+
 
 #include <assert.h>
 #include <stdlib.h>

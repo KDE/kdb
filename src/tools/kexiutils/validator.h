@@ -29,7 +29,7 @@
 #include <Q3ValueList>
 #include <Q3PtrList>
 
-#include <klocale.h>
+
 
 namespace KexiUtils
 {

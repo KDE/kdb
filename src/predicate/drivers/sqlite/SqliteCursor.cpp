@@ -31,7 +31,7 @@
 #include <stdlib.h>
 
 #include <QtDebug>
-#include <klocale.h>
+
 
 #include <QVector>
 #include <QDateTime>

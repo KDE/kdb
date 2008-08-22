@@ -25,7 +25,7 @@
 #include <Predicate/Global.h>
 
 #include <QtDebug>
-#include <klocale.h>
+
 
 #include <qvariant.h>
 #include <qfile.h>

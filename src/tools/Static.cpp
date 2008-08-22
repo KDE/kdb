@@ -39,7 +39,7 @@
 
 #include <kaboutdata.h>
 #include <kconfig.h>
-#include <klocale.h>
+
 #include <kcharsets.h>
 #include <kstandarddirs.h>
 #include <kcomponentdata.h>

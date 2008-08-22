@@ -23,7 +23,7 @@
 #include <qfileinfo.h>
 #include <qdir.h>
 
-#include <klocale.h>
+
 
 using namespace Predicate;
 

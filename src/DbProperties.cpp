@@ -18,7 +18,7 @@
 */
 
 #include "DbProperties.h"
-#include <klocale.h>
+
 
 using namespace Predicate;
 

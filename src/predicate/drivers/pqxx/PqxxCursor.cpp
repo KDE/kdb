@@ -24,7 +24,7 @@
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
 
-#include <klocale.h>
+
 #include <QtDebug>
 
 using namespace Predicate;

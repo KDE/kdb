@@ -28,7 +28,7 @@
 #include <ctype.h>
 
 #include <QtDebug>
-#include <klocale.h>
+
 
 PREDICATE_EXPORT QString Predicate::exprClassName(int c)
 {

@@ -21,7 +21,7 @@
 #include "Error.h"
 #include "MessageHandler.h"
 
-#include <klocale.h>
+
 #include <QtDebug>
 
 using namespace Predicate;

@@ -30,7 +30,7 @@
 #include <QBitArray>
 
 #include <QtDebug>
-#include <klocale.h>
+
 
 using namespace Predicate;
 

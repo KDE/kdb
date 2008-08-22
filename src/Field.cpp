@@ -27,7 +27,7 @@
 
 // we use here tr() but this depends on kde libs: TODO: add #ifdefs
 #include <QtDebug>
-#include <klocale.h>
+
 
 #include <qdatetime.h>
 
