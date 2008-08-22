@@ -17,30 +17,18 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
+
 #ifndef _PREDICATE_EXPORT_H_
 #define _PREDICATE_EXPORT_H_
 
-#include <kdemacros.h>
+#include <QtGlobal>
 
 #ifndef PREDICATE_EXPORT
 # ifdef MAKE_PREDICATE_LIB
-#  define PREDICATE_EXPORT KDE_EXPORT
+#  define PREDICATE_EXPORT Q_DECL_EXPORT
 # else
-#  define PREDICATE_EXPORT KDE_IMPORT
+#  define PREDICATE_EXPORT Q_DECL_IMPORT
 # endif
 #endif
 
-#ifndef KEXIMIGR_EXPORT
-# ifdef MAKE_KEXIMIGRATE_LIB
-#  define KEXIMIGR_EXPORT  KDE_EXPORT
-# else
-#  define KEXIMIGR_EXPORT  KDE_IMPORT
-# endif
 #endif
-
-/* -- compile-time settings -- */
-
-/* Might want to add GUI defines here if widgets are to be
- * distributed as part of kexidb - mart */
-
-#endif //KEXI_EXPORT_H
