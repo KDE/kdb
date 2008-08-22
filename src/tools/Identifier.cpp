@@ -18,12 +18,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "identifier.h"
-#include "transliteration_table.h"
+#include "Identifier.h"
+#include "transliteration/transliteration_table.h"
 
-using namespace KexiUtils;
+using namespace Predicate::Utils;
 
-bool KexiUtils::isIdentifier(const QString& s)
+bool Predicate::Utils::isIdentifier(const QString& s)
 {
     uint i;
     const uint sLength = s.length();
@@ -35,7 +35,7 @@ bool KexiUtils::isIdentifier(const QString& s)
     return i > 0 && i == sLength;
 }
 
-QString KexiUtils::string2FileName(const QString &s)
+QString Predicate::Utils::string2FileName(const QString &s)
 {
     QString fn = s.simplified();
     fn.replace(' ', "_"); fn.replace('$', "_");
@@ -52,7 +52,7 @@ inline QString char2Identifier(const QChar& c)
     return s ? QString::fromLatin1(s) : QString(QChar('_'));
 }
 
-QString KexiUtils::string2Identifier(const QString &s)
+QString Predicate::Utils::string2Identifier(const QString &s)
 {
     if (s.isEmpty())
         return QString();
@@ -87,7 +87,7 @@ QString KexiUtils::string2Identifier(const QString &s)
 
 //--------------------------------------------------------------------------------
 
-QString KexiUtils::identifierExpectedMessage(const QString &valueName, const QVariant& v)
+QString Predicate::Utils::identifierExpectedMessage(const QString &valueName, const QVariant& v)
 {
     return "<p>" + i18n("Value of \"%1\" column must be an identifier.", valueName)
            + "</p><p>" + i18n("\"%1\" is not a valid identifier.", v.toString()) + "</p>";

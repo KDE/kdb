@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIUTILS_UTILS_H
-#define KEXIUTILS_UTILS_H
+#ifndef PREDICATE_TOOLS_UTILS_H
+#define PREDICATE_TOOLS_UTILS_H
 
-#include "kexiutils_export.h"
+#include <Predicate/predicate_export.h>
 
 #include <QPointer>
 #include <QObject>
@@ -78,7 +78,7 @@ inline type findParent(QObject* o, const char* className = 0)
 /*! \return first found child of \a o, inheriting \a className.
  If objName is 0 (the default), all object names match.
  Returned pointer type is casted. */
-KEXIUTILS_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName);
+PREDICATE_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName);
 
 /*! \return first found child of \a o, that inherit \a className.
  If \a objName is 0 (the default), all object names match.
@@ -91,17 +91,17 @@ inline type findFirstChild(QObject *o, const char* className /* compat with Qt3 
 
 //! Finds property name and returns its index; otherwise returns -1.
 //! Like QMetaObject::indexOfProperty() but also looks at superclasses.
-KEXIUTILS_EXPORT int indexOfPropertyWithSuperclasses(
+PREDICATE_EXPORT int indexOfPropertyWithSuperclasses(
     const QObject *object, const char* name);
 
 //! Finds property for name \a name and object \a object returns it index;
 //! otherwise returns a null QMetaProperty.
-KEXIUTILS_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
+PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
         const char* name);
 
 //! Finds property for index \a index and object \a object returns it index;
 //! otherwise returns a null QMetaProperty.
-KEXIUTILS_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
+PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
         int index);
 
 //! \return true is \a object object is of class name \a className
@@ -111,12 +111,12 @@ inline bool objectIsA(QObject* object, const char* className)
 }
 
 //! \return true is \a object object is of the class names inside \a classNames
-KEXIUTILS_EXPORT bool objectIsA(QObject* object, const QList<QByteArray>& classNames);
+PREDICATE_EXPORT bool objectIsA(QObject* object, const QList<QByteArray>& classNames);
 
 //! \return a list of methods for \a metaObject meta object.
 //! The methods are of type declared in \a types and have access declared
 //! in \a access.
-KEXIUTILS_EXPORT QList<QMetaMethod> methodsForMetaObject(
+PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObject(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
     = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
     QFlags<QMetaMethod::Access> access
@@ -124,22 +124,22 @@ KEXIUTILS_EXPORT QList<QMetaMethod> methodsForMetaObject(
 
 //! Like \ref KexiUtils::methodsForMetaObject() but includes methods from all
 //! parent meta objects of the \a metaObject.
-KEXIUTILS_EXPORT QList<QMetaMethod> methodsForMetaObjectWithParents(
+PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObjectWithParents(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
     = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
     QFlags<QMetaMethod::Access> access
     = QFlags<QMetaMethod::Access>(QMetaMethod::Private | QMetaMethod::Protected | QMetaMethod::Public));
 
 //! \return a list with all this class's properties.
-KEXIUTILS_EXPORT QList<QMetaProperty> propertiesForMetaObject(
+PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObject(
     const QMetaObject *metaObject);
 
 //! \return a list with all this class's properties including thise inherited.
-KEXIUTILS_EXPORT QList<QMetaProperty> propertiesForMetaObjectWithInherited(
+PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObjectWithInherited(
     const QMetaObject *metaObject);
 
 //! \return a list of enum keys for meta property \a metaProperty.
-KEXIUTILS_EXPORT QStringList enumKeysForProperty(const QMetaProperty& metaProperty);
+PREDICATE_EXPORT QStringList enumKeysForProperty(const QMetaProperty& metaProperty);
 
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()
 inline QDateTime stringToHackedQTime(const QString& s)
@@ -152,12 +152,12 @@ inline QDateTime stringToHackedQTime(const QString& s)
 
 /*! Sets "wait" cursor with 1 second delay (or 0 seconds if noDelay is true).
  Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-KEXIUTILS_EXPORT void setWaitCursor(bool noDelay = false);
+PREDICATE_EXPORT void setWaitCursor(bool noDelay = false);
 
 /*! Remove "wait" cursor previously set with \a setWaitCursor(),
  even if it's not yet visible.
  Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-KEXIUTILS_EXPORT void removeWaitCursor();
+PREDICATE_EXPORT void removeWaitCursor();
 
 /*! Helper class. Allocate it in your code block as follows:
  <code>
@@ -166,7 +166,7 @@ KEXIUTILS_EXPORT void removeWaitCursor();
  .. and wait cursor will be visible (with one second delay) until you're in this block, without
  a need to call removeWaitCursor() before exiting the block.
  Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-class KEXIUTILS_EXPORT WaitCursor
+class PREDICATE_EXPORT WaitCursor
 {
 public:
     WaitCursor(bool noDelay = false);
@@ -181,7 +181,7 @@ public:
  a need to call setWaitCursor() before exiting the block. After leaving the codee block,
  the cursor will be visible again, if it was visible before creating the WaitCursorRemover object.
  Does nothing if the application has no GUI enabled. (see KApplication::guiEnabled()) */
-class KEXIUTILS_EXPORT WaitCursorRemover
+class PREDICATE_EXPORT WaitCursorRemover
 {
 public:
     WaitCursorRemover();
@@ -195,94 +195,94 @@ bool m_reactivateCursor : 1;
  eg. "Image files (*.png *.xpm *.jpg)", otherwise KFileDialog -compatible
  filter string is generated, eg. "*.png *.xpm *.jpg|Image files (*.png *.xpm *.jpg)".
  "\\n" is appended if \a kdeFormat is true, otherwise ";;" is appended. */
-KEXIUTILS_EXPORT QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true);
+PREDICATE_EXPORT QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true);
 
 /*! @overload QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true) */
-KEXIUTILS_EXPORT QString fileDialogFilterString(const QString& mimeString, bool kdeFormat = true);
+PREDICATE_EXPORT QString fileDialogFilterString(const QString& mimeString, bool kdeFormat = true);
 
 /*! Like QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true)
  but returns a list of filter strings. */
-KEXIUTILS_EXPORT QString fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat);
+PREDICATE_EXPORT QString fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat);
 
 /*! A global setting for minimal readable font.
  \a init is a widget that should be passed if no qApp->mainWidget() is available yet.
  The size of font is not smaller than he one returned by
  KGlobalSettings::smallestReadableFont(). */
-KEXIUTILS_EXPORT QFont smallFont(QWidget *init = 0);
+PREDICATE_EXPORT QFont smallFont(QWidget *init = 0);
 
 /*! \return a color being a result of blending \a c1 with \a c2 with \a factor1
  and \a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
-KEXIUTILS_EXPORT QColor blendedColors(const QColor& c1, const QColor& c2, int factor1 = 1, int factor2 = 1);
+PREDICATE_EXPORT QColor blendedColors(const QColor& c1, const QColor& c2, int factor1 = 1, int factor2 = 1);
 
 /*! \return a contrast color for a color \a c:
  If \a c is light color, darker color created using c.dark(200) is returned;
  otherwise lighter color created using c.light(200) is returned. */
-KEXIUTILS_EXPORT QColor contrastColor(const QColor& c);
+PREDICATE_EXPORT QColor contrastColor(const QColor& c);
 
 /*! \return a lighter color for a color \a c and a factor \a factor.
  For colors like Qt::red or Qt::green where hue and saturation are near to 255,
  hue is decreased so the result will be more bleached.
  For black color the result is dark gray rather than black. */
-KEXIUTILS_EXPORT QColor bleachedColor(const QColor& c, int factor);
+PREDICATE_EXPORT QColor bleachedColor(const QColor& c, int factor);
 
 /*! \return icon set computed as a result of colorizing \a icon pixmap with "buttonText"
  color of \a palette palette. This function is useful for displaying monochromed icons
  on the list view or table view header, to avoid bloat, but still have the color compatible
  with accessibility settings. */
-KEXIUTILS_EXPORT QIcon colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette);
+PREDICATE_EXPORT QIcon colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette);
 
 /*! \return empty (fully transparent) pixmap that can be used as a place for icon of size \a iconGroup */
-KEXIUTILS_EXPORT QPixmap emptyIcon(KIconLoader::Group iconGroup);
+PREDICATE_EXPORT QPixmap emptyIcon(KIconLoader::Group iconGroup);
 
 /*! Serializes \a map to \a array.
  KexiUtils::deserializeMap() can be used to deserialize this array back to map. */
-KEXIUTILS_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray& array);
-KEXIUTILS_EXPORT void serializeMap(const QMap<QString, QString>& map, QString& string);
+PREDICATE_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray& array);
+PREDICATE_EXPORT void serializeMap(const QMap<QString, QString>& map, QString& string);
 
 /*! \return a map deserialized from a byte array \a array.
  \a array need to contain data previously serialized using KexiUtils::serializeMap(). */
-KEXIUTILS_EXPORT QMap<QString, QString> deserializeMap(const QByteArray& array);
+PREDICATE_EXPORT QMap<QString, QString> deserializeMap(const QByteArray& array);
 
 /*! \return a map deserialized from \a string.
  \a string need to contain data previously serialized using KexiUtils::serializeMap(). */
-KEXIUTILS_EXPORT QMap<QString, QString> deserializeMap(const QString& string);
+PREDICATE_EXPORT QMap<QString, QString> deserializeMap(const QString& string);
 
 /*! \return a valid filename converted from \a string by:
  - replacing \\, /, :, *, ?, ", <, >, |, \n \\t characters with a space
  - simplifing whitespace by removing redundant space characters using QString::simplified()
  Do not pass full paths here, but only filename strings. */
-KEXIUTILS_EXPORT QString stringToFileName(const QString& string);
+PREDICATE_EXPORT QString stringToFileName(const QString& string);
 
 /*! Performs a simple \a string  encryption using rot47-like algorithm.
  Each character's unicode value is increased by 47 + i (where i is index of the character).
  The resulting string still contains redable characters.
  Do not use this for data that can be accessed by attackers! */
-KEXIUTILS_EXPORT void simpleCrypt(QString& string);
+PREDICATE_EXPORT void simpleCrypt(QString& string);
 
 /*! Performs a simple \a string decryption using rot47-like algorithm,
  using opposite operations to KexiUtils::simpleCrypt(). */
-KEXIUTILS_EXPORT void simpleDecrypt(QString& string);
+PREDICATE_EXPORT void simpleDecrypt(QString& string);
 
 #ifdef KEXI_DEBUG_GUI
 //! Creates debug window for convenient debugging output
-KEXIUTILS_EXPORT QWidget *createDebugWindow(QWidget *parent);
+PREDICATE_EXPORT QWidget *createDebugWindow(QWidget *parent);
 
 //! Adds debug line for for KexiDB database
-KEXIUTILS_EXPORT void addKexiDBDebug(const QString& text);
+PREDICATE_EXPORT void addKexiDBDebug(const QString& text);
 
 //! Adds debug line for for Table Designer (Alter Table actions)
-KEXIUTILS_EXPORT void addAlterTableActionDebug(const QString& text, int nestingLevel = 0);
+PREDICATE_EXPORT void addAlterTableActionDebug(const QString& text, int nestingLevel = 0);
 
 //! Connects push button action to \a receiver and its \a slot. This allows to execute debug-related actions
 //! using buttons displayed in the debug window.
-KEXIUTILS_EXPORT void connectPushButtonActionForDebugWindow(const char* actionName,
+PREDICATE_EXPORT void connectPushButtonActionForDebugWindow(const char* actionName,
         const QObject *receiver, const char* slot);
 #endif
 
 //! @internal
-KEXIUTILS_EXPORT QString ptrToStringInternal(void* ptr, uint size);
+PREDICATE_EXPORT QString ptrToStringInternal(void* ptr, uint size);
 //! @internal
-KEXIUTILS_EXPORT void* stringToPtrInternal(const QString& str, uint size);
+PREDICATE_EXPORT void* stringToPtrInternal(const QString& str, uint size);
 
 //! \return a pointer \a ptr safely serialized to string
 template<class type>
@@ -299,13 +299,13 @@ type* stringToPtr(const QString& str)
 }
 
 //! Sets focus for widget \a widget with reason \a reason.
-KEXIUTILS_EXPORT void setFocusWithReason(QWidget* widget, Qt::FocusReason reason);
+PREDICATE_EXPORT void setFocusWithReason(QWidget* widget, Qt::FocusReason reason);
 
 //! Unsets focus for widget \a widget with reason \a reason.
-KEXIUTILS_EXPORT void unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason);
+PREDICATE_EXPORT void unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason);
 
 //! @short A convenience class that simplifies usage of QWidget::getContentsMargins() and QWidget::setContentsMargins
-class KEXIUTILS_EXPORT WidgetMargins
+class PREDICATE_EXPORT WidgetMargins
 {
 public:
     //! Creates object with all margins set to 0
@@ -331,12 +331,12 @@ const WidgetMargins operator+ (const WidgetMargins& margins1, const WidgetMargin
 
 //! Draws pixmap on painter \a p using predefined parameters.
 //! Used in KexiDBImageBox and KexiBlobTableEdit.
-KEXIUTILS_EXPORT void drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
+PREDICATE_EXPORT void drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
                                  const QPixmap& pixmap, Qt::Alignment alignment, bool scaledContents, bool keepAspectRatio);
 
 //! A helper for automatic deleting of contents of containers.
 template <typename Container>
-class KEXIUTILS_EXPORT ContainerDeleter
+class PREDICATE_EXPORT ContainerDeleter
 {
 public:
     ContainerDeleter(Container& container) : m_container(container) {}
@@ -352,7 +352,7 @@ private:
 
 //! @short Autodeleted hash
 template <class Key, class T>
-class KEXIUTILS_EXPORT AutodeletedHash : public QHash<Key, T>
+class PREDICATE_EXPORT AutodeletedHash : public QHash<Key, T>
 {
 public:
     AutodeletedHash(const AutodeletedHash& other) : QHash<Key, T>(other), m_autoDelete(false) {}
@@ -372,7 +372,7 @@ bool m_autoDelete : 1;
 
 //! @short Autodeleted list
 template <typename T>
-class KEXIUTILS_EXPORT AutodeletedList : public QList<T>
+class PREDICATE_EXPORT AutodeletedList : public QList<T>
 {
 public:
     AutodeletedList(const AutodeletedList& other)
@@ -459,7 +459,7 @@ bool m_autoDelete : 1;
 //! @short Case insensitive hash container supporting QString or QByteArray keys.
 //! Keys are turned to lowercase before inserting. Also supports option for autodeletion.
 template <typename Key, typename T>
-class KEXIUTILS_EXPORT CaseInsensitiveHash : public QHash<Key, T>
+class PREDICATE_EXPORT CaseInsensitiveHash : public QHash<Key, T>
 {
 public:
     CaseInsensitiveHash() : QHash<Key, T>(), m_autoDelete(false) {}
@@ -517,7 +517,7 @@ bool m_autoDelete : 1;
 };
 
 //! A set created from static (0-terminated) array of raw null-terminated strings.
-class KEXIUTILS_EXPORT StaticSetOfStrings
+class PREDICATE_EXPORT StaticSetOfStrings
 {
 public:
     StaticSetOfStrings();
@@ -533,7 +533,7 @@ private:
 
 /*! A modified QFrame which sets up sunken styled panel frame style depending
  on the current widget style. The widget also reacts on style changes. */
-class KEXIUTILS_EXPORT KTextEditorFrame : public QFrame
+class PREDICATE_EXPORT KTextEditorFrame : public QFrame
 {
 public:
     KTextEditorFrame(QWidget * parent = 0, Qt::WindowFlags f = 0);
