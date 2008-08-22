@@ -26,7 +26,7 @@
 #include <QHash>
 
 #include <KDebug>
-#include <kexiutils/Utils.h>
+#include <Predicate/tools/Utils.h>
 
 namespace Predicate
 {

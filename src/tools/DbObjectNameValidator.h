@@ -20,8 +20,8 @@
 #ifndef KEXIDBOBJECTNAMEVALIDATOR_H
 #define KEXIDBOBJECTNAMEVALIDATOR_H
 
-#include "Global.h"
-#include <kexiutils/validator.h>
+#include <Predicate/Global.h>
+#include <Predicate/tools/Validator.h>
 #include <qstring.h>
 #include <qpointer.h>
 

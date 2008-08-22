@@ -19,8 +19,8 @@
 
 #include "FieldValidator.h"
 #include "Field.h"
+#include "LongLongValidator.h"
 
-#include <kexiutils/longlongvalidator.h>
 #include <knumvalidator.h>
 #include <qwidget.h>
 

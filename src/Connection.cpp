@@ -36,8 +36,8 @@
 #include "LookupFieldSchema.h"
 #include "parser/Parser.h"
 
-#include <kexiutils/Utils.h>
-#include <kexiutils/identifier.h>
+#include "tools/Utils.h"
+#include "tools/identifier.h"
 
 #include <qdir.h>
 #include <qfileinfo.h>

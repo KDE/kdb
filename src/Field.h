@@ -29,8 +29,8 @@
 #include <QStringList>
 #include <QHash>
 
-#include <kexiutils/Utils.h>
-#include "predicate_export.h"
+#include <Predicate/tools/Utils.h>
+#include <Predicate/predicate_export.h>
 
 namespace Predicate
 {

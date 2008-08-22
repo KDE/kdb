@@ -119,7 +119,7 @@ private:
 
  If there are no subvalidators, the multi validator always accepts the input.
 */
-class KEXIUTILS_EXPORT MultiValidator : public Validator
+class PREDICATE_EXPORT MultiValidator : public Validator
 {
 public:
     /*! Constructs multivalidator with no subvalidators defined.

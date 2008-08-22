@@ -31,7 +31,7 @@
 #include <Predicate/Driver.h>
 #include <Predicate/Cursor.h>
 #include <Predicate/Error.h>
-#include <kexiutils/Utils.h>
+#include <Predicate/tools/Utils.h>
 
 #include <qfile.h>
 #include <qdir.h>

@@ -35,7 +35,7 @@
 
 #include "Connection.h"
 #include "Admin.h"
-#include <kexiutils/Utils.h>
+#include <Predicate/tools/Utils.h>
 
 class KService;
 

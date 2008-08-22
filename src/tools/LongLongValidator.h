@@ -17,15 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXI_LLONGVALIDATOR_H
-#define KEXI_LLONGVALIDATOR_H
+#ifndef PREDICATE_TOOLS_LLONGVALIDATOR_H
+#define PREDICATE_TOOLS_LLONGVALIDATOR_H
 
-#include "kexiutils_export.h"
+#include <Predicate/predicate_export.h>
 
 #include <qvalidator.h>
 class QWidget;
 
-namespace KexiUtils
+namespace Predicate
+{
+namespace Utils
 {
 
 //! @short A validator for longlong data type.
@@ -36,7 +38,7 @@ namespace KexiUtils
 
   Based on KIntValidator code by Glen Parker <glenebob@nwlink.com>
 */
-class KEXIUTILS_EXPORT LongLongValidator : public QValidator
+class PREDICATE_EXPORT LongLongValidator : public QValidator
 {
 public:
     LongLongValidator(QWidget * parent, int base = 10);
@@ -70,5 +72,6 @@ private:
     qint64 m_max;
 };
 
+}
 }
 #endif

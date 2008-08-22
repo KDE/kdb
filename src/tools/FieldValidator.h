@@ -17,15 +17,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXI_DB_FIELDVALIDATOR_H
-#define KEXI_DB_FIELDVALIDATOR_H
+#ifndef PREDICATE_TOOLS_FIELDVALIDATOR_H
+#define PREDICATE_TOOLS_FIELDVALIDATOR_H
 
-#include "predicate_export.h"
-#include <kexiutils/validator.h>
+#include <Predicate/predicate_export.h>
+#include <Predicate/tools/Validator.h>
 
 class QWidget;
 
 namespace Predicate
+{
+namespace Utils
 {
 class Field;
 
@@ -45,6 +47,7 @@ public:
     ~FieldValidator();
 };
 
+}
 }
 
 #endif

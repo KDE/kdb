@@ -19,11 +19,11 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "longlongvalidator.h"
+#include "LongLongValidator.h"
 
 #include <qwidget.h>
 
-using namespace KexiUtils;
+using namespace Predicate::Utils;
 
 LongLongValidator::LongLongValidator(QWidget * parent, int base)
         : QValidator(parent)

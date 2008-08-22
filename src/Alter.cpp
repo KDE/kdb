@@ -19,7 +19,7 @@
 
 #include "Alter.h"
 #include "Utils.h"
-#include <kexiutils/Utils.h>
+#include "tools/Utils.h"
 #include <qmap.h>
 #include <stdlib.h>
 

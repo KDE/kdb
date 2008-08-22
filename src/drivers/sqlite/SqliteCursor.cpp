@@ -24,7 +24,7 @@
 
 #include <Predicate/Error.h>
 #include <Predicate/Driver.h>
-#include <kexiutils/Utils.h>
+#include <Predicate/tools/Utils.h>
 
 #include <assert.h>
 #include <string.h>
