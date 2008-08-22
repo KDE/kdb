@@ -29,10 +29,7 @@ namespace Predicate {
 
 class xBaseConnectionInternal;
 
-/*!
-* Should override kexiDB/kexiDB
-* all other members are done by the
-* base class.
+/*! @short Provides database connection, allowing queries and data modification.
 */
 class xBaseConnection : public Connection
 {
