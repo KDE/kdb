@@ -27,7 +27,7 @@
 using namespace Predicate;
 
 #define ERRMSG(a) \
-    { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
+    { if (m_msgHandler) m_msgHandler->showMessage(a); }
 
 Object::Object(MessageHandler* handler)
         : m_previousServerResultNum(0)
@@ -170,20 +170,23 @@ void Object::debugError()
         KexiDBDbg << "KEXIDB OK.";
 }
 
-int Object::askQuestion(const QString& message,
-                        KMessageBox::DialogType dlgType, KMessageBox::ButtonCode defaultResult,
-                        const KGuiItem &buttonYes,
-                        const KGuiItem &buttonNo,
-                        const QString &dontShowAskAgainName,
-                        int options,
-                        MessageHandler* msgHandler)
+MessageHandler::ButtonCode Object::askQuestion(
+    MessageHandler::QuestionType messageType,
+    const QString& message,
+    const QString &caption,
+    MessageHandler::ButtonCode defaultResult,
+    const GuiItem &buttonYes,
+    const GuiItem &buttonNo,
+    const QString &dontShowAskAgainName,
+    MessageHandler::Options options,
+    MessageHandler* msgHandler)
 {
     if (msgHandler)
-        return msgHandler->askQuestion(message, dlgType, defaultResult, buttonYes, buttonNo,
+        return msgHandler->askQuestion(messageType, message, caption, defaultResult, buttonYes, buttonNo,
                                        dontShowAskAgainName, options);
 
     if (m_msgHandler)
-        return m_msgHandler->askQuestion(message, dlgType, defaultResult, buttonYes, buttonNo,
+        return m_msgHandler->askQuestion(messageType, message, caption, defaultResult, buttonYes, buttonNo,
                                          dontShowAskAgainName, options);
 
     return defaultResult;

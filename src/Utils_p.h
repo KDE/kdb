@@ -20,16 +20,16 @@
 #ifndef PREDICATE_UTILS_P_H
 #define PREDICATE_UTILS_P_H
 
-#include <qtimer.h>
-#include <qwaitcondition.h>
+#include <QTimer>
+#include <QWaitCondition>
 
-#include <kprogressdialog.h>
+#include <QProgressDialog>
 
 #include "MessageHandler.h"
 
 class ConnectionTestThread;
 
-class ConnectionTestDialog : protected KProgressDialog
+class ConnectionTestDialog : protected QProgressDialog
 {
     Q_OBJECT
 public:

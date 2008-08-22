@@ -22,18 +22,17 @@
 #include "DriverManager.h"
 #include "LookupFieldSchema.h"
 #include "predicate_Global.h"
+#include "tools/Static.h"
 
 #include <QMap>
 #include <QHash>
 #include <QThread>
-#include <QDom>
+#include <QtXML>
 #include <QBuffer>
 #include <QPixmap>
 #include <QMutex>
 #include <QSet>
 #include <QProgressBar>
-
-#include <kmessagebox.h>
 
 #include "Utils_p.h"
 
@@ -424,17 +423,22 @@ void ConnectionTestDialog::slotTimeout()
         reject();
 //  close();
         if (m_errorObj) {
-            m_msgHandler->showErrorMessage(m_errorObj);
+            m_msgHandler->showMessage(m_errorObj);
             m_errorObj = 0;
         } else if (notResponding) {
-            KMessageBox::sorry(0,
-                               i18n("<qt>Test connection to <b>%1</b> database server failed. The server is not responding.</qt>", m_connData.serverInfoString(true)),
-                               i18n("Test Connection"));
+            m_msgHandler->showMessage(
+                MessageHandler::Sorry,
+                QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
+                    .arg(m_connData.serverInfoString(true)),
+                QString(),
+                QObject::tr("Test Connection"));
         } else {
-            KMessageBox::information(0,
-                                     i18n("<qt>Test connection to <b>%1</b> database server established successfully.</qt>",
-                                          m_connData.serverInfoString(true)),
-                                     i18n("Test Connection"));
+            m_msgHandler->showMessage(
+                MessageHandler::Information,
+                QObject::tr("Test connection to \"%1\" database server established successfully.")
+                    .arg(m_connData.serverInfoString(true)),
+                QString(),
+                i18n("Test Connection"));
         }
 //  slotCancel();
 //  reject();

@@ -23,6 +23,7 @@
 #include <QtCore/QString>
 
 #include "Error.h"
+#include "MessageHandler.h"
 
 //todo #include <kmessagebox.h>
 //todo #include <kstandardguiitem.h>
@@ -40,6 +41,10 @@ public:
     /*! \return true if there was error during last operation on the object. */
     bool error() const {
         return m_hasError;
+    }
+
+    MessageHandler::MessageType errorType() const {
+        return m_errType;
     }
 
     /*! \return (localized) error message if there was error during last operation on the object,
@@ -155,19 +160,19 @@ protected:
     virtual void setError(Predicate::Object *obj, int code,
                           const QString& prependMessage = QString());
 
-#if 0
-//! @todo
     /*! Interactively asks a question. Console or GUI can be used for this,
-     depending on installed message handler. For GUI version, KMessageBox class is used.
+     depending on installed message handler. For GUI version, message boxes are used.
      See Predicate::MessageHandler::askQuestion() for details. */
-    virtual int askQuestion(const QString& message,
-                            KMessageBox::DialogType dlgType, KMessageBox::ButtonCode defaultResult,
-                            const KGuiItem &buttonYes = KStandardGuiItem::yes(),
-                            const KGuiItem &buttonNo = KStandardGuiItem::no(),
-                            const QString &dontShowAskAgainName = QString(),
-                            int options = KMessageBox::Notify,
-                            MessageHandler* msgHandler = 0);
-#endif
+    virtual MessageHandler::ButtonCode Object::askQuestion(
+            MessageHandler::QuestionType messageType,
+            const QString& message,
+            const QString &caption = QString(),
+            MessageHandler::ButtonCode defaultResult = MessageHandler::Yes,
+            const GuiItem &buttonYes = GuiItem(),
+            const GuiItem &buttonNo = GuiItem(),
+            const QString &dontShowAskAgainName = QString(),
+            MessageHandler::Options options = 0,
+            MessageHandler* msgHandler = 0);
 
     /*! Clears number of last server operation's result stored
      as a single integer. Formally, this integer should be set to value
@@ -182,6 +187,8 @@ protected:
     int m_serverResult;
     QString m_serverResultName, m_serverErrorMsg;
     QString m_errMsg;
+    QString m_errCaption;
+    MessageHandler::MessageType m_errType;
 
 private:
     int m_errno;

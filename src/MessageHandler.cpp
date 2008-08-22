@@ -45,15 +45,20 @@ MessageHandler::~MessageHandler()
 {
 }
 
-int MessageHandler::askQuestion(const QString& message,
-                                KMessageBox::DialogType dlgType, KMessageBox::ButtonCode defaultResult,
-                                const KGuiItem &buttonYes,
-                                const KGuiItem &buttonNo,
-                                const QString &dontShowAskAgainName,
-                                int options)
+int MessageHandler::askQuestion(
+    MessageHandler::QuestionType messageType,
+    const QString& message,
+    const QString &caption,
+    MessageHandler::ButtonCode defaultResult,
+    const GuiItem &buttonYes,
+    const GuiItem &buttonNo,
+    const QString &dontShowAskAgainName,
+    MessageHandler::Options options,
+    MessageHandler* msgHandler)
 {
+    Q_UNUSED(messageType);
     Q_UNUSED(message);
-    Q_UNUSED(dlgType);
+    Q_UNUSED(caption);
     Q_UNUSED(buttonYes);
     Q_UNUSED(buttonNo);
     Q_UNUSED(dontShowAskAgainName);

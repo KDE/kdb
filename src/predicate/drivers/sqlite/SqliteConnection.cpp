@@ -196,16 +196,23 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 
     if (d->res == SQLITE_OK && cancelled && !wasReadOnly && allowReadonly && isReadOnly()) {
         //opened as read only, ask
-        if (KMessageBox::Continue !=
+        if (MessageHandler::Continue !=
                 askQuestion(
-                    i18n("Do you want to open file \"%1\" as read-only?",
-                         QDir::convertSeparators(data()->fileName()))
-                    + "\n\n"
-                    + i18n("The file is probably already open on this or another computer.") + " "
-                    + i18n("Could not gain exclusive access for writing the file."),
-                    KMessageBox::WarningContinueCancel, KMessageBox::Continue,
-                    KGuiItem(i18n("Open As Read-Only"), "document-open"), KStandardGuiItem::cancel(),
-                    "askBeforeOpeningFileReadOnly", KMessageBox::Notify, msgHandler)) {
+                    MessageHandler::WarningContinueCancel,
+                    i18n("Do you want to open file \"%1\" as read-only?\n\n"
+                        "The file is probably already open on this or another computer. "
+                        "Could not gain exclusive access for writing the file.")
+                    .arg(QDir::convertSeparators(data()->fileName())),
+                    QObject::tr("Opening As Read-Only"),
+                    MessageHandler::Continue,
+                    MessageHandler::GuiItem()
+                            .setProperty("text", QObject::tr("Open As Read-Only"))
+                            .setProperty("icon", "document-open"),
+                    MessageHandler::GuiItem(),
+                    "askBeforeOpeningFileReadOnly",
+                    MessageHandler::Notify,
+                    msgHandler)
+        {
             clearError();
             if (!drv_closeDatabase())
                 return false;
