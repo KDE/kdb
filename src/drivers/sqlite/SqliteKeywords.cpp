@@ -5,7 +5,7 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <sqliteDriver.h>
+#include "SqliteDriver.h"
 
 namespace Predicate
 {

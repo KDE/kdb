@@ -19,7 +19,7 @@
 
 // ** bits of SQLiteConnection related to table altering **
 
-#include "sqliteConnection.h"
+#include "SqliteConnection.h"
 #include <Predicate/Utils.h>
 #include <QHash>
 #include <kGlobal.h>

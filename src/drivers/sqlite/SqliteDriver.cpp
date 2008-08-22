@@ -23,8 +23,8 @@
 #include <Predicate/Utils.h>
 
 #include "sqlite.h"
-#include "sqliteDriver.h"
-#include "sqliteConnection.h"
+#include "SqliteDriver.h"
+#include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 #include "SqliteAdmin.h"
 

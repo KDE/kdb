@@ -17,9 +17,9 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "sqliteCursor.h"
+#include "SqliteCursor.h"
 
-#include "sqliteConnection.h"
+#include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 
 #include <Predicate/Error.h>

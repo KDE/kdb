@@ -23,7 +23,7 @@
 #include <qstring.h>
 
 #include <Predicate/Cursor.h>
-#include "Connection.h"
+#include <Predicate/Connection.h>
 
 namespace Predicate
 {

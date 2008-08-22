@@ -9,14 +9,14 @@ ADD_DEFINITIONS( -D__PREDICATE__= )
 ########### next target ###############
 
 set(predicate_sqlite3_SRCS 
-   sqliteconnection.cpp 
-   sqlitedriver.cpp 
-   sqlitecursor.cpp 
-   sqlitekeywords.cpp 
-   sqlitepreparedstatement.cpp
-   sqliteadmin.cpp
-   sqlitevacuum.cpp
-   sqlitealter.cpp
+   SqliteConnection.cpp 
+   SqliteDriver.cpp 
+   SqliteCursor.cpp 
+   SqliteKeywords.cpp 
+   SqlitePreparedStatement.cpp
+   SqliteAdmin.cpp
+   SqliteVacuum.cpp
+   SqliteAlter.cpp
 )
 
 
