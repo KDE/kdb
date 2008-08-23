@@ -9,17 +9,27 @@ Drivers:
 Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
 [ ] apply rules from http://techbase.kde.org/Policies/Library_Code_Policy
+[x] driver's .desktop file format changed:
+"X-Kexi-DriverName" -> "DriverName"
+"X-KDE-Library" -> "FileName"
+"X-Kexi-DriverType" -> "DriverType"
+"X-Kexi-FileDBDriverMime" -> "FileDBDriverMime"
+"X-Kexi-DoNotAllowProjectImportingTo" -> "AllowImporting"
+[ ] change the above in kexidb-qt3 too
 
-TODO: port files:
+Optimization & Cleanup
+[ ] use QLatin1String where possible
+
+TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes also applied)
   Admin.cpp
   Alter.cpp
-  Connection.cpp
-  Connectiondata.cpp
-  Cursor.cpp
+*  Connection.cpp
+*  Connectiondata.cpp
+*  Cursor.cpp
   DbObjectNameValidator.cpp
   DbProperties.cpp
-  Driver.cpp
-  DriverManager.cpp
+**  Driver.cpp
+**  DriverManager.cpp
   drivers/mysql/MysqlConnection.cpp
   drivers/mysql/MysqlConnection_p.cpp
   drivers/mysql/MysqlCursor.cpp
@@ -60,33 +70,33 @@ TODO: port files:
   drivers/xbase/XbaseDriver.cpp
   drivers/xbase/XbaseExport.cpp
   drivers/xbase/XbaseKeywords.cpp
-  Driver_p.cpp
-  Expression.cpp
-  Field.cpp
-  FieldList.cpp
+*  Driver_p.cpp
+*  Expression.cpp
+*  Field.cpp
+*  FieldList.cpp
   FieldValidator.cpp
-  Global.cpp
-  IndexSchema.cpp
-  keywords.cpp
-  LookupFieldSchema.cpp
+*  Global.cpp
+*  IndexSchema.cpp
+*  keywords.cpp
+*  LookupFieldSchema.cpp
   MessageHandler.cpp
-  Object.cpp
-  parser/Parser.cpp
-  parser/Parser_p.cpp
-  parser/SqlParser.cpp
-  parser/SqlScanner.cpp
-  parser/tokens.cpp
+*  Object.cpp
+*  parser/Parser.cpp
+*  parser/Parser_p.cpp
+*  parser/SqlParser.cpp
+*  parser/SqlScanner.cpp
+*  parser/tokens.cpp
   PreparedStatement.cpp
-  QuerySchema.cpp
-  QuerySchemaParameter.cpp
-  RecordData.cpp
-  Relationship.cpp
-  RowEditBuffer.cpp
-  SchemaData.cpp
-  TableSchema.cpp
+*  QuerySchema.cpp
+*  QuerySchemaParameter.cpp
+*  RecordData.cpp
+*  Relationship.cpp
+*  RowEditBuffer.cpp
+*  SchemaData.cpp
+*  TableSchema.cpp
   tools/SimpleCommandLineApp.cpp
-  Transaction.cpp
-  Utils.cpp
+*  Transaction.cpp
+*  Utils.cpp
 
   Admin.h
   Alter.h
@@ -98,7 +108,7 @@ TODO: port files:
   DbObjectNameValidator.h
   DbProperties.h
   Driver.h
-  DriverManager.h
+*  DriverManager.h
   DriverManager_p.h
   drivers/mysql/MysqlConnection.h
   drivers/mysql/MysqlConnection_p.h
