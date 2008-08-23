@@ -340,4 +340,4 @@ PREDICATE_EXPORT const QString& staticQString(const QString &str); //krazy:exclu
 }
 }
 
-#endif // _KGLOBAL_H
+#endif

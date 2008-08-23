@@ -244,8 +244,8 @@ protected:
                 //missing
                 do { //find 1st unused
                     colNum++;
-                    columnAlias = (i18nc("short for 'expression' word, e.g. 'expr' (only latin letters, please)", "expr")
-                                   .toLatin1() + QByteArray::number(colNum));
+                    columnAlias = QObject::tr("expr", "short for 'expression' word, e.g. 'expr' (only latin letters, please)")
+                                  .toLatin1() + QByteArray::number(colNum);
                 } while (-1 != tablePositionForAlias(columnAlias));
 
                 setColumnAliasInternal(p, columnAlias);

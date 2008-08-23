@@ -537,7 +537,7 @@ QuerySchema* buildSelectQuery(
                     setError(QObject::tr("Invalid column alias definition")); //ok?
                     return 0;
                   }
-                  kDebug() << "ALIAS \"" << aliasVariable->name << "\" set for column "
+                  PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
                     << columnNum << endl;
                   querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
                 }*/

@@ -26,7 +26,7 @@
 
 //remove debug
 #undef PreDbg
-#define PreDbg if (0) kDebug()
+#define PreDbg if (true); else qDebug()
 
 using namespace Predicate;
 

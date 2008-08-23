@@ -292,7 +292,7 @@ void Predicate::Utils::serializeMap(const QMap<QString, QString>& map, QString& 
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
-    kDebug() << array[3] << " " << array[4] << " " << array[5] << endl;
+    PreDbg << array[3] << " " << array[4] << " " << array[5] << endl;
     const uint size = array.size();
     string.clear();
     string.reserve(size);

@@ -121,9 +121,10 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         details += "<p>" + obj->errorMsg();
 
     if (!obj->serverErrorMsg().isEmpty())
-        details += "<p><b><nobr>" + tr("Message from server:") + "</nobr></b><br>" + obj->serverErrorMsg();
+        details += "<p><b><nobr>" + QObject::tr("Message from server:") + "</nobr></b><br>" + obj->serverErrorMsg();
     if (!obj->recentSQLString().isEmpty())
-        details += "<p><b><nobr>" + tr("SQL statement:") + QString("</nobr></b><br><tt>%1</tt>").arg(obj->recentSQLString());
+        details += "<p><b><nobr>" + QObject::tr("SQL statement:")
+            + QString("</nobr></b><br><tt>%1</tt>").arg(obj->recentSQLString());
     int serverResult;
     QString serverResultName;
     if (obj->serverResult() != 0) {
@@ -134,10 +135,12 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         serverResultName = obj->previousServerResultName();
     }
     if (!serverResultName.isEmpty())
-        details += (QString("<p><b><nobr>") + tr("Server result name:") + "</nobr></b><br>" + serverResultName);
+        details += (QString("<p><b><nobr>") + QObject::tr("Server result name:")
+            + "</nobr></b><br>" + serverResultName);
     if (!details.isEmpty()
             && (!obj->serverErrorMsg().isEmpty() || !obj->recentSQLString().isEmpty() || !serverResultName.isEmpty() || serverResult != 0)) {
-        details += (QString("<p><b><nobr>") + tr("Server result number:") + "</nobr></b><br>" + QString::number(serverResult));
+        details += (QString("<p><b><nobr>") + 
+            QObject::tr("Server result number:") + "</nobr></b><br>" + QString::number(serverResult));
     }
 
     if (!details.isEmpty() && !details.startsWith("<qt>")) {
@@ -371,11 +374,7 @@ void ConnectionTestThread::run()
 ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         const Predicate::ConnectionData& data,
         Predicate::MessageHandler& msgHandler)
-        : KProgressDialog(parent,
-                          tr("Test Connection"),
-                          tr("<qt>Testing connection to <b>%1</b> database server...</qt>",
-                               data.serverInfoString(true))
-                         )
+        : QProgressDialog(parent)
         , m_thread(new ConnectionTestThread(this, data))
         , m_connData(data)
         , m_msgHandler(&msgHandler)
@@ -383,10 +382,13 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         , m_errorObj(0)
         , m_stopWaiting(false)
 {
+    setWindowTitle(tr("Test Connection"));
+    setLabelText(tr("<qt>Testing connection to <b>%1</b> database server...</qt>")
+                 .arg(data.serverInfoString(true)));
     setModal(true);
-    showCancelButton(true);
-    progressBar()->setFormat(""); //hide %
-    progressBar()->setRange(0, 0); //to show busy indicator
+//Qt4    showCancelButton(true);
+//Qt4    progressBar()->setFormat(""); //hide %
+    setRange(0, 0); //to show busy indicator
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(slotTimeout()));
     adjustSize();
     resize(250, height());
@@ -403,7 +405,7 @@ int ConnectionTestDialog::exec()
 {
     m_timer.start(20);
     m_thread->start();
-    const int res = KProgressDialog::exec();
+    const int res = QProgressDialog::exec();
     m_thread->wait();
     m_timer.stop();
     return res;
@@ -446,7 +448,7 @@ void ConnectionTestDialog::slotTimeout()
         return;
     }
     m_elapsedTime += 20;
-    progressBar()->setValue(m_elapsedTime);
+    setValue(m_elapsedTime);
 }
 
 void ConnectionTestDialog::error(Predicate::Object *obj)
@@ -478,7 +480,7 @@ void ConnectionTestDialog::reject()
     m_thread->terminate();
     m_timer.disconnect(this);
     m_timer.stop();
-    KProgressDialog::reject();
+    QProgressDialog::reject();
 }
 
 void Predicate::connectionTestDialog(QWidget* parent, const Predicate::ConnectionData& data,
@@ -611,12 +613,13 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
             i--;
         if (s[i] == '.') //remove '.'
             i--;
-        s = s.left(i + 1).replace('.', KGlobal::locale()->decimalSymbol());
+//Qt4 port        s = s.left(i + 1).replace('.', KGlobal::locale()->decimalSymbol());
+        s = s.left(i + 1).replace('.', QLocale().decimalPoint());
         return s;
     }
     if (decimalPlaces == 0)
         return QString::number((int)value);
-    return KGlobal::locale()->formatNumber(value, decimalPlaces);
+    return QLocale().toString(value, 'g', decimalPlaces);
 }
 
 Predicate::Field::Type Predicate::intToFieldType(int type)
@@ -1017,10 +1020,13 @@ struct Predicate_NotEmptyValueForTypeCache {
             if (i == Field::BLOB) {
 //! @todo blobs will contain other mime types too
                 QByteArray ba;
+//! @todo port to Qt4
+#if 0
                 QBuffer buffer(&ba);
-                buffer.open(IO_WriteOnly);
+                buffer.open(QIODevice::WriteOnly);
                 QPixmap pm(SmallIcon("document-new"));
                 pm.save(&buffer, "PNG"/*! @todo default? */);
+#endif
                 ADD(i, ba);
                 continue;
             }
@@ -1135,7 +1141,7 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
                         array[output] = char((int(s[1] - '0') * 8 + int(s[2] - '0')) * 8 + int(s[3] - '0'));
                     s += 4;
                 } else {
-                    PreDrvWarn << "processBinaryData(): no octal value after backslash" << endl;
+                    PreWarn << "processBinaryData(): no octal value after backslash" << endl;
                     s++;
                 }
             } else {
@@ -1233,10 +1239,10 @@ Field::Type Predicate::maximumForIntegerTypes(Field::Type t1, Field::Type t2)
 QString Predicate::simplifiedTypeName(const Field& field)
 {
     if (field.isNumericType())
-        return tr("Number"); //simplify
+        return QObject::tr("Number"); //simplify
     else if (field.type() == Field::BLOB)
 //! @todo support names of other BLOB subtypes
-        return tr("Image"); //simplify
+        return QObject::tr("Image"); //simplify
 
     return field.typeGroupName();
 }
@@ -1248,6 +1254,10 @@ QString Predicate::defaultFileBasedDriverMimeType()
 
 QString Predicate::defaultFileBasedDriverIcon()
 {
+//! @todo port to Qt4
+#if 1
+    return QString();
+#else
     KMimeType::Ptr mimeType(KMimeType::mimeType(
                                 Predicate::defaultFileBasedDriverMimeType()));
     if (mimeType.isNull()) {
@@ -1256,6 +1266,7 @@ QString Predicate::defaultFileBasedDriverIcon()
         return QString();
     }
     return mimeType->iconName();
+#endif
 }
 
 QString Predicate::defaultFileBasedDriverName()

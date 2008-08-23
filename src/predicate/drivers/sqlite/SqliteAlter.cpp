@@ -22,7 +22,6 @@
 #include "SqliteConnection.h"
 #include <Predicate/Utils.h>
 #include <QHash>
-#include <kGlobal.h>
 
 using namespace Predicate;
 

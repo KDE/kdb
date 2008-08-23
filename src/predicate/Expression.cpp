@@ -24,6 +24,7 @@
 #include "Utils.h"
 #include "parser/sqlParser.h"
 #include "parser/Parser_p.h"
+#include "tools/Static.h"
 
 #include <ctype.h>
 
@@ -725,18 +726,18 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
                     firstField = f;
                 } else if (f->table() != firstField->table()) {
                     //ambiguous field name
-                    parseInfo.errMsg = tr("Ambiguous field name");
-                    parseInfo.errDescr = tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
-                                              "Use \"<tableName>.%4\" notation to specify table name.",
-                                              firstField->table()->name(), f->table()->name(),
+                    parseInfo.errMsg = QObject::tr("Ambiguous field name");
+                    parseInfo.errDescr = QObject::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
+                                              "Use \"<tableName>.%4\" notation to specify table name.")
+                                              .arg(firstField->table()->name(), f->table()->name(),
                                               fieldName, fieldName);
                     return false;
                 }
             }
         }
         if (!firstField) {
-            parseInfo.errMsg = tr("Field not found");
-            parseInfo.errDescr = tr("Table containing \"%1\" field not found", fieldName);
+            parseInfo.errMsg = QObject::tr("Field not found");
+            parseInfo.errDescr = QObject::tr("Table containing \"%1\" field not found").arg(fieldName);
             return false;
         }
         //ok
@@ -762,9 +763,9 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
             PreDbg << " --" << "covered by " << tableAlias << " alias" << endl;
         }
         if (covered) {
-            parseInfo.errMsg = tr("Could not access the table directly using its name");
-            parseInfo.errDescr = tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
-                                      "you can write \"%3\"", tableName, tableName + "." + fieldName, tableAlias + "." + QString(fieldName));
+            parseInfo.errMsg = QObject::tr("Could not access the table directly using its name");
+            parseInfo.errDescr = QObject::tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
+                                      "you can write \"%3\"").arg(tableName, tableName + "." + fieldName, tableAlias + "." + QString(fieldName));
             return false;
         }
     }
@@ -781,8 +782,8 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
     }
 
     if (!ts) {
-        parseInfo.errMsg = tr("Table not found");
-        parseInfo.errDescr = tr("Unknown table \"%1\"", tableName);
+        parseInfo.errMsg = QObject::tr("Table not found");
+        parseInfo.errDescr = QObject::tr("Unknown table \"%1\"").arg(tableName);
         return false;
     }
 
@@ -795,8 +796,8 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
     //it's a table.*
     if (fieldName == "*") {
         if (positionsList.count() > 1) {
-            parseInfo.errMsg = tr("Ambiguous \"%1.*\" expression", tableName);
-            parseInfo.errDescr = tr("More than one \"%1\" table or alias defined", tableName);
+            parseInfo.errMsg = QObject::tr("Ambiguous \"%1.*\" expression").arg(tableName);
+            parseInfo.errDescr = QObject::tr("More than one \"%1\" table or alias defined").arg(tableName);
             return false;
         }
         tableForQueryAsterisk = ts;
@@ -807,8 +808,8 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
 // PreDbg << " --it's a table.name" << endl;
     Field *realField = ts->field(fieldName);
     if (!realField) {
-        parseInfo.errMsg = tr("Field not found");
-        parseInfo.errDescr = tr("Table \"%1\" has no \"%2\" field", tableName, fieldName);
+        parseInfo.errMsg = QObject::tr("Field not found");
+        parseInfo.errDescr = QObject::tr("Table \"%1\" has no \"%2\" field").arg(tableName, fieldName);
         return false;
     }
 
@@ -820,9 +821,9 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
         if (otherTS->field(fieldName))
             numberOfTheSameFields++;
         if (numberOfTheSameFields > 1) {
-            parseInfo.errMsg = tr("Ambiguous \"%1.%2\" expression", tableName, fieldName);
-            parseInfo.errDescr = tr("More than one \"%1\" table or alias defined containing \"%2\" field",
-                                      tableName, fieldName);
+            parseInfo.errMsg = QObject::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName);
+            parseInfo.errDescr = QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field")
+                                      .arg(tableName, fieldName);
             return false;
         }
     }

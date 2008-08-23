@@ -103,8 +103,8 @@ QString ConnectionData::serverInfoString(bool addUser) const
 
     DriverManager man;
     if (!driverName.isEmpty()) {
-        Driver::Info info = man.driverInfo(driverName);
-        if (!info.name.isEmpty() && info.fileBased)
+        const Driver::Info info = man.driverInfo(driverName);
+        if (info.isValid() && info.isFileBased())
             return QString("<") + i18nFile + ">";
     }
 
