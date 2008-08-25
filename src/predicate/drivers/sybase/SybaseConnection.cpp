@@ -184,10 +184,10 @@ bool SybaseConnection::drv_getTablesList(QStringList &list)
     return queryStringList("Select name from sysobjects where type='U'", list);
 }
 
-PreparedStatement::Ptr SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
+PreparedStatement SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
         FieldList& fields)
 {
-    return PreparedStatement::Ptr(new SybasePreparedStatement(type, *d, fields));
+    return SybasePreparedStatement(type, *d, fields);
 }
 
 bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList& fields)

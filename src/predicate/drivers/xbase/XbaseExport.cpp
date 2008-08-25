@@ -104,7 +104,7 @@ char xBaseExportPrivate::type(Predicate::Field::Type fieldType)
 
 bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicate::RecordData* recordData ) {
 
-// 	kDebug()<<recordData->debugString();
+// 	PreDrvDbg<<recordData->debugString();
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toAscii();
   xbDbf* table = xbase.GetDbfPtr( pathNameBa.constData() );
@@ -120,19 +120,19 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicat
     // we use size()+1 as size to accomodate `\0`
     table->UpdateMemoData(i, stringData.size()+1, stringData.constData(), F_SETLKW );
   #else
-    kDebug()<<"XB_MEMO_FIELDS support disabled during compilation of XBase libraries";
+    PreDrvDbg<<"XB_MEMO_FIELDS support disabled during compilation of XBase libraries";
   #endif
   } else {
     if ((returnCode = table->PutField( i, stringData.constData())) != XB_NO_ERROR ) {
       switch(returnCode) {
       case XB_INVALID_FIELDNO:
-        kDebug()<<"Invalid field number "<<i;
+        PreDrvDbg<<"Invalid field number "<<i;
         return false;
       case XB_INVALID_DATA:
-        kDebug()<<"Invalid data "<<stringData;
+        PreDrvDbg<<"Invalid data "<<stringData;
         return false;
       default:
-        kDebug()<<"Error number "<<returnCode<<" has occured";
+        PreDrvDbg<<"Error number "<<returnCode<<" has occured";
         return false;
     }
     }
@@ -140,13 +140,13 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicat
   }
 
   if((returnCode = table->AppendRecord()) != XB_NO_ERROR) {
-    kDebug() << "\nxBase Error " << returnCode << " appending data record.";
+    PreDrvDbg << "\nxBase Error " << returnCode << " appending data record.";
     return false;
   }
 
 // 	// for debugging purposes only
 // 	for ( uint i=0; i< (uint)recordData->size(); ++i ) {
-// 		kDebug()<<table->GetField(i);
+// 		PreDrvDbg<<table->GetField(i);
 // 	}
 
   return true;
@@ -221,7 +221,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, Predicate
     if (f->isUniqueKey() || f->isPrimaryKey()) {
 
       if ((returnCode = index.CreateIndex(indexNameBa.constData(), fieldNameBa.constData(), XB_UNIQUE, XB_OVERLAY)) != XB_NO_ERROR ) {
-        kDebug()<<"Couldn't create unique index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
+        PreDrvDbg<<"Couldn't create unique index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
         return false;
       }
       index.CloseIndex();
@@ -229,7 +229,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, Predicate
     } else if ( f->isIndexed() ) {
 
       if ((returnCode = index.CreateIndex(indexNameBa.constData(), fieldNameBa.constData(), XB_NOT_UNIQUE, XB_OVERLAY)) != XB_NO_ERROR ) {
-        kDebug()<<"Couldn't create index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
+        PreDrvDbg<<"Couldn't create index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
         return false;
       }
       index.CloseIndex();
@@ -259,7 +259,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   Predicate::DriverManager drvManager;
 
   if (!m_migrateData) {
-    kDebug()<<"Migration Data not set yet !!";
+    PreDrvDbg<<"Migration Data not set yet !!";
     result->setStatus(&drvManager, tr("Data not set for migration"));
     return false;
   }
@@ -274,7 +274,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   // connect to destination database
   if (!dest_connect()) {
-    kDebug()<<"Couldn't connect to destination database";
+    PreDrvDbg<<"Couldn't connect to destination database";
     if (result)
       result->setStatus(tr("Could not connect to data source \"%1\".",
         m_migrateData->destination->connectionData()->serverInfoString()), "");
@@ -284,16 +284,16 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   Predicate::Connection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
 
   if (!sourceConn || sourceDriver->error()) {
-    kDebug()<<"Export failed";
+    PreDrvDbg<<"Export failed";
     return false;
   }
   if (!sourceConn->connect()) {
-    kDebug()<<"Export failed.Could not connect";
+    PreDrvDbg<<"Export failed.Could not connect";
     return false;
   }
 
   if (!sourceConn->useDatabase(m_migrateData->sourceName)) {
-    kDebug()<<"Couldn't use database "<<m_migrateData->sourceName;
+    PreDrvDbg<<"Couldn't use database "<<m_migrateData->sourceName;
     return false;
   }
 
@@ -301,7 +301,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   // Check if there are any tables
   if (tables.isEmpty()) {
-    kDebug() << "There were no tables to export" << endl;
+    PreDrvDbg << "There were no tables to export" << endl;
     if (result)
       result->setStatus(
         tr("No tables to export found in data source \"%1\".",
@@ -327,7 +327,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
     if (m_migrateData->keepData) {
       if (!dest_copyTable(tableCaption, sourceConn, tableSchema)) {
-        kDebug() << "Failed to copy table " << tableCaption << endl;
+        PreDrvDbg << "Failed to copy table " << tableCaption << endl;
         if (result)
           result->setStatus(sourceConn,
               tr("Could not copy table \"%1\" to destination database.", tableCaption));
@@ -412,7 +412,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, Predicate::Table
   xBaseTable->SetVersion( 4 ); // create dbase IV style files
   xbShort returnCode;
   if (( returnCode = xBaseTable->CreateDatabase( pathNameBa.constData() , xBaseTableSchema, XB_OVERLAY ))  != XB_NO_ERROR ) {
-    kDebug()<<"Error creating table "<<originalName<<" Error Code "<<returnCode;
+    PreDrvDbg<<"Error creating table "<<originalName<<" Error Code "<<returnCode;
     return false;
   }
 
@@ -445,7 +445,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connect
       return false;
     }
     if (!d->appendRecord(srcTableName, record)) {
-      kDebug()<<"Couldn't append record";
+      PreDrvDbg<<"Couldn't append record";
       return false;
     }
 

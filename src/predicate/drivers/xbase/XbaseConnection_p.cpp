@@ -78,7 +78,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
   temporaryKexiFile.setAutoRemove( false );
 
   if ( !temporaryKexiFile.open() ) {
-    kDebug()<<"Couldn't create .kexi file for exporting from xBase to .kexi";
+    PreDrvDbg<<"Couldn't create .kexi file for exporting from xBase to .kexi";
     return false;
   }
 
@@ -90,7 +90,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
   // set destination file name here.
   kexiConnectionData->driverName = Predicate::defaultFileBasedDriverName();
   kexiConnectionData->setFileName( tempDatabase );
-  kDebug() << "Current file name: " << tempDatabase << endl;
+  PreDrvDbg << "Current file name: " << tempDatabase << endl;
 
 
   QString sourceDriverName = "xbase";
@@ -98,7 +98,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
   KexiMigration::KexiMigrate* sourceDriver = 0;
   sourceDriver = xBase2KexiMigrateManager.driver( sourceDriverName );
   if(!sourceDriver || xBase2KexiMigrateManager.error()) {
-    kDebug() << "Import migrate driver error..." << endl;
+    PreDrvDbg << "Import migrate driver error..." << endl;
     return false;
   }
 
@@ -113,7 +113,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
   sourceDriver->setData(md);
   if ( !sourceDriver->performImport() ) {
-    kDebug()<<"Import failed";
+    PreDrvDbg<<"Import failed";
     return false;
   }
 

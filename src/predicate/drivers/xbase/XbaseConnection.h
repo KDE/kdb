@@ -41,7 +41,7 @@ class xBaseConnection : public Connection
     virtual Cursor* prepareQuery( const QString& statement = QString(), uint cursor_options = 0 );
     virtual Cursor* prepareQuery( QuerySchema& query, uint cursor_options = 0 );
 
-    virtual PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type, 
+    virtual PreparedStatement prepareStatement(PreparedStatement::StatementType type, 
       FieldList& fields);
 
   protected:

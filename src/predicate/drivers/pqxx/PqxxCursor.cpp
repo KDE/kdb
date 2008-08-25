@@ -217,7 +217,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
             return QString((*m_res)[at()][pos].c_str()).toLower() == "t" ? QVariant(true) : QVariant(false);
         } else if (f->typeGroup() == Field::BLOBGroup) {
 //   pqxx::result::field r = (*m_res)[at()][pos];
-//   kDebug() << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size() << endl;
+//   PreDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size() << endl;
             return ::pgsqlByteaToByteArray((*m_res)[at()][pos]);
         } else {
             return pgsqlCStrToVariant((*m_res)[at()][pos]);
