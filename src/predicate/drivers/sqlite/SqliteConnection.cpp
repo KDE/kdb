@@ -22,11 +22,8 @@
 #include "sqliteCursor.h"
 #include "SqlitePreparedStatement.h"
 
-#include "sqlite.h"
-
-#ifndef SQLITE2
-# include "kexisql.h" //for isReadOnly()
-#endif
+//#include "kexisql.h" //for isReadOnly()
+#include <sqlite3.h>
 
 #include <Predicate/Driver.h>
 #include <Predicate/Cursor.h>
@@ -37,12 +34,11 @@
 #include <qdir.h>
 #include <qregexp.h>
 
-#include <kgenericfactory.h>
 #include <QtDebug>
 
 //remove debug
 #undef PreDrvDbg
-#define PreDrvDbg if (0) kDebug()
+#define PreDrvDbg if (true); else qDebug()
 
 using namespace Predicate;
 
@@ -52,9 +48,7 @@ SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
         , data_owned(true)
         , errmsg_p(0)
         , res(SQLITE_OK)
-#ifdef SQLITE3
         , result_name(0)
-#endif
 {
 }
 
@@ -74,12 +68,10 @@ void SQLiteConnectionInternal::storeResult()
 {
     if (errmsg_p) {
         errmsg = errmsg_p;
-        sqlite_free(errmsg_p);
+        sqlite3_free(errmsg_p);
         errmsg_p = 0;
     }
-#ifdef SQLITE3
     errmsg = (data && res != SQLITE_OK) ? sqlite3_errmsg(data) : 0;
-#endif
 }
 
 /*! Used by driver */
@@ -170,14 +162,6 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 {
     Q_UNUSED(dbName);
 // PreDrvDbg << "drv_useDatabase(): " << data()->fileName() << endl;
-#ifdef SQLITE2
-    Q_UNUSED(cancelled);
-    Q_UNUSED(msgHandler);
-    d->data = sqlite_open(QFile::encodeName(data()->fileName()), 0/*mode: unused*/,
-                          &d->errmsg_p);
-    d->storeResult();
-    return d->data != 0;
-#else //SQLITE3
     //TODO: perhaps allow to use sqlite3_open16() as well for SQLite ~ 3.3 ?
 //! @todo add option (command line or in kexirc?)
     int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
@@ -233,7 +217,6 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                  + tr("Check the file's permissions and whether it is already opened and locked by another application."));
     }
     return d->res == SQLITE_OK;
-#endif
 }
 
 bool SQLiteConnection::drv_closeDatabase()
@@ -241,12 +224,7 @@ bool SQLiteConnection::drv_closeDatabase()
     if (!d->data)
         return false;
 
-#ifdef SQLITE2
-    sqlite_close(d->data);
-    d->data = 0;
-    return true;
-#else
-    const int res = sqlite_close(d->data);
+    const int res = sqlite3_close(d->data);
     if (SQLITE_OK == res) {
         d->data = 0;
         return true;
@@ -259,7 +237,6 @@ bool SQLiteConnection::drv_closeDatabase()
 #endif
     }
     return false;
-#endif
 }
 
 bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
@@ -301,7 +278,7 @@ bool SQLiteConnection::drv_executeSQL(const QString& statement)
     Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement);
 #endif
 
-    d->res = sqlite_exec(
+    d->res = sqlite3_exec(
                  d->data,
                  (const char*)d->temp_st,
                  0/*callback*/,
@@ -316,7 +293,7 @@ bool SQLiteConnection::drv_executeSQL(const QString& statement)
 
 quint64 SQLiteConnection::drv_lastInsertRowID()
 {
-    return (quint64)sqlite_last_insert_rowid(d->data);
+    return (quint64)sqlite3_last_insert_rowid(d->data);
 }
 
 int SQLiteConnection::serverResult()
@@ -327,11 +304,7 @@ int SQLiteConnection::serverResult()
 QString SQLiteConnection::serverResultName()
 {
     QString r =
-#ifdef SQLITE2
-        QString::fromLatin1(sqlite_error_string(d->res));
-#else //SQLITE3
         QString(); //fromLatin1( d->result_name );
-#endif
     return r.isEmpty() ? Connection::serverResultName() : r;
 }
 
@@ -340,11 +313,7 @@ void SQLiteConnection::drv_clearServerResult()
     if (!d)
         return;
     d->res = SQLITE_OK;
-#ifdef SQLITE2
-    d->errmsg_p = 0;
-#else
 // d->result_name = 0;
-#endif
 }
 
 QString SQLiteConnection::serverErrorMsg()
@@ -352,65 +321,17 @@ QString SQLiteConnection::serverErrorMsg()
     return d->errmsg.isEmpty() ? Connection::serverErrorMsg() : d->errmsg;
 }
 
-PreparedStatement::Ptr SQLiteConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList& fields)
+PreparedStatementInterface* SQLiteConnection::prepareStatementInternal(
+    PreparedStatement::Type type,
+    FieldList& fields, const QStringList& whereFieldNames)
 {
-//#ifndef SQLITE2 //TEMP IFDEF!
-    return PreparedStatement::Ptr(new SQLitePreparedStatement(type, *d, fields));
-//#endif
+    return new SQLitePreparedStatement(type, *d, fields, whereFieldNames);
 }
 
 bool SQLiteConnection::isReadOnly() const
 {
-#ifdef SQLITE2
-    return Connection::isReadOnly();
-#else
-    return (d->data ? sqlite3_is_readonly(d->data) : false)
-           || Connection::isReadOnly();
-#endif
+    return false
+//! @todo port
+    //return (d->data ? sqlite3_is_readonly(d->data) : false)
+    //       || Connection::isReadOnly();
 }
-
-#ifdef SQLITE2
-bool SQLiteConnection::drv_alterTableName(TableSchema& tableSchema, const QString& newName, bool replace)
-{
-    const QString oldTableName = tableSchema.name();
-    const bool destTableExists = this->tableSchema(newName) != 0;
-
-    //1. drop the table
-    if (destTableExists) {
-        if (!replace)
-            return false;
-        if (!drv_dropTable(newName))
-            return false;
-    }
-
-    //2. create a copy of the table
-//TODO: move this code to drv_copyTable()
-    tableSchema.setName(newName);
-
-//helper:
-#define drv_alterTableName_ERR \
-    tableSchema.setName(oldTableName) //restore old name
-
-    if (!drv_createTable(tableSchema)) {
-        drv_alterTableName_ERR;
-        return false;
-    }
-
-//TODO indices, etc.???
-
-    // 3. copy all rows to the new table
-    if (!executeSQL(QString::fromLatin1("INSERT INTO %1 SELECT * FROM %2")
-                    .arg(escapeIdentifier(tableSchema.name())).arg(escapeIdentifier(oldTableName)))) {
-        drv_alterTableName_ERR;
-        return false;
-    }
-
-    // 4. drop old table.
-    if (!drv_dropTable(oldTableName)) {
-        drv_alterTableName_ERR;
-        return false;
-    }
-    return true;
-}
-#endif

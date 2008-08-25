@@ -49,7 +49,7 @@ struct SQLiteTypeAffinityInternal {
     QHash<Field::Type, SQLiteTypeAffinity> affinity;
 };
 
-K_GLOBAL_STATIC(SQLiteTypeAffinityInternal, Predicate_SQLite_affinityForType)
+PREDICATE_GLOBAL_STATIC(SQLiteTypeAffinityInternal, Predicate_SQLite_affinityForType)
 
 //! \return SQLite type affinity for \a type
 //! See doc/dev/alter_table_type_conversions.ods, page 2 for more info

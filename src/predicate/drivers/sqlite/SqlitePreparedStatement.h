@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,32 +18,28 @@
 */
 
 #ifndef PREDICATE_SQLITEPREPAREDSTATEMENT_H
-//&& !defined SQLITE2
 #define PREDICATE_SQLITEPREPAREDSTATEMENT_H
 
-#include <Predicate/PreparedStatement.h>
+#include <Predicate/Interfaces/PreparedStatementInterface.h>
 #include "SqliteConnection_p.h"
 
 namespace Predicate
 {
 
-/*! Implementation of prepared statements for SQLite driver. */
-class SQLitePreparedStatement : public PreparedStatement, SQLiteConnectionInternal
+/*! Implementation of prepared statements for the SQLite driver. */
+class SQLitePreparedStatement : public PreparedStatementInterface, SQLiteConnectionInternal
 {
 public:
-    SQLitePreparedStatement(StatementType type, ConnectionInternal& conn,
-                            FieldList& fields);
+    SQLitePreparedStatement(ConnectionInternal& conn);
 
     virtual ~SQLitePreparedStatement();
 
-    virtual bool execute();
-
-#ifdef SQLITE2
-    sqlite_vm *prepared_st_handle;
-#else //SQLITE3
     sqlite3_stmt *prepared_st_handle;
-#endif
-bool m_resetRequired : 1;
+    bool m_resetRequired : 1;
+protected:
+    virtual bool prepare(const QByteArray& statement);
+    virtual bool execute(const PreparedStatement::Arguments& args);
+
 };
 
 }

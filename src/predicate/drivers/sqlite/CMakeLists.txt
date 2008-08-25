@@ -19,6 +19,13 @@ set(predicate_sqlite3_SRCS
    SqliteAlter.cpp
 )
 
+set(predicate_sqlite3_MOC_SRCS
+   SqliteConnection.h
+   SqliteDriver.h
+   SqliteVacuum.h
+)
+
+qt_wrap_cpp(predicate_sqlite3 predicate_sqlite3_SRCS ${predicate_sqlite3_MOC_SRCS})
 
 add_library(predicate_sqlite3 SHARED ${predicate_sqlite3_SRCS})
 

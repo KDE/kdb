@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,50 +24,40 @@
 
 using namespace Predicate;
 
-SQLitePreparedStatement::SQLitePreparedStatement(StatementType type, ConnectionInternal& conn,
-        FieldList& fields)
-        : Predicate::PreparedStatement(type, conn, fields)
+SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal& conn)
+        : PreparedStatementInterface()
         , SQLiteConnectionInternal(conn.connection)
         , prepared_st_handle(0)
         , m_resetRequired(false)
 {
     data_owned = false;
     data = dynamic_cast<Predicate::SQLiteConnectionInternal&>(conn).data; //copy
+}
 
-    temp_st = generateStatementString();
-#ifdef SQLITE2
-    //! @todo
-#else
-    if (!temp_st.isEmpty()) {
-        res = sqlite3_prepare(
-                  data, /* Database handle */
-                  temp_st, //const char *zSql,       /* SQL statement, UTF-8 encoded */
-                  temp_st.length(), //int nBytes,             /* Length of zSql in bytes. */
-                  &prepared_st_handle, //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-                  0 //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
-              );
-        if (SQLITE_OK != res) {
+bool SQLitePreparedStatement::prepare(const QByteArray& statement)
+{
+    res = sqlite3_prepare(
+              data, /* Database handle */
+              temp_st, //const char *zSql,       /* SQL statement, UTF-8 encoded */
+              temp_st.length(), //int nBytes,             /* Length of zSql in bytes. */
+              &prepared_st_handle, //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
+              0 //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+          );
+    if (SQLITE_OK == res)
+        return true;
+
 //! @todo copy error msg
-        }
-    }
-#endif
+    return false
 }
 
 SQLitePreparedStatement::~SQLitePreparedStatement()
 {
-#ifdef SQLITE2
-//! @todo
-#else
     sqlite3_finalize(prepared_st_handle);
     prepared_st_handle = 0;
-#endif
 }
 
-bool SQLitePreparedStatement::execute()
+bool SQLitePreparedStatement::execute(const Arguments& args)
 {
-#ifdef SQLITE2
-//! @todo
-#else
     if (!prepared_st_handle)
         return false;
     if (m_resetRequired) {
@@ -82,19 +72,19 @@ bool SQLitePreparedStatement::execute()
     //for INSERT, we're iterating over inserting values
     //for SELECT, we're iterating over WHERE conditions
     const Field::List *fieldList = 0;
-    if (m_type == SelectStatement)
-        fieldList = m_whereFields;
-    else if (m_type == InsertStatement)
-        fieldList = m_fields->fields();
+    if (d->type == SelectStatement)
+        fieldList = &d->whereFields;
+    else if (d->type == InsertStatement)
+        fieldList = d->fields->fields();
     else
         assert(0); //impl. error
 
     int arg = 1; //arg index counted from 1
     Field::ListIterator itFields(fieldList->constBegin());
-    for (QList<QVariant>::ConstIterator it = m_args.constBegin();
+    for (QList<QVariant>::ConstIterator it = args.constBegin();
             itFields != fieldList->constEnd(); ++it, ++itFields, arg++) {
         Predicate::Field *field = *itFields;
-        if (it == m_args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
+        if (it == args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
             res = sqlite3_bind_null(prepared_st_handle, arg);
             if (SQLITE_OK != res) {
                 //! @todo msg?
@@ -222,14 +212,13 @@ bool SQLitePreparedStatement::execute()
     //real execution
     res = sqlite3_step(prepared_st_handle);
     m_resetRequired = true;
-    if (m_type == InsertStatement && res == SQLITE_DONE) {
+    if (d->type == InsertStatement && res == SQLITE_DONE) {
         return true;
     }
-    if (m_type == SelectStatement) {
+    if (d->type == SelectStatement) {
         //fetch result
 
         //todo
     }
-#endif
     return false;
 }

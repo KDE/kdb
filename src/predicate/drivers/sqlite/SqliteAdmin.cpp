@@ -20,12 +20,10 @@
 #include <qdir.h>
 
 #include "SqliteAdmin.h"
+#include "SqliteVacuum.h"
+
 #include <Predicate/DriverManager.h>
 #include <Predicate/Driver_p.h>
-
-#ifndef SQLITE2
-# include "SqliteVacuum.h"
-#endif
 
 SQLiteAdminTools::SQLiteAdminTools()
         : Predicate::AdminTools()
@@ -39,11 +37,6 @@ SQLiteAdminTools::~SQLiteAdminTools()
 bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
 {
     clearError();
-#ifdef SQLITE2
-    Q_UNUSED(data);
-    Q_UNUSED(databaseName);
-    return false;
-#else
     Predicate::DriverManager manager;
     Predicate::Driver *drv = manager.driver(data.driverName);
     QString title(tr("Could not compact database \"%1\".", QDir::convertSeparators(databaseName)));
@@ -58,6 +51,5 @@ bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QStri
         return false;
     } else //success or cancelled
         return true;
-#endif
 }
 
