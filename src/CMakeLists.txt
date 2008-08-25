@@ -5,7 +5,7 @@ set(GENERIC_PREDICATE_LIB_SOVERSION "0")
 
 find_package(Qt4 REQUIRED)
 
-add_subdirectory( tools drivers )
+add_subdirectory( drivers )
 
 include_directories(
   ${CMAKE_SOURCE_DIR}
@@ -48,6 +48,21 @@ SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.h GEN
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp GENERATED)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
+
+########### generate transliteration table ###############
+
+INCLUDE (MacroAdditionalCleanFiles)
+FIND_PROGRAM(BZIP2_EXECUTABLE NAMES bzip2)
+
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
+  COMMAND ${BZIP2_EXECUTABLE} ARGS -dc -k
+    ${CMAKE_SOURCE_DIR}/Predicate/tools/transliteration/transliteration_table.cpp.bz2
+    > ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
+  DEPENDS ${CMAKE_SOURCE_DIR}/Predicate/tools/transliteration/transliteration_table.cpp.bz2
+)
+
+macro_additional_clean_files( ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp )
 
 ########### next target ###############
 
@@ -95,14 +110,26 @@ set(predicate_LIB_SRCS
    tools/Identifier.cpp
    tools/Utils.cpp
    tools/Static.cpp
-   ${CMAKE_CURRENT_BINARY_DIR}/tools/transliteration/transliteration_table.cpp
+   ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
 #TODO tools/debuggui.cpp
 #TODO tools/SimpleCommandLineApp.cpp
 )
 
+set(predicate_MOC_SRCS
+  DriverManager_p.h
+  Cursor.h
+  Utils_p.h
+  Driver.h
+  Connection.h
+)
+
+qt_wrap_cpp(predicate predicate_LIB_SRCS ${predicate_MOC_SRCS})
+
 add_library(predicate SHARED ${predicate_LIB_SRCS})
 target_link_libraries(predicate
+  ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
+  ${QT_QTXML_LIBRARY}
 #  kexiutils 
 )
 

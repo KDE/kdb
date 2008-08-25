@@ -28,6 +28,8 @@
 #include <QtCore/QVariant>
 #include <QtGui/QWidget>
 
+#include <Predicate/predicate_export.h>
+
 namespace Predicate
 {
 
@@ -151,7 +153,7 @@ public:
      \a message should contain translated string.
      Value of ButtonCode is returned.
      Reimplement this. This implementation does nothing, just returns \a defaultResult. */
-    virtual ButtonCode askQuestion(
+    virtual MessageHandler::ButtonCode askQuestion(
             MessageHandler::QuestionType messageType,
             const QString& message,
             const QString &caption = QString(),

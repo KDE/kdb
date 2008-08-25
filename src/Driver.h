@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -414,10 +414,10 @@ PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
 //    public: \
 //    virtual DatabaseVersionInfo version() const;
 
+#define PREDICATE_DRIVER_INTERFACE_ID \
+    "org.kde.Predicate.Driver/" PREDICATE_VERSION_MAJOR_STRING "." PREDICATE_VERSION_MINOR_STRING
+
 //! Declare Interface for Predicate drivers, loadable as Qt 4 plugins
-Q_DECLARE_INTERFACE(Predicate::Driver,
-    "org.kde.Predicate.Driver/" 
-    PREDICATE_VERSION_MAJOR_STRING "." PREDICATE_VERSION_MINOR_STRING
-)
+Q_DECLARE_INTERFACE(Predicate::Driver, PREDICATE_DRIVER_INTERFACE_ID)
 
 #endif

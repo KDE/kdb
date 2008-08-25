@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,97 +18,106 @@
 */
 
 #include "PreparedStatement.h"
-#include "Connection.h"
-#include "Connection_p.h"
+#include "Interfaces/PreparedStatementInterface.h"
+#include "TableSchema.h"
+
 #include <QtDebug>
 
 using namespace Predicate;
 
-PreparedStatement::PreparedStatement(StatementType type, ConnectionInternal& conn,
-                                     FieldList& fields, const QStringList& where)
-        : KShared()
-        , m_type(type)
-        , m_fields(&fields)
-        , m_where(where)
-        , m_whereFields(0)
+PreparedStatement::Data::~Data()
 {
-    Q_UNUSED(conn);
+    delete iface;
 }
 
 PreparedStatement::~PreparedStatement()
 {
-    delete m_whereFields;
+}
+
+bool PreparedStatement::execute( const Arguments& args )
+{
+    if (d->dirty) {
+        const QByteArray s( generateStatementString() );
+//! @todo error message?
+        if (s.isEmpty())
+            return false;
+        if (!d->iface->prepare(s))
+            return false;
+        d->dirty = false;
+    }
+    return d->iface->execute(args);
 }
 
 QByteArray PreparedStatement::generateStatementString()
 {
     QByteArray s;
     s.reserve(1024);
-    if (m_type == SelectStatement) {
-//! @todo only tables and trivial queries supported for select...
-        s = "SELECT ";
-        bool first = true;
-        foreach(Field *f, *m_fields->fields()) {
-            if (first)
-                first = false;
-            else
-                s.append(", ");
-            s.append(f->name().toLatin1());
-        }
-        if (!m_where.isEmpty())
-            s.append(" WHERE ");
-        delete m_whereFields;
-        m_whereFields = new Field::List();
-        first = true;
-        foreach(const QString& whereItem, m_where) {
-            if (first)
-                first = false;
-            else
-                s.append(" AND ");
-            Field *f = m_fields->field(whereItem);
-            if (!f) {
-                PreWarn << "PreparedStatement::generateStatementString(): no '"
-                << whereItem << "' field found" << endl;
-                continue;
-            }
-            m_whereFields->append(f);
-            s.append(whereItem.toLatin1());
-            s.append("=?");
-        }
-    } else if (m_type == InsertStatement /*&& dynamic_cast<TableSchema*>(m_fields)*/) {
-        //! @todo only tables supported for insert; what about views?
-
-        TableSchema *table = m_fields->fieldCount() > 0 ? m_fields->field(0)->table() : 0;
-        if (!table)
-            return ""; //err
-
-        QByteArray namesList;
-        bool first = true;
-        const bool allTableFieldsUsed = dynamic_cast<TableSchema*>(m_fields); //we are using a selection of fields only
-        foreach(Field* f, *m_fields->fields()) {
-            if (first) {
-                s.append("?");
-                if (!allTableFieldsUsed)
-                    namesList = f->name().toLatin1();
-                first = false;
-            } else {
-                s.append(",?");
-                if (!allTableFieldsUsed)
-                    namesList.append(QByteArray(", ") + f->name().toLatin1());
-            }
-        }
-        s.append(")");
-        s.prepend(QByteArray("INSERT INTO ") + table->name().toLatin1()
-                  + (allTableFieldsUsed ? "" : (" (" + namesList + ")"))
-                  + " VALUES (");
-    }
+    if (d->type == Select)
+        generateSelectStatementString(s);
+    else if (d->type == Insert)
+        generateInsertStatementString(s);
     return s;
 }
 
-PreparedStatement& PreparedStatement::operator<< (const QVariant& value)
+void PreparedStatement::generateSelectStatementString(QByteArray& s)
 {
-    m_args.append(value);
-    return *this;
+//! @todo only tables and trivial queries supported for select...
+    s = "SELECT ";
+    bool first = true;
+    foreach(Field *f, *d->fields.fields()) {
+        if (first)
+            first = false;
+        else
+            s.append(", ");
+        s.append(f->name().toUtf8());
+    }
+    // create WHERE
+    first = true;
+    foreach(const QString& whereItem, d->whereFieldNames) {
+        if (first) {
+            s.append(" WHERE ");
+            first = false;
+        }
+        else
+            s.append(" AND ");
+        Field *f = d->fields.field(whereItem);
+        if (!f) {
+            PreWarn << QString("field \"%1\" not found, aborting").arg(whereItem);
+            s.clear();
+            return;
+        }
+        d->whereFields->append(f);
+        s.append(whereItem.toUtf8() + "=?");
+    }
+}
+
+void PreparedStatement::generateInsertStatementString(QByteArray& s)
+{
+    //! @todo only tables supported for insert; what about views?
+    TableSchema *table = d->fields.isEmpty() ? 0 : d->fields.field(0)->table();
+    if (!table)
+        return; //err
+
+    QByteArray namesList;
+    bool first = true;
+    //we are using a selection of fields only
+    const bool allTableFieldsUsed = dynamic_cast<TableSchema*>(&d->fields);
+    foreach(Field* f, *d->fields.fields()) {
+        if (first) {
+            s.append("?");
+            if (!allTableFieldsUsed)
+                namesList = f->name().toUtf8();
+            first = false;
+        } else {
+            s.append(",?");
+            if (!allTableFieldsUsed)
+                namesList.append(QByteArray(", ") + f->name().toUtf8());
+        }
+    }
+    s.append(")");
+    s.prepend(QByteArray("INSERT INTO ") + table->name().toUtf8()
+              + (allTableFieldsUsed ? "" : (" (" + namesList + ")"))
+              + " VALUES (");
 }
 
 /*bool PreparedStatement::insert()
@@ -123,8 +132,3 @@ bool PreparedStatement::select()
 {
   const bool res = m_conn->drv_bindArgumentForPreparedStatement(this, m_args.count()-1);
 }*/
-
-void PreparedStatement::clearArguments()
-{
-    m_args.clear();
-}

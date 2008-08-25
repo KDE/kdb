@@ -26,6 +26,7 @@
 #include <QProgressDialog>
 
 #include "MessageHandler.h"
+#include "ConnectionData.h"
 
 class ConnectionTestThread;
 

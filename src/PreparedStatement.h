@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -22,16 +22,16 @@
 
 #include <QVariant>
 #include <QStringList>
-#include <Predicate/tools/SharedPtr.h>
+#include <QSharedData>
 
-#include "Field.h"
+#include "FieldList.h"
 
 namespace Predicate
 {
 
-class ConnectionInternal;
+//class ConnectionInternal;
 class TableSchema;
-class FieldList;
+class PreparedStatementInterface;
 
 /*! @short Prepared database command for optimizing sequences of multiple database actions
 
@@ -43,7 +43,7 @@ class FieldList;
   To use PreparedStatement, create is using Predicate::Connection:prepareStatement(),
   providing table schema; set up arguments using operator << ( const QVariant& value );
   and call execute() when ready. PreparedStatement objects are accessed
-  using KDE shared pointers, i.e Predicate::PreparedStatement::Ptr, so you do not need
+  using KDE shared pointers, i.e Predicate::PreparedStatement, so you do not need
   to remember about destroying them. However, when underlying Connection object
   is destroyed, PreparedStatement should not be used.
 
@@ -53,8 +53,8 @@ class FieldList;
   \code
   bool insertMultiple(Predicate::Connection &conn, Predicate::TableSchema& tableSchema)
   {
-    Predicate::PreparedStatement::Ptr prepared = conn.prepareStatement(
-      Predicate::PreparedStatement::InsertStatement, tableSchema);
+    Predicate::PreparedStatement statement = conn.prepareStatement(
+      Predicate::PreparedStatement::Insert, tableSchema);
     for (i=0; i<10000; i++) {
       prepared << rand() << getText(i);
       if (!prepared.execute())
@@ -72,46 +72,83 @@ class FieldList;
   Depending on database backend, you can avoid escaping BLOBs.
   See KexiFormView::storeData() for example use.
 */
-class PREDICATE_EXPORT PreparedStatement : public Utils::Shared
+class PREDICATE_EXPORT PreparedStatement
 {
 public:
-    typedef Utils::SharedPtr<PreparedStatement> Ptr;
+    //! Prepared statement arguments used in execute()
+    typedef QList<QVariant> Arguments;
 
     //! Defines type of the prepared statement.
-    enum StatementType {
-        SelectStatement, //!< SELECT statement will be prepared end executed
-        InsertStatement  //!< INSERT statement will be prepared end executed
+    enum Type {
+        Invalid,//!< Used only in invalid statements
+        Select, //!< SELECT statement will be prepared end executed
+        Insert  //!< INSERT statement will be prepared end executed
     };
 
-    //! Creates Prepared statement. In your code use Predicate::Connection:prepareStatement() instead.
-    PreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields,
-                      const QStringList& where = QStringList());
+    //! @internal
+    class Data : public QSharedData {
+    public:
+        Data() : type(Invalid), whereFields(0), dirty(true) {}
+        Data(Type _type, PreparedStatementInterface& _iface, FieldList& _fields,
+             const QStringList& _whereFieldNames)
+            : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
+            , whereFields(0), dirty(true), iface(&_iface)
+        {}
+        ~Data();
+        Type type;
+        FieldList fields;
+        QStringList whereFieldNames;
+        Field::List* whereFields;
+        bool dirty : 1; //!< true if the statement has to be internally 
+                        //!< prepared (possible again) before calling executeInternal()
+        PreparedStatementInterface *iface;
+    };
+
+    //! Creates an invalid prepared statement.
+    PreparedStatement()
+        : d( new Data() )
+    {
+    }
 
     virtual ~PreparedStatement();
 
-    //! Appends argument \a value to the statement.
-    PreparedStatement& operator<< (const QVariant& value);
+    bool isValid() const { return d->type == Invalid; }
 
-    //! Clears arguments of the prepared statement. Usually used after execute()
-    void clearArguments();
+    Type type() const { return d->type; }
+    void setType(Type type) { d->type = type; d->dirty = true; }
 
-    /*! Executes the prepared statement. In most cases you will need to clear
-     arguments after executing, using clearArguments().
+    FieldList fields() const { return d->fields; }
+    void setFields(FieldList& fields) { d->fields = fields; d->dirty = true; }
+
+    QStringList whereFieldNames() const { return d->whereFieldNames; }
+    void setWhereFieldNames(const QStringList& whereFieldNames)
+        { d->whereFieldNames = whereFieldNames; d->dirty = true; }
+
+    /*! Executes the prepared statement using @a args arguments.
      A number arguments set up for the statement must be the same as a number of fields
      defined in the underlying database table.
-     \return false on failure. Detailed error status can be obtained
-     from Predicate::Connection object used to create this statement. */
-    virtual bool execute() = 0;
+     @return false on failure. Detailed error status can be obtained
+     from Predicate::Connection object that was used to create this statement object. */
+    bool execute( const Arguments& args );
 
 protected:
+    //! Creates a new prepared statement. In your code use 
+    //! Users call Predicate::Connection:prepareStatement() instead.
+    PreparedStatement(PreparedStatementInterface& iface, Type type, FieldList& fields,
+                      const QStringList& whereFieldNames = QStringList())
+        : d( new Data(type, iface, fields, whereFieldNames) )
+    {
+    }
+
+    friend class Connection;
+
+private:
 //! @todo is this portable across backends?
     QByteArray generateStatementString();
+    void generateSelectStatementString(QByteArray& s);
+    void generateInsertStatementString(QByteArray& s);
 
-    StatementType m_type;
-    FieldList *m_fields;
-    QList<QVariant> m_args;
-    QStringList m_where;
-    Field::List* m_whereFields;
+    QSharedDataPointer<Data> d;
 };
 
 } //namespace Predicate

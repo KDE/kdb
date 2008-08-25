@@ -41,7 +41,7 @@ extern $decl;
 " > $out_h
 
 echo "$header
-#include \"$out_h\"
+#include \"tools/transliteration/$out_h\"
 $decl = {
 " > $out_cpp
 

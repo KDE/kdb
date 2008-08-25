@@ -102,7 +102,7 @@ private:
  * "SELECT dir.path, media.filename FROM dir, media WHERE dir.id=media.dirId AND media.id=%s"
  * we are able to use the \a Connection::prepareStatement method which takes the type of
  * the statement (in our case \a PreparedStatement::SelectStatement ), a list of fields (in
- * our case dir.path and media.filename) and returns a \a PreparedStatement::Ptr instance.
+ * our case dir.path and media.filename) and returns a \a PreparedStatement instance.
  * By using the \a QuerySchema::addRelationship and \a QuerySchema::addToWhereExpression methods
  * the SQL statement could be extended with relationships and WHERE expressions.
  *

@@ -60,6 +60,11 @@ public:
         return m_fields.count();
     }
 
+    /*! \return true if the list is empty. */
+    inline bool isEmpty() const {
+        return m_fields.isEmpty();
+    }
+
     /*! Adds \a field at the and of field list. */
     FieldList& addField(Field *field);
 

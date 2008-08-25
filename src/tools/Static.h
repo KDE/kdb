@@ -1,28 +1,34 @@
-/* This file is part of the KDE libraries
+/* This file is part of the KDE project
    Copyright (C) 1999 Sirtaj Singh Kanq <taj@kde.org>
    Copyright (C) 2007 Matthias Kretz <kretz@kde.org>
+   Copyright (C) 2008 Jarosław Staniek <staniek@kde.org>
 
    Based on kdelibs/kdecore/kernel/kstatic.*
 
-   This library is free software; you can redistribute it and/or
+   This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
+   This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
+   along with this program; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+ * Boston, MA 02110-1301, USA.
 */
+
 #ifndef PREDICATE_TOOLS_STATIC_H
 #define PREDICATE_TOOLS_STATIC_H
 
 #include <QtCore/QAtomicPointer>
+#include <QtCore/QString>
 #include <sys/types.h>
+
+#include <Predicate/predicate_export.h>
 
 namespace Predicate
 {
@@ -46,20 +52,20 @@ namespace Utils
 /**
  * @internal
  */
-typedef void (*KdeCleanUpFunction)();
+typedef void (*CleanUpFunction)();
 
 /**
  * @internal
  *
- * Helper class for K_GLOBAL_STATIC to clean up the object on library unload or application
+ * Helper class for PREDICATE_GLOBAL_STATIC to clean up the object on library unload or application
  * shutdown.
  */
-class KCleanUpGlobalStatic
+class CleanUpGlobalStatic
 {
     public:
-        KdeCleanUpFunction func;
+        CleanUpFunction func;
 
-        inline ~KCleanUpGlobalStatic() { func(); }
+        inline ~CleanUpGlobalStatic() { func(); }
 };
 
 #ifdef Q_CC_MSVC
@@ -69,14 +75,14 @@ class KCleanUpGlobalStatic
  * MSVC seems to give anonymous structs the same name which fails at link time. So instead we name
  * the struct and hope that by adding the line number to the name it's unique enough to never clash.
  */
-# define K_GLOBAL_STATIC_STRUCT_NAME(NAME) _k_##NAME##__LINE__
+# define PREDICATE_GLOBAL_STATIC_STRUCT_NAME(NAME) _k_##NAME##__LINE__
 #else
 /**
  * @internal
  *
- * Make the struct of the K_GLOBAL_STATIC anonymous.
+ * Make the struct of the PREDICATE_GLOBAL_STATIC anonymous.
  */
-# define K_GLOBAL_STATIC_STRUCT_NAME(NAME)
+# define PREDICATE_GLOBAL_STATIC_STRUCT_NAME(NAME)
 #endif
 
 /// @endcond
@@ -109,7 +115,7 @@ class KCleanUpGlobalStatic
  *     ...
  * };
  *
- * K_GLOBAL_STATIC(A, globalA)
+ * PREDICATE_GLOBAL_STATIC(A, globalA)
  * // The above creates a new globally static variable named 'globalA' which you
  * // can use as a pointer to an instance of A.
  *
@@ -170,7 +176,7 @@ class KCleanUpGlobalStatic
  *     MySingleton instance;
  * };
  *
- * K_GLOBAL_STATIC(MySingletonPrivate, mySingletonPrivate)
+ * PREDICATE_GLOBAL_STATIC(MySingletonPrivate, mySingletonPrivate)
  *
  * MySingleton *MySingleton::self()
  * {
@@ -199,7 +205,7 @@ class KCleanUpGlobalStatic
  *     QString foo;
  * };
  *
- * K_GLOBAL_STATIC(MySingletonPrivate, mySingletonPrivate)
+ * PREDICATE_GLOBAL_STATIC(MySingletonPrivate, mySingletonPrivate)
  *
  * QString MySingleton::someFunction()
  * {
@@ -216,13 +222,12 @@ class KCleanUpGlobalStatic
  * MySingleton::someFunction();
  * @endcode
  *
- * @ingroup KDEMacros
  */
-#define K_GLOBAL_STATIC(TYPE, NAME) K_GLOBAL_STATIC_WITH_ARGS(TYPE, NAME, ())
+#define PREDICATE_GLOBAL_STATIC(TYPE, NAME) PREDICATE_GLOBAL_STATIC_WITH_ARGS(TYPE, NAME, ())
 
 /**
  * @overload
- * This is the same as K_GLOBAL_STATIC, but can take arguments that are passed
+ * This is the same as PREDICATE_GLOBAL_STATIC, but can take arguments that are passed
  * to the object's constructor
  *
  * @param TYPE The type of the global static object. Do not add a *.
@@ -238,7 +243,7 @@ class KCleanUpGlobalStatic
  *     ...
  * };
  *
- * K_GLOBAL_STATIC_WITH_ARG(A, globalA, ("foo", 0))
+ * PREDICATE_GLOBAL_STATIC_WITH_ARG(A, globalA, ("foo", 0))
  * // The above creates a new globally static variable named 'globalA' which you
  * // can use as a pointer to an instance of A.
  *
@@ -250,12 +255,11 @@ class KCleanUpGlobalStatic
  * }
  * @endcode
  *
- * @ingroup KDEMacros
  */
-#define K_GLOBAL_STATIC_WITH_ARGS(TYPE, NAME, ARGS)                            \
+#define PREDICATE_GLOBAL_STATIC_WITH_ARGS(TYPE, NAME, ARGS)                            \
 static QBasicAtomicPointer<TYPE > _k_static_##NAME = Q_BASIC_ATOMIC_INITIALIZER(0); \
 static bool _k_static_##NAME##_destroyed;                                      \
-static struct K_GLOBAL_STATIC_STRUCT_NAME(NAME)                                \
+static struct PREDICATE_GLOBAL_STATIC_STRUCT_NAME(NAME)                                \
 {                                                                              \
     inline bool isDestroyed() const                                            \
     {                                                                          \
@@ -281,7 +285,7 @@ static struct K_GLOBAL_STATIC_STRUCT_NAME(NAME)                                \
                 && _k_static_##NAME != x ) {                                   \
                 delete x;                                                      \
             } else {                                                           \
-                static Predicate::Utils::KCleanUpGlobalStatic cleanUpObject = { destroy };       \
+                static Predicate::Utils::CleanUpGlobalStatic cleanUpObject = { destroy };       \
             }                                                                  \
         }                                                                      \
         return _k_static_##NAME;                                               \

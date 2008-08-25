@@ -1,20 +1,24 @@
-/* This file is part of the KDE libraries
+/* This file is part of the KDE project
    Copyright (C) 1999 Sirtaj Singh Kanq <taj@kde.org>
    Copyright (C) 2007 Matthias Kretz <kretz@kde.org>
+   Copyright (C) 2008 Jarosław Staniek <staniek@kde.org>
 
-   This library is free software; you can redistribute it and/or
+   Based on kdelibs/kdecore/kernel/kstatic.*
+
+   This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
-   License version 2 as published by the Free Software Foundation.
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-   This library is distributed in the hope that it will be useful,
+   This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this library; see the file COPYING.LIB.  If not, write to
+   along with this program; see the file COPYING.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.
+ * Boston, MA 02110-1301, USA.
 */
 
 /*
@@ -23,18 +27,13 @@
  * Generated:	Sat May  1 02:08:43 EST 1999
  */
 
-#include <config.h>
-
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#endif
+#include "Static.h"
 
 #include <QtCore/QList>
 #include <QtCore/QSet>
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTextCodec>
-#include <unistd.h> // umask
 
 #ifndef NDEBUG
 #define MYASSERT(x) if (!x) \
@@ -45,12 +44,7 @@
 #define MYASSERT(x) /* nope */
 #endif
 
-// ~KConfig needs qrand(). qrand() depends on a Q_GLOBAL_STATIC. With this Q_CONSTRUCTOR_FUNCTION we
-// try to make qrand() live longer than any KConfig object.
-Q_CONSTRUCTOR_FUNCTION(qrand)
-
 typedef QSet<QString> KStringDict;
-mode_t s_umsk;
 
 class KGlobalPrivate
 {
@@ -69,7 +63,7 @@ class KGlobalPrivate
         KStringDict *stringDict;
 };
 
-K_GLOBAL_STATIC(KGlobalPrivate, globalData)
+PREDICATE_GLOBAL_STATIC(KGlobalPrivate, globalData)
 
 #define PRIVATE_DATA KGlobalPrivate *d = globalData
 
@@ -77,20 +71,9 @@ K_GLOBAL_STATIC(KGlobalPrivate, globalData)
  * Create a static QString
  *
  * To be used inside functions(!) like:
- * static const QString &myString = KGlobal::staticQString("myText");
- */
-const QString &KGlobal::staticQString(const char *str)
-{
-    return staticQString(QLatin1String(str));
-}
-
-/**
- * Create a static QString
- *
- * To be used inside functions(!) like:
  * static const QString &myString = KGlobal::staticQString(tr("My Text"));
  */
-const QString &KGlobal::staticQString(const QString &str)
+const QString &staticQString(const QString &str)
 {
     PRIVATE_DATA;
     if (!d->stringDict) {
@@ -98,6 +81,17 @@ const QString &KGlobal::staticQString(const QString &str)
     }
 
    return *d->stringDict->insert(str);
+}
+
+/**
+ * Create a static QString
+ *
+ * To be used inside functions(!) like:
+ * static const QString &myString = KGlobal::staticQString("myText");
+ */
+const QString &staticQString(const char *str)
+{
+    return staticQString(QLatin1String(str));
 }
 
 #undef PRIVATE_DATA

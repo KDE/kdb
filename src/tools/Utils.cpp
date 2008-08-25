@@ -18,7 +18,6 @@
 */
 
 #include "Utils.h"
-#include "Utils_p.h"
 //#include "kexiutils_global.h"
 
 #include <QRegExp>
@@ -30,13 +29,17 @@
 #include <QFocusEvent>
 #include <QFile>
 #include <QStyle>
+#include <QtDebug>
+#include <QCoreApplication>
 
-//#include <QtDebug>
 //#include <KApplication>
 //#include <KIconEffect>
 //#include <KIconLoader>
 //#include <KGlobalSettings>
 //#include <KAction>
+
+#include "Global.h"
+#include "predicate_global.h"
 
 using namespace Predicate::Utils;
 
@@ -161,7 +164,7 @@ QList<QMetaProperty> Predicate::Utils::propertiesForMetaObjectWithInherited(
     return result;
 }
 
-QStringList Predicate::UtilsenumKeysForProperty(const QMetaProperty& metaProperty)
+QStringList Predicate::Utils::enumKeysForProperty(const QMetaProperty& metaProperty)
 {
     QStringList result;
     QMetaEnum enumerator(metaProperty.enumerator());
@@ -292,7 +295,7 @@ void Predicate::Utils::serializeMap(const QMap<QString, QString>& map, QString& 
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
-    PreDbg << array[3] << " " << array[4] << " " << array[5] << endl;
+    PreDbg << array[3] << array[4] << array[5];
     const uint size = array.size();
     string.clear();
     string.reserve(size);
@@ -535,10 +538,11 @@ const WidgetMargins Predicate::Utils::operator+ (
 
 //---------
 
-K_GLOBAL_STATIC(QFont, _smallFont)
-
 #if 0
 //! @todo
+
+PREDICATE_GLOBAL_STATIC(QFont, _smallFont)
+
 QFont Predicate::Utils::smallFont(QWidget *init)
 {
     if (init) {

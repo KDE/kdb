@@ -22,8 +22,8 @@
 
 #include <Predicate/Global.h>
 #include <Predicate/tools/Validator.h>
-#include <qstring.h>
-#include <qpointer.h>
+#include <QtCore/QString>
+#include <QtCore/QPointer>
 
 namespace Predicate
 {

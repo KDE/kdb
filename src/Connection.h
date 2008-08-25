@@ -828,8 +828,8 @@ public:
     virtual bool drv_dropTable(const QString& name);
 
     /*! Prepare a SQL statement and return a \a PreparedStatement instance. */
-    virtual PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type,
-            FieldList& fields) = 0;
+    PreparedStatement prepareStatement(PreparedStatement::Type type,
+        FieldList& fields, const QStringList& whereFieldNames = QStringList());
 
     bool isInternalTableSchema(const QString& tableName);
 
@@ -1085,6 +1085,10 @@ protected:
       \sa drv_beginTransaction(), autoCommit(), setAutoCommit()
      */
     virtual bool drv_setAutoCommit(bool on);
+
+    /*! Prepare a SQL statement and return a \a PreparedStatementInterface-derived object. */
+    virtual PreparedStatementInterface* prepareStatementInternal(PreparedStatement::Type type,
+            FieldList& fields, const QStringList& whereFieldNames) = 0;
 
     /*! Internal, for handling autocommited transactions:
      begins transaction if one is supported.

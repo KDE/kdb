@@ -26,7 +26,7 @@
 
 /*moved to Driver
 #include "tokens.cpp"
-K_GLOBAL_STATIC_WITH_ARGS(StaticSetOfStrings, _reservedKeywords, (_tokens))
+PREDICATE_GLOBAL_STATIC_WITH_ARGS(StaticSetOfStrings, _reservedKeywords, (_tokens))
 */
 
 //--------------------

@@ -20,7 +20,10 @@
 #include "Alter.h"
 #include "Utils.h"
 #include "tools/Utils.h"
-#include <qmap.h>
+#include "tools/Static.h"
+
+#include <QMap>
+
 #include <stdlib.h>
 
 namespace Predicate
@@ -170,7 +173,7 @@ struct Predicate_AlterTableHandlerStatic {
     QHash<QByteArray, int> types;
 };
 
-K_GLOBAL_STATIC(Predicate_AlterTableHandlerStatic, Predicate_alteringTypeForProperty)
+PREDICATE_GLOBAL_STATIC(Predicate_AlterTableHandlerStatic, Predicate_alteringTypeForProperty)
 
 //! @internal
 int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)

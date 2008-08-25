@@ -21,6 +21,7 @@
 
 #include "Driver.h"
 
+using namespace Predicate;
 using namespace Predicate::Utils;
 
 ObjectNameValidator::ObjectNameValidator(
@@ -42,9 +43,9 @@ Validator::Result ObjectNameValidator::internalCheck(
     if (m_drv.isNull() ? !Predicate::Driver::isPredicateSystemObjectName(v.toString())
             : !m_drv->isSystemObjectName(v.toString()))
         return Validator::Ok;
-    message = tr("You cannot use name \"%1\" for your object.\n"
-                   "It is reserved for internal objects. Please choose another name.",
-                   v.toString());
-    details = tr("Names of internal database objects are starting with \"kexi__\".");
+    message = QObject::tr("You cannot use name \"%1\" for your object. "
+                   "It is reserved for internal objects. Please choose another name.")
+                   .arg(v.toString());
+    details = QObject::tr("Names of internal database objects are starting with \"kexi__\".");
     return Validator::Error;
 }

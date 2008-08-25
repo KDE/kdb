@@ -21,10 +21,12 @@
 #include "Field.h"
 #include "LongLongValidator.h"
 
-#include <knumvalidator.h>
-#include <qwidget.h>
+#include <QIntValidator>
+#include <QDoubleValidator>
+#include <QWidget>
 
 using namespace Predicate;
+using namespace Predicate::Utils;
 
 FieldValidator::FieldValidator(const Field &field, QWidget * parent)
         : Utils::MultiValidator(parent)
@@ -52,20 +54,20 @@ FieldValidator::FieldValidator(const Field &field, QWidget * parent)
         }
 
         if (!validator)
-            validator = new KIntValidator(bottom, top, 0); //the default
+            validator = new QIntValidator(bottom, top, 0); //the default
         addSubvalidator(validator);
     } else if (field.isFPNumericType()) {
         QValidator *validator;
         if (t == Field::Float) {
             if (field.isUnsigned()) //ok?
-                validator = new KDoubleValidator(0, 3.4e+38, field.scale(), 0);
+                validator = new QDoubleValidator(0, 3.4e+38, field.scale(), 0);
             else
-                validator = new KDoubleValidator(this);
+                validator = new QDoubleValidator((QObject*)0);
         } else {//double
             if (field.isUnsigned()) //ok?
-                validator = new KDoubleValidator(0, 1.7e+308, field.scale(), 0);
+                validator = new QDoubleValidator(0, 1.7e+308, field.scale(), 0);
             else
-                validator = new KDoubleValidator(this);
+                validator = new QDoubleValidator((QObject*)0);
         }
         addSubvalidator(validator);
     } else if (t == Field::Date) {
@@ -81,7 +83,7 @@ FieldValidator::FieldValidator(const Field &field, QWidget * parent)
 //moved   dateTimeInputMask( *dateFormatter(), *timeFormatter() ) );
     } else if (t == Field::Boolean) {
 //! @todo add BooleanValidator
-        addSubvalidator(new KIntValidator(0, 1));
+        addSubvalidator(new QIntValidator(0, 1, 0));
     }
 }
 

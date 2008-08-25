@@ -73,7 +73,7 @@ struct TypeCache {
     QHash< Field::TypeGroup, Field::Type > def_tlist;
 };
 
-K_GLOBAL_STATIC(TypeCache, Predicate_typeCache)
+PREDICATE_GLOBAL_STATIC(TypeCache, Predicate_typeCache)
 
 const TypeGroupList Predicate::typesForGroup(Predicate::Field::TypeGroup typeGroup)
 {
@@ -670,7 +670,7 @@ struct Predicate_BuiltinFieldProperties {
 };
 
 //! for Predicate::isBuiltinTableFieldProperty()
-K_GLOBAL_STATIC(Predicate_BuiltinFieldProperties, Predicate_builtinFieldProperties)
+PREDICATE_GLOBAL_STATIC(Predicate_BuiltinFieldProperties, Predicate_builtinFieldProperties)
 
 
 bool Predicate::isBuiltinTableFieldProperty(const QByteArray& propertyName)
@@ -768,7 +768,7 @@ struct Predicate_ExtendedProperties {
 };
 
 //! for isExtendedTableProperty()
-K_GLOBAL_STATIC(Predicate_ExtendedProperties, Predicate_extendedProperties)
+PREDICATE_GLOBAL_STATIC(Predicate_ExtendedProperties, Predicate_extendedProperties)
 
 bool Predicate::isExtendedTableFieldProperty(const QByteArray& propertyName)
 {
@@ -983,7 +983,7 @@ struct Predicate_EmptyValueForTypeCache {
 };
 
 //! Used in Predicate::emptyValueForType()
-K_GLOBAL_STATIC(Predicate_EmptyValueForTypeCache, Predicate_emptyValueForTypeCache)
+PREDICATE_GLOBAL_STATIC(Predicate_EmptyValueForTypeCache, Predicate_emptyValueForTypeCache)
 
 QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
 {
@@ -1037,7 +1037,7 @@ struct Predicate_NotEmptyValueForTypeCache {
     QVector<QVariant> values;
 };
 //! Used in Predicate::notEmptyValueForType()
-K_GLOBAL_STATIC(Predicate_NotEmptyValueForTypeCache, Predicate_notEmptyValueForTypeCache)
+PREDICATE_GLOBAL_STATIC(Predicate_NotEmptyValueForTypeCache, Predicate_notEmptyValueForTypeCache)
 
 QVariant Predicate::notEmptyValueForType(Predicate::Field::Type type)
 {

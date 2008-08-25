@@ -19,6 +19,8 @@
 
 #include "MessageHandler.h"
 
+#include "Object.h"
+
 using namespace Predicate;
 
 MessageTitle::MessageTitle(Object* o, const QString& msg)
@@ -45,7 +47,7 @@ MessageHandler::~MessageHandler()
 {
 }
 
-int MessageHandler::askQuestion(
+MessageHandler::ButtonCode MessageHandler::askQuestion(
     MessageHandler::QuestionType messageType,
     const QString& message,
     const QString &caption,

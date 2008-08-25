@@ -27,9 +27,10 @@ class QWidget;
 
 namespace Predicate
 {
+class Field;
+
 namespace Utils
 {
-class Field;
 
 //! @short A validator for Predicate data types
 /*! This can be used by QLineEdit or subclass to provide validated

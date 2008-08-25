@@ -38,6 +38,7 @@
 
 #include "tools/Utils.h"
 #include "tools/identifier.h"
+#include "Interfaces/PreparedStatementInterface.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -3624,13 +3625,6 @@ tristate Connection::closeAllTableSchemaChangeListeners(TableSchema& tableSchema
     return res;
 }
 
-/*PreparedStatement::Ptr Connection::prepareStatement(PreparedStatement::StatementType,
-    TableSchema&)
-{
-  //safe?
-  return 0;
-}*/
-
 void Connection::setReadOnly(bool set)
 {
     if (d->isConnected)
@@ -3651,4 +3645,14 @@ void Connection::addCursor(Predicate::Cursor& cursor)
 void Connection::takeCursor(Predicate::Cursor& cursor)
 {
     d->cursors.remove(&cursor);
+}
+
+PreparedStatement Connection::prepareStatement(PreparedStatement::Type type,
+    FieldList& fields, const QStringList& whereFieldNames)
+{
+//! @todo move to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
+    PreparedStatementInterface *iface = prepareStatementInternal(type, fields, whereFieldNames);
+    if (!iface)
+        return PreparedStatement();
+    return PreparedStatement(*iface, type, fields, whereFieldNames);
 }

@@ -847,7 +847,7 @@ public:
     }
 };
 
-K_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
+PREDICATE_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
 
 //=========================================
 
