@@ -36,7 +36,7 @@ MySqlPreparedStatement::MySqlPreparedStatement(StatementType type, ConnectionInt
 #endif
         , m_resetRequired(false)
 {
-// PreDrvDbg << "MySqlPreparedStatement: Construction" << endl;
+// PreDrvDbg << "MySqlPreparedStatement: Construction";
 
     mysql_owned = false;
     mysql = dynamic_cast<Predicate::MySqlConnectionInternal&>(conn).mysql; //copy
@@ -261,7 +261,7 @@ bool MySqlPreparedStatement::execute()
             }
             default:
                 PreWarn << "PreparedStatement::execute(): unsupported field type: "
-                << field->type() << " - NULL value bound to column #" << arg << endl;
+                << field->type() << " - NULL value bound to column #" << arg;
                 res = sqlite3_bind_null(prepared_st_handle, arg);
                 if (SQLITE_OK != res) {
                     //! @todo msg?

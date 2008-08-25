@@ -37,7 +37,7 @@ MySqlCursor::MySqlCursor(Predicate::Connection* conn, const QString& statement, 
 {
     m_options |= Buffered;
     d->mysql = static_cast<MySqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "MySqlCursor: constructor for query statement" << endl;
+// PreDrvDbg << "MySqlCursor: constructor for query statement";
 }
 
 MySqlCursor::MySqlCursor(Connection* conn, QuerySchema& query, uint options)
@@ -46,7 +46,7 @@ MySqlCursor::MySqlCursor(Connection* conn, QuerySchema& query, uint options)
 {
     m_options |= Buffered;
     d->mysql = static_cast<MySqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "MySqlCursor: constructor for query statement" << endl;
+// PreDrvDbg << "MySqlCursor: constructor for query statement";
 }
 
 MySqlCursor::~MySqlCursor()
@@ -56,7 +56,7 @@ MySqlCursor::~MySqlCursor()
 
 bool MySqlCursor::drv_open()
 {
-// PreDrvDbg << "MySqlCursor::drv_open:" << m_sql << endl;
+// PreDrvDbg << "MySqlCursor::drv_open:" << m_sql;
     // This can't be right?  mysql_real_query takes a length in order that
     // queries can have binary data - but strlen does not allow binary data.
     if (mysql_real_query(d->mysql, m_sql.toUtf8(), strlen(m_sql.toUtf8())) == 0) {
@@ -97,7 +97,7 @@ bool MySqlCursor::drv_close()
 
 void MySqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "MySqlCursor::drv_getNextRecord" << endl;
+// PreDrvDbg << "MySqlCursor::drv_getNextRecord";
     if (at() < d->numRows && at() >= 0) {
         d->lengths = mysql_fetch_lengths(d->mysqlres);
         m_result = FetchOK;
@@ -142,7 +142,7 @@ QVariant MySqlCursor::value(uint pos)
  */
 bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
 {
-// PreDrvDbg << "MySqlCursor::storeCurrentRow: Position is " << (long)m_at<< endl;
+// PreDrvDbg << "MySqlCursor::storeCurrentRow: Position is " << (long)m_at;
     if (d->numRows <= 0)
         return false;
 
@@ -159,7 +159,7 @@ bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
         /* moved to cstringToVariant()
             if (f && f->type()==Field::BLOB) {
               data[i] = QByteArray(d->mysqlrow[i], d->mysqlres->lengths[i]);
-              PreDbg << data[i].toByteArray().size() << endl;
+              PreDbg << data[i].toByteArray().size();
             }
         //! @todo more types!
         //! @todo look at what type mysql declares!

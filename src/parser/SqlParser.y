@@ -628,7 +628,7 @@ ColDefs ',' ColDef|ColDef
 ColDef:
 IDENTIFIER ColType
 {
-	PreDbg << "adding field " << *$1 << endl;
+	PreDbg << "adding field " << *$1;
 	field->setName($1->toLatin1());
 	parser->table()->addField(field);
 	field = 0;
@@ -636,7 +636,7 @@ IDENTIFIER ColType
 }
 | IDENTIFIER ColType ColKeys
 {
-	PreDbg << "adding field " << *$1 << endl;
+	PreDbg << "adding field " << *$1;
 	field->setName(*$1);
 	delete $1;
 	parser->table()->addField(field);
@@ -659,17 +659,17 @@ ColKey:
 PRIMARY KEY
 {
 	field->setPrimaryKey(true);
-	PreDbg << "primary" << endl;
+	PreDbg << "primary";
 }
 | NOT SQL_NULL
 {
 	field->setNotNull(true);
-	PreDbg << "not_null" << endl;
+	PreDbg << "not_null";
 }
 | AUTO_INCREMENT
 {
 	field->setAutoIncrement(true);
-	PreDbg << "ainc" << endl;
+	PreDbg << "ainc";
 }
 ;
 
@@ -681,7 +681,7 @@ SQL_TYPE
 }
 | SQL_TYPE '(' INTEGER_CONST ')'
 {
-	PreDbg << "sql + length" << endl;
+	PreDbg << "sql + length";
 	field = new Field();
 	field->setPrecision($3);
 	field->setType($1);
@@ -703,7 +703,7 @@ SQL_TYPE
 SelectStatement:
 Select ColViews
 {
-	PreDbg << "Select ColViews=" << $2->debugString() << endl;
+	PreDbg << "Select ColViews=" << $2->debugString();
 
 	if (!($$ = buildSelectQuery( $1, $2 )))
 		return 0;
@@ -715,19 +715,19 @@ Select ColViews
 }
 | Select Tables
 {
-	PreDbg << "Select ColViews Tables" << endl;
+	PreDbg << "Select ColViews Tables";
 	if (!($$ = buildSelectQuery( $1, 0, $2 )))
 		return 0;
 }
 | Select ColViews SelectOptions
 {
-	PreDbg << "Select ColViews Conditions" << endl;
+	PreDbg << "Select ColViews Conditions";
 	if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
 		return 0;
 }
 | Select ColViews Tables SelectOptions
 {
-	PreDbg << "Select ColViews Tables SelectOptions" << endl;
+	PreDbg << "Select ColViews Tables SelectOptions";
 	if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
 		return 0;
 }
@@ -736,7 +736,7 @@ Select ColViews
 Select:
 SELECT
 {
-	PreDbg << "SELECT" << endl;
+	PreDbg << "SELECT";
 //	parser->createSelect();
 //	parser->setOperation(Parser::OP_Select);
 	$$ = new QuerySchema();
@@ -746,26 +746,26 @@ SELECT
 SelectOptions: /* todo: more options (having, group by, limit...) */
 WhereClause
 {
-	PreDbg << "WhereClause" << endl;
+	PreDbg << "WhereClause";
 	$$ = new SelectOptionsInternal;
 	$$->whereExpr = $1;
 }
 | ORDER BY OrderByClause
 {
-	PreDbg << "OrderByClause" << endl;
+	PreDbg << "OrderByClause";
 	$$ = new SelectOptionsInternal;
 	$$->orderByColumns = $3;
 }
 | WhereClause ORDER BY OrderByClause
 {
-	PreDbg << "WhereClause ORDER BY OrderByClause" << endl;
+	PreDbg << "WhereClause ORDER BY OrderByClause";
 	$$ = new SelectOptionsInternal;
 	$$->whereExpr = $1;
 	$$->orderByColumns = $4;
 } 
 | ORDER BY OrderByClause WhereClause
 {
-	PreDbg << "OrderByClause WhereClause" << endl;
+	PreDbg << "OrderByClause WhereClause";
 	$$ = new SelectOptionsInternal;
 	$$->whereExpr = $4;
 	$$->orderByColumns = $3;
@@ -784,7 +784,7 @@ WHERE aExpr
 OrderByClause:
 OrderByColumnId
 {
-	PreDbg << "ORDER BY IDENTIFIER" << endl;
+	PreDbg << "ORDER BY IDENTIFIER";
 	$$ = new OrderByColumnInternal::List;
 	OrderByColumnInternal orderByColumn;
 	orderByColumn.setColumnByNameOrNumber( *$1 );
@@ -793,7 +793,7 @@ OrderByColumnId
 }
 | OrderByColumnId OrderByOption
 {
-	PreDbg << "ORDER BY IDENTIFIER OrderByOption" << endl;
+	PreDbg << "ORDER BY IDENTIFIER OrderByOption";
 	$$ = new OrderByColumnInternal::List;
 	OrderByColumnInternal orderByColumn;
 	orderByColumn.setColumnByNameOrNumber( *$1 );
@@ -824,20 +824,20 @@ OrderByColumnId:
 IDENTIFIER
 {
 	$$ = new QVariant( *$1 );
-	PreDbg << "OrderByColumnId: " << *$$ << endl;
+	PreDbg << "OrderByColumnId: " << *$$;
 	delete $1;
 }
 | IDENTIFIER '.' IDENTIFIER
 {
 	$$ = new QVariant( *$1 + "." + *$3 );
-	PreDbg << "OrderByColumnId: " << *$$ << endl;
+	PreDbg << "OrderByColumnId: " << *$$;
 	delete $1;
 	delete $3;
 }
 | INTEGER_CONST
 {
 	$$ = new QVariant($1);
-	PreDbg << "OrderByColumnId: " << *$$ << endl;
+	PreDbg << "OrderByColumnId: " << *$$;
 }
 
 OrderByOption:
@@ -859,7 +859,7 @@ aExpr2
 aExpr2:
 aExpr3 AND aExpr2
 {
-//	PreDbg << "AND " << $3.debugString() << endl;
+//	PreDbg << "AND " << $3.debugString();
 	$$ = new BinaryExpr( KexiDBExpr_Logical, $1, AND, $3 );
 }
 | aExpr3 OR aExpr2
@@ -1024,18 +1024,18 @@ aExpr9:
 	$$ = new VariableExpr( *$1 );
 	
 //TODO: simplify this later if that's 'only one field name' expression
-	PreDbg << "  + identifier: " << *$1 << endl;
+	PreDbg << "  + identifier: " << *$1;
 	delete $1;
 }
 | QUERY_PARAMETER
 {
 	$$ = new QueryParameterExpr( *$1 );
-	PreDbg << "  + query parameter: " << $$->debugString() << endl;
+	PreDbg << "  + query parameter: " << $$->debugString();
 	delete $1;
 }
 | IDENTIFIER aExprList
 {
-	PreDbg << "  + function: " << *$1 << "(" << $2->debugString() << ")" << endl;
+	PreDbg << "  + function: " << *$1 << "(" << $2->debugString() << ")";
 	$$ = new FunctionExpr(*$1, $2);
 	delete $1;
 }
@@ -1043,21 +1043,21 @@ aExpr9:
 | IDENTIFIER '.' IDENTIFIER
 {
 	$$ = new VariableExpr( *$1 + "." + *$3 );
-	PreDbg << "  + identifier.identifier: " << *$1 << "." << *$3 << endl;
+	PreDbg << "  + identifier.identifier: " << *$1 << "." << *$3;
 	delete $1;
 	delete $3;
 }
 | SQL_NULL
 {
 	$$ = new ConstExpr( SQL_NULL, QVariant() );
-	PreDbg << "  + NULL" << endl;
+	PreDbg << "  + NULL";
 //	$$ = new Field();
 	//$$->setName(QString::null);
 }
 | CHARACTER_STRING_LITERAL
 {
 	$$ = new ConstExpr( CHARACTER_STRING_LITERAL, *$1 );
-	PreDbg << "  + constant " << $1 << endl;
+	PreDbg << "  + constant " << $1;
 	delete $1;
 }
 | INTEGER_CONST
@@ -1075,12 +1075,12 @@ aExpr9:
 //TODO ok?
 
 	$$ = new ConstExpr( INTEGER_CONST, val );
-	PreDbg << "  + int constant: " << val.toString() << endl;
+	PreDbg << "  + int constant: " << val.toString();
 }
 | REAL_CONST
 {
 	$$ = new ConstExpr( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
-	PreDbg << "  + real constant: " << $1.integer << "." << $1.fractional << endl;
+	PreDbg << "  + real constant: " << $1.integer << "." << $1.fractional;
 }
 |
 aExpr10
@@ -1090,7 +1090,7 @@ aExpr10
 aExpr10:
 '(' aExpr ')'
 {
-	PreDbg << "(expr)" << endl;
+	PreDbg << "(expr)";
 	$$ = new UnaryExpr('(', $2);
 }
 ;
@@ -1127,30 +1127,30 @@ FROM FlatTableList
 /*
 | Tables LEFT JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "LEFT JOIN: '" << *$4 << "' ON " << $6 << endl;
+	PreDbg << "LEFT JOIN: '" << *$4 << "' ON " << $6;
 	addTable($4->toQString());
 	delete $4;
 }
 | Tables LEFT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7 << endl;
+	PreDbg << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7;
 	addTable($5);
 }
 | Tables INNER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "INNER JOIN: '" << *$4 << "' ON " << $6 << endl;
+	PreDbg << "INNER JOIN: '" << *$4 << "' ON " << $6;
 	addTable($4->toQString());
 	delete $4;
 }
 | Tables RIGHT JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "RIGHT JOIN: '" << *$4 << "' ON " << $6 << endl;
+	PreDbg << "RIGHT JOIN: '" << *$4 << "' ON " << $6;
 	addTable(*$4);
 	delete $4;
 }
 | Tables RIGHT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7 << endl;
+	PreDbg << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7;
 	addTable($5->toQString());
 	delete $5;
 }*/
@@ -1180,7 +1180,7 @@ FlatTableList ',' FlatTable
 FlatTable:
 IDENTIFIER
 {
-	PreDbg << "FROM: '" << *$1 << "'" << endl;
+	PreDbg << "FROM: '" << *$1 << "'";
 	$$ = new VariableExpr(*$1);
 
 	/*
@@ -1237,13 +1237,13 @@ ColViews ',' ColItem
 {
 	$$ = $1;
 	$$->add( $3 );
-	PreDbg << "ColViews: ColViews , ColItem" << endl;
+	PreDbg << "ColViews: ColViews , ColItem";
 }
 |ColItem
 {
 	$$ = new NArgExpr(0,0);
 	$$->add( $1 );
-	PreDbg << "ColViews: ColItem" << endl;
+	PreDbg << "ColViews: ColItem";
 }
 ;
 
@@ -1255,12 +1255,12 @@ ColExpression
 //	$$->setExpression( $1 );
 //	parser->select()->addField($$);
 	$$ = $1;
-	PreDbg << " added column expr: '" << $1->debugString() << "'" << endl;
+	PreDbg << " added column expr: '" << $1->debugString() << "'";
 }
 | ColWildCard
 {
 	$$ = $1;
-	PreDbg << " added column wildcard: '" << $1->debugString() << "'" << endl;
+	PreDbg << " added column wildcard: '" << $1->debugString() << "'";
 }
 | ColExpression AS IDENTIFIER
 {
@@ -1268,7 +1268,7 @@ ColExpression
 		KexiDBExpr_SpecialBinary, $1, AS,
 		new VariableExpr(*$3)
 	);
-	PreDbg << " added column expr: " << $$->debugString() << endl;
+	PreDbg << " added column expr: " << $$->debugString();
 	delete $3;
 }
 | ColExpression IDENTIFIER
@@ -1277,7 +1277,7 @@ ColExpression
 		KexiDBExpr_SpecialBinary, $1, 0, 
 		new VariableExpr(*$2)
 	);
-	PreDbg << " added column expr: " << $$->debugString() << endl;
+	PreDbg << " added column expr: " << $$->debugString();
 	delete $2;
 }
 ;
@@ -1339,7 +1339,7 @@ ColWildCard:
 '*'
 {
 	$$ = new VariableExpr("*");
-	PreDbg << "all columns" << endl;
+	PreDbg << "all columns";
 
 //	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
 //	parser->select()->addAsterisk(ast);
@@ -1350,13 +1350,13 @@ ColWildCard:
 	QString s( *$1 );
 	s += ".*";
 	$$ = new VariableExpr(s);
-	PreDbg << "  + all columns from " << s << endl;
+	PreDbg << "  + all columns from " << s;
 	delete $1;
 }
 /*| ERROR_DIGIT_BEFORE_IDENTIFIER
 {
 	$$ = new VariableExpr($1);
-	PreDbg << "  Invalid identifier! " << $1 << endl;
+	PreDbg << "  Invalid identifier! " << $1;
 	setError(QObject::tr("Invalid identifier \"%1\"",$1));
 }*/
 ;

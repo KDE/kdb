@@ -41,7 +41,7 @@ static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
 pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
         Cursor(conn, statement, options)
 {
-// PreDrvDbg << "PQXXSQLCURSOR: constructor for query statement" << endl;
+// PreDrvDbg << "PQXXSQLCURSOR: constructor for query statement";
     my_conn = static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql;
     m_options = Buffered;
     m_res = 0;
@@ -54,7 +54,7 @@ pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& stateme
 pqxxSqlCursor::pqxxSqlCursor(Connection* conn, QuerySchema& query, uint options)
         : Cursor(conn, query, options)
 {
-// PreDrvDbg << "PQXXSQLCURSOR: constructor for query schema" << endl;
+// PreDrvDbg << "PQXXSQLCURSOR: constructor for query schema";
     my_conn = static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql;
     m_options = Buffered;
     m_res = 0;
@@ -73,7 +73,7 @@ pqxxSqlCursor::~pqxxSqlCursor()
 //Create a cursor result set
 bool pqxxSqlCursor::drv_open()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_open:" << m_sql << endl;
+// PreDrvDbg << "pqxxSqlCursor::drv_open:" << m_sql;
 
     if (!my_conn->is_open()) {
 //! @todo this check should be moved to Connection! when drv_prepareQuery() arrive
@@ -100,7 +100,7 @@ bool pqxxSqlCursor::drv_open()
         ((pqxxSqlConnection*)connection())
         ->drv_commitTransaction(((pqxxSqlConnection*)connection())->m_trans);
 //  my_conn->m_trans->commit();
-//  PreDrvDbg << "pqxxSqlCursor::drv_open: trans. committed: " << cur_name <<endl;
+//  PreDrvDbg << "pqxxSqlCursor::drv_open: trans. committed: " << cur_name;
 
         //We should now be placed before the first row, if any
         m_fieldsToStoreInRow = m_res->columns();
@@ -113,7 +113,7 @@ bool pqxxSqlCursor::drv_open()
         return true;
     } catch (const std::exception &e) {
         setError(ERR_DB_SPECIFIC, QString::fromUtf8(e.what()));
-        PreDrvWarn << "pqxxSqlCursor::drv_open:exception - " << QString::fromUtf8(e.what()) << endl;
+        PreDrvWarn << "pqxxSqlCursor::drv_open:exception - " << QString::fromUtf8(e.what());
     } catch (...) {
         setError();
     }
@@ -123,7 +123,7 @@ bool pqxxSqlCursor::drv_open()
         delete((pqxxSqlConnection*)connection())->m_trans;
         m_implicityStarted = false;
     }
-// PreDrvDbg << "pqxxSqlCursor::drv_open: trans. rolled back! - " << cur_name <<endl;
+// PreDrvDbg << "pqxxSqlCursor::drv_open: trans. rolled back! - " << cur_name;
     return false;
 }
 
@@ -149,7 +149,7 @@ bool pqxxSqlCursor::drv_close()
 //Gets the next record...does not need to do much, just return fetchend if at end of result set
 void pqxxSqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_getNextRecord, size is " <<m_res->size() << " Current Position is " << (long)at() << endl;
+// PreDrvDbg << "pqxxSqlCursor::drv_getNextRecord, size is " <<m_res->size() << " Current Position is " << (long)at();
     if (at() < m_res->size() && at() >= 0) {
         m_result = FetchOK;
     } else if (at() >= m_res->size()) {
@@ -165,7 +165,7 @@ void pqxxSqlCursor::drv_getNextRecord()
 //Check the current position is within boundaries
 void pqxxSqlCursor::drv_getPrevRecord()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_getPrevRecord" << endl;
+// PreDrvDbg << "pqxxSqlCursor::drv_getPrevRecord";
 
     if (at() < m_res->size() && at() >= 0) {
         m_result = FetchOK;
@@ -191,19 +191,19 @@ QVariant pqxxSqlCursor::value(uint pos)
 QVariant pqxxSqlCursor::pValue(uint pos)const
 {
     if (m_res->size() <= 0) {
-        PreDrvWarn << "pqxxSqlCursor::value - ERROR: result size not greater than 0" << endl;
+        PreDrvWarn << "pqxxSqlCursor::value - ERROR: result size not greater than 0";
         return QVariant();
     }
 
     if (pos >= m_fieldsToStoreInRow) {
-//  PreDrvWarn << "pqxxSqlCursor::value - ERROR: requested position is greater than the number of fields" << endl;
+//  PreDrvWarn << "pqxxSqlCursor::value - ERROR: requested position is greater than the number of fields";
         return QVariant();
     }
 
     Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
-// PreDrvDbg << "pqxxSqlCursor::value(" << pos << ")" << endl;
+// PreDrvDbg << "pqxxSqlCursor::value(" << pos << ")";
 
     //from most to least frequently used types:
     if (f) { //We probably have a schema type query so can use kexi to determin the row type
@@ -217,7 +217,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
             return QString((*m_res)[at()][pos].c_str()).toLower() == "t" ? QVariant(true) : QVariant(false);
         } else if (f->typeGroup() == Field::BLOBGroup) {
 //   pqxx::result::field r = (*m_res)[at()][pos];
-//   PreDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size() << endl;
+//   PreDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size();
             return ::pgsqlByteaToByteArray((*m_res)[at()][pos]);
         } else {
             return pgsqlCStrToVariant((*m_res)[at()][pos]);
@@ -234,7 +234,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
 //who'd have thought we'd be using char** in this day and age :o)
 const char** pqxxSqlCursor::rowData() const
 {
-// PreDrvDbg << "pqxxSqlCursor::recordData" << endl;
+// PreDrvDbg << "pqxxSqlCursor::recordData";
 
     const char** row;
 
@@ -244,10 +244,10 @@ const char** pqxxSqlCursor::rowData() const
         for (int i = 0; i < (int)m_res->columns(); i++) {
             row[i] = (char*)malloc(strlen((*m_res)[at()][i].c_str()) + 1);
             strcpy((char*)(*m_res)[at()][i].c_str(), row[i]);
-//   PreDrvDbg << row[i] << endl;
+//   PreDrvDbg << row[i];
         }
     } else {
-        PreDrvWarn << "pqxxSqlCursor::recordData: m_at is invalid" << endl;
+        PreDrvWarn << "pqxxSqlCursor::recordData: m_at is invalid";
     }
     return row;
 }
@@ -256,7 +256,7 @@ const char** pqxxSqlCursor::rowData() const
 //Store the current record in [data]
 bool pqxxSqlCursor::drv_storeCurrentRow(RecordData &data) const
 {
-// PreDrvDbg << "pqxxSqlCursor::storeCurrentRow: POSITION IS " << (long)m_at<< endl;
+// PreDrvDbg << "pqxxSqlCursor::storeCurrentRow: POSITION IS " << (long)m_at;
 
     if (m_res->size() <= 0)
         return false;

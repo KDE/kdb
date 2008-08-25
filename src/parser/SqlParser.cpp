@@ -2094,7 +2094,7 @@ yyreduce:
     case 12:
 #line 633 "sqlparser.y"
         {
-            PreDbg << "adding field " << *yyvsp[-1].stringValue << endl;
+            PreDbg << "adding field " << *yyvsp[-1].stringValue;
             field->setName(yyvsp[-1].stringValue->toLatin1());
             parser->table()->addField(field);
             field = 0;
@@ -2106,7 +2106,7 @@ yyreduce:
     case 13:
 #line 641 "sqlparser.y"
         {
-            PreDbg << "adding field " << *yyvsp[-2].stringValue << endl;
+            PreDbg << "adding field " << *yyvsp[-2].stringValue;
             field->setName(*yyvsp[-2].stringValue);
             delete yyvsp[-2].stringValue;
             parser->table()->addField(field);
@@ -2131,7 +2131,7 @@ yyreduce:
 #line 663 "sqlparser.y"
         {
             field->setPrimaryKey(true);
-            PreDbg << "primary" << endl;
+            PreDbg << "primary";
             ;
         }
         break;
@@ -2140,7 +2140,7 @@ yyreduce:
 #line 668 "sqlparser.y"
         {
             field->setNotNull(true);
-            PreDbg << "not_null" << endl;
+            PreDbg << "not_null";
             ;
         }
         break;
@@ -2149,7 +2149,7 @@ yyreduce:
 #line 673 "sqlparser.y"
         {
             field->setAutoIncrement(true);
-            PreDbg << "ainc" << endl;
+            PreDbg << "ainc";
             ;
         }
         break;
@@ -2166,7 +2166,7 @@ yyreduce:
     case 20:
 #line 686 "sqlparser.y"
         {
-            PreDbg << "sql + length" << endl;
+            PreDbg << "sql + length";
             field = new Field();
             field->setPrecision(yyvsp[-1].integerValue);
             field->setType(yyvsp[-3].colType);
@@ -2197,7 +2197,7 @@ yyreduce:
     case 23:
 #line 708 "sqlparser.y"
         {
-            PreDbg << "Select ColViews=" << yyvsp[0].exprList->debugString() << endl;
+            PreDbg << "Select ColViews=" << yyvsp[0].exprList->debugString();
 
             if (!(yyval.querySchema = buildSelectQuery(yyvsp[-1].querySchema, yyvsp[0].exprList)))
                 return 0;
@@ -2217,7 +2217,7 @@ yyreduce:
     case 25:
 #line 720 "sqlparser.y"
         {
-            PreDbg << "Select ColViews Tables" << endl;
+            PreDbg << "Select ColViews Tables";
             if (!(yyval.querySchema = buildSelectQuery(yyvsp[-1].querySchema, 0, yyvsp[0].exprList)))
                 return 0;
             ;
@@ -2227,7 +2227,7 @@ yyreduce:
     case 26:
 #line 726 "sqlparser.y"
         {
-            PreDbg << "Select ColViews Conditions" << endl;
+            PreDbg << "Select ColViews Conditions";
             if (!(yyval.querySchema = buildSelectQuery(yyvsp[-2].querySchema, yyvsp[-1].exprList, 0, yyvsp[0].selectOptions)))
                 return 0;
             ;
@@ -2237,7 +2237,7 @@ yyreduce:
     case 27:
 #line 732 "sqlparser.y"
         {
-            PreDbg << "Select ColViews Tables SelectOptions" << endl;
+            PreDbg << "Select ColViews Tables SelectOptions";
             if (!(yyval.querySchema = buildSelectQuery(yyvsp[-3].querySchema, yyvsp[-2].exprList, yyvsp[-1].exprList, yyvsp[0].selectOptions)))
                 return 0;
             ;
@@ -2247,7 +2247,7 @@ yyreduce:
     case 28:
 #line 741 "sqlparser.y"
         {
-            PreDbg << "SELECT" << endl;
+            PreDbg << "SELECT";
 // parser->createSelect();
 // parser->setOperation(Parser::OP_Select);
             yyval.querySchema = new QuerySchema();
@@ -2258,7 +2258,7 @@ yyreduce:
     case 29:
 #line 751 "sqlparser.y"
         {
-            PreDbg << "WhereClause" << endl;
+            PreDbg << "WhereClause";
             yyval.selectOptions = new SelectOptionsInternal;
             yyval.selectOptions->whereExpr = yyvsp[0].expr;
             ;
@@ -2268,7 +2268,7 @@ yyreduce:
     case 30:
 #line 757 "sqlparser.y"
         {
-            PreDbg << "OrderByClause" << endl;
+            PreDbg << "OrderByClause";
             yyval.selectOptions = new SelectOptionsInternal;
             yyval.selectOptions->orderByColumns = yyvsp[0].orderByColumns;
             ;
@@ -2278,7 +2278,7 @@ yyreduce:
     case 31:
 #line 763 "sqlparser.y"
         {
-            PreDbg << "WhereClause ORDER BY OrderByClause" << endl;
+            PreDbg << "WhereClause ORDER BY OrderByClause";
             yyval.selectOptions = new SelectOptionsInternal;
             yyval.selectOptions->whereExpr = yyvsp[-3].expr;
             yyval.selectOptions->orderByColumns = yyvsp[0].orderByColumns;
@@ -2289,7 +2289,7 @@ yyreduce:
     case 32:
 #line 770 "sqlparser.y"
         {
-            PreDbg << "OrderByClause WhereClause" << endl;
+            PreDbg << "OrderByClause WhereClause";
             yyval.selectOptions = new SelectOptionsInternal;
             yyval.selectOptions->whereExpr = yyvsp[0].expr;
             yyval.selectOptions->orderByColumns = yyvsp[-1].orderByColumns;
@@ -2308,7 +2308,7 @@ yyreduce:
     case 34:
 #line 789 "sqlparser.y"
         {
-            PreDbg << "ORDER BY IDENTIFIER" << endl;
+            PreDbg << "ORDER BY IDENTIFIER";
             yyval.orderByColumns = new OrderByColumnInternal::List;
             OrderByColumnInternal orderByColumn;
             orderByColumn.setColumnByNameOrNumber(*yyvsp[0].variantValue);
@@ -2321,7 +2321,7 @@ yyreduce:
     case 35:
 #line 798 "sqlparser.y"
         {
-            PreDbg << "ORDER BY IDENTIFIER OrderByOption" << endl;
+            PreDbg << "ORDER BY IDENTIFIER OrderByOption";
             yyval.orderByColumns = new OrderByColumnInternal::List;
             OrderByColumnInternal orderByColumn;
             orderByColumn.setColumnByNameOrNumber(*yyvsp[-1].variantValue);
@@ -2361,7 +2361,7 @@ yyreduce:
 #line 828 "sqlparser.y"
         {
             yyval.variantValue = new QVariant(*yyvsp[0].stringValue);
-            PreDbg << "OrderByColumnId: " << *yyval.variantValue << endl;
+            PreDbg << "OrderByColumnId: " << *yyval.variantValue;
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2371,7 +2371,7 @@ yyreduce:
 #line 834 "sqlparser.y"
         {
             yyval.variantValue = new QVariant(*yyvsp[-2].stringValue + "." + *yyvsp[0].stringValue);
-            PreDbg << "OrderByColumnId: " << *yyval.variantValue << endl;
+            PreDbg << "OrderByColumnId: " << *yyval.variantValue;
             delete yyvsp[-2].stringValue;
             delete yyvsp[0].stringValue;
             ;
@@ -2382,7 +2382,7 @@ yyreduce:
 #line 841 "sqlparser.y"
         {
             yyval.variantValue = new QVariant(yyvsp[0].integerValue);
-            PreDbg << "OrderByColumnId: " << *yyval.variantValue << endl;
+            PreDbg << "OrderByColumnId: " << *yyval.variantValue;
             ;
         }
         break;
@@ -2406,7 +2406,7 @@ yyreduce:
     case 44:
 #line 864 "sqlparser.y"
         {
-// PreDbg << "AND " << $3.debugString() << endl;
+// PreDbg << "AND " << $3.debugString();
             yyval.expr = new BinaryExpr(KexiDBExpr_Logical, yyvsp[-2].expr, AND, yyvsp[0].expr);
             ;
         }
@@ -2643,7 +2643,7 @@ yyreduce:
             yyval.expr = new VariableExpr(*yyvsp[0].stringValue);
 
 //TODO: simplify this later if that's 'only one field name' expression
-            PreDbg << "  + identifier: " << *yyvsp[0].stringValue << endl;
+            PreDbg << "  + identifier: " << *yyvsp[0].stringValue;
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2653,7 +2653,7 @@ yyreduce:
 #line 1034 "sqlparser.y"
         {
             yyval.expr = new QueryParameterExpr(*yyvsp[0].stringValue);
-            PreDbg << "  + query parameter: " << yyval.expr->debugString() << endl;
+            PreDbg << "  + query parameter: " << yyval.expr->debugString();
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2662,7 +2662,7 @@ yyreduce:
     case 82:
 #line 1040 "sqlparser.y"
         {
-            PreDbg << "  + function: " << *yyvsp[-1].stringValue << "(" << yyvsp[0].exprList->debugString() << ")" << endl;
+            PreDbg << "  + function: " << *yyvsp[-1].stringValue << "(" << yyvsp[0].exprList->debugString() << ")";
             yyval.expr = new FunctionExpr(*yyvsp[-1].stringValue, yyvsp[0].exprList);
             delete yyvsp[-1].stringValue;
             ;
@@ -2673,7 +2673,7 @@ yyreduce:
 #line 1047 "sqlparser.y"
         {
             yyval.expr = new VariableExpr(*yyvsp[-2].stringValue + "." + *yyvsp[0].stringValue);
-            PreDbg << "  + identifier.identifier: " << *yyvsp[-2].stringValue << "." << *yyvsp[0].stringValue << endl;
+            PreDbg << "  + identifier.identifier: " << *yyvsp[-2].stringValue << "." << *yyvsp[0].stringValue;
             delete yyvsp[-2].stringValue;
             delete yyvsp[0].stringValue;
             ;
@@ -2684,7 +2684,7 @@ yyreduce:
 #line 1054 "sqlparser.y"
         {
             yyval.expr = new ConstExpr(SQL_NULL, QVariant());
-            PreDbg << "  + NULL" << endl;
+            PreDbg << "  + NULL";
 // $$ = new Field();
             //$$->setName(QString::null);
             ;
@@ -2695,7 +2695,7 @@ yyreduce:
 #line 1061 "sqlparser.y"
         {
             yyval.expr = new ConstExpr(CHARACTER_STRING_LITERAL, *yyvsp[0].stringValue);
-            PreDbg << "  + constant " << yyvsp[0].stringValue << endl;
+            PreDbg << "  + constant " << yyvsp[0].stringValue;
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2717,7 +2717,7 @@ yyreduce:
 //TODO ok?
 
             yyval.expr = new ConstExpr(INTEGER_CONST, val);
-            PreDbg << "  + int constant: " << val.toString() << endl;
+            PreDbg << "  + int constant: " << val.toString();
             ;
         }
         break;
@@ -2726,7 +2726,7 @@ yyreduce:
 #line 1084 "sqlparser.y"
         {
             yyval.expr = new ConstExpr(REAL_CONST, QPoint(yyvsp[0].realValue.integer, yyvsp[0].realValue.fractional));
-            PreDbg << "  + real constant: " << yyvsp[0].realValue.integer << "." << yyvsp[0].realValue.fractional << endl;
+            PreDbg << "  + real constant: " << yyvsp[0].realValue.integer << "." << yyvsp[0].realValue.fractional;
             ;
         }
         break;
@@ -2734,7 +2734,7 @@ yyreduce:
     case 89:
 #line 1095 "sqlparser.y"
         {
-            PreDbg << "(expr)" << endl;
+            PreDbg << "(expr)";
             yyval.expr = new UnaryExpr('(', yyvsp[-1].expr);
             ;
         }
@@ -2799,7 +2799,7 @@ yyreduce:
     case 96:
 #line 1185 "sqlparser.y"
         {
-            PreDbg << "FROM: '" << *yyvsp[0].stringValue << "'" << endl;
+            PreDbg << "FROM: '" << *yyvsp[0].stringValue << "'";
             yyval.expr = new VariableExpr(*yyvsp[0].stringValue);
 
             /*
@@ -2863,7 +2863,7 @@ yyreduce:
         {
             yyval.exprList = yyvsp[-2].exprList;
             yyval.exprList->add(yyvsp[0].expr);
-            PreDbg << "ColViews: ColViews , ColItem" << endl;
+            PreDbg << "ColViews: ColViews , ColItem";
             ;
         }
         break;
@@ -2873,7 +2873,7 @@ yyreduce:
         {
             yyval.exprList = new NArgExpr(0, 0);
             yyval.exprList->add(yyvsp[0].expr);
-            PreDbg << "ColViews: ColItem" << endl;
+            PreDbg << "ColViews: ColItem";
             ;
         }
         break;
@@ -2886,7 +2886,7 @@ yyreduce:
 // $$->setExpression( $1 );
 // parser->select()->addField($$);
             yyval.expr = yyvsp[0].expr;
-            PreDbg << " added column expr: '" << yyvsp[0].expr->debugString() << "'" << endl;
+            PreDbg << " added column expr: '" << yyvsp[0].expr->debugString() << "'";
             ;
         }
         break;
@@ -2895,7 +2895,7 @@ yyreduce:
 #line 1264 "sqlparser.y"
         {
             yyval.expr = yyvsp[0].expr;
-            PreDbg << " added column wildcard: '" << yyvsp[0].expr->debugString() << "'" << endl;
+            PreDbg << " added column wildcard: '" << yyvsp[0].expr->debugString() << "'";
             ;
         }
         break;
@@ -2907,7 +2907,7 @@ yyreduce:
                 KexiDBExpr_SpecialBinary, yyvsp[-2].expr, AS,
                 new VariableExpr(*yyvsp[0].stringValue)
             );
-            PreDbg << " added column expr: " << yyval.expr->debugString() << endl;
+            PreDbg << " added column expr: " << yyval.expr->debugString();
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2920,7 +2920,7 @@ yyreduce:
                 KexiDBExpr_SpecialBinary, yyvsp[-1].expr, 0,
                 new VariableExpr(*yyvsp[0].stringValue)
             );
-            PreDbg << " added column expr: " << yyval.expr->debugString() << endl;
+            PreDbg << " added column expr: " << yyval.expr->debugString();
             delete yyvsp[0].stringValue;
             ;
         }
@@ -2948,7 +2948,7 @@ yyreduce:
 #line 1343 "sqlparser.y"
         {
             yyval.expr = new VariableExpr("*");
-            PreDbg << "all columns" << endl;
+            PreDbg << "all columns";
 
 // QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
 // parser->select()->addAsterisk(ast);
@@ -2963,7 +2963,7 @@ yyreduce:
             QString s(*yyvsp[-2].stringValue);
             s += ".*";
             yyval.expr = new VariableExpr(s);
-            PreDbg << "  + all columns from " << s << endl;
+            PreDbg << "  + all columns from " << s;
             delete yyvsp[-2].stringValue;
             ;
         }

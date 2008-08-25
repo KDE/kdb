@@ -90,7 +90,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
   // set destination file name here.
   kexiConnectionData->driverName = Predicate::defaultFileBasedDriverName();
   kexiConnectionData->setFileName( tempDatabase );
-  PreDrvDbg << "Current file name: " << tempDatabase << endl;
+  PreDrvDbg << "Current file name: " << tempDatabase;
 
 
   QString sourceDriverName = "xbase";
@@ -98,7 +98,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
   KexiMigration::KexiMigrate* sourceDriver = 0;
   sourceDriver = xBase2KexiMigrateManager.driver( sourceDriverName );
   if(!sourceDriver || xBase2KexiMigrateManager.error()) {
-    PreDrvDbg << "Import migrate driver error..." << endl;
+    PreDrvDbg << "Import migrate driver error...";
     return false;
   }
 
@@ -189,7 +189,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 bool xBaseConnectionInternal::executeSQL(const QString& statement)
 {
 //	PreDrvDbg << "xBaseConnectionInternal::executeSQL: "
-//	             << statement << endl;
+//	             << statement;
   if ( !internalConn ) {
     return false;
   }

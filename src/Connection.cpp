@@ -1616,7 +1616,7 @@ bool Connection::storeMainFieldSchema(Field *field)
 }
 
 #define createTable_ERR \
-    { PreDbg << "Connection::createTable(): ERROR!" <<endl; \
+    { PreDbg << "Connection::createTable(): ERROR!"; \
         setError(this, tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
@@ -2907,7 +2907,7 @@ Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
     RecordData fieldData;
     bool ok = true;
     while (!cursor->eof()) {
-//  PreDbg<<"@@@ f_name=="<<cursor->value(2).asCString()<<endl;
+//  PreDbg<<"@@@ f_name=="<<cursor->value(2).asCString();
         if (!cursor->storeCurrentRow(fieldData)) {
             ok = false;
             break;

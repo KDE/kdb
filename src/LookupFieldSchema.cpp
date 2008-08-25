@@ -152,7 +152,7 @@ QString LookupFieldSchema::RowSource::debugString() const
 
 void LookupFieldSchema::RowSource::debug() const
 {
-    PreDbg << debugString() << endl;
+    PreDbg << debugString();
 }
 
 //----------------------------
@@ -217,7 +217,7 @@ QString LookupFieldSchema::debugString() const
 
 void LookupFieldSchema::debug() const
 {
-    PreDbg << debugString() << endl;
+    PreDbg << debugString();
 }
 
 /* static */

@@ -83,17 +83,17 @@ SQLiteConnection::SQLiteConnection(Driver *driver, ConnectionData &conn_data)
 
 SQLiteConnection::~SQLiteConnection()
 {
-    PreDrvDbg << "SQLiteConnection::~SQLiteConnection()" << endl;
+    PreDrvDbg << "SQLiteConnection::~SQLiteConnection()";
     //disconnect if was connected
 // disconnect();
     destroy();
     delete d;
-    PreDrvDbg << "SQLiteConnection::~SQLiteConnection() ok" << endl;
+    PreDrvDbg << "SQLiteConnection::~SQLiteConnection() ok";
 }
 
 bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
-    PreDrvDbg << "SQLiteConnection::connect()" << endl;
+    PreDrvDbg << "SQLiteConnection::connect()";
     version.string = QString(SQLITE_VERSION); //defined in sqlite3.h
     QRegExp re("(\\d+)\\.(\\d+)\\.(\\d+)");
     if (re.exactMatch(version.string)) {
@@ -106,7 +106,7 @@ bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
 
 bool SQLiteConnection::drv_disconnect()
 {
-    PreDrvDbg << "SQLiteConnection::disconnect()" << endl;
+    PreDrvDbg << "SQLiteConnection::disconnect()";
     return true;
 }
 
@@ -129,7 +129,7 @@ bool SQLiteConnection::drv_getTablesList(QStringList &list)
     Predicate::Cursor *cursor;
     m_sql = "select lower(name) from sqlite_master where type='table'";
     if (!(cursor = executeQuery(m_sql))) {
-        PreWarn << "Connection::drv_getTablesList(): !executeQuery()" << endl;
+        PreWarn << "Connection::drv_getTablesList(): !executeQuery()";
         return false;
     }
     list.clear();
@@ -161,7 +161,7 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                                        MessageHandler* msgHandler)
 {
     Q_UNUSED(dbName);
-// PreDrvDbg << "drv_useDatabase(): " << data()->fileName() << endl;
+// PreDrvDbg << "drv_useDatabase(): " << data()->fileName();
     //TODO: perhaps allow to use sqlite3_open16() as well for SQLite ~ 3.3 ?
 //! @todo add option (command line or in kexirc?)
     int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
@@ -265,7 +265,7 @@ Cursor* SQLiteConnection::prepareQuery(QuerySchema& query, uint cursor_options)
 
 bool SQLiteConnection::drv_executeSQL(const QString& statement)
 {
-// PreDrvDbg << "SQLiteConnection::drv_executeSQL(" << statement << ")" <<endl;
+// PreDrvDbg << "SQLiteConnection::drv_executeSQL(" << statement << ")";
 // QCString st(statement.length()*2);
 // st = escapeString( statement.local8Bit() ); //?
 #ifdef SQLITE_UTF8

@@ -69,7 +69,7 @@ void xBaseCursor::init() {
 }
 
 bool xBaseCursor::drv_open() {
-//	PreDrvDbg << "xBaseCursor::drv_open:" << m_sql << endl;
+//	PreDrvDbg << "xBaseCursor::drv_open:" << m_sql;
   if (!d->internalCursor) {
     return false;
   }

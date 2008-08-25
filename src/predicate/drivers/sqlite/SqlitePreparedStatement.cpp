@@ -199,7 +199,7 @@ bool SQLitePreparedStatement::execute(const Arguments& args)
             }
             default:
                 PreWarn << "PreparedStatement::execute(): unsupported field type: "
-                << field->type() << " - NULL value bound to column #" << arg << endl;
+                << field->type() << " - NULL value bound to column #" << arg;
                 res = sqlite3_bind_null(prepared_st_handle, arg);
                 if (SQLITE_OK != res) {
                     //! @todo msg?

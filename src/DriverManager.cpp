@@ -313,7 +313,7 @@ void DriverManagerInternal::decRefCount()
     m_refCount--;
     PreDbg << "DriverManagerInternal::decRefCount(): " << m_refCount;
 // if (m_refCount<1) {
-//  PreDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()"<<endl;
+//  PreDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()";
 //  s_self=0;
 //  deleteLater();
 // }

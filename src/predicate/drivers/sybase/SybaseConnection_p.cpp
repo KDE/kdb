@@ -72,7 +72,7 @@ SybaseConnectionInternal::~SybaseConnectionInternal()
 
 void SybaseConnectionInternal::storeResult()
 {
-    //PreDrvDbg << "Store Result!!" << endl;
+    //PreDrvDbg << "Store Result!!";
     // all message numbers and message texts were handled in the messageHandler
     // so don't do anything here
 }
@@ -109,7 +109,7 @@ bool SybaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
     // set message handler
     dbmsghandle(connectionMessageHandler);
 
-    PreDrvDbg << "SybaseConnectionInternal::connect()" << endl;
+    PreDrvDbg << "SybaseConnectionInternal::connect()";
     QByteArray localSocket;
     QString hostName = data.hostName;
 
@@ -227,7 +227,7 @@ bool SybaseConnectionInternal::db_disconnect()
 
     dbclose(dbProcess);
     dbProcess = 0;
-    PreDrvDbg << "SybaseConnection::disconnect()" << endl;
+    PreDrvDbg << "SybaseConnection::disconnect()";
     return true;
 }
 

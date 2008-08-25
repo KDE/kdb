@@ -336,7 +336,7 @@ Field::setType(Type t)
 {
     if (m_expr) {
         PreWarn << QString("Field::setType(%1)").arg(t)
-        << " could not set type because the Field.has expression assigned!" << endl;
+        << " could not set type because the Field.has expression assigned!";
         return;
     }
     m_type = t;
@@ -646,7 +646,7 @@ QString Field::debugString() const
 
 void Field::debug()
 {
-    PreDbg << debugString() << endl;
+    PreDbg << debugString();
 }
 
 void Field::setExpression(Predicate::BaseExpr *expr)

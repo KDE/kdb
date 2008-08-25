@@ -277,7 +277,7 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 }
 
 {identifier} {
-	PreDbg << "yytext: '" << yytext << "' (" << yyleng << ")" << endl;
+	PreDbg << "yytext: '" << yytext << "' (" << yyleng << ")";
 	ECOUNT;
 	yylval.stringValue = new QString(QString::fromUtf8(yytext, yyleng));
 	if (yytext[0]>='0' && yytext[0]<='9') {
@@ -289,7 +289,7 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 }
 
 {query_parameter} {
-	PreDbg << "yytext: '" << yytext << "' (" << yyleng << ")" << endl;
+	PreDbg << "yytext: '" << yytext << "' (" << yyleng << ")";
 	ECOUNT;
 	yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
 	return QUERY_PARAMETER;
@@ -300,7 +300,7 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 }
 
 [\~\!\@\#\^\&\|\`\?,()\[\]\.;\:\+\-\*\/\%\^\<\>\=] {
-	PreDbg << "char: '" << yytext[0] << "'" << endl;
+	PreDbg << "char: '" << yytext[0] << "'";
 	ECOUNT;
 	return yytext[0];
 }

@@ -42,7 +42,7 @@ SybaseDriver::SybaseDriver(QObject *parent, const QStringList &args) :
         Driver(parent, args)
 {
 
-// PreDrvDbg << "SybaseDriver::SybaseDriver()" << endl;
+// PreDrvDbg << "SybaseDriver::SybaseDriver()";
 
 //    d->isFileDriver = false ;
 

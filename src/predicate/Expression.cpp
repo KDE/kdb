@@ -702,7 +702,7 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
     tableForQueryAsterisk = 0;
 
     /* taken from parser's addColumn(): */
-    PreDbg << "checking variable name: " << name << endl;
+    PreDbg << "checking variable name: " << name;
     int dotPos = name.indexOf('.');
     QString tableName, fieldName;
 //TODO: shall we also support db name?
@@ -760,7 +760,7 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
                 covered = false; //uncovered
                 break;
             }
-            PreDbg << " --" << "covered by " << tableAlias << " alias" << endl;
+            PreDbg << " --" << "covered by " << tableAlias << " alias";
         }
         if (covered) {
             parseInfo.errMsg = QObject::tr("Could not access the table directly using its name");
@@ -776,7 +776,7 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
         if (tablePosition >= 0) {
             ts = parseInfo.querySchema->tables()->at(tablePosition);
             if (ts) {
-//    PreDbg << " --it's a tableAlias.name" << endl;
+//    PreDbg << " --it's a tableAlias.name";
             }
         }
     }
@@ -805,7 +805,7 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
         return true;
     }
 
-// PreDbg << " --it's a table.name" << endl;
+// PreDbg << " --it's a table.name";
     Field *realField = ts->field(fieldName);
     if (!realField) {
         parseInfo.errMsg = QObject::tr("Field not found");

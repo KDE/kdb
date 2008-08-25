@@ -114,16 +114,16 @@ Cursor::~Cursor()
         Utils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement);
 #endif
     /* if (!m_query)
-        PreDbg << "Cursor::~Cursor() '" << m_rawStatement.toLatin1() << "'" << endl;
+        PreDbg << "Cursor::~Cursor() '" << m_rawStatement.toLatin1() << "'";
       else
-        PreDbg << "Cursor::~Cursor() " << endl;*/
+        PreDbg << "Cursor::~Cursor() ";*/
 
     //take me if delete was
     if (!m_conn->m_insideCloseDatabase) {
         if (!m_conn->m_destructor_started) {
             m_conn->takeCursor(*this);
         } else {
-            PreDbg << "Cursor::~Cursor() can be destroyed with Conenction::deleteCursor(), not with delete operator !" << endl;
+            PreDbg << "Cursor::~Cursor() can be destroyed with Conenction::deleteCursor(), not with delete operator !";
             exit(1);
         }
     }
@@ -141,7 +141,7 @@ bool Cursor::open()
         m_conn->m_sql = m_rawStatement;
     else {
         if (!m_query) {
-            PreDbg << "Cursor::open(): no query statement (or schema) defined!" << endl;
+            PreDbg << "Cursor::open(): no query statement (or schema) defined!";
             setError(ERR_SQL_EXECUTION_ERROR, tr("No query statement or schema defined."));
             return false;
         }
@@ -151,7 +151,7 @@ bool Cursor::open()
                         ? m_conn->selectStatement(*m_query, *m_queryParameters, options)
                         : m_conn->selectStatement(*m_query, options);
         if (m_conn->m_sql.isEmpty()) {
-            PreDbg << "Cursor::open(): empty statement!" << endl;
+            PreDbg << "Cursor::open(): empty statement!";
             setError(ERR_SQL_EXECUTION_ERROR, tr("Query statement is empty."));
             return false;
         }
@@ -170,9 +170,9 @@ bool Cursor::open()
 //luci: WHAT_EXACTLY_SHOULD_THAT_BE?
 // if (!m_readAhead) // jowenn: to ensure before first state, without cluttering implementation code
     if (m_conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
-//  PreDbg << "READ AHEAD:" << endl;
+//  PreDbg << "READ AHEAD:";
         m_readAhead = getNextRecord(); //true if any record in this query
-//  PreDbg << "READ AHEAD = " << m_readAhead << endl;
+//  PreDbg << "READ AHEAD = " << m_readAhead;
     }
     m_at = 0; //we are still before 1st rec
     return !error();
@@ -195,7 +195,7 @@ bool Cursor::close()
     m_logicalFieldCount = 0;
     m_at = -1;
 
-// PreDbg<<"Cursor::close() == "<<ret<<endl;
+// PreDbg<<"Cursor::close() == "<<ret;
     return ret;
 }
 
@@ -375,7 +375,7 @@ bool Cursor::getNextRecord()
     m_result = -1; //by default: invalid result of row fetching
 
     if ((m_options & Buffered)) {//this cursor is buffered:
-//  PreDbg << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf << endl;
+//  PreDbg << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
 //js  if (m_at==-1) m_at=0;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
 ///  if (m_at < (m_records_in_buf-1)) {//we have next record already buffered:
@@ -393,12 +393,12 @@ bool Cursor::getNextRecord()
                 if (!m_buffering_completed) {
                     //retrieve record only if we are not after
                     //the last buffer's item (i.e. when buffer is not fully filled):
-//     PreDbg<<"==== buffering: drv_getNextRecord() ===="<<endl;
+//     PreDbg<<"==== buffering: drv_getNextRecord() ====";
                     drv_getNextRecord();
                 }
                 if ((FetchResult) m_result != FetchOK) {//there is no record
                     m_buffering_completed = true; //no more records for buffer
-//     PreDbg<<"m_result != FetchOK ********"<<endl;
+//     PreDbg<<"m_result != FetchOK ********";
                     m_validRecord = false;
                     m_afterLast = true;
 //js     m_at = m_records_in_buf;
@@ -420,10 +420,10 @@ bool Cursor::getNextRecord()
         }
     } else {//we are after last retrieved record: we need to physically fetch next record:
         if (!m_readAhead) {//we have no record that was read ahead
-//   PreDbg<<"==== no prefetched record ===="<<endl;
+//   PreDbg<<"==== no prefetched record ====";
             drv_getNextRecord();
             if ((FetchResult)m_result != FetchOK) {//there is no record
-//    PreDbg<<"m_result != FetchOK ********"<<endl;
+//    PreDbg<<"m_result != FetchOK ********";
                 m_validRecord = false;
                 m_afterLast = true;
                 m_at = -1;
@@ -441,9 +441,9 @@ bool Cursor::getNextRecord()
 
 // if (m_data->curr_colname && m_data->curr_coldata)
 //  for (int i=0;i<m_data->curr_cols;i++) {
-//   PreDbg<<i<<": "<< m_data->curr_colname[i]<<" == "<< m_data->curr_coldata[i]<<endl;
+//   PreDbg<<i<<": "<< m_data->curr_colname[i]<<" == "<< m_data->curr_coldata[i];
 //  }
-// PreDbg<<"m_at == "<<(long)m_at<<endl;
+// PreDbg<<"m_at == "<<(long)m_at;
 
     m_validRecord = true;
     return true;
@@ -513,7 +513,7 @@ QString Cursor::debugString() const
 
 void Cursor::debug() const
 {
-    PreDbg << debugString() << endl;
+    PreDbg << debugString();
 }
 
 void Cursor::setOrderByColumnList(const QStringList& columnNames)

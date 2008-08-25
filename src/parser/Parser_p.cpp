@@ -76,8 +76,8 @@ extern void tokenize(const char *data);
 
 void yyerror(const char *str)
 {
-    PreDbg << "error: " << str << endl;
-    PreDbg << "at character " << current << " near tooken " << ctoken << endl;
+    PreDbg << "error: " << str;
+    PreDbg << "at character " << current << " near tooken " << ctoken;
     parser->setOperation(Parser::OP_Error);
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
@@ -86,14 +86,14 @@ void yyerror(const char *str)
             && (str == 0 || strlen(str) == 0
                 || qstrnicmp(str, "syntax error", 12) == 0 || qstrnicmp(str, "parse error", 11) == 0)
             || otherError) {
-        PreDbg << parser->statement() << endl;
+        PreDbg << parser->statement();
         QString ptrline = "";
         for (int i = 0; i < current; i++)
             ptrline += " ";
 
         ptrline += "^";
 
-        PreDbg << ptrline << endl;
+        PreDbg << ptrline;
 
         //lexer may add error messages
         QString lexerErr = parser->error().error();
@@ -104,7 +104,7 @@ void yyerror(const char *str)
             if (errtypestr.startsWith("parse error, unexpected ")) {
                 //something like "parse error, unexpected IDENTIFIER, expecting ',' or ')'"
                 QString e = errtypestr.mid(24);
-                PreDbg << e << endl;
+                PreDbg << e;
                 QString token = "IDENTIFIER";
                 if (e.startsWith(token)) {
                     QRegExp re("'.'");
@@ -112,8 +112,8 @@ void yyerror(const char *str)
                     pos = re.search(e, pos);
                     QStringList captured = re.capturedTexts();
                     if (captured.count() >= 2) {
-//      PreDbg << "**" << captured.at(1) << endl;
-//      PreDbg << "**" << captured.at(2) << endl;
+//      PreDbg << "**" << captured.at(1);
+//      PreDbg << "**" << captured.at(2);
                     }
                 }
 
@@ -121,7 +121,7 @@ void yyerror(const char *str)
 
 //    IDENTIFIER, expecting '")) {
                 e = errtypestr.mid(47);
-                PreDbg << e << endl;
+                PreDbg << e;
 //    ,' or ')'
 //  lexerErr QObject::tr("identifier was expected");
 
@@ -189,12 +189,12 @@ bool parseData(Parser *p, const char *data)
 
     bool ok = true;
     if (parser->operation() == Parser::OP_Select) {
-        PreDbg << "parseData(): ok" << endl;
-//   PreDbg << "parseData(): " << tableDict.count() << " loaded tables" << endl;
+        PreDbg << "parseData(): ok";
+//   PreDbg << "parseData(): " << tableDict.count() << " loaded tables";
         /*   TableSchema *ts;
               for(QDictIterator<TableSchema> it(tableDict); TableSchema *s = tableList.first(); s; s = tableList.next())
               {
-                PreDbg << " " << s->name() << endl;
+                PreDbg << " " << s->name();
               }*/
         /*removed
               Field::ListIterator it = parser->select()->fieldsIterator();
@@ -256,7 +256,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
     parseInfo.querySchema->addExpression(columnExpr);
 
 #if 0
-    PreDbg << "found variable name: " << varName << endl;
+    PreDbg << "found variable name: " << varName;
     int dotPos = varName.find('.');
     QString tableName, fieldName;
 //TODO: shall we also support db name?
@@ -310,7 +310,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
                     covered = false; //uncovered
                     break;
                 }
-                PreDbg << " --" << "covered by " << tableAlias << " alias" << endl;
+                PreDbg << " --" << "covered by " << tableAlias << " alias";
             }
             if (covered) {
                 setError(QObject::tr("Could not access the table directly using its name"),
@@ -329,7 +329,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
             if (tablePosition >= 0) {
                 ts = parseInfo.querySchema->tables()->at(tablePosition);
                 if (ts) {
-//     PreDbg << " --it's a tableAlias.name" << endl;
+//     PreDbg << " --it's a tableAlias.name";
                 }
             }
         }
@@ -350,7 +350,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
                 }
                 parseInfo.querySchema->addAsterisk(new QueryAsterisk(parseInfo.querySchema, ts));
             } else {
-//    PreDbg << " --it's a table.name" << endl;
+//    PreDbg << " --it's a table.name";
                 Field *realField = ts->field(fieldName);
                 if (realField) {
                     // check if table or alias is used twice and both have the same column
@@ -434,7 +434,7 @@ QuerySchema* buildSelectQuery(
             QString tableOrAliasName;
             if (!aliasString.isEmpty()) {
                 tableOrAliasName = aliasString;
-//    PreDbg << "- add alias for table: " << aliasString << endl;
+//    PreDbg << "- add alias for table: " << aliasString;
             } else {
                 tableOrAliasName = tname;
             }
@@ -450,7 +450,7 @@ QuerySchema* buildSelectQuery(
                     tableNamesAndTableAliases.insert(tname, (const char*)1);
                 }
                 if (!aliasString.isEmpty()) {
-                  PreDbg << "- add alias for table: " << aliasString << endl;
+                  PreDbg << "- add alias for table: " << aliasString;
             //   querySchema->setTableAlias(columnNum, aliasString);
                   //2. collect information about first repeated table name or alias
                   //   (potential ambiguity)
@@ -461,7 +461,7 @@ QuerySchema* buildSelectQuery(
                       tableNamesAndTableAliases.insert(aliasString, (const char*)1);
                   }
                 }*/
-//   PreDbg << "addTable: " << tname << endl;
+//   PreDbg << "addTable: " << tname;
             querySchema->addTable(s, aliasString.toLatin1());
         }
     }
@@ -507,7 +507,7 @@ QuerySchema* buildSelectQuery(
                 //just a variable, do nothing, addColumn() will handle this
             } else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
-//  PreDbg << colViews->list.count() << " " << it.current()->debugString() << endl;
+//  PreDbg << colViews->list.count() << " " << it.current()->debugString();
                 it.remove();
 //Qt4    moveNext = false;
             } else if (aliasVariable) {
@@ -524,7 +524,7 @@ QuerySchema* buildSelectQuery(
 
             if (aliasVariable) {
 //    PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
-//     << columnNum << endl;
+//     << columnNum;
                 querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
             }
             /*  if (e->exprClass() == KexiDBExpr_SpecialBinary && dynamic_cast<BinaryExpr*>(e)
@@ -538,7 +538,7 @@ QuerySchema* buildSelectQuery(
                     return 0;
                   }
                   PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
-                    << columnNum << endl;
+                    << columnNum;
                   querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
                 }*/
 
@@ -602,7 +602,7 @@ QuerySchema* buildSelectQuery(
     }
 
 // PreDbg << "Select ColViews=" << (colViews ? colViews->debugString() : QString())
-//  << " Tables=" << (tablesList ? tablesList->debugString() : QString()s) << endl;
+//  << " Tables=" << (tablesList ? tablesList->debugString() : QString()s);
 
     CLEANUP;
     return querySchema;
