@@ -24,11 +24,13 @@ TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes a
   Admin.cpp
   Alter.cpp
 *  Connection.cpp
+TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
 *  Connectiondata.cpp
 *  Cursor.cpp
   DbObjectNameValidator.cpp
   DbProperties.cpp
 **  Driver.cpp
+- Driver::Info is implicitly shared class now
 **  DriverManager.cpp
   drivers/mysql/MysqlConnection.cpp
   drivers/mysql/MysqlConnection_p.cpp
@@ -74,6 +76,7 @@ TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes a
 *  Expression.cpp
 *  Field.cpp
 *  FieldList.cpp
+- added isEmpty()
   FieldValidator.cpp
 *  Global.cpp
 *  IndexSchema.cpp
@@ -87,6 +90,17 @@ TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes a
 *  parser/SqlScanner.cpp
 *  parser/tokens.cpp
   PreparedStatement.cpp
+- it's implicitly shared class now
+- arguments are no longer provided using operator << but instead in execute(), 
+  so PreparedStatement is more generic now. Operator << and clearArguments() is thus removed.
+- StatementType -> Type, added Arguments typedef
+- execute() aborts now if at least one field provided on whereFieldNames list is not found
+  (before it was ignored)
+- internal: the statement is now created using utf8, not latin1 functions
+- internal: to implement PreparedStatement in a driver, one has to write these methods:
+    virtual bool executeInternal( const Arguments& args );
+    virtual bool prepare(QByteArray& statement) = 0;
+TODO: more changes like these related to WHERE expression
 *  QuerySchema.cpp
 *  QuerySchemaParameter.cpp
 *  RecordData.cpp
