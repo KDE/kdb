@@ -1,22 +1,41 @@
-# - Try to find the libsqlite libraries
+# - Try to find the SQLITE library
 # Once done this will define
 #
-# SQLite_FOUND - system has libsqlite
-# SQLITE_INCLUDE_DIR - the libsqlite include directory
-# SQLITE_LIBRARIES - libsqlite library
-FIND_PATH(SQLITE_INCLUDE_DIR sqlite3.h)
-FIND_LIBRARY(SQLITE_LIBRARIES NAMES sqlite3)
-if(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
- set(SQLite_FOUND TRUE)
-endif(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
+#  SQLITE_FOUND - system has sqlite
+#  SQLITE_INCLUDE_DIR - the sqlite include directory
+#  SQLITE_LIBRARIES - Link these to use sqlite
+#  SQLITE_DEFINITIONS - Compiler switches required for using sqlite
+#
 
-IF(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
-  SET(SQLite_FOUND 1)
-  if(NOT SQLite_FIND_QUIETLY)
-   message(STATUS "Found libsqlite: ${SQLITE_LIBRARIES}")
-  endif(NOT SQLite_FIND_QUIETLY)
-ELSE(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
-  SET(SQLite_FOUND 0 CACHE BOOL "Not found sqlite library")
-ENDIF(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
+if (SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
 
-MARK_AS_ADVANCED(SQLITE_INCLUDE_DIR SQLITE_LIBRARIES)
+  # in cache already
+  SET(SQLITE_FOUND TRUE)
+
+else (SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
+  IF (NOT WIN32)
+    # use pkg-config to get the directories and then use these values
+    # in the FIND_PATH() and FIND_LIBRARY() calls
+    INCLUDE(UsePkgConfig)
+  
+    PKGCONFIG(sqlite3 _SQLITEIncDir _SQLITELinkDir _SQLITELinkFlags _SQLITECflags)
+  
+    set(SQLITE_DEFINITIONS ${_SQLITECflags})
+  ENDIF (NOT WIN32)
+
+  FIND_PATH(SQLITE_INCLUDE_DIR sqlite3.h
+    ${_SQLITEIncDir}
+  )
+  
+  FIND_LIBRARY(SQLITE_LIBRARIES NAMES sqlite3
+    PATHS
+    ${_SQLITELinkDir}
+  )
+ 
+  
+  include(FindPackageHandleStandardArgs)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(Sqlite DEFAULT_MSG SQLITE_INCLUDE_DIR SQLITE_LIBRARIES )
+  
+  MARK_AS_ADVANCED(SQLITE_INCLUDE_DIR SQLITE_LIBRARIES)
+  
+endif (SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
