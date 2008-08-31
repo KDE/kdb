@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,17 +29,58 @@
  It is altered after every API change:
  - major number is increased after Predicate storage format change,
  - minor is increased after adding binary-incompatible change.
- In external code: do not use this to get library version information:
- use Predicate::versionMajor() and Predicate::versionMinor() instead to get real version.
+ In external code: do not use this to get library version information.
+ See Predicate::version() if you need the Predicate version used at runtime.
 */
-#define PREDICATE_VERSION_MAJOR 2
-#define PREDICATE_VERSION_MINOR 0
+#cmakedefine PREDICATE_VERSION_MAJOR @PREDICATE_VERSION_MAJOR@
+#cmakedefine PREDICATE_VERSION_MINOR @PREDICATE_VERSION_MINOR@
+#cmakedefine PREDICATE_VERSION_RELEASE @PREDICATE_VERSION_RELEASE@
 
-#define PREDICATE_VERSION_MAJOR_STRING "2"
-#define PREDICATE_VERSION_MINOR_STRING "0"
+#define PREDICATE_VERSION_MAJOR_STRING "@PREDICATE_VERSION_MAJOR@"
+#define PREDICATE_VERSION_MINOR_STRING "@PREDICATE_VERSION_MINOR@"
+#define PREDICATE_VERSION_RELEASE_STRING "@PREDICATE_VERSION_MINOR@"
+#define PREDICATE_VERSION_STRING "@PREDICATE_VERSION_STRING@"
 
-/*! Predicate implementation version. @see PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR */
-#define PREDICATE_VERSION Predicate::DatabaseVersionInfo(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR)
+/**
+ * @brief Make a number from the major, minor and release number of a Predicate version
+ *
+ * This function can be used for preprocessing when KDE_IS_VERSION is not
+ * appropriate.
+ */
+#define PREDICATE_MAKE_VERSION( a,b,c ) (((a) << 16) | ((b) << 8) | (c))
+
+/**
+ * @brief Version of Predicate as number, at compile time
+ *
+ * This macro contains the Predicate version in number form. As it is a macro,
+ * it contains the version at compile time. See versionString() if you need
+ * the KDE version used at runtime.
+ */
+#define PREDICATE_VERSION \
+  PREDICATE_MAKE_VERSION(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE)
+
+/**
+ * @brief Check if the Predicate version matches a certain version or is higher
+ *
+ * This macro is typically used to compile conditionally a part of code:
+ * @code
+ * #if PREDICATE_IS_VERSION(2,0,90)
+ * // Code for Predicate 2.1
+ * #else
+ * // Code for Predicate 2.0
+ * #endif
+ * @endcode
+ *
+ * @warning Especially during development phases of Predicate, be careful
+ * when choosing the version number that you are checking against.
+ * Otherwise you might risk to break the next Predicate release.
+ * Therefore be careful that development version have a
+ * version number lower than the released version, so do not check 
+ * e.g. for Predicate 2.1 with KDE_IS_VERSION(2,1,0)
+ * but with the actual version number at a time a needed feature was introduced.
+ */
+#define PREDICATE_IS_VERSION(a,b,c) ( PREDICATE_VERSION >= PREDICATE_MAKE_VERSION(a,b,c) )
+
 
 /*! \namespace Predicate
 \brief High-level database connectivity library with database backend drivers
@@ -124,13 +165,16 @@ class PREDICATE_EXPORT DatabaseVersionInfo
 {
 public:
     DatabaseVersionInfo();
-    DatabaseVersionInfo(uint majorVersion, uint minorVersion);
+    DatabaseVersionInfo(uint majorVersion, uint minorVersion, uint releaseVersion);
 
-    //! Major version number, e.g. 1 for 1.8
+    //! Major version number, e.g. 1 for 1.8.9
     uint major;
 
-    //! Minor version number, e.g. 8 for 1.8
+    //! Minor version number, e.g. 8 for 1.8.9
     uint minor;
+
+    //! Release version number, e.g. 9 for 1.8.9
+    uint release;
 };
 
 //! \return Predicate version info
