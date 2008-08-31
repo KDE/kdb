@@ -5,11 +5,11 @@
 *
 * Please edit the sql_keywords.sh, not this file!
 */
-#include <MysqlDriver.h>
+#include "MysqlDriver.h"
 
 namespace Predicate
 {
-const char* MySqlDriver::keywords[] = {
+const char* MysqlDriver::keywords[] = {
     "ACTION",
     "ADD",
     "AGAINST",

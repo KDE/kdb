@@ -32,7 +32,7 @@
 
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO( xBaseDriver , xbase )
+EXPORT_PREDICATE_DRIVER( xBaseDriver , xbase )
 
 class Predicate::xBaseDriverPrivate {
 

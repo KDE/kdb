@@ -44,9 +44,7 @@ public:
     virtual Cursor* prepareQuery(const QString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
 
-    virtual PreparedStatementInterface* prepareStatementInternal(
-        PreparedStatement::Type type,
-        FieldList& fields, const QStringList& whereFieldNames);
+    virtual PreparedStatementInterface* prepareStatementInternal();
 
     /*! Reimplemented to provide real read-only flag of the connection */
     virtual bool isReadOnly() const;

@@ -26,31 +26,30 @@ using namespace Predicate;
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
-MySqlPreparedStatement::MySqlPreparedStatement(StatementType type, ConnectionInternal& conn,
-        FieldList& fields)
-        : Predicate::PreparedStatement(type, conn, fields)
-        , MySqlConnectionInternal(conn.connection)
-#ifdef KEXI_USE_MYSQL_STMT
+MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal& conn)
+        : PreparedStatementInterface()
+        , MysqlConnectionInternal(conn.connection)
+#ifdef PREDICATE_USE_MYSQL_STMT
         , m_statement(0)
         , m_mysqlBind(0)
 #endif
         , m_resetRequired(false)
 {
-// PreDrvDbg << "MySqlPreparedStatement: Construction";
+// PreDrvDbg;
 
     mysql_owned = false;
-    mysql = dynamic_cast<Predicate::MySqlConnectionInternal&>(conn).mysql; //copy
-    m_tempStatementString = generateStatementString();
+    mysql = dynamic_cast<Predicate::MysqlConnectionInternal&>(conn).mysql; //copy
+//    m_tempStatementString = generateStatementString();
 
     if (!init())
         done();
 }
 
-bool MySqlPreparedStatement::init()
+bool MysqlPreparedStatement::init()
 {
-    if (m_tempStatementString.isEmpty())
-        return false;
-#ifdef KEXI_USE_MYSQL_STMT
+//    if (m_tempStatementString.isEmpty())
+//        return false;
+#ifdef PREDICATE_USE_MYSQL_STMT
     m_statement = mysql_stmt_init(mysql);
     if (!m_statement) {
 //! @todo err 'out of memory'
@@ -75,14 +74,14 @@ bool MySqlPreparedStatement::init()
 }
 
 
-MySqlPreparedStatement::~MySqlPreparedStatement()
+MysqlPreparedStatement::~MysqlPreparedStatement()
 {
     done();
 }
 
-void MySqlPreparedStatement::done()
+void MysqlPreparedStatement::done()
 {
-#ifdef KEXI_USE_MYSQL_STMT
+#ifdef PREDICATE_USE_MYSQL_STMT
     if (m_statement) {
 //! @todo handle errors of mysql_stmt_close()?
         mysql_stmt_close(m_statement);
@@ -93,7 +92,13 @@ void MySqlPreparedStatement::done()
 #endif
 }
 
-#ifdef KEXI_USE_MYSQL_STMT
+bool MysqlPreparedStatement::prepare(const QByteArray& statement)
+{
+    Q_UNUSED(statement);
+    return true;
+}
+
+#ifdef PREDICATE_USE_MYSQL_STMT
 #define BIND_NULL { \
         m_mysqlBind[arg].buffer_type = MYSQL_TYPE_NULL; \
         m_mysqlBind[arg].buffer = 0; \
@@ -102,9 +107,12 @@ void MySqlPreparedStatement::done()
         m_mysqlBind[arg].length = &str_length; }
 #endif
 
-bool MySqlPreparedStatement::execute()
+bool MysqlPreparedStatement::execute(
+    PreparedStatement::Type type,
+    const Field::List& fieldList,
+    const PreparedStatement::Arguments &args)
 {
-#ifdef KEXI_USE_MYSQL_STMT
+#ifdef PREDICATE_USE_MYSQL_STMT
     if (!m_statement || m_realParamCount <= 0)
         return false;
     if (mysql_stmt_errno(m_statement) == CR_SERVER_LOST) {
@@ -284,10 +292,13 @@ bool MySqlPreparedStatement::execute()
     }
 #else
     m_resetRequired = true;
-    if (connection->insertRecord(*m_fields, m_args)) {
+#if 0 //TODO
+    if (type == PreparedStatement::Insert && connection->insertRecord(fieldList, args)) {
         return true;
     }
+#endif
+//TODO handle Select...
 
-#endif //KEXI_USE_MYSQL_STMT
+#endif // !PREDICATE_USE_MYSQL_STMT
     return false;
 }

@@ -21,9 +21,10 @@
 #ifndef _KEXI_ERROR_H_
 #define _KEXI_ERROR_H_
 
-#include <qstring.h>
-#include "Global.h"
-#include "predicate_export.h"
+#include <QtCore/QString>
+
+#include <Predicate/Global.h>
+#include <Predicate/predicate_export.h>
 
 /*! Fine-grained Predicate error codes */
 

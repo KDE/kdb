@@ -31,13 +31,13 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifdef MYSQLMIGRATE_H
 #define NAMESPACE KexiMigration
 #else
-#define NAMESPACE KexiDB
+#define NAMESPACE Predicate
 #endif
 
 using namespace NAMESPACE;
 
 /* ************************************************************************** */
-MySqlConnectionInternal::MySqlConnectionInternal(Predicate::Connection* connection)
+MysqlConnectionInternal::MysqlConnectionInternal(Predicate::Connection* connection)
         : ConnectionInternal(connection)
         , mysql(0)
         , mysql_owned(true)
@@ -45,7 +45,7 @@ MySqlConnectionInternal::MySqlConnectionInternal(Predicate::Connection* connecti
 {
 }
 
-MySqlConnectionInternal::~MySqlConnectionInternal()
+MysqlConnectionInternal::~MysqlConnectionInternal()
 {
     if (mysql_owned && mysql) {
         mysql_close(mysql);
@@ -53,7 +53,7 @@ MySqlConnectionInternal::~MySqlConnectionInternal()
     }
 }
 
-void MySqlConnectionInternal::storeResult()
+void MysqlConnectionInternal::storeResult()
 {
     res = mysql_errno(mysql);
     errmsg = mysql_error(mysql);
@@ -66,14 +66,14 @@ void MySqlConnectionInternal::storeResult()
     none is specified).  If the server is on a remote machine, then a port is
     the port that the remote server is listening on.
  */
-//bool MySqlConnectionInternal::db_connect(QCString host, QCString user,
+//bool MysqlConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool MySqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
+bool MysqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
         return false;
 
-    PreDrvDbg << "MySqlConnectionInternal::connect()";
+    PreDrvDbg;
     QByteArray localSocket;
     QString hostName = data.hostName;
     if (hostName.isEmpty() || hostName.toLower() == "localhost") {
@@ -116,18 +116,18 @@ bool MySqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
 /*! Disconnects from the database.
  */
-bool MySqlConnectionInternal::db_disconnect()
+bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
     mysql = 0;
-    PreDrvDbg << "MySqlConnection::disconnect()";
+    PreDrvDbg;
     return true;
 }
 
 /* ************************************************************************** */
 /*! Selects dbName as the active database so it can be used.
  */
-bool MySqlConnectionInternal::useDatabase(const QString &dbName)
+bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //TODO is here escaping needed?
     return executeSQL("USE " + dbName);
@@ -135,10 +135,9 @@ bool MySqlConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement on the server.
  */
-bool MySqlConnectionInternal::executeSQL(const QString& statement)
+bool MysqlConnectionInternal::executeSQL(const QString& statement)
 {
-// PreDrvDbg << "MySqlConnectionInternal::executeSQL: "
-//              << statement;
+// PreDrvDbg << statement;
     QByteArray queryStr(statement.toUtf8());
     const char *query = queryStr.constData();
     if (mysql_real_query(mysql, query, qstrlen(query)) == 0)
@@ -149,15 +148,15 @@ bool MySqlConnectionInternal::executeSQL(const QString& statement)
     return false;
 }
 
-QString MySqlConnectionInternal::escapeIdentifier(const QString& str) const
+QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 {
     return QString(str).replace('`', "'");
 }
 
 //--------------------------------------
 
-MySqlCursorData::MySqlCursorData(Predicate::Connection* connection)
-        : MySqlConnectionInternal(connection)
+MysqlCursorData::MysqlCursorData(Predicate::Connection* connection)
+        : MysqlConnectionInternal(connection)
         , mysqlres(0)
         , mysqlrow(0)
         , lengths(0)
@@ -166,7 +165,7 @@ MySqlCursorData::MySqlCursorData(Predicate::Connection* connection)
     mysql_owned = false;
 }
 
-MySqlCursorData::~MySqlCursorData()
+MysqlCursorData::~MysqlCursorData()
 {
 }
 

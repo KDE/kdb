@@ -18,6 +18,7 @@
 */
 
 #include "SqlitePreparedStatement.h"
+#include "PreparedStatement.h"
 
 #include <QtDebug>
 #include <assert.h>
@@ -34,6 +35,12 @@ SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal& conn)
     data = dynamic_cast<Predicate::SQLiteConnectionInternal&>(conn).data; //copy
 }
 
+SQLitePreparedStatement::~SQLitePreparedStatement()
+{
+    sqlite3_finalize(prepared_st_handle);
+    prepared_st_handle = 0;
+}
+
 bool SQLitePreparedStatement::prepare(const QByteArray& statement)
 {
     res = sqlite3_prepare(
@@ -47,16 +54,13 @@ bool SQLitePreparedStatement::prepare(const QByteArray& statement)
         return true;
 
 //! @todo copy error msg
-    return false
+    return false;
 }
 
-SQLitePreparedStatement::~SQLitePreparedStatement()
-{
-    sqlite3_finalize(prepared_st_handle);
-    prepared_st_handle = 0;
-}
-
-bool SQLitePreparedStatement::execute(const Arguments& args)
+bool SQLitePreparedStatement::execute(
+    PreparedStatement::Type type,
+    const Field::List& fieldList,
+    const PreparedStatement::Arguments &args)
 {
     if (!prepared_st_handle)
         return false;
@@ -69,20 +73,22 @@ bool SQLitePreparedStatement::execute(const Arguments& args)
         m_resetRequired = false;
     }
 
+/*moved
     //for INSERT, we're iterating over inserting values
     //for SELECT, we're iterating over WHERE conditions
     const Field::List *fieldList = 0;
-    if (d->type == SelectStatement)
+    if (statement.type() == SelectStatement)
         fieldList = &d->whereFields;
     else if (d->type == InsertStatement)
         fieldList = d->fields->fields();
     else
         assert(0); //impl. error
+    */
 
     int arg = 1; //arg index counted from 1
-    Field::ListIterator itFields(fieldList->constBegin());
+    Field::ListIterator itFields(fieldList.constBegin());
     for (QList<QVariant>::ConstIterator it = args.constBegin();
-            itFields != fieldList->constEnd(); ++it, ++itFields, arg++) {
+            itFields != fieldList.constEnd(); ++it, ++itFields, arg++) {
         Predicate::Field *field = *itFields;
         if (it == args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
             res = sqlite3_bind_null(prepared_st_handle, arg);
@@ -212,10 +218,10 @@ bool SQLitePreparedStatement::execute(const Arguments& args)
     //real execution
     res = sqlite3_step(prepared_st_handle);
     m_resetRequired = true;
-    if (d->type == InsertStatement && res == SQLITE_DONE) {
+    if (type == PreparedStatement::Insert && res == SQLITE_DONE) {
         return true;
     }
-    if (d->type == SelectStatement) {
+    if (type == PreparedStatement::Select) {
         //fetch result
 
         //todo

@@ -30,9 +30,10 @@
 #include <QVector>
 #include <QByteArray>
 #include <QSet>
+#include <QtPlugin>
 
-#include "Connection.h"
-#include "Admin.h"
+#include <Predicate/Connection.h>
+#include <Predicate/Admin.h>
 #include <Predicate/tools/Utils.h>
 
 class KService;
@@ -208,7 +209,6 @@ bool isDBOpenedAfterCreate : 1;
     UI consistency and to allow DB migration without changing the queries.
     */
     static const char* kexiSQLKeywords[];
-
 protected:
     /*! Used by Driver::setInfo() to initialize properties based on the info. */
     void initInternalProperties();
@@ -232,14 +232,10 @@ public:
 
 //! Export the driver class @a driverName for the plugin specified by driverName.
 //! The resulting library file should be named "predicate_{driverName}".
-#define EXPORT_PREDICATE_DRIVER( driverName, driverClass ) \
-    Q_EXPORT_PLUGIN2( predicate_ ## pluginName, driverClass )
-
-/*
-//! Driver's static version information (implementation),
-//! with KLibFactory symbol declaration.
-#define PREDICATE_DRIVER_INFO( class_name, internal_name ) \
-    DatabaseVersionInfo class_name::version() const { return PREDICATE_VERSION; } \
-    K_EXPORT_COMPONENT_FACTORY(predicate_ ## internal_name ## driver, KGenericFactory<Predicate::class_name>( "predicate_" #internal_name ))
-*/
+//! Also exports driver's static version information.
+#define EXPORT_PREDICATE_DRIVER( driverClass, driverName ) \
+    Q_EXPORT_PLUGIN2( predicate_ ## driverName, driverClass ) \
+    DatabaseVersionInfo driverClass::version() const { \
+        return DatabaseVersionInfo( \
+            PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE); }
 #endif

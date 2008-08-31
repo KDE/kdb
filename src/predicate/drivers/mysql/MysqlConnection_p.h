@@ -34,7 +34,7 @@ typedef struct st_mysql MYSQL;
 #ifdef MYSQLMIGRATE_H
 #define NAMESPACE KexiMigration
 #else
-#define NAMESPACE KexiDB
+#define NAMESPACE Predicate
 #endif
 
 namespace Predicate
@@ -48,13 +48,14 @@ namespace NAMESPACE
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
     be shared by any module that needs direct access to the underlying
-    database.  Used by the Predicate and KexiMigration drivers.
+    database.  Used by the Predicate and migration drivers.
+    @todo fix the above note about migration...
  */
-class MySqlConnectionInternal : public Predicate::ConnectionInternal
+class MysqlConnectionInternal : public Predicate::ConnectionInternal
 {
 public:
-    MySqlConnectionInternal(Predicate::Connection* connection);
-    virtual ~MySqlConnectionInternal();
+    MysqlConnectionInternal(Predicate::Connection* connection);
+    virtual ~MysqlConnectionInternal();
 
     //! Connects to a MySQL database
     bool db_connect(const Predicate::ConnectionData& data);
@@ -83,11 +84,11 @@ public:
 
 //! Internal MySQL cursor data.
 /*! Provides a low-level abstraction for iterating over MySql result sets. */
-class MySqlCursorData : public MySqlConnectionInternal
+class MysqlCursorData : public MysqlConnectionInternal
 {
 public:
-    MySqlCursorData(Predicate::Connection* connection);
-    virtual ~MySqlCursorData();
+    MysqlCursorData(Predicate::Connection* connection);
+    virtual ~MysqlCursorData();
 
     MYSQL_RES *mysqlres;
     MYSQL_ROW mysqlrow;

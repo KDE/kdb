@@ -1087,8 +1087,7 @@ protected:
     virtual bool drv_setAutoCommit(bool on);
 
     /*! Prepare a SQL statement and return a \a PreparedStatementInterface-derived object. */
-    virtual PreparedStatementInterface* prepareStatementInternal(PreparedStatement::Type type,
-            FieldList& fields, const QStringList& whereFieldNames) = 0;
+    virtual PreparedStatementInterface* prepareStatementInternal() = 0;
 
     /*! Internal, for handling autocommited transactions:
      begins transaction if one is supported.

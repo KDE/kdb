@@ -17,29 +17,31 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "Global.h"
+#include <Predicate/Global.h>
 
 using namespace Predicate;
 
 DatabaseVersionInfo::DatabaseVersionInfo()
+    : major(0)
+    , minor(0)
+    , release(0)
 {
-    major = 0;
-    minor = 0;
 }
 
-DatabaseVersionInfo::DatabaseVersionInfo(uint majorVersion, uint minorVersion)
+DatabaseVersionInfo::DatabaseVersionInfo(uint majorVersion, uint minorVersion, uint releaseVersion)
+    : major(majorVersion)
+    , minor(minorVersion)
+    , release(releaseVersion)
 {
-    major = majorVersion;
-    minor = minorVersion;
 }
 
 //------------------------
 
 ServerVersionInfo::ServerVersionInfo()
+    : major(0)
+    , minor(0)
+    , release(0)
 {
-    major = 0;
-    minor = 0;
-    release = 0;
 }
 
 void ServerVersionInfo::clear()
@@ -54,5 +56,6 @@ void ServerVersionInfo::clear()
 
 DatabaseVersionInfo Predicate::version()
 {
-    return PREDICATE_VERSION;
+    return Predicate::DatabaseVersionInfo(
+        PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE);
 }

@@ -28,14 +28,14 @@ namespace Predicate
 {
 
 //! MySQL database driver.
-class MySqlDriver : public Driver
+class MysqlDriver : public Driver
 {
     Q_OBJECT
     PREDICATE_DRIVER
 
 public:
-    MySqlDriver(QObject *parent, const QStringList &args = QStringList());
-    virtual ~MySqlDriver();
+    MysqlDriver();
+    virtual ~MysqlDriver();
 
     virtual bool isSystemDatabaseName(const QString &n) const;
 

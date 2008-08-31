@@ -19,18 +19,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifdef Q_WS_WIN
-# include <mysql/config-win.h>
-#endif
-#include <mysql_version.h>
-#include <mysql.h>
-#define BOOL bool
-
-#include <QVariant>
-#include <QFile>
-
-#include <kgenericfactory.h>
-#include <QtDebug>
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
@@ -38,13 +26,24 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <Predicate/Driver_p.h>
 #include <Predicate/Utils.h>
 
+#include <QVariant>
+#include <QFile>
+#include <QtDebug>
+
+#ifdef Q_WS_WIN
+# include <config-win.h>
+#endif
+#include <mysql_version.h>
+#include <mysql.h>
+#define BOOL bool
+
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO(MySqlDriver, mysql)
+EXPORT_PREDICATE_DRIVER(MysqlDriver, mysql)
 
 /* TODO: Implement buffered/unbuffered, rather than buffer everything.
    Each MYSQL connection can only handle at most one unbuffered cursor,
-   so MySqlConnection should keep count?
+   so MysqlConnection should keep count?
  */
 
 /*!
@@ -53,10 +52,10 @@ PREDICATE_DRIVER_INFO(MySqlDriver, mysql)
  *
  * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
  */
-MySqlDriver::MySqlDriver(QObject *parent, const QStringList &args) :
-        Driver(parent, args)
+MysqlDriver::MysqlDriver()
+    : Driver()
 {
-// PreDrvDbg << "MySqlDriver::MySqlDriver()";
+// PreDrvDbg << "MysqlDriver::MysqlDriver()";
 
 //    d->isFileDriver = false;
     d->features = IgnoreTransactions | CursorForward;
@@ -92,27 +91,27 @@ MySqlDriver::MySqlDriver(QObject *parent, const QStringList &args) :
     d->typeNames[Field::BLOB] = "BLOB";
 }
 
-MySqlDriver::~MySqlDriver()
+MysqlDriver::~MysqlDriver()
 {
 }
 
 Predicate::Connection*
-MySqlDriver::drv_createConnection(ConnectionData &conn_data)
+MysqlDriver::drv_createConnection(ConnectionData &conn_data)
 {
-    return new MySqlConnection(this, conn_data);
+    return new MysqlConnection(this, conn_data);
 }
 
-bool MySqlDriver::isSystemDatabaseName(const QString &n) const
+bool MysqlDriver::isSystemDatabaseName(const QString &n) const
 {
     return n.toLower() == "mysql" || Driver::isSystemObjectName(n);
 }
 
-bool MySqlDriver::drv_isSystemFieldName(const QString&) const
+bool MysqlDriver::drv_isSystemFieldName(const QString&) const
 {
     return false;
 }
 
-QString MySqlDriver::escapeString(const QString& str) const
+QString MysqlDriver::escapeString(const QString& str) const
 {
     //escape as in http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 //! @todo support more characters, like %, _
@@ -171,12 +170,12 @@ QString MySqlDriver::escapeString(const QString& str) const
     return result;
 }
 
-QString MySqlDriver::escapeBLOB(const QByteArray& array) const
+QString MysqlDriver::escapeBLOB(const QByteArray& array) const
 {
     return Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex);
 }
 
-QByteArray MySqlDriver::escapeString(const QByteArray& str) const
+QByteArray MysqlDriver::escapeString(const QByteArray& str) const
 {
 //! @todo optimize using mysql_real_escape_string()?
 //! see http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
@@ -191,12 +190,12 @@ QByteArray MySqlDriver::escapeString(const QByteArray& str) const
 /*! Add back-ticks to an identifier, and replace any back-ticks within
  * the name with single quotes.
  */
-QString MySqlDriver::drv_escapeIdentifier(const QString& str) const
+QString MysqlDriver::drv_escapeIdentifier(const QString& str) const
 {
     return QString(str).replace('`', "'");
 }
 
-QByteArray MySqlDriver::drv_escapeIdentifier(const QByteArray& str) const
+QByteArray MysqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('`', "'");
 }

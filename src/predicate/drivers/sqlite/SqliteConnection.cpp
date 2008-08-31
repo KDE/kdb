@@ -164,20 +164,22 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 // PreDrvDbg << "drv_useDatabase(): " << data()->fileName();
     //TODO: perhaps allow to use sqlite3_open16() as well for SQLite ~ 3.3 ?
 //! @todo add option (command line or in kexirc?)
-    int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
+    int flags = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE;
 //! @todo add option
-    int allowReadonly = 1;
-    const bool wasReadOnly = Connection::isReadOnly();
+//removed in predicate    int allowReadonly = 1;
+//removed in predicate    const bool wasReadOnly = Connection::isReadOnly();
 
-    d->res = sqlite3_open(
-                 //QFile::encodeName( data()->fileName() ),
+    d->res = sqlite3_open_v2(
                  data()->fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
-                 exclusiveFlag,
-                 allowReadonly /* If 1 and locking fails, try opening in read-only mode */
+                 flags,
+//removed in predicate                 allowReadonly /* If 1 and locking fails, try opening in read-only mode */
+                 0
              );
     d->storeResult();
 
+// @todo removed in predicate - reenable?
+/*
     if (d->res == SQLITE_OK && cancelled && !wasReadOnly && allowReadonly && isReadOnly()) {
         //opened as read only, ask
         if (MessageHandler::Continue !=
@@ -215,7 +217,7 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                  tr("The file is probably already open on this or another computer.") + "\n\n"
                  + tr("Could not gain exclusive access for writing the file.") + " "
                  + tr("Check the file's permissions and whether it is already opened and locked by another application."));
-    }
+    }*/
     return d->res == SQLITE_OK;
 }
 
@@ -244,9 +246,9 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     Q_UNUSED(dbName); // Each database is one single SQLite file.
     const QString filename = data()->fileName();
     if (QFile(filename).exists() && !QDir().remove(filename)) {
-        setError(ERR_ACCESS_RIGHTS, tr("Could not remove file \"%1\".",
-                                         QDir::convertSeparators(filename)) + " "
-                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
+        setError(ERR_ACCESS_RIGHTS, tr("Could not remove file \"%1\". "
+                 "Check the file's permissions and whether it is already opened and locked by another application.")
+                   .arg(QDir::convertSeparators(filename)));
         return false;
     }
     return true;
@@ -321,16 +323,14 @@ QString SQLiteConnection::serverErrorMsg()
     return d->errmsg.isEmpty() ? Connection::serverErrorMsg() : d->errmsg;
 }
 
-PreparedStatementInterface* SQLiteConnection::prepareStatementInternal(
-    PreparedStatement::Type type,
-    FieldList& fields, const QStringList& whereFieldNames)
+PreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
 {
-    return new SQLitePreparedStatement(type, *d, fields, whereFieldNames);
+    return new SQLitePreparedStatement(*d);
 }
 
 bool SQLiteConnection::isReadOnly() const
 {
-    return false
+    return Connection::isReadOnly();
 //! @todo port
     //return (d->data ? sqlite3_is_readonly(d->data) : false)
     //       || Connection::isReadOnly();

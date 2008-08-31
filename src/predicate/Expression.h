@@ -23,11 +23,11 @@
 #ifndef PREDICATE_EXPRESSION_H
 #define PREDICATE_EXPRESSION_H
 
-#include "Field.h"
-#include "QuerySchema.h"
+#include <Predicate/Global.h>
+#include <Predicate/Field.h>
+#include <Predicate/QuerySchema.h>
 
 #include <QtDebug>
-#include "Global.h"
 #include <QList>
 #include <QByteArray>
 

@@ -34,12 +34,13 @@ SQLiteAdminTools::~SQLiteAdminTools()
 {
 }
 
+#ifndef PREDICATE_SQLITE3_NO_VACUUM
 bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
 {
     clearError();
     Predicate::DriverManager manager;
     Predicate::Driver *drv = manager.driver(data.driverName);
-    QString title(tr("Could not compact database \"%1\".", QDir::convertSeparators(databaseName)));
+    QString title(QObject::tr("Could not compact database \"%1\".").arg(QDir::convertSeparators(databaseName)));
     if (!drv) {
         setError(&manager, title);
         return false;
@@ -52,4 +53,4 @@ bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QStri
     } else //success or cancelled
         return true;
 }
-
+#endif

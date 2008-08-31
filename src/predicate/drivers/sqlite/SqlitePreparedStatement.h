@@ -36,10 +36,14 @@ public:
 
     sqlite3_stmt *prepared_st_handle;
     bool m_resetRequired : 1;
+
 protected:
     virtual bool prepare(const QByteArray& statement);
-    virtual bool execute(const PreparedStatement::Arguments& args);
 
+    virtual bool execute(
+        PreparedStatement::Type type,
+        const Field::List& fieldList,
+        const PreparedStatement::Arguments &args);
 };
 
 }

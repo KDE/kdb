@@ -29,7 +29,7 @@
 #include "Relationship.h"
 #include "Transaction.h"
 #include "Cursor.h"
-#include "Global.h"
+#include <Predicate/Global.h>
 #include "RowEditBuffer.h"
 #include "Utils.h"
 #include "DbProperties.h"
@@ -235,7 +235,7 @@ public:
     //! server version information for this connection.
     Predicate::ServerVersionInfo serverVersion;
 
-    //! Daabase version information for this connection.
+    //! Database version information for this connection.
     Predicate::DatabaseVersionInfo databaseVersion;
 
     Parser *m_parser;
@@ -3651,7 +3651,7 @@ PreparedStatement Connection::prepareStatement(PreparedStatement::Type type,
     FieldList& fields, const QStringList& whereFieldNames)
 {
 //! @todo move to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
-    PreparedStatementInterface *iface = prepareStatementInternal(type, fields, whereFieldNames);
+    PreparedStatementInterface *iface = prepareStatementInternal();
     if (!iface)
         return PreparedStatement();
     return PreparedStatement(*iface, type, fields, whereFieldNames);

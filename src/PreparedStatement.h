@@ -92,13 +92,14 @@ public:
         Data(Type _type, PreparedStatementInterface& _iface, FieldList& _fields,
              const QStringList& _whereFieldNames)
             : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
-            , whereFields(0), dirty(true), iface(&_iface)
+            , fieldsForArguments(0), whereFields(0), dirty(true), iface(&_iface)
         {}
         ~Data();
         Type type;
         FieldList fields;
         QStringList whereFieldNames;
-        Field::List* whereFields;
+        const Field::List* fieldsForArguments; //!< fields where we'll put the inserted arguments
+        Field::List* whereFields; //!< temporary, used for select statements, based on whereFieldNames
         bool dirty : 1; //!< true if the statement has to be internally 
                         //!< prepared (possible again) before calling executeInternal()
         PreparedStatementInterface *iface;
@@ -144,7 +145,7 @@ protected:
 
 private:
 //! @todo is this portable across backends?
-    QByteArray generateStatementString();
+    void generateStatementString(QByteArray& s);
     void generateSelectStatementString(QByteArray& s);
     void generateInsertStatementString(QByteArray& s);
 

@@ -31,7 +31,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO(SybaseDriver, sybase)
+EXPORT_PREDICATE_DRIVER(SybaseDriver, sybase)
 
 /*!
  * Constructor sets database features and

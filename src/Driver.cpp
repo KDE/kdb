@@ -71,8 +71,8 @@ DriverBehaviour::DriverBehaviour()
 
 //---------------------------------------------
 
-Driver::Driver(QObject *parent, const QStringList &)
-        : QObject(parent)
+Driver::Driver()
+        : QObject()
         , Object()
         , beh(new DriverBehaviour())
         , d(new DriverPrivate())

@@ -23,8 +23,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <QVariant>
 #include <QFile>
 #include <QRegExp>
-
-#include <kgenericfactory.h>
 #include <QtDebug>
 
 #include "MysqlDriver.h"
@@ -39,18 +37,18 @@ using namespace Predicate;
 
 //--------------------------------------------------------------------------
 
-MySqlConnection::MySqlConnection(Driver *driver, ConnectionData &conn_data)
+MysqlConnection::MysqlConnection(Driver *driver, ConnectionData &conn_data)
         : Connection(driver, conn_data)
-        , d(new MySqlConnectionInternal(this))
+        , d(new MysqlConnectionInternal(this))
 {
 }
 
-MySqlConnection::~MySqlConnection()
+MysqlConnection::~MysqlConnection()
 {
     destroy();
 }
 
-bool MySqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -80,24 +78,24 @@ bool MySqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
     return true;
 }
 
-bool MySqlConnection::drv_disconnect()
+bool MysqlConnection::drv_disconnect()
 {
     return d->db_disconnect();
 }
 
-Cursor* MySqlConnection::prepareQuery(const QString& statement, uint cursor_options)
+Cursor* MysqlConnection::prepareQuery(const QString& statement, uint cursor_options)
 {
-    return new MySqlCursor(this, statement, cursor_options);
+    return new MysqlCursor(this, statement, cursor_options);
 }
 
-Cursor* MySqlConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* MysqlConnection::prepareQuery(QuerySchema& query, uint cursor_options)
 {
-    return new MySqlCursor(this, query, cursor_options);
+    return new MysqlCursor(this, query, cursor_options);
 }
 
-bool MySqlConnection::drv_getDatabasesList(QStringList &list)
+bool MysqlConnection::drv_getDatabasesList(QStringList &list)
 {
-    PreDrvDbg << "MySqlConnection::drv_getDatabasesList()";
+    PreDrvDbg;
     list.clear();
     MYSQL_RES *res;
 
@@ -115,9 +113,9 @@ bool MySqlConnection::drv_getDatabasesList(QStringList &list)
     return false;
 }
 
-bool MySqlConnection::drv_createDatabase(const QString &dbName)
+bool MysqlConnection::drv_createDatabase(const QString &dbName)
 {
-    PreDrvDbg << "MySqlConnection::drv_createDatabase: " << dbName;
+    PreDrvDbg << dbName;
     // mysql_create_db deprecated, use SQL here.
     if (drv_executeSQL("CREATE DATABASE " + (dbName)))
         return true;
@@ -125,7 +123,7 @@ bool MySqlConnection::drv_createDatabase(const QString &dbName)
     return false;
 }
 
-bool MySqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, MessageHandler* msgHandler)
+bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, MessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
@@ -133,66 +131,65 @@ bool MySqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, Me
     return d->useDatabase(dbName);
 }
 
-bool MySqlConnection::drv_closeDatabase()
+bool MysqlConnection::drv_closeDatabase()
 {
 //TODO free resources
 //As far as I know, mysql doesn't support that
     return true;
 }
 
-bool MySqlConnection::drv_dropDatabase(const QString &dbName)
+bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
 //TODO is here escaping needed
     return drv_executeSQL("drop database " + dbName);
 }
 
-bool MySqlConnection::drv_executeSQL(const QString& statement)
+bool MysqlConnection::drv_executeSQL(const QString& statement)
 {
     return d->executeSQL(statement);
 }
 
-quint64 MySqlConnection::drv_lastInsertRowID()
+quint64 MysqlConnection::drv_lastInsertRowID()
 {
     //! @todo
     return (quint64)mysql_insert_id(d->mysql);
 }
 
-int MySqlConnection::serverResult()
+int MysqlConnection::serverResult()
 {
     return d->res;
 }
 
-QString MySqlConnection::serverResultName()
+QString MysqlConnection::serverResultName()
 {
     return QString();
 }
 
-void MySqlConnection::drv_clearServerResult()
+void MysqlConnection::drv_clearServerResult()
 {
     if (!d)
         return;
     d->res = 0;
 }
 
-QString MySqlConnection::serverErrorMsg()
+QString MysqlConnection::serverErrorMsg()
 {
     return d->errmsg;
 }
 
-bool MySqlConnection::drv_containsTable(const QString &tableName)
+bool MysqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
     return resultExists(QString("show tables like %1")
                         .arg(driver()->escapeString(tableName)), success) && success;
 }
 
-bool MySqlConnection::drv_getTablesList(QStringList &list)
+bool MysqlConnection::drv_getTablesList(QStringList &list)
 {
     return queryStringList("show tables", list);
 }
 
-PreparedStatement MySqlConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList& fields)
+PreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 {
-    return MySqlPreparedStatement(type, *d, fields);
+    return new MysqlPreparedStatement(*d);
 }

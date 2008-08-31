@@ -31,32 +31,32 @@
 
 using namespace Predicate;
 
-MySqlCursor::MySqlCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
+MysqlCursor::MysqlCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
         : Cursor(conn, statement, cursor_options)
-        , d(new MySqlCursorData(conn))
+        , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
-    d->mysql = static_cast<MySqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "MySqlCursor: constructor for query statement";
+    d->mysql = static_cast<MysqlConnection*>(conn)->d->mysql;
+// PreDrvDbg << "constructor for query statement";
 }
 
-MySqlCursor::MySqlCursor(Connection* conn, QuerySchema& query, uint options)
+MysqlCursor::MysqlCursor(Connection* conn, QuerySchema& query, uint options)
         : Cursor(conn, query, options)
-        , d(new MySqlCursorData(conn))
+        , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
-    d->mysql = static_cast<MySqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "MySqlCursor: constructor for query statement";
+    d->mysql = static_cast<MysqlConnection*>(conn)->d->mysql;
+// PreDrvDbg << "constructor for query statement";
 }
 
-MySqlCursor::~MySqlCursor()
+MysqlCursor::~MysqlCursor()
 {
     close();
 }
 
-bool MySqlCursor::drv_open()
+bool MysqlCursor::drv_open()
 {
-// PreDrvDbg << "MySqlCursor::drv_open:" << m_sql;
+// PreDrvDbg << m_sql;
     // This can't be right?  mysql_real_query takes a length in order that
     // queries can have binary data - but strlen does not allow binary data.
     if (mysql_real_query(d->mysql, m_sql.toUtf8(), strlen(m_sql.toUtf8())) == 0) {
@@ -79,7 +79,7 @@ bool MySqlCursor::drv_open()
     return false;
 }
 
-bool MySqlCursor::drv_close()
+bool MysqlCursor::drv_close()
 {
     mysql_free_result(d->mysqlres);
     d->mysqlres = 0;
@@ -91,13 +91,13 @@ bool MySqlCursor::drv_close()
     return true;
 }
 
-/*bool MySqlCursor::drv_moveFirst() {
+/*bool MysqlCursor::drv_moveFirst() {
   return true; //TODO
 }*/
 
-void MySqlCursor::drv_getNextRecord()
+void MysqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "MySqlCursor::drv_getNextRecord";
+// PreDrvDbg;
     if (at() < d->numRows && at() >= 0) {
         d->lengths = mysql_fetch_lengths(d->mysqlres);
         m_result = FetchOK;
@@ -111,12 +111,12 @@ void MySqlCursor::drv_getNextRecord()
 }
 
 // This isn't going to work right now as it uses d->mysqlrow
-QVariant MySqlCursor::value(uint pos)
+QVariant MysqlCursor::value(uint pos)
 {
     if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
         return QVariant();
 
-    Predicate::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
+    Predicate::Field *f = (m_fieldsExpanded && pos < (uint)m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 //! @todo js: use MYSQL_FIELD::type here!
@@ -140,9 +140,9 @@ QVariant MySqlCursor::value(uint pos)
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
  */
-bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
+bool MysqlCursor::drv_storeCurrentRow(RecordData& data) const
 {
-// PreDrvDbg << "MySqlCursor::storeCurrentRow: Position is " << (long)m_at;
+// PreDrvDbg << "position is " << (long)m_at;
     if (d->numRows <= 0)
         return false;
 
@@ -170,18 +170,18 @@ bool MySqlCursor::drv_storeCurrentRow(RecordData& data) const
     return true;
 }
 
-void MySqlCursor::drv_appendCurrentRecordToBuffer()
+void MysqlCursor::drv_appendCurrentRecordToBuffer()
 {
 }
 
 
-void MySqlCursor::drv_bufferMovePointerNext()
+void MysqlCursor::drv_bufferMovePointerNext()
 {
     d->mysqlrow = mysql_fetch_row(d->mysqlres);
     d->lengths = mysql_fetch_lengths(d->mysqlres);
 }
 
-void MySqlCursor::drv_bufferMovePointerPrev()
+void MysqlCursor::drv_bufferMovePointerPrev()
 {
     //MYSQL_ROW_OFFSET ro=mysql_row_tell(d->mysqlres);
     mysql_data_seek(d->mysqlres, m_at - 1);
@@ -190,7 +190,7 @@ void MySqlCursor::drv_bufferMovePointerPrev()
 }
 
 
-void MySqlCursor::drv_bufferMovePointerTo(qint64 to)
+void MysqlCursor::drv_bufferMovePointerTo(qint64 to)
 {
     //MYSQL_ROW_OFFSET ro=mysql_row_tell(d->mysqlres);
     mysql_data_seek(d->mysqlres, to);
@@ -198,30 +198,30 @@ void MySqlCursor::drv_bufferMovePointerTo(qint64 to)
     d->lengths = mysql_fetch_lengths(d->mysqlres);
 }
 
-const char** MySqlCursor::rowData() const
+const char** MysqlCursor::rowData() const
 {
     //! @todo
     return 0;
 }
 
-int MySqlCursor::serverResult()
+int MysqlCursor::serverResult()
 {
     return d->res;
 }
 
-QString MySqlCursor::serverResultName()
+QString MysqlCursor::serverResultName()
 {
     return QString();
 }
 
-void MySqlCursor::drv_clearServerResult()
+void MysqlCursor::drv_clearServerResult()
 {
     if (!d)
         return;
     d->res = 0;
 }
 
-QString MySqlCursor::serverErrorMsg()
+QString MysqlCursor::serverErrorMsg()
 {
     return d->errmsg;
 }

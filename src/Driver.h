@@ -26,9 +26,9 @@
 #include <QByteArray>
 #include <QSharedData>
 
-#include "Global.h"
-#include "Object.h"
-#include "Field.h"
+#include <Predicate/Global.h>
+#include <Predicate/Object.h>
+#include <Predicate/Field.h>
 
 class KService;
 
@@ -333,7 +333,7 @@ protected:
      You may also want to change options in DriverBehaviour *beh member.
      See drivers/mySQL/mysqldriver.cpp for usage example.
      */
-    Driver(QObject *parent, const QStringList &args = QStringList());
+    Driver();
 
     /*! For reimplemenation: creates and returns connection object
      with additional structures specific for a given driver.
@@ -407,12 +407,12 @@ PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
 
 } //namespace Predicate
 
-/*! Driver's static version information, automatically impemented for Predicate drivers.
+/*! Driver's static version information, automatically implemented for Predicate drivers.
  Put this into driver class declaration just like Q_OBJECT macro. */
 #define PREDICATE_DRIVER \
-    Q_INTERFACES(Predicate::Driver)
-//    public: \
-//    virtual DatabaseVersionInfo version() const;
+    Q_INTERFACES(Predicate::Driver) \
+    public: \
+        virtual DatabaseVersionInfo version() const;
 
 #define PREDICATE_DRIVER_INTERFACE_ID \
     "org.kde.Predicate.Driver/" PREDICATE_VERSION_MAJOR_STRING "." PREDICATE_VERSION_MINOR_STRING

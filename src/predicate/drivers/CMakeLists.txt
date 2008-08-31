@@ -6,9 +6,9 @@ endif(COMMAND cmake_policy)
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
 INCLUDE (FindSQLite)
-IF (SQLite_FOUND)
+IF (SQLITE_FOUND)
    add_subdirectory( sqlite )
-ENDIF (SQLite_FOUND)
+ENDIF (SQLITE_FOUND)
 
 INCLUDE (FindMySQL)
 IF (MYSQL_FOUND)

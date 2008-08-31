@@ -23,16 +23,16 @@
 #include <qobject.h>
 #include <qstring.h>
 
-#include "Tristate.h"
+#include <Predicate/tools/Tristate.h>
 
 class Q3Process;
-class KProgressDialog;
+class QProgressDialog;
 
 //! @short Helper class performing interactive compacting (VACUUM) of the SQLite database
 /*! Proved SQLite database filename in the constructor.
  Then execute run() should be executed.
 
- KProgressDialog will be displayed. Its progress bar will be updated whenever another
+ QProgressDialog will be displayed. Its progress bar will be updated whenever another
  table's data compacting is performed. User can click "Cancel" button in any time
  (except the final committing) to cancel the operation. In this case,
  it's guaranteed that the original file remains unchanged.
@@ -61,7 +61,7 @@ public slots:
 protected:
     QString m_filePath;
     Q3Process *m_process;
-    KProgressDialog* m_dlg;
+    QProgressDialog* m_dlg;
     int m_percent;
     tristate m_result;
 };

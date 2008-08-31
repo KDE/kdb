@@ -38,7 +38,7 @@
 //#include <KGlobalSettings>
 //#include <KAction>
 
-#include "Global.h"
+#include <Predicate/Global.h>
 #include "predicate_global.h"
 
 using namespace Predicate::Utils;

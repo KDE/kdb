@@ -28,6 +28,7 @@ using namespace Predicate;
 PreparedStatement::Data::~Data()
 {
     delete iface;
+    delete whereFields;
 }
 
 PreparedStatement::~PreparedStatement()
@@ -37,7 +38,8 @@ PreparedStatement::~PreparedStatement()
 bool PreparedStatement::execute( const Arguments& args )
 {
     if (d->dirty) {
-        const QByteArray s( generateStatementString() );
+        QByteArray s;
+        generateStatementString(s); // sets d->fieldsForArguments too
 //! @todo error message?
         if (s.isEmpty())
             return false;
@@ -45,18 +47,16 @@ bool PreparedStatement::execute( const Arguments& args )
             return false;
         d->dirty = false;
     }
-    return d->iface->execute(args);
+    return d->iface->execute(d->type, *d->fieldsForArguments, args);
 }
 
-QByteArray PreparedStatement::generateStatementString()
+void PreparedStatement::generateStatementString(QByteArray& s)
 {
-    QByteArray s;
     s.reserve(1024);
     if (d->type == Select)
         generateSelectStatementString(s);
     else if (d->type == Insert)
         generateInsertStatementString(s);
-    return s;
 }
 
 void PreparedStatement::generateSelectStatementString(QByteArray& s)
@@ -73,6 +73,8 @@ void PreparedStatement::generateSelectStatementString(QByteArray& s)
     }
     // create WHERE
     first = true;
+    delete d->whereFields;
+    d->whereFields = new Field::List();
     foreach(const QString& whereItem, d->whereFieldNames) {
         if (first) {
             s.append(" WHERE ");
@@ -89,6 +91,7 @@ void PreparedStatement::generateSelectStatementString(QByteArray& s)
         d->whereFields->append(f);
         s.append(whereItem.toUtf8() + "=?");
     }
+    d->fieldsForArguments = d->whereFields;
 }
 
 void PreparedStatement::generateInsertStatementString(QByteArray& s)
@@ -118,6 +121,7 @@ void PreparedStatement::generateInsertStatementString(QByteArray& s)
     s.prepend(QByteArray("INSERT INTO ") + table->name().toUtf8()
               + (allTableFieldsUsed ? "" : (" (" + namesList + ")"))
               + " VALUES (");
+    d->fieldsForArguments = d->fields.fields();
 }
 
 /*bool PreparedStatement::insert()

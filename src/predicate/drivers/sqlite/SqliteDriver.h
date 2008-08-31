@@ -35,7 +35,7 @@ class SQLiteDriver : public Driver
     PREDICATE_DRIVER
 
 public:
-    SQLiteDriver(QObject *parent, const QStringList &args = QStringList());
+    SQLiteDriver();
     virtual ~SQLiteDriver();
 
     /*! \return true if \a n is a system object name;

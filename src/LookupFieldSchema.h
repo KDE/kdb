@@ -20,7 +20,7 @@
 #ifndef PREDICATE_LOOKUPFIELDSCHEMA_H
 #define PREDICATE_LOOKUPFIELDSCHEMA_H
 
-#include "Global.h"
+#include <Predicate/Global.h>
 
 class QStringList;
 class QDomElement;

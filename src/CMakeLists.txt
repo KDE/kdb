@@ -1,17 +1,28 @@
 # define the generic version of the Predicate libraries here
 # this makes it easy to advance it when the next Predicate release comes
-set(GENERIC_PREDICATE_LIB_VERSION "0.0.0")
+set(PREDICATE_VERSION_MAJOR 2)
+set(PREDICATE_VERSION_MINOR 00)
+set(PREDICATE_VERSION_RELEASE 00)
+set (PREDICATE_VERSION
+  "${PREDICATE_VERSION_MAJOR}.${PREDICATE_VERSION_MINOR}.${PREDICATE_VERSION_RELEASE}" )
+#todo add build date as in kdepim
+set (PREDICATE_VERSION_STRING
+  "${PREDICATE_VERSION_MAJOR}.${PREDICATE_VERSION_MINOR}.${PREDICATE_VERSION_RELEASE}" )
+set(GENERIC_PREDICATE_LIB_VERSION
+  "${PREDICATE_VERSION_MAJOR}.${PREDICATE_VERSION_MINOR}.${PREDICATE_VERSION_RELEASE}")
 set(GENERIC_PREDICATE_LIB_SOVERSION "0")
 
 find_package(Qt4 REQUIRED)
 
-add_subdirectory( drivers )
-
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/Predicate
+  ${Predicate_BINARY_DIR}
+  ${Predicate_BINARY_DIR}/Predicate
   ${QT_INCLUDES}
 )
+
+add_subdirectory( drivers )
 
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
@@ -65,6 +76,9 @@ add_custom_command(
 macro_additional_clean_files( ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp )
 
 ########### next target ###############
+
+# Generate Global.h
+configure_file(Global.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Global.h )
 
 set(predicate_parser_SRCS 
    parser/SqlScanner.cpp 
@@ -148,11 +162,33 @@ install(TARGETS predicate DESTINATION ${LIB_INSTALL_DIR})
 
 ########### install files ###############
 
-install( FILES  Connection.h ConnectionData.h Cursor.h 
- Driver.h DriveManager.h Error.h Expression.h Field.h FieldList.h Global.h Object.h 
- SchemaData.h TableSchema.h QuerySchema.h QuerySchemaParameter.h IndexSchema.h 
- Relationship.h parser/Parser.h parser/SqlParser.h Transaction.h PreparedStatement.h  
- RecordData.h Utils.h
- predicate_export.h predicate_global.h DESTINATION ${INCLUDE_INSTALL_DIR}/predicate)
+install( FILES
+  Connection.h
+  ConnectionData.h
+  Cursor.h
+  Driver.h
+  DriveManager.h
+  Error.h
+  Expression.h
+  Field.h
+  FieldList.h
+  ${CMAKE_CURRENT_BINARY_DIR}/Global.h
+  Object.h
+  SchemaData.h
+  TableSchema.h
+  QuerySchema.h
+  QuerySchemaParameter.h
+  IndexSchema.h
+  Relationship.h
+  parser/Parser.h
+  parser/SqlParser.h
+  Transaction.h
+  PreparedStatement.h  
+  RecordData.h
+  Utils.h
+  predicate_export.h
+  predicate_global.h
+  DESTINATION ${INCLUDE_INSTALL_DIR}/predicate
+)
 
 #TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})

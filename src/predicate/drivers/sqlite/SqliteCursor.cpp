@@ -212,7 +212,7 @@ bool SQLiteCursor::drv_open()
         // this may as example be the case if SQLiteConnection::drv_useDatabase()
         // wasn't called before. Normaly sqlite_compile/sqlite3_prepare
         // should handle it, but it crashes in in sqlite3SafetyOn at util.c:786
-        kWarning() << "SQLiteCursor::drv_open(): Database handle undefined.";
+        qWarning() << "SQLiteCursor::drv_open(): Database handle undefined.";
         return false;
     }
 

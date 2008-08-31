@@ -29,7 +29,7 @@
 
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO(PqxxSqlDriver, pqxxsql)
+EXPORT_PREDICATE_DRIVER(PqxxSqlDriver, pqxxsql)
 
 //==================================================================================
 //

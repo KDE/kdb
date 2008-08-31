@@ -22,8 +22,9 @@
    Original Project: buX (www.bux.at)
 */
 
-#include "RecordData.h"
-#include "Global.h"
+#include <Predicate/Global.h>
+#include <Predicate/RecordData.h>
+
 #include <QtDebug>
 
 using namespace Predicate;

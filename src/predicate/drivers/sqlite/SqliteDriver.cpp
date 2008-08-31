@@ -33,7 +33,7 @@
 
 using namespace Predicate;
 
-PREDICATE_DRIVER_INFO(SQLiteDriver, sqlite3)
+EXPORT_PREDICATE_DRIVER(SQLiteDriver, sqlite3)
 
 //! driver specific private data
 //! @internal
@@ -44,9 +44,8 @@ public:
     }
 };
 
-//PgSqlDB::PgSqlDB(QObject *parent, const char *name, const QStringList &)
-SQLiteDriver::SQLiteDriver(QObject *parent, const QStringList &args)
-        : Driver(parent, args)
+SQLiteDriver::SQLiteDriver()
+        : Driver()
         , dp(new SQLiteDriverPrivate())
 {
 //    d->isFileDriver = true;

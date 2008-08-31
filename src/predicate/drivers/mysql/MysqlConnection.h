@@ -30,27 +30,26 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 namespace Predicate
 {
 
-class MySqlConnectionInternal;
+class MysqlConnectionInternal;
 
 /*! @short Provides database connection, allowing queries and data modification.
 */
-class MySqlConnection : public Connection
+class MysqlConnection : public Connection
 {
     Q_OBJECT
 
 public:
-    virtual ~MySqlConnection();
+    virtual ~MysqlConnection();
 
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
 
-    virtual PreparedStatement prepareStatement(PreparedStatement::StatementType type,
-            FieldList& fields);
+    virtual PreparedStatementInterface* prepareStatementInternal();
 
 protected:
 
     /*! Used by driver */
-    MySqlConnection(Driver *driver, ConnectionData &conn_data);
+    MysqlConnection(Driver *driver, ConnectionData &conn_data);
 
     virtual bool drv_connect(Predicate::ServerVersionInfo& version);
     virtual bool drv_disconnect();
@@ -73,10 +72,10 @@ protected:
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
-    MySqlConnectionInternal* d;
+    MysqlConnectionInternal* d;
 
-    friend class MySqlDriver;
-    friend class MySqlCursor;
+    friend class MysqlDriver;
+    friend class MysqlCursor;
 };
 
 }

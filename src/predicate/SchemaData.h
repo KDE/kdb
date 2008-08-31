@@ -20,8 +20,8 @@
 #ifndef PREDICATE_SCHEMADATA_H
 #define PREDICATE_SCHEMADATA_H
 
-#include "Global.h"
-#include "Field.h"
+#include <Predicate/Global.h>
+#include <Predicate/Field.h>
 
 namespace Predicate
 {

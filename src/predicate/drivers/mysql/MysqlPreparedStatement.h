@@ -20,37 +20,41 @@
 #ifndef MYSQLPREPAREDSTATEMENT_H
 #define MYSQLPREPAREDSTATEMENT_H
 
-#include <Predicate/PreparedStatement.h>
+#include <Predicate/Interfaces/PreparedStatementInterface.h>
 #include "MysqlConnection_p.h"
 
-//todo 1.1 - unfinished: #define KEXI_USE_MYSQL_STMT
+//todo 1.1 - unfinished: #define PREDICATE_USE_MYSQL_STMT
 // for 1.0 we're using unoptimized version
 
 namespace Predicate
 {
 
 /*! Implementation of prepared statements for MySQL driver. */
-class MySqlPreparedStatement : public PreparedStatement, public MySqlConnectionInternal
+class MysqlPreparedStatement : public PreparedStatementInterface, public MysqlConnectionInternal
 {
 public:
-    MySqlPreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields);
+    MysqlPreparedStatement(ConnectionInternal& conn);
 
-    virtual ~MySqlPreparedStatement();
+    virtual ~MysqlPreparedStatement();
 
-    virtual bool execute();
+protected:
+    virtual bool prepare(const QByteArray& statement);
 
-    QByteArray m_tempStatementString;
+    virtual bool execute(
+        PreparedStatement::Type type,
+        const Field::List& fieldList,
+        const PreparedStatement::Arguments &args);
 
-#ifdef KEXI_USE_MYSQL_STMT
+    bool init();
+    void done();
+
+#ifdef PREDICATE_USE_MYSQL_STMT
     int m_realParamCount;
     MYSQL_STMT *m_statement;
     MYSQL_BIND *m_mysqlBind;
 #endif
-bool m_resetRequired : 1;
-
-protected:
-    bool init();
-    void done();
+    QByteArray m_tempStatementString;
+    bool m_resetRequired : 1;
 };
 }
 #endif

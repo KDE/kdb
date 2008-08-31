@@ -37,6 +37,7 @@ TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes a
   Admin.cpp
   Alter.cpp
 *  Connection.cpp
+- prepareStatementInternal() has now no arguments and has PreparedStatementInterface* return type
 TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
 *  Connectiondata.cpp
 *  Cursor.cpp
@@ -51,6 +52,7 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
   drivers/mysql/MysqlDriver.cpp
   drivers/mysql/MysqlKeywords.cpp
   drivers/mysql/MysqlPreparedStatement.cpp
+- for now it's nonfunctional; port and improve code within PREDICATE_USE_MYSQL_STMT
   drivers/odbc/odbcconnection.cpp
   drivers/odbc/odbcdriver.cpp
   drivers/oracle/oracleconnection.cpp

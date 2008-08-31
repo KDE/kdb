@@ -20,22 +20,27 @@
 #include <Predicate/Global.h>
 #include "SqliteVacuum.h"
 
-#include <kstandarddirs.h>
-#include <kprogressdialog.h>
+//#include <kstandarddirs.h>
 #include <QtDebug>
+#include <QMessageBox>
+#include <QProgressBar>
+#include <QProgressDialog>
+#include <QFileInfo>
+#include <QDir>
+#include <QApplication>
+#include <Q3Process>
+#include <QCursor>
+#include <QLocale>
 
-#include <ktemporaryfile.h>
-#include <kmessagebox.h>
-#include <qprogressbar.h>
-#include <kio/Global.h>
-
-#include <qfileinfo.h>
-#include <qdir.h>
-#include <qapplication.h>
-#include <q3process.h>
-#include <qCursor.h>
-
+#ifdef Q_WS_WIN
+#include <windows.h>
+void usleep(unsigned int usec)
+{
+	Sleep(usec/1000);
+}
+#else
 #include <unistd.h>
+#endif
 
 SQLiteVacuum::SQLiteVacuum(const QString& filePath)
         : m_filePath(filePath)
@@ -56,7 +61,8 @@ SQLiteVacuum::~SQLiteVacuum()
 
 tristate SQLiteVacuum::run()
 {
-    const QString ksqlite_app = KStandardDirs::findExe("ksqlite");
+//TODO    const QString ksqlite_app = KStandardDirs::findExe("ksqlite");
+    const QString ksqlite_app = "ksqlite";
     if (ksqlite_app.isEmpty()) {
         m_result = false;
         return m_result;
@@ -78,16 +84,18 @@ tristate SQLiteVacuum::run()
         m_result = false;
         return m_result;
     }
-    m_dlg = new KProgressDialog(0, tr("Compacting database"),
-                                "<qt>" + tr("Compacting database \"%1\"...",
-                                              "<nobr>" + QDir::convertSeparators(QFileInfo(m_filePath).fileName()) + "</nobr>")
-                               );
+    m_dlg = new QProgressDialog(0);
+    m_dlg->setWindowTitle(QObject::tr("Compacting database"));
+    m_dlg->setLabelText(
+        "<qt>" + tr("Compacting database \"%1\"...")
+            .arg("<nobr>" + QDir::convertSeparators(QFileInfo(m_filePath).fileName()) + "</nobr>")
+    );
     m_dlg->adjustSize();
     m_dlg->resize(300, m_dlg->height());
     connect(m_dlg, SIGNAL(cancelClicked()), this, SLOT(cancelClicked()));
     m_dlg->setMinimumDuration(1000);
     m_dlg->setAutoClose(true);
-    m_dlg->progressBar()->setRange(0, 100);
+    m_dlg->setRange(0, 100);
     m_dlg->exec();
     while (m_process->isRunning()) {
         readFromStdout();
@@ -98,7 +106,9 @@ tristate SQLiteVacuum::run()
     if (m_result == true) {
         const uint newSize = QFileInfo(m_filePath).size();
         const uint decrease = 100 - 100 * newSize / origSize;
-        KMessageBox::information(0, tr("The database has been compacted. Current size decreased by %1% to %2.", decrease, KIO::convertSize(newSize)));
+        QMessageBox::information(0, QString(),
+            QObject::tr("The database has been compacted. Current size decreased by %1% to %2.")
+                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2) + " MB"));
     }
     return m_result;
 }
@@ -109,15 +119,15 @@ void SQLiteVacuum::readFromStdout()
         QString s(m_process->readLineStdout());   //readStdout();
         if (s.isEmpty())
             break;
-        m_dlg->progressBar()->setValue(m_percent);
+        m_dlg->setValue(m_percent);
 //  PreDrvDbg << m_percent << " " << s;
         if (s.startsWith("VACUUM: ")) {
             //set previously known progress
-            m_dlg->progressBar()->setValue(m_percent);
+            m_dlg->setValue(m_percent);
             //update progress info
             if (s.mid(8, 4) == "100%") {
                 m_percent = 100;
-                m_dlg->setAllowCancel(false);
+//TODO?                m_dlg->setAllowCancel(false);
                 m_dlg->setCursor(QCursor(Qt::WaitCursor));
             } else if (s.mid(9, 1) == "%") {
                 m_percent = s.mid(8, 1).toInt();

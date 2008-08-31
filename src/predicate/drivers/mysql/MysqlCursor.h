@@ -26,15 +26,15 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 namespace Predicate
 {
 
-class MySqlCursorData;
+class MysqlCursorData;
 
-class MySqlCursor: public Cursor
+class MysqlCursor: public Cursor
 {
 public:
-    MySqlCursor(Connection* conn, const QString& statement = QString(),
+    MysqlCursor(Connection* conn, const QString& statement = QString(),
                 uint cursor_options = NoOptions);
-    MySqlCursor(Connection* conn, QuerySchema& query, uint options = NoOptions);
-    virtual ~MySqlCursor();
+    MysqlCursor(Connection* conn, QuerySchema& query, uint options = NoOptions);
+    virtual ~MysqlCursor();
     virtual bool drv_open();
     virtual bool drv_close();
 //        virtual bool drv_moveFirst();
@@ -63,7 +63,7 @@ protected:
 // unsigned long *m_lengths;
 //js: int m_numFields;
 // unsigned long m_numRows;
-    MySqlCursorData *d;
+    MysqlCursorData *d;
 };
 
 }
