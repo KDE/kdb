@@ -1,10 +1,23 @@
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
 [ ] move *Validator classes from tools to a separate PredicateGui lib
+[x] version macros like PREDICATE_VERSION are generated using cmake
 
 Drivers:
-[ ] add SQLite driver for 3.6.1+ version (use FindSQLite.cmake) 
-    but also keep SQlite 3.2.8 for compatibility with Kexi 1.x
+[x] add SQLite driver for 3.6.1+ version (use FindSQLite.cmake);
+    Compatibility with Kexi 1.x (SQlite 3.2.8) is acheived because we use the 1st
+    file format of SQLite, which is the default for 3.3.6+.
+    (see http://www.sqlite.org/formatchng.html)
+[ ] TODO: let's add this note:
+     In June 2006 we have migrated to 3.2.8 from 3.0.7
+     (http://websvn.kde.org/trunk/koffice/kexi/3rdparty/kexisql3/version?view=log)
+     Thus, any future use autovacuum will make the db read-only for 3.0.7-based drivers
+     and ALTER TABLE ADD COLUMN will make it unreadable for 3.0.7-based drivers 
+     unless VACUUM is executed. We hope it will not be a problem by the time
+     we decide to use these features in the final, since 3.0.7-based Kexi will be already
+     3 years old. It will be always possible to perform simple migration using the following command
+     "sqlite-old old.db .dump | sqlite-new new.db"
+[x] MySQL driver builds
 
 Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
