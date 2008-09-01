@@ -12,8 +12,6 @@ set(GENERIC_PREDICATE_LIB_VERSION
   "${PREDICATE_VERSION_MAJOR}.${PREDICATE_VERSION_MINOR}.${PREDICATE_VERSION_RELEASE}")
 set(GENERIC_PREDICATE_LIB_SOVERSION "0")
 
-find_package(Qt4 REQUIRED)
-
 include_directories(
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/Predicate
@@ -152,43 +150,68 @@ set_target_properties(predicate PROPERTIES
   SOVERSION ${GENERIC_PREDICATE_LIB_SOVERSION}
 )
 
-if(MSVC)
-   # avoid LNK1169 errors
-   set_target_properties(predicate PROPERTIES LINK_FLAGS /FORCE:MULTIPLE)
-endif(MSVC)
-
 install(TARGETS predicate DESTINATION ${LIB_INSTALL_DIR})
 
 
 ########### install files ###############
 
 install( FILES
+  Admin.h
+  Alter.h
   Connection.h
+  Connection_p.h
   ConnectionData.h
   Cursor.h
+  Cursor_p.h
+  DbProperties.h
   Driver.h
-  DriveManager.h
+  Driver_p.h
+  DriverManager.h
+  DriverManager_p.h
   Error.h
   Expression.h
   Field.h
   FieldList.h
-  ${CMAKE_CURRENT_BINARY_DIR}/Global.h
-  Object.h
-  SchemaData.h
-  TableSchema.h
-  QuerySchema.h
-  QuerySchemaParameter.h
   IndexSchema.h
-  Relationship.h
-  parser/Parser.h
-  parser/SqlParser.h
-  Transaction.h
-  PreparedStatement.h  
-  RecordData.h
-  Utils.h
+  LookupFieldSchema.h
+  MessageHandler.h
+  Object.h
   predicate_export.h
   predicate_global.h
-  DESTINATION ${INCLUDE_INSTALL_DIR}/predicate
+  PreparedStatement.h
+  QuerySchema.h
+  QuerySchemaParameter.h
+  RecordData.h
+  Relationship.h
+  RowEditBuffer.h
+  SchemaData.h
+  TableSchema.h
+  Transaction.h
+  Utils.h
+  Utils_p.h
+  ${CMAKE_CURRENT_BINARY_DIR}/Global.h
+  parser/Parser.h
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
+)
+
+install( FILES
+  Interfaces/PreparedStatementInterface.h
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Interfaces COMPONENT Devel
+)
+
+install( FILES
+  tools/Validator.h
+  tools/Utils.h
+  tools/Tristate.h
+  tools/Static.h
+#todo  tools/SimpleCommandLineApp.h
+  tools/SharedPtr.h
+  tools/LongLongValidator.h
+  tools/Identifier.h
+  tools/FieldValidator.h
+  tools/DbObjectNameValidator.h
+
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/tools COMPONENT Devel
 )
 
 #TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})
