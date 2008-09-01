@@ -1,5 +1,6 @@
 include_directories(
-  ${CMAKE_SOURCE_DIR}/Predicate
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_BINARY_DIR}
   ${QT_INCLUDES}
 )
 
@@ -16,6 +17,6 @@ add_executable(predicatefeaturestest ${predicatefeaturestest_SRCS})
 
 target_link_libraries(
   predicatefeaturestest
-  ${QT_INCLUDES}
+  ${QT_QTCORE_LIBRARY}
   predicate
 )

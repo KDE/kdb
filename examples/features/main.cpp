@@ -19,13 +19,13 @@
 
 #include <QFileInfo>
 #include <QPointer>
-
 #include <QtDebug>
+/*qtonly
 #include <kcmdlineargs.h>
 #include <kapplication.h>
 #include <kcomponentdata.h>
 #include <kiconloader.h>
-#include <kaboutdata.h>
+#include <kaboutdata.h>*/
 
 #include <Predicate/DriverManager.h>
 #include <Predicate/Driver.h>
@@ -51,8 +51,8 @@ bool db_name_required = true;
 Predicate::ConnectionData conn_data;
 QPointer<Predicate::Connection> conn;
 QPointer<Predicate::Driver> driver;
-KApplication *app = 0;
-KComponentData *instance = 0;
+QApplication *app = 0;
+//qtonly KComponentData *instance = 0;
 
 #include "dbcreation_test.h"
 #include "cursors_test.h"
@@ -65,13 +65,43 @@ KComponentData *instance = 0;
 #include "dr_prop_test.h"
 
 #define RETURN(code) \
-    kDebug()<< test_name << " TEST: " << (code==0?"PASSED":"ERROR"); \
+    qDebug()<< test_name << " TEST: " << (code==0?"PASSED":"ERROR"); \
     return code
+
+//! @return true if option @a option is found
+//! Removes the option.
+bool takeOption(QStringList &args, const QString &option)
+{
+    QStringList::Iterator it = args.find(QString::fromLatin1("-")+option);
+    if (it==args.end())
+        it = args.find(QString::fromLatin1("--")+option);
+    if (it==args.end())
+        return false;
+    args.remove(it);
+    return true;
+}
+
+//! @return next element after option @a option, what should mean parameter
+//! Removes option and its argument
+QString takeOptionWithArg(QStringList &args, const QString &option)
+{
+    QStringList::Iterator it = args.find(QString::fromLatin1("-")+option);
+    if (it==args.end())
+        it = args.find(QString::fromLatin1("--")+option);
+    if (it==args.end())
+        return QString::null;
+    it = args.remove(it);
+    QString result = *it; // option's argument
+    args.remove(it);
+    return result;
+}
 
 int main(int argc, char** argv)
 {
     int minargs = 2;
+#ifndef NO_GUI
     bool gui = false;
+#endif
     /* if (argc < minargs) {
         usage();
         RETURN(0);
@@ -79,6 +109,7 @@ int main(int argc, char** argv)
     QFileInfo info = QFileInfo(argv[0]);
     prgname = info.baseName().toLatin1();
 
+#if 0 //qtonly: TODO?
     KCmdLineArgs::init(argc, argv,
                        new KAboutData(prgname, 0, ki18n("KexiDBTest"),
                                       "0.1.2", KLocalizedString(), KAboutData::License_GPL,
@@ -126,47 +157,61 @@ int main(int argc, char** argv)
     KCmdLineArgs::addCmdLineOptions(options);
 
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
+#endif //0
+    QStringList args;
+    for (int i=1; i<argc; i++)
+        args.append(QFile::decodeName(argv[i]));
     QStringList tests;
     tests << "cursors" << "schema" << "dbcreation" << "tables"
-    << "tableview" << "parser" << "dr_prop";
-    if (!args->isSet("test")) {
-        kDebug() << "No test specified. Use --help.";
+#ifndef NO_GUI
+    << "tableview"
+#endif
+    << "parser" << "dr_prop";
+    test_name = takeOptionWithArg(args, "test");
+    if (test_name.isEmpty()) {
+        qDebug() << "No test specified. Use --help.";
         RETURN(1);
     }
-    test_name = args->getOption("test");
     if (!tests.contains(test_name)) {
-        kDebug() << QString("No such test \"%1\". Use --help.").arg(test_name);
+        qDebug() << QString("No such test \"%1\". Use --help.").arg(test_name);
         RETURN(1);
     }
 
+#ifndef NO_GUI
     if (test_name == "tableview") {
         gui = true;
-    } else if (test_name == "parser") {
+    } else 
+#endif
+    if (test_name == "parser") {
         minargs = 3;
     } else if (test_name == "dr_prop") {
         minargs = 1;
         db_name_required = false;
     }
-    if ((int)args->count() < minargs) {
-        kDebug() << QString("Not enough args (%1 required). Use --help.").arg(minargs);
+/*    if ((int)args->count() < minargs) {
+        qDebug() << QString("Not enough args (%1 required). Use --help.").arg(minargs);
         RETURN(1);
-    }
+    }*/
 
+#ifndef NO_GUI
     if (gui) {
-        app = new KApplication(true);
-        instance = new KComponentData(KGlobal::mainComponent());
-        KIconLoader::global()->addAppDir("kexi");
-    } else {
-        instance = new KComponentData(prgname);
+        app = new QApplication(argc, argv, true);
+//qtonly        instance = new KComponentData(KGlobal::mainComponent());
+//qtonly        KIconLoader::global()->addAppDir("kexi");
+    } else
+#endif
+    {
+        app = new QApplication(argc, argv, false);
+//qtonly        instance = new KComponentData(prgname);
     }
 
-    drv_name = args->arg(0);
+    drv_name = args.first();
 
     Predicate::DriverManager manager;
     QStringList names = manager.driverNames();
-    kDebug() << "DRIVERS: ";
+    qDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
-        kDebug() << *it;
+        aDebug() << *it;
     if (manager.error() || names.isEmpty()) {
         manager.debugError();
         RETURN(1);
@@ -178,19 +223,22 @@ int main(int argc, char** argv)
         manager.debugError();
         RETURN(1);
     }
-    kDebug() << "MIME type for '" << driver->name() << "': " << driver->fileDBDriverMimeType();
+    qDebug() << "MIME type for '" << driver->name() << "': " << driver->fileDBDriverMimeType();
+
+    const bool bufCursors = takeOption(args, "buffered-cursors");
+    QString queryParams = takeOptionWithArg(args, "query-params");
 
     //open connection
-    if (args->count() >= 2)
-        db_name = args->arg(1);
+    if (args.count() >= 2)
+        db_name = args[1];
 
     if (db_name_required && db_name.isEmpty()) {
-        kDebug() << prgname << ": database name?";
+        qDebug() << prgname << ": database name?";
         RETURN(1);
     }
     if (!db_name.isEmpty()) {
         //additional switches:
-        if (args->isSet("buffered-cursors")) {
+        if (bufCursors) {
             cursor_options |= Predicate::Cursor::Buffered;
         }
         conn_data.setFileName(db_name);
@@ -222,13 +270,13 @@ int main(int argc, char** argv)
 #endif
     else if (test_name == "parser") {
         QStringList params;
-        if (args->isSet("query-params"))
-            params = args->getOption("query-params").split('|');
-        r = parserTest(QString(args->arg(2)), params);
+        if (!queryParams.isEmpty())
+            params = QStringList::split("|", queryParams);
+        r = parserTest(args[2]), params);
     } else if (test_name == "dr_prop")
         r = drPropTest();
     else {
-        kWarning() << "No such test: " << test_name;
+        qWarning() << "No such test: " << test_name;
 //  usage();
         RETURN(1);
     }
@@ -237,13 +285,13 @@ int main(int argc, char** argv)
         app->exec();
 
     if (r)
-        kDebug() << "RECENT SQL STATEMENT: " << conn->recentSQLString();
+        qDebug() << "RECENT SQL STATEMENT: " << conn->recentSQLString();
 
     if (conn && !conn->disconnect())
         r = 1;
 
-// kDebug() << "!!! Predicate::Transaction::globalcount == " << Predicate::Transaction::globalCount();
-// kDebug() << "!!! Predicate::TransactionData::globalcount == " << Predicate::TransactionData::globalCount();
+// qDebug() << "!!! Predicate::Transaction::globalcount == " << Predicate::Transaction::globalCount();
+// qDebug() << "!!! Predicate::TransactionData::globalcount == " << Predicate::TransactionData::globalCount();
 
     delete app;
 
