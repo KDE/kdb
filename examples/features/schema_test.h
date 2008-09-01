@@ -27,7 +27,7 @@ int schemaTest()
         return 1;
     }
 
-    KexiDB::TableSchema *t = conn->tableSchema("persons");
+    Predicate::TableSchema *t = conn->tableSchema("persons");
     if (t)
         t->debug();
     else
@@ -40,8 +40,8 @@ int schemaTest()
     /*
     // some tests
       {
-        KexiDB::Field::ListIterator iter = t->fieldsIterator();
-        KexiDB::Field::List *lst = t->fields();
+        Predicate::Field::ListIterator iter = t->fieldsIterator();
+        Predicate::Field::List *lst = t->fields();
         lst->clear();
         for (;iter.current();++iter) {
           kDebug() << "FIELD=" << iter.current()->name();

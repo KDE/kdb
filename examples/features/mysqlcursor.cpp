@@ -2,15 +2,15 @@
 #include <kdebug.h>
 #include <kcomponentdata.h>
 
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver.h>
-#include <kexidb/connection.h>
-#include <kexidb/cursor.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver.h>
+#include <Predicate/Connection.h>
+#include <Predicate/Cursor.h>
 
 int main(int argc, char * argv[])
 {
     KComponentData componentData("newapi");
-    KexiDB::DriverManager manager;
+    Predicate::DriverManager manager;
     QStringList names = manager.driverNames();
     kDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
@@ -21,14 +21,14 @@ int main(int argc, char * argv[])
     }
 
     //get driver
-    KexiDB::Driver *driver = manager.driver("mySQL");
+    Predicate::Driver *driver = manager.driver("mySQL");
     if (manager.error()) {
         kDebug() << manager.errorMsg();
         return 1;
     }
 
     //connection data that can be later reused
-    KexiDB::ConnectionData conn_data;
+    Predicate::ConnectionData conn_data;
 
     conn_data.userName = "root";
     if (argc > 1)
@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
         conn_data.password = "mysql";
     conn_data.hostName = "localhost";
 
-    KexiDB::Connection *conn = driver->createConnection(conn_data);
+    Predicate::Connection *conn = driver->createConnection(conn_data);
     if (driver->error()) {
         kDebug() << driver->errorMsg();
         return 1;
@@ -52,10 +52,10 @@ int main(int argc, char * argv[])
     }
 
     kDebug() << "Creating first cursor";
-    KexiDB::Cursor *c = conn->executeQuery("select * from Applications");
+    Predicate::Cursor *c = conn->executeQuery("select * from Applications");
     if (!c) kDebug() << conn->errorMsg();
     kDebug() << "Creating second cursor";
-    KexiDB::Cursor *c2 = conn->executeQuery("select * from Applications");
+    Predicate::Cursor *c2 = conn->executeQuery("select * from Applications");
     if (!c2) kDebug() << conn->errorMsg();
 
     QStringList l = conn->databaseNames();
@@ -100,7 +100,7 @@ int main(int argc, char * argv[])
 
     }
 #if 0
-    KexiDB::Table *t = conn->tableSchema("persons");
+    Predicate::Table *t = conn->tableSchema("persons");
     if (t)
         t->debug();
     t = conn->tableSchema("cars");

@@ -27,15 +27,15 @@
 #include <kiconloader.h>
 #include <kaboutdata.h>
 
-#include <kexidb/drivermanager.h>
-#include <kexidb/driver.h>
-#include <kexidb/connection.h>
-#include <kexidb/cursor.h>
-#include <kexidb/field.h>
-#include <kexidb/tableschema.h>
-#include <kexidb/queryschema.h>
-#include <kexidb/indexschema.h>
-#include <kexidb/parser/parser.h>
+#include <Predicate/DriverManager.h>
+#include <Predicate/Driver.h>
+#include <Predicate/Connection.h>
+#include <Predicate/Cursor.h>
+#include <Predicate/Field.h>
+#include <Predicate/TableSchema.h>
+#include <Predicate/QuerySchema.h>
+#include <Predicate/IndexSchema.h>
+#include <Predicate/parser/Parser.h>
 
 #include <iostream>
 
@@ -48,9 +48,9 @@ QString test_name;
 int cursor_options = 0;
 bool db_name_required = true;
 
-KexiDB::ConnectionData conn_data;
-QPointer<KexiDB::Connection> conn;
-QPointer<KexiDB::Driver> driver;
+Predicate::ConnectionData conn_data;
+QPointer<Predicate::Connection> conn;
+QPointer<Predicate::Driver> driver;
 KApplication *app = 0;
 KComponentData *instance = 0;
 
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 
     drv_name = args->arg(0);
 
-    KexiDB::DriverManager manager;
+    Predicate::DriverManager manager;
     QStringList names = manager.driverNames();
     kDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
     if (!db_name.isEmpty()) {
         //additional switches:
         if (args->isSet("buffered-cursors")) {
-            cursor_options |= KexiDB::Cursor::Buffered;
+            cursor_options |= Predicate::Cursor::Buffered;
         }
         conn_data.setFileName(db_name);
         conn = driver->createConnection(conn_data);
@@ -242,8 +242,8 @@ int main(int argc, char** argv)
     if (conn && !conn->disconnect())
         r = 1;
 
-// kDebug() << "!!! KexiDB::Transaction::globalcount == " << KexiDB::Transaction::globalCount();
-// kDebug() << "!!! KexiDB::TransactionData::globalcount == " << KexiDB::TransactionData::globalCount();
+// kDebug() << "!!! Predicate::Transaction::globalcount == " << Predicate::Transaction::globalCount();
+// kDebug() << "!!! Predicate::TransactionData::globalcount == " << Predicate::TransactionData::globalCount();
 
     delete app;
 

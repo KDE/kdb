@@ -38,7 +38,7 @@ int dbCreationTest()
         conn->debugError();
         return 1;
     }
-    /* KexiDB::Cursor *cursor = conn->executeQuery( "select * from osoby", KexiDB::Cursor::Buffered );
+    /* Predicate::Cursor *cursor = conn->executeQuery( "select * from osoby", Predicate::Cursor::Buffered );
       kDebug()<<"executeQuery() = "<<!!cursor;
       if (cursor) {
         kDebug()<<"Cursor::moveLast() ---------------------";

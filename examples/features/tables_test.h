@@ -31,23 +31,23 @@ int tablesTest()
     }
 
     conn->setAutoCommit(false);
-    KexiDB::Transaction t = conn->beginTransaction();
+    Predicate::Transaction t = conn->beginTransaction();
     if (conn->error()) {
         conn->debugError();
         return 1;
     }
 
     //now: lets create tables:
-    KexiDB::Field *f;
-    KexiDB::TableSchema *t_persons = new KexiDB::TableSchema("persons");
+    Predicate::Field *f;
+    Predicate::TableSchema *t_persons = new Predicate::TableSchema("persons");
     t_persons->setCaption("Persons in our factory");
-    t_persons->addField(f = new KexiDB::Field("id", KexiDB::Field::Integer, KexiDB::Field::PrimaryKey | KexiDB::Field::AutoInc, KexiDB::Field::Unsigned));
+    t_persons->addField(f = new Predicate::Field("id", Predicate::Field::Integer, Predicate::Field::PrimaryKey | Predicate::Field::AutoInc, Predicate::Field::Unsigned));
     f->setCaption("ID");
-    t_persons->addField(f = new KexiDB::Field("age", KexiDB::Field::Integer, 0, KexiDB::Field::Unsigned));
+    t_persons->addField(f = new Predicate::Field("age", Predicate::Field::Integer, 0, Predicate::Field::Unsigned));
     f->setCaption("Age");
-    t_persons->addField(f = new KexiDB::Field("name", KexiDB::Field::Text));
+    t_persons->addField(f = new Predicate::Field("name", Predicate::Field::Text));
     f->setCaption("Name");
-    t_persons->addField(f = new KexiDB::Field("surname", KexiDB::Field::Text));
+    t_persons->addField(f = new Predicate::Field("surname", Predicate::Field::Text));
     f->setCaption("Surname");
     if (!conn->createTable(t_persons)) {
         conn->debugError();
@@ -67,13 +67,13 @@ int tablesTest()
     kDebug() << "-- PERSONS data created --";
 
 
-    KexiDB::TableSchema *t_cars = new KexiDB::TableSchema("cars");
+    Predicate::TableSchema *t_cars = new Predicate::TableSchema("cars");
     t_cars->setCaption("Cars owned by persons");
-    t_cars->addField(f = new KexiDB::Field("id", KexiDB::Field::Integer, KexiDB::Field::PrimaryKey | KexiDB::Field::AutoInc, KexiDB::Field::Unsigned));
+    t_cars->addField(f = new Predicate::Field("id", Predicate::Field::Integer, Predicate::Field::PrimaryKey | Predicate::Field::AutoInc, Predicate::Field::Unsigned));
     f->setCaption("ID");
-    t_cars->addField(f = new KexiDB::Field("owner", KexiDB::Field::Integer, 0, KexiDB::Field::Unsigned));
+    t_cars->addField(f = new Predicate::Field("owner", Predicate::Field::Integer, 0, Predicate::Field::Unsigned));
     f->setCaption("Car owner");
-    t_cars->addField(f = new KexiDB::Field("model", KexiDB::Field::Text));
+    t_cars->addField(f = new Predicate::Field("model", Predicate::Field::Text));
     f->setCaption("Car model");
     if (!conn->createTable(t_cars)) {
         conn->debugError();
