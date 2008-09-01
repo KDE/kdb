@@ -202,11 +202,13 @@ int main(int argc, char** argv)
     drv_name = args.first();
 
     Predicate::DriverManager manager;
-    QStringList names = manager.driverNames();
-    qDebug() << "DRIVERS: ";
-    for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
-        qDebug() << *it;
-    if (manager.error() || names.isEmpty()) {
+    const QStringList driverNames = manager.driverNames();
+    qDebug() << "DRIVERS: " << driverNames;
+    if (driverNames.isEmpty()) {
+        qWarning() << "No drivers found";
+        RETURN(1);
+    }
+    if (manager.error()) {
         manager.debugError();
         RETURN(1);
     }
