@@ -45,6 +45,8 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
   DbProperties.cpp
 **  Driver.cpp
 - Driver::Info is implicitly shared class now
+- Driver::fileDBDriverMimeType() moved to Driver::Info::fileDBMimeType()
+- Driver::isFileDriver() renamed to Driver::isFileBased(), also available as Driver::Info::isFileBased()
 **  DriverManager.cpp
   drivers/mysql/MysqlConnection.cpp
   drivers/mysql/MysqlConnection_p.cpp
