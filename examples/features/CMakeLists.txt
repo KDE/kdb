@@ -4,7 +4,7 @@ include_directories(
 )
 
 # temp
-add_defnitions(
+add_definitions(
   -DNO_GUI=1
 )
 
@@ -12,7 +12,7 @@ add_defnitions(
 
 set(predicatefeaturestest_SRCS main.cpp )
 
-add_executable(predicatefeaturestest NOGUI ${predicatefeaturestest_SRCS})
+add_executable(predicatefeaturestest ${predicatefeaturestest_SRCS})
 
 target_link_libraries(
   predicatefeaturestest

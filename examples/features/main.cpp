@@ -20,7 +20,7 @@
 #include <QFileInfo>
 #include <QPointer>
 
-#include <kdebug.h>
+#include <QtDebug>
 #include <kcmdlineargs.h>
 #include <kapplication.h>
 #include <kcomponentdata.h>

@@ -1,16 +1,16 @@
-1. kexidbtest
+1. predicatefeaturestest
 -------------
 
-This is a set of tests for the new, common KexiDB API.
+This is a set of tests for the Predicate library API.
 Every test is driver-independent.
 
-Usage: run 'kexidbtest --help' for usage details.
+Usage: run 'predicatefeaturestest --help' for usage details.
 
 
 2. sqltest
 ----------
 
-Script for easier executing 'parser' subtest within kexidbtest.
+A script for easier executing 'parser' subtest within te predicatefeaturestest.
 Usage: run './sqltest' without arguments for usage details.
 
 There is also sqltest_int script accepting interactive mode.
@@ -19,6 +19,7 @@ Usage: run './sqltest_int' without arguments for usage details.
 
 3. Important documents
 ----------------------
+FIXME: update
 -Kexi API Documentation in html
 http://koffice.org/developer/apidocs/kexi/html
 
@@ -27,12 +28,13 @@ http://www.kexi-project.org/wiki/wikiview/index.php?KexiDBDrivers
 
 
 
-4. Information for KexiDB drivers developers
+4. Information for Predicate drivers developers
 --------------------------------------------
+FIXME: update
 
-While you're developing new driver or improving existing one,
-you may want to test a number of aspects to see if the behaviour 
-looks like expected.
+While you're developing a new driver or plan to improve existing one,
+you may want to test a number of aspects of the Predicate library to see
+if the behaviour is like expected.
 
 Following tests should be passed (the order is from most simple 
 test to more complicated):
@@ -41,19 +43,18 @@ test to more complicated):
 -schema
 -tables
 -cursors
--tableview
+-tableview (note: it is disabled as Predicate is largely non-gui for now)
 -parser
 -dr_prop
 
-If the given driver does not pass one of these tests, and you have found:
-- that the problem is at the KexiDB library side (e.g. crash, or improper
-behaviour), or
-- that the problem can be solved by extending KexiDB API, or
-- that the documentation is not correct or not enough detailed, or
-- whatever like that,
+If a given driver does not pass one of these tests, and you have found that:
+- the problem is apparently on the Predicate library side (e.g. crash, or improper
+behaviour),
+- the problem can be solved by extending the Predicate API,
+- the documentation is not correct or not clear enough, or
+- whatever like that...
 
 ..please contact:
 
-KexiDB maintainer
-Jaroslaw Staniek, js @ iidea . pl, irc://irc.freenode.net #kexi
-
+Predicate library maintainer
+Jaroslaw Staniek, staniek @ kde . org, irc://irc.freenode.net #kexi
