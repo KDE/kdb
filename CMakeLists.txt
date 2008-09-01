@@ -32,3 +32,4 @@ SET(PLUGIN_INSTALL_DIR
 
 add_subdirectory( cmake )
 add_subdirectory( Predicate )
+add_subdirectory( tests )
