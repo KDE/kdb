@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,6 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include <QApplication>
 #include <QFileInfo>
 #include <QPointer>
 #include <QtDebug>
@@ -72,28 +73,21 @@ QApplication *app = 0;
 //! Removes the option.
 bool takeOption(QStringList &args, const QString &option)
 {
-    QStringList::Iterator it = args.find(QString::fromLatin1("-")+option);
-    if (it==args.end())
-        it = args.find(QString::fromLatin1("--")+option);
-    if (it==args.end())
-        return false;
-    args.remove(it);
-    return true;
+    return args.removeOne(QLatin1String("-") + option)
+        || args.removeOne(QLatin1String("--") + option);
 }
 
 //! @return next element after option @a option, what should mean parameter
-//! Removes option and its argument
+//! Removes option and its argument.
 QString takeOptionWithArg(QStringList &args, const QString &option)
 {
-    QStringList::Iterator it = args.find(QString::fromLatin1("-")+option);
-    if (it==args.end())
-        it = args.find(QString::fromLatin1("--")+option);
-    if (it==args.end())
-        return QString::null;
-    it = args.remove(it);
-    QString result = *it; // option's argument
-    args.remove(it);
-    return result;
+    int index = args.indexOf(QLatin1String("-") + option);
+    if (index == -1)
+        index = args.indexOf(QLatin1String("--") + option);
+    if (index == -1)
+        return QString();
+    args.removeAt(index);
+    return args.takeAt(index); // option's argument
 }
 
 int main(int argc, char** argv)
@@ -211,7 +205,7 @@ int main(int argc, char** argv)
     QStringList names = manager.driverNames();
     qDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
-        aDebug() << *it;
+        qDebug() << *it;
     if (manager.error() || names.isEmpty()) {
         manager.debugError();
         RETURN(1);
@@ -223,7 +217,7 @@ int main(int argc, char** argv)
         manager.debugError();
         RETURN(1);
     }
-    qDebug() << "MIME type for '" << driver->name() << "': " << driver->fileDBDriverMimeType();
+    qDebug() << "MIME type for '" << driver->name() << "': " << driver->info().fileDBMimeType();
 
     const bool bufCursors = takeOption(args, "buffered-cursors");
     QString queryParams = takeOptionWithArg(args, "query-params");
@@ -271,8 +265,8 @@ int main(int argc, char** argv)
     else if (test_name == "parser") {
         QStringList params;
         if (!queryParams.isEmpty())
-            params = QStringList::split("|", queryParams);
-        r = parserTest(args[2]), params);
+            params = queryParams.split("|");
+        r = parserTest(args[2], params);
     } else if (test_name == "dr_prop")
         r = drPropTest();
     else {
