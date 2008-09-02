@@ -936,7 +936,7 @@ protected:
      that "Predicate already knows" at its level.
      If you cannot test anything, just leave default implementation (that returns true).
 
-     Result of this method is used as an addtional chance to check for isDatabaseUsed().
+     Result of this method is used as an additional chance to check for isDatabaseUsed().
      Do not call this method from your driver's code, it should be used at KexiDB
      level only.
     */

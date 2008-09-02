@@ -211,7 +211,7 @@ KexiDBDrvDbg <<endl;
    Not as with sqlite, the DB library doenst returns all values as
    strings. So we cannot use cstringtoVariant, isn't it?
    PD: It seems that you can fetch them as strings but I'm lazy to change this
-       (If it works dont touch if)
+       (If it works do not touch if)
  */
 bool OracleCursor::drv_storeCurrentRow(RecordData& data) const
 {
