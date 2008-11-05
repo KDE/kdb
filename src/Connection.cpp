@@ -2978,7 +2978,8 @@ tristate Connection::loadDataBlock(int objectID, QString &dataString, const QStr
         return false;
     return querySingleString(
                QString("SELECT o_data FROM kexi__objectdata WHERE o_id=") + QString::number(objectID)
-               + " AND " + Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id", dataID),
+               + " AND " + Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id",
+                                               dataID.isEmpty() ? QVariant() : QVariant(dataID)),
                dataString);
 }
 
@@ -2988,7 +2989,8 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
         return false;
     QString sql(QString::fromLatin1(
                     "SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
-    QString sql_sub(Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id", dataID));
+    QString sql_sub(Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id", 
+                                        dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     bool ok, exists;
     exists = resultExists(sql + " and " + sql_sub, ok);
