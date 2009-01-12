@@ -863,7 +863,7 @@ QStringList Connection::objectNames(int objType, bool* ok)
 
     QString sql;
     if (objType == Predicate::AnyObjectType)
-        sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
+        sql = QLatin1String("SELECT o_name FROM kexi__objects ORDER BY o_id");
     else
         sql = QString::fromLatin1("SELECT o_name FROM kexi__objects WHERE o_type=%1 ORDER BY o_id").arg(objType);
 
@@ -953,9 +953,9 @@ QList<int> Connection::objectIds(int objType)
 
     QString sql;
     if (objType == KexiDB::AnyObjectType)
-        sql = "SELECT o_id, o_name FROM kexi__objects ORDER BY o_id";
+        sql = QLatin1String("SELECT o_id, o_name FROM kexi__objects ORDER BY o_id");
     else
-        sql = QString::fromLatin1("SELECT o_id, o_name FROM kexi__objects WHERE o_type=%1 ORDER BY o_id").arg(objType));
+        sql = QString::fromLatin1("SELECT o_id, o_name FROM kexi__objects WHERE o_type=%1 ORDER BY o_id").arg(objType);
     
     Cursor *c = executeQuery(sql);
     if (!c)
