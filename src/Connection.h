@@ -159,7 +159,7 @@ public:
     */
     bool dropDatabase(const QString &dbName = QString());
 
-    /*! \return names of all the \a objecttype (see \a ObjectTypes in Global.h)
+    /*! \return names of all the \a objecttype (see \a ObjectType in Global.h)
     schemas stored in currently used database. Predicate::AnyObjectType can be passed
     as \a objType to get names of objects of any type.
     If \a ok is not null then variable pointed by it will be set to the result.
