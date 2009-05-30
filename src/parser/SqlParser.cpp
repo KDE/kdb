@@ -3168,7 +3168,7 @@ yyreturn:
 
 
 
-const char * const tname(int offset)
+const char* tname(int offset)
 {
     return yytname[offset];
 }
