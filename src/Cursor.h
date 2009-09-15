@@ -404,10 +404,6 @@ private:
     //<members related to buffering>
     bool m_at_buffer;             //!< true if we already point to the buffer with curr_coldata
     //</members related to buffering>
-
-
-    class Private;
-    Private * const d;
 };
 
 } //namespace Predicate
