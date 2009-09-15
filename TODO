@@ -29,6 +29,7 @@ Naming, API:
 "X-Kexi-FileDBDriverMime" -> "FileDBDriverMime"
 "X-Kexi-DoNotAllowProjectImportingTo" -> "AllowImporting"
 [ ] change the above in kexidb-qt3 too
+[ ] make Driver::Features use Q_FLAGS
 
 Optimization & Cleanup
 [ ] use QLatin1String where possible
