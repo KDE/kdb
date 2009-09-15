@@ -82,7 +82,7 @@ protected:
     friend class ODBCDriver;
 
 private:
-    ODBCConnectionPrivate *d;
+    ODBCConnectionPrivate * const d;
 };
 
 

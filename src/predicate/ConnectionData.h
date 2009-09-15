@@ -243,7 +243,7 @@ public:
 
 protected:
     class Private;
-    Private *priv;
+    Private * const priv;
 
     friend class Connection;
 };
