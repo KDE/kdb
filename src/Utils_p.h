@@ -54,7 +54,7 @@ protected:
     uint m_elapsedTime;
     Predicate::Object *m_errorObj;
     QWaitCondition m_wait;
-bool m_stopWaiting : 1;
+    bool m_stopWaiting;
 };
 
 #endif

@@ -35,7 +35,7 @@ public:
     virtual ~SQLitePreparedStatement();
 
     sqlite3_stmt *prepared_st_handle;
-    bool m_resetRequired : 1;
+    bool m_resetRequired;
 
 protected:
     virtual bool prepare(const QByteArray& statement);

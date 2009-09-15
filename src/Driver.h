@@ -69,8 +69,8 @@ public:
             : fileBased(false)
             , importingAllowed(true) {}
             QString name, caption, comment, fileDBMimeType, fileName;
-            bool fileBased : 1;
-            bool importingAllowed : 1;
+            bool fileBased;
+            bool importingAllowed;
         };
 
         //! Constructs an invalid info.

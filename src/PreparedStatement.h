@@ -100,8 +100,8 @@ public:
         QStringList whereFieldNames;
         const Field::List* fieldsForArguments; //!< fields where we'll put the inserted arguments
         Field::List* whereFields; //!< temporary, used for select statements, based on whereFieldNames
-        bool dirty : 1; //!< true if the statement has to be internally 
-                        //!< prepared (possible again) before calling executeInternal()
+        bool dirty; //!< true if the statement has to be internally 
+                    //!< prepared (possible again) before calling executeInternal()
         PreparedStatementInterface *iface;
     };
 

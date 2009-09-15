@@ -40,7 +40,7 @@ public:
     virtual ~pqxxPreparedStatement();
 
     virtual bool execute();
-bool m_resetRequired : 1;
+    bool m_resetRequired;
 
 private:
     Connection* m_conn;

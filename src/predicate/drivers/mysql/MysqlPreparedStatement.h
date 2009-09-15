@@ -54,7 +54,7 @@ protected:
     MYSQL_BIND *m_mysqlBind;
 #endif
     QByteArray m_tempStatementString;
-    bool m_resetRequired : 1;
+    bool m_resetRequired;
 };
 }
 #endif

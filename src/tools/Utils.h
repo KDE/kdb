@@ -316,7 +316,7 @@ public:
         if (m_autoDelete) qDeleteAll(*this);
     }
 private:
-bool m_autoDelete : 1;
+    bool m_autoDelete;
 };
 
 //! @short Autodeleted list
@@ -402,7 +402,7 @@ public:
     }
 
 private:
-bool m_autoDelete : 1;
+    bool m_autoDelete;
 };
 
 //! @short Case insensitive hash container supporting QString or QByteArray keys.
@@ -462,7 +462,7 @@ public:
         m_autoDelete = set;
     }
 private:
-bool m_autoDelete : 1;
+    bool m_autoDelete;
 };
 
 //! A set created from static (0-terminated) array of raw null-terminated strings.

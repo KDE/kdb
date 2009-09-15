@@ -198,7 +198,7 @@ private:
     //! Used by some ctors.
     void init(const TableSchema& ts, bool copyId);
 
-bool m_isPredicateSystem : 1;
+    bool m_isPredicateSystem;
 
     friend class Connection;
 };

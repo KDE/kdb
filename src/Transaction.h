@@ -45,7 +45,7 @@ public:
     static int globalCount();
 
     Connection *m_conn;
-bool m_active : 1;
+    bool m_active;
     uint refcount;
 };
 

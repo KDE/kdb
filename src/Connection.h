@@ -690,12 +690,12 @@ public:
         int identifierEscaping;
 
         //! True if ROWID should be also retrieved. False by default.
-    bool alsoRetrieveROWID : 1;
+        bool alsoRetrieveROWID;
 
         /*! True if relations (LEFT OUTER JOIN) for visible lookup columns should be added.
          True by default. This is set to false when user-visible statement is generated
          e.g. for the Query Designer. */
-    bool addVisibleLookupColumns : 1;
+        bool addVisibleLookupColumns;
     };
 
     /*! \return "SELECT ..." statement's string needed for executing query
@@ -1251,8 +1251,8 @@ protected:
 private:
     ConnectionPrivate* d; //!< @internal d-pointer class.
     Driver* const m_driver; //!< The driver this \a Connection instance uses.
-bool m_destructor_started : 1; //!< helper: true if destructor is started.
-bool m_insideCloseDatabase : 1; //!< helper: true while closeDatabase() is executed
+    bool m_destructor_started; //!< helper: true if destructor is started.
+    bool m_insideCloseDatabase; //!< helper: true while closeDatabase() is executed
 
     friend class Predicate::Driver;
     friend class Predicate::Cursor;

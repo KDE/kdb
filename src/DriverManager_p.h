@@ -83,7 +83,7 @@ protected:
 
 private:
     ulong m_refCount;
-    bool lookupDriversNeeded : 1;
+    bool lookupDriversNeeded;
 
     friend class DriverManager;
 };
