@@ -30,28 +30,28 @@ else(WIN32)
       PATHS
       $ENV{MYSQL_INCLUDE_DIR}
       $ENV{MYSQL_DIR}/include
-      /usr/include/mysql
-      /usr/local/include/mysql
       /usr/local/mysql/include
-      /usr/local/mysql/include/mysql
       /opt/mysql/mysql/include
-      /opt/mysql/mysql/include/mysql
+      PATH_SUFFIXES
+      mysql
    )
 endif(WIN32)
 
 if(WIN32)
+   string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_TOLOWER)
+
    # path suffix for debug/release mode
    # binary_dist: mysql binary distribution
    # build_dist: custom build
-   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   if(CMAKE_BUILD_TYPE_TOLOWER MATCHES "debug")
       set(binary_dist debug)
       set(build_dist Debug)
-   else(CMAKE_BUILD_TYPE STREQUAL "Debug")
+   else(CMAKE_BUILD_TYPE_TOLOWER MATCHES "debug")
       ADD_DEFINITIONS(-DDBUG_OFF)
       set(binary_dist opt)
       set(build_dist Release)
-   endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-   
+   endif(CMAKE_BUILD_TYPE_TOLOWER MATCHES "debug")
+
 #   find_library(MYSQL_LIBRARIES NAMES mysqlclient
    find_library(MYSQL_LIBRARIES NAMES libmysql
       PATHS
@@ -68,12 +68,10 @@ else(WIN32)
       $ENV{MYSQL_DIR}/libmysql_r/.libs
       $ENV{MYSQL_DIR}/lib
       $ENV{MYSQL_DIR}/lib/mysql
-      /usr/lib/mysql
-      /usr/local/lib/mysql
       /usr/local/mysql/lib
-      /usr/local/mysql/lib/mysql
       /opt/mysql/mysql/lib
-      /opt/mysql/mysql/lib/mysql
+      PATH_SUFFIXES 
+      mysql
    )
 endif(WIN32)
 
@@ -93,12 +91,10 @@ else(WIN32)
       $ENV{MYSQL_DIR}/libmysql_r/.libs
       $ENV{MYSQL_DIR}/lib
       $ENV{MYSQL_DIR}/lib/mysql
-      /usr/lib/mysql
-      /usr/local/lib/mysql
       /usr/local/mysql/lib
-      /usr/local/mysql/lib/mysql
       /opt/mysql/mysql/lib
-      /opt/mysql/mysql/lib/mysql
+      PATH_SUFFIXES
+      mysql
    )
    find_library(MYSQL_LIBRARIES NAMES mysqlclient
       PATHS

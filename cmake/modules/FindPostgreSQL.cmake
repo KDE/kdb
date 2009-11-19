@@ -5,7 +5,7 @@
 #  POSTGRESQL_LIBRARIES, the libraries needed to use POSTGRESQL.
 #  POSTGRESQL_FOUND, If false, do not try to use PostgreSQL.
 
-# Copyright (c) 2006, Jarosław Staniek <staniek@kde.org>
+# Copyright (c) 2006 Jarosław Staniek <staniek@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
