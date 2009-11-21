@@ -27,7 +27,7 @@
 using namespace Predicate;
 
 #define ERRMSG(a) \
-    { if (m_msgHandler) m_msgHandler->showMessage(a); }
+    { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
 
 Object::Object(MessageHandler* handler)
         : m_previousServerResultNum(0)
@@ -48,7 +48,7 @@ Object::~Object()
     m_previousServerResultNum2 = serverResult(); \
     m_previousServerResultName2 = serverResultName(); \
     PreDbg << "Object ERROR: " << m_previousServerResultNum2 << ": " \
-    << m_previousServerResultName2
+        << m_previousServerResultName2
 
 void Object::setError(int code, const QString &msg)
 {
@@ -158,16 +158,16 @@ QString Object::serverResultName()
 void Object::debugError()
 {
     if (error()) {
-        PreDbg << "KEXIDB ERROR: " << errorMsg();
+        PreDbg << "PREDICATE ERROR: " << errorMsg();
         QString s = serverErrorMsg(), sn = serverResultName();
         if (!s.isEmpty())
-            PreDbg << "KEXIDB SERVER ERRMSG: " << s;
+            PreDbg << "PREDICATE SERVER ERRMSG: " << s;
         if (!sn.isEmpty())
-            PreDbg << "KEXIDB SERVER RESULT NAME: " << sn;
+            PreDbg << "PREDICATE SERVER RESULT NAME: " << sn;
         if (serverResult() != 0)
-            PreDbg << "KEXIDB SERVER RESULT #: " << serverResult();
+            PreDbg << "PREDICATE SERVER RESULT #: " << serverResult();
     } else
-        PreDbg << "KEXIDB OK.";
+        PreDbg << "PREDICATE OK.";
 }
 
 MessageHandler::ButtonCode Object::askQuestion(

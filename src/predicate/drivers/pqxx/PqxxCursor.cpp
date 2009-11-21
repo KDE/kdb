@@ -73,7 +73,7 @@ pqxxSqlCursor::~pqxxSqlCursor()
 //Create a cursor result set
 bool pqxxSqlCursor::drv_open()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_open:" << m_sql;
+// PreDrvDbg << m_sql;
 
     if (!my_conn->is_open()) {
 //! @todo this check should be moved to Connection! when drv_prepareQuery() arrive
@@ -100,7 +100,7 @@ bool pqxxSqlCursor::drv_open()
         ((pqxxSqlConnection*)connection())
         ->drv_commitTransaction(((pqxxSqlConnection*)connection())->m_trans);
 //  my_conn->m_trans->commit();
-//  PreDrvDbg << "pqxxSqlCursor::drv_open: trans. committed: " << cur_name;
+//  PreDrvDbg << "trans. committed:" << cur_name;
 
         //We should now be placed before the first row, if any
         m_fieldsToStoreInRow = m_res->columns();
@@ -123,7 +123,7 @@ bool pqxxSqlCursor::drv_open()
         delete((pqxxSqlConnection*)connection())->m_trans;
         m_implicityStarted = false;
     }
-// PreDrvDbg << "pqxxSqlCursor::drv_open: trans. rolled back! - " << cur_name;
+// PreDrvDbg << "trans. rolled back! - " << cur_name;
     return false;
 }
 
@@ -149,7 +149,7 @@ bool pqxxSqlCursor::drv_close()
 //Gets the next record...does not need to do much, just return fetchend if at end of result set
 void pqxxSqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_getNextRecord, size is " <<m_res->size() << " Current Position is " << (long)at();
+// PreDrvDbg << "size is" <<m_res->size() << "current Position is" << (long)at();
     if (at() < m_res->size() && at() >= 0) {
         m_result = FetchOK;
     } else if (at() >= m_res->size()) {
@@ -165,7 +165,7 @@ void pqxxSqlCursor::drv_getNextRecord()
 //Check the current position is within boundaries
 void pqxxSqlCursor::drv_getPrevRecord()
 {
-// PreDrvDbg << "pqxxSqlCursor::drv_getPrevRecord";
+// PreDrvDbg;
 
     if (at() < m_res->size() && at() >= 0) {
         m_result = FetchOK;
@@ -203,7 +203,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
     Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
-// PreDrvDbg << "pqxxSqlCursor::value(" << pos << ")";
+// PreDrvDbg << "pos:" << pos;
 
     //from most to least frequently used types:
     if (f) { //We probably have a schema type query so can use kexi to determin the row type
@@ -234,7 +234,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
 //who'd have thought we'd be using char** in this day and age :o)
 const char** pqxxSqlCursor::rowData() const
 {
-// PreDrvDbg << "pqxxSqlCursor::recordData";
+// PreDrvDbg;
 
     const char** row;
 
@@ -256,7 +256,7 @@ const char** pqxxSqlCursor::rowData() const
 //Store the current record in [data]
 bool pqxxSqlCursor::drv_storeCurrentRow(RecordData &data) const
 {
-// PreDrvDbg << "pqxxSqlCursor::storeCurrentRow: POSITION IS " << (long)m_at;
+// PreDrvDbg << "POSITION IS" << (long)m_at;
 
     if (m_res->size() <= 0)
         return false;

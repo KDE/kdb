@@ -94,7 +94,7 @@ Cursor* SybaseConnection::prepareQuery(QuerySchema& query, uint cursor_options)
 
 bool SybaseConnection::drv_getDatabasesList(QStringList &list)
 {
-    PreDrvDbg << "SybaseConnection::drv_getDatabasesList()";
+    PreDrvDbg;
 
     // select * from master..sysdatabases ?
     // todo: verify.
@@ -103,7 +103,7 @@ bool SybaseConnection::drv_getDatabasesList(QStringList &list)
 
 bool SybaseConnection::drv_createDatabase(const QString &dbName)
 {
-    PreDrvDbg << "SybaseConnection::drv_createDatabase: " << dbName;
+    PreDrvDbg << dbName;
     // mysql_create_db deprecated, use SQL here.
     if (drv_executeSQL("CREATE DATABASE " + dbName)) {
         // set allow_nulls_by_default option to true

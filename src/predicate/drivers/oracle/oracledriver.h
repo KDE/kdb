@@ -32,9 +32,9 @@ class OracleDriver : public KexiDB::Driver{
 	KEXIDB_DRIVER
 
 	public:
-		OracleDriver( QObject *parent, const QStringList &args = QStringList() );
-		virtual ~OracleDriver();
+		OracleDriver();
 
+		virtual ~OracleDriver();
 
 		// From here on, almost everything is copied from mysqldriver.h
 

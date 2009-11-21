@@ -167,10 +167,12 @@ public:
     DatabaseVersionInfo();
     DatabaseVersionInfo(uint majorVersion, uint minorVersion, uint releaseVersion);
 
-    //! Major version number, e.g. 1 for 1.8.9
+    bool matches(uint _major, uint _minor) const { return _major == major && _minor == minor; }
+
+    //! Major version number, e.g. 1 for 1.8
     uint major;
 
-    //! Minor version number, e.g. 8 for 1.8.9
+    //! Minor version number, e.g. 8 for 1.8
     uint minor;
 
     //! Release version number, e.g. 9 for 1.8.9
@@ -217,15 +219,6 @@ enum ObjectType {
 };
 
 }
-
-
-#if 0 //Qt4: remove
-/*! a shortcut for iterating over lists or maps, eg. QMap, QValueList */
-#define foreach_list(_class, _variable, _list) \
-    for (_class _variable(_list); _variable.current(); ++_variable)
-
-#define foreach_dict(_class, _variable, _list) foreach_list(_class, _variable, _list)
-#endif
 
 #ifndef futureI18n
 # define futureI18n QString

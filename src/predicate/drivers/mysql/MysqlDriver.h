@@ -34,7 +34,14 @@ class MysqlDriver : public Driver
     PREDICATE_DRIVER
 
 public:
+    /*!
+     * Constructor sets database features and
+     * maps the types in Predicate::Field::Type to the MySQL types.
+     *
+     * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
+     */
     MysqlDriver();
+
     virtual ~MysqlDriver();
 
     virtual bool isSystemDatabaseName(const QString &n) const;

@@ -41,23 +41,14 @@ using namespace Predicate;
 
 EXPORT_PREDICATE_DRIVER(MysqlDriver, mysql)
 
-/* TODO: Implement buffered/unbuffered, rather than buffer everything.
+/*! @todo Implement buffered/unbuffered cursor, rather than buffer everything.
    Each MYSQL connection can only handle at most one unbuffered cursor,
    so MysqlConnection should keep count?
  */
 
-/*!
- * Constructor sets database features and
- * maps the types in Predicate::Field::Type to the MySQL types.
- *
- * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
- */
 MysqlDriver::MysqlDriver()
     : Driver()
 {
-// PreDrvDbg << "MysqlDriver::MysqlDriver()";
-
-//    d->isFileDriver = false;
     d->features = IgnoreTransactions | CursorForward;
 
     beh->ROW_ID_FIELD_NAME = "LAST_INSERT_ID()";

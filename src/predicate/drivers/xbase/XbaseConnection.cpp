@@ -20,8 +20,6 @@
 #include <QVariant>
 #include <QFile>
 #include <QRegExp>
-
-#include <kgenericfactory.h>
 #include <QtDebug>
 
 #include "XbaseDriver.h"
@@ -30,9 +28,7 @@
 #include "XbaseConnection_p.h"
 #include <Predicate/Error.h>
 
-
 using namespace Predicate;
-
 
 xBaseConnection::xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data )
   :Connection(driver,conn_data)
@@ -46,6 +42,7 @@ xBaseConnection::~xBaseConnection() {
 
 bool xBaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
+  Q_UNUSED(version);
   const bool ok = d->db_connect(*data());
   if (!ok)
     return false;
@@ -77,7 +74,7 @@ Cursor* xBaseConnection::prepareQuery( QuerySchema& query, uint cursor_options )
 }
 
 bool xBaseConnection::drv_getDatabasesList( QStringList &list ) {
-  PreDrvDbg << "xBaseConnection::drv_getDatabasesList()";
+  PreDrvDbg;
 
   //! TODO Check whether this is the right thing to do
   list<<QStringList( d->dbMap.keys() );
@@ -87,7 +84,7 @@ bool xBaseConnection::drv_getDatabasesList( QStringList &list ) {
 
 bool xBaseConnection::drv_createDatabase( const QString &dbName) {
   //! TODO Check whether this function has any use.
-  PreDrvDbg << "xBaseConnection::drv_createDatabase: " << dbName;
+  PreDrvDbg << dbName;
 //	return d->internalConn->createDatabase(d->dbMap[dbName]);
   return true;
 }
@@ -108,6 +105,7 @@ bool xBaseConnection::drv_closeDatabase() {
 }
 
 bool xBaseConnection::drv_dropDatabase( const QString &dbName) {
+    Q_UNUSED(dbName);
 //TODO is here escaping needed
   // Delete the directory ?
   return true;

@@ -30,6 +30,9 @@ SET(PLUGIN_INSTALL_DIR
     CACHE PATH "The subdirectory relative to the install prefix where plugins will be installed (default is ${PLUGIN_INSTALL_BASE_DIR}/Predicate/plugins)."
 )
 
+include(MacroOptionalFindPackage)
+include(InstallSettings)
+
 find_package(Qt4 REQUIRED)
 
 add_subdirectory( cmake )

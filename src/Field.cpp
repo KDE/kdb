@@ -335,8 +335,7 @@ void
 Field::setType(Type t)
 {
     if (m_expr) {
-        PreWarn << QString("Field::setType(%1)").arg(t)
-        << " could not set type because the Field.has expression assigned!";
+        PreWarn << "could not set type" << Field::typeName(t) << "because the Field.has expression assigned!";
         return;
     }
     m_type = t;

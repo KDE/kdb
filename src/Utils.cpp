@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2009 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -121,10 +121,9 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         details += "<p>" + obj->errorMsg();
 
     if (!obj->serverErrorMsg().isEmpty())
-        details += "<p><b><nobr>" + QObject::tr("Message from server:") + "</nobr></b><br>" + obj->serverErrorMsg();
+        details += "<p><b>" + QObject::tr("Message from server:") + "</b> " + obj->serverErrorMsg();
     if (!obj->recentSQLString().isEmpty())
-        details += "<p><b><nobr>" + QObject::tr("SQL statement:")
-            + QString("</nobr></b><br><tt>%1</tt>").arg(obj->recentSQLString());
+        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(obj->recentSQLString());
     int serverResult;
     QString serverResultName;
     if (obj->serverResult() != 0) {
@@ -134,20 +133,27 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         serverResult = obj->previousServerResult();
         serverResultName = obj->previousServerResultName();
     }
-    if (!serverResultName.isEmpty())
-        details += (QString("<p><b><nobr>") + QObject::tr("Server result name:")
-            + "</nobr></b><br>" + serverResultName);
-    if (!details.isEmpty()
-            && (!obj->serverErrorMsg().isEmpty() || !obj->recentSQLString().isEmpty() || !serverResultName.isEmpty() || serverResult != 0)) {
-        details += (QString("<p><b><nobr>") + 
-            QObject::tr("Server result number:") + "</nobr></b><br>" + QString::number(serverResult));
+    if (   !details.isEmpty()
+        && (   !obj->serverErrorMsg().isEmpty()
+            || !obj->recentSQLString().isEmpty()
+            || !serverResultName.isEmpty()
+            || serverResult != 0)
+           )
+    {
+        details += (QString("<p><b>") + QObject::tr("Server result:") + "</b> " + QString::number(serverResult));
+        if (!serverResultName.isEmpty()) {
+            details += QString(" (%1)").arg(serverResultName);
+        }
+    }
+    else {
+        if (!serverResultName.isEmpty()) {
+            details += (QString("<p><b>") + QObject::tr("Server result:") + "</b> " + serverResultName);
+        }
     }
 
     if (!details.isEmpty() && !details.startsWith("<qt>")) {
-        if (details.startsWith("<p>"))
-            details = QString::fromLatin1("<qt>") + details;
-        else
-            details = QString::fromLatin1("<qt><p>") + details;
+        if (!details.startsWith("<p>"))
+            details.prepend(QLatin1String("<p>"));
     }
 }
 
@@ -181,8 +187,7 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name)
     m_table = conn->tableSchema(QString(name));
     m_query = m_table ? 0 : conn->querySchema(QString(name));
     if (!m_table && !m_query)
-        PreWarn << "TableOrQuery(FieldList &tableOrQuery) : "
-        " tableOrQuery is neither table nor query!";
+        PreWarn << "tableOrQuery is neither table nor query!";
 }
 
 
@@ -192,11 +197,9 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name,
         , m_query(table ? 0 : conn->querySchema(QString(name)))
 {
     if (table && !m_table)
-        PreWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
-        "no table specified!";
+        PreWarn << "no table specified!";
     if (!table && !m_query)
-        PreWarn << "TableOrQuery(Connection *conn, const QByteArray& name, bool table) : "
-        "no query specified!";
+        PreWarn << "no query specified!";
 }
 
 TableOrQuerySchema::TableOrQuerySchema(FieldList &tableOrQuery)
@@ -204,8 +207,7 @@ TableOrQuerySchema::TableOrQuerySchema(FieldList &tableOrQuery)
         , m_query(dynamic_cast<QuerySchema*>(&tableOrQuery))
 {
     if (!m_table && !m_query)
-        PreWarn << "TableOrQuery(FieldList &tableOrQuery) : "
-        " tableOrQuery is nether table nor query!";
+        PreWarn << "tableOrQuery is nether table nor query!";
 }
 
 TableOrQuerySchema::TableOrQuerySchema(Connection *conn, int id)
@@ -213,8 +215,7 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, int id)
     m_table = conn->tableSchema(id);
     m_query = m_table ? 0 : conn->querySchema(id);
     if (!m_table && !m_query)
-        PreWarn << "TableOrQuery(Connection *conn, int id) : no table or query found for id=="
-        << id << "!";
+        PreWarn << "no table or query found for id==" << id;
 }
 
 TableOrQuerySchema::TableOrQuerySchema(TableSchema* table)
@@ -222,7 +223,7 @@ TableOrQuerySchema::TableOrQuerySchema(TableSchema* table)
         , m_query(0)
 {
     if (!m_table)
-        PreWarn << "TableOrQuery(TableSchema* table) : no table specified!";
+        PreWarn << "no table specified!";
 }
 
 TableOrQuerySchema::TableOrQuerySchema(QuerySchema* query)
@@ -230,7 +231,7 @@ TableOrQuerySchema::TableOrQuerySchema(QuerySchema* query)
         , m_query(query)
 {
     if (!m_query)
-        PreWarn << "TableOrQuery(QuerySchema* query) : no query specified!";
+        PreWarn << "no query specified!";
 }
 
 uint TableOrQuerySchema::fieldCount() const
@@ -250,7 +251,7 @@ const QueryColumnInfo::Vector TableOrQuerySchema::columns(bool unique)
     if (m_query)
         return m_query->fieldsExpanded(unique ? QuerySchema::Unique : QuerySchema::Default);
 
-    PreWarn << "TableOrQuery::fields() : no query or table specified!";
+    PreWarn << "no query or table specified!";
     return QueryColumnInfo::Vector();
 }
 
@@ -413,7 +414,7 @@ int ConnectionTestDialog::exec()
 
 void ConnectionTestDialog::slotTimeout()
 {
-// PreDbg << "ConnectionTestDialog::slotTimeout() " << m_errorObj;
+// PreDbg << m_errorObj;
     bool notResponding = false;
     if (m_elapsedTime >= 1000*5) {//5 seconds
         m_stopWaiting = true;
@@ -425,17 +426,17 @@ void ConnectionTestDialog::slotTimeout()
         reject();
 //  close();
         if (m_errorObj) {
-            m_msgHandler->showMessage(m_errorObj);
+            m_msgHandler->showErrorMessage(m_errorObj);
             m_errorObj = 0;
         } else if (notResponding) {
-            m_msgHandler->showMessage(
+            m_msgHandler->showErrorMessage(
                 MessageHandler::Sorry,
                 QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
                     .arg(m_connData.serverInfoString(true)),
                 QString(),
                 QObject::tr("Test Connection"));
         } else {
-            m_msgHandler->showMessage(
+            m_msgHandler->showErrorMessage(
                 MessageHandler::Information,
                 QObject::tr("Test connection to \"%1\" database server established successfully.")
                     .arg(m_connData.serverInfoString(true)),
@@ -453,7 +454,7 @@ void ConnectionTestDialog::slotTimeout()
 
 void ConnectionTestDialog::error(Predicate::Object *obj)
 {
-    PreDbg << "ConnectionTestDialog::error()";
+    PreDbg;
     m_stopWaiting = true;
     m_errorObj = obj;
     /*  reject();
@@ -502,7 +503,7 @@ int Predicate::rowCount(const Predicate::TableSchema& tableSchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!tableSchema.connection()) {
-        PreWarn << "Predicate::rowsCount(const Predicate::TableSchema&): no tableSchema.connection() !";
+        PreWarn << "no tableSchema.connection()";
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -518,7 +519,7 @@ int Predicate::rowCount(Predicate::QuerySchema& querySchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!querySchema.connection()) {
-        PreWarn << "Predicate::rowsCount(const Predicate::QuerySchema&): no querySchema.connection() !";
+        PreWarn << "no querySchema.connection()";
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -625,7 +626,7 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
 Predicate::Field::Type Predicate::intToFieldType(int type)
 {
     if (type < (int)Predicate::Field::InvalidType || type > (int)Predicate::Field::LastType) {
-        PreWarn << "Predicate::intToFieldType(): invalid type " << type;
+        PreWarn << "invalid type" << type;
         return Predicate::Field::InvalidType;
     }
     return (Predicate::Field::Type)type;
@@ -636,7 +637,7 @@ static bool setIntToFieldType(Field& field, const QVariant& value)
     bool ok;
     const int intType = value.toInt(&ok);
     if (!ok || Predicate::Field::InvalidType == intToFieldType(intType)) {//for sanity
-        PreWarn << "Predicate::setFieldProperties(): invalid type";
+        PreWarn << "invalid type";
         return false;
     }
     field.setType((Predicate::Field::Type)intType);
@@ -803,9 +804,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
             GET_INT(setVisibleDecimalPlaces);
         } else {
             if (!field.table()) {
-                PreWarn << QString(
-                    "Predicate::setFieldProperty() Cannot set \"%1\" property - no table assinged for field!")
-                .arg(QString(propertyName));
+                PreWarn << "Cannot set" << propertyName << "property - no table assigned for field";
             } else {
                 LookupFieldSchema *lookup = field.table()->lookupFieldSchema(field);
                 const bool hasLookup = lookup != 0;
@@ -876,7 +875,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         field.setCustomProperty(propertyName, value);
     }
 
-    PreWarn << "Predicate::setFieldProperty() property \"" << propertyName << "\" not found!";
+    PreWarn << "property" << propertyName << "not found!";
     return false;
 #undef SET_BOOLEAN_FLAG
 #undef GET_INT
@@ -934,7 +933,7 @@ QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node)
         return QVariant(text.toLower() == "true" || text == "1");
     }
 //! @todo add more QVariant types
-    PreWarn << "loadPropertyValueFromDom(): unknown type '" << valueType << "'";
+    PreWarn << "unknown type" << valueType;
     return QVariant();
 }
 
@@ -999,8 +998,7 @@ QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
         if (type == Field::Time)
             return QTime::currentTime();
     }
-    PreWarn << "Predicate::emptyValueForType() no value for type "
-    << Field::typeName(type);
+    PreWarn << "no value for type" << Field::typeName(type);
     return QVariant();
 }
 
@@ -1053,8 +1051,7 @@ QVariant Predicate::notEmptyValueForType(Predicate::Field::Type type)
         if (type == Field::Time)
             return QTime::currentTime();
     }
-    PreWarn << "Predicate::notEmptyValueForType() no value for type "
-    << Field::typeName(type);
+    PreWarn << "no value for type" << Field::typeName(type);
     return QVariant();
 }
 
@@ -1071,8 +1068,7 @@ QString Predicate::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     QString str;
     str.reserve(escaped_length);
     if (str.capacity() < escaped_length) {
-        PreWarn << "Predicate::Driver::escapeBLOB(): no enough memory (cannot allocate " <<
-        escaped_length << " chars)";
+        PreWarn << "no enough memory (cannot allocate" << escaped_length << "chars)";
         return QString();
     }
     if (type == BLOBEscapeXHex)
@@ -1141,7 +1137,7 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
                         array[output] = char((int(s[1] - '0') * 8 + int(s[2] - '0')) * 8 + int(s[3] - '0'));
                     s += 4;
                 } else {
-                    PreWarn << "processBinaryData(): no octal value after backslash";
+                    PreWarn << "no octal value after backslash";
                     s++;
                 }
             } else {
@@ -1179,7 +1175,7 @@ QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool 
         for (uint i = 0; i < (len - 1); i += 2) {
             int c = s.mid(i, 2).toInt(&ok, 16);
             if (!ok) {
-                PreWarn << "Predicate::stringToVariant(): Error in digit " << i;
+                PreWarn << "Error in digit" << i;
                 return QVariant();
             }
             ba[i/2] = (char)c;
@@ -1261,8 +1257,7 @@ QString Predicate::defaultFileBasedDriverIcon()
     KMimeType::Ptr mimeType(KMimeType::mimeType(
                                 Predicate::defaultFileBasedDriverMimeType()));
     if (mimeType.isNull()) {
-        PreWarn << QString("'%1' mimetype not installed!")
-        .arg(Predicate::defaultFileBasedDriverMimeType());
+        PreWarn << Predicate::defaultFileBasedDriverMimeType() << "mimetype not installed!";
         return QString();
     }
     return mimeType->iconName();

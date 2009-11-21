@@ -196,7 +196,7 @@ public:
 
     /*! Driver-specific SQL keywords that need to be escaped if used as an
       identifier (e.g. for a table or column name) that aren't also Kexi SQL
-      keywords.  These don't neccesarily need to be escaped when displayed by
+      keywords.  These don't necessarily need to be escaped when displayed by
       the front-end, because they won't confuse the parser.  However, they do
       need to be escaped before sending to the DB-backend which will have
       it's own parser.
@@ -235,6 +235,9 @@ public:
 //! Also exports driver's static version information.
 #define EXPORT_PREDICATE_DRIVER( driverClass, driverName ) \
     Q_EXPORT_PLUGIN2( predicate_ ## driverName, driverClass ) \
+    Q_EXTERN_C Q_DECL_EXPORT const uint version_major = PREDICATE_VERSION_MAJOR; \
+    Q_EXTERN_C Q_DECL_EXPORT const uint version_minor = PREDICATE_VERSION_MINOR; \
+    Q_EXTERN_C Q_DECL_EXPORT const uint version_release = PREDICATE_VERSION_RELEASE; \
     DatabaseVersionInfo driverClass::version() const { \
         return DatabaseVersionInfo( \
             PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE); }

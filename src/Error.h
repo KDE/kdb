@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
+   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -112,10 +112,11 @@ namespace Predicate
 class PREDICATE_EXPORT ResultInfo
 {
 public:
-    ResultInfo() {
-        success = true;
-        allowToDiscardChanges = false;
-        column = -1;
+    ResultInfo()
+        : success(true)
+        , allowToDiscardChanges(false)
+        , column(-1)
+    {
     }
     /*! Sets information to default values. */
     void clear() {
@@ -126,7 +127,7 @@ public:
         desc.clear();
     }
     bool success; //!< result of the operation, true by default
-    bool allowToDiscardChanges : 1; //!< True if changes can be discarded, false by default
+    bool allowToDiscardChanges; //!< True if changes can be discarded, false by default
     //!< If true, additional "Discard changes" messagebox
     //!< button can be displayed.
     QString msg, desc; //!< error message and detailed description, both empty by default
@@ -136,4 +137,3 @@ public:
 }//namespace
 
 #endif
-

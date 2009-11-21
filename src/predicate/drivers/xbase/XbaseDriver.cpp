@@ -32,7 +32,7 @@
 
 using namespace Predicate;
 
-EXPORT_PREDICATE_DRIVER( xBaseDriver , xbase )
+EXPORT_PREDICATE_DRIVER(xBaseDriver, xbase)
 
 class Predicate::xBaseDriverPrivate {
 
@@ -46,8 +46,8 @@ public:
 
 };
 
-xBaseDriver::xBaseDriver( QObject *parent, const QStringList &args )
-  : Driver( parent, args )
+xBaseDriver()
+  : Driver()
   ,dp( new xBaseDriverPrivate() )
 {
   Predicate::DriverManager manager;

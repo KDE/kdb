@@ -4,7 +4,10 @@ include_directories(
   ${QT_INCLUDES}
 )
 
-ADD_DEFINITIONS( -D__PREDICATE__= )
+ADD_DEFINITIONS(
+  -D__PREDICATE__=
+  -DPREDICATE_DRIVER_NAME="xbase"
+)
 
 ########### next target ###############
 

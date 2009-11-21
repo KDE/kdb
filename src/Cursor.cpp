@@ -123,7 +123,7 @@ Cursor::~Cursor()
         if (!m_conn->m_destructor_started) {
             m_conn->takeCursor(*this);
         } else {
-            PreDbg << "Cursor::~Cursor() can be destroyed with Conenction::deleteCursor(), not with delete operator !";
+            PreDbg << "can be destroyed with Conenction::deleteCursor(), not with delete operator !";
             exit(1);
         }
     }
@@ -141,7 +141,7 @@ bool Cursor::open()
         m_conn->m_sql = m_rawStatement;
     else {
         if (!m_query) {
-            PreDbg << "Cursor::open(): no query statement (or schema) defined!";
+            PreDbg << "no query statement (or schema) defined!";
             setError(ERR_SQL_EXECUTION_ERROR, tr("No query statement or schema defined."));
             return false;
         }
@@ -151,7 +151,7 @@ bool Cursor::open()
                         ? m_conn->selectStatement(*m_query, *m_queryParameters, options)
                         : m_conn->selectStatement(*m_query, options);
         if (m_conn->m_sql.isEmpty()) {
-            PreDbg << "Cursor::open(): empty statement!";
+            PreDbg << "empty statement!";
             setError(ERR_SQL_EXECUTION_ERROR, tr("Query statement is empty."));
             return false;
         }
@@ -195,7 +195,7 @@ bool Cursor::close()
     m_logicalFieldCount = 0;
     m_at = -1;
 
-// PreDbg<<"Cursor::close() == "<<ret;
+// PreDbg << ret;
     return ret;
 }
 

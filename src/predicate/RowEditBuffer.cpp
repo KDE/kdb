@@ -47,7 +47,7 @@ RowEditBuffer::~RowEditBuffer()
 const QVariant* RowEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPossible) const
 {
     if (!m_dbBuffer) {
-        PreWarn << "RowEditBuffer::at(QueryColumnInfo&): not db-aware buffer!";
+        PreWarn << "not db-aware buffer!";
         return 0;
     }
     *m_dbBufferIt = m_dbBuffer->find(&ci);
@@ -70,10 +70,10 @@ const QVariant* RowEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPos
 const QVariant* RowEditBuffer::at(Field& f) const
 {
     if (!m_simpleBuffer) {
-        PreWarn << "RowEditBuffer::at(Field&): this is db-aware buffer!";
+        PreWarn << "this is db-aware buffer!";
         return 0;
     }
-    *m_simpleBufferIt = m_simpleBuffer->find(f.name());
+    *m_simpleBufferIt = m_simpleBuffer->constFind(f.name());
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
         return 0;
     return &(*m_simpleBufferIt).value();
@@ -82,10 +82,10 @@ const QVariant* RowEditBuffer::at(Field& f) const
 const QVariant* RowEditBuffer::at(const QString& fname) const
 {
     if (!m_simpleBuffer) {
-        PreWarn << "RowEditBuffer::at(Field&): this is db-aware buffer!";
+        PreWarn << "this is db-aware buffer!";
         return 0;
     }
-    *m_simpleBufferIt = m_simpleBuffer->find(fname);
+    *m_simpleBufferIt = m_simpleBuffer->constFind(fname);
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
         return 0;
     return &(*m_simpleBufferIt).value();

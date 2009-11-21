@@ -147,8 +147,9 @@ QValidator::State MultiValidator::validate(QString & input, int & pos) const
 
 void MultiValidator::fixup(QString & input) const
 {
-    foreach(QValidator* validator, d->subValidators)
-    validator->fixup(input);
+    foreach(QValidator* validator, d->subValidators) {
+        validator->fixup(input);
+    }
 }
 
 Validator::Result MultiValidator::internalCheck(

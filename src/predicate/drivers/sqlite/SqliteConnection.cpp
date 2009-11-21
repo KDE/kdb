@@ -83,17 +83,17 @@ SQLiteConnection::SQLiteConnection(Driver *driver, ConnectionData &conn_data)
 
 SQLiteConnection::~SQLiteConnection()
 {
-    PreDrvDbg << "SQLiteConnection::~SQLiteConnection()";
+    PreDrvDbg;
     //disconnect if was connected
 // disconnect();
     destroy();
     delete d;
-    PreDrvDbg << "SQLiteConnection::~SQLiteConnection() ok";
+    PreDrvDbg << "ok";
 }
 
 bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
-    PreDrvDbg << "SQLiteConnection::connect()";
+    PreDrvDbg;
     version.string = QString(SQLITE_VERSION); //defined in sqlite3.h
     QRegExp re("(\\d+)\\.(\\d+)\\.(\\d+)");
     if (re.exactMatch(version.string)) {
@@ -106,7 +106,7 @@ bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
 
 bool SQLiteConnection::drv_disconnect()
 {
-    PreDrvDbg << "SQLiteConnection::disconnect()";
+    PreDrvDbg;
     return true;
 }
 
@@ -129,7 +129,7 @@ bool SQLiteConnection::drv_getTablesList(QStringList &list)
     Predicate::Cursor *cursor;
     m_sql = "select lower(name) from sqlite_master where type='table'";
     if (!(cursor = executeQuery(m_sql))) {
-        PreWarn << "Connection::drv_getTablesList(): !executeQuery()";
+        PreWarn << "!executeQuery()";
         return false;
     }
     list.clear();
@@ -267,7 +267,7 @@ Cursor* SQLiteConnection::prepareQuery(QuerySchema& query, uint cursor_options)
 
 bool SQLiteConnection::drv_executeSQL(const QString& statement)
 {
-// PreDrvDbg << "SQLiteConnection::drv_executeSQL(" << statement << ")";
+// PreDrvDbg << statement;
 // QCString st(statement.length()*2);
 // st = escapeString( statement.local8Bit() ); //?
 #ifdef SQLITE_UTF8
@@ -303,11 +303,45 @@ int SQLiteConnection::serverResult()
     return d->res == 0 ? Connection::serverResult() : d->res;
 }
 
+static const char* serverResultNames[] = {
+    "SQLITE_OK", // 0
+    "SQLITE_ERROR",
+    "SQLITE_INTERNAL",
+    "SQLITE_PERM",
+    "SQLITE_ABORT",
+    "SQLITE_BUSY",
+    "SQLITE_LOCKED",
+    "SQLITE_NOMEM",
+    "SQLITE_READONLY",
+    "SQLITE_INTERRUPT",
+    "SQLITE_IOERR",
+    "SQLITE_CORRUPT",
+    "SQLITE_NOTFOUND",
+    "SQLITE_FULL",
+    "SQLITE_CANTOPEN",
+    "SQLITE_PROTOCOL",
+    "SQLITE_EMPTY",
+    "SQLITE_SCHEMA",
+    "SQLITE_TOOBIG",
+    "SQLITE_CONSTRAINT",
+    "SQLITE_MISMATCH",
+    "SQLITE_MISUSE",
+    "SQLITE_NOLFS",
+    "SQLITE_AUTH",
+    "SQLITE_FORMAT",
+    "SQLITE_RANGE",
+    "SQLITE_NOTADB", // 26
+};
+
 QString SQLiteConnection::serverResultName()
 {
-    QString r =
-        QString(); //fromLatin1( d->result_name );
-    return r.isEmpty() ? Connection::serverResultName() : r;
+    if (d->res >= 0 && d->res <= SQLITE_NOTADB)
+        return QString::fromLatin1(serverResultNames[d->res]);
+    else if (d->res == SQLITE_ROW)
+        return QLatin1String("SQLITE_ROW");
+    else if (d->res == SQLITE_DONE)
+        return QLatin1String("SQLITE_DONE");
+    return QString();
 }
 
 void SQLiteConnection::drv_clearServerResult()

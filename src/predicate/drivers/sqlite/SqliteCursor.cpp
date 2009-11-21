@@ -101,7 +101,7 @@ public:
     int next_cols;
 //  const char **next_coldata;
 //  const char **next_colname;
-//  bool rec_stored : 1; //! true, current record is stored in next_coldata
+//  bool rec_stored; //! true, current record is stored in next_coldata
 
     /* MOVED TO Cursor:
         uint cols_pointers_mem_size; //! size of record's array of pointers to values
@@ -117,7 +117,7 @@ public:
 
     uint cols_pointers_mem_size; //! size of record's array of pointers to values
     QVector<const char**> records;//! buffer data
-//  bool rowDataReadyToFetch : 1;
+//  bool rowDataReadyToFetch;
 
     inline QVariant getValue(Field *f, int i) {
         int type = sqlite3_column_type(prepared_st_handle, i);
@@ -286,13 +286,13 @@ void SQLiteCursor::drv_getNextRecord()
           PreDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)");
         }
-    //  PreDrvDbg << "SQLiteCursor::drv_getNextRecord(): "<<m_fieldCount<<" col(s) fetched";
+    //  PreDrvDbg << m_fieldCount << "col(s) fetched";
       }*/
 }
 
 void SQLiteCursor::drv_appendCurrentRecordToBuffer()
 {
-// PreDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer():";
+// PreDrvDbg;
     if (!d->curr_coldata)
         return;
     if (!d->cols_pointers_mem_size)
@@ -306,7 +306,7 @@ void SQLiteCursor::drv_appendCurrentRecordToBuffer()
         *dest_col = *src_col ? strdup(*src_col) : 0;
     }
     d->records[m_records_in_buf] = record;
-// PreDrvDbg << "SQLiteCursor::drv_appendCurrentRecordToBuffer() ok.";
+// PreDrvDbg << "ok.";
 }
 
 void SQLiteCursor::drv_bufferMovePointerNext()
@@ -405,7 +405,7 @@ bool SQLiteCursor::drv_storeCurrentRow(RecordData &data) const
         }
         //(m_logicalFieldCount introduced) Field *f = (m_containsROWIDInfo && i>=m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
         Field *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
-//  PreDrvDbg << "SQLiteCursor::storeCurrentRow(): col=" << (col ? *col : 0);
+//  PreDrvDbg << "col=" << (col ? *col : 0);
 
         data[i] = d->getValue(f, i); //, !f /*!f means ROWID*/);
     }

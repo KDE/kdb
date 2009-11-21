@@ -182,9 +182,7 @@ int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
     if (res == 0) {
         if (Predicate::isExtendedTableFieldProperty(propertyName))
             return (int)ExtendedSchemaAlteringRequired;
-        PreWarn <<
-        QString("AlterTableHandler::alteringTypeForProperty(): property \"%1\" not found!")
-        .arg(QString(propertyName));
+        PreWarn << "property" << propertyName << "not found!";
     }
     return res;
     return Predicate_alteringTypeForProperty->types[propertyName.toLower()];
@@ -347,9 +345,8 @@ void AlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDic
                 if (!actionsLikeThis)
                     actionsLikeThis = createActionDict(fieldActions, uid());   //fieldName() );
                 AlterTableHandler::ChangeFieldPropertyAction* newRenameAction
-                = new AlterTableHandler::ChangeFieldPropertyAction(*this);
-                PreDbg << "ChangeFieldPropertyAction::simplifyActions(): insert into '"
-                << fieldName() << "' dict:"  << newRenameAction->debugString();
+                    = new AlterTableHandler::ChangeFieldPropertyAction(*this);
+                PreDbg << "insert into" << fieldName() << "dict:" << newRenameAction->debugString();
                 actionsLikeThis->insert(m_propertyName.toLatin1(), newRenameAction);
                 return;
             }
@@ -378,7 +375,7 @@ void AlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDic
     if (!nextActionsLikeThis || !nextActionsLikeThis->value(m_propertyName.toLatin1())) {
         //no such action, add this
         AlterTableHandler::ChangeFieldPropertyAction* newAction
-        = new AlterTableHandler::ChangeFieldPropertyAction(*this);
+            = new AlterTableHandler::ChangeFieldPropertyAction(*this);
         if (!nextActionsLikeThis)
             nextActionsLikeThis = createActionDict(fieldActions, uid());  //fieldName() );
         nextActionsLikeThis->insert(m_propertyName.toLatin1(), newAction);
@@ -514,7 +511,7 @@ void AlterTableHandler::RemoveFieldAction::simplifyActions(ActionDictDict &field
 {
     //! @todo not checked
     AlterTableHandler::RemoveFieldAction* newAction
-    = new AlterTableHandler::RemoveFieldAction(*this);
+        = new AlterTableHandler::RemoveFieldAction(*this);
     ActionDict *actionsLikeThis = fieldActions.value(uid());   //fieldName().toLatin1() ];
     if (!actionsLikeThis)
         actionsLikeThis = createActionDict(fieldActions, uid());   //fieldName() );
@@ -651,7 +648,7 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
                 Utils::addAlterTableActionDebug(
                     QString("** Failed to set properties for field ") + field().debugString(), 0);
 #endif
-                PreWarn << "AlterTableHandler::InsertFieldAction::simplifyActions(): Predicate::setFieldProperties() failed!";
+                PreWarn << "setFieldProperties() failed!";
                 delete f;
             }
         }
@@ -659,7 +656,7 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
     //ok, insert this action
     //! @todo not checked
     AlterTableHandler::InsertFieldAction* newAction
-    = new AlterTableHandler::InsertFieldAction(*this);
+        = new AlterTableHandler::InsertFieldAction(*this);
     if (!actionsForThisField)
         actionsForThisField = createActionDict(fieldActions, uid());
     actionsForThisField->insert(":insert:", newAction);   //special
@@ -779,8 +776,9 @@ void AlterTableHandler::setActions(const ActionList& actions)
 void AlterTableHandler::debug()
 {
     PreDbg << "AlterTableHandler's actions:";
-    foreach(ActionBase* action, d->actions)
-    action->debug();
+    foreach(ActionBase* action, d->actions) {
+        action->debug();
+    }
 }
 
 TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArguments& args)

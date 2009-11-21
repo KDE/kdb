@@ -33,7 +33,8 @@ class xBaseDriver : public Driver
   PREDICATE_DRIVER
 
   public:
-    xBaseDriver( QObject *parent, const QStringList &args = QStringList() );
+    xBaseDriver();
+
     virtual ~xBaseDriver();
 
     /*! \return true if \a n is a system object name; 

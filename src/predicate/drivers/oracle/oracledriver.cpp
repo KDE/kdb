@@ -22,19 +22,16 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "oracleconnection.h"
 #include <kexidb/driver_p.h>
 //#include <occiCommon.h>
-#include <kdebug.h>
-using namespace KexiDB;
+#include <QtDebug>
 
-KEXIDB_DRIVER_INFO( OracleDriver, oracle )
+using namespace Predicate;
 
-/**
- * Constructor sets database features and maps
- * types to Oracle datatypes.
- */
-OracleDriver::OracleDriver( QObject *parent, const QStringList &args)
-	: Driver(parent,args)
+EXPORT_PREDICATE_DRIVER(OracleDriver, oracle)
+
+OracleDriver::OracleDriver()
+	: Driver()
 {
-	//KexiDBDrvDbg << "OracleDriver::Constructor: "<< endl;
+	//KexiDBDrvDbg;
 	// Set database features and properties
 	d->isFileDriver = false;
 	d->features = SingleTransactions | CursorForward;
@@ -123,16 +120,17 @@ QString OracleDriver::valueToSQL(uint ftype, const QVariant & v) const
   }
 }
 /**
- * Orace does not have escape characters, although we may need to check this out
- * and see if single quotes ' or the ampersand thing & could be harmful
+ * Add single quotes at the beginning and the end of the string, and escapes any
+ * single quotes found within
  */
 QString OracleDriver::escapeString(const QString& str) const
 {
- //KexiDBDrvDbg <<str<<endl;
-  if (str[0]!='\''){
-	  return QString("\'"+str+"\'");
+ //KexiDBDrvDbg <<str;
+  QString res = str;
+  if (res[0]!='\''){
+	  return QString("\'"+res.replace("'","''")+"\'");
 	}else{
-	  return QString(str);
+	  return QString(res.replace("'","''")).mid(1,res.length()-2);
 	}
 }
 
@@ -141,7 +139,7 @@ QString OracleDriver::escapeString(const QString& str) const
  */
 QByteArray OracleDriver::escapeString(const QByteArray& str) const
 {
-//KexiDBDrvDbg<<str<<endl;
+//KexiDBDrvDbg<<str;
   if (str[0]!='\''){
     return QByteArray("\'"+str+"\'");
   }else{
@@ -162,7 +160,7 @@ QByteArray OracleDriver::escapeString(const QByteArray& str) const
  */
 QString OracleDriver::escapeBLOB(const QByteArray& array) const
 {
-  KexiDBDrvDbg<<array<<endl;
+  KexiDBDrvDbg<<array;
 	return QString(array);
 	//return KexiDB::escapeBLOB(array, KexiDB::BLOBEscape0xHex);
 }
@@ -178,4 +176,3 @@ QString OracleDriver::drv_escapeIdentifier( const QString& str) const {
 QByteArray OracleDriver::drv_escapeIdentifier( const QByteArray& str) const {
 	return QByteArray(str).replace('`', "'");
 }
-

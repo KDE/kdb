@@ -20,8 +20,7 @@
 #ifndef PREDICATE_TRANSACTION_H
 #define PREDICATE_TRANSACTION_H
 
-#include <qpointer.h>
-
+#include <QObject>
 #include "predicate_export.h"
 
 namespace Predicate
@@ -29,7 +28,7 @@ namespace Predicate
 
 class Connection;
 
-/*! Internal prototype for storing Transaction.handles for Transaction object.
+/*! Internal prototype for storing Transaction handles for Transaction object.
  Only for driver developers: reimplement this class for driver that
  support Transaction.handles.
 */
@@ -127,7 +126,7 @@ public:
     /*! Constructor #2: Uses already started transaction. */
     TransactionGuard(const Transaction& trans);
 
-    /*! Constructor #3: Creates TransactionGuard without transaction assinged.
+    /*! Constructor #3: Creates TransactionGuard without transaction assigned.
      setTransaction() can be used later to do so. */
     TransactionGuard();
 
@@ -154,11 +153,9 @@ public:
 
 protected:
     Transaction m_trans;
-bool m_doNothing : 1;
+    bool m_doNothing;
 };
 
 } //namespace Predicate
 
 #endif
-
-

@@ -1,0 +1,7 @@
+Predicate CHANGELOG
+
+2009-11-21
+General
+*merged with kexidb from KOffice trunk
+*added versioning in the driver plugins using version_* symbols
+*improved formatting

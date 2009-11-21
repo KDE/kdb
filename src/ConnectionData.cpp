@@ -98,18 +98,18 @@ QString ConnectionData::serverInfoString(bool addUser) const
     const QString& i18nFile = tr("file");
 
     if (!m_dbFileName.isEmpty())
-        return i18nFile + ": " + (m_dbPath.isEmpty() ? "" : m_dbPath
+        return i18nFile + ": " + (m_dbPath.isEmpty() ? QString() : m_dbPath
                                   + QDir::separator()) + m_dbFileName;
 
     DriverManager man;
     if (!driverName.isEmpty()) {
         const Driver::Info info = man.driverInfo(driverName);
         if (info.isValid() && info.isFileBased())
-            return QString("<") + i18nFile + ">";
+            return QLatin1String("<") + i18nFile + ">";
     }
 
     return ((userName.isEmpty() || !addUser) ? QString("") : (userName + "@"))
-           + (hostName.isEmpty() ? QString("localhost") : hostName)
-           + (port != 0 ? (QString(":") + QString::number(port)) : QString());
+           + (hostName.isEmpty() ? QLatin1String("localhost") : hostName)
+           + (port != 0 ? (QLatin1String(":") + QString::number(port)) : QString());
 }
 

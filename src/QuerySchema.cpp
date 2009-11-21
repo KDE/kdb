@@ -517,8 +517,7 @@ bool OrderByColumnList::appendField(QuerySchema& querySchema,
         append(new OrderByColumn(*field, ascending));
         return true;
     }
-    PreWarn << "OrderByColumnList::addColumn(QuerySchema& querySchema, "
-    "const QString& column, bool ascending): no such field \"" << fieldName << "\"";
+    PreWarn << "no such field" << fieldName;
     return false;
 }
 
@@ -569,7 +568,7 @@ QuerySchema::QuerySchema(TableSchema& tableSchema)
     d->masterTable = &tableSchema;
     init();
     /*if (!d->masterTable) {
-      PreWarn << "QuerySchema(TableSchema*): !d->masterTable";
+      PreWarn << "!d->masterTable";
       m_name.clear();
       return;
     }*/
@@ -584,8 +583,9 @@ QuerySchema::QuerySchema(TableSchema& tableSchema)
 //replaced by explicit field list: addField( new QueryAsterisk(this) );
 
     // add explicit field list to avoid problems (e.g. with fields added outside of Kexi):
-    foreach(Field* f, *d->masterTable->fields())
-    addField(f);
+    foreach(Field* f, *d->masterTable->fields()) {
+        addField(f);
+    }
 }
 
 QuerySchema::QuerySchema(const QuerySchema& querySchema)
@@ -639,17 +639,16 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
                                     int bindToTable, bool visible)
 {
     if (!field) {
-        PreWarn << "QuerySchema::insertField(): !field";
+        PreWarn << "!field";
         return *this;
     }
 
     if (position > (uint)m_fields.count()) {
-        PreWarn << "QuerySchema::insertField(): position (" << position << ") out of range";
+        PreWarn << "position" << position << "out of range";
         return *this;
     }
     if (!field->isQueryAsterisk() && !field->isExpression() && !field->table()) {
-        PreWarn << "QuerySchema::insertField(): WARNING: field '" << field->name()
-        << "' must contain table information!";
+        PreWarn << "field" << field->name() << "must contain table information!";
         return *this;
     }
     if ((int)fieldCount() >= d->visibility.size()) {
@@ -680,8 +679,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
 
     //bind to table
     if (bindToTable < -1 && bindToTable > (int)d->tables.count()) {
-        PreWarn << "QuerySchema::insertField(): bindToTable (" << bindToTable
-        << ") out of range";
+        PreWarn << "bindToTable" << bindToTable << "out of range";
         bindToTable = -1;
     }
     //--move items to make a place for a new one
@@ -689,7 +687,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
         d->tablesBoundToColumns[i] = d->tablesBoundToColumns[i-1];
     d->tablesBoundToColumns[ position ] = bindToTable;
 
-    PreDbg << "QuerySchema::insertField(): bound to table (" << bindToTable << "): ";
+    PreDbg << "bound to table" << bindToTable;
     if (bindToTable == -1)
         PreDbg << " <NOT SPECIFIED>";
     else
@@ -710,8 +708,7 @@ int QuerySchema::tableBoundToColumn(uint columnPosition) const
 {
     int res = d->tablesBoundToColumns.value(columnPosition, -99);
     if (res == -99) {
-        PreWarn << "QuerySchema::tableBoundToColumn(): columnPosition (" << columnPosition
-        << ") out of range";
+        PreWarn << "columnPosition" << columnPosition << "out of range";
         return -1;
     }
     return res;
@@ -910,8 +907,7 @@ TableSchema::List* QuerySchema::tables() const
 
 void QuerySchema::addTable(TableSchema *table, const QByteArray& alias)
 {
-    PreDbg << "QuerySchema::addTable() " << (void *)table
-    << " alias=" << alias;
+    PreDbg << (void *)table << "alias=" << alias;
     if (!table)
         return;
 
@@ -927,8 +923,7 @@ void QuerySchema::addTable(TableSchema *table, const QByteArray& alias)
             if (table->name().toLower() == tableNameLower) {
                 const QString& tAlias = tableAlias(num);
                 if (tAlias == aliasLower) {
-                    PreWarn << "QuerySchema::addTable(): table with \""
-                    << tAlias << "\" alias already added!";
+                    PreWarn << "table with" << tAlias << "alias already added!";
                     return;
                 }
             }
@@ -999,15 +994,13 @@ bool QuerySchema::hasColumnAlias(uint position) const
 void QuerySchema::setColumnAlias(uint position, const QByteArray& alias)
 {
     if (position >= (uint)m_fields.count()) {
-        PreWarn << "QuerySchema::setColumnAlias(): position ("  << position
-        << ") out of range!";
+        PreWarn << "position"  << position << "out of range!";
         return;
     }
     QByteArray fixedAlias(alias.trimmed());
     Field *f = FieldList::field(position);
     if (f->captionOrName().isEmpty() && fixedAlias.isEmpty()) {
-        PreWarn << "QuerySchema::setColumnAlias(): position ("  << position
-        << ") could not remove alias when no name is specified for expression column!";
+        PreWarn << "position" << position << "could not remove alias when no name is specified for expression column!";
         return;
     }
     d->setColumnAlias(position, fixedAlias);
@@ -1062,8 +1055,7 @@ int QuerySchema::columnPositionForAlias(const QByteArray& name) const
 void QuerySchema::setTableAlias(uint position, const QByteArray& alias)
 {
     if (position >= (uint)d->tables.count()) {
-        PreWarn << "QuerySchema::setTableAlias(): position ("  << position
-        << ") out of range!";
+        PreWarn << "position"  << position << "out of range!";
         return;
     }
     QByteArray fixedAlias(alias.trimmed());
@@ -1218,8 +1210,7 @@ void QuerySchema::computeFieldsExpanded()
                     QueryColumnInfo *ci = new QueryColumnInfo(ast_f, QByteArray()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     list.append(ci);
-                    PreDbg << "QuerySchema::computeFieldsExpanded(): caching (unexpanded) columns order: "
-                    << ci->debugString() << " at position " << fieldPosition;
+                    PreDbg << "caching (unexpanded) columns order:" << ci->debugString() << "at position" << fieldPosition;
                     d->columnsOrder->insert(ci, fieldPosition);
 //     list.append(ast_f);
                 }
@@ -1234,8 +1225,7 @@ void QuerySchema::computeFieldsExpanded()
                         QueryColumnInfo *ci = new QueryColumnInfo(tab_f, QByteArray()/*no field for asterisk!*/,
                                 isColumnVisible(fieldPosition));
                         list.append(ci);
-                        PreDbg << "QuerySchema::computeFieldsExpanded(): caching (unexpanded) columns order: "
-                        << ci->debugString() << " at position " << fieldPosition;
+                        PreDbg << "caching (unexpanded) columns order:" << ci->debugString() << "at position" << fieldPosition;
                         d->columnsOrder->insert(ci, fieldPosition);
                     }
                 }
@@ -1246,8 +1236,7 @@ void QuerySchema::computeFieldsExpanded()
             QueryColumnInfo *ci = new QueryColumnInfo(f, columnAlias(fieldPosition), isColumnVisible(fieldPosition));
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
-            PreDbg << "QuerySchema::computeFieldsExpanded(): caching (unexpanded) column's order: "
-            << ci->debugString() << " at position " << fieldPosition;
+            PreDbg << "caching (unexpanded) column's order:" << ci->debugString() << "at position" << fieldPosition;
             d->columnsOrder->insert(ci, fieldPosition);
             d->columnsOrderWithoutAsterisks->insert(ci, fieldPosition);
 
@@ -1367,8 +1356,9 @@ void QuerySchema::computeFieldsExpanded()
 //Qt 4  d->fieldsExpanded->setAutoDelete(true);
         d->columnsOrderExpanded = new QHash<QueryColumnInfo*, int>();
     } else {//for future:
-        foreach(QueryColumnInfo* ci, *d->fieldsExpanded)
-        delete ci;
+        foreach(QueryColumnInfo* ci, *d->fieldsExpanded) {
+            delete ci;
+        }
         d->fieldsExpanded->clear();
         d->fieldsExpanded->resize(list.count());
         d->columnsOrderExpanded->clear();
@@ -1441,8 +1431,9 @@ void QuerySchema::computeFieldsExpanded()
 
     //create internal expanded list with lookup fields
     if (d->internalFields) {
-        foreach(QueryColumnInfo* ci, *d->internalFields)
-        delete ci;
+        foreach(QueryColumnInfo* ci, *d->internalFields) {
+            delete ci;
+        }
         d->internalFields->clear();
         d->internalFields->resize(lookup_list.count());
     }
@@ -1528,8 +1519,7 @@ void QuerySchema::computeFieldsExpanded()
                     ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
             }
         } else {
-            PreWarn << "QuerySchema::computeFieldsExpanded(): unsupported row source type "
-            << rowSource.typeName();
+            PreWarn << "unsupported row source type" << rowSource.typeName();
         }
     }
 }
@@ -1567,15 +1557,14 @@ QVector<int> QuerySchema::pkeyFieldsOrder()
         const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(fi->field) : -1;
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
-            PreDbg << "QuerySchema::pkeyFieldsOrder(): FIELD " << fi->field->name()
-            << " IS IN PKEY AT POSITION #" << fieldIndex;
+            PreDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
 //   (*d->pkeyFieldsOrder)[j]=i;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldsCount++;
 //   j++;
         }
     }
-    PreDbg << "QuerySchema::pkeyFieldsOrder(): " << d->pkeyFieldsCount
+    PreDbg << d->pkeyFieldsCount
     << " OUT OF " << pkey->fieldCount() << " PKEY'S FIELDS FOUND IN QUERY " << name();
     return *d->pkeyFieldsOrder;
 }
@@ -1606,7 +1595,7 @@ QueryColumnInfo::List* QuerySchema::autoIncrementFields()
     }
     TableSchema *mt = masterTable();
     if (!mt) {
-        PreWarn << "QuerySchema::autoIncrementFields(): no master table!";
+        PreWarn << "no master table!";
         return d->autoincFields;
     }
     if (d->autoincFields->isEmpty()) {//no cache
@@ -1730,19 +1719,19 @@ QuerySchemaParameterList QuerySchema::parameters()
 /*
   new field1, Field *field2
   if (!field1 || !field2) {
-    PreWarn << "QuerySchema::addRelationship(): !masterField || !detailsField";
+    PreWarn << "!masterField || !detailsField";
     return;
   }
   if (field1->isQueryAsterisk() || field2->isQueryAsterisk()) {
-    PreWarn << "QuerySchema::addRelationship(): relationship's fields cannot be asterisks";
+    PreWarn << "relationship's fields cannot be asterisks";
     return;
   }
   if (!hasField(field1) && !hasField(field2)) {
-    PreWarn << "QuerySchema::addRelationship(): fields do not belong to this query";
+    PreWarn << "fields do not belong to this query";
     return;
   }
   if (field1->table() == field2->table()) {
-    PreWarn << "QuerySchema::addRelationship(): fields cannot belong to the same table";
+    PreWarn << "fields cannot belong to the same table";
     return;
   }
 //@todo: check more things: -types
@@ -1804,7 +1793,7 @@ Field* QueryAsterisk::copy() const
 
 void QueryAsterisk::setTable(TableSchema *table)
 {
-    PreDbg << "QueryAsterisk::setTable()";
+    PreDbg;
     m_table = table;
 }
 

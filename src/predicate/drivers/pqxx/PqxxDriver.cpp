@@ -33,10 +33,9 @@ EXPORT_PREDICATE_DRIVER(PqxxSqlDriver, pqxxsql)
 
 //==================================================================================
 //
-PqxxSqlDriver::PqxxSqlDriver(QObject *parent, const QStringList &args)
+PqxxSqlDriver::PqxxSqlDriver()
         : Driver(parent, args)
 {
-//    d->isFileDriver = false;
     d->features = SingleTransactions | CursorForward | CursorBackward;
 //! @todo enable this when kexidb supports multiple: d->features = MultipleTransactions | CursorForward | CursorBackward;
 
@@ -126,8 +125,18 @@ bool PqxxSqlDriver::isSystemDatabaseName(const QString& n) const
 //
 QString PqxxSqlDriver::escapeString(const QString& str) const
 {
-    return QString::fromLatin1("'")
-           + QString::fromAscii(pqxx::sqlesc(std::string(str.toAscii().constData())).c_str())
+    //Cannot use pqxx or libpq escape functions as they require a db connection
+    //to escape using the char encoding of the database
+    //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
+/*    return QString::fromLatin1("'")
+    + QString::fromAscii(_internalWork->esc(std::string(str.toAscii().constData())).c_str())
+           + QString::fromLatin1("'");
+*/
+//TODO Optimize
+           return QString::fromLatin1("'") + QString(str)
+           /*.replace('\\', "\\\\")*/
+           .replace('\'', "\\''")
+           .replace('"', "\\\"")
            + QString::fromLatin1("'");
 }
 
@@ -135,8 +144,19 @@ QString PqxxSqlDriver::escapeString(const QString& str) const
 //
 QByteArray PqxxSqlDriver::escapeString(const QByteArray& str) const
 {
+    //Cannot use pqxx or libpq escape functions as they require a db connection
+    //to escape using the char encoding of the database
+    //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
+    
+    /*
     return QByteArray("'")
-           + QByteArray(pqxx::sqlesc(str).c_str())
+    + QByteArray(_internalWork->esc(str).c_str())
+           + QByteArray("'");*/
+
+    return QByteArray("'") + QByteArray(str)
+           /*.replace('\\', "\\\\")*/
+           .replace('\'', "\\''")
+           .replace('"', "\\\"")
            + QByteArray("'");
 }
 

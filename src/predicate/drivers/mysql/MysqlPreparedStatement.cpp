@@ -268,8 +268,8 @@ bool MysqlPreparedStatement::execute(
                 break;
             }
             default:
-                PreWarn << "PreparedStatement::execute(): unsupported field type: "
-                << field->type() << " - NULL value bound to column #" << arg;
+                PreWarn << "unsupported field type:"
+                    << field->type() << "- NULL value bound to column #" << arg;
                 res = sqlite3_bind_null(prepared_st_handle, arg);
                 if (SQLITE_OK != res) {
                     //! @todo msg?

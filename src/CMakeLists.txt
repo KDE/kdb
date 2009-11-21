@@ -150,7 +150,7 @@ set_target_properties(predicate PROPERTIES
   SOVERSION ${GENERIC_PREDICATE_LIB_SOVERSION}
 )
 
-install(TARGETS predicate DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS predicate ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 
 ########### install files ###############

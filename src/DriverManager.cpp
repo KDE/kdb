@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2009 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -47,7 +47,6 @@ using namespace Predicate;
 
 DriverManagerInternal* DriverManagerInternal::s_self = 0L;
 
-
 DriverManagerInternal::DriverManagerInternal() /* protected */
         : QObject(0)
         , Object()
@@ -60,12 +59,12 @@ DriverManagerInternal::DriverManagerInternal() /* protected */
 
 DriverManagerInternal::~DriverManagerInternal()
 {
-    PreDbg << "DriverManagerInternal::~DriverManagerInternal()";
+    PreDbg;
     qDeleteAll(m_drivers);
     m_drivers.clear();
     if (s_self == this)
         s_self = 0;
-    PreDbg << "DriverManagerInternal::~DriverManagerInternal() ok";
+    PreDbg << "ok";
 }
 
 void DriverManagerInternal::slotAppQuits()
@@ -74,7 +73,7 @@ void DriverManagerInternal::slotAppQuits()
             && qApp->topLevelWidgets().first()->isVisible()) {
         return; //what a hack! - we give up when app is still there
     }
-    PreDbg << "DriverManagerInternal::slotAppQuits(): let's clear drivers...";
+    PreDbg << "let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
 }
@@ -125,7 +124,7 @@ bool DriverManagerInternal::lookupDrivers()
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
 //TODO: for QT-only version check for KComponentData wrapper
-//  PreWarn << "DriverManagerInternal::lookupDrivers(): cannot work without KComponentData (KGlobal::mainComponent()==0)!";
+//  PreWarn << "cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
     lookupDriversNeeded = false;
@@ -164,21 +163,18 @@ bool DriverManagerInternal::lookupDrivers()
     for (; it != tlist.constEnd(); ++it) {
         KService::Ptr ptr = (*it);
         if (!ptr->property("Library").toString().startsWith("predicate_")) {
-            PreWarn << "DriverManagerInternal::lookupDrivers():"
-            " X-KDE-Library == " << ptr->property("Library").toString()
-            << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!";
+            PreWarn << "X-KDE-Library == " << ptr->property("Library").toString()
+                << ": no \"predicate_\" prefix -- skipped to avoid potential conflicts!";
             continue;
         }
         QString srv_name = ptr->property("X-Kexi-DriverName").toString().toLower();
         if (srv_name.isEmpty()) {
-            PreWarn << "DriverManagerInternal::lookupDrivers():"
-            " X-Kexi-DriverName must be set for Predicate driver \""
-            << ptr->property("Name").toString() << "\" service!\n -- skipped!";
+            PreWarn << "X-Kexi-DriverName must be set for Predicate driver \""
+                << ptr->property("Name").toString() << "\" service!\n -- skipped!";
             continue;
         }
         if (m_services_lcase.contains(srv_name)) {
-            PreWarn << "DriverManagerInternal::lookupDrivers(): more than one driver named '"
-            << srv_name << "'\n -- skipping this one!";
+            PreWarn << "more than one driver named" << srv_name << "\n -- skipping this one!";
             continue;
         }
 
@@ -191,15 +187,15 @@ bool DriverManagerInternal::lookupDrivers()
         if (ok)
             minor_ver = lst[1].toUInt(&ok);
         if (!ok) {
-            PreWarn << "DriverManagerInternal::lookupDrivers(): problem with detecting '"
-            << srv_name << "' driver's version -- skipping it!";
+            PreWarn << "problem with detecting" << srv_name << "driver's version -- skipping it!";
             continue;
         }
-        if (major_ver != Predicate::version().major || minor_ver != Predicate::version().minor) {
-            PreWarn << QString("DriverManagerInternal::lookupDrivers(): '%1' driver"
-                                  " has version '%2' but required Predicate driver version is '%3.%4'\n"
-                                  " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
-            .arg(Predicate::version().major).arg(Predicate::version().minor);
+
+        if (!Predicate::version().matches(major_ver, minor_ver)) {
+            PreWarn << QString("'%1' driver"
+                               " has version '%2' but required Predicate driver version is '%3.%4'\n"
+                               " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
+                              .arg(Predicate::version().major).arg(Predicate::version().minor);
             possibleProblems += QString("\"%1\" database Driver.has version \"%2\" "
                                         "but required driver version is \"%3.%4\"")
                                 .arg(srv_name).arg(srv_ver_str)
@@ -224,15 +220,13 @@ bool DriverManagerInternal::lookupDrivers()
                 if (!m_services_by_mimetype.contains(mime)) {
                     m_services_by_mimetype.insert(mime, ptr);
                 } else {
-                    PreWarn << "DriverManagerInternal::lookupDrivers(): more than one driver for '"
-                    << mime << "' mime type!";
+                    PreWarn << "more than one driver for" << mime << "m ime type!";
                 }
             }
         }
         m_services.insert(srv_name, ptr);
         m_services_lcase.insert(srv_name,  ptr);
-        PreDbg << "Predicate::DriverManager::lookupDrivers(): registered driver: "
-        << ptr->name() << "(" << ptr->library() << ")";
+        PreDbg << "registered driver: " << ptr->name() << "(" << ptr->library() << ")";
     }
 #endif
     if (m_driversInfo.isEmpty()) {
@@ -250,13 +244,23 @@ Predicate::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
     return i;
 }
 
+struct LibUnloader {
+    LibUnloader(QLibrary *lib) : m_lib(lib) {}
+    ~LibUnloader() {
+        if (m_lib->isLoaded())
+            m_lib->unload();
+    }
+private:
+    QLibrary *m_lib;
+};
+
 Driver* DriverManagerInternal::driver(const QString& name)
 {
     if (!lookupDrivers())
         return 0;
 
     clearError();
-    PreDbg << "DriverManagerInternal::driver(): loading " << name;
+    PreDbg << "loading" << name;
 
     Driver *drv = 0;
     if (!name.isEmpty())
@@ -271,11 +275,40 @@ Driver* DriverManagerInternal::driver(const QString& name)
 
     const Driver::Info info = m_driversInfo[name.toLower()];
 
-    QPluginLoader loader(m_pluginsDir + "/bin/" + info.fileName()
+    QString libFileName(m_pluginsDir + "/bin/" + info.fileName()
 #if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
         + "_d"
 #endif
     );
+    QLibrary lib(libFileName);
+    LibUnloader unloader(&lib);
+    if (!lib.load()) {
+        setError(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(name));
+        return 0;
+    }
+    
+    const uint* foundMajor = (const uint*)lib.resolve("version_major");
+    if (!foundMajor) {
+       setError(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_major").arg(name));
+       return 0;
+    }
+    const uint* foundMinor = (const uint*)lib.resolve("version_minor");
+    if (!foundMinor) {
+       setError(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_minor").arg(name));
+       return 0;
+    }
+    lib.unload();
+    if (!Predicate::version().matches(*foundMajor, *foundMinor)) {
+        setError(ERR_INCOMPAT_DRIVER_VERSION,
+            QObject::tr("Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
+                 .arg(name)
+                 .arg(QString("%1.%2").arg(*foundMajor).arg(*foundMinor))
+                 .arg(QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor))
+            );
+        return 0;
+    }
+
+    QPluginLoader loader(libFileName);
     drv = qobject_cast<Driver*>(loader.instance());
     if (!drv) {
         setError(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
@@ -305,15 +338,15 @@ Driver* DriverManagerInternal::driver(const QString& name)
 void DriverManagerInternal::incRefCount()
 {
     m_refCount++;
-    PreDbg << "DriverManagerInternal::incRefCount(): " << m_refCount;
+    PreDbg << m_refCount;
 }
 
 void DriverManagerInternal::decRefCount()
 {
     m_refCount--;
-    PreDbg << "DriverManagerInternal::decRefCount(): " << m_refCount;
+    PreDbg << m_refCount;
 // if (m_refCount<1) {
-//  PreDbg<<"Predicate::DriverManagerInternal::decRefCount(): reached m_refCount<1 -->deletelater()";
+//  PreDbg<<"reached m_refCount<1 -->deletelater()";
 //  s_self=0;
 //  deleteLater();
 // }
@@ -344,7 +377,7 @@ DriverManager::DriverManager()
 
 DriverManager::~DriverManager()
 {
-    PreDbg << "DriverManager::~DriverManager()";
+    PreDbg;
     /* Connection *conn;
       for ( conn = m_connections.first(); conn ; conn = m_connections.next() ) {
         conn->disconnect();
@@ -360,7 +393,7 @@ DriverManager::~DriverManager()
     }
 // if ( s_self == this )
     //s_self = 0;
-    PreDbg << "DriverManager::~DriverManager() ok";
+    PreDbg << "ok";
 }
 
 Predicate::Driver::Info::Map DriverManager::driversInfo()

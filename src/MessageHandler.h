@@ -132,7 +132,7 @@ public:
     }
 
     /*! Shows error message with \a title (it is not caption) and details. */
-    virtual void showMessage(
+    virtual void showErrorMessage(
         MessageHandler::MessageType messageType,
         const QString &msg,
         const QString &details = QString(),
@@ -141,7 +141,7 @@ public:
 
     /*! Shows error message with \a msg text. Existing error message from \a obj object
      is also copied, if present. */
-    virtual void showMessage(
+    virtual void showErrorMessage(
         Predicate::Object *obj, 
         MessageHandler::MessageType messageType = Error,
         const QString& msg = QString(),

@@ -44,7 +44,7 @@ connection)
     , errno(0)
     , rs(0)
 {
-	KexiDBDrvDbg << "OracleConnectionInternal::Constructor: "<< endl;
+	//KexiDBDrvDbg;
    try{
       env = Environment::createEnvironment();
    }catch (oracle::occi::SQLException ea){
@@ -57,11 +57,11 @@ connection)
 
 OracleConnectionInternal::~OracleConnectionInternal()
 {
- KexiDBDrvDbg <<"~OracleConnectionInternal(): ";
+ KexiDBDrvDbg;
  try{
 	 	Environment::terminateEnvironment(env);
 	 	env=0;
-	 	KexiDBDrvDbg <<endl;
+	 	KexiDBDrvDbg;
 	}
 	catch (oracle::occi::SQLException ea){
       errno=ea.getErrorCode();
@@ -82,13 +82,20 @@ OracleConnectionInternal::~OracleConnectionInternal()
 */
 bool OracleConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 {
-	KexiDBDrvDbg<<endl;
-  char *port=(char*)malloc(10*sizeof(char));
-  sprintf(port,"%d",data.port);
-	QString hostName; 
+  QString hostName; 
 	QString sid="LCC";
 	//sid= data.sid.latin1(); //To be included in the API
+	char *port;
 	
+  if(data.port!=0)
+  {
+    port=(char*)malloc(10*sizeof(char));
+    sprintf(port,"%d",data.port);
+  }
+  else
+  {
+    port=strdup("1521");
+  }
 	if (data.hostName.isEmpty() || data.hostName.lower()=="localhost") {
 		//localSocketFile not suported
 			hostName = "127.0.0.1"; 
@@ -103,21 +110,23 @@ bool OracleConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
 																		data.password.latin1(),
 																		connectStr.latin1());
 	  stmt=oraconn->createStatement();
-	  return true;
   }
   catch (oracle::occi::SQLException ea)
   {
      errno=ea.getErrorCode();
-     errmsg=strdup(ea.what());
+     errmsg=ea.what();
+     KexiDBDrvDbg<<ea.what();
 	   return false;
-  }	
+  }
+  KexiDBDrvDbg<<"Ok";	
+  return true;
 }
 void OracleConnectionInternal::storeResult(){}
 /*! Disconnects from the database.
  */
 bool OracleConnectionInternal::db_disconnect()
 {
-  KexiDBDrvDbg<<endl;
+  KexiDBDrvDbg;
   try{
 	  oraconn->terminateStatement(stmt);
 	  env->terminateConnection(oraconn);
@@ -127,7 +136,7 @@ bool OracleConnectionInternal::db_disconnect()
 	 catch (oracle::occi::SQLException ea)
 	 {
 	  errmsg=ea.getMessage().c_str();
-	  KexiDBDrvDbg<<errmsg<<endl;
+	  KexiDBDrvDbg<<errmsg;
 	  errno=ea.getErrorCode();
 	  return false;
 	 }
@@ -138,7 +147,7 @@ bool OracleConnectionInternal::db_disconnect()
  */
 bool OracleConnectionInternal::useDatabase(const QString &dbName) 
 {
-  KexiDBDrvDbg<<endl;
+  KexiDBDrvDbg;
 	QString user; 
 	try{
 		rs=stmt->executeQuery("SELECT user FROM DUAL");
@@ -151,7 +160,7 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
   {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
-       KexiDBDrvDbg <<"OracleConnectionInternal::useDatabase:"<<ea.what()<<endl;
+       KexiDBDrvDbg << ea.what();
        return(false);
   }
 }
@@ -159,7 +168,7 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
 bool OracleConnectionInternal::executeSQL(const QString& statement) {
     //QString stat=QString(statement);
     //stat.replace("VALUES (", "VALUES ( KEXI__SEQ__ROW_ID.NEXTVAL, ");
-    KexiDBDrvDbg<<statement<<endl;
+    KexiDBDrvDbg<<statement;
     //const char *query=statement.utf8();
     try
     {
@@ -192,7 +201,7 @@ QString OracleConnectionInternal::getServerVersion()
   }	
 }
 bool OracleConnectionInternal::createSequences(){
-  KexiDBDrvDbg<<endl; 
+  KexiDBDrvDbg; 
   return executeSQL("CREATE SEQUENCE KEXI__SEQ__ROW_ID")&&
          executeSQL("ALTER SEQUENCE KEXI__SEQ__ROW_ID NOCACHE");
 }
@@ -213,8 +222,6 @@ bool OracleConnectionInternal::createTrigger
 
   }
   tg=tg+"END;";
-  KexiDBDrvDbg <<tg<<endl;
-  
   return executeSQL(tg); 
 }
 //--------------------------------------

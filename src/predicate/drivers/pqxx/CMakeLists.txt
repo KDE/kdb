@@ -7,6 +7,7 @@ include_directories(
 
 ADD_DEFINITIONS(
   -D__PREDICATE__=
+  -DPREDICATE_DRIVER_NAME="pqxx"
 )
 
 if (MSVC)

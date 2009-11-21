@@ -350,8 +350,7 @@ void TableSchema::setKexiDBSystem(bool set)
 void TableSchema::setNative(bool set)
 {
     if (m_isPredicateSystem && !set) {
-        PreWarn << "TableSchema::setNative(): cannot set native off"
-        " when Predicate system flag is set on!";
+        PreWarn << "cannot set native off when Predicate system flag is set on!";
         return;
     }
     m_native = set;
@@ -383,8 +382,7 @@ bool TableSchema::setLookupFieldSchema(const QString& fieldName, LookupFieldSche
 {
     Field *f = field(fieldName);
     if (!f) {
-        PreWarn << "TableSchema::setLookupFieldSchema(): no such field '" << fieldName
-        << "' in table " << name();
+        PreWarn << "no such field" << fieldName << "in table" << name();
         return false;
     }
     if (lookupFieldSchema)
@@ -419,7 +417,7 @@ const QVector<LookupFieldSchema*>& TableSchema::lookupFieldsList()
     d->lookupFieldsList.resize(d->lookupFields.count());
     uint i = 0;
     foreach(Field* f, m_fields) {
-        QHash<const Field*, LookupFieldSchema*>::ConstIterator itMap = d->lookupFields.find(f);
+        QHash<const Field*, LookupFieldSchema*>::ConstIterator itMap = d->lookupFields.constFind(f);
         if (itMap != d->lookupFields.constEnd()) {
             d->lookupFieldsList.insert(i, itMap.value());
             i++;

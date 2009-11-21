@@ -19,8 +19,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <QVariant>
 #include <QFile>
-
-#include <kgenericfactory.h>
 #include <QtDebug>
 
 #include "SybaseDriver.h"
@@ -33,19 +31,9 @@ using namespace Predicate;
 
 EXPORT_PREDICATE_DRIVER(SybaseDriver, sybase)
 
-/*!
- * Constructor sets database features and
- * maps the types in Predicate::Field::Type to the Sybase types.
- *
- */
-SybaseDriver::SybaseDriver(QObject *parent, const QStringList &args) :
-        Driver(parent, args)
+SybaseDriver::SybaseDriver()
+    : Driver()
 {
-
-// PreDrvDbg << "SybaseDriver::SybaseDriver()";
-
-//    d->isFileDriver = false ;
-
     // Sybase supports Nested Transactions. Ignore for now
     d->features = IgnoreTransactions | CursorForward;
 

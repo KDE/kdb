@@ -101,7 +101,7 @@ QString pqxxSqlConnection::escapeName(const QString &name) const
 //We tell kexi we are connected, but we wont actually connect until we use a database!
 bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 {
-    PreDrvDbg << "pqxxSqlConnection::drv_connect";
+    PreDrvDbg;
     version.clear();
     d->version = &version; //remember for later...
 #ifdef __GNUC__
@@ -115,7 +115,7 @@ bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 //We tell kexi wehave disconnected, but it is actually handled by closeDatabse
 bool pqxxSqlConnection::drv_disconnect()
 {
-    PreDrvDbg << "pqxxSqlConnection::drv_disconnect: ";
+    PreDrvDbg;
     return true;
 }
 
@@ -123,7 +123,7 @@ bool pqxxSqlConnection::drv_disconnect()
 //Return a list of database names
 bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
 {
-// PreDrvDbg << "pqxxSqlConnection::drv_getDatabaseList";
+// PreDrvDbg;
 
     if (executeSQL("SELECT datname FROM pg_database WHERE datallowconn = TRUE")) {
         std::string N;
@@ -143,7 +143,7 @@ bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
 //Create a new database
 bool pqxxSqlConnection::drv_createDatabase(const QString &dbName)
 {
-    PreDrvDbg << "pqxxSqlConnection::drv_createDatabase: " << dbName;
+    PreDrvDbg << dbName;
 
     if (executeSQL("CREATE DATABASE " + escapeName(dbName)))
         return true;
@@ -158,7 +158,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
-    PreDrvDbg << "pqxxSqlConnection::drv_useDatabase: " << dbName;
+    PreDrvDbg << dbName;
 
     QString conninfo;
     QString socket;
@@ -204,7 +204,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
         }
         return true;
     } catch (const std::exception &e) {
-        PreDrvDbg << "pqxxSqlConnection::drv_useDatabase:exception - " << e.what();
+        PreDrvDbg << "exception:" << e.what();
         d->errmsg = QString::fromUtf8(e.what());
 
     } catch (...) {
@@ -217,7 +217,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 //Here we close the database connection
 bool pqxxSqlConnection::drv_closeDatabase()
 {
-    PreDrvDbg << "pqxxSqlConnection::drv_closeDatabase";
+    PreDrvDbg;
 // if (isConnected())
 // {
     delete d->pqxxsql;
@@ -236,7 +236,7 @@ bool pqxxSqlConnection::drv_closeDatabase()
 //Drops the given database
 bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 {
-    PreDrvDbg << "pqxxSqlConnection::drv_dropDatabase: " << dbName;
+    PreDrvDbg << dbName;
 
     //FIXME Maybe should check that dbname is no the currentdb
     if (executeSQL("DROP DATABASE " + escapeName(dbName)))
@@ -249,7 +249,7 @@ bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 //Execute an SQL statement
 bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
 {
-// PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: " << statement;
+// PreDrvDbg << statement;
     bool ok = false;
 
     // Clear the last result information...
@@ -279,13 +279,13 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
         //If all went well then return true, errors picked up by the catch block
         ok = true;
     } catch (const pqxx::sql_error& sqlerr) {
-        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: sql_error exception - " << sqlerr.query().c_str();
+        PreDrvDbg << "sql_error exception - " << sqlerr.query().c_str();
     } catch (const pqxx::broken_connection& bcerr) {
-        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL: broken_connection exception";
+        PreDrvDbg << "broken_connection exception";
     } catch (const std::exception &e) {
         //If an error ocurred then put the error description into _dbError
         d->errmsg = QString::fromUtf8(e.what());
-        PreDrvDbg << "pqxxSqlConnection::drv_executeSQL:exception - " << e.what();
+        PreDrvDbg << "exception:" << e.what();
     } catch (...) {
         d->errmsg = tr("Unknown error.");
     }
@@ -294,7 +294,7 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
 }
 
 //==================================================================================
-//Return true if currently connected to a database, ignoring the m_is_connected falg.
+//Return true if currently connected to a database, ignoring the m_is_connected flag.
 bool pqxxSqlConnection::drv_isDatabaseUsed() const
 {
     if (d->pqxxsql->is_open()) {

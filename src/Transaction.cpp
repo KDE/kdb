@@ -50,13 +50,13 @@ TransactionData::TransactionData(Connection *conn)
     assert(conn);
     Transaction::globalcount++; //because refcount(1) init.
     TransactionData::globalcount++;
-    PreDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount;
+    PreDbg << "-- globalcount ==" << TransactionData::globalcount;
 }
 
 TransactionData::~TransactionData()
 {
     TransactionData::globalcount--;
-    PreDbg << "-- TransactionData::globalcount == " << TransactionData::globalcount;
+    PreDbg << "-- globalcount ==" << TransactionData::globalcount;
 }
 
 //---------------------------------------------------
@@ -86,13 +86,13 @@ Transaction::~Transaction()
     if (m_data) {
         m_data->refcount--;
         Transaction::globalcount--;
-        PreDbg << "~Transaction(): m_data->refcount==" << m_data->refcount;
+        PreDbg << "m_data->refcount==" << m_data->refcount;
         if (m_data->refcount == 0)
             delete m_data;
     } else {
-        PreDbg << "~Transaction(): null";
+        PreDbg << "null";
     }
-    PreDbg << "-- Transaction::globalcount == " << Transaction::globalcount;
+    PreDbg << "-- globalcount == " << Transaction::globalcount;
 }
 
 Transaction& Transaction::operator=(const Transaction & trans)
@@ -100,7 +100,7 @@ Transaction& Transaction::operator=(const Transaction & trans)
     if (m_data) {
         m_data->refcount--;
         Transaction::globalcount--;
-        PreDbg << "Transaction::operator=: m_data->refcount==" << m_data->refcount;
+        PreDbg << "m_data->refcount==" << m_data->refcount;
         if (m_data->refcount == 0)
             delete m_data;
     }

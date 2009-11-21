@@ -189,6 +189,8 @@ public:
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions()) {
             Q_UNUSED(debugOptions); return "ActionBase";
         }
+
+//! @todo add QDebug operator <<
         void debug(const DebugOptions& debugOptions = DebugOptions()) {
             PreDbg << debugString(debugOptions)
             << " (req = " << alteringRequirements() << ")";

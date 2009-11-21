@@ -188,8 +188,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 */
 bool xBaseConnectionInternal::executeSQL(const QString& statement)
 {
-//	PreDrvDbg << "xBaseConnectionInternal::executeSQL: "
-//	             << statement;
+//	PreDrvDbg << statement;
   if ( !internalConn ) {
     return false;
   }

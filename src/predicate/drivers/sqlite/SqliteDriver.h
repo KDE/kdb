@@ -36,6 +36,7 @@ class SQLiteDriver : public Driver
 
 public:
     SQLiteDriver();
+
     virtual ~SQLiteDriver();
 
     /*! \return true if \a n is a system object name;

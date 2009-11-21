@@ -45,7 +45,7 @@ pqxxPreparedStatement::~pqxxPreparedStatement()
 
 bool pqxxPreparedStatement::execute()
 {
-// PreDrvDbg << "pqxxPreparedStatement::execute()";
+// PreDrvDbg;
     m_resetRequired = true;
     if (m_conn->insertRecord(*m_fields, m_args)) {
         return true;

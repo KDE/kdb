@@ -69,7 +69,7 @@ void xBaseCursor::init() {
 }
 
 bool xBaseCursor::drv_open() {
-//	PreDrvDbg << "xBaseCursor::drv_open:" << m_sql;
+//	PreDrvDbg << m_sql;
   if (!d->internalCursor) {
     return false;
   }
@@ -139,6 +139,7 @@ void xBaseCursor::drv_bufferMovePointerPrev() {
 
 
 void xBaseCursor::drv_bufferMovePointerTo(qint64 to) {
+  Q_UNUSED(to);
 }
 
 const char** xBaseCursor::rowData() const {

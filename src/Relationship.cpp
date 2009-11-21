@@ -67,20 +67,20 @@ Relationship::~Relationship()
 void Relationship::createIndices(QuerySchema *query, Field *field1, Field *field2)
 {
     if (!field1 || !field2 || !query) {
-        PreWarn << "Relationship::addRelationship(): !masterField || !detailsField || !query";
+        PreWarn << "!masterField || !detailsField || !query";
         return;
     }
     if (field1->isQueryAsterisk() || field2->isQueryAsterisk()) {
-        PreWarn << "Relationship::addRelationship(): relationship's fields cannot be asterisks";
+        PreWarn << "relationship's fields cannot be asterisks";
         return;
     }
     if (field1->table() == field2->table()) {
-        PreWarn << "Relationship::addRelationship(): fields cannot belong to the same table";
+        PreWarn << "fields cannot belong to the same table";
         return;
     }
 // if (!query->hasField(field1) && !query->hasField(field2)) {
     if (!query->contains(field1->table()) || !query->contains(field2->table())) {
-        PreWarn << "Relationship::addRelationship(): fields do not belong to this query";
+        PreWarn << "fields do not belong to this query";
         return;
     }
 //@todo: check more things: -types
@@ -169,10 +169,10 @@ void Relationship::setIndices(IndexSchema* masterIndex, IndexSchema* detailsInde
         if (masterField->type() != detailsField->type()
                 && masterField->isIntegerType() != detailsField->isIntegerType()
                 && masterField->isTextType() != detailsField->isTextType()) {
-            PreWarn << "Relationship::setIndices(INDEX on '" << masterIndex->table()->name()
-            << "',INDEX on " << detailsIndex->table()->name() << "): !equal field types: "
-            << Driver::defaultSQLTypeName(masterField->type()) << " " << masterField->name() << ", "
-            << Driver::defaultSQLTypeName(detailsField->type()) << " " << detailsField->name();
+            PreWarn << "INDEX on" << masterIndex->table()->name()
+                << ", INDEX on" << detailsIndex->table()->name() << ": !equal field types:"
+                << Driver::defaultSQLTypeName(masterField->type()) << masterField->name() << ","
+                << Driver::defaultSQLTypeName(detailsField->type()) << detailsField->name();
             m_pairs.clear();
             return;
         }

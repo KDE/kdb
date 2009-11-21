@@ -69,6 +69,7 @@ public:
     }
 
     /*! Sends errorMsg() to debug output. */
+//! @todo add QDebug operator <<
     void debugError();
 
     /*! Clears error flag.

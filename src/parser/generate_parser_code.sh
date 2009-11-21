@@ -7,7 +7,7 @@ flex -oSqlScanner.cpp SqlScanner.l
 bison -dv SqlParser.y
 echo '#ifndef _SQLPARSER_H_
 #define _SQLPARSER_H_
-#include "Field.h"
+#include <Predicate/Field.h>
 #include "Parser.h"
 #include "SqlTypes.h"
 

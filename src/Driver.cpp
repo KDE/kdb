@@ -83,19 +83,20 @@ Driver::Driver()
 Driver::~Driver()
 {
     DriverManagerInternal::self()->aboutDelete(this);
-// PreDbg << "Driver::~Driver()";
+// PreDbg;
     // make a copy because d->connections will be touched by ~Connection
     QSet<Connection*> connections(d->connections);
     qDeleteAll(connections);
     d->connections.clear();
     delete beh;
     delete d;
-// PreDbg << "Driver::~Driver() ok";
+// PreDbg << "ok";
 }
 
 bool Driver::isValid()
 {
     clearError();
+/* moved to DriverManagerInternal::driver():
     if (Predicate::version().major != version().major
             || Predicate::version().minor != version().minor) {
         setError(ERR_INCOMPAT_DRIVER_VERSION,
@@ -113,7 +114,7 @@ bool Driver::isValid()
         setError(ERR_INVALID_DRIVER_IMPL,
                  inv_impl + not_init.arg("DriverBehaviour::ROW_ID_FIELD_NAME"));
         return false;
-    }
+    }*/
 
     return true;
 }
@@ -242,7 +243,7 @@ bool Driver::isSystemFieldName(const QString& n) const
 QString Driver::valueToSQL(uint ftype, const QVariant& v) const
 {
     if (v.isNull())
-        return "NULL";
+        return QLatin1String("NULL");
     switch (ftype) {
     case Field::Text:
     case Field::LongText: {
@@ -267,9 +268,9 @@ QString Driver::valueToSQL(uint ftype, const QVariant& v) const
     case Field::Boolean:
         return QString::number(v.toInt() ? 1 : 0); //0 or 1
     case Field::Time:
-        return QString("\'") + v.toTime().toString(Qt::ISODate) + "\'";
+        return QLatin1String("\'") + v.toTime().toString(Qt::ISODate) + QLatin1String("\'");
     case Field::Date:
-        return QString("\'") + v.toDate().toString(Qt::ISODate) + "\'";
+        return QLatin1String("\'") + v.toDate().toString(Qt::ISODate) + QLatin1String("\'");
     case Field::DateTime:
         return dateTimeToSQL(v.toDateTime());
     case Field::BLOB: {
@@ -280,9 +281,9 @@ QString Driver::valueToSQL(uint ftype, const QVariant& v) const
         return escapeBLOB(v.toByteArray());
     }
     case Field::InvalidType:
-        return "!INVALIDTYPE!";
+        return QLatin1String("!INVALIDTYPE!");
     default:
-        PreDbg << "Driver::valueToSQL(): UNKNOWN!";
+        PreDbg << QLatin1String("UNKNOWN!");
         return QString();
     }
     return QString();

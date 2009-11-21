@@ -30,6 +30,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "MysqlConnection_p.h"
 #include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
+#include <Predicate/Global.h>
 #include <Predicate/Error.h>
 
 
@@ -121,7 +122,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
           .arg(driver()->escapeString(dbName.toLower()/* db names are lower case in mysql */)), success);
     if (!exists || !success) {
         if (!ignoreErrors)
-            setError(ERR_OBJECT_NOT_FOUND, i18n("The database \"%1\" does not exist.", dbName));
+            setError(ERR_OBJECT_NOT_FOUND, QObject::tr("The database \"%1\" does not exist.").arg(dbName));
         return false;
     }
     return true;

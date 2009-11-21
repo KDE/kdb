@@ -84,7 +84,7 @@ void PreparedStatement::generateSelectStatementString(QByteArray& s)
             s.append(" AND ");
         Field *f = d->fields.field(whereItem);
         if (!f) {
-            PreWarn << QString("field \"%1\" not found, aborting").arg(whereItem);
+            PreWarn << "field" << whereItem << "not found, aborting";
             s.clear();
             return;
         }

@@ -34,7 +34,8 @@ class PqxxSqlDriver : public Driver
     PREDICATE_DRIVER
 
 public:
-    PqxxSqlDriver(QObject *parent, const QStringList &args = QStringList());
+    PqxxSqlDriver(QObject *parent, const QVariantList &args = QVariantList());
+
     ~PqxxSqlDriver();
 
     virtual bool isSystemObjectName(const QString& n)const;

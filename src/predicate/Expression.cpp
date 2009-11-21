@@ -151,8 +151,9 @@ NArgExpr::NArgExpr(int aClass, int token)
 NArgExpr::NArgExpr(const NArgExpr& expr)
         : BaseExpr(expr)
 {
-    foreach(BaseExpr* e, expr.list)
-    add(e->copy());
+    foreach(BaseExpr* e, expr.list) {
+        add(e->copy());
+    }
 }
 
 NArgExpr::~NArgExpr()
@@ -190,8 +191,9 @@ QString NArgExpr::toString(QuerySchemaParameterValueListIterator* params)
 
 void NArgExpr::getQueryParameters(QuerySchemaParameterList& params)
 {
-    foreach(BaseExpr *e, list)
-    e->getQueryParameters(params);
+    foreach(BaseExpr *e, list) {
+        e->getQueryParameters(params);
+    }
 }
 
 BaseExpr* NArgExpr::arg(int nr)

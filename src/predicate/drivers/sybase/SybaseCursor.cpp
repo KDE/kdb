@@ -128,7 +128,7 @@ bool SybaseCursor::drv_close()
 
 void SybaseCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "SybaseCursor::drv_getNextRecord";
+// PreDrvDbg;
 
     // no buffering , and we don't know how many rows are there in result set
 
@@ -177,7 +177,7 @@ QVariant SybaseCursor::value(uint pos)
  */
 bool SybaseCursor::drv_storeCurrentRow(RecordData& data) const
 {
-// PreDrvDbg << "SybaseCursor::storeCurrentRow: Position is " << (long)m_at;
+// PreDrvDbg << "Position is" << (long)m_at;
 // if (d->numRows<=0)
 //  return false;
 

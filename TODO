@@ -1,5 +1,6 @@
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
+[ ] move drivers/ to the main dir
 [ ] move *Validator classes from tools to a separate PredicateGui lib
 [x] version macros like PREDICATE_VERSION are generated using cmake
 
@@ -18,6 +19,7 @@ Drivers:
      3 years old. It will be always possible to perform simple migration using the following command
      "sqlite-old old.db .dump | sqlite-new new.db"
 [x] MySQL driver builds
+[ ] Port the ODBC driver (untouched for now)
 
 Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
