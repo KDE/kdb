@@ -854,7 +854,7 @@ typedef union YYSTYPE {
     QVariant *variantValue;
 } YYSTYPE;
 /* Line 191 of yacc.c.  */
-#line 863 "sqlparser.tab.c"
+#line 863 "SqlParser.cpp"
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 # define YYSTYPE_IS_TRIVIAL 1
@@ -866,7 +866,7 @@ typedef union YYSTYPE {
 
 
 /* Line 214 of yacc.c.  */
-#line 875 "sqlparser.tab.c"
+#line 875 "SqlParser.cpp"
 
 #if ! defined (yyoverflow) || YYERROR_VERBOSE
 
@@ -2973,7 +2973,7 @@ yyreduce:
     }
 
     /* Line 999 of yacc.c.  */
-#line 2915 "sqlparser.tab.c"
+#line 2915 "SqlParser.cpp"
     
     yyvsp -= yylen;
     yyssp -= yylen;

@@ -16,7 +16,7 @@ bool parseData(KexiDB::Parser *p, const char *data);' > SqlParser.h
 cat SqlParser.tab.h >> SqlParser.h
 echo '#endif' >> SqlParser.h
 
-cat SqlParser.tab.c > SqlParser.cpp
+cat SqlParser.tab.c | sed -e "s/SqlParser\.tab\.c/SqlParser.cpp/g" > SqlParser.cpp
 echo "const char* tname(int offset) { return yytname[offset]; }" >> SqlParser.cpp
 
 ./extract_tokens.sh > tokens.cpp
