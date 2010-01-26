@@ -35,6 +35,8 @@ namespace Predicate
 {
 
 //! classes
+//todo: enum ExpressionClass
+//todo:     UnknownExpression = 0,
 #define KexiDBExpr_Unknown 0
 #define KexiDBExpr_Unary 1
 #define KexiDBExpr_Arithm 2
