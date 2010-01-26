@@ -94,6 +94,7 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
   drivers/xbase/XbaseKeywords.cpp
 *  Driver_p.cpp
 *  Expression.cpp
+TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
 *  Field.cpp
 *  FieldList.cpp
 - added isEmpty()

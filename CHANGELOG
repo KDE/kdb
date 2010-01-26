@@ -1,5 +1,11 @@
 Predicate CHANGELOG
 
+2010-01-26
+Queries (merged with kexidb)
+*fixed memory ownership issues with data structures for ORDER BY in select queries
+**this fixes generation of ORDER BY section of SQL statements
+*improved debug of ORDER BY columns
+
 2009-11-21
 General
 *merged with kexidb from KOffice trunk
