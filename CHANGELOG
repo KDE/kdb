@@ -1,5 +1,13 @@
 Predicate CHANGELOG
 
+2010-01-31
+SQLite (merged with kexidb)
+*kexisql updated to 3.6.22
+**we're still embedding sqlite in Kexi because of many options that are not set in distros, e.g. SECURE DELETE should be on by default http://sqlite.org/compile.html#secure_delete
+**moved to amalgamation version for efficiency http://sqlite.org/amalgamation.html - makes it run faster
+**moved directly to the SQLite driver - even more efficiency
+**SQlite: "use database" operation no longer attempts to create new database if missing
+
 2010-01-26
 Queries (merged with kexidb)
 *fixed memory ownership issues with data structures for ORDER BY in select queries
