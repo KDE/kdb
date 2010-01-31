@@ -37,13 +37,13 @@
 #include "parser/Parser.h"
 
 #include "tools/Utils.h"
-#include "tools/identifier.h"
+#include "tools/Identifier.h"
 #include "Interfaces/PreparedStatementInterface.h"
 
 #include <QDir>
 #include <QFileInfo>
 #include <QPointer>
-#include <QtXML>
+#include <QtXml>
 #include <QtDebug>
 
 #define PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION 1

@@ -21,13 +21,13 @@
 #include "Cursor.h"
 #include "DriverManager.h"
 #include "LookupFieldSchema.h"
-#include "predicate_Global.h"
+#include "predicate_global.h"
 #include "tools/Static.h"
 
 #include <QMap>
 #include <QHash>
 #include <QThread>
-#include <QtXML>
+#include <QtXml>
 #include <QBuffer>
 #include <QPixmap>
 #include <QMutex>

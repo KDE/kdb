@@ -21,7 +21,7 @@
 #include "Driver.h"
 #include "Connection.h"
 #include "Expression.h"
-#include "parser/sqlParser.h"
+#include "parser/SqlParser.h"
 #include "Utils.h"
 #include "LookupFieldSchema.h"
 

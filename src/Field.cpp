@@ -33,7 +33,7 @@
 
 #include <assert.h>
 
-#include "predicate_Global.h"
+#include "predicate_global.h"
 
 using namespace Predicate;
 

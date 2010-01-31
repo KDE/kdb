@@ -22,7 +22,7 @@
 #include <TableSchema.h>
 #include "Parser.h"
 #include "Parser_p.h"
-#include "sqlParser.h"
+#include "SqlParser.h"
 
 /*moved to Driver
 #include "tokens.cpp"

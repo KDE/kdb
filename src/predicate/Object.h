@@ -164,7 +164,7 @@ protected:
     /*! Interactively asks a question. Console or GUI can be used for this,
      depending on installed message handler. For GUI version, message boxes are used.
      See Predicate::MessageHandler::askQuestion() for details. */
-    virtual MessageHandler::ButtonCode Object::askQuestion(
+    virtual MessageHandler::ButtonCode askQuestion(
             MessageHandler::QuestionType messageType,
             const QString& message,
             const QString &caption = QString(),

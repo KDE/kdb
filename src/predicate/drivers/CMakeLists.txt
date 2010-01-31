@@ -5,10 +5,8 @@ endif(COMMAND cmake_policy)
 
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
-INCLUDE (FindSqlite)
-IF (SQLITE_FOUND)
-   add_subdirectory( sqlite )
-ENDIF (SQLITE_FOUND)
+# always available
+add_subdirectory( sqlite )
 
 INCLUDE (FindMySQL)
 IF (MYSQL_FOUND)
@@ -35,7 +33,7 @@ ENDIF (FreeTDS_FOUND)
 
 INCLUDE(FindXBase)
 IF(XBASE_FOUND)
-   add_subdirectory(xbase)
+#todo   add_subdirectory(xbase)
 ENDIF(XBASE_FOUND)
 
 #message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(pgsql_dir)")

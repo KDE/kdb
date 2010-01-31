@@ -24,8 +24,8 @@
 
 #include <QtDebug>
 
-#include "predicate/DriverManager.h"
-#include "predicate/Utils.h"
+#include <Predicate/DriverManager.h>
+#include <Predicate/Utils.h>
 
 #include "XbaseDriver.h"
 #include "XbaseConnection.h"

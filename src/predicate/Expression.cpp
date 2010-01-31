@@ -22,7 +22,7 @@
 
 #include "Expression.h"
 #include "Utils.h"
-#include "parser/sqlParser.h"
+#include "parser/SqlParser.h"
 #include "parser/Parser_p.h"
 #include "tools/Static.h"
 

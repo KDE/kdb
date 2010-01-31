@@ -24,6 +24,7 @@
 #include "Driver.h"
 #include "Driver_p.h"
 #include "Error.h"
+#include <Predicate/Global.h>
 
 //#include <klibloader.h>
 //#include <kservicetypetrader.h>

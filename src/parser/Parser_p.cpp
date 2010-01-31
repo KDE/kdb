@@ -18,7 +18,7 @@
 */
 
 #include "Parser_p.h"
-#include "sqlParser.h"
+#include "SqlParser.h"
 
 #include <QRegExp>
 #include <QMutableListIterator>

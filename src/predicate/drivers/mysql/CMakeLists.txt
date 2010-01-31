@@ -29,10 +29,13 @@ qt_wrap_cpp(predicate_mysql predicate_mysql_SRCS ${predicate_mysql_MOC_SRCS})
 
 add_library(predicate_mysql SHARED ${predicate_mysql_SRCS})
 
+if(MSVC)
+  set(EXTRA_LIBRARIES ws2_32 msvcrtd)
+endif(MSVC)
+
 target_link_libraries(predicate_mysql
   ${MYSQL_LIBRARIES}
-  ws2_32
-  msvcrtd
+  ${EXTRA_LIBRARIES}
   predicate
 )
 

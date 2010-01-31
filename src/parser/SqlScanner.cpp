@@ -581,7 +581,7 @@ char *yytext;
 #include <Field.h>
 #include <Expression.h>
 
-#include "sqlParser.h"
+#include "SqlParser.h"
 #include "SqlTypes.h"
 #include <iostream>
 
