@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,10 +19,9 @@
 
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
-#include "sqliteCursor.h"
+#include "SqliteCursor.h"
 #include "SqlitePreparedStatement.h"
 
-//#include "kexisql.h" //for isReadOnly()
 #include <sqlite3.h>
 
 #include <Predicate/Driver.h>
@@ -147,38 +146,51 @@ bool SQLiteConnection::drv_getTablesList(QStringList &list)
 
 bool SQLiteConnection::drv_createDatabase(const QString &dbName)
 {
-    // SQLite creates a new db is it does not exist
-    return drv_useDatabase(dbName);
-#if 0
-    d->data = sqlite_open(QFile::encodeName(data()->fileName()), 0/*mode: unused*/,
-                          &d->errmsg_p);
-    d->storeResult();
-    return d->data != 0;
-#endif
+    Q_UNUSED(dbName);
+    return drv_useDatabaseInternal(0, 0, true/*create if missing*/);
 }
 
 bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                                        MessageHandler* msgHandler)
 {
     Q_UNUSED(dbName);
-// PreDrvDbg << "drv_useDatabase(): " << data()->fileName();
-    //TODO: perhaps allow to use sqlite3_open16() as well for SQLite ~ 3.3 ?
+    return drv_useDatabaseInternal(cancelled, msgHandler, false/*do not create if missing*/);
+}
+
+bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
+                                               MessageHandler* msgHandler, bool createIfMissing)
+{
 //! @todo add option (command line or in kexirc?)
-    int flags = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_READWRITE;
+//! @todo   int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
+    int openFlags = 0;
+    if (isReadOnly()) {
+        openFlags |= SQLITE_OPEN_READONLY;
+    }
+    else {
+        openFlags |= SQLITE_OPEN_READWRITE;
+        if (createIfMissing) {
+            openFlags |= SQLITE_OPEN_CREATE;
+        }
+    }
+
 //! @todo add option
-//removed in predicate    int allowReadonly = 1;
-//removed in predicate    const bool wasReadOnly = Connection::isReadOnly();
+//    int allowReadonly = 1;
+//    const bool wasReadOnly = Connection::isReadOnly();
 
     d->res = sqlite3_open_v2(
+                 //QFile::encodeName( data()->fileName() ),
                  data()->fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
-                 flags,
-//removed in predicate                 allowReadonly /* If 1 and locking fails, try opening in read-only mode */
+                 openFlags, /*exclusiveFlag,
+                 allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
                  0
              );
     d->storeResult();
 
-// @todo removed in predicate - reenable?
+//! @todo check exclusive status
+    Q_UNUSED(cancelled);
+    Q_UNUSED(msgHandler);
+//! @todo removed in predicate - reenable?
 /*
     if (d->res == SQLITE_OK && cancelled && !wasReadOnly && allowReadonly && isReadOnly()) {
         //opened as read only, ask
