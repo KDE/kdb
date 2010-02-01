@@ -58,21 +58,6 @@ SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp G
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
 
-########### generate transliteration table ###############
-
-INCLUDE (MacroAdditionalCleanFiles)
-FIND_PROGRAM(BZIP2_EXECUTABLE NAMES bzip2)
-
-add_custom_command(
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
-  COMMAND ${BZIP2_EXECUTABLE} ARGS -dc -k
-    ${CMAKE_SOURCE_DIR}/Predicate/tools/transliteration/transliteration_table.cpp.bz2
-    > ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
-  DEPENDS ${CMAKE_SOURCE_DIR}/Predicate/tools/transliteration/transliteration_table.cpp.bz2
-)
-
-macro_additional_clean_files( ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp )
-
 ########### next target ###############
 
 # Generate Global.h
@@ -122,7 +107,7 @@ set(predicate_LIB_SRCS
    tools/Identifier.cpp
    tools/Utils.cpp
    tools/Static.cpp
-   ${CMAKE_CURRENT_BINARY_DIR}/transliteration_table.cpp
+   tools/transliteration/transliteration_table.cpp
 #TODO tools/debuggui.cpp
 #TODO tools/SimpleCommandLineApp.cpp
 )
