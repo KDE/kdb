@@ -25,6 +25,7 @@
 
 namespace Predicate
 {
+class Field;
 
 /*! Implementation of prepared statements for the SQLite driver. */
 class SQLitePreparedStatement : public PreparedStatementInterface, SQLiteConnectionInternal
@@ -44,6 +45,8 @@ protected:
         PreparedStatement::Type type,
         const Field::List& fieldList,
         const PreparedStatement::Arguments &args);
+
+    bool bindValue(Field *field, const QVariant& value, int arg);
 };
 
 }
