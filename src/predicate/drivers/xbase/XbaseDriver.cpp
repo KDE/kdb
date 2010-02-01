@@ -46,7 +46,7 @@ public:
 
 };
 
-xBaseDriver()
+xBaseDriver::xBaseDriver()
   : Driver()
   ,dp( new xBaseDriverPrivate() )
 {

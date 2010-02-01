@@ -35,14 +35,6 @@
 
 #include <core/kexiprojectdata.h>
 
-#ifdef XBASEMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE KexiDB
-#endif
-
-using namespace NAMESPACE;
-
 xBaseConnectionInternal::xBaseConnectionInternal(Predicate::Connection* connection, Predicate::Driver* internalDriver )
   : ConnectionInternal(connection),
   internalDriver(internalDriver)

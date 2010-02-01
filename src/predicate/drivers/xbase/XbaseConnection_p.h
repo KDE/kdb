@@ -24,17 +24,9 @@
 
 #include <Predicate/Connection_p.h>
 
-#ifdef XBASEMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE KexiDB
-#endif
-
 namespace Predicate {
-class ConnectionData;
-}
 
-namespace NAMESPACE {
+class ConnectionData;
 
 //! Internal xBase connection data.
 /*! Provides a low-level API for accessing xBase databases, that can
@@ -55,7 +47,7 @@ class xBaseConnectionInternal : public Predicate::ConnectionInternal
 
     //! Selects a database that is about to be used
     bool useDatabase(const QString &dbName = QString());
-    
+
     //! Execute SQL statement on the database
     bool executeSQL( const QString& statement );
 

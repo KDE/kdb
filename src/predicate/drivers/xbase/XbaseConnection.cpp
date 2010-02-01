@@ -168,12 +168,10 @@ bool xBaseConnection::drv_getTablesList( QStringList &list )
   return true;
 }
 
-PreparedStatement xBaseConnection::prepareStatement(PreparedStatement::StatementType type,
-  FieldList& fields)
+PreparedStatementInterface* xBaseConnection::prepareStatementInternal()
 {
-  if ( !d->internalConn ) {
-    // return a null pointer
-    return PreparedStatement();
-  }
-  return d->internalConn->prepareStatement( type, fields );
+    if ( !d->internalConn )
+        return 0;
+//! @todo   return new XBasePreparedStatement(*d);
+        return 0;
 }
