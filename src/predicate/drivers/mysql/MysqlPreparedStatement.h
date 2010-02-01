@@ -49,6 +49,7 @@ protected:
     void done();
 
 #ifdef PREDICATE_USE_MYSQL_STMT
+    bool bindValue(Field *field, const QVariant& value, int arg);
     int m_realParamCount;
     MYSQL_STMT *m_statement;
     MYSQL_BIND *m_mysqlBind;

@@ -73,7 +73,6 @@ bool MysqlPreparedStatement::init()
     return true;
 }
 
-
 MysqlPreparedStatement::~MysqlPreparedStatement()
 {
     done();
@@ -105,6 +104,138 @@ bool MysqlPreparedStatement::prepare(const QByteArray& statement)
         m_mysqlBind[arg].buffer_length = 0; \
         m_mysqlBind[arg].is_null = &dummyNull; \
         m_mysqlBind[arg].length = &str_length; }
+
+bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int arg)
+{
+    if (value.isNull()) {
+        // no value to bind or the value is null: bind NULL
+        BIND_NULL;
+        return true;
+    }
+
+    if (field->isTextType()) {
+//! @todo optimize
+        m_stringBuffer[ 1024 ]; ? ? ?
+        char *str = qstrncpy(m_stringBuffer, (const char*)value.toString().toUtf8(), 1024);
+        m_mysqlBind[arg].buffer_type = MYSQL_TYPE_STRING;
+        m_mysqlBind[arg].buffer = m_stringBuffer;
+        m_mysqlBind[arg].is_null = (my_bool*)0;
+        m_mysqlBind[arg].buffer_length = 1024; //?
+        m_mysqlBind[arg].length = &str_length;
+        return true;
+    }
+
+    switch (field->type()) {
+    case Predicate::Field::Byte:
+    case Predicate::Field::ShortInteger:
+    case Predicate::Field::Integer: {
+        //! @todo what about unsigned > INT_MAX ?
+        bool ok;
+        const int intValue = value.toInt(&ok);
+        if (ok) {
+            if (field->type() == Predicate::Field::Byte)
+                m_mysqlBind[arg].buffer_type = MYSQL_TYPE_TINY;
+            else if (field->type() == Predicate::Field::ShortInteger)
+                m_mysqlBind[arg].buffer_type = MYSQL_TYPE_SHORT;
+            else if (field->type() == Predicate::Field::Integer)
+                m_mysqlBind[arg].buffer_type = MYSQL_TYPE_LONG;
+
+            m_mysqlBind[arg].is_null = (my_bool*)0;
+            m_mysqlBind[arg].length = 0;
+
+            res = sqlite3_bind_int(prepared_st_handle, arg, intValue);
+            if (SQLITE_OK != res) {
+                //! @todo msg?
+                return false;
+            }
+        } else
+            BIND_NULL;
+        break;
+    }
+    case Predicate::Field::Float:
+    case Predicate::Field::Double:
+        res = sqlite3_bind_double(prepared_st_handle, arg, value.toDouble());
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    case Predicate::Field::BigInteger: {
+        //! @todo what about unsigned > LLONG_MAX ?
+        bool ok;
+        qint64 int64Value = value.toLongLong(&ok);
+        if (ok) {
+            res = sqlite3_bind_int64(prepared_st_handle, arg, value);
+            if (SQLITE_OK != res) {
+                //! @todo msg?
+                return false;
+            }
+        } else {
+            res = sqlite3_bind_null(prepared_st_handle, arg);
+            if (SQLITE_OK != res) {
+                //! @todo msg?
+                return false;
+            }
+        }
+        break;
+    }
+    case Predicate::Field::Boolean:
+        res = sqlite3_bind_text(prepared_st_handle, arg,
+                                QString::number(value.toBool() ? 1 : 0).toLatin1(),
+                                1, SQLITE_TRANSIENT /*??*/);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    case Predicate::Field::Time:
+        res = sqlite3_bind_text(prepared_st_handle, arg,
+                                value.toTime().toString(Qt::ISODate).toLatin1(),
+                                sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    case Predicate::Field::Date:
+        res = sqlite3_bind_text(prepared_st_handle, arg,
+                                value.toDate().toString(Qt::ISODate).toLatin1(),
+                                sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    case Predicate::Field::DateTime:
+        res = sqlite3_bind_text(prepared_st_handle, arg,
+                                value.toDateTime().toString(Qt::ISODate).toLatin1(),
+                                sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    case Predicate::Field::BLOB: {
+        const QByteArray byteArray(value.toByteArray());
+        res = sqlite3_bind_blob(prepared_st_handle, arg,
+                                (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+        break;
+    }
+    default:
+        PreWarn << "unsupported field type:"
+            << field->type() << "- NULL value bound to column #" << arg;
+        res = sqlite3_bind_null(prepared_st_handle, arg);
+        if (SQLITE_OK != res) {
+            //! @todo msg?
+            return false;
+        }
+    } //switch
+    return true;
+}
 #endif
 
 bool MysqlPreparedStatement::execute(
@@ -152,130 +283,9 @@ bool MysqlPreparedStatement::execute(
     Field::ListIterator itFields(fieldList->constBegin());
     for (QList<QVariant>::ConstIterator it(m_args.constBegin());
             itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, arg++) {
-        Predicate::Field *field = *itFields;
-        if (it == m_args.constEnd() || (*it).isNull()) {//no value to bind or the value is null: bind NULL
-            BIND_NULL;
-            continue;
-        }
-        if (field->isTextType()) {
-//! @todo optimize
-            m_stringBuffer[ 1024 ]; ? ? ?
-            char *str = qstrncpy(m_stringBuffer, (const char*)(*it).toString().toUtf8(), 1024);
-            m_mysqlBind[arg].buffer_type = MYSQL_TYPE_STRING;
-            m_mysqlBind[arg].buffer = m_stringBuffer;
-            m_mysqlBind[arg].is_null = (my_bool*)0;
-            m_mysqlBind[arg].buffer_length = 1024; //?
-            m_mysqlBind[arg].length = &str_length;
-        } else {
-            switch (field->type()) {
-            case Predicate::Field::Byte:
-            case Predicate::Field::ShortInteger:
-            case Predicate::Field::Integer: {
-                //! @todo what about unsigned > INT_MAX ?
-                bool ok;
-                const int value = (*it).toInt(&ok);
-                if (ok) {
-                    if (field->type() == Predicate::Field::Byte)
-                        m_mysqlBind[arg].buffer_type = MYSQL_TYPE_TINY;
-                    else if (field->type() == Predicate::Field::ShortInteger)
-                        m_mysqlBind[arg].buffer_type = MYSQL_TYPE_SHORT;
-                    else if (field->type() == Predicate::Field::Integer)
-                        m_mysqlBind[arg].buffer_type = MYSQL_TYPE_LONG;
+        if (!bindValue(*itFields, it == args.constEnd() ? QVariant() : *it, arg))
+            return false;
 
-                    m_mysqlBind[arg].is_null = (my_bool*)0;
-                    m_mysqlBind[arg].length = 0;
-
-                    res = sqlite3_bind_int(prepared_st_handle, arg, value);
-                    if (SQLITE_OK != res) {
-                        //! @todo msg?
-                        return false;
-                    }
-                } else
-                    BIND_NULL;
-                break;
-            }
-            case Predicate::Field::Float:
-            case Predicate::Field::Double:
-                res = sqlite3_bind_double(prepared_st_handle, arg, (*it).toDouble());
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            case Predicate::Field::BigInteger: {
-                //! @todo what about unsigned > LLONG_MAX ?
-                bool ok;
-                qint64 value = (*it).toLongLong(&ok);
-                if (ok) {
-                    res = sqlite3_bind_int64(prepared_st_handle, arg, value);
-                    if (SQLITE_OK != res) {
-                        //! @todo msg?
-                        return false;
-                    }
-                } else {
-                    res = sqlite3_bind_null(prepared_st_handle, arg);
-                    if (SQLITE_OK != res) {
-                        //! @todo msg?
-                        return false;
-                    }
-                }
-                break;
-            }
-            case Predicate::Field::Boolean:
-                res = sqlite3_bind_text(prepared_st_handle, arg,
-                                        QString::number((*it).toBool() ? 1 : 0).toLatin1(),
-                                        1, SQLITE_TRANSIENT /*??*/);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            case Predicate::Field::Time:
-                res = sqlite3_bind_text(prepared_st_handle, arg,
-                                        (*it).toTime().toString(Qt::ISODate).toLatin1(),
-                                        sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            case Predicate::Field::Date:
-                res = sqlite3_bind_text(prepared_st_handle, arg,
-                                        (*it).toDate().toString(Qt::ISODate).toLatin1(),
-                                        sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            case Predicate::Field::DateTime:
-                res = sqlite3_bind_text(prepared_st_handle, arg,
-                                        (*it).toDateTime().toString(Qt::ISODate).toLatin1(),
-                                        sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            case Predicate::Field::BLOB: {
-                const QByteArray byteArray((*it).toByteArray());
-                res = sqlite3_bind_blob(prepared_st_handle, arg,
-                                        (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-                break;
-            }
-            default:
-                PreWarn << "unsupported field type:"
-                    << field->type() << "- NULL value bound to column #" << arg;
-                res = sqlite3_bind_null(prepared_st_handle, arg);
-                if (SQLITE_OK != res) {
-                    //! @todo msg?
-                    return false;
-                }
-            } //switch
         }//else
     }//for
 
