@@ -15,7 +15,7 @@ ENDIF (MYSQL_FOUND)
 
 INCLUDE (FindPkgConfig)
 INCLUDE (FindPostgreSQL)
-# ??? INCLUDE (FindPqxx)
+INCLUDE (FindPqxx)
 set (PQXX_MIN_VERSION "3.0.0")
 set (PQXX_MAX_VERSION "4.0.0")
 
