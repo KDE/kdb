@@ -19,6 +19,8 @@ Drivers:
      3 years old. It will be always possible to perform simple migration using the following command
      "sqlite-old old.db .dump | sqlite-new new.db"
 [x] MySQL driver builds
+[ ] replace the Pqxx driver with a new one using libpq C API
+[ ] Port the Sybase driver (untouched for now)
 [ ] Port the ODBC driver (untouched for now)
 
 Naming, API:
@@ -79,6 +81,7 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
   drivers/sqlite/SqliteDriver.cpp
   drivers/sqlite/SqliteKeywords.cpp
   drivers/sqlite/SqlitePreparedStatement.cpp
+- refactored: internal bindValue() added
   drivers/sqlite/SqliteVacuum.cpp
   drivers/sybase/SybaseConnection.cpp
   drivers/sybase/SybaseConnection_p.cpp
