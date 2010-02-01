@@ -412,8 +412,7 @@ QString pqxxSqlConnection::serverErrorMsg()
     return d->errmsg;
 }
 
-PreparedStatement pqxxSqlConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList& fields)
+PreparedStatementInterface* pqxxSqlConnection::prepareStatementInternal()
 {
-    return pqxxPreparedStatement(type, *d, fields);
+    return new pqxxPreparedStatement(*d);
 }

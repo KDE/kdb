@@ -52,10 +52,11 @@ public:
 
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
-    virtual PreparedStatement prepareStatement(PreparedStatement::StatementType type,
-            FieldList& fields);
-protected:
 
+    virtual PreparedStatementInterface* prepareStatementInternal();
+
+protected:
+    /*! Used by driver */
     pqxxSqlConnection(Driver *driver, ConnectionData &conn_data);
 
     virtual bool drv_isDatabaseUsed() const;
