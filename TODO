@@ -216,3 +216,6 @@ TODO: more changes like these related to WHERE expression
   Transaction.h
   Utils.h
   Utils_p.h
+
+kexiutils:
+  debuggui.cpp - port and re-enable KEXI_DEBUG_GUI
