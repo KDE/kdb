@@ -239,7 +239,7 @@ bool DriverManagerInternal::lookupDrivers()
 
 Predicate::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
 {
-    Predicate::Driver::Info i = m_driversInfo[name.toLower()];
+    Predicate::Driver::Info i = m_driversInfo.value(name.toLower());
     if (!error() && i.isValid())
         setError(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
     return i;
@@ -274,7 +274,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
         return 0;
     }
 
-    const Driver::Info info = m_driversInfo[name.toLower()];
+    const Driver::Info info(m_driversInfo.value(name.toLower()));
 
     QString libFileName(m_pluginsDir + "/bin/" + info.fileName()
 #if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
@@ -452,7 +452,7 @@ QString DriverManager::lookupByMime(const QString &mimeType)
         return 0;
     }
 
-    const Driver::Info info( d_int->m_infos_by_mimetype[mimeType.toLower()] );
+    const Driver::Info info(d_int->m_infos_by_mimetype.value(mimeType.toLower()));
     if (!info.isValid())
         return QString();
     return info.name();
