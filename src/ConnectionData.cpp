@@ -61,7 +61,7 @@ ConnectionData::ConnectionData()
 ConnectionData::ConnectionData(const ConnectionData& cd)
         : QObject()
         , ConnectionDataBase()
-        , priv(0)
+        , priv(new ConnectionData::Private())
 {
     static_cast<ConnectionData&>(*this) = static_cast<const ConnectionData&>(cd);//copy data members
 }
