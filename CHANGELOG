@@ -1,5 +1,11 @@
 Predicate CHANGELOG
 
+2010-04-24
+*merge kexidb r1116241:
+**fix possible crash when adding two or more new columns to a table at once
+**BUG:234194
+**rename typedefs to use Const when needed
+
 2010-01-31
 SQLite (merged with kexidb)
 *kexisql updated to 3.6.22

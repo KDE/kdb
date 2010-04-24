@@ -264,13 +264,16 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
 static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, bool simulate)
 {
     QString fieldName;
-    AlterTableHandler::ActionDictIterator it(dict->constBegin());
-    if (it != dict->constEnd()) //retrieve field name from the 1st related action
+    AlterTableHandler::ActionDictConstIterator it(dict->constBegin());
+    if (it != dict->constEnd() && dynamic_cast<AlterTableHandler::FieldActionBase*>(it.value())) {
+        //retrieve field name from the 1st related action
         fieldName = dynamic_cast<AlterTableHandler::FieldActionBase*>(it.value())->fieldName();
-    else
+    }
+    else {
         fieldName = "??";
-    QString dbg = QString("Action dict for field \"%1\" (%2, UID=%3):")
-                  .arg(fieldName).arg(dict->count()).arg(fieldUID);
+    }
+    QString dbg(QString("Action dict for field \"%1\" (%2, UID=%3):")
+                        .arg(fieldName).arg(dict->count()).arg(fieldUID));
     PreDbg << dbg;
 #ifdef KEXI_DEBUG_GUI
     if (simulate)
@@ -287,7 +290,7 @@ static void debugFieldActions(const AlterTableHandler::ActionDictDict &fieldActi
     if (simulate)
         Utils::addAlterTableActionDebug("** Simplified Field Actions:");
 #endif
-    for (AlterTableHandler::ActionDictDictIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
+    for (AlterTableHandler::ActionDictDictConstIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
         debugActionDict(it.value(), it.key(), simulate);
     }
 }
@@ -618,7 +621,9 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
     if (actionsForThisField) {
         //collect property values that have to be changed in this field
         QHash<QByteArray, QVariant> values;
-        for (ActionDictIterator it(actionsForThisField->constBegin()); it != actionsForThisField->constEnd();) {
+        ActionDict *newActionsForThisField = new ActionDict(); // this will replace actionsForThisField after the loop
+        QSet<ActionBase*> actionsToDelete; // used to collect actions taht we soon delete but cannot delete in the loop below
+        for (ActionDictConstIterator it(actionsForThisField->constBegin()); it != actionsForThisField->constEnd();++it) {
             ChangeFieldPropertyAction* changePropertyAction = dynamic_cast<ChangeFieldPropertyAction*>(it.value());
             if (changePropertyAction) {
                 //if this field is going to be renamed, also update fieldName()
@@ -627,11 +632,18 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
                 }
                 values.insert(changePropertyAction->propertyName().toLatin1(), changePropertyAction->newValue());
                 //the subsequent "change property" action is no longer needed
-                actionsForThisField->remove(changePropertyAction->propertyName().toLatin1());
+                actionsToDelete.insert(it.value());
             } else {
-                ++it;
+                //keep
+                newActionsForThisField->insert(it.key(), it.value());
             }
         }
+        qDeleteAll(actionsToDelete);
+        actionsForThisField->setAutoDelete(false);
+        delete actionsForThisField;
+        actionsForThisField = newActionsForThisField;
+        fieldActions.take(uid());
+        fieldActions.insert(uid(), actionsForThisField);
         if (!values.isEmpty()) {
             //update field, so it will be created as one step
             Predicate::Field *f = new Predicate::Field(field());
@@ -861,9 +873,10 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
     args.requirements = 0;
     QSet<QString> fieldsWithChangedMainSchema; // Used to collect fields with changed main schema.
     // This will be used when recreateTable is false to update kexi__fields
-    for (ActionDictDictIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
-        for (AlterTableHandler::ActionDictIterator it2(it.value()->constBegin());
-                it2 != it.value()->constEnd(); ++it2, currentActionsCount++) {
+    for (ActionDictDictConstIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
+        for (AlterTableHandler::ActionDictConstIterator it2(it.value()->constBegin());
+             it2 != it.value()->constEnd(); ++it2, currentActionsCount++)
+        {
             if (it2.value()->shouldBeRemoved(fieldActions))
                 continue;
             actionsVector[ it2.value()->m_order ] = it2.value();
