@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2009 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -33,6 +33,8 @@
 #include <QMutex>
 #include <QSet>
 #include <QProgressBar>
+
+#include <memory>
 
 #include "Utils_p.h"
 
@@ -322,54 +324,55 @@ Connection* TableOrQuerySchema::connection() const
 
 //------------------------------------------
 
-class ConnectionTestThread : public QThread
-{
-public:
-    ConnectionTestThread(ConnectionTestDialog *dlg, const Predicate::ConnectionData& connData);
-    virtual void run();
-protected:
-    ConnectionTestDialog* m_dlg;
-    Predicate::ConnectionData m_connData;
-};
-
 ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const Predicate::ConnectionData& connData)
         : m_dlg(dlg), m_connData(connData)
 {
+    connect(this, SIGNAL(error(const QString&,const QString&)),
+            dlg, SLOT(error(const QString&,const QString&)), Qt::QueuedConnection);
+
+    // try to load driver now because it's not supported in different thread
+    Predicate::DriverManager manager;
+    m_driver = manager.driver(m_connData.driverName);
+    if (manager.error()) {
+        emitError(&manager);
+        m_driver = 0;
+    }
+}
+
+void ConnectionTestThread::emitError(Predicate::Object* object)
+{
+    QString msg;
+    QString details;
+    Predicate::getHTMLErrorMesage(object, msg, details);
+    emit error(msg, details);
 }
 
 void ConnectionTestThread::run()
 {
-    Predicate::DriverManager manager;
-    Predicate::Driver* drv = manager.driver(m_connData.driverName);
-// KexiGUIMessageHandler msghdr;
-    if (!drv || manager.error()) {
-//move  msghdr.showErrorMessage(&Kexi::driverManager());
-        m_dlg->error(&manager);
+    if (!m_driver) {
         return;
     }
-    Predicate::Connection * conn = drv->createConnection(m_connData);
-    if (!conn || drv->error()) {
-//move  msghdr.showErrorMessage(drv);
-        delete conn;
-        m_dlg->error(drv);
+    std::auto_ptr<Predicate::Connection> conn(m_driver->createConnection(m_connData));
+    if (!conn.get() || m_driver->error()) {
+        //kDebug() << "err 1";
+        emitError(m_driver);
         return;
     }
-    if (!conn->connect() || conn->error()) {
-//move  msghdr.showErrorMessage(conn);
-        m_dlg->error(conn);
-        delete conn;
+    if (!conn.get()->connect() || conn.get()->error()) {
+        //kDebug() << "err 2";
+        emitError(conn.get());
         return;
     }
     // SQL database backends like PostgreSQL require executing "USE database"
     // if we really want to know connection to the server succeeded.
     QString tmpDbName;
     if (!conn->useTemporaryDatabaseIfNeeded(tmpDbName)) {
-        m_dlg->error(conn);
-        delete conn;
+        //kDebug() << "err 3";
+        emitError(conn.get());
         return;
     }
-    delete conn;
-    m_dlg->error(0);
+    //kDebug() << "emitError(0)";
+    emitError(0);
 }
 
 ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
@@ -380,7 +383,7 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         , m_connData(data)
         , m_msgHandler(&msgHandler)
         , m_elapsedTime(0)
-        , m_errorObj(0)
+        , m_error(false)
         , m_stopWaiting(false)
 {
     setWindowTitle(tr("Test Connection"));
@@ -397,13 +400,13 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
 
 ConnectionTestDialog::~ConnectionTestDialog()
 {
-    m_wait.wakeAll();
     m_thread->terminate();
     delete m_thread;
 }
 
 int ConnectionTestDialog::exec()
 {
+    //kDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
     m_timer.start(20);
     m_thread->start();
     const int res = QProgressDialog::exec();
@@ -414,20 +417,24 @@ int ConnectionTestDialog::exec()
 
 void ConnectionTestDialog::slotTimeout()
 {
-// PreDbg << m_errorObj;
+    //PreDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    PreDbg << m_error;
     bool notResponding = false;
     if (m_elapsedTime >= 1000*5) {//5 seconds
         m_stopWaiting = true;
         notResponding = true;
     }
+    PreDbg << m_elapsedTime << m_stopWaiting << notResponding;
     if (m_stopWaiting) {
         m_timer.disconnect(this);
         m_timer.stop();
         reject();
-//  close();
-        if (m_errorObj) {
-            m_msgHandler->showErrorMessage(m_errorObj);
-            m_errorObj = 0;
+        PreDbg << "after reject";
+        if (m_error) {
+            PreDbg << "show?";
+            m_msgHandler->showErrorMessage(MessageHandler::Sorry, m_msg, m_details);
+            PreDbg << "shown";
+            m_error = false;
         } else if (notResponding) {
             m_msgHandler->showErrorMessage(
                 MessageHandler::Sorry,
@@ -445,39 +452,28 @@ void ConnectionTestDialog::slotTimeout()
         }
 //  slotCancel();
 //  reject();
-        m_wait.wakeAll();
         return;
     }
     m_elapsedTime += 20;
     setValue(m_elapsedTime);
 }
 
-void ConnectionTestDialog::error(Predicate::Object *obj)
+void ConnectionTestDialog::error(const QString& msg, const QString& details)
 {
-    PreDbg;
+    //kDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    PreDbg << msg << details;
     m_stopWaiting = true;
-    m_errorObj = obj;
-    /*  reject();
-        m_msgHandler->showErrorMessage(obj);
-      if (obj) {
-      }
-      else {
-        accept();
-      }*/
-    QMutex mutex;
-    mutex.lock();
-#ifdef __GNUC__
-#warning QWaitCondition::wait() OK?
-#else
-#pragma WARNING( QWaitCondition::wait() OK? )
-#endif
-    m_wait.wait(&mutex);
-    mutex.unlock();
+    if (!msg.isEmpty() || !details.isEmpty()) {
+        m_error = true;
+        m_msg = msg;
+        m_details = details;
+        PreDbg << "ERR!";
+//        m_msgHandler->showErrorMessage(msg, details);
+    }
 }
 
 void ConnectionTestDialog::reject()
 {
-// m_wait.wakeAll();
     m_thread->terminate();
     m_timer.disconnect(this);
     m_timer.stop();

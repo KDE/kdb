@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,16 +21,35 @@
 #define PREDICATE_UTILS_P_H
 
 #include <QTimer>
-#include <QWaitCondition>
-
+#include <QThread>
 #include <QProgressDialog>
 
 #include "MessageHandler.h"
 #include "ConnectionData.h"
 
-class ConnectionTestThread;
+namespace Predicate {
+class Driver;
+}
 
-class ConnectionTestDialog : protected QProgressDialog
+class ConnectionTestDialog;
+
+class ConnectionTestThread : public QThread
+{
+    Q_OBJECT
+public:
+    ConnectionTestThread(ConnectionTestDialog *dlg, const Predicate::ConnectionData& connData);
+    virtual void run();
+signals:
+    void error(const QString& msg, const QString& details);
+protected:
+    void emitError(Predicate::Object* object);
+
+    ConnectionTestDialog* m_dlg;
+    Predicate::ConnectionData m_connData;
+    Predicate::Driver *m_driver;
+};
+
+class ConnectionTestDialog : public QProgressDialog
 {
     Q_OBJECT
 public:
@@ -40,7 +59,8 @@ public:
 
     int exec();
 
-    void error(Predicate::Object *obj);
+public slots:
+    void error(const QString& msg, const QString& details);
 
 protected slots:
     void slotTimeout();
@@ -52,8 +72,9 @@ protected:
     QTimer m_timer;
     Predicate::MessageHandler* m_msgHandler;
     uint m_elapsedTime;
-    Predicate::Object *m_errorObj;
-    QWaitCondition m_wait;
+    bool m_error;
+    QString m_msg;
+    QString m_details;
     bool m_stopWaiting;
 };
 
