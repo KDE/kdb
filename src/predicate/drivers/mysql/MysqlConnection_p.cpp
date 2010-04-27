@@ -42,6 +42,7 @@ MysqlConnectionInternal::MysqlConnectionInternal(Predicate::Connection* connecti
         , mysql(0)
         , mysql_owned(true)
         , res(0)
+        , lowerCaseTableNames(false)
 {
 }
 
@@ -130,7 +131,7 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //TODO is here escaping needed?
-    return executeSQL("USE " + dbName);
+    return executeSQL(QLatin1String("USE ") + escapeIdentifier(dbName));
 }
 
 /*! Executes the given SQL statement on the server.
