@@ -1,5 +1,11 @@
 Predicate CHANGELOG
 
+2010-04-28
+*merge kexidb r1119294
+*MySQL Driver: Fix "DB created but cannot open" error appearing on creating a new database for mysql backend.
+ See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html (complex!) for logic of otherwise simple thing.
+ The solution is to execute SHOW VARIABLES LIKE 'lower_case_table_name' to get the flag and make the table and database names lowercase if needed.
+
 2010-04-24
 *merge kexidb r1116241:
 **fix possible crash when adding two or more new columns to a table at once
