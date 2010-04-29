@@ -35,6 +35,9 @@ Naming, API:
 [ ] change the above in kexidb-qt3 too
 [ ] make Driver::Features use Q_FLAGS
 
+Other:
+[ ] store config in ~/.config/predicate/, e.g. *rc files
+
 Optimization & Cleanup
 [ ] use QLatin1String where possible
 
