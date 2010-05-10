@@ -18,6 +18,8 @@ Drivers:
      we decide to use these features in the final, since 3.0.7-based Kexi will be already
      3 years old. It will be always possible to perform simple migration using the following command
      "sqlite-old old.db .dump | sqlite-new new.db"
+[ ] SQLite: (security) Add connection flags to the driver and global setting to control the "secure delete" pragma
+            for now secure delete is always enabled
 [x] MySQL driver builds
 [ ] replace the Pqxx driver with a new one using libpq C API
 [ ] Port the Sybase driver (untouched for now)

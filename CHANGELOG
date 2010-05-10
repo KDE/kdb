@@ -1,10 +1,15 @@
 Predicate CHANGELOG
 
+2010-05-10
+*merge kexidb r1125175
+*[security] SQLite: Set the secure-delete on, so SQLite overwrites deleted content with zeros. Works with 3.6.23. Earlier versions just ignore this pragma. See http://www.sqlite.org/pragma.html#pragma_secure_delete
+TODO: add connection flags to the driver and global setting to control the "secure delete" pragma
+
 2010-04-28
 *merge kexidb r1119294
-*MySQL Driver: Fix "DB created but cannot open" error appearing on creating a new database for mysql backend.
- See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html (complex!) for logic of otherwise simple thing.
- The solution is to execute SHOW VARIABLES LIKE 'lower_case_table_name' to get the flag and make the table and database names lowercase if needed.
+**MySQL Driver: Fix "DB created but cannot open" error appearing on creating a new database for mysql backend.
+  See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html (complex!) for logic of otherwise simple thing.
+  The solution is to execute SHOW VARIABLES LIKE 'lower_case_table_name' to get the flag and make the table and database names lowercase if needed.
 
 2010-04-24
 *merge kexidb r1116241:
