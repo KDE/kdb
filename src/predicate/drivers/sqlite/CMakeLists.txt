@@ -1,4 +1,5 @@
 
+
 # definitins used for the sqlite driver and the shell
 ADD_DEFINITIONS(
     # sqlite compile-time options, http://sqlite.org/compile.html

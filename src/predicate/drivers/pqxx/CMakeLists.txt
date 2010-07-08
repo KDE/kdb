@@ -35,8 +35,5 @@ target_link_libraries(predicate_pqxx
   predicate
 )
 
-install(TARGETS predicate_pqxx DESTINATION ${PLUGIN_INSTALL_DIR})
-
-########### install files ###############
-
-#TODO install( FILES predicate_pqxx.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS predicate_pqxx DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_pqxx.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=mysql
+Caption=MySQL
+Comment=Predicate driver for handling MySQL databases
+Comment[en_GB]=Predicate driver for handling MySQL databases
+FileName=mysql
+Type=Network
+Version=1.0

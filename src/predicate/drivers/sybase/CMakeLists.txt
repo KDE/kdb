@@ -27,9 +27,5 @@ target_link_libraries(predicate_sybase
   predicate
 )
 
-install(TARGETS predicate_sybase DESTINATION ${PLUGIN_INSTALL_DIR})
-
-
-########### install files ###############
-
-#TODO install( FILES predicate_sybase.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS predicate_sybase DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_sybase.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

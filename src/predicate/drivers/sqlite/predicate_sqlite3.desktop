@@ -1,10 +1,9 @@
 [Desktop Entry]
 Name=sqlite3
 Caption=SQLite 3
-Comment=SQLite is the default SQL engine for Predicate
-Comment[en_GB]=SQLite is the default SQL engine for Predicate
+Comment=Predicate driver for handling SQLite databases
+Comment[en_GB]=Predicate driver for handling SQLite databases
 FileName=sqlite3
-InitialPreference=8
 Type=File
 MimeTypes=application/x-sqlite3,application/x-kexiproject-sqlite3
 Version=1.0

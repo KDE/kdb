@@ -31,9 +31,5 @@ target_link_libraries(predicate_odbc
   predicate
 )
 
-install(TARGETS predicate_odbc DESTINATION ${PLUGIN_INSTALL_DIR})
-
-
-########### install files ###############
-
-#TODO install( FILES  kexidb_odbcdriver.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS predicate_odbc DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_odbc.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

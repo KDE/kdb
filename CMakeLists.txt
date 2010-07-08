@@ -32,9 +32,12 @@ SET(PLUGIN_INSTALL_DIR
 
 include(MacroOptionalFindPackage)
 include(InstallSettings)
+include(MacroLogFeature)
 
 find_package(Qt4 REQUIRED)
 
 add_subdirectory( cmake )
 add_subdirectory( Predicate )
 add_subdirectory( tests )
+
+macro_display_feature_log()

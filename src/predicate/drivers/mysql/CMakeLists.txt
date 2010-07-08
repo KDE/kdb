@@ -42,14 +42,8 @@ target_link_libraries(predicate_mysql
 if(MSVC)
   # avoid LNK2005 errors
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FORCE:MULTIPLE")
-SET_TARGET_PROPERTIES(predicate_mysql PROPERTIES
-    LINK_FLAGS "
-    /NODEFAULTLIB:\"libcmtd.lib\"
-    ")
+  SET_TARGET_PROPERTIES(predicate_mysql PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")
 endif(MSVC)
 
-install(TARGETS predicate_mysql DESTINATION ${PLUGIN_INSTALL_DIR})
-
-########### install files ###############
-
-#TODO install( FILES predicate_mysql.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS predicate_mysql DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_mysql.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

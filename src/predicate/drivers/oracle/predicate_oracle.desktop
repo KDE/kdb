@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=oracle
+Caption=Oracle
+Comment=Predicate driver for handling Oracle databases
+Comment[en_GB]=Predicate driver for handling Oracle databases
+FileName=oracle
+Type=Network
+Version=1.0

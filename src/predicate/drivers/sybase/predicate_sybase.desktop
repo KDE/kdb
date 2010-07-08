@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=sybase
+Caption=Sybase
+Comment=Predicate driver for handling Sybase databases
+Comment[en_GB]=Predicate driver for handling Sybase databases
+FileName=sybase
+Type=Network
+Version=1.0
