@@ -5,6 +5,8 @@ Predicate CHANGELOG
 **sqlite driver ported to that
 *QT_PLUGIN_DIR is used to find predicate/ dir with drivers
 *fix library version to 1.0.0
+*all the drivers desktop files ported to the new plugin system
+*use system sqlite
 
 2010-05-10
 *merge kexidb r1125175
