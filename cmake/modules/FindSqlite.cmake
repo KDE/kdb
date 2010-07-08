@@ -76,8 +76,6 @@ macro(_check_min_sqlite_version)
         set(SQLITE_MIN_VERSION_PATCH ${Sqlite_FIND_VERSION_PATCH} CACHE STRING "Required SQLite minimal version (patch)" FORCE)
         math(EXPR SQLITE_MIN_VERSION_NUMBER
             "${SQLITE_MIN_VERSION_MAJOR} * 1000000 + ${SQLITE_MIN_VERSION_MINOR} * 1000 + ${SQLITE_MIN_VERSION_PATCH}")
-message(STATUS ${SQLITE_MIN_VERSION_NUMBER})
-message(STATUS ${SQLITE_VERSION})
         if(SQLITE_MIN_VERSION_NUMBER GREATER SQLITE_VERSION)
             if(Sqlite_FIND_REQUIRED)
                 message(FATAL_ERROR "Minimal SQLite version required: ${SQLITE_MIN_VERSION}, found ${SQLITE_VERSION_STRING}")
