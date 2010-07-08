@@ -68,7 +68,8 @@ public:
             Data()
             : fileBased(false)
             , importingAllowed(true) {}
-            QString name, caption, comment, fileDBMimeType, fileName;
+            QString name, caption, comment, fileDBMimeType, absoluteFilePath;
+            QString version; //!< x.y major+minor version
             bool fileBased;
             bool importingAllowed;
         };
@@ -76,24 +77,27 @@ public:
         //! Constructs an invalid info.
         Info() : d( new Data() ) {}
 
-        //! @return true if the info is valid. Valid info provides at least name and filename.
+        //! @return true if the info is valid. Valid info provides at least name and file path.
         //! @since 2.0
-        bool isValid() const { return !d->name.isEmpty() && !d->fileName.isEmpty(); }
+        bool isValid() const { return !d->name.isEmpty() && !d->absoluteFilePath.isEmpty(); }
 
         QString name() const { return d->name; }
         void setName(const QString& name) { d->name = name; }
 
         QString caption() const { return d->caption; }
         void setCaption(const QString& caption) { d->caption = caption; }
-        
+
         QString comment() const { return d->comment; }
         void setComment(const QString& comment) { d->comment = comment; }
+
+        QString version() const { return d->version; }
+        void setVersion(const QString& version) { d->version = version; }
 
         QString fileDBMimeType() const { return d->fileDBMimeType; }
         void setFileDBMimeType(const QString& fileDBMimeType) { d->fileDBMimeType = fileDBMimeType; }
 
-        QString fileName() const { return d->fileName; }
-        void setFileName(const QString& fileName) { d->fileName = fileName; }
+        QString absoluteFilePath() const { return d->absoluteFilePath; }
+        void setAbsoluteFilePath(const QString& absoluteFilePath) { d->absoluteFilePath = absoluteFilePath; }
 
         //! @return true if the driver is for file-based database backend
         bool isFileBased() const { return d->fileBased; }

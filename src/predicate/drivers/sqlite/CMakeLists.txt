@@ -70,9 +70,5 @@ add_library(predicate_sqlite3 SHARED ${predicate_sqlite3_SRCS})
 
 target_link_libraries(predicate_sqlite3 ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} predicate )
 
-install(TARGETS predicate_sqlite3 DESTINATION ${PLUGIN_INSTALL_DIR})
-
-
-########### install files ###############
-
-#TODO install( FILES  kexidb_sqlite3driver.desktop  DESTINATION ${SERVICES_INSTALL_DIR})
+install(TARGETS predicate_sqlite3 DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_sqlite3.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

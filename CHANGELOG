@@ -1,5 +1,11 @@
 Predicate CHANGELOG
 
+2010-07-08
+*clean up the .desktop file format for drivers
+**sqlite driver ported to that
+*QT_PLUGIN_DIR is used to find predicate/ dir with drivers
+*fix library version to 1.0.0
+
 2010-05-10
 *merge kexidb r1125175
 *[security] SQLite: Set the secure-delete on, so SQLite overwrites deleted content with zeros. Works with 3.6.23. Earlier versions just ignore this pragma. See http://www.sqlite.org/pragma.html#pragma_secure_delete

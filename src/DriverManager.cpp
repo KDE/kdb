@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2009 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -87,14 +87,9 @@ DriverManagerInternal *DriverManagerInternal::self()
     return s_self;
 }
 
-/*! Find driver's directory.
- First, checks for existence of 'plugins' subdirectory.
- Then reads "Plugins" entry from ~/predicate.ini (Windows) or ~/.predicate (Unix) files.
-*/
 static QString findPluginsDir()
 {
-    QString pluginsDir;
-    QString fname(
+/*    QString fname(
 #ifdef Q_WS_WIN
         "predicate.ini"
 #else
@@ -113,7 +108,48 @@ static QString findPluginsDir()
         if (QDir(pluginsDir).exists())
             return pluginsDir;
     }
-    return QString::null;
+*/
+//! @todo try in XDG_* http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html ?
+    foreach (const QString& path, qApp->libraryPaths()) {
+        const QString pluginsDir(path + "/predicate");
+        if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable())
+            return pluginsDir;
+    }
+    return QString();
+}
+
+void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
+{
+    QDir dir(pluginsDir, "predicate_*.desktop");
+    const QFileInfoList infoFiles( dir.entryInfoList(QDir::Files|QDir::Readable) );
+    foreach (const QFileInfo& infoFile, infoFiles) {
+        QSettings config(infoFile.absoluteFilePath(), QSettings::IniFormat);
+        config.beginGroup("Desktop Entry");
+        Driver::Info info;
+        info.setName( config.value("Name").toString().toLower() );
+        if (m_driversInfo.contains(info.name())) {
+            qWarning() << "More than one driver named" << info.name() << "-- skipping this one";
+            continue;
+        }
+        info.setVersion( config.value("Version").toString() );
+        const QString expectedVersion(QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor));
+        if (expectedVersion != info.version()) {
+            qWarning() << "Incompatible database driver's" << info.name()
+                << "version: found version" << info.version() << "expected version" << expectedVersion
+                << "-- skipping this one";
+        }
+        info.setAbsoluteFilePath( pluginsDir + '/' + config.value("FileName").toString() );
+        info.setCaption( config.value("Caption").toString() );
+//! @todo read translated [..]
+        info.setComment( config.value("Comment").toString() );
+        if (info.caption().isEmpty())
+            info.setCaption( info.name() );
+        info.setFileBased( config.value("Type", "Network").toString().toLower()=="file" );
+        if (info.isFileBased())
+            info.setFileDBMimeType( config.value("MimeType").toString().toLower() );
+        info.setImportingAllowed( config.value("AllowImporting", true).toBool() );
+        m_driversInfo.insert(info.name().toLower(), info);
+    }
 }
 
 bool DriverManagerInternal::lookupDrivers()
@@ -131,32 +167,23 @@ bool DriverManagerInternal::lookupDrivers()
     lookupDriversNeeded = false;
     clearError();
 
-    m_pluginsDir = findPluginsDir();
-    if (m_pluginsDir.isEmpty()) {
+    /*! Try in all possible driver directories.
+     Looks for "predicate" directory in $INSTALL/plugins, $QT_PLUGIN_PATH, and directory of the application executable.
+     Plugin path "Plugins" entry can be added to qt.conf to override; see http://doc.trolltech.com/4.6/qt-conf.html.
+    */
+    qDebug() << "qApp->libraryPaths():" << qApp->libraryPaths();
+    bool foundAtLeastOne = false;
+    foreach (const QString& path, qApp->libraryPaths()) {
+        const QString pluginsDir(path + "/predicate");
+        if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable()) {
+            foundAtLeastOne = true;
+            lookupDriversForDirectory(pluginsDir);
+        }
+    }
+    if (!foundAtLeastOne) {
         setError(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers.") );
         return false;
     }
-    
-    QDir dir(m_pluginsDir, "predicate_*.desktop");
-    const QFileInfoList infoFiles( dir.entryInfoList(QDir::Files|QDir::Readable) );
-    foreach (const QFileInfo& infoFile, infoFiles) {
-        QSettings config(infoFile.absoluteFilePath(), QSettings::IniFormat);
-        config.beginGroup("Desktop Entry");
-        Driver::Info info;
-        info.setName( config.value("DriverName").toString() );
-        info.setFileName( config.value("FileName").toString() );
-        info.setCaption( config.value("Name").toString() );
-//js TODO read translated [..]
-        info.setComment( config.value("Comment").toString() );
-        if (info.caption().isEmpty())
-            info.setCaption( info.name() );
-        info.setFileBased( config.value("DriverType", "Network").toString().toLower()=="file" );
-        if (info.isFileBased())
-            info.setFileDBMimeType( config.value("FileDBDriverMime").toString().toLower() );
-        info.setImportingAllowed( config.value("AllowImporting", true).toBool() );
-        m_driversInfo.insert(info.name().toLower(), info);
-    }
-
 
 #if 0 // todo?
     KService::List tlist = KServiceTypeTrader::self()->query("Kexi/DBDriver");
@@ -276,11 +303,10 @@ Driver* DriverManagerInternal::driver(const QString& name)
 
     const Driver::Info info(m_driversInfo.value(name.toLower()));
 
-    QString libFileName(m_pluginsDir + "/bin/" + info.fileName()
+    QString libFileName(info.absoluteFilePath());
 #if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
-        + "_d"
+    libFileName += "_d";
 #endif
-    );
     QLibrary lib(libFileName);
     LibUnloader unloader(&lib);
     if (!lib.load()) {

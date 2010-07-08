@@ -58,11 +58,12 @@ protected slots:
     */
     void slotAppQuits();
 
-protected:
+private:
     /*! Used by self() */
     DriverManagerInternal();
 
     bool lookupDrivers();
+    void lookupDriversForDirectory(const QString& pluginsDir);
 
     static Predicate::DriverManagerInternal* s_self;
 
@@ -81,7 +82,6 @@ protected:
 
     ulong refCount() const { return m_refCount; }
 
-private:
     ulong m_refCount;
     bool lookupDriversNeeded;
 
