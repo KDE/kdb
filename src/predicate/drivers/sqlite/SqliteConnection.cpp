@@ -54,13 +54,9 @@ SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
 SQLiteConnectionInternal::~SQLiteConnectionInternal()
 {
     if (data_owned && data) {
-        free(data);
+        sqlite3_close(data);
         data = 0;
     }
-//sqlite_freemem does this if (errmsg) {
-//  free( errmsg );
-//  errmsg = 0;
-// }
 }
 
 void SQLiteConnectionInternal::storeResult()
