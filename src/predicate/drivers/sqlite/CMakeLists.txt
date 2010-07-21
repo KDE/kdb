@@ -22,10 +22,7 @@ ADD_DEFINITIONS(
 # todo -DSQLITE_OMIT_DEPRECATED
 )
 
-add_subdirectory( 3rdparty/sqlite3 )
-
 include_directories(
-  3rdparty/sqlite3
   ${CMAKE_SOURCE_DIR}
   ${QT_INCLUDES}
 )
@@ -55,8 +52,6 @@ set(predicate_sqlite3_SRCS
    SqliteAdmin.cpp
 #todo   SqliteVacuum.cpp
    SqliteAlter.cpp
-
-   3rdparty/sqlite3/sqlite3.c
 )
 
 set(predicate_sqlite3_MOC_SRCS
