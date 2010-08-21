@@ -89,8 +89,10 @@ MACRO(MACRO_LOG_FEATURE _var _package _description _url ) # _required _minvers _
 #      SET(_logtext "${_logtext}\n") #double-space missing features?
    ENDIF (NOT ${_var})
 
-   FILE(APPEND "${_LOGFILENAME}" "${_logtext}\n")
- 
+   IF (${_LOGFILENAME})
+      FILE(APPEND "${_LOGFILENAME}" "${_logtext}\n")
+   ENDIF (${_LOGFILENAME})
+
 ENDMACRO(MACRO_LOG_FEATURE)
 
 
