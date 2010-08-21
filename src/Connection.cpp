@@ -234,15 +234,15 @@ public:
     QSet<QuerySchema*> obsoleteQueries;
 
     //! server version information for this connection.
-    Predicate::ServerVersionInfo serverVersion;
+    ServerVersionInfo serverVersion;
 
     //! Database version information for this connection.
-    Predicate::DatabaseVersionInfo databaseVersion;
+    DatabaseVersionInfo databaseVersion;
 
     Parser *m_parser;
 
     //! cursors created for this connection
-    QSet<Predicate::Cursor*> cursors;
+    QSet<Cursor*> cursors;
 
     //! Database properties
     DatabaseProperties dbProperties;
@@ -910,14 +910,14 @@ QStringList Connection::predicateSystemTableNames()
     return Predicate_predicateSystemTableNames;
 }
 
-Predicate::ServerVersionInfo* Connection::serverVersion() const
+ServerVersionInfo Connection::serverVersion() const
 {
-    return isConnected() ? &d->serverVersion : 0;
+    return isConnected() ? d->serverVersion : ServerVersionInfo();
 }
 
-Predicate::DatabaseVersionInfo* Connection::databaseVersion() const
+DatabaseVersionInfo Connection::databaseVersion() const
 {
-    return isDatabaseUsed() ? &d->databaseVersion : 0;
+    return isDatabaseUsed() ? d->databaseVersion : DatabaseVersionInfo();
 }
 
 DatabaseProperties Connection::databaseProperties() const
@@ -1182,7 +1182,7 @@ bool Connection::executeSQL(const QString& statement)
     return true;
 }
 
-QString Connection::selectStatement(Predicate::QuerySchema* querySchema,
+QString Connection::selectStatement(QuerySchema* querySchema,
                                     const QList<QVariant>& params,
                                     const SelectStatementOptions& options) const
 {
@@ -1500,13 +1500,13 @@ QString Connection::selectStatement(Predicate::QuerySchema* querySchema,
     return sql;
 }
 
-QString Connection::selectStatement(Predicate::TableSchema* tableSchema,
+QString Connection::selectStatement(TableSchema* tableSchema,
                                     const SelectStatementOptions& options) const
 {
     return selectStatement(tableSchema->query(), options);
 }
 
-Field* Connection::findSystemFieldName(const Predicate::FieldList& fieldlist)
+Field* Connection::findSystemFieldName(const FieldList& fieldlist)
 {
     for (Field::ListIterator it(fieldlist.fieldsIterator()); it != fieldlist.fieldsIteratorConstEnd(); ++it) {
         if (m_driver->isSystemFieldName((*it)->name()))
@@ -1538,7 +1538,7 @@ quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName, const Q
 }
 
 quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName,
-        const Predicate::TableSchema& table, quint64* recordId)
+        const TableSchema& table, quint64* recordId)
 {
     return lastInsertedAutoIncValue(aiFieldName, table.name(), recordId);
 }
@@ -1662,7 +1662,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
 
     bool previousSchemaStillKept = false;
 
-    Predicate::TableSchema *existingTable = 0;
+    TableSchema *existingTable = 0;
     if (replaceExisting) {
         //get previous table (do not retrieve, though)
         existingTable = d->table(tableName);
@@ -1690,7 +1690,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
 
     /* if (replaceExisting) {
       //get previous table (do not retrieve, though)
-      Predicate::TableSchema *existingTable = d->tables_byname.take(name);
+      TableSchema *existingTable = d->tables_byname.take(name);
       if (oldTable) {
       }*/
 
@@ -1782,12 +1782,12 @@ bool Connection::drv_dropTable(const QString& name)
 
     TODO: Should check that a database is currently in use? (c.f. createTable)
 */
-tristate Connection::dropTable(Predicate::TableSchema* tableSchema)
+tristate Connection::dropTable(TableSchema* tableSchema)
 {
     return dropTable(tableSchema, true);
 }
 
-tristate Connection::dropTable(Predicate::TableSchema* tableSchema, bool alsoRemoveSchema)
+tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
 {
 // Each SQL identifier needs to be escaped in the generated query.
     clearResult();
@@ -2031,7 +2031,7 @@ bool Connection::dropQuery(const QString& query)
     return dropQuery(qs);
 }
 
-bool Connection::drv_createTable(const Predicate::TableSchema& tableSchema)
+bool Connection::drv_createTable(const TableSchema& tableSchema)
 {
     const QString sql( createTableStatement(tableSchema) );
     PreDbg << "******** " << sql;
@@ -2352,7 +2352,7 @@ bool Connection::deleteCursor(Cursor *cursor)
 bool Connection::setupObjectData(const RecordData &data, Object *object)
 {
     //not found: retrieve schema
-    /* Predicate::Cursor *cursor;
+    /* Cursor *cursor;
       if (!(cursor = executeQuery( QString("select * from kexi__objects where o_id='%1'").arg(objId) )))
         return false;
       if (!cursor->moveFirst()) {
@@ -2459,8 +2459,8 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
     return executeSQL(
                QString::fromLatin1("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
                .arg(QString::number(object->id()), QString::number(object->type()),
-                    m_driver->valueToSQL(Predicate::Field::Text, object->caption()),
-                    m_driver->valueToSQL(Predicate::Field::Text, object->description())));
+                    m_driver->valueToSQL(Field::Text, object->caption()),
+                    m_driver->valueToSQL(Field::Text, object->description())));
 }
 
 bool Connection::storeObjectData(Object* object)
@@ -2480,7 +2480,7 @@ tristate Connection::querySingleRecordInternal(RecordData* data, const QString* 
 //! @todo does not work with non-SQL data sources
     if (sql)
         m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
-    Predicate::Cursor *cursor;
+    Cursor *cursor;
     if (!(cursor = sql ? executeQuery(m_result.sql()) : executeQuery(query))) {
         PreWarn << "!executeQuery()" << m_result.sql();
         return false;
@@ -2519,7 +2519,7 @@ bool Connection::checkIfColumnExists(Cursor *cursor, uint column)
 
 tristate Connection::querySingleString(const QString& sql, QString* value, uint column, bool addLimitTo1)
 {
-    Predicate::Cursor *cursor;
+    Cursor *cursor;
     m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
     if (!(cursor = executeQuery(m_result.sql()))) {
         PreWarn << "!executeQuery() " << m_result.sql();
@@ -2555,7 +2555,7 @@ tristate Connection::querySingleNumber(const QString& sql, int* number, uint col
 
 bool Connection::queryStringList(const QString& sql, QStringList* list, uint column)
 {
-    Predicate::Cursor *cursor;
+    Cursor *cursor;
     clearResult();
     m_result.setSql(sql);
     if (!(cursor = executeQuery(m_result.sql()))) {
@@ -2586,7 +2586,7 @@ bool Connection::queryStringList(const QString& sql, QStringList* list, uint col
 
 bool Connection::resultExists(const QString& sql, bool* success, bool addLimitTo1)
 {
-    Predicate::Cursor *cursor;
+    Cursor *cursor;
     //optimization
     if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
         //this is at least for sqlite
@@ -2861,7 +2861,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
     return true;
 }
 
-Predicate::Field* Connection::setupField(const RecordData &data)
+Field* Connection::setupField(const RecordData &data)
 {
     bool ok = true;
     int f_int_type = data.at(1).toInt(&ok);
@@ -2904,7 +2904,7 @@ Predicate::Field* Connection::setupField(const RecordData &data)
     return f;
 }
 
-Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
+TableSchema* Connection::setupTableSchema(const RecordData &data)
 {
     TableSchema *t = new TableSchema(this);
     if (!setupObjectData(data, t)) {
@@ -2912,7 +2912,7 @@ Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
         return 0;
     }
 
-    Predicate::Cursor *cursor;
+    Cursor *cursor;
     if (!(cursor = executeQuery(
                        QString::fromLatin1("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
                                            "f_options, f_default, f_order, f_caption, f_help"
@@ -2977,7 +2977,7 @@ TableSchema* Connection::tableSchema(const QString& tableName)
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
                                       " AND o_type=%2")
-                                  .arg(tableName, Predicate::TableObjectType), &data))
+                                  .arg(tableName, TableObjectType), &data))
         return 0;
 
     return setupTableSchema(data);
@@ -3004,7 +3004,7 @@ tristate Connection::loadDataBlock(int objectID, QString* dataString, const QStr
         return false;
     return querySingleString(
                QString::fromLatin1("SELECT o_data FROM kexi__objectdata WHERE o_id=") + QString::number(objectID)
-               + QLatin1String(" AND ") + Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id",
+               + QLatin1String(" AND ") + Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
                dataID.isEmpty() ? QVariant() : QVariant(dataID)),
                dataString);
 }
@@ -3015,7 +3015,7 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
         return false;
     QString sql(QString::fromLatin1(
                     "SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
-    QString sql_sub(Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id", 
+    QString sql_sub(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
                                         dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     bool ok, exists;
@@ -3024,13 +3024,13 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
         return false;
     if (exists) {
         return executeSQL("UPDATE kexi__objectdata SET o_data="
-                          + m_driver->valueToSQL(Predicate::Field::LongText, dataString)
+                          + m_driver->valueToSQL(Field::LongText, dataString)
                           + " WHERE o_id=" + QString::number(objectID) + " AND " + sql_sub);
     }
     return executeSQL(
                QString::fromLatin1("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
-               + QString::number(objectID) + "," + m_driver->valueToSQL(Predicate::Field::LongText, dataString)
-               + "," + m_driver->valueToSQL(Predicate::Field::Text, dataID) + ')');
+               + QString::number(objectID) + "," + m_driver->valueToSQL(Field::LongText, dataString)
+               + "," + m_driver->valueToSQL(Field::Text, dataID) + ')');
 }
 
 bool Connection::removeDataBlock(int objectID, const QString& dataID)
@@ -3041,10 +3041,10 @@ bool Connection::removeDataBlock(int objectID, const QString& dataID)
         return Predicate::deleteRecord(this, "kexi__objectdata", "o_id", QString::number(objectID));
     else
         return Predicate::deleteRecord(this, "kexi__objectdata",
-                                 "o_id", Predicate::Field::Integer, objectID, "o_sub_id", Predicate::Field::Text, dataID);
+                                 "o_id", Field::Integer, objectID, "o_sub_id", Field::Text, dataID);
 }
 
-Predicate::QuerySchema* Connection::setupQuerySchema(const RecordData &data)
+QuerySchema* Connection::setupQuerySchema(const RecordData &data)
 {
     bool ok = true;
     const int objID = data[0].toInt(&ok);
@@ -3058,7 +3058,7 @@ Predicate::QuerySchema* Connection::setupQuerySchema(const RecordData &data)
         return 0;
     }
     d->parser()->parse(sqlText);
-    Predicate::QuerySchema *query = d->parser()->query();
+    QuerySchema *query = d->parser()->query();
     //error?
     if (!query) {
         m_result = Result(ERR_SQL_PARSE_ERROR,
@@ -3087,7 +3087,7 @@ QuerySchema* Connection::querySchema(const QString& queryName)
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
                                       " AND o_type=%2")
-                                  .arg(m_queryName, Predicate::QueryObjectType), &data))
+                                  .arg(m_queryName, QueryObjectType), &data))
         return 0;
 
     return setupQuerySchema(data);
@@ -3239,12 +3239,12 @@ void Connection::setAvailableDatabaseName(const QString& dbName)
 }
 
 //! @internal used in updateRecord(), insertRecord(),
-inline void updateRecordDataWithNewValues(QuerySchema* query, RecordData* data, const Predicate::RecordEditBuffer::DBMap& b,
+inline void updateRecordDataWithNewValues(QuerySchema* query, RecordData* data, const RecordEditBuffer::DBMap& b,
                                           QHash<QueryColumnInfo*, int>* columnsOrderExpanded)
 {
     *columnsOrderExpanded = query->columnsOrder(QuerySchema::ExpandedList);
     QHash<QueryColumnInfo*, int>::ConstIterator columnsOrderExpandedIt;
-    for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+    for (RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
         if (columnsOrderExpandedIt == columnsOrderExpanded->constEnd()) {
             PreWarn << "(Connection) \"now also assign new value in memory\" step"
@@ -3289,11 +3289,11 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
     QString sqlset, sqlwhere;
     sqlset.reserve(1024);
     sqlwhere.reserve(1024);
-    Predicate::RecordEditBuffer::DBMap b = buf->dbBuffer();
+    RecordEditBuffer::DBMap b = buf->dbBuffer();
 
     //gather the fields which are updated ( have values in RecordEditBuffer)
     FieldList affectedFields;
-    for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+    for (RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         if (it.key()->field->table() != mt)
             continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
         if (!sqlset.isEmpty())
@@ -3385,7 +3385,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
     QString sql;
     sql.reserve(4096);
     sql = "INSERT INTO " + escapeIdentifier(mt->name()) + " (";
-    Predicate::RecordEditBuffer::DBMap b = buf->dbBuffer();
+    RecordEditBuffer::DBMap b = buf->dbBuffer();
 
     // add default values, if available (for any column without value explicitly set)
     const QueryColumnInfo::Vector fieldsExpanded(query->fieldsExpanded(QuerySchema::Unique));
@@ -3438,7 +3438,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
         affectedFields.addField(anyField);
     } else {
         // non-empty record inserting requested:
-        for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+        for (RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
             if (it.key()->field->table() != mt)
                 continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
             if (!sqlcols.isEmpty()) {
@@ -3670,12 +3670,12 @@ bool Connection::isReadOnly() const
     return d->readOnly;
 }
 
-void Connection::addCursor(Predicate::Cursor* cursor)
+void Connection::addCursor(Cursor* cursor)
 {
     d->cursors.insert(cursor);
 }
 
-void Connection::takeCursor(Predicate::Cursor* cursor)
+void Connection::takeCursor(Cursor* cursor)
 {
     d->cursors.remove(cursor);
 }

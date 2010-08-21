@@ -73,6 +73,9 @@ public:
 
     //! @return true if @a major and @a minor exatcly matches major and minor version of this info, respectively.
     bool matches(uint major, uint minor) const { return major == d->major && minor == d->minor; }
+
+    //! @return true if this version info is null, i.e. all the version numbers are zero.
+    bool isNull() const;
 };
 
 //! @return Predicate-specific information about version of the database.
@@ -117,6 +120,9 @@ public:
 
     //! Clears the information - integers will be set to 0 and string to null
     void clear();
+
+    //! @return true if this version info is null, i.e. all the version numbers are zero.
+    bool isNull() const;
 };
 
 } // namespace Predicate

@@ -193,14 +193,14 @@ public:
     static QStringList predicateSystemTableNames();
 
     /*! \return server version information for this connection.
-     If database is not connected (i.e. isConnected() is false) 0 is returned. */
-    Predicate::ServerVersionInfo* serverVersion() const;
+     If database is not connected (i.e. isConnected() is false) null ServerVersionInfo is returned. */
+    ServerVersionInfo serverVersion() const;
 
     /*! \return version information for this connection.
-     If database is not used (i.e. isDatabaseUsed() is false) 0 is returned.
+     If database is not used (i.e. isDatabaseUsed() is false) null DatabaseVersionInfo is returned.
      It can be compared to drivers' and Predicate library version to maintain
      backward/upward compatiblility. */
-    Predicate::DatabaseVersionInfo* databaseVersion() const;
+    DatabaseVersionInfo databaseVersion() const;
 
     /*! \return DatabaseProperties object allowing to read and write global database properties
      for this connection. */
@@ -240,7 +240,7 @@ public:
     QList<int> objectIds(int objType);
 
     /*! \brief Creates new Transaction.handle and starts a new transaction.
-     \return Predicate::Transaction object if Transaction.has been started
+     \return Transaction object if Transaction.has been started
      successfully, otherwise null transaction.
      For drivers that allow single transaction per connection
      (Driver::features() && SingleTransactions) this method can be called one time,
@@ -291,7 +291,7 @@ public:
      started at all.
      Default transaction can be defined automatically for some drivers --
      see beginTransaction().
-     \sa Predicate::Driver::transactionsSupported()
+     \sa Driver::transactionsSupported()
     */
     Transaction defaultTransaction() const;
 
@@ -348,7 +348,7 @@ public:
     /*! Prepares SELECT query described by raw \a statement.
      \return opened cursor created for results of this query
      or NULL if there was any error. Cursor can have optionally applied \a cursor_options
-     (one of more selected from Predicate::Cursor::Options).
+     (one of more selected from Cursor::Options).
      Preparation means that returned cursor is created but not opened.
      Open this when you would like to do it with Cursor::open().
 
@@ -385,7 +385,7 @@ public:
      \return opened cursor created for results of this query
      or NULL if there was any error on the cursor creation or opening.
      Cursor can have optionally applied \a cursor_options
-     (one of more selected from Predicate::Cursor::Options).
+     (one of more selected from Cursor::Options).
      Identifiers in \a statement that are the same as keywords in Kexi
      SQL or the backend's SQL need to have been escaped.
      */
@@ -570,7 +570,7 @@ public:
     tristate dropTable(TableSchema* tableSchema);
 
     /*! It is a convenience function, does exactly the same as
-     bool dropTable( Predicate::TableSchema* tableSchema ) */
+     bool dropTable( TableSchema* tableSchema ) */
     tristate dropTable(const QString& table);
 
     /*! Alters \a tableSchema using \a newTableSchema in memory and on the db backend.
@@ -598,7 +598,7 @@ public:
     bool dropQuery(QuerySchema* querySchema);
 
     /*! It is a convenience function, does exactly the same as
-     bool dropQuery( Predicate::QuerySchema* querySchema ) */
+     bool dropQuery( QuerySchema* querySchema ) */
     bool dropQuery(const QString& query);
 
     /*! Removes information about object with \a objId
@@ -738,7 +738,7 @@ public:
     bool storeNewObjectData(Object* object);
 
     /*! Added for convenience.
-     \sa setupObjectData(const Predicate::RecordData*, Object*).
+     \sa setupObjectData(const RecordData*, Object*).
      \return true on success, false on failure and cancelled when such object couldn't */
     tristate loadObjectData(int id, Object* object);
 
@@ -859,7 +859,7 @@ public:
       Moved to public for KexiMigrate
       @todo fix this after refatoring
     */
-    Predicate::Field* setupField(const RecordData& data);
+    Field* setupField(const RecordData& data);
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
      This method is used for example in KexiProject to insert information about "kexi__blobs"
@@ -881,12 +881,12 @@ protected:
      Used (alsoRemoveSchema==false) on table altering:
      if recreating table can failed we're giving up and keeping
      the original table schema (even if it is no longer points to any real data). */
-    tristate dropTable(Predicate::TableSchema* tableSchema, bool alsoRemoveSchema);
+    tristate dropTable(TableSchema* tableSchema, bool alsoRemoveSchema);
 
     /*! For reimplementation: connects to database. \a version should be set to real
      server's version.
       \return true on success. */
-    virtual bool drv_connect(Predicate::ServerVersionInfo* version) = 0;
+    virtual bool drv_connect(ServerVersionInfo* version) = 0;
 
     /*! For reimplementation: disconnects database
       \return true on success. */
@@ -1253,10 +1253,10 @@ protected:
     }
 
     //! Used by Cursor class
-    void addCursor(Predicate::Cursor* cursor);
+    void addCursor(Cursor* cursor);
 
     //! Used by Cursor class
-    void takeCursor(Predicate::Cursor* cursor);
+    void takeCursor(Cursor* cursor);
 
 private:
     //! Internal, used by storeObjectData(Object*) and storeNewObjectData(Object* object).

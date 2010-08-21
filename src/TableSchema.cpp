@@ -215,7 +215,7 @@ FieldList& TableSchema::insertField(uint index, Field *field)
     return *this;
 }
 
-void TableSchema::removeField(Predicate::Field *field)
+void TableSchema::removeField(Field *field)
 {
     if (d->anyNonPKField && field == d->anyNonPKField) //d->anyNonPKField will be removed!
         d->anyNonPKField = 0;
