@@ -232,7 +232,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
 //==================================================================================
 //Return the current record as a char**
 //who'd have thought we'd be using char** in this day and age :o)
-const char** pqxxSqlCursor::rowData() const
+const char** pqxxSqlCursor::recordData() const
 {
 // PreDrvDbg;
 
@@ -254,7 +254,7 @@ const char** pqxxSqlCursor::rowData() const
 
 //==================================================================================
 //Store the current record in [data]
-bool pqxxSqlCursor::drv_storeCurrentRow(RecordData &data) const
+bool pqxxSqlCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "POSITION IS" << (long)m_at;
 

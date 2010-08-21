@@ -45,7 +45,7 @@ public:
 	virtual void drv_bufferMovePointerPrev();
 	virtual void drv_bufferMovePointerTo(Q_LLONG to);
 	virtual const char** rowData() const;
-	virtual bool drv_storeCurrentRow(RecordData &data) const;
+	virtual bool drv_storeCurrentRecord(RecordData* data) const;
 //        virtual bool save(RowData& data, RowEditBuffer& buf);
 
 	virtual int serverResult();

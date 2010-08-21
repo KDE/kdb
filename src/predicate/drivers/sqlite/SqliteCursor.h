@@ -42,9 +42,9 @@ public:
     /*! [PROTOTYPE] \return internal buffer data. */
 //TODO  virtual const char *** bufferData()
     /*! [PROTOTYPE] \return current record data or NULL if there is no current records. */
-    virtual const char ** rowData() const;
+    virtual const char ** recordData() const;
 
-    virtual bool drv_storeCurrentRow(RecordData &data) const;
+    virtual bool drv_storeCurrentRecord(RecordData* data) const;
 
 //  virtual bool save(RecordData& data, RowEditBuffer& buf);
 

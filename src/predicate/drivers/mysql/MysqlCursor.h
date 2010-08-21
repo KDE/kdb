@@ -47,8 +47,8 @@ public:
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
-    virtual const char** rowData() const;
-    virtual bool drv_storeCurrentRow(RecordData &data) const;
+    virtual const char** recordData() const;
+    virtual bool drv_storeCurrentRecord(RecordData* data) const;
 //        virtual bool save(RecordData& data, RowEditBuffer& buf);
 
     virtual int serverResult();

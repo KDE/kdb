@@ -175,7 +175,7 @@ QVariant SybaseCursor::value(uint pos)
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
  */
-bool SybaseCursor::drv_storeCurrentRow(RecordData& data) const
+bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "Position is" << (long)m_at;
 // if (d->numRows<=0)
@@ -228,7 +228,7 @@ void SybaseCursor::drv_bufferMovePointerTo(qint64 to)
     //dbgetrow( d->dbProcess, to );
 }
 
-const char** SybaseCursor::rowData() const
+const char** SybaseCursor::recordData() const
 {
     //! @todo
     return 0;

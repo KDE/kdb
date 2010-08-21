@@ -113,13 +113,13 @@ QVariant xBaseCursor::value(uint pos) {
 }
 
 
-bool xBaseCursor::drv_storeCurrentRow(RecordData& data) const
+bool xBaseCursor::drv_storeCurrentRecord(RecordData* data) const
 {
   if (!d->internalCursor) {
     return false;
   }
 
-  RecordData* rData = d->internalCursor->storeCurrentRow();
+  RecordData* rData = d->internalCursor->storeCurrentRecord();
   if (!rData) {
     return false;
   }
@@ -142,11 +142,11 @@ void xBaseCursor::drv_bufferMovePointerTo(qint64 to) {
   Q_UNUSED(to);
 }
 
-const char** xBaseCursor::rowData() const {
+const char** xBaseCursor::recordData() const {
   if (!d->internalCursor) {
     return 0;
   }
-  return d->internalCursor->rowData();
+  return d->internalCursor->recordData();
 }
 
 int xBaseCursor::serverResult()

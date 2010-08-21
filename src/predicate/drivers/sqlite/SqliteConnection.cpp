@@ -89,12 +89,12 @@ SQLiteConnection::~SQLiteConnection()
 bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
-    version->string = QString(SQLITE_VERSION); //defined in sqlite3.h
+    version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
     QRegExp re("(\\d+)\\.(\\d+)\\.(\\d+)");
-    if (re.exactMatch(version->string)) {
-        version->major = re.cap(1).toUInt();
-        version->minor = re.cap(2).toUInt();
-        version->release = re.cap(3).toUInt();
+    if (re.exactMatch(version->string())) {
+        version->setMajor(re.cap(1).toUInt());
+        version->setMinor(re.cap(2).toUInt());
+        version->setRelease(re.cap(3).toUInt());
     }
     return true;
 }
@@ -108,7 +108,7 @@ bool SQLiteConnection::drv_disconnect()
 bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 {
     //this is one-db-per-file database
-    list->append(data()->fileName());   //more consistent than dbFileName() ?
+    list->append(data().fileName());   //more consistent than dbFileName() ?
     return true;
 }
 
@@ -122,18 +122,17 @@ bool SQLiteConnection::drv_containsTable(const QString &tableName)
 bool SQLiteConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
-    m_sql = "SELECT lower(name) FROM sqlite_master WHERE type='table'";
-    if (!(cursor = executeQuery(m_sql))) {
+    if (!(cursor = executeQuery(QLatin1String("SELECT lower(name) FROM sqlite_master WHERE type='table'")))) {
         PreWarn << "!executeQuery()";
         return false;
     }
     list->clear();
     cursor->moveFirst();
-    while (!cursor->eof() && !cursor->error()) {
+    while (!cursor->eof() && !cursor->result().isError()) {
         *list += cursor->value(0).toString();
         cursor->moveNext();
     }
-    if (cursor->error()) {
+    if (cursor->result().isError()) {
         deleteCursor(cursor);
         return false;
     }
@@ -175,7 +174,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
     d->res = sqlite3_open_v2(
                  //QFile::encodeName( data()->fileName() ),
-                 data()->fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
+                 data().fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
@@ -269,10 +268,11 @@ bool SQLiteConnection::drv_closeDatabase()
 bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
 {
     Q_UNUSED(dbName); // Each database is one single SQLite file.
-    const QString filename = data()->fileName();
+    const QString filename = data().fileName();
     if (QFile(filename).exists() && !QDir().remove(filename)) {
-        setError(ERR_ACCESS_RIGHTS, tr("Could not remove file \"%1\". "
-                 "Check the file's permissions and whether it is already opened and locked by another application.")
+        m_result = Result(ERR_ACCESS_RIGHTS,
+                          tr("Could not remove file \"%1\". "
+                             "Check the file's permissions and whether it is already opened and locked by another application.")
                    .arg(QDir::convertSeparators(filename)));
         return false;
     }

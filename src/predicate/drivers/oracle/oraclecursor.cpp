@@ -213,13 +213,13 @@ QVariant OracleCursor::value(uint pos)
    PD: It seems that you can fetch them as strings but I'm lazy to change this
        (If it works do not touch if)
  */
-bool OracleCursor::drv_storeCurrentRow(RecordData& data) const
+bool OracleCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 	//KexiDBDrvDbg << ": Position is " << (long)m_at;
 	if (d->numRows<=0)
 		return false;
 
-//! @todo    see SQLiteCursor::storeCurrentRow()
+//! @todo    see SQLiteCursor::storeCurrentRecord()
 	vector<MetaData> md=d->rs->getColumnListMetaData();
 	int t;
 	
@@ -286,7 +286,7 @@ void OracleCursor::drv_bufferMovePointerTo(Q_LLONG to)
   }
 }
 
-const char** OracleCursor::rowData() const 
+const char** OracleCursor::recordData() const 
 {
   KexiDBDrvDbg;
 	return NULL;

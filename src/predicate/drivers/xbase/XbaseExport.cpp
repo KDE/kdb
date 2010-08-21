@@ -440,7 +440,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connect
     return false;
 
   while (!cursor->eof()) {
-    Predicate::RecordData *record = cursor->storeCurrentRow();
+    Predicate::RecordData *record = cursor->storeCurrentRecord();
     if (!record) {
       return false;
     }

@@ -42,8 +42,8 @@ public:
     virtual ~pqxxSqlCursor();
 
     virtual QVariant value(uint i);
-    virtual const char** rowData() const;
-    virtual bool drv_storeCurrentRow(RecordData &data) const;
+    virtual const char** recordData() const;
+    virtual bool drv_storeCurrentRecord(RecordData* data) const;
 
 //TODO  virtual const char *** bufferData()
 

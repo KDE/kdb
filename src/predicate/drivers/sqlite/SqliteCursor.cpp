@@ -375,12 +375,12 @@ const char *** SQLiteCursor::bufferData()
   return m_records.data();
 }*/
 
-const char ** SQLiteCursor::rowData() const
+const char ** SQLiteCursor::recordData() const
 {
     return d->curr_coldata;
 }
 
-bool SQLiteCursor::drv_storeCurrentRow(RecordData &data) const
+bool SQLiteCursor::drv_storeCurrentRecord(RecordData* data) const
 {
     //const uint realCount = m_fieldCount + (m_containsROWIDInfo ? 1 : 0);
 //not needed data.resize(m_fieldCount);

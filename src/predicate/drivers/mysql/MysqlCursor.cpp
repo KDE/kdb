@@ -140,14 +140,14 @@ QVariant MysqlCursor::value(uint pos)
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
  */
-bool MysqlCursor::drv_storeCurrentRow(RecordData& data) const
+bool MysqlCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "position is " << (long)m_at;
     if (d->numRows <= 0)
         return false;
 
 //! @todo js: use MYSQL_FIELD::type here!
-//!           see SQLiteCursor::storeCurrentRow()
+//!           see SQLiteCursor::storeCurrentRecord()
 
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
     const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRow);
@@ -198,7 +198,7 @@ void MysqlCursor::drv_bufferMovePointerTo(qint64 to)
     d->lengths = mysql_fetch_lengths(d->mysqlres);
 }
 
-const char** MysqlCursor::rowData() const
+const char** MysqlCursor::recordData() const
 {
     //! @todo
     return 0;
