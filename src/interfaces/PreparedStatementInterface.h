@@ -24,7 +24,7 @@
 #include <QStringList>
 #include <QSharedData>
 
-#include "Predicate/PreparedStatement.h"
+#include <Predicate/PreparedStatement.h>
 
 namespace Predicate
 {

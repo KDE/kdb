@@ -77,7 +77,7 @@ public:
     bool AUTO_INCREMENT_REQUIRES_PK;
 
     /*! Name of a field (or built-in function) with autoincremented unique value,
-     typically returned by Connection::drv_lastInsertRowID().
+     typically returned by Connection::drv_lastInsertRecordId().
 
      Examples:
      - PostgreSQL and SQLite engines use 'OID' field
@@ -151,7 +151,7 @@ public:
 //moved to info:    QString fileDBDriverMimeType;
 
     /*! Info about the driver. */
-    Driver::Info info;
+    DriverInfo info;
 
     //    /*! Internal constant flag: Set this in subclass if driver is a file driver */
     //moved to info bool isFileDriver;

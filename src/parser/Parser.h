@@ -157,7 +157,7 @@ public:
     QString operationString() const;
 
     /**
-     * \return a pointer to a KexiDBTable on CREATE TABLE
+     * \return a pointer to a table schema on CREATE TABLE
      * or 0 on any other operation or error. Returned object is owned by you.
      * You can call this method only once every time after doing parse().
      * Next time, the call will return 0.
@@ -165,7 +165,7 @@ public:
     TableSchema *table();
 
     /**
-     * \return a pointer to KexiDBSelect if 'SELECT ...' was called
+     * \return a pointer to a query schema if 'SELECT ...' was called
      * or 0 on any other operation or error. Returned object is owned by you.
      * You can call this method only once every time after doing parse().
      * Next time, the call will return 0.

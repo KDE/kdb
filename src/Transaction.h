@@ -21,7 +21,7 @@
 #define PREDICATE_TRANSACTION_H
 
 #include <QObject>
-#include "predicate_export.h"
+#include <Predicate/predicate_export.h>
 
 namespace Predicate
 {
@@ -59,7 +59,7 @@ public:
 class PREDICATE_EXPORT Transaction : public QObject
 {
 public:
-    /*! Constructs uninitialised (null) transaction.
+/*! Constructs uninitialised (null) transaction.
      Only in Conenction code it can be initialised */
     Transaction();
 

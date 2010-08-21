@@ -48,7 +48,7 @@ public:
         }
     }
 
-    Predicate::DriverManager manager;
+    DriverManager manager;
     KComponentData componentData;
     ConnectionData connData;
     QPointer<Connection> conn;
@@ -131,7 +131,7 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
         }
 
         //get the driver
-        Predicate::Driver *driver = d->manager.driver(d->connData.driverName);
+        Driver *driver = d->manager.driver(d->connData.driverName);
         if (!driver || d->manager.error()) {
             setError(&d->manager);
             return false;

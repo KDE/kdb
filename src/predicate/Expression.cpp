@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -33,27 +33,27 @@
 
 PREDICATE_EXPORT QString Predicate::exprClassName(int c)
 {
-    if (c == KexiDBExpr_Unary)
+    if (c == PredicateExpr_Unary)
         return "Unary";
-    else if (c == KexiDBExpr_Arithm)
+    else if (c == PredicateExpr_Arithm)
         return "Arithm";
-    else if (c == KexiDBExpr_Logical)
+    else if (c == PredicateExpr_Logical)
         return "Logical";
-    else if (c == KexiDBExpr_Relational)
+    else if (c == PredicateExpr_Relational)
         return "Relational";
-    else if (c == KexiDBExpr_SpecialBinary)
+    else if (c == PredicateExpr_SpecialBinary)
         return "SpecialBinary";
-    else if (c == KexiDBExpr_Const)
+    else if (c == PredicateExpr_Const)
         return "Const";
-    else if (c == KexiDBExpr_Variable)
+    else if (c == PredicateExpr_Variable)
         return "Variable";
-    else if (c == KexiDBExpr_Function)
+    else if (c == PredicateExpr_Function)
         return "Function";
-    else if (c == KexiDBExpr_Aggregation)
+    else if (c == PredicateExpr_Aggregation)
         return "Aggregation";
-    else if (c == KexiDBExpr_TableList)
+    else if (c == PredicateExpr_TableList)
         return "TableList";
-    else if (c == KexiDBExpr_QueryParameter)
+    else if (c == PredicateExpr_QueryParameter)
         return "QueryParameter";
 
     return "Unknown";
@@ -64,7 +64,7 @@ using namespace Predicate;
 //=========================================
 
 BaseExpr::BaseExpr(int token)
-        : m_cl(KexiDBExpr_Unknown)
+        : m_cl(PredicateExpr_Unknown)
         , m_par(0)
         , m_token(token)
 {
@@ -74,14 +74,20 @@ BaseExpr::~BaseExpr()
 {
 }
 
-Field::Type BaseExpr::type()
+Field::Type BaseExpr::type() const
 {
     return Field::InvalidType;
 }
 
-QString BaseExpr::debugString()
+QString BaseExpr::debugString() const
 {
     return QString("BaseExpr(%1,type=%1)").arg(m_token).arg(Driver::defaultSQLTypeName(type()));
+}
+
+//! Sends information about expression  @a expr to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const BaseExpr& expr)
+{
+    dbg.nospace() << expr.debugString();
 }
 
 bool BaseExpr::validate(ParseInfo& /*parseInfo*/)
@@ -103,7 +109,7 @@ QString BaseExpr::tokenToDebugString(int token)
     return QString(safe_tname(token));
 }
 
-QString BaseExpr::tokenToString()
+QString BaseExpr::tokenToString() const
 {
     if (m_token < 255 && isprint(m_token))
         return tokenToDebugString();
@@ -165,7 +171,7 @@ NArgExpr* NArgExpr::copy() const
     return new NArgExpr(*this);
 }
 
-QString NArgExpr::debugString()
+QString NArgExpr::debugString() const
 {
     QString s = QString("NArgExpr(")
                 + "class=" + exprClassName(m_cl);
@@ -177,7 +183,7 @@ QString NArgExpr::debugString()
     return s;
 }
 
-QString NArgExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString NArgExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     QString s;
     s.reserve(256);
@@ -235,7 +241,7 @@ UnaryExpr::UnaryExpr(int token, BaseExpr *arg)
         : BaseExpr(token)
         , m_arg(arg)
 {
-    m_cl = KexiDBExpr_Unary;
+    m_cl = PredicateExpr_Unary;
     if (m_arg)
         m_arg->setParent(this);
 }
@@ -258,7 +264,7 @@ UnaryExpr* UnaryExpr::copy() const
     return new UnaryExpr(*this);
 }
 
-QString UnaryExpr::debugString()
+QString UnaryExpr::debugString() const
 {
     return "UnaryExpr('"
            + tokenToDebugString() + "', "
@@ -266,7 +272,7 @@ QString UnaryExpr::debugString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     if (m_token == '(') //parentheses (special case)
         return "(" + (m_arg ? m_arg->toString(params) : "<NULL>") + ")";
@@ -287,7 +293,7 @@ void UnaryExpr::getQueryParameters(QuerySchemaParameterList& params)
         m_arg->getQueryParameters(params);
 }
 
-Field::Type UnaryExpr::type()
+Field::Type UnaryExpr::type() const
 {
     //NULL IS NOT NULL : BOOLEAN
     //NULL IS NULL : BOOLEAN
@@ -397,7 +403,7 @@ bool BinaryExpr::validate(ParseInfo& parseInfo)
     return true;
 }
 
-Field::Type BinaryExpr::type()
+Field::Type BinaryExpr::type() const
 {
     const Field::Type lt = m_larg->type(), rt = m_rarg->type();
     if (lt == Field::InvalidType || rt == Field::InvalidType)
@@ -427,7 +433,7 @@ Field::Type BinaryExpr::type()
     return Field::Boolean;
 }
 
-QString BinaryExpr::debugString()
+QString BinaryExpr::debugString() const
 {
     return QString("BinaryExpr(")
            + "class=" + exprClassName(m_cl)
@@ -437,7 +443,7 @@ QString BinaryExpr::debugString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString BinaryExpr::tokenToString()
+QString BinaryExpr::tokenToString() const
 {
     if (m_token < 255 && isprint(m_token))
         return tokenToDebugString();
@@ -467,7 +473,7 @@ QString BinaryExpr::tokenToString()
     return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(m_token);
 }
 
-QString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
 #define INFIX(a) \
     (m_larg ? m_larg->toString(params) : "<NULL>") + " " + a + " " + (m_rarg ? m_rarg->toString(params) : "<NULL>")
@@ -487,7 +493,7 @@ ConstExpr::ConstExpr(int token, const QVariant& val)
         : BaseExpr(token)
         , value(val)
 {
-    m_cl = KexiDBExpr_Const;
+    m_cl = PredicateExpr_Const;
 }
 
 ConstExpr::ConstExpr(const ConstExpr& expr)
@@ -505,7 +511,7 @@ ConstExpr* ConstExpr::copy() const
     return new ConstExpr(*this);
 }
 
-Field::Type ConstExpr::type()
+Field::Type ConstExpr::type() const
 {
     if (m_token == SQL_NULL)
         return Field::Null;
@@ -539,13 +545,13 @@ Field::Type ConstExpr::type()
     return Field::InvalidType;
 }
 
-QString ConstExpr::debugString()
+QString ConstExpr::debugString() const
 {
-    return QString("ConstExpr('") + tokenToDebugString() + "'," + toString()
+    return QLatin1String("ConstExpr('") + tokenToDebugString() + "'," + toString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString ConstExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString ConstExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
     if (m_token == SQL_NULL)
@@ -584,7 +590,7 @@ QueryParameterExpr::QueryParameterExpr(const QString& message)
         : ConstExpr(QUERY_PARAMETER, message)
         , m_type(Field::Text)
 {
-    m_cl = KexiDBExpr_QueryParameter;
+    m_cl = PredicateExpr_QueryParameter;
 }
 
 QueryParameterExpr::QueryParameterExpr(const QueryParameterExpr& expr)
@@ -602,7 +608,7 @@ QueryParameterExpr* QueryParameterExpr::copy() const
     return new QueryParameterExpr(*this);
 }
 
-Field::Type QueryParameterExpr::type()
+Field::Type QueryParameterExpr::type() const
 {
     return m_type;
 }
@@ -612,13 +618,13 @@ void QueryParameterExpr::setType(Field::Type type)
     m_type = type;
 }
 
-QString QueryParameterExpr::debugString()
+QString QueryParameterExpr::debugString() const
 {
     return QString("QueryParameterExpr('") + QString::fromLatin1("[%2]").arg(value.toString())
            + QString("',type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString QueryParameterExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString QueryParameterExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     return params ? params->getPreviousValueAsString(type()) : QString::fromLatin1("[%2]").arg(value.toString());
 }
@@ -645,7 +651,7 @@ VariableExpr::VariableExpr(const QString& _name)
         , tablePositionForField(-1)
         , tableForQueryAsterisk(0)
 {
-    m_cl = KexiDBExpr_Variable;
+    m_cl = PredicateExpr_Variable;
 }
 
 VariableExpr::VariableExpr(const VariableExpr& expr)
@@ -666,13 +672,13 @@ VariableExpr* VariableExpr::copy() const
     return new VariableExpr(*this);
 }
 
-QString VariableExpr::debugString()
+QString VariableExpr::debugString() const
 {
     return QString("VariableExpr(") + name
            + QString(",type=%1)").arg(field ? Driver::defaultSQLTypeName(type()) : QString("FIELD NOT DEFINED YET"));
 }
 
-QString VariableExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString VariableExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
     return name;
@@ -684,7 +690,7 @@ void VariableExpr::getQueryParameters(QuerySchemaParameterList& params)
 }
 
 //! We're assuming it's called after VariableExpr::validate()
-Field::Type VariableExpr::type()
+Field::Type VariableExpr::type() const
 {
     if (field)
         return field->type();
@@ -859,9 +865,9 @@ FunctionExpr::FunctionExpr(const QString& _name, NArgExpr* args_)
         , args(args_)
 {
     if (isBuiltInAggregate(name.toLatin1()))
-        m_cl = KexiDBExpr_Aggregation;
+        m_cl = PredicateExpr_Aggregation;
     else
-        m_cl = KexiDBExpr_Function;
+        m_cl = PredicateExpr_Function;
     if (args)
         args->setParent(this);
 }
@@ -885,7 +891,7 @@ FunctionExpr* FunctionExpr::copy() const
     return new FunctionExpr(*this);
 }
 
-QString FunctionExpr::debugString()
+QString FunctionExpr::debugString() const
 {
     QString res;
     res.append(QString("FunctionExpr(") + name);
@@ -895,7 +901,7 @@ QString FunctionExpr::debugString()
     return res;
 }
 
-QString FunctionExpr::toString(QuerySchemaParameterValueListIterator* params)
+QString FunctionExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     return name + "(" + (args ? args->toString(params) : QString()) + ")";
 }
@@ -905,7 +911,7 @@ void FunctionExpr::getQueryParameters(QuerySchemaParameterList& params)
     args->getQueryParameters(params);
 }
 
-Field::Type FunctionExpr::type()
+Field::Type FunctionExpr::type() const
 {
     //TODO
     return Field::InvalidType;

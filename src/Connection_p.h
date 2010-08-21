@@ -20,7 +20,7 @@
 #ifndef PREDICATE_CONNECTION_P_H
 #define PREDICATE_CONNECTION_P_H
 
-#include "Connection.h"
+#include <Predicate/Connection.h>
 
 namespace Predicate
 {

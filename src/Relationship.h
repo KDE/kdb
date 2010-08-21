@@ -20,7 +20,7 @@
 #ifndef PREDICATE_RELATIONSHIP_H
 #define PREDICATE_RELATIONSHIP_H
 
-#include "Field.h"
+#include <Predicate/Field.h>
 
 namespace Predicate
 {

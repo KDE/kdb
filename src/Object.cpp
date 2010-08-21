@@ -1,193 +1,54 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
-   This program is free software; you can redistribute it and/or
+   This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
    License as published by the Free Software Foundation; either
    version 2 of the License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program; see the file COPYING.  If not, write to
+   along with this library; see the file COPYING.LIB.  If not, write to
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
 #include "Object.h"
-#include "Error.h"
-#include "MessageHandler.h"
-
+#include "Connection.h"
 
 #include <QtDebug>
 
 using namespace Predicate;
 
-#define ERRMSG(a) \
-    { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
-
-Object::Object(MessageHandler* handler)
-        : m_previousServerResultNum(0)
-        , m_previousServerResultNum2(0)
-        , m_msgHandler(handler)
-        , d(0) //empty
+Object::Object(int type)
+    : d(new Data)
 {
-    clearError();
+    d->type = type;
 }
 
 Object::~Object()
 {
 }
 
-#define STORE_PREV_ERR \
-    m_previousServerResultNum = m_previousServerResultNum2; \
-    m_previousServerResultName = m_previousServerResultName2; \
-    m_previousServerResultNum2 = serverResult(); \
-    m_previousServerResultName2 = serverResultName(); \
-    PreDbg << "Object ERROR: " << m_previousServerResultNum2 << ": " \
-        << m_previousServerResultName2
-
-void Object::setError(int code, const QString &msg)
+void Object::clear()
 {
-    STORE_PREV_ERR;
-
-    m_errno = code;
-    m_errorSql = m_sql;
-    if (m_errno == ERR_OTHER && msg.isEmpty())
-        m_errMsg = QObject::tr("Unspecified error encountered");
-    else
-        m_errMsg = msg;
-    m_hasError = code != ERR_NONE;
-
-    if (m_hasError)
-        ERRMSG(this);
+    const int type = d->type;
+    d = new Data;
+    d->type = type;
 }
 
-void Object::setError(const QString &msg)
+QDebug operator<<(QDebug dbg, const Object& object)
 {
-    setError(ERR_OTHER, msg);
-}
-
-void Object::setError(const QString& title, const QString &msg)
-{
-    STORE_PREV_ERR;
-
-    m_errno = ERR_OTHER;
-    QString origMsgTitle(m_msgTitle);   //store
-
-    m_msgTitle += title;
-    m_errMsg = msg;
-    m_errorSql = m_sql;
-    m_hasError = true;
-    if (m_hasError)
-        ERRMSG(this);
-
-    m_msgTitle = origMsgTitle; //revert
-}
-
-void Object::setError(Predicate::Object *obj, const QString& prependMessage)
-{
-    setError(obj, obj ? obj->errorNum() : ERR_OTHER, prependMessage);
-}
-
-void Object::setError(Predicate::Object *obj, int code, const QString& prependMessage)
-{
-    if (obj && (obj->errorNum() != 0 || !obj->serverErrorMsg().isEmpty())) {
-        STORE_PREV_ERR;
-
-        m_errno = obj->errorNum();
-        m_hasError = obj->error();
-        if (m_errno == 0) {
-            m_errno = code;
-            m_hasError = true;
-        }
-        m_errMsg = (prependMessage.isEmpty() ? QString() : (prependMessage + " "))
-                   + obj->errorMsg();
-        m_sql = obj->m_sql;
-        m_errorSql = obj->m_errorSql;
-        m_serverResult = obj->serverResult();
-        if (m_serverResult == 0) //try copied
-            m_serverResult = obj->m_serverResult;
-        m_serverResultName = obj->serverResultName();
-        if (m_serverResultName.isEmpty()) //try copied
-            m_serverResultName = obj->m_serverResultName;
-        m_serverErrorMsg = obj->serverErrorMsg();
-        if (m_serverErrorMsg.isEmpty()) //try copied
-            m_serverErrorMsg = obj->m_serverErrorMsg;
-        //override
-        if (code != 0 && code != ERR_OTHER)
-            m_errno = code;
-        if (m_hasError)
-            ERRMSG(this);
-    } else {
-        setError(code != 0 ? code : ERR_OTHER, prependMessage);
+    dbg.nospace() << "Predicate::Object:";
+    QString desc = object.description();
+    if (desc.length() > 120) {
+        desc.truncate(120);
+        desc += "...";
     }
-}
-
-void Object::clearError()
-{
-    m_errno = 0;
-    m_hasError = false;
-    m_errMsg.clear();
-    m_sql.clear();
-    m_errorSql.clear();
-    m_serverResult = 0;
-    m_serverResultName.clear();
-    m_serverErrorMsg.clear();
-    drv_clearServerResult();
-}
-
-QString Object::serverErrorMsg()
-{
-    return m_serverErrorMsg;
-}
-
-int Object::serverResult()
-{
-    return m_serverResult;
-}
-
-QString Object::serverResultName()
-{
-    return m_serverResultName;
-}
-
-void Object::debugError()
-{
-    if (error()) {
-        PreDbg << "PREDICATE ERROR: " << errorMsg();
-        QString s = serverErrorMsg(), sn = serverResultName();
-        if (!s.isEmpty())
-            PreDbg << "PREDICATE SERVER ERRMSG: " << s;
-        if (!sn.isEmpty())
-            PreDbg << "PREDICATE SERVER RESULT NAME: " << sn;
-        if (serverResult() != 0)
-            PreDbg << "PREDICATE SERVER RESULT #: " << serverResult();
-    } else
-        PreDbg << "PREDICATE OK.";
-}
-
-MessageHandler::ButtonCode Object::askQuestion(
-    MessageHandler::QuestionType messageType,
-    const QString& message,
-    const QString &caption,
-    MessageHandler::ButtonCode defaultResult,
-    const GuiItem &buttonYes,
-    const GuiItem &buttonNo,
-    const QString &dontShowAskAgainName,
-    MessageHandler::Options options,
-    MessageHandler* msgHandler)
-{
-    if (msgHandler)
-        return msgHandler->askQuestion(messageType, message, caption, defaultResult, buttonYes, buttonNo,
-                                       dontShowAskAgainName, options);
-
-    if (m_msgHandler)
-        return m_msgHandler->askQuestion(messageType, message, caption, defaultResult, buttonYes, buttonNo,
-                                         dontShowAskAgainName, options);
-
-    return defaultResult;
+    dbg.space() << "ID=" << object.id() << "NAME=" << object.name() << "CAPTION=" << object.caption() << "DESC=" << desc;
+    return dbg.space();
 }

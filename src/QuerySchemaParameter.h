@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,7 +20,8 @@
 #ifndef PREDICATE_QUERYSCHEMAPARAMETER_H
 #define PREDICATE_QUERYSCHEMAPARAMETER_H
 
-#include "QuerySchema.h"
+#include <Predicate/QuerySchema.h>
+#include <QtDebug>
 
 namespace Predicate
 {
@@ -32,8 +33,6 @@ public:
     QuerySchemaParameter();
     ~QuerySchemaParameter();
 
-    QString debugString() const;
-
     Field::Type type; //!< A datatype of the parameter
     QString message; //!< A user-visible message that will be displayed to ask for value of the parameter
 };
@@ -41,17 +40,13 @@ public:
 typedef QList<QuerySchemaParameter>::Iterator QuerySchemaParameterListIterator;
 typedef QList<QuerySchemaParameter>::ConstIterator QuerySchemaParameterListConstIterator;
 
-//! Shows debug information for \a list
-PREDICATE_EXPORT void debug(const QuerySchemaParameterList& list);
-
 //! @short An iteratof for a list of values of query schema parameters providing
 //! Allows to iterate over parameters and return QVariant value or well-formatted string.
 //! The iterator is initially set to the last item because of the parser requirements
 class PREDICATE_EXPORT QuerySchemaParameterValueListIterator
 {
 public:
-    QuerySchemaParameterValueListIterator(
-        Driver& driver, const QList<QVariant>& params);
+    QuerySchemaParameterValueListIterator(Driver* driver, const QList<QVariant>& params);
     ~QuerySchemaParameterValueListIterator();
 
     //! \return previous value
@@ -65,5 +60,11 @@ protected:
 };
 
 } //namespace Predicate
+
+//! Sends information about query schema parameter @a parameter to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::QuerySchemaParameter& parameter);
+
+//! Sends information about query schema parameter list @a list to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::QuerySchemaParameterList& list);
 
 #endif

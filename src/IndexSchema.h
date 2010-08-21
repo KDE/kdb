@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,10 +23,11 @@
 #include <QList>
 #include <QString>
 #include <QSet>
+#include <QtDebug>
 
-#include "FieldList.h"
-#include "SchemaData.h"
-#include "Relationship.h"
+#include <Predicate/Object.h>
+#include <Predicate/FieldList.h>
+#include <Predicate/Relationship.h>
 
 namespace Predicate
 {
@@ -42,7 +43,7 @@ class Relationship;
   defines this index and additional properties like: whether index is unique
   or primary key (requires unique). Single-field index can be also auto generated.
 */
-class PREDICATE_EXPORT IndexSchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT IndexSchema : public FieldList, public Object
 {
 public:
     typedef QList<IndexSchema*> List;
@@ -156,10 +157,11 @@ public:
      is the requirement for PRIMARY KEYS. */
     void setUnique(bool set);
 
-    /*! \return String for debugging purposes. */
-    virtual QString debugString();
-protected:
+    /*! @return true if the index defines a foreign key,
+     Created implicity for Relationship object.*/
+    bool isForeignKey() const;
 
+protected:
     /*! Internal constructor for convenience.
      Constructs a new index schema object
      that is assigned, and adds one \a field to it.
@@ -210,5 +212,8 @@ protected:
 };
 
 } //namespace Predicate
+
+//! Sends information about index schema @a index to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::IndexSchema& index);
 
 #endif

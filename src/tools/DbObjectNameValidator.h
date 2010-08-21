@@ -38,13 +38,13 @@ public:
     /*! \a drv is a Predicate driver on which isSystemObjectName() will be
      called inside check(). If \a drv is 0, Predicate::Driver::isPredicateSystemObjectName()
      static function is called instead. */
-    ObjectNameValidator(Predicate::Driver *drv, QObject * parent = 0);
+    ObjectNameValidator(Driver *drv, QObject * parent = 0);
     virtual ~ObjectNameValidator();
 
 protected:
     virtual Utils::Validator::Result internalCheck(const QString &valueName, const QVariant& v,
             QString &message, QString &details);
-    QPointer<Predicate::Driver> m_drv;
+    Driver* m_drv;
 };
 }
 

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003, 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003, 2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,19 +17,19 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_ROWEDITBUFFER_H
-#define PREDICATE_ROWEDITBUFFER_H
+#ifndef PREDICATE_RECORDEDITBUFFER_H
+#define PREDICATE_RECORDEDITBUFFER_H
 
-#include <qmap.h>
+#include <QMap>
 
-#include "Field.h"
-#include "QuerySchema.h"
+#include <Predicate/Field.h>
+#include <Predicate/QuerySchema.h>
 
 namespace Predicate
 {
 
-/*!  @short provides data for single edited database row
-  Predicate::RowEditBuffer provides data for single edited row,
+/*!  @short provides data for single edited database record
+  Predicate::RecordEditBuffer provides data for single edited record,
   needed to perform update at the database backend.
   Its advantage over pasing e.g. Predicate::FieldList object is that
   EditBuffer contains only changed values.
@@ -48,7 +48,7 @@ namespace Predicate
   buf.at("surname"); //returns "Black"
   buf.at(query->field("surname")); //returns "Black" too
   // Now you can use buf to add or edit records using
-  // Predicate::Connection::updateRow(), Predicate::Connection::insertRow()
+  // Predicate::Connection::updateRecord(), Predicate::Connection::insertRecord()
   </code>
 
   Example usage of db-aware buffer:
@@ -62,7 +62,7 @@ namespace Predicate
   buf.at(*ci1); //returns "Joe"
   buf.at(*ci2); //returns "Black"
   // Now you can use buf to add or edit records using
-  // Predicate::Connection::updateRow(), Predicate::Connection::insertRow()
+  // Predicate::Connection::updateRecord(), Predicate::Connection::insertRecord()
   </code>
 
   You can use QMap::clear() to clear buffer contents,
@@ -72,14 +72,14 @@ namespace Predicate
   Notes: added fields should come from the same (common) QuerySchema object.
   However, this isn't checked at QValue& EditBuffer::operator[]( const Field& f ) level.
 */
-class PREDICATE_EXPORT RowEditBuffer
+class PREDICATE_EXPORT RecordEditBuffer
 {
 public:
     typedef QMap<QString, QVariant> SimpleMap;
     typedef QMap<QueryColumnInfo*, QVariant> DBMap;
 
-    RowEditBuffer(bool dbAwareBuffer);
-    ~RowEditBuffer();
+    RecordEditBuffer(bool dbAwareBuffer);
+    ~RecordEditBuffer();
 
     inline bool isDBAware() const {
         return m_dbBuffer != 0;

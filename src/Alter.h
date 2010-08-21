@@ -20,7 +20,7 @@
 #ifndef PREDICATE_ALTER_H
 #define PREDICATE_ALTER_H
 
-#include "Connection.h"
+#include <Predicate/Connection.h>
 
 #include <QList>
 #include <QHash>
@@ -108,7 +108,7 @@ class Connection;
 
  Actions for Alter
 */
-class PREDICATE_EXPORT AlterTableHandler : public Object
+class PREDICATE_EXPORT AlterTableHandler : public Resultable
 {
 public:
     class ChangeFieldPropertyAction;
@@ -225,14 +225,14 @@ public:
             Q_UNUSED(fieldActions); return false;
         }
 
-        virtual tristate updateTableSchema(TableSchema &table, Field* field,
-                                           QHash<QString, QString>& fieldHash) {
+        virtual tristate updateTableSchema(TableSchema* table, Field* field,
+                                           QHash<QString, QString>* fieldHash) {
             Q_UNUSED(table); Q_UNUSED(field); Q_UNUSED(fieldHash); return true;
         }
 
     private:
         //! Performs physical execution of this action.
-        virtual tristate execute(Connection& /*conn*/, TableSchema& /*table*/) {
+        virtual tristate execute(Connection* /*conn*/, TableSchema* /*table*/) {
             return true;
         }
 
@@ -315,14 +315,14 @@ public:
 
         virtual bool shouldBeRemoved(ActionDictDict &fieldActions);
 
-        virtual tristate updateTableSchema(TableSchema &table, Field* field,
-                                           QHash<QString, QString>& fieldHash);
+        virtual tristate updateTableSchema(TableSchema* table, Field* field,
+                                           QHash<QString, QString>* fieldHash);
 
     protected:
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
-        virtual tristate execute(Connection &conn, TableSchema &table);
+        virtual tristate execute(Connection* conn, TableSchema* table);
 
         QString m_propertyName;
         QVariant m_newValue;
@@ -340,14 +340,14 @@ public:
 
         virtual void simplifyActions(ActionDictDict &fieldActions);
 
-        virtual tristate updateTableSchema(TableSchema &table, Field* field,
-                                           QHash<QString, QString>& fieldHash);
+        virtual tristate updateTableSchema(TableSchema* table, Field* field,
+                                           QHash<QString, QString>* fieldHash);
 
     protected:
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
-        virtual tristate execute(Connection &conn, TableSchema &table);
+        virtual tristate execute(Connection* conn, TableSchema* table);
     };
 
     //! Defines an action for inserting a single table field.
@@ -374,14 +374,14 @@ public:
 
         virtual void simplifyActions(ActionDictDict &fieldActions);
 
-        virtual tristate updateTableSchema(TableSchema &table, Field* field,
-                                           QHash<QString, QString>& fieldHash);
+        virtual tristate updateTableSchema(TableSchema* table, Field* field,
+                                           QHash<QString, QString>* fieldHash);
 
     protected:
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
-        virtual tristate execute(Connection &conn, TableSchema &table);
+        virtual tristate execute(Connection* conn, TableSchema* table);
 
         int m_index;
 
@@ -409,12 +409,12 @@ public:
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
-        virtual tristate execute(Connection &conn, TableSchema &table);
+        virtual tristate execute(Connection* conn, TableSchema* table);
 
         int m_index;
     };
 
-    AlterTableHandler(Connection &conn);
+    AlterTableHandler(Connection* conn);
 
     virtual ~AlterTableHandler();
 
@@ -481,7 +481,7 @@ public:
      \return the new table schema object created as a result of schema altering.
      The old table is returned if recreating table schema was not necessary or args.simulate is true.
      0 is returned if args.result is not true. */
-    TableSchema* execute(const QString& tableName, ExecutionArguments & args);
+    TableSchema* execute(const QString& tableName, ExecutionArguments* args);
 
     //! Displays debug information about all actions collected by the handler.
     void debug();

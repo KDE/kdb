@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,9 +19,9 @@
 
 #include "QuerySchemaParameter.h"
 #include "Driver.h"
+#include "DriverManager_p.h"
 
-#include <QtDebug>
-#include <qpointer.h>
+#include <QWeakPointer>
 
 using namespace Predicate;
 
@@ -34,17 +34,19 @@ QuerySchemaParameter::~QuerySchemaParameter()
 {
 }
 
-QString QuerySchemaParameter::debugString() const
+QDebug operator<<(QDebug dbg, const QuerySchemaParameter& parameter)
 {
-    return QString("msg=\"%1\" type=\"%2\"").arg(Field::typeName(type)).arg(message);
+    dbg.nospace() << "MESSAGE=" << parameter.message << "TYPE=" << Field::typeName(parameter.type);
+    return dbg.space();
 }
 
-void Predicate::debug(const QuerySchemaParameterList& list)
+QDebug operator<<(QDebug dbg, const QuerySchemaParameterList& list)
 {
-    PreDbg << QString("Query parameters (%1):").arg(list.count());
+    dbg.nospace() << QString::fromLatin1("QUERY PARAMETERS (%1):").arg(list.count());
     foreach(const QuerySchemaParameter& parameter, list) {
-        PreDbg << " - " << parameter.debugString();
+        dbg.nospace() << " - " << parameter;
     }
+    return dbg.space();
 }
 
 //================================================
@@ -52,22 +54,23 @@ void Predicate::debug(const QuerySchemaParameterList& list)
 class QuerySchemaParameterValueListIterator::Private
 {
 public:
-    Private(Driver& aDriver, const QList<QVariant>& aParams)
-            : driver(&aDriver)
-            , params(aParams) {
+    Private(Driver* driver, const QList<QVariant>& aParams)
+            : driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
+            , params(aParams)
+    {
         //move to last item, as the order is reversed due to parser's internals
         paramsIt = params.constEnd(); //fromLast();
         --paramsIt;
         paramsItPosition = params.count();
     }
-    QPointer<Driver> driver;
+    QWeakPointer<Driver> driverWeakPointer;
     const QList<QVariant> params;
     QList<QVariant>::ConstIterator paramsIt;
     uint paramsItPosition;
 };
 
 QuerySchemaParameterValueListIterator::QuerySchemaParameterValueListIterator(
-    Driver& driver, const QList<QVariant>& params)
+    Driver* driver, const QList<QVariant>& params)
         : d(new Private(driver, params))
 {
 }
@@ -94,9 +97,9 @@ QString QuerySchemaParameterValueListIterator::getPreviousValueAsString(Field::T
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
         PreWarn << "no prev value";
-        return d->driver->valueToSQL(type, QVariant()); //"NULL"
+        return d->driverWeakPointer.toStrongRef()->valueToSQL(type, QVariant()); //"NULL"
     }
-    QString res(d->driver->valueToSQL(type, *d->paramsIt));
+    QString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));
     --d->paramsItPosition;
     --d->paramsIt;
 // ++d->paramsIt;

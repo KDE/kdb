@@ -234,7 +234,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
     }
 
     VariableExpr *v_e = columnExpr->toVariable();
-    if (columnExpr->exprClass() == KexiDBExpr_Variable && v_e) {
+    if (columnExpr->exprClass() == PredicateExpr_Variable && v_e) {
         //it's a variable:
         if (v_e->name == "*") {//all tables asterisk
             if (parseInfo.querySchema->tables()->isEmpty()) {
@@ -399,7 +399,7 @@ QuerySchema* buildSelectQuery(
     ParseInfo parseInfo(querySchema);
 
     //-------tables list
-// assert( tablesList ); //&& tablesList->exprClass() == KexiDBExpr_TableList );
+// assert( tablesList ); //&& tablesList->exprClass() == PredicateExpr_TableList );
 
     uint columnNum = 0;
     /*TODO: use this later if there are columns that use database fields,
@@ -412,11 +412,11 @@ QuerySchema* buildSelectQuery(
             BaseExpr *e = tablesList->arg(i);
             VariableExpr* t_e = 0;
             QString aliasString;
-            if (e->exprClass() == KexiDBExpr_SpecialBinary) {
+            if (e->exprClass() == PredicateExpr_SpecialBinary) {
                 BinaryExpr* t_with_alias = e->toBinary();
                 assert(t_with_alias);
-                assert(t_with_alias->left()->exprClass() == KexiDBExpr_Variable);
-                assert(t_with_alias->right()->exprClass() == KexiDBExpr_Variable
+                assert(t_with_alias->left()->exprClass() == PredicateExpr_Variable);
+                assert(t_with_alias->right()->exprClass() == PredicateExpr_Variable
                        && (t_with_alias->token() == AS || t_with_alias->token() == 0));
                 t_e = t_with_alias->left()->toVariable();
                 aliasString = t_with_alias->right()->toVariable()->name.toLatin1();
@@ -481,9 +481,9 @@ QuerySchema* buildSelectQuery(
 //Qt4   bool moveNext = true; //used to avoid ++it when an item is taken from the list
             BaseExpr *columnExpr = e;
             VariableExpr* aliasVariable = 0;
-            if (e->exprClass() == KexiDBExpr_SpecialBinary && e->toBinary()
+            if (e->exprClass() == PredicateExpr_SpecialBinary && e->toBinary()
                     && (e->token() == AS || e->token() == 0)) {
-                //KexiDBExpr_SpecialBinary: with alias
+                //PredicateExpr_SpecialBinary: with alias
                 columnExpr = e->toBinary()->left();
                 //   isFieldWithAlias = true;
                 aliasVariable = e->toBinary()->right()->toVariable();
@@ -496,16 +496,16 @@ QuerySchema* buildSelectQuery(
 
             const int c = columnExpr->exprClass();
             const bool isExpressionField =
-                c == KexiDBExpr_Const
-                || c == KexiDBExpr_Unary
-                || c == KexiDBExpr_Arithm
-                || c == KexiDBExpr_Logical
-                || c == KexiDBExpr_Relational
-                || c == KexiDBExpr_Const
-                || c == KexiDBExpr_Function
-                || c == KexiDBExpr_Aggregation;
+                c == PredicateExpr_Const
+                || c == PredicateExpr_Unary
+                || c == PredicateExpr_Arithm
+                || c == PredicateExpr_Logical
+                || c == PredicateExpr_Relational
+                || c == PredicateExpr_Const
+                || c == PredicateExpr_Function
+                || c == PredicateExpr_Aggregation;
 
-            if (c == KexiDBExpr_Variable) {
+            if (c == PredicateExpr_Variable) {
                 //just a variable, do nothing, addColumn() will handle this
             } else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
@@ -529,7 +529,7 @@ QuerySchema* buildSelectQuery(
 //     << columnNum;
                 querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
             }
-            /*  if (e->exprClass() == KexiDBExpr_SpecialBinary && dynamic_cast<BinaryExpr*>(e)
+            /*  if (e->exprClass() == PredicateExpr_SpecialBinary && dynamic_cast<BinaryExpr*>(e)
                   && (e->type()==AS || e->type()==0))
                 {
                   //also add alias

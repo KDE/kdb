@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,96 +20,39 @@
 #include "ConnectionData.h"
 #include "DriverManager.h"
 
-#include <qfileinfo.h>
-#include <qdir.h>
-
-
+#include <QFileInfo>
+#include <QDir>
 
 using namespace Predicate;
 
-namespace Predicate
-{
-//! @internal
-class ConnectionData::Private
-{
-public:
-    Private() {
-        dummy = false;
-    }
-    ~Private() {}
-    bool dummy;
-};
-}
-
-/*================================================================*/
-
-ConnectionDataBase::ConnectionDataBase()
-        : id(-1), port(0), useLocalSocketFile(true), savePassword(false)
-{
-}
-
-/*================================================================*/
-
-ConnectionData::ConnectionData()
-        : QObject()
-        , ConnectionDataBase()
-        , formatVersion(0)
-        , priv(new ConnectionData::Private())
-{
-}
-
-ConnectionData::ConnectionData(const ConnectionData& cd)
-        : QObject()
-        , ConnectionDataBase()
-        , priv(new ConnectionData::Private())
-{
-    static_cast<ConnectionData&>(*this) = static_cast<const ConnectionData&>(cd);//copy data members
-}
-
 ConnectionData::~ConnectionData()
 {
-    delete priv;
-    priv = 0;
 }
 
-ConnectionData& ConnectionData::operator=(const ConnectionData & cd)
+void ConnectionData::setFileName(const QString& fileName)
 {
-    if (this != &cd) {
-        delete priv; //this is old
-        static_cast<ConnectionDataBase&>(*this) = static_cast<const ConnectionDataBase&>(cd);//copy data members
-        priv = new ConnectionData::Private();
-        *priv = *cd.priv;
-    }
-    return *this;
-}
-
-void ConnectionData::setFileName(const QString& fn)
-{
-    QFileInfo file(fn);
-    if (!fn.isEmpty() && m_fileName != file.absoluteFilePath()) {
-        m_fileName = QDir::convertSeparators(file.absoluteFilePath());
-        m_dbPath = QDir::convertSeparators(file.absolutePath());
-        m_dbFileName = file.fileName();
+    QFileInfo file(fileName);
+    if (!fileName.isEmpty() && d->fileName != file.absoluteFilePath()) {
+        d->fileName = QDir::convertSeparators(file.absoluteFilePath());
+        d->databasePath = QDir::convertSeparators(file.absolutePath());
+        d->databaseFileName = file.fileName();
     }
 }
 
-QString ConnectionData::serverInfoString(bool addUser) const
+QString ConnectionData::serverInfoString(ServerInfoStringOptions options) const
 {
-    const QString& i18nFile = tr("file");
+    if (!d->databaseFileName.isEmpty())
+        return QObject::tr("file: %1")
+               .arg(d->databasePath.isEmpty() ? QString() : d->databasePath + QDir::separator() + d->databaseFileName);
 
-    if (!m_dbFileName.isEmpty())
-        return i18nFile + ": " + (m_dbPath.isEmpty() ? QString() : m_dbPath
-                                  + QDir::separator()) + m_dbFileName;
-
-    DriverManager man;
-    if (!driverName.isEmpty()) {
-        const Driver::Info info = man.driverInfo(driverName);
+    if (!d->driverName.isEmpty()) {
+        DriverManager mananager;
+        const DriverInfo info = mananager.driverInfo(d->driverName);
         if (info.isValid() && info.isFileBased())
-            return QLatin1String("<") + i18nFile + ">";
+            return QObject::tr("<file>");
     }
 
-    return ((userName.isEmpty() || !addUser) ? QString("") : (userName + "@"))
-           + (hostName.isEmpty() ? QLatin1String("localhost") : hostName)
-           + (port != 0 ? (QLatin1String(":") + QString::number(port)) : QString());
+    return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QLatin1String("") : (d->userName + '@'))
+           + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
+           + (d->port != 0 ? (QLatin1String(":") + QString::number(d->port)) : QString());
 }
-

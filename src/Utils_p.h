@@ -24,12 +24,11 @@
 #include <QThread>
 #include <QProgressDialog>
 
-#include "MessageHandler.h"
-#include "ConnectionData.h"
+#include <Predicate/MessageHandler.h>
+#include <Predicate/ConnectionData.h>
 
 namespace Predicate {
 class Driver;
-}
 
 class ConnectionTestDialog;
 
@@ -37,24 +36,23 @@ class ConnectionTestThread : public QThread
 {
     Q_OBJECT
 public:
-    ConnectionTestThread(ConnectionTestDialog *dlg, const Predicate::ConnectionData& connData);
+    ConnectionTestThread(ConnectionTestDialog *dlg, const ConnectionData& connData);
     virtual void run();
 signals:
     void error(const QString& msg, const QString& details);
 protected:
-    void emitError(Predicate::Object* object);
+    void emitError(const Result& result);
 
     ConnectionTestDialog* m_dlg;
-    Predicate::ConnectionData m_connData;
-    Predicate::Driver *m_driver;
+    ConnectionData m_connData;
+    Driver *m_driver;
 };
 
 class ConnectionTestDialog : public QProgressDialog
 {
     Q_OBJECT
 public:
-    ConnectionTestDialog(QWidget* parent,
-                         const Predicate::ConnectionData& data, Predicate::MessageHandler& msgHandler);
+    ConnectionTestDialog(QWidget* parent, const ConnectionData& data, MessageHandler& msgHandler);
     virtual ~ConnectionTestDialog();
 
     int exec();
@@ -68,14 +66,16 @@ protected slots:
 
 protected:
     ConnectionTestThread* m_thread;
-    Predicate::ConnectionData m_connData;
+    ConnectionData m_connData;
     QTimer m_timer;
-    Predicate::MessageHandler* m_msgHandler;
+    MessageHandler* m_msgHandler;
     uint m_elapsedTime;
     bool m_error;
     QString m_msg;
     QString m_details;
     bool m_stopWaiting;
 };
+
+} // namespace Predicate
 
 #endif

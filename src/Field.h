@@ -28,6 +28,7 @@
 #include <QVector>
 #include <QStringList>
 #include <QHash>
+#include <QtDebug>
 
 #include <Predicate/tools/Utils.h>
 #include <Predicate/predicate_export.h>
@@ -601,16 +602,14 @@ public:
         return m_type == Field::Asterisk;
     }
 
-    /*! \return string for debugging purposes. */
-    virtual QString debugString() const;
-
-    /*! Shows debug information about this field. */
-    void debug();
-
     /*! \return Predicate::BaseExpr object if the field value is an
      expression.  Unless the expression is set with setExpression(), it is null.
     */
     inline Predicate::BaseExpr *expression() {
+        return m_expr;
+    }
+
+    inline const Predicate::BaseExpr *expression() const {
         return m_expr;
     }
 
@@ -658,7 +657,7 @@ public:
     typedef QHash<QByteArray, QVariant> CustomPropertiesMap;
 
     //! \return all custom properties
-    inline const CustomPropertiesMap customProperties() const {
+    inline CustomPropertiesMap customProperties() const {
         return m_customProperties ? *m_customProperties : CustomPropertiesMap();
     }
 
@@ -735,5 +734,8 @@ private:
 };
 
 } //namespace Predicate
+
+//! Sends information about field @a field to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Field& field);
 
 #endif

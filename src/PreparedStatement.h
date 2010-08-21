@@ -24,7 +24,7 @@
 #include <QStringList>
 #include <QSharedData>
 
-#include "FieldList.h"
+#include <Predicate/FieldList.h>
 
 namespace Predicate
 {
@@ -51,9 +51,9 @@ class PreparedStatementInterface;
   Following code inserts 10000 records with random numbers and text strings
   obtained elsewhere using getText(i).
   \code
-  bool insertMultiple(Predicate::Connection &conn, Predicate::TableSchema& tableSchema)
+  bool insertMultiple(Predicate::Connection* conn, Predicate::TableSchema* tableSchema)
   {
-    Predicate::PreparedStatement statement = conn.prepareStatement(
+    Predicate::PreparedStatement statement = conn->prepareStatement(
       Predicate::PreparedStatement::Insert, tableSchema);
     for (i=0; i<10000; i++) {
       prepared << rand() << getText(i);
@@ -89,10 +89,10 @@ public:
     class Data : public QSharedData {
     public:
         Data() : type(Invalid), whereFields(0), dirty(true) {}
-        Data(Type _type, PreparedStatementInterface& _iface, FieldList& _fields,
+        Data(Type _type, PreparedStatementInterface* _iface, FieldList* _fields,
              const QStringList& _whereFieldNames)
-            : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
-            , fieldsForArguments(0), whereFields(0), dirty(true), iface(&_iface)
+            : type(_type), fields(*_fields), whereFieldNames(_whereFieldNames)
+            , fieldsForArguments(0), whereFields(0), dirty(true), iface(_iface)
         {}
         ~Data();
         Type type;
@@ -133,9 +133,9 @@ public:
     bool execute( const Arguments& args );
 
 protected:
-    //! Creates a new prepared statement. In your code use 
+    //! Creates a new prepared statement. In your code use
     //! Users call Predicate::Connection:prepareStatement() instead.
-    PreparedStatement(PreparedStatementInterface& iface, Type type, FieldList& fields,
+    PreparedStatement(PreparedStatementInterface* iface, Type type, FieldList* fields,
                       const QStringList& whereFieldNames = QStringList())
         : d( new Data(type, iface, fields, whereFieldNames) )
     {

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -57,64 +57,59 @@ class PREDICATE_EXPORT LookupFieldSchema
 {
 public:
 
-    //! Row source information that can be specified for the lookup field schema
-    class PREDICATE_EXPORT RowSource
+    //! Record source information that can be specified for the lookup field schema
+    class PREDICATE_EXPORT RecordSource
     {
     public:
-        //! Row source type
+        //! Record source type
         enum Type {
             NoType,         //!< used for invalid schema
-            Table,        //!< table as lookup row source
-            Query,        //!< named query as lookup row source
-            SQLStatement, //!< anonymous query as lookup row source
-            ValueList,    //!< a fixed list of values as lookup row source
+            Table,        //!< table as lookup record source
+            Query,        //!< named query as lookup record source
+            SQLStatement, //!< anonymous query as lookup record source
+            ValueList,    //!< a fixed list of values as lookup record source
             FieldList     //!< a list of column names from a table/query will be displayed
         };
 
-        RowSource();
-        RowSource(const RowSource& other);
-        ~RowSource();
+        RecordSource();
+        RecordSource(const RecordSource& other);
+        ~RecordSource();
 
-        /*! @return row source type: table, query, anonymous; in the future it will
+        /*! @return record source type: table, query, anonymous; in the future it will
          be also fixed value list and field list. The latter is basically a list
          of column names of a table/query, "Field List" in MSA. */
         Type type() const;
 
-        /*! Sets row source type to \a type. */
+        /*! Sets record source type to \a type. */
         void setType(Type type);
 
-        /*! @return row source type name. @see setTypeByName() */
+        /*! @return record source type name. @see setTypeByName() */
         QString typeName() const;
 
-        /*! Sets row source type by name using \a typeName. Accepted (cast sensitive)
+        /*! Sets record source type by name using \a typeName. Accepted (cast sensitive)
          names are "table", "query", "sql", "valuelist", "fieldlist".
          For other value NoType type is set. */
         void setTypeByName(const QString& typeName);
 
-        /*! @return a string for row source: table name, query name or anonymous query
-         provided as KEXISQL string. If rowSourceType() is a ValueList,
-         rowSourceValues() should be used instead. If rowSourceType() is a FieldList,
-         rowSource() should return table or query name. */
+        /*! @return a string for record source: table name, query name or anonymous query
+         provided as KEXISQL string. If recordSourceType() is a ValueList,
+         recordSourceValues() should be used instead. If recordSourceType() is a FieldList,
+         recordSource() should return table or query name. */
         QString name() const;
 
-        /*! Sets row source value. @see value() */
+        /*! Sets record source value. @see value() */
         void setName(const QString& name);
 
-        /*! @return row source values specified if type() is ValueList. */
+        /*! @return record source values specified if type() is ValueList. */
         QStringList values() const;
 
-        /*! Sets row source values used if type() is ValueList.
+        /*! Sets record source values used if type() is ValueList.
          Using it clears name (see name()). */
         void setValues(const QStringList& values);
 
-        //! Assigns other to this row source and returns a reference to this row source.
-        RowSource& operator=(const RowSource& other);
+        //! Assigns other to this record source and returns a reference to this record source.
+        RecordSource& operator=(const RecordSource& other);
 
-        /*! \return String for debugging purposes. */
-        QString debugString() const;
-
-        /*! Shows debug information. */
-        void debug() const;
     private:
         class Private;
         Private * const d;
@@ -124,11 +119,11 @@ public:
 
     ~LookupFieldSchema();
 
-    /*! @return row source information for the lookup field schema */
-    RowSource& rowSource() const;
+    /*! @return record source information for the lookup field schema */
+    RecordSource recordSource() const;
 
-    /*! Sets row source for the lookup field schema */
-    void setRowSource(const RowSource& rowSource);
+    /*! Sets record source for the lookup field schema */
+    void setRecordSource(const RecordSource& recordSource);
 
     /*! @return bound column: an integer specifying a column that is bound
      (counted from 0). -1 means unspecified value. */
@@ -199,12 +194,6 @@ public:
     /*! Sets type of widget to display within the forms for this lookup field. @see displayWidget() */
     void setDisplayWidget(DisplayWidget widget);
 
-    /*! \return String for debugging purposes. */
-    QString debugString() const;
-
-    /*! Shows debug information. */
-    void debug() const;
-
     /*! Loads data of lookup column schema from DOM tree.
      The data can be outdated or invalid, so the app should handle such cases.
      @return a new LookupFieldSchema object even if lookupEl contains no valid contents. */
@@ -226,5 +215,11 @@ private:
 };
 
 } //namespace Predicate
+
+//! Sends lookup field schema's record source information @a source to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::LookupFieldSchema::RecordSource& source);
+
+//! Sends lookup field schema information @a lookup to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::LookupFieldSchema& lookup);
 
 #endif

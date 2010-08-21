@@ -24,18 +24,18 @@ int dbCreationTest()
 {
     if (conn->databaseExists(db_name)) {
         if (!conn->dropDatabase(db_name)) {
-            conn->debugError();
+            //qDebug() << (*conn);
             return 1;
         }
-        qDebug() << "DB '" << db_name << "' dropped";
+        qDebug() << "DB" << db_name << "dropped";
     }
     if (!conn->createDatabase(db_name)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
-    qDebug() << "DB '" << db_name << "' created";
+    qDebug() << "DB" << db_name << "created";
     if (!conn->useDatabase(db_name)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
     /* Predicate::Cursor *cursor = conn->executeQuery( "select * from osoby", Predicate::Cursor::Buffered );

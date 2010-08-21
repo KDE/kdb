@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,13 +23,12 @@
 #include <QString>
 #include <QVariant>
 
-#include "Connection.h"
-#include "Object.h"
+#include <Predicate/Connection.h>
 
 namespace Predicate
 {
 
-class RowEditBuffer;
+class RecordEditBuffer;
 
 //! Provides database cursor functionality.
 /*!
@@ -65,10 +64,8 @@ class RowEditBuffer;
   instead.
   - QuerySchema object is not owned by Cursor object that uses it.
 */
-class PREDICATE_EXPORT Cursor: public QObject, public Object
+class PREDICATE_EXPORT Cursor: public Resultable
 {
-    Q_OBJECT
-
 public:
     //! Cursor options that describes its behaviour
     enum Options {
@@ -183,14 +180,14 @@ public:
         return m_query ? m_logicalFieldCount : m_fieldCount;
     }
 
-    /*! \return true if ROWID information is appended with every row.
+    /*! \return true if ROWID information is available for each record.
      ROWID information is available
      if DriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
      for a Predicate database driver and the master table has no primary key defined.
      Phisically, ROWID value is returned after last returned field,
      so data vector's length is expanded by one. */
-    inline bool containsROWIDInfo() const {
-        return m_containsROWIDInfo;
+    inline bool containsRecordIdInfo() const {
+        return m_containsRecordIdInfo;
     }
 
     /*! \return a value stored in column number \a i (counting from 0).
@@ -198,11 +195,11 @@ public:
      Note for driver developers:
      If \a i is >= than m_fieldCount, null QVariant value should be returned.
      To return a value typically you can use a pointer to internal structure
-     that contain current row data (buffered or unbuffered). */
+     that contain current record data (buffered or unbuffered). */
     virtual QVariant value(uint i) = 0;
 
     /*! [PROTOTYPE] \return current record data or NULL if there is no current records. */
-    virtual const char ** rowData() const = 0;
+    virtual const char ** recordData() const = 0;
 
     /*! Sets a list of columns for ORDER BY section of the query.
      Only works when the Cursor.has been created using QuerySchema object
@@ -232,9 +229,9 @@ public:
     /*! Allocates a new RecordData and stores data in it (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
      \return newly created record data object or 0 on error. */
-    inline RecordData* storeCurrentRow() const {
-        RecordData* data = new RecordData(m_fieldsToStoreInRow);
-        if (!drv_storeCurrentRow(*data)) {
+    inline RecordData* storeCurrentRecord() const {
+        RecordData* data = new RecordData(m_fieldsToStoreInRecord);
+        if (!drv_storeCurrentRecord(data)) {
             delete data;
             return 0;
         }
@@ -244,18 +241,18 @@ public:
     /*! Puts current record's data into \a data (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
      \return true on success. */
-    inline bool storeCurrentRow(RecordData& data) const {
-        data.resize(m_fieldsToStoreInRow);
-        return drv_storeCurrentRow(data);
+    inline bool storeCurrentRecord(RecordData* data) const {
+        data->resize(m_fieldsToStoreInRecord);
+        return drv_storeCurrentRecord(data);
     }
 
-    bool updateRow(RecordData& data, RowEditBuffer& buf, bool useROWID = false);
+    bool updateRecord(RecordData* data, RecordEditBuffer* buf, bool useRecordId = false);
 
-    bool insertRow(RecordData& data, RowEditBuffer& buf, bool getROWID = false);
+    bool insertRecord(RecordData* data, RecordEditBuffer* buf, bool getRecrordId = false);
 
-    bool deleteRow(RecordData& data, bool useROWID = false);
+    bool deleteRecord(RecordData* data, bool useRecordId = false);
 
-    bool deleteAllRows();
+    bool deleteAllRecords();
 
     /*! \return a code of last executed operation's result at the server side.
      This code is engine dependent and may be even engine-version dependent.
@@ -293,14 +290,11 @@ public:
     void debug() const;
 
 protected:
-    //! possible results of row fetching, used for m_result
-    enum FetchResult { FetchError = 0, FetchOK = 1, FetchEnd = 2 };
-
     /*! Cursor will operate on \a conn, raw \a statement will be used to execute query. */
     Cursor(Connection* conn, const QString& statement, uint options = NoOptions);
 
     /*! Cursor will operate on \a conn, \a query schema will be used to execute query. */
-    Cursor(Connection* conn, QuerySchema& query, uint options = NoOptions);
+    Cursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
 
     void init();
 
@@ -323,11 +317,11 @@ protected:
      Note for driver developers:
      This place can be computed using m_at. Do not change value of m_at or any other
      Cursor members, only change your internal structures like pointer to current
-     row, etc. If your database engine's API function (for record fetching)
+     record, etc. If your database engine's API function (for record fetching)
      do not allocates such a space, you want to allocate a space for current
      record. Otherwise, reuse existing structure, what could be more efficient.
      All functions like drv_appendCurrentRecordToBuffer() operates on the buffer,
-     i.e. array of stored rows. You are not forced to have any particular
+     i.e. array of stored records. You are not forced to have any particular
      fixed structure for buffer item or buffer itself - the structure is internal and
      only methods like storeCurrentRecord() visible to public.
     */
@@ -363,11 +357,12 @@ protected:
      This method has unspecified behaviour if the cursor is not at valid record.
      \return true on success.
      Note: For reimplementation in driver's code. Shortly, this method translates
-     a row data from internal representation (probably also used in buffer)
+     a record data from internal representation (probably also used in buffer)
      to simple public RecordData representation. */
-    virtual bool drv_storeCurrentRow(RecordData& data) const = 0;
+    virtual bool drv_storeCurrentRecord(RecordData* data) const = 0;
 
-    QPointer<Connection> m_conn;
+//    QPointer<Connection> m_conn;
+    Connection *m_conn;
     QuerySchema *m_query;
 //  CursorData *m_data;
     QString m_rawStatement;
@@ -377,15 +372,24 @@ protected:
     bool m_afterLast;
 //  bool m_atLast;
     bool m_validRecord; //!< true if valid record is currently retrieved @ current position
-    bool m_containsROWIDInfo;
+    bool m_containsRecordIdInfo;
     qint64 m_at;
     uint m_fieldCount; //!< cached field count information
-    uint m_fieldsToStoreInRow; //!< Used by storeCurrentRow(), reimplement if needed
-    //!< (e.g. PostgreSQL driver, when m_containsROWIDInfo==true
+    uint m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
+    //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
     //!< sets m_fieldCount+1 here)
-    uint m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like ROWID or lookup
+    uint m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
     uint m_options; //!< cursor options that describes its behaviour
-    char m_result; //!< result of a row fetching
+
+    //! possible results of record fetching, used for m_fetchResult
+    enum FetchResult {
+        FetchInvalid, //!< used before starting the fetching, result is not known yet
+        FetchError, //!< error of fetching
+        FetchOK, //!< the data is fetched
+        FetchEnd //!< at the end of data
+    };
+
+    FetchResult m_fetchResult; //!< result of a record fetching
 
     //<members related to buffering>
     int m_records_in_buf;          //!< number of records currently stored in the buffer

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003,2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,15 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "RowEditBuffer.h"
+#include "RecordEditBuffer.h"
 #include "Utils.h"
 
 #include <QtDebug>
 
 using namespace Predicate;
 
-
-RowEditBuffer::RowEditBuffer(bool dbAwareBuffer)
+RecordEditBuffer::RecordEditBuffer(bool dbAwareBuffer)
         : m_simpleBuffer(dbAwareBuffer ? 0 : new SimpleMap())
         , m_simpleBufferIt(dbAwareBuffer ? 0 : new SimpleMap::ConstIterator())
         , m_dbBuffer(dbAwareBuffer ? new DBMap() : 0)
@@ -35,7 +34,7 @@ RowEditBuffer::RowEditBuffer(bool dbAwareBuffer)
 {
 }
 
-RowEditBuffer::~RowEditBuffer()
+RecordEditBuffer::~RecordEditBuffer()
 {
     delete m_simpleBuffer;
     delete m_simpleBufferIt;
@@ -44,7 +43,7 @@ RowEditBuffer::~RowEditBuffer()
     delete m_dbBufferIt;
 }
 
-const QVariant* RowEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPossible) const
+const QVariant* RecordEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPossible) const
 {
     if (!m_dbBuffer) {
         PreWarn << "not db-aware buffer!";
@@ -67,7 +66,7 @@ const QVariant* RowEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPos
     return (const QVariant*)result;
 }
 
-const QVariant* RowEditBuffer::at(Field& f) const
+const QVariant* RecordEditBuffer::at(Field& f) const
 {
     if (!m_simpleBuffer) {
         PreWarn << "this is db-aware buffer!";
@@ -79,7 +78,7 @@ const QVariant* RowEditBuffer::at(Field& f) const
     return &(*m_simpleBufferIt).value();
 }
 
-const QVariant* RowEditBuffer::at(const QString& fname) const
+const QVariant* RecordEditBuffer::at(const QString& fname) const
 {
     if (!m_simpleBuffer) {
         PreWarn << "this is db-aware buffer!";
@@ -91,7 +90,7 @@ const QVariant* RowEditBuffer::at(const QString& fname) const
     return &(*m_simpleBufferIt).value();
 }
 
-void RowEditBuffer::clear()
+void RecordEditBuffer::clear()
 {
     if (m_dbBuffer) {
         m_dbBuffer->clear();
@@ -101,7 +100,7 @@ void RowEditBuffer::clear()
         m_simpleBuffer->clear();
 }
 
-bool RowEditBuffer::isEmpty() const
+bool RecordEditBuffer::isEmpty() const
 {
     if (m_dbBuffer)
         return m_dbBuffer->isEmpty();
@@ -110,10 +109,10 @@ bool RowEditBuffer::isEmpty() const
     return true;
 }
 
-void RowEditBuffer::debug()
+void RecordEditBuffer::debug()
 {
     if (isDBAware()) {
-        PreDbg << "RowEditBuffer type=DB-AWARE, " << m_dbBuffer->count() << " items";
+        PreDbg << "RecordEditBuffer type=DB-AWARE, " << m_dbBuffer->count() << " items";
         for (DBMap::ConstIterator it = m_dbBuffer->constBegin(); it != m_dbBuffer->constEnd(); ++it) {
             PreDbg << "* field name=" << it.key()->field->name() << " val="
             << (it.value().isNull() ? QString("<NULL>") : it.value().toString())
@@ -121,7 +120,7 @@ void RowEditBuffer::debug()
         }
         return;
     }
-    PreDbg << "RowEditBuffer type=SIMPLE, " << m_simpleBuffer->count() << " items";
+    PreDbg << "RecordEditBuffer type=SIMPLE, " << m_simpleBuffer->count() << " items";
     for (SimpleMap::ConstIterator it = m_simpleBuffer->constBegin(); it != m_simpleBuffer->constEnd(); ++it) {
         PreDbg << "* field name=" << it.key() << " val="
         << (it.value().isNull() ? QString("<NULL>") : it.value().toString());

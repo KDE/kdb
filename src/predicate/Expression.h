@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    Design based on nexp.h : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -37,18 +37,18 @@ namespace Predicate
 //! classes
 //todo: enum ExpressionClass
 //todo:     UnknownExpression = 0,
-#define KexiDBExpr_Unknown 0
-#define KexiDBExpr_Unary 1
-#define KexiDBExpr_Arithm 2
-#define KexiDBExpr_Logical 3
-#define KexiDBExpr_Relational 4
-#define KexiDBExpr_SpecialBinary 5
-#define KexiDBExpr_Const 6
-#define KexiDBExpr_Variable 7
-#define KexiDBExpr_Function 8
-#define KexiDBExpr_Aggregation 9
-#define KexiDBExpr_TableList 10
-#define KexiDBExpr_QueryParameter 11
+#define PredicateExpr_Unknown 0
+#define PredicateExpr_Unary 1
+#define PredicateExpr_Arithm 2
+#define PredicateExpr_Logical 3
+#define PredicateExpr_Relational 4
+#define PredicateExpr_SpecialBinary 5
+#define PredicateExpr_Const 6
+#define PredicateExpr_Variable 7
+#define PredicateExpr_Function 8
+#define PredicateExpr_Aggregation 9
+#define PredicateExpr_TableList 10
+#define PredicateExpr_QueryParameter 11
 
 //! Custom tokens are not used in parser but used as extension in expression classes.
 //#define PREDICATE_CUSTOM_TOKEN 0x1000
@@ -85,7 +85,7 @@ public:
         return m_token;
     }
 
-    virtual Field::Type type();
+    virtual Field::Type type() const;
 
     BaseExpr* parent() const {
         return m_par;
@@ -100,28 +100,25 @@ public:
     /*! \return string as a representation of this expression element by running recursive calls.
      \a param, if not 0, points to a list item containing value of a query parameter
      (used in QueryParameterExpr). */
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) = 0;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const = 0;
 
     /*! Collects query parameters (messages and types) reculsively and saves them to params.
      The leaf nodes are objects of QueryParameterExpr class. */
     virtual void getQueryParameters(QuerySchemaParameterList& params) = 0;
 
-    inline void debug() {
-        PreDbg << debugString();
-    }
-
-    virtual QString debugString();
-
     /*! \return single character if the token is < 256
      or token name, e.g. LESS_OR_EQUAL (for debugging). */
-    inline QString tokenToDebugString() {
+    inline QString tokenToDebugString() const {
         return tokenToDebugString(m_token);
     }
+
+    //! @return debug string, used in QDebug operator<<(QDebug, const BaseExpr&)
+    virtual QString debugString() const;
 
     static QString tokenToDebugString(int token);
 
     /*! \return string for token, like "<=" or ">" */
-    virtual QString tokenToString();
+    virtual QString tokenToString() const;
 
     int exprClass() const {
         return m_cl;
@@ -155,8 +152,8 @@ public:
     void prepend(BaseExpr *expr);
     BaseExpr *arg(int n);
     int args();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
     BaseExpr::List list;
@@ -171,9 +168,9 @@ public:
     virtual ~UnaryExpr();
     //! \return a deep copy of this object.
     virtual UnaryExpr* copy() const;
-    virtual Field::Type type();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual Field::Type type() const;
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     BaseExpr *arg() const {
         return m_arg;
@@ -199,9 +196,9 @@ public:
     virtual ~BinaryExpr();
     //! \return a deep copy of this object.
     virtual BinaryExpr* copy() const;
-    virtual Field::Type type();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual Field::Type type() const;
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     BaseExpr *left() const {
         return m_larg;
@@ -210,7 +207,7 @@ public:
         return m_rarg;
     }
     virtual bool validate(ParseInfo& parseInfo);
-    virtual QString tokenToString();
+    virtual QString tokenToString() const;
 
     BaseExpr *m_larg;
     BaseExpr *m_rarg;
@@ -227,9 +224,9 @@ public:
     virtual ~ConstExpr();
     //! \return a deep copy of this object.
     virtual ConstExpr* copy() const;
-    virtual Field::Type type();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual Field::Type type() const;
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
     QVariant value;
@@ -245,7 +242,7 @@ public:
     virtual ~QueryParameterExpr();
     //! \return a deep copy of this object.
     virtual QueryParameterExpr* copy() const;
-    virtual Field::Type type();
+    virtual Field::Type type() const;
     /*! Sets expected type of the parameter. The default is String.
      This method is called from parent's expression validate().
      This depends on the type of the related expression.
@@ -255,8 +252,8 @@ public:
      of the expression and then the right side will have type set to String.
     */
     void setType(Field::Type type);
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
 protected:
@@ -272,9 +269,9 @@ public:
     virtual ~VariableExpr();
     //! \return a deep copy of this object.
     virtual VariableExpr* copy() const;
-    virtual Field::Type type();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual Field::Type type() const;
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
 
     /*! Validation. Sets field, tablePositionForField
@@ -285,13 +282,13 @@ public:
     /*! Verbatim name as returned by scanner. */
     QString name;
 
-    /* NULL by default. After successful validate() it will point to a field,
+    /*! NULL by default. After successful validate() it will point to a field,
      if the variable is of a form "tablename.fieldname" or "fieldname",
      otherwise (eg. for asterisks) -still NULL.
      Only meaningful for column expressions within a query. */
     Field *field;
 
-    /* -1 by default. After successful validate() it will contain a position of a table
+    /*! -1 by default. After successful validate() it will contain a position of a table
      within query that needs to be bound to the field.
      This value can be either be -1 if no binding is needed.
      This value is used in the Parser to call
@@ -316,9 +313,9 @@ public:
     virtual ~FunctionExpr();
     //! \return a deep copy of this object.
     virtual FunctionExpr* copy() const;
-    virtual Field::Type type();
-    virtual QString debugString();
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0);
+    virtual Field::Type type() const;
+    virtual QString debugString() const;
+    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
 
@@ -330,5 +327,8 @@ public:
 };
 
 } //namespace Predicate
+
+//! Sends information about expression  @a expr to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::BaseExpr& expr);
 
 #endif

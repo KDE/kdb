@@ -20,8 +20,8 @@
 #ifndef PREDICATE_SIMPLECMDLINEAPP_H
 #define PREDICATE_SIMPLECMDLINEAPP_H
 
-#include "Connection.h"
-#include "Driver.h"
+#include <Predicate/Connection.h>
+#include <Predicate/Driver.h>
 
 #include <KAboutData>
 
@@ -41,7 +41,7 @@ namespace Predicate
  - --local-socket \<filename\> (Server's local socket filename, if needed) or -s
 
  You can use this helper class to create test applications or small tools that open
- a KexiDB-compatible database using command line arguments, do some data processing
+ a Predicate-compatible database using command line arguments, do some data processing
  and close the database.
 */
 class PREDICATE_EXPORT SimpleCommandLineApp : public Predicate::Object

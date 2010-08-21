@@ -115,7 +115,7 @@ Predicate supports two kinds of databases: file-based and network-based database
 The type of a driver is available from several places. The DriverType
 field in the driver's .desktop file, is read by the DriverManager and
 available by calling DriverManager::driverInfo(const QString &name) and using
-the Driver::Info#fileBased member from the result. Given a reference to a
+the DriverInfo#fileBased member from the result. Given a reference to a
 Driver, its type can also be found directly using Driver::isFileBased().
 
 Each database backend driver consists of three main classes: a driver,
@@ -123,7 +123,7 @@ a connection and a cursor class, e.g SQLiteDriver, SQLiteConnection,
 SQLiteCursor.
 
 The driver classes subclass the Driver class.  They set Driver#m_typeNames,
-which maps KexiDB's Field::Type on to the types supported by the database.  They also
+which maps Predicate Field::Type on to the types supported by the database.  They also
 provide functions for escaping strings and checking table names.  These may be
 used, for example, on a database backend that uses the database name as a
 filename.  In this case, it should be ensured that all the characters in the
@@ -158,52 +158,6 @@ namespace Predicate
 //! Fatal command for Predicate driver's code
 # define PreDrvFatal PREDICATE_DEBUG qCritical() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
 
-
-/*! @short Contains database version information about a Kexi-compatible database.
- The version is stored as internal database properties. */
-class PREDICATE_EXPORT DatabaseVersionInfo
-{
-public:
-    DatabaseVersionInfo();
-    DatabaseVersionInfo(uint majorVersion, uint minorVersion, uint releaseVersion);
-
-    bool matches(uint _major, uint _minor) const { return _major == major && _minor == minor; }
-
-    //! Major version number, e.g. 1 for 1.8
-    uint major;
-
-    //! Minor version number, e.g. 8 for 1.8
-    uint minor;
-
-    //! Release version number, e.g. 9 for 1.8.9
-    uint release;
-};
-
-//! \return Predicate version info
-PREDICATE_EXPORT DatabaseVersionInfo version();
-
-/*! @short Contains version information about a database backend. */
-class PREDICATE_EXPORT ServerVersionInfo
-{
-public:
-    ServerVersionInfo();
-
-    //! Clears the information - integers will be set to 0 and string to null
-    void clear();
-
-    //! Major version number, e.g. 1 for 1.2.3
-    uint major;
-
-    //! Minor version number, e.g. 2 for 1.2.3
-    uint minor;
-
-    //! Release version number, e.g. 3 for 1.2.3
-    uint release;
-
-    //! Version string, as returned by the server
-    QString string;
-};
-
 /*! Object types set like table or query. */
 enum ObjectType {
     UnknownObjectType = -1, //!< helper
@@ -212,7 +166,7 @@ enum ObjectType {
     QueryObjectType = 2,
     LastObjectType = 2, //ALWAYS UPDATE THIS
 
-    KexiDBSystemTableObjectType = 128,//!< helper, not used in storage
+    PredicateSystemTableObjectType = 128,//!< helper, not used in storage
     //!< (allows to select kexidb system tables
     //!< may be or'd with TableObjectType)
     IndexObjectType = 256 //!< special

@@ -60,7 +60,7 @@ MACRO(MACRO_LOG_FEATURE _var _package _description _url ) # _required _minvers _
    IF (${_var})
      IF (NOT("${_required}" STREQUAL "TRUE"))
        SET(_LOGFILENAME ${CMAKE_BINARY_DIR}/EnabledFeatures.txt)
-     ENDIF ("${_required}" STREQUAL "TRUE")
+     ENDIF (NOT("${_required}" STREQUAL "TRUE"))
    ELSE (${_var})
      IF ("${_required}" STREQUAL "TRUE")
        SET(_LOGFILENAME ${CMAKE_BINARY_DIR}/MissingRequirements.txt)

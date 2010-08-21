@@ -31,7 +31,7 @@ int cursorsTest()
     }
 
     if (!conn->useDatabase(db_name)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 

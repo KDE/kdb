@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,20 +19,20 @@
 
 #include "MessageHandler.h"
 
-#include "Object.h"
+#include "Result.h"
 
 using namespace Predicate;
 
-MessageTitle::MessageTitle(Object* o, const QString& msg)
-        : m_obj(o)
-        , m_prevMsgTitle(o->m_msgTitle)
+MessageTitleSetter::MessageTitleSetter(Result* result, const QString& message)
+        : m_result(result)
+        , m_prevMsgTitle(result->messageTitle())
 {
-    m_obj->m_msgTitle = msg;
+    m_result->setMessageTitle(message);
 }
 
-MessageTitle::~MessageTitle()
+MessageTitleSetter::~MessageTitleSetter()
 {
-    m_obj->m_msgTitle = m_prevMsgTitle;
+    m_result->setMessageTitle(m_prevMsgTitle);
 }
 
 //------------------------------------------------

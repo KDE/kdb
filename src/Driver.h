@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,17 +20,15 @@
 #ifndef PREDICATE_DRIVER_H
 #define PREDICATE_DRIVER_H
 
-#include <QObject>
-#include <qdatetime.h>
 #include <QList>
 #include <QByteArray>
-#include <QSharedData>
+#include <QDateTime>
 
 #include <Predicate/Global.h>
-#include <Predicate/Object.h>
+#include <Predicate/VersionInfo.h>
 #include <Predicate/Field.h>
-
-class KService;
+#include <Predicate/DriverInfo.h>
+#include <Predicate/Result.h>
 
 namespace Predicate
 {
@@ -54,64 +52,9 @@ FIXME - driver must be provided within KDE module file named with "predicate_" p
 
  \sa SQLiteDriver MySqlDriver, PqxxSqlDriver, EXPORT_PREDICATE_DRIVER
 */
-class PREDICATE_EXPORT Driver : public QObject, public Predicate::Object
+class PREDICATE_EXPORT Driver : public Resultable
 {
-    Q_OBJECT
 public:
-    /*! Provides information about driver. */
-    class PREDICATE_EXPORT Info
-    {
-    public:
-        typedef QMap<QString,Info> Map;
-
-        struct Data : public QSharedData {
-            Data()
-            : fileBased(false)
-            , importingAllowed(true) {}
-            QString name, caption, comment, fileDBMimeType, absoluteFilePath;
-            QString version; //!< x.y major+minor version
-            bool fileBased;
-            bool importingAllowed;
-        };
-
-        //! Constructs an invalid info.
-        Info() : d( new Data() ) {}
-
-        //! @return true if the info is valid. Valid info provides at least name and file path.
-        //! @since 2.0
-        bool isValid() const { return !d->name.isEmpty() && !d->absoluteFilePath.isEmpty(); }
-
-        QString name() const { return d->name; }
-        void setName(const QString& name) { d->name = name; }
-
-        QString caption() const { return d->caption; }
-        void setCaption(const QString& caption) { d->caption = caption; }
-
-        QString comment() const { return d->comment; }
-        void setComment(const QString& comment) { d->comment = comment; }
-
-        QString version() const { return d->version; }
-        void setVersion(const QString& version) { d->version = version; }
-
-        QString fileDBMimeType() const { return d->fileDBMimeType; }
-        void setFileDBMimeType(const QString& fileDBMimeType) { d->fileDBMimeType = fileDBMimeType; }
-
-        QString absoluteFilePath() const { return d->absoluteFilePath; }
-        void setAbsoluteFilePath(const QString& absoluteFilePath) { d->absoluteFilePath = absoluteFilePath; }
-
-        //! @return true if the driver is for file-based database backend
-        bool isFileBased() const { return d->fileBased; }
-        void setFileBased(bool set) { d->fileBased = set; }
-
-        /*! @return true if the driver is for a backend that allows importing.
-         Defined by AllowImporting field in "predicate_*.desktop" information files.
-         Used for migration. */
-        bool isImportingAllowed() const { return d->importingAllowed; }
-        void setImportingAllowed(bool set) { d->importingAllowed = set; }
-    private:
-        QSharedDataPointer<Data> d;
-    };
-
     /*! Features supported by driver (sum of few Features enum items). */
     enum Features {
         NoFeatures = 0,
@@ -134,7 +77,7 @@ public:
         //-- temporary options: can be removed later, use at your own risk --
         /*! If set, actions related to transactions will be silently bypassed
          with success. Set this if your driver does not support transactions at all
-         Currently, this is only way to get it working with KexiDB.
+         Currently, this is only way to get it working with Predicate.
          Keep in mind that this hack do not provide data integrity!
          This flag is currently used for MySQL driver. */
         IgnoreTransactions = 1024
@@ -144,8 +87,6 @@ public:
     enum CreateConnectionOptions {
         ReadOnlyConnection = 1 //!< set to perform read only connection
     };
-
-    virtual ~Driver();
 
     /*! Creates connection using \a conn_data as parameters.
      \return 0 and sets error message on error.
@@ -165,21 +106,8 @@ public:
     //! Provided for convenience and optimization. This is the same as info().isFileBased().
     bool isFileBased() const;
 
-    /*! \return a name of MIME type of files handled by this driver
-     if it is a file-based database's driver
-     (equal X-Kexi-FileDBDriverMime service property)
-     otherwise returns null string. \sa isFileDriver()
-    */
-/* moved to info()
-    QString fileDBDriverMimeType() const;*/
-
     /*! Info about the driver. */
-    Info info() const;
-//ported    const KService* service() const;
-
-    /*! \return true if this driver is file-based */
-/* moved to info()
-    bool isFileDriver() const;*/
+    DriverInfo info() const;
 
     /*! \return true if \a n is a system object's name,
      eg. name of build-in system table that cannot be used or created by a user,
@@ -327,6 +255,9 @@ public:
     //! \return a list of property names available for this driver.
     QList<QByteArray> propertyNames() const;
 
+    //! @internal
+    virtual ~Driver();
+
 protected:
     /*! Used by DriverManager.
      Note for driver developers: Reimplement this.
@@ -395,7 +326,7 @@ protected:
 
 protected:
     /*! Used by the driver manager to set info for just loaded driver. */
-    void setInfo( const Driver::Info& info );
+    void setInfo( const DriverInfo& info );
 
     friend class Connection;
     friend class Cursor;

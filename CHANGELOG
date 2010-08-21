@@ -1,5 +1,45 @@
 Predicate CHANGELOG
 
+2010-08-19..21
+*SDC
+**properly generates code for more than one shared class per file
+**add "#include <QSharedData>" is needed
+*remaining bits: replaced KexiDB with Predicate
+*Cursor, Driver and Connection no longer inherit QObject
+
+2010-08-18
+* replaced usage of 'row' term with 'record' in most places, e.g. Cursor::storeCurrentRow -> Cursor::storeCurrentRecord and RowEditBuffer with RecordEditBuffer, LookupFieldSchema::RowSource -> LookupFieldSchema::RecordSource
+
+2010-08-06
+*SDC
+**added "namespace" option (string) for shared class, used in 
+TODO: document SDC options
+
+2010-08-05
+*SDC
+**added "with_from_to_map" option for shared class, generates extra methods as <file>_sdc.cpp:
+***QMap<QString, QString> CLASSNAME::toMap() const;
+***CLASSNAME(const QMap<QString, QString>& map, bool* ok);
+
+2010-08-04
+*SDC
+**added support for protected option for data_member
+**added support for "#if 0" blocks
+
+2010-08-03
+*ConnectionData is shared class (using SDC)
+
+2010-07-21
+*introducted Shared Data Compiler tool for creating implicitly shared classes
+*introducted Result class using SDC, obsoletes Predicate::Object
+**introducted Resultable helper
+
+2010-07-18
+*merge kexidb r1151238
+*SQLite Driver: remove all sqlite_* macros, use sqlite3_* functions directly since we only support version 3
+**use sqlite3_close() on sqlite3 structure instead of free(3)
+***possible fix of crash in bug #245030
+
 2010-07-08
 *clean up the .desktop file format for drivers
 **sqlite driver ported to that

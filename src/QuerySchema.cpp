@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,6 +19,7 @@
 
 #include "QuerySchema.h"
 #include "Driver.h"
+#include "DriverManager_p.h"
 #include "Connection.h"
 #include "Expression.h"
 #include "parser/SqlParser.h"
@@ -28,7 +29,7 @@
 #include <assert.h>
 
 #include <QBitArray>
-
+#include <QWeakPointer>
 #include <QtDebug>
 
 
@@ -45,17 +46,17 @@ QueryColumnInfo::~QueryColumnInfo()
 {
 }
 
-QString QueryColumnInfo::debugString() const
+QDebug operator<<(QDebug dbg, const QueryColumnInfo& info)
 {
-    QString res;
-    if (field->table()) {
-        res += field->table()->name() + QLatin1String(".");
+    QString s;
+    if (info.field->table()) {
+        s = info.field->table()->name() + '.';
     }
-    res += field->debugString() +
-           (alias.isEmpty() ? QString()
-            : (QLatin1String(" AS ") + QString(alias)))
-            + (visible ? QString() : QLatin1String(" [INVISIBLE]"));
-    return res;
+    dbg.nospace() << s << *info.field
+        << (info.alias.isEmpty() ? QString()
+            : (QLatin1String(" AS ") + QString(info.alias)))
+            + (info.visible ? QString() : QLatin1String(" [INVISIBLE]"));
+    return dbg.space();
 }
 
 //=======================================
@@ -68,13 +69,13 @@ public:
     QuerySchemaPrivate(QuerySchema* q, QuerySchemaPrivate* copy = 0)
             : query(q)
             , masterTable(0)
-            , fakeRowIDField(0)
-            , fakeRowIDCol(0)
+            , fakeRecordIdField(0)
+            , fakeRecordIdCol(0)
             , maxIndexWithAlias(-1)
             , visibility(64)
             , fieldsExpanded(0)
             , internalFields(0)
-            , fieldsExpandedWithInternalAndRowID(0)
+            , fieldsExpandedWithInternalAndRecordId(0)
             , fieldsExpandedWithInternal(0)
             , autoincFields(0)
             , columnsOrder(0)
@@ -100,9 +101,9 @@ public:
                 fieldsExpanded = new QueryColumnInfo::Vector(*copy->fieldsExpanded);
             if (copy->internalFields)
                 internalFields = new QueryColumnInfo::Vector(*copy->internalFields);
-            if (copy->fieldsExpandedWithInternalAndRowID)
-                fieldsExpandedWithInternalAndRowID = new QueryColumnInfo::Vector(
-                    *copy->fieldsExpandedWithInternalAndRowID);
+            if (copy->fieldsExpandedWithInternalAndRecordId)
+                fieldsExpandedWithInternalAndRecordId = new QueryColumnInfo::Vector(
+                    *copy->fieldsExpandedWithInternalAndRecordId);
             if (copy->fieldsExpandedWithInternal)
                 fieldsExpandedWithInternal = new QueryColumnInfo::Vector(
                     *copy->fieldsExpandedWithInternal);
@@ -119,10 +120,10 @@ public:
                 pkeyFieldsOrder = new QVector<int>(*copy->pkeyFieldsOrder);
             if (copy->whereExpr)
                 whereExpr = copy->whereExpr->copy();
-            if (copy->fakeRowIDCol)
-                fakeRowIDCol = new QueryColumnInfo(*copy->fakeRowIDCol);
-            if (copy->fakeRowIDField)
-                fakeRowIDField = new Field(*copy->fakeRowIDField);
+            if (copy->fakeRecordIdCol)
+                fakeRecordIdCol = new QueryColumnInfo(*copy->fakeRecordIdCol);
+            if (copy->fakeRecordIdField)
+                fakeRecordIdField = new Field(*copy->fakeRecordIdField);
             if (copy->ownedVisibleColumns)
                 ownedVisibleColumns = new Field::List(*copy->ownedVisibleColumns);
         }
@@ -130,7 +131,7 @@ public:
     ~QuerySchemaPrivate() {
         delete fieldsExpanded;
         delete internalFields;
-        delete fieldsExpandedWithInternalAndRowID;
+        delete fieldsExpandedWithInternalAndRecordId;
         delete fieldsExpandedWithInternal;
         delete autoincFields;
         delete columnsOrder;
@@ -138,8 +139,8 @@ public:
         delete columnsOrderExpanded;
         delete pkeyFieldsOrder;
         delete whereExpr;
-        delete fakeRowIDCol;
-        delete fakeRowIDField;
+        delete fakeRecordIdCol;
+        delete fakeRecordIdField;
         delete ownedVisibleColumns;
     }
 
@@ -196,9 +197,9 @@ public:
         tablePositionsForAliases.insert(alias.toLower(), position);
     }
 
-    inline bool hasColumnAliases() {
+    inline int columnAliasesCount() {
         tryRegenerateExprAliases();
-        return !columnAliases.isEmpty();
+        return columnAliases.count();
     }
 
     inline QByteArray columnAlias(uint position) {
@@ -233,8 +234,8 @@ public:
     /*! List of tables used in this query */
     TableSchema::List tables;
 
-    Field *fakeRowIDField; //! used to mark a place for ROWID
-    QueryColumnInfo *fakeRowIDCol; //! used to mark a place for ROWID
+    Field *fakeRecordIdField; //! used to mark a place for record Id
+    QueryColumnInfo *fakeRecordIdCol; //! used to mark a place for record Id
 
 protected:
     void tryRegenerateExprAliases() {
@@ -297,9 +298,9 @@ public:
     /*! Temporary field vector containing internal fields used for lookup columns. */
     QueryColumnInfo::Vector *internalFields;
 
-    /*! Temporary, used to cache sum of expanded fields and internal fields (+rowid) used for lookup columns.
+    /*! Temporary, used to cache sum of expanded fields and internal fields (+record Id) used for lookup columns.
      Contains not auto-deleted items.*/
-    QueryColumnInfo::Vector *fieldsExpandedWithInternalAndRowID;
+    QueryColumnInfo::Vector *fieldsExpandedWithInternalAndRecordId;
 
     /*! Temporary, used to cache sum of expanded fields and internal fields used for lookup columns.
      Contains not auto-deleted items.*/
@@ -313,7 +314,7 @@ public:
 
     /*! A cache for autoIncrementSQLFieldsList(). */
     QString autoIncrementSQLFieldsList;
-    QPointer<Driver> lastUsedDriverForAutoIncrementSQLFieldsList;
+    QWeakPointer<Driver> lastUsedDriverForAutoIncrementSQLFieldsList;
 
     /*! A hash for fast lookup of query columns' order (unexpanded version). */
     QHash<QueryColumnInfo*, int> *columnsOrder;
@@ -328,7 +329,7 @@ public:
 
 //  QValueList<bool> detailedVisibility;
 
-    /*! order of PKEY fields (e.g. for updateRow() ) */
+    /*! order of PKEY fields (e.g. for updateRecord() ) */
     QVector<int> *pkeyFieldsOrder;
 
     /*! number of PKEY fields within the query */
@@ -403,18 +404,29 @@ OrderByColumn::~OrderByColumn()
 {
 }
 
-QString OrderByColumn::debugString() const
+QDebug operator<<(QDebug dbg, const OrderByColumn& order)
 {
-    QString orderString(m_ascending ? "ascending" : "descending");
-    if (m_column) {
-        if (m_pos > -1)
-            return QString("COLUMN_AT_POSITION_%1(%2, %3)")
-                   .arg(m_pos + 1).arg(m_column->debugString()).arg(orderString);
-        else
-            return QString("COLUMN(%1, %2)").arg(m_column->debugString()).arg(orderString);
+    const QString orderString(order.ascending() ? "ASCENDING" : "DESCENDING");
+    if (order.column()) {
+        if (order.position() > -1) {
+            dbg.nospace() << QString::fromLatin1("COLUMN_AT_POSITION_%1(").arg(order.position() + 1);
+            dbg.space() << *order.column() << ',';
+            dbg.space() << orderString << ')';
+            return dbg.space();
+        }
+        else {
+            dbg.nospace() << "COLUMN(" << *order.column() << ',';
+            dbg.space() << orderString << ')';
+            return dbg.space();
+        }
     }
-    return m_field ? QString("FIELD(%1, %2)").arg(m_field->debugString()).arg(orderString)
-           : QString("NONE");
+    if (order.field()) {
+        dbg.nospace() << "FIELD(" << *order.field() << ',';
+        dbg.space() << orderString << ')';
+        return dbg.space();
+    }
+    dbg.nospace() << "NONE";
+    return dbg.space();
 }
 
 QString OrderByColumn::toSQLString(bool includeTableName, Driver *drv, int identifierEscaping) const
@@ -540,17 +552,21 @@ void OrderByColumnList::appendColumn(const OrderByColumn& column)
     append(new OrderByColumn(column));
 }
 
-QString OrderByColumnList::debugString() const
+QDebug operator<<(QDebug dbg, const OrderByColumnList& list)
 {
-    if (isEmpty())
-        return "NONE";
-    QString dbg;
-    for (QList<OrderByColumn*>::ConstIterator it(constBegin()); it != constEnd(); ++it) {
-        if (!dbg.isEmpty())
-            dbg += "\n";
-        dbg += (*it)->debugString();
+    if (list.isEmpty()) {
+        dbg.nospace() << "NONE";
+        return dbg.space();
     }
-    return dbg;
+    bool first = true;
+    for (QList<OrderByColumn*>::ConstIterator it(list.constBegin()); it != list.constEnd(); ++it) {
+        if (first)
+            first = false;
+        else
+            dbg.nospace() << '\n';
+        dbg.nospace() << *(*it);
+    }
+    return dbg.space();
 }
 
 QString OrderByColumnList::toSQLString(bool includeTableNames, Driver *drv, int identifierEscaping) const
@@ -574,7 +590,7 @@ void OrderByColumnList::clear()
 
 QuerySchema::QuerySchema()
         : FieldList(false)//fields are not owned by QuerySchema object
-        , SchemaData(Predicate::QueryObjectType)
+        , Object(Predicate::QueryObjectType)
         , d(new QuerySchemaPrivate(this))
 {
     init();
@@ -582,7 +598,7 @@ QuerySchema::QuerySchema()
 
 QuerySchema::QuerySchema(TableSchema& tableSchema)
         : FieldList(false)
-        , SchemaData(Predicate::QueryObjectType)
+        , Object(Predicate::QueryObjectType)
         , d(new QuerySchemaPrivate(this))
 {
     d->masterTable = &tableSchema;
@@ -595,9 +611,9 @@ QuerySchema::QuerySchema(TableSchema& tableSchema)
     addTable(d->masterTable);
     //defaults:
     //inherit name from a table
-    m_name = d->masterTable->name();
+    setName(d->masterTable->name());
     //inherit caption from a table
-    m_caption = d->masterTable->caption();
+    setCaption(d->masterTable->caption());
 
 //replaced by explicit field list: //add all fields of the table as asterisk:
 //replaced by explicit field list: addField( new QueryAsterisk(this) );
@@ -610,11 +626,11 @@ QuerySchema::QuerySchema(TableSchema& tableSchema)
 
 QuerySchema::QuerySchema(const QuerySchema& querySchema)
         : FieldList(querySchema, false /* !deepCopyFields */)
-        , SchemaData(querySchema)
+        , Object(querySchema)
         , d(new QuerySchemaPrivate(this, querySchema.d))
 {
     //only deep copy query asterisks
-    foreach(Field* f, querySchema.m_fields) {
+    foreach(Field* f, *querySchema.fields()) {
         Field *copiedField;
         if (dynamic_cast<QueryAsterisk*>(f)) {
             copiedField = f->copy();
@@ -633,14 +649,13 @@ QuerySchema::~QuerySchema()
 
 void QuerySchema::init()
 {
-    m_type = Predicate::QueryObjectType;
 //m_fields_by_name.setAutoDelete( true ); //because we're using QueryColumnInfoEntry objects
 }
 
 void QuerySchema::clear()
 {
     FieldList::clear();
-    SchemaData::clear();
+    Object::clear();
     d->clear();
 }
 
@@ -778,8 +793,8 @@ FieldList& QuerySchema::addAsterisk(QueryAsterisk *asterisk, bool visible)
     if (!asterisk)
         return *this;
     //make unique name
-    asterisk->m_name = (asterisk->table() ? asterisk->table()->name() + ".*" : "*")
-                       + QString::number(asterisks()->count());
+    asterisk->setName((asterisk->table() ? asterisk->table()->name() + ".*" : "*")
+                       + QString::number(asterisks()->count()));
     return addField(asterisk, visible);
 }
 
@@ -789,108 +804,121 @@ Connection* QuerySchema::connection() const
     return mt ? mt->connection() : 0;
 }
 
-QString QuerySchema::debugString()
+QDebug operator<<(QDebug dbg, const QuerySchema& query)
 {
-    QString dbg;
-    dbg.reserve(1024);
     //fields
-    TableSchema *mt = masterTable();
-    dbg = QString("QUERY ") + schemaDataDebugString() + "\n"
-          + "-masterTable=" + (mt ? mt->name() : "<NULL>")
-          + "\n-COLUMNS:\n"
-          + ((fieldCount() > 0) ? FieldList::debugString() : "<NONE>") + "\n"
-          + "-FIELDS EXPANDED ";
+    TableSchema *mt = query.masterTable();
+    dbg.nospace() << "QUERY";
+    dbg.space() << static_cast<const Object&>(query) << '\n';
+    dbg.nospace() << " - MASTERTABLE=" << (mt ? mt->name() : "<NULL>")
+        << "\n - COLUMNS:\n";
+    if (query.fieldCount() > 0)
+        dbg.nospace() << static_cast<const FieldList&>(query) << '\n';
+    else
+        dbg.nospace() << "<NONE>\n";
 
-    QString dbg1;
+    if (query.fieldCount() == 0)
+        dbg.nospace() << " - NO FIELDS\n";
+    else
+        dbg.nospace() << " - FIELDS EXPANDED (";
+
     uint fieldsExpandedCount = 0;
-    if (fieldCount() > 0) {
-        QueryColumnInfo::Vector fe(fieldsExpanded());
+    bool first;
+    if (query.fieldCount() > 0) {
+        const QueryColumnInfo::Vector fe(query.fieldsExpanded());
         fieldsExpandedCount = fe.size();
+        dbg.nospace() << fieldsExpandedCount << "):\n";
+        first = true;
         for (uint i = 0; i < fieldsExpandedCount; i++) {
             QueryColumnInfo *ci = fe[i];
-            if (!dbg1.isEmpty())
-                dbg1 += ",\n";
-            dbg1 += ci->debugString();
+            if (first)
+                first = false;
+            else
+                dbg.nospace() << ",\n";
+            dbg.nospace() << *ci;
         }
-        dbg1 += "\n";
-    } else {
-        dbg1 = "<NONE>\n";
+        dbg.nospace() << '\n';
     }
-    dbg1.prepend(QString("(%1):\n").arg(fieldsExpandedCount));
-    dbg += dbg1;
 
     //it's safer to delete fieldsExpanded for now
     // (debugString() could be called before all fields are added)
 //causes a crash d->clearCachedData();
 
     //bindings
-    QString dbg2;
-    dbg2.reserve(512);
-    for (uint i = 0; i < fieldCount(); i++) {
-        int tablePos = tableBoundToColumn(i);
+    dbg.nospace() << " - BINDINGS:\n";
+    bool bindingsExist = false;
+    for (uint i = 0; i < query.fieldCount(); i++) {
+        const int tablePos = query.tableBoundToColumn(i);
         if (tablePos >= 0) {
-            QByteArray tAlias(tableAlias(tablePos));
+            const QByteArray tAlias(query.tableAlias(tablePos));
             if (!tAlias.isEmpty()) {
-                dbg2 += (QString::fromLatin1(" field \"") + FieldList::field(i)->name()
-                         + "\" uses alias \"" + QString(tAlias) + "\" of table \""
-                         + d->tables.at(tablePos)->name() + "\"\n");
+                bindingsExist = true;
+                dbg.space() << "FIELD";
+                dbg.space() << static_cast<const FieldList&>(query).field(i)->name();
+                dbg.space() << "USES ALIAS";
+                dbg.space() << QString(tAlias);
+                dbg.space() << "OF TABLE";
+                dbg.space() << query.tables()->at(tablePos)->name() << '\n';
             }
         }
     }
-    if (!dbg2.isEmpty()) {
-        dbg += "\n-BINDINGS:\n";
-        dbg += dbg2;
+    if (!bindingsExist) {
+        dbg.nospace() << "<NONE>\n";
     }
 
     //tables
-    QString table_names;
-    table_names.reserve(512);
-    foreach(TableSchema *table, d->tables) {
-        if (!table_names.isEmpty())
-            table_names += ", ";
-        table_names += (QString("'") + table->name() + "'");
+    dbg.nospace() << " - TABLES:\n";
+    first = true;
+    foreach(TableSchema *table, *query.tables()) {
+        if (first)
+            first = false;
+        else
+            dbg.nospace() << ",";
+        dbg.space() << table->name();
     }
-    if (d->tables.isEmpty())
-        table_names = "<NONE>";
-    dbg += (QString("-TABLES:\n") + table_names);
-    QString aliases;
-    if (!d->hasColumnAliases())
-        aliases = "<NONE>\n";
-    else {
-        int i = -1;
-        foreach(Field *f, m_fields) {
-            i++;
-            QByteArray alias(d->columnAlias(i));
-            if (!alias.isEmpty())
-                aliases += (QString("field #%1: ").arg(i)
-                            + (f->name().isEmpty() ? "<noname>" : f->name())
-                            + " -> " + alias + "\n");
-        }
-    }
+    if (query.tables()->isEmpty())
+        dbg.nospace() << "<NONE>";
+
     //aliases
-    dbg += QString("\n-COLUMN ALIASES:\n" + aliases);
-    if (d->tableAliases.isEmpty())
-        aliases = "<NONE>";
+    dbg.nospace() << "\n - COLUMN ALIASES:\n";
+    if (query.columnAliasesCount() == 0) {
+        dbg.nospace() << "<NONE>\n";
+    }
     else {
-        aliases = "";
         int i = -1;
-        foreach(TableSchema* table, d->tables) {
+        foreach(Field *f, *query.fields()) {
             i++;
-            QByteArray alias(d->tableAliases.value(i));
-            if (!alias.isEmpty())
-                aliases += (QString("table #%1: ").arg(i)
-                            + (table->name().isEmpty() ? "<noname>" : table->name())
-                            + " -> " + alias + "\n");
+            const QByteArray alias(query.columnAlias(i));
+            if (!alias.isEmpty()) {
+                dbg.nospace() << QString::fromLatin1("FIELD #%1:").arg(i);
+                dbg.space() << (f->name().isEmpty() ? "<NONAME>" : f->name()) << " -> " << alias << '\n';
+            }
         }
     }
-    dbg += QString("-TABLE ALIASES:\n" + aliases);
-    QString where = d->whereExpr ? d->whereExpr->debugString() : QString();
-    if (!where.isEmpty())
-        dbg += (QString("\n-WHERE EXPRESSION:\n") + where);
-    if (!orderByColumnList().isEmpty())
-        dbg += (QString("\n-ORDER BY (%1):\n").arg(orderByColumnList().count())
-                + orderByColumnList().debugString());
-    return dbg;
+
+    dbg.nospace() << " - TABLE ALIASES:\n";
+    if (query.tableAliasesCount() == 0) {
+        dbg.nospace() << "<NONE>\n";
+    }
+    else {
+        int i = -1;
+        foreach(TableSchema* table, *query.tables()) {
+            i++;
+            const QByteArray alias(query.tableAlias(i));
+            if (!alias.isEmpty()) {
+                dbg.nospace() << QString::fromLatin1("table #%1:").arg(i);
+                dbg.space() << (table->name().isEmpty() ? "<NONAME>" : table->name()) << " -> " << alias << '\n';
+            }
+        }
+    }
+    if (query.whereExpression()) {
+        dbg.nospace() << " - WHERE EXPRESSION:\n" << *query.whereExpression() << '\n';
+    }
+    if (!query.orderByColumnList().isEmpty()) {
+        dbg.space() << QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList().count());
+        dbg.nospace() << query.orderByColumnList();
+    }
+    return dbg.nospace();
 }
 
 TableSchema* QuerySchema::masterTable() const
@@ -1001,6 +1029,11 @@ Field* QuerySchema::findTableField(const QString &tableOrTableAndFieldName) cons
     return tableSchema->field(fieldName);
 }
 
+int QuerySchema::columnAliasesCount() const
+{
+    return d->columnAliasesCount();
+}
+
 QByteArray QuerySchema::columnAlias(uint position) const
 {
     return d->columnAlias(position);
@@ -1024,6 +1057,11 @@ void QuerySchema::setColumnAlias(uint position, const QByteArray& alias)
         return;
     }
     d->setColumnAlias(position, fixedAlias);
+}
+
+int QuerySchema::tableAliasesCount() const
+{
+    return d->tableAliases.count();
 }
 
 QByteArray QuerySchema::tableAlias(uint position) const
@@ -1117,25 +1155,25 @@ Field* QuerySchema::field(const QString& identifier, bool expanded)
     return ci ? ci->field : 0;
 }
 
-QueryColumnInfo* QuerySchema::columnInfo(const QString& identifier, bool expanded)
+QueryColumnInfo* QuerySchema::columnInfo(const QString& identifier, bool expanded) const
 {
     computeFieldsExpanded();
     return expanded ? d->columnInfosByNameExpanded[identifier] : d->columnInfosByName[identifier];
 }
 
-QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions options)
+QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions options) const
 {
     computeFieldsExpanded();
-    if (options == WithInternalFields || options == WithInternalFieldsAndRowID) {
+    if (options == WithInternalFields || options == WithInternalFieldsAndRecordId) {
         //a ref to a proper pointer (as we cache the vector for two cases)
         QueryColumnInfo::Vector*& tmpFieldsExpandedWithInternal =
-            (options == WithInternalFields) ? d->fieldsExpandedWithInternal : d->fieldsExpandedWithInternalAndRowID;
+            (options == WithInternalFields) ? d->fieldsExpandedWithInternal : d->fieldsExpandedWithInternalAndRecordId;
         //special case
         if (!tmpFieldsExpandedWithInternal) {
             //glue expanded and internal fields and cache it
             const uint size = d->fieldsExpanded->count()
                               + (d->internalFields ? d->internalFields->count() : 0)
-                              + ((options == WithInternalFieldsAndRowID) ? 1 : 0) /*ROWID*/;
+                              + ((options == WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
             tmpFieldsExpandedWithInternal = new QueryColumnInfo::Vector(size);
             const uint fieldsExpandedVectorSize = d->fieldsExpanded->size();
             for (uint i = 0; i < fieldsExpandedVectorSize; i++)
@@ -1145,12 +1183,12 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
                 for (uint i = 0; i < internalFieldsCount; i++)
                     (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = d->internalFields->at(i);
             }
-            if (options == WithInternalFieldsAndRowID) {
-                if (!d->fakeRowIDField) {
-                    d->fakeRowIDField = new Field("rowID", Field::BigInteger);
-                    d->fakeRowIDCol = new QueryColumnInfo(d->fakeRowIDField, QByteArray(), true);
+            if (options == WithInternalFieldsAndRecordId) {
+                if (!d->fakeRecordIdField) {
+                    d->fakeRecordIdField = new Field("rowID", Field::BigInteger);
+                    d->fakeRecordIdCol = new QueryColumnInfo(d->fakeRecordIdField, QByteArray(), true);
                 }
-                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldsCount] = d->fakeRowIDCol;
+                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldsCount] = d->fakeRecordIdCol;
             }
         }
         return *tmpFieldsExpandedWithInternal;
@@ -1179,13 +1217,13 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
     return result;
 }
 
-QueryColumnInfo::Vector QuerySchema::internalFields()
+QueryColumnInfo::Vector QuerySchema::internalFields() const
 {
     computeFieldsExpanded();
     return d->internalFields ? *d->internalFields : QueryColumnInfo::Vector();
 }
 
-QueryColumnInfo* QuerySchema::expandedOrInternalField(uint index)
+QueryColumnInfo* QuerySchema::expandedOrInternalField(uint index) const
 {
     return fieldsExpanded(WithInternalFields).value(index);
 }
@@ -1198,7 +1236,7 @@ inline QString lookupColumnKey(Field *foreignField, Field* field)
     return res + field->name() + "_" + foreignField->table()->name() + "." + foreignField->name();
 }
 
-void QuerySchema::computeFieldsExpanded()
+void QuerySchema::computeFieldsExpanded() const
 {
     if (d->fieldsExpanded)
         return;
@@ -1230,7 +1268,7 @@ void QuerySchema::computeFieldsExpanded()
                     QueryColumnInfo *ci = new QueryColumnInfo(ast_f, QByteArray()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     list.append(ci);
-                    PreDbg << "caching (unexpanded) columns order:" << ci->debugString() << "at position" << fieldPosition;
+                    PreDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
                     d->columnsOrder->insert(ci, fieldPosition);
 //     list.append(ast_f);
                 }
@@ -1245,7 +1283,7 @@ void QuerySchema::computeFieldsExpanded()
                         QueryColumnInfo *ci = new QueryColumnInfo(tab_f, QByteArray()/*no field for asterisk!*/,
                                 isColumnVisible(fieldPosition));
                         list.append(ci);
-                        PreDbg << "caching (unexpanded) columns order:" << ci->debugString() << "at position" << fieldPosition;
+                        PreDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
                         d->columnsOrder->insert(ci, fieldPosition);
                     }
                 }
@@ -1256,7 +1294,7 @@ void QuerySchema::computeFieldsExpanded()
             QueryColumnInfo *ci = new QueryColumnInfo(f, columnAlias(fieldPosition), isColumnVisible(fieldPosition));
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
-            PreDbg << "caching (unexpanded) column's order:" << ci->debugString() << "at position" << fieldPosition;
+            PreDbg << "caching (unexpanded) column's order:" << *ci << "at position" << fieldPosition;
             d->columnsOrder->insert(ci, fieldPosition);
             d->columnsOrderWithoutAsterisks->insert(ci, fieldPosition);
 
@@ -1268,9 +1306,9 @@ void QuerySchema::computeFieldsExpanded()
             // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
             // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
             // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
-            LookupFieldSchema::RowSource& rowSource = lookupFieldSchema->rowSource();
-            if (rowSource.type() == LookupFieldSchema::RowSource::Table) {
-                TableSchema *lookupTable = connection()->tableSchema(rowSource.name());
+            LookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
+            if (recordSource.type() == LookupFieldSchema::RecordSource::Table) {
+                TableSchema *lookupTable = connection()->tableSchema(recordSource.name());
                 FieldList* visibleColumns = 0;
                 Field *boundField = 0;
                 if (lookupTable
@@ -1311,8 +1349,8 @@ void QuerySchema::computeFieldsExpanded()
                               }*/
                 }
                 delete visibleColumns;
-            } else if (rowSource.type() == LookupFieldSchema::RowSource::Query) {
-                QuerySchema *lookupQuery = connection()->querySchema(rowSource.name());
+            } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
+                QuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
                 if (!lookupQuery)
                     continue;
                 const QueryColumnInfo::Vector lookupQueryFieldsExpanded(lookupQuery->fieldsExpanded());
@@ -1458,9 +1496,9 @@ void QuerySchema::computeFieldsExpanded()
         d->internalFields->resize(lookup_list.count());
     }
     delete d->fieldsExpandedWithInternal; //clear cache
-    delete d->fieldsExpandedWithInternalAndRowID; //clear cache
+    delete d->fieldsExpandedWithInternalAndRecordId; //clear cache
     d->fieldsExpandedWithInternal = 0;
-    d->fieldsExpandedWithInternalAndRowID = 0;
+    d->fieldsExpandedWithInternalAndRecordId = 0;
     if (!lookup_list.isEmpty() && !d->internalFields) {//create on demand
         d->internalFields = new QueryColumnInfo::Vector(lookup_list.count());
 //Qt 4  d->internalFields->setAutoDelete(true);
@@ -1482,9 +1520,9 @@ void QuerySchema::computeFieldsExpanded()
         = ci->field->table() ? ci->field->table()->lookupFieldSchema(*ci->field) : 0;
         if (!lookupFieldSchema || lookupFieldSchema->boundColumn() < 0)
             continue;
-        LookupFieldSchema::RowSource& rowSource = lookupFieldSchema->rowSource();
-        if (rowSource.type() == LookupFieldSchema::RowSource::Table) {
-            TableSchema *lookupTable = connection()->tableSchema(rowSource.name());
+        const LookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
+        if (recordSource.type() == LookupFieldSchema::RecordSource::Table) {
+            TableSchema *lookupTable = connection()->tableSchema(recordSource.name());
             FieldList* visibleColumns = 0;
             if (lookupTable
                     && (uint)lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
@@ -1507,8 +1545,8 @@ void QuerySchema::computeFieldsExpanded()
                 }
             }
             delete visibleColumns;
-        } else if (rowSource.type() == LookupFieldSchema::RowSource::Query) {
-            QuerySchema *lookupQuery = connection()->querySchema(rowSource.name());
+        } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
+            QuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
             if (!lookupQuery)
                 continue;
             const QueryColumnInfo::Vector lookupQueryFieldsExpanded(lookupQuery->fieldsExpanded());
@@ -1539,12 +1577,12 @@ void QuerySchema::computeFieldsExpanded()
                     ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
             }
         } else {
-            PreWarn << "unsupported row source type" << rowSource.typeName();
+            PreWarn << "unsupported record source type" << recordSource.typeName();
         }
     }
 }
 
-QHash<QueryColumnInfo*, int> QuerySchema::columnsOrder(ColumnsOrderOptions options)
+QHash<QueryColumnInfo*, int> QuerySchema::columnsOrder(ColumnsOrderOptions options) const
 {
     if (!d->columnsOrder)
         computeFieldsExpanded();
@@ -1555,7 +1593,7 @@ QHash<QueryColumnInfo*, int> QuerySchema::columnsOrder(ColumnsOrderOptions optio
     return *d->columnsOrderExpanded;
 }
 
-QVector<int> QuerySchema::pkeyFieldsOrder()
+QVector<int> QuerySchema::pkeyFieldsOrder() const
 {
     if (d->pkeyFieldsOrder)
         return *d->pkeyFieldsOrder;
@@ -1564,9 +1602,9 @@ QVector<int> QuerySchema::pkeyFieldsOrder()
     if (!tbl || !tbl->primaryKey())
         return QVector<int>();
 
-    //get order of PKEY fields (e.g. for rows updating or inserting )
+    //get order of PKEY fields (e.g. for records updating or inserting )
     IndexSchema *pkey = tbl->primaryKey();
-    pkey->debug();
+    PreDbg << *pkey;
     //debug(); //20080107, sebsauer; this seems to crash in kexi on query SQL text view
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
@@ -1608,7 +1646,7 @@ Relationship* QuerySchema::addRelationship(Field *field1, Field *field2)
     return r;
 }
 
-QueryColumnInfo::List* QuerySchema::autoIncrementFields()
+QueryColumnInfo::List* QuerySchema::autoIncrementFields() const
 {
     if (!d->autoincFields) {
         d->autoincFields = new QueryColumnInfo::List();
@@ -1630,6 +1668,7 @@ QueryColumnInfo::List* QuerySchema::autoIncrementFields()
     return d->autoincFields;
 }
 
+// static
 QString QuerySchema::sqlColumnsList(QueryColumnInfo::List* infolist, Driver *driver)
 {
     if (!infolist)
@@ -1647,12 +1686,14 @@ QString QuerySchema::sqlColumnsList(QueryColumnInfo::List* infolist, Driver *dri
     return result;
 }
 
-QString QuerySchema::autoIncrementSQLFieldsList(Driver *driver)
+QString QuerySchema::autoIncrementSQLFieldsList(Driver *driver) const
 {
-    if ((Driver *)d->lastUsedDriverForAutoIncrementSQLFieldsList != driver
-            || d->autoIncrementSQLFieldsList.isEmpty()) {
+    QWeakPointer<Driver> driverWeakPointer = DriverManagerInternal::self()->driverWeakPointer(driver);
+    if (   d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
+        || d->autoIncrementSQLFieldsList.isEmpty())
+    {
         d->autoIncrementSQLFieldsList = QuerySchema::sqlColumnsList(autoIncrementFields(), driver);
-        d->lastUsedDriverForAutoIncrementSQLFieldsList = driver;
+        d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
     }
     return d->autoIncrementSQLFieldsList;
 }
@@ -1678,14 +1719,14 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
     }
 
     BinaryExpr * newExpr = new BinaryExpr(
-        KexiDBExpr_Relational,
+        PredicateExpr_Relational,
         new ConstExpr(token, value),
         relation,
         new VariableExpr((field->table() ? (field->table()->name() + ".") : QString()) + field->name())
     );
     if (d->whereExpr) {
         d->whereExpr = new BinaryExpr(
-            KexiDBExpr_Logical,
+            PredicateExpr_Logical,
             d->whereExpr,
             AND,
             newExpr
@@ -1730,7 +1771,7 @@ OrderByColumnList& QuerySchema::orderByColumnList() const
     return d->orderByColumnList;
 }
 
-QuerySchemaParameterList QuerySchema::parameters()
+QuerySchemaParameterList QuerySchema::parameters() const
 {
     if (!whereExpression())
         return QuerySchemaParameterList();
@@ -1820,21 +1861,21 @@ void QueryAsterisk::setTable(TableSchema *table)
     m_table = table;
 }
 
-QString QueryAsterisk::debugString() const
+QDebug operator<<(QDebug dbg, const QueryAsterisk& asterisk)
 {
-    QString dbg;
-    if (isAllTableAsterisk()) {
-        dbg += "ALL-TABLES ASTERISK (*) ON TABLES(";
-        QString table_names;
-        foreach(TableSchema *table, *query()->tables()) {
-            if (!table_names.isEmpty())
-                table_names += ", ";
-            table_names += table->name();
+    if (asterisk.isAllTableAsterisk()) {
+        dbg.nospace() <<"ALL-TABLES ASTERISK (*) ON TABLES(";
+        bool first = true;
+        foreach(TableSchema *table, *asterisk.query()->tables()) {
+            if (first)
+                first = false;
+            else
+                dbg.nospace() << ',';
+            dbg.space() << table->name();
         }
-        dbg += (table_names + ")");
+        dbg.space() << ')';
     } else {
-        dbg += ("SINGLE-TABLE ASTERISK (" + table()->name() + ".*)");
+        dbg.nospace() << "SINGLE-TABLE ASTERISK (" << asterisk.table()->name() << ".*)";
     }
-    return dbg;
+    return dbg.space();
 }
-

@@ -53,8 +53,8 @@ struct TypeCache {
                 str_list = slist.value(tg);
             }
             list += t;
-            name_list += Predicate::Field::typeName(t);
-            str_list += Predicate::Field::typeString(t);
+            name_list += Field::typeName(t);
+            str_list += Field::typeString(t);
             tlist[ tg ] = list;
             nlist[ tg ] = name_list;
             slist[ tg ] = str_list;
@@ -77,29 +77,29 @@ struct TypeCache {
 
 PREDICATE_GLOBAL_STATIC(TypeCache, Predicate_typeCache)
 
-const TypeGroupList Predicate::typesForGroup(Predicate::Field::TypeGroup typeGroup)
+const TypeGroupList Predicate::typesForGroup(Field::TypeGroup typeGroup)
 {
     return Predicate_typeCache->tlist.value(typeGroup);
 }
 
-QStringList Predicate::typeNamesForGroup(Predicate::Field::TypeGroup typeGroup)
+QStringList Predicate::typeNamesForGroup(Field::TypeGroup typeGroup)
 {
     return Predicate_typeCache->nlist.value(typeGroup);
 }
 
-QStringList Predicate::typeStringsForGroup(Predicate::Field::TypeGroup typeGroup)
+QStringList Predicate::typeStringsForGroup(Field::TypeGroup typeGroup)
 {
     return Predicate_typeCache->slist.value(typeGroup);
 }
 
-Predicate::Field::Type Predicate::defaultTypeForGroup(Predicate::Field::TypeGroup typeGroup)
+Field::Type Predicate::defaultTypeForGroup(Field::TypeGroup typeGroup)
 {
     return (typeGroup <= Field::LastTypeGroup) ? Predicate_typeCache->def_tlist.value(typeGroup) : Field::InvalidType;
 }
 
-void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
+void Predicate::getHTMLErrorMesage(const Result& result, QString& msg, QString &details)
 {
-    Connection *conn = 0;
+/*    Connection *conn = 0;
     if (!obj || !obj->error()) {
         if (dynamic_cast<Cursor*>(obj)) {
             conn = dynamic_cast<Cursor*>(obj)->connection();
@@ -107,42 +107,42 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
         } else {
             return;
         }
-    }
+    }*/
 // if (dynamic_cast<Connection*>(obj)) {
     // conn = dynamic_cast<Connection*>(obj);
     //}
-    if (!obj || !obj->error())
+    if (!result.isError())
         return;
     //lower level message is added to the details, if there is alread message specified
-    if (!obj->msgTitle().isEmpty())
-        msg += "<p>" + obj->msgTitle();
+    if (!result.messageTitle().isEmpty())
+        msg += "<p>" + result.messageTitle();
 
     if (msg.isEmpty())
-        msg = "<p>" + obj->errorMsg();
+        msg = "<p>" + result.message();
     else
-        details += "<p>" + obj->errorMsg();
+        details += "<p>" + result.message();
 
-    if (!obj->serverErrorMsg().isEmpty())
-        details += "<p><b>" + QObject::tr("Message from server:") + "</b> " + obj->serverErrorMsg();
-    if (!obj->recentSQLString().isEmpty())
-        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(obj->recentSQLString());
-    int serverResult;
+    if (!result.serverMessage().isEmpty())
+        details += "<p><b>" + QObject::tr("Message from server:") + "</b> " + result.serverMessage();
+    if (!result.recentSQLString().isEmpty())
+        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(result.recentSQLString());
+    int serverResultCode;
     QString serverResultName;
-    if (obj->serverResult() != 0) {
-        serverResult = obj->serverResult();
-        serverResultName = obj->serverResultName();
+    if (result.serverResultCode() != 0) {
+        serverResultCode = result.serverResultCode();
+        serverResultName = result.serverResultName();
     } else {
-        serverResult = obj->previousServerResult();
-        serverResultName = obj->previousServerResultName();
+        serverResultCode = result.previousServerResultCode();
+        serverResultName = result.previousServerResultName();
     }
     if (   !details.isEmpty()
-        && (   !obj->serverErrorMsg().isEmpty()
-            || !obj->recentSQLString().isEmpty()
+        && (   !result.serverMessage().isEmpty()
+            || !result.recentSQLString().isEmpty()
             || !serverResultName.isEmpty()
-            || serverResult != 0)
+            || serverResultCode != 0)
            )
     {
-        details += (QString("<p><b>") + QObject::tr("Server result:") + "</b> " + QString::number(serverResult));
+        details += (QString("<p><b>") + QObject::tr("Server result code:") + "</b> " + QString::number(serverResultCode));
         if (!serverResultName.isEmpty()) {
             details += QString(" (%1)").arg(serverResultName);
         }
@@ -159,22 +159,22 @@ void Predicate::getHTMLErrorMesage(Object* obj, QString& msg, QString &details)
     }
 }
 
-void Predicate::getHTMLErrorMesage(Object* obj, QString& msg)
+void Predicate::getHTMLErrorMesage(const Result& result, QString& msg)
 {
-    getHTMLErrorMesage(obj, msg, msg);
+    getHTMLErrorMesage(result, msg, msg);
 }
 
-void Predicate::getHTMLErrorMesage(Object* obj, ResultInfo *result)
+void Predicate::getHTMLErrorMesage(const Result& result, ResultInfo *info)
 {
-    getHTMLErrorMesage(obj, result->msg, result->desc);
+    getHTMLErrorMesage(result, info->msg, info->desc);
 }
 
 int Predicate::idForObjectName(Connection &conn, const QString& objName, int objType)
 {
     RecordData data;
     if (true != conn.querySingleRecord(
-                QString::fromLatin1("select o_id from kexi__objects where lower(o_name)='%1' and o_type=%2")
-                .arg(objName.toLower()).arg(objType), data))
+                QString::fromLatin1("SELECT o_id FROM kexi__objects WHERE lower(o_name)='%1' AND o_type=%2")
+                .arg(objName.toLower()).arg(objType), &data))
         return 0;
     bool ok;
     int id = data[0].toInt(&ok);
@@ -268,10 +268,10 @@ QByteArray TableOrQuerySchema::name() const
 
 QString TableOrQuerySchema::captionOrName() const
 {
-    SchemaData *sdata = m_table ? static_cast<SchemaData *>(m_table) : static_cast<SchemaData *>(m_query);
-    if (!sdata)
+    Object *object = m_table ? static_cast<Object *>(m_table) : static_cast<Object *>(m_query);
+    if (!object)
         return m_name;
-    return sdata->caption().isEmpty() ? sdata->name() : sdata->caption();
+    return object->caption().isEmpty() ? object->name() : object->caption();
 }
 
 Field* TableOrQuerySchema::field(const QString& name)
@@ -295,21 +295,14 @@ QueryColumnInfo* TableOrQuerySchema::columnInfo(const QString& name)
     return 0;
 }
 
-QString TableOrQuerySchema::debugString()
+//! Sends information about table or query schema @a schema to debug output @a dbg.
+QDebug operator<<(QDebug dbg, const TableOrQuerySchema& schema)
 {
-    if (m_table)
-        return m_table->debugString();
-    else if (m_query)
-        return m_query->debugString();
-    return QString();
-}
-
-void TableOrQuerySchema::debug()
-{
-    if (m_table)
-        return m_table->debug();
-    else if (m_query)
-        return m_query->debug();
+    if (schema.table())
+        dbg.nospace() << *schema.table();
+    else if (schema.query())
+        dbg.nospace() << *schema.query();
+    return dbg.space();
 }
 
 Connection* TableOrQuerySchema::connection() const
@@ -324,26 +317,26 @@ Connection* TableOrQuerySchema::connection() const
 
 //------------------------------------------
 
-ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const Predicate::ConnectionData& connData)
+ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const ConnectionData& connData)
         : m_dlg(dlg), m_connData(connData)
 {
     connect(this, SIGNAL(error(const QString&,const QString&)),
             dlg, SLOT(error(const QString&,const QString&)), Qt::QueuedConnection);
 
     // try to load driver now because it's not supported in different thread
-    Predicate::DriverManager manager;
-    m_driver = manager.driver(m_connData.driverName);
-    if (manager.error()) {
-        emitError(&manager);
+    DriverManager manager;
+    m_driver = manager.driver(m_connData.driverName());
+    if (manager.result().isError()) {
+        emitError(manager.result());
         m_driver = 0;
     }
 }
 
-void ConnectionTestThread::emitError(Predicate::Object* object)
+void ConnectionTestThread::emitError(const Result& result)
 {
     QString msg;
     QString details;
-    Predicate::getHTMLErrorMesage(object, msg, details);
+    Predicate::getHTMLErrorMesage(result, msg, details);
     emit error(msg, details);
 }
 
@@ -352,32 +345,32 @@ void ConnectionTestThread::run()
     if (!m_driver) {
         return;
     }
-    std::auto_ptr<Predicate::Connection> conn(m_driver->createConnection(m_connData));
-    if (!conn.get() || m_driver->error()) {
+    std::auto_ptr<Connection> conn(m_driver->createConnection(m_connData));
+    if (!conn.get() || m_driver->result().isError()) {
         //kDebug() << "err 1";
-        emitError(m_driver);
+        emitError(m_driver->result());
         return;
     }
-    if (!conn.get()->connect() || conn.get()->error()) {
+    if (!conn.get()->connect() || conn.get()->result().isError()) {
         //kDebug() << "err 2";
-        emitError(conn.get());
+        emitError(conn.get()->result());
         return;
     }
     // SQL database backends like PostgreSQL require executing "USE database"
     // if we really want to know connection to the server succeeded.
     QString tmpDbName;
-    if (!conn->useTemporaryDatabaseIfNeeded(tmpDbName)) {
+    if (!conn->useTemporaryDatabaseIfNeeded(&tmpDbName)) {
         //kDebug() << "err 3";
-        emitError(conn.get());
+        emitError(conn.get()->result());
         return;
     }
     //kDebug() << "emitError(0)";
-    emitError(0);
+    emitError(Result());
 }
 
 ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
-        const Predicate::ConnectionData& data,
-        Predicate::MessageHandler& msgHandler)
+        const ConnectionData& data,
+        MessageHandler& msgHandler)
         : QProgressDialog(parent)
         , m_thread(new ConnectionTestThread(this, data))
         , m_connData(data)
@@ -388,7 +381,7 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
 {
     setWindowTitle(tr("Test Connection"));
     setLabelText(tr("<qt>Testing connection to <b>%1</b> database server...</qt>")
-                 .arg(data.serverInfoString(true)));
+                 .arg(data.serverInfoString()));
     setModal(true);
 //Qt4    showCancelButton(true);
 //Qt4    progressBar()->setFormat(""); //hide %
@@ -439,14 +432,14 @@ void ConnectionTestDialog::slotTimeout()
             m_msgHandler->showErrorMessage(
                 MessageHandler::Sorry,
                 QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
-                    .arg(m_connData.serverInfoString(true)),
+                    .arg(m_connData.serverInfoString()),
                 QString(),
                 QObject::tr("Test Connection"));
         } else {
             m_msgHandler->showErrorMessage(
                 MessageHandler::Information,
                 QObject::tr("Test connection to \"%1\" database server established successfully.")
-                    .arg(m_connData.serverInfoString(true)),
+                    .arg(m_connData.serverInfoString()),
                 QString(),
                 tr("Test Connection"));
         }
@@ -480,22 +473,22 @@ void ConnectionTestDialog::reject()
     QProgressDialog::reject();
 }
 
-void Predicate::connectionTestDialog(QWidget* parent, const Predicate::ConnectionData& data,
-                                  Predicate::MessageHandler& msgHandler)
+void Predicate::connectionTestDialog(QWidget* parent, const ConnectionData& data,
+                                     MessageHandler& msgHandler)
 {
     ConnectionTestDialog dlg(parent, data, msgHandler);
     dlg.exec();
 }
 
-int Predicate::rowCount(Connection &conn, const QString& sql)
+int Predicate::recordCount(Connection* conn, const QString& sql)
 {
     int count = -1; //will be changed only on success of querySingleNumber()
-    QString selectSql(QString::fromLatin1("SELECT COUNT() FROM (") + sql + ")");
-    conn.querySingleNumber(selectSql, count);
+    QString selectSql(QLatin1String("SELECT COUNT() FROM (") + sql + ')');
+    conn->querySingleNumber(selectSql, &count);
     return count;
 }
 
-int Predicate::rowCount(const Predicate::TableSchema& tableSchema)
+int Predicate::recordCount(const TableSchema& tableSchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!tableSchema.connection()) {
@@ -504,47 +497,48 @@ int Predicate::rowCount(const Predicate::TableSchema& tableSchema)
     }
     int count = -1; //will be changed only on success of querySingleNumber()
     tableSchema.connection()->querySingleNumber(
-        QString::fromLatin1("SELECT COUNT(*) FROM ")
+        QLatin1String("SELECT COUNT(*) FROM ")
         + tableSchema.connection()->driver()->escapeIdentifier(tableSchema.name()),
-        count
+        &count
     );
     return count;
 }
 
-int Predicate::rowCount(Predicate::QuerySchema& querySchema)
+int Predicate::recordCount(QuerySchema* querySchema)
 {
 //! @todo does not work with non-SQL data sources
-    if (!querySchema.connection()) {
-        PreWarn << "no querySchema.connection()";
+    if (!querySchema->connection()) {
+        PreWarn << "no querySchema->connection()";
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
-    querySchema.connection()->querySingleNumber(
-        QString::fromLatin1("SELECT COUNT(*) FROM (")
-        + querySchema.connection()->selectStatement(querySchema) + ")",
-        count
+    querySchema->connection()->querySingleNumber(
+        QLatin1String("SELECT COUNT(*) FROM (")
+            + querySchema->connection()->selectStatement(querySchema) + ')',
+        &count
     );
     return count;
 }
 
-int Predicate::rowCount(Predicate::TableOrQuerySchema& tableOrQuery)
+int Predicate::recordCount(TableOrQuerySchema* tableOrQuery)
 {
-    if (tableOrQuery.table())
-        return rowCount(*tableOrQuery.table());
-    if (tableOrQuery.query())
-        return rowCount(*tableOrQuery.query());
+    if (tableOrQuery->table())
+        return recordCount(*tableOrQuery->table());
+    if (tableOrQuery->query())
+        return recordCount(tableOrQuery->query());
     return -1;
 }
 
-int Predicate::fieldCount(Predicate::TableOrQuerySchema& tableOrQuery)
+int Predicate::fieldCount(TableOrQuerySchema* tableOrQuery)
 {
-    if (tableOrQuery.table())
-        return tableOrQuery.table()->fieldCount();
-    if (tableOrQuery.query())
-        return tableOrQuery.query()->fieldsExpanded().count();
+    if (tableOrQuery->table())
+        return tableOrQuery->table()->fieldCount();
+    if (tableOrQuery->query())
+        return tableOrQuery->query()->fieldsExpanded().count();
     return -1;
 }
 
+#if 0 // moved to ConnectionData
 QMap<QString, QString> Predicate::toMap(const ConnectionData& data)
 {
     QMap<QString, QString> m;
@@ -576,10 +570,11 @@ void Predicate::fromMap(const QMap<QString, QString>& map, ConnectionData& data)
     data.userName = map["userName"];
     data.setFileName(map["fileName"]);
 }
+#endif
 
 bool Predicate::splitToTableAndFieldParts(const QString& string,
-                                       QString& tableName, QString& fieldName,
-                                       SplitToTableAndFieldPartsOptions option)
+                                          QString& tableName, QString& fieldName,
+                                          SplitToTableAndFieldPartsOptions option)
 {
     const int id = string.indexOf('.');
     if (option & SetFieldNameIfNoTableName && id == -1) {
@@ -619,24 +614,24 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
     return QLocale().toString(value, 'g', decimalPlaces);
 }
 
-Predicate::Field::Type Predicate::intToFieldType(int type)
+Field::Type Predicate::intToFieldType(int type)
 {
-    if (type < (int)Predicate::Field::InvalidType || type > (int)Predicate::Field::LastType) {
+    if (type < (int)Field::InvalidType || type > (int)Field::LastType) {
         PreWarn << "invalid type" << type;
-        return Predicate::Field::InvalidType;
+        return Field::InvalidType;
     }
-    return (Predicate::Field::Type)type;
+    return (Field::Type)type;
 }
 
 static bool setIntToFieldType(Field& field, const QVariant& value)
 {
     bool ok;
     const int intType = value.toInt(&ok);
-    if (!ok || Predicate::Field::InvalidType == intToFieldType(intType)) {//for sanity
+    if (!ok || Field::InvalidType == intToFieldType(intType)) {//for sanity
         PreWarn << "invalid type";
         return false;
     }
-    field.setType((Predicate::Field::Type)intType);
+    field.setType((Field::Type)intType);
     return true;
 }
 
@@ -684,7 +679,7 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
     }
 
 #define SET_BOOLEAN_FLAG(flag, value) { \
-        constraints |= Predicate::Field::flag; \
+        constraints |= Field::flag; \
         if (!value) \
             constraints ^= Predicate::Field::flag; \
     }
@@ -696,7 +691,7 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
     if ((it = values.find("indexed")) != values.constEnd())
         SET_BOOLEAN_FLAG(Indexed, (*it).toBool());
     if ((it = values.find("autoIncrement")) != values.constEnd()
-            && Predicate::Field::isAutoIncrementAllowed(field.type()))
+            && Field::isAutoIncrementAllowed(field.type()))
         SET_BOOLEAN_FLAG(AutoInc, (*it).toBool());
     if ((it = values.find("unique")) != values.constEnd())
         SET_BOOLEAN_FLAG(Unique, (*it).toBool());
@@ -708,9 +703,9 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
 
     uint options = 0;
     if ((it = values.find("unsigned")) != values.constEnd()) {
-        options |= Predicate::Field::Unsigned;
+        options |= Field::Unsigned;
         if (!(*it).toBool())
-            options ^= Predicate::Field::Unsigned;
+            options ^= Field::Unsigned;
     }
     field.setOptions(options);
 
@@ -775,9 +770,9 @@ bool Predicate::isExtendedTableFieldProperty(const QByteArray& propertyName)
 bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, const QVariant& value)
 {
 #define SET_BOOLEAN_FLAG(flag, value) { \
-        constraints |= Predicate::Field::flag; \
+        constraints |= Field::flag; \
         if (!value) \
-            constraints ^= Predicate::Field::flag; \
+            constraints ^= Field::flag; \
         field.setConstraints( constraints ); \
         return true; \
     }
@@ -824,7 +819,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         if ("indexed" == propertyName)
             SET_BOOLEAN_FLAG(Indexed, value.toBool());
         if ("autoIncrement" == propertyName
-                && Predicate::Field::isAutoIncrementAllowed(field.type()))
+                && Field::isAutoIncrementAllowed(field.type()))
             SET_BOOLEAN_FLAG(AutoInc, value.toBool());
         if ("unique" == propertyName)
             SET_BOOLEAN_FLAG(Unique, value.toBool());
@@ -835,9 +830,9 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
 
         uint options = 0;
         if ("unsigned" == propertyName) {
-            options |= Predicate::Field::Unsigned;
+            options |= Field::Unsigned;
             if (!value.toBool())
-                options ^= Predicate::Field::Unsigned;
+                options ^= Field::Unsigned;
             field.setOptions(options);
             return true;
         }
@@ -980,7 +975,7 @@ struct Predicate_EmptyValueForTypeCache {
 //! Used in Predicate::emptyValueForType()
 PREDICATE_GLOBAL_STATIC(Predicate_EmptyValueForTypeCache, Predicate_emptyValueForTypeCache)
 
-QVariant Predicate::emptyValueForType(Predicate::Field::Type type)
+QVariant Predicate::emptyValueForType(Field::Type type)
 {
     const QVariant val(Predicate_emptyValueForTypeCache->values.at(
                            (type <= Field::LastType) ? type : Field::InvalidType));
@@ -1033,7 +1028,7 @@ struct Predicate_NotEmptyValueForTypeCache {
 //! Used in Predicate::notEmptyValueForType()
 PREDICATE_GLOBAL_STATIC(Predicate_NotEmptyValueForTypeCache, Predicate_notEmptyValueForTypeCache)
 
-QVariant Predicate::notEmptyValueForType(Predicate::Field::Type type)
+QVariant Predicate::notEmptyValueForType(Field::Type type)
 {
     const QVariant val(Predicate_notEmptyValueForTypeCache->values.at(
                            (type <= Field::LastType) ? type : Field::InvalidType));
@@ -1154,14 +1149,16 @@ QString Predicate::variantToString(const QVariant& v)
     return v.toString();
 }
 
-QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool &ok)
+QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
 {
     if (s.isNull()) {
-        ok = true;
+        if (ok)
+            *ok = true;
         return QVariant();
     }
     if (QVariant::Invalid == type) {
-        ok = false;
+        if (ok)
+            *ok = false;
         return QVariant();
     }
     if (type == QVariant::ByteArray) {//special case: hex string
@@ -1169,26 +1166,32 @@ QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool 
         QByteArray ba;
         ba.resize(len / 2 + len % 2);
         for (uint i = 0; i < (len - 1); i += 2) {
-            int c = s.mid(i, 2).toInt(&ok, 16);
-            if (!ok) {
+            bool _ok;
+            int c = s.mid(i, 2).toInt(&_ok, 16);
+            if (!_ok) {
+                if (ok)
+                    *ok = _ok;
                 PreWarn << "Error in digit" << i;
                 return QVariant();
             }
             ba[i/2] = (char)c;
         }
-        ok = true;
+        if (ok)
+            *ok = true;
         return ba;
     }
     QVariant result(s);
     if (!result.convert(type)) {
-        ok = false;
+        if (ok)
+            *ok = false;
         return QVariant();
     }
-    ok = true;
+    if (ok)
+        *ok = true;
     return result;
 }
 
-bool Predicate::isDefaultValueAllowed(Predicate::Field* field)
+bool Predicate::isDefaultValueAllowed(Field* field)
 {
     return field && !field->isUniqueKey();
 }

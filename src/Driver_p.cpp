@@ -71,7 +71,7 @@ void DriverPrivate::initInternalProperties()
     propertyCaptions["transaction_nested"] = QObject::tr("Nested transactions support");
 
     properties["predicate_driver_version"] =
-        QString("%1.%2").arg(version().major).arg(version().minor);
+        QString("%1.%2").arg(version().major()).arg(version().minor());
     propertyCaptions["predicate_driver_version"] =
         QObject::tr("Predicate driver version");
 }

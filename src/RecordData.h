@@ -27,7 +27,8 @@
 
 #include <QVector>
 #include <QVariant>
-#include "predicate_export.h"
+#include <QtDebug>
+#include <Predicate/predicate_export.h>
 
 namespace Predicate
 {
@@ -54,13 +55,11 @@ public:
     inline void clearValues() {
         init(count());
     }
-
-    /*! @return debug string for this record. */
-    QString debugString() const;
-
-    /*! Prints debug string for this record. */
-    void debug() const;
 };
+
 }
+
+//! Sends information about record data @a data to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::RecordData& data);
 
 #endif

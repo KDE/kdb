@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,36 +20,47 @@
 #ifndef PREDICATE_DRIVER_MNGR_P_H
 #define PREDICATE_DRIVER_MNGR_P_H
 
-#include "Driver.h"
+#include <QObject>
+#include <QWeakPointer>
+#include <Predicate/Driver.h>
 
 namespace Predicate
 {
 
 //! Internal class of the driver manager.
-class PREDICATE_EXPORT DriverManagerInternal : public QObject, public Predicate::Object
+class DriverManagerInternal : public QObject, public Resultable
 {
     Q_OBJECT
 public:
+    /*! Used by self() */
+    DriverManagerInternal();
+
     ~DriverManagerInternal();
 
     /*! Tries to load db driver \a name.
       \return db driver, or 0 if error (then error message is also set) */
-    Predicate::Driver* driver(const QString& name);
+    Driver* driver(const QString& name);
 
-    Predicate::Driver::Info driverInfo(const QString &name);
+    /*! @return weak pointer reference for driver @a driver or null pointer if @a driver is 0.
+     Used to be able to track drivers lifetime using QSharedPointers/QWeakPointers. */
+    QWeakPointer<Driver> driverWeakPointer(Driver* driver) {
+        return m_driverWeakPointers.value(driver);
+    }
+
+    DriverInfo driverInfo(const QString &name);
 
     static DriverManagerInternal *self();
 
     /*! increments the refcount for the manager */
-    void incRefCount();
+//void incRefCount();
 
     /*! decrements the refcount for the manager
       if the refcount reaches a value less than 1 the manager is freed */
-    void decRefCount();
+//void decRefCount();
 
-    /*! Called from Driver dtor (because sometimes KLibrary (used by Driver)
-     is destroyed before DriverManagerInternal) */
-    void aboutDelete(Driver* drv);
+//2.0    /*! Called from Driver dtor (because sometimes KLibrary (used by Driver)
+//2.0     is destroyed before DriverManagerInternal) */
+//2.0    void aboutDelete(Driver* drv);
 
 protected slots:
     /*! Used to destroy all drivers on QApplication quit, so even if there are
@@ -59,30 +70,26 @@ protected slots:
     void slotAppQuits();
 
 private:
-    /*! Used by self() */
-    DriverManagerInternal();
-
     bool lookupDrivers();
     void lookupDriversForDirectory(const QString& pluginsDir);
 
-    static Predicate::DriverManagerInternal* s_self;
-
-    Driver::Info::Map m_infos_by_mimetype;
-    Driver::Info::Map m_driversInfo; //!< used to store drivers information
-    QHash<QString, Predicate::Driver*> m_drivers;
+    DriverInfoMap m_infos_by_mimetype;
+    DriverInfoMap m_driversInfo; //!< used to store drivers information
+    QMap<QString, QSharedPointer<Driver>* > m_drivers; //!< for owning drivers
+    QMap<Driver*, QWeakPointer<Driver> > m_driverWeakPointers;
     QString m_pluginsDir;
 
-    QString m_serverErrMsg;
-    int m_serverResultNum;
-    QString m_serverResultName;
+//pred    QString m_serverErrMsg;
+//pred    int m_serverResultNum;
+//pred    QString m_serverResultName;
 //    //! result names for KParts::ComponentFactory::ComponentLoadingError
 //    QHash<int, QString> m_componentLoadingErrors;
 
     QStringList possibleProblems;
 
-    ulong refCount() const { return m_refCount; }
+//pred    ulong refCount() const { return m_refCount; }
 
-    ulong m_refCount;
+//ulong m_refCount;
     bool lookupDriversNeeded;
 
     friend class DriverManager;
@@ -90,4 +97,3 @@ private:
 }
 
 #endif
-

@@ -27,15 +27,14 @@
 #include <QVariant>
 #include <QPointer>
 
-#include "Object.h"
-#include "ConnectionData.h"
-#include "TableSchema.h"
-#include "QuerySchema.h"
-#include "QuerySchemaParameter.h"
-#include "Transaction.h"
-#include "Driver.h"
-#include "PreparedStatement.h"
-#include "RecordData.h"
+#include <Predicate/ConnectionData.h>
+#include <Predicate/TableSchema.h>
+#include <Predicate/QuerySchema.h>
+#include <Predicate/QuerySchemaParameter.h>
+#include <Predicate/Transaction.h>
+#include <Predicate/Driver.h>
+#include <Predicate/PreparedStatement.h>
+#include <Predicate/RecordData.h>
 #include <Predicate/tools/Tristate.h>
 
 namespace Predicate
@@ -43,9 +42,21 @@ namespace Predicate
 
 class Cursor;
 class ConnectionPrivate;
-class RowEditBuffer;
+class RecordEditBuffer;
 class DatabaseProperties;
 class AlterTableHandler;
+
+class PREDICATE_EXPORT ConnectionSqlInterface : public Resultable
+{
+    protected:
+        void setSql(const QString& sql) {
+            m_result.setSql(sql);
+        }
+        QString sql() const {
+            return m_result.sql();
+        }
+    friend class Cursor;
+};
 
 /*! @short Provides database connection, allowing queries and data modification.
 
@@ -53,10 +64,8 @@ class AlterTableHandler;
  It supports data queries and modification by creating client-side database cursors.
  Database transactions are supported.
 */
-class PREDICATE_EXPORT Connection : public QObject, public Predicate::Object
+class PREDICATE_EXPORT Connection : public ConnectionSqlInterface
 {
-    Q_OBJECT
-
 public:
 
     /*! Opened connection is automatically disconnected and removed
@@ -66,7 +75,7 @@ public:
     virtual ~Connection();
 
     /*! \return parameters that were used to create this connection. */
-    ConnectionData* data() const;
+    ConnectionData data() const;
 
     /*! \return the driver used for this connection. */
     inline Driver* driver() const {
@@ -91,9 +100,9 @@ public:
      (SQlite3 dirver does this). */
     virtual bool isReadOnly() const;
 
-    /*! Reimplemented from Object: also clears sql string.
+    /*! Reimplemented, also clears sql string.
      @sa recentSQLString() */
-    virtual void clearError();
+    void clearResult();
 
     /*! \brief Disconnects from driver with given parameters.
 
@@ -181,7 +190,7 @@ public:
      opened database can contain fewer 'system' tables than in current
      Predicate implementation, if the current one is newer than the one used
      to build the database. */
-    static const QStringList& predicateSystemTableNames();
+    static QStringList predicateSystemTableNames();
 
     /*! \return server version information for this connection.
      If database is not connected (i.e. isConnected() is false) 0 is returned. */
@@ -195,7 +204,7 @@ public:
 
     /*! \return DatabaseProperties object allowing to read and write global database properties
      for this connection. */
-    DatabaseProperties& databaseProperties();
+    DatabaseProperties databaseProperties() const;
 
     /*! \return ids of all table schema names stored in currently
      used database. These ids can be later used as argument for tableSchema().
@@ -284,7 +293,7 @@ public:
      see beginTransaction().
      \sa Predicate::Driver::transactionsSupported()
     */
-    Transaction& defaultTransaction() const;
+    Transaction defaultTransaction() const;
 
     /*! Sets default transaction that will be used as context for operations
      on data in opened database for this connection. */
@@ -296,7 +305,7 @@ public:
      Use Transaction::active() to check that. Inactive transaction
      handle is useless and can be safely dropped.
     */
-    const QList<Transaction>& transactions();
+    QList<Transaction> transactions();
 
     /*! \return true if "auto commit" option is on.
 
@@ -358,19 +367,19 @@ public:
      (passing \a query and \a cursor_options to it's constructor).
      Kexi SQL and driver-specific escaping is performed on table names.
     */
-    Cursor* prepareQuery(QuerySchema& query, const QList<QVariant>& params,
+    Cursor* prepareQuery(QuerySchema* query, const QList<QVariant>& params,
                          uint cursor_options = 0);
 
-    /*! \overload prepareQuery( QuerySchema& query, const QList<QVariant>& params,
+    /*! \overload prepareQuery( QuerySchema* query, const QList<QVariant>& params,
       uint cursor_options = 0 )
      Prepares query described by \a query schema without parameters.
     */
-    virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0) = 0;
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0) = 0;
 
     /*! \overload prepareQuery( const QString& statement = QString(), uint cursor_options = 0)
      Statement is build from data provided by \a table schema,
      it is like "select * from table_name".*/
-    Cursor* prepareQuery(TableSchema& table, uint cursor_options = 0);
+    Cursor* prepareQuery(TableSchema* table, uint cursor_options = 0);
 
     /*! Executes SELECT query described by \a statement.
      \return opened cursor created for results of this query
@@ -388,18 +397,18 @@ public:
 
      Statement is build from data provided by \a query schema.
      Kexi SQL and driver-specific escaping is performed on table names. */
-    Cursor* executeQuery(QuerySchema& query, const QList<QVariant>& params,
+    Cursor* executeQuery(QuerySchema* query, const QList<QVariant>& params,
                          uint cursor_options = 0);
 
-    /*! \overload executeQuery( QuerySchema& query, const QList<QVariant>& params,
+    /*! \overload executeQuery( QuerySchema* query, const QList<QVariant>& params,
       uint cursor_options = 0 ) */
-    Cursor* executeQuery(QuerySchema& query, uint cursor_options = 0);
+    Cursor* executeQuery(QuerySchema* query, uint cursor_options = 0);
 
     /*! \overload executeQuery( const QString& statement, uint cursor_options = 0 )
      Executes query described by \a query schema without parameters.
      Statement is build from data provided by \a table schema,
      it is like "select * from table_name".*/
-    Cursor* executeQuery(TableSchema& table, uint cursor_options = 0);
+    Cursor* executeQuery(TableSchema* table, uint cursor_options = 0);
 
     /*! Deletes cursor \a cursor previously created by functions like executeQuery()
      for this connection.
@@ -448,12 +457,12 @@ public:
      so \a sql should not include one already.
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleRecord(const QString& sql, RecordData &data, bool addLimitTo1 = true);
+    tristate querySingleRecord(const QString& sql, RecordData* data, bool addLimitTo1 = true);
 
-    /*! Like tristate querySingleRecord(const QString& sql, RecordData &data)
+    /*! Like tristate querySingleRecord(const QString& sql, RecordData* data)
      but uses QuerySchema object.
      If \a addLimitTo1 is true (the default), adds a LIMIT clause to the query. */
-    tristate querySingleRecord(QuerySchema& query, RecordData &data, bool addLimitTo1 = true);
+    tristate querySingleRecord(QuerySchema* query, RecordData* data, bool addLimitTo1 = true);
 
     /*! Executes \a sql query and stores first record's field's (number \a column) string value
      inside \a value. For efficiency it's recommended that a query defined by \a sql
@@ -463,7 +472,7 @@ public:
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available.
      \sa queryStringList() */
-    tristate querySingleString(const QString& sql, QString &value, uint column = 0,
+    tristate querySingleString(const QString& sql, QString* value, uint column = 0,
                                bool addLimitTo1 = true);
 
     /*! Convenience function: executes \a sql query and stores first
@@ -471,7 +480,7 @@ public:
      Note: "LIMIT 1" is appended to \a sql statement if \a addLimitTo1 is true (the default).
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleNumber(const QString& sql, int &number, uint column = 0,
+    tristate querySingleNumber(const QString& sql, int* number, uint column = 0,
                                bool addLimitTo1 = true);
 
     /*! Executes \a sql query and stores Nth field's string value of every record
@@ -481,7 +490,7 @@ public:
      \return true if all values were fetched successfuly,
      false on data retrieving failure. Returning empty list can be still a valid result.
      On errors, the list is not cleared, it may contain a few retrieved values. */
-    bool queryStringList(const QString& sql, QStringList& list, uint column = 0);
+    bool queryStringList(const QString& sql, QStringList* list, uint column = 0);
 
     /*! \return true if there is at least one record returned in \a sql query.
      Does not fetch any records. \a success will be set to false
@@ -489,10 +498,10 @@ public:
      "no results" and "query execution error" states.
      Note: real executed query is: "SELECT 1 FROM (\a sql) LIMIT 1"
      if \a addLimitTo1 is true (the default). */
-    bool resultExists(const QString& sql, bool &success, bool addLimitTo1 = true);
+    bool resultExists(const QString& sql, bool* success, bool addLimitTo1 = true);
 
     /*! \return true if there is at least one record in \a table. */
-    bool isEmpty(TableSchema& table, bool &success);
+    bool isEmpty(TableSchema* table, bool *success);
 
 //! @todo perhaps use quint64 here?
     /*! \return number of records in \a sql query.
@@ -501,9 +510,11 @@ public:
      (using querySingleNumber()) */
     int resultCount(const QString& sql);
 
+    virtual QString recentSQLString() const;
+
     //PROTOTYPE:
 #define A , const QVariant&
-#define H_INS_REC(args) bool insertRecord(TableSchema &tableSchema args)
+#define H_INS_REC(args) bool insertRecord(TableSchema* tableSchema args)
 #define H_INS_REC_ALL \
     H_INS_REC(A); \
     H_INS_REC(A A); \
@@ -516,16 +527,16 @@ public:
     H_INS_REC_ALL;
 
 #undef H_INS_REC
-#define H_INS_REC(args) bool insertRecord(FieldList& fields args)
+#define H_INS_REC(args) bool insertRecord(FieldList* fields args)
 
     H_INS_REC_ALL;
 #undef H_INS_REC_ALL
 #undef H_INS_REC
 #undef A
 
-    bool insertRecord(TableSchema &tableSchema, const QList<QVariant>& values);
+    bool insertRecord(TableSchema* tableSchema, const QList<QVariant>& values);
 
-    bool insertRecord(FieldList& fields, const QList<QVariant>& values);
+    bool insertRecord(FieldList* fields, const QList<QVariant>& values);
 
     /*! Creates table defined by \a tableSchema.
      Schema information is also added into kexi system tables, for later reuse.
@@ -544,7 +555,7 @@ public:
      - \a tableSchema is not inserted into Connection's structures,
        so you are still owner of this object
      - existing table schema object is not destroyed (i.e. it is still available
-       e.g. using Connection::tableSchema(const QString& ), even if the table
+       e.g. using Connection::tableSchema(const QString&), even if the table
        was physically dropped.
     */
     bool createTable(TableSchema* tableSchema, bool replaceExisting = false);
@@ -566,7 +577,7 @@ public:
      \return true on success, cancelled if altering was cancelled. */
 //! @todo (js): implement real altering
 //! @todo (js): update any structure (e.g. query) that depend on this table!
-    tristate alterTable(TableSchema& tableSchema, TableSchema& newTableSchema);
+    tristate alterTable(TableSchema* tableSchema, TableSchema* newTableSchema);
 
     /*! Alters name of table described by \a tableSchema to \a newName.
      If \a replace is true, destination table is completely dropped and replaced
@@ -578,7 +589,7 @@ public:
      -- false is returned and ERR_OBJECT_EXISTS error is set.
      The schema of \a tableSchema is updated on success.
      \return true on success. */
-    bool alterTableName(TableSchema& tableSchema, const QString& newName, bool replace = false);
+    bool alterTableName(TableSchema* tableSchema, const QString& newName, bool replace = false);
 
     /*! Drops a query defined by \a querySchema.
      If true is returned, schema information \a querySchema is destoyed
@@ -640,19 +651,19 @@ public:
     /*! Because some engines need to have opened any database before
      executing administrative sql statements like "create database" or "drop database",
      this method is used to use appropriate, existing database for this connection.
-     For file-based db drivers this always return true and does not set tmpdbName
-     to any value. For other db drivers: this sets tmpdbName to db name computed
+     For file-based db drivers this always return true and does not set @a name
+     to any value. For other db drivers: this sets @a name to db name computed
      using anyAvailableDatabaseName(), and if the name computed is empty, false
      is returned; if it is not empty, useDatabase() is called.
      False is returned also when useDatabase() fails.
      You can call this method from your application's level if you really want to perform
      tasks that require any used database. In such a case don't forget
-     to closeDatabase() if returned tmpdbName is not empty.
+     to closeDatabase() if returned @a name is not empty.
 
      Note: This method has nothing to do with creating or using temporary databases
      in such meaning that these database are not persistent
     */
-    bool useTemporaryDatabaseIfNeeded(QString &tmpdbName);
+    bool useTemporaryDatabaseIfNeeded(QString* name);
 
     /*! \return autoincrement field's \a aiFieldName value
      of last inserted record. This refers \a tableName table.
@@ -661,21 +672,21 @@ public:
      field's value. Requirements: field must be of integer type, there must be a
      record inserted in current database session (whatever this means).
      On error (quint64)-1 is returned.
-     Last inserted record is identified by magical row identifier, usually called
+     Last inserted record is identified by magical record identifier, usually called
      ROWID (PostgreSQL has it as well as SQLite;
      see DriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
-     ROWID's value will be assigned back to \a ROWID if this pointer is not null.
+     ROWID's value will be assigned back to \a recordId if this pointer is not null.
     */
     quint64 lastInsertedAutoIncValue(const QString& aiFieldName, const QString& tableName,
-                                     quint64* ROWID = 0);
+                                     quint64* recordId = 0);
 
     /*! \overload int lastInsertedAutoIncValue(const QString&, const QString&, quint64*)
     */
     quint64 lastInsertedAutoIncValue(const QString& aiFieldName,
-                                     const TableSchema& table, quint64* ROWID = 0);
+                                     const TableSchema& table, quint64* recordId = 0);
 
     /*! Executes query \a statement, but without returning resulting
-     rows (used mostly for functional queries).
+     records (used mostly for functional queries).
      Only use this method if you really need. */
     bool executeSQL(const QString& statement);
 
@@ -689,8 +700,8 @@ public:
         //! A mode for escaping identifier, Driver::EscapeDriver|Driver::EscapeAsNecessary by default
         int identifierEscaping;
 
-        //! True if ROWID should be also retrieved. False by default.
-        bool alsoRetrieveROWID;
+        //! True if record ID should be also retrieved. False by default.
+        bool alsoRetrieveRecordId;
 
         /*! True if relations (LEFT OUTER JOIN) for visible lookup columns should be added.
          True by default. This is set to false when user-visible statement is generated
@@ -700,46 +711,47 @@ public:
 
     /*! \return "SELECT ..." statement's string needed for executing query
      defined by \a querySchema and \a params. */
-    QString selectStatement(QuerySchema& querySchema,
+    QString selectStatement(QuerySchema* querySchema,
                             const QList<QVariant>& params,
                             const SelectStatementOptions& options = SelectStatementOptions()) const;
 
-    /*! \overload QString selectStatement( QuerySchema& querySchema,
+    /*! \overload QString selectStatement( QuerySchema* querySchema,
       QList<QVariant> params = QList<QVariant>(),
       const SelectStatementOptions& options = SelectStatementOptions() ) const;
      \return "SELECT ..." statement's string needed for executing query
      defined by \a querySchema. */
-    inline QString selectStatement(QuerySchema& querySchema,
+    inline QString selectStatement(QuerySchema* querySchema,
                                    const SelectStatementOptions& options = SelectStatementOptions()) const {
         return selectStatement(querySchema, QList<QVariant>(), options);
     }
 
-    /*! Stores object's schema data (id, name, caption, help text)
-     described by \a sdata on the backend.
-     If \a newObject is true, new entry is created,
-     and (when sdata.id() was <=0), new, unique object identifier
-     is obtained and assigned to \a sdata (see SchemaData::id()).
+    /*! Stores object (id, name, caption, description)
+    described by @a object on the backend. It is expected that entry on the
+    backend already exists, so it's updated. Changes to identifier attribute are not allowed.
+    @return true on success. */
+    bool storeObjectData(Object* object);
 
-     If \a newObject is false, it's expected that entry on the
-     backend already exists, so it's updated (changes to identifier are not allowed).
-     \return true on success. */
-    bool storeObjectSchemaData(SchemaData &sdata, bool newObject);
+    /*! Stores new entry for object (id, name, caption, description)
+    described by \a object on the backend. If object.id() was less than 0,
+    new, unique object identifier is obtained and assigned to @a object (see Object::id()).
+    @return true on success. */
+    bool storeNewObjectData(Object* object);
 
     /*! Added for convenience.
-     \sa setupObjectSchemaData( const Predicate::RecordData &data, SchemaData &sdata ).
+     \sa setupObjectData(const Predicate::RecordData*, Object*).
      \return true on success, false on failure and cancelled when such object couldn't */
-    tristate loadObjectSchemaData(int objectID, SchemaData &sdata);
+    tristate loadObjectData(int id, Object* object);
 
-    /*! Finds object schema data for object of type \a objectType and name \a objectName.
-     If the object is found, resulted schema is stored in \a sdata and true is returned,
+    /*! Finds object schema data for object of type @a type and name \a name.
+     If the object is found, resulted schema is stored in @a object and true is returned,
      otherwise false is returned. */
-    tristate loadObjectSchemaData(int objectType, const QString& objectName, SchemaData &sdata);
+    tristate loadObjectData(int type, const QString& name, Object* object);
 
     /*! Loads (potentially large) data block (e.g. xml form's representation), referenced by objectID
      and puts it to \a dataString. The can be block indexed with optional \a dataID.
      \return true on success, false on failure and cancelled when there is no such data block
      \sa storeDataBlock(). */
-    tristate loadDataBlock(int objectID, QString &dataString, const QString& dataID);
+    tristate loadDataBlock(int objectID, QString* dataString, const QString& dataID);
 
     /*! Stores (potentially large) data block \a dataString (e.g. xml form's representation),
      referenced by objectID. Block will be stored in "kexi__objectdata" table and
@@ -774,18 +786,18 @@ public:
 //TMP// TODO: will be more generic
     /** Register \a listener for receiving (listening) information about changes
      in TableSchema object. Changes could be: altering and removing. */
-    void registerForTableSchemaChanges(TableSchemaChangeListenerInterface& listener,
-                                       TableSchema& schema);
+    void registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
+                                       TableSchema* schema);
 
-    void unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface& listener,
-                                         TableSchema &schema);
+    void unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
+                                         TableSchema* schema);
 
-    void unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface& listener);
+    void unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener);
 
     QSet<Connection::TableSchemaChangeListenerInterface*>*
-    tableSchemaChangeListeners(TableSchema& tableSchema) const;
+    tableSchemaChangeListeners(TableSchema* tableSchema) const;
 
-    tristate closeAllTableSchemaChangeListeners(TableSchema& tableSchema);
+    tristate closeAllTableSchemaChangeListeners(TableSchema* tableSchema);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
     /*! LOW LEVEL METHOD. For reimplementation: returns true if table
@@ -816,7 +828,7 @@ public:
      Moved to public for KexiProject.
      @todo fix this after refactoring
     */
-    virtual bool drv_alterTableName(TableSchema& tableSchema, const QString& newName);
+    virtual bool drv_alterTableName(TableSchema* tableSchema, const QString& newName);
 
     /*! Physically drops table named with \a name.
      Default impelmentation executes "DROP TABLE.." command,
@@ -829,18 +841,17 @@ public:
 
     /*! Prepare a SQL statement and return a \a PreparedStatement instance. */
     PreparedStatement prepareStatement(PreparedStatement::Type type,
-        FieldList& fields, const QStringList& whereFieldNames = QStringList());
+        FieldList* fields, const QStringList& whereFieldNames = QStringList());
 
     bool isInternalTableSchema(const QString& tableName);
 
-    /*! Setups schema data for object that owns sdata (e.g. table, query)
-      using \a cursor opened on 'kexi__objects' table, pointing to a record
+    /*! Setups data for object that owns @a object (e.g. table, query)
+      opened on 'kexi__objects' table, pointing to a record
       corresponding to given object.
 
       Moved to public for KexiMigrate
-      @todo fix this after refatoring
     */
-    bool setupObjectSchemaData(const RecordData &data, SchemaData &sdata);
+    bool setupObjectData(const RecordData& data, Object* object);
 
     /*! \return a new field table schema for a table retrieved from \a data.
      Used internally by tableSchema().
@@ -848,18 +859,18 @@ public:
       Moved to public for KexiMigrate
       @todo fix this after refatoring
     */
-    Predicate::Field* setupField(const RecordData &data);
+    Predicate::Field* setupField(const RecordData& data);
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
      This method is used for example in KexiProject to insert information about "kexi__blobs"
      table schema. Use createTable() to physically create table. After createTable()
      calling insertInternalTable() is not required.
-     Also used internally by Connection::newKexiDBSystemTableSchema(const QString&) */
-    void insertInternalTable(TableSchema& tableSchema);
+     Also used internally by Connection::newPredicateSystemTableSchema(const QString&) */
+    void insertInternalTable(TableSchema* tableSchema);
 
 protected:
     /*! Used by Driver */
-    Connection(Driver *driver, ConnectionData &conn_data);
+    Connection(Driver *driver, const ConnectionData& connData);
 
     /*! Method to be called form Connection's subclass destructor.
      \sa ~Connection() */
@@ -875,14 +886,14 @@ protected:
     /*! For reimplementation: connects to database. \a version should be set to real
      server's version.
       \return true on success. */
-    virtual bool drv_connect(Predicate::ServerVersionInfo& version) = 0;
+    virtual bool drv_connect(Predicate::ServerVersionInfo* version) = 0;
 
     /*! For reimplementation: disconnects database
       \return true on success. */
     virtual bool drv_disconnect() = 0;
 
     /*! Executes query \a statement, but without returning resulting
-     rows (used mostly for functional queries).
+     records (used mostly for functional queries).
      Only use this method if you really need. */
     virtual bool drv_executeSQL(const QString& statement) = 0;
 
@@ -892,14 +903,14 @@ protected:
      The method should return true only if there was no error on getting database names
      list from the server.
      Default implementation puts empty list into \a list and returns true. */
-    virtual bool drv_getDatabasesList(QStringList &list);
+    virtual bool drv_getDatabasesList(QStringList* list);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
     /*! LOW LEVEL METHOD. For reimplementation: loads low-level list of table names
      available for this connection. The names are in lower case.
      The method should return true only if there was no error on getting database names
      list from the server. */
-    virtual bool drv_getTablesList(QStringList &list) = 0;
+    virtual bool drv_getTablesList(QStringList* list) = 0;
 
     /*! For optional reimplementation: asks server if database \a dbName exists.
      This method is used internally in databaseExists(). The default  implementation
@@ -937,8 +948,7 @@ protected:
      If you cannot test anything, just leave default implementation (that returns true).
 
      Result of this method is used as an additional chance to check for isDatabaseUsed().
-     Do not call this method from your driver's code, it should be used at KexiDB
-     level only.
+     Do not call this method from your driver's code, it should be used at Predicate level only.
     */
     virtual bool drv_isDatabaseUsed() const {
         return true;
@@ -965,29 +975,29 @@ protected:
      Note: The statement string can be specific for this connection's driver database,
      and thus not reusable in general.
     */
-    QString selectStatement(TableSchema& tableSchema,
+    QString selectStatement(TableSchema* tableSchema,
                             const SelectStatementOptions& options = SelectStatementOptions()) const;
 
     /*!
      Creates table named by \a tableSchemaName. Schema object must be on
      schema tables' list before calling this method (otherwise false if returned).
-     Just uses drv_createTable( const Predicate::TableSchema& tableSchema ).
+     Just uses drv_createTable( const TableSchema& tableSchema ).
      Used internally, e.g. in createDatabase().
      \return true on success
     */
     virtual bool drv_createTable(const QString& tableSchemaName);
 
-//  /*! Executes query \a statement and returns resulting rows
+//  /*! Executes query \a statement and returns resulting records
 //   (used mostly for SELECT query). */
 //  virtual bool drv_executeQuery( const QString& statement ) = 0;
 
-    /*! \return unique identifier of last inserted row.
+    /*! \return unique identifier of last inserted record.
      Typically this is just primary key value.
      This identifier could be reused when we want to reference
-     just inserted row.
+     just inserted record.
      Note for driver developers: contact staniek (at) kde.org
      if your engine does not offer this information. */
-    virtual quint64 drv_lastInsertRowID() = 0;
+    virtual quint64 drv_lastInsertRecordId() = 0;
 
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just
@@ -1027,7 +1037,7 @@ protected:
         executed before an Insert statement.
       \sa drv_afterInsert()
     */
-    virtual bool drv_beforeInsert(const QString& table, FieldList& fields) {
+    virtual bool drv_beforeInsert(const QString& table, FieldList* fields) {
         Q_UNUSED(table);
         Q_UNUSED(fields);
         return true;
@@ -1039,7 +1049,7 @@ protected:
         executed after an Insert statement.
       \sa drv_beforeInsert()
     */
-    virtual bool drv_afterInsert(const QString& table, FieldList& fields) {
+    virtual bool drv_afterInsert(const QString& table, FieldList* fields) {
         Q_UNUSED(table);
         Q_UNUSED(fields);
         return true;
@@ -1051,7 +1061,7 @@ protected:
         executed before an Update statement.
     \sa drv_afterUpdate()
     */
-    virtual bool drv_beforeUpdate(const QString& table, FieldList& fields) {
+    virtual bool drv_beforeUpdate(const QString& table, FieldList* fields) {
         Q_UNUSED(table);
         Q_UNUSED(fields);
         return true;
@@ -1063,7 +1073,7 @@ protected:
         executed after an Update statement.
       \sa drv_beforeUpdate()
     */
-    virtual bool drv_afterUpdate(const QString& table, FieldList& fields) {
+    virtual bool drv_afterUpdate(const QString& table, FieldList* fields) {
         Q_UNUSED(table);
         Q_UNUSED(fields);
         return true;
@@ -1104,7 +1114,7 @@ protected:
      (i.e. by beginAutoCommitTransaction()). Otherwise, a new transaction will not be started,
      but true will be returned immediately.
     */
-    bool beginAutoCommitTransaction(TransactionGuard& tg);
+    bool beginAutoCommitTransaction(TransactionGuard* tg);
 
     /*! Internal, for handling autocommited transactions:
      Commits transaction prevoiusly started with beginAutoCommitTransaction().
@@ -1144,20 +1154,20 @@ protected:
 
     /*! \return a full table schema for a table retrieved using 'kexi__*' system tables.
      Used internally by tableSchema() methods. */
-    TableSchema* setupTableSchema(const RecordData &data);
+    TableSchema* setupTableSchema(const RecordData& data);
 
     /*! \return a full query schema for a query using 'kexi__*' system tables.
      Used internally by querySchema() methods. */
-    QuerySchema* setupQuerySchema(const RecordData &data);
+    QuerySchema* setupQuerySchema(const RecordData& data);
 
-    /*! Update a row. */
-    bool updateRow(QuerySchema &query, RecordData& data, RowEditBuffer& buf, bool useROWID = false);
-    /*! Insert a new row. */
-    bool insertRow(QuerySchema &query, RecordData& data, RowEditBuffer& buf, bool getROWID = false);
-    /*! Delete an existing row. */
-    bool deleteRow(QuerySchema &query, RecordData& data, bool useROWID = false);
-    /*! Delete all existing rows. */
-    bool deleteAllRows(QuerySchema &query);
+    /*! Update a record. */
+    bool updateRecord(QuerySchema* query, RecordData* data, RecordEditBuffer* buf, bool useRecordId = false);
+    /*! Insert a new record. */
+    bool insertRecord(QuerySchema* query, RecordData* data, RecordEditBuffer* buf, bool getRecordId = false);
+    /*! Delete an existing record. */
+    bool deleteRecord(QuerySchema* query, RecordData* data, bool useRecordId = false);
+    /*! Delete all existing records. */
+    bool deleteAllRecords(QuerySchema* query);
 
     /*! Allocates all needed table Predicate system objects for kexi__* Predicate library's
      system tables schema.
@@ -1165,13 +1175,13 @@ protected:
      and are added to list of tables (by name,
      not by id because these have no ids).
     */
-    bool setupKexiDBSystemSchema();
+    bool setupPredicateSystemSchema();
 
-    /*! used internally by setupKexiDBSystemSchema():
+    /*! used internally by setupPredicateSystemSchema():
      Allocates single table Predicate system object named \a tsname
      and adds this to list of such objects (for later removal on closeDatabase()).
     */
-    TableSchema* newKexiDBSystemTableSchema(const QString& tsname);
+    TableSchema* newPredicateSystemTableSchema(const QString& tsname);
 
     //! Identifier escaping function in the associated Driver.
     /*! Calls the identifier escaping function in the associated Driver to
@@ -1201,7 +1211,7 @@ protected:
 
     /*! @internal used by querySingleRecord() methods.
      Note: "LIMIT 1" is appended to \a sql statement if \a addLimitTo1 is true (the default). */
-    tristate querySingleRecordInternal(RecordData &data, const QString* sql,
+    tristate querySingleRecordInternal(RecordData* data, const QString* sql,
                                        QuerySchema* query, bool addLimitTo1 = true);
 
     /*! @internal used by Driver::createConnection().
@@ -1211,7 +1221,7 @@ protected:
     /*! Loads extended schema information for table \a tableSchema,
      if present (see ExtendedTableSchemaInformation in Kexi Wiki).
      \return true on success */
-    bool loadExtendedTableSchemaData(TableSchema& tableSchema);
+    bool loadExtendedTableSchemaData(TableSchema* tableSchema);
 
     /*! Stores extended schema information for table \a tableSchema,
      (see ExtendedTableSchemaInformation in Kexi Wiki).
@@ -1219,7 +1229,7 @@ protected:
      so it's up to you to commit.
      Used, e.g. by createTable(), within its transaction.
      \return true on success */
-    bool storeExtendedTableSchemaData(TableSchema& tableSchema);
+    bool storeExtendedTableSchemaData(TableSchema* tableSchema);
 
     /*! @internal
      Stores main field's schema information for field \a field.
@@ -1236,30 +1246,33 @@ protected:
      \return true on success, false on failure, cancelled if the action has been cancelled.
 
      Note for driver developers: implement this if the Driver.has to supprot the altering. */
-    virtual tristate drv_changeFieldProperty(TableSchema &table, Field& field,
+    virtual tristate drv_changeFieldProperty(TableSchema* table, Field* field,
             const QString& propertyName, const QVariant& value) {
         Q_UNUSED(table); Q_UNUSED(field); Q_UNUSED(propertyName); Q_UNUSED(value);
         return cancelled;
     }
 
     //! Used by Cursor class
-    void addCursor(Predicate::Cursor& cursor);
+    void addCursor(Predicate::Cursor* cursor);
 
     //! Used by Cursor class
-    void takeCursor(Predicate::Cursor& cursor);
+    void takeCursor(Predicate::Cursor* cursor);
 
 private:
+    //! Internal, used by storeObjectData(Object*) and storeNewObjectData(Object* object).
+    bool storeObjectDataInternal(Object* object, bool newObject);
+
     ConnectionPrivate* d; //!< @internal d-pointer class.
     Driver* const m_driver; //!< The driver this \a Connection instance uses.
     bool m_destructor_started; //!< helper: true if destructor is started.
     bool m_insideCloseDatabase; //!< helper: true while closeDatabase() is executed
 
-    friend class Predicate::Driver;
-    friend class Predicate::Cursor;
-    friend class Predicate::TableSchema; //!< for removeMe()
-    friend class Predicate::DatabaseProperties; //!< for setError()
+    friend class Driver;
+    friend class Cursor;
+    friend class TableSchema; //!< for removeMe()
+    friend class DatabaseProperties; //!< for setError()
     friend class ConnectionPrivate;
-    friend class Predicate::AlterTableHandler;
+    friend class AlterTableHandler;
 };
 
 } //namespace Predicate

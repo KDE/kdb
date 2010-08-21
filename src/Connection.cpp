@@ -24,13 +24,13 @@
 #include "ConnectionData.h"
 #include "Driver.h"
 #include "Driver_p.h"
-#include "SchemaData.h"
+#include "Object.h"
 #include "TableSchema.h"
 #include "Relationship.h"
 #include "Transaction.h"
 #include "Cursor.h"
 #include <Predicate/Global.h>
-#include "RowEditBuffer.h"
+#include "RecordEditBuffer.h"
 #include "Utils.h"
 #include "DbProperties.h"
 #include "LookupFieldSchema.h"
@@ -55,7 +55,7 @@ namespace Predicate
 
 Connection::SelectStatementOptions::SelectStatementOptions()
         : identifierEscaping(Driver::EscapeDriver | Driver::EscapeAsNecessary)
-        , alsoRetrieveROWID(false)
+        , alsoRetrieveRecordId(false)
         , addVisibleLookupColumns(true)
 {
 }
@@ -80,16 +80,18 @@ ConnectionInternal::~ConnectionInternal()
 class ConnectionPrivate
 {
 public:
-    ConnectionPrivate(Connection* const conn, ConnectionData &conn_data)
+    ConnectionPrivate(Connection* const conn, const ConnectionData& _connData)
             : conn(conn)
-            , conn_data(&conn_data)
+            , connData(_connData)
             , m_parser(0)
+            , dbProperties(conn)
             , dont_remove_transactions(false)
             , skip_databaseExists_check_in_useDatabase(false)
             , default_trans_started_inside(false)
             , isConnected(false)
             , autoCommit(true)
-            , takeTableEnabled(true) {
+            , takeTableEnabled(true)
+    {
 //Qt 4   tableSchemaChangeListeners.setAutoDelete(true);
 //Qt 4   obsoleteQueries.setAutoDelete(true);
 
@@ -108,8 +110,7 @@ public:
     }
 
     void errorInvalidDBContents(const QString& details) {
-        conn->setError(ERR_INVALID_DATABASE_CONTENTS, QObject::tr("Invalid database contents. %1")
-            .arg(details));
+        conn->m_result = Result(ERR_INVALID_DATABASE_CONTENTS, QObject::tr("Invalid database contents. %1").arg(details));
     }
 
     QString strItIsASystemObject() const {
@@ -129,21 +130,21 @@ public:
     }
 
     //! used just for removing system TableSchema objects on db close.
-    inline const QSet<TableSchema*>& predicateSystemTables() const {
+    inline QSet<TableSchema*> predicateSystemTables() const {
         return _predicateSystemTables;
     }
 
-    inline void insertTable(TableSchema& tableSchema) {
-        tables.insert(tableSchema.id(), &tableSchema);
-        tables_byname.insert(tableSchema.name().toLower(), &tableSchema);
+    inline void insertTable(TableSchema* tableSchema) {
+        tables.insert(tableSchema->id(), tableSchema);
+        tables_byname.insert(tableSchema->name().toLower(), tableSchema);
     }
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
-     Used by Connection::insertInternalTable(TableSchema&) */
-    inline void insertInternalTable(TableSchema& tableSchema) {
-        tableSchema.setKexiDBSystem(true);
-        _predicateSystemTables.insert(&tableSchema);
-        tables_byname.insert(tableSchema.name().toLower(), &tableSchema);
+     Used by Connection::insertInternalTable(TableSchema*) */
+    inline void insertInternalTable(TableSchema* tableSchema) {
+        tableSchema->setPredicateSystem(true);
+        _predicateSystemTables.insert(tableSchema);
+        tables_byname.insert(tableSchema->name().toLower(), tableSchema);
     }
 
     /*! @internal Removes table schema pointed by tableSchema.id() and tableSchema.name()
@@ -155,22 +156,22 @@ public:
         delete toDelete;
     }
 
-    inline void takeTable(TableSchema& tableSchema) {
+    inline void takeTable(TableSchema* tableSchema) {
         if (!takeTableEnabled)
             return;
-        tables.take(tableSchema.id());
-        tables_byname.take(tableSchema.name());
+        tables.take(tableSchema->id());
+        tables_byname.take(tableSchema->name());
     }
 
-    inline void renameTable(TableSchema& tableSchema, const QString& newName) {
-        tables_byname.take(tableSchema.name());
-        tableSchema.setName(newName.toLower());
-        tables_byname.insert(tableSchema.name(), &tableSchema);
+    inline void renameTable(TableSchema* tableSchema, const QString& newName) {
+        tables_byname.take(tableSchema->name());
+        tableSchema->setName(newName.toLower());
+        tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
-    inline void changeTableId(TableSchema& tableSchema, int newId) {
-        tables.take(tableSchema.id());
-        tables.insert(newId, &tableSchema);
+    inline void changeTableId(TableSchema* tableSchema, int newId) {
+        tables.take(tableSchema->id());
+        tables.insert(newId, tableSchema);
     }
 
     inline void clearTables() {
@@ -192,23 +193,23 @@ public:
         return queries.value(id);
     }
 
-    inline void insertQuery(QuerySchema& query) {
-        queries.insert(query.id(), &query);
-        queries_byname.insert(query.name(), &query);
+    inline void insertQuery(QuerySchema* query) {
+        queries.insert(query->id(), query);
+        queries_byname.insert(query->name(), query);
     }
 
     /*! @internal Removes \a querySchema from internal structures and
      destroys it. Does not make any change at the backend. */
-    inline void removeQuery(QuerySchema &querySchema) {
-        queries_byname.remove(querySchema.name());
-        queries.remove(querySchema.id());
-        delete &querySchema;
+    inline void removeQuery(QuerySchema* querySchema) {
+        queries_byname.remove(querySchema->name());
+        queries.remove(querySchema->id());
+        delete querySchema;
     }
 
-    inline void setQueryObsolete(QuerySchema& query) {
-        obsoleteQueries.insert(&query);
-        queries_byname.take(query.name());
-        queries.take(query.id());
+    inline void setQueryObsolete(QuerySchema* query) {
+        obsoleteQueries.insert(query);
+        queries_byname.take(query->name());
+        queries.take(query->id());
     }
 
     inline void clearQueries() {
@@ -217,7 +218,7 @@ public:
     }
 
     Connection* const conn; //!< The \a Connection instance this \a ConnectionPrivate belongs to.
-    QPointer<ConnectionData> conn_data; //!< the \a ConnectionData used within that connection.
+    ConnectionData connData; //!< the \a ConnectionData used within that connection.
 
     /*! Default Transaction.handle.
     If transactions are supported: Any operation on database (e.g. inserts)
@@ -244,7 +245,7 @@ public:
     QSet<Predicate::Cursor*> cursors;
 
     //! Database properties
-    DatabaseProperties* dbProperties;
+    DatabaseProperties dbProperties;
 
     QString availableDatabaseName; //!< used by anyAvailableDatabaseName()
     QString usedDatabase; //!< database name that is opened now (the currentDatabase() name)
@@ -294,20 +295,16 @@ using namespace Predicate;
 //! static: list of internal Predicate system table names
 QStringList Predicate_predicateSystemTableNames;
 
-Connection::Connection(Driver *driver, ConnectionData &conn_data)
-        : QObject()
-        , Predicate::Object()
-        , d(new ConnectionPrivate(this, conn_data))
+Connection::Connection(Driver *driver, const ConnectionData& connData)
+        : d(new ConnectionPrivate(this, connData))
         , m_driver(driver)
         , m_destructor_started(false)
         , m_insideCloseDatabase(false)
 {
-    d->dbProperties = new DatabaseProperties(this);
 //Qt3 m_cursors.setAutoDelete(true);
 // d->transactions.setAutoDelete(true);
     //reasonable sizes: TODO
 // d->transactions.resize(101);//woohoo! so many transactions?
-    m_sql.reserve(0x4000);
 }
 
 void Connection::destroy()
@@ -321,7 +318,6 @@ Connection::~Connection()
 {
     m_destructor_started = true;
 // PreDbg;
-    delete d->dbProperties;
     delete d;
     d = 0;
     /* if (m_driver) {
@@ -336,25 +332,26 @@ Connection::~Connection()
       }*/
 }
 
-ConnectionData* Connection::data() const
+ConnectionData Connection::data() const
 {
-    return d->conn_data;
+    return d->connData;
 }
 
 bool Connection::connect()
 {
-    clearError();
+    clearResult();
     if (d->isConnected) {
-        setError(ERR_ALREADY_CONNECTED, QObject::tr("Connection already established."));
+        m_result = Result(ERR_ALREADY_CONNECTED, QObject::tr("Connection already established."));
         return false;
     }
 
     d->serverVersion.clear();
-    if (!(d->isConnected = drv_connect(d->serverVersion))) {
-        setError(m_driver->isFileBased() ?
-                    tr("Could not open \"%1\" project file.")
-                    .arg(QDir::convertSeparators(d->conn_data->fileName()))
-                 :  tr("Could not connect to \"%1\" database server.").arg(d->conn_data->serverInfoString()));
+    if (!(d->isConnected = drv_connect(&d->serverVersion))) {
+        m_result = Result(m_driver->isFileBased() ?
+                    QObject::tr("Could not open \"%1\" project file.")
+                    .arg(QDir::convertSeparators(d->connData.fileName()))
+                 :  QObject::tr("Could not connect to \"%1\" database server.")
+                    .arg(d->connData.serverInfoString()));
     }
     return d->isConnected;
 }
@@ -364,15 +361,14 @@ bool Connection::isDatabaseUsed() const
     return !d->usedDatabase.isEmpty() && d->isConnected && drv_isDatabaseUsed();
 }
 
-void Connection::clearError()
+void Connection::clearResult()
 {
-    Object::clearError();
-    m_sql.clear();
+    Resultable::clearResult();
 }
 
 bool Connection::disconnect()
 {
-    clearError();
+    clearResult();
     if (!d->isConnected)
         return true;
 
@@ -393,20 +389,20 @@ bool Connection::isConnected() const
 bool Connection::checkConnected()
 {
     if (d->isConnected) {
-        clearError();
+        clearResult();
         return true;
     }
-    setError(ERR_NO_CONNECTION, tr("Not connected to the database server."));
+    m_result = Result(ERR_NO_CONNECTION, QObject::tr("Not connected to the database server."));
     return false;
 }
 
 bool Connection::checkIsDatabaseUsed()
 {
     if (isDatabaseUsed()) {
-        clearError();
+        clearResult();
         return true;
     }
-    setError(ERR_NO_DB_USED, tr("Currently no database is used."));
+    m_result = Result(ERR_NO_DB_USED, QObject::tr("Currently no database is used."));
     return false;
 }
 
@@ -418,12 +414,12 @@ QStringList Connection::databaseNames(bool also_system_db)
 
     QString tmpdbName;
     //some engines need to have opened any database before executing "create database"
-    if (!useTemporaryDatabaseIfNeeded(tmpdbName))
+    if (!useTemporaryDatabaseIfNeeded(&tmpdbName))
         return QStringList();
 
     QStringList list, non_system_list;
 
-    bool ret = drv_getDatabasesList(list);
+    bool ret = drv_getDatabasesList(&list);
 
     if (!tmpdbName.isEmpty()) {
         //whatever result is - now we have to close temporary opened database:
@@ -447,22 +443,22 @@ QStringList Connection::databaseNames(bool also_system_db)
     return non_system_list;
 }
 
-bool Connection::drv_getDatabasesList(QStringList &list)
+bool Connection::drv_getDatabasesList(QStringList* list)
 {
-    list.clear();
+    list->clear();
     return true;
 }
 
 bool Connection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 {
     QStringList list = databaseNames(true);//also system
-    if (error()) {
+    if (m_result.isError()) {
         return false;
     }
 
     if (list.indexOf(dbName) == -1) {
         if (!ignoreErrors)
-            setError(ERR_OBJECT_NOT_FOUND, tr("The database \"%1\" does not exist.").arg(dbName));
+            m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("The database \"%1\" does not exist.").arg(dbName));
         return false;
     }
 
@@ -474,28 +470,28 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
 // PreDbg << dbName << ignoreErrors;
     if (!checkConnected())
         return false;
-    clearError();
+    clearResult();
 
     if (m_driver->isFileBased()) {
         //for file-based db: file must exists and be accessible
 //js: moved from useDatabase():
-        QFileInfo file(d->conn_data->fileName());
+        QFileInfo file(d->connData.fileName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
             if (!ignoreErrors)
-                setError(ERR_OBJECT_NOT_FOUND, tr("Database file \"%1\" does not exist.")
-                                               .arg(QDir::convertSeparators(d->conn_data->fileName())));
+                m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Database file \"%1\" does not exist.")
+                                                        .arg(QDir::convertSeparators(d->connData.fileName())));
             return false;
         }
         if (!file.isReadable()) {
             if (!ignoreErrors)
-                setError(ERR_ACCESS_RIGHTS, tr("Database file \"%1\" is not readable.")
-                                            .arg(QDir::convertSeparators(d->conn_data->fileName())));
+                m_result = Result(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not readable.")
+                                                     .arg(QDir::convertSeparators(d->connData.fileName())));
             return false;
         }
         if (!file.isWritable()) {
             if (!ignoreErrors)
-                setError(ERR_ACCESS_RIGHTS, tr("Database file \"%1\" is not writable.")
-                                            .arg(QDir::convertSeparators(d->conn_data->fileName())));
+                m_result = Result(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not writable.")
+                                                     .arg(QDir::convertSeparators(d->connData.fileName())));
             return false;
         }
         return true;
@@ -505,7 +501,7 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
     //some engines need to have opened any database before executing "create database"
     const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
     d->skip_databaseExists_check_in_useDatabase = true;
-    bool ret = useTemporaryDatabaseIfNeeded(tmpdbName);
+    bool ret = useTemporaryDatabaseIfNeeded(&tmpdbName);
     d->skip_databaseExists_check_in_useDatabase = orig_skip_databaseExists_check_in_useDatabase;
     if (!ret)
         return false;
@@ -523,7 +519,7 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
 
 #define createDatabase_CLOSE \
     { if (!closeDatabase()) { \
-            setError(tr("Database \"%1\" created but could not be closed after creation.").arg(dbName) ); \
+            m_result = Result(QObject::tr("Database \"%1\" created but could not be closed after creation.").arg(dbName)); \
             return false; \
         } }
 
@@ -537,27 +533,27 @@ bool Connection::createDatabase(const QString &dbName)
         return false;
 
     if (databaseExists(dbName)) {
-        setError(ERR_OBJECT_EXISTS, tr("Database \"%1\" already exists.").arg(dbName));
+        m_result = Result(ERR_OBJECT_EXISTS, QObject::tr("Database \"%1\" already exists.").arg(dbName));
         return false;
     }
     if (m_driver->isSystemDatabaseName(dbName)) {
-        setError(ERR_SYSTEM_NAME_RESERVED,
-                 tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
+        m_result = Result(ERR_SYSTEM_NAME_RESERVED,
+                 QObject::tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
         return false;
     }
     if (m_driver->isFileBased()) {
         //update connection data if filename differs
-        d->conn_data->setFileName(dbName);
+        d->connData.setFileName(dbName);
     }
 
     QString tmpdbName;
     //some engines need to have opened any database before executing "create database"
-    if (!useTemporaryDatabaseIfNeeded(tmpdbName))
+    if (!useTemporaryDatabaseIfNeeded(&tmpdbName))
         return false;
 
     //low-level create
     if (!drv_createDatabase(dbName)) {
-        setError(tr("Error creating database \"%1\" on the server.").arg(dbName));
+        m_result = Result(QObject::tr("Error creating database \"%1\" on the server.").arg(dbName));
         closeDatabase();//sanity
         return false;
     }
@@ -571,7 +567,7 @@ bool Connection::createDatabase(const QString &dbName)
     if (!tmpdbName.isEmpty() || !m_driver->d->isDBOpenedAfterCreate) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
-            setError(tr("Database \"%1\" created but could not be opened.").arg(dbName));
+            m_result = Result(QObject::tr("Database \"%1\" created but could not be opened.").arg(dbName));
             return false;
         }
     } else {
@@ -590,7 +586,7 @@ bool Connection::createDatabase(const QString &dbName)
 //  return false;
 
     //-create system tables schema objects
-    if (!setupKexiDBSystemSchema())
+    if (!setupPredicateSystemSchema())
         return false;
 
     //-physically create system tables
@@ -608,18 +604,18 @@ bool Connection::createDatabase(const QString &dbName)
       FieldList *fl = ts->subList("p_id", "p_name", "p_mime", "p_url");
       if (!fl)
         createDatabase_ERROR;
-      if (!insertRecord(*fl, QVariant(1), QVariant("Tables"), QVariant("kexi/table"), QVariant("http://koffice.org/kexi/")))
+      if (!insertRecord(fl, QVariant(1), QVariant("Tables"), QVariant("kexi/table"), QVariant("http://koffice.org/kexi/")))
         createDatabase_ERROR;
-      if (!insertRecord(*fl, QVariant(2), QVariant("Queries"), QVariant("kexi/query"), QVariant("http://koffice.org/kexi/")))
+      if (!insertRecord(fl, QVariant(2), QVariant("Queries"), QVariant("kexi/query"), QVariant("http://koffice.org/kexi/")))
         createDatabase_ERROR;
     */
 
     //-insert Predicate version info:
-    TableSchema *t_db = d->table("kexi__db");
-    if (!t_db)
+    TableSchema *table = d->table("kexi__db");
+    if (!table)
         createDatabase_ERROR;
-    if (!insertRecord(*t_db, "predicate_major_ver", Predicate::version().major)
-            || !insertRecord(*t_db, "predicate_minor_ver", Predicate::version().minor))
+    if (!insertRecord(table, "predicate_major_ver", Predicate::version().major())
+            || !insertRecord(table, "predicate_minor_ver", Predicate::version().minor()))
         createDatabase_ERROR;
 
     if (trans.active() && !commitTransaction(trans))
@@ -664,36 +660,32 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
     if (!drv_useDatabase(my_dbName, cancelled, msgHandler)) {
         if (cancelled && *cancelled)
             return false;
-        QString msg(tr("Opening database \"%1\" failed.").arg(my_dbName));
-        if (error())
-            setError(this, msg);
-        else
-            setError(msg);
+        QString msg(QObject::tr("Opening database \"%1\" failed.").arg(my_dbName));
+        m_result.prependMessage(msg);
         return false;
     }
 
     //-create system tables schema objects
-    if (!setupKexiDBSystemSchema())
+    if (!setupPredicateSystemSchema())
         return false;
 
     if (kexiCompatible && my_dbName.toLower() != anyAvailableDatabaseName().toLower()) {
         //-get global database information
-        int num;
         bool ok;
-//  static QString notfound_str = tr("\"%1\" database property not found");
-        num = d->dbProperties->value("predicate_major_ver").toInt(&ok);
+//  static QString notfound_str = QObject::tr("\"%1\" database property not found");
+        const int major = d->dbProperties.value("predicate_major_ver").toInt(&ok);
         if (!ok)
             return false;
-        d->databaseVersion.major = num;
+        const int minor = d->dbProperties.value("predicate_minor_ver").toInt(&ok);
+        if (!ok)
+            return false;
+        d->databaseVersion.setMajor(major);
         /*  if (true!=querySingleNumber(
               "select db_value from kexi__db where db_property=" + m_driver->escapeString(QString("predicate_major_ver")), num)) {
               d->errorInvalidDBContents(notfound_str.arg("predicate_major_ver"));
               return false;
             }*/
-        num = d->dbProperties->value("predicate_minor_ver").toInt(&ok);
-        if (!ok)
-            return false;
-        d->databaseVersion.minor = num;
+        d->databaseVersion.setMinor(minor);
         /*  if (true!=querySingleNumber(
               "select db_value from kexi__db where db_property=" + m_driver->escapeString(QString("predicate_minor_ver")), num)) {
               d->errorInvalidDBContents(notfound_str.arg("predicate_minor_ver"));
@@ -704,7 +696,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
         //** error if major version does not match
         if (m_driver->versionMajor() != Predicate::versionMajor()) {
             setError(ERR_INCOMPAT_DATABASE_VERSION,
-                     tr("Database version (%1) does not match Kexi application's version (%2)")
+                     QObject::tr("Database version (%1) does not match Kexi application's version (%2)")
                      .arg( QString("%1.%2").arg(versionMajor(), versionMinor()),
                           QString("%1.%2").arg(Predicate::versionMajor(), Predicate::versionMinor()))
                     );
@@ -769,24 +761,24 @@ QString Connection::currentDatabase() const
     return d->usedDatabase;
 }
 
-bool Connection::useTemporaryDatabaseIfNeeded(QString &tmpdbName)
+bool Connection::useTemporaryDatabaseIfNeeded(QString* name)
 {
     if (!m_driver->isFileBased() && m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT
             && !isDatabaseUsed()) {
         //we have no db used, but it is required by engine to have used any!
-        tmpdbName = anyAvailableDatabaseName();
-        if (tmpdbName.isEmpty()) {
-            setError(ERR_NO_DB_USED, tr("Cannot find any database for temporary connection."));
+        *name = anyAvailableDatabaseName();
+        if (name->isEmpty()) {
+            m_result = Result(ERR_NO_DB_USED, QObject::tr("Cannot find any database for temporary connection."));
             return false;
         }
         const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
         d->skip_databaseExists_check_in_useDatabase = true;
-        bool ret = useDatabase(tmpdbName, false);
+        bool ret = useDatabase(*name, false);
         d->skip_databaseExists_check_in_useDatabase = orig_skip_databaseExists_check_in_useDatabase;
         if (!ret) {
-            setError(errorNum(),
-                     tr("Error during starting temporary connection using \"%1\" database name.")
-                        .arg(tmpdbName));
+            m_result = Result(m_result.code(),
+                              QObject::tr("Error during starting temporary connection using \"%1\" database name.")
+                              .arg(*name));
             return false;
         }
     }
@@ -801,12 +793,12 @@ bool Connection::dropDatabase(const QString &dbName)
     QString dbToDrop;
     if (dbName.isEmpty() && d->usedDatabase.isEmpty()) {
         if (!m_driver->isFileBased()
-                || (m_driver->isFileBased() && d->conn_data->fileName().isEmpty())) {
-            setError(ERR_NO_NAME_SPECIFIED, tr("Cannot drop database - name not specified."));
+                || (m_driver->isFileBased() && d->connData.fileName().isEmpty())) {
+            m_result = Result(ERR_NO_NAME_SPECIFIED, QObject::tr("Cannot drop database - name not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
-        dbToDrop = d->conn_data->fileName();
+        dbToDrop = d->connData.fileName();
     } else {
         if (dbName.isEmpty()) {
             dbToDrop = d->usedDatabase;
@@ -819,12 +811,12 @@ bool Connection::dropDatabase(const QString &dbName)
     }
 
     if (dbToDrop.isEmpty()) {
-        setError(ERR_NO_NAME_SPECIFIED, tr("Cannot delete database - name not specified."));
+        m_result = Result(ERR_NO_NAME_SPECIFIED, QObject::tr("Cannot delete database - name not specified."));
         return false;
     }
 
     if (m_driver->isSystemDatabaseName(dbToDrop)) {
-        setError(ERR_SYSTEM_NAME_RESERVED, tr("Cannot delete system database \"%1\".").arg(dbToDrop));
+        m_result = Result(ERR_SYSTEM_NAME_RESERVED, QObject::tr("Cannot delete system database \"%1\".").arg(dbToDrop));
         return false;
     }
 
@@ -836,7 +828,7 @@ bool Connection::dropDatabase(const QString &dbName)
 
     QString tmpdbName;
     //some engines need to have opened any database before executing "drop database"
-    if (!useTemporaryDatabaseIfNeeded(tmpdbName))
+    if (!useTemporaryDatabaseIfNeeded(&tmpdbName))
         return false;
 
     //ok, now we have access to dropping
@@ -896,13 +888,13 @@ QStringList Connection::tableNames(bool also_system_tables)
     bool ok = true;
     QStringList list = objectNames(TableObjectType, &ok);
     if (also_system_tables && ok) {
-        list += Connection::predicateSystemTableNames();
+        list += predicateSystemTableNames();
     }
     return list;
 }
 
 //! \todo (js): this will depend on Predicate lib version
-const QStringList& Connection::predicateSystemTableNames()
+QStringList Connection::predicateSystemTableNames()
 {
     if (Predicate_predicateSystemTableNames.isEmpty()) {
         Predicate_predicateSystemTableNames
@@ -928,9 +920,9 @@ Predicate::DatabaseVersionInfo* Connection::databaseVersion() const
     return isDatabaseUsed() ? &d->databaseVersion : 0;
 }
 
-DatabaseProperties& Connection::databaseProperties()
+DatabaseProperties Connection::databaseProperties() const
 {
-    return *d->dbProperties;
+    return d->dbProperties;
 }
 
 QList<int> Connection::tableIds()
@@ -969,7 +961,7 @@ QList<int> Connection::objectIds(int objType)
     return list;
 }
 
-QString Connection::createTableStatement(const Predicate::TableSchema& tableSchema) const
+QString Connection::createTableStatement(const TableSchema& tableSchema) const
 {
 // Each SQL identifier needs to be escaped in the generated query.
     QString sql;
@@ -1034,25 +1026,25 @@ QString Connection::createTableStatement(const Predicate::TableSchema& tableSche
 //yeah, it is very efficient:
 #define C_A(a) , const QVariant& c ## a
 
-#define V_A0 m_driver->valueToSQL( tableSchema.field(0), c0 )
+#define V_A0 m_driver->valueToSQL( tableSchema->field(0), c0 )
 #define V_A(a) +","+m_driver->valueToSQL( \
-        tableSchema.field(a) ? tableSchema.field(a)->type() : Field::Text, c ## a )
+        tableSchema->field(a) ? tableSchema->field(a)->type() : Field::Text, c ## a )
 
 //  PreDbg << "******** " << QString("INSERT INTO ") +
-//   escapeIdentifier(tableSchema.name()) +
+//   escapeIdentifier(tableSchema->name()) +
 //   " VALUES (" + vals + ")";
 
 #define C_INS_REC(args, vals) \
-    bool Connection::insertRecord(Predicate::TableSchema &tableSchema args) {\
-        if ( !drv_beforeInsert( tableSchema.name(), tableSchema ) )  \
+    bool Connection::insertRecord(TableSchema* tableSchema args) {\
+        if ( !drv_beforeInsert( tableSchema->name(), tableSchema ) )  \
             return false;                                      \
         \
         bool res = executeSQL(                                      \
-                   QLatin1String("INSERT INTO ") + escapeIdentifier(tableSchema.name()) \
-                   + " (" + tableSchema.sqlFieldsList(m_driver) + ") VALUES (" + vals + ")"      \
+                   QLatin1String("INSERT INTO ") + escapeIdentifier(tableSchema->name()) \
+                   + " (" + tableSchema->sqlFieldsList(m_driver) + ") VALUES (" + vals + ")"      \
                              ); \
         \
-        if ( !drv_afterInsert( tableSchema.name(),tableSchema ) ) \
+        if ( !drv_afterInsert( tableSchema->name(), tableSchema ) ) \
             return false;                                      \
         \
         return res;                                             \
@@ -1078,10 +1070,10 @@ C_INS_REC_ALL
 #define V_A( a ) value += ("," + m_driver->valueToSQL( it.next(), c ## a ));
 
 #define C_INS_REC(args, vals) \
-    bool Connection::insertRecord(FieldList& fields args) \
+    bool Connection::insertRecord(FieldList* fields args) \
     { \
         QString value; \
-        const Field::List *flist = fields.fields(); \
+        const Field::List *flist = fields->fields(); \
         QListIterator<Field*> it(*flist); \
         vals \
         it.toFront(); \
@@ -1090,7 +1082,7 @@ C_INS_REC_ALL
             return false;                                       \
         bool res = executeSQL(                                  \
                    QLatin1String("INSERT INTO ") + escapeIdentifier(tableName) \
-                   + "(" + fields.sqlFieldsList(m_driver) + ") VALUES (" + value + ")" \
+                   + "(" + fields->sqlFieldsList(m_driver) + ") VALUES (" + value + ")" \
                              ); \
         if ( !drv_afterInsert( tableName, fields ) )    \
             return false;                               \
@@ -1105,74 +1097,73 @@ C_INS_REC_ALL
 #undef C_INS_REC
 #undef C_INS_REC_ALL
 
-bool Connection::insertRecord(TableSchema &tableSchema, const QList<QVariant>& values)
+bool Connection::insertRecord(TableSchema* tableSchema, const QList<QVariant>& values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    const Field::List *fields = tableSchema.fields();
+    const Field::List *fields = tableSchema->fields();
     Field::ListIterator fieldsIt(fields->constBegin());
     Field *f = *fieldsIt;
-// QString s_val;
-// s_val.reserve(4096);
-    m_sql.clear();
     QList<QVariant>::ConstIterator it = values.constBegin();
-// int i=0;
+    QString sql;
+    sql.reserve(4096);
     while (f && (it != values.end())) {
-        if (m_sql.isEmpty())
-            m_sql = QLatin1String("INSERT INTO ") +
-                    escapeIdentifier(tableSchema.name()) +
-                    " VALUES (";
-        else
-            m_sql += ",";
-        m_sql += m_driver->valueToSQL(f, *it);
+        if (sql.isEmpty()) {
+            sql = QLatin1String("INSERT INTO ") + escapeIdentifier(tableSchema->name()) +
+                  " VALUES (";
+        }
+        else {
+            sql += ",";
+        }
+        sql += m_driver->valueToSQL(f, *it);
 //  PreDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
         f = *fieldsIt;
     }
-    m_sql += ")";
+    sql += ")";
+    m_result.setSql(sql);
 
-// PreDbg<<"******** "<< m_sql;
-    if (!drv_beforeInsert(tableSchema.name(), tableSchema))
+    if (!drv_beforeInsert(tableSchema->name(), tableSchema))
         return false;
-    bool res = executeSQL(m_sql);
-    if (!drv_afterInsert(tableSchema.name(), tableSchema))
+    bool res = executeSQL(sql);
+    if (!drv_afterInsert(tableSchema->name(), tableSchema))
         return false;
 
     return res;
 }
 
-bool Connection::insertRecord(FieldList& fields, const QList<QVariant>& values)
+bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    const Field::List *flist = fields.fields();
+    const Field::List *flist = fields->fields();
     Field::ListIterator fieldsIt(flist->constBegin());
     Field *f = *fieldsIt;
     if (!f)
         return false;
-// QString s_val;
-// s_val.reserve(4096);
-    m_sql.clear();
+    QString sql;
+    sql.reserve(4096);
     QList<QVariant>::ConstIterator it = values.constBegin();
-// int i=0;
     QString tableName = escapeIdentifier(flist->first()->table()->name());
     while (f && (it != values.constEnd())) {
-        if (m_sql.isEmpty())
-            m_sql = QLatin1String("INSERT INTO ") +
-                    tableName + "(" +
-                    fields.sqlFieldsList(m_driver) + ") VALUES (";
-        else
-            m_sql += ",";
-        m_sql += m_driver->valueToSQL(f, *it);
+        if (sql.isEmpty()) {
+            sql = QLatin1String("INSERT INTO ") + tableName + "(" +
+                  fields->sqlFieldsList(m_driver) + ") VALUES (";
+        }
+        else {
+            sql += ",";
+        }
+        sql += m_driver->valueToSQL(f, *it);
 //  PreDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
         f = *fieldsIt;
     }
-    m_sql += ")";
+    sql += ")";
+    m_result.setSql(sql);
 
     if (!drv_beforeInsert(tableName, fields))
         return false;
-    bool res = executeSQL(m_sql);
+    bool res = executeSQL(sql);
     if (!drv_afterInsert(tableName, fields))
         return false;
 
@@ -1181,17 +1172,17 @@ bool Connection::insertRecord(FieldList& fields, const QList<QVariant>& values)
 
 bool Connection::executeSQL(const QString& statement)
 {
-    m_sql = statement; //remember for Error.handling
-    if (!drv_executeSQL(m_sql)) {
-        m_errMsg.clear(); //clear as this could be most probably jsut "Unknown error" string.
-        m_errorSql = statement;
-        setError(this, ERR_SQL_EXECUTION_ERROR, tr("Error while executing SQL statement."));
+    m_result.setSql(statement); //remember for Error.handling
+    if (!drv_executeSQL(statement)) {
+        m_result.setMessage(QString()); //clear as this could be most probably just "Unknown error" string.
+        m_result.setErrorSql(statement);
+        m_result.prependMessage(ERR_SQL_EXECUTION_ERROR, QObject::tr("Error while executing SQL statement."));
         return false;
     }
     return true;
 }
 
-QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
+QString Connection::selectStatement(Predicate::QuerySchema* querySchema,
                                     const QList<QVariant>& params,
                                     const SelectStatementOptions& options) const
 {
@@ -1200,17 +1191,17 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
 //  return QString();
 // Each SQL identifier needs to be escaped in the generated query.
 
-    if (!querySchema.statement().isEmpty())
-        return querySchema.statement();
+    if (!querySchema->statement().isEmpty())
+        return querySchema->statement();
 
 //! @todo looking at singleTable is visually nice but a field name can conflict
 //!   with function or variable name...
     uint number = 0;
-    bool singleTable = querySchema.tables()->count() <= 1;
+    bool singleTable = querySchema->tables()->count() <= 1;
     if (singleTable) {
         //make sure we will have single table:
-        foreach(Field *f, *querySchema.fields()) {
-            if (querySchema.isColumnVisible(number) && f->table() && f->table()->lookupFieldSchema(*f)) {
+        foreach(Field *f, *querySchema->fields()) {
+            if (querySchema->isColumnVisible(number) && f->table() && f->table()->lookupFieldSchema(*f)) {
                 //uups, no, there's at least one left join
                 singleTable = false;
                 break;
@@ -1229,8 +1220,8 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
     number = 0;
     QList<QuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
     QString predicate_subquery_prefix("__predicate_subquery_");
-    foreach(Field *f, *querySchema.fields()) {
-        if (querySchema.isColumnVisible(number)) {
+    foreach(Field *f, *querySchema->fields()) {
+        if (querySchema->isColumnVisible(number)) {
             if (!sql.isEmpty())
                 sql += QLatin1String(", ");
 
@@ -1248,9 +1239,9 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                         return QString();
 
                     QString tableName;
-                    int tablePosition = querySchema.tableBoundToColumn(number);
+                    int tablePosition = querySchema->tableBoundToColumn(number);
                     if (tablePosition >= 0)
-                        tableName = querySchema.tableAlias(tablePosition);
+                        tableName = querySchema->tableAlias(tablePosition);
                     if (tableName.isEmpty())
                         tableName = f->table()->name();
 
@@ -1259,7 +1250,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                     }
                     sql += escapeIdentifier(f->name(), options.identifierEscaping);
                 }
-                QString aliasString = QString(querySchema.columnAlias(number));
+                QString aliasString(querySchema->columnAlias(number));
                 if (!aliasString.isEmpty())
                     sql += (QLatin1String(" AS ") + aliasString);
 //! @todo add option that allows to omit "AS" keyword
@@ -1271,9 +1262,9 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                 // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
                 // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
                 // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
-                LookupFieldSchema::RowSource& rowSource = lookupFieldSchema->rowSource();
-                if (rowSource.type() == LookupFieldSchema::RowSource::Table) {
-                    TableSchema *lookupTable = querySchema.connection()->tableSchema(rowSource.name());
+                LookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
+                if (recordSource.type() == LookupFieldSchema::RecordSource::Table) {
+                    TableSchema *lookupTable = querySchema->connection()->tableSchema(recordSource.name());
                     FieldList* visibleColumns = 0;
                     Field *boundField = 0;
                     if (lookupTable
@@ -1315,8 +1306,8 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                                                    driver(), " || ' ' || ", internalUniqueTableAlias, options.identifierEscaping);
                     }
                     delete visibleColumns;
-                } else if (rowSource.type() == LookupFieldSchema::RowSource::Query) {
-                    QuerySchema *lookupQuery = querySchema.connection()->querySchema(rowSource.name());
+                } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
+                    QuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
                     if (!lookupQuery) {
                         PreWarn << "!lookupQuery";
                         return QString();
@@ -1343,7 +1334,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                         predicate_subquery_prefix + lookupQuery->name() + "_"
                         + QString::number(internalUniqueQueryAliasNumber++));
                     s_additional_joins += QString::fromLatin1("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
-                                          .arg(selectStatement(*lookupQuery, params, options),
+                                          .arg(selectStatement(lookupQuery, params, options),
                                                internalUniqueQueryAlias,
                                                escapeIdentifier(f->table()->name(), options.identifierEscaping),
                                                escapeIdentifier(f->name(), options.identifierEscaping),
@@ -1371,8 +1362,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                     s_additional_fields += expression;
 //subqueries_for_lookup_data.append(lookupQuery);
                 } else {
-                    PreWarn << "unsupported row source type "
-                    << rowSource.typeName();
+                    PreWarn << "unsupported record source type" << recordSource.typeName();
                     return QString();
                 }
             }
@@ -1384,18 +1374,18 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
     if (!s_additional_fields.isEmpty())
         sql += (QLatin1String(", ") + s_additional_fields);
 
-    if (options.alsoRetrieveROWID) { //append rowid column
+    if (options.alsoRetrieveRecordId) { //append rowid column
         QString s;
         if (!sql.isEmpty())
             s = QLatin1String(", ");
-        if (querySchema.masterTable())
-            s += (escapeIdentifier(querySchema.masterTable()->name()) + ".");
+        if (querySchema->masterTable())
+            s += (escapeIdentifier(querySchema->masterTable()->name()) + ".");
         s += m_driver->beh->ROW_ID_FIELD_NAME;
         sql += s;
     }
 
     sql.prepend(QLatin1String("SELECT "));
-    TableSchema::List* tables = querySchema.tables();
+    TableSchema::List* tables = querySchema->tables();
     if ((tables && !tables->isEmpty()) || !subqueries_for_lookup_data.isEmpty()) {
         sql += QLatin1String(" FROM ");
         QString s_from;
@@ -1405,7 +1395,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
                 if (!s_from.isEmpty())
                     s_from += QLatin1String(", ");
                 s_from += escapeIdentifier(table->name(), options.identifierEscaping);
-                QString aliasString = QString(querySchema.tableAlias(number));
+                QString aliasString = QString(querySchema->tableAlias(number));
                 if (!aliasString.isEmpty())
                     s_from += (QLatin1String(" AS ") + aliasString);
                 number++;
@@ -1422,7 +1412,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
             if (!s_from.isEmpty())
                 s_from += QLatin1String(", ");
             s_from += QLatin1String("(");
-            s_from += selectStatement(*subQuery, params, options);
+            s_from += selectStatement(subQuery, params, options);
             s_from += QString::fromLatin1(") AS %1%2")
                       .arg(predicate_subquery_prefix, subqueries_for_lookup_data_counter++);
         }
@@ -1440,7 +1430,7 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
 
     //WHERE
     bool wasWhere = false; //for later use
-    foreach(Relationship *rel, *querySchema.relationships()) {
+    foreach(Relationship *rel, *querySchema->relationships()) {
         if (s_where.isEmpty()) {
             wasWhere = true;
         } else
@@ -1465,14 +1455,14 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
         s_where += s_where_sub;
     }
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
-    if (querySchema.whereExpression()) {
-        QuerySchemaParameterValueListIterator paramValuesIt(*m_driver, params);
+    if (querySchema->whereExpression()) {
+        QuerySchemaParameterValueListIterator paramValuesIt(m_driver, params);
         QuerySchemaParameterValueListIterator *paramValuesItPtr = params.isEmpty() ? 0 : &paramValuesIt;
         if (wasWhere) {
 //TODO: () are not always needed
-            s_where = "(" + s_where + ") AND (" + querySchema.whereExpression()->toString(paramValuesItPtr) + ")";
+            s_where = "(" + s_where + ") AND (" + querySchema->whereExpression()->toString(paramValuesItPtr) + ")";
         } else {
-            s_where = querySchema.whereExpression()->toString(paramValuesItPtr);
+            s_where = querySchema->whereExpression()->toString(paramValuesItPtr);
         }
     }
     if (!s_where.isEmpty())
@@ -1482,13 +1472,13 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
 
     // ORDER BY
     QString orderByString(
-        querySchema.orderByColumnList().toSQLString(!singleTable/*includeTableName*/,
+        querySchema->orderByColumnList().toSQLString(!singleTable/*includeTableName*/,
                 driver(), options.identifierEscaping));
-    const QVector<int> pkeyFieldsOrder(querySchema.pkeyFieldsOrder());
+    const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());
     if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
         //add automatic ORDER BY if there is no explicitly defined (especially helps when there are complex JOINs)
         OrderByColumnList automaticPKOrderBy;
-        const QueryColumnInfo::Vector fieldsExpanded(querySchema.fieldsExpanded());
+        const QueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded());
         foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
             if (pkeyFieldsIndex < 0) // no field mentioned in this query
                 continue;
@@ -1510,10 +1500,10 @@ QString Connection::selectStatement(Predicate::QuerySchema& querySchema,
     return sql;
 }
 
-QString Connection::selectStatement(Predicate::TableSchema& tableSchema,
+QString Connection::selectStatement(Predicate::TableSchema* tableSchema,
                                     const SelectStatementOptions& options) const
 {
-    return selectStatement(*tableSchema.query(), options);
+    return selectStatement(tableSchema->query(), options);
 }
 
 Field* Connection::findSystemFieldName(const Predicate::FieldList& fieldlist)
@@ -1526,28 +1516,31 @@ Field* Connection::findSystemFieldName(const Predicate::FieldList& fieldlist)
 }
 
 quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName, const QString& tableName,
-        quint64* ROWID)
+        quint64* recordId)
 {
-    quint64 row_id = drv_lastInsertRowID();
-    if (ROWID)
-        *ROWID = row_id;
+    const quint64 foundRecordId = drv_lastInsertRecordId();
+    if (recordId)
+        *recordId = foundRecordId;
     if (m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
-        return row_id;
+        return foundRecordId;
     }
     RecordData rdata;
-    if (row_id <= 0 || true != querySingleRecord(
-                QLatin1String("SELECT ") + tableName + QLatin1String(".") + aiFieldName + QLatin1String(" FROM ") + tableName
-                + QLatin1String(" WHERE ") + m_driver->beh->ROW_ID_FIELD_NAME + QLatin1String("=") + QString::number(row_id), rdata)) {
-//  PreDbg << "row_id<=0 || true!=querySingleRecord()";
+    if (foundRecordId <= 0 || true != querySingleRecord(
+                  QLatin1String("SELECT ") + tableName + QLatin1String(".") + aiFieldName
+                + QLatin1String(" FROM ") + tableName
+                + QLatin1String(" WHERE ") + m_driver->beh->ROW_ID_FIELD_NAME
+                + QLatin1String("=") + QString::number(foundRecordId), &rdata))
+    {
+//  PreDbg << "foundRecordId<=0 || true!=querySingleRecord()";
         return (quint64) - 1; //ULL;
     }
     return rdata[0].toULongLong();
 }
 
 quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName,
-        const Predicate::TableSchema& table, quint64* ROWID)
+        const Predicate::TableSchema& table, quint64* recordId)
 {
-    return lastInsertedAutoIncValue(aiFieldName, table.name(), ROWID);
+    return lastInsertedAutoIncValue(aiFieldName, table.name(), recordId);
 }
 
 //! Creates a Field list for kexi__fields, for sanity. Used by createTable()
@@ -1620,10 +1613,10 @@ bool Connection::storeMainFieldSchema(Field *field)
 
 #define createTable_ERR \
     { PreDbg << "ERROR!"; \
-        setError(this, tr("Creating table failed.")); \
+        m_result.prependMessage(QObject::tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
-//setError( errorNum(), tr("Creating table failed.") + " " + errorMsg());
+//setError( errorNum(), QObject::tr("Creating table failed.") + " " + errorMsg());
 
 //! Creates a table according to the given schema
 /*! Creates a table according to the given TableSchema, adding the table and
@@ -1633,35 +1626,36 @@ bool Connection::storeMainFieldSchema(Field *field)
     If the table exists, and replaceExisting is true, the table is replaced.
     Otherwise, the table is not replaced.
 */
-bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceExisting)
+bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
 {
     if (!tableSchema || !checkIsDatabaseUsed())
         return false;
 
     //check if there are any fields
     if (tableSchema->fieldCount() < 1) {
-        clearError();
-        setError(ERR_CANNOT_CREATE_EMPTY_OBJECT, tr("Cannot create table without fields."));
+        clearResult();
+        m_result = Result(ERR_CANNOT_CREATE_EMPTY_OBJECT, QObject::tr("Cannot create table without fields."));
         return false;
     }
     const bool internalTable = dynamic_cast<InternalTableSchema*>(tableSchema);
 
-    const QString &tableName = tableSchema->name().toLower();
+    const QString tableName(tableSchema->name().toLower());
 
     if (!internalTable) {
         if (m_driver->isSystemObjectName(tableName)) {
-            clearError();
-            setError(ERR_SYSTEM_NAME_RESERVED, tr("System name \"%1\" cannot be used as table name.")
-                                                .arg(tableSchema->name()));
+            clearResult();
+            m_result = Result(ERR_SYSTEM_NAME_RESERVED,
+                              QObject::tr("System name \"%1\" cannot be used as table name.")
+                              .arg(tableSchema->name()));
             return false;
         }
 
-        Field *sys_field = findSystemFieldName(*tableSchema);
+        Field *sys_field = findSystemFieldName(tableSchema);
         if (sys_field) {
-            clearError();
-            setError(ERR_SYSTEM_NAME_RESERVED,
-                     tr("System name \"%1\" cannot be used as one of fields in \"%2\" table.")
-                     .arg(sys_field->name(), tableName));
+            clearResult();
+            m_result = Result(ERR_SYSTEM_NAME_RESERVED,
+                              QObject::tr("System name \"%1\" cannot be used as one of fields in \"%2\" table.")
+                              .arg(sys_field->name(), tableName));
             return false;
         }
     }
@@ -1674,22 +1668,22 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
         existingTable = d->table(tableName);
         if (existingTable) {
             if (existingTable == tableSchema) {
-                clearError();
-                setError(ERR_OBJECT_EXISTS,
-                         tr("Could not create the same table \"%1\" twice.").arg(tableSchema->name()));
+                clearResult();
+                m_result = Result(ERR_OBJECT_EXISTS,
+                                  QObject::tr("Could not create the same table \"%1\" twice.").arg(tableSchema->name()));
                 return false;
             }
 //TODO(js): update any structure (e.g. queries) that depend on this table!
             if (existingTable->id() > 0)
-                tableSchema->m_id = existingTable->id(); //copy id from existing table
+                tableSchema->setId(existingTable->id()); //copy id from existing table
             previousSchemaStillKept = true;
             if (!dropTable(existingTable, false /*alsoRemoveSchema*/))
                 return false;
         }
     } else {
         if (this->tableSchema(tableSchema->name()) != 0) {
-            clearError();
-            setError(ERR_OBJECT_EXISTS, tr("Table \"%1\" already exists.").arg(tableSchema->name()));
+            clearResult();
+            m_result = Result(ERR_OBJECT_EXISTS, QObject::tr("Table \"%1\" already exists.").arg(tableSchema->name()));
             return false;
         }
     }
@@ -1701,7 +1695,7 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
       }*/
 
     TransactionGuard tg;
-    if (!beginAutoCommitTransaction(tg))
+    if (!beginAutoCommitTransaction(&tg))
         return false;
 
     if (!drv_createTable(*tableSchema))
@@ -1710,14 +1704,14 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
     //add schema data to kexi__* tables
     if (!internalTable) {
         //update kexi__objects
-        if (!storeObjectSchemaData(*tableSchema, true))
+        if (!storeNewObjectData(tableSchema))
             createTable_ERR;
 
         TableSchema *ts = d->table("kexi__fields");
         if (!ts)
             return false;
         //for sanity: remove field info (if any) for this table id
-        if (!Predicate::deleteRow(*this, ts, "t_id", tableSchema->id()))
+        if (!Predicate::deleteRecord(this, ts, "t_id", tableSchema->id()))
             return false;
 
         FieldList *fl = createFieldListForKexi__Fields(d->table("kexi__fields"));
@@ -1727,12 +1721,12 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
         foreach(Field *f, *tableSchema->fields()) {
             QList<QVariant> vals;
             buildValuesForKexi__Fields(vals, f);
-            if (!insertRecord(*fl, vals))
+            if (!insertRecord(fl, vals))
                 createTable_ERR;
         }
         delete fl;
 
-        if (!storeExtendedTableSchemaData(*tableSchema))
+        if (!storeExtendedTableSchemaData(tableSchema))
             createTable_ERR;
     }
 
@@ -1749,14 +1743,14 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
     if (res) {
         if (internalTable) {
             //insert the internal table into structures
-            insertInternalTable(*tableSchema);
+            insertInternalTable(tableSchema);
         } else {
             if (previousSchemaStillKept) {
                 //remove previous table schema
                 d->removeTable(*tableSchema);
             }
             //store one schema object locally:
-            d->insertTable(*tableSchema);
+            d->insertTable(tableSchema);
         }
         //ok, this table is not created by the connection
         tableSchema->m_conn = this;
@@ -1766,11 +1760,11 @@ bool Connection::createTable(Predicate::TableSchema* tableSchema, bool replaceEx
 
 bool Connection::removeObject(uint objId)
 {
-    clearError();
+    clearResult();
     //remove table schema from kexi__* tables
-    if (!Predicate::deleteRow(*this, d->table("kexi__objects"), "o_id", objId) //schema entry
-            || !Predicate::deleteRow(*this, d->table("kexi__objectdata"), "o_id", objId)) {//data blocks
-        setError(ERR_DELETE_SERVER_ERROR, tr("Could not remove object's data."));
+    if (!Predicate::deleteRecord(this, d->table("kexi__objects"), "o_id", objId) //schema entry
+            || !Predicate::deleteRecord(this, d->table("kexi__objectdata"), "o_id", objId)) {//data blocks
+        m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Could not remove object's data."));
         return false;
     }
     return true;
@@ -1778,8 +1772,7 @@ bool Connection::removeObject(uint objId)
 
 bool Connection::drv_dropTable(const QString& name)
 {
-    m_sql = "DROP TABLE " + escapeIdentifier(name);
-    return executeSQL(m_sql);
+    return executeSQL( QLatin1String("DROP TABLE ") + escapeIdentifier(name) );
 }
 
 //! Drops a table corresponding to the name in the given schema
@@ -1797,33 +1790,33 @@ tristate Connection::dropTable(Predicate::TableSchema* tableSchema)
 tristate Connection::dropTable(Predicate::TableSchema* tableSchema, bool alsoRemoveSchema)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    clearError();
+    clearResult();
     if (!tableSchema)
         return false;
 
-    QString errmsg = tr("Table \"%1\" cannot be removed.\n");
+    QString errmsg = QObject::tr("Table \"%1\" cannot be removed.\n");
     //be sure that we handle the correct TableSchema object:
     if (tableSchema->id() < 0
             || this->tableSchema(tableSchema->name()) != tableSchema
             || this->tableSchema(tableSchema->id()) != tableSchema) {
-        setError(ERR_OBJECT_NOT_FOUND, errmsg.arg(tableSchema->name())
-                 + tr("Unexpected name or identifier."));
+        m_result = Result(ERR_OBJECT_NOT_FOUND, errmsg.arg(tableSchema->name())
+                          + QObject::tr("Unexpected name or identifier."));
         return false;
     }
 
-    tristate res = closeAllTableSchemaChangeListeners(*tableSchema);
+    tristate res = closeAllTableSchemaChangeListeners(tableSchema);
     if (true != res)
         return res;
 
     //sanity checks:
     if (m_driver->isSystemObjectName(tableSchema->name())) {
-        setError(ERR_SYSTEM_NAME_RESERVED, errmsg.arg(tableSchema->name())
-                 + d->strItIsASystemObject());
+        m_result = Result(ERR_SYSTEM_NAME_RESERVED, errmsg.arg(tableSchema->name())
+                          + d->strItIsASystemObject());
         return false;
     }
 
     TransactionGuard tg;
-    if (!beginAutoCommitTransaction(tg))
+    if (!beginAutoCommitTransaction(&tg))
         return false;
 
     //for sanity we're checking if this table exists physically
@@ -1833,7 +1826,7 @@ tristate Connection::dropTable(Predicate::TableSchema* tableSchema, bool alsoRem
     }
 
     TableSchema *ts = d->table("kexi__fields");
-    if (!Predicate::deleteRow(*this, ts, "t_id", tableSchema->id())) //field entries
+    if (!Predicate::deleteRecord(this, ts, "t_id", tableSchema->id())) //field entries
         return false;
 
     //remove table schema from kexi__objects table
@@ -1853,26 +1846,26 @@ tristate Connection::dropTable(Predicate::TableSchema* tableSchema, bool alsoRem
 
 tristate Connection::dropTable(const QString& table)
 {
-    clearError();
+    clearResult();
     TableSchema* ts = tableSchema(table);
     if (!ts) {
-        setError(ERR_OBJECT_NOT_FOUND, tr("Table \"%1\" does not exist.")
-                                       .arg(table));
+        m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Table \"%1\" does not exist.")
+                                                .arg(table));
         return false;
     }
     return dropTable(ts);
 }
 
-tristate Connection::alterTable(TableSchema& tableSchema, TableSchema& newTableSchema)
+tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableSchema)
 {
-    clearError();
+    clearResult();
     tristate res = closeAllTableSchemaChangeListeners(tableSchema);
     if (true != res)
         return res;
 
-    if (&tableSchema == &newTableSchema) {
-        setError(ERR_OBJECT_THE_SAME, tr("Could not alter table \"%1\" using the same table.")
-                                           .arg(tableSchema.name()));
+    if (tableSchema == newTableSchema) {
+        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could not alter table \"%1\" using the same table.")
+                                               .arg(tableSchema->name()));
         return false;
     }
 //TODO(js): implement real altering
@@ -1884,27 +1877,27 @@ tristate Connection::alterTable(TableSchema& tableSchema, TableSchema& newTableS
     empty = true;
 #endif
     if (empty) {
-        ok = createTable(&newTableSchema, true/*replace*/);
+        ok = createTable(newTableSchema, true/*replace*/);
     }
     return ok;
 }
 
-bool Connection::alterTableName(TableSchema& tableSchema, const QString& newName, bool replace)
+bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName, bool replace)
 {
-    clearError();
-    if (&tableSchema != d->table(tableSchema.id())) {
-        setError(ERR_OBJECT_NOT_FOUND, tr("Unknown table \"%1\"").arg(tableSchema.name()));
+    clearResult();
+    if (tableSchema != d->table(tableSchema->id())) {
+        m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Unknown table \"%1\"").arg(tableSchema->name()));
         return false;
     }
     if (newName.isEmpty() || !Utils::isIdentifier(newName)) {
-        setError(ERR_INVALID_IDENTIFIER, tr("Invalid table name \"%1\"").arg(newName));
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid table name \"%1\"").arg(newName));
         return false;
     }
-    const QString oldTableName = tableSchema.name();
+    const QString oldTableName = tableSchema->name();
     const QString newTableName = newName.toLower().trimmed();
     if (oldTableName.toLower().trimmed() == newTableName) {
-        setError(ERR_OBJECT_THE_SAME, tr("Could rename table \"%1\" using the same name.")
-                                      .arg(newTableName));
+        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could rename table \"%1\" using the same name.")
+                                               .arg(newTableName));
         return false;
     }
 //TODO: alter table name for server DB backends!
@@ -1914,18 +1907,18 @@ bool Connection::alterTableName(TableSchema& tableSchema, const QString& newName
     const bool destTableExists = tableToReplace != 0;
     const int origID = destTableExists ? tableToReplace->id() : -1; //will be reused in the new table
     if (!replace && destTableExists) {
-        setError(ERR_OBJECT_EXISTS,
-                 tr("Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists.")
-                 .arg(tableSchema.name(), newName, newName));
+        m_result = Result(ERR_OBJECT_EXISTS,
+                          QObject::tr("Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists.")
+                          .arg(tableSchema->name(), newName, newName));
         return false;
     }
 
 //helper:
 #define alterTableName_ERR \
-    tableSchema.setName(oldTableName) //restore old name
+    tableSchema->setName(oldTableName) //restore old name
 
     TransactionGuard tg;
-    if (!beginAutoCommitTransaction(tg))
+    if (!beginAutoCommitTransaction(&tg))
         return false;
 
     // drop the table replaced (with schema)
@@ -1940,18 +1933,18 @@ bool Connection::alterTableName(TableSchema& tableSchema, const QString& newName
         // the new table owns the previous table's id:
         if (!executeSQL(
                     QString::fromLatin1("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
-                    .arg(origID, tableSchema.id(), (int)TableObjectType)))
+                    .arg(origID, tableSchema->id(), (int)TableObjectType)))
         {
             return false;
         }
         if (!executeSQL(QString::fromLatin1("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
-                        .arg(origID, tableSchema.id()))) {
+                        .arg(origID, tableSchema->id()))) {
             return false;
         }
 
         //maintain table ID
         d->changeTableId(tableSchema, origID);
-        tableSchema.m_id = origID;
+        tableSchema->setId(origID);
     }
 
     if (!drv_alterTableName(tableSchema, newTableName)) {
@@ -1962,14 +1955,14 @@ bool Connection::alterTableName(TableSchema& tableSchema, const QString& newName
     // Update kexi__objects
     //TODO
     if (!executeSQL(QString::fromLatin1("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
-                    .arg(m_driver->escapeString(tableSchema.name()), tableSchema.id()))) {
+                    .arg(m_driver->escapeString(tableSchema->name()), tableSchema->id()))) {
         alterTableName_ERR;
         return false;
     }
 //TODO what about caption?
 
     //restore old name: it will be changed soon!
-    tableSchema.setName(oldTableName);
+    tableSchema->setName(oldTableName);
 
     if (!commitAutoCommitTransaction(tg.transaction())) {
         alterTableName_ERR;
@@ -1981,39 +1974,39 @@ bool Connection::alterTableName(TableSchema& tableSchema, const QString& newName
     return true;
 }
 
-bool Connection::drv_alterTableName(TableSchema& tableSchema, const QString& newName)
+bool Connection::drv_alterTableName(TableSchema* tableSchema, const QString& newName)
 {
-    const QString oldTableName = tableSchema.name();
-    tableSchema.setName(newName);
+    const QString oldTableName = tableSchema->name();
+    tableSchema->setName(newName);
 
     if (!executeSQL(QString::fromLatin1("ALTER TABLE %1 RENAME TO %2")
                     .arg(escapeIdentifier(oldTableName), escapeIdentifier(newName)))) {
-        tableSchema.setName(oldTableName); //restore old name
+        tableSchema->setName(oldTableName); //restore old name
         return false;
     }
     return true;
 }
 
-bool Connection::dropQuery(Predicate::QuerySchema* querySchema)
+bool Connection::dropQuery(QuerySchema* querySchema)
 {
-    clearError();
+    clearResult();
     if (!querySchema)
         return false;
 
     TransactionGuard tg;
-    if (!beginAutoCommitTransaction(tg))
+    if (!beginAutoCommitTransaction(&tg))
         return false;
 
     /* TableSchema *ts = d->tables_byname["kexi__querydata"];
-      if (!Predicate::deleteRow(*this, ts, "q_id", querySchema->id()))
+      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
         return false;
 
       ts = d->tables_byname["kexi__queryfields"];
-      if (!Predicate::deleteRow(*this, ts, "q_id", querySchema->id()))
+      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
         return false;
 
       ts = d->tables_byname["kexi__querytables"];
-      if (!Predicate::deleteRow(*this, ts, "q_id", querySchema->id()))
+      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
         return false;*/
 
     //remove query schema from kexi__objects table
@@ -2022,17 +2015,17 @@ bool Connection::dropQuery(Predicate::QuerySchema* querySchema)
     }
 
 //TODO(js): update any structure that depend on this table!
-    d->removeQuery(*querySchema);
+    d->removeQuery(querySchema);
     return commitAutoCommitTransaction(tg.transaction());
 }
 
 bool Connection::dropQuery(const QString& query)
 {
-    clearError();
+    clearResult();
     QuerySchema* qs = querySchema(query);
     if (!qs) {
-        setError(ERR_OBJECT_NOT_FOUND, tr("Query \"%1\" does not exist.")
-                                       .arg(query));
+        m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Query \"%1\" does not exist.")
+                                                .arg(query));
         return false;
     }
     return dropQuery(qs);
@@ -2040,9 +2033,9 @@ bool Connection::dropQuery(const QString& query)
 
 bool Connection::drv_createTable(const Predicate::TableSchema& tableSchema)
 {
-    m_sql = createTableStatement(tableSchema);
-    PreDbg << "******** " << m_sql;
-    return executeSQL(m_sql);
+    const QString sql( createTableStatement(tableSchema) );
+    PreDbg << "******** " << sql;
+    return executeSQL(sql);
 }
 
 bool Connection::drv_createTable(const QString& tableSchemaName)
@@ -2053,11 +2046,11 @@ bool Connection::drv_createTable(const QString& tableSchemaName)
     return drv_createTable(*ts);
 }
 
-bool Connection::beginAutoCommitTransaction(TransactionGuard &tg)
+bool Connection::beginAutoCommitTransaction(TransactionGuard* tg)
 {
     if ((m_driver->d->features & Driver::IgnoreTransactions)
             || !d->autoCommit) {
-        tg.setTransaction(Transaction());
+        tg->setTransaction(Transaction());
         return true;
     }
 
@@ -2066,22 +2059,22 @@ bool Connection::beginAutoCommitTransaction(TransactionGuard &tg)
     if (m_driver->d->features & Driver::SingleTransactions) {
         if (d->default_trans_started_inside) //only commit internally started transaction
             if (!commitTransaction(d->default_trans, true)) {
-                tg.setTransaction(Transaction());
+                tg->setTransaction(Transaction());
                 return false; //we have a real error
             }
 
         d->default_trans_started_inside = d->default_trans.isNull();
         if (!d->default_trans_started_inside) {
-            tg.setTransaction(d->default_trans);
-            tg.doNothing();
+            tg->setTransaction(d->default_trans);
+            tg->doNothing();
             return true; //reuse externally started transaction
         }
     } else if (!(m_driver->d->features & Driver::MultipleTransactions)) {
-        tg.setTransaction(Transaction());
+        tg->setTransaction(Transaction());
         return true; //no trans. supported at all - just return
     }
-    tg.setTransaction(beginTransaction());
-    return !error();
+    tg->setTransaction(beginTransaction());
+    return !m_result.isError();
 }
 
 bool Connection::commitAutoCommitTransaction(const Transaction& trans)
@@ -2105,12 +2098,12 @@ bool Connection::rollbackAutoCommitTransaction(const Transaction& trans)
 }
 
 #define SET_ERR_TRANS_NOT_SUPP \
-    { setError(ERR_UNSUPPORTED_DRV_FEATURE, \
-                   tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->name() )); }
+    { m_result = Result(ERR_UNSUPPORTED_DRV_FEATURE, \
+                        QObject::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->name() )); }
 
 #define SET_BEGIN_TR_ERROR \
-    { if (!error()) \
-            setError(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, tr("Begin transaction failed")); }
+    { if (!m_result.isError()) \
+            m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Begin transaction failed")); }
 
 Transaction Connection::beginTransaction()
 {
@@ -2126,7 +2119,7 @@ Transaction Connection::beginTransaction()
     }
     if (m_driver->d->features & Driver::SingleTransactions) {
         if (d->default_trans.active()) {
-            setError(ERR_TRANSACTION_ACTIVE, tr("Transaction already started."));
+            m_result = Result(ERR_TRANSACTION_ACTIVE, QObject::tr("Transaction already started."));
             return Transaction();
         }
         if (!(trans.m_data = drv_beginTransaction())) {
@@ -2166,8 +2159,8 @@ bool Connection::commitTransaction(const Transaction trans, bool ignore_inactive
         if (!d->default_trans.active()) {
             if (ignore_inactive)
                 return true;
-            clearError();
-            setError(ERR_NO_TRANSACTION_ACTIVE, tr("Transaction not started."));
+            clearResult();
+            m_result = Result(ERR_NO_TRANSACTION_ACTIVE, QObject::tr("Transaction not started."));
             return false;
         }
         t = d->default_trans;
@@ -2180,8 +2173,8 @@ bool Connection::commitTransaction(const Transaction trans, bool ignore_inactive
         t.m_data->m_active = false; //now this transaction if inactive
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
-    if (!ret && !error())
-        setError(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, tr("Error on commit transaction"));
+    if (!ret && !m_result.isError())
+        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on commit transaction"));
     return ret;
 }
 
@@ -2201,8 +2194,8 @@ bool Connection::rollbackTransaction(const Transaction trans, bool ignore_inacti
         if (!d->default_trans.active()) {
             if (ignore_inactive)
                 return true;
-            clearError();
-            setError(ERR_NO_TRANSACTION_ACTIVE, tr("Transaction not started."));
+            clearResult();
+            m_result = Result(ERR_NO_TRANSACTION_ACTIVE, QObject::tr("Transaction not started."));
             return false;
         }
         t = d->default_trans;
@@ -2215,8 +2208,8 @@ bool Connection::rollbackTransaction(const Transaction trans, bool ignore_inacti
         t.m_data->m_active = false; //now this transaction if inactive
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
-    if (!ret && !error())
-        setError(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, tr("Error on rollback transaction"));
+    if (!ret && !m_result.isError())
+        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on rollback transaction"));
     return ret;
 }
 
@@ -2228,7 +2221,7 @@ bool Connection::rollbackTransaction(const Transaction trans, bool ignore_inacti
   return drv_duringTransaction();
 }*/
 
-Transaction& Connection::defaultTransaction() const
+Transaction Connection::defaultTransaction() const
 {
     return d->default_trans;
 }
@@ -2246,7 +2239,7 @@ void Connection::setDefaultTransaction(const Transaction& trans)
     d->default_trans = trans;
 }
 
-const QList<Transaction>& Connection::transactions()
+QList<Transaction> Connection::transactions()
 {
     return d->transactions;
 }
@@ -2268,7 +2261,7 @@ bool Connection::setAutoCommit(bool on)
 
 TransactionData* Connection::drv_beginTransaction()
 {
-    QString old_sql = m_sql; //don't
+    //QString old_sql = d->sql; //don't
     if (!executeSQL("BEGIN"))
         return 0;
     return new TransactionData(this);
@@ -2297,43 +2290,43 @@ Cursor* Connection::executeQuery(const QString& statement, uint cursor_options)
     if (!c)
         return 0;
     if (!c->open()) {//err - kill that
-        setError(c);
+        m_result = c->result();
         delete c;
         return 0;
     }
     return c;
 }
 
-Cursor* Connection::executeQuery(QuerySchema& query, const QList<QVariant>& params,
+Cursor* Connection::executeQuery(QuerySchema* query, const QList<QVariant>& params,
                                  uint cursor_options)
 {
     Cursor *c = prepareQuery(query, params, cursor_options);
     if (!c)
         return 0;
     if (!c->open()) {//err - kill that
-        setError(c);
+        m_result = c->result();
         delete c;
         return 0;
     }
     return c;
 }
 
-Cursor* Connection::executeQuery(QuerySchema& query, uint cursor_options)
+Cursor* Connection::executeQuery(QuerySchema* query, uint cursor_options)
 {
     return executeQuery(query, QList<QVariant>(), cursor_options);
 }
 
-Cursor* Connection::executeQuery(TableSchema& table, uint cursor_options)
+Cursor* Connection::executeQuery(TableSchema* table, uint cursor_options)
 {
-    return executeQuery(*table.query(), cursor_options);
+    return executeQuery(table->query(), cursor_options);
 }
 
-Cursor* Connection::prepareQuery(TableSchema& table, uint cursor_options)
+Cursor* Connection::prepareQuery(TableSchema* table, uint cursor_options)
 {
-    return prepareQuery(*table.query(), cursor_options);
+    return prepareQuery(table->query(), cursor_options);
 }
 
-Cursor* Connection::prepareQuery(QuerySchema& query, const QList<QVariant>& params,
+Cursor* Connection::prepareQuery(QuerySchema* query, const QList<QVariant>& params,
                                  uint cursor_options)
 {
     Cursor* cursor = prepareQuery(query, cursor_options);
@@ -2355,7 +2348,8 @@ bool Connection::deleteCursor(Cursor *cursor)
     return ret;
 }
 
-bool Connection::setupObjectSchemaData(const RecordData &data, SchemaData &sdata)
+#warning fix Connection::setupObjectData() after refactoring
+bool Connection::setupObjectData(const RecordData &data, Object *object)
 {
     //not found: retrieve schema
     /* Predicate::Cursor *cursor;
@@ -2370,44 +2364,45 @@ bool Connection::setupObjectSchemaData(const RecordData &data, SchemaData &sdata
     //return 0;
 // }
     bool ok;
-    sdata.m_id = data[0].toInt(&ok);
-    if (!ok) {
+    const int id = data[0].toInt(&ok);
+    if (!ok)
+        return false;
+    object->setId(id);
+    const QString name(data[2].toString());
+    if (!Utils::isIdentifier(name)) {
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\"").arg(name));
         return false;
     }
-    sdata.m_name = data[2].toString();
-    if (!Utils::isIdentifier(sdata.m_name)) {
-        setError(ERR_INVALID_IDENTIFIER, tr("Invalid object name \"%1\"").arg(sdata.m_name));
-        return false;
-    }
-    sdata.m_caption = data[3].toString();
-    sdata.m_desc = data[4].toString();
+    object->setName(name);
+    object->setCaption(data[3].toString());
+    object->setDescription(data[4].toString());
 
-// PreDbg<<"@@@ Connection::setupObjectSchemaData() == " << sdata.schemaDataDebugString();
+// PreDbg<<"@@@ Connection::setupObjectData() == " << sdata.schemaDataDebugString();
     return true;
 }
 
-tristate Connection::loadObjectSchemaData(int objectID, SchemaData &sdata)
+tristate Connection::loadObjectData(int id, Object* object)
 {
     RecordData data;
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(objectID), data))
+                                  .arg(id), &data))
         return cancelled;
-    return setupObjectSchemaData(data, sdata);
+    return setupObjectData(data, object);
 }
 
-tristate Connection::loadObjectSchemaData(int objectType, const QString& objectName, SchemaData &sdata)
+tristate Connection::loadObjectData(int type, const QString& name, Object* object)
 {
     RecordData data;
     if (true != querySingleRecord(QString::fromLatin1("SELECT o_id, o_type, o_name, o_caption, o_desc "
                                   "FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
-                                  .arg(QString::number(objectType), 
-                                       m_driver->valueToSQL(Field::Text, objectName.toLower())), data))
+                                  .arg(QString::number(type),
+                                       m_driver->valueToSQL(Field::Text, name.toLower())), &data))
         return cancelled;
-    return setupObjectSchemaData(data, sdata);
+    return setupObjectData(data, object);
 }
 
-bool Connection::storeObjectSchemaData(SchemaData &sdata, bool newObject)
+bool Connection::storeObjectDataInternal(Object* object, bool newObject)
 {
     TableSchema *ts = d->table("kexi__objects");
     if (!ts)
@@ -2416,22 +2411,27 @@ bool Connection::storeObjectSchemaData(SchemaData &sdata, bool newObject)
         int existingID;
         if (true == querySingleNumber(QString::fromLatin1(
                                           "SELECT o_id FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
-                                      .arg(QString::number(sdata.type()), m_driver->valueToSQL(Field::Text, sdata.name().toLower())), existingID)) {
+                                          .arg(QString::number(object->type()),
+                                      m_driver->valueToSQL(Field::Text, object->name().toLower())),
+                                      &existingID))
+        {
             //we already have stored a schema data with the same name and type:
             //just update it's properties as it would be existing object
-            sdata.m_id = existingID;
+            object->setId(existingID);
             newObject = false;
         }
     }
     if (newObject) {
         FieldList *fl;
         bool ok;
-        if (sdata.id() <= 0) {//get new ID
+        if (object->id() <= 0) {//get new ID
             fl = ts->subList("o_type", "o_name", "o_caption", "o_desc");
             ok = fl != 0;
-            if (ok && !insertRecord(*fl, QVariant(sdata.type()), QVariant(sdata.name()),
-                                    QVariant(sdata.caption()), QVariant(sdata.description())))
+            if (ok && !insertRecord(fl, QVariant(object->type()), QVariant(object->name()),
+                                    QVariant(object->caption()), QVariant(object->description())))
+            {
                 ok = false;
+            }
             delete fl;
             if (!ok)
                 return false;
@@ -2441,14 +2441,16 @@ bool Connection::storeObjectSchemaData(SchemaData &sdata, bool newObject)
             PreDbg << "######## NEW obj_id == " << obj_id;
             if (obj_id <= 0)
                 return false;
-            sdata.m_id = obj_id;
+            object->setId(obj_id);
             return true;
         } else {
             fl = ts->subList("o_id", "o_type", "o_name", "o_caption", "o_desc");
             ok = fl != 0;
-            if (ok && !insertRecord(*fl, QVariant(sdata.id()), QVariant(sdata.type()), QVariant(sdata.name()),
-                                    QVariant(sdata.caption()), QVariant(sdata.description())))
+            if (ok && !insertRecord(fl, QVariant(object->id()), QVariant(object->type()), QVariant(object->name()),
+                                    QVariant(object->caption()), QVariant(object->description())))
+            {
                 ok = false;
+            }
             delete fl;
             return ok;
         }
@@ -2456,65 +2458,76 @@ bool Connection::storeObjectSchemaData(SchemaData &sdata, bool newObject)
     //existing object:
     return executeSQL(
                QString::fromLatin1("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
-               .arg(QString::number(sdata.id()), QString::number(sdata.type()),
-                    m_driver->valueToSQL(Predicate::Field::Text, sdata.caption()),
-                    m_driver->valueToSQL(Predicate::Field::Text, sdata.description())));
+               .arg(QString::number(object->id()), QString::number(object->type()),
+                    m_driver->valueToSQL(Predicate::Field::Text, object->caption()),
+                    m_driver->valueToSQL(Predicate::Field::Text, object->description())));
 }
 
-tristate Connection::querySingleRecordInternal(RecordData &data, const QString* sql, QuerySchema* query,
-        bool addLimitTo1)
+bool Connection::storeObjectData(Object* object)
+{
+    return storeObjectDataInternal(object, false);
+}
+
+bool Connection::storeNewObjectData(Object* object)
+{
+    return storeObjectDataInternal(object, true);
+}
+
+tristate Connection::querySingleRecordInternal(RecordData* data, const QString* sql, QuerySchema* query,
+                                               bool addLimitTo1)
 {
     Q_ASSERT(sql || query);
 //! @todo does not work with non-SQL data sources
     if (sql)
-        m_sql = m_driver->addLimitTo1(*sql, addLimitTo1);
+        m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
     Predicate::Cursor *cursor;
-    if (!(cursor = sql ? executeQuery(m_sql) : executeQuery(*query))) {
-        PreWarn << "!executeQuery()" << m_sql;
+    if (!(cursor = sql ? executeQuery(m_result.sql()) : executeQuery(query))) {
+        PreWarn << "!executeQuery()" << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst()
             || cursor->eof()
-            || !cursor->storeCurrentRow(data)) {
-        const tristate result = cursor->error() ? false : cancelled;
-        PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRow(data) m_sql=" << m_sql;
-        setError(cursor);
+            || !cursor->storeCurrentRecord(data))
+    {
+        const tristate result = cursor->result().isError() ? false : cancelled;
+        PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) m_result.sql()=" << m_result.sql();
+        m_result = cursor->result();
         deleteCursor(cursor);
         return result;
     }
     return deleteCursor(cursor);
 }
 
-tristate Connection::querySingleRecord(const QString& sql, RecordData &data, bool addLimitTo1)
+tristate Connection::querySingleRecord(const QString& sql, RecordData* data, bool addLimitTo1)
 {
     return querySingleRecordInternal(data, &sql, 0, addLimitTo1);
 }
 
-tristate Connection::querySingleRecord(QuerySchema& query, RecordData &data, bool addLimitTo1)
+tristate Connection::querySingleRecord(QuerySchema* query, RecordData* data, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, 0, &query, addLimitTo1);
+    return querySingleRecordInternal(data, 0, query, addLimitTo1);
 }
 
 bool Connection::checkIfColumnExists(Cursor *cursor, uint column)
 {
     if (column >= cursor->fieldCount()) {
-        setError(ERR_CURSOR_RECORD_FETCHING, tr("Column %1 does not exist for the query.").arg(column));
+        m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Column %1 does not exist for the query.").arg(column));
         return false;
     }
     return true;
 }
 
-tristate Connection::querySingleString(const QString& sql, QString &value, uint column, bool addLimitTo1)
+tristate Connection::querySingleString(const QString& sql, QString* value, uint column, bool addLimitTo1)
 {
     Predicate::Cursor *cursor;
-    m_sql = m_driver->addLimitTo1(sql, addLimitTo1);
-    if (!(cursor = executeQuery(m_sql))) {
-        PreWarn << "!executeQuery() " << m_sql;
+    m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
+    if (!(cursor = executeQuery(m_result.sql()))) {
+        PreWarn << "!executeQuery() " << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
-        const tristate result = cursor->error() ? false : cancelled;
-        PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_sql;
+        const tristate result = cursor->result().isError() ? false : cancelled;
+        PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         deleteCursor(cursor);
         return result;
     }
@@ -2522,33 +2535,36 @@ tristate Connection::querySingleString(const QString& sql, QString &value, uint 
         deleteCursor(cursor);
         return false;
     }
-    value = cursor->value(column).toString();
+    *value = cursor->value(column).toString();
     return deleteCursor(cursor);
 }
 
-tristate Connection::querySingleNumber(const QString& sql, int &number, uint column, bool addLimitTo1)
+tristate Connection::querySingleNumber(const QString& sql, int* number, uint column, bool addLimitTo1)
 {
     static QString str;
     static bool ok;
-    const tristate result = querySingleString(sql, str, column, addLimitTo1);
+    const tristate result = querySingleString(sql, &str, column, addLimitTo1);
     if (result != true)
         return result;
-    number = str.toInt(&ok);
-    return ok;
+    const int _number = str.toInt(&ok);
+    if (!ok)
+        return false;
+    *number = _number;
+    return true;
 }
 
-bool Connection::queryStringList(const QString& sql, QStringList& list, uint column)
+bool Connection::queryStringList(const QString& sql, QStringList* list, uint column)
 {
     Predicate::Cursor *cursor;
-    clearError();
-    m_sql = sql;
-    if (!(cursor = executeQuery(m_sql))) {
-        PreWarn << "!executeQuery() " << m_sql;
+    clearResult();
+    m_result.setSql(sql);
+    if (!(cursor = executeQuery(m_result.sql()))) {
+        PreWarn << "!executeQuery() " << m_result.sql();
         return false;
     }
     cursor->moveFirst();
-    if (cursor->error()) {
-        setError(cursor);
+    if (cursor->result().isError()) {
+        m_result = cursor->result();
         deleteCursor(cursor);
         return false;
     }
@@ -2556,11 +2572,11 @@ bool Connection::queryStringList(const QString& sql, QStringList& list, uint col
         deleteCursor(cursor);
         return false;
     }
-    list.clear();
+    list->clear();
     while (!cursor->eof()) {
-        list.append(cursor->value(column).toString());
-        if (!cursor->moveNext() && cursor->error()) {
-            setError(cursor);
+        list->append(cursor->value(column).toString());
+        if (!cursor->moveNext() && cursor->result().isError()) {
+            m_result = cursor->result();
             deleteCursor(cursor);
             return false;
         }
@@ -2568,68 +2584,73 @@ bool Connection::queryStringList(const QString& sql, QStringList& list, uint col
     return deleteCursor(cursor);
 }
 
-bool Connection::resultExists(const QString& sql, bool &success, bool addLimitTo1)
+bool Connection::resultExists(const QString& sql, bool* success, bool addLimitTo1)
 {
     Predicate::Cursor *cursor;
     //optimization
     if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
         //this is at least for sqlite
-        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT"))
-            m_sql = m_driver->addLimitTo1(QLatin1String("SELECT 1 FROM (") + sql + QLatin1String(")"), addLimitTo1);
-        else
-            m_sql = sql;
+        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT")) {
+            m_result.setSql(
+                m_driver->addLimitTo1(QLatin1String("SELECT 1 FROM (") + sql + QLatin1String(")"), addLimitTo1));
+        }
+        else {
+            m_result.setSql(sql);
+        }
     } else {
-        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT"))
-            m_sql = m_driver->addLimitTo1(sql, addLimitTo1);
-        else
-            m_sql = sql;
+        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT")) {
+            m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
+        }
+        else {
+            m_result.setSql(sql);
+        }
     }
-    if (!(cursor = executeQuery(m_sql))) {
-        PreWarn << "!executeQuery()" << m_sql;
-        success = false;
+    if (!(cursor = executeQuery(m_result.sql()))) {
+        PreWarn << "!executeQuery()" << m_result.sql();
+        *success = false;
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
-        success = !cursor->error();
-        PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_sql;
-        setError(cursor);
+        *success = !cursor->result().isError();
+        PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
+        m_result = cursor->result();
         deleteCursor(cursor);
         return false;
     }
-    success = deleteCursor(cursor);
+    *success = deleteCursor(cursor);
     return true;
 }
 
-bool Connection::isEmpty(TableSchema& table, bool &success)
+bool Connection::isEmpty(TableSchema* table, bool* success)
 {
-    return !resultExists(selectStatement(*table.query()), success);
+    return !resultExists(selectStatement(table->query()), success);
 }
 
 //! Used by addFieldPropertyToExtendedTableSchemaData()
 static void createExtendedTableSchemaMainElementIfNeeded(
-    QDomDocument& doc, QDomElement& extendedTableSchemaMainEl,
-    bool& extendedTableSchemaStringIsEmpty)
+    QDomDocument* doc, QDomElement* extendedTableSchemaMainEl,
+    bool* extendedTableSchemaStringIsEmpty)
 {
     if (!extendedTableSchemaStringIsEmpty)
         return;
     //init document
-    extendedTableSchemaMainEl = doc.createElement("EXTENDED_TABLE_SCHEMA");
-    doc.appendChild(extendedTableSchemaMainEl);
-    extendedTableSchemaMainEl.setAttribute("version", QString::number(PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION));
-    extendedTableSchemaStringIsEmpty = false;
+    *extendedTableSchemaMainEl = doc->createElement("EXTENDED_TABLE_SCHEMA");
+    doc->appendChild(*extendedTableSchemaMainEl);
+    extendedTableSchemaMainEl->setAttribute("version", QString::number(PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION));
+    *extendedTableSchemaStringIsEmpty = false;
 }
 
 //! Used by addFieldPropertyToExtendedTableSchemaData()
-static void createExtendedTableSchemaFieldElementIfNeeded(QDomDocument& doc,
-        QDomElement& extendedTableSchemaMainEl, const QString& fieldName, QDomElement& extendedTableSchemaFieldEl,
+static void createExtendedTableSchemaFieldElementIfNeeded(QDomDocument* doc,
+        QDomElement* extendedTableSchemaMainEl, const QString& fieldName, QDomElement* extendedTableSchemaFieldEl,
         bool append = true)
 {
-    if (!extendedTableSchemaFieldEl.isNull())
+    if (!extendedTableSchemaFieldEl->isNull())
         return;
-    extendedTableSchemaFieldEl = doc.createElement("field");
+    *extendedTableSchemaFieldEl = doc->createElement("field");
     if (append)
-        extendedTableSchemaMainEl.appendChild(extendedTableSchemaFieldEl);
-    extendedTableSchemaFieldEl.setAttribute("name", fieldName);
+        extendedTableSchemaMainEl->appendChild(*extendedTableSchemaFieldEl);
+    extendedTableSchemaFieldEl->setAttribute("name", fieldName);
 }
 
 /*! @internal used by storeExtendedTableSchemaData()
@@ -2639,40 +2660,40 @@ static void createExtendedTableSchemaFieldElementIfNeeded(QDomDocument& doc,
  If extendedTableSchemaFieldEl is null, creates <field> element (with optional
  "custom" attribute is \a custom is false). */
 static void addFieldPropertyToExtendedTableSchemaData(
-    Field *f, const char* propertyName, const QVariant& propertyValue,
-    QDomDocument& doc, QDomElement& extendedTableSchemaMainEl,
-    QDomElement& extendedTableSchemaFieldEl,
-    bool& extendedTableSchemaStringIsEmpty,
+    const Field& f, const char* propertyName, const QVariant& propertyValue,
+    QDomDocument* doc, QDomElement* extendedTableSchemaMainEl,
+    QDomElement* extendedTableSchemaFieldEl,
+    bool* extendedTableSchemaStringIsEmpty,
     bool custom = false)
 {
     createExtendedTableSchemaMainElementIfNeeded(doc,
             extendedTableSchemaMainEl, extendedTableSchemaStringIsEmpty);
     createExtendedTableSchemaFieldElementIfNeeded(
-        doc, extendedTableSchemaMainEl, f->name(), extendedTableSchemaFieldEl);
+        doc, extendedTableSchemaMainEl, f.name(), extendedTableSchemaFieldEl);
 
     //create <property>
-    QDomElement extendedTableSchemaFieldPropertyEl = doc.createElement("property");
-    extendedTableSchemaFieldEl.appendChild(extendedTableSchemaFieldPropertyEl);
+    QDomElement extendedTableSchemaFieldPropertyEl = doc->createElement("property");
+    extendedTableSchemaFieldEl->appendChild(extendedTableSchemaFieldPropertyEl);
     if (custom)
         extendedTableSchemaFieldPropertyEl.setAttribute("custom", "true");
     extendedTableSchemaFieldPropertyEl.setAttribute("name", propertyName);
     QDomElement extendedTableSchemaFieldPropertyValueEl;
     switch (propertyValue.type()) {
     case QVariant::String:
-        extendedTableSchemaFieldPropertyValueEl = doc.createElement("string");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement("string");
         break;
     case QVariant::ByteArray:
-        extendedTableSchemaFieldPropertyValueEl = doc.createElement("cstring");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement("cstring");
         break;
     case QVariant::Int:
     case QVariant::Double:
     case QVariant::UInt:
     case QVariant::LongLong:
     case QVariant::ULongLong:
-        extendedTableSchemaFieldPropertyValueEl = doc.createElement("number");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement("number");
         break;
     case QVariant::Bool:
-        extendedTableSchemaFieldPropertyValueEl = doc.createElement("bool");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement("bool");
         break;
     default:
 //! @todo add more QVariant types
@@ -2680,10 +2701,10 @@ static void addFieldPropertyToExtendedTableSchemaData(
     }
     extendedTableSchemaFieldPropertyEl.appendChild(extendedTableSchemaFieldPropertyValueEl);
     extendedTableSchemaFieldPropertyValueEl.appendChild(
-        doc.createTextNode(propertyValue.toString()));
+        doc->createTextNode(propertyValue.toString()));
 }
 
-bool Connection::storeExtendedTableSchemaData(TableSchema& tableSchema)
+bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
 {
 //! @todo future: save in older versions if neeed
     QDomDocument doc("EXTENDED_TABLE_SCHEMA");
@@ -2691,13 +2712,13 @@ bool Connection::storeExtendedTableSchemaData(TableSchema& tableSchema)
     bool extendedTableSchemaStringIsEmpty = true;
 
     //for each field:
-    foreach(Field* f, *tableSchema.fields()) {
+    foreach(Field* f, *tableSchema->fields()) {
         QDomElement extendedTableSchemaFieldEl;
         if (f->visibleDecimalPlaces() >= 0/*nondefault*/ && Predicate::supportsVisibleDecimalPlacesProperty(f->type())) {
             addFieldPropertyToExtendedTableSchemaData(
-                f, "visibleDecimalPlaces", f->visibleDecimalPlaces(), doc,
-                extendedTableSchemaMainEl, extendedTableSchemaFieldEl,
-                extendedTableSchemaStringIsEmpty);
+                *f, "visibleDecimalPlaces", f->visibleDecimalPlaces(), &doc,
+                &extendedTableSchemaMainEl, &extendedTableSchemaFieldEl,
+                &extendedTableSchemaStringIsEmpty);
         }
         // boolean field with "not null"
 
@@ -2706,21 +2727,21 @@ bool Connection::storeExtendedTableSchemaData(TableSchema& tableSchema)
         for (Field::CustomPropertiesMap::ConstIterator itCustom = customProperties.constBegin();
                 itCustom != customProperties.constEnd(); ++itCustom) {
             addFieldPropertyToExtendedTableSchemaData(
-                f, itCustom.key(), itCustom.value(), doc,
-                extendedTableSchemaMainEl, extendedTableSchemaFieldEl, extendedTableSchemaStringIsEmpty,
+                *f, itCustom.key(), itCustom.value(), &doc,
+                &extendedTableSchemaMainEl, &extendedTableSchemaFieldEl, &extendedTableSchemaStringIsEmpty,
                 /*custom*/true);
         }
         // save lookup table specification, if present
-        LookupFieldSchema *lookupFieldSchema = tableSchema.lookupFieldSchema(*f);
+        LookupFieldSchema *lookupFieldSchema = tableSchema->lookupFieldSchema(*f);
         if (lookupFieldSchema) {
             createExtendedTableSchemaFieldElementIfNeeded(
-                doc, extendedTableSchemaMainEl, f->name(), extendedTableSchemaFieldEl, false/* !append */);
+                &doc, &extendedTableSchemaMainEl, f->name(), &extendedTableSchemaFieldEl, false/* !append */);
             LookupFieldSchema::saveToDom(*lookupFieldSchema, doc, extendedTableSchemaFieldEl);
 
             if (extendedTableSchemaFieldEl.hasChildNodes()) {
                 // this element provides the definition, so let's append it now
-                createExtendedTableSchemaMainElementIfNeeded(doc, extendedTableSchemaMainEl,
-                        extendedTableSchemaStringIsEmpty);
+                createExtendedTableSchemaMainElementIfNeeded(&doc, &extendedTableSchemaMainEl,
+                        &extendedTableSchemaStringIsEmpty);
                 extendedTableSchemaMainEl.appendChild(extendedTableSchemaFieldEl);
             }
         }
@@ -2731,47 +2752,50 @@ bool Connection::storeExtendedTableSchemaData(TableSchema& tableSchema)
 #ifdef KEXI_DEBUG_GUI
         Utils::addAlterTableActionDebug(QString("** Extended table schema REMOVED."));
 #endif
-        if (!removeDataBlock(tableSchema.id(), "extended_schema"))
+        if (!removeDataBlock(tableSchema->id(), "extended_schema"))
             return false;
     } else {
 #ifdef KEXI_DEBUG_GUI
-        Utils::addAlterTableActionDebug(QString("** Extended table schema set to:\n") + doc.toString(4));
+        Utils::addAlterTableActionDebug(QString("** Extended table schema set to:\n") + doc->toString(4));
 #endif
-        if (!storeDataBlock(tableSchema.id(), doc.toString(1), "extended_schema"))
+        if (!storeDataBlock(tableSchema->id(), doc.toString(1), "extended_schema"))
             return false;
     }
     return true;
 }
 
-bool Connection::loadExtendedTableSchemaData(TableSchema& tableSchema)
+bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
 {
 #define loadExtendedTableSchemaData_ERR \
-    { setError(tr("Error while loading extended table schema information.")); \
-        return false; }
+    { m_result = Result(QObject::tr("Error while loading extended table schema information.")); \
+      return false; }
 #define loadExtendedTableSchemaData_ERR2(details) \
-    { setError(tr("Error while loading extended table schema information."), details); \
-        return false; }
+    { m_result = Result(details); \
+      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema information.")); \
+      return false; }
 #define loadExtendedTableSchemaData_ERR3(data) \
-    { setError(tr("Error while loading extended table schema information."), \
-                   tr("Invalid XML data: ") + data.left(1024) ); \
-        return false; }
+    { m_result = Result(QObject::tr("Invalid XML data: ") + data.left(1024)); \
+      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema information.")); \
+      return false; }
 
     // Load extended schema information, if present (see ExtendedTableSchemaInformation in Kexi Wiki)
     QString extendedTableSchemaString;
-    tristate res = loadDataBlock(tableSchema.id(), extendedTableSchemaString, "extended_schema");
+    tristate res = loadDataBlock(tableSchema->id(), &extendedTableSchemaString, "extended_schema");
     if (!res)
         loadExtendedTableSchemaData_ERR;
     // extendedTableSchemaString will be just empty if there is no such data block
 
 #ifdef PREDICATE_LOOKUP_FIELD_TEST
 //<temp. for LookupFieldSchema tests>
-    if (tableSchema.name() == "cars") {
+    if (tableSchema->name() == "cars") {
         LookupFieldSchema *lookupFieldSchema = new LookupFieldSchema();
-        lookupFieldSchema->rowSource().setType(LookupFieldSchema::RowSource::Table);
-        lookupFieldSchema->rowSource().setName("persons");
+        LookupFieldSchema::RecordSource recordSource;
+        recordSource.setType(LookupFieldSchema::RecordSource::Table);
+        recordSource.setName("persons");
+        lookupFieldSchema->setRecordSource(recordSource);
         lookupFieldSchema->setBoundColumn(0); //id
         lookupFieldSchema->setVisibleColumn(3); //surname
-        tableSchema.setLookupFieldSchema("owner", lookupFieldSchema);
+        tableSchema->setLookupFieldSchema("owner", lookupFieldSchema);
     }
 //</temp. for LookupFieldSchema tests>
 #endif
@@ -2783,7 +2807,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema& tableSchema)
     QString errorMsg;
     int errorLine, errorColumn;
     if (!doc.setContent(extendedTableSchemaString, &errorMsg, &errorLine, &errorColumn))
-        loadExtendedTableSchemaData_ERR2(tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: ")
+        loadExtendedTableSchemaData_ERR2(QObject::tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: ")
             .arg(errorMsg, errorLine, errorColumn) + extendedTableSchemaString.left(1024));
 
 //! @todo look at the current format version (PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION)
@@ -2798,7 +2822,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema& tableSchema)
     for (QDomNode n = docEl.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement fieldEl = n.toElement();
         if (fieldEl.tagName() == "field") {
-            Field *f = tableSchema.field(fieldEl.attribute("name"));
+            Field *f = tableSchema->field(fieldEl.attribute("name"));
             if (f) {
                 //set properties of the field:
 //! @todo more properties
@@ -2823,13 +2847,13 @@ bool Connection::loadExtendedTableSchemaData(TableSchema& tableSchema)
                     } else if (propEl.tagName() == "lookup-column") {
                         LookupFieldSchema *lookupFieldSchema = LookupFieldSchema::loadFromDom(propEl);
                         if (lookupFieldSchema)
-                            lookupFieldSchema->debug();
-                        tableSchema.setLookupFieldSchema(f->name(), lookupFieldSchema);
+                            qDebug() << *lookupFieldSchema;
+                        tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
                     }
                 }
             } else {
                 PreWarn << "no such field:"
-                << fieldEl.attribute("name") << "in table:" << tableSchema.name();
+                << fieldEl.attribute("name") << "in table:" << tableSchema->name();
             }
         }
     }
@@ -2860,8 +2884,8 @@ Predicate::Field* Connection::setupField(const RecordData &data)
         return 0;
 
     if (!Utils::isIdentifier(data.at(2).toString())) {
-        setError(ERR_INVALID_IDENTIFIER, tr("Invalid object name \"%1\"")
-                                         .arg(data.at(2).toString()));
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\"")
+                                                  .arg(data.at(2).toString()));
         ok = false;
         return 0;
     }
@@ -2869,22 +2893,21 @@ Predicate::Field* Connection::setupField(const RecordData &data)
     Field *f = new Field(
         data.at(2).toString(), f_type, f_constr, f_opts, f_len, f_prec);
 
-    f->setDefaultValue(Predicate::stringToVariant(data.at(7).toString(), Field::variantType(f_type), ok));
+    f->setDefaultValue(Predicate::stringToVariant(data.at(7).toString(), Field::variantType(f_type), &ok));
     if (!ok) {
-        PreWarn << "problem with Predicate::stringToVariant("
-        << data.at(7).toString() << ")";
+        PreWarn << "problem with Predicate::stringToVariant(" << data.at(7).toString() << ")";
     }
     ok = true; //problem with defaultValue is not critical
 
-    f->m_caption = data.at(9).toString();
-    f->m_desc = data.at(10).toString();
+    f->setCaption(data.at(9).toString());
+    f->setDescription(data.at(10).toString());
     return f;
 }
 
 Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
 {
     TableSchema *t = new TableSchema(this);
-    if (!setupObjectSchemaData(data, *t)) {
+    if (!setupObjectData(data, t)) {
         delete t;
         return 0;
     }
@@ -2893,13 +2916,13 @@ Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
     if (!(cursor = executeQuery(
                        QString::fromLatin1("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
                                            "f_options, f_default, f_order, f_caption, f_help"
-                                           " FROM kexi__fields WHERE t_id=%1 ORDER BY f_order").arg(t->m_id)))) {
+                                           " FROM kexi__fields WHERE t_id=%1 ORDER BY f_order").arg(t->id())))) {
         delete t;
         return 0;
     }
     if (!cursor->moveFirst()) {
-        if (!cursor->error() && cursor->eof()) {
-            setError(tr("Table has no fields defined."));
+        if (!cursor->result().isError() && cursor->eof()) {
+            m_result = Result(QObject::tr("Table has no fields defined."));
         }
         deleteCursor(cursor);
         delete t;
@@ -2911,7 +2934,7 @@ Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
     bool ok = true;
     while (!cursor->eof()) {
 //  PreDbg<<"@@@ f_name=="<<cursor->value(2).asCString();
-        if (!cursor->storeCurrentRow(fieldData)) {
+        if (!cursor->storeCurrentRecord(&fieldData)) {
             ok = false;
             break;
         }
@@ -2935,12 +2958,12 @@ Predicate::TableSchema* Connection::setupTableSchema(const RecordData &data)
         return 0;
     }
 
-    if (!loadExtendedTableSchemaData(*t)) {
+    if (!loadExtendedTableSchemaData(t)) {
         delete t;
         return 0;
     }
     //store locally:
-    d->insertTable(*t);
+    d->insertTable(t);
     return t;
 }
 
@@ -2954,7 +2977,7 @@ TableSchema* Connection::tableSchema(const QString& tableName)
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
                                       " AND o_type=%2")
-                                  .arg(tableName, Predicate::TableObjectType), data))
+                                  .arg(tableName, Predicate::TableObjectType), &data))
         return 0;
 
     return setupTableSchema(data);
@@ -2969,20 +2992,20 @@ TableSchema* Connection::tableSchema(int tableId)
     RecordData data;
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(tableId), data))
+                                  .arg(tableId), &data))
         return 0;
 
     return setupTableSchema(data);
 }
 
-tristate Connection::loadDataBlock(int objectID, QString &dataString, const QString& dataID)
+tristate Connection::loadDataBlock(int objectID, QString* dataString, const QString& dataID)
 {
     if (objectID <= 0)
         return false;
     return querySingleString(
                QString::fromLatin1("SELECT o_data FROM kexi__objectdata WHERE o_id=") + QString::number(objectID)
                + QLatin1String(" AND ") + Predicate::sqlWhere(m_driver, Predicate::Field::Text, "o_sub_id",
-                                               dataID.isEmpty() ? QVariant() : QVariant(dataID)),
+               dataID.isEmpty() ? QVariant() : QVariant(dataID)),
                dataString);
 }
 
@@ -2996,7 +3019,7 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
                                         dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     bool ok, exists;
-    exists = resultExists(sql + " and " + sql_sub, ok);
+    exists = resultExists(sql + QLatin1String(" AND ") + sql_sub, &ok);
     if (!ok)
         return false;
     if (exists) {
@@ -3007,7 +3030,7 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
     return executeSQL(
                QString::fromLatin1("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
                + QString::number(objectID) + "," + m_driver->valueToSQL(Predicate::Field::LongText, dataString)
-               + "," + m_driver->valueToSQL(Predicate::Field::Text, dataID) + ")");
+               + "," + m_driver->valueToSQL(Predicate::Field::Text, dataID) + ')');
 }
 
 bool Connection::removeDataBlock(int objectID, const QString& dataID)
@@ -3015,9 +3038,9 @@ bool Connection::removeDataBlock(int objectID, const QString& dataID)
     if (objectID <= 0)
         return false;
     if (dataID.isEmpty())
-        return Predicate::deleteRow(*this, "kexi__objectdata", "o_id", QString::number(objectID));
+        return Predicate::deleteRecord(this, "kexi__objectdata", "o_id", QString::number(objectID));
     else
-        return Predicate::deleteRow(*this, "kexi__objectdata",
+        return Predicate::deleteRecord(this, "kexi__objectdata",
                                  "o_id", Predicate::Field::Integer, objectID, "o_sub_id", Predicate::Field::Text, dataID);
 }
 
@@ -3028,28 +3051,28 @@ Predicate::QuerySchema* Connection::setupQuerySchema(const RecordData &data)
     if (!ok)
         return false;
     QString sqlText;
-    if (!loadDataBlock(objID, sqlText, "sql")) {
-        setError(ERR_OBJECT_NOT_FOUND,
-                 tr("Could not find definition for query \"%1\". Removing this query is recommended.")
-                 .arg(data[2].toString()));
+    if (!loadDataBlock(objID, &sqlText, "sql")) {
+        m_result = Result(ERR_OBJECT_NOT_FOUND,
+                          QObject::tr("Could not find definition for query \"%1\". Removing this query is recommended.")
+                          .arg(data[2].toString()));
         return 0;
     }
     d->parser()->parse(sqlText);
     Predicate::QuerySchema *query = d->parser()->query();
     //error?
     if (!query) {
-        setError(ERR_SQL_PARSE_ERROR,
-                 tr("<p>Could not load definition for query \"%1\". "
-                    "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
-                    "<p>You can open this query in Text View and correct it.</p>")
-                    .arg(data[2].toString(), d->parser()->statement()));
+        m_result = Result(ERR_SQL_PARSE_ERROR,
+                          QObject::tr("<p>Could not load definition for query \"%1\". "
+                             "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
+                             "<p>You can open this query in Text View and correct it.</p>")
+                             .arg(data[2].toString(), d->parser()->statement()));
         return 0;
     }
-    if (!setupObjectSchemaData(data, *query)) {
+    if (!setupObjectData(data, query)) {
         delete query;
         return 0;
     }
-    d->insertQuery(*query);
+    d->insertQuery(query);
     return query;
 }
 
@@ -3064,7 +3087,7 @@ QuerySchema* Connection::querySchema(const QString& queryName)
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
                                       " AND o_type=%2")
-                                  .arg(m_queryName, Predicate::QueryObjectType), data))
+                                  .arg(m_queryName, Predicate::QueryObjectType), &data))
         return 0;
 
     return setupQuerySchema(data);
@@ -3076,11 +3099,11 @@ QuerySchema* Connection::querySchema(int queryId)
     if (q)
         return q;
     //not found: retrieve schema
-    clearError();
+    clearResult();
     RecordData data;
     if (true != querySingleRecord(QString::fromLatin1(
                                       "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(queryId), data))
+                                  .arg(queryId), &data))
         return 0;
 
     return setupQuerySchema(data);
@@ -3091,19 +3114,19 @@ bool Connection::setQuerySchemaObsolete(const QString& queryName)
     QuerySchema* oldQuery = querySchema(queryName);
     if (!oldQuery)
         return false;
-    d->setQueryObsolete(*oldQuery);
+    d->setQueryObsolete(oldQuery);
     return true;
 }
 
-void Connection::insertInternalTable(TableSchema& tableSchema)
+void Connection::insertInternalTable(TableSchema* tableSchema)
 {
     d->insertInternalTable(tableSchema);
 }
 
-TableSchema* Connection::newKexiDBSystemTableSchema(const QString& tsname)
+TableSchema* Connection::newPredicateSystemTableSchema(const QString& tableName)
 {
-    TableSchema *ts = new TableSchema(tsname.toLower());
-    insertInternalTable(*ts);
+    TableSchema *ts = new TableSchema(tableName.toLower());
+    insertInternalTable(ts);
     return ts;
 }
 
@@ -3116,26 +3139,26 @@ bool Connection::isInternalTableSchema(const QString& tableName)
 }
 
 //! Creates kexi__* tables.
-bool Connection::setupKexiDBSystemSchema()
+bool Connection::setupPredicateSystemSchema()
 {
     if (!d->predicateSystemTables().isEmpty())
         return true; //already set up
 
-    TableSchema *t_objects = newKexiDBSystemTableSchema("kexi__objects");
+    TableSchema *t_objects = newPredicateSystemTableSchema("kexi__objects");
     t_objects->addField(new Field("o_id", Field::Integer, Field::PrimaryKey | Field::AutoInc, Field::Unsigned))
     .addField(new Field("o_type", Field::Byte, 0, Field::Unsigned))
     .addField(new Field("o_name", Field::Text))
     .addField(new Field("o_caption", Field::Text))
     .addField(new Field("o_desc", Field::LongText));
 
-    t_objects->debug();
+    qDebug() << *t_objects;
 
-    TableSchema *t_objectdata = newKexiDBSystemTableSchema("kexi__objectdata");
+    TableSchema *t_objectdata = newPredicateSystemTableSchema("kexi__objectdata");
     t_objectdata->addField(new Field("o_id", Field::Integer, Field::NotNull, Field::Unsigned))
     .addField(new Field("o_data", Field::LongText))
     .addField(new Field("o_sub_id", Field::Text));
 
-    TableSchema *t_fields = newKexiDBSystemTableSchema("kexi__fields");
+    TableSchema *t_fields = newPredicateSystemTableSchema("kexi__fields");
     t_fields->addField(new Field("t_id", Field::Integer, 0, Field::Unsigned))
     .addField(new Field("f_type", Field::Byte, 0, Field::Unsigned))
     .addField(new Field("f_name", Field::Text))
@@ -3149,29 +3172,29 @@ bool Connection::setupKexiDBSystemSchema()
     .addField(new Field("f_caption", Field::Text))
     .addField(new Field("f_help", Field::LongText));
 
-    /* TableSchema *t_querydata = newKexiDBSystemTableSchema("kexi__querydata");
+    /* TableSchema *t_querydata = newPredicateSystemTableSchema("kexi__querydata");
       t_querydata->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("q_sql", Field::LongText ) )
       .addField( new Field("q_valid", Field::Boolean ) );
 
-      TableSchema *t_queryfields = newKexiDBSystemTableSchema("kexi__queryfields");
+      TableSchema *t_queryfields = newPredicateSystemTableSchema("kexi__queryfields");
       t_queryfields->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("f_order", Field::Integer ) )
       .addField( new Field("f_id", Field::Integer ) )
       .addField( new Field("f_tab_asterisk", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("f_alltab_asterisk", Field::Boolean) );
 
-      TableSchema *t_querytables = newKexiDBSystemTableSchema("kexi__querytables");
+      TableSchema *t_querytables = newPredicateSystemTableSchema("kexi__querytables");
       t_querytables->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("t_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("t_order", Field::Integer, 0, Field::Unsigned) );*/
 
-    TableSchema *t_db = newKexiDBSystemTableSchema("kexi__db");
+    TableSchema *t_db = newPredicateSystemTableSchema("kexi__db");
     t_db->addField(new Field("db_property", Field::Text, Field::NoConstraints, Field::NoOptions, 32))
     .addField(new Field("db_value", Field::LongText));
 
     /* moved to KexiProject...
-      TableSchema *t_parts = newKexiDBSystemTableSchema("kexi__parts");
+      TableSchema *t_parts = newPredicateSystemTableSchema("kexi__parts");
       t_parts->addField( new Field("p_id", Field::Integer, Field::PrimaryKey | Field::AutoInc, Field::Unsigned) )
       .addField( new Field("p_name", Field::Text) )
       .addField( new Field("p_mime", Field::Text ) )
@@ -3179,12 +3202,12 @@ bool Connection::setupKexiDBSystemSchema()
     */
 
     /*UNUSED
-      TableSchema *t_final = newKexiDBSystemTableSchema("kexi__final");
+      TableSchema *t_final = newPredicateSystemTableSchema("kexi__final");
       t_final->addField( new Field("p_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("property", Field::LongText ) )
       .addField( new Field("value", Field::BLOB) );
 
-      TableSchema *t_useractions = newKexiDBSystemTableSchema("kexi__useractions");
+      TableSchema *t_useractions = newPredicateSystemTableSchema("kexi__useractions");
       t_useractions->addField( new Field("p_id", Field::Integer, 0, Field::Unsigned) )
       .addField( new Field("scope", Field::Integer ) )
       .addField( new Field("name", Field::LongText ) )
@@ -3196,10 +3219,10 @@ bool Connection::setupKexiDBSystemSchema()
     return true;
 }
 
-void Connection::removeMe(TableSchema *ts)
+void Connection::removeMe(TableSchema *table)
 {
-    if (ts && !m_destructor_started)
-        d->takeTable(*ts);
+    if (table && !m_destructor_started)
+        d->takeTable(table);
 }
 
 QString Connection::anyAvailableDatabaseName()
@@ -3215,60 +3238,62 @@ void Connection::setAvailableDatabaseName(const QString& dbName)
     d->availableDatabaseName = dbName;
 }
 
-//! @internal used in updateRow(), insertRow(),
-inline void updateRowDataWithNewValues(QuerySchema &query, RecordData& data, Predicate::RowEditBuffer::DBMap& b,
-                                       QHash<QueryColumnInfo*, int>& columnsOrderExpanded)
+//! @internal used in updateRecord(), insertRecord(),
+inline void updateRecordDataWithNewValues(QuerySchema* query, RecordData* data, const Predicate::RecordEditBuffer::DBMap& b,
+                                          QHash<QueryColumnInfo*, int>* columnsOrderExpanded)
 {
-    columnsOrderExpanded = query.columnsOrder(QuerySchema::ExpandedList);
+    *columnsOrderExpanded = query->columnsOrder(QuerySchema::ExpandedList);
     QHash<QueryColumnInfo*, int>::ConstIterator columnsOrderExpandedIt;
-    for (Predicate::RowEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
-        columnsOrderExpandedIt = columnsOrderExpanded.constFind(it.key());
-        if (columnsOrderExpandedIt == columnsOrderExpanded.constEnd()) {
+    for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+        columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
+        if (columnsOrderExpandedIt == columnsOrderExpanded->constEnd()) {
             PreWarn << "(Connection) \"now also assign new value in memory\" step"
             "- could not find item" << it.key()->aliasOrName();
             continue;
         }
-        data[ columnsOrderExpandedIt.value()] = it.value();
+        data->insert(columnsOrderExpandedIt.value(), it.value());
     }
 }
 
-bool Connection::updateRow(QuerySchema &query, RecordData& data, RowEditBuffer& buf, bool useROWID)
+bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBuffer* buf, bool useRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-// query.debug();
+// qDebug() << *query;
 
     PreDbg << "..";
-    clearError();
+    clearResult();
     //--get PKEY
-    if (buf.dbBuffer().isEmpty()) {
+    if (buf->dbBuffer().isEmpty()) {
         PreDbg << " -- NO CHANGES DATA!";
         return true;
     }
-    TableSchema *mt = query.masterTable();
+    TableSchema *mt = query->masterTable();
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
-        setError(ERR_UPDATE_NO_MASTER_TABLE,
-                 tr("Could not update row because there is no master table defined."));
+        m_result = Result(ERR_UPDATE_NO_MASTER_TABLE,
+                          QObject::tr("Could not update record because there is no master table defined."));
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
-    if (!useROWID && !pkey) {
+    if (!useRecordId && !pkey) {
         PreWarn << " -- NO MASTER TABLE's PKEY!";
-        setError(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
-                 tr("Could not update row because master table has no primary key defined."));
+        m_result = Result(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
+                          QObject::tr("Could not update record because master table has no primary key defined."));
 //! @todo perhaps we can try to update without using PKEY?
         return false;
     }
     //update the record:
-    m_sql = "UPDATE " + escapeIdentifier(mt->name()) + " SET ";
+    QString sql;
+    sql.reserve(4096);
+    sql = QLatin1String("UPDATE ") + escapeIdentifier(mt->name()) + " SET ";
     QString sqlset, sqlwhere;
     sqlset.reserve(1024);
     sqlwhere.reserve(1024);
-    Predicate::RowEditBuffer::DBMap b = buf.dbBuffer();
+    Predicate::RecordEditBuffer::DBMap b = buf->dbBuffer();
 
-    //gather the fields which are updated ( have values in RowEditBuffer)
+    //gather the fields which are updated ( have values in RecordEditBuffer)
     FieldList affectedFields;
-    for (Predicate::RowEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+    for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         if (it.key()->field->table() != mt)
             continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
         if (!sqlset.isEmpty())
@@ -3279,12 +3304,12 @@ bool Connection::updateRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
                    m_driver->valueToSQL(currentField, it.value()));
     }
     if (pkey) {
-        const QVector<int> pkeyFieldsOrder(query.pkeyFieldsOrder());
-        PreDbg << pkey->fieldCount() << " ? " << query.pkeyFieldsCount();
-        if (pkey->fieldCount() != query.pkeyFieldsCount()) { //sanity check
+        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+        PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
+        if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
             PreWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
-            setError(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
-                     tr("Could not update row because it does not contain entire master table's primary key."));
+            m_result = Result(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
+                              QObject::tr("Could not update record because it does not contain entire master table's primary key."));
             return false;
         }
         if (!pkey->fields()->isEmpty()) {
@@ -3292,10 +3317,10 @@ bool Connection::updateRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
             foreach(Field *f, *pkey->fields()) {
                 if (!sqlwhere.isEmpty())
                     sqlwhere += " AND ";
-                QVariant val(data.at(pkeyFieldsOrder.at(i)));
+                QVariant val(data->at(pkeyFieldsOrder.at(i)));
                 if (val.isNull() || !val.isValid()) {
-                    setError(ERR_UPDATE_NULL_PKEY_FIELD,
-                             tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
+                    m_result = Result(ERR_UPDATE_NULL_PKEY_FIELD,
+                                      QObject::tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
                     //js todo: pass the field's name somewhere!
                     return false;
                 }
@@ -3304,52 +3329,52 @@ bool Connection::updateRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
                 i++;
             }
         }
-    } else {//use ROWID
-        sqlwhere = (escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME) + "="
-                    + m_driver->valueToSQL(Field::BigInteger, data[data.size()-1]));
+    } else { //use RecordId
+        sqlwhere = (escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME) + '='
+                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]));
     }
-    m_sql += (sqlset + " WHERE " + sqlwhere);
-    PreDbg << " -- SQL == " << ((m_sql.length() > 400) ? (m_sql.left(400) + "[.....]") : m_sql);
+    sql += (sqlset + " WHERE " + sqlwhere);
+    PreDbg << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
 
     // preprocessing before update
-    if (!drv_beforeUpdate(mt->name(), affectedFields))
+    if (!drv_beforeUpdate(mt->name(), &affectedFields))
         return false;
 
-    bool res = executeSQL(m_sql);
+    bool res = executeSQL(sql);
 
     // postprocessing after update
-    if (!drv_afterUpdate(mt->name(), affectedFields))
+    if (!drv_afterUpdate(mt->name(), &affectedFields))
         return false;
 
     if (!res) {
-        setError(ERR_UPDATE_SERVER_ERROR, tr("Row updating on the server failed."));
+        m_result = Result(ERR_UPDATE_SERVER_ERROR, QObject::tr("Record updating on the server failed."));
         return false;
     }
     //success: now also assign new values in memory:
     QHash<QueryColumnInfo*, int> columnsOrderExpanded;
-    updateRowDataWithNewValues(query, data, b, columnsOrderExpanded);
+    updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
     return true;
 }
 
-bool Connection::insertRow(QuerySchema &query, RecordData& data, RowEditBuffer& buf, bool getROWID)
+bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBuffer* buf, bool getRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
     PreDbg << "..";
-    clearError();
+    clearResult();
     //--get PKEY
-    /*disabled: there may be empty rows (with autoinc)
+    /*disabled: there may be empty records (with autoinc)
     if (buf.dbBuffer().isEmpty()) {
       PreDbg << " -- NO CHANGES DATA!";
       return true; }*/
-    TableSchema *mt = query.masterTable();
+    TableSchema *mt = query->masterTable();
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
-        setError(ERR_INSERT_NO_MASTER_TABLE,
-                 tr("Could not insert row because there is no master table defined."));
+        m_result = Result(ERR_INSERT_NO_MASTER_TABLE,
+                          QObject::tr("Could not insert record because there is no master table defined."));
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
-    if (!getROWID && !pkey)
+    if (!getRecordId && !pkey)
         PreWarn << " -- WARNING: NO MASTER TABLE's PKEY";
 
     QString sqlcols, sqlvals;
@@ -3357,40 +3382,43 @@ bool Connection::insertRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
     sqlvals.reserve(1024);
 
     //insert the record:
-    m_sql = "INSERT INTO " + escapeIdentifier(mt->name()) + " (";
-    Predicate::RowEditBuffer::DBMap b = buf.dbBuffer();
+    QString sql;
+    sql.reserve(4096);
+    sql = "INSERT INTO " + escapeIdentifier(mt->name()) + " (";
+    Predicate::RecordEditBuffer::DBMap b = buf->dbBuffer();
 
     // add default values, if available (for any column without value explicitly set)
-    const QueryColumnInfo::Vector fieldsExpanded(query.fieldsExpanded(QuerySchema::Unique));
+    const QueryColumnInfo::Vector fieldsExpanded(query->fieldsExpanded(QuerySchema::Unique));
     uint fieldsExpandedCount = fieldsExpanded.count();
     for (uint i = 0; i < fieldsExpandedCount; i++) {
         QueryColumnInfo *ci = fieldsExpanded.at(i);
         if (ci->field && Predicate::isDefaultValueAllowed(ci->field)
                 && !ci->field->defaultValue().isNull()
-                && !b.contains(ci)) {
+                && !b.contains(ci))
+        {
             PreDbg << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
             b.insert(ci, ci->field->defaultValue());
         }
     }
 
-    //collect fields which have values in RowEditBuffer
+    //collect fields which have values in RecordEditBuffer
     FieldList affectedFields;
 
     if (b.isEmpty()) {
-        // empty row inserting requested:
-        if (!getROWID && !pkey) {
-            PreWarn << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY ROWS: INSERT CANCELLED";
-            setError(ERR_INSERT_NO_MASTER_TABLES_PKEY,
-                     tr("Could not insert row because master table has no primary key defined."));
+        // empty record inserting requested:
+        if (!getRecordId && !pkey) {
+            PreWarn << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY RECORDS: INSERT CANCELLED";
+            m_result = Result(ERR_INSERT_NO_MASTER_TABLES_PKEY,
+                              QObject::tr("Could not insert record because master table has no primary key defined."));
             return false;
         }
         if (pkey) {
-            const QVector<int> pkeyFieldsOrder(query.pkeyFieldsOrder());
-//   PreDbg << pkey->fieldCount() << " ? " << query.pkeyFieldsCount();
-            if (pkey->fieldCount() != query.pkeyFieldsCount()) { //sanity check
+            const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+//   PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
+            if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
                 PreWarn << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
-                setError(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
-                         tr("Could not insert row because it does not contain entire master table's primary key."));
+                m_result = Result(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
+                                  QObject::tr("Could not insert record because it does not contain entire master table's primary key."));
                 return false;
             }
         }
@@ -3409,8 +3437,8 @@ bool Connection::insertRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
         sqlvals += m_driver->valueToSQL(anyField, QVariant()/*NULL*/);
         affectedFields.addField(anyField);
     } else {
-        // non-empty row inserting requested:
-        for (Predicate::RowEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+        // non-empty record inserting requested:
+        for (Predicate::RecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
             if (it.key()->field->table() != mt)
                 continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
             if (!sqlcols.isEmpty()) {
@@ -3423,118 +3451,120 @@ bool Connection::insertRow(QuerySchema &query, RecordData& data, RowEditBuffer& 
             sqlvals += m_driver->valueToSQL(currentField, it.value());
         }
     }
-    m_sql += (sqlcols + ") VALUES (" + sqlvals + ")");
-// PreDbg << " -- SQL == " << m_sql;
+    sql += (sqlcols + ") VALUES (" + sqlvals + ")");
+// PreDbg << " -- SQL == " << sql;
 
     // do driver specific pre-processing
-    if (!drv_beforeInsert(mt->name(), affectedFields))
+    if (!drv_beforeInsert(mt->name(), &affectedFields))
         return false;
 
-    bool res = executeSQL(m_sql);
+    bool res = executeSQL(sql);
 
     // do driver specific post-processing
-    if (!drv_afterInsert(mt->name(), affectedFields))
+    if (!drv_afterInsert(mt->name(), &affectedFields))
         return false;
 
     if (!res) {
-        setError(ERR_INSERT_SERVER_ERROR, tr("Row inserting on the server failed."));
+        m_result = Result(ERR_INSERT_SERVER_ERROR, QObject::tr("Record inserting on the server failed."));
         return false;
     }
     //success: now also assign a new value in memory:
     QHash<QueryColumnInfo*, int> columnsOrderExpanded;
-    updateRowDataWithNewValues(query, data, b, columnsOrderExpanded);
+    updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
 
     //fetch autoincremented values
-    QueryColumnInfo::List *aif_list = query.autoIncrementFields();
-    quint64 ROWID = 0;
+    QueryColumnInfo::List *aif_list = query->autoIncrementFields();
+    quint64 recordId = 0;
     if (pkey && !aif_list->isEmpty()) {
         //! @todo now only if PKEY is present, this should also work when there's no PKEY
         QueryColumnInfo *id_columnInfo = aif_list->first();
 //! @todo safe to cast it?
         quint64 last_id = lastInsertedAutoIncValue(
-                              id_columnInfo->field->name(), id_columnInfo->field->table()->name(), &ROWID);
+                              id_columnInfo->field->name(), id_columnInfo->field->table()->name(), &recordId);
         if (last_id == (quint64) - 1 || last_id <= 0) {
             //! @todo show error
-//! @todo remove just inserted row. How? Using ROLLBACK?
+//! @todo remove just inserted record. How? Using ROLLBACK?
             return false;
         }
         RecordData aif_data;
         QString getAutoIncForInsertedValue = QLatin1String("SELECT ")
-                                             + query.autoIncrementSQLFieldsList(m_driver)
+                                             + query->autoIncrementSQLFieldsList(m_driver)
                                              + QLatin1String(" FROM ")
                                              + escapeIdentifier(id_columnInfo->field->table()->name())
                                              + QLatin1String(" WHERE ")
                                              + escapeIdentifier(id_columnInfo->field->name()) + "="
                                              + QString::number(last_id);
-        if (true != querySingleRecord(getAutoIncForInsertedValue, aif_data)) {
+        if (true != querySingleRecord(getAutoIncForInsertedValue, &aif_data)) {
             //! @todo show error
             return false;
         }
         uint i = 0;
         foreach(QueryColumnInfo *ci, *aif_list) {
 //   PreDbg << "AUTOINCREMENTED FIELD" << fi->field->name() << "==" << aif_data[i].toInt();
-            (data[ columnsOrderExpanded.value(ci)] = aif_data.value(i)).convert(ci->field->variantType());        //cast to get proper type
+            ((*data)[ columnsOrderExpanded.value(ci)] = aif_data.value(i)).convert(ci->field->variantType());        //cast to get proper type
             i++;
         }
     } else {
-        ROWID = drv_lastInsertRowID();
-//  PreDbg << "new ROWID ==" << (uint)ROWID;
+        recordId = drv_lastInsertRecordId();
+//  PreDbg << "new recordId ==" << (uint)recordId;
         if (m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
             PreWarn << "m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
             return false;
         }
     }
-    if (getROWID && /*sanity check*/data.size() > (int)fieldsExpanded.size()) {
+    if (getRecordId && /*sanity check*/data->size() > (int)fieldsExpanded.size()) {
 //  PreDbg << "new ROWID ==" << (uint)ROWID;
-        data[data.size()-1] = ROWID;
+        (*data)[data->size() - 1] = recordId;
     }
     return true;
 }
 
-bool Connection::deleteRow(QuerySchema &query, RecordData& data, bool useROWID)
+bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
     PreWarn << "..";
-    clearError();
-    TableSchema *mt = query.masterTable();
+    clearResult();
+    TableSchema *mt = query->masterTable();
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
-        setError(ERR_DELETE_NO_MASTER_TABLE,
-                 tr("Could not delete row because there is no master table defined."));
+        m_result = Result(ERR_DELETE_NO_MASTER_TABLE,
+                          QObject::tr("Could not delete record because there is no master table defined."));
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
 
 //! @todo allow to delete from a table without pkey
-    if (!useROWID && !pkey) {
+    if (!useRecordId && !pkey) {
         PreWarn << " -- WARNING: NO MASTER TABLE's PKEY";
-        setError(ERR_DELETE_NO_MASTER_TABLES_PKEY,
-                 tr("Could not delete row because there is no primary key for master table defined."));
+        m_result = Result(ERR_DELETE_NO_MASTER_TABLES_PKEY,
+                          QObject::tr("Could not delete record because there is no primary key for master table defined."));
         return false;
     }
 
     //update the record:
-    m_sql = "DELETE FROM " + escapeIdentifier(mt->name()) + " WHERE ";
+    QString sql;
+    sql.reserve(4096);
+    sql = QLatin1String("DELETE FROM ") + escapeIdentifier(mt->name()) + " WHERE ";
     QString sqlwhere;
     sqlwhere.reserve(1024);
 
     if (pkey) {
-        const QVector<int> pkeyFieldsOrder(query.pkeyFieldsOrder());
-        PreDbg << pkey->fieldCount() << " ? " << query.pkeyFieldsCount();
-        if (pkey->fieldCount() != query.pkeyFieldsCount()) { //sanity check
+        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+        PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
+        if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
             PreWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
-            setError(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
-                     tr("Could not delete row because it does not contain entire master table's primary key."));
+            m_result = Result(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
+                              QObject::tr("Could not delete record because it does not contain entire master table's primary key."));
             return false;
         }
         uint i = 0;
         foreach(Field *f, *pkey->fields()) {
             if (!sqlwhere.isEmpty())
                 sqlwhere += " AND ";
-            QVariant val(data.at(pkeyFieldsOrder.at(i)));
+            QVariant val(data->at(pkeyFieldsOrder.at(i)));
             if (val.isNull() || !val.isValid()) {
-                setError(ERR_DELETE_NULL_PKEY_FIELD, tr("Primary key's field \"%1\" cannot be empty.")
-                                                     .arg(f->name()));
+                m_result = Result(ERR_DELETE_NULL_PKEY_FIELD,
+                                  QObject::tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
 //js todo: pass the field's name somewhere!
                 return false;
             }
@@ -3542,24 +3572,24 @@ bool Connection::deleteRow(QuerySchema &query, RecordData& data, bool useROWID)
                          m_driver->valueToSQL(f, val));
             i++;
         }
-    } else {//use ROWID
+    } else {//use RecordId
         sqlwhere = (escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME) + "="
-                    + m_driver->valueToSQL(Field::BigInteger, data[data.size()-1]));
+                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]));
     }
-    m_sql += sqlwhere;
-    PreDbg << " -- SQL == " << m_sql;
+    sql += sqlwhere;
+    PreDbg << " -- SQL == " << sql;
 
-    if (!executeSQL(m_sql)) {
-        setError(ERR_DELETE_SERVER_ERROR, tr("Row deletion on the server failed."));
+    if (!executeSQL(sql)) {
+        m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
         return false;
     }
     return true;
 }
 
-bool Connection::deleteAllRows(QuerySchema &query)
+bool Connection::deleteAllRecords(QuerySchema* query)
 {
-    clearError();
-    TableSchema *mt = query.masterTable();
+    clearResult();
+    TableSchema *mt = query->masterTable();
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
         return false;
@@ -3568,62 +3598,61 @@ bool Connection::deleteAllRows(QuerySchema &query)
     if (!pkey || pkey->fields()->isEmpty())
         PreWarn << "-- WARNING: NO MASTER TABLE's PKEY";
 
-    m_sql = QLatin1String("DELETE FROM ") + escapeIdentifier(mt->name());
+    QString sql(QLatin1String("DELETE FROM ") + escapeIdentifier(mt->name()));
 
-    PreDbg << "-- SQL == " << m_sql;
+    PreDbg << "-- SQL == " << sql;
 
-    if (!executeSQL(m_sql)) {
-        setError(ERR_DELETE_SERVER_ERROR, tr("Row deletion on the server failed."));
+    if (!executeSQL(sql)) {
+        m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
         return false;
     }
     return true;
 }
 
-void Connection::registerForTableSchemaChanges(TableSchemaChangeListenerInterface& listener,
-        TableSchema &schema)
+void Connection::registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
+                                               TableSchema* schema)
 {
-    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(&schema);
+    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(schema);
     if (!listeners) {
         listeners = new QSet<TableSchemaChangeListenerInterface*>();
-        d->tableSchemaChangeListeners.insert(&schema, listeners);
+        d->tableSchemaChangeListeners.insert(schema, listeners);
     }
-    listeners->insert(&listener);
+    listeners->insert(listener);
 }
 
-void Connection::unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface& listener,
-        TableSchema &schema)
+void Connection::unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
+                                                 TableSchema* schema)
 {
-    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(&schema);
+    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(schema);
     if (!listeners)
         return;
-    listeners->remove(&listener);
+    listeners->remove(listener);
 }
 
-void Connection::unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface& listener)
+void Connection::unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener)
 {
     foreach(QSet<TableSchemaChangeListenerInterface*> *listeners, d->tableSchemaChangeListeners) {
-        listeners->remove(&listener);
+        listeners->remove(listener);
     }
 }
 
-QSet<Connection::TableSchemaChangeListenerInterface*>*
-Connection::tableSchemaChangeListeners(TableSchema& tableSchema) const
+QSet<Connection::TableSchemaChangeListenerInterface*>* Connection::tableSchemaChangeListeners(TableSchema* schema) const
 {
     PreDbg << d->tableSchemaChangeListeners.count();
-    return d->tableSchemaChangeListeners.value(&tableSchema);
+    return d->tableSchemaChangeListeners.value(schema);
 }
 
-tristate Connection::closeAllTableSchemaChangeListeners(TableSchema& tableSchema)
+tristate Connection::closeAllTableSchemaChangeListeners(TableSchema* schema)
 {
-    QSet<Connection::TableSchemaChangeListenerInterface*> *listeners
-    = d->tableSchemaChangeListeners.value(&tableSchema);
+    QSet<Connection::TableSchemaChangeListenerInterface*> *listeners = d->tableSchemaChangeListeners.value(schema);
     if (!listeners)
         return true;
 //Qt4??? QSet<Connection::TableSchemaChangeListenerInterface*>::ConstIterator tmpListeners(*listeners); //safer copy
     tristate res = true;
     //try to close every window
     for (QSet<Connection::TableSchemaChangeListenerInterface*>::ConstIterator it(listeners->constBegin());
-            it != listeners->constEnd() && res == true; ++it) {
+            it != listeners->constEnd() && res == true; ++it)
+    {
         res = (*it)->closeListener();
     }
     return res;
@@ -3641,22 +3670,26 @@ bool Connection::isReadOnly() const
     return d->readOnly;
 }
 
-void Connection::addCursor(Predicate::Cursor& cursor)
+void Connection::addCursor(Predicate::Cursor* cursor)
 {
-    d->cursors.insert(&cursor);
+    d->cursors.insert(cursor);
 }
 
-void Connection::takeCursor(Predicate::Cursor& cursor)
+void Connection::takeCursor(Predicate::Cursor* cursor)
 {
-    d->cursors.remove(&cursor);
+    d->cursors.remove(cursor);
 }
 
 PreparedStatement Connection::prepareStatement(PreparedStatement::Type type,
-    FieldList& fields, const QStringList& whereFieldNames)
+    FieldList* fields, const QStringList& whereFieldNames)
 {
 //! @todo move to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
     PreparedStatementInterface *iface = prepareStatementInternal();
     if (!iface)
         return PreparedStatement();
-    return PreparedStatement(*iface, type, fields, whereFieldNames);
+    return PreparedStatement(iface, type, fields, whereFieldNames);
+}
+
+QString Connection::recentSQLString() const {
+    return result().errorSql().isEmpty() ? m_result.sql() : result().errorSql();
 }

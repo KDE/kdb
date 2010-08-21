@@ -58,18 +58,18 @@ using namespace Predicate;
 
 TableSchema::TableSchema(const QString& name)
         : FieldList(true)
-        , SchemaData(Predicate::TableObjectType)
+        , Object(Predicate::TableObjectType)
         , m_query(0)
         , d( new Private )
         , m_isPredicateSystem(false)
 {
-    m_name = name.toLower();
+    setName(name.toLower());
     init();
 }
 
-TableSchema::TableSchema(const SchemaData& sdata)
+TableSchema::TableSchema(const Object& other)
         : FieldList(true)
-        , SchemaData(sdata)
+        , Object(other)
         , m_query(0)
         , d( new Private )
         , m_isPredicateSystem(false)
@@ -79,7 +79,7 @@ TableSchema::TableSchema(const SchemaData& sdata)
 
 TableSchema::TableSchema()
         : FieldList(true)
-        , SchemaData(Predicate::TableObjectType)
+        , Object(Predicate::TableObjectType)
         , m_query(0)
         , d( new Private )
         , m_isPredicateSystem(false)
@@ -89,32 +89,32 @@ TableSchema::TableSchema()
 
 TableSchema::TableSchema(const TableSchema& ts, bool copyId)
         : FieldList(static_cast<const FieldList&>(ts))
-        , SchemaData(static_cast<const SchemaData&>(ts))
+        , Object(static_cast<const Object&>(ts))
         , d( new Private )
 {
     init(ts, copyId);
 }
 
-TableSchema::TableSchema(const TableSchema& ts, int setId)
+TableSchema::TableSchema(const TableSchema& ts, int id)
         : FieldList(static_cast<const FieldList&>(ts))
-        , SchemaData(static_cast<const SchemaData&>(ts))
+        , Object(static_cast<const Object&>(ts))
         , d( new Private )
 {
     init(ts, false);
-    m_id = setId;
+    setId(id);
 }
 
 // used by Connection
 TableSchema::TableSchema(Connection *conn, const QString & name)
         : FieldList(true)
-        , SchemaData(Predicate::TableObjectType)
+        , Object(Predicate::TableObjectType)
         , m_conn(conn)
         , m_query(0)
         , d( new Private )
         , m_isPredicateSystem(false)
 {
     assert(conn);
-    m_name = name;
+    setName(name);
     init();
 }
 
@@ -138,10 +138,10 @@ void TableSchema::init(const TableSchema& ts, bool copyId)
     m_conn = ts.m_conn;
     m_query = 0; //not cached
     m_isPredicateSystem = false;
-    m_name = ts.m_name;
+    setName(ts.name());
     m_pkey = 0; //will be copied
     if (!copyId)
-        m_id = -1;
+        setId(-1);
 
     //deep copy all members
     foreach(IndexSchema* otherIdx, ts.m_indices) {
@@ -265,7 +265,7 @@ void TableSchema::clear()
     m_indices.clear();
     d->clearLookupFields();
     FieldList::clear();
-    SchemaData::clear();
+    Object::clear();
     m_conn = 0;
 }
 
@@ -315,46 +315,49 @@ unsigned int TableSchema::fieldCount() const
   return m_fields.count();
 }*/
 
-QString TableSchema::debugString()
+QDebug TableSchema::debugFields(QDebug dbg) const
 {
-    return debugString(true);
-}
-
-QString TableSchema::debugString(bool includeTableName)
-{
-    QString s;
-    if (includeTableName)
-        s = QString("TABLE ") + schemaDataDebugString() + "\n";
-    s.append(FieldList::debugString());
-
-    foreach(Field *f, m_fields) {
-        LookupFieldSchema *lookupSchema = lookupFieldSchema(*f);
+    dbg.nospace() << static_cast<const FieldList&>(*this);
+    foreach(const Field *f, m_fields) {
+        const LookupFieldSchema *lookupSchema = lookupFieldSchema(*f);
         if (lookupSchema)
-            s.append(QString("\n") + lookupSchema->debugString());
+            dbg.nospace() << '\n' << *lookupSchema;
     }
-    return s;
+    return dbg.space();
 }
+
+QDebug operator<<(QDebug dbg, const TableSchema& table)
+{
+    dbg.nospace() << QLatin1String("TABLE");
+    dbg.space() << static_cast<const Object&>(table) << '\n';
+    table.debugFields(dbg);
+    return dbg.space();
+}
+
+#warning replace QPointer<Connection> m_conn;
 
 Connection* TableSchema::connection() const
 {
     return (Connection*)m_conn;
 }
 
-void TableSchema::setKexiDBSystem(bool set)
+void TableSchema::setPredicateSystem(bool set)
 {
     if (set)
-        m_native = true;
+        setNative(true);
     m_isPredicateSystem = set;
+    if (m_isPredicateSystem)
+        setNative(true);
 }
 
-void TableSchema::setNative(bool set)
-{
-    if (m_isPredicateSystem && !set) {
-        PreWarn << "cannot set native off when Predicate system flag is set on!";
-        return;
-    }
-    m_native = set;
-}
+// void TableSchema::setNative(bool set)
+// {
+//     if (m_isPredicateSystem && !set) {
+//         PreWarn << "cannot set native off when Predicate system flag is set on!";
+//         return;
+//     }
+//     m_native = set;
+// }
 
 QuerySchema* TableSchema::query()
 {

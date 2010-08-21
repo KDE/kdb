@@ -25,7 +25,7 @@ int parserTest(const QString &st, const QStringList &params)
     int r = 0;
 
     if (!conn->useDatabase(db_name)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 
@@ -37,8 +37,8 @@ int parserTest(const QString &st, const QStringList &params)
     foreach(const QString param, params)
     variantParams.append(param.toLocal8Bit());
     if (ok && q) {
-        cout << q->debugString().toLatin1().constData() << '\n';
-        cout << "-STATEMENT:\n" << conn->selectStatement(*q, variantParams).toLatin1().data() << '\n';
+        cout << Predicate::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
+        cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toLatin1().data() << '\n';
     } else {
         Predicate::ParserError err = parser.error();
         qDebug() << QString("Error = %1\ntype = %2\nat = %3").arg(err.error())
@@ -50,7 +50,7 @@ int parserTest(const QString &st, const QStringList &params)
 
 
     if (!conn->closeDatabase()) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 

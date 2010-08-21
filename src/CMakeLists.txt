@@ -21,7 +21,7 @@ add_subdirectory( drivers )
 
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
-  -D__PREDICATE__= 
+  -D__PREDICATE__=
   -DMAKE_PREDICATE_LIB=1
   -DYYERROR_VERBOSE=1
 )
@@ -55,52 +55,59 @@ SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp G
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
 
+PREDICATE_CREATE_SHARED_DATA_CLASSES(
+    Result.shared.h
+    VersionInfo.shared.h
+    ConnectionData.shared.h
+    Object.shared.h
+)
+
 ########### next target ###############
 
 # Generate Global.h
 configure_file(Global.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Global.h )
 
-set(predicate_parser_SRCS 
-   parser/SqlScanner.cpp 
-   parser/SqlParser.cpp 
-   parser/Parser.cpp 
-   parser/Parser_p.cpp )
-
-set(predicate_LIB_SRCS 
-   ${predicate_parser_SRCS}
-   DriverManager.cpp 
-   Driver.cpp 
-   Driver_p.cpp 
-   Connection.cpp 
-   keywords.cpp 
-   Object.cpp 
-   Field.cpp 
-   Utils.cpp 
-   Expression.cpp 
-   ConnectionData.cpp 
+set(predicate_LIB_SRCS
+   Result.cpp
+   ConnectionData.cpp
+   VersionInfo.cpp
+   ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp
+   FieldList.cpp
+   TableSchema.cpp
+   IndexSchema.cpp
+   QuerySchema.cpp
+   DriverManager.cpp
+   Driver.cpp
+   Driver_p.cpp
+   Connection.cpp
+   keywords.cpp
+   Object.cpp
+   Field.cpp
+   Utils.cpp
+   Expression.cpp
    RecordData.cpp
-   FieldList.cpp 
-   TableSchema.cpp 
-   Cursor.cpp 
-   Transaction.cpp 
-   IndexSchema.cpp 
-   QuerySchema.cpp 
+   Cursor.cpp
+   Transaction.cpp
    QuerySchemaParameter.cpp
-   SchemaData.cpp 
-   Global.cpp 
-   Relationship.cpp 
-   RowEditBuffer.cpp 
-   MessageHandler.cpp 
-   PreparedStatement.cpp 
-   DbProperties.cpp 
-   Admin.cpp 
-   LookupFieldSchema.cpp 
+   Global.cpp
+   Relationship.cpp
+   RecordEditBuffer.cpp
+   MessageHandler.cpp
+   PreparedStatement.cpp
+   DbProperties.cpp
+   Admin.cpp
+   LookupFieldSchema.cpp
    Alter.cpp
+
+   parser/SqlScanner.cpp
+   parser/SqlParser.cpp
+   parser/Parser.cpp
+   parser/Parser_p.cpp
 
    tools/Validator.cpp
    tools/FieldValidator.cpp
    tools/LongLongValidator.cpp
-   tools/DbObjectNameValidator.cpp 
+   tools/DbObjectNameValidator.cpp
    tools/Identifier.cpp
    tools/Utils.cpp
    tools/Static.cpp
@@ -111,10 +118,10 @@ set(predicate_LIB_SRCS
 
 set(predicate_MOC_SRCS
   DriverManager_p.h
-  Cursor.h
+#  Cursor.h
   Utils_p.h
-  Driver.h
-  Connection.h
+#  Driver.h
+#  Connection.h
 )
 
 qt_wrap_cpp(predicate predicate_LIB_SRCS ${predicate_MOC_SRCS})
@@ -124,10 +131,10 @@ target_link_libraries(predicate
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   ${QT_QTXML_LIBRARY}
-#  kexiutils 
+#  kexiutils
 )
 
-set_target_properties(predicate PROPERTIES 
+set_target_properties(predicate PROPERTIES
   VERSION ${GENERIC_PREDICATE_LIB_VERSION}
   SOVERSION ${GENERIC_PREDICATE_LIB_SOVERSION}
 )
@@ -142,7 +149,7 @@ install( FILES
   Alter.h
   Connection.h
   Connection_p.h
-  ConnectionData.h
+  ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData.h
   Cursor.h
   Cursor_p.h
   DbProperties.h
@@ -150,6 +157,7 @@ install( FILES
   Driver_p.h
   DriverManager.h
   DriverManager_p.h
+  ${CMAKE_CURRENT_BINARY_DIR}/Result.h
   Error.h
   Expression.h
   Field.h
@@ -157,7 +165,7 @@ install( FILES
   IndexSchema.h
   LookupFieldSchema.h
   MessageHandler.h
-  Object.h
+  ${CMAKE_CURRENT_BINARY_DIR}/Object.h
   predicate_export.h
   predicate_global.h
   PreparedStatement.h
@@ -165,20 +173,15 @@ install( FILES
   QuerySchemaParameter.h
   RecordData.h
   Relationship.h
-  RowEditBuffer.h
-  SchemaData.h
+  RecordEditBuffer.h
   TableSchema.h
   Transaction.h
   Utils.h
-  Utils_p.h
   ${CMAKE_CURRENT_BINARY_DIR}/Global.h
+  ${CMAKE_CURRENT_BINARY_DIR}/VersionInfo.h
   parser/Parser.h
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
-)
-
-install( FILES
   Interfaces/PreparedStatementInterface.h
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Interfaces COMPONENT Devel
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
 )
 
 install( FILES

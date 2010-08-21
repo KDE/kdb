@@ -37,6 +37,7 @@
 #include <Predicate/QuerySchema.h>
 #include <Predicate/IndexSchema.h>
 #include <Predicate/parser/Parser.h>
+#include <Predicate/Utils.h>
 
 #include <iostream>
 
@@ -50,8 +51,10 @@ int cursor_options = 0;
 bool db_name_required = true;
 
 Predicate::ConnectionData conn_data;
-QPointer<Predicate::Connection> conn;
-QPointer<Predicate::Driver> driver;
+#warning replace QPointer<Predicate::Connection> conn;
+Predicate::Connection* conn;
+#warning replace QPointer<Predicate::Driver> driver;
+Predicate::Driver* driver;
 QApplication *app = 0;
 //qtonly KComponentData *instance = 0;
 
@@ -208,15 +211,15 @@ int main(int argc, char** argv)
         qWarning() << "No drivers found";
         RETURN(1);
     }
-    if (manager.error()) {
-        manager.debugError();
+    if (manager.result().isError()) {
+        qDebug() << manager.result();
         RETURN(1);
     }
 
     //get driver
     driver = manager.driver(drv_name);
-    if (!driver || manager.error()) {
-        manager.debugError();
+    if (!driver || manager.result().isError()) {
+        qDebug() << manager.result();
         RETURN(1);
     }
     qDebug() << "MIME type for '" << driver->name() << "': " << driver->info().fileDBMimeType();
@@ -240,12 +243,12 @@ int main(int argc, char** argv)
         conn_data.setFileName(db_name);
         conn = driver->createConnection(conn_data);
 
-        if (!conn || driver->error()) {
-            driver->debugError();
+        if (!conn || driver->result().isError()) {
+            qDebug() << driver->result();
             RETURN(1);
         }
         if (!conn->connect()) {
-            conn->debugError();
+            qDebug() << conn->result();
             RETURN(1);
         }
     }

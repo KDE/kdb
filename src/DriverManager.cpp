@@ -21,19 +21,13 @@
 
 #include "DriverManager.h"
 #include "DriverManager_p.h"
-#include "Driver.h"
 #include "Driver_p.h"
-#include "Error.h"
-#include <Predicate/Global.h>
-
-//#include <klibloader.h>
-//#include <kservicetypetrader.h>
-//#include <QtDebug>
-
-//#include <kservice.h>
+#include "Driver_p.h"
+#include "tools/Static.h"
 
 #include <assert.h>
 
+#include <QObject>
 #include <QApplication>
 #include <QDir>
 #include <QPluginLoader>
@@ -46,16 +40,12 @@
 
 using namespace Predicate;
 
-DriverManagerInternal* DriverManagerInternal::s_self = 0L;
+PREDICATE_GLOBAL_STATIC(DriverManagerInternal, s_self);
 
 DriverManagerInternal::DriverManagerInternal() /* protected */
-        : QObject(0)
-        , Object()
-        , m_refCount(0)
-        , lookupDriversNeeded(true)
+ : lookupDriversNeeded(true)
 {
-    setObjectName("Predicate::DriverManager");
-    m_serverResultNum = 0;
+//pred    m_serverResultNum = 0;
 }
 
 DriverManagerInternal::~DriverManagerInternal()
@@ -63,8 +53,9 @@ DriverManagerInternal::~DriverManagerInternal()
     PreDbg;
     qDeleteAll(m_drivers);
     m_drivers.clear();
-    if (s_self == this)
-        s_self = 0;
+    m_driverWeakPointers.clear();
+//    if (s_self == this)
+//        s_self = 0;
     PreDbg << "ok";
 }
 
@@ -77,13 +68,12 @@ void DriverManagerInternal::slotAppQuits()
     PreDbg << "let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
+    m_driverWeakPointers.clear();
 }
 
+//static
 DriverManagerInternal *DriverManagerInternal::self()
 {
-    if (!s_self)
-        s_self = new DriverManagerInternal();
-
     return s_self;
 }
 
@@ -125,14 +115,14 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
     foreach (const QFileInfo& infoFile, infoFiles) {
         QSettings config(infoFile.absoluteFilePath(), QSettings::IniFormat);
         config.beginGroup("Desktop Entry");
-        Driver::Info info;
+        DriverInfo info;
         info.setName( config.value("Name").toString().toLower() );
         if (m_driversInfo.contains(info.name())) {
             qWarning() << "More than one driver named" << info.name() << "-- skipping this one";
             continue;
         }
         info.setVersion( config.value("Version").toString() );
-        const QString expectedVersion(QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor));
+        const QString expectedVersion(QString("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()));
         if (expectedVersion != info.version()) {
             qWarning() << "Incompatible database driver's" << info.name()
                 << "version: found version" << info.version() << "expected version" << expectedVersion
@@ -160,12 +150,12 @@ bool DriverManagerInternal::lookupDrivers()
     if (qApp) {
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
-//TODO: for QT-only version check for KComponentData wrapper
+//TODO: for Qt-only version check for KComponentData wrapper
 //  PreWarn << "cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
     lookupDriversNeeded = false;
-    clearError();
+    clearResult();
 
     /*! Try in all possible driver directories.
      Looks for "predicate" directory in $INSTALL/plugins, $QT_PLUGIN_PATH, and directory of the application executable.
@@ -181,7 +171,7 @@ bool DriverManagerInternal::lookupDrivers()
         }
     }
     if (!foundAtLeastOne) {
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers.") );
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers."));
         return false;
     }
 
@@ -258,17 +248,17 @@ bool DriverManagerInternal::lookupDrivers()
     }
 #endif
     if (m_driversInfo.isEmpty()) {
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find any database drivers."));
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find any database drivers."));
         return false;
     }
     return true;
 }
 
-Predicate::Driver::Info DriverManagerInternal::driverInfo(const QString &name)
+DriverInfo DriverManagerInternal::driverInfo(const QString &name)
 {
-    Predicate::Driver::Info i = m_driversInfo.value(name.toLower());
-    if (!error() && i.isValid())
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
+    DriverInfo i = m_driversInfo.value(name.toLower());
+    if (!m_result.isError() && i.isValid())
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
     return i;
 }
 
@@ -287,21 +277,21 @@ Driver* DriverManagerInternal::driver(const QString& name)
     if (!lookupDrivers())
         return 0;
 
-    clearError();
+    clearResult();
     PreDbg << "loading" << name;
 
     Driver *drv = 0;
     if (!name.isEmpty())
-        drv = m_drivers.value(name.toLower());
+        drv = m_drivers.value(name.toLower())->data();
     if (drv)
         return drv; //cached
 
     if (!m_driversInfo.contains(name.toLower())) {
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
         return 0;
     }
 
-    const Driver::Info info(m_driversInfo.value(name.toLower()));
+    const DriverInfo info(m_driversInfo.value(name.toLower()));
 
     QString libFileName(info.absoluteFilePath());
 #if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
@@ -310,27 +300,28 @@ Driver* DriverManagerInternal::driver(const QString& name)
     QLibrary lib(libFileName);
     LibUnloader unloader(&lib);
     if (!lib.load()) {
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(name));
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(name));
         return 0;
     }
     
     const uint* foundMajor = (const uint*)lib.resolve("version_major");
     if (!foundMajor) {
-       setError(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_major").arg(name));
+       m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_major").arg(name));
        return 0;
     }
     const uint* foundMinor = (const uint*)lib.resolve("version_minor");
     if (!foundMinor) {
-       setError(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_minor").arg(name));
+       m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".")
+                         .arg("version_minor").arg(name));
        return 0;
     }
     lib.unload();
     if (!Predicate::version().matches(*foundMajor, *foundMinor)) {
-        setError(ERR_INCOMPAT_DRIVER_VERSION,
+        m_result = Result(ERR_INCOMPAT_DRIVER_VERSION,
             QObject::tr("Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
                  .arg(name)
                  .arg(QString("%1.%2").arg(*foundMajor).arg(*foundMinor))
-                 .arg(QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor))
+                 .arg(QString("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()))
             );
         return 0;
     }
@@ -338,7 +329,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
     QPluginLoader loader(libFileName);
     drv = qobject_cast<Driver*>(loader.instance());
     if (!drv) {
-        setError(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
+        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
 //! @todo
 /*        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
             m_componentLoadingErrors[KLibLoader::ErrNoServiceFound] = "ErrNoServiceFound";
@@ -354,15 +345,17 @@ Driver* DriverManagerInternal::driver(const QString& name)
     drv->setInfo( info );
 
     if (!drv->isValid()) {
-        setError(drv);
+        m_result = drv->result();
         delete drv;
         return 0;
     }
-    m_drivers.insert(info.name().toLower(), drv); //cache it
+    QSharedPointer<Driver>* ptr = new QSharedPointer<Driver>(drv);
+    m_drivers.insert(info.name().toLower(), ptr); //cache it
+    m_driverWeakPointers.insert(drv, ptr->toWeakRef());
     return drv;
 }
 
-void DriverManagerInternal::incRefCount()
+/*void DriverManagerInternal::incRefCount()
 {
     m_refCount++;
     PreDbg << m_refCount;
@@ -377,12 +370,14 @@ void DriverManagerInternal::decRefCount()
 //  s_self=0;
 //  deleteLater();
 // }
-}
+}*/
 
+#warning is DriverManagerInternal::aboutDelete() needed?
+/*2.0
 void DriverManagerInternal::aboutDelete(Driver* drv)
 {
-    m_drivers.remove(drv->name());
-}
+    m_drivers.remove(drv->name().toLower());
+}*/
 
 
 
@@ -391,12 +386,8 @@ void DriverManagerInternal::aboutDelete(Driver* drv)
 // ---------------------------
 
 DriverManager::DriverManager()
-        : QObject(0)
-        , Object()
-        , d_int(DriverManagerInternal::self())
 {
-    setObjectName("Predicate::DriverManager");
-    d_int->incRefCount();
+//    d_int->incRefCount();
 // if ( !s_self )
 //  s_self = this;
 // lookupDrivers();
@@ -413,40 +404,42 @@ DriverManager::~DriverManager()
         delete conn;
       }*/
 
-    d_int->decRefCount();
-    if (d_int->refCount() == 0) {
+//    d_int->decRefCount();
+/*    if (d_int->refCount() == 0) {
         //delete internal drv manager!
         delete d_int;
-    }
+    }*/
 // if ( s_self == this )
     //s_self = 0;
     PreDbg << "ok";
 }
 
-Predicate::Driver::Info::Map DriverManager::driversInfo()
-{
-    if (!d_int->lookupDrivers())
-        return Predicate::Driver::Info::Map();
+Result DriverManager::result() const {
+    return s_self->result();
+}
 
-    return d_int->m_driversInfo;
+DriverInfoMap DriverManager::driversInfo()
+{
+    if (!s_self->lookupDrivers())
+        return DriverInfoMap();
+
+    return s_self->m_driversInfo;
 }
 
 const QStringList DriverManager::driverNames()
 {
-    if (!d_int->lookupDrivers())
+    if (!s_self->lookupDrivers())
         return QStringList();
 
-    if (d_int->m_driversInfo.isEmpty() && d_int->error())
+    if (s_self->m_driversInfo.isEmpty() && result().isError())
         return QStringList();
-    return d_int->m_driversInfo.keys();
+    return s_self->m_driversInfo.keys();
 }
 
-Predicate::Driver::Info DriverManager::driverInfo(const QString &name)
+DriverInfo DriverManager::driverInfo(const QString &name)
 {
-    d_int->lookupDrivers();
-    Predicate::Driver::Info i = d_int->driverInfo(name);
-    if (d_int->error())
-        setError(d_int);
+    s_self->lookupDrivers();
+    DriverInfo i = s_self->driverInfo(name);
     return i;
 }
 
@@ -473,12 +466,11 @@ const DriverManager::ServicesHash& DriverManager::services()
 
 QString DriverManager::lookupByMime(const QString &mimeType)
 {
-    if (!d_int->lookupDrivers()) {
-        setError(d_int);
+    if (!s_self->lookupDrivers()) {
         return 0;
     }
 
-    const Driver::Info info(d_int->m_infos_by_mimetype.value(mimeType.toLower()));
+    const DriverInfo info(s_self->m_infos_by_mimetype.value(mimeType.toLower()));
     if (!info.isValid())
         return QString();
     return info.name();
@@ -486,13 +478,11 @@ QString DriverManager::lookupByMime(const QString &mimeType)
 
 Driver* DriverManager::driver(const QString& name)
 {
-    Driver *drv = d_int->driver(name);
-    if (d_int->error())
-        setError(d_int);
+    Driver *drv = s_self->driver(name);
     return drv;
 }
 
-QString DriverManager::serverErrorMsg()
+/*QString DriverManager::serverErrorMsg()
 {
     return d_int->m_serverErrMsg;
 }
@@ -512,16 +502,16 @@ void DriverManager::drv_clearServerResult()
     d_int->m_serverErrMsg.clear();
     d_int->m_serverResultNum = 0;
 //    d_int->m_serverResultName.clear();
-}
+}*/
 
 QString DriverManager::possibleProblemsInfoMsg() const
 {
-    if (d_int->possibleProblems.isEmpty())
+    if (s_self->possibleProblems.isEmpty())
         return QString();
     QString str;
     str.reserve(1024);
     str = QLatin1String("<ul>");
-    foreach (const QString& problem, d_int->possibleProblems)
+    foreach (const QString& problem, s_self->possibleProblems)
         str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
     str += QLatin1String("</ul>");
     return str;

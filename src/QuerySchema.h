@@ -26,10 +26,10 @@
 #include <QList>
 #include <QByteArray>
 
-#include "FieldList.h"
-#include "SchemaData.h"
-#include "TableSchema.h"
-#include "Relationship.h"
+#include <Predicate/FieldList.h>
+#include <Predicate/Object.h>
+#include <Predicate/TableSchema.h>
+#include <Predicate/Relationship.h>
 
 namespace Predicate
 {
@@ -93,9 +93,6 @@ public:
         return m_foreignColumn;
     }
 
-    /*! \return string for debugging purposes. */
-    QString debugString() const;
-
     //! true if this column is visible to the user (and its data is fetched by the engine)
     bool visible;
 
@@ -150,9 +147,6 @@ public:
         return m_column == col.m_column && m_field == col.m_field
                && m_ascending == col.m_ascending;
     }
-
-    /*! \return string for debugging purposes. */
-    QString debugString() const;
 
     /*! \return a string like "name ASC" usable for building a SQL statement.
      If \a includeTableNames is true (the default) field is output in a form
@@ -263,9 +257,6 @@ public:
         return OrderByColumnListBase::constEnd();
     }
 
-    /*! \return string for debugging purposes. */
-    QString debugString() const;
-
     /*! \return a string like "name ASC, 2 DESC" usable for building a SQL statement.
      If \a includeTableNames is true (the default) fields are output in a form
      of "tablename.fieldname".
@@ -275,10 +266,10 @@ public:
 };
 
 //! @short Predicate::QuerySchema provides information about database query
-/*! The query that can be executed using KexiDB-compatible SQL database engine
+/*! The query that can be executed using Predicate-compatible SQL database engine
  or used as an introspection tool. Predicate parser builds QuerySchema objects
  by parsing SQL statements. */
-class PREDICATE_EXPORT QuerySchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT QuerySchema : public FieldList, public Object
 {
 public:
     /*! Creates empty query object (without columns). */
@@ -373,9 +364,6 @@ public:
      \sa FieldList::clear() */
     virtual void clear();
 
-    /*! \return string for debugging purposes. */
-    virtual QString debugString();
-
     /*! If query was created using a connection,
       returns this connection object, otherwise NULL. */
     Connection* connection() const;
@@ -449,6 +437,9 @@ public:
     */
     QByteArray columnAlias(uint position) const;
 
+    /*! @return number of column aliases */
+    int columnAliasesCount() const;
+
     /*! Provided for convenience.
      \return true if a column at \a position has non empty alias defined
      within the query.
@@ -482,6 +473,9 @@ public:
         e.g. "1" constant for "SELECT 1 from table" query statement)
     */
     int tableBoundToColumn(uint columnPosition) const;
+
+    /*! @return number of table aliases */
+    int tableAliasesCount() const;
 
     /*! \return alias of a table at \a position (within FROM section)
      or null string if there is no alias for this table
@@ -596,14 +590,14 @@ public:
      calling columnInfo("name") for "SELECT t1.name, t2.name FROM t1, t2" statement
      will only return the column related to t1.name and not t2.name, so you'll need to
      explicitly specify "t2.name" as the identifier to get the second column. */
-    QueryColumnInfo* columnInfo(const QString& identifier, bool expanded = true);
+    QueryColumnInfo* columnInfo(const QString& identifier, bool expanded = true) const;
 
     /*! Options used in fieldsExpanded(). */
     enum FieldsExpandedOptions {
-        Default,                   //!< All fields are returned even if duplicated
-        Unique,                    //!< Unique list of fields is returned
-        WithInternalFields,        //!< Like Default but internal fields (for lookup) are appended
-        WithInternalFieldsAndRowID //!< Like WithInternalFields but RowID (big int type) field
+        Default,                      //!< All fields are returned even if duplicated
+        Unique,                       //!< Unique list of fields is returned
+        WithInternalFields,           //!< Like Default but internal fields (for lookup) are appended
+        WithInternalFieldsAndRecordId //!< Like WithInternalFields but record ID (big int type) field
         //!< is appended after internal fields
     };
 
@@ -626,17 +620,17 @@ public:
      fieldsExpanded(Default) will return [ a, b, a ] list while
      fieldsExpanded(Unique) will return [ a, b ] list.
 
-     If \a options is WithInternalFields or WithInternalFieldsAndRowID,
+     If \a options is WithInternalFields or WithInternalFieldsAndRecordID,
      additional internal fields are also appended to the vector.
 
-     If \a options is WithInternalFieldsAndRowID,
-     one fake BigInteger column is appended to make space for ROWID column used
+     If \a options is WithInternalFieldsAndRecordId,
+     one fake BigInteger column is appended to make space for Record ID column used
      by Predicate::Cursor implementations. For example, let persons be TABLE( surname, city_id ),
      let city_number reference cities.is in TABLE cities( id, name ) and let query q be defined
      by "SELECT * FROM t" statement. If we want to display persons' city names instead of city_id's.
      To do this, cities.name has to be retrieved as well, so the following statement should be used:
      "SELECT * FROM persons, cities.name LEFT OUTER JOIN cities ON persons.city_id=cities.id".
-     Thus, calling fieldsExpanded(WithInternalFieldsAndRowID) will return 4 elements instead of 2:
+     Thus, calling fieldsExpanded(WithInternalFieldsAndRecordId) will return 4 elements instead of 2:
      persons.surname, persons.city_id, cities.name, {ROWID}. The {ROWID} item is the placeholder
      used for fetching ROWID by Predicate cursors.
 
@@ -648,16 +642,16 @@ public:
      This method's result is cached by QuerySchema object.
     @todo js: UPDATE CACHE!
     */
-    QueryColumnInfo::Vector fieldsExpanded(FieldsExpandedOptions options = Default);
+    QueryColumnInfo::Vector fieldsExpanded(FieldsExpandedOptions options = Default) const;
 
     /*! \return list of fields internal fields used for lookup columns. */
-    QueryColumnInfo::Vector internalFields();
+    QueryColumnInfo::Vector internalFields() const;
 
     /*! \return info for expanded of internal field at index \a index.
      The returned field can be either logical or internal (for lookup),
      the latter case is true if \a index &gt;= fieldsExpanded().count().
      Equivalent of QuerySchema::fieldsExpanded(WithInternalFields).at(index). */
-    QueryColumnInfo* expandedOrInternalField(uint index);
+    QueryColumnInfo* expandedOrInternalField(uint index) const;
 
     /*! Options used in columnsOrder(). */
     enum ColumnsOrderOptions {
@@ -680,7 +674,7 @@ public:
      Note: indices of internal fields (see internalFields()) are also returned
      here - in this case the index is counted as a sum of size(e) + i (where "e" is
      the list of expanded fields and i is the column index within internal fields list).
-     This feature is used eg. at the end of Connection::updateRow() where need indices of
+     This feature is used eg. at the end of Connection::updateRecord() where need indices of
      fields (including internal) to update all the values in memory.
 
      Example use: let t be table (int id, name text, surname text) and q be query
@@ -695,11 +689,11 @@ public:
      - columnsOrder(UnexpandedListWithoutAsterisks) will return the following map:
        QueryColumnInfo(id)->0,
     */
-    QHash<QueryColumnInfo*, int> columnsOrder(ColumnsOrderOptions options = ExpandedList);
+    QHash<QueryColumnInfo*, int> columnsOrder(ColumnsOrderOptions options = ExpandedList) const;
 
     /*! \return table describing order of primary key (PKEY) fields within the query.
      Indexing is performed against vector returned by fieldsExpanded().
-     It is usable for e.g. Conenction::updateRow(), when we need
+     It is usable for e.g. Conenction::updateRecord(), when we need
      to locate each primary key's field in a constant time.
 
      Returned vector is owned and cached by QuerySchema object. When you assign it,
@@ -719,13 +713,13 @@ public:
      @see example for pkeyFieldsCount().
     @todo js: UPDATE CACHE!
     */
-    QVector<int> pkeyFieldsOrder();
+    QVector<int> pkeyFieldsOrder() const;
 
     /*! \return number of master table's primary key fields included in this query.
      This method is useful to quickly check whether the vector returned by pkeyFieldsOrder()
      if filled completely.
 
-     User e.g. in Connection::updateRow() to check if entire primary
+     User e.g. in Connection::updateRecord() to check if entire primary
      key information is specified.
 
      Examples: let table T has (ID1 INTEGER, ID2 INTEGER, A INTEGER) fields,
@@ -745,7 +739,7 @@ public:
      from master table of this query. This result is cached for efficiency.
      fieldsExpanded() is used for that.
     */
-    QueryColumnInfo::List* autoIncrementFields();
+    QueryColumnInfo::List* autoIncrementFields() const;
 
     /*! \return a preset statement (if any). */
     QString statement() const;
@@ -767,7 +761,7 @@ public:
 
     /*! \return cached sql list created using sqlColumnsList() on a list returned
      by autoIncrementFields(). */
-    QString autoIncrementSQLFieldsList(Driver *driver);
+    QString autoIncrementSQLFieldsList(Driver *driver) const;
 
     /*! Sets a WHERE expression \a exp. It will be owned by this query,
      so you can forget about it. Previously set WHERE expression will be deleted.
@@ -802,12 +796,12 @@ public:
 
     /*! \return query schema parameters. These are taked from the WHERE section
      (a tree of expression items). */
-    QuerySchemaParameterList parameters();
+    QuerySchemaParameterList parameters() const;
 
 protected:
     void init();
 
-    void computeFieldsExpanded();
+    void computeFieldsExpanded() const;
 
     QuerySchemaPrivate * const d;
 
@@ -882,9 +876,6 @@ public:
         return m_table == NULL;
     }
 
-    /*! \return String for debugging purposes. */
-    virtual QString debugString() const;
-
 protected:
     //! \return a deep copy of this object. Used in FieldList(const FieldList& fl).
     virtual Field* copy() const;
@@ -896,5 +887,20 @@ protected:
 };
 
 } //namespace Predicate
+
+//! Sends information about column info @a info to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::QueryColumnInfo& info);
+
+//! Sends order-by-column information @a order to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::OrderByColumn& order);
+
+//! Sends order-by-column-list information @a list to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::OrderByColumnList& list);
+
+//! Sends query schema information @a query to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::QuerySchema& query);
+
+//! Sends query asterisk information @a asterisk to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::QueryAsterisk& asterisk);
 
 #endif

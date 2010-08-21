@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2009 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -25,7 +25,7 @@
 //#include <klibloader.h>
 //#include <kservice.h>
 
-#include "Driver.h"
+#include <Predicate/Driver.h>
 
 namespace Predicate
 {
@@ -34,11 +34,13 @@ class DriverManagerInternal;
 class Connection;
 
 //! Database driver manager, provided for finding and loading drivers.
-class PREDICATE_EXPORT DriverManager : public QObject, public Predicate::Object
+class PREDICATE_EXPORT DriverManager
 {
 public:
     DriverManager();
     virtual ~DriverManager();
+
+    Result result() const;
 
     /*! Tries to load db driver with named name \a name.
       The name is case insensitive.
@@ -51,13 +53,13 @@ public:
 
     /*! returns information list of available drivers.
       That drivers can be loaded by first use of driver() method. */
-    Predicate::Driver::Info::Map driversInfo();
+    DriverInfoMap driversInfo();
 
     /*! \return information about driver's named with \a name.
       The name is case insensitive.
       You can check if driver information is not found calling
       Info::name.isEmpty() (then error message is also set). */
-    Predicate::Driver::Info driverInfo(const QString &name);
+    DriverInfo driverInfo(const QString &name);
 
     /*! \return service information about driver's named with \a name.
       The name is case insensitive.
@@ -65,7 +67,7 @@ public:
 //TODO    KService::Ptr serviceInfo(const QString &name);
 
     /*! \return a hash structure of the driver infos. Not necessary for everyday use. */
-    Driver::Info::Map infoMap();
+    DriverInfoMap infoMap();
 
     /*! Looks up a drivers list by MIME type of database file.
      Only file-based database drivers are checked.
@@ -75,9 +77,9 @@ public:
     QString lookupByMime(const QString &mimeType);
 
     //! server error is set if there is error related to loading the drivers (useful for debugging)
-    virtual QString serverErrorMsg();
-    virtual int serverResult();
-    virtual QString serverResultName();
+//pred    virtual QString serverErrorMsg();
+//pred    virtual int serverResult();
+//pred    virtual QString serverResultName();
 
     /*! HTML information about possible problems encountered.
      It's displayed in 'details' section, if an error encountered.
@@ -86,10 +88,7 @@ public:
     QString possibleProblemsInfoMsg() const;
 
 protected:
-    virtual void drv_clearServerResult();
-
-private:
-    DriverManagerInternal *d_int;
+//???    virtual void drv_clearServerResult();
 };
 
 } //namespace Predicate

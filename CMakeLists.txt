@@ -33,6 +33,7 @@ SET(PLUGIN_INSTALL_DIR
 include(MacroOptionalFindPackage)
 include(InstallSettings)
 include(MacroLogFeature)
+include(CreateSharedDataClasses)
 
 find_package(Qt4 REQUIRED)
 

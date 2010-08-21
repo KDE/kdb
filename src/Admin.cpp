@@ -23,8 +23,7 @@
 using namespace Predicate;
 
 AdminTools::AdminTools()
-        : Object()
-        , d(new Private())
+ : d(new Private())
 {
 }
 
@@ -37,6 +36,6 @@ bool AdminTools::vacuum(const ConnectionData& data, const QString& databaseName)
 {
     Q_UNUSED(data);
     Q_UNUSED(databaseName);
-    clearError();
+    clearResult();
     return false;
 }

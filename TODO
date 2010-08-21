@@ -1,3 +1,7 @@
+Predicate TODO
+
+Legend: [ ] TODO [x] done [p] in progress
+
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
 [ ] move drivers/ to the main dir
@@ -29,16 +33,21 @@ Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
 [ ] apply rules from http://techbase.kde.org/Policies/Library_Code_Policy
 [x] driver's .desktop file format changed:
-"X-Kexi-DriverName" -> "DriverName"
+"X-Kexi-DriverName" -> "Name"
 "X-KDE-Library" -> "FileName"
-"X-Kexi-DriverType" -> "DriverType"
-"X-Kexi-FileDBDriverMime" -> "FileDBDriverMime"
-"X-Kexi-DoNotAllowProjectImportingTo" -> "AllowImporting"
+"X-Kexi-DriverType" -> "Type"
+"X-Kexi-FileDBDriverMime" -> "MimeTypes"
 [ ] change the above in kexidb-qt3 too
 [ ] make Driver::Features use Q_FLAGS
+[p] remove usage of QObject in Driver, DriverManager, etc.
+[p] make classes implicitly shared
+[p] replace usage of 'row' term with 'record' in most places, e.g. Cursor::storeCurrentRow -> Cursor::storeCurrentRecord
+[p] port debug methods to uniform "QDebug operator<<()"
+[p] make certain methods of *Expr classes const if possible
 
 Other:
 [ ] store config in ~/.config/predicate/, e.g. *rc files
+[x] load plugins from QT_PLUGINS_DIR and similar locations
 
 Optimization & Cleanup
 [ ] use QLatin1String where possible
@@ -53,11 +62,13 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
 *  Cursor.cpp
   DbObjectNameValidator.cpp
   DbProperties.cpp
-**  Driver.cpp
-- Driver::Info is implicitly shared class now
-- Driver::fileDBDriverMimeType() moved to Driver::Info::fileDBMimeType()
-- Driver::isFileDriver() renamed to Driver::isFileBased(), also available as Driver::Info::isFileBased()
-**  DriverManager.cpp
+*  Driver.cpp
+** Driver::Info is implicitly shared class now
+** Driver::fileDBDriverMimeType() moved to Driver::Info::fileDBMimeType()
+** Driver::isFileDriver() renamed to Driver::isFileBased(), also available as Driver::Info::isFileBased()
+** Driver no longer inherits QObject
+*  DriverManager.cpp
+** DriverManager no longer inherits QObject
   drivers/mysql/MysqlConnection.cpp
   drivers/mysql/MysqlConnection_p.cpp
   drivers/mysql/MysqlCursor.cpp

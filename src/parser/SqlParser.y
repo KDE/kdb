@@ -703,7 +703,7 @@ SQL_TYPE
 SelectStatement:
 Select ColViews
 {
-	PreDbg << "Select ColViews=" << $2->debugString();
+	PreDbg << "Select ColViews=" << *$2;
 
 	if (!($$ = buildSelectQuery( $1, $2 )))
 		return 0;
@@ -860,15 +860,15 @@ aExpr2:
 aExpr3 AND aExpr2
 {
 //	PreDbg << "AND " << $3.debugString();
-	$$ = new BinaryExpr( KexiDBExpr_Logical, $1, AND, $3 );
+	$$ = new BinaryExpr( PredicateExpr_Logical, $1, AND, $3 );
 }
 | aExpr3 OR aExpr2
 {
-	$$ = new BinaryExpr( KexiDBExpr_Logical, $1, OR, $3 );
+	$$ = new BinaryExpr( PredicateExpr_Logical, $1, OR, $3 );
 }
 | aExpr3 XOR aExpr2
 {
-	$$ = new BinaryExpr( KexiDBExpr_Arithm, $1, XOR, $3 );
+	$$ = new BinaryExpr( PredicateExpr_Arithm, $1, XOR, $3 );
 }
 |
 aExpr3
@@ -878,23 +878,23 @@ aExpr3
 aExpr3:
 aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, '>', $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '>', $3);
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, GREATER_OR_EQUAL, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, GREATER_OR_EQUAL, $3);
 }
 | aExpr4 '<' %prec LESS_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, '<', $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '<', $3);
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, LESS_OR_EQUAL, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, LESS_OR_EQUAL, $3);
 }
 | aExpr4 '=' aExpr3
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, '=', $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '=', $3);
 }
 |
 aExpr4
@@ -904,28 +904,28 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, NOT_EQUAL, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_EQUAL, $3);
 }
 |
 aExpr5 NOT_EQUAL2 aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, NOT_EQUAL2, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_EQUAL2, $3);
 }
 | aExpr5 LIKE aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, LIKE, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, LIKE, $3);
 }
 | aExpr5 SQL_IN aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, SQL_IN, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, SQL_IN, $3);
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, SIMILAR_TO, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, SIMILAR_TO, $3);
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-	$$ = new BinaryExpr(KexiDBExpr_Relational, $1, NOT_SIMILAR_TO, $3);
+	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_SIMILAR_TO, $3);
 }
 |
 aExpr5
@@ -949,11 +949,11 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, BITWISE_SHIFT_LEFT, $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, BITWISE_SHIFT_LEFT, $3);
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, BITWISE_SHIFT_RIGHT, $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, BITWISE_SHIFT_RIGHT, $3);
 }
 |
 aExpr7
@@ -963,20 +963,20 @@ aExpr7
 aExpr7:
 aExpr8 '+' aExpr7
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '+', $3);
-	$$->debug();
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '+', $3);
+	PreDbg << *$$;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '-', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '-', $3);
 }
 | aExpr8 '&' aExpr7
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '&', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '&', $3);
 }
 | aExpr8 '|' aExpr7
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '|', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '|', $3);
 }
 |
 aExpr8
@@ -986,15 +986,15 @@ aExpr8
 aExpr8:
 aExpr9 '/' aExpr8
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '/', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '/', $3);
 }
 | aExpr9 '*' aExpr8
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '*', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '*', $3);
 }
 | aExpr9 '%' aExpr8
 {
-	$$ = new BinaryExpr(KexiDBExpr_Arithm, $1, '%', $3);
+	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '%', $3);
 }
 |
 aExpr9
@@ -1030,12 +1030,12 @@ aExpr9:
 | QUERY_PARAMETER
 {
 	$$ = new QueryParameterExpr( *$1 );
-	PreDbg << "  + query parameter: " << $$->debugString();
+	PreDbg << "  + query parameter:" << *$$;
 	delete $1;
 }
 | IDENTIFIER aExprList
 {
-	PreDbg << "  + function: " << *$1 << "(" << $2->debugString() << ")";
+	PreDbg << "  + function:" << *$1 << "(" << *$2 << ")";
 	$$ = new FunctionExpr(*$1, $2);
 	delete $1;
 }
@@ -1043,7 +1043,7 @@ aExpr9:
 | IDENTIFIER '.' IDENTIFIER
 {
 	$$ = new VariableExpr( *$1 + "." + *$3 );
-	PreDbg << "  + identifier.identifier: " << *$1 << "." << *$3;
+	PreDbg << "  + identifier.identifier:" << *$1 << "." << *$3;
 	delete $1;
 	delete $3;
 }
@@ -1172,7 +1172,7 @@ FlatTableList ',' FlatTable
 }
 |FlatTable
 {
-	$$ = new NArgExpr(KexiDBExpr_TableList, IDENTIFIER); //ok?
+	$$ = new NArgExpr(PredicateExpr_TableList, IDENTIFIER); //ok?
 	$$->add($1);
 }
 ;
@@ -1210,7 +1210,7 @@ IDENTIFIER
 {
 	//table + alias
 	$$ = new BinaryExpr(
-		KexiDBExpr_SpecialBinary, 
+		PredicateExpr_SpecialBinary,
 		new VariableExpr(*$1), 0,
 		new VariableExpr(*$2)
 	);
@@ -1221,7 +1221,7 @@ IDENTIFIER
 {
 	//table + alias
 	$$ = new BinaryExpr(
-		KexiDBExpr_SpecialBinary,
+		PredicateExpr_SpecialBinary,
 		new VariableExpr(*$1), AS,
 		new VariableExpr(*$3)
 	);
@@ -1255,29 +1255,29 @@ ColExpression
 //	$$->setExpression( $1 );
 //	parser->select()->addField($$);
 	$$ = $1;
-	PreDbg << " added column expr: '" << $1->debugString() << "'";
+	PreDbg << " added column expr:" << *$1;
 }
 | ColWildCard
 {
 	$$ = $1;
-	PreDbg << " added column wildcard: '" << $1->debugString() << "'";
+	PreDbg << " added column wildcard:" << *$1;
 }
 | ColExpression AS IDENTIFIER
 {
 	$$ = new BinaryExpr(
-		KexiDBExpr_SpecialBinary, $1, AS,
+		PredicateExpr_SpecialBinary, $1, AS,
 		new VariableExpr(*$3)
 	);
-	PreDbg << " added column expr: " << $$->debugString();
+	PreDbg << " added column expr:" << *$$;
 	delete $3;
 }
 | ColExpression IDENTIFIER
 {
 	$$ = new BinaryExpr(
-		KexiDBExpr_SpecialBinary, $1, 0, 
+		PredicateExpr_SpecialBinary, $1, 0,
 		new VariableExpr(*$2)
 	);
-	PreDbg << " added column expr: " << $$->debugString();
+	PreDbg << " added column expr:" << *$$;
 	delete $2;
 }
 ;

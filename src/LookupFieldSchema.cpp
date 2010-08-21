@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,13 +29,13 @@
 namespace Predicate
 {
 //! @internal
-class LookupFieldSchema::RowSource::Private
+class LookupFieldSchema::RecordSource::Private
 {
 public:
     Private()
-            : type(LookupFieldSchema::RowSource::NoType) {
+            : type(LookupFieldSchema::RecordSource::NoType) {
     }
-    LookupFieldSchema::RowSource::Type type;
+    LookupFieldSchema::RecordSource::Type type;
     QString name;
     QStringList values;
 };
@@ -52,7 +52,7 @@ public:
             , limitToList(PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
     }
 
-    RowSource rowSource;
+    RecordSource recordSource;
     int boundColumn;
     QList<uint> visibleColumns;
     QList<int> columnWidths;
@@ -67,44 +67,44 @@ public:
 
 using namespace Predicate;
 
-LookupFieldSchema::RowSource::RowSource()
+LookupFieldSchema::RecordSource::RecordSource()
         : d(new Private)
 {
 }
 
-LookupFieldSchema::RowSource::RowSource(const RowSource& other)
+LookupFieldSchema::RecordSource::RecordSource(const RecordSource& other)
         : d(new Private)
 {
     *d = *other.d;
 }
 
-LookupFieldSchema::RowSource::~RowSource()
+LookupFieldSchema::RecordSource::~RecordSource()
 {
     delete d;
 }
 
-LookupFieldSchema::RowSource::Type LookupFieldSchema::RowSource::type() const
+LookupFieldSchema::RecordSource::Type LookupFieldSchema::RecordSource::type() const
 {
     return d->type;
 }
 
-void LookupFieldSchema::RowSource::setType(Type type)
+void LookupFieldSchema::RecordSource::setType(Type type)
 {
     d->type = type;
 }
 
-QString LookupFieldSchema::RowSource::name() const
+QString LookupFieldSchema::RecordSource::name() const
 {
     return d->name;
 }
 
-void LookupFieldSchema::RowSource::setName(const QString& name)
+void LookupFieldSchema::RecordSource::setName(const QString& name)
 {
     d->name = name;
     d->values.clear();
 }
 
-QString LookupFieldSchema::RowSource::typeName() const
+QString LookupFieldSchema::RecordSource::typeName() const
 {
     switch (d->type) {
     case Table: return "table";
@@ -117,7 +117,7 @@ QString LookupFieldSchema::RowSource::typeName() const
     return QString();
 }
 
-void LookupFieldSchema::RowSource::setTypeByName(const QString& typeName)
+void LookupFieldSchema::RecordSource::setTypeByName(const QString& typeName)
 {
     if (typeName == "table")
         setType(Table);
@@ -133,32 +133,32 @@ void LookupFieldSchema::RowSource::setTypeByName(const QString& typeName)
         setType(NoType);
 }
 
-QStringList LookupFieldSchema::RowSource::values() const
+QStringList LookupFieldSchema::RecordSource::values() const
 {
     return d->values;
 }
 
-void LookupFieldSchema::RowSource::setValues(const QStringList& values)
+void LookupFieldSchema::RecordSource::setValues(const QStringList& values)
 {
     d->name.clear();
     d->values = values;
 }
 
-LookupFieldSchema::RowSource& LookupFieldSchema::RowSource::operator=(const RowSource & other)
+LookupFieldSchema::RecordSource& LookupFieldSchema::RecordSource::operator=(const RecordSource & other)
 {
     *d = *other.d;
     return *this;
 }
 
-QString LookupFieldSchema::RowSource::debugString() const
+QDebug operator<<(QDebug dbg, const LookupFieldSchema::RecordSource& source)
 {
-    return QString("rowSourceType:'%1' rowSourceName:'%2' rowSourceValues:'%3'\n")
-           .arg(typeName()).arg(name()).arg(d->values.join("|"));
-}
-
-void LookupFieldSchema::RowSource::debug() const
-{
-    PreDbg << debugString();
+    dbg.nospace() << "RecordSource TYPE:";
+    dbg.space() << source.typeName();
+    dbg.space() << "NAME:";
+    dbg.space() << source.name();
+    dbg.space() << "VALUES:";
+    dbg.space() << source.values().join("|");
+    return dbg.space();
 }
 
 //----------------------------
@@ -173,14 +173,14 @@ LookupFieldSchema::~LookupFieldSchema()
     delete d;
 }
 
-LookupFieldSchema::RowSource& LookupFieldSchema::rowSource() const
+LookupFieldSchema::RecordSource LookupFieldSchema::recordSource() const
 {
-    return d->rowSource;
+    return d->recordSource;
 }
 
-void LookupFieldSchema::setRowSource(const LookupFieldSchema::RowSource& rowSource)
+void LookupFieldSchema::setRecordSource(const LookupFieldSchema::RecordSource& recordSource)
 {
-    d->rowSource = rowSource;
+    d->recordSource = recordSource;
 }
 
 void LookupFieldSchema::setMaximumListRows(uint rows)
@@ -193,43 +193,53 @@ void LookupFieldSchema::setMaximumListRows(uint rows)
         d->maximumListRows = rows;
 }
 
-QString LookupFieldSchema::debugString() const
+QDebug operator<<(QDebug dbg, const LookupFieldSchema& lookup)
 {
-    QString columnWidthsStr;
-    for (QList<int>::ConstIterator it = d->columnWidths.constBegin();
-            it != d->columnWidths.constEnd();++it) {
-        if (!columnWidthsStr.isEmpty())
-            columnWidthsStr.append(";");
-        columnWidthsStr.append(QString::number(*it));
+    dbg.nospace() << "LookupFieldSchema(";
+    dbg.space() << lookup.recordSource();
+    dbg.space() << "boundColumn:";
+    dbg.space() << lookup.boundColumn();
+    dbg.space() << "visibleColumns:";
+
+    bool first = true;
+    foreach(uint visibleColumn, lookup.visibleColumns()) {
+        if (first) {
+            first = false;
+            dbg.nospace();
+        }
+        else
+            dbg.nospace() << ';';
+        dbg.nospace() << visibleColumn;
     }
+    dbg.space() << "maximumListRows:";
+    dbg.space() << lookup.maximumListRows();
+    dbg.space() << "displayWidget:";
+    dbg.space() << (lookup.displayWidget() == LookupFieldSchema::ComboBox ? "ComboBox" : "ListBox");
+    dbg.space() << "columnHeadersVisible:";
+    dbg.space() << lookup.columnHeadersVisible();
+    dbg.space() << "limitToList:";
+    dbg.space() << lookup.limitToList();
+    dbg.space() << "columnWidths:";
 
-    QString visibleColumnsString;
-    foreach(uint visibleColumn, d->visibleColumns) {
-        if (!visibleColumnsString.isEmpty())
-            visibleColumnsString.append(";");
-        visibleColumnsString.append(QString::number(visibleColumn));
+    first = true;
+    for (QList<int>::ConstIterator it = lookup.columnWidths().constBegin();
+            it != lookup.columnWidths().constEnd();++it)
+    {
+        if (first)
+            first = false;
+        else
+            dbg.nospace() << ';';
+        dbg.space() << *it;
     }
-
-    return QString("LookupFieldSchema( %1\n"
-                   " boundColumn:%2 visibleColumns:%3 maximumListRows:%4 displayWidget:%5\n"
-                   " columnHeadersVisible:%6 limitToList:%7\n"
-                   " columnWidths:%8 )")
-           .arg(d->rowSource.debugString())
-           .arg(d->boundColumn).arg(visibleColumnsString).arg(d->maximumListRows)
-           .arg(d->displayWidget == ComboBox ? "ComboBox" : "ListBox")
-           .arg(d->columnHeadersVisible).arg(d->limitToList)
-           .arg(columnWidthsStr);
-}
-
-void LookupFieldSchema::debug() const
-{
-    PreDbg << debugString();
+    dbg.nospace() << ')';
+    return dbg.space();
 }
 
 /* static */
 LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
 {
     LookupFieldSchema *lookupFieldSchema = new LookupFieldSchema();
+    LookupFieldSchema::RecordSource recordSource;
     for (QDomNode node = lookupEl.firstChild(); !node.isNull(); node = node.nextSibling()) {
         QDomElement el = node.toElement();
         QString name(el.tagName());
@@ -246,10 +256,10 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
              </row-source> */
             for (el = el.firstChild().toElement(); !el.isNull(); el = el.nextSibling().toElement()) {
                 if (el.tagName() == "type")
-                    lookupFieldSchema->rowSource().setTypeByName(el.text());
+                    recordSource.setTypeByName(el.text());
                 else if (el.tagName() == "name")
-                    lookupFieldSchema->rowSource().setName(el.text());
-//! @todo handle fieldlist (retrieve from external table or so?), use lookupFieldSchema.rowSource().setValues()
+                    recordSource.setName(el.text());
+//! @todo handle fieldlist (retrieve from external table or so?), use RecordSource::setValues()
             }
         } else if (name == "bound-column") {
             /* <bound-column>
@@ -313,6 +323,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
                 lookupFieldSchema->setDisplayWidget(LookupFieldSchema::ListBox);
         }
     }
+    lookupFieldSchema->setRecordSource(recordSource);
     return lookupFieldSchema;
 }
 
@@ -320,7 +331,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
 void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument& doc, QDomElement& parentEl)
 {
     QDomElement lookupColumnEl, rowSourceEl, rowSourceTypeEl, nameEl;
-    if (!lookupSchema.rowSource().name().isEmpty()) {
+    if (!lookupSchema.recordSource().name().isEmpty()) {
         lookupColumnEl = doc.createElement("lookup-column");
         parentEl.appendChild(lookupColumnEl);
 
@@ -329,14 +340,14 @@ void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument&
 
         rowSourceTypeEl = doc.createElement("type");
         rowSourceEl.appendChild(rowSourceTypeEl);
-        rowSourceTypeEl.appendChild(doc.createTextNode(lookupSchema.rowSource().typeName()));   //can be empty
+        rowSourceTypeEl.appendChild(doc.createTextNode(lookupSchema.recordSource().typeName()));   //can be empty
 
         nameEl = doc.createElement("name");
         rowSourceEl.appendChild(nameEl);
-        nameEl.appendChild(doc.createTextNode(lookupSchema.rowSource().name()));
+        nameEl.appendChild(doc.createTextNode(lookupSchema.recordSource().name()));
     }
 
-    const QStringList& values(lookupSchema.rowSource().values());
+    const QStringList& values(lookupSchema.recordSource().values());
     if (!values.isEmpty()) {
         QDomElement valuesEl(doc.createElement("values"));
         rowSourceEl.appendChild(valuesEl);
@@ -395,20 +406,22 @@ bool LookupFieldSchema::setProperty(
     if ("rowSource" == propertyName
             || "rowSourceType" == propertyName
             || "rowSourceValues" == propertyName) {
-        LookupFieldSchema::RowSource rowSource(lookup.rowSource());
+        LookupFieldSchema::RecordSource recordSource(lookup.recordSource());
         if ("rowSource" == propertyName)
-            rowSource.setName(value.toString());
+            recordSource.setName(value.toString());
         else if ("rowSourceType" == propertyName)
-            rowSource.setTypeByName(value.toString());
+            recordSource.setTypeByName(value.toString());
         else if ("rowSourceValues" == propertyName)
-            rowSource.setValues(value.toStringList());
-        lookup.setRowSource(rowSource);
-    } else if ("boundColumn" == propertyName) {
+            recordSource.setValues(value.toStringList());
+        lookup.setRecordSource(recordSource);
+    }
+    else if ("boundColumn" == propertyName) {
         const int ival = value.toInt(&ok);
         if (!ok)
             return false;
         lookup.setBoundColumn(ival);
-    } else if ("visibleColumn" == propertyName) {
+    }
+    else if ("visibleColumn" == propertyName) {
         QList<QVariant> variantList;
         if (value.type() == QVariant::Int) {
 //! @todo Remove this case: it's for backward compatibility with Kexi's 1.1.2 table designer GUI

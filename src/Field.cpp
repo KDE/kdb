@@ -26,10 +26,7 @@
 #include "Utils.h"
 
 // we use here tr() but this depends on kde libs: TODO: add #ifdefs
-#include <QtDebug>
-
-
-#include <qdatetime.h>
+#include <QDateTime>
 
 #include <assert.h>
 
@@ -596,56 +593,59 @@ void Field::setIndexed(bool s)
     }
 }
 
-
-QString Field::debugString() const
+QDebug operator<<(QDebug dbg, const Field& field)
 {
-    Predicate::Connection *conn = table() ? table()->connection() : 0;
-    QString dbg = (m_name.isEmpty() ? "<NONAME> " : m_name + " ");
-    if (m_options & Field::Unsigned)
-        dbg += " UNSIGNED ";
-    dbg += (conn && conn->driver()) ? conn->driver()->sqlTypeName(type()) : Driver::defaultSQLTypeName(type());
-    if (isFPNumericType() && m_precision > 0) {
-        if (scale() > 0)
-            dbg += QString::fromLatin1("(%1,%2)").arg(m_precision).arg(scale());
+    Predicate::Connection *conn = field.table() ? field.table()->connection() : 0;
+    dbg.nospace() << (field.name().isEmpty() ? "<NONAME> " : field.name());
+    if (field.options() & Field::Unsigned)
+        dbg.space() << "UNSIGNED";
+    dbg.space() << ((conn && conn->driver())
+        ? conn->driver()->sqlTypeName(field.type()) : Driver::defaultSQLTypeName(field.type()));
+    if (field.isFPNumericType() && field.precision() > 0) {
+        if (field.scale() > 0)
+            dbg.nospace() << QString::fromLatin1("(%1,%2)").arg(field.precision()).arg(field.scale());
         else
-            dbg += QString::fromLatin1("(%1)").arg(m_precision);
-    } else if (m_type == Field::Text && m_length > 0)
-        dbg += QString::fromLatin1("(%1)").arg(m_length);
-    if (m_constraints & Field::AutoInc)
-        dbg += " AUTOINC";
-    if (m_constraints & Field::Unique)
-        dbg += " UNIQUE";
-    if (m_constraints & Field::PrimaryKey)
-        dbg += " PKEY";
-    if (m_constraints & Field::ForeignKey)
-        dbg += " FKEY";
-    if (m_constraints & Field::NotNull)
-        dbg += " NOTNULL";
-    if (m_constraints & Field::NotEmpty)
-        dbg += " NOTEMPTY";
-    if (!m_defaultValue.isNull())
-        dbg += QString(" DEFAULT=[%1]").arg(m_defaultValue.typeName()) + Predicate::variantToString(m_defaultValue);
-    if (m_expr)
-        dbg += " EXPRESSION=" + m_expr->debugString();
-    if (m_customProperties && !m_customProperties->isEmpty()) {
-        dbg += QString(" CUSTOM PROPERTIES (%1): ").arg(m_customProperties->count());
+            dbg.nospace() << QString::fromLatin1("(%1)").arg(field.precision());
+    }
+    else if (field.type() == Field::Text && field.length() > 0)
+        dbg.nospace() << QString::fromLatin1("(%1)").arg(field.length());
+
+    if (field.constraints() & Field::AutoInc)
+        dbg.space() << "AUTOINC";
+    if (field.constraints() & Field::Unique)
+        dbg.space() << "UNIQUE";
+    if (field.constraints() & Field::PrimaryKey)
+        dbg.space() << "PKEY";
+    if (field.constraints() & Field::ForeignKey)
+        dbg.space() << "FKEY";
+    if (field.constraints() & Field::NotNull)
+        dbg.space() << "NOTNULL";
+    if (field.constraints() & Field::NotEmpty)
+        dbg.space() << "NOTEMPTY";
+    if (!field.defaultValue().isNull()) {
+        dbg.space() << QString::fromLatin1("DEFAULT=[%1]").arg(field.defaultValue().typeName());
+        dbg.nospace() << Predicate::variantToString(field.defaultValue());
+    }
+    if (field.expression()) {
+        dbg.space() << "EXPRESSION=";
+        dbg.nospace() << *field.expression();
+    }
+    const Field::CustomPropertiesMap customProperties(field.customProperties());
+    if (!customProperties.isEmpty()) {
+        dbg.space() << QString::fromLatin1("CUSTOM PROPERTIES (%1): ").arg(customProperties.count());
         bool first = true;
-        for (CustomPropertiesMap::ConstIterator it(m_customProperties->constBegin());
-                it != m_customProperties->constEnd(); ++it) {
+        for (Field::CustomPropertiesMap::ConstIterator it(customProperties.constBegin());
+                it != customProperties.constEnd(); ++it)
+        {
             if (first)
                 first = false;
             else
-                dbg += ", ";
-            dbg += QString("%1 = %2 (%3)").arg(QString(it.key())).arg(it.value().toString())
-                   .arg(it.value().typeName());
+                dbg.nospace() << ',';
+            dbg.space() << QString::fromLatin1("%1 = %2 (%3)")
+                .arg(QString(it.key())).arg(it.value().toString()).arg(it.value().typeName());
         }
     }
-    return dbg;
-}
-
-void Field::debug()
-{
-    PreDbg << debugString();
+    return dbg.space();
 }
 
 void Field::setExpression(Predicate::BaseExpr *expr)

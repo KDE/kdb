@@ -22,7 +22,7 @@
 
 #include <qstring.h>
 
-#include "Connection.h"
+#include <Predicate/Connection.h>
 
 namespace Predicate
 {

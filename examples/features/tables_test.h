@@ -26,14 +26,14 @@ int tablesTest()
         return 1;
 
     if (!conn->useDatabase(db_name)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 
     conn->setAutoCommit(false);
     Predicate::Transaction t = conn->beginTransaction();
-    if (conn->error()) {
-        conn->debugError();
+    if (conn->result().isError()) {
+        qDebug() << conn->result();
         return 1;
     }
 
@@ -50,16 +50,16 @@ int tablesTest()
     t_persons->addField(f = new Predicate::Field("surname", Predicate::Field::Text));
     f->setCaption("Surname");
     if (!conn->createTable(t_persons)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
     qDebug() << "-- PERSONS created --";
-    t_persons->debug();
+    qDebug() << *t_persons;
 
-    if (!conn->insertRecord(*t_persons, QVariant(1), QVariant(27), QVariant("Jaroslaw"), QVariant("Staniek"))
-            || !conn->insertRecord(*t_persons, QVariant(2), QVariant(60), QVariant("Lech"), QVariant("Walesa"))
-            || !conn->insertRecord(*t_persons, QVariant(3), QVariant(45), QVariant("Bill"), QVariant("Gates"))
-            || !conn->insertRecord(*t_persons, QVariant(4), QVariant(35), QVariant("John"), QVariant("Smith"))
+    if (!conn->insertRecord(t_persons, QVariant(1), QVariant(27), QVariant("Jaroslaw"), QVariant("Staniek"))
+            || !conn->insertRecord(t_persons, QVariant(2), QVariant(60), QVariant("Lech"), QVariant("Walesa"))
+            || !conn->insertRecord(t_persons, QVariant(3), QVariant(45), QVariant("Bill"), QVariant("Gates"))
+            || !conn->insertRecord(t_persons, QVariant(4), QVariant(35), QVariant("John"), QVariant("Smith"))
        ) {
         qDebug() << "-- PERSONS data err. --";
         return 1;
@@ -76,23 +76,24 @@ int tablesTest()
     t_cars->addField(f = new Predicate::Field("model", Predicate::Field::Text));
     f->setCaption("Car model");
     if (!conn->createTable(t_cars)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
     qDebug() << "-- CARS created --";
-    if (!conn->insertRecord(*t_cars, QVariant(1), QVariant(1), QVariant("Fiat"))
-            || !conn->insertRecord(*t_cars, QVariant(2), QVariant(2), QVariant("Syrena"))
-            || !conn->insertRecord(*t_cars, QVariant(3), QVariant(3), QVariant("Chrysler"))
-            || !conn->insertRecord(*t_cars, QVariant(4), QVariant(3), QVariant("BMW"))
-            || !conn->insertRecord(*t_cars, QVariant(5), QVariant(4), QVariant("Volvo"))
-       ) {
+    if (!conn->insertRecord(t_cars, QVariant(1), QVariant(1), QVariant("Fiat"))
+            || !conn->insertRecord(t_cars, QVariant(2), QVariant(2), QVariant("Syrena"))
+            || !conn->insertRecord(t_cars, QVariant(3), QVariant(3), QVariant("Chrysler"))
+            || !conn->insertRecord(t_cars, QVariant(4), QVariant(3), QVariant("BMW"))
+            || !conn->insertRecord(t_cars, QVariant(5), QVariant(4), QVariant("Volvo"))
+       )
+    {
         qDebug() << "-- CARS data err. --";
         return 1;
     }
     qDebug() << "-- CARS data created --";
 
     if (!conn->commitTransaction(t)) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 
@@ -104,7 +105,7 @@ int tablesTest()
 
 
     if (!conn->closeDatabase()) {
-        conn->debugError();
+        qDebug() << conn->result();
         return 1;
     }
 

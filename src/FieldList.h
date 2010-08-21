@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,9 +23,10 @@
 #include <QList>
 #include <QHash>
 #include <QString>
+#include <QtDebug>
 
-#include "Field.h"
-#include "Driver.h"
+#include <Predicate/Field.h>
+#include <Predicate/Driver.h>
 
 namespace Predicate
 {
@@ -78,10 +79,15 @@ public:
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
-    virtual void removeField(Predicate::Field *field);
+    virtual void removeField(Field *field);
 
     /*! \return field id or NULL if there is no such a field. */
     inline Field* field(uint id) {
+        return m_fields.value(id);
+    }
+
+    /*! \return field id or NULL if there is no such a field. */
+    inline const Field* field(uint id) const {
         return m_fields.value(id);
     }
 
@@ -109,7 +115,7 @@ public:
         return m_fields.constEnd();
     }
 
-    inline const Field::List* fields() {
+    inline const Field::List* fields() const {
         return &m_fields;
     }
 
@@ -123,12 +129,6 @@ public:
 
     /*! Removes all fields from the list. */
     virtual void clear();
-
-    /*! \return String for debugging purposes. */
-    virtual QString debugString();
-
-    /*! Shows debug information about all fields in the list. */
-    void debug();
 
     /*! Creates and returns a list that contain fields selected by name.
      At least one field (exising on this list) should be selected, otherwise 0 is
@@ -181,7 +181,7 @@ public:
 
     /*! @internal
      \overload void renameField(const QString& oldName, const QString& newName) */
-    void renameField(Predicate::Field *field, const QString& newName);
+    void renameField(Field *field, const QString& newName);
 
 protected:
     Field::List m_fields;
@@ -196,5 +196,8 @@ private:
 };
 
 } //namespace Predicate
+
+//! Sends information about field list  @a list to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::FieldList& list);
 
 #endif

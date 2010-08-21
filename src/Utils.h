@@ -24,9 +24,10 @@
 #include <QList>
 #include <QVariant>
 #include <QByteArray>
+#include <QtDebug>
 
-#include "Connection.h"
-#include "Driver.h"
+#include <Predicate/Connection.h>
+#include <Predicate/Driver.h>
 
 class QDomNode;
 class QDomElement;
@@ -35,53 +36,54 @@ class QDomDocument;
 namespace Predicate
 {
 //! for convenience
-inline PREDICATE_EXPORT bool deleteRow(Connection &conn, TableSchema *table,
-                                     const QString &keyname, const QString &keyval)
+inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
+                                          const QString &keyname, const QString &keyval)
 {
-    return table != 0 && conn.executeSQL("DELETE FROM " + table->name() + " WHERE "
-                                         + keyname + "=" + conn.driver()->valueToSQL(Field::Text, QVariant(keyval)));
+    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ") + table->name() + QLatin1String(" WHERE ")
+                                         + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
 }
 
-inline PREDICATE_EXPORT bool deleteRow(Connection &conn, const QString &tableName,
-                                     const QString &keyname, const QString &keyval)
+inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                          const QString &keyname, const QString &keyval)
 {
-    return conn.executeSQL("DELETE FROM " + tableName + " WHERE "
-                           + keyname + "=" + conn.driver()->valueToSQL(Field::Text, QVariant(keyval)));
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+                           + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
 }
 
-inline PREDICATE_EXPORT bool deleteRow(Connection &conn, TableSchema *table,
-                                     const QString &keyname, int keyval)
+inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
+                                          const QString& keyname, int keyval)
 {
-    return table != 0 && conn.executeSQL("DELETE FROM " + table->name() + " WHERE "
-                                         + keyname + "=" + conn.driver()->valueToSQL(Field::Integer, QVariant(keyval)));
+    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ") + table->name() + QLatin1String(" WHERE ")
+                                         + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
 }
 
-inline PREDICATE_EXPORT bool deleteRow(Connection &conn, const QString &tableName,
-                                     const QString &keyname, int keyval)
+inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                          const QString &keyname, int keyval)
 {
-    return conn.executeSQL("DELETE FROM " + tableName + " WHERE "
-                           + keyname + "=" + conn.driver()->valueToSQL(Field::Integer, QVariant(keyval)));
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+                           + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
 }
 
-/*! Delete row with two generic criterias. */
-inline PREDICATE_EXPORT bool deleteRow(Connection &conn, const QString &tableName,
-                                     const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
-                                     const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
+/*! Delete record with two generic criterias. */
+inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                          const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
+                                          const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
 {
-    return conn.executeSQL("DELETE FROM " + tableName + " WHERE "
-                           + keyname1 + "=" + conn.driver()->valueToSQL(keytype1, keyval1)
-                           + " AND " + keyname2 + "=" + conn.driver()->valueToSQL(keytype2, keyval2));
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+                           + keyname1 + '=' + conn->driver()->valueToSQL(keytype1, keyval1)
+                           + QLatin1String(" AND ") + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
 }
 
-inline PREDICATE_EXPORT bool replaceRow(Connection &conn, TableSchema *table,
-                                      const QString &keyname, const QString &keyval, const QString &valname, QVariant val, int ftype)
+inline PREDICATE_EXPORT bool replaceRecord(Connection* conn, TableSchema *table,
+                                           const QString &keyname, const QString &keyval, const QString &valname,
+                                           const QVariant& val, int ftype)
 {
-    if (!table || !Predicate::deleteRow(conn, table, keyname, keyval))
+    if (!table || !Predicate::deleteRecord(conn, table, keyname, keyval))
         return false;
-    return conn.executeSQL("INSERT INTO " + table->name()
-                           + " (" + keyname + "," + valname + ") VALUES ("
-                           + conn.driver()->valueToSQL(Field::Text, QVariant(keyval)) + ","
-                           + conn.driver()->valueToSQL(ftype, val) + ")");
+    return conn->executeSQL(QLatin1String("INSERT INTO ") + table->name()
+                           + QLatin1String(" (") + keyname + ',' + valname + QLatin1String(") VALUES (")
+                           + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)) + ','
+                           + conn->driver()->valueToSQL(ftype, val) + ')');
 }
 
 typedef QList<uint> TypeGroupList;
@@ -117,20 +119,19 @@ inline bool isEmptyValue(Field *f, const QVariant &v)
     return v.isNull();
 }
 
-/*! Sets \a msg to an error message retrieved from object \a obj, and \a details
+/*! Sets \a msg to an error message retrieved from result \a result, and \a details
  to details of this error (server message and result number).
- Does nothing if \a obj is null or no error occurred.
- \a msg and \a details strings are not overwritten.
- If \a msg is not empty, \a obj's error message is appended to \a details.
+ Does nothing if \a result is empty. In this case \a msg and \a details strings are not overwritten.
+ If \a msg is not empty, \a result message is appended to \a details.
  */
-PREDICATE_EXPORT void getHTMLErrorMesage(Object* obj, QString& msg, QString &details);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, QString& msg, QString &details);
 
 /*! This methods works like above, but appends both a message and a description
  to \a msg. */
-PREDICATE_EXPORT void getHTMLErrorMesage(Object* obj, QString& msg);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, QString& msg);
 
 /*! This methods works like above, but works on \a result's  members instead. */
-PREDICATE_EXPORT void getHTMLErrorMesage(Object* obj, ResultInfo *result);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, ResultInfo *info);
 
 /*! Function useful for building WHERE parts of sql statements.
 Constructs an sql string like "fielname = value" for specific \a drv driver,
@@ -140,8 +141,8 @@ inline PREDICATE_EXPORT QString sqlWhere(Driver *drv, Field::Type t,
                                        const QString fieldName, const QVariant value)
 {
     if (value.isNull())
-        return fieldName + " is NULL";
-    return fieldName + "=" + drv->valueToSQL(t, value);
+        return fieldName + QLatin1String(" is NULL");
+    return fieldName + '=' + drv->valueToSQL(t, value);
 }
 
 /*! \return identifier for object \a objName of type \a objType
@@ -219,12 +220,6 @@ public:
     /*! \return connection object, for table or query or 0 if there's no table or query defined. */
     Connection* connection() const;
 
-    /*! \return String for debugging purposes. */
-    QString debugString();
-
-    /*! Shows debug information about table or query. */
-    void debug();
-
 protected:
     QByteArray m_name; //!< the name is kept here because m_table and m_table can be 0
     //! and we still want name() and acptionOrName() work.
@@ -233,34 +228,34 @@ protected:
 };
 
 //! @todo perhaps use quint64 here?
-/*! \return number of rows that can be retrieved after executing \a sql statement
+/*! \return number of records that can be retrieved after executing \a sql statement
  within a connection \a conn. The statement should be of type SELECT.
  For SQL data sources it does not fetch any records, only "COUNT(*)"
  SQL aggregation is used at the backed.
  -1 is returned if error occurred. */
-int rowCount(Connection &conn, const QString& sql);
+int recordCount(Connection* conn, const QString& sql);
 
 //! @todo perhaps use quint64 here?
-/*! \return number of rows that can be retrieved from \a tableSchema.
+/*! \return number of records that can be retrieved from \a tableSchema.
  The table must be created or retrieved using a Connection object,
  i.e. tableSchema.connection() must not return 0.
  For SQL data sources it does not fetch any records, only "COUNT(*)"
  SQL aggregation is used at the backed.
  -1 is returned if error occurred. */
-PREDICATE_EXPORT int rowCount(const TableSchema& tableSchema);
+PREDICATE_EXPORT int recordCount(const TableSchema& tableSchema);
 
 //! @todo perhaps use quint64 here?
 /*! Like above but operates on a query schema. */
-PREDICATE_EXPORT int rowCount(QuerySchema& querySchema);
+PREDICATE_EXPORT int recordCount(QuerySchema* querySchema);
 
 //! @todo perhaps use quint64 here?
 /*! Like above but operates on a table or query schema variant. */
-PREDICATE_EXPORT int rowCount(TableOrQuerySchema& tableOrQuery);
+PREDICATE_EXPORT int recordCount(TableOrQuerySchema* tableOrQuery);
 
 /*! \return a number of columns that can be retrieved from table or query schema.
  In case of query, expanded fields are counted. Can return -1 if \a tableOrQuery
  has neither table or query assigned. */
-PREDICATE_EXPORT int fieldCount(TableOrQuerySchema& tableOrQuery);
+PREDICATE_EXPORT int fieldCount(TableOrQuerySchema* tableOrQuery);
 
 /*! shows connection test dialog with a progress bar indicating connection testing
  (within a second thread).
@@ -269,11 +264,13 @@ PREDICATE_EXPORT int fieldCount(TableOrQuerySchema& tableOrQuery);
 PREDICATE_EXPORT void connectionTestDialog(QWidget* parent, const ConnectionData& data,
         MessageHandler& msgHandler);
 
+#if 0 // moved to ConnectionData
 /*! Saves connection data \a data into \a map. */
 PREDICATE_EXPORT QMap<QString, QString> toMap(const ConnectionData& data);
 
 /*! Restores connection data \a data from \a map. */
 PREDICATE_EXPORT void fromMap(const QMap<QString, QString>& map, ConnectionData& data);
+#endif
 
 //! Used in splitToTableAndFieldParts().
 enum SplitToTableAndFieldPartsOptions {
@@ -427,7 +424,7 @@ PREDICATE_EXPORT QString variantToString(const QVariant& v);
 /*! \return variant value of type \a type for a string \a s that was previously serialized using
  \ref variantToString( const QVariant& v ) function.
  \a ok is set to the result of the operation. */
-PREDICATE_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool &ok);
+PREDICATE_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool* ok);
 
 /*! \return true if setting default value for \a field field is allowed. Fields with unique
  (and thus primary key) flags set do not accept  default values.
@@ -447,8 +444,8 @@ PREDICATE_EXPORT void getLimitsForType(Field::Type type, int &minValue, int &max
 PREDICATE_EXPORT Field::Type maximumForIntegerTypes(Field::Type t1, Field::Type t2);
 
 /*! \return QVariant value converted from null-terminated \a data string.
- In case of BLOB type, \a data is not nul lterminated, so passing length is needed. */
-inline QVariant cstringToVariant(const char* data, Predicate::Field* f, int length = -1)
+ In case of BLOB type, \a data is not null terminated, so passing length is needed. */
+inline QVariant cstringToVariant(const char* data, Field* f, int length = -1)
 {
     if (!data)
         return QVariant();
@@ -457,18 +454,18 @@ inline QVariant cstringToVariant(const char* data, Predicate::Field* f, int leng
     if (!f || f->isTextType())
         return QString::fromUtf8(data, length);
     if (f->isIntegerType()) {
-        if (f->type() == Predicate::Field::BigInteger)
+        if (f->type() == Field::BigInteger)
             return QVariant(QString::fromLatin1(data, length).toLongLong());
         return QVariant(QString::fromLatin1(data, length).toInt());
     }
     if (f->isFPNumericType())
         return QString::fromLatin1(data, length).toDouble();
-    if (f->type() == Predicate::Field::BLOB)
+    if (f->type() == Field::BLOB)
         return QByteArray::fromRawData(data, length);
     // the default
 //! @todo date/time?
     QVariant result(QString::fromUtf8(data, length));
-    if (!result.convert(Predicate::Field::variantType(f->type())))
+    if (!result.convert(Field::variantType(f->type())))
         return QVariant();
     return result;
 }
@@ -484,6 +481,20 @@ PREDICATE_EXPORT QString defaultFileBasedDriverIcon();
 
 /*! \return default file-based driver name (currently, "sqlite3"). */
 PREDICATE_EXPORT QString defaultFileBasedDriverName();
+
+/*! @return debugging string for object @a object of type @a T */
+template <typename T>
+QString debugString(const T& object)
+{
+    QString result;
+    QDebug dbg(&result);
+    dbg << object;
+    return result;
 }
+
+} // namespace Predicate
+
+//! Sends information about table or query schema @a schema to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::TableOrQuerySchema& schema);
 
 #endif

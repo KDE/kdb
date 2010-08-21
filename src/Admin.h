@@ -20,7 +20,7 @@
 #ifndef PREDICATE_ADMIN_H
 #define PREDICATE_ADMIN_H
 
-#include "Object.h"
+#include <Predicate/Result.h>
 
 namespace Predicate
 {
@@ -30,7 +30,7 @@ class ConnectionData;
 //! @short An interface containing a set of tools for database administration
 /*! Can be implemented in database drivers. @see Driver::adminTools
 */
-class PREDICATE_EXPORT AdminTools : public Object
+class PREDICATE_EXPORT AdminTools : public Resultable
 {
 public:
     AdminTools();

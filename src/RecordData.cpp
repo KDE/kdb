@@ -25,22 +25,15 @@
 #include <Predicate/Global.h>
 #include <Predicate/RecordData.h>
 
-#include <QtDebug>
-
 using namespace Predicate;
 
-QString RecordData::debugString() const
+QDebug operator<<(QDebug dbg, const RecordData& data)
 {
-    QString s(QString("RECORD DATA (%1 columns)").arg(size()));
+    dbg.nospace() << QString::fromLatin1("RECORD DATA (%1 COLUMNS):").arg(data.size());
     int i = 0;
-    foreach(const QVariant& value, *this) {
+    foreach(const QVariant& value, data) {
         i++;
-        s.append(QString::number(i) + ":[" + value.typeName() + "]" + value.toString() + " ");
+        dbg.space() << QString::fromLatin1("%1:[%2]%3").arg(i).arg(value.typeName()).arg(value.toString());
     }
-    return s;
-}
-
-void RecordData::debug() const
-{
-    PreDbg << debugString();
+    return dbg.space();
 }

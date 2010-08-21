@@ -24,8 +24,9 @@
 using namespace Predicate;
 using namespace Predicate::Utils;
 
-ObjectNameValidator::ObjectNameValidator(
-    Predicate::Driver *drv, QObject * parent)
+#warning replace QPointer<Driver> m_drv;
+
+ObjectNameValidator::ObjectNameValidator(Driver *drv, QObject * parent)
         : Validator(parent)
         , m_drv(drv)
 {
@@ -39,8 +40,7 @@ Validator::Result ObjectNameValidator::internalCheck(
     const QString & /*valueName*/, const QVariant& v,
     QString &message, QString &details)
 {
-
-    if (m_drv.isNull() ? !Predicate::Driver::isPredicateSystemObjectName(v.toString())
+    if (!m_drv ? !Driver::isPredicateSystemObjectName(v.toString())
             : !m_drv->isSystemObjectName(v.toString()))
         return Validator::Ok;
     message = QObject::tr("You cannot use name \"%1\" for your object. "

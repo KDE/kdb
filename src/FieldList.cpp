@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,7 +18,7 @@
 */
 
 #include "FieldList.h"
-#include "Object.h"
+//#include "Object.h"
 
 #include <QtDebug>
 
@@ -127,27 +127,19 @@ Field* FieldList::field(const QString& name)
     return m_fields_by_name.value(name.toLower());
 }
 
-QString FieldList::debugString()
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::FieldList& list)
 {
-    if (m_fields.isEmpty())
-        return "<NO FIELDS>";
-    QString dbg;
-    dbg.reserve(512);
+    if (list.fields()->isEmpty())
+        dbg.nospace() << "<NO FIELDS>";
     bool start = true;
-    foreach(Field *field, m_fields) {
+    foreach(const Field *field, *list.fields()) {
         if (!start)
-            dbg += ",\n";
+            dbg.nospace() << '\n';
         else
             start = false;
-        dbg += "  ";
-        dbg += field->debugString();
+        dbg.nospace() << " - " << *field;
     }
-    return dbg;
-}
-
-void FieldList::debug()
-{
-    PreDbg << debugString();
+    return dbg.space();
 }
 
 #define _ADD_FIELD(fname) \

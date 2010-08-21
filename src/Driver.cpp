@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -72,17 +72,15 @@ DriverBehaviour::DriverBehaviour()
 //---------------------------------------------
 
 Driver::Driver()
-        : QObject()
-        , Object()
-        , beh(new DriverBehaviour())
-        , d(new DriverPrivate())
+ : beh(new DriverBehaviour())
+ , d(new DriverPrivate())
 {
     d->typeNames.resize(Field::LastType + 1);
 }
 
 Driver::~Driver()
 {
-    DriverManagerInternal::self()->aboutDelete(this);
+    //DriverManagerInternal::self()->aboutDelete(this);
 // PreDbg;
     // make a copy because d->connections will be touched by ~Connection
     QSet<Connection*> connections(d->connections);
@@ -95,7 +93,7 @@ Driver::~Driver()
 
 bool Driver::isValid()
 {
-    clearError();
+    clearResult();
 /* moved to DriverManagerInternal::driver():
     if (Predicate::version().major != version().major
             || Predicate::version().minor != version().minor) {
@@ -131,7 +129,7 @@ QString Driver::fileDBDriverMimeType() const
 }*/
 
 //ported const KService* Driver::service() const
-Driver::Info Driver::info() const
+DriverInfo Driver::info() const
 {
     return d->info;
 }
@@ -184,13 +182,13 @@ QString Driver::sqlTypeName(int id_t, int /*p*/) const
 
 Connection *Driver::createConnection(ConnectionData &conn_data, int options)
 {
-    clearError();
+    clearResult();
     if (!isValid())
         return 0;
     if (d->info.isFileBased()) {
         if (conn_data.fileName().isEmpty()) {
-            setError(ERR_MISSING_DB_LOCATION,
-                     tr("File name expected for file-based database driver."));
+            m_result = Result(ERR_MISSING_DB_LOCATION,
+                              QObject::tr("File name expected for file-based database driver."));
             return 0;
         }
     }
@@ -199,14 +197,14 @@ Connection *Driver::createConnection(ConnectionData &conn_data, int options)
 
     conn->setReadOnly(options & ReadOnlyConnection);
 
-    conn_data.driverName = name();
+    conn_data.setDriverName(name());
     d->connections.insert(conn);
     return conn;
 }
 
 Connection* Driver::removeConnection(Connection *conn)
 {
-    clearError();
+    clearResult();
     if (d->connections.remove(conn))
         return conn;
     return 0;
@@ -358,10 +356,9 @@ bool Driver::isDriverSpecificKeyword(const QByteArray& word) const
     return d->driverSpecificSQLKeywords.contains(word);
 }
 
-void Driver::setInfo( const Driver::Info& info )
+void Driver::setInfo( const DriverInfo& info )
 {
     d->info = info;
-    setObjectName( info.name().toLower() );
     d->initInternalProperties();
 }
 

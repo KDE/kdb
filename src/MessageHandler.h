@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
 
    Contains parts of kmessagebox.h
    Copyright (C) 1999 Waldo Bastian (bastian@kde.org)
@@ -33,25 +33,24 @@
 namespace Predicate
 {
 
-class Object;
+class Result;
 
-/*! A helper class for setting temporary message title for an Predicate::Object.
+/*! Helper for setting temporary message title for an Predicate::Result object.
  Message title is a text prepended to error or warning messages.
- Use it this way:
+ Use it as follows:
  \code
- Predicate::MessageTitle title(myKexiDBObject, tr("Terrible error occurred"));
+ Predicate::MessageTitleSetter ts(&m_result, tr("Terrible error occurred"));
  \endcode
- After leaving current from code block, object's message title will be reverted
- to previous value.
+ After leaving the current code block, myResultableObject's message title will be set back to the previous value.
 */
-class PREDICATE_EXPORT MessageTitle
+class PREDICATE_EXPORT MessageTitleSetter
 {
 public:
-    MessageTitle(Predicate::Object* o, const QString& msg = QString());
-    ~MessageTitle();
+    MessageTitleSetter(Result* result, const QString& message = QString());
+    ~MessageTitleSetter();
 
 protected:
-    Object* m_obj;
+    Result* m_result;
     QString m_prevMsgTitle;
 };
 
@@ -142,7 +141,7 @@ public:
     /*! Shows error message with \a msg text. Existing error message from \a obj object
      is also copied, if present. */
     virtual void showErrorMessage(
-        Predicate::Object *obj, 
+        const Predicate::Result& result,
         MessageHandler::MessageType messageType = Error,
         const QString& msg = QString(),
         const QString& caption = QString()

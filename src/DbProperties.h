@@ -20,7 +20,7 @@
 #ifndef PREDICATE_DBPROPERTIES_H
 #define PREDICATE_DBPROPERTIES_H
 
-#include "Connection.h"
+#include <Predicate/Connection.h>
 
 namespace Predicate
 {
@@ -32,9 +32,11 @@ namespace Predicate
  for creating and maintain custom table.
  DatabaseProperties object is accessible only using Predicate::Connection::databaseProperties() method.
  */
-class PREDICATE_EXPORT DatabaseProperties : public Predicate::Object
+class PREDICATE_EXPORT DatabaseProperties : public Resultable
 {
 public:
+    ~DatabaseProperties();
+
     /*! Sets \a value for property \a name. Optional caption can be also set.
      If there's no such property defined, it will be added. Existing value will be overwritten.
      Note that to execute this method, database must be opened in read-write mode.
@@ -58,10 +60,9 @@ public:
 
 protected:
     DatabaseProperties(Connection *conn);
-    ~DatabaseProperties();
 
-    QPointer<Connection> m_conn;
-    friend class Connection;
+    Connection* m_conn;
+    friend class ConnectionPrivate;
 };
 }
 

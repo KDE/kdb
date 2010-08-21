@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 #include "Driver.h"
 #include "Driver_p.h"
 #include "Error.h"
-#include "RowEditBuffer.h"
+#include "RecordEditBuffer.h"
 #include "Utils.h"
 
 #include <QtDebug>
@@ -32,13 +32,10 @@
 
 using namespace Predicate;
 
-#ifdef KEXI_DEBUG_GUI
-
-#endif
+#warning replace    QPointer<Connection> m_conn;
 
 Cursor::Cursor(Connection* conn, const QString& statement, uint options)
-        : QObject()
-        , m_conn(conn)
+        : m_conn(conn)
         , m_query(0)
         , m_rawStatement(statement)
         , m_options(options)
@@ -49,10 +46,9 @@ Cursor::Cursor(Connection* conn, const QString& statement, uint options)
     init();
 }
 
-Cursor::Cursor(Connection* conn, QuerySchema& query, uint options)
-        : QObject()
-        , m_conn(conn)
-        , m_query(&query)
+Cursor::Cursor(Connection* conn, QuerySchema* query, uint options)
+        : m_conn(conn)
+        , m_query(query)
         , m_options(options)
 {
 #ifdef KEXI_DEBUG_GUI
@@ -64,7 +60,7 @@ Cursor::Cursor(Connection* conn, QuerySchema& query, uint options)
 void Cursor::init()
 {
     assert(m_conn);
-    m_conn->addCursor(*this);
+    m_conn->addCursor(this);
     m_opened = false;
 // , m_atFirst(false)
 // , m_atLast(false)
@@ -81,25 +77,25 @@ void Cursor::init()
     m_records_in_buf = 0;
     m_buffering_completed = false;
     m_at_buffer = false;
-    m_result = -1;
+    m_fetchResult = FetchInvalid;
 
-    m_containsROWIDInfo = (m_query && m_query->masterTable())
+    m_containsRecordIdInfo = (m_query && m_query->masterTable())
                           && m_conn->driver()->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
 
     if (m_query) {
         //get list of all fields
         m_fieldsExpanded = new QueryColumnInfo::Vector();
         *m_fieldsExpanded = m_query->fieldsExpanded(
-                                m_containsROWIDInfo ? QuerySchema::WithInternalFieldsAndRowID : QuerySchema::WithInternalFields);
+                                m_containsRecordIdInfo ? QuerySchema::WithInternalFieldsAndRecordId : QuerySchema::WithInternalFields);
         m_logicalFieldCount = m_fieldsExpanded->count()
-                              - m_query->internalFields().count() - (m_containsROWIDInfo ? 1 : 0);
+                              - m_query->internalFields().count() - (m_containsRecordIdInfo ? 1 : 0);
         m_fieldCount = m_fieldsExpanded->count();
-        m_fieldsToStoreInRow = m_fieldCount;
+        m_fieldsToStoreInRecord = m_fieldCount;
     } else {
         m_fieldsExpanded = 0;
         m_logicalFieldCount = 0;
         m_fieldCount = 0;
-        m_fieldsToStoreInRow = 0;
+        m_fieldsToStoreInRecord = 0;
     }
     m_orderByColumnList = 0;
     m_queryParameters = 0;
@@ -121,10 +117,9 @@ Cursor::~Cursor()
     //take me if delete was
     if (!m_conn->m_insideCloseDatabase) {
         if (!m_conn->m_destructor_started) {
-            m_conn->takeCursor(*this);
+            m_conn->takeCursor(this);
         } else {
-            PreDbg << "can be destroyed with Conenction::deleteCursor(), not with delete operator !";
-            exit(1);
+            PreFatal << "can be destroyed with Conenction::deleteCursor(), not with delete operator!";
         }
     }
     delete m_fieldsExpanded;
@@ -137,32 +132,33 @@ bool Cursor::open()
         if (!close())
             return false;
     }
-    if (!m_rawStatement.isEmpty())
-        m_conn->m_sql = m_rawStatement;
+    if (!m_rawStatement.isEmpty()) {
+        m_conn->setSql(m_rawStatement);
+    }
     else {
         if (!m_query) {
             PreDbg << "no query statement (or schema) defined!";
-            setError(ERR_SQL_EXECUTION_ERROR, tr("No query statement or schema defined."));
+            m_result = Result(ERR_SQL_EXECUTION_ERROR, QObject::tr("No query statement or schema defined."));
             return false;
         }
         Connection::SelectStatementOptions options;
-        options.alsoRetrieveROWID = m_containsROWIDInfo; /*get ROWID if needed*/
-        m_conn->m_sql = m_queryParameters
-                        ? m_conn->selectStatement(*m_query, *m_queryParameters, options)
-                        : m_conn->selectStatement(*m_query, options);
-        if (m_conn->m_sql.isEmpty()) {
+        options.alsoRetrieveRecordId = m_containsRecordIdInfo; /*get record Id if needed*/
+        m_conn->setSql(m_queryParameters
+                        ? m_conn->selectStatement(m_query, *m_queryParameters, options)
+                        : m_conn->selectStatement(m_query, options));
+        if (m_conn->sql().isEmpty()) {
             PreDbg << "empty statement!";
-            setError(ERR_SQL_EXECUTION_ERROR, tr("Query statement is empty."));
+            m_result = Result(ERR_SQL_EXECUTION_ERROR, QObject::tr("Query statement is empty."));
             return false;
         }
     }
-    m_sql = m_conn->m_sql;
+    m_result.setSql(m_conn->sql());
     m_opened = drv_open();
 // m_beforeFirst = true;
     m_afterLast = false; //we are not @ the end
     m_at = 0; //we are before 1st rec
     if (!m_opened) {
-        setError(ERR_SQL_EXECUTION_ERROR, tr("Error opening database cursor."));
+        m_result = Result(ERR_SQL_EXECUTION_ERROR, QObject::tr("Error opening database cursor."));
         return false;
     }
     m_validRecord = false;
@@ -175,7 +171,7 @@ bool Cursor::open()
 //  PreDbg << "READ AHEAD = " << m_readAhead;
     }
     m_at = 0; //we are still before 1st rec
-    return !error();
+    return !m_result.isError();
 }
 
 bool Cursor::close()
@@ -191,7 +187,7 @@ bool Cursor::close()
     m_afterLast = false;
     m_readAhead = false;
     m_fieldCount = 0;
-    m_fieldsToStoreInRow = 0;
+    m_fieldsToStoreInRecord = 0;
     m_logicalFieldCount = 0;
     m_at = -1;
 
@@ -372,9 +368,9 @@ void Cursor::clearBuffer()
 
 bool Cursor::getNextRecord()
 {
-    m_result = -1; //by default: invalid result of row fetching
+    m_fetchResult = FetchInvalid; //by default: invalid result of record fetching
 
-    if ((m_options & Buffered)) {//this cursor is buffered:
+    if (m_options & Buffered) {//this cursor is buffered:
 //  PreDbg << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
 //js  if (m_at==-1) m_at=0;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
@@ -396,21 +392,21 @@ bool Cursor::getNextRecord()
 //     PreDbg<<"==== buffering: drv_getNextRecord() ====";
                     drv_getNextRecord();
                 }
-                if ((FetchResult) m_result != FetchOK) {//there is no record
+                if (m_fetchResult != FetchOK) {//there is no record
                     m_buffering_completed = true; //no more records for buffer
-//     PreDbg<<"m_result != FetchOK ********";
+//     PreDbg<<"m_fetchResult != FetchOK ********";
                     m_validRecord = false;
                     m_afterLast = true;
 //js     m_at = m_records_in_buf;
                     m_at = -1; //position is invalid now and will not be used
-//     if ((FetchResult) m_result == FetchEnd) {
+//     if ((FetchResult) m_fetchResult == FetchEnd) {
 //      return false;
 //     }
-                    if ((FetchResult) m_result == FetchError) {
-                        setError(ERR_CURSOR_RECORD_FETCHING, tr("Cannot fetch next record."));\
+                    if (m_fetchResult == FetchError) {
+                        m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Cannot fetch next record."));
                         return false;
                     }
-                    return false; // in case of m_result = FetchEnd or m_result = -1
+                    return false; // in case of m_fetchResult = FetchEnd or m_fetchResult = FetchInvalid
                 }
                 //we have a record: store this record's values in the buffer
                 drv_appendCurrentRecordToBuffer();
@@ -422,15 +418,15 @@ bool Cursor::getNextRecord()
         if (!m_readAhead) {//we have no record that was read ahead
 //   PreDbg<<"==== no prefetched record ====";
             drv_getNextRecord();
-            if ((FetchResult)m_result != FetchOK) {//there is no record
-//    PreDbg<<"m_result != FetchOK ********";
+            if (m_fetchResult != FetchOK) {//there is no record
+//    PreDbg<<"m_fetchResult != FetchOK ********";
                 m_validRecord = false;
                 m_afterLast = true;
                 m_at = -1;
-                if ((FetchResult) m_result == FetchEnd) {
+                if (m_fetchResult == FetchEnd) {
                     return false;
                 }
-                setError(ERR_CURSOR_RECORD_FETCHING, tr("Cannot fetch next record."));
+                m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Cannot fetch next record."));
                 return false;
             }
         } else //we have a record that was read ahead: eat this
@@ -449,40 +445,40 @@ bool Cursor::getNextRecord()
     return true;
 }
 
-bool Cursor::updateRow(RecordData& data, RowEditBuffer& buf, bool useROWID)
+bool Cursor::updateRecord(RecordData* data, RecordEditBuffer* buf, bool useRecordId)
 {
 //! @todo doesn't update cursor's buffer YET!
-    clearError();
+    clearResult();
     if (!m_query)
         return false;
-    return m_conn->updateRow(*m_query, data, buf, useROWID);
+    return m_conn->updateRecord(m_query, data, buf, useRecordId);
 }
 
-bool Cursor::insertRow(RecordData& data, RowEditBuffer& buf, bool getROWID)
+bool Cursor::insertRecord(RecordData* data, RecordEditBuffer* buf, bool useRecordId)
 {
 //! @todo doesn't update cursor's buffer YET!
-    clearError();
+    clearResult();
     if (!m_query)
         return false;
-    return m_conn->insertRow(*m_query, data, buf, getROWID);
+    return m_conn->insertRecord(m_query, data, buf, useRecordId);
 }
 
-bool Cursor::deleteRow(RecordData& data, bool useROWID)
+bool Cursor::deleteRecord(RecordData* data, bool useRecordId)
 {
 //! @todo doesn't update cursor's buffer YET!
-    clearError();
+    clearResult();
     if (!m_query)
         return false;
-    return m_conn->deleteRow(*m_query, data, useROWID);
+    return m_conn->deleteRecord(m_query, data, useRecordId);
 }
 
-bool Cursor::deleteAllRows()
+bool Cursor::deleteAllRecords()
 {
 //! @todo doesn't update cursor's buffer YET!
-    clearError();
+    clearResult();
     if (!m_query)
         return false;
-    return m_conn->deleteAllRows(*m_query);
+    return m_conn->deleteAllRecords(m_query);
 }
 
 QString Cursor::debugString() const
@@ -494,7 +490,7 @@ QString Cursor::debugString() const
         dbg += "'\n";
     } else {
         dbg += "QuerySchema: '";
-        dbg += m_conn->selectStatement(*m_query);
+        dbg += m_conn->selectStatement(m_query);
         dbg += "'\n";
     }
     if (isOpened())

@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -25,11 +25,11 @@
 #include <QString>
 #include <QPointer>
 #include <QVector>
+#include <QtDebug>
 
-#include "FieldList.h"
-#include "SchemaData.h"
-#include "IndexSchema.h"
-#include "Relationship.h"
+#include <Predicate/FieldList.h>
+#include <Predicate/IndexSchema.h>
+#include <Predicate/Relationship.h>
 
 namespace Predicate
 {
@@ -37,17 +37,17 @@ namespace Predicate
 class Connection;
 class LookupFieldSchema;
 
-/*! Predicate::TableSchema provides information about native database table
+/*! Provides information about native database table
   that can be stored using Predicate database engine.
 */
-class PREDICATE_EXPORT TableSchema : public FieldList, public SchemaData
+class PREDICATE_EXPORT TableSchema : public FieldList, public Object
 {
 public:
     typedef QList<TableSchema*> List; //!< Type of tables list
     typedef QList<TableSchema>::ConstIterator ListIterator; //!< Iterator for tables list
 
-    TableSchema(const QString & name);
-    TableSchema(const SchemaData& sdata);
+    TableSchema(const QString& name);
+    TableSchema(const Object& object);
     TableSchema();
 
     /*! Copy constructor.
@@ -56,10 +56,10 @@ public:
     TableSchema(const TableSchema& ts, bool copyId = true);
 
     /*! Copy constructor like \ref TableSchema(const TableSchema&, bool).
-     \a setId is set as the table identifier. This is rarely usable, e.g.
+     \a id is set as the table identifier. This is rarely usable, e.g.
      in project and data migration routines when we need to need deal with unique identifiers;
      @see KexiMigrate::performImport(). */
-    TableSchema(const TableSchema& ts, int setId);
+    TableSchema(const TableSchema& ts, int id);
 
     virtual ~TableSchema();
 
@@ -102,25 +102,20 @@ public:
       \sa FieldList::clear() */
     virtual void clear();
 
-    /*! \return String for debugging purposes, if \a includeTableName is true,
-     table name, caption, etc. is prepended, else only debug string for
-     the fields are returned. */
-    QString debugString(bool includeTableName);
-
-    /*! \return String for debugging purposes. Equal to debugString(true). */
-    virtual QString debugString();
+    /*! Sends information about fields of this table schema to debug output @a dbg. */
+    QDebug debugFields(QDebug dbg) const;
 
     /*! \return connection object if table was created/retrieved using a connection,
       otherwise 0. */
     Connection* connection() const;
 
     /*! \return true if this is Predicate storage system's table
-     (used internally by KexiDB). This helps in hiding such tables
+     (used internally by Predicate). This helps in hiding such tables
      in applications (if desired) and will also enable lookup of system
      tables for schema export/import functionality.
 
      Any internal Predicate system table's schema (kexi__*) has
-     cleared its SchemaData part, e.g. id=-1 for such table,
+     cleared its Object part, e.g. id=-1 for such table,
      and no description, caption and so on. This is because
      it represents a native database table rather that extended Kexi table.
 
@@ -132,19 +127,21 @@ public:
         return m_isPredicateSystem;
     }
 
-    /*! Sets KexiDBSystem flag to on or off. When on, native flag is forced to be on.
+    /*! Sets PredicateSystem flag to on or off. When on, native flag is forced to be on.
      When off, native flag is not affected.
      \sa isPredicateSystem() */
-    void setKexiDBSystem(bool set);
+    void setPredicateSystem(bool set);
 
+#if 0
     /*! \return true if this is schema of native database object,
      When this is predicateSystem table, native flag is forced to be on. */
     virtual bool isNative() const {
         return m_native || m_isPredicateSystem;
     }
+#endif
 
     /* Sets native flag. Does not allow to set this off for system Predicate table. */
-    virtual void setNative(bool set);
+    //virtual void setNative(bool set);
 
     /*! \return query schema object that is defined by "select * from <this_table_name>"
      This query schema object is owned by the table schema object.
@@ -165,7 +162,7 @@ public:
     /*! \return lookup field schema for \a field.
      0 is returned if there is no such field in the table or this Field.has no lookup schema.
      Note that even id non-zero is returned here, you may want to check whether lookup field's
-     rowSource().name() is empty (if so, the field should behave as there was no lookup field
+     recordSource().name() is empty (if so, the field should behave as there was no lookup field
      defined at all). */
     LookupFieldSchema *lookupFieldSchema(const Field& field) const;
 
@@ -182,7 +179,7 @@ protected:
 
     IndexSchema::List m_indices;
 
-    QPointer<Connection> m_conn;
+    Connection *m_conn;
 
     IndexSchema *m_pkey;
 
@@ -216,5 +213,8 @@ public:
 };
 
 } //namespace Predicate
+
+//! Sends information about table schema @a table to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::TableSchema& table);
 
 #endif
