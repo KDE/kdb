@@ -50,7 +50,7 @@ public:
     virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options);
 
     PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type,
-							    FieldList& fields);
+							    FieldList* fields);
 
     void setODBCError( int nativeErrorCode, const QString& odbcErrorCode ,const QString& errorMessage);
 
@@ -68,7 +68,7 @@ protected:
     /*! Used by driver */
     ODBCConnection(Driver *driver,  ConnectionData &conn_data);
 
-    virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+    virtual bool drv_connect(KexiDB::ServerVersionInfo* version);
 
     virtual bool drv_disconnect();
 
@@ -95,12 +95,12 @@ protected:
 
     virtual bool drv_executeSQL(const QString& statement);
 
-    virtual quint64 drv_lastInsertRowID();
+    virtual quint64 drv_lastInsertRecordId();
 
-    virtual bool drv_getDatabasesList(QStringList &list);
+    virtual bool drv_getDatabasesList(QStringList* list);
 
 //TODO: move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_getTablesList(QStringList &list);
+    virtual bool drv_getTablesList(QStringList* list);
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 

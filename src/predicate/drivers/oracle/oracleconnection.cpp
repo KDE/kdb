@@ -39,7 +39,7 @@ OracleConnection::~OracleConnection()
 	destroy();
 }
 
-bool OracleConnection::drv_connect(ServerVersionInfo& version)
+bool OracleConnection::drv_connect(ServerVersionInfo* version)
 {
 	QString versionString; // Version string from server
 
@@ -330,7 +330,7 @@ bool OracleConnection::drv_createTable( const KexiDB::TableSchema& tableSchema )
 /* 
  * Here is we do the count of ROW_IDs
  */
-bool OracleConnection::drv_afterInsert(const QString& table, FieldList& fields)
+bool OracleConnection::drv_afterInsert(const QString& table, FieldList* fields)
 {
   Q_UNUSED(table);
   Q_UNUSED(fields);
@@ -402,14 +402,14 @@ bool OracleConnection::drv_alterTableName
  * extra column on every single table which is called ROW_ID and a global 
  * sequence. The value of ROW_ID is set on drv_afterInsert
  */
-Q_ULLONG OracleConnection::drv_lastInsertRowID()
+Q_ULLONG OracleConnection::drv_lastInsertRecordId()
 {
   KexiDBDrvDbg;
   int res;
   try
   {
     d->rs=d->stmt->executeQuery
-    ("SELECT LAST_NUMBER-1 from user_sequences WHERE SEQUENCE_NAME='KEXI__SEQ__ROW_ID'");
+    ("SELECT LAST_NUMBER-1 FROM user_sequences WHERE SEQUENCE_NAME='KEXI__SEQ__ROW_ID'");
     if(d->rs->next()) res=d->rs->getInt(1);
     d->stmt->closeResultSet(d->rs);
     d->rs=0;
@@ -454,7 +454,7 @@ bool OracleConnection::drv_containsTable( const QString &tableName )
   KexiDBDrvDbg;
 	bool success;
 	return resultExists(QString("SELECT TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE %1")
-		.arg(driver()->escapeString(tableName).upper()), success) && success;
+		.arg(driver()->escapeString(tableName).upper()), &success) && success;
 }
 
 /**

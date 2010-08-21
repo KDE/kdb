@@ -49,7 +49,7 @@ MysqlConnection::~MysqlConnection()
     destroy();
 }
 
-bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -68,7 +68,7 @@ bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
 #else //better way to get the version info: use 'version' built-in variable:
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
     QString versionString;
-    tristate res = querySingleString("SELECT @@version", versionString, /*column*/0, false /*!addLimitTo1*/);
+    tristate res = querySingleString("SELECT @@version", &versionString, /*column*/0, false /*!addLimitTo1*/);
     QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)");
     if (res == true && versionRe.exactMatch(versionString)) { // (if querySingleString failed, the version will be 0.0.0...
         version.major = versionRe.cap(1).toInt();
@@ -79,7 +79,7 @@ bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
     // Get lower_case_table_name value so we know if there's case sensitivity supported
     // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
     int intLowerCaseTableNames = 0;
-    res = querySingleNumber(QLatin1String("SHOW VARIABLES LIKE 'lower_case_table_name'"), intLowerCaseTableNames,
+    res = querySingleNumber(QLatin1String("SHOW VARIABLES LIKE 'lower_case_table_name'"), &intLowerCaseTableNames,
                             0/*col*/, false/* !addLimitTo1 */);
     if (res == false) // sanity
         return false;
@@ -129,7 +129,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
     bool exists = resultExists(
       QString::fromLatin1("SHOW DATABASES LIKE %1")
-          .arg(driver()->escapeString(storedDbName)), success);
+          .arg(driver()->escapeString(storedDbName)), &success);
     if (!exists || !success) {
         if (!ignoreErrors)
             setError(ERR_OBJECT_NOT_FOUND, QObject::tr("The database \"%1\" does not exist.").arg(storedDbName));
@@ -178,7 +178,7 @@ bool MysqlConnection::drv_executeSQL(const QString& statement)
     return d->executeSQL(statement);
 }
 
-quint64 MysqlConnection::drv_lastInsertRowID()
+quint64 MysqlConnection::drv_lastInsertRecordId()
 {
     //! @todo
     return (quint64)mysql_insert_id(d->mysql);
@@ -209,13 +209,13 @@ QString MysqlConnection::serverErrorMsg()
 bool MysqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("show tables like %1")
+    return resultExists(QString("SHOW TABLES LIKE %1")
                         .arg(driver()->escapeString(tableName)), success) && success;
 }
 
 bool MysqlConnection::drv_getTablesList(QStringList &list)
 {
-    return queryStringList("show tables", list);
+    return queryStringList("SHOW TABLES", list);
 }
 
 PreparedStatementInterface* MysqlConnection::prepareStatementInternal()

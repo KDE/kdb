@@ -47,7 +47,7 @@ SybaseConnection::~SybaseConnection()
     destroy();
 }
 
-bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -59,11 +59,11 @@ bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
 
     QString serverVersionString;
 
-    if (!querySingleString("Select @@servername" , version.string)) {
+    if (!querySingleString("Select @@servername" , &version.string)) {
         PreDrvDbg << "Couldn't fetch server name";
     }
 
-    if (!querySingleString("Select @@version", serverVersionString)) {
+    if (!querySingleString("Select @@version", &serverVersionString)) {
         PreDrvDbg << "Couldn't fetch server version";
     }
 
@@ -92,13 +92,13 @@ Cursor* SybaseConnection::prepareQuery(QuerySchema& query, uint cursor_options)
     return new SybaseCursor(this, query, cursor_options);
 }
 
-bool SybaseConnection::drv_getDatabasesList(QStringList &list)
+bool SybaseConnection::drv_getDatabasesList(QStringList* list)
 {
     PreDrvDbg;
 
     // select * from master..sysdatabases ?
     // todo: verify.
-    return queryStringList("Select name from master..sysdatabases", list) ;
+    return queryStringList("SELECT name FROM master..sysdatabases", list) ;
 }
 
 bool SybaseConnection::drv_createDatabase(const QString &dbName)
@@ -141,10 +141,10 @@ bool SybaseConnection::drv_executeSQL(const QString& statement)
     return d->executeSQL(statement);
 }
 
-quint64 SybaseConnection::drv_lastInsertRowID()
+quint64 SybaseConnection::drv_lastInsertRecordId()
 {
     int rowId;
-    querySingleNumber("Select @@IDENTITY", rowId);
+    querySingleNumber("Select @@IDENTITY", &rowId);
 
     return (qint64)rowId;
 }
@@ -175,22 +175,22 @@ QString SybaseConnection::serverErrorMsg()
 bool SybaseConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("select name from sysobjects where type='U' and name=%1")
-                        .arg(driver()->escapeString(tableName)), success) && success;
+    return resultExists(QString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
+                        .arg(driver()->escapeString(tableName)), &success) && success;
 }
 
 bool SybaseConnection::drv_getTablesList(QStringList &list)
 {
-    return queryStringList("Select name from sysobjects where type='U'", list);
+    return queryStringList("SELECT name FROM sysobjects WHERE type='U'", list);
 }
 
 PreparedStatement SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList& fields)
+        FieldList* fields)
 {
     return SybasePreparedStatement(type, *d, fields);
 }
 
-bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList* fields)
 {
 
     if (fields.autoIncrementFields()->isEmpty())
@@ -201,7 +201,7 @@ bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldLi
 
 }
 
-bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldList* fields)
 {
     // should we instead just set a flag when an identity_insert has taken place and only check for that
     // flag here ?
@@ -214,9 +214,9 @@ bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldLis
 
 }
 
-bool Predicate::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList& fields)
+bool Predicate::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList* fields)
 {
-    if (fields.autoIncrementFields()->isEmpty())
+    if (fields->autoIncrementFields()->isEmpty())
         return true;
 
     // explicit update of IDENTITY fields has taken place.

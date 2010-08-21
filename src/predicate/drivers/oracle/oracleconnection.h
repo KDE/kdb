@@ -38,13 +38,13 @@ class OracleConnection : public Connection
 		virtual Cursor* prepareQuery( const QString& statement = QString(), uint cursor_options = 0 );
 		virtual Cursor* prepareQuery( QuerySchema& query, uint cursor_options = 0 );
 		virtual PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type, 
-			FieldList& fields);
+			FieldList* fields);
 
 	protected:
 		//! Used by Driver
 		OracleConnection(Driver *driver, ConnectionData &conn_data);
 
-		virtual bool drv_connect(KexiDB::ServerVersionInfo& version);
+		virtual bool drv_connect(KexiDB::ServerVersionInfo* version);
 		virtual bool drv_disconnect();
 
 // TODO: Check these
@@ -56,7 +56,7 @@ class OracleConnection : public Connection
 // End check
 
 		virtual bool drv_executeSQL( const QString& statement );
-		virtual Q_ULLONG drv_lastInsertRowID();
+		virtual quint64 drv_lastInsertRecordId();
 
 		virtual int serverResult();
 		virtual QString serverResultName();
@@ -67,16 +67,16 @@ class OracleConnection : public Connection
 		virtual bool drv_databaseExists(const QString &dbName,bool ignoreErrors=true);
 		virtual TransactionData* drv_beginTransaction();
 		virtual bool drv_setAutoCommit(bool on);
-		virtual bool drv_getDatabasesList( QStringList &list );
+		virtual bool drv_getDatabasesList(QStringList* list);
 		virtual bool drv_createTable(const TableSchema& tableSchema);
 		virtual bool drv_afterInsert(const QString& table, FieldList& fields);
 		virtual bool drv_dropTable( const QString& name );
 		virtual bool drv_alterTableName(TableSchema& tableSchema, const QString& newName);
 
 //TODO: move this somewhere to low level class (MIGRATION?)
-		virtual bool drv_getTablesList( QStringList &list );
+		virtual bool drv_getTablesList(QStringList* list);
 //TODO: move this somewhere to low level class (MIGRATION?)
-		virtual bool drv_containsTable( const QString &tableName );
+		virtual bool drv_containsTable(const QString &tableName);
 
 		OracleConnectionInternal *d;
 

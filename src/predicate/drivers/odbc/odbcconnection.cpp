@@ -96,7 +96,7 @@ QByteArray ODBCConnection::escapeString(const QByteArray& str) const
     return str;
 }
 
-bool ODBCConnection::drv_connect(KexiDB::ServerVersionInfo& version)
+bool ODBCConnection::drv_connect(KexiDB::ServerVersionInfo* version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -176,7 +176,7 @@ bool ODBCConnection::drv_executeSQL(const QString& statement)
     return d->executeSQL(statement);
 }
 
-bool ODBCConnection::drv_getTablesList(QStringList &list)
+bool ODBCConnection::drv_getTablesList(QStringList* list)
 {
    ODBCTablesQueryUnit* queryUnit = new ODBCTablesQueryUnit( this );
    Cursor* cursor = new ODBCCursor( this, queryUnit );
@@ -188,7 +188,7 @@ bool ODBCConnection::drv_getTablesList(QStringList &list)
    while ( !cursor->eof() ) {
        // the third column is the table name.
        QString tableName = cursor->value( 2 ).toString();
-       list<<tableName;
+       *list += tableName;
         if (!cursor->moveNext() && cursor->error()) {
             setError(cursor);
             deleteCursor(cursor);
@@ -199,7 +199,7 @@ bool ODBCConnection::drv_getTablesList(QStringList &list)
    return deleteCursor( cursor );
 }
 
-quint64 ODBCConnection::drv_lastInsertRowID()
+quint64 ODBCConnection::drv_lastInsertRecordId()
 {
     // TODO: One huge hack. Will work for mysql ( and perhaps sybase too )
     QString queryToExecute;
@@ -208,12 +208,12 @@ quint64 ODBCConnection::drv_lastInsertRowID()
         queryToExecute = odbcDriver->getQueryForOID();
 
     int rowId;
-    querySingleNumber( queryToExecute , rowId);
+    querySingleNumber(queryToExecute, &rowId);
 
     return rowId;
 }
 
-bool ODBCConnection::drv_getDatabasesList(QStringList &list)
+bool ODBCConnection::drv_getDatabasesList(QStringList* list)
 {
     KexiDBDrvDbg;
     // we return the "Data Sources" list here, actually.
@@ -230,7 +230,7 @@ bool ODBCConnection::drv_getDatabasesList(QStringList &list)
                                              desc, sizeof(desc), &descRet))) {
         direction = SQL_FETCH_NEXT;
         KexiDBDrvDbg << ( const char* )dsn <<" - "<< ( const char* )desc;
-        list << QString::fromLatin1((const char*)dsn);
+        *list += QString::fromLatin1((const char*)dsn);
     }
 
     return true;
@@ -283,7 +283,7 @@ QString ODBCConnection::serverResultName() {
 }
 
 PreparedStatement::Ptr ODBCConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList& fields)
+        FieldList* fields)
 {
     return KSharedPtr<PreparedStatement>(new ODBCPreparedStatement(type, *d, fields));
 }

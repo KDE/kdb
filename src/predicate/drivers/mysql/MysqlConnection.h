@@ -51,9 +51,9 @@ protected:
     /*! Used by driver */
     MysqlConnection(Driver *driver, ConnectionData &conn_data);
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
-    virtual bool drv_getDatabasesList(QStringList &list);
+    virtual bool drv_getDatabasesList(QStringList* list);
     //! reimplemented using "SHOW DATABASES LIKE..." because MySQL stores db names in lower case.
     virtual bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true);
     virtual bool drv_createDatabase(const QString &dbName = QString());
@@ -62,7 +62,7 @@ protected:
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
     virtual bool drv_executeSQL(const QString& statement);
-    virtual quint64 drv_lastInsertRowID();
+    virtual quint64 drv_lastInsertRecordId();
 
     virtual int serverResult();
     virtual QString serverResultName();
@@ -70,7 +70,7 @@ protected:
     virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_getTablesList(QStringList &list);
+    virtual bool drv_getTablesList(QStringList* list);
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 

@@ -40,7 +40,7 @@ xBaseConnection::~xBaseConnection() {
   destroy();
 }
 
-bool xBaseConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool xBaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
   Q_UNUSED(version);
   const bool ok = d->db_connect(*data());
@@ -73,11 +73,12 @@ Cursor* xBaseConnection::prepareQuery( QuerySchema& query, uint cursor_options )
   return new xBaseCursor( this, internalCursor, query, cursor_options );
 }
 
-bool xBaseConnection::drv_getDatabasesList( QStringList &list ) {
+bool xBaseConnection::drv_getDatabasesList(QStringList* list)
+{
   PreDrvDbg;
 
   //! TODO Check whether this is the right thing to do
-  list<<QStringList( d->dbMap.keys() );
+  *list += QStringList( d->dbMap.keys() );
 //        list<<d->internalConn->databaseNames();
   return true;
 }
@@ -115,7 +116,7 @@ bool xBaseConnection::drv_executeSQL( const QString& statement ) {
   return d->executeSQL(statement);
 }
 
-quint64 xBaseConnection::drv_lastInsertRowID()
+quint64 xBaseConnection::drv_lastInsertRecordId()
 {
   //! TODO
   quint64 rowID = -1;
@@ -155,16 +156,16 @@ bool xBaseConnection::drv_containsTable( const QString &tableName )
 {
   bool success;
   // this will be called on the SQLite database
-  return resultExists(QString("show tables like %1")
-    .arg(driver()->escapeString(tableName)), success) && success;
+  return resultExists(QString("SHOW TABLES LIKE %1")
+    .arg(driver()->escapeString(tableName)), &success) && success;
 }
 
-bool xBaseConnection::drv_getTablesList( QStringList &list )
+bool xBaseConnection::drv_getTablesList(QStringList* list)
 {
   if ( !d->internalConn ) {
     return false;
   }
-  list<<d->internalConn->tableNames();
+  *list += d->internalConn->tableNames();
   return true;
 }
 

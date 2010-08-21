@@ -49,16 +49,16 @@ class xBaseConnection : public Connection
     /*! Used by driver */
     xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data );
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo& version);
+    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
-    virtual bool drv_getDatabasesList( QStringList &list );
+    virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase( const QString &dbName = QString() );
     virtual bool drv_useDatabase( const QString &dbName = QString(), bool *cancelled = 0, 
       MessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase( const QString &dbName = QString() );
     virtual bool drv_executeSQL( const QString& statement );
-    virtual quint64 drv_lastInsertRowID();
+    virtual quint64 drv_lastInsertRecordId();
 
     virtual int serverResult();
     virtual QString serverResultName();
@@ -66,9 +66,9 @@ class xBaseConnection : public Connection
     virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_getTablesList( QStringList &list );
+    virtual bool drv_getTablesList(QStringList* list);
 //TODO: move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_containsTable( const QString &tableName );
+    virtual bool drv_containsTable(const QString &tableName);
 
     xBaseConnectionInternal* d;
 

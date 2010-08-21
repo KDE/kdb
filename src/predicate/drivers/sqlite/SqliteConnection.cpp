@@ -86,15 +86,15 @@ SQLiteConnection::~SQLiteConnection()
     PreDrvDbg << "ok";
 }
 
-bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
-    version.string = QString(SQLITE_VERSION); //defined in sqlite3.h
+    version->string = QString(SQLITE_VERSION); //defined in sqlite3.h
     QRegExp re("(\\d+)\\.(\\d+)\\.(\\d+)");
-    if (re.exactMatch(version.string)) {
-        version.major = re.cap(1).toUInt();
-        version.minor = re.cap(2).toUInt();
-        version.release = re.cap(3).toUInt();
+    if (re.exactMatch(version->string)) {
+        version->major = re.cap(1).toUInt();
+        version->minor = re.cap(2).toUInt();
+        version->release = re.cap(3).toUInt();
     }
     return true;
 }
@@ -105,32 +105,32 @@ bool SQLiteConnection::drv_disconnect()
     return true;
 }
 
-bool SQLiteConnection::drv_getDatabasesList(QStringList &list)
+bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 {
     //this is one-db-per-file database
-    list.append(data()->fileName());   //more consistent than dbFileName() ?
+    list->append(data()->fileName());   //more consistent than dbFileName() ?
     return true;
 }
 
 bool SQLiteConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("select name from sqlite_master where type='table' and name LIKE %1")
-                        .arg(driver()->escapeString(tableName)), success) && success;
+    return resultExists(QString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
+                        .arg(driver()->escapeString(tableName)), &success) && success;
 }
 
-bool SQLiteConnection::drv_getTablesList(QStringList &list)
+bool SQLiteConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
-    m_sql = "select lower(name) from sqlite_master where type='table'";
+    m_sql = "SELECT lower(name) FROM sqlite_master WHERE type='table'";
     if (!(cursor = executeQuery(m_sql))) {
         PreWarn << "!executeQuery()";
         return false;
     }
-    list.clear();
+    list->clear();
     cursor->moveFirst();
     while (!cursor->eof() && !cursor->error()) {
-        list += cursor->value(0).toString();
+        *list += cursor->value(0).toString();
         cursor->moveNext();
     }
     if (cursor->error()) {
@@ -318,7 +318,7 @@ bool SQLiteConnection::drv_executeSQL(const QString& statement)
     return d->res == SQLITE_OK;
 }
 
-quint64 SQLiteConnection::drv_lastInsertRowID()
+quint64 SQLiteConnection::drv_lastInsertRecordId()
 {
     return (quint64)sqlite3_last_insert_rowid(d->data);
 }

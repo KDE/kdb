@@ -99,7 +99,7 @@ QString pqxxSqlConnection::escapeName(const QString &name) const
 //==================================================================================
 //Made this a noop
 //We tell kexi we are connected, but we wont actually connect until we use a database!
-bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo& version)
+bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
     version.clear();
@@ -121,7 +121,7 @@ bool pqxxSqlConnection::drv_disconnect()
 
 //==================================================================================
 //Return a list of database names
-bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
+bool pqxxSqlConnection::drv_getDatabasesList(QStringList* list)
 {
 // PreDrvDbg;
 
@@ -131,7 +131,7 @@ bool pqxxSqlConnection::drv_getDatabasesList(QStringList &list)
             // Read value of column 0 into a string N
             c[0].to(N);
             // Copy the result into the return list
-            list << QString::fromLatin1(N.c_str());
+            *list += QString::fromLatin1(N.c_str());
         }
         return true;
     }
@@ -305,7 +305,7 @@ bool pqxxSqlConnection::drv_isDatabaseUsed() const
 
 //==================================================================================
 //Return the oid of the last insert - only works if sql was insert of 1 row
-quint64 pqxxSqlConnection::drv_lastInsertRowID()
+quint64 pqxxSqlConnection::drv_lastInsertRecordId()
 {
     if (d->res) {
         pqxx::oid theOid = d->res->inserted_oid();
@@ -323,22 +323,22 @@ quint64 pqxxSqlConnection::drv_lastInsertRowID()
 bool pqxxSqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("select 1 from pg_class where relkind='r' and relname LIKE %1")
+        return resultExists(QString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
                         .arg(driver()->escapeString(tableName)), success) && success;
 }
 
-bool pqxxSqlConnection::drv_getTablesList(QStringList &list)
+bool pqxxSqlConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
-    m_sql = "select lower(relname) from pg_class where relkind='r'";
+    m_sql = "SELECT lower(relname) FROM pg_class WHERE relkind='r'";
     if (!(cursor = executeQuery(m_sql))) {
         PreDrvWarn << "pqxxSqlConnection::drv_getTablesList(): !executeQuery()";
         return false;
     }
-    list.clear();
+    list->clear();
     cursor->moveFirst();
     while (!cursor->eof() && !cursor->error()) {
-        list += cursor->value(0).toString();
+        *list += cursor->value(0).toString();
         cursor->moveNext();
     }
     if (cursor->error()) {
