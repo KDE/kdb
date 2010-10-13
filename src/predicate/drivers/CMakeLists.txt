@@ -7,11 +7,11 @@ endif(COMMAND cmake_policy)
 
 set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
 
-# find sqlite:
-set(SQLITE_RECOMMENDED_VERSION "3.6.23")
+# find SQLite:
+set(SQLITE_RECOMMENDED_VERSION "3.7.3")
 find_package(Sqlite 3.6.16)
 macro_log_feature(SQLITE_FOUND "SQLite" "Embedded SQL database engine" "http://www.sqlite.org"
-                    TRUE ${SQLITE_MIN_VERSION} "Required for Predicate's default database driver.")
+                  TRUE ${SQLITE_MIN_VERSION} "Required for Predicate's default database driver.")
 if(NOT SQLITE_FOUND)
     message(FATAL_ERROR "Required package SQLite NOT found")
 else(NOT SQLITE_FOUND)
