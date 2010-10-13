@@ -34,8 +34,7 @@ public:
     SQLiteConnectionInternal(Connection* connection);
     virtual ~SQLiteConnectionInternal();
 
-    //! stores last result's message
-    virtual void storeResult();
+    virtual void storeResult() {}
 
     static QString serverResultName(int serverResultCode);
 
