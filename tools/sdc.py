@@ -78,6 +78,7 @@ shared_class_inserted = False
 data_class_ctor = ''
 data_class_copy_ctor = ''
 data_class_members = ''
+members_list = []
 data_accesors = ''
 protected_data_accesors = ''
 main_ctor = ''
@@ -139,10 +140,41 @@ QMap<QString, QString> %s::Data::toMap() const
     outfile_sdc.close()
 
 """
+    Inserts generated operator==() code for shared class into the output.
+"""
+def insert_operator_eq():
+    global outfile, shared_class_name
+    outfile.write("""    bool operator==(const %s& other) const {
+        return *d == *other.d;
+    }
+""" % shared_class_name)
+
+"""
+    Inserts generated Data::operator==() code into the output.
+"""
+def insert_data_operator_eq():
+    global outfile, members_list
+    outfile.write("""        bool operator==(const Data& other) const {
+""")
+    outfile.write("            return ")
+    first = True;
+    space = ""
+    for member in members_list:
+        outfile.write("""%s%s == other.%s""" % (space, member, member))
+        if first:
+            first = False
+            space = """
+                && """
+    outfile.write(""";
+        }
+
+""")
+
+"""
     Inserts generated code into the output.
 """
 def insert_generated_code():
-    global infile, outfile, generated_code_inserted, data_class_ctor, data_class_copy_ctor, data_class_members, data_accesors, protected_data_accesors, main_ctor, shared_class_name
+    global infile, outfile, generated_code_inserted, data_class_ctor, data_class_copy_ctor, data_class_members, data_accesors, protected_data_accesors, main_ctor, shared_class_name, shared_class_options
     if generated_code_inserted:
         return;
     #print "--------insert_generated_code--------"
@@ -163,12 +195,17 @@ def insert_generated_code():
         QMap<QString, QString> toMap() const;
 
 """)
+    if shared_class_options['operator==']:
+        insert_data_operator_eq()
+
     outfile.write(data_class_members)
     outfile.write(main_ctor)
     outfile.write(data_accesors)
     outfile.write("\n")
     if shared_class_options['with_from_to_map']:
         insert_fromMap_toMap_methods()
+    if shared_class_options['operator==']:
+        insert_operator_eq()
     if protected_data_accesors:
         outfile.write("protected:")
         outfile.write(protected_data_accesors)
@@ -380,7 +417,7 @@ def get_pos_for_QSharedData_h():
     return last_include
 
 def process():
-    global infile, outfile, generated_code_inserted, data_class_ctor, data_class_copy_ctor, shared_class_name, shared_class_options, shared_class_inserted, data_class_members, data_accesors, member, main_ctor, toMap_impl, fromMap_impl
+    global infile, outfile, generated_code_inserted, data_class_ctor, data_class_copy_ctor, shared_class_name, shared_class_options, shared_class_inserted, data_class_members, members_list, data_accesors, member, main_ctor, toMap_impl, fromMap_impl
     outfile.write(warningHeader())
 
     member = {}
@@ -415,6 +452,7 @@ def process():
             data_class_ctor = ''
             data_class_copy_ctor = ''
             data_class_members = ''
+            members_list = []
             data_accesors = ''
             protected_data_accesors = ''
             toMap_impl = ''
@@ -426,6 +464,7 @@ def process():
             # output: class <EXPORT> <NAME>
             export = param(lst, 'export')
             inherits = param(lst, 'inherits')
+            lst = get_shared_class_option(lst, 'operator==')
             lst = get_shared_class_option(lst, 'with_from_to_map')
             lst = get_shared_class_option_with_value(lst, 'namespace')
             shared_class_name = lst[-1]
@@ -509,6 +548,7 @@ def process():
                 member['access'] = 'public'
             member['type'] = lst[1]
             member['name'] = lst[2]
+            members_list.append(member['name']);
             member['default'] = param(lst, 'default')
             member['default_setter'] = param(lst, 'default_setter')
             member['no_getter'] = param_exists(lst, 'no_getter')
