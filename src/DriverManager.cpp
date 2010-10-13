@@ -128,7 +128,12 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
                 << "version: found version" << info.version() << "expected version" << expectedVersion
                 << "-- skipping this one";
         }
-        info.setAbsoluteFilePath( pluginsDir + '/' + config.value("FileName").toString() );
+#ifdef Q_OS_WIN
+        QString suffix = ".dll";
+#else
+        QString suffix = ".so";
+#endif
+        info.setAbsoluteFilePath( pluginsDir + "/predicate_" + config.value("Name").toString() + suffix );
         info.setCaption( config.value("Caption").toString() );
 //! @todo read translated [..]
         info.setComment( config.value("Comment").toString() );
@@ -281,8 +286,11 @@ Driver* DriverManagerInternal::driver(const QString& name)
     PreDbg << "loading" << name;
 
     Driver *drv = 0;
-    if (!name.isEmpty())
-        drv = m_drivers.value(name.toLower())->data();
+    if (!name.isEmpty()) {
+        QSharedPointer<Driver> *dp = m_drivers.value(name.toLower());
+        if (dp && !dp->isNull())
+            drv = dp->data();
+    }
     if (drv)
         return drv; //cached
 
@@ -294,13 +302,16 @@ Driver* DriverManagerInternal::driver(const QString& name)
     const DriverInfo info(m_driversInfo.value(name.toLower()));
 
     QString libFileName(info.absoluteFilePath());
-#if defined Q_WS_WIN && (defined(_DEBUG) || defined(DEBUG))
+#if defined Q_OS_WIN && (defined(_DEBUG) || defined(DEBUG))
     libFileName += "_d";
 #endif
     QLibrary lib(libFileName);
     LibUnloader unloader(&lib);
+    qDebug() << libFileName;
     if (!lib.load()) {
         m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(name));
+        m_result.setServerMessage(lib.errorString());
+        qDebug() << lib.errorString();
         return 0;
     }
     
@@ -315,7 +326,6 @@ Driver* DriverManagerInternal::driver(const QString& name)
                          .arg("version_minor").arg(name));
        return 0;
     }
-    lib.unload();
     if (!Predicate::version().matches(*foundMajor, *foundMinor)) {
         m_result = Result(ERR_INCOMPAT_DRIVER_VERSION,
             QObject::tr("Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
@@ -325,11 +335,14 @@ Driver* DriverManagerInternal::driver(const QString& name)
             );
         return 0;
     }
+    lib.unload();
 
     QPluginLoader loader(libFileName);
-    drv = qobject_cast<Driver*>(loader.instance());
+    drv = dynamic_cast<Driver*>(loader.instance());
     if (!drv) {
         m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
+        m_result.setServerMessage(loader.errorString());
+        qDebug() << loader.instance() << loader.errorString();
 //! @todo
 /*        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
             m_componentLoadingErrors[KLibLoader::ErrNoServiceFound] = "ErrNoServiceFound";

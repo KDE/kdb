@@ -63,7 +63,8 @@ qt_wrap_cpp(predicate_sqlite3 predicate_sqlite3_SRCS ${predicate_sqlite3_MOC_SRC
 
 add_library(predicate_sqlite3 SHARED ${predicate_sqlite3_SRCS})
 
-target_link_libraries(predicate_sqlite3 ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} predicate )
+target_link_libraries(predicate_sqlite3 ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} ${SQLITE_LIBRARIES} predicate)
+set_target_properties(predicate_sqlite3 PROPERTIES PREFIX "")
 
 install(TARGETS predicate_sqlite3 DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_sqlite3.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
