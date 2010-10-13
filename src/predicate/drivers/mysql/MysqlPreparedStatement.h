@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,8 +23,7 @@
 #include <Predicate/Interfaces/PreparedStatementInterface.h>
 #include "MysqlConnection_p.h"
 
-//todo 1.1 - unfinished: #define PREDICATE_USE_MYSQL_STMT
-// for 1.0 we're using unoptimized version
+//! @todo 1.1 - unfinished: #define PREDICATE_USE_MYSQL_STMT; for 1.0 we're using unoptimized version
 
 namespace Predicate
 {
@@ -33,7 +32,7 @@ namespace Predicate
 class MysqlPreparedStatement : public PreparedStatementInterface, public MysqlConnectionInternal
 {
 public:
-    MysqlPreparedStatement(ConnectionInternal& conn);
+    MysqlPreparedStatement(ConnectionInternal* conn);
 
     virtual ~MysqlPreparedStatement();
 
@@ -43,7 +42,7 @@ protected:
     virtual bool execute(
         PreparedStatement::Type type,
         const Field::List& fieldList,
-        const PreparedStatement::Arguments &args);
+        const PreparedStatementParameters& parameters);
 
     bool init();
     void done();

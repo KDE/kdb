@@ -33,9 +33,9 @@ class SybaseCursor: public Cursor
 public:
     SybaseCursor(Connection* conn, const QString& statement = QString(),
                  uint cursor_options = NoOptions);
-    SybaseCursor(Connection* conn, QuerySchema& query, uint options = NoOptions);
+    SybaseCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
     virtual ~SybaseCursor();
-    virtual bool drv_open();
+    virtual bool drv_open(const QString& sql);
     virtual bool drv_close();
 //   virtual bool drv_moveFirst();
     virtual void drv_getNextRecord();
@@ -51,9 +51,8 @@ public:
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
 //   virtual bool save(RecordData& data, RowEditBuffer& buf);
 
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
 
 protected:
     QVariant pValue(uint pos) const;

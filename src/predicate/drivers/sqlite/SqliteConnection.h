@@ -20,12 +20,9 @@
 #ifndef PREDICATE_CONN_SQLITE_H
 #define PREDICATE_CONN_SQLITE_H
 
-#include <qstringlist.h>
+#include <QStringList>
 
 #include <Predicate/Connection.h>
-
-/*!
- */
 
 namespace Predicate
 {
@@ -33,16 +30,14 @@ namespace Predicate
 class SQLiteConnectionInternal;
 class Driver;
 
-//! sqlite-specific connection
+//! SQLite-specific connection
 class SQLiteConnection : public Connection
 {
-    Q_OBJECT
-
 public:
     virtual ~SQLiteConnection();
 
     virtual Cursor* prepareQuery(const QString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
 
@@ -51,7 +46,7 @@ public:
 
 protected:
     /*! Used by driver */
-    SQLiteConnection(Driver *driver, ConnectionData &conn_data);
+    SQLiteConnection(Driver *driver, const ConnectionData& connData);
 
     virtual bool drv_connect(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
@@ -89,10 +84,11 @@ protected:
 
     virtual quint64 drv_lastInsertRecordId();
 
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
-    virtual void drv_clearServerResult();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
+
+    void storeResult();
+
     virtual tristate drv_changeFieldProperty(TableSchema &table, Field& field,
             const QString& propertyName, const QVariant& value);
 

@@ -418,6 +418,11 @@ Result DriverManager::result() const {
     return s_self->result();
 }
 
+const Resultable& DriverManager::resultable() const
+{
+    return static_cast<const Resultable&>(*s_self);
+}
+
 DriverInfoMap DriverManager::driversInfo()
 {
     if (!s_self->lookupDrivers())

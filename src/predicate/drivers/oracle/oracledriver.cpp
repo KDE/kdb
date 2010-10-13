@@ -84,9 +84,9 @@ OracleDriver::~OracleDriver()
 /**
  * Creates a new connection.
  */
-KexiDB::Connection* OracleDriver::drv_createConnection(ConnectionData & conn_data)
+KexiDB::Connection* OracleDriver::drv_createConnection(const ConnectionData& connData)
 {
-	return new OracleConnection(this, conn_data);
+	return new OracleConnection(this, connData);
 }
 
 /**

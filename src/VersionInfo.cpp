@@ -34,6 +34,12 @@ ServerVersionInfo::~ServerVersionInfo()
 {
 }
 
+bool ServerVersionInfo::isNull() const
+{
+//TODO add this to SDC:        bool operator==(const Data& other) const { return false; }
+    *d.data() == Data();
+};
+
 //------------------------
 
 DatabaseVersionInfo::~DatabaseVersionInfo()
@@ -44,4 +50,9 @@ PREDICATE_EXPORT DatabaseVersionInfo Predicate::version()
 {
     return Predicate::DatabaseVersionInfo(
         PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE);
+}
+
+bool DatabaseVersionInfo::isNull() const
+{
+    *this == DatabaseVersionInfo();
 }

@@ -52,7 +52,7 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual Connection *drv_createConnection(ConnectionData &conn_data);
+    virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n) const;
     virtual QString addLimitTo1(const QString& sql, bool add);
 

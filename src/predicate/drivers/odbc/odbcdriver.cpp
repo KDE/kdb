@@ -171,10 +171,9 @@ ODBCDriver::~ODBCDriver()
 }
 
 KexiDB::Connection*
-ODBCDriver::drv_createConnection(ConnectionData &conn_data)
+ODBCDriver::drv_createConnection(const ConnectionData& connData)
 {
-    KexiDB::Connection* connection = new ODBCConnection(this, conn_data);
-    return connection;
+    return new ODBCConnection(this, connData);
 }
 
 bool ODBCDriver::isSystemDatabaseName(const QString&  name) const

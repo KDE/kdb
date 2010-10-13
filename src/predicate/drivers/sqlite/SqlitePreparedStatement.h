@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -28,15 +28,12 @@ namespace Predicate
 class Field;
 
 /*! Implementation of prepared statements for the SQLite driver. */
-class SQLitePreparedStatement : public PreparedStatementInterface, SQLiteConnectionInternal
+class SQLitePreparedStatement : public PreparedStatementInterface, public SQLiteConnectionInternal
 {
 public:
-    SQLitePreparedStatement(ConnectionInternal& conn);
+    explicit SQLitePreparedStatement(ConnectionInternal* conn);
 
     virtual ~SQLitePreparedStatement();
-
-    sqlite3_stmt *prepared_st_handle;
-    bool m_resetRequired;
 
 protected:
     virtual bool prepare(const QByteArray& statement);
@@ -44,9 +41,12 @@ protected:
     virtual bool execute(
         PreparedStatement::Type type,
         const Field::List& fieldList,
-        const PreparedStatement::Arguments &args);
+        const PreparedStatementParameters& parameters);
 
     bool bindValue(Field *field, const QVariant& value, int arg);
+
+    sqlite3_stmt *m_handle;
+    bool m_resetRequired;
 };
 
 }

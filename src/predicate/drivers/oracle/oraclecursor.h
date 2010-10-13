@@ -30,9 +30,9 @@ class OracleCursorData;
 class OracleCursor: public Cursor {
 public:
 	OracleCursor(Connection* conn, const QString& statement = QString(), uint cursor_options = NoOptions );
-	OracleCursor(Connection* conn, QuerySchema& query, uint options = NoOptions );
+	OracleCursor(Connection* conn, QuerySchema* query, uint options = NoOptions );
 	virtual ~OracleCursor();
-	virtual bool drv_open();
+	virtual bool drv_open(const QString& sql);
 	virtual bool drv_close();
   virtual bool moveFirst();
 	virtual void drv_getNextRecord();
@@ -48,9 +48,8 @@ public:
 	virtual bool drv_storeCurrentRecord(RecordData* data) const;
 //        virtual bool save(RowData& data, RowEditBuffer& buf);
 
-	virtual int serverResult();
-	virtual QString serverResultName();
-	virtual QString serverErrorMsg();
+    //! Implemented for Resultable
+	virtual QString serverResultName() const;
 
 protected:
 	QVariant pValue(uint pos) const;

@@ -95,9 +95,9 @@ SybaseDriver::~SybaseDriver()
 }
 
 Predicate::Connection*
-SybaseDriver::drv_createConnection(ConnectionData &conn_data)
+SybaseDriver::drv_createConnection(const ConnectionData& connData)
 {
-    return new SybaseConnection(this, conn_data);
+    return new SybaseConnection(this, connData);
 }
 
 bool SybaseDriver::isSystemDatabaseName(const QString &n) const

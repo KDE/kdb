@@ -25,44 +25,46 @@
 
 using namespace Predicate;
 
-SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal& conn)
+SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal* conn)
         : PreparedStatementInterface()
-        , SQLiteConnectionInternal(conn.connection)
-        , prepared_st_handle(0)
+        , SQLiteConnectionInternal(conn->connection)
+        , m_handle(0)
         , m_resetRequired(false)
 {
     data_owned = false;
-    data = dynamic_cast<SQLiteConnectionInternal&>(conn).data; //copy
+    data = dynamic_cast<SQLiteConnectionInternal&>(*conn).data; //copy
 }
 
 SQLitePreparedStatement::~SQLitePreparedStatement()
 {
-    sqlite3_finalize(prepared_st_handle);
-    prepared_st_handle = 0;
+    sqlite3_finalize(m_handle);
+    m_handle = 0;
 }
 
 bool SQLitePreparedStatement::prepare(const QByteArray& statement)
 {
-    res = sqlite3_prepare(
-              data, /* Database handle */
-              temp_st, //const char *zSql,       /* SQL statement, UTF-8 encoded */
-              temp_st.length(), //int nBytes,             /* Length of zSql in bytes. */
-              &prepared_st_handle, //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-              0 //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
-          );
-    if (SQLITE_OK == res)
+    m_result.setServerResultCode(
+        sqlite3_prepare(
+            data,                  /* Database handle */
+            statement,             //const char *zSql,       /* SQL statement, UTF-8 encoded */
+            statement.length(),    //int nBytes,             /* Length of zSql in bytes. */
+            &m_handle,   //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
+            0                      //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+        )
+    );
+    return m_result.serverResultCode() == SQLITE_OK;
         return true;
 
 //! @todo copy error msg
     return false;
 }
 
-bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int arg)
+bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int par)
 {
     if (value.isNull()) {
         //no value to bind or the value is null: bind NULL
-        res = sqlite3_bind_null(prepared_st_handle, arg);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -71,9 +73,10 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
     if (field->isTextType()) {
         //! @todo optimize: make a static copy so SQLITE_STATIC can be used
         const QByteArray utf8String(value.toString().toUtf8());
-        res = sqlite3_bind_text(prepared_st_handle, arg,
-                                (const char*)utf8String, utf8String.length(), SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_text(m_handle, par,
+                              (const char*)utf8String, utf8String.length(), SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -88,14 +91,14 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         bool ok;
         const int intValue = value.toInt(&ok);
         if (ok) {
-            res = sqlite3_bind_int(prepared_st_handle, arg, intValue);
-            if (SQLITE_OK != res) {
+            m_result.setServerResultCode(sqlite3_bind_int(m_handle, par, intValue));
+            if (SQLITE_OK != m_result.serverResultCode()) {
                 //! @todo msg?
                 return false;
             }
         } else {
-            res = sqlite3_bind_null(prepared_st_handle, arg);
-            if (SQLITE_OK != res) {
+            m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
+            if (SQLITE_OK != m_result.serverResultCode()) {
                 //! @todo msg?
                 return false;
             }
@@ -104,8 +107,8 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
     }
     case Field::Float:
     case Field::Double:
-        res = sqlite3_bind_double(prepared_st_handle, arg, value.toDouble());
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(sqlite3_bind_double(m_handle, par, value.toDouble()));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -115,14 +118,14 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         bool ok;
         const qint64 int64Value = value.toLongLong(&ok);
         if (ok) {
-            res = sqlite3_bind_int64(prepared_st_handle, arg, int64Value);
-            if (SQLITE_OK != res) {
+            m_result.setServerResultCode(sqlite3_bind_int64(m_handle, par, int64Value));
+            if (SQLITE_OK != m_result.serverResultCode()) {
                 //! @todo msg?
                 return false;
             }
         } else {
-            res = sqlite3_bind_null(prepared_st_handle, arg);
-            if (SQLITE_OK != res) {
+            m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
+            if (SQLITE_OK != m_result.serverResultCode()) {
                 //! @todo msg?
                 return false;
             }
@@ -130,46 +133,50 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         break;
     }
     case Field::Boolean:
-        res = sqlite3_bind_text(prepared_st_handle, arg,
-                                QString::number(value.toBool() ? 1 : 0).toLatin1(),
-                                1, SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_text(m_handle, par, value.toBool() ? "1" : "0",
+                              1, SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
         break;
     case Field::Time:
-        res = sqlite3_bind_text(prepared_st_handle, arg,
-                                value.toTime().toString(Qt::ISODate).toLatin1(),
-                                sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_text(m_handle, par,
+                              value.toTime().toString(Qt::ISODate).toLatin1(),
+                              sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
         break;
     case Field::Date:
-        res = sqlite3_bind_text(prepared_st_handle, arg,
-                                value.toDate().toString(Qt::ISODate).toLatin1(),
-                                sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_text(m_handle, par,
+                              value.toDate().toString(Qt::ISODate).toLatin1(),
+                              sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
         break;
     case Field::DateTime:
-        res = sqlite3_bind_text(prepared_st_handle, arg,
-                                value.toDateTime().toString(Qt::ISODate).toLatin1(),
-                                sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_text(m_handle, par,
+                              value.toDateTime().toString(Qt::ISODate).toLatin1(),
+                              sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
         break;
     case Field::BLOB: {
         const QByteArray byteArray(value.toByteArray());
-        res = sqlite3_bind_blob(prepared_st_handle, arg,
-                                (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(
+            sqlite3_bind_blob(m_handle, par,
+                              byteArray.constData(), byteArray.size(), SQLITE_TRANSIENT /*??*/));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -177,9 +184,9 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
     }
     default:
         PreWarn << "unsupported field type:"
-            << field->type() << "- NULL value bound to column #" << arg;
-        res = sqlite3_bind_null(prepared_st_handle, arg);
-        if (SQLITE_OK != res) {
+            << field->type() << "- NULL value bound to column #" << par;
+        m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -190,13 +197,13 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
 bool SQLitePreparedStatement::execute(
     PreparedStatement::Type type,
     const Field::List& fieldList,
-    const PreparedStatement::Arguments &args)
+    const PreparedStatementParameters& parameters)
 {
-    if (!prepared_st_handle)
+    if (!m_handle)
         return false;
     if (m_resetRequired) {
-        res = sqlite3_reset(prepared_st_handle);
-        if (SQLITE_OK != res) {
+        m_result.setServerResultCode(sqlite3_reset(m_handle));
+        if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
@@ -215,21 +222,21 @@ bool SQLitePreparedStatement::execute(
         assert(0); //impl. error
     */
 
-    int arg = 1; //arg index counted from 1
+    int par = 1; // par.index counted from 1
     Field::ListIterator itFields(fieldList.constBegin());
-    for (QList<QVariant>::ConstIterator it = args.constBegin();
-            itFields != fieldList.constEnd(); ++it, ++itFields, arg++) {
-        if (!bindValue(*itFields, it == args.constEnd() ? QVariant() : *it, arg))
+    for (QList<QVariant>::ConstIterator it = parameters.constBegin();
+            itFields != fieldList.constEnd(); ++it, ++itFields, par++) {
+        if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))
             return false;
     }
 
     //real execution
-    res = sqlite3_step(prepared_st_handle);
+    m_result.setServerResultCode(sqlite3_step(m_handle));
     m_resetRequired = true;
-    if (type == PreparedStatement::Insert && res == SQLITE_DONE) {
+    if (type == PreparedStatement::InsertStatement && SQLITE_DONE == m_result.serverResultCode()) {
         return true;
     }
-    if (type == PreparedStatement::Select) {
+    if (type == PreparedStatement::SelectStatement) {
         //fetch result
 
         //todo

@@ -97,7 +97,7 @@ Field::Type Predicate::defaultTypeForGroup(Field::TypeGroup typeGroup)
     return (typeGroup <= Field::LastTypeGroup) ? Predicate_typeCache->def_tlist.value(typeGroup) : Field::InvalidType;
 }
 
-void Predicate::getHTMLErrorMesage(const Result& result, QString& msg, QString &details)
+void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg, QString &details)
 {
 /*    Connection *conn = 0;
     if (!obj || !obj->error()) {
@@ -111,6 +111,7 @@ void Predicate::getHTMLErrorMesage(const Result& result, QString& msg, QString &
 // if (dynamic_cast<Connection*>(obj)) {
     // conn = dynamic_cast<Connection*>(obj);
     //}
+    const Result result(resultable.result());
     if (!result.isError())
         return;
     //lower level message is added to the details, if there is alread message specified
@@ -130,11 +131,11 @@ void Predicate::getHTMLErrorMesage(const Result& result, QString& msg, QString &
     QString serverResultName;
     if (result.serverResultCode() != 0) {
         serverResultCode = result.serverResultCode();
-        serverResultName = result.serverResultName();
-    } else {
+        serverResultName = resultable.serverResultName();
+    } /*else {
         serverResultCode = result.previousServerResultCode();
         serverResultName = result.previousServerResultName();
-    }
+    }*/
     if (   !details.isEmpty()
         && (   !result.serverMessage().isEmpty()
             || !result.recentSQLString().isEmpty()
@@ -159,14 +160,14 @@ void Predicate::getHTMLErrorMesage(const Result& result, QString& msg, QString &
     }
 }
 
-void Predicate::getHTMLErrorMesage(const Result& result, QString& msg)
+void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg)
 {
-    getHTMLErrorMesage(result, msg, msg);
+    getHTMLErrorMesage(resultable, msg, msg);
 }
 
-void Predicate::getHTMLErrorMesage(const Result& result, ResultInfo *info)
+void Predicate::getHTMLErrorMesage(const Resultable& resultable, ResultInfo *info)
 {
-    getHTMLErrorMesage(result, info->msg, info->desc);
+    getHTMLErrorMesage(resultable, info->msg, info->desc);
 }
 
 int Predicate::idForObjectName(Connection &conn, const QString& objName, int objType)
@@ -327,16 +328,16 @@ ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const Conn
     DriverManager manager;
     m_driver = manager.driver(m_connData.driverName());
     if (manager.result().isError()) {
-        emitError(manager.result());
+        emitError(manager.resultable());
         m_driver = 0;
     }
 }
 
-void ConnectionTestThread::emitError(const Result& result)
+void ConnectionTestThread::emitError(const Resultable& resultable)
 {
     QString msg;
     QString details;
-    Predicate::getHTMLErrorMesage(result, msg, details);
+    Predicate::getHTMLErrorMesage(resultable, msg, details);
     emit error(msg, details);
 }
 
@@ -348,12 +349,12 @@ void ConnectionTestThread::run()
     std::auto_ptr<Connection> conn(m_driver->createConnection(m_connData));
     if (!conn.get() || m_driver->result().isError()) {
         //kDebug() << "err 1";
-        emitError(m_driver->result());
+        emitError(*m_driver);
         return;
     }
     if (!conn.get()->connect() || conn.get()->result().isError()) {
         //kDebug() << "err 2";
-        emitError(conn.get()->result());
+        emitError(*conn.get());
         return;
     }
     // SQL database backends like PostgreSQL require executing "USE database"
@@ -361,11 +362,11 @@ void ConnectionTestThread::run()
     QString tmpDbName;
     if (!conn->useTemporaryDatabaseIfNeeded(&tmpDbName)) {
         //kDebug() << "err 3";
-        emitError(conn.get()->result());
+        emitError(*conn.get());
         return;
     }
     //kDebug() << "emitError(0)";
-    emitError(Result());
+    emitError(Resultable());
 }
 
 ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,

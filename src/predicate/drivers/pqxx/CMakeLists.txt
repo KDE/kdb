@@ -24,8 +24,14 @@ set(predicate_pqxx_SRCS
    PqxxConnection.cpp 
    PqxxKeywords.cpp 
    PqxxConnection_p.cpp 
-   PqxxPreparedStatement.cpp )
+   PqxxPreparedStatement.cpp
+)
 
+set(predicate_pqxx_MOC_SRCS
+   PqxxDriver.h
+)
+
+qt_wrap_cpp(predicate_pqxx predicate_pqxx_SRCS ${predicate_pqxx_MOC_SRCS})
 
 add_library(predicate_pqxx SHARED ${predicate_pqxx_SRCS})
 

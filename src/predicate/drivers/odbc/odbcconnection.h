@@ -36,8 +36,6 @@ class ODBCConnectionInternal;
 
 class ODBCConnection : public Connection
 {
-    Q_OBJECT
-
 public:
     ~ODBCConnection();
 
@@ -47,7 +45,7 @@ public:
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
     virtual QString escapeString(const QString& str) const;
     virtual QByteArray escapeString(const QByteArray& str) const;
-    virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options);
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options);
 
     PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type,
 							    FieldList* fields);
@@ -61,12 +59,12 @@ public:
     //! Sets the native error code returned by the server
     virtual int serverResult();
 
-    //! Sets the ODBC error code :)
-    virtual QString serverResultName();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
 
 protected:
     /*! Used by driver */
-    ODBCConnection(Driver *driver,  ConnectionData &conn_data);
+    ODBCConnection(Driver *driver, const ConnectionData& connData);
 
     virtual bool drv_connect(KexiDB::ServerVersionInfo* version);
 

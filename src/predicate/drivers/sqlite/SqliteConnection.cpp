@@ -45,9 +45,6 @@ SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
         : ConnectionInternal(connection)
         , data(0)
         , data_owned(true)
-        , errmsg_p(0)
-        , res(SQLITE_OK)
-        , result_name(0)
 {
 }
 
@@ -59,19 +56,51 @@ SQLiteConnectionInternal::~SQLiteConnectionInternal()
     }
 }
 
-void SQLiteConnectionInternal::storeResult()
+static const char* serverResultNames[] = {
+    "SQLITE_OK", // 0
+    "SQLITE_ERROR",
+    "SQLITE_INTERNAL",
+    "SQLITE_PERM",
+    "SQLITE_ABORT",
+    "SQLITE_BUSY",
+    "SQLITE_LOCKED",
+    "SQLITE_NOMEM",
+    "SQLITE_READONLY",
+    "SQLITE_INTERRUPT",
+    "SQLITE_IOERR",
+    "SQLITE_CORRUPT",
+    "SQLITE_NOTFOUND",
+    "SQLITE_FULL",
+    "SQLITE_CANTOPEN",
+    "SQLITE_PROTOCOL",
+    "SQLITE_EMPTY",
+    "SQLITE_SCHEMA",
+    "SQLITE_TOOBIG",
+    "SQLITE_CONSTRAINT",
+    "SQLITE_MISMATCH",
+    "SQLITE_MISUSE",
+    "SQLITE_NOLFS",
+    "SQLITE_AUTH",
+    "SQLITE_FORMAT",
+    "SQLITE_RANGE",
+    "SQLITE_NOTADB", // 26
+};
+
+// static
+QString SQLiteConnectionInternal::serverResultName(int serverResultCode)
 {
-    if (errmsg_p) {
-        errmsg = errmsg_p;
-        sqlite3_free(errmsg_p);
-        errmsg_p = 0;
-    }
-    errmsg = (data && res != SQLITE_OK) ? sqlite3_errmsg(data) : 0;
+    if (serverResultCode >= 0 && serverResultCode <= SQLITE_NOTADB)
+        return QString::fromLatin1(serverResultNames[serverResultCode]);
+    else if (serverResultCode == SQLITE_ROW)
+        return QLatin1String("SQLITE_ROW");
+    else if (serverResultCode == SQLITE_DONE)
+        return QLatin1String("SQLITE_DONE");
+    return QString();
 }
 
 /*! Used by driver */
-SQLiteConnection::SQLiteConnection(Driver *driver, ConnectionData &conn_data)
-        : Connection(driver, conn_data)
+SQLiteConnection::SQLiteConnection(Driver *driver, const ConnectionData& connData)
+        : Connection(driver, connData)
         , d(new SQLiteConnectionInternal(this))
 {
 }
@@ -84,6 +113,12 @@ SQLiteConnection::~SQLiteConnection()
     destroy();
     delete d;
     PreDrvDbg << "ok";
+}
+
+void SQLiteConnection::storeResult()
+{
+    m_result.setServerMessage(
+        QLatin1String( (d->data && m_result.serverResultCode() != SQLITE_OK) ? sqlite3_errmsg(d->data) : 0 ));
 }
 
 bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo* version)
@@ -172,29 +207,33 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 //    int allowReadonly = 1;
 //    const bool wasReadOnly = Connection::isReadOnly();
 
-    d->res = sqlite3_open_v2(
+    m_result.setServerResultCode(
+        sqlite3_open_v2(
                  //QFile::encodeName( data()->fileName() ),
                  data().fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
                  0
-             );
-    d->storeResult();
+             )
+    );
+    storeResult();
 
-    if (d->res == SQLITE_OK) {
+    if (m_result.serverResultCode() == SQLITE_OK) {
         // Set the secure-delete on, so SQLite overwrites deleted content with zeros.
         // The default setting is determined by the SQLITE_SECURE_DELETE compile-time option but we overwrite it here.
         // Works with 3.6.23. Earlier version just ignore this pragma.
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
         if (!drv_executeSQL("PRAGMA secure_delete = on")) {
-            d->storeResult();
-            const QString errmsg(d->errmsg); // save
-            const int res = d->res; // save
+            storeResult();
+            Result result = d->connection->result(); // save
+/*            const QString errmsg(d->errmsg); // save
+            const int res = d->res; // save*/
             drv_closeDatabase();
-            d->errmsg = errmsg;
-            d->res = res;
+/*            d->errmsg = errmsg;
+            d->res = res;*/
+            d->setResult(result);
             return false;
         }
     }
@@ -242,7 +281,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
                  + tr("Could not gain exclusive access for writing the file.") + " "
                  + tr("Check the file's permissions and whether it is already opened and locked by another application."));
     }*/
-    return d->res == SQLITE_OK;
+    return m_result.serverResultCode() == SQLITE_OK;
 }
 
 bool SQLiteConnection::drv_closeDatabase()
@@ -270,9 +309,10 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     Q_UNUSED(dbName); // Each database is one single SQLite file.
     const QString filename = data().fileName();
     if (QFile(filename).exists() && !QDir().remove(filename)) {
-        m_result = Result(m_result = Result(ERR_ACCESS_RIGHTS,
-                          tr("Could not remove file \"%1\". "
-                             "Check the file's permissions and whether it is already opened and locked by another application.")
+        m_result = Result(ERR_ACCESS_RIGHTS,
+                          QObject::tr("Could not remove file \"%1\". "
+                             "Check the file's permissions and whether it is already "
+                             "opened and locked by another application.")
                    .arg(QDir::convertSeparators(filename)));
         return false;
     }
@@ -285,37 +325,38 @@ Cursor* SQLiteConnection::prepareQuery(const QString& statement, uint cursor_opt
     return new SQLiteCursor(this, statement, cursor_options);
 }
 
-Cursor* SQLiteConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* SQLiteConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     return new SQLiteCursor(this, query, cursor_options);
 }
 
 bool SQLiteConnection::drv_executeSQL(const QString& statement)
 {
-// PreDrvDbg << statement;
-// QCString st(statement.length()*2);
-// st = escapeString( statement.local8Bit() ); //?
-#ifdef SQLITE_UTF8
-    d->temp_st = statement.toUtf8();
-#else
-    d->temp_st = statement.toLocal8Bit(); //latin1 only
-#endif
-
 #ifdef KEXI_DEBUG_GUI
     Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement);
 #endif
 
-    d->res = sqlite3_exec(
+    char *errmsg_p = 0;
+    const QByteArray st(statement.toUtf8());
+    m_result.setServerResultCode(
+        sqlite3_exec(
                  d->data,
-                 (const char*)d->temp_st,
+                 st.constData(),
                  0/*callback*/,
                  0,
-                 &d->errmsg_p);
-    d->storeResult();
+                 &errmsg_p)
+    );
+    if (errmsg_p) {
+        clearResult();
+        d->setServerMessage(QLatin1String(errmsg_p));
+        sqlite3_free(errmsg_p);
+    }
+
+    storeResult();
 #ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(d->res == SQLITE_OK ? "  Success" : "  Failure");
+    Utils::addKexiDBDebug(m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure");
 #endif
-    return d->res == SQLITE_OK;
+    return m_result.serverResultCode() == SQLITE_OK;
 }
 
 quint64 SQLiteConnection::drv_lastInsertRecordId()
@@ -323,68 +364,14 @@ quint64 SQLiteConnection::drv_lastInsertRecordId()
     return (quint64)sqlite3_last_insert_rowid(d->data);
 }
 
-int SQLiteConnection::serverResult()
+QString SQLiteConnection::serverResultName() const
 {
-    return d->res == 0 ? Connection::serverResult() : d->res;
-}
-
-static const char* serverResultNames[] = {
-    "SQLITE_OK", // 0
-    "SQLITE_ERROR",
-    "SQLITE_INTERNAL",
-    "SQLITE_PERM",
-    "SQLITE_ABORT",
-    "SQLITE_BUSY",
-    "SQLITE_LOCKED",
-    "SQLITE_NOMEM",
-    "SQLITE_READONLY",
-    "SQLITE_INTERRUPT",
-    "SQLITE_IOERR",
-    "SQLITE_CORRUPT",
-    "SQLITE_NOTFOUND",
-    "SQLITE_FULL",
-    "SQLITE_CANTOPEN",
-    "SQLITE_PROTOCOL",
-    "SQLITE_EMPTY",
-    "SQLITE_SCHEMA",
-    "SQLITE_TOOBIG",
-    "SQLITE_CONSTRAINT",
-    "SQLITE_MISMATCH",
-    "SQLITE_MISUSE",
-    "SQLITE_NOLFS",
-    "SQLITE_AUTH",
-    "SQLITE_FORMAT",
-    "SQLITE_RANGE",
-    "SQLITE_NOTADB", // 26
-};
-
-QString SQLiteConnection::serverResultName()
-{
-    if (d->res >= 0 && d->res <= SQLITE_NOTADB)
-        return QString::fromLatin1(serverResultNames[d->res]);
-    else if (d->res == SQLITE_ROW)
-        return QLatin1String("SQLITE_ROW");
-    else if (d->res == SQLITE_DONE)
-        return QLatin1String("SQLITE_DONE");
-    return QString();
-}
-
-void SQLiteConnection::drv_clearServerResult()
-{
-    if (!d)
-        return;
-    d->res = SQLITE_OK;
-// d->result_name = 0;
-}
-
-QString SQLiteConnection::serverErrorMsg()
-{
-    return d->errmsg.isEmpty() ? Connection::serverErrorMsg() : d->errmsg;
+    return SQLiteConnectionInternal::serverResultName(m_result.serverResultCode());
 }
 
 PreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
 {
-    return new SQLitePreparedStatement(*d);
+    return new SQLitePreparedStatement(d);
 }
 
 bool SQLiteConnection::isReadOnly() const

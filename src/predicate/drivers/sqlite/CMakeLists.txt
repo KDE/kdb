@@ -55,7 +55,6 @@ set(predicate_sqlite3_SRCS
 )
 
 set(predicate_sqlite3_MOC_SRCS
-   SqliteConnection.h
    SqliteDriver.h
 #todo   SqliteVacuum.h
 )

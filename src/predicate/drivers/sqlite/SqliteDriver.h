@@ -60,7 +60,7 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual Connection *drv_createConnection(ConnectionData &conn_data);
+    virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual AdminTools* drv_createAdminTools() const;
 
     /*! \return true if \a n is a system field name;

@@ -57,8 +57,8 @@ pqxxTransactionData::~pqxxTransactionData()
 
 //==================================================================================
 
-pqxxSqlConnection::pqxxSqlConnection(Driver *driver, ConnectionData &conn_data)
-        : Connection(driver, conn_data)
+pqxxSqlConnection::pqxxSqlConnection(Driver *driver, const ConnectionData& connData)
+        : Connection(driver, connData)
         , d(new pqxxSqlConnectionInternal(this))
         , m_trans(0)
 {
@@ -83,7 +83,7 @@ Cursor* pqxxSqlConnection::prepareQuery(const QString& statement,  uint cursor_o
 
 //==================================================================================
 //Return a new query based on a query object
-Cursor* pqxxSqlConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* pqxxSqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new pqxxSqlCursor(this, query, 1);//Always used buffered cursor
@@ -397,7 +397,7 @@ int pqxxSqlConnection::serverResult()
     return d->resultCode;
 }
 
-QString pqxxSqlConnection::serverResultName()
+QString pqxxSqlConnection::serverResultName() const
 {
     return QString();
 }

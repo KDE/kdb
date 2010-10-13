@@ -96,14 +96,12 @@ xBaseDriver::~xBaseDriver()
   delete dp;
 }
 
-Predicate::Connection*
-xBaseDriver::drv_createConnection( ConnectionData &conn_data )
+Predicate::Connection* xBaseDriver::drv_createConnection(const ConnectionData& connData)
 {
-  if ( !dp->internalDriver ) {
-    return 0;
-  }
-
-  return new xBaseConnection( this, dp->internalDriver, conn_data );
+    if ( !dp->internalDriver ) {
+        return 0;
+    }
+    return new xBaseConnection( this, dp->internalDriver, connData );
 }
 
 bool xBaseDriver::isSystemObjectName( const QString& n ) const

@@ -66,8 +66,8 @@ void ODBCConnection::extractError(ODBCConnection* connection, SQLHANDLE handle, 
     } while( ret == SQL_SUCCESS );
 }
 
-ODBCConnection::ODBCConnection(Driver *driver, ConnectionData &conn_data)
-        : Connection(driver, conn_data)
+ODBCConnection::ODBCConnection(Driver *driver, const ConnectionData& connData)
+        : Connection(driver, connData)
          , d(new ODBCConnectionInternal(this))
 {
 }
@@ -78,7 +78,7 @@ Cursor* ODBCConnection::prepareQuery(const QString& statement, uint cursor_optio
     return new ODBCCursor(this, queryUnit, statement, cursor_options);
 }
 
-Cursor* ODBCConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* ODBCConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     ODBCSQLQueryUnit* queryUnit = new ODBCSQLQueryUnit( this );
     return new ODBCCursor(this, queryUnit, query, cursor_options);
@@ -278,7 +278,8 @@ int ODBCConnection::serverResult() {
     return d->nativeErrorCode;
 }
 
-QString ODBCConnection::serverResultName() {
+QString ODBCConnection::serverResultName() const
+{
     return d->odbcErrorCode;
 }
 

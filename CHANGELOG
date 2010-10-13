@@ -1,5 +1,12 @@
 Predicate CHANGELOG
 
+2010-10-13
+*Port MySQL and SQLite drivers to the new API; some updates in other drivers but no tests
+
+2010-09-05
+*SDC
+**added "operator==" option for generating operator== (deep comparison)
+
 2010-08-19..21
 *SDC
 **properly generates code for more than one shared class per file

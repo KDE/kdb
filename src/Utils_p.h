@@ -29,6 +29,7 @@
 
 namespace Predicate {
 class Driver;
+class Resultable;
 
 class ConnectionTestDialog;
 
@@ -41,7 +42,7 @@ public:
 signals:
     void error(const QString& msg, const QString& details);
 protected:
-    void emitError(const Result& result);
+    void emitError(const Resultable& resultable);
 
     ConnectionTestDialog* m_dlg;
     ConnectionData m_connData;

@@ -51,7 +51,7 @@ pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& stateme
 
 //==================================================================================
 //Constructor base on query object
-pqxxSqlCursor::pqxxSqlCursor(Connection* conn, QuerySchema& query, uint options)
+pqxxSqlCursor::pqxxSqlCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
 {
 // PreDrvDbg << "PQXXSQLCURSOR: constructor for query schema";
@@ -71,9 +71,9 @@ pqxxSqlCursor::~pqxxSqlCursor()
 
 //==================================================================================
 //Create a cursor result set
-bool pqxxSqlCursor::drv_open()
+bool pqxxSqlCursor::drv_open(const QString& sql)
 {
-// PreDrvDbg << m_sql;
+// PreDrvDbg << sql;
 
     if (!my_conn->is_open()) {
 //! @todo this check should be moved to Connection! when drv_prepareQuery() arrive
@@ -96,15 +96,15 @@ bool pqxxSqlCursor::drv_open()
             m_implicityStarted = true;
         }
 
-        m_res = new pqxx::result(((pqxxSqlConnection*)connection())->m_trans->data->exec(std::string(m_sql.toUtf8())));
+        m_res = new pqxx::result(((pqxxSqlConnection*)connection())->m_trans->data->exec(std::string(sql.toUtf8())));
         ((pqxxSqlConnection*)connection())
         ->drv_commitTransaction(((pqxxSqlConnection*)connection())->m_trans);
 //  my_conn->m_trans->commit();
 //  PreDrvDbg << "trans. committed:" << cur_name;
 
         //We should now be placed before the first row, if any
-        m_fieldsToStoreInRow = m_res->columns();
-        m_fieldCount = m_fieldsToStoreInRow - (m_containsROWIDInfo ? 1 : 0);
+        m_fieldsToStoreInRecord = m_res->columns();
+        m_fieldCount = m_fieldsToStoreInRecord - (m_containsROWIDInfo ? 1 : 0);
 
 //js  m_opened=true;
         m_afterLast = false;
@@ -151,13 +151,13 @@ void pqxxSqlCursor::drv_getNextRecord()
 {
 // PreDrvDbg << "size is" <<m_res->size() << "current Position is" << (long)at();
     if (at() < m_res->size() && at() >= 0) {
-        m_result = FetchOK;
+        m_fetchResult = FetchOK;
     } else if (at() >= m_res->size()) {
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     } else {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     }
 }
 
@@ -168,11 +168,11 @@ void pqxxSqlCursor::drv_getPrevRecord()
 // PreDrvDbg;
 
     if (at() < m_res->size() && at() >= 0) {
-        m_result = FetchOK;
+        m_fetchResult = FetchOK;
     } else if (at() >= m_res->size()) {
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     } else {
-        m_result = FetchError;
+        m_fetchResult = FetchError;
     }
 }
 
@@ -195,7 +195,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
         return QVariant();
     }
 
-    if (pos >= m_fieldsToStoreInRow) {
+    if (pos >= m_fieldsToStoreInRecord) {
 //  PreDrvWarn << "pqxxSqlCursor::value - ERROR: requested position is greater than the number of fields";
         return QVariant();
     }
@@ -264,8 +264,8 @@ bool pqxxSqlCursor::drv_storeCurrentRecord(RecordData* data) const
 // const uint realCount = m_fieldCount + (m_containsROWIDInfo ? 1 : 0);
 //not needed data.resize(realCount);
 
-    for (uint i = 0; i < m_fieldsToStoreInRow; i++)
-        data[i] = pValue(i);
+    for (uint i = 0; i < m_fieldsToStoreInRecord; i++)
+        (*data)[i] = pValue(i);
     return true;
 }
 

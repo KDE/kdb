@@ -48,12 +48,15 @@ class DriverPrivate;
 
  Notes:
 FIXME - driver must be provided within KDE module file named with "predicate_" prefix
-  - EXPORT_PREDICATE_DRIVER should be placed in driver's implementation
+  - EXPORT_PREDICATE_DRIVER should be placed in driver's .cpp file
+  - Driver inherits from QObject only because this enables Qt Plugin system
 
- \sa SQLiteDriver MySqlDriver, PqxxSqlDriver, EXPORT_PREDICATE_DRIVER
+ @see SQLiteDriver MySqlDriver, PqxxSqlDriver, EXPORT_PREDICATE_DRIVER, PREDICATE_DRIVER
 */
-class PREDICATE_EXPORT Driver : public Resultable
+class PREDICATE_EXPORT Driver : public QObject, public Resultable
 {
+    Q_OBJECT
+
 public:
     /*! Features supported by driver (sum of few Features enum items). */
     enum Features {
@@ -93,7 +96,7 @@ public:
      driverName member of \a conn_data will be updated with this driver name.
      \a options can be a combination of CreateConnectionOptions enum values.
      */
-    Connection *createConnection(ConnectionData &conn_data, int options = 0);
+    Connection *createConnection(const ConnectionData& connData, int options = 0);
 
     /*! \return Set of created connections. */
     const QSet<Connection*> connections() const;
@@ -274,7 +277,7 @@ protected:
      with additional structures specific for a given driver.
      Connection object should inherit Connection and have a destructor
      that descructs all allocated driver-dependent connection structures. */
-    virtual Connection *drv_createConnection(ConnectionData &conn_data) = 0;
+    virtual Connection *drv_createConnection(const ConnectionData& connData) = 0;
 //virtual ConnectionInternal* createConnectionInternalObject( Connection& conn ) = 0;
 
     /*! Driver-specific SQL string escaping.

@@ -64,7 +64,7 @@ public:
 
 protected:
 
-    virtual Connection* drv_createConnection(ConnectionData &conn_data);
+    virtual Connection* drv_createConnection(const ConnectionData& connData);
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     /**

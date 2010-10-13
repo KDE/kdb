@@ -30,9 +30,9 @@
 
 using namespace Predicate;
 
-xBaseConnection::xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data )
-  :Connection(driver,conn_data)
-  ,d(new xBaseConnectionInternal(this, internalDriver))
+xBaseConnection::xBaseConnection(Driver *driver, Driver* internalDriver, const ConnectionData& connData)
+  : Connection(driver, connData)
+  , d(new xBaseConnectionInternal(this, internalDriver))
 {
 }
 
@@ -65,7 +65,7 @@ Cursor* xBaseConnection::prepareQuery(const QString& statement, uint cursor_opti
   return new xBaseCursor( this, internalCursor, statement, cursor_options );
 }
 
-Cursor* xBaseConnection::prepareQuery( QuerySchema& query, uint cursor_options ) {
+Cursor* xBaseConnection::prepareQuery(QuerySchema* query, uint cursor_options) {
   if ( !d->internalConn ) {
     return 0;
   }
@@ -131,7 +131,7 @@ int xBaseConnection::serverResult()
   return d->res;
 }
 
-QString xBaseConnection::serverResultName()
+QString xBaseConnection::serverResultName() const
 {
   if (!d->internalConn) {
     return QString();

@@ -36,7 +36,7 @@ namespace Predicate
 /*! Provides Predicate-specific information about version of the database.
 
  The version is stored as internal database properties. */
-shared class export=PREDICATE_EXPORT DatabaseVersionInfo
+shared class export=PREDICATE_EXPORT operator== DatabaseVersionInfo
 {
 public:
     /*!
@@ -83,7 +83,7 @@ PREDICATE_EXPORT DatabaseVersionInfo version();
 
 /*! Provides information about version of given database backend.
 */
-shared class export=PREDICATE_EXPORT ServerVersionInfo
+shared class export=PREDICATE_EXPORT operator== ServerVersionInfo
 {
 public:
     /*!

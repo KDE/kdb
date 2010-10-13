@@ -36,13 +36,13 @@ class OracleConnection : public Connection
 
 // TODO: Do we need this?
 		virtual Cursor* prepareQuery( const QString& statement = QString(), uint cursor_options = 0 );
-		virtual Cursor* prepareQuery( QuerySchema& query, uint cursor_options = 0 );
+		virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 		virtual PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type, 
 			FieldList* fields);
 
 	protected:
 		//! Used by Driver
-		OracleConnection(Driver *driver, ConnectionData &conn_data);
+		OracleConnection(Driver *driver, const ConnectionData& connData);
 
 		virtual bool drv_connect(KexiDB::ServerVersionInfo* version);
 		virtual bool drv_disconnect();
@@ -58,9 +58,8 @@ class OracleConnection : public Connection
 		virtual bool drv_executeSQL( const QString& statement );
 		virtual quint64 drv_lastInsertRecordId();
 
-		virtual int serverResult();
-		virtual QString serverResultName();
-		virtual QString serverErrorMsg();
+        //! Implemented for Resultable
+		virtual QString serverResultName() const;
 		virtual void drv_clearServerResult();
 		
 		//Experiments

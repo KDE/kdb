@@ -45,19 +45,17 @@ public:
 */
 class pqxxSqlConnection : public Connection
 {
-    Q_OBJECT
-
 public:
     virtual ~pqxxSqlConnection();
 
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
 
 protected:
     /*! Used by driver */
-    pqxxSqlConnection(Driver *driver, ConnectionData &conn_data);
+    pqxxSqlConnection(Driver *driver, const ConnectionData& connData);
 
     virtual bool drv_isDatabaseUsed() const;
     virtual bool drv_connect(Predicate::ServerVersionInfo* version);
@@ -80,11 +78,9 @@ protected:
     virtual bool drv_commitTransaction(TransactionData *);
     virtual bool drv_rollbackTransaction(TransactionData *);
 
-    //Error reporting
-    virtual int serverResult();
-    virtual QString serverResultName();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
     virtual void drv_clearServerResult();
-    virtual QString serverErrorMsg();
 
     pqxxSqlConnectionInternal *d;
 private:

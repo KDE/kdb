@@ -42,6 +42,8 @@ public:
 
     Result result() const;
 
+    const Resultable& resultable() const;
+
     /*! Tries to load db driver with named name \a name.
       The name is case insensitive.
       \return db driver, or 0 if error (then error message is also set) */

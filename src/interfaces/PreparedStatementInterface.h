@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2008-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,13 +24,14 @@
 #include <QStringList>
 #include <QSharedData>
 
+#include <Predicate/Result.h>
 #include <Predicate/PreparedStatement.h>
 
 namespace Predicate
 {
 
 //! Prepared statement interface for backend-dependent implementations.
-class PREDICATE_EXPORT PreparedStatementInterface
+class PREDICATE_EXPORT PreparedStatementInterface : public Resultable
 {
 protected:
     PreparedStatementInterface() {}
@@ -44,11 +45,11 @@ protected:
         i.e. when attributes of the object (like WHERE field names) change. */
     virtual bool prepare(const QByteArray& statement) = 0;
 
-    //! For implementation. Executes the prepared statement using arguments @a args. 
+    //! For implementation. Executes the prepared statement using parameters @a parameters. 
     virtual bool execute(
         PreparedStatement::Type type,
         const Field::List& fieldList,
-        const PreparedStatement::Arguments &args) = 0;
+        const PreparedStatementParameters& parameters) = 0;
 
     friend class Connection;
     friend class PreparedStatement;

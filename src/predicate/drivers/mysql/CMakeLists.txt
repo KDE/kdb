@@ -21,7 +21,6 @@ set(predicate_mysql_SRCS
 )
 
 set(predicate_mysql_MOC_SRCS
-   MysqlConnection.h
    MysqlDriver.h
 )
 

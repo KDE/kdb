@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -26,9 +26,9 @@ using namespace Predicate;
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
-MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal& conn)
+MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
         : PreparedStatementInterface()
-        , MysqlConnectionInternal(conn.connection)
+        , MysqlConnectionInternal(conn->connection)
 #ifdef PREDICATE_USE_MYSQL_STMT
         , m_statement(0)
         , m_mysqlBind(0)
@@ -38,7 +38,7 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal& conn)
 // PreDrvDbg;
 
     mysql_owned = false;
-    mysql = dynamic_cast<Predicate::MysqlConnectionInternal&>(conn).mysql; //copy
+    mysql = dynamic_cast<Predicate::MysqlConnectionInternal&>(*conn).mysql; //copy
 //    m_tempStatementString = generateStatementString();
 
     if (!init())
@@ -241,7 +241,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
 bool MysqlPreparedStatement::execute(
     PreparedStatement::Type type,
     const Field::List& fieldList,
-    const PreparedStatement::Arguments &args)
+    const PreparedStatementParameters& parameters)
 {
 #ifdef PREDICATE_USE_MYSQL_STMT
     if (!m_statement || m_realParamCount <= 0)
@@ -266,7 +266,7 @@ bool MysqlPreparedStatement::execute(
         m_resetRequired = false;
     }
 
-    int arg = 0;
+    int par = 0;
     bool dummyNull = true;
     unsigned long str_length;
 
@@ -281,9 +281,9 @@ bool MysqlPreparedStatement::execute(
         assert(0); //impl. error
 
     Field::ListIterator itFields(fieldList->constBegin());
-    for (QList<QVariant>::ConstIterator it(m_args.constBegin());
-            itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, arg++) {
-        if (!bindValue(*itFields, it == args.constEnd() ? QVariant() : *it, arg))
+    for (QList<QVariant>::ConstIterator it(parameters.constBegin());
+            itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, par++) {
+        if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))
             return false;
 
         }//else
@@ -303,7 +303,7 @@ bool MysqlPreparedStatement::execute(
 #else
     m_resetRequired = true;
 #if 0 //TODO
-    if (type == PreparedStatement::Insert && connection->insertRecord(fieldList, args)) {
+    if (type == PreparedStatement::InsertStatement && connection->insertRecord(fieldList, parameters)) {
         return true;
     }
 #endif

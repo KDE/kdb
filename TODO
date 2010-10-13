@@ -28,6 +28,19 @@ Drivers:
 [ ] replace the Pqxx driver with a new one using libpq C API
 [ ] Port the Sybase driver (untouched for now)
 [ ] Port the ODBC driver (untouched for now)
+[ ] Add string escpaing to connection, call driver's escpaing by default
+[23:12] <jstaniek> piggz: what's the reason for escape in connection?
+[23:13] <piggz> jstaniek: short answer, the connection knows the database encoding, and can do the right think
+[23:14] <jstaniek> piggz: but this would be just a helper function calling driver anyway, right?
+[23:14] <piggz> no, the actual connection to the database is needed to know the encoding
+[23:15] <piggz> the driver could have a simple fallback like i have put in today
+[23:16] <piggz> jstaniek: difference between pqescapestring and pqescapestringconn here http://books.google.co.uk/books?id=EwSt1gAjRjgC&pg=PA273&lpg=PA273&dq=pqescapestringconn+documentation&source=bl&ots=dVAChqjY5b&sig=mUWYdPqS0Xzz0n30etYg2EjLjpQ&hl=en&ei=8LaCTJqaGIyA4Ab7143UCw&sa=X&oi=book_result&ct=result&resnum=7&ved=0CCwQ6AEwBg#v=onepage&q&f=false
+[23:16] <piggz> pqescapestring, the non-connection version is deprecated as a security risk
+[23:17] <piggz> becuase, in a multi-byte char set, \ can be part of a character, the postgres guys told me
+[23:18] <jstaniek> I see...
+[23:18] <jstaniek> so indeed good idea about the fall back
+[23:28] <piggz> it may require escapeString and valueToSQl functions in Connection class, as driver::valueToSql calls escapeString
+[23:28] <piggz> that was where i traced todays bug
 
 Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
@@ -44,6 +57,17 @@ Naming, API:
 [p] replace usage of 'row' term with 'record' in most places, e.g. Cursor::storeCurrentRow -> Cursor::storeCurrentRecord
 [p] port debug methods to uniform "QDebug operator<<()"
 [p] make certain methods of *Expr classes const if possible
+[ ] Add MONEY/DECIMAL data type; for sqlite use INTEGER
+    (see http://www.mail-archive.com/sqlite-users@sqlite.org/msg26965.html
+         http://www.mail-archive.com/sqlite-users@sqlite.org/msg27247.html)
+    Currency in MS Access: Currency values and numeric data used in mathematical calculations involving data
+                           with one to four decimal places. Accurate to 15 digits on the left side of the
+                           decimal separator and to 4 digits on the right side.
+    Decimal Number (NUMERIC?) in MS Access: Decimal Stores numbers from -10^381 through 10^381 (.adp),
+                                            from -10^281 through 10^281 (.mdb); decimal precision: 28 B,
+                                            storage size: 12 B
+[ ] Add extension-functions.c from http://sqlite.org/contrib: mathematical and string extension functions
+    for SQL queries using the loadable extensions mechanism
 
 Other:
 [ ] store config in ~/.config/predicate/, e.g. *rc files
@@ -129,7 +153,7 @@ TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
 *  parser/SqlParser.cpp
 *  parser/SqlScanner.cpp
 *  parser/tokens.cpp
-  PreparedStatement.cpp
+*  PreparedStatement.cpp
 - it's implicitly shared class now
 - arguments are no longer provided using operator << but instead in execute(), 
   so PreparedStatement is more generic now. Operator << and clearArguments() is thus removed.
@@ -137,6 +161,7 @@ TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
 - execute() aborts now if at least one field provided on whereFieldNames list is not found
   (before it was ignored)
 - internal: the statement is now created using utf8, not latin1 functions
+- PreparedStatement::Arguments renamed to PreparedStatementParameters
 - internal: to implement PreparedStatement in a driver, one has to write these methods:
     virtual bool executeInternal( const Arguments& args );
     virtual bool prepare(QByteArray& statement) = 0;

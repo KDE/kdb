@@ -36,8 +36,8 @@ using namespace Predicate;
 
 //--------------------------------------------------------------------------
 
-SybaseConnection::SybaseConnection(Driver *driver, ConnectionData &conn_data)
-        : Connection(driver, conn_data)
+SybaseConnection::SybaseConnection(Driver *driver, const ConnectionData& connData)
+        : Connection(driver, connData)
         , d(new SybaseConnectionInternal(this))
 {
 }
@@ -87,7 +87,7 @@ Cursor* SybaseConnection::prepareQuery(const QString& statement, uint cursor_opt
     return new SybaseCursor(this, statement, cursor_options);
 }
 
-Cursor* SybaseConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* SybaseConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     return new SybaseCursor(this, query, cursor_options);
 }
@@ -154,9 +154,8 @@ int SybaseConnection::serverResult()
     return d->res;
 }
 
-QString SybaseConnection::serverResultName()
+QString SybaseConnection::serverResultName() const
 {
-
     return QString();
 }
 

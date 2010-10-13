@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -48,19 +48,18 @@ public:
 
 //  virtual bool save(RecordData& data, RowEditBuffer& buf);
 
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
 
 protected:
     /*! Cursor will operate on \a conn, raw \a statement will be used to execute query. */
     SQLiteCursor(Connection* conn, const QString& statement, uint options = NoOptions);
 
     /*! Cursor will operate on \a conn, \a query schema will be used to execute query. */
-    SQLiteCursor(Connection* conn, QuerySchema& query,
+    SQLiteCursor(Connection* conn, QuerySchema* query,
                  uint options = NoOptions);
 
-    virtual bool drv_open();
+    virtual bool drv_open(const QString& sql);
 
     virtual bool drv_close();
 //  virtual bool drv_moveFirst();
@@ -79,7 +78,7 @@ protected:
       (only for buffered cursor type), eg. in close(). */
     virtual void drv_clearBuffer();
 
-    virtual void drv_clearServerResult();
+    void storeResult();
 
     SQLiteCursorData *d;
 

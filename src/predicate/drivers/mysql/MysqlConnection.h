@@ -1,21 +1,21 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public License
-along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   You should have received a copy of the GNU Library General Public License
+   along with this program; see the file COPYING.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
@@ -36,20 +36,18 @@ class MysqlConnectionInternal;
 */
 class MysqlConnection : public Connection
 {
-    Q_OBJECT
-
 public:
     virtual ~MysqlConnection();
 
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema& query, uint cursor_options = 0);
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
 
 protected:
 
     /*! Used by driver */
-    MysqlConnection(Driver *driver, ConnectionData &conn_data);
+    MysqlConnection(Driver *driver, const ConnectionData& connData);
 
     virtual bool drv_connect(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
@@ -64,9 +62,8 @@ protected:
     virtual bool drv_executeSQL(const QString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
     virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)

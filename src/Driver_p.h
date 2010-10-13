@@ -235,9 +235,9 @@ public:
 //! Also exports driver's static version information.
 #define EXPORT_PREDICATE_DRIVER( driverClass, driverName ) \
     Q_EXPORT_PLUGIN2( predicate_ ## driverName, driverClass ) \
-    Q_EXTERN_C Q_DECL_EXPORT const uint version_major = PREDICATE_VERSION_MAJOR; \
-    Q_EXTERN_C Q_DECL_EXPORT const uint version_minor = PREDICATE_VERSION_MINOR; \
-    Q_EXTERN_C Q_DECL_EXPORT const uint version_release = PREDICATE_VERSION_RELEASE; \
+    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_major = PREDICATE_VERSION_MAJOR; \
+    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_minor = PREDICATE_VERSION_MINOR; \
+    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_release = PREDICATE_VERSION_RELEASE; \
     DatabaseVersionInfo driverClass::version() const { \
         return DatabaseVersionInfo( \
             PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE); }

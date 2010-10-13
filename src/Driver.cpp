@@ -180,24 +180,23 @@ QString Driver::sqlTypeName(int id_t, int /*p*/) const
     return d->typeNames[Field::InvalidType];
 }
 
-Connection *Driver::createConnection(ConnectionData &conn_data, int options)
+Connection *Driver::createConnection(const ConnectionData& connData, int options)
 {
     clearResult();
     if (!isValid())
         return 0;
     if (d->info.isFileBased()) {
-        if (conn_data.fileName().isEmpty()) {
+        if (connData.fileName().isEmpty()) {
             m_result = Result(ERR_MISSING_DB_LOCATION,
                               QObject::tr("File name expected for file-based database driver."));
             return 0;
         }
     }
-// Connection *conn = new Connection( this, conn_data );
-    Connection *conn = drv_createConnection(conn_data);
+    Connection *conn = drv_createConnection(connData);
 
     conn->setReadOnly(options & ReadOnlyConnection);
 
-    conn_data.setDriverName(name());
+//! @todo needed? connData->setDriverName(name()); 
     d->connections.insert(conn);
     return conn;
 }

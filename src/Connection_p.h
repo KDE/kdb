@@ -33,6 +33,16 @@ public:
     virtual ~ConnectionInternal();
     virtual void storeResult() = 0;
 
+    inline void setServerMessage(const QString& serverMessage) {
+        connection->setServerMessage(serverMessage);
+    }
+    inline void setServerResultCode(int code) {
+        connection->setServerResultCode(code);
+    }
+    inline void setResult(const Result& result) {
+        connection->setResult(result);
+    }
+
     Connection* connection;
 };
 

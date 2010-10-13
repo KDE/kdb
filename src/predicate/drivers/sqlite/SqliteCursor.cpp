@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -42,7 +42,8 @@ using namespace Predicate;
 //! safer interpretations of boolean values for SQLite
 static bool sqliteStringToBool(const QString& s)
 {
-    return s.toLower() == "yes" || (s.toLower() != "no" && s != "0");
+    return 0 == s.compare(QLatin1String("yes"), Qt::CaseInsensitive)
+        || (0 != s.compare(QLatin1String("no"), Qt::CaseInsensitive) && s != QLatin1String("0"));
 }
 
 //----------------------------------------------------
@@ -83,7 +84,6 @@ public:
         }
     */
 
-    QByteArray st;
     //for sqlite:
 //  sqlite_struct *data; //! taken from SQLiteConnection
     sqlite3_stmt *prepared_st_handle;
@@ -188,7 +188,7 @@ SQLiteCursor::SQLiteCursor(Connection* conn, const QString& statement, uint opti
     d->data = static_cast<SQLiteConnection*>(conn)->d->data;
 }
 
-SQLiteCursor::SQLiteCursor(Connection* conn, QuerySchema& query, uint options)
+SQLiteCursor::SQLiteCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
         , d(new SQLiteCursorData(conn))
 {
@@ -201,7 +201,7 @@ SQLiteCursor::~SQLiteCursor()
     delete d;
 }
 
-bool SQLiteCursor::drv_open()
+bool SQLiteCursor::drv_open(const QString& sql)
 {
 // d->st.resize(statement.length()*2);
     //TODO: decode
@@ -216,23 +216,26 @@ bool SQLiteCursor::drv_open()
         return false;
     }
 
-    d->st = m_sql.toUtf8();
-    d->res = sqlite3_prepare(
+    const QByteArray st(sql.toUtf8());
+    m_result.setServerResultCode(
+        sqlite3_prepare(
                  d->data,            /* Database handle */
-                 d->st.constData(),       /* SQL statement, UTF-8 encoded */
-                 d->st.length(),             /* Length of zSql in bytes. */
+                 st.constData(),       /* SQL statement, UTF-8 encoded */
+                 st.length(),             /* Length of zSql in bytes. */
                  &d->prepared_st_handle,  /* OUT: Statement handle */
                  0/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
-             );
-    if (d->res != SQLITE_OK) {
-        d->storeResult();
+             )
+    );
+    if (m_result.serverResultCode() != SQLITE_OK) {
+        storeResult();
         return false;
     }
 //cursor is automatically @ first record
 // m_beforeFirst = true;
 
     if (isBuffered()) {
-        d->records.resize(128); //TODO: manage size dynamically
+//! @todo manage size dynamically
+        d->records.resize(128);
     }
 
     return true;
@@ -252,9 +255,11 @@ bool SQLiteCursor::drv_open()
 
 bool SQLiteCursor::drv_close()
 {
-    d->res = sqlite3_finalize(d->prepared_st_handle);
-    if (d->res != SQLITE_OK) {
-        d->storeResult();
+    m_result.setServerResultCode(
+        sqlite3_finalize(d->prepared_st_handle)
+    );
+    if (m_result.serverResultCode() != SQLITE_OK) {
+        storeResult();
         return false;
     }
     return true;
@@ -262,21 +267,24 @@ bool SQLiteCursor::drv_close()
 
 void SQLiteCursor::drv_getNextRecord()
 {
-    d->res = sqlite3_step(d->prepared_st_handle);
-    if (d->res == SQLITE_ROW) {
-        m_result = FetchOK;
+    m_result.setServerResultCode(
+        sqlite3_step(d->prepared_st_handle)
+    );
+    if (m_result.serverResultCode() == SQLITE_ROW) {
+        m_fetchResult = FetchOK;
         m_fieldCount = sqlite3_data_count(d->prepared_st_handle);
 //#else //for SQLITE3 data fetching is delayed. Now we even do not take field count information
 //      // -- just set a flag that we've a data not fetched but available
 //  d->rowDataReadyToFetch = true;
-        m_fieldsToStoreInRow = m_fieldCount;
+        m_fieldsToStoreInRecord = m_fieldCount;
         //(m_logicalFieldCount introduced) m_fieldCount -= (m_containsROWIDInfo ? 1 : 0);
-    } else {
+    }
+    else {
 //  d->rowDataReadyToFetch = false;
-        if (d->res == SQLITE_DONE)
-            m_result = FetchEnd;
+        if (m_result.serverResultCode() == SQLITE_DONE)
+            m_fetchResult = FetchEnd;
         else
-            m_result = FetchError;
+            m_fetchResult = FetchError;
     }
 
     //debug
@@ -386,7 +394,7 @@ bool SQLiteCursor::drv_storeCurrentRecord(RecordData* data) const
 //not needed data.resize(m_fieldCount);
     if (!m_fieldsExpanded) {//simple version: without types
         for (uint i = 0; i < m_fieldCount; i++) {
-            data[i] = QString::fromUtf8((const char*)sqlite3_column_text(d->prepared_st_handle, i));
+            (*data)[i] = QString::fromUtf8((const char*)sqlite3_column_text(d->prepared_st_handle, i));
         }
         return true;
     }
@@ -407,7 +415,7 @@ bool SQLiteCursor::drv_storeCurrentRecord(RecordData* data) const
         Field *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
 //  PreDrvDbg << "col=" << (col ? *col : 0);
 
-        data[i] = d->getValue(f, i); //, !f /*!f means ROWID*/);
+        (*data)[i] = d->getValue(f, i); //, !f /*!f means ROWID*/);
     }
     return true;
 }
@@ -434,24 +442,13 @@ bool SQLiteCursor::storeStringValue(uint i, QString &str)
   return true;
 }*/
 
-int SQLiteCursor::serverResult()
+QString SQLiteCursor::serverResultName() const
 {
-    return d->res;
+    return SQLiteConnectionInternal::serverResultName(m_result.serverResultCode());
 }
 
-QString SQLiteCursor::serverResultName()
+void SQLiteCursor::storeResult()
 {
-    return QString::fromLatin1(d->result_name);
+    m_result.setServerMessage(
+        QLatin1String( (d->data && m_result.serverResultCode() != SQLITE_OK) ? sqlite3_errmsg(d->data) : 0 ));
 }
-
-QString SQLiteCursor::serverErrorMsg()
-{
-    return d->errmsg;
-}
-
-void SQLiteCursor::drv_clearServerResult()
-{
-    d->res = SQLITE_OK;
-    d->errmsg_p = 0;
-}
-

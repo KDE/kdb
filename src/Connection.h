@@ -49,13 +49,23 @@ class AlterTableHandler;
 class PREDICATE_EXPORT ConnectionSqlInterface : public Resultable
 {
     protected:
-        void setSql(const QString& sql) {
+        inline void setSql(const QString& sql) {
             m_result.setSql(sql);
         }
-        QString sql() const {
+/*        inline QString sql() const {
             return m_result.sql();
+        }*/
+        inline void setServerMessage(const QString& serverMessage) {
+            m_result.setServerMessage(serverMessage);
+        }
+        inline void setServerResultCode(int code) {
+            m_result.setServerResultCode(code);
+        }
+        inline void setResult(const Result& result) {
+            m_result = result;
         }
     friend class Cursor;
+    friend class ConnectionInternal;
 };
 
 /*! @short Provides database connection, allowing queries and data modification.

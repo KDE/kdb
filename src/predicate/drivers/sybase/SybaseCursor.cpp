@@ -46,7 +46,7 @@ SybaseCursor::SybaseCursor(Predicate::Connection* conn, const QString& statement
 // PreDrvDbg << "SybaseCursor: constructor for query statement";
 }
 
-SybaseCursor::SybaseCursor(Connection* conn, QuerySchema& query, uint options)
+SybaseCursor::SybaseCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
         , d(new SybaseCursorData(conn))
 {
@@ -61,7 +61,7 @@ SybaseCursor::~SybaseCursor()
     close();
 }
 
-bool SybaseCursor::drv_open()
+bool SybaseCursor::drv_open(const QString& sql)
 {
 
     /* Pseudo Code
@@ -70,7 +70,7 @@ bool SybaseCursor::drv_open()
      * If no error
      *   Store Result in buffer ( d-> ?? )
      *   Store fieldcount ( no. of columns ) in m_fieldCount
-     *   Set m_fieldsToStoreInRow equal to m_fieldCount
+     *   Set m_fieldsToStoreInRecord equal to m_fieldCount
      *   Store number of rows in d->numRows
      *   Set pointer at 0 ( m_at = 0 )
      *
@@ -86,14 +86,14 @@ bool SybaseCursor::drv_open()
         PreDrvDbg << "drv_open" << "dead DBPROCESS ?";
 
     // insert into command buffer
-    dbcmd(d->dbProcess, m_sql.toUtf8());
+    dbcmd(d->dbProcess, sql.toUtf8());
     // execute query
     dbsqlexec(d->dbProcess);
 
     if (dbresults(d->dbProcess) == SUCCEED) {
         // result set goes directly into dbProcess' buffer
         m_fieldCount = dbnumcols(d->dbProcess);
-        m_fieldsToStoreInRow = m_fieldCount;
+        m_fieldsToStoreInRecord = m_fieldCount;
 
         // only relevant if buffering will ever work
         // <ignore>
@@ -133,9 +133,9 @@ void SybaseCursor::drv_getNextRecord()
     // no buffering , and we don't know how many rows are there in result set
 
     if (dbnextrow(d->dbProcess) != NO_MORE_ROWS)
-        m_result = FetchOK;
+        m_fetchResult = FetchOK;
     else {
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     }
 
 }
@@ -182,7 +182,7 @@ bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
 //  return false;
 
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
-    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRow);
+    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
     for (uint i = 0; i < realCount; i++) {
         Field *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
@@ -200,7 +200,7 @@ bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
         // convert to string representation. All values are convertible to string
         dbconvert(d->dbProcess , dbcoltype(d->dbProcess , i + 1), dbdata(d->dbProcess , i + 1), columnDataLength , (SYBCHAR), columnValue, -2);
 
-        data[i] =  Predicate::cstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
+        (*data)[i] =  Predicate::cstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
 
         delete[] columnValue;
     }
@@ -239,7 +239,7 @@ int SybaseCursor::serverResult()
     return d->res;
 }
 
-QString SybaseCursor::serverResultName()
+QString SybaseCursor::serverResultName() const
 {
     return QString();
 }

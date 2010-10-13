@@ -133,7 +133,8 @@ bool Cursor::open()
             return false;
     }
     if (!m_rawStatement.isEmpty()) {
-        m_conn->setSql(m_rawStatement);
+        m_result.setSql(m_rawStatement);
+        //m_conn->setSql(m_rawStatement);
     }
     else {
         if (!m_query) {
@@ -143,22 +144,24 @@ bool Cursor::open()
         }
         Connection::SelectStatementOptions options;
         options.alsoRetrieveRecordId = m_containsRecordIdInfo; /*get record Id if needed*/
-        m_conn->setSql(m_queryParameters
+//        m_conn->setSql(m_queryParameters
+        m_result.setSql(m_queryParameters
                         ? m_conn->selectStatement(m_query, *m_queryParameters, options)
                         : m_conn->selectStatement(m_query, options));
-        if (m_conn->sql().isEmpty()) {
+        if (m_result.sql().isEmpty()) {
             PreDbg << "empty statement!";
             m_result = Result(ERR_SQL_EXECUTION_ERROR, QObject::tr("Query statement is empty."));
             return false;
         }
     }
-    m_result.setSql(m_conn->sql());
-    m_opened = drv_open();
+//    m_result.setSql(m_conn->result().sql());
+    m_opened = drv_open(m_result.sql());
 // m_beforeFirst = true;
     m_afterLast = false; //we are not @ the end
     m_at = 0; //we are before 1st rec
     if (!m_opened) {
-        m_result = Result(ERR_SQL_EXECUTION_ERROR, QObject::tr("Error opening database cursor."));
+        m_result.setCode(ERR_SQL_EXECUTION_ERROR);
+        m_result.setMessage(QObject::tr("Error opening database cursor."));
         return false;
     }
     m_validRecord = false;

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -25,6 +25,7 @@
 #include <QSharedData>
 
 #include <Predicate/FieldList.h>
+#include <Predicate/Result.h>
 
 namespace Predicate
 {
@@ -32,6 +33,9 @@ namespace Predicate
 //class ConnectionInternal;
 class TableSchema;
 class PreparedStatementInterface;
+
+//! Prepared statement paraneters used in PreparedStatement::execute()
+typedef QList<QVariant> PreparedStatementParameters;
 
 /*! @short Prepared database command for optimizing sequences of multiple database actions
 
@@ -41,7 +45,7 @@ class PreparedStatementInterface;
   connection.insertRecord(*tabelSchema, dbRowBuffer).
 
   To use PreparedStatement, create is using Predicate::Connection:prepareStatement(),
-  providing table schema; set up arguments using operator << ( const QVariant& value );
+  providing table schema; set up parameters using operator << ( const QVariant& value );
   and call execute() when ready. PreparedStatement objects are accessed
   using KDE shared pointers, i.e Predicate::PreparedStatement, so you do not need
   to remember about destroying them. However, when underlying Connection object
@@ -59,46 +63,44 @@ class PreparedStatementInterface;
       prepared << rand() << getText(i);
       if (!prepared.execute())
         return false;
-      prepared.clearArguments();
+      prepared.clearParameters();
     }
     return true;
   }
   \endcode
 
-  If you do not call clearArguments() after every insert, you can insert
+  If you do not call clearParameters() after every insert, you can insert
   the same value multiple times using execute() what increases efficiency even more.
 
   Another use case is inserting large objects (BLOBs or CLOBs).
   Depending on database backend, you can avoid escaping BLOBs.
   See KexiFormView::storeData() for example use.
 */
-class PREDICATE_EXPORT PreparedStatement
+class PREDICATE_EXPORT PreparedStatement : public Resultable
 {
 public:
-    //! Prepared statement arguments used in execute()
-    typedef QList<QVariant> Arguments;
 
     //! Defines type of the prepared statement.
     enum Type {
-        Invalid,//!< Used only in invalid statements
-        Select, //!< SELECT statement will be prepared end executed
-        Insert  //!< INSERT statement will be prepared end executed
+        InvalidStatement, //!< Used only in invalid statements
+        SelectStatement,  //!< SELECT statement will be prepared end executed
+        InsertStatement   //!< INSERT statement will be prepared end executed
     };
 
     //! @internal
-    class Data : public QSharedData {
+    class PREDICATE_EXPORT Data : public QSharedData {
     public:
-        Data() : type(Invalid), whereFields(0), dirty(true) {}
+        Data() : type(InvalidStatement), whereFields(0), dirty(true) {}
         Data(Type _type, PreparedStatementInterface* _iface, FieldList* _fields,
              const QStringList& _whereFieldNames)
             : type(_type), fields(*_fields), whereFieldNames(_whereFieldNames)
-            , fieldsForArguments(0), whereFields(0), dirty(true), iface(_iface)
+            , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
         {}
         ~Data();
         Type type;
         FieldList fields;
         QStringList whereFieldNames;
-        const Field::List* fieldsForArguments; //!< fields where we'll put the inserted arguments
+        const Field::List* fieldsForParameters; //!< fields where we'll put the inserted parameters
         Field::List* whereFields; //!< temporary, used for select statements, based on whereFieldNames
         bool dirty; //!< true if the statement has to be internally 
                     //!< prepared (possible again) before calling executeInternal()
@@ -113,7 +115,7 @@ public:
 
     virtual ~PreparedStatement();
 
-    bool isValid() const { return d->type == Invalid; }
+    bool isValid() const { return d->type == InvalidStatement; }
 
     Type type() const { return d->type; }
     void setType(Type type) { d->type = type; d->dirty = true; }
@@ -125,12 +127,12 @@ public:
     void setWhereFieldNames(const QStringList& whereFieldNames)
         { d->whereFieldNames = whereFieldNames; d->dirty = true; }
 
-    /*! Executes the prepared statement using @a args arguments.
-     A number arguments set up for the statement must be the same as a number of fields
+    /*! Executes the prepared statement using @a parameters parameters.
+     A number parameters set up for the statement must be the same as a number of fields
      defined in the underlying database table.
      @return false on failure. Detailed error status can be obtained
      from Predicate::Connection object that was used to create this statement object. */
-    bool execute( const Arguments& args );
+    bool execute(const PreparedStatementParameters& parameters);
 
 protected:
     //! Creates a new prepared statement. In your code use
@@ -145,9 +147,9 @@ protected:
 
 private:
 //! @todo is this portable across backends?
-    void generateStatementString(QByteArray& s);
-    void generateSelectStatementString(QByteArray& s);
-    void generateInsertStatementString(QByteArray& s);
+    bool generateStatementString(QByteArray* s);
+    bool generateSelectStatementString(QByteArray* s);
+    bool generateInsertStatementString(QByteArray* s);
 
     QSharedDataPointer<Data> d;
 };

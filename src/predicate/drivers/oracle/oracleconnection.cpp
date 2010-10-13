@@ -27,8 +27,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 using namespace KexiDB;
 //using namespace std;
 
-OracleConnection::OracleConnection(Driver *driver, ConnectionData &conn_data)
-	: Connection(driver,conn_data)
+OracleConnection::OracleConnection(Driver *driver, const ConnectionData& connData)
+	: Connection(driver, connData)
 	, d(new OracleConnectionInternal(this))
 	, active(false)
 {
@@ -80,7 +80,7 @@ Cursor* OracleConnection::prepareQuery
 }
 
 // TODO: Do we need this?
-Cursor* OracleConnection::prepareQuery(QuerySchema& query, uint cursor_options )
+Cursor* OracleConnection::prepareQuery(QuerySchema* query, uint cursor_options )
 {
 	return new OracleCursor( this, query, cursor_options );
 }
@@ -91,7 +91,7 @@ Cursor* OracleConnection::prepareQuery(QuerySchema& query, uint cursor_options )
  The only database which can exist is the current user.
  That database exists if it contains kexi tables.
 */
-bool OracleConnection::drv_getDatabasesList( QStringList &list )
+bool OracleConnection::drv_getDatabasesList(QStringList* list)
 {
 	KexiDBDrvDbg;
 	QString user;
@@ -106,9 +106,10 @@ bool OracleConnection::drv_getDatabasesList( QStringList &list )
 		     ("select COUNT(*) from user_tables where table_name like \'KEXI__%\'");
 	  d->rs->next();
 	  
-	  if (d->rs->getInt(1)>0) list.append(user);
-		d->stmt->closeResultSet(d->rs);
-		d->rs=0;
+	  if (d->rs->getInt(1)>0)
+        list->append(user);
+	d->stmt->closeResultSet(d->rs);
+	d->rs=0;
 		
 		return true;
 	}
@@ -429,7 +430,7 @@ int OracleConnection::serverResult()
 	return d->errno;
 }
 
-QString OracleConnection::serverResultName()
+QString OracleConnection::serverResultName() const
 {
 	return QString();
 }

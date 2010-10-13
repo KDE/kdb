@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,7 +27,7 @@
 namespace Predicate
 {
 
-/*! Internal SQLite connection data. Also used inside SQLiteCursor. */
+/*! Internal SQLite connection data. Also used by SqliteCursor. */
 class SQLiteConnectionInternal : public ConnectionInternal
 {
 public:
@@ -37,14 +37,13 @@ public:
     //! stores last result's message
     virtual void storeResult();
 
+    static QString serverResultName(int serverResultCode);
+
     sqlite3 *data;
     bool data_owned; //!< true if data pointer should be freed on destruction
-    QString errmsg; //<! server-specific message of last operation
-    char *errmsg_p; //<! temporary: server-specific message of last operation
-    int res; //<! result code of last operation on server
-
-    QByteArray temp_st;
-    const char *result_name;
+//moved to Result    QString errmsg; //<! server-specific message of last operation
+//moved to Result    char *errmsg_p; //<! temporary: server-specific message of last operation
+//moved to Result    int res; //<! result code of last operation on server
 };
 
 }

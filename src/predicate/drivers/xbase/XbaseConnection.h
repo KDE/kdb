@@ -33,13 +33,11 @@ class xBaseConnectionInternal;
 */
 class xBaseConnection : public Connection
 {
-  Q_OBJECT
-
-  public:
+public:
     virtual ~xBaseConnection();
 
     virtual Cursor* prepareQuery( const QString& statement = QString(), uint cursor_options = 0 );
-    virtual Cursor* prepareQuery( QuerySchema& query, uint cursor_options = 0 );
+    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     //! @todo returns 0 for now
     virtual PreparedStatementInterface* prepareStatementInternal();
@@ -47,7 +45,7 @@ class xBaseConnection : public Connection
   protected:
 
     /*! Used by driver */
-    xBaseConnection( Driver *driver, Driver* internalDriver, ConnectionData &conn_data );
+    xBaseConnection(Driver *driver, Driver* internalDriver, const ConnectionData& connData);
 
     virtual bool drv_connect(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
@@ -60,9 +58,8 @@ class xBaseConnection : public Connection
     virtual bool drv_executeSQL( const QString& statement );
     virtual quint64 drv_lastInsertRecordId();
 
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
     virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)

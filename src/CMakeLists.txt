@@ -122,7 +122,7 @@ set(predicate_MOC_SRCS
   DriverManager_p.h
 #  Cursor.h
   Utils_p.h
-#  Driver.h
+  Driver.h
 #  Connection.h
 )
 

@@ -254,35 +254,6 @@ public:
 
     bool deleteAllRecords();
 
-    /*! \return a code of last executed operation's result at the server side.
-     This code is engine dependent and may be even engine-version dependent.
-     It can be visible in applications mainly after clicking a "Details>>" button
-     or something like that -- this just can be useful for advanced users and
-     for testing.
-     Note for driver developers: Return here the value you usually store as result
-     of most lower-level operations. By default this method returns 0. */
-    virtual int serverResult() {
-        return 0;
-    }
-
-    /*! \return (not i18n-ed) name of last executed operation's result at the server side.
-     Sometimes engines have predefined its result names that can be used e.g.
-     to refer a documentation. SQLite is one of such engines.
-     Note for driver developers: Leave the default implementation (null
-     string is returned ) if your engine has no such capability. */
-    virtual QString serverResultName() {
-        return QString();
-    }
-
-    /*! \return (not i18n-ed) description text (message) of last operation's error/result.
-     In most cases engines do return such a messages, any user can then use this
-     to refer a documentation.
-     Note for driver developers: Leave the default implementation (null
-     string is returned ) if your engine has no such capability. */
-    virtual QString serverErrorMsg() {
-        return QString();
-    }
-
     /*! \return Debug information. */
     QString debugString() const;
 
@@ -306,7 +277,7 @@ protected:
      resources using m_sql statement. It is not required to store \a statement somewhere
      in your Cursor subclass (it is already stored in m_query or m_rawStatement,
      depending query type) - only pass it to proper engine's function. */
-    virtual bool drv_open() = 0;
+    virtual bool drv_open(const QString& sql) = 0;
 
     virtual bool drv_close() = 0;
 //  virtual bool drv_moveFirst() = 0;
@@ -348,10 +319,6 @@ protected:
 
     //! @internal clears buffer with reimplemented drv_clearBuffer(). */
     void clearBuffer();
-
-    /*! Clears an internal member that is used to storing last result code,
-     the same that is returend by serverResult(). */
-    virtual void drv_clearServerResult() = 0;
 
     /*! Puts current record's data into \a data (makes a deep copy of each field).
      This method has unspecified behaviour if the cursor is not at valid record.

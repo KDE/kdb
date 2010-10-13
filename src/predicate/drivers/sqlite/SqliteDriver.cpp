@@ -92,9 +92,9 @@ SQLiteDriver::~SQLiteDriver()
 
 
 Predicate::Connection*
-SQLiteDriver::drv_createConnection(ConnectionData &conn_data)
+SQLiteDriver::drv_createConnection(const ConnectionData& connData)
 {
-    return new SQLiteConnection(this, conn_data);
+    return new SQLiteConnection(this, connData);
 }
 
 bool SQLiteDriver::isSystemObjectName(const QString& n) const

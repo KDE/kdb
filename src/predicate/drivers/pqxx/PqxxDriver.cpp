@@ -95,9 +95,9 @@ PqxxSqlDriver::~PqxxSqlDriver()
 //==================================================================================
 //
 Predicate::Connection*
-PqxxSqlDriver::drv_createConnection(ConnectionData &conn_data)
+PqxxSqlDriver::drv_createConnection(const ConnectionData& connData)
 {
-    return new pqxxSqlConnection(this, conn_data);
+    return new pqxxSqlConnection(this, connData);
 }
 
 //==================================================================================

@@ -1,22 +1,21 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
-                      Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2004, 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public License
-along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   You should have received a copy of the GNU Library General Public License
+   along with this program; see the file COPYING.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
@@ -38,8 +37,8 @@ using namespace Predicate;
 
 //--------------------------------------------------------------------------
 
-MysqlConnection::MysqlConnection(Driver *driver, ConnectionData &conn_data)
-        : Connection(driver, conn_data)
+MysqlConnection::MysqlConnection(Driver *driver, const ConnectionData& connData)
+        : Connection(driver, connData)
         , d(new MysqlConnectionInternal(this))
 {
 }
@@ -51,11 +50,11 @@ MysqlConnection::~MysqlConnection()
 
 bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
-    const bool ok = d->db_connect(*data());
+    const bool ok = d->db_connect(data());
     if (!ok)
         return false;
 
-    version.string = mysql_get_host_info(d->mysql);
+    version->setString(mysql_get_host_info(d->mysql));
 
     //retrieve server version info
 #if 0 //this only works for client version >= 4.1 :(
@@ -71,9 +70,9 @@ bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
     tristate res = querySingleString("SELECT @@version", &versionString, /*column*/0, false /*!addLimitTo1*/);
     QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)");
     if (res == true && versionRe.exactMatch(versionString)) { // (if querySingleString failed, the version will be 0.0.0...
-        version.major = versionRe.cap(1).toInt();
-        version.minor = versionRe.cap(2).toInt();
-        version.release = versionRe.cap(3).toInt();
+        version->setMajor(versionRe.cap(1).toInt());
+        version->setMinor(versionRe.cap(2).toInt());
+        version->setRelease(versionRe.cap(3).toInt());
     }
 #endif
     // Get lower_case_table_name value so we know if there's case sensitivity supported
@@ -97,28 +96,25 @@ Cursor* MysqlConnection::prepareQuery(const QString& statement, uint cursor_opti
     return new MysqlCursor(this, statement, cursor_options);
 }
 
-Cursor* MysqlConnection::prepareQuery(QuerySchema& query, uint cursor_options)
+Cursor* MysqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     return new MysqlCursor(this, query, cursor_options);
 }
 
-bool MysqlConnection::drv_getDatabasesList(QStringList &list)
+bool MysqlConnection::drv_getDatabasesList(QStringList* list)
 {
     PreDrvDbg;
-    list.clear();
-    MYSQL_RES *res;
-
-    if ((res = mysql_list_dbs(d->mysql, 0)) != 0) {
-        MYSQL_ROW  row;
+    list->clear();
+    MYSQL_RES *res = mysql_list_dbs(d->mysql, 0);
+    if (res != 0) {
+        MYSQL_ROW row;
         while ((row = mysql_fetch_row(res)) != 0) {
-            list << QString(row[0]);
+            *list << QString(row[0]);
         }
         mysql_free_result(res);
         return true;
     }
-
     d->storeResult();
-// setError(ERR_DB_SPECIFIC,mysql_error(d->mysql));
     return false;
 }
 
@@ -131,8 +127,10 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
       QString::fromLatin1("SHOW DATABASES LIKE %1")
           .arg(driver()->escapeString(storedDbName)), &success);
     if (!exists || !success) {
-        if (!ignoreErrors)
-            setError(ERR_OBJECT_NOT_FOUND, QObject::tr("The database \"%1\" does not exist.").arg(storedDbName));
+        if (!ignoreErrors) {
+            m_result = Result(ERR_OBJECT_NOT_FOUND,
+                              QObject::tr("The database \"%1\" does not exist.").arg(storedDbName));
+        }
         return false;
     }
     return true;
@@ -181,15 +179,10 @@ bool MysqlConnection::drv_executeSQL(const QString& statement)
 quint64 MysqlConnection::drv_lastInsertRecordId()
 {
     //! @todo
-    return (quint64)mysql_insert_id(d->mysql);
+    return static_cast<quint64>(mysql_insert_id(d->mysql));
 }
 
-int MysqlConnection::serverResult()
-{
-    return d->res;
-}
-
-QString MysqlConnection::serverResultName()
+QString MysqlConnection::serverResultName() const
 {
     return QString();
 }
@@ -201,24 +194,19 @@ void MysqlConnection::drv_clearServerResult()
     d->res = 0;
 }
 
-QString MysqlConnection::serverErrorMsg()
-{
-    return d->errmsg;
-}
-
-bool MysqlConnection::drv_containsTable(const QString &tableName)
+bool MysqlConnection::drv_containsTable(const QString& tableName)
 {
     bool success;
     return resultExists(QString("SHOW TABLES LIKE %1")
-                        .arg(driver()->escapeString(tableName)), success) && success;
+                        .arg(driver()->escapeString(tableName)), &success) && success;
 }
 
-bool MysqlConnection::drv_getTablesList(QStringList &list)
+bool MysqlConnection::drv_getTablesList(QStringList* list)
 {
     return queryStringList("SHOW TABLES", list);
 }
 
 PreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 {
-    return new MysqlPreparedStatement(*d);
+    return new MysqlPreparedStatement(d);
 }

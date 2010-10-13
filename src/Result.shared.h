@@ -62,26 +62,6 @@ public:
 
     /*!
     @getter
-    @return previous server result code, for displaying.
-    @setter
-    Sets previous server result code, for displaying.
-    */
-    data_member int previousServerResultCode default=0;
-
-    data_member int previousServerResultCode2 default=0 no_getter no_setter;
-
-    /*!
-    @getter
-    @return previous server result name, for displaying.
-    @setter
-    Sets previous server result name, for displaying.
-    */
-    data_member QString previousServerResultName;
-
-    data_member QString previousServerResultName2 no_getter no_setter;
-
-    /*!
-    @getter
     @return (localized) message if there was error.
     @setter
     Sets (localized) message to @a message.
@@ -98,17 +78,6 @@ public:
     data_member QString errorSql;
 
     data_member QString sql;
-
-    /*!
-    @getter
-    @return engine-specific last server-side operation result name, (name for serverResultCode()).
-    Use this in your application to give users more information on what's up.
-
-    Use this for your driver - default implementation just returns empty string.
-    Note that this result name is not the same as the error message returned by serverMessage() or message()
-    @sa serverMessage()
-    */
-    data_member QString serverResultName;
 
     /*!
     @getter
@@ -160,10 +129,6 @@ public:
     }
 
 protected:
-    /*! Helper, stores previous error.
-    */
-    void storePreviousError();
-
     void init(int code, const QString& message);
 #if 0
     /*! Interactively asks a question. Console or GUI can be used for this,
@@ -184,7 +149,7 @@ protected:
      as a single integer. Formally, this integer should be set to value
      that means "NO ERRORS" or "OK". This method is called by clearError().
      For reimplementation. By default does nothing.
-     \sa serverErrorMsg()
+     \sa serverMessage()
     */
     virtual void drv_clearServerResultCode() {}
 #endif
@@ -198,7 +163,36 @@ public:
 
     void clearResult() { m_result = Result(); }
 
+    /*! Stores previous error.
+    */
+//    void storePreviousError();
+
+    /*!
+    @return engine-specific last server-side operation result name, (name for serverResultCode()).
+    Use this in your application to give users more information on what's up.
+
+    Use this for your driver - default implementation just returns empty string.
+    Note that this result name is not the same as the error message returned by Result::serverMessage() or Result::message().
+    @sa Result::serverMessage()
+    */
+    virtual QString serverResultName() const;
+
 protected:
+#if 0
+    /*!
+    Previous server result code, for displaying.
+    */
+    int m_previousServerResultCode;
+
+    int m_previousServerResultCode2;
+
+    /*!
+    Previous server result name, for displaying.
+    */
+    QString m_previousServerResultName;
+
+    QString m_previousServerResultName2;
+#endif
     Result m_result;
 };
 

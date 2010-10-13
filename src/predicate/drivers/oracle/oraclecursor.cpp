@@ -50,7 +50,7 @@ OracleCursor::OracleCursor
 	m_containsROWIDInfo = false;
 }
 
-OracleCursor::OracleCursor(Connection* conn, QuerySchema& query, uint options )
+OracleCursor::OracleCursor(Connection* conn, QuerySchema* query, uint options )
    : Cursor( conn, query, options )
       , d( new OracleCursorData(conn) )
 {
@@ -70,10 +70,10 @@ OracleCursor::~OracleCursor()
 	close();
 }
 
-bool OracleCursor::drv_open() 
+bool OracleCursor::drv_open(const QString& sql) 
 {
-  QString count="select count(*) from("+m_sql+")";
-  KexiDBDrvDbg <<m_sql;
+  QString count = "SELECT COUNT(*) FROM(" + sql + ")";
+  KexiDBDrvDbg << sql;
   try
   {
     d->rs=d->stmt->executeQuery(count.latin1());
@@ -81,7 +81,7 @@ bool OracleCursor::drv_open()
     //Oracle doesn't provide a method to count ¬¬
     d->stmt->closeResultSet(d->rs);
     d->rs = 0; 
-    d->rs=d->stmt->executeQuery(m_sql.latin1()); 
+    d->rs=d->stmt->executeQuery(sql.toUtf8());
       
     vector<MetaData> md = d->rs->getColumnListMetaData();
     m_fieldCount=md.size();//Number of columns
@@ -152,16 +152,16 @@ void OracleCursor::drv_getNextRecord()
     switch(d->rs->status())
     {
       case ResultSet::DATA_AVAILABLE:
-        m_result=FetchOK;
+        m_fetchResult = FetchOK;
         //KexiDBDrvDbg<<"("<<m_at+1<<"/"<<d->numRows<<") OK";
         break;
         
       case ResultSet::END_OF_FETCH:
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
         break;
       
       default:
-        m_result = FetchError;
+        m_fetchResult = FetchError;
     } 
  }
  catch(oracle::occi::SQLException ea)
@@ -239,16 +239,16 @@ bool OracleCursor::drv_storeCurrentRecord(RecordData* data) const
 		if (t==1||t==5||t==9||t==94||t==96||t==104)//text
 			data[i] = QVariant( d->rs->getString(i+1).c_str() );
 		else if (t==3||t==6||t==2)//Numeric
-			data[i] = QVariant(d->rs->getDouble(i+1));
+			(*data)[i] = QVariant(d->rs->getDouble(i+1));
 											//,md[i+1].getInt(MetaData::ATTR_PRECISION));
 		else if (t==113) {//blob
-			data[i]=QByteArray((char *) &d->rs->getBlob(i+1),d->lengths[i]);
+			(*data)[i]=QByteArray((char *) &d->rs->getBlob(i+1),d->lengths[i]);
 		}
 		else
 		{
 //! @todo date/time?
 	//default
-			data[i]= QVariant(d->rs->getString(i+1).c_str());
+			(*data)[i]= QVariant(d->rs->getString(i+1).c_str());
 		}
 	}
 	return true;
@@ -266,7 +266,7 @@ void OracleCursor::drv_bufferMovePointerNext()
   }
   catch ( oracle::occi::SQLException ea)
   {
-    m_result = FetchError;
+    m_fetchResult = FetchError;
   }   
 }
 
@@ -298,10 +298,10 @@ int OracleCursor::serverResult()
 	return d->errno;
 }
 
-QString OracleCursor::serverResultName()
+QString OracleCursor::serverResultName() const
 {
-  KexiDBDrvDbg;
-	return QString();
+    KexiDBDrvDbg;
+    return QString();
 }
 
 void OracleCursor::drv_clearServerResult()

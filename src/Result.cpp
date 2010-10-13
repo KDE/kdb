@@ -47,7 +47,7 @@ Result::~Result()
 
 void Result::init(int code, const QString& message)
 {
-    storePreviousError();
+//    storePreviousError();
     d->code = code;
     d->errorSql = d->sql;
     if (d->code == ERR_OTHER && message.isEmpty())
@@ -58,15 +58,6 @@ void Result::init(int code, const QString& message)
 //! @todo
 /*    if (m_hasError)
         ERRMSG(this);*/
-}
-
-void Result::storePreviousError()
-{
-    d->previousServerResultCode = d->previousServerResultCode2;
-    d->previousServerResultName = d->previousServerResultName2;
-    d->previousServerResultCode2 = d->serverResultCode;
-    d->previousServerResultName2 = d->serverResultName;
-    qDebug() << "Object ERROR:" << d->previousServerResultCode2 << ":" << d->previousServerResultName2;
 }
 
 // void Object::setError(Predicate::Object *obj, int code, const QString& prependMessage)
@@ -118,7 +109,7 @@ void Result::storePreviousError()
 
 void Result::prependMessage(int code, const QString& message)
 {
-    storePreviousError();
+//    storePreviousError();
     if (d->code == 0) {
         if (code == 0)
             d->code = ERR_OTHER;
@@ -149,11 +140,11 @@ QDebug operator<<(QDebug dbg, const Result& result)
             dbg.space() << "SQL=" << result.sql();
         if (!result.errorSql().isEmpty())
             dbg.space() << "ERR_SQL=" << result.errorSql();
-        dbg.space() << "SERVER_RESULT=(CODE:" << result.serverResultCode() << "NAME:" << result.serverResultName() << ")";
+        dbg.space() << "SERVER_RESULT=(CODE:" << result.serverResultCode() /*<< "NAME:" << result.serverResultName()*/ << ")";
         if (!result.serverMessage().isEmpty())
             dbg.nospace() << "MESSAGE:" << result.serverMessage();
-        dbg.space() << "PREV_SERVER_RESULT=(CODE:" << result.previousServerResultCode() << "NAME:" <<
-             result.previousServerResultName() << ")";
+        /*dbg.space() << "PREV_SERVER_RESULT=(CODE:" << result.previousServerResultCode() << "NAME:" <<
+             result.previousServerResultName() << ")";*/
     } else {
         dbg.nospace() << "Predicate::Result: OK";
     }
@@ -181,3 +172,18 @@ MessageHandler::ButtonCode Object::askQuestion(
 
     return defaultResult;
 }*/
+
+/*
+void Resultable::storePreviousError()
+{
+    m_previousServerResultCode = m_previousServerResultCode2;
+    m_previousServerResultName = m_previousServerResultName2;
+    m_previousServerResultCode2 = m_serverResultCode;
+    m_previousServerResultName2 = m_serverResultName;
+    qDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
+}*/
+
+QString Resultable::serverResultName() const
+{
+    return QString();
+}

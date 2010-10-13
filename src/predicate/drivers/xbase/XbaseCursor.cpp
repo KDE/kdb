@@ -47,7 +47,7 @@ xBaseCursor::xBaseCursor(Predicate::Connection* conn, Predicate::Cursor* interna
   init();
 }
 
-xBaseCursor::xBaseCursor(Connection* conn, Predicate::Cursor* internalCursor, QuerySchema& query, uint options )
+xBaseCursor::xBaseCursor(Connection* conn, Predicate::Cursor* internalCursor, QuerySchema* query, uint options)
   : Cursor( conn, query, options )
   , d( new xBaseCursorData(internalCursor) )
 {
@@ -68,7 +68,8 @@ void xBaseCursor::init() {
   setBuffered(false);
 }
 
-bool xBaseCursor::drv_open() {
+bool xBaseCursor::drv_open(const QString& sql)
+{
 //	PreDrvDbg << m_sql;
   if (!d->internalCursor) {
     return false;
@@ -88,19 +89,19 @@ bool xBaseCursor::drv_close() {
 
 void xBaseCursor::drv_getNextRecord() {
   if (!d->internalCursor) {
-    m_result = FetchError;
+    m_fetchResult = FetchError;
     return;
   }
 
   if ( !d->internalCursor->moveNext() ) {
     if ( d->internalCursor->eof() )
-      m_result = FetchEnd;
+      m_fetchResult = FetchEnd;
     else
-      m_result = FetchError;
+      m_fetchResult = FetchError;
   } else {
-    m_result = FetchOK;
+    m_fetchResult = FetchOK;
     m_fieldCount = d->internalCursor->fieldCount();
-    m_fieldsToStoreInRow = m_fieldCount;
+    m_fieldsToStoreInRecord = m_fieldCount;
   }
 }
 
@@ -123,7 +124,7 @@ bool xBaseCursor::drv_storeCurrentRecord(RecordData* data) const
   if (!rData) {
     return false;
   }
-  data = *rData;
+  *data = *rData;
   return true;
 }
 
@@ -158,7 +159,7 @@ int xBaseCursor::serverResult()
   return d->internalCursor->serverResult();
 }
 
-QString xBaseCursor::serverResultName()
+QString xBaseCursor::serverResultName() const
 {
   if (!d->internalCursor) {
     return QString();

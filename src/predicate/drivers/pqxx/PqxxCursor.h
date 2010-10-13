@@ -56,13 +56,13 @@ public:
 protected:
     pqxxSqlCursor(Connection* conn, const QString& statement = QString(),
                   uint options = NoOptions);
-    pqxxSqlCursor(Connection* conn, QuerySchema& query, uint options = NoOptions);
+    pqxxSqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
     virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
-    virtual bool drv_open();
+    virtual bool drv_open(const QString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     virtual void drv_getPrevRecord();

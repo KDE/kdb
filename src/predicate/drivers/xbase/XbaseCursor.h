@@ -31,10 +31,10 @@ class xBaseCursor: public Cursor {
   public:
         	xBaseCursor(Connection* conn, Cursor* internalCursor, const QString& statement = QString(), 
       uint cursor_options = NoOptions );
-    xBaseCursor(Connection* conn, Cursor* internalCursor, QuerySchema& query, uint options = 	NoOptions );
+    xBaseCursor(Connection* conn, Cursor* internalCursor, QuerySchema* query, uint options = NoOptions);
     virtual ~xBaseCursor();
 
-    virtual bool drv_open();
+    virtual bool drv_open(const QString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     virtual QVariant value(uint);
@@ -46,10 +46,9 @@ class xBaseCursor: public Cursor {
     virtual void drv_bufferMovePointerTo(qint64 to);
     virtual const char** recordData() const;
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
-    
-    virtual int serverResult();
-    virtual QString serverResultName();
-    virtual QString serverErrorMsg();
+
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
 
   protected:
     xBaseCursorData *d;

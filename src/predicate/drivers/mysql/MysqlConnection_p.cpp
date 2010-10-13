@@ -2,19 +2,19 @@
    Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU Library General Public
-License as published by the Free Software Foundation; either
-version 2 of the License, or (at your option) any later version.
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Library General Public
+   License as published by the Free Software Foundation; either
+   version 2 of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Library General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Library General Public License for more details.
 
-You should have received a copy of the GNU Library General Public License
-along with this program; see the file COPYING.  If not, write to
-the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+   You should have received a copy of the GNU Library General Public License
+   along with this program; see the file COPYING.  If not, write to
+   the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
@@ -56,8 +56,8 @@ MysqlConnectionInternal::~MysqlConnectionInternal()
 
 void MysqlConnectionInternal::storeResult()
 {
-    res = mysql_errno(mysql);
-    errmsg = mysql_error(mysql);
+    setServerResultCode(mysql_errno(mysql));
+    setServerMessage(mysql_error(mysql));
 }
 
 /* ************************************************************************** */
@@ -76,10 +76,10 @@ bool MysqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
     PreDrvDbg;
     QByteArray localSocket;
-    QString hostName = data.hostName;
+    QString hostName = data.hostName();
     if (hostName.isEmpty() || hostName.toLower() == "localhost") {
-        if (data.useLocalSocketFile) {
-            if (data.localSocketFileName.isEmpty()) {
+        if (data.useLocalSocketFile()) {
+            if (data.localSocketFileName().isEmpty()) {
                 //! @todo move the list of default sockets to a generic method
                 QStringList sockets;
 #ifndef Q_WS_WIN
@@ -95,7 +95,7 @@ bool MysqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
                 }
 #endif
             } else
-                localSocket = QFile::encodeName(data.localSocketFileName);
+                localSocket = QFile::encodeName(data.localSocketFileName());
         } else {
             //we're not using local socket
             hostName = "127.0.0.1"; //this will force mysql to connect to localhost
@@ -103,9 +103,9 @@ bool MysqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
     }
 
     /*! @todo is latin1() encoding here valid? what about using UTF for passwords? */
-    QByteArray pwd(data.password.isNull() ? QByteArray() : data.password.toLatin1());
-    mysql_real_connect(mysql, hostName.toLatin1(), data.userName.toLatin1(),
-                       pwd.constData(), 0, data.port, localSocket, 0);
+    QByteArray pwd(data.password().isNull() ? QByteArray() : data.password().toLatin1());
+    mysql_real_connect(mysql, hostName.toLatin1(), data.userName().toLatin1(),
+                       pwd.constData(), 0, data.port(), localSocket, 0);
     if (mysql_errno(mysql) == 0)
         return true;
 
@@ -138,14 +138,12 @@ bool MysqlConnectionInternal::useDatabase(const QString &dbName)
  */
 bool MysqlConnectionInternal::executeSQL(const QString& statement)
 {
-// PreDrvDbg << statement;
     QByteArray queryStr(statement.toUtf8());
     const char *query = queryStr.constData();
     if (mysql_real_query(mysql, query, qstrlen(query)) == 0)
         return true;
 
     storeResult();
-// setError(ERR_DB_SPECIFIC,mysql_error(m_mysql));
     return false;
 }
 

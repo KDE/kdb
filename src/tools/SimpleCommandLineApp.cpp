@@ -140,7 +140,7 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
         if (driver->isFileBased())
             d->connData.setFileName(databaseName);
 
-        d->conn = driver->createConnection(d->connData);
+        d->conn = driver->createConnection(&d->connData);
         if (!d->conn || driver->error()) {
             setError(driver);
             return false;

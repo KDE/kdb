@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,7 +40,7 @@ MysqlCursor::MysqlCursor(Predicate::Connection* conn, const QString& statement, 
 // PreDrvDbg << "constructor for query statement";
 }
 
-MysqlCursor::MysqlCursor(Connection* conn, QuerySchema& query, uint options)
+MysqlCursor::MysqlCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
         , d(new MysqlCursorData(conn))
 {
@@ -54,16 +54,14 @@ MysqlCursor::~MysqlCursor()
     close();
 }
 
-bool MysqlCursor::drv_open()
+bool MysqlCursor::drv_open(const QString& sql)
 {
-// PreDrvDbg << m_sql;
-    // This can't be right?  mysql_real_query takes a length in order that
-    // queries can have binary data - but strlen does not allow binary data.
-    if (mysql_real_query(d->mysql, m_sql.toUtf8(), strlen(m_sql.toUtf8())) == 0) {
+    const QByteArray st(sql.toUtf8());
+    if (mysql_real_query(d->mysql, st, st.length()) == 0) {
         if (mysql_errno(d->mysql) == 0) {
             d->mysqlres = mysql_store_result(d->mysql);
             m_fieldCount = mysql_num_fields(d->mysqlres);
-            m_fieldsToStoreInRow = m_fieldCount;
+            m_fieldsToStoreInRecord = m_fieldCount;
             d->numRows = mysql_num_rows(d->mysqlres);
             m_at = 0;
 
@@ -75,7 +73,7 @@ bool MysqlCursor::drv_open()
         }
     }
 
-    setError(ERR_DB_SPECIFIC, QString::fromUtf8(mysql_error(d->mysql)));
+    d->storeResult();
     return false;
 }
 
@@ -100,13 +98,13 @@ void MysqlCursor::drv_getNextRecord()
 // PreDrvDbg;
     if (at() < d->numRows && at() >= 0) {
         d->lengths = mysql_fetch_lengths(d->mysqlres);
-        m_result = FetchOK;
+        m_fetchResult = FetchOK;
     } else if (at() >= d->numRows) {
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     } else {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
-        m_result = FetchEnd;
+        m_fetchResult = FetchEnd;
     }
 }
 
@@ -150,12 +148,12 @@ bool MysqlCursor::drv_storeCurrentRecord(RecordData* data) const
 //!           see SQLiteCursor::storeCurrentRecord()
 
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
-    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRow);
+    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
     for (uint i = 0; i < realCount; i++) {
         Field *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
-        data[i] = Predicate::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
+        (*data)[i] = Predicate::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
         /* moved to cstringToVariant()
             if (f && f->type()==Field::BLOB) {
               data[i] = QByteArray(d->mysqlrow[i], d->mysqlres->lengths[i]);
@@ -204,24 +202,6 @@ const char** MysqlCursor::recordData() const
     return 0;
 }
 
-int MysqlCursor::serverResult()
-{
-    return d->res;
-}
-
-QString MysqlCursor::serverResultName()
-{
-    return QString();
-}
-
 void MysqlCursor::drv_clearServerResult()
 {
-    if (!d)
-        return;
-    d->res = 0;
-}
-
-QString MysqlCursor::serverErrorMsg()
-{
-    return d->errmsg;
 }

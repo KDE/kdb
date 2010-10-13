@@ -119,19 +119,19 @@ inline bool isEmptyValue(Field *f, const QVariant &v)
     return v.isNull();
 }
 
-/*! Sets \a msg to an error message retrieved from result \a result, and \a details
+/*! Sets \a msg to an error message retrieved from resultable \a resultable, and \a details
  to details of this error (server message and result number).
  Does nothing if \a result is empty. In this case \a msg and \a details strings are not overwritten.
  If \a msg is not empty, \a result message is appended to \a details.
  */
-PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, QString& msg, QString &details);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Resultable& resultable, QString& msg, QString &details);
 
 /*! This methods works like above, but appends both a message and a description
  to \a msg. */
-PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, QString& msg);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Resultable& resultable, QString& msg);
 
 /*! This methods works like above, but works on \a result's  members instead. */
-PREDICATE_EXPORT void getHTMLErrorMesage(const Result& result, ResultInfo *info);
+PREDICATE_EXPORT void getHTMLErrorMesage(const Resultable& resultable, ResultInfo *info);
 
 /*! Function useful for building WHERE parts of sql statements.
 Constructs an sql string like "fielname = value" for specific \a drv driver,
