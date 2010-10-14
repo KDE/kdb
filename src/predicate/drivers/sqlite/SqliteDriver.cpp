@@ -46,7 +46,7 @@ public:
 
 SQLiteDriver::SQLiteDriver()
         : Driver()
-        , dp(new SQLiteDriverPrivate())
+        , dp(0) //TODO new SQLiteDriverPrivate())
 {
 //    d->isFileDriver = true;
     d->isDBOpenedAfterCreate = true;
@@ -87,7 +87,7 @@ SQLiteDriver::SQLiteDriver()
 
 SQLiteDriver::~SQLiteDriver()
 {
-    delete dp;
+//    delete dp;
 }
 
 
