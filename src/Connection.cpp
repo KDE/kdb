@@ -141,7 +141,7 @@ public:
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
      Used by Connection::insertInternalTable(TableSchema*) */
-    inline void insertInternalTable(TableSchema* tableSchema) {
+    void insertInternalTable(TableSchema* tableSchema) {
         tableSchema->setPredicateSystem(true);
         _predicateSystemTables.insert(tableSchema);
         tables_byname.insert(tableSchema->name().toLower(), tableSchema);
@@ -150,31 +150,31 @@ public:
     /*! @internal Removes table schema pointed by tableSchema.id() and tableSchema.name()
      from internal structures and destroys it. Does not make any change at the backend.
      Note that the table schema being removed may be not the same as @a tableSchema. */
-    inline void removeTable(const TableSchema& tableSchema) {
+    void removeTable(const TableSchema& tableSchema) {
         tables_byname.remove(tableSchema.name());
         TableSchema *toDelete = tables.take(tableSchema.id());
         delete toDelete;
     }
 
-    inline void takeTable(TableSchema* tableSchema) {
+    void takeTable(TableSchema* tableSchema) {
         if (!takeTableEnabled)
             return;
         tables.take(tableSchema->id());
         tables_byname.take(tableSchema->name());
     }
 
-    inline void renameTable(TableSchema* tableSchema, const QString& newName) {
+    void renameTable(TableSchema* tableSchema, const QString& newName) {
         tables_byname.take(tableSchema->name());
         tableSchema->setName(newName.toLower());
         tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
-    inline void changeTableId(TableSchema* tableSchema, int newId) {
+    void changeTableId(TableSchema* tableSchema, int newId) {
         tables.take(tableSchema->id());
         tables.insert(newId, tableSchema);
     }
 
-    inline void clearTables() {
+    void clearTables() {
         tables_byname.clear();
         qDeleteAll(_predicateSystemTables);
         _predicateSystemTables.clear();
@@ -193,26 +193,26 @@ public:
         return queries.value(id);
     }
 
-    inline void insertQuery(QuerySchema* query) {
+    void insertQuery(QuerySchema* query) {
         queries.insert(query->id(), query);
         queries_byname.insert(query->name(), query);
     }
 
     /*! @internal Removes \a querySchema from internal structures and
      destroys it. Does not make any change at the backend. */
-    inline void removeQuery(QuerySchema* querySchema) {
+    void removeQuery(QuerySchema* querySchema) {
         queries_byname.remove(querySchema->name());
         queries.remove(querySchema->id());
         delete querySchema;
     }
 
-    inline void setQueryObsolete(QuerySchema* query) {
+    void setQueryObsolete(QuerySchema* query) {
         obsoleteQueries.insert(query);
         queries_byname.take(query->name());
         queries.take(query->id());
     }
 
-    inline void clearQueries() {
+    void clearQueries() {
         qDeleteAll(queries);
         queries.clear();
     }
