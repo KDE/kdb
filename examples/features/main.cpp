@@ -280,8 +280,10 @@ int main(int argc, char** argv)
         RETURN(1);
     }
 
-    if (app && r == 0)
+#ifndef NO_GUI
+    if (app && r == 0 && gui)
         app->exec();
+#endif
 
     if (r)
         qDebug() << "RECENT SQL STATEMENT: " << conn->recentSQLString();
