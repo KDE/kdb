@@ -59,32 +59,27 @@ using namespace Predicate;
 TableSchema::TableSchema(const QString& name)
         : FieldList(true)
         , Object(Predicate::TableObjectType)
-        , m_query(0)
         , d( new Private )
         , m_isPredicateSystem(false)
 {
     setName(name.toLower());
-    init();
+    init(0);
 }
 
 TableSchema::TableSchema(const Object& other)
         : FieldList(true)
         , Object(other)
-        , m_query(0)
         , d( new Private )
-        , m_isPredicateSystem(false)
 {
-    init();
+    init(0);
 }
 
 TableSchema::TableSchema()
         : FieldList(true)
         , Object(Predicate::TableObjectType)
-        , m_query(0)
         , d( new Private )
-        , m_isPredicateSystem(false)
 {
-    init();
+    init(0);
 }
 
 TableSchema::TableSchema(const TableSchema& ts, bool copyId)
@@ -108,14 +103,11 @@ TableSchema::TableSchema(const TableSchema& ts, int id)
 TableSchema::TableSchema(Connection *conn, const QString & name)
         : FieldList(true)
         , Object(Predicate::TableObjectType)
-        , m_conn(conn)
-        , m_query(0)
         , d( new Private )
-        , m_isPredicateSystem(false)
 {
-    assert(conn);
+    Q_ASSERT(conn);
     setName(name);
-    init();
+    init(conn);
 }
 
 TableSchema::~TableSchema()
@@ -127,8 +119,11 @@ TableSchema::~TableSchema()
     delete d;
 }
 
-void TableSchema::init()
+void TableSchema::init(Connection* conn)
 {
+    m_conn = conn;
+    m_query = 0; //not cached
+    m_isPredicateSystem = false;
     m_pkey = new IndexSchema(this);
     m_indices.append(m_pkey);
 }

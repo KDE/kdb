@@ -190,7 +190,7 @@ protected:
 
 private:
     //! Used by some ctors.
-    void init();
+    void init(Connection* conn);
 
     //! Used by some ctors.
     void init(const TableSchema& ts, bool copyId);
