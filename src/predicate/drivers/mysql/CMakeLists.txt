@@ -37,6 +37,7 @@ target_link_libraries(predicate_mysql
   ${EXTRA_LIBRARIES}
   predicate
 )
+set_target_properties(predicate_mysql PROPERTIES PREFIX "")
 
 if(MSVC)
   # avoid LNK2005 errors

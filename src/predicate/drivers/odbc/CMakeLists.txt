@@ -30,6 +30,7 @@ add_library(predicate_odbc SHARED ${predicate_odbcdriver_SRCS})
 target_link_libraries(predicate_odbc
   predicate
 )
+set_target_properties(predicate_odbc PROPERTIES PREFIX "")
 
 install(TARGETS predicate_odbc DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_odbc.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

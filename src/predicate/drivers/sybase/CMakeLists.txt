@@ -26,6 +26,7 @@ target_link_libraries(predicate_sybase
   ${FreeTDS_LIBRARIES}
   predicate
 )
+set_target_properties(predicate_sybase PROPERTIES PREFIX "")
 
 install(TARGETS predicate_sybase DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_sybase.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

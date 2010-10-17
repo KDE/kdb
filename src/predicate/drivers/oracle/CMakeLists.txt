@@ -36,6 +36,7 @@ target_link_libraries(predicate_oracle
   occi
   clntsh
 )
+set_target_properties(predicate_oracle PROPERTIES PREFIX "")
 
 install(TARGETS predicate_oracle DESTINATION ${PLUGIN_INSTALL_DIR})
 

@@ -40,6 +40,7 @@ target_link_libraries(predicate_pqxx
   ${PQXX_LIBRARIES}
   predicate
 )
+set_target_properties(predicate_pqxx PROPERTIES PREFIX "")
 
 install(TARGETS predicate_pqxx DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_pqxx.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

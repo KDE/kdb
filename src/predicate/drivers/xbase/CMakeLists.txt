@@ -28,6 +28,7 @@ target_link_libraries(predicate_xbase
   predicate
 #TODO  keximigrate
 )
+set_target_properties(predicate_xbase PROPERTIES PREFIX "")
 
 install(TARGETS predicate_xbase DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_xbase.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
