@@ -1,5 +1,13 @@
 Predicate CHANGELOG
 
+....-..-..
+*MySQL connections work again
+
+2010-10-17
+DriverManager
+*driversForMimeType() added
+*driversInfo() removed as redundant
+
 2010-10-13
 *Port MySQL and SQLite drivers to the new API; some updates in other drivers but no tests
 

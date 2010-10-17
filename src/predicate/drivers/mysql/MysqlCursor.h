@@ -52,8 +52,8 @@ public:
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
 //        virtual bool save(RecordData& data, RowEditBuffer& buf);
 
-    //! Implemented for Resultable
-    virtual QString serverResultName() const;
+//    //! Implemented for Resultable
+//    virtual QString serverResultName() const;
 
 protected:
     QVariant pValue(uint pos) const;

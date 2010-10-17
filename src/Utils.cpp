@@ -1245,7 +1245,15 @@ QString Predicate::simplifiedTypeName(const Field& field)
 
 QString Predicate::defaultFileBasedDriverMimeType()
 {
-    return QString::fromLatin1("application/x-kexiproject-sqlite3");
+    return QLatin1String("application/x-kexiproject-sqlite3");
+}
+
+QString Predicate::defaultFileBasedDriverName()
+{
+/* not needed, it's hardcoded anyway:
+    DriverManager dm;
+    return dm.driversForMimeType(Predicate::defaultFileBasedDriverMimeType()).first().lower();*/
+    return QLatin1String("sqlite3");
 }
 
 QString Predicate::defaultFileBasedDriverIcon()
@@ -1262,10 +1270,4 @@ QString Predicate::defaultFileBasedDriverIcon()
     }
     return mimeType->iconName();
 #endif
-}
-
-QString Predicate::defaultFileBasedDriverName()
-{
-    DriverManager dm;
-    return dm.lookupByMime(Predicate::defaultFileBasedDriverMimeType()).toLower();
 }

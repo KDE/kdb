@@ -140,10 +140,21 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
         if (info.caption().isEmpty())
             info.setCaption( info.name() );
         info.setFileBased( config.value("Type", "Network").toString().toLower()=="file" );
-        if (info.isFileBased())
-            info.setFileDBMimeType( config.value("MimeType").toString().toLower() );
-        info.setImportingAllowed( config.value("AllowImporting", true).toBool() );
+        QStringList mimeTypes;
+        if (info.isFileBased()) {
+            mimeTypes = config.value("MimeTypes").toStringList();
+            QStringList mimeTypesTrimmed;
+            foreach (const QString& mimeType, mimeTypes)
+                mimeTypesTrimmed.append(mimeType.trimmed().toLower());
+            mimeTypes = mimeTypesTrimmed;
+            info.setMimeTypes(mimeTypes);
+        }
+        info.setImportingAllowed(config.value("AllowImporting", true).toBool());
+
         m_driversInfo.insert(info.name().toLower(), info);
+        foreach (const QString& mimeType, mimeTypes) {
+            m_infos_by_mimetype.insertMulti(mimeType, info);
+        }
     }
 }
 
@@ -436,15 +447,7 @@ const Resultable& DriverManager::resultable() const
     return static_cast<const Resultable&>(*s_self);
 }
 
-DriverInfoMap DriverManager::driversInfo()
-{
-    if (!s_self->lookupDrivers())
-        return DriverInfoMap();
-
-    return s_self->m_driversInfo;
-}
-
-const QStringList DriverManager::driverNames()
+QStringList DriverManager::driverNames()
 {
     if (!s_self->lookupDrivers())
         return QStringList();
@@ -482,16 +485,18 @@ const DriverManager::ServicesHash& DriverManager::services()
     return d_int->m_services;
 }*/
 
-QString DriverManager::lookupByMime(const QString &mimeType)
+QStringList DriverManager::driversForMimeType(const QString &mimeType)
 {
     if (!s_self->lookupDrivers()) {
-        return 0;
+        return QStringList();
     }
 
-    const DriverInfo info(s_self->m_infos_by_mimetype.value(mimeType.toLower()));
-    if (!info.isValid())
-        return QString();
-    return info.name();
+    const QList<DriverInfo> infos(s_self->m_infos_by_mimetype.values(mimeType.toLower()));
+    QStringList result;
+    foreach (const DriverInfo& info, infos) {
+        result.append(info.name());
+    }
+    return result;
 }
 
 Driver* DriverManager::driver(const QString& name)

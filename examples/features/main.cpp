@@ -222,7 +222,7 @@ int main(int argc, char** argv)
         qDebug() << manager.result();
         RETURN(1);
     }
-    qDebug() << "MIME type for '" << driver->name() << "': " << driver->info().fileDBMimeType();
+    qDebug() << "MIME types for" << driver->name() << ":" << driver->info().mimeTypes();
 
     const bool bufCursors = takeOption(args, "buffered-cursors");
     QString queryParams = takeOptionWithArg(args, "query-params");

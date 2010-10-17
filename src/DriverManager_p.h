@@ -73,8 +73,8 @@ private:
     bool lookupDrivers();
     void lookupDriversForDirectory(const QString& pluginsDir);
 
-    DriverInfoMap m_infos_by_mimetype;
-    DriverInfoMap m_driversInfo; //!< used to store drivers information
+    QMap<QString, DriverInfo> m_infos_by_mimetype;
+    QMap<QString, DriverInfo> m_driversInfo; //!< used to store drivers information
     QMap<QString, QSharedPointer<Driver>* > m_drivers; //!< for owning drivers
     QMap<Driver*, QWeakPointer<Driver> > m_driverWeakPointers;
     QString m_pluginsDir;

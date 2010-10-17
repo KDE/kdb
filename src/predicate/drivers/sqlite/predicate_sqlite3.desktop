@@ -5,5 +5,5 @@ Comment=Predicate driver for handling SQLite databases
 Comment[en_GB]=Predicate driver for handling SQLite databases
 FileName=sqlite3
 Type=File
-MimeTypes=application/x-sqlite3,application/x-kexiproject-sqlite3
+MimeTypes=application/x-kexiproject-sqlite3,application/x-sqlite3
 Version=1.0

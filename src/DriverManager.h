@@ -40,53 +40,39 @@ public:
     DriverManager();
     virtual ~DriverManager();
 
+    //! @return result of the recent operation.
     Result result() const;
 
+    //! @return Resultable object for the recent operation.
+    //! It adds serverResultName() in addition to the result().
     const Resultable& resultable() const;
 
-    /*! Tries to load db driver with named name \a name.
+    /*! Tries to load db driver with named name @a name.
       The name is case insensitive.
-      \return db driver, or 0 if error (then error message is also set) */
+      @return driver object, or 0 if error (then result is also set, see result()). */
     Driver* driver(const QString& name);
 
     /*! returns list of available drivers names.
       That drivers can be loaded by first use of driver() method. */
-    const QStringList driverNames();
+    QStringList driverNames();
 
-    /*! returns information list of available drivers.
-      That drivers can be loaded by first use of driver() method. */
-    DriverInfoMap driversInfo();
-
-    /*! \return information about driver's named with \a name.
+    /*! @return information about driver's named with @a name.
       The name is case insensitive.
       You can check if driver information is not found calling
       Info::name.isEmpty() (then error message is also set). */
     DriverInfo driverInfo(const QString &name);
 
-    /*! \return service information about driver's named with \a name.
-      The name is case insensitive.
-      In most cases you can use driverInfo() instead. */
-//TODO    KService::Ptr serviceInfo(const QString &name);
-
-    /*! \return a hash structure of the driver infos. Not necessary for everyday use. */
-    DriverInfoMap infoMap();
-
-    /*! Looks up a drivers list by MIME type of database file.
-     Only file-based database drivers are checked.
-     The lookup is case insensitive.
-     \return driver name or null string if no driver found.
-    */
-    QString lookupByMime(const QString &mimeType);
-
-    //! server error is set if there is error related to loading the drivers (useful for debugging)
-//pred    virtual QString serverErrorMsg();
-//pred    virtual int serverResult();
-//pred    virtual QString serverResultName();
+    /*! @return list of driver names for @a mimeType mime type
+     or empty list if no driver has been found.
+     Works only with drivers for file-based databases like SQLite.
+     The lookup is case insensitive. */
+    QStringList driversForMimeType(const QString& mimeType);
 
     /*! HTML information about possible problems encountered.
      It's displayed in 'details' section, if an error encountered.
      Currently it contains a list of incompatible db drivers.
      Used in KexiStartupHandler::detectDriverForFile(). */
+//! @todo make just QStringList
     QString possibleProblemsInfoMsg() const;
 
 protected:

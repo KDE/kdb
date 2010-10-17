@@ -44,8 +44,8 @@ void DriverPrivate::initInternalProperties()
     properties["is_file_database"] = QVariant(info.isFileBased());
     propertyCaptions["is_file_database"] = QObject::tr("File-based database driver");
     if (info.isFileBased()) {
-        properties["file_database_mimetype"] = info.fileDBMimeType();
-        propertyCaptions["file_database_mimetype"] = QObject::tr("File-based database's MIME type");
+        properties["file_database_mimetypes"] = info.mimeTypes();
+        propertyCaptions["file_database_mimetypes"] = QObject::tr("File-based database's MIME types");
     }
 
 #if 0
