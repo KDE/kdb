@@ -1,7 +1,10 @@
 Predicate CHANGELOG
 
-....-..-..
+2010-10-18
+MySQL
 *MySQL connections work again
+*server supported by predicatefeaturestest: added -h option for host, -u for user, -p for password
+**e.g. predicatefeaturestest --test tables -h myhost.com -u root -p pass mysql testdb
 
 2010-10-17
 DriverManager

@@ -161,9 +161,9 @@ int main(int argc, char** argv)
     QStringList tests;
     tests << "cursors" << "schema" << "dbcreation" << "tables"
 #ifndef NO_GUI
-    << "tableview"
+        << "tableview"
 #endif
-    << "parser" << "dr_prop";
+        << "parser" << "dr_prop";
     test_name = takeOptionWithArg(args, "test");
     if (test_name.isEmpty()) {
         qDebug() << "No test specified. Use --help.";
@@ -200,6 +200,27 @@ int main(int argc, char** argv)
     {
         app = new QApplication(argc, argv, false);
 //qtonly        instance = new KComponentData(prgname);
+    }
+
+    QString hostName = takeOptionWithArg(args, "h");
+    if (!hostName.isEmpty()) {
+        conn_data.setHostName(hostName);
+    }
+    QString userName = takeOptionWithArg(args, "u");
+    if (!userName.isEmpty()) {
+        conn_data.setUserName(userName);
+    }
+    QString password = takeOptionWithArg(args, "p");
+    if (!password.isEmpty()) {
+        conn_data.setPassword(password);
+    }
+    QString port = takeOptionWithArg(args, "P");
+    if (!port.isEmpty()) {
+        bool ok;
+        conn_data.setPort(port.toInt(&ok));
+        if (!ok) {
+            RETURN(1);
+        }
     }
 
     drv_name = args.first();
@@ -240,7 +261,9 @@ int main(int argc, char** argv)
         if (bufCursors) {
             cursor_options |= Predicate::Cursor::Buffered;
         }
-        conn_data.setFileName(db_name);
+        if (driver->isFileBased()) {
+            conn_data.setFileName(db_name);
+        }
         conn = driver->createConnection(conn_data);
 
         if (!conn || driver->result().isError()) {
