@@ -1650,7 +1650,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
             return false;
         }
 
-        Field *sys_field = findSystemFieldName(tableSchema);
+        Field *sys_field = findSystemFieldName(*tableSchema);
         if (sys_field) {
             clearResult();
             m_result = Result(ERR_SYSTEM_NAME_RESERVED,
