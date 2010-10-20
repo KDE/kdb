@@ -146,7 +146,9 @@ void LookupFieldSchema::RecordSource::setValues(const QStringList& values)
 
 LookupFieldSchema::RecordSource& LookupFieldSchema::RecordSource::operator=(const RecordSource & other)
 {
-    *d = *other.d;
+    if (this != &other) {
+        *d = *other.d;
+    }
     return *this;
 }
 
