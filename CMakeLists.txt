@@ -37,8 +37,8 @@ include(CreateSharedDataClasses)
 
 find_package(Qt4 REQUIRED)
 
-add_subdirectory( cmake )
 add_subdirectory( Predicate )
+add_subdirectory( Drivers )
 add_subdirectory( tests )
 
 macro_display_feature_log()

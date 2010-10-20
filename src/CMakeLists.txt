@@ -17,8 +17,6 @@ include_directories(
   ${QT_INCLUDES}
 )
 
-add_subdirectory( drivers )
-
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
   -D__PREDICATE__=

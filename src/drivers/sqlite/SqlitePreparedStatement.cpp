@@ -18,10 +18,9 @@
 */
 
 #include "SqlitePreparedStatement.h"
-#include "PreparedStatement.h"
+#include <Predicate/PreparedStatement.h>
 
 #include <QtDebug>
-#include <assert.h>
 
 using namespace Predicate;
 

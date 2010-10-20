@@ -6,6 +6,11 @@ endif(COMMAND cmake_policy)
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
 set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
+include_directories(
+  ${CMAKE_SOURCE_DIR}
+  ${Predicate_BINARY_DIR}
+  ${QT_INCLUDES}
+)
 
 # find SQLite:
 set(SQLITE_RECOMMENDED_VERSION "3.7.3")
