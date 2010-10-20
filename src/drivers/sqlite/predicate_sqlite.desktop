@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=sqlite3
-Caption=SQLite 3
+Name=sqlite
+Caption=SQLite
 Comment=Predicate driver for handling SQLite databases
 Comment[en_GB]=Predicate driver for handling SQLite databases
-FileName=sqlite3
+FileName=sqlite
 Type=File
 MimeTypes=application/x-kexiproject-sqlite3,application/x-sqlite3
 Version=1.0

@@ -1253,7 +1253,7 @@ QString Predicate::defaultFileBasedDriverName()
 /* not needed, it's hardcoded anyway:
     DriverManager dm;
     return dm.driversForMimeType(Predicate::defaultFileBasedDriverMimeType()).first().lower();*/
-    return QLatin1String("sqlite3");
+    return QLatin1String("sqlite");
 }
 
 QString Predicate::defaultFileBasedDriverIcon()

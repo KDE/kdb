@@ -107,7 +107,7 @@ public:
 
     /*! \return true for read only connection. Used especially for file-based drivers.
      Can be reimplemented in a driver to provide real read-only flag of the connection
-     (SQlite3 dirver does this). */
+     (sqlite driver does this). */
     virtual bool isReadOnly() const;
 
     /*! Reimplemented, also clears sql string.

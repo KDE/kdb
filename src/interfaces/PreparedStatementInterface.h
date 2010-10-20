@@ -40,7 +40,7 @@ protected:
     /*! For implementation. Initializes the prepared statement in a backend-dependent way
         using recently generated @a statement. 
         It is guaranteed that @a statement valid and not empty.
-        For example sqlite3_prepare() is used for SQLite 3.
+        For example sqlite3_prepare() is used for SQLite.
         This is called only when d->dirty == true is encountered on execute(),
         i.e. when attributes of the object (like WHERE field names) change. */
     virtual bool prepare(const QByteArray& statement) = 0;

@@ -479,7 +479,7 @@ PREDICATE_EXPORT QString defaultFileBasedDriverMimeType();
  @see Predicate::defaultFileBasedDriverMimeType() */
 PREDICATE_EXPORT QString defaultFileBasedDriverIcon();
 
-/*! \return default file-based driver name (currently, "sqlite3"). */
+/*! \return default file-based driver name (currently, "sqlite"). */
 PREDICATE_EXPORT QString defaultFileBasedDriverName();
 
 /*! @return debugging string for object @a object of type @a T */

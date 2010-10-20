@@ -29,8 +29,8 @@ include_directories(
 
 ADD_DEFINITIONS(
   -D__PREDICATE__=
-  -DPREDICATE_DRIVER_NAME="sqlite3"
-  -DPREDICATE_SQLITE3_NO_VACUUM=1 #TODO remove
+  -DPREDICATE_DRIVER_NAME="sqlite"
+  -DPREDICATE_SQLITE_NO_VACUUM=1 #TODO remove
 )
 
 if(MSVC)
@@ -43,7 +43,7 @@ endif(MSVC)
 
 ########### next target ###############
 
-set(predicate_sqlite3_SRCS 
+set(predicate_sqlite_SRCS
    SqliteConnection.cpp 
    SqliteDriver.cpp 
    SqliteCursor.cpp 
@@ -54,17 +54,17 @@ set(predicate_sqlite3_SRCS
    SqliteAlter.cpp
 )
 
-set(predicate_sqlite3_MOC_SRCS
+set(predicate_sqlite_MOC_SRCS
    SqliteDriver.h
 #todo   SqliteVacuum.h
 )
 
-qt_wrap_cpp(predicate_sqlite3 predicate_sqlite3_SRCS ${predicate_sqlite3_MOC_SRCS})
+qt_wrap_cpp(predicate_sqlite predicate_sqlite_SRCS ${predicate_sqlite_MOC_SRCS})
 
-add_library(predicate_sqlite3 SHARED ${predicate_sqlite3_SRCS})
+add_library(predicate_sqlite SHARED ${predicate_sqlite_SRCS})
 
-target_link_libraries(predicate_sqlite3 ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} ${SQLITE_LIBRARIES} predicate)
-set_target_properties(predicate_sqlite3 PROPERTIES PREFIX "")
+target_link_libraries(predicate_sqlite ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} ${SQLITE_LIBRARIES} predicate)
+set_target_properties(predicate_sqlite PROPERTIES PREFIX "")
 
-install(TARGETS predicate_sqlite3 DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_sqlite3.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS predicate_sqlite DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(FILES predicate_sqlite.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

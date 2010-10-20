@@ -34,7 +34,7 @@ SQLiteAdminTools::~SQLiteAdminTools()
 {
 }
 
-#ifndef PREDICATE_SQLITE3_NO_VACUUM
+#ifndef PREDICATE_SQLITE_NO_VACUUM
 bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
 {
     clearError();
