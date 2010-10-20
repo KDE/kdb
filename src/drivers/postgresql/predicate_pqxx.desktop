@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=postgresql
+Caption=PostgreSQL
+Comment=Predicate driver for handling PostgreSQL databases
+Comment[en_GB]=Predicate driver for handling PostgreSQL databases
+FileName=postgresql
+Type=Network
+Version=1.0
