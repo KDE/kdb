@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -50,6 +50,8 @@ class PREDICATE_EXPORT DriverBehaviour
 {
 public:
     DriverBehaviour();
+
+    ~DriverBehaviour();
 
     //! "UNSIGNED" by default
     QString UNSIGNED_TYPE_KEYWORD;
@@ -134,6 +136,12 @@ public:
     /*! True if "SELECT 1 from (subquery)" is supported. False by default.
      Used in Connection::resultExists() for optimization. It's set to true for SQLite driver. */
     bool SELECT_1_SUBQUERY_SUPPORTED;
+
+    /*! Literal for boolean true. "1" by default. */
+    QString BOOLEAN_TRUE_LITERAL;
+
+    /*! Literal for boolean false. "0" by default. */
+    QString BOOLEAN_FALSE_LITERAL;
 };
 
 /*! Private driver's data members. Available for implementation. */

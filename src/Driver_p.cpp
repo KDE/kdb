@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-    Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+    Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
     Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -23,6 +23,28 @@
 #include <QtDebug>
 
 using namespace Predicate;
+
+DriverBehaviour::DriverBehaviour()
+        : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))
+        , AUTO_INCREMENT_FIELD_OPTION(QLatin1String("AUTO_INCREMENT"))
+        , AUTO_INCREMENT_PK_FIELD_OPTION(QLatin1String("AUTO_INCREMENT PRIMARY KEY"))
+        , SPECIAL_AUTO_INCREMENT_DEF(false)
+        , AUTO_INCREMENT_REQUIRES_PK(false)
+        , ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE(false)
+        , QUOTATION_MARKS_FOR_IDENTIFIER('"')
+        , USING_DATABASE_REQUIRED_TO_CONNECT(true)
+        , _1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY(false)
+        , SELECT_1_SUBQUERY_SUPPORTED(false)
+        , BOOLEAN_TRUE_LITERAL('1')
+        , BOOLEAN_FALSE_LITERAL('0')
+{
+}
+
+DriverBehaviour::~DriverBehaviour()
+{
+}
+
+//---------------------------------------------
 
 DriverPrivate::DriverPrivate()
         : isDBOpenedAfterCreate(false)

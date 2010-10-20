@@ -55,22 +55,6 @@ static const char* Predicate_defaultSQLTypeNames[] = {
 
 //---------------------------------------------
 
-DriverBehaviour::DriverBehaviour()
-        : UNSIGNED_TYPE_KEYWORD("UNSIGNED")
-        , AUTO_INCREMENT_FIELD_OPTION("AUTO_INCREMENT")
-        , AUTO_INCREMENT_PK_FIELD_OPTION("AUTO_INCREMENT PRIMARY KEY")
-        , SPECIAL_AUTO_INCREMENT_DEF(false)
-        , AUTO_INCREMENT_REQUIRES_PK(false)
-        , ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE(false)
-        , QUOTATION_MARKS_FOR_IDENTIFIER('"')
-        , USING_DATABASE_REQUIRED_TO_CONNECT(true)
-        , _1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY(false)
-        , SELECT_1_SUBQUERY_SUPPORTED(false)
-{
-}
-
-//---------------------------------------------
-
 Driver::Driver()
  : beh(new DriverBehaviour())
  , d(new DriverPrivate())
@@ -263,11 +247,11 @@ QString Driver::valueToSQL(uint ftype, const QVariant& v) const
     }
 //TODO: here special encoding method needed
     case Field::Boolean:
-        return QString::number(v.toInt() ? 1 : 0); //0 or 1
+        return v.toInt() == 0 ? beh->BOOLEAN_FALSE_LITERAL : beh->BOOLEAN_TRUE_LITERAL;
     case Field::Time:
-        return QLatin1String("\'") + v.toTime().toString(Qt::ISODate) + QLatin1String("\'");
+        return QString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
     case Field::Date:
-        return QLatin1String("\'") + v.toDate().toString(Qt::ISODate) + QLatin1String("\'");
+        return QString('\'') + v.toDate().toString(Qt::ISODate) + '\'';
     case Field::DateTime:
         return dateTimeToSQL(v.toDateTime());
     case Field::BLOB: {
