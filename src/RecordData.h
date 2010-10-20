@@ -42,7 +42,7 @@ public:
     inline RecordData() : QVector<QVariant>() {}
 
     /*! Creates a new record data with \a numCols columns. */
-    inline RecordData(int numCols) : QVector<QVariant>(numCols) {}
+    inline explicit RecordData(int numCols) : QVector<QVariant>(numCols) {}
 
     /*! Clears existing column values and inits new \a numCols
      columns with empty values. The vector is resized to \a numCols. */

@@ -96,7 +96,7 @@ public:
 
     Result(int code, const QString& message);
 
-    Result(const QString& message);
+    explicit Result(const QString& message);
 
     void prependMessage(int code, const QString& message);
 

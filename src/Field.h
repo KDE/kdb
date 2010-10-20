@@ -152,7 +152,7 @@ public:
 
     /*! Creates a database field as a child of \a tableSchema table
      No other properties are set (even the name), so these should be set later. */
-    Field(TableSchema *tableSchema);
+    explicit Field(TableSchema *tableSchema);
 
     /*! Creates a database field without any properties set.
      These should be set later. */

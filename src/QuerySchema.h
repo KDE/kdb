@@ -54,7 +54,8 @@ public:
     typedef QList<QueryColumnInfo*> List;
     typedef QList<QueryColumnInfo*>::ConstIterator ListIterator;
 
-    QueryColumnInfo(Field *f, const QByteArray& _alias, bool _visible, QueryColumnInfo *foreignColumn = 0);
+    QueryColumnInfo(Field *f, const QByteArray& _alias, bool _visible,
+                    QueryColumnInfo *foreignColumn = 0);
     ~QueryColumnInfo();
 
     //! \return alias if it is not empty, field's name otherwise.
@@ -289,7 +290,7 @@ public:
      in a system table, so query connection is set to NULL
      (even if \a tableSchema's connection is not NULL).
      Id of the created query is set to 0. */
-    QuerySchema(TableSchema& tableSchema);
+    explicit QuerySchema(TableSchema& tableSchema);
 
     /*! Copy constructor. Creates deep copy of \a querySchema.
      QueryAsterisk objects are deeply copied while only pointers to Field objects are copied. */

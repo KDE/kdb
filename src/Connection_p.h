@@ -29,7 +29,7 @@ namespace Predicate
 class PREDICATE_EXPORT ConnectionInternal
 {
 public:
-    ConnectionInternal(Connection *conn);
+    explicit ConnectionInternal(Connection *conn);
     virtual ~ConnectionInternal();
     virtual void storeResult() = 0;
 
@@ -43,7 +43,7 @@ public:
         connection->setResult(result);
     }
 
-    Connection* connection;
+    Connection* const connection;
 };
 
 } //namespace Predicate

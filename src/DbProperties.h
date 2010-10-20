@@ -59,7 +59,7 @@ public:
     QStringList names();
 
 protected:
-    DatabaseProperties(Connection *conn);
+    explicit DatabaseProperties(Connection *conn);
 
     Connection* m_conn;
     friend class ConnectionPrivate;

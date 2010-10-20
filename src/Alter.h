@@ -160,7 +160,7 @@ public:
     class PREDICATE_EXPORT ActionBase
     {
     public:
-        ActionBase(bool null = false);
+        explicit ActionBase(bool null = false);
         virtual ~ActionBase();
 
         ChangeFieldPropertyAction& toChangeFieldPropertyAction();
@@ -252,7 +252,7 @@ public:
     {
     public:
         FieldActionBase(const QString& fieldName, int uid);
-        FieldActionBase(bool);
+        explicit FieldActionBase(bool);
         virtual ~FieldActionBase();
 
         //! \return field name for this action
@@ -357,7 +357,7 @@ public:
         InsertFieldAction(int fieldIndex, Predicate::Field *newField, int uid);
         //copy ctor
         InsertFieldAction(const InsertFieldAction& action);
-        InsertFieldAction(bool);
+        explicit InsertFieldAction(bool);
         virtual ~InsertFieldAction();
 
         int index() const {
@@ -395,7 +395,7 @@ public:
     {
     public:
         MoveFieldPositionAction(int fieldIndex, const QString& fieldName, int uid);
-        MoveFieldPositionAction(bool);
+        explicit MoveFieldPositionAction(bool);
         virtual ~MoveFieldPositionAction();
 
         int index() const {
@@ -414,7 +414,7 @@ public:
         int m_index;
     };
 
-    AlterTableHandler(Connection* conn);
+    explicit AlterTableHandler(Connection* conn);
 
     virtual ~AlterTableHandler();
 

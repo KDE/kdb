@@ -46,7 +46,7 @@ class Result;
 class PREDICATE_EXPORT MessageTitleSetter
 {
 public:
-    MessageTitleSetter(Result* result, const QString& message = QString());
+    explicit MessageTitleSetter(Result* result, const QString& message = QString());
     ~MessageTitleSetter();
 
 protected:
@@ -117,7 +117,7 @@ public:
 
     /*! Constructs mesage handler, \a parent is a widget that will be a parent
      for displaying gui elements (e.g. message boxes). Can be 0 for non-gui usage. */
-    MessageHandler(QWidget *parent = 0);
+    explicit MessageHandler(QWidget *parent = 0);
     virtual ~MessageHandler();
 
     /*! This method can be used to block/unblock messages.

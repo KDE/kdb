@@ -46,8 +46,8 @@ public:
     typedef QList<TableSchema*> List; //!< Type of tables list
     typedef QList<TableSchema>::ConstIterator ListIterator; //!< Iterator for tables list
 
-    TableSchema(const QString& name);
-    TableSchema(const Object& object);
+    explicit TableSchema(const QString& name);
+    explicit TableSchema(const Object& object);
     TableSchema();
 
     /*! Copy constructor.
@@ -175,7 +175,7 @@ public:
 
 protected:
     /*! Automatically retrieves table schema via connection. */
-    TableSchema(Connection *conn, const QString & name = QString());
+    explicit TableSchema(Connection *conn, const QString & name = QString());
 
     IndexSchema::List m_indices;
 
@@ -207,8 +207,8 @@ private:
 class PREDICATE_EXPORT InternalTableSchema : public TableSchema
 {
 public:
-    InternalTableSchema(const QString& name);
-    InternalTableSchema(const TableSchema& ts);
+    explicit InternalTableSchema(const QString& name);
+    explicit InternalTableSchema(const TableSchema& ts);
     virtual ~InternalTableSchema();
 };
 
