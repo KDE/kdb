@@ -207,11 +207,10 @@ bool Driver::isSystemObjectName(const QString& n) const
 
 bool Driver::isPredicateSystemObjectName(const QString& n)
 {
-    QString lcName = n.toLower();
+    const QString lcName = n.toLower();
     if (!lcName.startsWith("kexi__"))
         return false;
-    const QStringList list(Connection::predicateSystemTableNames());
-    return list.indexOf(lcName) != -1;
+    return Connection::predicateSystemTableNames().contains(lcName);
 }
 
 bool Driver::isSystemFieldName(const QString& n) const
