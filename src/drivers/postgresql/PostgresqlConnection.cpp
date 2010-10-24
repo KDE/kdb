@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "PqxxConnection.h"
+#include "PostgresqlConnection.h"
 
-#include "PqxxPreparedStatement.h"
-#include "PqxxConnection_p.h"
+#include "PostgresqlPreparedStatement.h"
+#include "PostgresqlConnection_p.h"
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
 
@@ -34,22 +34,22 @@
 
 using namespace Predicate;
 
-pqxxTransactionData::pqxxTransactionData(Connection *conn, bool nontransaction)
+PostgresqlTransactionData::PostgresqlTransactionData(Connection *conn, bool nontransaction)
         : TransactionData(conn)
 {
     if (nontransaction)
-        data = new pqxx::nontransaction(*static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
+        data = new pqxx::nontransaction(*static_cast<PostgresqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
     else
-        data = new pqxx::transaction<>(*static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
-    if (!static_cast<pqxxSqlConnection*>(conn)->m_trans) {
-        static_cast<pqxxSqlConnection*>(conn)->m_trans = this;
+        data = new pqxx::transaction<>(*static_cast<PostgresqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
+    if (!static_cast<PostgresqlConnection*>(conn)->m_trans) {
+        static_cast<PostgresqlConnection*>(conn)->m_trans = this;
     }
 }
 
-pqxxTransactionData::~pqxxTransactionData()
+PostgresqlTransactionData::~PostgresqlTransactionData()
 {
-    if (static_cast<pqxxSqlConnection*>(m_conn)->m_trans == this) {
-        static_cast<pqxxSqlConnection*>(m_conn)->m_trans = 0;
+    if (static_cast<PostgresqlConnection*>(m_conn)->m_trans == this) {
+        static_cast<PostgresqlConnection*>(m_conn)->m_trans = 0;
     }
     delete data;
     data = 0;
@@ -57,16 +57,16 @@ pqxxTransactionData::~pqxxTransactionData()
 
 //==================================================================================
 
-pqxxSqlConnection::pqxxSqlConnection(Driver *driver, const ConnectionData& connData)
+PostgresqlConnection::PostgresqlConnection(Driver *driver, const ConnectionData& connData)
         : Connection(driver, connData)
-        , d(new pqxxSqlConnectionInternal(this))
+        , d(new PostgresqlConnectionInternal(this))
         , m_trans(0)
 {
 }
 
 //==================================================================================
 //Do any tidying up before the object is deleted
-pqxxSqlConnection::~pqxxSqlConnection()
+PostgresqlConnection::~PostgresqlConnection()
 {
     //delete m_trans;
     destroy();
@@ -75,23 +75,23 @@ pqxxSqlConnection::~pqxxSqlConnection()
 
 //==================================================================================
 //Return a new query based on a query statment
-Cursor* pqxxSqlConnection::prepareQuery(const QString& statement,  uint cursor_options)
+Cursor* PostgresqlConnection::prepareQuery(const QString& statement,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
-    return new pqxxSqlCursor(this, statement, 1); //Always used buffered cursor
+    return new PostgresqlCursor(this, statement, 1); //Always used buffered cursor
 }
 
 //==================================================================================
 //Return a new query based on a query object
-Cursor* pqxxSqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
+Cursor* PostgresqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 {
     Q_UNUSED(cursor_options);
-    return new pqxxSqlCursor(this, query, 1);//Always used buffered cursor
+    return new PostgresqlCursor(this, query, 1);//Always used buffered cursor
 }
 
 //==================================================================================
 //Properly escaped a database object name
-QString pqxxSqlConnection::escapeName(const QString &name) const
+QString PostgresqlConnection::escapeName(const QString &name) const
 {
     return QString("\"" + name + "\"");
 }
@@ -99,13 +99,13 @@ QString pqxxSqlConnection::escapeName(const QString &name) const
 //==================================================================================
 //Made this a noop
 //We tell kexi we are connected, but we wont actually connect until we use a database!
-bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool PostgresqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
     version.clear();
     d->version = &version; //remember for later...
 #ifdef __GNUC__
-#warning pqxxSqlConnection::drv_connect implement setting version info when we drop libpqxx for libpq
+#warning PostgresqlConnection::drv_connect implement setting version info when we drop libpqxx for libpq
 #endif
     return true;
 }
@@ -113,7 +113,7 @@ bool pqxxSqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 //==================================================================================
 //Made this a noop
 //We tell kexi wehave disconnected, but it is actually handled by closeDatabse
-bool pqxxSqlConnection::drv_disconnect()
+bool PostgresqlConnection::drv_disconnect()
 {
     PreDrvDbg;
     return true;
@@ -121,7 +121,7 @@ bool pqxxSqlConnection::drv_disconnect()
 
 //==================================================================================
 //Return a list of database names
-bool pqxxSqlConnection::drv_getDatabasesList(QStringList* list)
+bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 {
 // PreDrvDbg;
 
@@ -141,7 +141,7 @@ bool pqxxSqlConnection::drv_getDatabasesList(QStringList* list)
 
 //==================================================================================
 //Create a new database
-bool pqxxSqlConnection::drv_createDatabase(const QString &dbName)
+bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
 
@@ -153,7 +153,7 @@ bool pqxxSqlConnection::drv_createDatabase(const QString &dbName)
 
 //==================================================================================
 //Use this as our connection instead of connect
-bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
+bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                                         MessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
@@ -215,7 +215,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 
 //==================================================================================
 //Here we close the database connection
-bool pqxxSqlConnection::drv_closeDatabase()
+bool PostgresqlConnection::drv_closeDatabase()
 {
     PreDrvDbg;
 // if (isConnected())
@@ -234,7 +234,7 @@ bool pqxxSqlConnection::drv_closeDatabase()
 
 //==================================================================================
 //Drops the given database
-bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
+bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
 
@@ -247,7 +247,7 @@ bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 
 //==================================================================================
 //Execute an SQL statement
-bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
+bool PostgresqlConnection::drv_executeSQL(const QString& statement)
 {
 // PreDrvDbg << statement;
     bool ok = false;
@@ -261,7 +261,7 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
         //Create a transaction
         const bool implicityStarted = !m_trans;
         if (implicityStarted)
-            (void)new pqxxTransactionData(this, true);
+            (void)new PostgresqlTransactionData(this, true);
 
         //  m_trans = new pqxx::nontransaction(*m_pqxxsql);
 //  PreDrvDbg << "About to execute";
@@ -270,7 +270,7 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
 //  PreDrvDbg << "Executed";
         //Commit the transaction
         if (implicityStarted) {
-            pqxxTransactionData *t = m_trans;
+            PostgresqlTransactionData *t = m_trans;
             drv_commitTransaction(t);
             delete t;
 //   m_trans = 0;
@@ -295,7 +295,7 @@ bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
 
 //==================================================================================
 //Return true if currently connected to a database, ignoring the m_is_connected flag.
-bool pqxxSqlConnection::drv_isDatabaseUsed() const
+bool PostgresqlConnection::drv_isDatabaseUsed() const
 {
     if (d->pqxxsql->is_open()) {
         return true;
@@ -305,7 +305,7 @@ bool pqxxSqlConnection::drv_isDatabaseUsed() const
 
 //==================================================================================
 //Return the oid of the last insert - only works if sql was insert of 1 row
-quint64 pqxxSqlConnection::drv_lastInsertRecordId()
+quint64 PostgresqlConnection::drv_lastInsertRecordId()
 {
     if (d->res) {
         pqxx::oid theOid = d->res->inserted_oid();
@@ -320,19 +320,19 @@ quint64 pqxxSqlConnection::drv_lastInsertRecordId()
 }
 
 //<queries taken from pqxxMigrate>
-bool pqxxSqlConnection::drv_containsTable(const QString &tableName)
+bool PostgresqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
         return resultExists(QString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
                         .arg(driver()->escapeString(tableName)), success) && success;
 }
 
-bool pqxxSqlConnection::drv_getTablesList(QStringList* list)
+bool PostgresqlConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
     m_sql = "SELECT lower(relname) FROM pg_class WHERE relkind='r'";
     if (!(cursor = executeQuery(m_sql))) {
-        PreDrvWarn << "pqxxSqlConnection::drv_getTablesList(): !executeQuery()";
+        PreDrvWarn << "PostgresqlConnection::drv_getTablesList(): !executeQuery()";
         return false;
     }
     list->clear();
@@ -349,16 +349,16 @@ bool pqxxSqlConnection::drv_getTablesList(QStringList* list)
 }
 //</taken from pqxxMigrate>
 
-TransactionData* pqxxSqlConnection::drv_beginTransaction()
+TransactionData* PostgresqlConnection::drv_beginTransaction()
 {
-    return new pqxxTransactionData(this, false);
+    return new PostgresqlTransactionData(this, false);
 }
 
-bool pqxxSqlConnection::drv_commitTransaction(TransactionData *tdata)
+bool PostgresqlConnection::drv_commitTransaction(TransactionData *tdata)
 {
     bool result = true;
     try {
-        static_cast<pqxxTransactionData*>(tdata)->data->commit();
+        static_cast<PostgresqlTransactionData*>(tdata)->data->commit();
     } catch (const std::exception &e) {
         //If an error ocurred then put the error description into _dbError
         d->errmsg = QString::fromUtf8(e.what());
@@ -373,11 +373,11 @@ bool pqxxSqlConnection::drv_commitTransaction(TransactionData *tdata)
     return result;
 }
 
-bool pqxxSqlConnection::drv_rollbackTransaction(TransactionData *tdata)
+bool PostgresqlConnection::drv_rollbackTransaction(TransactionData *tdata)
 {
     bool result = true;
     try {
-        static_cast<pqxxTransactionData*>(tdata)->data->abort();
+        static_cast<PostgresqlTransactionData*>(tdata)->data->abort();
     } catch (const std::exception &e) {
         //If an error ocurred then put the error description into _dbError
         d->errmsg = QString::fromUtf8(e.what());
@@ -392,27 +392,27 @@ bool pqxxSqlConnection::drv_rollbackTransaction(TransactionData *tdata)
     return result;
 }
 
-int pqxxSqlConnection::serverResult()
+int PostgresqlConnection::serverResult()
 {
     return d->resultCode;
 }
 
-QString pqxxSqlConnection::serverResultName() const
+QString PostgresqlConnection::serverResultName() const
 {
     return QString();
 }
 
-void pqxxSqlConnection::drv_clearServerResult()
+void PostgresqlConnection::drv_clearServerResult()
 {
     d->resultCode = 0;
 }
 
-QString pqxxSqlConnection::serverErrorMsg()
+QString PostgresqlConnection::serverErrorMsg()
 {
     return d->errmsg;
 }
 
-PreparedStatementInterface* pqxxSqlConnection::prepareStatementInternal()
+PreparedStatementInterface* PostgresqlConnection::prepareStatementInternal()
 {
-    return new pqxxPreparedStatement(*d);
+    return new PostgresqlPreparedStatement(*d);
 }

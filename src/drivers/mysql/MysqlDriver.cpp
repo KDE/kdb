@@ -50,7 +50,7 @@ MysqlDriver::MysqlDriver()
 {
     d->features = IgnoreTransactions | CursorForward;
 
-    beh->ROW_ID_FIELD_NAME = "LAST_INSERT_ID()";
+    beh->ROW_ID_FIELD_NAME = QLatin1String("LAST_INSERT_ID()");
     beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE = true;
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = false;
     beh->USING_DATABASE_REQUIRED_TO_CONNECT = false;
@@ -65,20 +65,20 @@ MysqlDriver::MysqlDriver()
 //OK? d->properties["client_library_version"] = mysql_get_client_version();
 #endif
 
-    d->typeNames[Field::Byte] = "TINYINT";
-    d->typeNames[Field::ShortInteger] = "SMALLINT";
-    d->typeNames[Field::Integer] = "INT";
-    d->typeNames[Field::BigInteger] = "BIGINT";
+    d->typeNames[Field::Byte] = QLatin1String("TINYINT");
+    d->typeNames[Field::ShortInteger] = QLatin1String("SMALLINT");
+    d->typeNames[Field::Integer] = QLatin1String("INT");
+    d->typeNames[Field::BigInteger] = QLatin1String("BIGINT");
     // Can use BOOLEAN here, but BOOL has been in MySQL longer
-    d->typeNames[Field::Boolean] = "BOOL";
-    d->typeNames[Field::Date] = "DATE";
-    d->typeNames[Field::DateTime] = "DATETIME";
-    d->typeNames[Field::Time] = "TIME";
-    d->typeNames[Field::Float] = "FLOAT";
-    d->typeNames[Field::Double] = "DOUBLE";
-    d->typeNames[Field::Text] = "VARCHAR";
-    d->typeNames[Field::LongText] = "LONGTEXT";
-    d->typeNames[Field::BLOB] = "BLOB";
+    d->typeNames[Field::Boolean] = QLatin1String("BOOL");
+    d->typeNames[Field::Date] = QLatin1String("DATE");
+    d->typeNames[Field::DateTime] = QLatin1String("DATETIME");
+    d->typeNames[Field::Time] = QLatin1String("TIME");
+    d->typeNames[Field::Float] = QLatin1String("FLOAT");
+    d->typeNames[Field::Double] = QLatin1String("DOUBLE");
+    d->typeNames[Field::Text] = QLatin1String("VARCHAR");
+    d->typeNames[Field::LongText] = QLatin1String("LONGTEXT");
+    d->typeNames[Field::BLOB] = QLatin1String("BLOB");
 }
 
 MysqlDriver::~MysqlDriver()
@@ -93,7 +93,7 @@ MysqlDriver::drv_createConnection(const ConnectionData& connData)
 
 bool MysqlDriver::isSystemDatabaseName(const QString &n) const
 {
-    return n.toLower() == "mysql" || Driver::isSystemObjectName(n);
+    return 0 == n.compare(QLatin1String("mysql"), Qt::CaseInsensitive);
 }
 
 bool MysqlDriver::drv_isSystemFieldName(const QString&) const

@@ -17,9 +17,9 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "PqxxCursor.h"
-#include "PqxxConnection.h"
-#include "PqxxConnection_p.h"
+#include "PostgresqlCursor.h"
+#include "PostgresqlConnection.h"
+#include "PostgresqlConnection_p.h"
 
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
@@ -29,7 +29,7 @@
 
 using namespace Predicate;
 
-unsigned int pqxxSqlCursor_trans_num = 0; //!< debug helper
+unsigned int PostgresqlCursor_trans_num = 0; //!< debug helper
 
 static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
 {
@@ -38,11 +38,11 @@ static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
 
 //==================================================================================
 //Constructor based on query statement
-pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
+PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
         Cursor(conn, statement, options)
 {
-// PreDrvDbg << "PQXXSQLCURSOR: constructor for query statement";
-    my_conn = static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql;
+// PreDrvDbg << "POSTGRESQLSQLCURSOR: constructor for query statement";
+    my_conn = static_cast<PostgresqlConnection*>(conn)->d->pqxxsql;
     m_options = Buffered;
     m_res = 0;
 // m_tran = 0;
@@ -51,11 +51,11 @@ pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& stateme
 
 //==================================================================================
 //Constructor base on query object
-pqxxSqlCursor::pqxxSqlCursor(Connection* conn, QuerySchema* query, uint options)
+PostgresqlCursor::PostgresqlCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
 {
-// PreDrvDbg << "PQXXSQLCURSOR: constructor for query schema";
-    my_conn = static_cast<pqxxSqlConnection*>(conn)->d->pqxxsql;
+// PreDrvDbg << "POSTGRESQLSQLCURSOR: constructor for query schema";
+    my_conn = static_cast<PostgresqlConnection*>(conn)->d->pqxxsql;
     m_options = Buffered;
     m_res = 0;
 // m_tran = 0;
@@ -64,14 +64,14 @@ pqxxSqlCursor::pqxxSqlCursor(Connection* conn, QuerySchema* query, uint options)
 
 //==================================================================================
 //Destructor
-pqxxSqlCursor::~pqxxSqlCursor()
+PostgresqlCursor::~PostgresqlCursor()
 {
     close();
 }
 
 //==================================================================================
 //Create a cursor result set
-bool pqxxSqlCursor::drv_open(const QString& sql)
+bool PostgresqlCursor::drv_open(const QString& sql)
 {
 // PreDrvDbg << sql;
 
@@ -86,19 +86,19 @@ bool pqxxSqlCursor::drv_open(const QString& sql)
     //Set up a transaction
     try {
         //m_tran = new pqxx::work(*my_conn, "cursor_open");
-        //cur_name.sprintf("cursor_transaction%d", pqxxSqlCursor_trans_num++);
+        //cur_name.sprintf("cursor_transaction%d", PostgresqlCursor_trans_num++);
 
 //  m_tran = new pqxx::nontransaction(*my_conn, (const char*)cur_name);
-        if (!((pqxxSqlConnection*)connection())->m_trans) {
+        if (!((PostgresqlConnection*)connection())->m_trans) {
 //   my_conn->drv_beginTransaction();
 //  if (implicityStarted)
-            (void)new pqxxTransactionData((pqxxSqlConnection*)connection(), true);
+            (void)new PostgresqlTransactionData((PostgresqlConnection*)connection(), true);
             m_implicityStarted = true;
         }
 
-        m_res = new pqxx::result(((pqxxSqlConnection*)connection())->m_trans->data->exec(std::string(sql.toUtf8())));
-        ((pqxxSqlConnection*)connection())
-        ->drv_commitTransaction(((pqxxSqlConnection*)connection())->m_trans);
+        m_res = new pqxx::result(((PostgresqlConnection*)connection())->m_trans->data->exec(std::string(sql.toUtf8())));
+        ((PostgresqlConnection*)connection())
+        ->drv_commitTransaction(((PostgresqlConnection*)connection())->m_trans);
 //  my_conn->m_trans->commit();
 //  PreDrvDbg << "trans. committed:" << cur_name;
 
@@ -113,14 +113,14 @@ bool pqxxSqlCursor::drv_open(const QString& sql)
         return true;
     } catch (const std::exception &e) {
         setError(ERR_DB_SPECIFIC, QString::fromUtf8(e.what()));
-        PreDrvWarn << "pqxxSqlCursor::drv_open:exception - " << QString::fromUtf8(e.what());
+        PreDrvWarn << "PostgresqlCursor::drv_open:exception - " << QString::fromUtf8(e.what());
     } catch (...) {
         setError();
     }
 // delete m_tran;
 // m_tran = 0;
     if (m_implicityStarted) {
-        delete((pqxxSqlConnection*)connection())->m_trans;
+        delete((PostgresqlConnection*)connection())->m_trans;
         m_implicityStarted = false;
     }
 // PreDrvDbg << "trans. rolled back! - " << cur_name;
@@ -129,7 +129,7 @@ bool pqxxSqlCursor::drv_open(const QString& sql)
 
 //==================================================================================
 //Delete objects
-bool pqxxSqlCursor::drv_close()
+bool PostgresqlCursor::drv_close()
 {
 //js m_opened=false;
 
@@ -147,7 +147,7 @@ bool pqxxSqlCursor::drv_close()
 
 //==================================================================================
 //Gets the next record...does not need to do much, just return fetchend if at end of result set
-void pqxxSqlCursor::drv_getNextRecord()
+void PostgresqlCursor::drv_getNextRecord()
 {
 // PreDrvDbg << "size is" <<m_res->size() << "current Position is" << (long)at();
     if (at() < m_res->size() && at() >= 0) {
@@ -163,7 +163,8 @@ void pqxxSqlCursor::drv_getNextRecord()
 
 //==================================================================================
 //Check the current position is within boundaries
-void pqxxSqlCursor::drv_getPrevRecord()
+#if 0 
+void PostgresqlCursor::drv_getPrevRecord()
 {
 // PreDrvDbg;
 
@@ -175,10 +176,11 @@ void pqxxSqlCursor::drv_getPrevRecord()
         m_fetchResult = FetchError;
     }
 }
+#endif
 
 //==================================================================================
 //Return the value for a given column for the current record
-QVariant pqxxSqlCursor::value(uint pos)
+QVariant PostgresqlCursor::value(uint pos)
 {
     if (pos < m_fieldCount)
         return pValue(pos);
@@ -186,17 +188,47 @@ QVariant pqxxSqlCursor::value(uint pos)
         return QVariant();
 }
 
+inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
+{
+    switch (r.type()) {
+    case BOOLOID:
+        return QString::fromLatin1(r.c_str(), r.size()) == "true"; //TODO check formatting
+    case INT2OID:
+    case INT4OID:
+    case INT8OID:
+        return r.as(int());
+    case FLOAT4OID:
+    case FLOAT8OID:
+    case NUMERICOID:
+        return r.as(double());
+    case DATEOID:
+        return QString::fromUtf8(r.c_str(), r.size()); //TODO check formatting
+    case TIMEOID:
+        return QString::fromUtf8(r.c_str(), r.size()); //TODO check formatting
+    case TIMESTAMPOID:
+        return QString::fromUtf8(r.c_str(), r.size()); //TODO check formatting
+    case BYTEAOID:
+        return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
+    case BPCHAROID:
+    case VARCHAROID:
+    case TEXTOID:
+        return QString::fromUtf8(r.c_str(), r.size()); //utf8?
+    default:
+        return QString::fromUtf8(r.c_str(), r.size()); //utf8?
+    }
+}
+
 //==================================================================================
 //Return the value for a given column for the current record - Private const version
-QVariant pqxxSqlCursor::pValue(uint pos)const
+QVariant PostgresqlCursor::pValue(uint pos)const
 {
     if (m_res->size() <= 0) {
-        PreDrvWarn << "pqxxSqlCursor::value - ERROR: result size not greater than 0";
+        PreDrvWarn << "PostgresqlCursor::value - ERROR: result size not greater than 0";
         return QVariant();
     }
 
     if (pos >= m_fieldsToStoreInRecord) {
-//  PreDrvWarn << "pqxxSqlCursor::value - ERROR: requested position is greater than the number of fields";
+//  PreDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
         return QVariant();
     }
 
@@ -232,7 +264,7 @@ QVariant pqxxSqlCursor::pValue(uint pos)const
 //==================================================================================
 //Return the current record as a char**
 //who'd have thought we'd be using char** in this day and age :o)
-const char** pqxxSqlCursor::recordData() const
+const char** PostgresqlCursor::recordData() const
 {
 // PreDrvDbg;
 
@@ -247,14 +279,14 @@ const char** pqxxSqlCursor::recordData() const
 //   PreDrvDbg << row[i];
         }
     } else {
-        PreDrvWarn << "pqxxSqlCursor::recordData: m_at is invalid";
+        PreDrvWarn << "PostgresqlCursor::recordData: m_at is invalid";
     }
     return row;
 }
 
 //==================================================================================
 //Store the current record in [data]
-bool pqxxSqlCursor::drv_storeCurrentRecord(RecordData* data) const
+bool PostgresqlCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "POSITION IS" << (long)m_at;
 
@@ -271,16 +303,16 @@ bool pqxxSqlCursor::drv_storeCurrentRecord(RecordData* data) const
 
 //==================================================================================
 //
-void pqxxSqlCursor::drv_clearServerResult()
+void PostgresqlCursor::drv_clearServerResult()
 {
-//! @todo pqxxSqlCursor: stuff with server results
+//! @todo PostgresqlCursor: stuff with server results
 }
 
 //==================================================================================
 //Add the current record to the internal buffer
 //Implementation required but no need in this driver
 //Result set is a buffer so do not need another
-void pqxxSqlCursor::drv_appendCurrentRecordToBuffer()
+void PostgresqlCursor::drv_appendCurrentRecordToBuffer()
 {
 
 }
@@ -288,7 +320,7 @@ void pqxxSqlCursor::drv_appendCurrentRecordToBuffer()
 //==================================================================================
 //Move internal pointer to internal buffer +1
 //Implementation required but no need in this driver
-void pqxxSqlCursor::drv_bufferMovePointerNext()
+void PostgresqlCursor::drv_bufferMovePointerNext()
 {
 
 }
@@ -296,7 +328,7 @@ void pqxxSqlCursor::drv_bufferMovePointerNext()
 //==================================================================================
 //Move internal pointer to internal buffer -1
 //Implementation required but no need in this driver
-void pqxxSqlCursor::drv_bufferMovePointerPrev()
+void PostgresqlCursor::drv_bufferMovePointerPrev()
 {
 
 }
@@ -304,7 +336,7 @@ void pqxxSqlCursor::drv_bufferMovePointerPrev()
 //==================================================================================
 //Move internal pointer to internal buffer to N
 //Implementation required but no need in this driver
-void pqxxSqlCursor::drv_bufferMovePointerTo(qint64 to)
+void PostgresqlCursor::drv_bufferMovePointerTo(qint64 to)
 {
     Q_UNUSED(to);
 }

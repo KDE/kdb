@@ -16,34 +16,32 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
-//
-// C++ Interface: pqxxpreparedstatement
-//
-// Description:
-//
-//
-#ifndef PQXXPREPAREDSTATEMENT_H
-#define PQXXPREPAREDSTATEMENT_H
-#include <Predicate/PreparedStatement.h>
-#include <Predicate/Connection_p.h>
 
-/**
-  @author Adam Pigg <adam@piggz.co.uk>
-*/
-namespace Predicate
+#include "PostgresqlPreparedStatement.h"
+#include <QtDebug>
+using namespace Predicate;
+
+PostgresqlPreparedStatement::PostgresqlPreparedStatement(
+    StatementType type, ConnectionInternal& conn, FieldList& fields)
+        : Predicate::PreparedStatement(type, conn, fields)
+        , m_conn(conn.connection)
 {
-class pqxxPreparedStatement : public PreparedStatement
-{
-public:
-    pqxxPreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields);
-
-    virtual ~pqxxPreparedStatement();
-
-    virtual bool execute();
-    bool m_resetRequired;
-
-private:
-    Connection* m_conn;
-};
+// PreDrvDbg << "PostgresqlPreparedStatement: Construction";
 }
-#endif
+
+
+PostgresqlPreparedStatement::~PostgresqlPreparedStatement()
+{
+}
+
+bool PostgresqlPreparedStatement::execute()
+{
+// PreDrvDbg;
+    m_resetRequired = true;
+    if (m_conn->insertRecord(*m_fields, m_args)) {
+        return true;
+    }
+    return false;
+}
+
+

@@ -16,22 +16,12 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
-//
-// C++ Implementation: pqxxsqlconnectioninternal
-//
-// Description:
-//
-//
-// Author: Adam Pigg <adam@piggz.co.uk>, (C) 2005
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
-#include "PqxxConnection_p.h"
+
+#include "PostgresqlConnection_p.h"
 #include <QtDebug>
 
 using namespace Predicate;
-pqxxSqlConnectionInternal::pqxxSqlConnectionInternal(Connection *conn)
+PostgresqlConnectionInternal::PostgresqlConnectionInternal(Connection *conn)
         : ConnectionInternal(conn)
         , pqxxsql(0)
         , res(0)
@@ -39,13 +29,12 @@ pqxxSqlConnectionInternal::pqxxSqlConnectionInternal(Connection *conn)
 {
 }
 
-
-pqxxSqlConnectionInternal::~pqxxSqlConnectionInternal()
+PostgresqlConnectionInternal::~PostgresqlConnectionInternal()
 {
 
 }
 
-void pqxxSqlConnectionInternal::storeResult()
+void PostgresqlConnectionInternal::storeResult()
 {
     errmsg = "";
 }

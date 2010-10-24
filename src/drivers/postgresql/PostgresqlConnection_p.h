@@ -16,34 +16,23 @@
    the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
-//
-// C++ Interface: pqxxsqlconnectioninternal
-//
-// Description:
-//
-//
-// Author: Adam Pigg <adam@piggz.co.uk>, (C) 2005
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
-#ifndef PQXXSQLCONNECTIONINTERNAL_H
-#define PQXXSQLCONNECTIONINTERNAL_H
+
+#ifndef POSTGRESQLSQLCONNECTIONINTERNAL_H
+#define POSTGRESQLSQLCONNECTIONINTERNAL_H
 
 #include <Predicate/Connection_p.h>
-#include <pqxx/pqxx>
 
 /**
   @author Adam Pigg <adam@piggz.co.uk>
 */
 namespace Predicate
 {
-class pqxxSqlConnectionInternal : public ConnectionInternal
+class PostgresqlConnectionInternal : public ConnectionInternal
 {
 public:
-    pqxxSqlConnectionInternal(Connection *conn);
+    explicit PostgresqlConnectionInternal(Connection *conn);
 
-    virtual ~pqxxSqlConnectionInternal();
+    virtual ~PostgresqlConnectionInternal();
 
     //! stores last result's message
     virtual void storeResult();
@@ -57,5 +46,31 @@ public:
     QString errmsg; //!< server-specific message of last operation
     int resultCode; //!< result code of last operation on server
 };
+
+#if 0 //pred
+//! @internal
+class PostgresqlTransactionData : public TransactionData
+{
+public:
+    PostgresqlTransactionData(Connection *conn, bool nontransaction);
+    ~PostgresqlTransactionData();
+    pqxx::transaction_base *data;
+};
+#endif
+
+//! Internal PostgreSQL cursor data.
+/*! Provides a low-level abstraction for iterating over result sets. */
+class PostgresqlCursorData : public PostgresqlConnectionInternal
+{
+public:
+    explicit PostgresqlCursorData(Predicate::Connection* connection);
+    virtual ~MysqlCursorData();
+
+    MYSQL_RES *mysqlres;
+    MYSQL_ROW mysqlrow;
+    unsigned long *lengths;
+    unsigned long numRows;
+};
+
 }
 #endif

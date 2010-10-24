@@ -1,5 +1,15 @@
 Predicate CHANGELOG
 
+2010-10-20
+PostgreSQL Driver
+*development of PostgreSQL driver based on libpq started, total rewrite of the 'pqxx' driver
+Predicate
+*add sanity checks to assignment operators
+*add explicit ctors
+*added BOOLEAN_TRUE_LITERAL, BOOLEAN_FALSE_LITERAL to DriverBehaviour, 1/0 by default, PostgreSQL driver changes them to TRUE/FALSE
+SQLite Driver
+*renamed from sqlite3 to sqlite for simplicity
+
 2010-10-18
 MySQL
 *MySQL connections work again

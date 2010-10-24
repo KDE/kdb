@@ -2,6 +2,10 @@ Predicate TODO
 
 Legend: [ ] TODO [x] done [p] in progress
 
+General hints:
+*Use explicit ctors where possible
+*check other==this in operator=() overloads
+
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
 [ ] move drivers/ to the main dir
@@ -77,186 +81,203 @@ Optimization & Cleanup
 [ ] use QLatin1String where possible
 
 TODO: port files (Legend: *-compiles, no warnings; **-cleanup and naming notes also applied)
+  Admin.h
   Admin.cpp
+  Alter.h
   Alter.cpp
+*  Connection.h
+*  Connection_p.h
 *  Connection.cpp
-- prepareStatementInternal() has now no arguments and has PreparedStatementInterface* return type
+** prepareStatementInternal() has now no arguments and has PreparedStatementInterface* return type
 TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionInterface just like we moved execute() and prepare() to PreparedStatementInterface...
-*  Connectiondata.cpp
+*  ConnectionData.h
+*  ConnectionData.cpp
+*  Cursor.h
+*  Cursor_p.h
 *  Cursor.cpp
+  DbObjectNameValidator.h
   DbObjectNameValidator.cpp
+  DbProperties.h
   DbProperties.cpp
+*  Driver.h
 *  Driver.cpp
 ** Driver::Info is implicitly shared class now
 ** Driver::fileDBDriverMimeType() moved to Driver::Info::fileDBMimeType()
 ** Driver::isFileDriver() renamed to Driver::isFileBased(), also available as Driver::Info::isFileBased()
 ** Driver no longer inherits QObject
+*  DriverManager.h
+*  DriverManager_p.h
 *  DriverManager.cpp
 ** DriverManager no longer inherits QObject
-  drivers/mysql/MysqlConnection.cpp
-  drivers/mysql/MysqlConnection_p.cpp
-  drivers/mysql/MysqlCursor.cpp
-  drivers/mysql/MysqlDriver.cpp
-  drivers/mysql/MysqlKeywords.cpp
-  drivers/mysql/MysqlPreparedStatement.cpp
-- for now it's nonfunctional; port and improve code within PREDICATE_USE_MYSQL_STMT
-  drivers/odbc/odbcconnection.cpp
-  drivers/odbc/odbcdriver.cpp
-  drivers/oracle/oracleconnection.cpp
-  drivers/oracle/oracleconnection_p.cpp
-  drivers/oracle/oraclecursor.cpp
-  drivers/oracle/oracledriver.cpp
-  drivers/oracle/oraclekeywords.cpp
-  drivers/oracle/oraclepreparedstatement.cpp
-  drivers/pqxx/PqxxConnection.cpp
-  drivers/pqxx/PqxxConnection_p.cpp
-  drivers/pqxx/PqxxCursor.cpp
-  drivers/pqxx/PqxxDriver.cpp
-  drivers/pqxx/PqxxKeywords.cpp
-  drivers/pqxx/PqxxPreparedStatement.cpp
-  drivers/sqlite/SqliteAdmin.cpp
-  drivers/sqlite/SqliteAlter.cpp
-  drivers/sqlite/SqliteConnection.cpp
-  drivers/sqlite/SqliteCursor.cpp
-  drivers/sqlite/SqliteDriver.cpp
-  drivers/sqlite/SqliteKeywords.cpp
-  drivers/sqlite/SqlitePreparedStatement.cpp
-- refactored: internal bindValue() added
-  drivers/sqlite/SqliteVacuum.cpp
-  drivers/sybase/SybaseConnection.cpp
-  drivers/sybase/SybaseConnection_p.cpp
-  drivers/sybase/SybaseCursor.cpp
-  drivers/sybase/SybaseDriver.cpp
-  drivers/sybase/SybaseKeywords.cpp
-  drivers/sybase/SybasePreparedStatement.cpp
-  drivers/xbase/XbaseConnection.cpp
-  drivers/xbase/XbaseConnection_p.cpp
-  drivers/xbase/XbaseCursor.cpp
-  drivers/xbase/XbaseDriver.cpp
-  drivers/xbase/XbaseExport.cpp
-  drivers/xbase/XbaseKeywords.cpp
+*  Driver_p.h
 *  Driver_p.cpp
-*  Expression.cpp
+  Expression.h
+  Expression.cpp
 TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
+*  Error.h
+*  Field.h
 *  Field.cpp
+*  FieldList.h
 *  FieldList.cpp
-- added isEmpty()
+** added isEmpty()
+  FieldValidator.h
   FieldValidator.cpp
+*  Global.h
 *  Global.cpp
+*  IndexSchema.h
 *  IndexSchema.cpp
 *  keywords.cpp
-*  LookupFieldSchema.cpp
+  LookupFieldSchema.h
+  LookupFieldSchema.cpp
+  MessageHandler.h
   MessageHandler.cpp
+*  Object.h
 *  Object.cpp
-*  parser/Parser.cpp
-*  parser/Parser_p.cpp
-*  parser/SqlParser.cpp
-*  parser/SqlScanner.cpp
-*  parser/tokens.cpp
+** made implicitly shared, used in fewer number of classed than before
+*  PreparedStatement.h
 *  PreparedStatement.cpp
-- it's implicitly shared class now
-- arguments are no longer provided using operator << but instead in execute(), 
-  so PreparedStatement is more generic now. Operator << and clearArguments() is thus removed.
-- StatementType -> Type, added Arguments typedef
-- execute() aborts now if at least one field provided on whereFieldNames list is not found
-  (before it was ignored)
-- internal: the statement is now created using utf8, not latin1 functions
-- PreparedStatement::Arguments renamed to PreparedStatementParameters
-- internal: to implement PreparedStatement in a driver, one has to write these methods:
-    virtual bool executeInternal( const Arguments& args );
-    virtual bool prepare(QByteArray& statement) = 0;
+** it's implicitly shared class now
+** arguments are no longer provided using operator << but instead in execute(), so PreparedStatement is more generic now. Operator << and clearArguments() is thus removed.
+** StatementType -> Type, added Arguments typedef
+** execute() aborts now if at least one field provided on whereFieldNames list is not found (before it was ignored)
+** internal: the statement is now created using utf8, not latin1 functions
+** PreparedStatement::Arguments renamed to PreparedStatementParameters
+** internal: to implement PreparedStatement in a driver, one has to write these methods:
+*** virtual bool executeInternal( const Arguments& args );
+*** virtual bool prepare(QByteArray& statement) = 0;
 TODO: more changes like these related to WHERE expression
+*  QuerySchema.h
 *  QuerySchema.cpp
+*  QuerySchemaParameter.h
 *  QuerySchemaParameter.cpp
+*  RecordData.h
 *  RecordData.cpp
-*  Relationship.cpp
+  Relationship.h
+  Relationship.cpp
+*  RowEditBuffer.h
 *  RowEditBuffer.cpp
+** renamed to RecordEditBuffer
+*  SchemaData.h
 *  SchemaData.cpp
+*  TableSchema.h
 *  TableSchema.cpp
   tools/SimpleCommandLineApp.cpp
+*  Transaction.h
 *  Transaction.cpp
-*  Utils.cpp
+  Utils.h
+  Utils_p.h
+  Utils.cpp
+  predicate_export.h
+  predicate_global.h
 
-  Admin.h
-  Alter.h
-  Connection.h
-  ConnectionData.h
-  Connection_p.h
-  Cursor.h
-  Cursor_p.h
-  DbObjectNameValidator.h
-  DbProperties.h
-  Driver.h
-*  DriverManager.h
-  DriverManager_p.h
-  drivers/mysql/MysqlConnection.h
-  drivers/mysql/MysqlConnection_p.h
-  drivers/mysql/MysqlCursor.h
-  drivers/mysql/MysqlDriver.h
-  drivers/mysql/MysqlPreparedStatement.h
-  drivers/odbc/odbcconnection.h
-  drivers/odbc/odbcdriver.h
-  drivers/oracle/oracleconnection.h
-  drivers/oracle/oracleconnection_p.h
-  drivers/oracle/oraclecursor.h
-  drivers/oracle/oracledriver.h
-  drivers/oracle/oraclepreparedstatement.h
-  drivers/oracle/oracle_keywords.sh
-  drivers/pqxx/PqxxConnection.h
-  drivers/pqxx/PqxxConnection_p.h
-  drivers/pqxx/PqxxCursor.h
-  drivers/pqxx/PqxxDriver.h
-  drivers/pqxx/PqxxPreparedStatement.h
-  drivers/sqlite/driver/sqlite.h
-  drivers/sqlite/SqliteAdmin.h
-  drivers/sqlite/SqliteConnection.h
-  drivers/sqlite/SqliteConnection_p.h
-  drivers/sqlite/SqliteCursor.h
-  drivers/sqlite/SqliteDriver.h
-  drivers/sqlite/SqlitePreparedStatement.h
-  drivers/sqlite/SqliteVacuum.h
-  drivers/sybase/SybaseConnection.h
-  drivers/sybase/SybaseConnection_p.h
-  drivers/sybase/SybaseCursor.h
-  drivers/sybase/SybaseDriver.h
-  drivers/sybase/SybasePreparedStatement.h
-  drivers/xbase/XbaseConnection.h
-  drivers/xbase/XbaseConnection_p.h
-  drivers/xbase/XbaseCursor.h
-  drivers/xbase/XbaseDriver.h
-  drivers/xbase/XbaseExport.h
-  Driver_p.h
-  Error.h
-  Expression.h
-  Field.h
-  FieldList.h
-  FieldValidator.h
-  Global.h
-  IndexSchema.h
-  LookupFieldSchema.h
-  MessageHandler.h
-  Object.h
+parser:
   parser/extract_tokens.sh
   parser/generate_parser_code.sh
   parser/Parser.h
+  parser/Parser.cpp
   parser/Parser_p.h
+  parser/Parser_p.cpp
   parser/SqlParser.h
+  parser/SqlParser.cpp
   parser/SqlTypes.h
-  predicate_export.h
-  predicate_global.h
-  PreparedStatement.h
-  QuerySchema.h
-  QuerySchemaParameter.h
-  RecordData.h
-  Relationship.h
-  RowEditBuffer.h
-  SchemaData.h
-  TableSchema.h
+  parser/SqlScanner.cpp
+  parser/tokens.cpp
+
+tools:
   tools/SimpleCommandLineApp.h
 * tools/Tristate.h
-  Transaction.h
-  Utils.h
-  Utils_p.h
+
+drivers:
+*  drivers/mysql/MysqlConnection.h
+*  drivers/mysql/MysqlConnection.cpp
+*  drivers/mysql/MysqlConnection_p.h
+*  drivers/mysql/MysqlConnection_p.cpp
+*  drivers/mysql/MysqlCursor.h
+*  drivers/mysql/MysqlCursor.cpp
+*  drivers/mysql/MysqlDriver.h
+*  drivers/mysql/MysqlDriver.cpp
+*  drivers/mysql/MysqlKeywords.cpp
+*  drivers/mysql/MysqlPreparedStatement.h
+*  drivers/mysql/MysqlPreparedStatement.cpp
+** for now it's nonfunctional; port and improve code within PREDICATE_USE_MYSQL_STMT
+
+  drivers/odbc/odbcconnection.h
+  drivers/odbc/odbcconnection.cpp
+  drivers/odbc/odbcdriver.h
+  drivers/odbc/odbcdriver.cpp
+  
+  drivers/oracle/oracleconnection.h
+  drivers/oracle/oracleconnection.cpp
+  drivers/oracle/oracleconnection_p.h
+  drivers/oracle/oracleconnection_p.cpp
+  drivers/oracle/oraclekeywords.cpp
+  drivers/oracle/oraclecursor.h
+  drivers/oracle/oraclecursor.cpp
+  drivers/oracle/oracledriver.h
+  drivers/oracle/oracledriver.cpp
+  drivers/oracle/oraclepreparedstatement.h
+  drivers/oracle/oraclepreparedstatement.cpp
+  drivers/oracle/oracle_keywords.sh
+  
+*  drivers/pqxx/PqxxConnection.h
+*  drivers/pqxx/PqxxConnection.cpp
+** forked to postgresql driver
+* drivers/pqxx/PqxxConnection_p.h
+* drivers/pqxx/PqxxConnection_p.cpp
+** forked to postgresql driver
+* drivers/pqxx/PqxxCursor.h
+* drivers/pqxx/PqxxCursor.cpp
+** forked to postgresql driver
+* drivers/pqxx/PqxxDriver.h
+* drivers/pqxx/PqxxDriver.cpp
+** forked to postgresql driver
+* drivers/pqxx/PqxxPreparedStatement.h
+* drivers/pqxx/PqxxPreparedStatement.cpp
+** forked to postgresql driver
+* drivers/pqxx/PqxxKeywords.cpp
+
+* drivers/sqlite/driver/sqlite.h
+** removed, system SQLite is used
+*  drivers/sqlite/SqliteAdmin.h
+*  drivers/sqlite/SqliteAdmin.cpp
+*  drivers/sqlite/SqliteConnection.h
+*  drivers/sqlite/SqliteConnection_p.h
+*  drivers/sqlite/SqliteConnection.cpp
+*  drivers/sqlite/SqliteCursor.h
+*  drivers/sqlite/SqliteCursor.cpp
+*  drivers/sqlite/SqliteDriver.h
+*  drivers/sqlite/SqliteDriver.cpp
+*  drivers/sqlite/SqlitePreparedStatement.h
+*  drivers/sqlite/SqlitePreparedStatement.cpp
+** refactored: internal bindValue() added
+*  drivers/sqlite/SqliteVacuum.h
+*  drivers/sqlite/SqliteVacuum.cpp
+*  drivers/sqlite/SqliteKeywords.cpp
+
+  drivers/sybase/SybaseConnection.h
+  drivers/sybase/SybaseConnection.cpp
+  drivers/sybase/SybaseConnection_p.h
+  drivers/sybase/SybaseConnection_p.cpp
+  drivers/sybase/SybaseCursor.h
+  drivers/sybase/SybaseCursor.cpp
+  drivers/sybase/SybaseDriver.h
+  drivers/sybase/SybaseDriver.cpp
+  drivers/sybase/SybasePreparedStatement.h
+  drivers/sybase/SybasePreparedStatement.cpp
+  drivers/sybase/SybaseKeywords.cpp
+
+  drivers/xbase/XbaseConnection.h
+  drivers/xbase/XbaseConnection.cpp
+  drivers/xbase/XbaseConnection.cpp
+  drivers/xbase/XbaseConnection_p.h
+  drivers/xbase/XbaseConnection_p.cpp
+  drivers/xbase/XbaseCursor.h
+  drivers/xbase/XbaseCursor.cpp
+  drivers/xbase/XbaseDriver.h
+  drivers/xbase/XbaseDriver.cpp
+  drivers/xbase/XbaseExport.h
+  drivers/xbase/XbaseExport.cpp
+  drivers/xbase/XbaseKeywords.cpp
 
 kexiutils:
   debuggui.cpp - port and re-enable KEXI_DEBUG_GUI

@@ -1,6 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,24 +17,27 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef _MYSQLCURSOR_H_
-#define _MYSQLCURSOR_H_
+#ifndef PREDICATE_CURSOR_POSTGRESQL_H
+#define PREDICATE_CURSOR_POSTGRESQL_H
 
 #include <Predicate/Cursor.h>
 #include <Predicate/Connection.h>
+#include <Predicate/Utils.h>
+
+//#include <migration/pqxx/pg_type.h>
 
 namespace Predicate
 {
 
-class MysqlCursorData;
+class PostgresqlCursorData;
 
-class MysqlCursor: public Cursor
+class PostgresqlCursor: public Cursor
 {
 public:
-    MysqlCursor(Connection* conn, const QString& statement = QString(),
-                uint cursor_options = NoOptions);
-    MysqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
-    virtual ~MysqlCursor();
+    explicit PostgresqlCursor(Connection* conn, const QString& statement = QString(),
+                              uint options = NoOptions);
+    PostgresqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
+    virtual ~PostgresqlCursor();
 
     virtual QVariant value(uint pos);
     virtual const char** recordData() const;
@@ -43,19 +45,18 @@ public:
     virtual bool drv_open(const QString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
+    //virtual void drv_getPrevRecord();
     virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
-//        virtual bool save(RecordData& data, RowEditBuffer& buf);
-
-//    //! Implemented for Resultable
-//    virtual QString serverResultName() const;
 
 private:
-    QVariant pValue(uint pos) const;
-    MysqlCursorData *d;
+    QVariant pValue(uint pos)const;
+    PostgresqlCursorData *d;
+    bool m_implicityStarted;
+    //friend class PostgresqlConnection;
 };
 
 }

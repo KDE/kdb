@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_PQXX_H
-#define PREDICATE_DRIVER_PQXX_H
+#ifndef PREDICATE_DRIVER_POSTGRESQL_H
+#define PREDICATE_DRIVER_POSTGRESQL_H
 
 #include <Predicate/Driver.h>
 
@@ -28,18 +29,19 @@ namespace Predicate
 class Connection;
 
 //! PostgreSQL database driver.
-class PqxxSqlDriver : public Driver
+class PostgresqlDriver : public Driver
 {
     Q_OBJECT
     PREDICATE_DRIVER
 
 public:
-    PqxxSqlDriver(QObject *parent, const QVariantList &args = QVariantList());
+    PostgresqlDriver();
 
-    ~PqxxSqlDriver();
+    virtual ~PostgresqlDriver();
 
-    virtual bool isSystemObjectName(const QString& n)const;
-    virtual bool isSystemDatabaseName(const QString& n)const;
+    virtual bool isSystemObjectName(const QString& n) const;
+
+    virtual bool isSystemDatabaseName(const QString& n) const;
 
     //! Escape a string for use as a value
     virtual QString escapeString(const QString& str) const;
@@ -48,11 +50,6 @@ public:
 
     //! Escape BLOB value \a array
     virtual QString escapeBLOB(const QByteArray& array) const;
-
-    /*! Escapes and converts value \a v (for type \a ftype)
-     to string representation required by SQL commands.
-     Reimplemented for boolean type only to use SQL compliant TRUE or FALSE */
-    virtual QString valueToSQL(uint ftype, const QVariant& v) const;
 
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;

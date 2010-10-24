@@ -17,36 +17,26 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PQXXCONNECTION_H
-#define PQXXCONNECTION_H
+#ifndef POSTGRESQLCONNECTION_H
+#define POSTGRESQLCONNECTION_H
 
-#include <qstringlist.h>
+#include <QStringList>
 
 #include <Predicate/Connection.h>
-#include "PqxxCursor.h"
-
+#include "PostgresqlCursor.h"
 
 namespace Predicate
 {
 
-class pqxxSqlConnectionInternal;
-
-//! @internal
-class pqxxTransactionData : public TransactionData
-{
-public:
-    pqxxTransactionData(Connection *conn, bool nontransaction);
-    ~pqxxTransactionData();
-    pqxx::transaction_base *data;
-};
+class PostgresqlConnectionInternal;
 
 /**
 @author Adam Pigg
 */
-class pqxxSqlConnection : public Connection
+class PostgresqlConnection : public Connection
 {
 public:
-    virtual ~pqxxSqlConnection();
+    virtual ~PostgresqlConnection();
 
     virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
@@ -55,7 +45,7 @@ public:
 
 protected:
     /*! Used by driver */
-    pqxxSqlConnection(Driver *driver, const ConnectionData& connData);
+    PostgresqlConnection(Driver *driver, const ConnectionData& connData);
 
     virtual bool drv_isDatabaseUsed() const;
     virtual bool drv_connect(Predicate::ServerVersionInfo* version);
@@ -69,31 +59,28 @@ protected:
     virtual bool drv_executeSQL(const QString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
+    //! Implemented for Resultable
+    virtual QString serverResultName() const;
+    virtual void drv_clearServerResult();
+
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
-    virtual TransactionData* drv_beginTransaction();
-    virtual bool drv_commitTransaction(TransactionData *);
-    virtual bool drv_rollbackTransaction(TransactionData *);
+//pred    virtual TransactionData* drv_beginTransaction();
+//pred    virtual bool drv_commitTransaction(TransactionData *);
+//pred    virtual bool drv_rollbackTransaction(TransactionData *);
 
-    //! Implemented for Resultable
-    virtual QString serverResultName() const;
-    virtual void drv_clearServerResult();
+    PostgresqlConnectionInternal *d;
 
-    pqxxSqlConnectionInternal *d;
-private:
     QString escapeName(const QString &tn) const;
-    //   pqxx::transaction_base* m_trans;
     //! temporary solution for executeSQL()...
-    pqxxTransactionData *m_trans;
+//pred    PostgresqlTransactionData *m_trans;
 
-
-
-    friend class PqxxSqlDriver;
-    friend class PqxxSqlCursor;
-    friend class PqxxTransactionData;
+    friend class PostgresqlDriver;
+    friend class PostgresqlCursor;
+    friend class PostgresqlTransactionData;
 };
 }
 #endif

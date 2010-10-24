@@ -24,11 +24,11 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <pqxxDriver.h>
+#include <PostgresqlDriver.h>
 
 namespace Predicate
 {
-const char* PqxxSqlDriver::keywords[] = {
+const char* PostgresqlDriver::keywords[] = {
     "ABORT",
     "ABSOLUTE",
     "ACCESS",

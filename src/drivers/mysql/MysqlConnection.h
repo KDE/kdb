@@ -45,7 +45,6 @@ public:
     virtual PreparedStatementInterface* prepareStatementInternal();
 
 protected:
-
     /*! Used by driver */
     MysqlConnection(Driver *driver, const ConnectionData& connData);
 
