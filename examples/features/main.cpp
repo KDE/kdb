@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -68,9 +68,16 @@ QApplication *app = 0;
 #include "parser_test.h"
 #include "dr_prop_test.h"
 
-#define RETURN(code) \
-    qDebug()<< test_name << " TEST: " << (code==0?"PASSED":"ERROR"); \
-    return code
+static int finish(int code)
+{
+    qDebug() << "main:" << test_name << "test:" << (code==0?"PASSED":"ERROR");
+    if (code != 0 && conn) {
+        qDebug() << "main:" << conn->result();
+        conn->disconnect();
+        delete conn;
+    }
+    return code;
+}
 
 //! @return true if option @a option is found
 //! Removes the option.
@@ -167,11 +174,11 @@ int main(int argc, char** argv)
     test_name = takeOptionWithArg(args, "test");
     if (test_name.isEmpty()) {
         qDebug() << "No test specified. Use --help.";
-        RETURN(1);
+        return finish(1);
     }
     if (!tests.contains(test_name)) {
         qDebug() << QString("No such test \"%1\". Use --help.").arg(test_name);
-        RETURN(1);
+        return finish(1);
     }
 
 #ifndef NO_GUI
@@ -219,7 +226,7 @@ int main(int argc, char** argv)
         bool ok;
         conn_data.setPort(port.toInt(&ok));
         if (!ok) {
-            RETURN(1);
+            return finish(1);
         }
     }
 
@@ -230,20 +237,20 @@ int main(int argc, char** argv)
     qDebug() << "DRIVERS: " << driverNames;
     if (driverNames.isEmpty()) {
         qWarning() << "No drivers found";
-        RETURN(1);
+        return finish(1);
     }
     if (manager.result().isError()) {
         qDebug() << manager.result();
-        RETURN(1);
+        return finish(1);
     }
 
     //get driver
     driver = manager.driver(drv_name);
     if (!driver || manager.result().isError()) {
         qDebug() << manager.result();
-        RETURN(1);
+        return finish(1);
     }
-    qDebug() << "MIME types for" << driver->name() << ":" << driver->info().mimeTypes();
+    qDebug() << "main: MIME types for" << driver->name() << ":" << driver->info().mimeTypes();
 
     const bool bufCursors = takeOption(args, "buffered-cursors");
     QString queryParams = takeOptionWithArg(args, "query-params");
@@ -254,26 +261,29 @@ int main(int argc, char** argv)
 
     if (db_name_required && db_name.isEmpty()) {
         qDebug() << prgname << ": database name?";
-        RETURN(1);
+        return finish(1);
+    }
+    if (test_name != "dbcreation" && test_name != "tables") {
+        // these test can use the database directly after connecting
+        conn_data.setDatabaseName(db_name);
     }
     if (!db_name.isEmpty()) {
         //additional switches:
         if (bufCursors) {
             cursor_options |= Predicate::Cursor::Buffered;
         }
-        if (driver->isFileBased()) {
-            conn_data.setFileName(db_name);
-        }
         conn = driver->createConnection(conn_data);
 
         if (!conn || driver->result().isError()) {
             qDebug() << driver->result();
-            RETURN(1);
+            return finish(1);
         }
+        qDebug() << "main: Connection object created.";
         if (!conn->connect()) {
             qDebug() << conn->result();
-            RETURN(1);
+            return finish(1);
         }
+        qDebug() << "main: Connection::connect() OK.";
     }
 
     //start test:
@@ -300,7 +310,7 @@ int main(int argc, char** argv)
     else {
         qWarning() << "No such test: " << test_name;
 //  usage();
-        RETURN(1);
+        return finish(1);
     }
 
 #ifndef NO_GUI
@@ -319,5 +329,5 @@ int main(int argc, char** argv)
 
     delete app;
 
-    RETURN(r);
+    return finish(r);
 }

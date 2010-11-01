@@ -46,10 +46,11 @@ int main(int argc, char * argv[])
         qDebug() << conn->errorMsg();
         return 1;
     }
+/* not needed
     if (!conn->useDatabase("test")) {
         qDebug() << "use db:" << conn->errorMsg();
         return 1;
-    }
+    }*/
 
     qDebug() << "Creating first cursor";
     Predicate::Cursor *c = conn->executeQuery("select * from Applications");

@@ -24,10 +24,11 @@ int parserTest(const QString &st, const QStringList &params)
 {
     int r = 0;
 
+/* not needed
     if (!conn->useDatabase(db_name)) {
         qDebug() << conn->result();
         return 1;
-    }
+    }*/
 
     Predicate::Parser parser(conn);
 

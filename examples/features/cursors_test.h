@@ -30,10 +30,11 @@ int cursorsTest()
         qDebug() << "DB created & filled";
     }
 
+/* not needed
     if (!conn->useDatabase(db_name)) {
         qDebug() << conn->result();
         return 1;
-    }
+    }*/
 
     Predicate::Cursor *cursor = conn->executeQuery("select * from persons", cursor_options);  //Predicate::Cursor::Buffered );
     qDebug() << "executeQuery() = " << !!cursor;
