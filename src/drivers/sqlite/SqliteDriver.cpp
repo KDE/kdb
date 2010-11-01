@@ -48,11 +48,9 @@ SQLiteDriver::SQLiteDriver()
         : Driver()
         , dp(0) //TODO new SQLiteDriverPrivate())
 {
-//    d->isFileDriver = true;
     d->isDBOpenedAfterCreate = true;
     d->features = SingleTransactions | CursorForward
                   | CompactingDatabaseSupported;
-    ;
 
     //special method for autoincrement definition
     beh->SPECIAL_AUTO_INCREMENT_DEF = true;

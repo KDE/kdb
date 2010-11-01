@@ -25,6 +25,8 @@
 #include "PostgresqlDriver.h"
 #include "PostgresqlConnection.h"
 
+#include <libpq-fe.h>
+
 #include <QtDebug>
 
 using namespace Predicate;
@@ -52,6 +54,7 @@ PostgresqlDriver::PostgresqlDriver()
     // 1 or 0 does not work.
     beh->BOOLEAN_TRUE_LITERAL = QLatin1String("TRUE");
     beh->BOOLEAN_FALSE_LITERAL = QLatin1String("FALSE");
+    beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED = true;
 
     initDriverSpecificKeywords(keywords);
 

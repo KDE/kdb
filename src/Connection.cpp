@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -259,7 +259,7 @@ public:
     bool skip_databaseExists_check_in_useDatabase;
 
     /*! Used when single transactions are only supported (Driver::SingleTransactions).
-     True value means default Transaction.has been started inside connection object
+     True value means default Transaction has been started inside connection object
      (by beginAutoCommitTransaction()), otherwise default Transaction.has been started outside
      of the object (e.g. before createTable()), so we shouldn't autocommit the transaction
      in commitAutoCommitTransaction(). Also, beginAutoCommitTransaction() doesn't restarts
@@ -349,9 +349,16 @@ bool Connection::connect()
     if (!(d->isConnected = drv_connect(&d->serverVersion))) {
         m_result = Result(m_driver->isFileBased() ?
                     QObject::tr("Could not open \"%1\" project file.")
-                    .arg(QDir::convertSeparators(d->connData.fileName()))
+                    .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName()))
                  :  QObject::tr("Could not connect to \"%1\" database server.")
                     .arg(d->connData.serverInfoString()));
+    }
+    if (m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT || !d->connData.databaseName().isEmpty()) {
+        const bool ok = useDatabase(d->connData.databaseName());
+        if (!ok) {
+            disconnect();
+            return false;
+        }
     }
     return d->isConnected;
 }
@@ -475,23 +482,23 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
     if (m_driver->isFileBased()) {
         //for file-based db: file must exists and be accessible
 //js: moved from useDatabase():
-        QFileInfo file(d->connData.fileName());
+        QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
             if (!ignoreErrors)
                 m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Database file \"%1\" does not exist.")
-                                                        .arg(QDir::convertSeparators(d->connData.fileName())));
+                                                        .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         if (!file.isReadable()) {
             if (!ignoreErrors)
                 m_result = Result(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not readable.")
-                                                     .arg(QDir::convertSeparators(d->connData.fileName())));
+                                                     .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         if (!file.isWritable()) {
             if (!ignoreErrors)
                 m_result = Result(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not writable.")
-                                                     .arg(QDir::convertSeparators(d->connData.fileName())));
+                                                     .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         return true;
@@ -543,7 +550,7 @@ bool Connection::createDatabase(const QString &dbName)
     }
     if (m_driver->isFileBased()) {
         //update connection data if filename differs
-        d->connData.setFileName(dbName);
+        d->connData.setDatabaseName(dbName);
     }
 
     QString tmpdbName;
@@ -763,8 +770,7 @@ QString Connection::currentDatabase() const
 
 bool Connection::useTemporaryDatabaseIfNeeded(QString* name)
 {
-    if (!m_driver->isFileBased() && m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT
-            && !isDatabaseUsed()) {
+    if (m_driver->beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED && !isDatabaseUsed()) {
         //we have no db used, but it is required by engine to have used any!
         *name = anyAvailableDatabaseName();
         if (name->isEmpty()) {
@@ -793,12 +799,14 @@ bool Connection::dropDatabase(const QString &dbName)
     QString dbToDrop;
     if (dbName.isEmpty() && d->usedDatabase.isEmpty()) {
         if (!m_driver->isFileBased()
-                || (m_driver->isFileBased() && d->connData.fileName().isEmpty())) {
-            m_result = Result(ERR_NO_NAME_SPECIFIED, QObject::tr("Cannot drop database - name not specified."));
+                || (m_driver->isFileBased() && d->connData.databaseName().isEmpty()))
+        {
+            m_result = Result(ERR_NO_NAME_SPECIFIED,
+                              QObject::tr("Cannot drop database - name not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
-        dbToDrop = d->connData.fileName();
+        dbToDrop = d->connData.databaseName();
     } else {
         if (dbName.isEmpty()) {
             dbToDrop = d->usedDatabase;

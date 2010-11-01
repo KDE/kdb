@@ -29,29 +29,20 @@ ConnectionData::~ConnectionData()
 {
 }
 
-void ConnectionData::setFileName(const QString& fileName)
-{
-    QFileInfo file(fileName);
-    if (!fileName.isEmpty() && d->fileName != file.absoluteFilePath()) {
-        d->fileName = QDir::convertSeparators(file.absoluteFilePath());
-        d->databasePath = QDir::convertSeparators(file.absolutePath());
-        d->databaseFileName = file.fileName();
-    }
-}
-
 QString ConnectionData::serverInfoString(ServerInfoStringOptions options) const
 {
-    if (!d->databaseFileName.isEmpty())
-        return QObject::tr("file: %1")
-               .arg(d->databasePath.isEmpty() ? QString() : d->databasePath + QDir::separator() + d->databaseFileName);
-
     if (!d->driverName.isEmpty()) {
         DriverManager mananager;
         const DriverInfo info = mananager.driverInfo(d->driverName);
-        if (info.isValid() && info.isFileBased())
-            return QObject::tr("<file>");
+        if (info.isValid() && info.isFileBased()) {
+            if (d->databaseName.isEmpty()) {
+                return QObject::tr("<file>");
+            }
+            else {
+                return QObject::tr("file: %1").arg(d->databaseName);
+            }
+        }
     }
-
     return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QLatin1String("") : (d->userName + '@'))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
            + (d->port != 0 ? (QLatin1String(":") + QString::number(d->port)) : QString());

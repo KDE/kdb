@@ -120,13 +120,29 @@ public:
     */
     QChar QUOTATION_MARKS_FOR_IDENTIFIER;
 
-    /*! True if using database is requied to perform real connection.
-     This is true for may engines, e.g. for PostgreSQL, where connections
-     string should contain a database name.
-     This flag is unused for file-based db drivers,
-     by default set to true and used for all other db drivers.
+    /*! True if using database is required to perform real connection.
+     This is true for may engines, e.g. for PostgreSQL, where connection
+     strings should contain a database name.
+     If the flag is false, then developer has to call Connection::useDatabase()
+     after creating the Connection object.
+     This flag can be also used for file-based db drivers, e.g. SQLite sets it to true.
+     By default this flag is true and used for all other db drivers.
     */
     bool USING_DATABASE_REQUIRED_TO_CONNECT;
+
+    /*! Because some engines need to have opened any database before
+     executing administrative sql statements like "create database" or "drop database",
+     using appropriate, existing temporary database for this connection.
+     This is the case for PostgreSQL.
+     For file-based db drivers this flag is ignored.
+     By default this flag is false.
+
+     Note: This method has nothing to do with creating or using temporary databases
+     in such meaning that these database are not persistent.
+
+     @see Connection::useTemporaryDatabaseIfNeeded
+    */
+    bool USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED;
 
     /*! True if before we know whether the fetched result of executed query
      is empty or not, we need to fetch first record. Particularly, it's true for SQLite.

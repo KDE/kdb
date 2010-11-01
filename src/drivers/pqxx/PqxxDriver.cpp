@@ -47,6 +47,8 @@ PqxxSqlDriver::PqxxSqlDriver()
     beh->AUTO_INCREMENT_PK_FIELD_OPTION = "PRIMARY KEY";
     beh->ALWAYS_AVAILABLE_DATABASE_NAME = "template1";
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
+    beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED = true;
+
     initDriverSpecificKeywords(keywords);
 
     //predefined properties

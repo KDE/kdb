@@ -23,8 +23,7 @@
 using namespace Predicate;
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(Connection *conn)
         : ConnectionInternal(conn)
-        , pqxxsql(0)
-        , res(0)
+        , conn(0)
         , version(0)
 {
 }

@@ -147,34 +147,22 @@ public:
 
     /*!
     @getter
-    @return filename for file-based databases
+    @return database name
 
-    For file-based database engines like SQLite, @a fileName is used
-    instead hostName and port.
+    Optional attribute explicitly providing database name.
+    If not empty, the database driver will attempt to use the database
+    (e.g. with "USE DATABASE" SQL statement).
+
+    For file-based database engines like SQLite, the database name is equal to filename
+    (absolute or relative) that should be open. In this case hostName and port is unused.
+
+    Can be empty, in which case if database name is required by the connection,
+    after connecting Connection::useDatabase() should be called.
+
     @setter
-    Sets filename for file-based databases.
-
-    For file-based database engines, like SQLite, you should use this
-    function to set the file name of the database to use.
-    @a fileName can be either absolute or relative path to the file.
+    Explicitly sets database name.
     */
-    data_member QString fileName custom_setter;
-
-    /*!
-    @getter
-    @return absolute path to the database file
-
-    Will be empty if database is not file-based.
-    */
-    protected data_member QString databasePath no_setter;
-
-    /*!
-    @getter
-    @return filename of the database file
-
-    Will be empty if database is not file-based.
-    */
-    protected data_member QString databaseFileName no_setter;
+    data_member QString databaseName;
 
 #if 0
     /*!
@@ -207,7 +195,9 @@ public:
      - "localhost:12345" of only port is specified;
      - "user@myhost.org:12345" if also user is specified
      - "<file>" if file-based driver is assigned but no filename is assigned
-     - "file: pathto/mydb.kexi" if file-based driver is assigned and filename is assigned
+       to the databaseName attribute
+     - "file: pathto/mydb.kexi" if file-based driver is assigned and filename
+       is assigned to the databaseName attribute
 
      User's name is added if @a options & AddUserToServerInfoString is true (the default).
     */

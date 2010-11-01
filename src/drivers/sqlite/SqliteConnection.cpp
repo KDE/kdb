@@ -143,7 +143,7 @@ bool SQLiteConnection::drv_disconnect()
 bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 {
     //this is one-db-per-file database
-    list->append(data().fileName());   //more consistent than dbFileName() ?
+    list->append(data().databaseName());
     return true;
 }
 
@@ -209,8 +209,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
     m_result.setServerResultCode(
         sqlite3_open_v2(
-                 //QFile::encodeName( data()->fileName() ),
-                 data().fileName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
+                 data().databaseName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
@@ -251,7 +250,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
                     tr("Do you want to open file \"%1\" as read-only?\n\n"
                         "The file is probably already open on this or another computer. "
                         "Could not gain exclusive access for writing the file.")
-                    .arg(QDir::convertSeparators(data()->fileName())),
+                    .arg(QDir::convertSeparators(data()->databaseName())),
                     QObject::tr("Opening As Read-Only"),
                     MessageHandler::Continue,
                     MessageHandler::GuiItem()
@@ -307,8 +306,8 @@ bool SQLiteConnection::drv_closeDatabase()
 bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
 {
     Q_UNUSED(dbName); // Each database is one single SQLite file.
-    const QString filename = data().fileName();
-    if (QFile(filename).exists() && !QDir().remove(filename)) {
+    const QString filename = data().databaseName();
+    if (QFile::exists(filename) && !QFile::remove(filename)) {
         m_result = Result(ERR_ACCESS_RIGHTS,
                           QObject::tr("Could not remove file \"%1\". "
                              "Check the file's permissions and whether it is already "

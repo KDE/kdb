@@ -1,5 +1,9 @@
 Predicate CHANGELOG
 
+2010-10-30
+Predicate
+*ConnectionData now contains optional databaseName attribute, so it is not needed to call useDatabase() (useful e.g. for SQLite and MySQL)
+
 2010-10-20
 PostgreSQL Driver
 *development of PostgreSQL driver based on libpq started, total rewrite of the 'pqxx' driver

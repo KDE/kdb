@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -94,7 +94,12 @@ public:
 
     /*!
     \brief Connects to driver with given parameters.
-    \return true if successful. */
+    \return true if successful.
+
+     Note: many database drivers may require connData.databaseName() to be specified
+     because explicit database name is needed to perform connection (e.g. SQLite, PostgreSQL).
+     MySQL does not require database name; Connection::useDatabase() can be called later.
+    */
     bool connect();
 
     /*! \return true, if connection is properly established. */

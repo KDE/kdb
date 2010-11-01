@@ -36,6 +36,7 @@ pqxxSqlConnectionInternal::pqxxSqlConnectionInternal(Connection *conn)
         , pqxxsql(0)
         , res(0)
         , version(0)
+        , resultCode(0)
 {
 }
 

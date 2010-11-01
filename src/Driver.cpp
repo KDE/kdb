@@ -169,18 +169,16 @@ Connection *Driver::createConnection(const ConnectionData& connData, int options
     clearResult();
     if (!isValid())
         return 0;
-    if (d->info.isFileBased()) {
-        if (connData.fileName().isEmpty()) {
-            m_result = Result(ERR_MISSING_DB_LOCATION,
-                              QObject::tr("File name expected for file-based database driver."));
-            return 0;
-        }
+    if (beh->USING_DATABASE_REQUIRED_TO_CONNECT && connData.databaseName().isEmpty()) {
+        m_result = Result(ERR_MISSING_DB_LOCATION,
+                            QObject::tr("Database name required to create connection."));
+        return 0;
     }
     Connection *conn = drv_createConnection(connData);
 
     conn->setReadOnly(options & ReadOnlyConnection);
 
-//! @todo needed? connData->setDriverName(name()); 
+//! @todo needed? connData->setDriverName(name());
     d->connections.insert(conn);
     return conn;
 }

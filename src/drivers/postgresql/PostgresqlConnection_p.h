@@ -22,6 +22,8 @@
 
 #include <Predicate/Connection_p.h>
 
+#include <libpq-fe.h>
+
 /**
   @author Adam Pigg <adam@piggz.co.uk>
 */
@@ -37,8 +39,7 @@ public:
     //! stores last result's message
     virtual void storeResult();
 
-    pqxx::connection* pqxxsql;
-    pqxx::result* res;
+    PGconn *conn;
 
     Predicate::ServerVersionInfo *version; //!< this is set in drv_connect(), so we can use it in drv_useDatabase()
     //!< because pgsql really connects after "USE".
