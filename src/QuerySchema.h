@@ -117,7 +117,7 @@ public:
 
     //! Like above but used when the field \a field is not present on the list of columns.
     //! (e.g. SELECT a FROM t ORDER BY b; where T is a table with fields (a,b)).
-    OrderByColumn(Field& field, bool ascending = true);
+    explicit OrderByColumn(Field& field, bool ascending = true);
 
     ~OrderByColumn();
 
@@ -152,9 +152,12 @@ public:
     /*! \return a string like "name ASC" usable for building a SQL statement.
      If \a includeTableNames is true (the default) field is output in a form
      of "tablename.fieldname" (but only if fieldname is not a name of alias).
-     \a drv and \a identifierEscaping are used for escaping the table and field identifiers. */
+
+     @a escapingType can be used to alter default escaping type.
+     If @a conn is not provided for DriverEscaping, no escaping is performed. */
     QString toSQLString(bool includeTableName = true,
-                        Driver *drv = 0, int identifierEscaping = Driver::EscapeDriver | Driver::EscapeAsNecessary) const;
+                        Connection *conn = 0,
+                        Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
 protected:
     //! Column to sort
@@ -261,9 +264,12 @@ public:
     /*! \return a string like "name ASC, 2 DESC" usable for building a SQL statement.
      If \a includeTableNames is true (the default) fields are output in a form
      of "tablename.fieldname".
-     \a drv and \a identifierEscaping are used for escaping the table and field identifiers. */
+
+     @a escapingType can be used to alter default escaping type.
+     If @a conn is not provided for DriverEscaping, no escaping is performed. */
     QString toSQLString(bool includeTableNames = true,
-                        Driver *drv = 0, int identifierEscaping = Driver::EscapeDriver | Driver::EscapeAsNecessary) const;
+                        Connection *conn = 0,
+                        Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 };
 
 //! @short Predicate::QuerySchema provides information about database query
@@ -757,12 +763,15 @@ public:
 
      This method is similar to FieldList::sqlFieldsList() it just uses
      QueryColumnInfo::List instead of Field::List.
-    */
-    static QString sqlColumnsList(QueryColumnInfo::List* infolist, Driver *driver);
+
+     @a escapingType can be used to alter default escaping type.
+     If @a conn is not provided for DriverEscaping, no escaping is performed. */
+    static QString sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn = 0,
+        Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
     /*! \return cached sql list created using sqlColumnsList() on a list returned
      by autoIncrementFields(). */
-    QString autoIncrementSQLFieldsList(Driver *driver) const;
+    QString autoIncrementSQLFieldsList(Connection *conn) const;
 
     /*! Sets a WHERE expression \a exp. It will be owned by this query,
      so you can forget about it. Previously set WHERE expression will be deleted.

@@ -368,7 +368,7 @@ Field* TableSchema::anyNonPKField()
         Field *f = 0;
         for (QListIterator<Field*> it(m_fields); it.hasPrevious();) {
             f = it.previous();
-            if (!f->isPrimaryKey() && (!m_pkey || !m_pkey->hasField(f)))
+            if (!f->isPrimaryKey() && (!m_pkey || !m_pkey->hasField(*f)))
                 break;
         }
         d->anyNonPKField = f;

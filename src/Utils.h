@@ -26,8 +26,7 @@
 #include <QByteArray>
 #include <QtDebug>
 
-#include <Predicate/Connection.h>
-#include <Predicate/Driver.h>
+#include <Predicate/QuerySchema.h>
 
 class QDomNode;
 class QDomElement;
@@ -35,56 +34,31 @@ class QDomDocument;
 
 namespace Predicate
 {
+
+class Connection;
+class Driver;
+
 //! for convenience
-inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
-                                          const QString &keyname, const QString &keyval)
-{
-    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ") + table->name() + QLatin1String(" WHERE ")
-                                         + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
-}
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
+                                          const QString &keyname, const QString& keyval);
 
-inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
-                                          const QString &keyname, const QString &keyval)
-{
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
-                           + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
-}
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                          const QString &keyname, const QString &keyval);
 
-inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
-                                          const QString& keyname, int keyval)
-{
-    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ") + table->name() + QLatin1String(" WHERE ")
-                                         + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
-}
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, TableSchema *table,
+                                          const QString& keyname, int keyval);
 
-inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
-                                          const QString &keyname, int keyval)
-{
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
-                           + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
-}
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                          const QString &keyname, int keyval);
 
-/*! Delete record with two generic criterias. */
-inline PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
-                                          const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
-                                          const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
-{
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
-                           + keyname1 + '=' + conn->driver()->valueToSQL(keytype1, keyval1)
-                           + QLatin1String(" AND ") + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
-}
+/*! Deletes record with two generic criterias. */
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                   const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
+                                   const QString &keyname2, Field::Type keytype2, const QVariant& keyval2);
 
-inline PREDICATE_EXPORT bool replaceRecord(Connection* conn, TableSchema *table,
-                                           const QString &keyname, const QString &keyval, const QString &valname,
-                                           const QVariant& val, int ftype)
-{
-    if (!table || !Predicate::deleteRecord(conn, table, keyname, keyval))
-        return false;
-    return conn->executeSQL(QLatin1String("INSERT INTO ") + table->name()
-                           + QLatin1String(" (") + keyname + ',' + valname + QLatin1String(") VALUES (")
-                           + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)) + ','
-                           + conn->driver()->valueToSQL(ftype, val) + ')');
-}
+PREDICATE_EXPORT bool replaceRecord(Connection* conn, TableSchema *table,
+                                    const QString &keyname, const QString &keyval, const QString &valname,
+                                    const QVariant& val, int ftype);
 
 typedef QList<uint> TypeGroupList;
 
@@ -112,12 +86,7 @@ PREDICATE_EXPORT QString simplifiedTypeName(const Field& field);
 
 /*! \return true if \a v represents an empty (but not null) value.
  Values of some types (as for strings) can be both empty and not null. */
-inline bool isEmptyValue(Field *f, const QVariant &v)
-{
-    if (f->hasEmptyProperty() && v.toString().isEmpty() && !v.toString().isNull())
-        return true;
-    return v.isNull();
-}
+PREDICATE_EXPORT bool isEmptyValue(Field *f, const QVariant &v);
 
 /*! Sets \a msg to an error message retrieved from resultable \a resultable, and \a details
  to details of this error (server message and result number).
@@ -137,17 +106,12 @@ PREDICATE_EXPORT void getHTMLErrorMesage(const Resultable& resultable, ResultInf
 Constructs an sql string like "fielname = value" for specific \a drv driver,
  field type \a t, \a fieldName and \a value. If \a value is null, "fieldname is NULL"
  string is returned. */
-inline PREDICATE_EXPORT QString sqlWhere(Driver *drv, Field::Type t,
-                                       const QString fieldName, const QVariant value)
-{
-    if (value.isNull())
-        return fieldName + QLatin1String(" is NULL");
-    return fieldName + '=' + drv->valueToSQL(t, value);
-}
+PREDICATE_EXPORT QString sqlWhere(Driver *drv, Field::Type t,
+                                  const QString fieldName, const QVariant value);
 
 /*! \return identifier for object \a objName of type \a objType
  or 0 if such object does not exist. */
-PREDICATE_EXPORT int idForObjectName(Connection &conn, const QString& objName, int objType);
+PREDICATE_EXPORT int idForObjectName(Connection* conn, const QString& objName, int objType);
 
 /*! Variant class providing a pointer to table or query. */
 class PREDICATE_EXPORT TableOrQuerySchema
@@ -388,6 +352,19 @@ PREDICATE_EXPORT QVariant emptyValueForType(Field::Type type);
  This function is efficient (uses a cache) and is heavily used by the AlterTableHandler
  for filling new columns. */
 PREDICATE_EXPORT QVariant notEmptyValueForType(Field::Type type);
+
+/*! @return escaped identifier string @a string using PredicateSQL dialect,
+            i.e. doubles double quotes and inserts the string into double quotes.
+    If the identifier does not contain double quote, @a string is returned.
+    Use it for user-visible backend-independent statements. */
+PREDICATE_EXPORT QString escapeIdentifier(const QString& string);
+
+/*! @return escaped string @a string using PredicateSQL dialect,
+            i.e. doubles single quotes and inserts the string into single quotes.
+    Quotes are always added.
+    Also escapes \\n, \\r, \\t, \\\\, \\0.
+    Use it for user-visible backend-independent statements. */
+PREDICATE_EXPORT QString escapeString(const QString& string);
 
 //! Escaping types used in escapeBLOB().
 enum BLOBEscapingType {

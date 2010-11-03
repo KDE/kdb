@@ -120,7 +120,7 @@ public:
     Type type() const { return d->type; }
     void setType(Type type) { d->type = type; d->dirty = true; }
 
-    FieldList fields() const { return d->fields; }
+    const FieldList& fields() const { return d->fields; }
     void setFields(FieldList& fields) { d->fields = fields; d->dirty = true; }
 
     QStringList whereFieldNames() const { return d->whereFieldNames; }

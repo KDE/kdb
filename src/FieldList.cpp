@@ -18,11 +18,7 @@
 */
 
 #include "FieldList.h"
-//#include "Object.h"
-
-#include <QtDebug>
-
-#include <assert.h>
+#include "Connection.h"
 
 using namespace Predicate;
 
@@ -32,6 +28,7 @@ FieldList::FieldList(bool owner)
 {
 }
 
+#warning (API) improve deepCopyFields
 FieldList::FieldList(const FieldList& fl, bool deepCopyFields)
         : m_fields(fl.m_fields.autoDelete())
         , m_autoinc_fields(0)
@@ -64,7 +61,7 @@ void FieldList::clear()
 
 FieldList& FieldList::insertField(uint index, Predicate::Field *field)
 {
-    assert(field);
+    Q_ASSERT(field);
     if (!field)
         return *this;
     if (index > (uint)m_fields.count()) {
@@ -114,7 +111,7 @@ FieldList& FieldList::addField(Predicate::Field *field)
 
 void FieldList::removeField(Predicate::Field *field)
 {
-    assert(field);
+    Q_ASSERT(field);
     if (!field)
         return;
     m_fields_by_name.remove(field->name().toLower());
@@ -122,7 +119,7 @@ void FieldList::removeField(Predicate::Field *field)
     m_sqlFields.clear();
 }
 
-Field* FieldList::field(const QString& name)
+Field* FieldList::field(const QString& name) const
 {
     return m_fields_by_name.value(name.toLower());
 }
@@ -229,36 +226,39 @@ QStringList FieldList::names() const
 }
 
 //static
-QString FieldList::sqlFieldsList(Field::List* list, Driver *driver,
-                                 const QString& separator, const QString& tableAlias, int drvEscaping)
+QString FieldList::sqlFieldsList(const Field::List& list, Connection *conn,
+                                 const QString& separator, const QString& tableAlias,
+                                 Predicate::EscapingType escapingType)
 {
-    if (!list)
-        return QString();
     QString result;
     result.reserve(256);
     bool start = true;
-    const QString tableAliasAndDot(tableAlias.isEmpty() ? QString() : (tableAlias + "."));
-    foreach(Field *f, *list) {
+    const QString tableAliasAndDot(tableAlias.isEmpty() ? QString() : (tableAlias + '.'));
+    foreach(Field *f, list) {
         if (!start)
             result += separator;
         else
             start = false;
-        result += (tableAliasAndDot + driver->escapeIdentifier(f->name(), drvEscaping));
+        result += (tableAliasAndDot +
+                   ((conn && escapingType == DriverEscaping) ? conn->escapeIdentifier(f->name())
+                                                             : Predicate::escapeIdentifier(f->name()))
+                  );
     }
     return result;
 }
 
-QString FieldList::sqlFieldsList(Driver *driver,
-                                 const QString& separator, const QString& tableAlias, int drvEscaping)
+QString FieldList::sqlFieldsList(Connection *conn,
+                                 const QString& separator, const QString& tableAlias,
+                                 Predicate::EscapingType escapingType) const
 {
     if (!m_sqlFields.isEmpty())
         return m_sqlFields;
 
-    m_sqlFields = FieldList::sqlFieldsList(&m_fields, driver, separator, tableAlias, drvEscaping);
+    m_sqlFields = FieldList::sqlFieldsList(m_fields, conn, separator, tableAlias, escapingType);
     return m_sqlFields;
 }
 
-Field::List* FieldList::autoIncrementFields()
+Field::List* FieldList::autoIncrementFields() const
 {
     if (m_autoinc_fields)
         return m_autoinc_fields;

@@ -118,7 +118,7 @@ public:
     /*! Quotation marks used for escaping identifier (see Driver::escapeIdentifier()).
      Default value is '"'. Change it for your driver.
     */
-    QChar QUOTATION_MARKS_FOR_IDENTIFIER;
+    char QUOTATION_MARKS_FOR_IDENTIFIER;
 
     /*! True if using database is required to perform real connection.
      This is true for may engines, e.g. for PostgreSQL, where connection
@@ -126,9 +126,35 @@ public:
      If the flag is false, then developer has to call Connection::useDatabase()
      after creating the Connection object.
      This flag can be also used for file-based db drivers, e.g. SQLite sets it to true.
-     By default this flag is true and used for all other db drivers.
+     MySQL sets it to false.
+     By default this flag is true.
     */
     bool USING_DATABASE_REQUIRED_TO_CONNECT;
+
+    /*! True if connection should be established (Connection::connect()) in order
+     to check database existence (Connection::databaseExists()).
+     This is true for most engines, but not for SQLite (and probably most
+     file-based databases) where existence of database is checked at filesystem level.
+     By default this flag is true.
+    */
+    bool CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE;
+
+    /*! True if connection should be established (Connection::connect()) in order
+     to create new database (Connection::createDatabase()).
+     This is true for most engines, but not for SQLite (and probably most
+     file-based databases) where opening physical connection for nonexisting
+     file creates new file.
+     By default this flag is true.
+    */
+    bool CONNECTION_REQUIRED_TO_CREATE_DB;
+
+    /*! True if connection should be established (Connection::connect()) in order
+     to drop database (Connection::dropDatabase()).
+     This is true for most engines, but not for SQLite (and probably most
+     file-based databases) where dropping database is performed at filesystem level.
+     By default this flag is true.
+    */
+    bool CONNECTION_REQUIRED_TO_DROP_DB;
 
     /*! Because some engines need to have opened any database before
      executing administrative sql statements like "create database" or "drop database",
@@ -140,7 +166,7 @@ public:
      Note: This method has nothing to do with creating or using temporary databases
      in such meaning that these database are not persistent.
 
-     @see Connection::useTemporaryDatabaseIfNeeded
+     @see Connection::useTemporaryDatabaseIfNeeded()
     */
     bool USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED;
 
@@ -187,7 +213,7 @@ public:
     //moved to info bool isFileDriver;
 
     /*! Internal constant flag: Set this in subclass if after successful
-     drv_createDatabased() database is in opened state (as after useDatabase()).
+     drv_createDatabase() the database is in opened state (as after useDatabase()).
      For most engines this is not true. */
     bool isDBOpenedAfterCreate;
 

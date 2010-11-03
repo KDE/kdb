@@ -33,9 +33,7 @@ namespace Predicate
 
 class Connection;
 
-/*! Helper class that stores list of fields.
-*/
-
+/*! Helper class that stores list of fields. */
 class PREDICATE_EXPORT FieldList
 {
 public:
@@ -50,7 +48,7 @@ public:
     /*! Copy constructor.
      If \a deepCopyFields is true, all fields are deeply copied, else only pointer are copied.
      Reimplemented in QuerySchema constructor. */
-    FieldList(const FieldList& fl, bool deepCopyFields = true);
+    explicit FieldList(const FieldList& fl, bool deepCopyFields = true);
 
     /*! Destroys the list. If the list owns fields (see constructor),
      these are also deleted. */
@@ -92,17 +90,17 @@ public:
     }
 
     /*! \return field with name \a name or NULL if there is no such a field. */
-    virtual Field* field(const QString& name);
+    virtual Field* field(const QString& name) const;
 
     /*! \return true if this list contains given \a field. */
-    inline bool hasField(Field* field) const {
-        return m_fields.contains(field);
+    inline bool hasField(const Field& field) const {
+        return m_fields.contains(const_cast<Field*>(&field));
     }
 
     /*! \return first occurrence of \a field in the list
      or -1 if this list does not contain this field. */
-    inline int indexOf(Field* field) const {
-        return m_fields.indexOf(field);
+    inline int indexOf(const Field& field) const {
+        return m_fields.indexOf(const_cast<Field*>(&field));
     }
 
     /*! \return list of field names for this list. */
@@ -120,7 +118,7 @@ public:
     }
 
     /*! \return list of autoincremented fields. The list is owned by this FieldList object. */
-    Field::List* autoIncrementFields();
+    Field::List* autoIncrementFields() const;
 
     /*! \return true if fields in the list are owned by this list. */
     inline bool isOwner() const {
@@ -160,20 +158,24 @@ public:
      for "INSERT INTO (xxx) ..". The result of this method is effectively cached,
      and it is invalidated when set of fields changes (e.g. using clear()
      or addField()).
+
      \a tableAlias, if provided is prepended to each field, so the resulting
      names will be in form tableAlias.fieldName. This option is used for building
      queries with joins, where fields have to be spicified without ambiguity.
      See @ref Connection::selectStatement() for example use.
-     \a drvEscaping can be used to alter default escaping type.
+
+     @a escapingType can be used to alter default escaping type.
+     If @a conn is not provided for DriverEscaping, no escaping is performed.
     */
-    QString sqlFieldsList(Driver *driver, const QString& separator = QString::fromLatin1(","),
+    QString sqlFieldsList(Connection *conn, const QString& separator = QString(','),
                           const QString& tableAlias = QString(),
-                          int drvEscaping = Driver::EscapeDriver | Driver::EscapeAsNecessary);
+                          Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
     /*! Like above, but this is convenient static function, so you can pass any \a list here. */
-    static QString sqlFieldsList(Field::List* list, Driver *driver,
-                                 const QString& separator = QString::fromLatin1(","), const QString& tableAlias = QString(),
-                                 int drvEscaping = Driver::EscapeDriver | Driver::EscapeAsNecessary);
+    static QString sqlFieldsList(const Field::List& list, Connection *conn,
+                                 const QString& separator = QString(','),
+                                 const QString& tableAlias = QString(),
+                                 Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
     /*! @internal Renames field \a oldName to \a newName.
      Do not use this for physical renaming columns. Use AlterTableHandler instead. */
@@ -185,14 +187,14 @@ public:
 
 protected:
     Field::List m_fields;
-    QHash<QString, Field*> m_fields_by_name; //!< Fields collected by name. Not used by QuerySchema.
-    Field::List *m_autoinc_fields;
+    mutable QHash<QString, Field*> m_fields_by_name; //!< Fields collected by name. Not used by QuerySchema.
+    mutable Field::List *m_autoinc_fields;
 
 private:
     void renameFieldInternal(Predicate::Field *field, const QString& newNameLower);
 
     //! cached
-    QString m_sqlFields;
+    mutable QString m_sqlFields;
 };
 
 } //namespace Predicate

@@ -40,6 +40,73 @@
 
 using namespace Predicate;
 
+bool Predicate::deleteRecord(Connection* conn, TableSchema *table,
+                             const QString &keyname, const QString &keyval)
+{
+    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ")
+        + table->name() + QLatin1String(" WHERE ")
+        + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
+}
+
+bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
+                             const QString &keyname, const QString &keyval)
+{
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+                           + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
+}
+
+bool Predicate::deleteRecord(Connection* conn, TableSchema *table,
+                             const QString& keyname, int keyval)
+{
+    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ")
+        + table->name() + QLatin1String(" WHERE ")
+        + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
+}
+
+bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
+                             const QString &keyname, int keyval)
+{
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+                           + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
+}
+
+/*! Delete record with two generic criterias. */
+bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
+                             const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
+                             const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
+{
+    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+        + keyname1 + '=' + conn->driver()->valueToSQL(keytype1, keyval1)
+        + QLatin1String(" AND ") + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
+}
+
+bool Predicate::replaceRecord(Connection* conn, TableSchema *table,
+                              const QString &keyname, const QString &keyval, const QString &valname,
+                              const QVariant& val, int ftype)
+{
+    if (!table || !Predicate::deleteRecord(conn, table, keyname, keyval))
+        return false;
+    return conn->executeSQL(QLatin1String("INSERT INTO ") + table->name()
+                           + QLatin1String(" (") + keyname + ',' + valname + QLatin1String(") VALUES (")
+                           + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)) + ','
+                           + conn->driver()->valueToSQL(ftype, val) + ')');
+}
+
+bool Predicate::isEmptyValue(Field *f, const QVariant &v)
+{
+    if (f->hasEmptyProperty() && v.toString().isEmpty() && !v.toString().isNull())
+        return true;
+    return v.isNull();
+}
+
+QString Predicate::sqlWhere(Driver *drv, Field::Type t,
+                                       const QString fieldName, const QVariant value)
+{
+    if (value.isNull())
+        return fieldName + QLatin1String(" is NULL");
+    return fieldName + '=' + drv->valueToSQL(t, value);
+}
+
 //! Cache
 struct TypeCache {
     TypeCache() {
@@ -170,10 +237,10 @@ void Predicate::getHTMLErrorMesage(const Resultable& resultable, ResultInfo *inf
     getHTMLErrorMesage(resultable, info->msg, info->desc);
 }
 
-int Predicate::idForObjectName(Connection &conn, const QString& objName, int objType)
+int Predicate::idForObjectName(Connection* conn, const QString& objName, int objType)
 {
     RecordData data;
-    if (true != conn.querySingleRecord(
+    if (true != conn->querySingleRecord(
                 QString::fromLatin1("SELECT o_id FROM kexi__objects WHERE lower(o_name)='%1' AND o_type=%2")
                 .arg(objName.toLower()).arg(objType), &data))
         return 0;
@@ -1045,6 +1112,85 @@ QVariant Predicate::notEmptyValueForType(Field::Type type)
     }
     PreWarn << "no value for type" << Field::typeName(type);
     return QVariant();
+}
+
+QString Predicate::escapeIdentifier(const QString& string)
+{
+    const char quote = '"';
+    // find out the length ot the destination string
+    const int origStringLength = string.length();
+    int newStringLength = 1 + 1;
+    for (int i = 0; i < origStringLength; i++) {
+        if (string.at(i) == quote)
+            newStringLength += 2;
+        else
+            newStringLength++;
+    }
+    if (newStringLength == origStringLength)
+        return string;
+    newStringLength += 2; // for quotes
+    // create
+    QString escapedQuote(quote);
+    escapedQuote.append(quote);
+    QString newString;
+    newString.reserve(newStringLength);
+    newString.append(quote);
+    for (int i = 0; i < origStringLength; i++) {
+        const QChar c = string.at(i);
+        if (c == quote)
+            newString.append(escapedQuote);
+        else
+            newString.append(c);
+    }
+    newString.append(quote);
+    return newString;
+}
+
+QString Predicate::escapeString(const QString& string)
+{
+    const char quote = '\'';
+    // find out the length ot the destination string
+    const int origStringLength = string.length();
+    int newStringLength = 1 + 1;
+    for (int i = 0; i < origStringLength; i++) {
+        const ushort unicode = string.at(i).unicode();
+        if (   unicode == quote
+            || unicode == '\t'
+            || unicode == '\\'
+            || unicode == '\n'
+            || unicode == '\r'
+            || unicode == '\0')
+        {
+            newStringLength += 2;
+        }
+        else
+            newStringLength++;
+    }
+    newStringLength += 2; // for quotes
+    // create
+    QString newString;
+    newString.reserve(newStringLength);
+    newString.append(quote);
+    for (int i = 0; i < origStringLength; i++) {
+        const QChar c = string.at(i);
+        const ushort unicode = c.unicode();
+        if (unicode == quote)
+            newString.append(QLatin1String("''"));
+        else if (unicode == '\t')
+            newString.append(QLatin1String("\\t"));
+        else if (unicode == '\\')
+            newString.append(QLatin1String("\\\\"));
+        else if (unicode == '\n')
+            newString.append(QLatin1String("\\n"));
+        else if (unicode == '\r')
+            newString.append(QLatin1String("\\r"));
+        else if (unicode == '\0')
+            newString.append(QLatin1String("\\0"));
+        else
+            newString.append(c);
+    }
+    newString.append(quote);
+    return newString;
 }
 
 QString Predicate::escapeBLOB(const QByteArray& array, BLOBEscapingType type)

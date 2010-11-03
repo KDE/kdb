@@ -41,6 +41,9 @@ class DriverManager;
 class DriverBehaviour;
 class DriverPrivate;
 
+//! Escaping type
+enum EscapingType { DriverEscaping = 0, PredicateEscaping = 1 };
+
 //! Database driver's abstraction.
 /*! This class is a prototype of the database driver.
  Driver allows new connections to be created, and groups as their parent.
@@ -228,24 +231,14 @@ public:
     */
     virtual QString escapeBLOB(const QByteArray& array) const = 0;
 
-//todo enum EscapeType { EscapeDriver = 0x00, EscapeKexi = 0x01};
-//todo enum EscapePolicy { EscapeAsNecessary = 0x00, EscapeAlways = 0x02 };
-
-    enum EscapeType { EscapeDriver = 0x01, EscapeKexi = 0x02};
-
-    enum EscapePolicy { EscapeAsNecessary = 0x04, EscapeAlways = 0x08 };
+//    enum EscapePolicy { EscapeAsNecessary = 0x04, EscapeAlways = 0x08 };
 
     //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
     /*! Escape database identifier (\a str) in order that keywords
-       can be used as table names, column names, etc.
-       \a options is the union of the EscapeType and EscapePolicy types.
-       If no escaping options are given, defaults to driver escaping as
-       necessary. */
-    QString escapeIdentifier(const QString& str,
-                             int options = EscapeDriver | EscapeAsNecessary) const;
+       can be used as table names, column names, etc. */
+    inline QString escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
 
-    QByteArray escapeIdentifier(const QByteArray& str,
-                                int options = EscapeDriver | EscapeAsNecessary) const;
+    inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
     //! \return property value for \a propeName available for this driver.
     //! If there's no such property defined for driver, Null QVariant value is returned.

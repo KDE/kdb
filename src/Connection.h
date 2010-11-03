@@ -35,6 +35,7 @@
 #include <Predicate/Driver.h>
 #include <Predicate/PreparedStatement.h>
 #include <Predicate/RecordData.h>
+#include <Predicate/Utils.h>
 #include <Predicate/tools/Tristate.h>
 
 namespace Predicate
@@ -156,11 +157,10 @@ public:
      If \a kexiCompatible is true (the default) initial checks will be performed
      to recognize database Kexi-specific format. Set \a kexiCompatible to false
      if you're using native database (one that have no Kexi System tables).
-     For file-based drivers, \a dbName should be equal to filename
-     (the same as specified for ConnectionData).
+     For file-based drivers, \a dbName can be skipped, so the same as specified for ConnectionData is used.
      \return true on success, false on failure.
      If user has cancelled this action and \a cancelled is not 0, *cancelled is set to true. */
-    bool useDatabase(const QString &dbName, bool kexiCompatible = true, bool *cancelled = 0,
+    bool useDatabase(const QString &dbName = QString(), bool kexiCompatible = true, bool *cancelled = 0,
                      MessageHandler* msgHandler = 0);
 
     /*!
@@ -712,8 +712,9 @@ public:
         SelectStatementOptions();
         ~SelectStatementOptions();
 
-        //! A mode for escaping identifier, Driver::EscapeDriver|Driver::EscapeAsNecessary by default
-        int identifierEscaping;
+        //! Escaping mode can be of PredicateSQL dialect. DriverEscaping by default.
+        //! Use for user-visible backend-independent statements.
+        Predicate::EscapingType escapingType;
 
         //! True if record ID should be also retrieved. False by default.
         bool alsoRetrieveRecordId;
@@ -728,7 +729,7 @@ public:
      defined by \a querySchema and \a params. */
     QString selectStatement(QuerySchema* querySchema,
                             const QList<QVariant>& params,
-                            const SelectStatementOptions& options = SelectStatementOptions()) const;
+                            const SelectStatementOptions& options = SelectStatementOptions());
 
     /*! \overload QString selectStatement( QuerySchema* querySchema,
       QList<QVariant> params = QList<QVariant>(),
@@ -736,7 +737,7 @@ public:
      \return "SELECT ..." statement's string needed for executing query
      defined by \a querySchema. */
     inline QString selectStatement(QuerySchema* querySchema,
-                                   const SelectStatementOptions& options = SelectStatementOptions()) const {
+                                   const SelectStatementOptions& options = SelectStatementOptions()) {
         return selectStatement(querySchema, QList<QVariant>(), options);
     }
 
@@ -883,6 +884,22 @@ public:
      Also used internally by Connection::newPredicateSystemTableSchema(const QString&) */
     void insertInternalTable(TableSchema* tableSchema);
 
+    //! Identifier escaping function in the associated Driver.
+    /*! Calls the identifier escaping function in this connection to
+     escape table and column names.  This should be used when explicitly
+     constructing SQL strings (e.g. "FROM " + escapeIdentifier(tablename)).
+     It should not be used for other functions (e.g. don't do
+     useDatabase(escapeIdentifier(database))), because the identifier will
+     be escaped when the called function generates, for example, "USE " +
+     escapeIdentifier(database).
+
+     For efficiency, kexi__* system tables and columns therein are not escaped
+     - we assume these are valid identifiers for all drivers.
+    */
+    virtual QString escapeIdentifier(const QString& id) const {
+        return m_driver->escapeIdentifier(id);
+    }
+
 protected:
     /*! Used by Driver */
     Connection(Driver *driver, const ConnectionData& connData);
@@ -982,7 +999,6 @@ protected:
     */
     QString createTableStatement(const TableSchema& tableSchema) const;
 
-
     /*! \return "SELECT ..." statement's string needed for executing query
      defined by "select * from table_name" where <i>table_name</i> is \a tableSchema's name.
      This method's variant can be useful when there is no appropriate QuerySchema defined.
@@ -991,7 +1007,7 @@ protected:
      and thus not reusable in general.
     */
     QString selectStatement(TableSchema* tableSchema,
-                            const SelectStatementOptions& options = SelectStatementOptions()) const;
+                            const SelectStatementOptions& options = SelectStatementOptions());
 
     /*!
      Creates table named by \a tableSchemaName. Schema object must be on
@@ -1093,7 +1109,6 @@ protected:
         Q_UNUSED(fields);
         return true;
     }
-
 
     /*! Changes autocommiting option for established connection.
       \return true on success.
@@ -1198,23 +1213,6 @@ protected:
     */
     TableSchema* newPredicateSystemTableSchema(const QString& tsname);
 
-    //! Identifier escaping function in the associated Driver.
-    /*! Calls the identifier escaping function in the associated Driver to
-     escape table and column names.  This should be used when explicitly
-     constructing SQL strings (e.g. "FROM " + escapeIdentifier(tablename)).
-     It should not be used for other functions (e.g. don't do
-     useDatabase(escapeIdentifier(database))), because the identifier will
-     be escaped when the called function generates, for example, "USE " +
-     escapeIdentifier(database).
-
-     For efficiency, kexi__* system tables and columns therein are not escaped
-     - we assume these are valid identifiers for all drivers.
-    */
-    inline QString escapeIdentifier(const QString& id,
-                                    int escaping = Driver::EscapeDriver | Driver::EscapeAsNecessary) const {
-        return m_driver->escapeIdentifier(id, escaping);
-    }
-
     /*! Called by TableSchema -- signals destruction to Connection object
      To avoid having deleted table object on its list. */
     void removeMe(TableSchema *ts);
@@ -1276,6 +1274,13 @@ protected:
 private:
     //! Internal, used by storeObjectData(Object*) and storeNewObjectData(Object* object).
     bool storeObjectDataInternal(Object* object, bool newObject);
+
+    //! @internal
+    //! @return identifier escaped by driver (if predicateSqlEscaping is false)
+    //! or by the Predicate's built-in escape routine. 
+    inline QString escapeIdentifier(const QString& id, EscapingType escapingType) const {
+        return escapingType == PredicateEscaping ? Predicate::escapeIdentifier(id) : escapeIdentifier(id);
+    }
 
     ConnectionPrivate* d; //!< @internal d-pointer class.
     Driver* const m_driver; //!< The driver this \a Connection instance uses.

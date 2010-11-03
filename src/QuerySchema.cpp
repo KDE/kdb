@@ -429,7 +429,21 @@ QDebug operator<<(QDebug dbg, const OrderByColumn& order)
     return dbg.space();
 }
 
-QString OrderByColumn::toSQLString(bool includeTableName, Driver *drv, int identifierEscaping) const
+static QString escapeIdentifier(const QString& name, Connection *conn, Predicate::EscapingType escapingType)
+{
+    switch (escapingType) {
+    case DriverEscaping:
+        if (conn)
+            return conn->escapeIdentifier(name);
+        break;
+    case PredicateEscaping:
+        return Predicate::escapeIdentifier(name);
+    }
+    return name;
+}
+
+QString OrderByColumn::toSQLString(bool includeTableName,
+                                   Connection *conn, Predicate::EscapingType escapingType) const
 {
     const QString orderString(m_ascending ? "" : " DESC");
     QString fieldName, tableName;
@@ -438,25 +452,17 @@ QString OrderByColumn::toSQLString(bool includeTableName, Driver *drv, int ident
             return QString::number(m_pos + 1) + orderString;
         else {
             if (includeTableName && m_column->alias.isEmpty()) {
-                tableName = m_column->field->table()->name();
-                if (drv)
-                    tableName = drv->escapeIdentifier(tableName, identifierEscaping);
-                tableName += ".";
+                tableName = escapeIdentifier(m_column->field->table()->name(), conn, escapingType);
+                tableName += '.';
             }
-            fieldName = m_column->aliasOrName();
-            if (drv)
-                fieldName = drv->escapeIdentifier(fieldName, identifierEscaping);
+            fieldName = escapeIdentifier(m_column->aliasOrName(), conn, escapingType);
         }
     } else {
         if (includeTableName) {
-            tableName = m_field->table()->name();
-            if (drv)
-                tableName = drv->escapeIdentifier(tableName, identifierEscaping);
-            tableName += ".";
+            tableName = escapeIdentifier(m_field->table()->name(), conn, escapingType);
+            tableName += '.';
         }
-        fieldName = m_field ? m_field->name() : "??"/*error*/;
-        if (drv)
-            fieldName = drv->escapeIdentifier(fieldName, identifierEscaping);
+        fieldName = escapeIdentifier(m_field ? m_field->name() : "??"/*error*/, conn, escapingType);
     }
     return tableName + fieldName + orderString;
 }
@@ -569,13 +575,14 @@ QDebug operator<<(QDebug dbg, const OrderByColumnList& list)
     return dbg.space();
 }
 
-QString OrderByColumnList::toSQLString(bool includeTableNames, Driver *drv, int identifierEscaping) const
+QString OrderByColumnList::toSQLString(bool includeTableNames, Connection *conn,
+                                       Predicate::EscapingType escapingType) const
 {
     QString string;
     for (QList<OrderByColumn*>::ConstIterator it(constBegin()); it != constEnd(); ++it) {
         if (!string.isEmpty())
             string += ", ";
-        string += (*it)->toSQLString(includeTableNames, drv, identifierEscaping);
+        string += (*it)->toSQLString(includeTableNames, conn, escapingType);
     }
     return string;
 }
@@ -730,7 +737,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
         << " alias=" << tableAlias(bindToTable);
     QString s;
     for (uint i = 0; i < fieldCount();i++)
-        s += (QString::number(d->tablesBoundToColumns[i]) + " ");
+        s += (QString::number(d->tablesBoundToColumns[i]) + ' ');
     PreDbg << "tablesBoundToColumns == [" << s << "]";
 
     if (field->isExpression())
@@ -1232,8 +1239,8 @@ inline QString lookupColumnKey(Field *foreignField, Field* field)
 {
     QString res;
     if (field->table()) // can be 0 for anonymous fields built as joined multiple visible columns
-        res = field->table()->name() + ".";
-    return res + field->name() + "_" + foreignField->table()->name() + "." + foreignField->name();
+        res = field->table()->name() + '.';
+    return res + field->name() + '_' + foreignField->table()->name() + '.' + foreignField->name();
 }
 
 void QuerySchema::computeFieldsExpanded() const
@@ -1441,7 +1448,7 @@ void QuerySchema::computeFieldsExpanded() const
                 d->columnInfosByNameExpanded.insert(ci->alias, ci);
             QString tableAndAlias(ci->alias);
             if (ci->field->table())
-                tableAndAlias.prepend(ci->field->table()->name() + ".");
+                tableAndAlias.prepend(ci->field->table()->name() + '.');
             if (!d->columnInfosByNameExpanded[ tableAndAlias ])
                 d->columnInfosByNameExpanded.insert(tableAndAlias, ci);
             //the same for "unexpanded" list
@@ -1457,7 +1464,7 @@ void QuerySchema::computeFieldsExpanded() const
                 d->columnInfosByNameExpanded.insert(ci->field->name(), ci);
             QString tableAndName(ci->field->name());
             if (ci->field->table())
-                tableAndName.prepend(ci->field->table()->name() + ".");
+                tableAndName.prepend(ci->field->table()->name() + '.');
             if (!d->columnInfosByNameExpanded[ tableAndName ])
                 d->columnInfosByNameExpanded.insert(tableAndName, ci);
             //the same for "unexpanded" list
@@ -1612,7 +1619,7 @@ QVector<int> QuerySchema::pkeyFieldsOrder() const
     d->pkeyFieldsCount = 0;
     for (uint i = 0; i < fCount; i++) {
         QueryColumnInfo *fi = d->fieldsExpanded->at(i);
-        const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(fi->field) : -1;
+        const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(*fi->field) : -1;
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
             PreDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
@@ -1669,30 +1676,29 @@ QueryColumnInfo::List* QuerySchema::autoIncrementFields() const
 }
 
 // static
-QString QuerySchema::sqlColumnsList(QueryColumnInfo::List* infolist, Driver *driver)
+QString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn,
+                                    Predicate::EscapingType escapingType)
 {
-    if (!infolist)
-        return QString();
     QString result;
     result.reserve(256);
     bool start = true;
-    foreach(QueryColumnInfo* ci, *infolist) {
+    foreach(QueryColumnInfo* ci, infolist) {
         if (!start)
             result += ",";
         else
             start = false;
-        result += driver->escapeIdentifier(ci->field->name());
+        result += escapeIdentifier(ci->field->name(), conn, escapingType);
     }
     return result;
 }
 
-QString QuerySchema::autoIncrementSQLFieldsList(Driver *driver) const
+QString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
 {
-    QWeakPointer<Driver> driverWeakPointer = DriverManagerInternal::self()->driverWeakPointer(driver);
+    QWeakPointer<Driver> driverWeakPointer = DriverManagerInternal::self()->driverWeakPointer(conn->driver());
     if (   d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
         || d->autoIncrementSQLFieldsList.isEmpty())
     {
-        d->autoIncrementSQLFieldsList = QuerySchema::sqlColumnsList(autoIncrementFields(), driver);
+        d->autoIncrementSQLFieldsList = QuerySchema::sqlColumnsList(*autoIncrementFields(), conn);
         d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
     }
     return d->autoIncrementSQLFieldsList;
@@ -1722,7 +1728,7 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
         PredicateExpr_Relational,
         new ConstExpr(token, value),
         relation,
-        new VariableExpr((field->table() ? (field->table()->name() + ".") : QString()) + field->name())
+        new VariableExpr((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
     );
     if (d->whereExpr) {
         d->whereExpr = new BinaryExpr(

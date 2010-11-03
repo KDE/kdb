@@ -169,11 +169,6 @@ Connection *Driver::createConnection(const ConnectionData& connData, int options
     clearResult();
     if (!isValid())
         return 0;
-    if (beh->USING_DATABASE_REQUIRED_TO_CONNECT && connData.databaseName().isEmpty()) {
-        m_result = Result(ERR_MISSING_DB_LOCATION,
-                            QObject::tr("Database name required to create connection."));
-        return 0;
-    }
     Connection *conn = drv_createConnection(connData);
 
     conn->setReadOnly(options & ReadOnlyConnection);
@@ -284,6 +279,7 @@ QList<QByteArray> Driver::propertyNames() const
     return names;
 }
 
+#if 0 // old
 QString Driver::escapeIdentifier(const QString& str, int options) const
 {
     QByteArray cstr(str.toLatin1());
@@ -325,6 +321,7 @@ QByteArray Driver::escapeIdentifier(const QByteArray& str, int options) const
         return drv_escapeIdentifier(str);
     }
 }
+#endif
 
 void Driver::initDriverSpecificKeywords(const char** keywords)
 {
