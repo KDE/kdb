@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -62,6 +62,10 @@ SQLiteDriver::SQLiteDriver()
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = true;
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
     beh->SELECT_1_SUBQUERY_SUPPORTED = true;
+    beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE = false;
+    beh->CONNECTION_REQUIRED_TO_CREATE_DB = false;
+    beh->CONNECTION_REQUIRED_TO_DROP_DB = false;
+
     initDriverSpecificKeywords(keywords);
 
     //predefined properties
