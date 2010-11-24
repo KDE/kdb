@@ -1488,6 +1488,7 @@ void QuerySchema::computeFieldsExpanded() const
             lookup_dict.contains(key)) {
             // this table.field is already fetched by this query
             it.remove();
+            delete ci;
         } else {
             lookup_dict.insert(key, i);
             i++;
