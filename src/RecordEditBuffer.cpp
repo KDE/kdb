@@ -39,8 +39,9 @@ RecordEditBuffer::~RecordEditBuffer()
     delete m_simpleBuffer;
     delete m_simpleBufferIt;
     delete m_dbBuffer;
-    delete m_defaultValuesDbBuffer;
     delete m_dbBufferIt;
+    delete m_defaultValuesDbBuffer;
+    delete m_defaultValuesDbBufferIt;
 }
 
 const QVariant* RecordEditBuffer::at(QueryColumnInfo& ci, bool useDefaultValueIfPossible) const
