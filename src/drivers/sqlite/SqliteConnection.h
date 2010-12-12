@@ -36,7 +36,7 @@ class SQLiteConnection : public Connection
 public:
     virtual ~SQLiteConnection();
 
-    virtual Cursor* prepareQuery(const QString& statement, uint cursor_options = 0);
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
@@ -79,8 +79,8 @@ protected:
 
     //virtual bool drv_createTable( const Predicate::Table& table );
 
-    virtual bool drv_executeSQL(const QString& statement);
-//  virtual bool drv_executeQuery( const QString& statement );
+    virtual bool drv_executeSQL(const EscapedString& statement);
+//  virtual bool drv_executeQuery( const EscapedString& statement );
 
     virtual quint64 drv_lastInsertRecordId();
 

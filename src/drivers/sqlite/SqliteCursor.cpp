@@ -181,7 +181,7 @@ public:
     }
 };
 
-SQLiteCursor::SQLiteCursor(Connection* conn, const QString& statement, uint options)
+SQLiteCursor::SQLiteCursor(Connection* conn, const EscapedString& statement, uint options)
         : Cursor(conn, statement, options)
         , d(new SQLiteCursorData(conn))
 {
@@ -201,12 +201,12 @@ SQLiteCursor::~SQLiteCursor()
     delete d;
 }
 
-bool SQLiteCursor::drv_open(const QString& sql)
+bool SQLiteCursor::drv_open(const EscapedString& sql)
 {
 // d->st.resize(statement.length()*2);
     //TODO: decode
 // d->st = statement.local8Bit();
-// d->st = m_conn->driver()->escapeString( statement.local8Bit() );
+// d->st = m_conn->escapeString( statement.local8Bit() );
 
     if (! d->data) {
         // this may as example be the case if SQLiteConnection::drv_useDatabase()
@@ -216,12 +216,12 @@ bool SQLiteCursor::drv_open(const QString& sql)
         return false;
     }
 
-    const QByteArray st(sql.toUtf8());
+    //const QByteArray st(sql.toUtf8());
     m_result.setServerResultCode(
         sqlite3_prepare(
                  d->data,            /* Database handle */
-                 st.constData(),       /* SQL statement, UTF-8 encoded */
-                 st.length(),             /* Length of zSql in bytes. */
+                 sql.constData(),       /* SQL statement, UTF-8 encoded */
+                 sql.length(),             /* Length of zSql in bytes. */
                  &d->prepared_st_handle,  /* OUT: Statement handle */
                  0/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
              )
@@ -431,16 +431,6 @@ QVariant SQLiteCursor::value(uint i)
                        ? m_fieldsExpanded->at(i)->field : 0;
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }
-
-/*! Stores string value taken from field number \a i to \a str.
- \return false when range checking failed.
-bool SQLiteCursor::storeStringValue(uint i, QString &str)
-{
-  if (i > (m_fieldCount-1)) //range checking
-    return false;
-  str = d->curr_coldata[i];
-  return true;
-}*/
 
 QString SQLiteCursor::serverResultName() const
 {

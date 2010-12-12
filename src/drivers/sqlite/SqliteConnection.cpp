@@ -150,14 +150,14 @@ bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 bool SQLiteConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
-                        .arg(driver()->escapeString(tableName)), &success) && success;
+    return resultExists(EscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
+                        .arg(escapeString(tableName)), &success) && success;
 }
 
 bool SQLiteConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
-    if (!(cursor = executeQuery(QLatin1String("SELECT lower(name) FROM sqlite_master WHERE type='table'")))) {
+    if (!(cursor = executeQuery(EscapedString("SELECT lower(name) FROM sqlite_master WHERE type='table'")))) {
         PreWarn << "!executeQuery()";
         return false;
     }
@@ -224,7 +224,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
         // Works with 3.6.23. Earlier version just ignore this pragma.
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
-        if (!drv_executeSQL("PRAGMA secure_delete = on")) {
+        if (!drv_executeSQL(EscapedString("PRAGMA secure_delete = on"))) {
             storeResult();
             Result result = d->connection->result(); // save
 /*            const QString errmsg(d->errmsg); // save
@@ -319,7 +319,7 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
 }
 
 //CursorData* SQLiteConnection::drv_createCursor( const QString& statement )
-Cursor* SQLiteConnection::prepareQuery(const QString& statement, uint cursor_options)
+Cursor* SQLiteConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
 {
     return new SQLiteCursor(this, statement, cursor_options);
 }
@@ -329,18 +329,17 @@ Cursor* SQLiteConnection::prepareQuery(QuerySchema* query, uint cursor_options)
     return new SQLiteCursor(this, query, cursor_options);
 }
 
-bool SQLiteConnection::drv_executeSQL(const QString& statement)
+bool SQLiteConnection::drv_executeSQL(const EscapedString& statement)
 {
 #ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement);
+    Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement.toString());
 #endif
 
     char *errmsg_p = 0;
-    const QByteArray st(statement.toUtf8());
     m_result.setServerResultCode(
         sqlite3_exec(
                  d->data,
-                 st.constData(),
+                 statement.constData(),
                  0/*callback*/,
                  0,
                  &errmsg_p)

@@ -36,7 +36,7 @@ public:
     virtual ~SQLitePreparedStatement();
 
 protected:
-    virtual bool prepare(const QByteArray& statement);
+    virtual bool prepare(const EscapedString& statement);
 
     virtual bool execute(
         PreparedStatement::Type type,

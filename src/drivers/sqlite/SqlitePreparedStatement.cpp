@@ -40,15 +40,15 @@ SQLitePreparedStatement::~SQLitePreparedStatement()
     m_handle = 0;
 }
 
-bool SQLitePreparedStatement::prepare(const QByteArray& statement)
+bool SQLitePreparedStatement::prepare(const EscapedString& statement)
 {
     m_result.setServerResultCode(
         sqlite3_prepare(
-            data,                  /* Database handle */
-            statement,             //const char *zSql,       /* SQL statement, UTF-8 encoded */
-            statement.length(),    //int nBytes,             /* Length of zSql in bytes. */
-            &m_handle,   //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-            0                      //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+            data,                    /* Database handle */
+            statement.toByteArray(), //const char *zSql,       /* SQL statement, UTF-8 encoded */
+            statement.length(),      //int nBytes,             /* Length of zSql in bytes. */
+            &m_handle,               //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
+            0                        //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
         )
     );
     return m_result.serverResultCode() == SQLITE_OK;

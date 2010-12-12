@@ -112,24 +112,24 @@ bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
            || (lcName == "oid");
 }
 
-QString SQLiteDriver::escapeString(const QString& str) const
+EscapedString SQLiteDriver::escapeString(const QString& str) const
 {
-    return QString("'") + QString(str).replace('\'', "''") + "'";
+    return EscapedString("'") + EscapedString(str).replace('\'', "''") + '\'';
 }
 
-QByteArray SQLiteDriver::escapeString(const QByteArray& str) const
+EscapedString SQLiteDriver::escapeString(const QByteArray& str) const
 {
-    return QByteArray("'") + QByteArray(str).replace('\'', "''") + "'";
+    return EscapedString("'") + EscapedString(str).replace('\'', "''") + '\'';
 }
 
-QString SQLiteDriver::escapeBLOB(const QByteArray& array) const
+EscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
 {
-    return Predicate::escapeBLOB(array, Predicate::BLOBEscapeXHex);
+    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscapeXHex));
 }
 
-QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const
+QByteArray SQLiteDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QString(str).replace('"', "\"\"");
+    return QByteArray(str.toUtf8()).replace('"', "\"\"");
 }
 
 QByteArray SQLiteDriver::drv_escapeIdentifier(const QByteArray& str) const
