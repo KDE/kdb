@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,25 +24,33 @@
 #include <QStringList>
 
 #include <Predicate/Connection.h>
-#include "PostgresqlCursor.h"
 
 namespace Predicate
 {
 
 class PostgresqlConnectionInternal;
 
-/**
-@author Adam Pigg
-*/
+//! @internal
+class PostgresqlTransactionData : public TransactionData
+{
+public:
+    PostgresqlTransactionData(Connection *conn);
+    ~PostgresqlTransactionData();
+};
+
 class PostgresqlConnection : public Connection
 {
 public:
     virtual ~PostgresqlConnection();
 
-    virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
+
+    /*! Connection-specific string escaping.  */
+    virtual EscapedString escapeString(const QString& str) const;
+    virtual EscapedString escapeString(const QByteArray& str) const;
 
 protected:
     /*! Used by driver */
@@ -52,16 +61,18 @@ protected:
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase(const QString &dbName = QString());
+    //! Uses database. Note that if data().localSocketFileName() is not empty,
+    //! only directory path is used for connecting; the local socket's filename stays ".s.PGSQL.5432".
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
                                  MessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const QString& statement);
+    virtual bool drv_executeSQL(const EscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
@@ -74,12 +85,11 @@ protected:
 
     PostgresqlConnectionInternal *d;
 
-    QString escapeName(const QString &tn) const;
     //! temporary solution for executeSQL()...
 //pred    PostgresqlTransactionData *m_trans;
 
     friend class PostgresqlDriver;
-    friend class PostgresqlCursor;
+    friend class PostgresqlCursorData;
     friend class PostgresqlTransactionData;
 };
 }

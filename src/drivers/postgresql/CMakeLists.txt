@@ -1,5 +1,5 @@
 include_directories(
-  ${POSTGRESQL_INCLUDE_DIR}
+  ${PostgreSQL_INCLUDE_DIRS}
 )
 
 ADD_DEFINITIONS(
@@ -11,8 +11,8 @@ ADD_DEFINITIONS(
 
 set(predicate_postgresql_SRCS
    PostgresqlDriver.cpp
-   PostgresqlCursor.cpp
    PostgresqlConnection.cpp
+   PostgresqlCursor.cpp
    PostgresqlKeywords.cpp
    PostgresqlConnection_p.cpp
    PostgresqlPreparedStatement.cpp

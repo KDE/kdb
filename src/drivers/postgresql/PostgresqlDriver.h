@@ -44,21 +44,30 @@ public:
     virtual bool isSystemDatabaseName(const QString& n) const;
 
     //! Escape a string for use as a value
-    virtual QString escapeString(const QString& str) const;
-    virtual QByteArray escapeString(const QByteArray& str) const;
+    virtual EscapedString escapeString(const QString& str) const;
+    virtual EscapedString escapeString(const QByteArray& str) const;
     virtual QString sqlTypeName(int id_t, int p = 0) const;
 
     //! Escape BLOB value \a array
-    virtual QString escapeBLOB(const QByteArray& array) const;
+    virtual EscapedString escapeBLOB(const QByteArray& array) const;
+
+    //! @return QVariant type for PostgreSQL type @a pgsqlType.
+    //! If type cannot be found QVariant::Invalid is returned. Used in cursors to speed up conversion.
+    inline QVariant::Type pgsqlToVariantType(int pgsqlType) const {
+        return m_pgsqlToVariantTypes.value(pgsqlType, QVariant::Invalid);
+    }
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
+    virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n)const;
 
 private:
-    static const char *keywords[];
+    void initPgsqlToVariantMap();
+
+    static const char *m_keywords[];
+    QMap<int, QVariant::Type> m_pgsqlToVariantTypes;
 };
 
 }

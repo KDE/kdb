@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,6 +21,7 @@
 #include "PostgresqlCursor.h"
 #include "PostgresqlConnection.h"
 #include "PostgresqlConnection_p.h"
+#include "PostgresqlDriver.h"
 
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
@@ -29,37 +31,32 @@
 
 using namespace Predicate;
 
-unsigned int PostgresqlCursor_trans_num = 0; //!< debug helper
+// unsigned int PostgresqlCursor_trans_num = 0; //!< debug helper
 
-static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
-{
-    return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
-}
+// static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
+// {
+//     return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
+// }
 
 //==================================================================================
-//Constructor based on query statement
-PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
-        Cursor(conn, statement, options)
+// Constructor based on query statement
+PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint options)
+        : Cursor(conn, statement, options)
+        , m_numRows(0)
+        , d(new PostgresqlCursorData(conn))
 {
-// PreDrvDbg << "POSTGRESQLSQLCURSOR: constructor for query statement";
-    my_conn = static_cast<PostgresqlConnection*>(conn)->d->pqxxsql;
-    m_options = Buffered;
-    m_res = 0;
-// m_tran = 0;
-    m_implicityStarted = false;
+    m_options |= Buffered;
+    //m_implicityStarted = false;
 }
 
 //==================================================================================
 //Constructor base on query object
 PostgresqlCursor::PostgresqlCursor(Connection* conn, QuerySchema* query, uint options)
         : Cursor(conn, query, options)
+        , d(new PostgresqlCursorData(conn))
 {
-// PreDrvDbg << "POSTGRESQLSQLCURSOR: constructor for query schema";
-    my_conn = static_cast<PostgresqlConnection*>(conn)->d->pqxxsql;
-    m_options = Buffered;
-    m_res = 0;
-// m_tran = 0;
-    m_implicityStarted = false;
+    m_options |= Buffered;
+    //m_implicityStarted = false;
 }
 
 //==================================================================================
@@ -67,81 +64,39 @@ PostgresqlCursor::PostgresqlCursor(Connection* conn, QuerySchema* query, uint op
 PostgresqlCursor::~PostgresqlCursor()
 {
     close();
+    delete d;
 }
+
 
 //==================================================================================
 //Create a cursor result set
-bool PostgresqlCursor::drv_open(const QString& sql)
+bool PostgresqlCursor::drv_open(const EscapedString& sql)
 {
-// PreDrvDbg << sql;
-
-    if (!my_conn->is_open()) {
-//! @todo this check should be moved to Connection! when drv_prepareQuery() arrive
-        //should never happen, but who knows
-        setError(ERR_NO_CONNECTION, tr("No connection for cursor open operation specified"));
+    if (!d->executeSQL(sql, PGRES_TUPLES_OK))
         return false;
+
+    m_fieldsToStoreInRecord = PQnfields(d->res);
+    m_fieldCount = m_fieldsToStoreInRecord - (m_containsRecordIdInfo ? 1 : 0);
+    m_numRows = PQntuples(d->res);
+    m_records_in_buf = m_numRows;
+    m_buffering_completed = true;
+
+    // get real types for all fields
+    PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(m_conn->driver());
+    
+    m_realTypes.resize(m_fieldsToStoreInRecord);
+    for (int i = 0; i < m_fieldsToStoreInRecord; i++) {
+        const int pqtype = PQftype(d->res, i);
+        m_realTypes[i] = drv->pgsqlToVariantType(pqtype);
     }
-
-    //QByteArray cur_name;
-    //Set up a transaction
-    try {
-        //m_tran = new pqxx::work(*my_conn, "cursor_open");
-        //cur_name.sprintf("cursor_transaction%d", PostgresqlCursor_trans_num++);
-
-//  m_tran = new pqxx::nontransaction(*my_conn, (const char*)cur_name);
-        if (!((PostgresqlConnection*)connection())->m_trans) {
-//   my_conn->drv_beginTransaction();
-//  if (implicityStarted)
-            (void)new PostgresqlTransactionData((PostgresqlConnection*)connection(), true);
-            m_implicityStarted = true;
-        }
-
-        m_res = new pqxx::result(((PostgresqlConnection*)connection())->m_trans->data->exec(std::string(sql.toUtf8())));
-        ((PostgresqlConnection*)connection())
-        ->drv_commitTransaction(((PostgresqlConnection*)connection())->m_trans);
-//  my_conn->m_trans->commit();
-//  PreDrvDbg << "trans. committed:" << cur_name;
-
-        //We should now be placed before the first row, if any
-        m_fieldsToStoreInRecord = m_res->columns();
-        m_fieldCount = m_fieldsToStoreInRecord - (m_containsROWIDInfo ? 1 : 0);
-
-//js  m_opened=true;
-        m_afterLast = false;
-        m_records_in_buf = m_res->size();
-        m_buffering_completed = true;
-        return true;
-    } catch (const std::exception &e) {
-        setError(ERR_DB_SPECIFIC, QString::fromUtf8(e.what()));
-        PreDrvWarn << "PostgresqlCursor::drv_open:exception - " << QString::fromUtf8(e.what());
-    } catch (...) {
-        setError();
-    }
-// delete m_tran;
-// m_tran = 0;
-    if (m_implicityStarted) {
-        delete((PostgresqlConnection*)connection())->m_trans;
-        m_implicityStarted = false;
-    }
-// PreDrvDbg << "trans. rolled back! - " << cur_name;
-    return false;
+    return true;
 }
 
 //==================================================================================
 //Delete objects
 bool PostgresqlCursor::drv_close()
 {
-//js m_opened=false;
-
-    delete m_res;
-    m_res = 0;
-
-// if (m_implicityStarted) {
-//  delete m_tran;
-//  m_tran = 0;
-//  m_implicityStarted = false;
-// }
-
+    PQclear(d->res);
     return true;
 }
 
@@ -149,15 +104,16 @@ bool PostgresqlCursor::drv_close()
 //Gets the next record...does not need to do much, just return fetchend if at end of result set
 void PostgresqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg << "size is" <<m_res->size() << "current Position is" << (long)at();
-    if (at() < m_res->size() && at() >= 0) {
-        m_fetchResult = FetchOK;
-    } else if (at() >= m_res->size()) {
+    if (at() >= m_numRows) {
         m_fetchResult = FetchEnd;
-    } else {
+    }
+    else if (at() < 0) {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
         m_fetchResult = FetchEnd;
+    }
+    else { // 0 <= at() < m_numRows
+        m_fetchResult = FetchOK;
     }
 }
 
@@ -188,6 +144,7 @@ QVariant PostgresqlCursor::value(uint pos)
         return QVariant();
 }
 
+#if 0
 inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
 {
     switch (r.type()) {
@@ -217,29 +174,98 @@ inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
         return QString::fromUtf8(r.c_str(), r.size()); //utf8?
     }
 }
+#endif
+
+inline bool hasTimeZone(const QString& s)
+{
+    return s.at(s.length() - 3) == QLatin1Char('+') || s.at(s.length() - 3) == QLatin1Char('-');
+}
 
 //==================================================================================
 //Return the value for a given column for the current record - Private const version
-QVariant PostgresqlCursor::pValue(uint pos)const
+QVariant PostgresqlCursor::pValue(uint pos) const
 {
-    if (m_res->size() <= 0) {
-        PreDrvWarn << "PostgresqlCursor::value - ERROR: result size not greater than 0";
-        return QVariant();
-    }
-
-    if (pos >= m_fieldsToStoreInRecord) {
+    //not needed: if (pos >= m_fieldsToStoreInRecord) {
 //  PreDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
-        return QVariant();
-    }
+        //return QVariant();
+    //}
+    const qint64 row = at();
 
     Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 // PreDrvDbg << "pos:" << pos;
 
-    //from most to least frequently used types:
-    if (f) { //We probably have a schema type query so can use kexi to determin the row type
-        if ((f->isIntegerType()) || (/*ROWID*/!f && m_containsROWIDInfo && pos == m_fieldCount)) {
+    const QVariant::Type type = m_realTypes[pos];
+    if (PQgetisnull(d->res, row, pos)) {
+        return QVariant(type);
+    }
+    const char *data = PQgetvalue(d->res, row, pos);
+    const int len = PQgetlength(d->res, row, pos);
+
+//    if (f) { //We probably have a schema type query so can use kexi to determine the row type
+    switch (type) { // from most to least frequently used types:
+    case QVariant::String:
+        return d->unicode ? QString::fromUtf8(data, len) : QString::fromAscii(data, len);
+    case QVariant::Int:
+        return atoi(data); // the fastest way
+    case QVariant::Bool:
+        return bool(data[0] == 't');
+    case QVariant::LongLong:
+        if (data[0] == '-')
+            return QByteArray::fromRawData(data, len).toLongLong();
+        else
+            return QByteArray::fromRawData(data, len).toULongLong();
+    case QVariant::Double:
+//! @todo support equivalent of QSql::NumericalPrecisionPolicy, especially for NUMERICOID
+        return QByteArray::fromRawData(data, len).toDouble();
+    case QVariant::Date:
+        if (len == 0) {
+            return QVariant(QDate());
+        } else {
+            return QVariant(QDate::fromString(QByteArray::fromRawData(data, len), Qt::ISODate));
+        }
+    case QVariant::Time:
+        if (len == 0) {
+            return QVariant(QTime());
+        } else {
+            QString s(QString::fromAscii(data, len));
+            if (hasTimeZone(s)) {
+                s.chop(3); // skip timezone
+                return QVariant(QTime::fromString(s, Qt::ISODate));
+            }
+            return QVariant(QTime::fromString(s, Qt::ISODate));
+        }
+    case QVariant::DateTime:
+        if (len < 10 /*ISO Date*/) {
+            return QVariant(QDateTime());
+        } else {
+            QString s(QString::fromAscii(data, len));
+            if (hasTimeZone(s)) {
+                s.chop(3); // skip timezone
+                if (s.isEmpty())
+                    return QVariant(QDateTime());
+            }
+            if (s.at(s.length() - 3).isPunct()) // fix ms, should be three digits
+                s += QLatin1Char('0');
+            return QVariant(QDateTime::fromString(s, Qt::ISODate));
+        }
+    case QVariant::ByteArray:
+        {
+            size_t unescapedLen;
+            unsigned char *unescapedData = PQunescapeBytea((const unsigned char*)data, &unescapedLen);
+            const QByteArray result((const char*)unescapedData, unescapedLen);
+//! @todo avoid deep copy; QByteArray does not allow passing ownership of data; maybe copy PQunescapeBytea code?
+            PQfreemem(unescapedData);
+            return QVariant(result);
+        }
+    default:
+        qWarning() << "PostgresqlCursor::pValue() data type?";
+    }
+    return QVariant();
+
+#if 0
+        if ((f->isIntegerType()) || (/*ROWID*/!f && m_containsRecordIdInfo && pos == m_fieldCount)) {
             return (*m_res)[at()][pos].as(int());
         } else if (f->isTextType()) {
             return QString::fromUtf8((*m_res)[at()][pos].c_str()); //utf8?
@@ -248,7 +274,6 @@ QVariant PostgresqlCursor::pValue(uint pos)const
         } else if (f->type() == Field::Boolean) {
             return QString((*m_res)[at()][pos].c_str()).toLower() == "t" ? QVariant(true) : QVariant(false);
         } else if (f->typeGroup() == Field::BLOBGroup) {
-//   pqxx::result::field r = (*m_res)[at()][pos];
 //   PreDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size();
             return ::pgsqlByteaToByteArray((*m_res)[at()][pos]);
         } else {
@@ -259,29 +284,15 @@ QVariant PostgresqlCursor::pValue(uint pos)const
     }
 
     return QString::fromUtf8((*m_res)[at()][pos].c_str(), (*m_res)[at()][pos].size()); //utf8?
+#endif
 }
 
 //==================================================================================
 //Return the current record as a char**
-//who'd have thought we'd be using char** in this day and age :o)
 const char** PostgresqlCursor::recordData() const
 {
-// PreDrvDbg;
-
-    const char** row;
-
-    row = (const char**)malloc(m_res->columns() + 1);
-    row[m_res->columns()] = NULL;
-    if (at() >= 0 && at() < m_res->size()) {
-        for (int i = 0; i < (int)m_res->columns(); i++) {
-            row[i] = (char*)malloc(strlen((*m_res)[at()][i].c_str()) + 1);
-            strcpy((char*)(*m_res)[at()][i].c_str(), row[i]);
-//   PreDrvDbg << row[i];
-        }
-    } else {
-        PreDrvWarn << "PostgresqlCursor::recordData: m_at is invalid";
-    }
-    return row;
+    //! @todo
+    return 0;
 }
 
 //==================================================================================
@@ -290,10 +301,7 @@ bool PostgresqlCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "POSITION IS" << (long)m_at;
 
-    if (m_res->size() <= 0)
-        return false;
-
-// const uint realCount = m_fieldCount + (m_containsROWIDInfo ? 1 : 0);
+// const uint realCount = m_fieldCount + (m_containsRecordIdInfo ? 1 : 0);
 //not needed data.resize(realCount);
 
     for (uint i = 0; i < m_fieldsToStoreInRecord; i++)
@@ -303,10 +311,10 @@ bool PostgresqlCursor::drv_storeCurrentRecord(RecordData* data) const
 
 //==================================================================================
 //
-void PostgresqlCursor::drv_clearServerResult()
+/*void PostgresqlCursor::drv_clearServerResult()
 {
 //! @todo PostgresqlCursor: stuff with server results
-}
+}*/
 
 //==================================================================================
 //Add the current record to the internal buffer

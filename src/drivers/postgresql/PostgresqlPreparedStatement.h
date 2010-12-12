@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2005 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,26 +20,27 @@
 
 #ifndef POSTGRESQLPREPAREDSTATEMENT_H
 #define POSTGRESQLPREPAREDSTATEMENT_H
-#include <Predicate/PreparedStatement.h>
-#include <Predicate/Connection_p.h>
 
-/**
-  @author Adam Pigg <adam@piggz.co.uk>
-*/
+#include <Predicate/Interfaces/PreparedStatementInterface.h>
+#include "PostgresqlConnection_p.h"
+
 namespace Predicate
 {
-class PostgresqlPreparedStatement : public PreparedStatement
+class PostgresqlPreparedStatement : public PreparedStatementInterface, public PostgresqlConnectionInternal
 {
 public:
-    PostgresqlPreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields);
+    PostgresqlPreparedStatement(ConnectionInternal* conn);
 
     virtual ~PostgresqlPreparedStatement();
 
-    virtual bool execute();
-    bool m_resetRequired;
+    virtual bool prepare(const EscapedString& statement);
+
+    virtual bool execute(
+        PreparedStatement::Type type,
+        const Field::List& fieldList,
+        const PreparedStatementParameters& parameters);
 
 private:
-    Connection* m_conn;
 };
 }
 #endif

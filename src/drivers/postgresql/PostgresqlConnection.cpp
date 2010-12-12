@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,38 +22,26 @@
 
 #include "PostgresqlPreparedStatement.h"
 #include "PostgresqlConnection_p.h"
+#include "PostgresqlCursor.h"
 #include <Predicate/Error.h>
 #include <Predicate/Global.h>
 
+#include <QFileInfo>
+#include <QHostAddress>
 #include <QtDebug>
 
-
-#include <qvariant.h>
-#include <qfile.h>
-
-#include <string>
+#define MIN_SERVER_VERSION_MAJOR 7
+#define MIN_SERVER_VERSION_MINOR 1
 
 using namespace Predicate;
 
-PostgresqlTransactionData::PostgresqlTransactionData(Connection *conn, bool nontransaction)
+PostgresqlTransactionData::PostgresqlTransactionData(Connection *conn)
         : TransactionData(conn)
 {
-    if (nontransaction)
-        data = new pqxx::nontransaction(*static_cast<PostgresqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
-    else
-        data = new pqxx::transaction<>(*static_cast<PostgresqlConnection*>(conn)->d->pqxxsql /* todo: add name? */);
-    if (!static_cast<PostgresqlConnection*>(conn)->m_trans) {
-        static_cast<PostgresqlConnection*>(conn)->m_trans = this;
-    }
 }
 
 PostgresqlTransactionData::~PostgresqlTransactionData()
 {
-    if (static_cast<PostgresqlConnection*>(m_conn)->m_trans == this) {
-        static_cast<PostgresqlConnection*>(m_conn)->m_trans = 0;
-    }
-    delete data;
-    data = 0;
 }
 
 //==================================================================================
@@ -60,7 +49,6 @@ PostgresqlTransactionData::~PostgresqlTransactionData()
 PostgresqlConnection::PostgresqlConnection(Driver *driver, const ConnectionData& connData)
         : Connection(driver, connData)
         , d(new PostgresqlConnectionInternal(this))
-        , m_trans(0)
 {
 }
 
@@ -75,7 +63,7 @@ PostgresqlConnection::~PostgresqlConnection()
 
 //==================================================================================
 //Return a new query based on a query statment
-Cursor* PostgresqlConnection::prepareQuery(const QString& statement,  uint cursor_options)
+Cursor* PostgresqlConnection::prepareQuery(const EscapedString& statement,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new PostgresqlCursor(this, statement, 1); //Always used buffered cursor
@@ -90,23 +78,29 @@ Cursor* PostgresqlConnection::prepareQuery(QuerySchema* query, uint cursor_optio
 }
 
 //==================================================================================
-//Properly escaped a database object name
-QString PostgresqlConnection::escapeName(const QString &name) const
-{
-    return QString("\"" + name + "\"");
-}
-
-//==================================================================================
 //Made this a noop
-//We tell kexi we are connected, but we wont actually connect until we use a database!
+//We tell we are connected, but we wont actually connect until we use a database!
 bool PostgresqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
-    version.clear();
-    d->version = &version; //remember for later...
-#ifdef __GNUC__
-#warning PostgresqlConnection::drv_connect implement setting version info when we drop libpqxx for libpq
-#endif
+    // http://www.postgresql.org/docs/8.4/static/libpq-status.html
+    version->setString(d->parameter("server_version"));
+
+    QString versionString;
+    int versionNumber = PQserverVersion(d->conn);
+    if (versionNumber > 0) {
+        version->setMajor(versionNumber / 10000);
+        version->setMinor((versionNumber % 1000) / 100);
+        version->setRelease(versionNumber % 100);
+    }
+
+    if (   version->major() < MIN_SERVER_VERSION_MAJOR
+        || (version->major() == MIN_SERVER_VERSION_MAJOR && version->minor() < MIN_SERVER_VERSION_MINOR))
+    {
+        qWarning(
+            "PostgreSQL %d.%d is not supported and may not work. The minimum is %d.%d",
+            version->major(), version->minor(), MIN_SERVER_VERSION_MAJOR, MIN_SERVER_VERSION_MINOR);
+    }
     return true;
 }
 
@@ -123,93 +117,96 @@ bool PostgresqlConnection::drv_disconnect()
 //Return a list of database names
 bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 {
-// PreDrvDbg;
-
-    if (executeSQL("SELECT datname FROM pg_database WHERE datallowconn = TRUE")) {
-        std::string N;
-        for (pqxx::result::const_iterator c = d->res->begin(); c != d->res->end(); ++c) {
-            // Read value of column 0 into a string N
-            c[0].to(N);
-            // Copy the result into the return list
-            *list += QString::fromLatin1(N.c_str());
-        }
-        return true;
-    }
-
-    return false;
+    return queryStringList(EscapedString("SELECT datname FROM pg_database WHERE datallowconn = TRUE"), list);
 }
 
 //==================================================================================
 //Create a new database
 bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
-    PreDrvDbg << dbName;
+    return executeSQL(EscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
+}
 
-    if (executeSQL("CREATE DATABASE " + escapeName(dbName)))
-        return true;
-
-    return false;
+QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
+{
+    QByteArray result = key;
+//! @todo optimize
+    result.replace('\\', "\\\\").replace('\'', "\\'");
+    return key + "='" + value.toString().toUtf8() + "'";
 }
 
 //==================================================================================
 //Use this as our connection instead of connect
 bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
-                                        MessageHandler* msgHandler)
+                                           MessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
-    PreDrvDbg << dbName;
 
-    QString conninfo;
-    QString socket;
-    QStringList sockets;
+    QByteArray conninfo;
 
-    if (data()->hostName.isEmpty() || data()->hostName == "localhost") {
-        if (data()->localSocketFileName.isEmpty()) {
-            sockets.append("/tmp/.s.PGSQL.5432");
-
-            for (QStringList::ConstIterator it = sockets.constBegin(); it != sockets.constEnd(); it++) {
-                if (QFile(*it).exists()) {
-                    socket = (*it);
-                    break;
-                }
+    if (data().hostName().isEmpty() || data().hostName() == "localhost") {
+        if (!data().localSocketFileName().isEmpty()) {
+            QFileInfo fileInfo(data().localSocketFileName());
+            if (fileInfo.exists()) {
+                conninfo += buildConnParameter("host", fileInfo.absolutePath());
             }
-        } else {
-            socket = data()->localSocketFileName; //data()->fileName();
         }
-    } else {
-        conninfo = "host='" + data()->hostName + "'";
+    }
+    else {
+        const QHostAddress ip(data().hostName());
+        if (ip.isNull()) {
+            conninfo += buildConnParameter("host", data().hostName());
+        }
+        else {
+            conninfo += buildConnParameter("hostaddr", ip.toString());
+        }
     }
 
     //Build up the connection string
-    if (data()->port == 0)
-        data()->port = 5432;
+    if (data().port() > 0)
+        conninfo += buildConnParameter("port", data().port());
 
-    conninfo += QString::fromLatin1(" port='%1'").arg(data()->port);
+    QString myDbName = dbName;
+    if (myDbName.isEmpty())
+        myDbName = data().databaseName();
+    if (!myDbName.isEmpty())
+        conninfo += buildConnParameter("dbname", myDbName);
 
-    conninfo += QString::fromLatin1(" dbname='%1'").arg(dbName);
+    if (!data().userName().isEmpty())
+        conninfo += buildConnParameter("user'", data().userName());
 
-    if (!data()->userName.isNull())
-        conninfo += QString::fromLatin1(" user='%1'").arg(data()->userName);
+    if (!data().password().isEmpty())
+        conninfo += buildConnParameter("password", data().password());
 
-    if (!data()->password.isNull())
-        conninfo += QString::fromLatin1(" password='%1'").arg(data()->password);
+    qDebug() << conninfo;
 
-    try {
-        d->pqxxsql = new pqxx::connection(conninfo.toLatin1());
-        drv_executeSQL("SET DEFAULT_WITH_OIDS TO ON");   //Postgres 8.1 changed the default to no oids but we need them
+    //! @todo other parameters: connect_timeout, options, options, sslmode, sslcert, sslkey, sslrootcert, sslcrl, krbsrvname, gsslib, service
+    // http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
+    d->conn = PQconnectdb(conninfo);
 
-        if (d->version) {
-//! @todo set version using the connection pointer when we drop libpqxx for libpq
-        }
-        return true;
-    } catch (const std::exception &e) {
-        PreDrvDbg << "exception:" << e.what();
-        d->errmsg = QString::fromUtf8(e.what());
-
-    } catch (...) {
-        d->errmsg = tr("Unknown error.");
+    if (!d->connectionOK()) {
+        PQfinish(d->conn);
+        d->conn = 0;
+        return false;
     }
+
+    // pgsql 8.1 changed the default to no oids but we need them
+    PGresult* result = PQexec(d->conn, "SET DEFAULT_WITH_OIDS TO ON");
+    int status = PQresultStatus(result);
+    PQclear(result);
+
+    // initialize encoding
+    result = PQexec(d->conn, "SET CLIENT_ENCODING TO 'UNICODE'");
+    status = PQresultStatus(result);
+    PQclear(result);
+    d->unicode = status == PGRES_COMMAND_OK;
+
+    result = PQexec(d->conn, "SET DATESTYLE TO 'ISO'");
+    status = PQresultStatus(result);
+    if (status != PGRES_COMMAND_OK)
+        qWarning("Failed to set DATESTYLE to 'ISO': %1", PQerrorMessage(d->conn));
+    PQclear(result);
     return false;
 }
 
@@ -220,7 +217,9 @@ bool PostgresqlConnection::drv_closeDatabase()
     PreDrvDbg;
 // if (isConnected())
 // {
-    delete d->pqxxsql;
+    PQclear(d->res);
+    PQfinish(d->conn);
+    d->conn = 0;
     return true;
 // }
     /* js: not needed, right?
@@ -239,7 +238,7 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     PreDrvDbg << dbName;
 
     //FIXME Maybe should check that dbname is no the currentdb
-    if (executeSQL("DROP DATABASE " + escapeName(dbName)))
+    if (executeSQL(EscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
         return true;
 
     return false;
@@ -247,111 +246,42 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 
 //==================================================================================
 //Execute an SQL statement
-bool PostgresqlConnection::drv_executeSQL(const QString& statement)
+bool PostgresqlConnection::drv_executeSQL(const EscapedString& statement)
 {
-// PreDrvDbg << statement;
-    bool ok = false;
-
-    // Clear the last result information...
-    delete d->res;
-    d->res = 0;
-
-// PreDrvDbg << "About to try";
-    try {
-        //Create a transaction
-        const bool implicityStarted = !m_trans;
-        if (implicityStarted)
-            (void)new PostgresqlTransactionData(this, true);
-
-        //  m_trans = new pqxx::nontransaction(*m_pqxxsql);
-//  PreDrvDbg << "About to execute";
-        //Create a result object through the transaction
-        d->res = new pqxx::result(m_trans->data->exec(std::string(statement.toUtf8())));
-//  PreDrvDbg << "Executed";
-        //Commit the transaction
-        if (implicityStarted) {
-            PostgresqlTransactionData *t = m_trans;
-            drv_commitTransaction(t);
-            delete t;
-//   m_trans = 0;
-        }
-
-        //If all went well then return true, errors picked up by the catch block
-        ok = true;
-    } catch (const pqxx::sql_error& sqlerr) {
-        PreDrvDbg << "sql_error exception - " << sqlerr.query().c_str();
-    } catch (const pqxx::broken_connection& bcerr) {
-        PreDrvDbg << "broken_connection exception";
-    } catch (const std::exception &e) {
-        //If an error ocurred then put the error description into _dbError
-        d->errmsg = QString::fromUtf8(e.what());
-        PreDrvDbg << "exception:" << e.what();
-    } catch (...) {
-        d->errmsg = tr("Unknown error.");
-    }
-    //PreDrvDbg << "EXECUTE SQL OK: OID was " << (d->res ? d->res->inserted_oid() : 0);
-    return ok;
+    return d->executeSQL(statement, PGRES_COMMAND_OK);
 }
 
 //==================================================================================
 //Return true if currently connected to a database, ignoring the m_is_connected flag.
 bool PostgresqlConnection::drv_isDatabaseUsed() const
 {
-    if (d->pqxxsql->is_open()) {
-        return true;
-    }
-    return false;
+    return d->conn;
 }
 
 //==================================================================================
 //Return the oid of the last insert - only works if sql was insert of 1 row
 quint64 PostgresqlConnection::drv_lastInsertRecordId()
 {
-    if (d->res) {
-        pqxx::oid theOid = d->res->inserted_oid();
-
-        if (theOid != pqxx::oid_none) {
-            return (quint64)theOid;
-        } else {
-            return 0;
-        }
-    }
-    return 0;
+    // InvalidOid is 0, so the cast is OK
+    return static_cast<quint64>(PQoidValue(d->res));
 }
 
-//<queries taken from pqxxMigrate>
 bool PostgresqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-        return resultExists(QString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
-                        .arg(driver()->escapeString(tableName)), success) && success;
+    return resultExists(EscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
+                        .arg(escapeString(tableName)), &success) && success;
 }
 
 bool PostgresqlConnection::drv_getTablesList(QStringList* list)
 {
-    Predicate::Cursor *cursor;
-    m_sql = "SELECT lower(relname) FROM pg_class WHERE relkind='r'";
-    if (!(cursor = executeQuery(m_sql))) {
-        PreDrvWarn << "PostgresqlConnection::drv_getTablesList(): !executeQuery()";
-        return false;
-    }
-    list->clear();
-    cursor->moveFirst();
-    while (!cursor->eof() && !cursor->error()) {
-        *list += cursor->value(0).toString();
-        cursor->moveNext();
-    }
-    if (cursor->error()) {
-        deleteCursor(cursor);
-        return false;
-    }
-    return deleteCursor(cursor);
+    return queryStringList(EscapedString("SELECT lower(relname) FROM pg_class WHERE relkind='r'"), list);
 }
-//</taken from pqxxMigrate>
 
+/*pred
 TransactionData* PostgresqlConnection::drv_beginTransaction()
 {
-    return new PostgresqlTransactionData(this, false);
+    return new PostgresqlTransactionData(this);
 }
 
 bool PostgresqlConnection::drv_commitTransaction(TransactionData *tdata)
@@ -384,35 +314,57 @@ bool PostgresqlConnection::drv_rollbackTransaction(TransactionData *tdata)
 
         result = false;
     } catch (...) {
-        d->errmsg = tr("Unknown error.");
+        d->errmsg = QObject::tr("Unknown error.");
         result = false;
     }
     if (m_trans == tdata)
         m_trans = 0;
     return result;
-}
+}*/
 
+/*pred
 int PostgresqlConnection::serverResult()
 {
     return d->resultCode;
-}
+}*/
 
 QString PostgresqlConnection::serverResultName() const
 {
+    if (m_result.serverResultCode() >= 0 && m_result.serverResultCode() <= PGRES_FATAL_ERROR) {
+        return QString::fromLatin1(PQresStatus(ExecStatusType(m_result.serverResultCode())));
+    }
     return QString();
 }
 
-void PostgresqlConnection::drv_clearServerResult()
+/*void PostgresqlConnection::drv_clearServerResult()
 {
     d->resultCode = 0;
-}
-
-QString PostgresqlConnection::serverErrorMsg()
-{
-    return d->errmsg;
-}
+}*/
 
 PreparedStatementInterface* PostgresqlConnection::prepareStatementInternal()
 {
-    return new PostgresqlPreparedStatement(*d);
+    return new PostgresqlPreparedStatement(d);
+}
+
+EscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
+{
+    int error;
+    d->escapingBuffer.resize(str.length() * 2 + 1);
+    size_t count = PQescapeStringConn(d->conn,
+                                      d->escapingBuffer.data(), str.constData(), str.length(),
+                                      &error);
+    d->escapingBuffer.resize(count);
+
+    if (error != 0) {
+        d->storeResult();
+        const_cast<Result&>(m_result) = Result(ERR_INVALID_ENCODING,
+                          QObject::tr("Escaping string failed. Invalid multibyte encoding."));
+        return EscapedString();
+    }
+    return EscapedString("\'") + d->escapingBuffer + '\'';
+}
+
+EscapedString PostgresqlConnection::escapeString(const QString& str) const
+{
+    return escapeString(d->unicode ? str.toUtf8() : str.toLocal8Bit());
 }

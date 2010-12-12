@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,8 +25,6 @@
 #include <Predicate/Connection.h>
 #include <Predicate/Utils.h>
 
-//#include <migration/pqxx/pg_type.h>
-
 namespace Predicate
 {
 
@@ -34,7 +33,7 @@ class PostgresqlCursorData;
 class PostgresqlCursor: public Cursor
 {
 public:
-    explicit PostgresqlCursor(Connection* conn, const QString& statement = QString(),
+    explicit PostgresqlCursor(Connection* conn, const EscapedString& statement,
                               uint options = NoOptions);
     PostgresqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
     virtual ~PostgresqlCursor();
@@ -42,11 +41,11 @@ public:
     virtual QVariant value(uint pos);
     virtual const char** recordData() const;
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
-    virtual bool drv_open(const QString& sql);
+    virtual bool drv_open(const EscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     //virtual void drv_getPrevRecord();
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
@@ -54,8 +53,12 @@ public:
 
 private:
     QVariant pValue(uint pos)const;
+
+    unsigned long m_numRows;
+    QVector<QVariant::Type> m_realTypes;
+
     PostgresqlCursorData *d;
-    bool m_implicityStarted;
+    //bool m_implicityStarted;
     //friend class PostgresqlConnection;
 };
 

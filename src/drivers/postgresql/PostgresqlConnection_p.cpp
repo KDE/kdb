@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2005 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,14 +19,19 @@
 */
 
 #include "PostgresqlConnection_p.h"
+#include "PostgresqlConnection.h"
 #include <QtDebug>
 
 using namespace Predicate;
+
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(Connection *conn)
         : ConnectionInternal(conn)
         , conn(0)
-        , version(0)
+        , unicode(true) // will be set in PostgresqlConnection::drv_useDatabase()
+        , res(0)
 {
+    setServerResultCode(-1);
+    escapingBuffer.reserve(0x8000);
 }
 
 PostgresqlConnectionInternal::~PostgresqlConnectionInternal()
@@ -35,5 +41,45 @@ PostgresqlConnectionInternal::~PostgresqlConnectionInternal()
 
 void PostgresqlConnectionInternal::storeResult()
 {
-    errmsg = "";
+    QString msg = QLatin1String(PQerrorMessage(conn));
+    if (msg.endsWith('\n'))
+        msg.chop(1);
+    setServerMessage(msg);
+/*    if (d->res) {
+        setServerResultCode(PQresultStatus(d->res));
+    }
+    else {
+        setServerResultCode(-1);
+    }*/
+}
+
+bool PostgresqlConnectionInternal::executeSQL(const EscapedString& statement, ExecStatusType expectedStatus)
+{
+    if (res) { // for sanity
+        PQclear(res);
+    }
+//! @todo consider using binary mode with PQexecParams()
+    res = PQexec(conn, statement.toByteArray().constData());
+    if (PQresultStatus(res) != expectedStatus) {
+        setServerResultCode(PQresultStatus(res));
+        storeResult();
+        PQclear(res);
+        return false;
+    }
+    else {
+        setServerResultCode(-1);
+    }
+    return true;
+}
+
+//--------------------------------------
+
+PostgresqlCursorData::PostgresqlCursorData(Connection* connection)
+        : PostgresqlConnectionInternal(connection)
+{
+    conn = static_cast<PostgresqlConnection*>(connection)->d->conn;
+}
+
+PostgresqlCursorData::~PostgresqlCursorData()
+{
 }

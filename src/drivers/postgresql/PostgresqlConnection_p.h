@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2005 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,9 +25,6 @@
 
 #include <libpq-fe.h>
 
-/**
-  @author Adam Pigg <adam@piggz.co.uk>
-*/
 namespace Predicate
 {
 class PostgresqlConnectionInternal : public ConnectionInternal
@@ -36,13 +34,26 @@ public:
 
     virtual ~PostgresqlConnectionInternal();
 
+    //! Execute SQL statement on the database
+    //! @a expectedStatus can be PGRES_COMMAND_OK for command
+    //! not returning tuples, e.g. CREATE and PGRES_TUPLES_OK for command returning tuples, e.g. SELECT.
+    bool executeSQL(const EscapedString& statement, ExecStatusType expectedStatus);
+
     //! stores last result's message
     virtual void storeResult();
 
-    PGconn *conn;
+    //! @return true if status of connection is "OK".
+    /*! From http://www.postgresql.org/docs/8.4/static/libpq-status.html:
+        "Only two of these are seen outside of an asynchronous connection procedure:
+         CONNECTION_OK and CONNECTION_BAD." */
+    inline bool connectionOK() { return CONNECTION_OK == PQstatus(conn); }
 
-    Predicate::ServerVersionInfo *version; //!< this is set in drv_connect(), so we can use it in drv_useDatabase()
-    //!< because pgsql really connects after "USE".
+    QString parameter(const char *paramName) { return QLatin1String(PQparameterStatus(conn, paramName)); }
+
+    PGconn *conn;
+    bool unicode;
+    PGresult *res;
+    QByteArray escapingBuffer;
 
     QString errmsg; //!< server-specific message of last operation
     int resultCode; //!< result code of last operation on server
@@ -64,13 +75,8 @@ public:
 class PostgresqlCursorData : public PostgresqlConnectionInternal
 {
 public:
-    explicit PostgresqlCursorData(Predicate::Connection* connection);
-    virtual ~MysqlCursorData();
-
-    MYSQL_RES *mysqlres;
-    MYSQL_ROW mysqlrow;
-    unsigned long *lengths;
-    unsigned long numRows;
+    explicit PostgresqlCursorData(Connection* connection);
+    virtual ~PostgresqlCursorData();
 };
 
 }

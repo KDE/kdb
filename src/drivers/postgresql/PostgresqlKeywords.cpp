@@ -24,11 +24,11 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <PostgresqlDriver.h>
+#include "PostgresqlDriver.h"
 
 namespace Predicate
 {
-const char* PostgresqlDriver::keywords[] = {
+const char* PostgresqlDriver::m_keywords[] = {
     "ABORT",
     "ABSOLUTE",
     "ACCESS",

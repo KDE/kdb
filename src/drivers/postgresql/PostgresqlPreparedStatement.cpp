@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2005 Adam Pigg <adam@piggz.co.uk>
+   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,12 +22,10 @@
 #include <QtDebug>
 using namespace Predicate;
 
-PostgresqlPreparedStatement::PostgresqlPreparedStatement(
-    StatementType type, ConnectionInternal& conn, FieldList& fields)
-        : Predicate::PreparedStatement(type, conn, fields)
-        , m_conn(conn.connection)
+PostgresqlPreparedStatement::PostgresqlPreparedStatement(ConnectionInternal* conn)
+        : PreparedStatementInterface()
+        , PostgresqlConnectionInternal(conn->connection)
 {
-// PreDrvDbg << "PostgresqlPreparedStatement: Construction";
 }
 
 
@@ -34,13 +33,20 @@ PostgresqlPreparedStatement::~PostgresqlPreparedStatement()
 {
 }
 
-bool PostgresqlPreparedStatement::execute()
+bool PostgresqlPreparedStatement::prepare(const EscapedString& statement)
 {
-// PreDrvDbg;
-    m_resetRequired = true;
-    if (m_conn->insertRecord(*m_fields, m_args)) {
+    Q_UNUSED(statement);
+    return true;
+}
+
+bool PostgresqlPreparedStatement::execute(
+    PreparedStatement::Type type,
+    const Field::List& fieldList,
+    const PreparedStatementParameters& parameters)
+{
+    /*if (conn->connection->insertRecord(fieldList, parameters)) {
         return true;
-    }
+    }*/
     return false;
 }
 
