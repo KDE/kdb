@@ -75,7 +75,7 @@ pqxxSqlConnection::~pqxxSqlConnection()
 
 //==================================================================================
 //Return a new query based on a query statment
-Cursor* pqxxSqlConnection::prepareQuery(const QString& statement,  uint cursor_options)
+Cursor* pqxxSqlConnection::prepareQuery(const EscapedString& statement,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new pqxxSqlCursor(this, statement, 1); //Always used buffered cursor
@@ -125,7 +125,7 @@ bool pqxxSqlConnection::drv_getDatabasesList(QStringList* list)
 {
 // PreDrvDbg;
 
-    if (executeSQL("SELECT datname FROM pg_database WHERE datallowconn = TRUE")) {
+    if (executeSQL(EscapedString("SELECT datname FROM pg_database WHERE datallowconn = TRUE"))) {
         std::string N;
         for (pqxx::result::const_iterator c = d->res->begin(); c != d->res->end(); ++c) {
             // Read value of column 0 into a string N
@@ -145,7 +145,7 @@ bool pqxxSqlConnection::drv_createDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
 
-    if (executeSQL("CREATE DATABASE " + escapeName(dbName)))
+    if (executeSQL(EscapedString("CREATE DATABASE ") + escapeName(dbName)))
         return true;
 
     return false;
@@ -197,7 +197,7 @@ bool pqxxSqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 
     try {
         d->pqxxsql = new pqxx::connection(conninfo.toLatin1());
-        drv_executeSQL("SET DEFAULT_WITH_OIDS TO ON");   //Postgres 8.1 changed the default to no oids but we need them
+        drv_executeSQL(EscapedString("SET DEFAULT_WITH_OIDS TO ON"));   //Postgres 8.1 changed the default to no oids but we need them
 
         if (d->version) {
 //! @todo set version using the connection pointer when we drop libpqxx for libpq
@@ -239,7 +239,7 @@ bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
     PreDrvDbg << dbName;
 
     //FIXME Maybe should check that dbname is no the currentdb
-    if (executeSQL("DROP DATABASE " + escapeName(dbName)))
+    if (executeSQL(EscapedString("DROP DATABASE ") + escapeName(dbName)))
         return true;
 
     return false;
@@ -247,7 +247,7 @@ bool pqxxSqlConnection::drv_dropDatabase(const QString &dbName)
 
 //==================================================================================
 //Execute an SQL statement
-bool pqxxSqlConnection::drv_executeSQL(const QString& statement)
+bool pqxxSqlConnection::drv_executeSQL(const EscapedString& statement)
 {
 // PreDrvDbg << statement;
     bool ok = false;
@@ -323,8 +323,8 @@ quint64 pqxxSqlConnection::drv_lastInsertRecordId()
 bool pqxxSqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-        return resultExists(QString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
-                        .arg(driver()->escapeString(tableName)), success) && success;
+        return resultExists(EscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
+                        .arg(escapeString(tableName)), success) && success;
 }
 
 bool pqxxSqlConnection::drv_getTablesList(QStringList* list)
@@ -399,18 +399,14 @@ int pqxxSqlConnection::serverResult()
 
 QString pqxxSqlConnection::serverResultName() const
 {
+#warning TODO pqxxSqlConnection::serverResultName()
     return QString();
 }
 
-void pqxxSqlConnection::drv_clearServerResult()
+/*void pqxxSqlConnection::drv_clearServerResult()
 {
     d->resultCode = 0;
-}
-
-QString pqxxSqlConnection::serverErrorMsg()
-{
-    return d->errmsg;
-}
+}*/
 
 PreparedStatementInterface* pqxxSqlConnection::prepareStatementInternal()
 {

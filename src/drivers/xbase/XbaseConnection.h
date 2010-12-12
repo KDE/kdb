@@ -36,7 +36,7 @@ class xBaseConnection : public Connection
 public:
     virtual ~xBaseConnection();
 
-    virtual Cursor* prepareQuery( const QString& statement = QString(), uint cursor_options = 0 );
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     //! @todo returns 0 for now
@@ -55,12 +55,12 @@ public:
       MessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase( const QString &dbName = QString() );
-    virtual bool drv_executeSQL( const QString& statement );
+    virtual bool drv_executeSQL( const EscapedString& statement );
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
 
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);

@@ -43,18 +43,18 @@ public:
     virtual bool isSystemDatabaseName(const QString &n) const;
 
     //! Escape a string for use as a value
-    virtual QString escapeString(const QString& str) const;
-    virtual QByteArray escapeString(const QByteArray& str) const;
+    virtual EscapedString escapeString(const QString& str) const;
+    virtual EscapedString escapeString(const QByteArray& str) const;
 
     //! Escape BLOB value \a array
-    virtual QString escapeBLOB(const QByteArray& array) const;
+    virtual EscapedString escapeBLOB(const QByteArray& array) const;
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
+    virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n) const;
-    virtual QString addLimitTo1(const QString& sql, bool add);
+    virtual EscapedString addLimitTo1(const QString& sql, bool add);
 
 private:
     static const char *keywords[];

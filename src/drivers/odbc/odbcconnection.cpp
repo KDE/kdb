@@ -72,7 +72,7 @@ ODBCConnection::ODBCConnection(Driver *driver, const ConnectionData& connData)
 {
 }
 
-Cursor* ODBCConnection::prepareQuery(const QString& statement, uint cursor_options)
+Cursor* ODBCConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
 {
     ODBCSQLQueryUnit* queryUnit = new ODBCSQLQueryUnit( this );
     return new ODBCCursor(this, queryUnit, statement, cursor_options);
@@ -84,16 +84,16 @@ Cursor* ODBCConnection::prepareQuery(QuerySchema* query, uint cursor_options)
     return new ODBCCursor(this, queryUnit, query, cursor_options);
 }
 
-QString ODBCConnection::escapeString(const QString& str) const
+EscapedString ODBCConnection::escapeString(const QString& str) const
 {
-    // TODO : escape strings
-    return str;
+    //! @todo escape strings
+    return EscapedString(str);
 }
 
-QByteArray ODBCConnection::escapeString(const QByteArray& str) const
+EscapedString ODBCConnection::escapeString(const QByteArray& str) const
 {
-    // TODO : escape strings
-    return str;
+    //! @todo escape strings
+    return EscapedString(str);
 }
 
 bool ODBCConnection::drv_connect(KexiDB::ServerVersionInfo* version)
@@ -171,7 +171,7 @@ bool ODBCConnection::drv_dropDatabase(const QString &)
     return true;
 }
 
-bool ODBCConnection::drv_executeSQL(const QString& statement)
+bool ODBCConnection::drv_executeSQL(const EscapedString& statement)
 {
     return d->executeSQL(statement);
 }
@@ -207,9 +207,8 @@ quint64 ODBCConnection::drv_lastInsertRecordId()
     if ( odbcDriver )
         queryToExecute = odbcDriver->getQueryForOID();
 
-    int rowId;
+    int rowId = 0;
     querySingleNumber(queryToExecute, &rowId);
-
     return rowId;
 }
 
@@ -268,10 +267,6 @@ void ODBCConnection::setODBCError( int nativeErrorCode, const QString& odbcError
     d->nativeErrorCode = nativeErrorCode;
     d->odbcErrorText = errorMessage;
     d->odbcErrorCode = odbcErrorCode;
-}
-
-QString ODBCConnection::serverErrorMsg() {
-    return d->odbcErrorText;
 }
 
 int ODBCConnection::serverResult() {

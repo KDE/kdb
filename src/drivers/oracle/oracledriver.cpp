@@ -20,7 +20,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "oracledriver.h"
 #include "oracleconnection.h"
-#include <kexidb/driver_p.h>
+#include <Predicate/Driver_p.h>
 //#include <occiCommon.h>
 #include <QtDebug>
 
@@ -105,16 +105,17 @@ bool OracleDriver::isSystemDatabaseName(const QString& /*n*/) const
 bool OracleDriver::drv_isSystemFieldName(const QString&) const {
 	return false;
 }
-QString OracleDriver::valueToSQL(uint ftype, const QVariant & v) const
+
+EscapedString OracleDriver::valueToSQL(uint ftype, const QVariant & v) const
 {
   switch (ftype) {
     case Field::Time:
-      return "TO_DATE("+escapeString(v.toString())+", 'HH24:MI:SS')";
+      return EscapedString("TO_DATE(") + escapeString(v.toString()) + ", 'HH24:MI:SS')";
     case Field::Date:
       //return "TO_DATE("+escapeString(v.toString())+", 'DD-MM-YYYY')";
     case Field::DateTime:
     //return dateTimeToSQL(v.toDateTime());
-      return "TO_DATE("+escapeString(v.toString())+", 'DD-MM-YYYY HH24:MI:SS')";
+      return EscapedString("TO_DATE(") + escapeString(v.toString()) + ", 'DD-MM-YYYY HH24:MI:SS')";
     default:
       return Driver::valueToSQL(ftype,v);
   }
@@ -123,28 +124,19 @@ QString OracleDriver::valueToSQL(uint ftype, const QVariant & v) const
  * Add single quotes at the beginning and the end of the string, and escapes any
  * single quotes found within
  */
-QString OracleDriver::escapeString(const QString& str) const
+EscapedString OracleDriver::escapeString(const QString& str) const
 {
- //KexiDBDrvDbg <<str;
-  QString res = str;
-  if (res[0]!='\''){
-	  return QString("\'"+res.replace("'","''")+"\'");
-	}else{
-	  return QString(res.replace("'","''")).mid(1,res.length()-2);
-	}
+    //! @todo verify
+    return EscapedString("'") + EscapedString(str).replace("'","''") + '\'';
 }
 
 /**
- * See KexiDB::OracleDriver::escapeString(const QString& str) const.
+ * See OracleDriver::escapeString(const QString& str) const.
  */
-QByteArray OracleDriver::escapeString(const QByteArray& str) const
+EscapedString OracleDriver::escapeString(const QByteArray& str) const
 {
-//KexiDBDrvDbg<<str;
-  if (str[0]!='\''){
-    return QByteArray("\'"+str+"\'");
-  }else{
-	  return QByteArray(str);
-	}
+    //! @todo verify
+    return EscapedString("'") + EscapedString(str).replace("'","''") + '\'';
 }
 
 /*
@@ -158,10 +150,9 @@ QByteArray OracleDriver::escapeString(const QByteArray& str) const
  * As I haven't fully understood this function, all the above hexadecimal stuff
  * may be useless.
  */
-QString OracleDriver::escapeBLOB(const QByteArray& array) const
+EscapedString OracleDriver::escapeBLOB(const QByteArray& array) const
 {
-  KexiDBDrvDbg<<array;
-	return QString(array);
+	return EscapedString(array);
 	//return KexiDB::escapeBLOB(array, KexiDB::BLOBEscape0xHex);
 }
 
@@ -169,8 +160,8 @@ QString OracleDriver::escapeBLOB(const QByteArray& array) const
  * Add back-ticks to an identifier, and replace any back-ticks within
  * the name with single quotes.
  */
-QString OracleDriver::drv_escapeIdentifier( const QString& str) const {
-	return QString(str).replace('`', "'");
+QByteArray OracleDriver::drv_escapeIdentifier( const QString& str) const {
+	return QByteArray(str.toUtf8()).replace('`', "'");
 }
 
 QByteArray OracleDriver::drv_escapeIdentifier( const QByteArray& str) const {

@@ -73,8 +73,7 @@ bool OracleConnection::drv_disconnect()
 }
 
 // TODO: Do we need this?
-Cursor* OracleConnection::prepareQuery
-                                 (const QString& statement, uint cursor_options)
+Cursor* OracleConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
 {
 	return new OracleCursor(this,statement,cursor_options);
 }
@@ -96,14 +95,14 @@ bool OracleConnection::drv_getDatabasesList(QStringList* list)
 	KexiDBDrvDbg;
 	QString user;
 	try{
-		d->rs=d->stmt->executeQuery("SELECT user FROM DUAL");
+		d->rs=d->stmt->executeQuery(EscapedString("SELECT user FROM DUAL"));
 		d->rs->next();
 		user=QString(d->rs->getString(1).c_str());
 		d->stmt->closeResultSet(d->rs);
 		d->rs=0;
 		
-		d->rs=d->stmt->executeQuery
-		     ("select COUNT(*) from user_tables where table_name like \'KEXI__%\'");
+		d->rs=d->stmt->executeQuery(
+          EscapedString("SELECT COUNT(*) FROM user_tables WHERE table_name LIKE \'kexi__%\'"));
 	  d->rs->next();
 	  
 	  if (d->rs->getInt(1)>0)
@@ -133,8 +132,9 @@ bool OracleConnection::drv_createDatabase( const QString &dbName) {
   bool res;
 	try
 	{
-		d->rs=d->stmt->executeQuery("SELECT user FROM DUAL");
-		if(d->rs->next()) user=QString(d->rs->getString(1).c_str());
+		d->rs=d->stmt->executeQuery(EscapedString("SELECT user FROM DUAL"));
+		if(d->rs->next())
+          user=QString(d->rs->getString(1).c_str());
 		d->stmt->closeResultSet(d->rs);
 		d->rs=0;
 		res=(!user.compare(dbName));
@@ -159,7 +159,7 @@ bool OracleConnection::drv_databaseExists
 	{
 	  if(active) return true;
 	  
-		d->rs=d->stmt->executeQuery("SELECT user FROM DUAL");
+		d->rs=d->stmt->executeQuery(EscapedString("SELECT user FROM DUAL"));
 		if(d->rs->next()) user=QString(d->rs->getString(1).c_str());
 		d->stmt->closeResultSet(d->rs);
 		d->rs=0;
@@ -293,7 +293,7 @@ bool OracleConnection::drv_setAutoCommit(bool on)
 	}
 }
             
-bool OracleConnection::drv_executeSQL( const QString& statement )
+bool OracleConnection::drv_executeSQL( const EscapedString& statement )
 {
   return d->executeSQL(statement);
 }
@@ -318,13 +318,13 @@ bool OracleConnection::drv_createTable( const KexiDB::TableSchema& tableSchema )
     {
       sequenceName = "KEXI__SEQ__" + tableName;
       // Add custom sequence and trigger to manage it
-      if(!d->executeSQL("CREATE SEQUENCE "+sequenceName) ||
+      if(!d->executeSQL(EscapedString("CREATE SEQUENCE ") + sequenceName) ||
                                                !d->createTrigger(tableName,ind))
       {
         return false;
       }
     }
-    return d->executeSQL("ALTER TABLE " + tableName + " ADD ROW_ID NUMBER");
+    return d->executeSQL(EscapedString("ALTER TABLE ") + tableName + " ADD ROW_ID NUMBER");
   }
   return false;
 }
@@ -336,14 +336,14 @@ bool OracleConnection::drv_afterInsert(const QString& table, FieldList* fields)
   Q_UNUSED(table);
   Q_UNUSED(fields);
   //KexiDBDrvDbg << "Updating ROW_ID on " << table;
-  QString stat=QString("UPDATE "+table
-            +" SET ROW_ID=KEXI__SEQ__ROW_ID.NEXTVAL WHERE ROW_ID IS NULL");
+  EscapedString stat = EscapedString("UPDATE ") + escapeIdentifier(table)
+            + " SET ROW_ID=KEXI__SEQ__ROW_ID.NEXTVAL WHERE ROW_ID IS NULL";
   if(d->executeSQL(stat))
   {
   //In Oracle DDL sentences are autoconfirmed (AUTOCOMMIT)
   //So I think kexi should reflect it somehow.. like this XD
     if(table.compare("kexi__objects "))
-      return d->executeSQL("COMMIT");
+      return d->executeSQL(EscapedString("COMMIT"));
     return true;  
   }
   return false;
@@ -351,12 +351,14 @@ bool OracleConnection::drv_afterInsert(const QString& table, FieldList* fields)
 
 bool OracleConnection::drv_dropTable( const QString& name )
 {
-  QString trig ="DROP TRIGGER KEXI__TG__"+ escapeIdentifier(name);
-  QString seq ="DROP SEQUENCE KEXI__SEQ__"+ escapeIdentifier(name);
-  m_sql = "DROP TABLE " + escapeIdentifier(name);
+  EscapedString trig = EscapedString("DROP TRIGGER KEXI__TG__") + escapeIdentifier(name);
+  EscapedString seq = EscapedString("DROP SEQUENCE KEXI__SEQ__") + escapeIdentifier(name);
+  m_sql = EscapedString("DROP TABLE ") + escapeIdentifier(name);
 
-  d->executeSQL(trig);
-  d->executeSQL(seq);
+  if (!d->executeSQL(trig))
+    reuturn false;
+  if (!d->executeSQL(seq))
+    return false;
   return d->executeSQL(m_sql);
 }
 
@@ -373,15 +375,16 @@ bool OracleConnection::drv_alterTableName
  
   if(ind->isPrimaryKey())
   {
-    d->rs = d->stmt->executeQuery(QString("SELECT KEXI__SEQ__"+oldTableName+".NEXTVAL FROM DUAL").latin1());
+    d->rs = d->stmt->executeQuery(EscapedString("SELECT KEXI__SEQ__") + oldTableName + ".NEXTVAL FROM DUAL");
     int n = d->rs->getInt(1);
-    QString sq="CREATE SEQUENCE KEXI__SEQ__" + escapeIdentifier(newName) 
-               +" START WITH " + n;          
-    if(!d->executeSQL(sq.latin1())||!d->createTrigger(newName,ind)) return false;
+    EscapedString sq = EscapedString("CREATE SEQUENCE KEXI__SEQ__") + escapeIdentifier(newName)
+               + " START WITH " + n;
+    if (!d->executeSQL(sq) || !d->createTrigger(newName,ind))
+        return false;
   }
   
   tableSchema.setName(newName);
-  if (!d->executeSQL(QString::fromLatin1("ALTER TABLE %1 RENAME TO %2")
+  if (!d->executeSQL(EscapedString("ALTER TABLE %1 RENAME TO %2")
     .arg(escapeIdentifier(oldTableName)).arg(escapeIdentifier(newName))))
   {
     tableSchema.setName(oldTableName); //restore old name
@@ -390,13 +393,13 @@ bool OracleConnection::drv_alterTableName
   
   if(ind->isPrimaryKey())//Now we've changed the name, we can drop sqncs&trggers
   {
-    QString droptg="DROP TRIGGER KEXI__TG__"+oldTableName;
-    QString dropsq="DROP SEQUENCE KEXI__SEQ__"+oldTableName;
+    EscapedString droptg = EscapedString("DROP TRIGGER KEXI__TG__") + oldTableName;
+    EscapedString dropsq = EscapedString("DROP SEQUENCE KEXI__SEQ__") + oldTableName;
     
-    d->executeSQL(droptg.latin1());
-    d->executeSQL(dropsq.latin1());
+    d->executeSQL(droptg);
+    d->executeSQL(dropsq);
   }
-  return true;           
+  return true;
 }
 /*
  * RowID in Oracle is not a number, is an alphanumeric string, so we have an 
@@ -409,8 +412,8 @@ Q_ULLONG OracleConnection::drv_lastInsertRecordId()
   int res;
   try
   {
-    d->rs=d->stmt->executeQuery
-    ("SELECT LAST_NUMBER-1 FROM user_sequences WHERE SEQUENCE_NAME='KEXI__SEQ__ROW_ID'");
+    d->rs=d->stmt->executeQuery(EscapedString("SELECT LAST_NUMBER-1 FROM user_sequences WHERE "
+        "SEQUENCE_NAME='KEXI__SEQ__ROW_ID'"));
     if(d->rs->next()) res=d->rs->getInt(1);
     d->stmt->closeResultSet(d->rs);
     d->rs=0;
@@ -435,17 +438,12 @@ QString OracleConnection::serverResultName() const
 	return QString();
 }
 
-void OracleConnection::drv_clearServerResult()
+/*void OracleConnection::drv_clearServerResult()
 {
 	if (!d) return;
 	d->errno = 0;
 	d->errmsg="";
-}
-
-QString OracleConnection::serverErrorMsg()
-{
-	return d->errmsg;
-}
+}*/
 
 /*
  * Finds out if a given table exists
@@ -454,8 +452,8 @@ bool OracleConnection::drv_containsTable( const QString &tableName )
 {
   KexiDBDrvDbg;
 	bool success;
-	return resultExists(QString("SELECT TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE %1")
-		.arg(driver()->escapeString(tableName).upper()), &success) && success;
+	return resultExists(EscapedString("SELECT TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE %1")
+		.arg(escapeString(tableName).upper()), &success) && success;
 }
 
 /**
@@ -465,7 +463,7 @@ bool OracleConnection::drv_getTablesList( QStringList &list )
 {
   KexiDBDrvDbg;
 	KexiDB::Cursor *cursor;
-	if (!(cursor = executeQuery( "SELECT TABLE_NAME FROM USER_TABLES" ))) 
+	if (!(cursor = executeQuery(EscapedString("SELECT TABLE_NAME FROM USER_TABLES" ))))
 	{
 	  return false;
   }

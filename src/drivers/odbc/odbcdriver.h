@@ -44,10 +44,10 @@ public:
 
     virtual bool isSystemDatabaseName(const QString& name) const;
 
-    virtual QString escapeString(const QString& str) const;
-    virtual QByteArray escapeString(const QByteArray& str) const;
+    virtual EscapedString escapeString(const QString& str) const;
+    virtual EscapedString escapeString(const QByteArray& str) const;
 
-    QString escapeBLOB(const QByteArray& array) const;
+    virtual EscapedString escapeBLOB(const QByteArray& array) const;
 
     /** 
      * Updates the driver properties/fields using the connection handle
@@ -65,7 +65,7 @@ public:
 protected:
 
     virtual Connection* drv_createConnection(const ConnectionData& connData);
-    virtual QString drv_escapeIdentifier(const QString& str) const;
+    virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     /**
      * \return true if \a n is a system field name;

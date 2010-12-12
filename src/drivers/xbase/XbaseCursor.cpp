@@ -40,7 +40,7 @@ class Predicate::xBaseCursorData {
 
 };
 
-xBaseCursor::xBaseCursor(Predicate::Connection* conn, Predicate::Cursor* internalCursor, const QString& statement, uint cursor_options)
+xBaseCursor::xBaseCursor(Predicate::Connection* conn, Predicate::Cursor* internalCursor, const EscapedString& statement, uint cursor_options)
   : Cursor(conn,statement,cursor_options)
   , d( new xBaseCursorData(internalCursor) )
 {
@@ -68,7 +68,7 @@ void xBaseCursor::init() {
   setBuffered(false);
 }
 
-bool xBaseCursor::drv_open(const QString& sql)
+bool xBaseCursor::drv_open(const EscapedString& sql)
 {
 //	PreDrvDbg << m_sql;
   if (!d->internalCursor) {
@@ -167,10 +167,10 @@ QString xBaseCursor::serverResultName() const
   return d->internalCursor->serverResultName();
 }
 
-void xBaseCursor::drv_clearServerResult()
+/*void xBaseCursor::drv_clearServerResult()
 {
   //! TODO
-}
+}*/
 
 QString xBaseCursor::serverErrorMsg()
 {

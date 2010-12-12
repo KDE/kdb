@@ -187,34 +187,34 @@ bool ODBCDriver::drv_isSystemFieldName(const QString&) const
     return false;
 }
 
-QString ODBCDriver::escapeString(const QString& str) const
+EscapedString ODBCDriver::escapeString(const QString& str) const
 {
     //! TODO: Find if we get any info about escaping strings
-    return QString::fromLatin1("'") +
-           QString(str).replace("\'", "\\''") +
-           QString::fromLatin1("'");
+    return EscapedString("'") +
+           EscapedString(str).replace("\'", "\\''") +
+           '\'';
 }
 
-QString ODBCDriver::escapeBLOB(const QByteArray& array) const
+EscapedString ODBCDriver::escapeBLOB(const QByteArray& array) const
 {
     //! TODO: Find if we get any info about escaping blobs ( wasn't there something in SQLGetInfo ? )
-    return KexiDB::escapeBLOB(array, KexiDB::BLOBEscape0xHex);
+    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex));
 }
 
-QByteArray ODBCDriver::escapeString(const QByteArray& str) const
+EscapedString ODBCDriver::escapeString(const QByteArray& str) const
 {
     //! TODO: Find if we get any info about escaping strings
-    return QByteArray("'") + QByteArray(str)
+    return EscapedString("'") + EscapedString(str)
            .replace("\'", "\\''")
-           + QByteArray("'");
+           + '\'';
 }
 
 /*! Add back-ticks to an identifier, and replace any back-ticks within
  * the name with single quotes.
  */
-QString ODBCDriver::drv_escapeIdentifier(const QString& str) const
+QByteArray ODBCDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return str;
+    return str.toUtf8();
 }
 
 QByteArray ODBCDriver::drv_escapeIdentifier(const QByteArray& str) const

@@ -48,7 +48,7 @@ class pqxxSqlConnection : public Connection
 public:
     virtual ~pqxxSqlConnection();
 
-    virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
@@ -66,7 +66,7 @@ protected:
                                  MessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const QString& statement);
+    virtual bool drv_executeSQL(const EscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
 //TODO: move this somewhere to low level class (MIGRATION?)
@@ -80,7 +80,7 @@ protected:
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
 
     pqxxSqlConnectionInternal *d;
 private:

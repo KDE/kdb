@@ -150,7 +150,7 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
   KexiDBDrvDbg;
 	QString user; 
 	try{
-		rs=stmt->executeQuery("SELECT user FROM DUAL");
+		rs=stmt->executeQuery(EscapedString("SELECT user FROM DUAL"));
 		if(rs->next()) user=QString(rs->getString(1).c_str());
 		stmt->closeResultSet(rs);
 		rs=0;
@@ -165,14 +165,14 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
   }
 }
 
-bool OracleConnectionInternal::executeSQL(const QString& statement) {
+bool OracleConnectionInternal::executeSQL(const EscapedString& statement) {
     //QString stat=QString(statement);
     //stat.replace("VALUES (", "VALUES ( KEXI__SEQ__ROW_ID.NEXTVAL, ");
-    KexiDBDrvDbg<<statement;
+    KexiDBDrvDbg<<statement.toString();
     //const char *query=statement.utf8();
     try
     {
-      stmt->execute(statement.latin1());
+      stmt->execute(statement.toByteArray());
       rs=stmt->getResultSet();
       return true;
     }
@@ -202,26 +202,27 @@ QString OracleConnectionInternal::getServerVersion()
 }
 bool OracleConnectionInternal::createSequences(){
   KexiDBDrvDbg; 
-  return executeSQL("CREATE SEQUENCE KEXI__SEQ__ROW_ID")&&
-         executeSQL("ALTER SEQUENCE KEXI__SEQ__ROW_ID NOCACHE");
+  return executeSQL(EscapedString("CREATE SEQUENCE KEXI__SEQ__ROW_ID"))
+         && executeSQL(EscapedString("ALTER SEQUENCE KEXI__SEQ__ROW_ID NOCACHE"));
 }
 	
 bool OracleConnectionInternal::createTrigger
                                            (QString tableName, IndexSchema* ind)
 {
   QString fieldName;
-  QString tg="CREATE OR REPLACE TRIGGER KEXI__TG__"+tableName+
-             "\nBEFORE INSERT ON "+tableName+
+  EscapedString tg = EscapedString("CREATE OR REPLACE TRIGGER KEXI__TG__")
+             + escapeIdentifier(tableName) +
+             "\nBEFORE INSERT ON "+tableName +
              "\nFOR EACH ROW\n"+
              "BEGIN\n";
   for(int i=0; i<ind->fieldCount(); i++)
   {
       fieldName=ind->field(i)->name();          
-      tg=tg+"IF :NEW."+fieldName+" IS NULL THEN\nSELECT KEXI__SEQ__"+tableName
-      +".NEXTVAL INTO :NEW."+fieldName+" FROM DUAL;\nEND IF;\n";
+      tg += EscapedString("IF :NEW.") + fieldName + " IS NULL THEN\nSELECT KEXI__SEQ__" + tableName
+        +".NEXTVAL INTO :NEW."+fieldName+" FROM DUAL;\nEND IF;\n";
 
   }
-  tg=tg+"END;";
+  tg += "END;";
   return executeSQL(tg); 
 }
 //--------------------------------------

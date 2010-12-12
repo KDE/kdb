@@ -52,10 +52,10 @@ public:
     /*! Escapes and converts value \a v (for type \a ftype)
      to string representation required by SQL commands.
      Reimplemented for boolean type only to use SQL compliant TRUE or FALSE */
-    virtual QString valueToSQL(uint ftype, const QVariant& v) const;
+    virtual EscapedString valueToSQL(uint ftype, const QVariant& v) const;
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
+    virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n)const;

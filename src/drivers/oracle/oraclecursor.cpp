@@ -33,7 +33,7 @@ using namespace oracle::occi;
 
 //Cursor can be defined in two ways:
 OracleCursor::OracleCursor
-(KexiDB::Connection* conn, const QString& statement, uint cursor_options)
+(KexiDB::Connection* conn, const EscapedString& statement, uint cursor_options)
 	: Cursor(conn,statement,cursor_options)
 	, d( new OracleCursorData(conn) )
 {
@@ -70,10 +70,10 @@ OracleCursor::~OracleCursor()
 	close();
 }
 
-bool OracleCursor::drv_open(const QString& sql) 
+bool OracleCursor::drv_open(const EscapedString& sql) 
 {
-  QString count = "SELECT COUNT(*) FROM(" + sql + ")";
-  KexiDBDrvDbg << sql;
+  EscapedString count = EscapedString("SELECT COUNT(*) FROM(") + sql + ")";
+  KexiDBDrvDbg << sql.toString();
   try
   {
     d->rs=d->stmt->executeQuery(count.latin1());
@@ -81,7 +81,7 @@ bool OracleCursor::drv_open(const QString& sql)
     //Oracle doesn't provide a method to count ¬¬
     d->stmt->closeResultSet(d->rs);
     d->rs = 0; 
-    d->rs=d->stmt->executeQuery(sql.toUtf8());
+    d->rs=d->stmt->executeQuery(sql);
       
     vector<MetaData> md = d->rs->getColumnListMetaData();
     m_fieldCount=md.size();//Number of columns
@@ -304,16 +304,9 @@ QString OracleCursor::serverResultName() const
     return QString();
 }
 
-void OracleCursor::drv_clearServerResult()
+/*void OracleCursor::drv_clearServerResult()
 {
   KexiDBDrvDbg;
   d->errno=0;
   d->errmsg="";
-}
-
-QString OracleCursor::serverErrorMsg()
-{
-   KexiDBDrvDbg;
- //Description of last operation's error/result
-	return d->errmsg;
-}
+}*/

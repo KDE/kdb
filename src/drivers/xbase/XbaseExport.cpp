@@ -431,7 +431,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connect
 
   // using the tableSchema as argument automatically appends rowid
   // info to the recordData which we don't want. Hence we use SQL query
-  Predicate::Cursor* cursor = srcConn->executeQuery(QString( "Select * from %1" ).arg(srcTableName));
+  Predicate::Cursor* cursor = srcConn->executeQuery(EscapedString( "SELECT * FROM %1" ).arg(srcTableName));
 
   if (!cursor)
     return false;

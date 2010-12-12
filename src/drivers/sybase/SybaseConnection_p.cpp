@@ -245,16 +245,12 @@ bool SybaseConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement on the server.
  */
-bool SybaseConnectionInternal::executeSQL(const QString& statement)
+bool SybaseConnectionInternal::executeSQL(const EscapedString& statement)
 {
-
-    QByteArray queryStr(statement.toUtf8());
-    const char *query = queryStr.constData();
-
     // remove queries in buffer if any. flush existing results if any
     dbcancel(dbProcess);
     // put query in command bufffer
-    dbcmd(dbProcess, query);
+    dbcmd(dbProcess, statement.constData());
     if (dbsqlexec(dbProcess) == SUCCEED) {
         while (dbresults(dbProcess) != NO_MORE_RESULTS) {
             /* nop */

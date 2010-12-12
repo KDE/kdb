@@ -125,48 +125,32 @@ bool PqxxSqlDriver::isSystemDatabaseName(const QString& n) const
 
 //==================================================================================
 //
-QString PqxxSqlDriver::escapeString(const QString& str) const
+EscapedString PqxxSqlDriver::escapeString(const QString& str) const
 {
     //Cannot use pqxx or libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
-/*    return QString::fromLatin1("'")
-    + QString::fromAscii(_internalWork->esc(std::string(str.toAscii().constData())).c_str())
-           + QString::fromLatin1("'");
-*/
-//TODO Optimize
-           return QString::fromLatin1("'") + QString(str)
-           /*.replace('\\', "\\\\")*/
-           .replace('\'', "\\''")
-           .replace('"', "\\\"")
-           + QString::fromLatin1("'");
+
+    return EscapedString("E'") + EscapedString(str).replace("'", "\"\"").replace("\\", "\\\\")
+        + '\'';
 }
 
 //==================================================================================
 //
-QByteArray PqxxSqlDriver::escapeString(const QByteArray& str) const
+EscapedString PqxxSqlDriver::escapeString(const QByteArray& str) const
 {
     //Cannot use pqxx or libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
-    
-    /*
-    return QByteArray("'")
-    + QByteArray(_internalWork->esc(str).c_str())
-           + QByteArray("'");*/
 
-    return QByteArray("'") + QByteArray(str)
-           /*.replace('\\', "\\\\")*/
-           .replace('\'', "\\''")
-           .replace('"', "\\\"")
-           + QByteArray("'");
+    return EscapedString("E'") + EscapedString(str).replace("'", "\"\"").replace("\\", "\\\\") + '\'';
 }
 
 //==================================================================================
 //
-QString PqxxSqlDriver::drv_escapeIdentifier(const QString& str) const
+QByteArray PqxxSqlDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QByteArray(str.toLatin1()).replace('"', "\"\"");
+    return QByteArray(str.toUtf8()).replace('"', "\"\"");
 }
 
 //==================================================================================
@@ -178,18 +162,18 @@ QByteArray PqxxSqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 
 //==================================================================================
 //
-QString PqxxSqlDriver::escapeBLOB(const QByteArray& array) const
+EscapedString PqxxSqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return Predicate::escapeBLOB(array, Predicate::BLOBEscapeOctal);
+    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscapeOctal));
 }
 
-QString PqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
+EscapedString PqxxSqlDriver::valueToSQL(uint ftype, const QVariant& v) const
 {
     if (ftype == Field::Boolean) {
         // use SQL compliant TRUE or FALSE as described here
         // http://www.postgresql.org/docs/8.0/interactive/datatype-boolean.html
         // 1 or 0 does not work
-        return v.toInt() == 0 ? QString::fromLatin1("FALSE") : QString::fromLatin1("TRUE");
+        return v.toInt() == 0 ? EscapedString("FALSE") : EscapedString("TRUE");
     }
     return Driver::valueToSQL(ftype, v);
 }

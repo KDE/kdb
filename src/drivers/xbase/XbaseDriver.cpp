@@ -120,23 +120,23 @@ bool xBaseDriver::drv_isSystemFieldName( const QString& n ) const
   return dp->internalDriver->isSystemFieldName(n);
 }
 
-QString xBaseDriver::escapeString(const QString& str) const
+EscapedString xBaseDriver::escapeString(const QString& str) const
 {
   if ( !dp->internalDriver ) {
-    return str;
+    return EscapedString("'") + str + '\'';
   }
   return dp->internalDriver->escapeString(str);
 }
 
-QByteArray xBaseDriver::escapeString(const QByteArray& str) const
+EscapedString xBaseDriver::escapeString(const QByteArray& str) const
 {
   if ( !dp->internalDriver ) {
-    return str;
+    return EscapedString("'") + str + '\'';
   }
   return dp->internalDriver->escapeString(str);
 }
 
-QString xBaseDriver::escapeBLOB(const QByteArray& array) const
+EscapedString xBaseDriver::escapeBLOB(const QByteArray& array) const
 {
   if ( !dp->internalDriver ) {
     return array;
@@ -144,7 +144,7 @@ QString xBaseDriver::escapeBLOB(const QByteArray& array) const
   return dp->internalDriver->escapeBLOB(array);
 }
 
-QString xBaseDriver::drv_escapeIdentifier( const QString& str) const
+QByteArray xBaseDriver::drv_escapeIdentifier( const QString& str) const
 {
   if ( !dp->internalDriver ) {
     return str;

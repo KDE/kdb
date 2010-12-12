@@ -178,7 +178,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement
 */
-bool xBaseConnectionInternal::executeSQL(const QString& statement)
+bool xBaseConnectionInternal::executeSQL(const EscapedString& statement)
 {
 //	PreDrvDbg << statement;
   if ( !internalConn ) {

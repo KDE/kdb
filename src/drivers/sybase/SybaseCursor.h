@@ -31,18 +31,18 @@ class SybaseCursorData;
 class SybaseCursor: public Cursor
 {
 public:
-    SybaseCursor(Connection* conn, const QString& statement = QString(),
+    SybaseCursor(Connection* conn, const EscapedString& statement,
                  uint cursor_options = NoOptions);
     SybaseCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
     virtual ~SybaseCursor();
-    virtual bool drv_open(const QString& sql);
+    virtual bool drv_open(const EscapedString& sql);
     virtual bool drv_close();
 //   virtual bool drv_moveFirst();
     virtual void drv_getNextRecord();
     //virtual bool drv_getPrevRecord();
     virtual QVariant value(uint);
 
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();

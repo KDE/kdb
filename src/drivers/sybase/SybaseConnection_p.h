@@ -65,7 +65,7 @@ public:
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const QString& statement);
+    bool executeSQL(const EscapedString& statement);
 
     //! Stores last operation's result
     virtual void storeResult();

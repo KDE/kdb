@@ -59,11 +59,11 @@ bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
 
     QString serverVersionString;
 
-    if (!querySingleString("Select @@servername" , &version.string)) {
+    if (!querySingleString(EscapedString("SELECT @@servername") , &version.string)) {
         PreDrvDbg << "Couldn't fetch server name";
     }
 
-    if (!querySingleString("Select @@version", &serverVersionString)) {
+    if (!querySingleString(EscapedString("SELECT @@version"), &serverVersionString)) {
         PreDrvDbg << "Couldn't fetch server version";
     }
 
@@ -82,7 +82,7 @@ bool SybaseConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-Cursor* SybaseConnection::prepareQuery(const QString& statement, uint cursor_options)
+Cursor* SybaseConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
 {
     return new SybaseCursor(this, statement, cursor_options);
 }
@@ -98,17 +98,17 @@ bool SybaseConnection::drv_getDatabasesList(QStringList* list)
 
     // select * from master..sysdatabases ?
     // todo: verify.
-    return queryStringList("SELECT name FROM master..sysdatabases", list) ;
+    return queryStringList(EscapedString("SELECT name FROM master..sysdatabases"), list) ;
 }
 
 bool SybaseConnection::drv_createDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
     // mysql_create_db deprecated, use SQL here.
-    if (drv_executeSQL("CREATE DATABASE " + dbName)) {
+    if (drv_executeSQL(EscapedString("CREATE DATABASE ") + dbName)) {
         // set allow_nulls_by_default option to true
-        QString allowNullsQuery = QString("sp_dboption %1, allow_nulls_by_default, true").arg(dbName);
-        if (drv_executeSQL(allowNullsQuery.toLatin1().data()))
+        EscapedString allowNullsQuery = EscapedString("sp_dboption %1, allow_nulls_by_default, true").arg(dbName);
+        if (drv_executeSQL(allowNullsQuery.data()))
             return true;
     }
     d->storeResult();
@@ -133,19 +133,18 @@ bool SybaseConnection::drv_closeDatabase()
 bool SybaseConnection::drv_dropDatabase(const QString &dbName)
 {
 
-    return drv_executeSQL("drop database " + driver()->escapeString(dbName));
+    return drv_executeSQL(EscapedString("DROP DATABASE ") + escapeString(dbName));
 }
 
-bool SybaseConnection::drv_executeSQL(const QString& statement)
+bool SybaseConnection::drv_executeSQL(const EscapedString& statement)
 {
     return d->executeSQL(statement);
 }
 
 quint64 SybaseConnection::drv_lastInsertRecordId()
 {
-    int rowId;
-    querySingleNumber("Select @@IDENTITY", &rowId);
-
+    int rowId = 0;
+    querySingleNumber(EscapedString("Select @@IDENTITY"), &rowId);
     return (qint64)rowId;
 }
 
@@ -159,28 +158,23 @@ QString SybaseConnection::serverResultName() const
     return QString();
 }
 
-void SybaseConnection::drv_clearServerResult()
+/*void SybaseConnection::drv_clearServerResult()
 {
     if (!d)
         return;
     d->res = 0;
-}
-
-QString SybaseConnection::serverErrorMsg()
-{
-    return d->errmsg;
-}
+}*/
 
 bool SybaseConnection::drv_containsTable(const QString &tableName)
 {
     bool success;
-    return resultExists(QString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
-                        .arg(driver()->escapeString(tableName)), &success) && success;
+    return resultExists(EscapedString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
+                        .arg(escapeString(tableName)), &success) && success;
 }
 
-bool SybaseConnection::drv_getTablesList(QStringList &list)
+bool SybaseConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList("SELECT name FROM sysobjects WHERE type='U'", list);
+    return queryStringList(EscapedString("SELECT name FROM sysobjects WHERE type='U'"), list);
 }
 
 PreparedStatement SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
@@ -196,7 +190,7 @@ bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldLi
         return true;
 
     // explicit insertion into IDENTITY fields !!
-    return drv_executeSQL(QString("SET IDENTITY_INSERT %1 ON").arg(escapeIdentifier(table)));
+    return drv_executeSQL(EscapedString("SET IDENTITY_INSERT %1 ON").arg(escapeIdentifier(table)));
 
 }
 
@@ -209,7 +203,7 @@ bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldLis
         return true;
 
     // explicit insertion into IDENTITY fields has taken place. Turn off IDENTITY_INSERT
-    return drv_executeSQL(QString("SET IDENTITY_INSERT %1 OFF").arg(escapeIdentifier(table)));
+    return drv_executeSQL(EscapedString("SET IDENTITY_INSERT %1 OFF").arg(escapeIdentifier(table)));
 
 }
 
@@ -219,7 +213,7 @@ bool Predicate::SybaseConnection::drv_beforeUpdate(const QString& table, FieldLi
         return true;
 
     // explicit update of IDENTITY fields has taken place.
-    return drv_executeSQL(QString("SET IDENTITY_UPDATE %1 ON").arg(escapeIdentifier(table)));
+    return drv_executeSQL(EscapedString("SET IDENTITY_UPDATE %1 ON").arg(escapeIdentifier(table)));
 }
 
 bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldList& fields)
@@ -231,6 +225,6 @@ bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldLis
         return true;
 
     // explicit insertion into IDENTITY fields has taken place. Turn off IDENTITY_INSERT
-    return drv_executeSQL(QString("SET IDENTITY_UPDATE %1 OFF").arg(escapeIdentifier(table)));
+    return drv_executeSQL(EscapedString("SET IDENTITY_UPDATE %1 OFF").arg(escapeIdentifier(table)));
 
 }

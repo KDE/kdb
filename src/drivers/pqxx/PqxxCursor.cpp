@@ -38,7 +38,7 @@ static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
 
 //==================================================================================
 //Constructor based on query statement
-pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const QString& statement, uint options):
+pqxxSqlCursor::pqxxSqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint options):
         Cursor(conn, statement, options)
 {
 // PreDrvDbg << "PQXXSQLCURSOR: constructor for query statement";
@@ -71,7 +71,7 @@ pqxxSqlCursor::~pqxxSqlCursor()
 
 //==================================================================================
 //Create a cursor result set
-bool pqxxSqlCursor::drv_open(const QString& sql)
+bool pqxxSqlCursor::drv_open(const EscapedString& sql)
 {
 // PreDrvDbg << sql;
 
@@ -96,7 +96,7 @@ bool pqxxSqlCursor::drv_open(const QString& sql)
             m_implicityStarted = true;
         }
 
-        m_res = new pqxx::result(((pqxxSqlConnection*)connection())->m_trans->data->exec(std::string(sql.toUtf8())));
+        m_res = new pqxx::result(((pqxxSqlConnection*)connection())->m_trans->data->exec(std::string(sql.toByteArray())));
         ((pqxxSqlConnection*)connection())
         ->drv_commitTransaction(((pqxxSqlConnection*)connection())->m_trans);
 //  my_conn->m_trans->commit();
@@ -271,10 +271,10 @@ bool pqxxSqlCursor::drv_storeCurrentRecord(RecordData* data) const
 
 //==================================================================================
 //
-void pqxxSqlCursor::drv_clearServerResult()
+/*void pqxxSqlCursor::drv_clearServerResult()
 {
 //! @todo pqxxSqlCursor: stuff with server results
-}
+}*/
 
 //==================================================================================
 //Add the current record to the internal buffer

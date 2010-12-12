@@ -57,7 +57,8 @@ bool xBaseConnection::drv_disconnect() {
   return d->db_disconnect(*data());
 }
 
-Cursor* xBaseConnection::prepareQuery(const QString& statement, uint cursor_options) {
+Cursor* xBaseConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
+{
   if ( !d->internalConn ) {
     return 0;
   }
@@ -112,7 +113,7 @@ bool xBaseConnection::drv_dropDatabase( const QString &dbName) {
   return true;
 }
 
-bool xBaseConnection::drv_executeSQL( const QString& statement ) {
+bool xBaseConnection::drv_executeSQL( const EscapedString& statement ) {
   return d->executeSQL(statement);
 }
 
@@ -139,13 +140,13 @@ QString xBaseConnection::serverResultName() const
   return d->internalConn->serverResultName();
 }
 
-void xBaseConnection::drv_clearServerResult()
+/*void xBaseConnection::drv_clearServerResult()
 {
   if (!d || !d->internalConn)
     return;
   d->internalConn->clearError();
   d->res = 0;
-}
+}*/
 
 QString xBaseConnection::serverErrorMsg()
 {
@@ -156,8 +157,8 @@ bool xBaseConnection::drv_containsTable( const QString &tableName )
 {
   bool success;
   // this will be called on the SQLite database
-  return resultExists(QString("SHOW TABLES LIKE %1")
-    .arg(driver()->escapeString(tableName)), &success) && success;
+  return resultExists(EscapedString("SHOW TABLES LIKE %1")
+    .arg(escapeString(tableName)), &success) && success;
 }
 
 bool xBaseConnection::drv_getTablesList(QStringList* list)

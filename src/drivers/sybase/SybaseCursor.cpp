@@ -35,7 +35,7 @@
 
 using namespace Predicate;
 
-SybaseCursor::SybaseCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
+SybaseCursor::SybaseCursor(Predicate::Connection* conn, const EscapedString& statement, uint cursor_options)
         : Cursor(conn, statement, cursor_options)
         , d(new SybaseCursorData(conn))
 {
@@ -61,7 +61,7 @@ SybaseCursor::~SybaseCursor()
     close();
 }
 
-bool SybaseCursor::drv_open(const QString& sql)
+bool SybaseCursor::drv_open(const EscapedString& sql)
 {
 
     /* Pseudo Code
@@ -86,7 +86,7 @@ bool SybaseCursor::drv_open(const QString& sql)
         PreDrvDbg << "drv_open" << "dead DBPROCESS ?";
 
     // insert into command buffer
-    dbcmd(d->dbProcess, sql.toUtf8());
+    dbcmd(d->dbProcess, sql.toByteArray());
     // execute query
     dbsqlexec(d->dbProcess);
 
@@ -244,14 +244,9 @@ QString SybaseCursor::serverResultName() const
     return QString();
 }
 
-void SybaseCursor::drv_clearServerResult()
+/*void SybaseCursor::drv_clearServerResult()
 {
     if (!d)
         return;
     d->res = 0;
-}
-
-QString SybaseCursor::serverErrorMsg()
-{
-    return d->errmsg;
-}
+}*/

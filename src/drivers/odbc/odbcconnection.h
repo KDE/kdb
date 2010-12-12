@@ -42,19 +42,15 @@ public:
     // static function which stores error
     static void extractError(ODBCConnection* connection, SQLHANDLE handle, SQLSMALLINT type);
 
-    virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
-    virtual QString escapeString(const QString& str) const;
-    virtual QByteArray escapeString(const QByteArray& str) const;
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
+    virtual EscapedString escapeString(const QString& str) const;
+    virtual EscapedString escapeString(const QByteArray& str) const;
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options);
 
     PreparedStatement::Ptr prepareStatement(PreparedStatement::StatementType type,
 							    FieldList* fields);
 
     void setODBCError( int nativeErrorCode, const QString& odbcErrorCode ,const QString& errorMessage);
-
-    // reimplemented from KexiDB::Object
-    //! Sets the server error message
-    virtual QString serverErrorMsg();
 
     //! Sets the native error code returned by the server
     virtual int serverResult();
@@ -91,7 +87,7 @@ protected:
 
     //virtual bool drv_createTable( const KexiDB::Table& table );
 
-    virtual bool drv_executeSQL(const QString& statement);
+    virtual bool drv_executeSQL(const EscapedString& statement);
 
     virtual quint64 drv_lastInsertRecordId();
 

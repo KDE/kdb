@@ -32,14 +32,14 @@ public:
 	OracleCursor(Connection* conn, const QString& statement = QString(), uint cursor_options = NoOptions );
 	OracleCursor(Connection* conn, QuerySchema* query, uint options = NoOptions );
 	virtual ~OracleCursor();
-	virtual bool drv_open(const QString& sql);
+	virtual bool drv_open(const EscapedString& sql);
 	virtual bool drv_close();
   virtual bool moveFirst();
 	virtual void drv_getNextRecord();
         //virtual bool drv_getPrevRecord();
 	virtual QVariant value(uint);
 
-	virtual void drv_clearServerResult();
+//	virtual void drv_clearServerResult();
 	virtual void drv_appendCurrentRecordToBuffer();
 	virtual void drv_bufferMovePointerNext();
 	virtual void drv_bufferMovePointerPrev();

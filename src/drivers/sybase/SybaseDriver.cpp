@@ -125,47 +125,42 @@ bool SybaseDriver::drv_isSystemFieldName(const QString&) const
     return false;
 }
 
-QString SybaseDriver::escapeString(const QString& str) const
+EscapedString SybaseDriver::escapeString(const QString& str) const
 {
-    return QString::fromLatin1("'") +
-           QString(str).replace("\'", "\\''") +
-           QString::fromLatin1("'");
+    return EscapedString("'") + EscapedString(str).replace("\'", "\\''") + '\'';
 }
 
-QString SybaseDriver::escapeBLOB(const QByteArray& array) const
+EscapedString SybaseDriver::escapeBLOB(const QByteArray& array) const
 {
-    return Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex);
+    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex));
 }
 
-QByteArray SybaseDriver::escapeString(const QByteArray& str) const
+EscapedString SybaseDriver::escapeString(const QByteArray& str) const
 {
-    // needs any modification ?
-    return QByteArray("'") + QByteArray(str)
-           .replace("\'", "\\''")
-           + QByteArray("'");
+    //! @todo needs any modification ?
+    return EscapedString("'") + EscapedString(str).replace("\'", "\\''") + '\'';
 }
 
-QString SybaseDriver::drv_escapeIdentifier(const QString& str) const
+QByteArray SybaseDriver::drv_escapeIdentifier(const QString& str) const
 {
-    // verify
-    return QString("\"") + QString(str).replace("\\", "\\\\").replace("\"", "\"\"")
-           + QString("\"");
+    //! @todo verify
+    return QByteArray("\"") + QByteArray(str.toUtf8()).replace("\\", "\\\\").replace("\"", "\"\"")
+           + "\"";
 }
 
 QByteArray SybaseDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     // verify
-    return QByteArray("\"") + QByteArray(str)
+    return QByteArray("\"") + str
            .replace("\\", "\\\\")
            .replace("\"", "\"\"")
-           + QByteArray("\"") ;
+           + "\"";
 }
 
-QString SybaseDriver::addLimitTo1(const QString& sql, bool add)
+EscapedString SybaseDriver::addLimitTo1(const QString& sql, bool add)
 {
     // length of "select" is 6
     // eg: before:  select foo from foobar
     // after:   select TOP 1 foo from foobar
-    QString returnString = sql.trimmed().insert(6, " TOP 1 ");
-    return add ? returnString : sql;
+    return add ? EscapedString(sql).trimmed().insert(6, " TOP 1 ") : EscapedString(sql);
 }
