@@ -45,6 +45,12 @@ Drivers:
 [23:18] <jstaniek> so indeed good idea about the fall back
 [23:28] <piggz> it may require escapeString and valueToSQl functions in Connection class, as driver::valueToSql calls escapeString
 [23:28] <piggz> that was where i traced todays bug
+[ ] PostgreSQL driver: define USE_SSL and add support for SSL connections (http://www.postgresql.org/docs/8.4/static/libpq-status.html)
+[ ] PostgreSQL driver: Use binary mode with PQexecParams() instead of PQexec(), this will reduce number
+    of conversions from string.
+    See http://www.postgresql.org/docs/8.4/interactive/libpq-example.html#LIBPQ-EXAMPLE-3
+    Passing numeric values requires knowledge of the server storage format, as implemented in
+    src/backend/utils/adt/numeric.c::numeric_send() and src/backend/utils/adt/numeric.c::numeric_recv().
 
 Naming, API:
 [ ] what to do with kexi__ prefix for db objects (backward compat.)?
@@ -72,10 +78,15 @@ Naming, API:
                                             storage size: 12 B
 [ ] Add extension-functions.c from http://sqlite.org/contrib: mathematical and string extension functions
     for SQL queries using the loadable extensions mechanism
+[ ] add Connection::reset(), e.g. for pgsql that would call PQreset():
+    "This function will close the connection to the server and attempt to reestablish a new connection
+     to the same server, using all the same parameters previously used. This may be useful for error recovery
+     if a working connection is lost."
 
 Other:
 [ ] store config in ~/.config/predicate/, e.g. *rc files
 [x] load plugins from QT_PLUGINS_DIR and similar locations
+[ ] add more Q_INTERFACES than just Driver: add Import, Export (replaces KexiDB migration) so driver plugin can support more or less features
 
 Optimization & Cleanup
 [ ] use QLatin1String where possible

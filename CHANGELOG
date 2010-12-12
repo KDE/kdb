@@ -1,8 +1,31 @@
 Predicate CHANGELOG
 
-2010-10-30
+2010-12-12
+Moved to git: https://projects.kde.org/projects/playground/libs/predicate/repository
+
+2010-12-03
 Predicate
-*ConnectionData now contains optional databaseName attribute, so it is not needed to call useDatabase() (useful e.g. for SQLite and MySQL)
+*RecordData is internally a low-level array of QVector pointers now, this adds speed and size optimizations; null values are null pointers there; more optimization planned (replacing QVariant since implicit sharing of values is not needed)
+
+2010-11-03..2010-11-16
+Predicate
+*EscapedString introduced: specialized string for escaping. In addition to byte array, contains "validity" flag that is transferred when strings are concatenated or in general when any operation with invalid escaped string is performed.
+*SQLite, MySQL, PostgreSQL Ported to EscapedString-based API
+
+TODO: use QStringBuilder http://doc.qt.nokia.com/4.6/qstring.html
+add
+     #define QT_USE_FAST_CONCATENATION
+     #define QT_USE_FAST_OPERATOR_PLUS
+
+2010-10-30..2010-11-03
+PostgreSQL Driver
+*DriverBehaviour::QUOTATION_MARKS_FOR_IDENTIFIER changed from QChar to char
+*option EscapeKexi in escape*() methods replaced by providing Predicate::escapeIdentifier() and Predicate::escapeString() functions
+Predicate
+*ConnectionData now contains optional databaseName attribute, so it is not needed to pass the name in useDatabase() (useful e.g. for SQLite)
+*escaping is now based on Connection, not Driver (NOTE: string escaping hints: http://pastebin.com/Lagyyfj7)
+*constness improved in the API
+*use QString(char) when possible (small optimization)
 
 2010-10-20
 PostgreSQL Driver
