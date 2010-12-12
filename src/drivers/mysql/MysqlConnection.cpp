@@ -46,6 +46,7 @@ MysqlConnection::MysqlConnection(Driver *driver, const ConnectionData& connData)
 MysqlConnection::~MysqlConnection()
 {
     destroy();
+    delete d;
 }
 
 bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
@@ -54,31 +55,28 @@ bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
     if (!ok)
         return false;
 
-    version->setString(mysql_get_host_info(d->mysql));
+    // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
+    version->setString(mysql_get_server_info(d->mysql));
 
-    //retrieve server version info
-#if 0 //this only works for client version >= 4.1 :(
-    unsigned long v = mysql_get_server_version(d->mysql);
-    // v - a number that represents the MySQL server version in this format
-    // = major_version*10000 + minor_version *100 + sub_version
-    version.major = v / 10000;
-    version.minor = (v - version.major * 10000) / 100;
-    version.release = v - version.major * 10000 - version.minor * 100;
-#else //better way to get the version info: use 'version' built-in variable:
+    // get the version info using 'version' built-in variable:
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
+    // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-version.html
     QString versionString;
-    tristate res = querySingleString("SELECT @@version", &versionString, /*column*/0, false /*!addLimitTo1*/);
+    tristate res = querySingleString(EscapedString("SELECT @@version"),
+                                     &versionString, /*column*/0, false /*!addLimitTo1*/);
     QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)");
-    if (res == true && versionRe.exactMatch(versionString)) { // (if querySingleString failed, the version will be 0.0.0...
+    if (res == true && versionRe.exactMatch(versionString)) {
+        // (if querySingleString failed, the version will be 0.0.0...
         version->setMajor(versionRe.cap(1).toInt());
         version->setMinor(versionRe.cap(2).toInt());
         version->setRelease(versionRe.cap(3).toInt());
     }
-#endif
+
     // Get lower_case_table_name value so we know if there's case sensitivity supported
     // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
     int intLowerCaseTableNames = 0;
-    res = querySingleNumber(QLatin1String("SHOW VARIABLES LIKE 'lower_case_table_name'"), &intLowerCaseTableNames,
+    res = querySingleNumber(EscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
+                            &intLowerCaseTableNames,
                             0/*col*/, false/* !addLimitTo1 */);
     if (res == false) // sanity
         return false;
@@ -91,7 +89,7 @@ bool MysqlConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-Cursor* MysqlConnection::prepareQuery(const QString& statement, uint cursor_options)
+Cursor* MysqlConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
 {
     return new MysqlCursor(this, statement, cursor_options);
 }
@@ -124,8 +122,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
     /* db names can be lower case in mysql */
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
     bool exists = resultExists(
-      QString::fromLatin1("SHOW DATABASES LIKE %1")
-          .arg(driver()->escapeString(storedDbName)), &success);
+      EscapedString("SHOW DATABASES LIKE %1").arg(escapeString(storedDbName)), &success);
     if (!exists || !success) {
         if (!ignoreErrors) {
             m_result = Result(ERR_OBJECT_NOT_FOUND,
@@ -142,7 +139,7 @@ bool MysqlConnection::drv_createDatabase(const QString &dbName)
     PreDrvDbg << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
-    if (drv_executeSQL(QString::fromLatin1("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
+    if (drv_executeSQL(EscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
         return true;
     d->storeResult();
     return false;
@@ -168,10 +165,10 @@ bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
 //TODO is here escaping needed
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    return drv_executeSQL(QString::fromLatin1("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
+    return drv_executeSQL(EscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
-bool MysqlConnection::drv_executeSQL(const QString& statement)
+bool MysqlConnection::drv_executeSQL(const EscapedString& statement)
 {
     return d->executeSQL(statement);
 }
@@ -184,26 +181,27 @@ quint64 MysqlConnection::drv_lastInsertRecordId()
 
 QString MysqlConnection::serverResultName() const
 {
+#warning TODO: MysqlConnection::serverResultName()
     return QString();
 }
 
-void MysqlConnection::drv_clearServerResult()
+/*void MysqlConnection::drv_clearServerResult()
 {
     if (!d)
         return;
     d->res = 0;
-}
+}*/
 
 bool MysqlConnection::drv_containsTable(const QString& tableName)
 {
     bool success;
-    return resultExists(QString("SHOW TABLES LIKE %1")
-                        .arg(driver()->escapeString(tableName)), &success) && success;
+    return resultExists(EscapedString("SHOW TABLES LIKE %1")
+                        .arg(escapeString(tableName)), &success) && success;
 }
 
 bool MysqlConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList("SHOW TABLES", list);
+    return queryStringList(EscapedString("SHOW TABLES"), list);
 }
 
 PreparedStatementInterface* MysqlConnection::prepareStatementInternal()

@@ -39,7 +39,7 @@ class MysqlConnection : public Connection
 public:
     virtual ~MysqlConnection();
 
-    virtual Cursor* prepareQuery(const QString& statement = QString(), uint cursor_options = 0);
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
 
     virtual PreparedStatementInterface* prepareStatementInternal();
@@ -58,7 +58,7 @@ protected:
                                  MessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const QString& statement);
+    virtual bool drv_executeSQL(const EscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for Resultable
@@ -73,7 +73,7 @@ protected:
     MysqlConnectionInternal* d;
 
     friend class MysqlDriver;
-    friend class MysqlCursor;
+    friend class MysqlCursorData;
 };
 
 }

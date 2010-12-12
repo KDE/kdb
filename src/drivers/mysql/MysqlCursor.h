@@ -32,7 +32,7 @@ class MysqlCursorData;
 class MysqlCursor: public Cursor
 {
 public:
-    MysqlCursor(Connection* conn, const QString& statement = QString(),
+    MysqlCursor(Connection* conn, const EscapedString& statement,
                 uint cursor_options = NoOptions);
     MysqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
     virtual ~MysqlCursor();
@@ -40,10 +40,10 @@ public:
     virtual QVariant value(uint pos);
     virtual const char** recordData() const;
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
-    virtual bool drv_open(const QString& sql);
+    virtual bool drv_open(const EscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
-    virtual void drv_clearServerResult();
+//    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();

@@ -91,7 +91,7 @@ void MysqlPreparedStatement::done()
 #endif
 }
 
-bool MysqlPreparedStatement::prepare(const QByteArray& statement)
+bool MysqlPreparedStatement::prepare(const EscapedString& statement)
 {
     Q_UNUSED(statement);
     return true;

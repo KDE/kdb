@@ -31,13 +31,11 @@
 
 using namespace Predicate;
 
-MysqlCursor::MysqlCursor(Predicate::Connection* conn, const QString& statement, uint cursor_options)
+MysqlCursor::MysqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint cursor_options)
         : Cursor(conn, statement, cursor_options)
         , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
-    d->mysql = static_cast<MysqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "constructor for query statement";
 }
 
 MysqlCursor::MysqlCursor(Connection* conn, QuerySchema* query, uint options)
@@ -45,30 +43,25 @@ MysqlCursor::MysqlCursor(Connection* conn, QuerySchema* query, uint options)
         , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
-    d->mysql = static_cast<MysqlConnection*>(conn)->d->mysql;
-// PreDrvDbg << "constructor for query statement";
 }
 
 MysqlCursor::~MysqlCursor()
 {
     close();
+    delete d;
 }
 
-bool MysqlCursor::drv_open(const QString& sql)
+bool MysqlCursor::drv_open(const EscapedString& sql)
 {
-    const QByteArray st(sql.toUtf8());
-    if (mysql_real_query(d->mysql, st, st.length()) == 0) {
+    if (mysql_real_query(d->mysql, sql.constData(), sql.length()) == 0) {
         if (mysql_errno(d->mysql) == 0) {
             d->mysqlres = mysql_store_result(d->mysql);
             m_fieldCount = mysql_num_fields(d->mysqlres);
             m_fieldsToStoreInRecord = m_fieldCount;
             d->numRows = mysql_num_rows(d->mysqlres);
-            m_at = 0;
 
-            m_opened = true;
             m_records_in_buf = d->numRows;
             m_buffering_completed = true;
-            m_afterLast = false;
             return true;
         }
     }
@@ -95,16 +88,17 @@ bool MysqlCursor::drv_close()
 
 void MysqlCursor::drv_getNextRecord()
 {
-// PreDrvDbg;
-    if (at() < d->numRows && at() >= 0) {
-        d->lengths = mysql_fetch_lengths(d->mysqlres);
-        m_fetchResult = FetchOK;
-    } else if (at() >= d->numRows) {
+    if (at() >= d->numRows) {
         m_fetchResult = FetchEnd;
-    } else {
+    }
+    else if (at() < 0) {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
         m_fetchResult = FetchEnd;
+    }
+    else {  // 0 <= at() < d->numRows
+        d->lengths = mysql_fetch_lengths(d->mysqlres);
+        m_fetchResult = FetchOK;
     }
 }
 
@@ -202,6 +196,6 @@ const char** MysqlCursor::recordData() const
     return 0;
 }
 
-void MysqlCursor::drv_clearServerResult()
+/*void MysqlCursor::drv_clearServerResult()
 {
-}
+}*/

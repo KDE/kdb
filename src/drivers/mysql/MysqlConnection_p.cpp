@@ -25,6 +25,7 @@
 #include <QtDebug>
 
 #include "MysqlConnection_p.h"
+#include "MysqlConnection.h"
 
 #include <Predicate/ConnectionData.h>
 
@@ -37,7 +38,7 @@
 using namespace NAMESPACE;
 
 /* ************************************************************************** */
-MysqlConnectionInternal::MysqlConnectionInternal(Predicate::Connection* connection)
+MysqlConnectionInternal::MysqlConnectionInternal(Connection* connection)
         : ConnectionInternal(connection)
         , mysql(0)
         , mysql_owned(true)
@@ -69,7 +70,7 @@ void MysqlConnectionInternal::storeResult()
  */
 //bool MysqlConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool MysqlConnectionInternal::db_connect(const Predicate::ConnectionData& data)
+bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
         return false;
@@ -131,16 +132,14 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //TODO is here escaping needed?
-    return executeSQL(QLatin1String("USE ") + escapeIdentifier(dbName));
+    return executeSQL(EscapedString("USE ") + escapeIdentifier(dbName));
 }
 
 /*! Executes the given SQL statement on the server.
  */
-bool MysqlConnectionInternal::executeSQL(const QString& statement)
+bool MysqlConnectionInternal::executeSQL(const EscapedString& statement)
 {
-    QByteArray queryStr(statement.toUtf8());
-    const char *query = queryStr.constData();
-    if (mysql_real_query(mysql, query, qstrlen(query)) == 0)
+    if (mysql_real_query(mysql, statement.constData(), statement.length()) == 0)
         return true;
 
     storeResult();
@@ -154,7 +153,7 @@ QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 
 //--------------------------------------
 
-MysqlCursorData::MysqlCursorData(Predicate::Connection* connection)
+MysqlCursorData::MysqlCursorData(Connection* connection)
         : MysqlConnectionInternal(connection)
         , mysqlres(0)
         , mysqlrow(0)
@@ -162,6 +161,7 @@ MysqlCursorData::MysqlCursorData(Predicate::Connection* connection)
         , numRows(0)
 {
     mysql_owned = false;
+    mysql = static_cast<MysqlConnection*>(connection)->d->mysql;
 }
 
 MysqlCursorData::~MysqlCursorData()

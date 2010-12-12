@@ -37,7 +37,7 @@ public:
     virtual ~MysqlPreparedStatement();
 
 protected:
-    virtual bool prepare(const QByteArray& statement);
+    virtual bool prepare(const EscapedString& statement);
 
     virtual bool execute(
         PreparedStatement::Type type,
@@ -53,7 +53,7 @@ protected:
     MYSQL_STMT *m_statement;
     MYSQL_BIND *m_mysqlBind;
 #endif
-    QByteArray m_tempStatementString;
+    EscapedString m_tempStatementString;
     bool m_resetRequired;
 };
 }

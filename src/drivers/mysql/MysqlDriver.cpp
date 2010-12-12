@@ -101,7 +101,7 @@ bool MysqlDriver::drv_isSystemFieldName(const QString&) const
     return false;
 }
 
-QString MysqlDriver::escapeString(const QString& str) const
+EscapedString MysqlDriver::escapeString(const QString& str) const
 {
     //escape as in http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 //! @todo support more characters, like %, _
@@ -114,7 +114,7 @@ QString MysqlDriver::escapeString(const QString& str) const
             break;
     }
     if (i >= old_length) { //no characters to escape
-        return QString::fromLatin1("'") + str + QString::fromLatin1("'");
+        return EscapedString("'") + EscapedString(str) + '\'';
     }
 
     QChar *new_string = new QChar[ old_length * 3 + 1 ]; // a worst case approximation
@@ -155,34 +155,34 @@ QString MysqlDriver::escapeString(const QString& str) const
     }
 
     new_string[new_length++] = '\''; //append '
-    QString result(new_string, new_length);
+    EscapedString result(QString(new_string, new_length));
     delete [] new_string;
     return result;
 }
 
-QString MysqlDriver::escapeBLOB(const QByteArray& array) const
+EscapedString MysqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex);
+    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex));
 }
 
-QByteArray MysqlDriver::escapeString(const QByteArray& str) const
+EscapedString MysqlDriver::escapeString(const QByteArray& str) const
 {
 //! @todo optimize using mysql_real_escape_string()?
 //! see http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 
-    return QByteArray("'") + QByteArray(str)
+    return EscapedString("'") + EscapedString(str)
            .replace('\\', "\\\\")
            .replace('\'', "\\''")
            .replace('"', "\\\"")
-           + QByteArray("'");
+           + '\'';
 }
 
 /*! Add back-ticks to an identifier, and replace any back-ticks within
  * the name with single quotes.
  */
-QString MysqlDriver::drv_escapeIdentifier(const QString& str) const
+QByteArray MysqlDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QString(str).replace('`', "'");
+    return QByteArray(str.toUtf8()).replace('`', "'");
 }
 
 QByteArray MysqlDriver::drv_escapeIdentifier(const QByteArray& str) const

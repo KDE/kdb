@@ -51,14 +51,14 @@ namespace NAMESPACE
     database.  Used by the Predicate and migration drivers.
     @todo fix the above note about migration...
  */
-class MysqlConnectionInternal : public Predicate::ConnectionInternal
+class MysqlConnectionInternal : public ConnectionInternal
 {
 public:
-    MysqlConnectionInternal(Predicate::Connection* connection);
+    MysqlConnectionInternal(Connection* connection);
     virtual ~MysqlConnectionInternal();
 
     //! Connects to a MySQL database
-    bool db_connect(const Predicate::ConnectionData& data);
+    bool db_connect(const ConnectionData& data);
 
     //! Disconnects from the database
     bool db_disconnect();
@@ -67,7 +67,7 @@ public:
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const QString& statement);
+    bool executeSQL(const EscapedString& statement);
 
     //! Stores last operation's result
     virtual void storeResult();
@@ -89,13 +89,13 @@ public:
 class MysqlCursorData : public MysqlConnectionInternal
 {
 public:
-    MysqlCursorData(Predicate::Connection* connection);
+    MysqlCursorData(Connection* connection);
     virtual ~MysqlCursorData();
 
     MYSQL_RES *mysqlres;
     MYSQL_ROW mysqlrow;
     unsigned long *lengths;
-    unsigned long numRows;
+    qint64 numRows;
 };
 
 }
