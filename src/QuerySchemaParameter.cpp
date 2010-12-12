@@ -93,13 +93,13 @@ QVariant QuerySchemaParameterValueListIterator::getPreviousValue()
     return res;
 }
 
-QString QuerySchemaParameterValueListIterator::getPreviousValueAsString(Field::Type type)
+EscapedString QuerySchemaParameterValueListIterator::getPreviousValueAsString(Field::Type type)
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
         PreWarn << "no prev value";
         return d->driverWeakPointer.toStrongRef()->valueToSQL(type, QVariant()); //"NULL"
     }
-    QString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));
+    EscapedString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));
     --d->paramsItPosition;
     --d->paramsIt;
 // ++d->paramsIt;

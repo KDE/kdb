@@ -183,9 +183,9 @@ QString NArgExpr::debugString() const
     return s;
 }
 
-QString NArgExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString NArgExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
-    QString s;
+    EscapedString s;
     s.reserve(256);
     foreach(BaseExpr* e, list) {
         if (!s.isEmpty())
@@ -272,19 +272,19 @@ QString UnaryExpr::debugString() const
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     if (m_token == '(') //parentheses (special case)
-        return "(" + (m_arg ? m_arg->toString(params) : "<NULL>") + ")";
+        return "(" + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + ")";
     if (m_token < 255 && isprint(m_token))
-        return tokenToDebugString() + (m_arg ? m_arg->toString(params) : "<NULL>");
+        return tokenToDebugString() + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
     if (m_token == NOT)
-        return "NOT " + (m_arg ? m_arg->toString(params) : "<NULL>");
+        return "NOT " + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
     if (m_token == SQL_IS_NULL)
-        return (m_arg ? m_arg->toString(params) : "<NULL>") + " IS NULL";
+        return (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + " IS NULL";
     if (m_token == SQL_IS_NOT_NULL)
-        return (m_arg ? m_arg->toString(params) : "<NULL>") + " IS NOT NULL";
-    return QString("{INVALID_OPERATOR#%1} ").arg(m_token) + (m_arg ? m_arg->toString(params) : "<NULL>");
+        return (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + " IS NOT NULL";
+    return EscapedString("{INVALID_OPERATOR#%1} ").arg(m_token) + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
 }
 
 void UnaryExpr::getQueryParameters(QuerySchemaParameterList& params)
@@ -473,11 +473,12 @@ QString BinaryExpr::tokenToString() const
     return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(m_token);
 }
 
-QString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
 #define INFIX(a) \
-    (m_larg ? m_larg->toString(params) : "<NULL>") + " " + a + " " + (m_rarg ? m_rarg->toString(params) : "<NULL>")
+    (m_larg ? m_larg->toString(params) : EscapedString("<NULL>")) + " " + a + " " + (m_rarg ? m_rarg->toString(params) : EscapedString("<NULL>"))
     return INFIX(tokenToString());
+#undef INFIX
 }
 
 void BinaryExpr::getQueryParameters(QuerySchemaParameterList& params)
@@ -547,29 +548,29 @@ Field::Type ConstExpr::type() const
 
 QString ConstExpr::debugString() const
 {
-    return QLatin1String("ConstExpr('") + tokenToDebugString() + "'," + toString()
+    return QLatin1String("ConstExpr('") + tokenToDebugString() + "'," + toString().toString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString ConstExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString ConstExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
     if (m_token == SQL_NULL)
-        return "NULL";
+        return EscapedString("NULL");
     else if (m_token == CHARACTER_STRING_LITERAL)
 //TODO: better escaping!
-        return "'" + value.toString() + "'";
+        return EscapedString("'") + value.toString() + "'";
     else if (m_token == REAL_CONST)
-        return QString::number(value.toPoint().x()) + "." + QString::number(value.toPoint().y());
+        return EscapedString::number(value.toPoint().x()) + "." + EscapedString::number(value.toPoint().y());
     else if (m_token == DATE_CONST)
-        return "'" + value.toDate().toString(Qt::ISODate) + "'";
+        return EscapedString("'") + value.toDate().toString(Qt::ISODate) + "'";
     else if (m_token == DATETIME_CONST)
-        return "'" + value.toDateTime().date().toString(Qt::ISODate)
+        return EscapedString("'") + EscapedString(value.toDateTime().date().toString(Qt::ISODate))
                + " " + value.toDateTime().time().toString(Qt::ISODate) + "'";
     else if (m_token == TIME_CONST)
-        return "'" + value.toTime().toString(Qt::ISODate) + "'";
+        return EscapedString("'") + value.toTime().toString(Qt::ISODate) + "'";
 
-    return value.toString();
+    return EscapedString(value.toString());
 }
 
 void ConstExpr::getQueryParameters(QuerySchemaParameterList& params)
@@ -624,9 +625,10 @@ QString QueryParameterExpr::debugString() const
            + QString("',type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString QueryParameterExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString QueryParameterExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
-    return params ? params->getPreviousValueAsString(type()) : QString::fromLatin1("[%2]").arg(value.toString());
+    return params ? params->getPreviousValueAsString(type())
+                                : EscapedString("[%1]").arg(EscapedString(value.toString()));
 }
 
 void QueryParameterExpr::getQueryParameters(QuerySchemaParameterList& params)
@@ -678,10 +680,10 @@ QString VariableExpr::debugString() const
            + QString(",type=%1)").arg(field ? Driver::defaultSQLTypeName(type()) : QString("FIELD NOT DEFINED YET"));
 }
 
-QString VariableExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString VariableExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
-    return name;
+    return EscapedString(name);
 }
 
 void VariableExpr::getQueryParameters(QuerySchemaParameterList& params)
@@ -901,9 +903,9 @@ QString FunctionExpr::debugString() const
     return res;
 }
 
-QString FunctionExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString FunctionExpr::toString(QuerySchemaParameterValueListIterator* params) const
 {
-    return name + "(" + (args ? args->toString(params) : QString()) + ")";
+    return name + "(" + (args ? args->toString(params) : EscapedString()) + ")";
 }
 
 void FunctionExpr::getQueryParameters(QuerySchemaParameterList& params)

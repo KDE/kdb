@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002   Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003   Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,13 +27,30 @@
 
 using namespace Predicate;
 
+QVariant RecordData::s_null;
+
 QDebug operator<<(QDebug dbg, const RecordData& data)
 {
-    dbg.nospace() << QString::fromLatin1("RECORD DATA (%1 COLUMNS):").arg(data.size());
-    int i = 0;
-    foreach(const QVariant& value, data) {
-        i++;
-        dbg.space() << QString::fromLatin1("%1:[%2]%3").arg(i).arg(value.typeName()).arg(value.toString());
+    if (data.isEmpty()) {
+        dbg.nospace() << QLatin1String("EMPTY RECORD DATA");
+    }
+    else {
+        dbg.nospace() << QString::fromLatin1("RECORD DATA (%1 COLUMNS):").arg(data.size());
+        for (int i = 0; i < data.size(); i++) {
+            dbg.space()
+                << QString::fromLatin1("%1:[%2]%3").arg(i).arg(data[i].typeName()).arg(data[i].toString());
+        }
     }
     return dbg.space();
+}
+
+void RecordData::clear()
+{
+    if (m_numCols > 0) {
+        for (int i = 0; i < m_numCols; i++)
+            free(m_data[i]);
+        free(m_data);
+        m_data = 0;
+        m_numCols = 0;
+    }
 }

@@ -49,7 +49,7 @@ public:
     TableSchema *table;
     QuerySchema *select;
     Connection *db;
-    QString statement;
+    EscapedString statement;
     ParserError error;
     bool initialized;
 };

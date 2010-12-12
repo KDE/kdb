@@ -68,6 +68,7 @@ PREDICATE_CREATE_SHARED_DATA_CLASSES(
 configure_file(Global.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Global.h )
 
 set(predicate_LIB_SRCS
+   EscapedString.cpp
    Result.cpp
    ConnectionData.cpp
    VersionInfo.cpp
@@ -159,6 +160,7 @@ install( FILES
   DriverManager_p.h
   ${CMAKE_CURRENT_BINARY_DIR}/Result.h
   Error.h
+  EscapedString.h
   Expression.h
   Field.h
   FieldList.h

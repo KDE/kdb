@@ -50,7 +50,7 @@ class AlterTableHandler;
 class PREDICATE_EXPORT ConnectionSqlInterface : public Resultable
 {
     protected:
-        inline void setSql(const QString& sql) {
+        inline void setSql(const EscapedString& sql) {
             m_result.setSql(sql);
         }
 /*        inline QString sql() const {
@@ -356,9 +356,12 @@ public:
      \sa autoCommit() */
     bool setAutoCommit(bool on);
 
-    /*! driver-specific string escaping */
-//js: MOVED TO Driver  virtual QString escapeString(const QString& str) const = 0;
-//  virtual QCString escapeString(const QCString& str) const = 0;
+    /*! Connection-specific string escaping. Default implementation uses driver's escaping.
+     Use EscapedString::isValid() to check if escaping has been performed successfully.
+     Invalid strings are set to null in addition, that is EscapedString::isNull() is true,
+     not just isEmpty().
+    */
+    virtual EscapedString escapeString(const QString& str) const;
 
     /*! Prepares SELECT query described by raw \a statement.
      \return opened cursor created for results of this query
@@ -371,9 +374,9 @@ public:
      resources and return Cursor subclass' object
      (passing \a statement and \a cursor_options to it's constructor).
     */
-    virtual Cursor* prepareQuery(const QString& statement, uint cursor_options = 0) = 0;
+    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0) = 0;
 
-    /*! \overload prepareQuery( const QString& statement = QString(), uint cursor_options = 0)
+    /*! \overload prepareQuery(const EscapedString&, uint)
      Prepares query described by \a query schema. \a params are values of parameters that
      will be inserted into places marked with [] before execution of the query.
 
@@ -385,13 +388,13 @@ public:
     Cursor* prepareQuery(QuerySchema* query, const QList<QVariant>& params,
                          uint cursor_options = 0);
 
-    /*! \overload prepareQuery( QuerySchema* query, const QList<QVariant>& params,
+    /*! \overload prepareQuery(QuerySchema* query, const QList<QVariant>& params,
       uint cursor_options = 0 )
      Prepares query described by \a query schema without parameters.
     */
     virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0) = 0;
 
-    /*! \overload prepareQuery( const QString& statement = QString(), uint cursor_options = 0)
+    /*! \overload prepareQuery(const EscapedString&, uint)
      Statement is build from data provided by \a table schema,
      it is like "select * from table_name".*/
     Cursor* prepareQuery(TableSchema* table, uint cursor_options = 0);
@@ -401,12 +404,12 @@ public:
      or NULL if there was any error on the cursor creation or opening.
      Cursor can have optionally applied \a cursor_options
      (one of more selected from Cursor::Options).
-     Identifiers in \a statement that are the same as keywords in Kexi
-     SQL or the backend's SQL need to have been escaped.
+     Identifiers in \a statement that are the same as keywords
+     in PredicateSQL dialect or the backend's SQL need to have been escaped.
      */
-    Cursor* executeQuery(const QString& statement, uint cursor_options = 0);
+    Cursor* executeQuery(const EscapedString& statement, uint cursor_options = 0);
 
-    /*! \overload executeQuery( const QString& statement, uint cursor_options = 0 )
+    /*! \overload executeQuery(const EscapedString&, uint)
      \a params are values of parameters that
      will be inserted into places marked with [] before execution of the query.
 
@@ -419,7 +422,7 @@ public:
       uint cursor_options = 0 ) */
     Cursor* executeQuery(QuerySchema* query, uint cursor_options = 0);
 
-    /*! \overload executeQuery( const QString& statement, uint cursor_options = 0 )
+    /*! \overload executeQuery(const EscapedString&, uint)
      Executes query described by \a query schema without parameters.
      Statement is build from data provided by \a table schema,
      it is like "select * from table_name".*/
@@ -465,67 +468,67 @@ public:
 //js: MOVED TO Driver  QString valueToSQL( const Field::Type ftype, const QVariant& v ) const;
 //  QString valueToSQL( const Field *field, const QVariant& v ) const;
 
-    /*! Executes \a sql query and stores first record's data inside \a data.
+    /*! Executes \a statement query and stores first record's data inside \a data.
      This is convenient method when we need only first record from query result,
      or when we know that query result has only one record.
      If \a addLimitTo1 is true (the default), adds a LIMIT clause to the query,
-     so \a sql should not include one already.
+     so \a statement should not include one already.
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleRecord(const QString& sql, RecordData* data, bool addLimitTo1 = true);
+    tristate querySingleRecord(const EscapedString& statement, RecordData* data, bool addLimitTo1 = true);
 
-    /*! Like tristate querySingleRecord(const QString& sql, RecordData* data)
+    /*! Like tristate @ref querySingleRecord(const QString&, RecordData*, bool)
      but uses QuerySchema object.
      If \a addLimitTo1 is true (the default), adds a LIMIT clause to the query. */
     tristate querySingleRecord(QuerySchema* query, RecordData* data, bool addLimitTo1 = true);
 
-    /*! Executes \a sql query and stores first record's field's (number \a column) string value
-     inside \a value. For efficiency it's recommended that a query defined by \a sql
+    /*! Executes \a statement query and stores first record's field's (number \a column) string value
+     inside \a value. For efficiency it's recommended that a query defined by \a statement
      should have just one field (SELECT one_field FROM ....).
      If \a addLimitTo1 is true (the default), adds a LIMIT clause to the query,
-     so \a sql should not include one already.
+     so \a statement should not include one already.
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available.
      \sa queryStringList() */
-    tristate querySingleString(const QString& sql, QString* value, uint column = 0,
+    tristate querySingleString(const EscapedString& statement, QString* value, uint column = 0,
                                bool addLimitTo1 = true);
 
-    /*! Convenience function: executes \a sql query and stores first
+    /*! Convenience function: executes \a statement query and stores first
      record's field's (number \a column) value inside \a number. \sa querySingleString().
      Note: "LIMIT 1" is appended to \a sql statement if \a addLimitTo1 is true (the default).
      \return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleNumber(const QString& sql, int* number, uint column = 0,
+    tristate querySingleNumber(const EscapedString& statement, int* number, uint column = 0,
                                bool addLimitTo1 = true);
 
-    /*! Executes \a sql query and stores Nth field's string value of every record
+    /*! Executes \a statement query and stores Nth field's string value of every record
      inside \a list, where N is equal to \a column. The list is initially cleared.
-     For efficiency it's recommended that a query defined by \a sql
+     For efficiency it's recommended that a query defined by \a statement
      should have just one field (SELECT one_field FROM ....).
      \return true if all values were fetched successfuly,
      false on data retrieving failure. Returning empty list can be still a valid result.
      On errors, the list is not cleared, it may contain a few retrieved values. */
-    bool queryStringList(const QString& sql, QStringList* list, uint column = 0);
+    bool queryStringList(const EscapedString& statement, QStringList* list, uint column = 0);
 
-    /*! \return true if there is at least one record returned in \a sql query.
+    /*! \return true if there is at least one record returned in \a statement query.
      Does not fetch any records. \a success will be set to false
      on query execution errors (true otherwise), so you can see a difference between
      "no results" and "query execution error" states.
-     Note: real executed query is: "SELECT 1 FROM (\a sql) LIMIT 1"
+     Note: real executed query is: "SELECT 1 FROM (\a statement) LIMIT 1"
      if \a addLimitTo1 is true (the default). */
-    bool resultExists(const QString& sql, bool* success, bool addLimitTo1 = true);
+    bool resultExists(const EscapedString& statement, bool* success, bool addLimitTo1 = true);
 
     /*! \return true if there is at least one record in \a table. */
     bool isEmpty(TableSchema* table, bool *success);
 
 //! @todo perhaps use quint64 here?
-    /*! \return number of records in \a sql query.
+    /*! \return number of records in \a statement query.
      Does not fetch any records. -1 is returned on query execution errors (>0 otherwise).
-     Note: real executed query is: "SELECT COUNT() FROM (\a sql) LIMIT 1"
+     Note: real executed query is: "SELECT COUNT() FROM (\a statement) LIMIT 1"
      (using querySingleNumber()) */
-    int resultCount(const QString& sql);
+    int resultCount(const EscapedString& statement);
 
-    virtual QString recentSQLString() const;
+    virtual EscapedString recentSQLString() const;
 
     //PROTOTYPE:
 #define A , const QVariant&
@@ -664,7 +667,7 @@ public:
     void setAvailableDatabaseName(const QString& dbName);
 
     /*! Because some engines need to have opened any database before
-     executing administrative sql statements like "create database" or "drop database",
+     executing administrative SQL statements like "create database" or "drop database",
      this method is used to use appropriate, existing database for this connection.
      For file-based db drivers this always return true and does not set @a name
      to any value. For other db drivers: this sets @a name to db name computed
@@ -703,7 +706,7 @@ public:
     /*! Executes query \a statement, but without returning resulting
      records (used mostly for functional queries).
      Only use this method if you really need. */
-    bool executeSQL(const QString& statement);
+    bool executeSQL(const EscapedString& statement);
 
     //! @short options used in selectStatement()
     class PREDICATE_EXPORT SelectStatementOptions
@@ -727,17 +730,18 @@ public:
 
     /*! \return "SELECT ..." statement's string needed for executing query
      defined by \a querySchema and \a params. */
-    QString selectStatement(QuerySchema* querySchema,
-                            const QList<QVariant>& params,
-                            const SelectStatementOptions& options = SelectStatementOptions());
+    EscapedString selectStatement(QuerySchema* querySchema,
+                                  const QList<QVariant>& params,
+                                  const SelectStatementOptions& options = SelectStatementOptions());
 
     /*! \overload QString selectStatement( QuerySchema* querySchema,
       QList<QVariant> params = QList<QVariant>(),
       const SelectStatementOptions& options = SelectStatementOptions() ) const;
      \return "SELECT ..." statement's string needed for executing query
      defined by \a querySchema. */
-    inline QString selectStatement(QuerySchema* querySchema,
-                                   const SelectStatementOptions& options = SelectStatementOptions()) {
+    inline EscapedString selectStatement(QuerySchema* querySchema,
+                                         const SelectStatementOptions& options = SelectStatementOptions())
+    {
         return selectStatement(querySchema, QList<QVariant>(), options);
     }
 
@@ -893,10 +897,14 @@ public:
      be escaped when the called function generates, for example, "USE " +
      escapeIdentifier(database).
 
-     For efficiency, kexi__* system tables and columns therein are not escaped
-     - we assume these are valid identifiers for all drivers.
+     For efficiency, Predicate "system" tables (prefixed with kexi__)
+     and columns therein are not escaped - we assume these are valid identifiers for all drivers.
+
+     Use EscapedString::isValid() to check if escaping has been performed successfully.
+     Invalid strings are set to null in addition, that is EscapedString::isNull() is true,
+     not just isEmpty().
     */
-    virtual QString escapeIdentifier(const QString& id) const {
+    virtual QByteArray escapeIdentifier(const QString& id) const {
         return m_driver->escapeIdentifier(id);
     }
 
@@ -924,10 +932,11 @@ protected:
       \return true on success. */
     virtual bool drv_disconnect() = 0;
 
-    /*! Executes query \a statement, but without returning resulting
+    /*! Executes query @a statement, but without returning resulting
      records (used mostly for functional queries).
+     It is already verified that @a statement is valid (properly escaped).
      Only use this method if you really need. */
-    virtual bool drv_executeSQL(const QString& statement) = 0;
+    virtual bool drv_executeSQL(const EscapedString& statement) = 0;
 
     /*! For reimplementation: loads list of databases' names available for this connection
      and adds these names to \a list. If your server is not able to offer such a list,
@@ -997,7 +1006,7 @@ protected:
      Note: The statement string can be specific for this connection's driver database,
      and thus not reusable in general.
     */
-    QString createTableStatement(const TableSchema& tableSchema) const;
+    EscapedString createTableStatement(const TableSchema& tableSchema) const;
 
     /*! \return "SELECT ..." statement's string needed for executing query
      defined by "select * from table_name" where <i>table_name</i> is \a tableSchema's name.
@@ -1006,8 +1015,8 @@ protected:
      Note: The statement string can be specific for this connection's driver database,
      and thus not reusable in general.
     */
-    QString selectStatement(TableSchema* tableSchema,
-                            const SelectStatementOptions& options = SelectStatementOptions());
+    EscapedString selectStatement(TableSchema* tableSchema,
+                                  const SelectStatementOptions& options = SelectStatementOptions());
 
     /*!
      Creates table named by \a tableSchemaName. Schema object must be on
@@ -1022,10 +1031,11 @@ protected:
 //   (used mostly for SELECT query). */
 //  virtual bool drv_executeQuery( const QString& statement ) = 0;
 
-    /*! \return unique identifier of last inserted record.
+    /*! \return unique identifier of the most recently inserted record.
      Typically this is just primary key value.
      This identifier could be reused when we want to reference
      just inserted record.
+     If there was no insertion recently performed for this connection, 0 is returned.
      Note for driver developers: contact staniek (at) kde.org
      if your engine does not offer this information. */
     virtual quint64 drv_lastInsertRecordId() = 0;
@@ -1224,7 +1234,7 @@ protected:
 
     /*! @internal used by querySingleRecord() methods.
      Note: "LIMIT 1" is appended to \a sql statement if \a addLimitTo1 is true (the default). */
-    tristate querySingleRecordInternal(RecordData* data, const QString* sql,
+    tristate querySingleRecordInternal(RecordData* data, const EscapedString* sql,
                                        QuerySchema* query, bool addLimitTo1 = true);
 
     /*! @internal used by Driver::createConnection().
@@ -1278,8 +1288,9 @@ private:
     //! @internal
     //! @return identifier escaped by driver (if predicateSqlEscaping is false)
     //! or by the Predicate's built-in escape routine. 
-    inline QString escapeIdentifier(const QString& id, EscapingType escapingType) const {
-        return escapingType == PredicateEscaping ? Predicate::escapeIdentifier(id) : escapeIdentifier(id);
+    inline QByteArray escapeIdentifier(const QString& id, EscapingType escapingType) const {
+        return escapingType == PredicateEscaping
+            ? Predicate::escapeIdentifier(id).toUtf8() : escapeIdentifier(id);
     }
 
     ConnectionPrivate* d; //!< @internal d-pointer class.

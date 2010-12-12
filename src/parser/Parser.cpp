@@ -92,7 +92,7 @@ ParserError Parser::error() const
     return d->error;
 }
 
-QString Parser::statement() const
+EscapedString Parser::statement() const
 {
     return d->statement;
 }
@@ -145,7 +145,7 @@ bool Parser::isReservedKeyword(const QByteArray& str)
 }*/
 
 bool
-Parser::parse(const QString &statement)
+Parser::parse(const EscapedString &statement)
 {
     init();
     clear();
@@ -153,7 +153,7 @@ Parser::parse(const QString &statement)
 
     Predicate::Parser *oldParser = parser;
     Predicate::Field *oldField = field;
-    bool res = parseData(this, statement.toUtf8());
+    bool res = parseData(this, statement.toByteArray());
     parser = oldParser;
     field = oldField;
     return res;

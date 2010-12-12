@@ -188,20 +188,20 @@ public:
      This implementation return date, datetime and time values in ISO format,
      what seems to be accepted by SQL servers.
      @see Qt::DateFormat */
-    virtual QString valueToSQL(uint ftype, const QVariant& v) const;
+    virtual EscapedString valueToSQL(uint ftype, const QVariant& v) const;
 
     //! Like above but with the fildtype as string.
-    inline QString valueToSQL(const QString& ftype, const QVariant& v) const {
+    inline EscapedString valueToSQL(const QString& ftype, const QVariant& v) const {
         return valueToSQL(Field::typeForString(ftype), v);
     }
 
     //! Like above method, for \a field.
-    inline QString valueToSQL(const Field *field, const QVariant& v) const {
+    inline EscapedString valueToSQL(const Field *field, const QVariant& v) const {
         return valueToSQL((field ? field->type() : Field::InvalidType), v);
     }
 
     /*! not compatible with all drivers - reimplement */
-    inline virtual QString dateTimeToSQL(const QDateTime& v) const {
+    inline virtual EscapedString dateTimeToSQL(const QDateTime& v) const {
 
         /*! (was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
           Now it's ISO 8601 DateTime format - with "T" delimiter:
@@ -211,32 +211,32 @@ public:
         */
 //old   const QDateTime dt( v.toDateTime() );
 //old   return QString("\'")+dt.date().toString(Qt::ISODate)+" "+dt.time().toString(Qt::ISODate)+"\'";
-        return QString("\'") + v.toString(Qt::ISODate) + "\'";
+        return EscapedString('\'') + v.toString(Qt::ISODate);// + '\'';
     }
 
     /*! Driver-specific SQL string escaping.
      Implement escaping for any character like " or ' as your
      database engine requires. Prepend and append quotation marks.
     */
-    virtual QString escapeString(const QString& str) const = 0;
+    virtual EscapedString escapeString(const QString& str) const = 0;
 
     /*! This is overloaded version of escapeString( const QString& str )
      to be implemented in the same way.
     */
-    virtual QByteArray escapeString(const QByteArray& str) const = 0;
+    virtual EscapedString escapeString(const QByteArray& str) const = 0;
 
     /*! Driver-specific SQL BLOB value escaping.
      Implement escaping for any character like " or ' and \\0 as your
      database engine requires. Prepend and append quotation marks.
     */
-    virtual QString escapeBLOB(const QByteArray& array) const = 0;
+    virtual EscapedString escapeBLOB(const QByteArray& array) const = 0;
 
 //    enum EscapePolicy { EscapeAsNecessary = 0x04, EscapeAlways = 0x08 };
 
     //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
     /*! Escape database identifier (\a str) in order that keywords
        can be used as table names, column names, etc. */
-    inline QString escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
+    inline QByteArray escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
 
     inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
@@ -280,7 +280,7 @@ protected:
      marks characters - it is automatically done by escapeIdentifier() using
      DriverBehaviour::QUOTATION_MARKS_FOR_IDENTIFIER.
     */
-    virtual QString drv_escapeIdentifier(const QString& str) const = 0;
+    virtual QByteArray drv_escapeIdentifier(const QString& str) const = 0;
 
     /*! This is overloaded version of drv_escapeIdentifier( const QString& str )
      to be implemented in the same way.
@@ -316,8 +316,8 @@ protected:
     /* \return SQL statement @a sql modified by adding limiting command,
      (if possible and if @add is true). Used for optimization for the server side.
      Can be reimplemented for other drivers. */
-    inline virtual QString addLimitTo1(const QString& sql, bool add) {
-        return add ? (sql + QString::fromLatin1(" LIMIT 1")) : sql;
+    inline virtual EscapedString addLimitTo1(const EscapedString& sql, bool add) {
+        return add ? (sql + " LIMIT 1") : sql;
     }
 
 protected:

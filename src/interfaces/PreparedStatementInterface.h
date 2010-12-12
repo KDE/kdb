@@ -43,7 +43,7 @@ protected:
         For example sqlite3_prepare() is used for SQLite.
         This is called only when d->dirty == true is encountered on execute(),
         i.e. when attributes of the object (like WHERE field names) change. */
-    virtual bool prepare(const QByteArray& statement) = 0;
+    virtual bool prepare(const EscapedString& statement) = 0;
 
     //! For implementation. Executes the prepared statement using parameters @a parameters. 
     virtual bool execute(

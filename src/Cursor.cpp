@@ -34,14 +34,14 @@ using namespace Predicate;
 
 #warning replace    QPointer<Connection> m_conn;
 
-Cursor::Cursor(Connection* conn, const QString& statement, uint options)
+Cursor::Cursor(Connection* conn, const EscapedString& statement, uint options)
         : m_conn(conn)
         , m_query(0)
         , m_rawStatement(statement)
         , m_options(options)
 {
 #ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(QString("Create cursor: ") + statement);
+    Utils::addKexiDBDebug(QString("Create cursor: ") + statement.toString());
 #endif
     init();
 }
@@ -107,7 +107,7 @@ Cursor::~Cursor()
     if (m_query)
         Utils::addKexiDBDebug(QString("~ Delete cursor for query"));
     else
-        Utils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement);
+        Utils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement.toString());
 #endif
     /* if (!m_query)
         PreDbg << "Cursor::~Cursor() '" << m_rawStatement.toLatin1() << "'";
@@ -134,7 +134,6 @@ bool Cursor::open()
     }
     if (!m_rawStatement.isEmpty()) {
         m_result.setSql(m_rawStatement);
-        //m_conn->setSql(m_rawStatement);
     }
     else {
         if (!m_query) {
@@ -489,11 +488,11 @@ QString Cursor::debugString() const
     QString dbg = "CURSOR( ";
     if (!m_query) {
         dbg += "RAW STATEMENT: '";
-        dbg += m_rawStatement;
+        dbg += m_rawStatement.toString();
         dbg += "'\n";
     } else {
         dbg += "QuerySchema: '";
-        dbg += m_conn->selectStatement(m_query);
+        dbg += m_conn->selectStatement(m_query).toString();
         dbg += "'\n";
     }
     if (isOpened())

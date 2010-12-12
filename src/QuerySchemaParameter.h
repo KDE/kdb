@@ -53,7 +53,7 @@ public:
     QVariant getPreviousValue();
 
     //! \return previous value as string formatted using driver's escaping
-    QString getPreviousValueAsString(Field::Type type);
+    EscapedString getPreviousValueAsString(Field::Type type);
 protected:
     class Private;
     Private * const d;

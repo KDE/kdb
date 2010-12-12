@@ -43,30 +43,30 @@ using namespace Predicate;
 bool Predicate::deleteRecord(Connection* conn, TableSchema *table,
                              const QString &keyname, const QString &keyval)
 {
-    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ")
-        + table->name() + QLatin1String(" WHERE ")
+    return table != 0 && conn->executeSQL(EscapedString("DELETE FROM ")
+        + table->name() + " WHERE "
         + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
 }
 
 bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
                              const QString &keyname, const QString &keyval)
 {
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+    return conn->executeSQL(EscapedString("DELETE FROM ") + tableName + " WHERE "
                            + keyname + '=' + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)));
 }
 
 bool Predicate::deleteRecord(Connection* conn, TableSchema *table,
                              const QString& keyname, int keyval)
 {
-    return table != 0 && conn->executeSQL(QLatin1String("DELETE FROM ")
-        + table->name() + QLatin1String(" WHERE ")
+    return table != 0 && conn->executeSQL(EscapedString("DELETE FROM ")
+        + table->name() + " WHERE "
         + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
 }
 
 bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
                              const QString &keyname, int keyval)
 {
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+    return conn->executeSQL(EscapedString("DELETE FROM ") + tableName + " WHERE "
                            + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
 }
 
@@ -75,9 +75,9 @@ bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
                              const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
                              const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
 {
-    return conn->executeSQL(QLatin1String("DELETE FROM ") + tableName + QLatin1String(" WHERE ")
+    return conn->executeSQL(EscapedString("DELETE FROM ") + tableName + " WHERE "
         + keyname1 + '=' + conn->driver()->valueToSQL(keytype1, keyval1)
-        + QLatin1String(" AND ") + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
+        + " AND " + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
 }
 
 bool Predicate::replaceRecord(Connection* conn, TableSchema *table,
@@ -86,8 +86,8 @@ bool Predicate::replaceRecord(Connection* conn, TableSchema *table,
 {
     if (!table || !Predicate::deleteRecord(conn, table, keyname, keyval))
         return false;
-    return conn->executeSQL(QLatin1String("INSERT INTO ") + table->name()
-                           + QLatin1String(" (") + keyname + ',' + valname + QLatin1String(") VALUES (")
+    return conn->executeSQL(EscapedString("INSERT INTO ") + table->name()
+                           + " (" + keyname + ',' + valname + ") VALUES ("
                            + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)) + ','
                            + conn->driver()->valueToSQL(ftype, val) + ')');
 }
@@ -99,12 +99,12 @@ bool Predicate::isEmptyValue(Field *f, const QVariant &v)
     return v.isNull();
 }
 
-QString Predicate::sqlWhere(Driver *drv, Field::Type t,
-                                       const QString fieldName, const QVariant value)
+EscapedString Predicate::sqlWhere(Driver *drv, Field::Type t,
+                            const QString fieldName, const QVariant value)
 {
     if (value.isNull())
-        return fieldName + QLatin1String(" is NULL");
-    return fieldName + '=' + drv->valueToSQL(t, value);
+        return EscapedString(fieldName) + " is NULL";
+    return EscapedString(fieldName) + '=' + drv->valueToSQL(t, value);
 }
 
 //! Cache
@@ -193,7 +193,7 @@ void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg, Q
     if (!result.serverMessage().isEmpty())
         details += "<p><b>" + QObject::tr("Message from server:") + "</b> " + result.serverMessage();
     if (!result.recentSQLString().isEmpty())
-        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(result.recentSQLString());
+        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
     int serverResultCode;
     QString serverResultName;
     if (result.serverResultCode() != 0) {
@@ -241,8 +241,8 @@ int Predicate::idForObjectName(Connection* conn, const QString& objName, int obj
 {
     RecordData data;
     if (true != conn->querySingleRecord(
-                QString::fromLatin1("SELECT o_id FROM kexi__objects WHERE lower(o_name)='%1' AND o_type=%2")
-                .arg(objName.toLower()).arg(objType), &data))
+                EscapedString("SELECT o_id FROM kexi__objects WHERE lower(o_name)='%1' AND o_type=%2")
+                .arg(EscapedString(objName.toLower()), EscapedString::number(objType)), &data))
         return 0;
     bool ok;
     int id = data[0].toInt(&ok);
@@ -548,11 +548,10 @@ void Predicate::connectionTestDialog(QWidget* parent, const ConnectionData& data
     dlg.exec();
 }
 
-int Predicate::recordCount(Connection* conn, const QString& sql)
+int Predicate::recordCount(Connection* conn, const EscapedString& sql)
 {
     int count = -1; //will be changed only on success of querySingleNumber()
-    QString selectSql(QLatin1String("SELECT COUNT() FROM (") + sql + ')');
-    conn->querySingleNumber(selectSql, &count);
+    conn->querySingleNumber(EscapedString("SELECT COUNT() FROM (") + sql + ')', &count);
     return count;
 }
 
@@ -565,8 +564,8 @@ int Predicate::recordCount(const TableSchema& tableSchema)
     }
     int count = -1; //will be changed only on success of querySingleNumber()
     tableSchema.connection()->querySingleNumber(
-        QLatin1String("SELECT COUNT(*) FROM ")
-        + tableSchema.connection()->driver()->escapeIdentifier(tableSchema.name()),
+        EscapedString("SELECT COUNT(*) FROM ")
+        + tableSchema.connection()->escapeIdentifier(tableSchema.name()),
         &count
     );
     return count;
@@ -581,7 +580,7 @@ int Predicate::recordCount(QuerySchema* querySchema)
     }
     int count = -1; //will be changed only on success of querySingleNumber()
     querySchema->connection()->querySingleNumber(
-        QLatin1String("SELECT COUNT(*) FROM (")
+        EscapedString("SELECT COUNT(*) FROM (")
             + querySchema->connection()->selectStatement(querySchema) + ')',
         &count
     );

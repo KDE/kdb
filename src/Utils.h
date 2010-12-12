@@ -106,8 +106,8 @@ PREDICATE_EXPORT void getHTMLErrorMesage(const Resultable& resultable, ResultInf
 Constructs an sql string like "fielname = value" for specific \a drv driver,
  field type \a t, \a fieldName and \a value. If \a value is null, "fieldname is NULL"
  string is returned. */
-PREDICATE_EXPORT QString sqlWhere(Driver *drv, Field::Type t,
-                                  const QString fieldName, const QVariant value);
+PREDICATE_EXPORT EscapedString sqlWhere(Driver *drv, Field::Type t,
+                                        const QString fieldName, const QVariant value);
 
 /*! \return identifier for object \a objName of type \a objType
  or 0 if such object does not exist. */
@@ -197,7 +197,7 @@ protected:
  For SQL data sources it does not fetch any records, only "COUNT(*)"
  SQL aggregation is used at the backed.
  -1 is returned if error occurred. */
-int recordCount(Connection* conn, const QString& sql);
+int recordCount(Connection* conn, const EscapedString& sql);
 
 //! @todo perhaps use quint64 here?
 /*! \return number of records that can be retrieved from \a tableSchema.
@@ -426,7 +426,7 @@ inline QVariant cstringToVariant(const char* data, Field* f, int length = -1)
 {
     if (!data)
         return QVariant();
-    // from mo st to least frequently used types:
+    // from most to least frequently used types:
 
     if (!f || f->isTextType())
         return QString::fromUtf8(data, length);
@@ -438,7 +438,7 @@ inline QVariant cstringToVariant(const char* data, Field* f, int length = -1)
     if (f->isFPNumericType())
         return QString::fromLatin1(data, length).toDouble();
     if (f->type() == Field::BLOB)
-        return QByteArray::fromRawData(data, length);
+        return QByteArray(data, length);
     // the default
 //! @todo date/time?
     QVariant result(QString::fromUtf8(data, length));

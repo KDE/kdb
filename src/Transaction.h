@@ -30,7 +30,7 @@ class Connection;
 
 /*! Internal prototype for storing Transaction handles for Transaction object.
  Only for driver developers: reimplement this class for driver that
- support Transaction.handles.
+ support Transaction handles.
 */
 class PREDICATE_EXPORT TransactionData
 {
@@ -48,7 +48,7 @@ public:
     uint refcount;
 };
 
-//! This class encapsulates Transaction.handle.
+//! This class encapsulates Transaction handle.
 /*! Transaction handle is sql driver-dependent,
   but outside Transaction is visible as universal container
   for any handler implementation.
@@ -120,7 +120,7 @@ class PREDICATE_EXPORT TransactionGuard
 {
 public:
     /*! Constructor #1: Starts new transaction constructor for \a connection.
-     Started Transaction.handle is available via transaction().*/
+     Started Transaction handle is available via transaction().*/
     explicit TransactionGuard(Connection& conn);
 
     /*! Constructor #2: Uses already started transaction. */

@@ -72,7 +72,8 @@ public:
     /*!
     @getter
     @return host name used for creating remote connections
-    Can be empty if the connection is not remote. If empty, "localhost" is used.
+    Can be IP number. Can be empty if the connection is not remote.
+    If empty, "localhost" is used.
     @setter
     Sets host name used for creating remote connections
     */

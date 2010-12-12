@@ -213,53 +213,52 @@ bool Driver::isSystemFieldName(const QString& n) const
     return drv_isSystemFieldName(n);
 }
 
-QString Driver::valueToSQL(uint ftype, const QVariant& v) const
+EscapedString Driver::valueToSQL(uint ftype, const QVariant& v) const
 {
     if (v.isNull())
-        return QLatin1String("NULL");
+        return EscapedString("NULL");
     switch (ftype) {
     case Field::Text:
     case Field::LongText: {
-        QString s = v.toString();
-        return escapeString(s); //QString("'")+s.replace( '"', "\\\"" ) + "'";
+        return escapeString(v.toString()); //QString("'")+s.replace( '"', "\\\"" ) + "'";
     }
     case Field::Byte:
     case Field::ShortInteger:
     case Field::Integer:
     case Field::BigInteger:
-        return v.toString();
+        return EscapedString(v.toByteArray());
     case Field::Float:
     case Field::Double: {
         if (v.type() == QVariant::String) {
             //workaround for values stored as string that should be casted to floating-point
-            QString s(v.toString());
+            EscapedString s(v.toByteArray());
             return s.replace(',', ".");
         }
-        return v.toString();
+        return EscapedString(v.toByteArray());
     }
 //TODO: here special encoding method needed
     case Field::Boolean:
-        return v.toInt() == 0 ? beh->BOOLEAN_FALSE_LITERAL : beh->BOOLEAN_TRUE_LITERAL;
+        return EscapedString(v.toInt() == 0 ? beh->BOOLEAN_FALSE_LITERAL : beh->BOOLEAN_TRUE_LITERAL);
     case Field::Time:
-        return QString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
+        return EscapedString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
     case Field::Date:
-        return QString('\'') + v.toDate().toString(Qt::ISODate) + '\'';
+        return EscapedString('\'') + v.toDate().toString(Qt::ISODate) + '\'';
     case Field::DateTime:
         return dateTimeToSQL(v.toDateTime());
     case Field::BLOB: {
         if (v.toByteArray().isEmpty())
-            return QLatin1String("NULL");
+            return EscapedString("NULL");
         if (v.type() == QVariant::String)
             return escapeBLOB(v.toString().toUtf8());
         return escapeBLOB(v.toByteArray());
     }
     case Field::InvalidType:
-        return QLatin1String("!INVALIDTYPE!");
+        return EscapedString("!INVALIDTYPE!");
     default:
-        PreDbg << QLatin1String("UNKNOWN!");
-        return QString();
+        PreDbg << EscapedString("UNKNOWN!");
+        return EscapedString();
     }
-    return QString();
+    return EscapedString();
 }
 
 QVariant Driver::propertyValue(const QByteArray& propName) const

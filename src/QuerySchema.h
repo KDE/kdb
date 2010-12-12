@@ -21,10 +21,7 @@
 #define PREDICATE_QUERY_H
 
 #include <QVector>
-#include <QString>
 #include <QHash>
-#include <QList>
-#include <QByteArray>
 
 #include <Predicate/FieldList.h>
 #include <Predicate/Object.h>
@@ -155,9 +152,9 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    QString toSQLString(bool includeTableName = true,
-                        Connection *conn = 0,
-                        Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
+    EscapedString toSQLString(bool includeTableName = true,
+                              Connection *conn = 0,
+                              Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
 protected:
     //! Column to sort
@@ -267,9 +264,9 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    QString toSQLString(bool includeTableNames = true,
-                        Connection *conn = 0,
-                        Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
+    EscapedString toSQLString(bool includeTableNames = true,
+                              Connection *conn = 0,
+                              Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 };
 
 //! @short Predicate::QuerySchema provides information about database query
@@ -749,10 +746,10 @@ public:
     QueryColumnInfo::List* autoIncrementFields() const;
 
     /*! \return a preset statement (if any). */
-    QString statement() const;
+    EscapedString statement() const;
 
     /*! Forces a query statement (i.e. no statement is composed from QuerySchema's content) */
-    void setStatement(const QString &s);
+    void setStatement(const EscapedString& statement);
 
     /*! \return a string that is a result of concatenating all column names
      for \a infolist, with "," between each one.
@@ -766,12 +763,12 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    static QString sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn = 0,
+    static EscapedString sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn = 0,
         Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
     /*! \return cached sql list created using sqlColumnsList() on a list returned
      by autoIncrementFields(). */
-    QString autoIncrementSQLFieldsList(Connection *conn) const;
+    EscapedString autoIncrementSQLFieldsList(Connection *conn) const;
 
     /*! Sets a WHERE expression \a exp. It will be owned by this query,
      so you can forget about it. Previously set WHERE expression will be deleted.

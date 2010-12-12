@@ -21,8 +21,8 @@
 #ifndef PREDICATE_RESULT_H
 #define PREDICATE_RESULT_H
 
-#include <QtCore/QString>
 #include <Predicate/Error.h>
+#include <Predicate/EscapedString.h>
 
 namespace Predicate
 {
@@ -75,9 +75,9 @@ public:
     */
     data_member QString messageTitle;
 
-    data_member QString errorSql;
+    data_member EscapedString errorSql;
 
-    data_member QString sql;
+    data_member EscapedString sql;
 
     /*!
     @getter
@@ -124,7 +124,7 @@ public:
     /*! @return sql string of actually executed SQL statement,
      usually using drv_executeSQL(). If there was error during executing SQL statement,
      before, that string is returned instead. */
-    virtual QString recentSQLString() const {
+    virtual EscapedString recentSQLString() const {
         return d->errorSql;
     }
 

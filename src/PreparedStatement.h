@@ -147,9 +147,9 @@ protected:
 
 private:
 //! @todo is this portable across backends?
-    bool generateStatementString(QByteArray* s);
-    bool generateSelectStatementString(QByteArray* s);
-    bool generateInsertStatementString(QByteArray* s);
+    bool generateStatementString(EscapedString* s);
+    bool generateSelectStatementString(EscapedString * s);
+    bool generateInsertStatementString(EscapedString * s);
 
     QSharedDataPointer<Data> d;
 };

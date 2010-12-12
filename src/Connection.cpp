@@ -681,7 +681,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
     if (!setupPredicateSystemSchema())
         return false;
 
-    if (kexiCompatible && my_dbName.toLower() != anyAvailableDatabaseName().toLower()) {
+    if (kexiCompatible && my_dbName.compare(anyAvailableDatabaseName(), Qt::CaseInsensitive) != 0) {
         //-get global database information
         bool ok;
 //  static QString notfound_str = QObject::tr("\"%1\" database property not found");
@@ -693,13 +693,13 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
             return false;
         d->databaseVersion.setMajor(major);
         /*  if (true!=querySingleNumber(
-              "select db_value from kexi__db where db_property=" + m_driver->escapeString(QString("predicate_major_ver")), num)) {
+              "select db_value from kexi__db where db_property=" + escapeString(QString("predicate_major_ver")), num)) {
               d->errorInvalidDBContents(notfound_str.arg("predicate_major_ver"));
               return false;
             }*/
         d->databaseVersion.setMinor(minor);
         /*  if (true!=querySingleNumber(
-              "select db_value from kexi__db where db_property=" + m_driver->escapeString(QString("predicate_minor_ver")), num)) {
+              "select db_value from kexi__db where db_property=" + escapeString(QString("predicate_minor_ver")), num)) {
               d->errorInvalidDBContents(notfound_str.arg("predicate_minor_ver"));
               return false;
             }*/
@@ -865,11 +865,12 @@ QStringList Connection::objectNames(int objType, bool* ok)
         return list;
     }
 
-    QString sql;
+    EscapedString sql;
     if (objType == Predicate::AnyObjectType)
-        sql = QLatin1String("SELECT o_name FROM kexi__objects ORDER BY o_id");
+        sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
     else
-        sql = QString::fromLatin1("SELECT o_name FROM kexi__objects WHERE o_type=%1 ORDER BY o_id").arg(objType);
+        sql = "SELECT o_name FROM kexi__objects WHERE o_type=" + QByteArray::number(objType)
+              + " ORDER BY o_id";
 
     Cursor *c = executeQuery(sql);
     if (!c) {
@@ -955,11 +956,12 @@ QList<int> Connection::objectIds(int objType)
     if (!checkIsDatabaseUsed())
         return list;
 
-    QString sql;
+    EscapedString sql;
     if (objType == Predicate::AnyObjectType)
-        sql = QLatin1String("SELECT o_id, o_name FROM kexi__objects ORDER BY o_id");
+        sql = "SELECT o_id, o_name FROM kexi__objects ORDER BY o_id";
     else
-        sql = QString::fromLatin1("SELECT o_id, o_name FROM kexi__objects WHERE o_type=%1 ORDER BY o_id").arg(objType);
+        sql = "SELECT o_id, o_name FROM kexi__objects WHERE o_type=" + QByteArray::number(objType)
+              + " ORDER BY o_id";
     
     Cursor *c = executeQuery(sql);
     if (!c)
@@ -974,10 +976,10 @@ QList<int> Connection::objectIds(int objType)
     return list;
 }
 
-QString Connection::createTableStatement(const TableSchema& tableSchema) const
+EscapedString Connection::createTableStatement(const TableSchema& tableSchema) const
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
     sql = "CREATE TABLE " + escapeIdentifier(tableSchema.name()) + " (";
     bool first = true;
@@ -986,7 +988,7 @@ QString Connection::createTableStatement(const TableSchema& tableSchema) const
             first = false;
         else
             sql += ", ";
-        QString v = escapeIdentifier(field->name()) + " ";
+        EscapedString v = EscapedString(escapeIdentifier(field->name())) + " ";
         const bool autoinc = field->isAutoIncrement();
         const bool pk = field->isPrimaryKey() || (autoinc && m_driver->beh->AUTO_INCREMENT_REQUIRES_PK);
 //TODO: warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
@@ -1025,9 +1027,9 @@ QString Connection::createTableStatement(const TableSchema& tableSchema) const
             if (!autoinc && !pk && field->isNotNull())
                 v += " NOT NULL"; //only add not null option if no autocommit is set
             if (field->defaultValue().isValid()) {
-                QString valToSQL(m_driver->valueToSQL(field, field->defaultValue()));
+                EscapedString valToSQL(m_driver->valueToSQL(field, field->defaultValue()));
                 if (!valToSQL.isEmpty()) //for sanity
-                    v += QLatin1String(" DEFAULT ") + valToSQL;
+                    v += " DEFAULT " + valToSQL;
             }
         }
         sql += v;
@@ -1053,7 +1055,7 @@ QString Connection::createTableStatement(const TableSchema& tableSchema) const
             return false;                                      \
         \
         bool res = executeSQL(                                      \
-                   QLatin1String("INSERT INTO ") + escapeIdentifier(tableSchema->name()) \
+                   "INSERT INTO " + escapeIdentifier(tableSchema->name()) \
                    + " (" + tableSchema->sqlFieldsList(this) + ") VALUES (" + vals + ')'      \
                              ); \
         \
@@ -1085,7 +1087,7 @@ C_INS_REC_ALL
 #define C_INS_REC(args, vals) \
     bool Connection::insertRecord(FieldList* fields args) \
     { \
-        QString value; \
+        EscapedString value; \
         const Field::List *flist = fields->fields(); \
         QListIterator<Field*> it(*flist); \
         vals \
@@ -1094,7 +1096,7 @@ C_INS_REC_ALL
         if ( !drv_beforeInsert( tableName, fields ) )            \
             return false;                                       \
         bool res = executeSQL(                                  \
-                   QLatin1String("INSERT INTO ") + escapeIdentifier(tableName) \
+                   "INSERT INTO " + escapeIdentifier(tableName) \
                    + '(' + fields->sqlFieldsList(this) + ") VALUES (" + value + ')' \
                              ); \
         if ( !drv_afterInsert( tableName, fields ) )    \
@@ -1117,11 +1119,11 @@ bool Connection::insertRecord(TableSchema* tableSchema, const QList<QVariant>& v
     Field::ListIterator fieldsIt(fields->constBegin());
     Field *f = *fieldsIt;
     QList<QVariant>::ConstIterator it = values.constBegin();
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
     while (f && (it != values.end())) {
         if (sql.isEmpty()) {
-            sql = QLatin1String("INSERT INTO ") + escapeIdentifier(tableSchema->name()) +
+            sql = "INSERT INTO " + escapeIdentifier(tableSchema->name()) +
                   " VALUES (";
         }
         else {
@@ -1153,13 +1155,13 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
     Field *f = *fieldsIt;
     if (!f)
         return false;
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
     QList<QVariant>::ConstIterator it = values.constBegin();
-    QString tableName = escapeIdentifier(flist->first()->table()->name());
+    QByteArray tableName = escapeIdentifier(flist->first()->table()->name());
     while (f && (it != values.constEnd())) {
         if (sql.isEmpty()) {
-            sql = QLatin1String("INSERT INTO ") + tableName + '(' +
+            sql = "INSERT INTO " + tableName + '(' +
                   fields->sqlFieldsList(this) + ") VALUES (";
         }
         else {
@@ -1183,8 +1185,13 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
     return res;
 }
 
-bool Connection::executeSQL(const QString& statement)
+bool Connection::executeSQL(const EscapedString& statement)
 {
+    if (!statement.isValid()) {
+        m_result = Result(ERR_SQL_EXECUTION_ERROR,
+                          QObject::tr("SQL statement for execution is invalid (empty)."));
+        return false;
+    }
     m_result.setSql(statement); //remember for Error.handling
     if (!drv_executeSQL(statement)) {
         m_result.setMessage(QString()); //clear as this could be most probably just "Unknown error" string.
@@ -1195,7 +1202,7 @@ bool Connection::executeSQL(const QString& statement)
     return true;
 }
 
-QString Connection::selectStatement(QuerySchema* querySchema,
+EscapedString Connection::selectStatement(QuerySchema* querySchema,
                                     const QList<QVariant>& params,
                                     const SelectStatementOptions& options)
 {
@@ -1223,25 +1230,24 @@ QString Connection::selectStatement(QuerySchema* querySchema,
         }
     }
 
-    QString sql; //final sql string
+    EscapedString sql; //final sql string
     sql.reserve(4096);
 //unused QString s_from_additional; //additional tables list needed for lookup fields
-    QString s_additional_joins; //additional joins needed for lookup fields
-    QString s_additional_fields; //additional fields to append to the fields list
+    EscapedString s_additional_joins; //additional joins needed for lookup fields
+    EscapedString s_additional_fields; //additional fields to append to the fields list
     uint internalUniqueTableAliasNumber = 0; //used to build internalUniqueTableAliases
     uint internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
     number = 0;
     QList<QuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
-    QString predicate_subquery_prefix("__predicate_subquery_");
+    QByteArray predicate_subquery_prefix("__predicate_subquery_");
     foreach(Field *f, *querySchema->fields()) {
         if (querySchema->isColumnVisible(number)) {
             if (!sql.isEmpty())
-                sql += QLatin1String(", ");
+                sql += ", ";
 
             if (f->isQueryAsterisk()) {
                 if (!singleTable && static_cast<QueryAsterisk*>(f)->isSingleTableAsterisk()) //single-table *
-                    sql += escapeIdentifier(f->table()->name(), options.escapingType) +
-                           QLatin1String(".*");
+                    sql += escapeIdentifier(f->table()->name(), options.escapingType) + ".*";
                 else //all-tables * (or simplified table.* when there's only one table)
                     sql += '*';
             } else {
@@ -1249,7 +1255,7 @@ QString Connection::selectStatement(QuerySchema* querySchema,
                     sql += f->expression()->toString();
                 } else {
                     if (!f->table()) //sanity check
-                        return QString();
+                        return EscapedString();
 
                     QString tableName;
                     int tablePosition = querySchema->tableBoundToColumn(number);
@@ -1265,7 +1271,7 @@ QString Connection::selectStatement(QuerySchema* querySchema,
                 }
                 QString aliasString(querySchema->columnAlias(number));
                 if (!aliasString.isEmpty())
-                    sql += (QLatin1String(" AS ") + aliasString);
+                    sql += (" AS " + aliasString);
 //! @todo add option that allows to omit "AS" keyword
             }
             LookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns && f->table())
@@ -1286,17 +1292,17 @@ QString Connection::selectStatement(QuerySchema* querySchema,
                             && (boundField = lookupTable->field(lookupFieldSchema->boundColumn()))) {
                         //add LEFT OUTER JOIN
                         if (!s_additional_joins.isEmpty())
-                            s_additional_joins += QLatin1String(" ");
+                            s_additional_joins += " ";
                         QString internalUniqueTableAlias(
-                            QLatin1String("__predicate_") + lookupTable->name() + '_'
+                            "__predicate_" + lookupTable->name() + '_'
                             + QString::number(internalUniqueTableAliasNumber++));
-                        s_additional_joins += QString::fromLatin1("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
-                            .arg(escapeIdentifier(lookupTable->name(), options.escapingType),
-                                 internalUniqueTableAlias,
-                                 escapeIdentifier(f->table()->name(), options.escapingType),
-                                 escapeIdentifier(f->name(), options.escapingType),
-                                 internalUniqueTableAlias,
-                                 escapeIdentifier(boundField->name(), options.escapingType));
+                        s_additional_joins += EscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
+                            .arg(EscapedString(escapeIdentifier(lookupTable->name(), options.escapingType)),
+                                 EscapedString(internalUniqueTableAlias),
+                                 EscapedString(escapeIdentifier(f->table()->name(), options.escapingType)),
+                                 EscapedString(escapeIdentifier(f->name(), options.escapingType)),
+                                 EscapedString(internalUniqueTableAlias),
+                                 EscapedString(escapeIdentifier(boundField->name(), options.escapingType)));
 
                         //add visibleField to the list of SELECTed fields //if it is not yet present there
 //not needed      if (!querySchema.findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
@@ -1311,61 +1317,62 @@ QString Connection::selectStatement(QuerySchema* querySchema,
                         }
 #endif
                         if (!s_additional_fields.isEmpty())
-                            s_additional_fields += QLatin1String(", ");
+                            s_additional_fields += ", ";
 //       s_additional_fields += (internalUniqueTableAlias + "." //escapeIdentifier(visibleField->table()->name(), options.predicateSqlEscaping) + "."
 //         escapeIdentifier(visibleField->name(), options.predicateSqlEscaping));
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         s_additional_fields += visibleColumns->sqlFieldsList(
-                                                   this, " || ' ' || ", internalUniqueTableAlias, options.escapingType);
+                                                   this, " || ' ' || ", internalUniqueTableAlias,
+                                                   options.escapingType);
                     }
                     delete visibleColumns;
                 } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
                     QuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
                     if (!lookupQuery) {
                         PreWarn << "!lookupQuery";
-                        return QString();
+                        return EscapedString();
                     }
                     const QueryColumnInfo::Vector fieldsExpanded(lookupQuery->fieldsExpanded());
                     if (lookupFieldSchema->boundColumn() >= fieldsExpanded.count()) {
                         PreWarn << "(uint)lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
-                        return QString();
+                        return EscapedString();
                     }
                     QueryColumnInfo *boundColumnInfo = fieldsExpanded.at(lookupFieldSchema->boundColumn());
                     if (!boundColumnInfo) {
                         PreWarn << "!boundColumnInfo";
-                        return QString();
+                        return EscapedString();
                     }
                     Field *boundField = boundColumnInfo->field;
                     if (!boundField) {
                         PreWarn << "!boundField";
-                        return QString();
+                        return EscapedString();
                     }
                     //add LEFT OUTER JOIN
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
                     QString internalUniqueQueryAlias(
                         predicate_subquery_prefix + lookupQuery->name() + '_'
-                        + QString::number(internalUniqueQueryAliasNumber++));
-                    s_additional_joins += QString::fromLatin1("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
+                        + QByteArray::number(internalUniqueQueryAliasNumber++));
+                    s_additional_joins += EscapedString("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
                         .arg(selectStatement(lookupQuery, params, options),
-                             internalUniqueQueryAlias,
-                             escapeIdentifier(f->table()->name(), options.escapingType),
-                             escapeIdentifier(f->name(), options.escapingType),
-                             internalUniqueQueryAlias,
-                             escapeIdentifier(boundColumnInfo->aliasOrName(), options.escapingType));
+                             EscapedString(internalUniqueQueryAlias),
+                             EscapedString(escapeIdentifier(f->table()->name(), options.escapingType)),
+                             EscapedString(escapeIdentifier(f->name(), options.escapingType)),
+                             EscapedString(internalUniqueQueryAlias),
+                             EscapedString(escapeIdentifier(boundColumnInfo->aliasOrName(), options.escapingType)));
 
                     if (!s_additional_fields.isEmpty())
-                        s_additional_fields += QLatin1String(", ");
+                        s_additional_fields += ", ";
                     const QList<uint> visibleColumns(lookupFieldSchema->visibleColumns());
-                    QString expression;
+                    EscapedString expression;
                     foreach(uint visibleColumnIndex, visibleColumns) {
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         if ((uint)fieldsExpanded.count() <= visibleColumnIndex) {
                             PreWarn << "fieldsExpanded.count() <= (*visibleColumnsIt) : "
                             << fieldsExpanded.count() << " <= " << visibleColumnIndex;
-                            return QString();
+                            return EscapedString();
                         }
                         if (!expression.isEmpty())
                             expression += " || ' ' || ";
@@ -1379,7 +1386,7 @@ QString Connection::selectStatement(QuerySchema* querySchema,
 //subqueries_for_lookup_data.append(lookupQuery);
                 } else {
                     PreWarn << "unsupported record source type" << recordSource.typeName();
-                    return QString();
+                    return EscapedString();
                 }
             }
         }
@@ -1388,32 +1395,32 @@ QString Connection::selectStatement(QuerySchema* querySchema,
 
     //add lookup fields
     if (!s_additional_fields.isEmpty())
-        sql += (QLatin1String(", ") + s_additional_fields);
+        sql += (", " + s_additional_fields);
 
     if (options.alsoRetrieveRecordId) { //append rowid column
-        QString s;
+        EscapedString s;
         if (!sql.isEmpty())
-            s = QLatin1String(", ");
+            s = ", ";
         if (querySchema->masterTable())
             s += (escapeIdentifier(querySchema->masterTable()->name()) + '.');
         s += m_driver->beh->ROW_ID_FIELD_NAME;
         sql += s;
     }
 
-    sql.prepend(QLatin1String("SELECT "));
+    sql.prepend("SELECT ");
     TableSchema::List* tables = querySchema->tables();
     if ((tables && !tables->isEmpty()) || !subqueries_for_lookup_data.isEmpty()) {
-        sql += QLatin1String(" FROM ");
-        QString s_from;
+        sql += " FROM ";
+        EscapedString s_from;
         if (tables) {
             number = 0;
             foreach(TableSchema *table, *tables) {
                 if (!s_from.isEmpty())
-                    s_from += QLatin1String(", ");
+                    s_from += ", ";
                 s_from += escapeIdentifier(table->name(), options.escapingType);
-                QString aliasString = QString(querySchema->tableAlias(number));
+                QByteArray aliasString = querySchema->tableAlias(number);
                 if (!aliasString.isEmpty())
-                    s_from += (QLatin1String(" AS ") + aliasString);
+                    s_from += (" AS " + aliasString);
                 number++;
             }
             /*unused if (!s_from_additional.isEmpty()) {//additional tables list needed for lookup fields
@@ -1426,15 +1433,15 @@ QString Connection::selectStatement(QuerySchema* querySchema,
         uint subqueries_for_lookup_data_counter = 0;
         foreach(QuerySchema* subQuery, subqueries_for_lookup_data) {
             if (!s_from.isEmpty())
-                s_from += QLatin1String(", ");
+                s_from += ", ";
             s_from += '(';
             s_from += selectStatement(subQuery, params, options);
-            s_from += QString::fromLatin1(") AS %1%2")
-                      .arg(predicate_subquery_prefix, subqueries_for_lookup_data_counter++);
+            s_from += (") AS " + predicate_subquery_prefix
+                       + EscapedString::number(subqueries_for_lookup_data_counter++));
         }
         sql += s_from;
     }
-    QString s_where;
+    EscapedString s_where;
     s_where.reserve(4096);
 
     //JOINS
@@ -1450,16 +1457,16 @@ QString Connection::selectStatement(QuerySchema* querySchema,
         if (s_where.isEmpty()) {
             wasWhere = true;
         } else
-            s_where += QLatin1String(" AND ");
-        QString s_where_sub;
+            s_where += " AND ";
+        EscapedString s_where_sub;
         foreach(Field::Pair pair, *rel->fieldPairs()) {
             if (!s_where_sub.isEmpty())
-                s_where_sub += QLatin1String(" AND ");
+                s_where_sub += " AND ";
             s_where_sub += (
                                escapeIdentifier(pair.first->table()->name(), options.escapingType) +
                                '.' +
                                escapeIdentifier(pair.first->name(), options.escapingType) +
-                               QLatin1String(" = ")  +
+                               " = " +
                                escapeIdentifier(pair.second->table()->name(), options.escapingType) +
                                '.' +
                                escapeIdentifier(pair.second->name(), options.escapingType));
@@ -1483,12 +1490,12 @@ QString Connection::selectStatement(QuerySchema* querySchema,
         }
     }
     if (!s_where.isEmpty())
-        sql += QLatin1String(" WHERE ") + s_where;
+        sql += " WHERE " + s_where;
 //! \todo (js) add other sql parts
     //(use wasWhere here)
 
     // ORDER BY
-    QString orderByString(
+    EscapedString orderByString(
         querySchema->orderByColumnList().toSQLString(
             !singleTable/*includeTableName*/, this, options.escapingType)
     );
@@ -1518,8 +1525,8 @@ QString Connection::selectStatement(QuerySchema* querySchema,
     return sql;
 }
 
-QString Connection::selectStatement(TableSchema* tableSchema,
-                                    const SelectStatementOptions& options)
+EscapedString Connection::selectStatement(TableSchema* tableSchema,
+                                          const SelectStatementOptions& options)
 {
     return selectStatement(tableSchema->query(), options);
 }
@@ -1544,10 +1551,10 @@ quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName, const Q
     }
     RecordData rdata;
     if (foundRecordId <= 0 || true != querySingleRecord(
-                  QLatin1String("SELECT ") + tableName + '.' + aiFieldName
-                + QLatin1String(" FROM ") + tableName
-                + QLatin1String(" WHERE ") + m_driver->beh->ROW_ID_FIELD_NAME
-                + '=' + QString::number(foundRecordId), &rdata))
+                  "SELECT " + tableName + '.' + aiFieldName
+                + " FROM " + tableName
+                + " WHERE " + m_driver->beh->ROW_ID_FIELD_NAME
+                + '=' + EscapedString::number(foundRecordId), &rdata))
     {
 //  PreDbg << "foundRecordId<=0 || true!=querySingleRecord()";
         return (quint64) - 1; //ULL;
@@ -1614,9 +1621,9 @@ bool Connection::storeMainFieldSchema(Field *field)
     buildValuesForKexi__Fields(vals, field);
     QList<QVariant>::ConstIterator valsIt = vals.constBegin();
     bool first = true;
-    QString sql = "UPDATE kexi__fields SET ";
+    EscapedString sql("UPDATE kexi__fields SET ");
     foreach(Field *f, *fl->fields()) {
-        sql.append((first ? QString() : QLatin1String(", ")) +
+        sql.append((first ? "" : ", ") +
                    f->name() + '=' + m_driver->valueToSQL(f, *valsIt));
         if (first)
             first = false;
@@ -1624,8 +1631,9 @@ bool Connection::storeMainFieldSchema(Field *field)
     }
     delete fl;
 
-    sql.append(QLatin1String(" WHERE t_id=") + QString::number(field->table()->id())
-               + " AND f_name=" + m_driver->valueToSQL(Field::Text, field->name()));
+    sql.append(EscapedString(" WHERE t_id=%1 AND f_name=%2")
+                .arg(EscapedString::number(field->table()->id()),
+                     m_driver->valueToSQL(Field::Text, field->name())));
     return executeSQL(sql);
 }
 
@@ -1790,7 +1798,7 @@ bool Connection::removeObject(uint objId)
 
 bool Connection::drv_dropTable(const QString& name)
 {
-    return executeSQL( QLatin1String("DROP TABLE ") + escapeIdentifier(name) );
+    return executeSQL(EscapedString("DROP TABLE ") + escapeIdentifier(name));
 }
 
 //! Drops a table corresponding to the name in the given schema
@@ -1950,12 +1958,12 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
 
         // the new table owns the previous table's id:
         if (!executeSQL(
-                    QString::fromLatin1("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
-                    .arg(origID, tableSchema->id(), (int)TableObjectType)))
+                    EscapedString("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
+                    .arg(origID).arg(tableSchema->id()).arg((int)TableObjectType)))
         {
             return false;
         }
-        if (!executeSQL(QString::fromLatin1("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
+        if (!executeSQL(EscapedString("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
                         .arg(origID, tableSchema->id()))) {
             return false;
         }
@@ -1972,8 +1980,8 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
 
     // Update kexi__objects
     //TODO
-    if (!executeSQL(QString::fromLatin1("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
-                    .arg(m_driver->escapeString(tableSchema->name()), tableSchema->id()))) {
+    if (!executeSQL(EscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
+                    .arg(escapeString(tableSchema->name()), tableSchema->id()))) {
         alterTableName_ERR;
         return false;
     }
@@ -1997,8 +2005,10 @@ bool Connection::drv_alterTableName(TableSchema* tableSchema, const QString& new
     const QString oldTableName = tableSchema->name();
     tableSchema->setName(newName);
 
-    if (!executeSQL(QString::fromLatin1("ALTER TABLE %1 RENAME TO %2")
-                    .arg(escapeIdentifier(oldTableName), escapeIdentifier(newName)))) {
+    if (!executeSQL(EscapedString("ALTER TABLE %1 RENAME TO %2")
+                    .arg(EscapedString(escapeIdentifier(oldTableName)),
+                         EscapedString(escapeIdentifier(newName)))))
+    {
         tableSchema->setName(oldTableName); //restore old name
         return false;
     }
@@ -2051,7 +2061,7 @@ bool Connection::dropQuery(const QString& query)
 
 bool Connection::drv_createTable(const TableSchema& tableSchema)
 {
-    const QString sql( createTableStatement(tableSchema) );
+    const EscapedString sql( createTableStatement(tableSchema) );
     PreDbg << "******** " << sql;
     return executeSQL(sql);
 }
@@ -2279,20 +2289,19 @@ bool Connection::setAutoCommit(bool on)
 
 TransactionData* Connection::drv_beginTransaction()
 {
-    //QString old_sql = d->sql; //don't
-    if (!executeSQL("BEGIN"))
+    if (!executeSQL(EscapedString("BEGIN")))
         return 0;
     return new TransactionData(this);
 }
 
 bool Connection::drv_commitTransaction(TransactionData *)
 {
-    return executeSQL("COMMIT");
+    return executeSQL(EscapedString("COMMIT"));
 }
 
 bool Connection::drv_rollbackTransaction(TransactionData *)
 {
-    return executeSQL("ROLLBACK");
+    return executeSQL(EscapedString("ROLLBACK"));
 }
 
 bool Connection::drv_setAutoCommit(bool /*on*/)
@@ -2300,7 +2309,7 @@ bool Connection::drv_setAutoCommit(bool /*on*/)
     return true;
 }
 
-Cursor* Connection::executeQuery(const QString& statement, uint cursor_options)
+Cursor* Connection::executeQuery(const EscapedString& statement, uint cursor_options)
 {
     if (statement.isEmpty())
         return 0;
@@ -2402,21 +2411,28 @@ bool Connection::setupObjectData(const RecordData &data, Object *object)
 tristate Connection::loadObjectData(int id, Object* object)
 {
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1(
-                                      "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(id), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
+                          .arg(id),
+            &data))
+    {
         return cancelled;
+    }
     return setupObjectData(data, object);
 }
 
 tristate Connection::loadObjectData(int type, const QString& name, Object* object)
 {
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1("SELECT o_id, o_type, o_name, o_caption, o_desc "
-                                  "FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
-                                  .arg(QString::number(type),
-                                       m_driver->valueToSQL(Field::Text, name.toLower())), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
+                          "FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
+                          .arg(EscapedString::number(type),
+                                       m_driver->valueToSQL(Field::Text, name.toLower())),
+            &data))
+    {
         return cancelled;
+    }
     return setupObjectData(data, object);
 }
 
@@ -2427,11 +2443,11 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
         return false;
     if (newObject) {
         int existingID;
-        if (true == querySingleNumber(QString::fromLatin1(
-                                          "SELECT o_id FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
-                                          .arg(QString::number(object->type()),
-                                      m_driver->valueToSQL(Field::Text, object->name().toLower())),
-                                      &existingID))
+        if (true == querySingleNumber(
+                EscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
+                              .arg(EscapedString::number(object->type()),
+                                   m_driver->valueToSQL(Field::Text, object->name().toLower())),
+            &existingID))
         {
             //we already have stored a schema data with the same name and type:
             //just update it's properties as it would be existing object
@@ -2475,8 +2491,8 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
     }
     //existing object:
     return executeSQL(
-               QString::fromLatin1("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
-               .arg(QString::number(object->id()), QString::number(object->type()),
+               EscapedString("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
+               .arg(EscapedString::number(object->id()), EscapedString::number(object->type()),
                     m_driver->valueToSQL(Field::Text, object->caption()),
                     m_driver->valueToSQL(Field::Text, object->description())));
 }
@@ -2491,8 +2507,8 @@ bool Connection::storeNewObjectData(Object* object)
     return storeObjectDataInternal(object, true);
 }
 
-tristate Connection::querySingleRecordInternal(RecordData* data, const QString* sql, QuerySchema* query,
-                                               bool addLimitTo1)
+tristate Connection::querySingleRecordInternal(RecordData* data, const EscapedString* sql,
+                                               QuerySchema* query, bool addLimitTo1)
 {
     Q_ASSERT(sql || query);
 //! @todo does not work with non-SQL data sources
@@ -2508,7 +2524,8 @@ tristate Connection::querySingleRecordInternal(RecordData* data, const QString* 
             || !cursor->storeCurrentRecord(data))
     {
         const tristate result = cursor->result().isError() ? false : cancelled;
-        PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) m_result.sql()=" << m_result.sql();
+        PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
+                   "m_result.sql()=" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
         return result;
@@ -2516,7 +2533,7 @@ tristate Connection::querySingleRecordInternal(RecordData* data, const QString* 
     return deleteCursor(cursor);
 }
 
-tristate Connection::querySingleRecord(const QString& sql, RecordData* data, bool addLimitTo1)
+tristate Connection::querySingleRecord(const EscapedString& sql, RecordData* data, bool addLimitTo1)
 {
     return querySingleRecordInternal(data, &sql, 0, addLimitTo1);
 }
@@ -2535,7 +2552,7 @@ bool Connection::checkIfColumnExists(Cursor *cursor, uint column)
     return true;
 }
 
-tristate Connection::querySingleString(const QString& sql, QString* value, uint column, bool addLimitTo1)
+tristate Connection::querySingleString(const EscapedString& sql, QString* value, uint column, bool addLimitTo1)
 {
     Cursor *cursor;
     m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
@@ -2557,13 +2574,13 @@ tristate Connection::querySingleString(const QString& sql, QString* value, uint 
     return deleteCursor(cursor);
 }
 
-tristate Connection::querySingleNumber(const QString& sql, int* number, uint column, bool addLimitTo1)
+tristate Connection::querySingleNumber(const EscapedString& sql, int* number, uint column, bool addLimitTo1)
 {
-    static QString str;
-    static bool ok;
+    QString str;
     const tristate result = querySingleString(sql, &str, column, addLimitTo1);
     if (result != true)
         return result;
+    bool ok;
     const int _number = str.toInt(&ok);
     if (!ok)
         return false;
@@ -2571,7 +2588,7 @@ tristate Connection::querySingleNumber(const QString& sql, int* number, uint col
     return true;
 }
 
-bool Connection::queryStringList(const QString& sql, QStringList* list, uint column)
+bool Connection::queryStringList(const EscapedString& sql, QStringList* list, uint column)
 {
     Cursor *cursor;
     clearResult();
@@ -2602,21 +2619,21 @@ bool Connection::queryStringList(const QString& sql, QStringList* list, uint col
     return deleteCursor(cursor);
 }
 
-bool Connection::resultExists(const QString& sql, bool* success, bool addLimitTo1)
+bool Connection::resultExists(const EscapedString& sql, bool* success, bool addLimitTo1)
 {
     Cursor *cursor;
     //optimization
     if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
         //this is at least for sqlite
-        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT")) {
+        if (addLimitTo1 && sql.left(6).toUpper() == "SELECT") {
             m_result.setSql(
-                m_driver->addLimitTo1(QLatin1String("SELECT 1 FROM (") + sql + ')', addLimitTo1));
+                m_driver->addLimitTo1("SELECT 1 FROM (" + sql + ')', addLimitTo1));
         }
         else {
             m_result.setSql(sql);
         }
     } else {
-        if (addLimitTo1 && sql.left(6).toUpper() == QLatin1String("SELECT")) {
+        if (addLimitTo1 && sql.startsWith("SELECT")) {
             m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
         }
         else {
@@ -2932,9 +2949,10 @@ TableSchema* Connection::setupTableSchema(const RecordData &data)
 
     Cursor *cursor;
     if (!(cursor = executeQuery(
-                       QString::fromLatin1("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
-                                           "f_options, f_default, f_order, f_caption, f_help"
-                                           " FROM kexi__fields WHERE t_id=%1 ORDER BY f_order").arg(t->id())))) {
+            EscapedString("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
+                          "f_options, f_default, f_order, f_caption, f_help "
+                          "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order").arg(t->id()))))
+    {
         delete t;
         return 0;
     }
@@ -2992,12 +3010,13 @@ TableSchema* Connection::tableSchema(const QString& tableName)
         return t;
     //not found: retrieve schema
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1(
-                                      "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
-                                      " AND o_type=%2")
-                                  .arg(tableName, TableObjectType), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
+                          "WHERE lower(o_name)='%1' AND o_type=%2")
+                          .arg(EscapedString(tableName), EscapedString::number(TableObjectType)), &data))
+    {
         return 0;
-
+    }
     return setupTableSchema(data);
 }
 
@@ -3008,11 +3027,12 @@ TableSchema* Connection::tableSchema(int tableId)
         return t;
     //not found: retrieve schema
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1(
-                                      "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(tableId), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
+                          .arg(tableId), &data))
+    {
         return 0;
-
+    }
     return setupTableSchema(data);
 }
 
@@ -3021,9 +3041,10 @@ tristate Connection::loadDataBlock(int objectID, QString* dataString, const QStr
     if (objectID <= 0)
         return false;
     return querySingleString(
-               QString::fromLatin1("SELECT o_data FROM kexi__objectdata WHERE o_id=") + QString::number(objectID)
-               + QLatin1String(" AND ") + Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
-               dataID.isEmpty() ? QVariant() : QVariant(dataID)),
+               EscapedString("SELECT o_data FROM kexi__objectdata WHERE o_id=%1 AND %2")
+                             .arg(EscapedString::number(objectID),
+                                  EscapedString(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
+                                                      dataID.isEmpty() ? QVariant() : QVariant(dataID)))),
                dataString);
 }
 
@@ -3031,13 +3052,13 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
 {
     if (objectID <= 0)
         return false;
-    QString sql(QString::fromLatin1(
-                    "SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
-    QString sql_sub(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
-                                        dataID.isEmpty() ? QVariant() : QVariant(dataID)));
+    EscapedString sql(
+        EscapedString("SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
+    EscapedString sql_sub(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
+                                              dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     bool ok, exists;
-    exists = resultExists(sql + QLatin1String(" AND ") + sql_sub, &ok);
+    exists = resultExists(sql + " AND " + sql_sub, &ok);
     if (!ok)
         return false;
     if (exists) {
@@ -3046,8 +3067,8 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
                           + " WHERE o_id=" + QString::number(objectID) + " AND " + sql_sub);
     }
     return executeSQL(
-               QString::fromLatin1("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
-               + QString::number(objectID) + ',' + m_driver->valueToSQL(Field::LongText, dataString)
+               EscapedString("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
+               + EscapedString::number(objectID) + ',' + m_driver->valueToSQL(Field::LongText, dataString)
                + ',' + m_driver->valueToSQL(Field::Text, dataID) + ')');
 }
 
@@ -3068,14 +3089,14 @@ QuerySchema* Connection::setupQuerySchema(const RecordData &data)
     const int objID = data[0].toInt(&ok);
     if (!ok)
         return false;
-    QString sqlText;
-    if (!loadDataBlock(objID, &sqlText, "sql")) {
+    QString sql;
+    if (!loadDataBlock(objID, &sql, "sql")) {
         m_result = Result(ERR_OBJECT_NOT_FOUND,
                           QObject::tr("Could not find definition for query \"%1\". Removing this query is recommended.")
                           .arg(data[2].toString()));
         return 0;
     }
-    d->parser()->parse(sqlText);
+    d->parser()->parse(EscapedString(sql));
     QuerySchema *query = d->parser()->query();
     //error?
     if (!query) {
@@ -3083,7 +3104,7 @@ QuerySchema* Connection::setupQuerySchema(const RecordData &data)
                           QObject::tr("<p>Could not load definition for query \"%1\". "
                              "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
                              "<p>You can open this query in Text View and correct it.</p>")
-                             .arg(data[2].toString(), d->parser()->statement()));
+                             .arg(data[2].toString(), sql));
         return 0;
     }
     if (!setupObjectData(data, query)) {
@@ -3102,12 +3123,14 @@ QuerySchema* Connection::querySchema(const QString& queryName)
         return q;
     //not found: retrieve schema
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1(
-                                      "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE lower(o_name)='%1'"
-                                      " AND o_type=%2")
-                                  .arg(m_queryName, QueryObjectType), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
+                          "WHERE lower(o_name)='%1' AND o_type=%2")
+                          .arg(EscapedString(m_queryName), EscapedString::number(QueryObjectType)),
+            &data))
+    {
         return 0;
-
+    }
     return setupQuerySchema(data);
 }
 
@@ -3119,11 +3142,13 @@ QuerySchema* Connection::querySchema(int queryId)
     //not found: retrieve schema
     clearResult();
     RecordData data;
-    if (true != querySingleRecord(QString::fromLatin1(
-                                      "SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                                  .arg(queryId), &data))
+    if (true != querySingleRecord(
+            EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
+                          .arg(queryId),
+            &data))
+    {
         return 0;
-
+    }
     return setupQuerySchema(data);
 }
 
@@ -3269,7 +3294,7 @@ inline void updateRecordDataWithNewValues(QuerySchema* query, RecordData* data, 
             "- could not find item" << it.key()->aliasOrName();
             continue;
         }
-        data->insert(columnsOrderExpandedIt.value(), it.value());
+        (*data)[ columnsOrderExpandedIt.value() ] = it.value();
     }
 }
 
@@ -3301,10 +3326,10 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
         return false;
     }
     //update the record:
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
-    sql = QLatin1String("UPDATE ") + escapeIdentifier(mt->name()) + " SET ";
-    QString sqlset, sqlwhere;
+    sql = "UPDATE " + escapeIdentifier(mt->name()) + " SET ";
+    EscapedString sqlset, sqlwhere;
     sqlset.reserve(1024);
     sqlwhere.reserve(1024);
     RecordEditBuffer::DBMap b = buf->dbBuffer();
@@ -3395,12 +3420,12 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
     if (!getRecordId && !pkey)
         PreWarn << " -- WARNING: NO MASTER TABLE's PKEY";
 
-    QString sqlcols, sqlvals;
+    EscapedString sqlcols, sqlvals;
     sqlcols.reserve(1024);
     sqlvals.reserve(1024);
 
     //insert the record:
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
     sql = "INSERT INTO " + escapeIdentifier(mt->name()) + " (";
     RecordEditBuffer::DBMap b = buf->dbBuffer();
@@ -3505,13 +3530,13 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
             return false;
         }
         RecordData aif_data;
-        QString getAutoIncForInsertedValue = QLatin1String("SELECT ")
+        EscapedString getAutoIncForInsertedValue("SELECT "
                                              + query->autoIncrementSQLFieldsList(this)
-                                             + QLatin1String(" FROM ")
+                                             + " FROM "
                                              + escapeIdentifier(id_columnInfo->field->table()->name())
-                                             + QLatin1String(" WHERE ")
+                                             + " WHERE "
                                              + escapeIdentifier(id_columnInfo->field->name()) + '='
-                                             + QString::number(last_id);
+                                             + QByteArray::number(last_id));
         if (true != querySingleRecord(getAutoIncForInsertedValue, &aif_data)) {
             //! @todo show error
             return false;
@@ -3560,10 +3585,10 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
     }
 
     //update the record:
-    QString sql;
+    EscapedString sql;
     sql.reserve(4096);
-    sql = QLatin1String("DELETE FROM ") + escapeIdentifier(mt->name()) + " WHERE ";
-    QString sqlwhere;
+    sql = "DELETE FROM " + escapeIdentifier(mt->name()) + " WHERE ";
+    EscapedString sqlwhere;
     sqlwhere.reserve(1024);
 
     if (pkey) {
@@ -3616,7 +3641,7 @@ bool Connection::deleteAllRecords(QuerySchema* query)
     if (!pkey || pkey->fields()->isEmpty())
         PreWarn << "-- WARNING: NO MASTER TABLE's PKEY";
 
-    QString sql(QLatin1String("DELETE FROM ") + escapeIdentifier(mt->name()));
+    EscapedString sql("DELETE FROM " + escapeIdentifier(mt->name()));
 
     PreDbg << "-- SQL == " << sql;
 
@@ -3708,6 +3733,11 @@ PreparedStatement Connection::prepareStatement(PreparedStatement::Type type,
     return PreparedStatement(iface, type, fields, whereFieldNames);
 }
 
-QString Connection::recentSQLString() const {
+EscapedString Connection::recentSQLString() const {
     return result().errorSql().isEmpty() ? m_result.sql() : result().errorSql();
+}
+
+EscapedString Connection::escapeString(const QString& str) const
+{
+    return m_driver->escapeString(str);
 }

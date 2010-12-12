@@ -167,15 +167,15 @@ public:
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed.
     */
-    QString sqlFieldsList(Connection *conn, const QString& separator = QString(','),
-                          const QString& tableAlias = QString(),
-                          Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
+    EscapedString sqlFieldsList(Connection *conn, const QString& separator = QString(','),
+                                const QString& tableAlias = QString(),
+                                Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
     /*! Like above, but this is convenient static function, so you can pass any \a list here. */
-    static QString sqlFieldsList(const Field::List& list, Connection *conn,
-                                 const QString& separator = QString(','),
-                                 const QString& tableAlias = QString(),
-                                 Predicate::EscapingType escapingType = Predicate::DriverEscaping);
+    static EscapedString sqlFieldsList(const Field::List& list, Connection *conn,
+                                       const QString& separator = QString(','),
+                                       const QString& tableAlias = QString(),
+                                       Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
     /*! @internal Renames field \a oldName to \a newName.
      Do not use this for physical renaming columns. Use AlterTableHandler instead. */
@@ -194,7 +194,7 @@ private:
     void renameFieldInternal(Predicate::Field *field, const QString& newNameLower);
 
     //! cached
-    mutable QString m_sqlFields;
+    mutable EscapedString m_sqlFields;
 };
 
 } //namespace Predicate

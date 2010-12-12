@@ -313,7 +313,7 @@ public:
     QueryColumnInfo::List *autoincFields;
 
     /*! A cache for autoIncrementSQLFieldsList(). */
-    QString autoIncrementSQLFieldsList;
+    EscapedString autoIncrementSQLFieldsList;
     QWeakPointer<Driver> lastUsedDriverForAutoIncrementSQLFieldsList;
 
     /*! A hash for fast lookup of query columns' order (unexpanded version). */
@@ -336,7 +336,7 @@ public:
     uint pkeyFieldsCount;
 
     /*! forced (predefined) statement */
-    QString statement;
+    EscapedString statement;
 
     /*! Relationships defined for this query. */
     Relationship::List relations;
@@ -429,7 +429,8 @@ QDebug operator<<(QDebug dbg, const OrderByColumn& order)
     return dbg.space();
 }
 
-static QString escapeIdentifier(const QString& name, Connection *conn, Predicate::EscapingType escapingType)
+static QByteArray escapeIdentifier(const QString& name, Connection *conn,
+                                   Predicate::EscapingType escapingType)
 {
     switch (escapingType) {
     case DriverEscaping:
@@ -437,19 +438,19 @@ static QString escapeIdentifier(const QString& name, Connection *conn, Predicate
             return conn->escapeIdentifier(name);
         break;
     case PredicateEscaping:
-        return Predicate::escapeIdentifier(name);
+        return Predicate::escapeIdentifier(name).toUtf8();
     }
-    return name;
+    return '"' + name.toUtf8() + '"';
 }
 
-QString OrderByColumn::toSQLString(bool includeTableName,
+EscapedString OrderByColumn::toSQLString(bool includeTableName,
                                    Connection *conn, Predicate::EscapingType escapingType) const
 {
-    const QString orderString(m_ascending ? "" : " DESC");
-    QString fieldName, tableName;
+    const QByteArray orderString(m_ascending ? "" : " DESC");
+    EscapedString fieldName, tableName;
     if (m_column) {
         if (m_pos > -1)
-            return QString::number(m_pos + 1) + orderString;
+            return EscapedString::number(m_pos + 1) + orderString;
         else {
             if (includeTableName && m_column->alias.isEmpty()) {
                 tableName = escapeIdentifier(m_column->field->table()->name(), conn, escapingType);
@@ -575,10 +576,10 @@ QDebug operator<<(QDebug dbg, const OrderByColumnList& list)
     return dbg.space();
 }
 
-QString OrderByColumnList::toSQLString(bool includeTableNames, Connection *conn,
+EscapedString OrderByColumnList::toSQLString(bool includeTableNames, Connection *conn,
                                        Predicate::EscapingType escapingType) const
 {
-    QString string;
+    EscapedString string;
     for (QList<OrderByColumn*>::ConstIterator it(constBegin()); it != constEnd(); ++it) {
         if (!string.isEmpty())
             string += ", ";
@@ -1146,14 +1147,14 @@ Field::List* QuerySchema::asterisks() const
     return &d->asterisks;
 }
 
-QString QuerySchema::statement() const
+EscapedString QuerySchema::statement() const
 {
     return d->statement;
 }
 
-void QuerySchema::setStatement(const QString &s)
+void QuerySchema::setStatement(const EscapedString& statement)
 {
-    d->statement = s;
+    d->statement = statement;
 }
 
 Field* QuerySchema::field(const QString& identifier, bool expanded)
@@ -1677,10 +1678,10 @@ QueryColumnInfo::List* QuerySchema::autoIncrementFields() const
 }
 
 // static
-QString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn,
+EscapedString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn,
                                     Predicate::EscapingType escapingType)
 {
-    QString result;
+    EscapedString result;
     result.reserve(256);
     bool start = true;
     foreach(QueryColumnInfo* ci, infolist) {
@@ -1693,7 +1694,7 @@ QString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist, Conne
     return result;
 }
 
-QString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
+EscapedString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
 {
     QWeakPointer<Driver> driverWeakPointer = DriverManagerInternal::self()->driverWeakPointer(conn->driver());
     if (   d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer

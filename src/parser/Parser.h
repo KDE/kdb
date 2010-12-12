@@ -139,7 +139,7 @@ public:
     /**
      * clears previous results and runs the parser
      */
-    bool parse(const QString &statement);
+    bool parse(const EscapedString &statement);
 
     /**
      * rests results
@@ -188,7 +188,7 @@ public:
     /**
      * \return the statement passed on the last \a parse method-call.
      */
-    QString statement() const;
+    EscapedString statement() const;
 
     /**
      * \internal

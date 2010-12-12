@@ -226,28 +226,36 @@ QStringList FieldList::names() const
 }
 
 //static
-QString FieldList::sqlFieldsList(const Field::List& list, Connection *conn,
-                                 const QString& separator, const QString& tableAlias,
-                                 Predicate::EscapingType escapingType)
+EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn,
+                                       const QString& separator, const QString& tableAlias,
+                                       Predicate::EscapingType escapingType)
 {
-    QString result;
+    EscapedString result;
     result.reserve(256);
     bool start = true;
-    const QString tableAliasAndDot(tableAlias.isEmpty() ? QString() : (tableAlias + '.'));
+    QByteArray tableAliasAndDot;
+    if (!tableAlias.isEmpty()) {
+        tableAliasAndDot
+                 = ((conn && escapingType == DriverEscaping)
+                        ? conn->escapeIdentifier(tableAlias)
+                        : Predicate::escapeIdentifier(tableAlias).toUtf8())
+                   + '.';
+    }
     foreach(Field *f, list) {
         if (!start)
             result += separator;
         else
             start = false;
         result += (tableAliasAndDot +
-                   ((conn && escapingType == DriverEscaping) ? conn->escapeIdentifier(f->name())
-                                                             : Predicate::escapeIdentifier(f->name()))
+                   ((conn && escapingType == DriverEscaping)
+                        ? conn->escapeIdentifier(f->name())
+                        : Predicate::escapeIdentifier(f->name()))
                   );
     }
     return result;
 }
 
-QString FieldList::sqlFieldsList(Connection *conn,
+EscapedString FieldList::sqlFieldsList(Connection *conn,
                                  const QString& separator, const QString& tableAlias,
                                  Predicate::EscapingType escapingType) const
 {

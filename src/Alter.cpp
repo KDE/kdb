@@ -1021,13 +1021,13 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
         // -Some source fields can be skipped in case when there are deleted fields.
         // -Some destination fields can be skipped in case when there
         //  are new empty fields without fixed/default value.
-        QString sql = QString("INSERT INTO %1 (").arg(d->conn->escapeIdentifier(newTable->name()));
+        EscapedString sql = EscapedString("INSERT INTO %1 (").arg(d->conn->escapeIdentifier(newTable->name()));
         //insert list of dest. fields
         bool first = true;
-        QString sourceFields;
+        EscapedString sourceFields;
         foreach(Field* f, *newTable->fields()) {
             QString renamedFieldName(fieldHash.value(f->name()));
-            QString sourceSQLString;
+            EscapedString sourceSQLString;
             if (!renamedFieldName.isEmpty()) {
                 //this field should be renamed
                 sourceSQLString = d->conn->escapeIdentifier(renamedFieldName);
@@ -1056,11 +1056,11 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
                     sql.append(", ");
                     sourceFields.append(", ");
                 }
-                sql.append(d->conn->escapeIdentifier(f->name()));
+                sql += d->conn->escapeIdentifier(f->name());
                 sourceFields.append(sourceSQLString);
             }
         }
-        sql.append(QString(") SELECT ") + sourceFields + " FROM " + oldTable->name());
+        sql += (") SELECT " + sourceFields + " FROM " + oldTable->name());
         PreDbg << " ** " << sql;
         if (!d->conn->executeSQL(sql)) {
             m_result = d->conn->result();

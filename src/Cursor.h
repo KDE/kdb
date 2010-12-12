@@ -113,7 +113,7 @@ public:
 
     /*! \return raw query statement used to define this cursor
      or null string if raw statement instead (but QuerySchema is defined instead). */
-    inline QString rawStatement() const {
+    inline EscapedString rawStatement() const {
         return m_rawStatement;
     }
 
@@ -262,7 +262,7 @@ public:
 
 protected:
     /*! Cursor will operate on \a conn, raw \a statement will be used to execute query. */
-    Cursor(Connection* conn, const QString& statement, uint options = NoOptions);
+    Cursor(Connection* conn, const EscapedString& statement, uint options = NoOptions);
 
     /*! Cursor will operate on \a conn, \a query schema will be used to execute query. */
     Cursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
@@ -274,10 +274,10 @@ protected:
     bool getNextRecord();
 
     /* Note for driver developers: this method should initialize engine-specific cursor's
-     resources using m_sql statement. It is not required to store \a statement somewhere
+     resources using m_sql statement. It is not required to store \a sql statement somewhere
      in your Cursor subclass (it is already stored in m_query or m_rawStatement,
      depending query type) - only pass it to proper engine's function. */
-    virtual bool drv_open(const QString& sql) = 0;
+    virtual bool drv_open(const EscapedString& sql) = 0;
 
     virtual bool drv_close() = 0;
 //  virtual bool drv_moveFirst() = 0;
@@ -332,19 +332,20 @@ protected:
     Connection *m_conn;
     QuerySchema *m_query;
 //  CursorData *m_data;
-    QString m_rawStatement;
+    EscapedString m_rawStatement;
     bool m_opened;
 //js (m_at==0 is enough)  bool m_beforeFirst : 1;
     bool m_atLast;
     bool m_afterLast;
 //  bool m_atLast;
     bool m_validRecord; //!< true if valid record is currently retrieved @ current position
-    bool m_containsRecordIdInfo;
+    bool m_containsRecordIdInfo; //!< true if result contains extra column for record id;
+                                 //!< used only for PostgreSQL now
     qint64 m_at;
     uint m_fieldCount; //!< cached field count information
     uint m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
-    //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
-    //!< sets m_fieldCount+1 here)
+                                  //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
+                                  //!< sets m_fieldCount+1 here)
     uint m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
     uint m_options; //!< cursor options that describes its behaviour
 
@@ -359,7 +360,7 @@ protected:
     FetchResult m_fetchResult; //!< result of a record fetching
 
     //<members related to buffering>
-    int m_records_in_buf;          //!< number of records currently stored in the buffer
+    int m_records_in_buf;         //!< number of records currently stored in the buffer
     bool m_buffering_completed;   //!< true if we already have all records stored in the buffer
     //</members related to buffering>
 
@@ -376,7 +377,7 @@ private:
     bool m_readAhead;
 
     //<members related to buffering>
-    bool m_at_buffer;             //!< true if we already point to the buffer with curr_coldata
+    bool m_at_buffer; //!< true if we already point to the buffer with curr_coldata
     //</members related to buffering>
 };
 

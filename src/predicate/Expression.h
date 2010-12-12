@@ -100,7 +100,7 @@ public:
     /*! \return string as a representation of this expression element by running recursive calls.
      \a param, if not 0, points to a list item containing value of a query parameter
      (used in QueryParameterExpr). */
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const = 0;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const = 0;
 
     /*! Collects query parameters (messages and types) reculsively and saves them to params.
      The leaf nodes are objects of QueryParameterExpr class. */
@@ -153,7 +153,7 @@ public:
     BaseExpr *arg(int n);
     int args();
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
     BaseExpr::List list;
@@ -170,7 +170,7 @@ public:
     virtual UnaryExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     BaseExpr *arg() const {
         return m_arg;
@@ -198,7 +198,7 @@ public:
     virtual BinaryExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     BaseExpr *left() const {
         return m_larg;
@@ -226,7 +226,7 @@ public:
     virtual ConstExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
     QVariant value;
@@ -253,7 +253,7 @@ public:
     */
     void setType(Field::Type type);
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
 protected:
@@ -271,7 +271,7 @@ public:
     virtual VariableExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
 
     /*! Validation. Sets field, tablePositionForField
@@ -315,7 +315,7 @@ public:
     virtual FunctionExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
-    virtual QString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
 

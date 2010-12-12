@@ -489,7 +489,7 @@ QuerySchema* buildSelectQuery(
                 aliasVariable = e->toBinary()->right()->toVariable();
                 if (!aliasVariable) {
                     setError(QObject::tr("Invalid alias definition for column \"%1\"")
-                                  .arg(columnExpr->toString())); //ok?
+                                  .arg(columnExpr->toString().toString())); //ok?
                     break;
                 }
             }
@@ -516,7 +516,7 @@ QuerySchema* buildSelectQuery(
                 //take first (left) argument of the special binary expr, will be owned, do not destroy
                 e->toBinary()->m_larg = 0;
             } else {
-                setError(QObject::tr("Invalid \"%1\" column definition").arg(e->toString())); //ok?
+                setError(QObject::tr("Invalid \"%1\" column definition").arg(e->toString().toString())); //ok?
                 break;
             }
 

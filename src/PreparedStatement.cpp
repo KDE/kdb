@@ -38,7 +38,7 @@ PreparedStatement::~PreparedStatement()
 bool PreparedStatement::execute(const PreparedStatementParameters& parameters)
 {
     if (d->dirty) {
-        QByteArray s;
+        EscapedString s;
         if (!generateStatementString(&s)) // sets d->fieldsForParameters too
             return false;
 //! @todo error message?
@@ -51,7 +51,7 @@ bool PreparedStatement::execute(const PreparedStatementParameters& parameters)
     return d->iface->execute(d->type, *d->fieldsForParameters, parameters);
 }
 
-bool PreparedStatement::generateStatementString(QByteArray* s)
+bool PreparedStatement::generateStatementString(EscapedString * s)
 {
     s->reserve(1024);
     switch (d->type) {
@@ -65,7 +65,7 @@ bool PreparedStatement::generateStatementString(QByteArray* s)
     return false;
 }
 
-bool PreparedStatement::generateSelectStatementString(QByteArray* s)
+bool PreparedStatement::generateSelectStatementString(EscapedString * s)
 {
 //! @todo only tables and trivial queries supported for select...
     *s = "SELECT ";
@@ -75,7 +75,7 @@ bool PreparedStatement::generateSelectStatementString(QByteArray* s)
             first = false;
         else
             s->append(", ");
-        s->append(f->name().toUtf8());
+        s->append(f->name());
     }
     // create WHERE
     first = true;
@@ -101,14 +101,14 @@ bool PreparedStatement::generateSelectStatementString(QByteArray* s)
     return true;
 }
 
-bool PreparedStatement::generateInsertStatementString(QByteArray* s)
+bool PreparedStatement::generateInsertStatementString(EscapedString * s)
 {
     //! @todo only tables supported for insert; what about views?
     TableSchema *table = d->fields.isEmpty() ? 0 : d->fields.field(0)->table();
     if (!table)
         return false; //err
 
-    QByteArray namesList;
+    EscapedString namesList;
     bool first = true;
     //we are using a selection of fields only
     const bool allTableFieldsUsed = dynamic_cast<TableSchema*>(&d->fields);
@@ -116,17 +116,19 @@ bool PreparedStatement::generateInsertStatementString(QByteArray* s)
         if (first) {
             s->append("?");
             if (!allTableFieldsUsed)
-                namesList = f->name().toUtf8();
+                namesList = EscapedString(f->name());
             first = false;
         } else {
             s->append(",?");
-            if (!allTableFieldsUsed)
-                namesList.append(QByteArray(", ") + f->name().toUtf8());
+            if (!allTableFieldsUsed) {
+                namesList.append(", ");
+                namesList.append(f->name());
+            }
         }
     }
     s->append(")");
-    s->prepend(QByteArray("INSERT INTO ") + table->name().toUtf8()
-              + (allTableFieldsUsed ? "" : (" (" + namesList + ")"))
+    s->prepend(EscapedString("INSERT INTO ") + table->name()
+              + (allTableFieldsUsed ? EscapedString() : (EscapedString(" (") + namesList + ")"))
               + " VALUES (");
     d->fieldsForParameters = d->fields.fields();
     return true;
