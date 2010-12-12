@@ -22,11 +22,10 @@
 
 int schemaTest()
 {
-/* not needed
-    if (!conn->useDatabase(db_name)) {
+    if (!conn->useDatabase()) {
         qDebug() << conn->result();
         return 1;
-    }*/
+    }
 
     Predicate::TableSchema *t = conn->tableSchema("persons");
     if (t)

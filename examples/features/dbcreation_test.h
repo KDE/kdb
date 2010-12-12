@@ -34,7 +34,7 @@ int dbCreationTest()
         return 1;
     }
     qDebug() << "DB" << db_name << "created";
-    if (!conn->useDatabase(db_name)) {
+    if (!conn->useDatabase()) {
         qDebug() << conn->result();
         return 1;
     }

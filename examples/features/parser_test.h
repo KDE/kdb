@@ -20,15 +20,13 @@
 #ifndef PARSER_TEST_H
 #define PARSER_TEST_H
 
-int parserTest(const QString &st, const QStringList &params)
+int parserTest(const Predicate::EscapedString &st, const QStringList &params)
 {
     int r = 0;
-
-/* not needed
-    if (!conn->useDatabase(db_name)) {
+    if (!conn->useDatabase()) {
         qDebug() << conn->result();
         return 1;
-    }*/
+    }
 
     Predicate::Parser parser(conn);
 
@@ -39,7 +37,7 @@ int parserTest(const QString &st, const QStringList &params)
     variantParams.append(param.toLocal8Bit());
     if (ok && q) {
         cout << Predicate::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
-        cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toLatin1().data() << '\n';
+        cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toByteArray().constData() << '\n';
     } else {
         Predicate::ParserError err = parser.error();
         qDebug() << QString("Error = %1\ntype = %2\nat = %3").arg(err.error())

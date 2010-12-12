@@ -25,11 +25,10 @@ int tablesTest()
     if (dbCreationTest() != 0)
         return 1;
 
-/* not needed
-    if (!conn->useDatabase(db_name)) {
+    if (!conn->useDatabase()) {
         qDebug() << conn->result();
         return 1;
-    }*/
+    }
 
     conn->setAutoCommit(false);
     Predicate::Transaction t = conn->beginTransaction();

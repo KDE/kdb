@@ -27,11 +27,10 @@
 
 int tableViewTest()
 {
-/* not needed
-    if (!conn->useDatabase(db_name)) {
+    if (!conn->useDatabase()) {
         conn->debugError();
         return 1;
-    }*/
+    }
 
     Predicate::TableSchema *persons = conn->tableSchema("persons");
     if (!persons) {

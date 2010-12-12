@@ -263,11 +263,8 @@ int main(int argc, char** argv)
         qDebug() << prgname << ": database name?";
         return finish(1);
     }
-    if (test_name != "dbcreation" && test_name != "tables") {
-        // these test can use the database directly after connecting
-        conn_data.setDatabaseName(db_name);
-    }
-    if (!db_name.isEmpty()) {
+    conn_data.setDatabaseName(db_name);
+    if (!db_name.isEmpty() ) {
         //additional switches:
         if (bufCursors) {
             cursor_options |= Predicate::Cursor::Buffered;
@@ -304,7 +301,7 @@ int main(int argc, char** argv)
         QStringList params;
         if (!queryParams.isEmpty())
             params = queryParams.split("|");
-        r = parserTest(args[2], params);
+        r = parserTest(Predicate::EscapedString(args[2]), params);
     } else if (test_name == "dr_prop")
         r = drPropTest();
     else {
