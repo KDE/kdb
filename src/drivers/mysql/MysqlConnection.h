@@ -48,7 +48,8 @@ protected:
     /*! Used by driver */
     MysqlConnection(Driver *driver, const ConnectionData& connData);
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
+    virtual bool drv_connect();
+    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     //! reimplemented using "SHOW DATABASES LIKE..." because MySQL stores db names in lower case.

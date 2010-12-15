@@ -353,12 +353,16 @@ bool Connection::connect()
     }
 
     d->serverVersion.clear();
-    if (!(d->isConnected = drv_connect(&d->serverVersion))) {
+    if (!(d->isConnected = drv_connect())) {
         m_result = Result(m_driver->isFileBased() ?
                     QObject::tr("Could not open \"%1\" project file.")
                     .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName()))
                  :  QObject::tr("Could not connect to \"%1\" database server.")
                     .arg(d->connData.serverInfoString()));
+    }
+    if (d->isConnected && !m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+        if (!drv_getServerVersion(&d->serverVersion))
+            return false;
     }
     return d->isConnected;
 }
@@ -675,6 +679,11 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
         QString msg(QObject::tr("Opening database \"%1\" failed.").arg(my_dbName));
         m_result.prependMessage(msg);
         return false;
+    }
+    if (d->serverVersion.isNull() && m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+        // get version just now, it was not possible earlier
+        if (!drv_getServerVersion(&d->serverVersion))
+            return false;
     }
 
     //-create system tables schema objects

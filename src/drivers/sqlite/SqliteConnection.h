@@ -48,7 +48,8 @@ protected:
     /*! Used by driver */
     SQLiteConnection(Driver *driver, const ConnectionData& connData);
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
+    virtual bool drv_connect();
+    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
 

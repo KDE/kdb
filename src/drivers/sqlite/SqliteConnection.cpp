@@ -121,7 +121,12 @@ void SQLiteConnection::storeResult()
         QLatin1String( (d->data && m_result.serverResultCode() != SQLITE_OK) ? sqlite3_errmsg(d->data) : 0 ));
 }
 
-bool SQLiteConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool SQLiteConnection::drv_connect()
+{
+    return true;
+}
+
+bool SQLiteConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
 {
     PreDrvDbg;
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h

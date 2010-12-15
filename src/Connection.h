@@ -820,7 +820,7 @@ public:
     tristate closeAllTableSchemaChangeListeners(TableSchema* tableSchema);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    /*! LOW LEVEL METHOD. For reimplementation: returns true if table
+    /*! LOW LEVEL METHOD. For implementation: returns true if table
      with name \a tableName exists in the database.
      \return false if it does not exist or error occurred.
      The lookup is case insensitive. */
@@ -923,12 +923,21 @@ protected:
      the original table schema (even if it is no longer points to any real data). */
     tristate dropTable(TableSchema* tableSchema, bool alsoRemoveSchema);
 
-    /*! For reimplementation: connects to database. \a version should be set to real
-     server's version.
+    /*! For implementation: connects to database.
       \return true on success. */
-    virtual bool drv_connect(ServerVersionInfo* version) = 0;
+    virtual bool drv_connect() = 0;
 
-    /*! For reimplementation: disconnects database
+    /*! For implementation: Sets @a version to real server's version.
+     Depending on backend type this method is called after
+     (if DriverBehaviour::USING_DATABASE_REQUIRED_TO_CONNECT is true)
+     or before database is used
+     (if DriverBehaviour::USING_DATABASE_REQUIRED_TO_CONNECT is false),
+     i.e. for PostgreSQL it is called after.
+     In any case it is called after successfull drv_connect().
+     \return true on success. */
+    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version) = 0;
+
+    /*! For implementation: disconnects database
       \return true on success. */
     virtual bool drv_disconnect() = 0;
 
@@ -947,7 +956,7 @@ protected:
     virtual bool drv_getDatabasesList(QStringList* list);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    /*! LOW LEVEL METHOD. For reimplementation: loads low-level list of table names
+    /*! LOW LEVEL METHOD. For implementation: loads low-level list of table names
      available for this connection. The names are in lower case.
      The method should return true only if there was no error on getting database names
      list from the server. */
@@ -967,15 +976,16 @@ protected:
      in this situation no changes should be made in current database selection. */
     virtual bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true);
 
-    /*! For reimplementation: creates new database using connection */
+    /*! For implementation: creates new database using connection */
     virtual bool drv_createDatabase(const QString &dbName = QString()) = 0;
 
-    /*! For reimplementation: opens existing database using connection
-     \return true on success, false on failure and cancelled if user has cancelled this action. */
+    /*! For implementation: opens existing database using connection
+     \return true on success, false on failure; sets @a cancelled to true if this action
+     has been cancelled. */
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
                                  MessageHandler* msgHandler = 0) = 0;
 
-    /*! For reimplementation: closes previously opened database
+    /*! For implementation: closes previously opened database
       using connection. */
     virtual bool drv_closeDatabase() = 0;
 
@@ -995,7 +1005,7 @@ protected:
         return true;
     }
 
-    /*! For reimplementation: drops database from the server
+    /*! For implementation: drops database from the server
       using connection. After drop, database shouldn't be accessible
       anymore. */
     virtual bool drv_dropDatabase(const QString &dbName = QString()) = 0;

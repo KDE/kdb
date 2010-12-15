@@ -47,7 +47,7 @@ bool db_name_required = true;
 
 Predicate::ConnectionData conn_data;
 #warning replace QPointer<Predicate::Connection> conn;
-Predicate::Connection* conn;
+Predicate::Connection* conn = 0;
 #warning replace QPointer<Predicate::Driver> driver;
 Predicate::Driver* driver;
 QApplication *app = 0;

@@ -49,12 +49,26 @@ MysqlConnection::~MysqlConnection()
     delete d;
 }
 
-bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool MysqlConnection::drv_connect()
 {
     const bool ok = d->db_connect(data());
     if (!ok)
         return false;
 
+    // Get lower_case_table_name value so we know if there's case sensitivity supported
+    // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
+    int intLowerCaseTableNames = 0;
+    tristate res = querySingleNumber(EscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
+                            &intLowerCaseTableNames,
+                            0/*col*/, false/* !addLimitTo1 */);
+    if (res == false) // sanity
+        return false;
+    d->lowerCaseTableNames = intLowerCaseTableNames > 0;
+    return true;
+}
+
+bool MysqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
+{
     // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
     version->setString(mysql_get_server_info(d->mysql));
 
@@ -65,22 +79,14 @@ bool MysqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
     tristate res = querySingleString(EscapedString("SELECT @@version"),
                                      &versionString, /*column*/0, false /*!addLimitTo1*/);
     QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)");
-    if (res == true && versionRe.exactMatch(versionString)) {
+    if (res == false) // sanity
+        return false;
+    if (versionRe.exactMatch(versionString)) {
         // (if querySingleString failed, the version will be 0.0.0...
         version->setMajor(versionRe.cap(1).toInt());
         version->setMinor(versionRe.cap(2).toInt());
         version->setRelease(versionRe.cap(3).toInt());
     }
-
-    // Get lower_case_table_name value so we know if there's case sensitivity supported
-    // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
-    int intLowerCaseTableNames = 0;
-    res = querySingleNumber(EscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
-                            &intLowerCaseTableNames,
-                            0/*col*/, false/* !addLimitTo1 */);
-    if (res == false) // sanity
-        return false;
-    d->lowerCaseTableNames = intLowerCaseTableNames > 0;
     return true;
 }
 

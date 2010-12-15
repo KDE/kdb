@@ -1,5 +1,8 @@
 Predicate CHANGELOG
 
+2010-12-15
+*Added Connection::drv_getServerVersion() and moved getting server version here from drv_connect() so PostgreSQL driver also can get version properly
+
 2010-12-12
 Moved to git: https://projects.kde.org/projects/playground/libs/predicate/repository
 

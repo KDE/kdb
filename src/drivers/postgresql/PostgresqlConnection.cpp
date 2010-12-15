@@ -80,10 +80,16 @@ Cursor* PostgresqlConnection::prepareQuery(QuerySchema* query, uint cursor_optio
 //==================================================================================
 //Made this a noop
 //We tell we are connected, but we wont actually connect until we use a database!
-bool PostgresqlConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool PostgresqlConnection::drv_connect()
 {
     PreDrvDbg;
+    return true;
+}
+
+bool PostgresqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
+{
     // http://www.postgresql.org/docs/8.4/static/libpq-status.html
+    qDebug() << "server_version:" << d->parameter("server_version");
     version->setString(d->parameter("server_version"));
 
     QString versionString;
