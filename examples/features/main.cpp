@@ -108,13 +108,15 @@ static void showHelp()
 "\n (c) 2003-2010, Kexi Team"
 "\n (c) 2003-2006, OpenOffice Software LLC."
 "\n"
-"\nUsage: kexidbtest [options] driver_name [db_name] [sql_statement]"
+"\nUsage: predicatefeaturestest --test <test_name> [options]"
+"\n                             driver_name [db_name] [sql_statement]"
 "\n"
 "\nGeneric options:"
-"\n  -h, --help                Show help about options"
+"\n  --help                    Show help about options"
 "\n"
 "\nOptions:"
-"\n  -t, --test <test_name>    Available tests:"
+"\n  -t, --test <test_name>    Specifies test to execute. Required."
+"\n                            Available tests:"
 "\n                            - cursors: test for cursors behaviour"
 "\n                            - schema: test for db schema retrieving"
 "\n                            - dbcreation: test for new db creation"
@@ -126,11 +128,19 @@ static void showHelp()
 "\n                                      returns debug string for a given"
 "\n                                      sql statement or error message"
 "\n                            - dr_prop: shows properties of selected driver"
+"\n  -h, --host <name>         Host name to use when connecting to server-based"
+"\n                            backends."
 "\n  --buffered-cursors        Optional switch: turns cursors used in any tests"
 "\n                            to be buffered"
+"\n  -p, --password <name>     Password to use when connecting to server-based"
+"\n                            backends."
+"\n  -P, --port <number>       Port number to use when connecting to server-based"
+"\n                            backends."
 "\n  --query-params <params>   Query parameters separated"
 "\n                            by '|' character that will be passed to query"
 "\n                            statement to replace [...] placeholders."
+"\n  -u, --user <name>         User name to use when connecting to server-based"
+"\n                            backends."
 "\n"
 "\nNotes:"
 "\n1. 'dr_prop' requires <db_name> argument."
@@ -153,16 +163,12 @@ int main(int argc, char** argv)
 #ifndef NO_GUI
     bool gui = false;
 #endif
-    /* if (argc < minargs) {
-        usage();
-        RETURN(0);
-      }*/
     QFileInfo info = QFileInfo(argv[0]);
     prgname = info.baseName().toLatin1();
     QStringList args;
     for (int i=1; i<argc; i++)
         args.append(QFile::decodeName(argv[i]));
-    if (takeOption(args, "help", "h")) {
+    if (takeOption(args, "help")) {
         showHelp();
         return 0;
     }
@@ -193,36 +199,29 @@ int main(int argc, char** argv)
         minargs = 1;
         db_name_required = false;
     }
-/*    if ((int)args->count() < minargs) {
-        qDebug() << QString("Not enough args (%1 required). Use --help.").arg(minargs);
-        RETURN(1);
-    }*/
 
 #ifndef NO_GUI
     if (gui) {
         app = new QApplication(argc, argv, true);
-//qtonly        instance = new KComponentData(KGlobal::mainComponent());
-//qtonly        KIconLoader::global()->addAppDir("kexi");
     } else
 #endif
     {
         app = new QApplication(argc, argv, false);
-//qtonly        instance = new KComponentData(prgname);
     }
 
-    QString hostName = takeOptionWithArg(args, "h");
+    QString hostName = takeOptionWithArg(args, "host" "h");
     if (!hostName.isEmpty()) {
         conn_data.setHostName(hostName);
     }
-    QString userName = takeOptionWithArg(args, "u");
+    QString userName = takeOptionWithArg(args, "user", "u");
     if (!userName.isEmpty()) {
         conn_data.setUserName(userName);
     }
-    QString password = takeOptionWithArg(args, "p");
+    QString password = takeOptionWithArg(args, "password", "p");
     if (!password.isEmpty()) {
         conn_data.setPassword(password);
     }
-    QString port = takeOptionWithArg(args, "P");
+    QString port = takeOptionWithArg(args, "port", "P");
     if (!port.isEmpty()) {
         bool ok;
         conn_data.setPort(port.toInt(&ok));
@@ -306,7 +305,8 @@ int main(int argc, char** argv)
     } else if (test_name == "dr_prop")
         r = drPropTest();
     else {
-        qWarning() << "No such test: " << test_name;
+        qWarning() << "No such test:" << test_name;
+        qWarning() << "Available tests are:" << tests;
 //  usage();
         return finish(1);
     }
