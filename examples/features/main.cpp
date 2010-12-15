@@ -21,12 +21,7 @@
 #include <QFileInfo>
 #include <QPointer>
 #include <QtDebug>
-/*qtonly
-#include <kcmdlineargs.h>
-#include <kapplication.h>
-#include <kcomponentdata.h>
-#include <kiconloader.h>
-#include <kaboutdata.h>*/
+#include <QTextStream>
 
 #include <Predicate/DriverManager.h>
 #include <Predicate/Driver.h>
@@ -79,25 +74,77 @@ static int finish(int code)
     return code;
 }
 
-//! @return true if option @a option is found
+//! @return true if option @a option or @a shortOption is found
 //! Removes the option.
-bool takeOption(QStringList &args, const QString &option)
+static bool takeOption(QStringList &args, const QString &option,
+                       const QString &shortOption = QString())
 {
-    return args.removeOne(QLatin1String("-") + option)
+    return args.removeOne(QLatin1String("-") + (shortOption.isEmpty() ? option : shortOption))
         || args.removeOne(QLatin1String("--") + option);
 }
 
-//! @return next element after option @a option, what should mean parameter
+//! @return next element after option @a option or @a shortOption, what should mean parameter
 //! Removes option and its argument.
-QString takeOptionWithArg(QStringList &args, const QString &option)
+static QString takeOptionWithArg(QStringList &args, const QString &option,
+                                 const QString &shortOption = QString())
 {
-    int index = args.indexOf(QLatin1String("-") + option);
+    int index = args.indexOf(QLatin1String("-") + (shortOption.isEmpty() ? option : shortOption));
     if (index == -1)
         index = args.indexOf(QLatin1String("--") + option);
     if (index == -1)
         return QString();
     args.removeAt(index);
     return args.takeAt(index); // option's argument
+}
+
+static void showHelp()
+{
+    QTextStream s(stdout);
+    s <<
+"predicatefeaturestest, version " PREDICATE_VERSION_STRING
+"\n"
+"\nA set of tests for the Predicate library API."
+"\nEvery test is mostly driver-independent."
+"\n (c) 2003-2010, Kexi Team"
+"\n (c) 2003-2006, OpenOffice Software LLC."
+"\n"
+"\nUsage: kexidbtest [options] driver_name [db_name] [sql_statement]"
+"\n"
+"\nGeneric options:"
+"\n  -h, --help                Show help about options"
+"\n"
+"\nOptions:"
+"\n  -t, --test <test_name>    Available tests:"
+"\n                            - cursors: test for cursors behaviour"
+"\n                            - schema: test for db schema retrieving"
+"\n                            - dbcreation: test for new db creation"
+"\n                            - tables: test for tables creation and data"
+"\n                                      inserting"
+//"\n                            - tableview: test for KexiDataTableView data-aware
+//"\n                               widget
+"\n                            - parser: test for parsing sql statements,"
+"\n                                      returns debug string for a given"
+"\n                                      sql statement or error message"
+"\n                            - dr_prop: shows properties of selected driver"
+"\n  --buffered-cursors        Optional switch: turns cursors used in any tests"
+"\n                            to be buffered"
+"\n  --query-params <params>   Query parameters separated"
+"\n                            by '|' character that will be passed to query"
+"\n                            statement to replace [...] placeholders."
+"\n"
+"\nNotes:"
+"\n1. 'dr_prop' requires <db_name> argument."
+"\n2. 'parser' test requires <db_name>, <driver_name> and <sql_statement> arguments"
+"\n3. All other tests require <db_name> and <driver_name> arguments."
+"\n4. 'tables' test automatically runs 'dbcreation' test."
+"\n   <new_db_name> is removed if already exists."
+"\n5. <db_name> must be a valid kexi database e.g. created with 'tables' test."
+"\n"
+"\nArguments:"
+"\n  driver_name               Driver name"
+"\n  db_name                   Database name"
+"\n  sql_statement             Optional SQL statement (for parser test)"
+"\n";
 }
 
 int main(int argc, char** argv)
@@ -112,69 +159,23 @@ int main(int argc, char** argv)
       }*/
     QFileInfo info = QFileInfo(argv[0]);
     prgname = info.baseName().toLatin1();
-
-#if 0 //qtonly: TODO?
-    KCmdLineArgs::init(argc, argv,
-                       new KAboutData(prgname, 0, ki18n("KexiDBTest"),
-                                      "0.1.2", KLocalizedString(), KAboutData::License_GPL,
-                                      ki18n("(c) 2003-2006, Kexi Team\n"
-                                            "(c) 2003-2006, OpenOffice Polska Ltd.\n"),
-                                      KLocalizedString(),
-                                      "http://www.koffice.org/kexi",
-                                      "submit@bugs.kde.org"
-                                     )
-                      );
-
-    KCmdLineOptions options;
-    options.add("test <test_name>", ki18n("Available tests:\n"
-                                          "- cursors: test for cursors behaviour\n"
-                                          "- schema: test for db schema retrieving\n"
-                                          "- dbcreation: test for new db creation\n"
-                                          "- tables: test for tables creation and data\n"
-                                          "   inserting\n"
-#ifndef NO_GUI
-                                          "- tableview: test for KexiDataTableView data-aware\n"
-                                          "   widget\n"
-#endif
-                                          "- parser: test for parsing sql statements,\n"
-                                          "   returns debug string for a given\n"
-                                          "   sql statement or error message\n"
-                                          "- dr_prop: shows properties of selected driver"));
-    options.add("buffered-cursors", ki18n("Optional switch :turns cursors used in any tests\n"
-                                          " to be buffered"));
-    options.add("query-params <params>", ki18n("Query parameters separated\n"
-                "by '|' character that will be passed to query\n"
-                "statement to replace [...] placeholders."));
-    options.add("", ki18n(" Notes:\n"
-                          "1. 'dr_prop' requires <db_name> argument.\n"
-                          "2. 'parser' test requires <db_name>,\n"
-                          " <driver_name> and <sql_statement> arguments\n"
-                          "3. All other tests require <db_name>\n"
-                          " and <driver_name> arguments.\n"
-                          "4. 'tables' test automatically runs 'dbcreation'\n"
-                          " test. (<new_db_name> is removed if already exists.\n"
-                          "5. <db_name> must be a valid kexi database\n"
-                          " e.g. created with 'tables' test."));
-    options.add("+driver_name", ki18n("Driver name"));
-    options.add("+[db_name]", ki18n("Database name"));
-    options.add("+[sql_statement]", ki18n("Optional SQL statement (for parser test)"));
-    KCmdLineArgs::addCmdLineOptions(options);
-
-    KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
-#endif //0
     QStringList args;
     for (int i=1; i<argc; i++)
         args.append(QFile::decodeName(argv[i]));
+    if (takeOption(args, "help", "h")) {
+        showHelp();
+        return 0;
+    }
     QStringList tests;
     tests << "cursors" << "schema" << "dbcreation" << "tables"
 #ifndef NO_GUI
         << "tableview"
 #endif
         << "parser" << "dr_prop";
-    test_name = takeOptionWithArg(args, "test");
+    test_name = takeOptionWithArg(args, "test", "t");
     if (test_name.isEmpty()) {
         qDebug() << "No test specified. Use --help.";
-        return finish(1);
+        return 1;
     }
     if (!tests.contains(test_name)) {
         qDebug() << QString("No such test \"%1\". Use --help.").arg(test_name);
