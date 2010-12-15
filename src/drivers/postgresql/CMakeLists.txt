@@ -27,7 +27,7 @@ qt_wrap_cpp(predicate_postgresql predicate_postgresql_SRCS ${predicate_postgresq
 add_library(predicate_postgresql SHARED ${predicate_postgresql_SRCS})
 
 target_link_libraries(predicate_postgresql
-  ${POSTGRESQL_LIBRARIES}
+  ${PostgreSQL_LIBRARIES}
   predicate
 )
 set_target_properties(predicate_postgresql PROPERTIES PREFIX "")
