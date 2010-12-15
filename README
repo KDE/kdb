@@ -7,8 +7,5 @@ Because there is no dependency on Kexi, Calligra or even on KDE libraries,
 Predicate is available for very wide audience. Kexi 2.5 will use it too,
 thus deprecating KexiDB.
 
-Predicate is a database connectivity and creation library, a new iteration
-of KexiDB library developed within Kexi.
-
 [1] http://www.calligra-suite.org/kexi
 [2] http://www.calligra-suite.org
