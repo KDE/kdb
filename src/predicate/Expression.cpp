@@ -88,6 +88,7 @@ QString BaseExpr::debugString() const
 PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const BaseExpr& expr)
 {
     dbg.nospace() << expr.debugString();
+    return dbg.space();
 }
 
 bool BaseExpr::validate(ParseInfo& /*parseInfo*/)

@@ -161,6 +161,7 @@ PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::IndexSchema& ind
     dbg.space() << (index.isPrimaryKey() ? "PRIMARY" : "");
     dbg.space() << ((!index.isPrimaryKey()) && index.isUnique() ? "UNIQUE" : "");
     dbg.space() << static_cast<const FieldList&>(index);
+    return dbg.space();
 }
 
 void IndexSchema::attachRelationship(Relationship *rel)

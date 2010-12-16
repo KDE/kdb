@@ -409,4 +409,5 @@ PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::EscapedString& s
         dbg.nospace() << "Predicate::EscapedString:" << string.toByteArray();
     else
         dbg.nospace() << "Predicate::EscapedString(INVALID)";
+    return dbg.space();
 }
