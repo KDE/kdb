@@ -1168,7 +1168,7 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
     sql.reserve(4096);
     QList<QVariant>::ConstIterator it = values.constBegin();
     QByteArray tableName = escapeIdentifier(flist->first()->table()->name());
-    while (f && (it != values.constEnd())) {
+    while (it != values.constEnd() && f) {
         if (sql.isEmpty()) {
             sql = "INSERT INTO " + tableName + '(' +
                   fields->sqlFieldsList(this) + ") VALUES (";
@@ -1180,6 +1180,8 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
 //  PreDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
+        if (fieldsIt == flist->constEnd())
+            break;
         f = *fieldsIt;
     }
     sql += ')';
