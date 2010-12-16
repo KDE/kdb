@@ -1,6 +1,12 @@
 Predicate CHANGELOG
 
+2010-12-16
+Predicate
+*fix memory leak in Connection::insertRecord: Conditional jump or move depends on uninitialised value(s)
+*add missing "return dbg.space();" to QDebug operator<<(QDebug dbg, ..), otherwise crashes
+
 2010-12-15
+Predicate
 *Added Connection::drv_getServerVersion() and moved getting server version here from drv_connect() so PostgreSQL driver also can get version properly
 
 2010-12-12
