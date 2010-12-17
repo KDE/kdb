@@ -7,6 +7,9 @@ Predicate
 Predicate
 *fix memory leak in Connection::insertRecord: Conditional jump or move depends on uninitialised value(s)
 *add missing "return dbg.space();" to QDebug operator<<(QDebug dbg, ..), otherwise crashes
+PostgreSQL Driver
+*fix building connection string, remove crash on closing database
+*'tables' test passed
 
 2010-12-15
 Predicate
