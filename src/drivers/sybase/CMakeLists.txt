@@ -1,6 +1,6 @@
 include_directories(
   ${FreeTDS_INCLUDE_DIR}
-  ${CMAKE_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

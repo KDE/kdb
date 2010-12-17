@@ -23,7 +23,7 @@ ADD_DEFINITIONS(
 )
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

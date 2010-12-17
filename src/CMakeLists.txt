@@ -1,17 +1,7 @@
-# define the generic version of the Predicate libraries here
-# this makes it easy to advance it when the next Predicate release comes
-set(PREDICATE_VERSION_MAJOR "1")
-set(PREDICATE_VERSION_MINOR "00")
-set(PREDICATE_VERSION_RELEASE "00")
-set(PREDICATE_VERSION "1.0.0")
-#todo add build date as in kdepim
-set (PREDICATE_VERSION_STRING ${PREDICATE_VERSION})
-set(GENERIC_PREDICATE_LIB_VERSION ${PREDICATE_VERSION})
-set(GENERIC_PREDICATE_LIB_SOVERSION ${PREDICATE_VERSION_MAJOR})
 
 include_directories(
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/Predicate
+  ${Predicate_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}/Predicate
   ${Predicate_BINARY_DIR}
   ${Predicate_BINARY_DIR}/Predicate
   ${QT_INCLUDES}
@@ -39,19 +29,19 @@ ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
 
 # Create custom command for flex/lex (note the outputs)
 ADD_CUSTOM_COMMAND(
-COMMAND ${CMAKE_SOURCE_DIR}/Predicate/parser/generate_parser_code.sh
+COMMAND ${Predicate_SOURCE_DIR}/Predicate/parser/generate_parser_code.sh
 TARGET parser
 OUTPUTS
-  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.h
-  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp
-  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h
-  ${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp)
+  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.h
+  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.cpp
+  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.h
+  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp)
 
 # mark files as generated
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlParser.cpp GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
 
 SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp GENERATED)
 

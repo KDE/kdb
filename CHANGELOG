@@ -1,5 +1,8 @@
 Predicate CHANGELOG
 
+2010-12-17
+Predicate
+*build system: use Predicate_SOURCE_DIR, Predicate_BINARY_DIR for clarity; generate predicate.pc and install it, append git hash to PREDICATE_VERSION_STRING
 2010-12-16
 Predicate
 *fix memory leak in Connection::insertRecord: Conditional jump or move depends on uninitialised value(s)

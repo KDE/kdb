@@ -7,7 +7,7 @@ endif(COMMAND cmake_policy)
 
 set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
 include_directories(
-  ${CMAKE_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}
   ${Predicate_BINARY_DIR}
   ${QT_INCLUDES}
 )
@@ -54,6 +54,3 @@ INCLUDE(FindXBase)
 IF(XBASE_FOUND)
 #todo   add_subdirectory(xbase)
 ENDIF(XBASE_FOUND)
-
-#message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(pgsql_dir)")
-#message(STATUS "${CMAKE_CURRENT_SOURCE_DIR}: skipped subdir $(mysql_dir)")

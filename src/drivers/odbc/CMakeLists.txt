@@ -1,6 +1,6 @@
 include_directories(
   /usr/include/ #TODO
-  ${CMAKE_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}
   ${QT_INCLUDES}
 )
 

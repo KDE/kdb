@@ -1,6 +1,6 @@
 include_directories(
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_BINARY_DIR}
+  ${Predicate_SOURCE_DIR}
+  ${Predicate_BINARY_DIR}
   ${QT_INCLUDES}
 )
 
