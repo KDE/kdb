@@ -29,6 +29,7 @@
 #include <Predicate/Field.h>
 #include <Predicate/DriverInfo.h>
 #include <Predicate/Result.h>
+#include <Predicate/EscapedString.h>
 
 namespace Predicate
 {
