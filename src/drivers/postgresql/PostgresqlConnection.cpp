@@ -138,7 +138,7 @@ QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
     QByteArray result = key;
 //! @todo optimize
     result.replace('\\', "\\\\").replace('\'', "\\'");
-    return key + "='" + value.toString().toUtf8() + "'";
+    return key + "='" + value.toString().toUtf8() + "' ";
 }
 
 //==================================================================================
@@ -180,7 +180,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
         conninfo += buildConnParameter("dbname", myDbName);
 
     if (!data().userName().isEmpty())
-        conninfo += buildConnParameter("user'", data().userName());
+        conninfo += buildConnParameter("user", data().userName());
 
     if (!data().password().isEmpty())
         conninfo += buildConnParameter("password", data().password());
@@ -213,7 +213,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     if (status != PGRES_COMMAND_OK)
         qWarning("Failed to set DATESTYLE to 'ISO': %1", PQerrorMessage(d->conn));
     PQclear(result);
-    return false;
+    return true;
 }
 
 //==================================================================================
@@ -224,6 +224,7 @@ bool PostgresqlConnection::drv_closeDatabase()
 // if (isConnected())
 // {
     PQclear(d->res);
+    d->res = 0;
     PQfinish(d->conn);
     d->conn = 0;
     return true;
