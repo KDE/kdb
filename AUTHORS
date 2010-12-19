@@ -1,0 +1,12 @@
+Main Authors:
+- Jarosław Staniek <staniek@kde.org> - Maintainer, main author
+- Adam Pigg <adam@piggz.co.uk> - libpqxx driver, migration
+
+Contributors:
+- Lucijan Busch <lucijan@kde.org> - early code
+- Sebastian Sauer <mail@dipe.org> - fixess
+- Sharan Rao <sharanrao@gmail.com> - Sybase, MS SQL, xBase drivers, fixes
+- Joseph Wenninger <kde@jowenn.at> - fixes, MySQL driver
+- Martin Ellis <martin.ellis@kdemail.net> - fixes, MySQL driver
+- Julia Sanchez-Simon <hithwen@gmail.com> - Oracle driver
+- Matt Rogers <mattr@kde.org> - ODBC driver
