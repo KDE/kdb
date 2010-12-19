@@ -1,0 +1,61 @@
+Packaging Information for Predicate
+-----------------------------------
+
+We recommend building several binary packages from the Predicate source.
+
+Splitting Predicate into packages:
+ * gives users a better choice of which components they have installed;
+ * allows users to avoid installing unnecessary dependencies;
+ * helps to reduce packaging conflicts for users with non-standard
+   package selections.
+
+
+Table Of Contents
+-----------------
+1. Predicate libraries
+2. Database and migration drivers
+3. Default database driver: SQLite
+
+
+3. Predicate libraries
+======================
+
+List of Predicate libraries:
+
+ * predicate
+
+
+2. Database and migration drivers
+=================================
+
+Predicate provides database drivers (and later migration) drivers
+for a number of database types or data sources. The following matrix lists them:
+
+ Name         Database driver files
+ ------------------------------------------------------------------------
+ MySQL        predicate_mysqldriver.so
+              predicate_mysqldriver.desktop
+ PostgreSQL   predicate_postgresqldriver.so
+              predicate_pqxxsqldriver.desktop
+
+(other drivers are not currently distributed)
+
+Plugin .so and .desktop service files typically go
+to $PREFIX/lib/plugins/predicate/.
+
+We suggest putting each driver in a separate package, and that installation of
+these packages be optional. Each driver package may then depend
+on the corresponding 'native' libraries. For example libmysqlclient for MySQL
+and libpq for PostgreSQL.
+
+
+3. Default database driver: SQLite
+----------------------------------
+
+In contrast to the other database drivers, SQLite 3 driver should be part
+of the main Predicate package. Thus, Predicate main package should depend
+on SQLite 3 package.
+
+If minimal SQLite version is not present, the configure phase will stop
+and required minimal version will be printed. If recommended SQLite is not
+present, this fact is displayed during the configure phase.
