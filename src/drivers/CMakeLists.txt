@@ -13,7 +13,7 @@ include_directories(
 )
 
 # find SQLite:
-set(SQLITE_RECOMMENDED_VERSION "3.7.3")
+set(SQLITE_RECOMMENDED_VERSION "3.7.4")
 find_package(Sqlite 3.6.16)
 macro_log_feature(SQLITE_FOUND "SQLite" "Embedded SQL database engine" "http://www.sqlite.org"
                   TRUE ${SQLITE_MIN_VERSION} "Required for Predicate's default database driver.")
