@@ -11,14 +11,14 @@ set(CMAKE_MODULE_PATH ${Predicate_SOURCE_DIR}/cmake/modules)
 
 # define the generic version of the Predicate libraries here
 # this makes it easy to advance it when the next Predicate release comes
-set(PREDICATE_VERSION_MAJOR "1")
+set(PREDICATE_VERSION_MAJOR "00")
+set(GENERIC_PREDICATE_LIB_SOVERSION "0") # like PREDICATE_VERSION_MAJOR
 set(PREDICATE_VERSION_MINOR "00")
-set(PREDICATE_VERSION_RELEASE "00")
-set(PREDICATE_VERSION "1.0.0")
-#todo add build date as in kdepim
+set(PREDICATE_VERSION_RELEASE "1")
+set(PREDICATE_VERSION "0.0.1")
 set(PREDICATE_VERSION_STRING "${PREDICATE_VERSION}")
+
 set(GENERIC_PREDICATE_LIB_VERSION ${PREDICATE_VERSION})
-set(GENERIC_PREDICATE_LIB_SOVERSION ${PREDICATE_VERSION_MAJOR})
 
 # If Git is installed and a '.git' directory is found,
 # we append the Git revision to AKONADI_VERSION_STRING
