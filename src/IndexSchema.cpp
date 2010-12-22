@@ -87,9 +87,9 @@ IndexSchema::~IndexSchema()
 FieldList& IndexSchema::addField(Field *field)
 {
     if (field->table() != m_tableSchema) {
-        PreDbg << (field ? field->name() : 0)
-        << "WARNING: field doas not belong to the same table"
-        << (field && field->table() ? field->table()->name() : 0)
+        PreWarn << (field ? field->name() : QString())
+        << "WARNING: field does not belong to the same table"
+        << (field && field->table() ? field->table()->name() : QString())
         << "as index!";
         return *this;
     }
