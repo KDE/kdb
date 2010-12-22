@@ -48,8 +48,6 @@
 
 #define PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION 1
 
-//#define PREDICATE_LOOKUP_FIELD_TEST
-
 namespace Predicate
 {
 
@@ -2830,21 +2828,6 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
     if (!res)
         loadExtendedTableSchemaData_ERR;
     // extendedTableSchemaString will be just empty if there is no such data block
-
-#ifdef PREDICATE_LOOKUP_FIELD_TEST
-//<temp. for LookupFieldSchema tests>
-    if (tableSchema->name() == "cars") {
-        LookupFieldSchema *lookupFieldSchema = new LookupFieldSchema();
-        LookupFieldSchema::RecordSource recordSource;
-        recordSource.setType(LookupFieldSchema::RecordSource::Table);
-        recordSource.setName("persons");
-        lookupFieldSchema->setRecordSource(recordSource);
-        lookupFieldSchema->setBoundColumn(0); //id
-        lookupFieldSchema->setVisibleColumn(3); //surname
-        tableSchema->setLookupFieldSchema("owner", lookupFieldSchema);
-    }
-//</temp. for LookupFieldSchema tests>
-#endif
 
     if (extendedTableSchemaString.isEmpty())
         return true;
