@@ -36,7 +36,7 @@ ServerVersionInfo::~ServerVersionInfo()
 
 bool ServerVersionInfo::isNull() const
 {
-//TODO add this to SDC:        bool operator==(const Data& other) const { return false; }
+//! @todo add this to SDC:        bool operator==(const Data& other) const { return false; }
     *d.data() == Data();
 };
 

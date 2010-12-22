@@ -776,7 +776,7 @@ void QuerySchema::removeField(Predicate::Field *field)
     if (field->isQueryAsterisk()) {
         d->asterisks.removeAt(d->asterisks.indexOf(field));   //this will destroy this asterisk
     }
-//TODO: should we also remove table for this field or asterisk?
+//! @todo should we also remove table for this field or asterisk?
     FieldList::removeField(field);
 }
 

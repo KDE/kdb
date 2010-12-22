@@ -96,7 +96,7 @@ Field::Field(const Field& f)
         m_customProperties = new CustomPropertiesMap(f.customProperties());
 
     if (f.m_expr) {//deep copy the expression
-//TODO  m_expr = new BaseExpr(*f.m_expr);
+//! @todo  m_expr = new BaseExpr(*f.m_expr);
 
 //  m_expr->m_field = this;
     } else
@@ -511,7 +511,7 @@ Field::setDefaultValue(const QByteArray& def)
         break;
     }
     case BLOB: {
-//TODO
+//! @todo
         if (def.isNull())
             m_defaultValue = QVariant();
         else

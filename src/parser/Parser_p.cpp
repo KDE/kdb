@@ -261,7 +261,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
     PreDbg << "found variable name: " << varName;
     int dotPos = varName.find('.');
     QString tableName, fieldName;
-//TODO: shall we also support db name?
+//! @todo shall we also support db name?
     if (dotPos > 0) {
         tableName = varName.left(dotPos);
         fieldName = varName.mid(dotPos + 1);

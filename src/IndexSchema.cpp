@@ -63,7 +63,7 @@ IndexSchema::IndexSchema(const IndexSchema& idx, TableSchema& parentTable)
         addField(parentTableField);
     }
 
-//js TODO: copy relationships!
+//! @todo copy relationships!
 // Reference::List m_refs_to; //! list of references to table (of this index)
 // Reference::List m_refs_from; //! list of references from the table (of this index),
 //         //! this index is foreign key for these references

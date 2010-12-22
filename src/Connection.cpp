@@ -954,7 +954,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
         EscapedString v = EscapedString(escapeIdentifier(field->name())) + " ";
         const bool autoinc = field->isAutoIncrement();
         const bool pk = field->isPrimaryKey() || (autoinc && m_driver->beh->AUTO_INCREMENT_REQUIRES_PK);
-//TODO: warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
+//! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         if (autoinc && m_driver->beh->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
                 v += m_driver->beh->AUTO_INCREMENT_TYPE + " " + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION;
@@ -981,7 +981,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
                 v += (" " +
                       (pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION));
             else
-                //TODO: here is automatically a single-field key created
+                //! @todo here is automatically a single-field key created
                 if (pk)
                     v += " PRIMARY KEY";
             if (!pk && field->isUniqueKey())
@@ -1441,7 +1441,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         QuerySchemaParameterValueListIterator paramValuesIt(m_driver, params);
         QuerySchemaParameterValueListIterator *paramValuesItPtr = params.isEmpty() ? 0 : &paramValuesIt;
         if (wasWhere) {
-//TODO: () are not always needed
+//! @todo () are not always needed
             s_where = '(' + s_where + ") AND ("
                 + querySchema->whereExpression()->toString(paramValuesItPtr) + ')';
         } else {
@@ -1658,7 +1658,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
                                   QObject::tr("Could not create the same table \"%1\" twice.").arg(tableSchema->name()));
                 return false;
             }
-//TODO(js): update any structure (e.g. queries) that depend on this table!
+//! @todo (js) update any structure (e.g. queries) that depend on this table!
             if (existingTable->id() > 0)
                 tableSchema->setId(existingTable->id()); //copy id from existing table
             previousSchemaStillKept = true;
@@ -1765,7 +1765,7 @@ bool Connection::drv_dropTable(const QString& name)
     table and column definitions to kexi__* tables.  Checks first that the
     table is not a system table.
 
-    TODO: Should check that a database is currently in use? (c.f. createTable)
+    @todo Should check that a database is currently in use? (c.f. createTable)
 */
 tristate Connection::dropTable(TableSchema* tableSchema)
 {
@@ -1853,8 +1853,8 @@ tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableS
                                                .arg(tableSchema->name()));
         return false;
     }
-//TODO(js): implement real altering
-//TODO(js): update any structure (e.g. query) that depend on this table!
+//! @todo (js) implement real altering
+//! @todo (js) update any structure (e.g. query) that depend on this table!
     bool ok, empty;
 #if 0//TODO ucomment:
     empty = isEmpty(tableSchema, ok) && ok;
@@ -1885,9 +1885,8 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
                                                .arg(newTableName));
         return false;
     }
-//TODO: alter table name for server DB backends!
-//TODO: what about objects (queries/forms) that use old name?
-//TODO
+//! @todo alter table name for server DB backends!
+//! @todo what about objects (queries/forms) that use old name?
     TableSchema *tableToReplace = this->tableSchema(newName);
     const bool destTableExists = tableToReplace != 0;
     const int origID = destTableExists ? tableToReplace->id() : -1; //will be reused in the new table
@@ -1944,7 +1943,7 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
         alterTableName_ERR;
         return false;
     }
-//TODO what about caption?
+//! @todo what about caption?
 
     //restore old name: it will be changed soon!
     tableSchema->setName(oldTableName);

@@ -518,8 +518,8 @@ Field::Type ConstExpr::type() const
     if (m_token == SQL_NULL)
         return Field::Null;
     else if (m_token == INTEGER_CONST) {
-//TODO ok?
-//TODO: add sign info?
+//! @todo ok?
+//! @todo add sign info?
         if (value.type() == QVariant::Int || value.type() == QVariant::UInt) {
             qint64 v = value.toInt();
             if (v <= 0xff && v > -0x80)
@@ -530,7 +530,7 @@ Field::Type ConstExpr::type() const
         }
         return Field::BigInteger;
     } else if (m_token == CHARACTER_STRING_LITERAL) {
-//TODO: Field::defaultTextLength() is hardcoded now!
+//! @todo Field::defaultTextLength() is hardcoded now!
         if (value.toString().length() > (int)Field::defaultTextLength())
             return Field::LongText;
         else
@@ -559,7 +559,7 @@ EscapedString ConstExpr::toString(QuerySchemaParameterValueListIterator* params)
     if (m_token == SQL_NULL)
         return EscapedString("NULL");
     else if (m_token == CHARACTER_STRING_LITERAL)
-//TODO: better escaping!
+//! @todo better escaping!
         return EscapedString("'") + value.toString() + "'";
     else if (m_token == REAL_CONST)
         return EscapedString::number(value.toPoint().x()) + "." + EscapedString::number(value.toPoint().y());
@@ -716,7 +716,7 @@ bool VariableExpr::validate(ParseInfo& parseInfo)
     PreDbg << "checking variable name: " << name;
     int dotPos = name.indexOf('.');
     QString tableName, fieldName;
-//TODO: shall we also support db name?
+//! @todo shall we also support db name?
     if (dotPos > 0) {
         tableName = name.left(dotPos);
         fieldName = name.mid(dotPos + 1);
@@ -916,7 +916,7 @@ void FunctionExpr::getQueryParameters(QuerySchemaParameterList& params)
 
 Field::Type FunctionExpr::type() const
 {
-    //TODO
+//! @todo
     return Field::InvalidType;
 }
 

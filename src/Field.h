@@ -114,7 +114,7 @@ public:
         Map = 130        /*!< Mapping from string to string list (more generic than Enum */
     };
 
-//TODO: make this configurable
+//! @todo make this configurable
     static uint defaultTextLength() {
         return 200;
     }
