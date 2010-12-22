@@ -605,21 +605,6 @@ bool Connection::createDatabase(const QString &dbName)
             createDatabase_ERROR;
     }
 
-    /* moved to KexiProject...
-
-      //-create default part info
-      TableSchema *ts;
-      if (!(ts = tableSchema("kexi__parts")))
-        createDatabase_ERROR;
-      FieldList *fl = ts->subList("p_id", "p_name", "p_mime", "p_url");
-      if (!fl)
-        createDatabase_ERROR;
-      if (!insertRecord(fl, QVariant(1), QVariant("Tables"), QVariant("kexi/table"), QVariant("http://koffice.org/kexi/")))
-        createDatabase_ERROR;
-      if (!insertRecord(fl, QVariant(2), QVariant("Queries"), QVariant("kexi/query"), QVariant("http://koffice.org/kexi/")))
-        createDatabase_ERROR;
-    */
-
     //-insert Predicate version info:
     TableSchema *table = d->table("kexi__db");
     if (!table)
@@ -699,33 +684,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
         if (!ok)
             return false;
         d->databaseVersion.setMajor(major);
-        /*  if (true!=querySingleNumber(
-              "select db_value from kexi__db where db_property=" + escapeString(QString("predicate_major_ver")), num)) {
-              d->errorInvalidDBContents(notfound_str.arg("predicate_major_ver"));
-              return false;
-            }*/
         d->databaseVersion.setMinor(minor);
-        /*  if (true!=querySingleNumber(
-              "select db_value from kexi__db where db_property=" + escapeString(QString("predicate_minor_ver")), num)) {
-              d->errorInvalidDBContents(notfound_str.arg("predicate_minor_ver"));
-              return false;
-            }*/
-
-#if 0 //this is already checked in DriverManagerInternal::lookupDrivers()
-        //** error if major version does not match
-        if (m_driver->versionMajor() != Predicate::versionMajor()) {
-            setError(ERR_INCOMPAT_DATABASE_VERSION,
-                     QObject::tr("Database version (%1) does not match Kexi application's version (%2)")
-                     .arg( QString("%1.%2").arg(versionMajor(), versionMinor()),
-                          QString("%1.%2").arg(Predicate::versionMajor(), Predicate::versionMinor()))
-                    );
-            return false;
-        }
-        if (m_driver->versionMinor() != Predicate::versionMinor()) {
-            //js TODO: COMPATIBILITY CODE HERE!
-            //js TODO: CONVERSION CODE HERE (or signal that conversion is needed)
-        }
-#endif
     }
     d->usedDatabase = my_dbName;
     return true;
@@ -922,9 +881,6 @@ QStringList Connection::predicateSystemTableNames()
         << "kexi__objects"
         << "kexi__objectdata"
         << "kexi__fields"
-//  << "kexi__querydata"
-//  << "kexi__queryfields"
-//  << "kexi__querytables"
         << "kexi__db"
         ;
     }
@@ -1241,7 +1197,6 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
 
     EscapedString sql; //final sql string
     sql.reserve(4096);
-//unused QString s_from_additional; //additional tables list needed for lookup fields
     EscapedString s_additional_joins; //additional joins needed for lookup fields
     EscapedString s_additional_fields; //additional fields to append to the fields list
     uint internalUniqueTableAliasNumber = 0; //used to build internalUniqueTableAliases
@@ -1432,11 +1387,6 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                     s_from += (" AS " + aliasString);
                 number++;
             }
-            /*unused if (!s_from_additional.isEmpty()) {//additional tables list needed for lookup fields
-                  if (!s_from.isEmpty())
-                    s_from += QLatin1String(", ");
-                  s_from += s_from_additional;
-                }*/
         }
         // add subqueries for lookup data
         uint subqueries_for_lookup_data_counter = 0;
@@ -2034,24 +1984,12 @@ bool Connection::dropQuery(QuerySchema* querySchema)
     if (!beginAutoCommitTransaction(&tg))
         return false;
 
-    /* TableSchema *ts = d->tables_byname["kexi__querydata"];
-      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
-        return false;
-
-      ts = d->tables_byname["kexi__queryfields"];
-      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
-        return false;
-
-      ts = d->tables_byname["kexi__querytables"];
-      if (!Predicate::deleteRecord(this, ts, "q_id", querySchema->id()))
-        return false;*/
-
     //remove query schema from kexi__objects table
     if (!removeObject(querySchema->id())) {
         return false;
     }
 
-//TODO(js): update any structure that depend on this table!
+//! @todo update any structure that depend on this table!
     d->removeQuery(querySchema);
     return commitAutoCommitTransaction(tg.transaction());
 }
@@ -2387,18 +2325,6 @@ bool Connection::deleteCursor(Cursor *cursor)
 #warning fix Connection::setupObjectData() after refactoring
 bool Connection::setupObjectData(const RecordData &data, Object *object)
 {
-    //not found: retrieve schema
-    /* Cursor *cursor;
-      if (!(cursor = executeQuery( QString("select * from kexi__objects where o_id='%1'").arg(objId) )))
-        return false;
-      if (!cursor->moveFirst()) {
-        deleteCursor(cursor);
-        return false;
-      }*/
-    //if (!ok) {
-    //deleteCursor(cursor);
-    //return 0;
-// }
     bool ok;
     const int id = data[0].toInt(&ok);
     if (!ok)
@@ -3209,50 +3135,10 @@ bool Connection::setupPredicateSystemSchema()
     .addField(new Field("f_caption", Field::Text))
     .addField(new Field("f_help", Field::LongText));
 
-    /* TableSchema *t_querydata = newPredicateSystemTableSchema("kexi__querydata");
-      t_querydata->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("q_sql", Field::LongText ) )
-      .addField( new Field("q_valid", Field::Boolean ) );
-
-      TableSchema *t_queryfields = newPredicateSystemTableSchema("kexi__queryfields");
-      t_queryfields->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("f_order", Field::Integer ) )
-      .addField( new Field("f_id", Field::Integer ) )
-      .addField( new Field("f_tab_asterisk", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("f_alltab_asterisk", Field::Boolean) );
-
-      TableSchema *t_querytables = newPredicateSystemTableSchema("kexi__querytables");
-      t_querytables->addField( new Field("q_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("t_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("t_order", Field::Integer, 0, Field::Unsigned) );*/
-
     TableSchema *t_db = newPredicateSystemTableSchema("kexi__db");
     t_db->addField(new Field("db_property", Field::Text, Field::NoConstraints, Field::NoOptions, 32))
     .addField(new Field("db_value", Field::LongText));
 
-    /* moved to KexiProject...
-      TableSchema *t_parts = newPredicateSystemTableSchema("kexi__parts");
-      t_parts->addField( new Field("p_id", Field::Integer, Field::PrimaryKey | Field::AutoInc, Field::Unsigned) )
-      .addField( new Field("p_name", Field::Text) )
-      .addField( new Field("p_mime", Field::Text ) )
-      .addField( new Field("p_url", Field::Text ) );
-    */
-
-    /*UNUSED
-      TableSchema *t_final = newPredicateSystemTableSchema("kexi__final");
-      t_final->addField( new Field("p_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("property", Field::LongText ) )
-      .addField( new Field("value", Field::BLOB) );
-
-      TableSchema *t_useractions = newPredicateSystemTableSchema("kexi__useractions");
-      t_useractions->addField( new Field("p_id", Field::Integer, 0, Field::Unsigned) )
-      .addField( new Field("scope", Field::Integer ) )
-      .addField( new Field("name", Field::LongText ) )
-      .addField( new Field("text", Field::LongText ) )
-      .addField( new Field("icon", Field::LongText ) )
-      .addField( new Field("method", Field::Integer ) )
-      .addField( new Field("arguments", Field::LongText) );
-    */
     return true;
 }
 

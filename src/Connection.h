@@ -254,7 +254,7 @@ public:
      @see queryIds() */
     QList<int> objectIds(int objType);
 
-    /*! \brief Creates new Transaction.handle and starts a new transaction.
+    /*! \brief Creates new Transaction handle and starts a new transaction.
      \return Transaction object if Transaction.has been started
      successfully, otherwise null transaction.
      For drivers that allow single transaction per connection
@@ -464,9 +464,6 @@ public:
      previously instantiated query schema.
      \return true if there is such query. Otherwise the method does nothing. */
     bool setQuerySchemaObsolete(const QString& queryName);
-
-//js: MOVED TO Driver  QString valueToSQL( const Field::Type ftype, const QVariant& v ) const;
-//  QString valueToSQL( const Field *field, const QVariant& v ) const;
 
     /*! Executes \a statement query and stores first record's data inside \a data.
      This is convenient method when we need only first record from query result,
@@ -1037,10 +1034,6 @@ protected:
     */
     virtual bool drv_createTable(const QString& tableSchemaName);
 
-//  /*! Executes query \a statement and returns resulting records
-//   (used mostly for SELECT query). */
-//  virtual bool drv_executeQuery( const QString& statement ) = 0;
-
     /*! \return unique identifier of the most recently inserted record.
      Typically this is just primary key value.
      This identifier could be reused when we want to reference
@@ -1319,4 +1312,3 @@ private:
 } //namespace Predicate
 
 #endif
-
