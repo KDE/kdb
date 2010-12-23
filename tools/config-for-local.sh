@@ -8,6 +8,11 @@
 #  2. cd {predicate-build-dir}
 #  3. {predicate-source-dir}/tools/cmakepredicate.sh {predicate-source-dir}
 #
+# "Dry run" mode:
+#  Add --dry-run parameter. This only displays the resulting cmake command
+#  and exists without executing cmake. Useful when cmake arguments
+#  are needed e.g. for configuring a Qt Creator project.
+#
 # You need to type the above command only once to configure the CMake-based
 # buildsystem.
 #
@@ -34,7 +39,11 @@ cmd="cmake $1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$PREDICATE_INSTALL
     -DQT_PLUGINS_DIR=$PREDICATE_INSTALL_PREFIX/$_libdir/plugins"
 
 echo "------------------------------------------"
-echo "Generating CMake files using this command:"
+echo "CMake will be executed using this command:"
+echo
 echo $cmd
+if [ "$1" == "--dry-run" -o "$2" == "--dry-run" ] ; then
+    exit 0
+fi
 echo
 $cmd
