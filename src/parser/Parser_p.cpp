@@ -226,14 +226,14 @@ bool parseData(Parser *p, const char *data)
 /* Adds @a column to @a querySchema. @a column can be in a form of
  table.field, tableAlias.field or field
 */
-bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
+bool addColumn(ParseInfo& parseInfo, Expression* columnExpr)
 {
     if (!columnExpr->validate(parseInfo)) {
         setError(parseInfo.errMsg, parseInfo.errDescr);
         return false;
     }
 
-    VariableExpr *v_e = columnExpr->toVariable();
+    VariableExpression *v_e = columnExpr->toVariable();
     if (columnExpr->exprClass() == PredicateExpr_Variable && v_e) {
         //it's a variable:
         if (v_e->name == "*") {//all tables asterisk
@@ -393,7 +393,7 @@ bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)
     delete options
 
 QuerySchema* buildSelectQuery(
-    QuerySchema* querySchema, NArgExpr* colViews, NArgExpr* tablesList,
+    QuerySchema* querySchema, NArgExpression* colViews, NArgExpression* tablesList,
     SelectOptionsInternal* options)
 {
     ParseInfo parseInfo(querySchema);
@@ -409,11 +409,11 @@ QuerySchema* buildSelectQuery(
 // QString repeatedTableNameOrTableAlias;
     if (tablesList) {
         for (int i = 0; i < tablesList->args(); i++, columnNum++) {
-            BaseExpr *e = tablesList->arg(i);
-            VariableExpr* t_e = 0;
+            Expression *e = tablesList->arg(i);
+            VariableExpression* t_e = 0;
             QString aliasString;
             if (e->exprClass() == PredicateExpr_SpecialBinary) {
-                BinaryExpr* t_with_alias = e->toBinary();
+                BinaryExpression* t_with_alias = e->toBinary();
                 assert(t_with_alias);
                 assert(t_with_alias->left()->exprClass() == PredicateExpr_Variable);
                 assert(t_with_alias->right()->exprClass() == PredicateExpr_Variable
@@ -476,11 +476,11 @@ QuerySchema* buildSelectQuery(
     //-------add fields
     if (colViews) {
         columnNum = 0;
-        for (QMutableListIterator<BaseExpr*> it(colViews->list); it.hasNext(); columnNum++) {
-            BaseExpr *e = it.next();
+        for (QMutableListIterator<Expression*> it(colViews->list); it.hasNext(); columnNum++) {
+            Expression *e = it.next();
 //Qt4   bool moveNext = true; //used to avoid ++it when an item is taken from the list
-            BaseExpr *columnExpr = e;
-            VariableExpr* aliasVariable = 0;
+            Expression *columnExpr = e;
+            VariableExpression* aliasVariable = 0;
             if (e->exprClass() == PredicateExpr_SpecialBinary && e->toBinary()
                     && (e->token() == AS || e->token() == 0)) {
                 //PredicateExpr_SpecialBinary: with alias

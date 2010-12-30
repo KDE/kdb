@@ -1,5 +1,9 @@
 Predicate CHANGELOG
 
+2010-12-30
+Predicate
+*(*Expr) classes renamed to *Expression
+
 2010-12-17
 Predicate
 *build system: use Predicate_SOURCE_DIR, Predicate_BINARY_DIR for clarity; generate predicate.pc and install it, append git hash to PREDICATE_VERSION_STRING

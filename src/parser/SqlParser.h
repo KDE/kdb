@@ -757,9 +757,9 @@ typedef union YYSTYPE
 	struct realType realValue;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
-	Predicate::BaseExpr *expr;
-	Predicate::NArgExpr *exprList;
-	Predicate::ConstExpr *constExpr;
+	Predicate::Expression *expr;
+	Predicate::NArgExpression *exprList;
+	Predicate::ConstExpression *constExpr;
 	Predicate::QuerySchema *querySchema;
 	SelectOptionsInternal *selectOptions;
 	OrderByColumnInternal::List *orderByColumns;

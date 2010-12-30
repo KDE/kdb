@@ -63,35 +63,36 @@ using namespace Predicate;
 
 //=========================================
 
-BaseExpr::BaseExpr(int token)
+Expression::Expression(int token)
         : m_cl(PredicateExpr_Unknown)
         , m_par(0)
         , m_token(token)
 {
 }
 
-BaseExpr::~BaseExpr()
+Expression::~Expression()
 {
 }
 
-Field::Type BaseExpr::type() const
+Field::Type Expression::type() const
 {
     return Field::InvalidType;
 }
 
-QString BaseExpr::debugString() const
+QString Expression::debugString() const
 {
-    return QString("BaseExpr(%1,type=%1)").arg(m_token).arg(Driver::defaultSQLTypeName(type()));
+    return QString("Expression(%1,type=%1)")
+                   .arg(m_token).arg(Driver::defaultSQLTypeName(type()));
 }
 
 //! Sends information about expression  @a expr to debug output @a dbg.
-PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const BaseExpr& expr)
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Expression& expr)
 {
     dbg.nospace() << expr.debugString();
     return dbg.space();
 }
 
-bool BaseExpr::validate(ParseInfo& /*parseInfo*/)
+bool Expression::validate(ParseInfo& /*parseInfo*/)
 {
     return true;
 }
@@ -99,7 +100,7 @@ bool BaseExpr::validate(ParseInfo& /*parseInfo*/)
 extern const char* tname(int offset);
 #define safe_tname(token) ((token>=255 && token<=__LAST_TOKEN) ? tname(token-255) : "")
 
-QString BaseExpr::tokenToDebugString(int token)
+QString Expression::tokenToDebugString(int token)
 {
     if (token < 254) {
         if (isprint(token))
@@ -110,73 +111,73 @@ QString BaseExpr::tokenToDebugString(int token)
     return QString(safe_tname(token));
 }
 
-QString BaseExpr::tokenToString() const
+QString Expression::tokenToString() const
 {
     if (m_token < 255 && isprint(m_token))
         return tokenToDebugString();
     return QString();
 }
 
-NArgExpr* BaseExpr::toNArg()
+NArgExpression* Expression::toNArg()
 {
-    return dynamic_cast<NArgExpr*>(this);
+    return dynamic_cast<NArgExpression*>(this);
 }
-UnaryExpr* BaseExpr::toUnary()
+UnaryExpression* Expression::toUnary()
 {
-    return dynamic_cast<UnaryExpr*>(this);
+    return dynamic_cast<UnaryExpression*>(this);
 }
-BinaryExpr* BaseExpr::toBinary()
+BinaryExpression* Expression::toBinary()
 {
-    return dynamic_cast<BinaryExpr*>(this);
+    return dynamic_cast<BinaryExpression*>(this);
 }
-ConstExpr* BaseExpr::toConst()
+ConstExpression* Expression::toConst()
 {
-    return dynamic_cast<ConstExpr*>(this);
+    return dynamic_cast<ConstExpression*>(this);
 }
-VariableExpr* BaseExpr::toVariable()
+VariableExpression* Expression::toVariable()
 {
-    return dynamic_cast<VariableExpr*>(this);
+    return dynamic_cast<VariableExpression*>(this);
 }
-FunctionExpr* BaseExpr::toFunction()
+FunctionExpression* Expression::toFunction()
 {
-    return dynamic_cast<FunctionExpr*>(this);
+    return dynamic_cast<FunctionExpression*>(this);
 }
-QueryParameterExpr* BaseExpr::toQueryParameter()
+QueryParameterExpression* Expression::toQueryParameter()
 {
-    return dynamic_cast<QueryParameterExpr*>(this);
+    return dynamic_cast<QueryParameterExpression*>(this);
 }
 
 //=========================================
 
-NArgExpr::NArgExpr(int aClass, int token)
-        : BaseExpr(token)
+NArgExpression::NArgExpression(int aClass, int token)
+        : Expression(token)
 {
     m_cl = aClass;
 //Qt 4 list.setAutoDelete(true);
 }
 
-NArgExpr::NArgExpr(const NArgExpr& expr)
-        : BaseExpr(expr)
+NArgExpression::NArgExpression(const NArgExpression& expr)
+        : Expression(expr)
 {
-    foreach(BaseExpr* e, expr.list) {
+    foreach(Expression* e, expr.list) {
         add(e->copy());
     }
 }
 
-NArgExpr::~NArgExpr()
+NArgExpression::~NArgExpression()
 {
 }
 
-NArgExpr* NArgExpr::copy() const
+NArgExpression* NArgExpression::copy() const
 {
-    return new NArgExpr(*this);
+    return new NArgExpression(*this);
 }
 
-QString NArgExpr::debugString() const
+QString NArgExpression::debugString() const
 {
     QString s = QString("NArgExpr(")
                 + "class=" + exprClassName(m_cl);
-    foreach(BaseExpr *expr, list) {
+    foreach(Expression *expr, list) {
         s += ", ";
         s += expr->debugString();
     }
@@ -184,11 +185,11 @@ QString NArgExpr::debugString() const
     return s;
 }
 
-EscapedString NArgExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString NArgExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     EscapedString s;
     s.reserve(256);
-    foreach(BaseExpr* e, list) {
+    foreach(Expression* e, list) {
         if (!s.isEmpty())
             s += ", ";
         s += e->toString(params);
@@ -196,41 +197,41 @@ EscapedString NArgExpr::toString(QuerySchemaParameterValueListIterator* params) 
     return s;
 }
 
-void NArgExpr::getQueryParameters(QuerySchemaParameterList& params)
+void NArgExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
-    foreach(BaseExpr *e, list) {
+    foreach(Expression *e, list) {
         e->getQueryParameters(params);
     }
 }
 
-BaseExpr* NArgExpr::arg(int nr)
+Expression* NArgExpression::arg(int nr)
 {
     return list.at(nr);
 }
 
-void NArgExpr::add(BaseExpr *expr)
+void NArgExpression::add(Expression *expr)
 {
     list.append(expr);
     expr->setParent(this);
 }
 
-void NArgExpr::prepend(BaseExpr *expr)
+void NArgExpression::prepend(Expression *expr)
 {
     list.prepend(expr);
     expr->setParent(this);
 }
 
-int NArgExpr::args()
+int NArgExpression::args()
 {
     return list.count();
 }
 
-bool NArgExpr::validate(ParseInfo& parseInfo)
+bool NArgExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
 
-    foreach(BaseExpr *e, list) {
+    foreach(Expression *e, list) {
         if (!e->validate(parseInfo))
             return false;
     }
@@ -238,8 +239,8 @@ bool NArgExpr::validate(ParseInfo& parseInfo)
 }
 
 //=========================================
-UnaryExpr::UnaryExpr(int token, BaseExpr *arg)
-        : BaseExpr(token)
+UnaryExpression::UnaryExpression(int token, Expression *arg)
+        : Expression(token)
         , m_arg(arg)
 {
     m_cl = PredicateExpr_Unary;
@@ -247,25 +248,25 @@ UnaryExpr::UnaryExpr(int token, BaseExpr *arg)
         m_arg->setParent(this);
 }
 
-UnaryExpr::UnaryExpr(const UnaryExpr& expr)
-        : BaseExpr(expr)
+UnaryExpression::UnaryExpression(const UnaryExpression& expr)
+        : Expression(expr)
         , m_arg(expr.m_arg ? expr.m_arg->copy() : 0)
 {
     if (m_arg)
         m_arg->setParent(this);
 }
 
-UnaryExpr::~UnaryExpr()
+UnaryExpression::~UnaryExpression()
 {
     delete m_arg;
 }
 
-UnaryExpr* UnaryExpr::copy() const
+UnaryExpression* UnaryExpression::copy() const
 {
-    return new UnaryExpr(*this);
+    return new UnaryExpression(*this);
 }
 
-QString UnaryExpr::debugString() const
+QString UnaryExpression::debugString() const
 {
     return "UnaryExpr('"
            + tokenToDebugString() + "', "
@@ -273,7 +274,7 @@ QString UnaryExpr::debugString() const
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-EscapedString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString UnaryExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     if (m_token == '(') //parentheses (special case)
         return "(" + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + ")";
@@ -288,13 +289,13 @@ EscapedString UnaryExpr::toString(QuerySchemaParameterValueListIterator* params)
     return EscapedString("{INVALID_OPERATOR#%1} ").arg(m_token) + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
 }
 
-void UnaryExpr::getQueryParameters(QuerySchemaParameterList& params)
+void UnaryExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     if (m_arg)
         m_arg->getQueryParameters(params);
 }
 
-Field::Type UnaryExpr::type() const
+Field::Type UnaryExpression::type() const
 {
     //NULL IS NOT NULL : BOOLEAN
     //NULL IS NULL : BOOLEAN
@@ -312,9 +313,9 @@ Field::Type UnaryExpr::type() const
     return t;
 }
 
-bool UnaryExpr::validate(ParseInfo& parseInfo)
+bool UnaryExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
 
     if (!m_arg->validate(parseInfo))
@@ -329,7 +330,7 @@ bool UnaryExpr::validate(ParseInfo& parseInfo)
 
     return true;
 #if 0
-    BaseExpr *n = l.at(0);
+    Expression *n = l.at(0);
 
     n->check();
     /*typ wyniku:
@@ -351,8 +352,8 @@ bool UnaryExpr::validate(ParseInfo& parseInfo)
 }
 
 //=========================================
-BinaryExpr::BinaryExpr(int aClass, BaseExpr *left_expr, int token, BaseExpr *right_expr)
-        : BaseExpr(token)
+BinaryExpression::BinaryExpression(int aClass, Expression *left_expr, int token, Expression *right_expr)
+        : Expression(token)
         , m_larg(left_expr)
         , m_rarg(right_expr)
 {
@@ -363,27 +364,27 @@ BinaryExpr::BinaryExpr(int aClass, BaseExpr *left_expr, int token, BaseExpr *rig
         m_rarg->setParent(this);
 }
 
-BinaryExpr::BinaryExpr(const BinaryExpr& expr)
-        : BaseExpr(expr)
+BinaryExpression::BinaryExpression(const BinaryExpression& expr)
+        : Expression(expr)
         , m_larg(expr.m_larg ? expr.m_larg->copy() : 0)
         , m_rarg(expr.m_rarg ? expr.m_rarg->copy() : 0)
 {
 }
 
-BinaryExpr::~BinaryExpr()
+BinaryExpression::~BinaryExpression()
 {
     delete m_larg;
     delete m_rarg;
 }
 
-BinaryExpr* BinaryExpr::copy() const
+BinaryExpression* BinaryExpression::copy() const
 {
-    return new BinaryExpr(*this);
+    return new BinaryExpression(*this);
 }
 
-bool BinaryExpr::validate(ParseInfo& parseInfo)
+bool BinaryExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
 
     if (!m_larg->validate(parseInfo))
@@ -394,7 +395,7 @@ bool BinaryExpr::validate(ParseInfo& parseInfo)
 //! @todo compare types..., BITWISE_SHIFT_RIGHT requires integers, etc...
 
     //update type for query parameters
-    QueryParameterExpr * queryParameter = m_larg->toQueryParameter();
+    QueryParameterExpression * queryParameter = m_larg->toQueryParameter();
     if (queryParameter)
         queryParameter->setType(m_rarg->type());
     queryParameter = m_rarg->toQueryParameter();
@@ -404,7 +405,7 @@ bool BinaryExpr::validate(ParseInfo& parseInfo)
     return true;
 }
 
-Field::Type BinaryExpr::type() const
+Field::Type BinaryExpression::type() const
 {
     const Field::Type lt = m_larg->type(), rt = m_rarg->type();
     if (lt == Field::InvalidType || rt == Field::InvalidType)
@@ -434,7 +435,7 @@ Field::Type BinaryExpr::type() const
     return Field::Boolean;
 }
 
-QString BinaryExpr::debugString() const
+QString BinaryExpression::debugString() const
 {
     return QString("BinaryExpr(")
            + "class=" + exprClassName(m_cl)
@@ -444,7 +445,7 @@ QString BinaryExpr::debugString() const
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-QString BinaryExpr::tokenToString() const
+QString BinaryExpression::tokenToString() const
 {
     if (m_token < 255 && isprint(m_token))
         return tokenToDebugString();
@@ -474,7 +475,7 @@ QString BinaryExpr::tokenToString() const
     return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(m_token);
 }
 
-EscapedString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString BinaryExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
 #define INFIX(a) \
     (m_larg ? m_larg->toString(params) : EscapedString("<NULL>")) + " " + a + " " + (m_rarg ? m_rarg->toString(params) : EscapedString("<NULL>"))
@@ -482,7 +483,7 @@ EscapedString BinaryExpr::toString(QuerySchemaParameterValueListIterator* params
 #undef INFIX
 }
 
-void BinaryExpr::getQueryParameters(QuerySchemaParameterList& params)
+void BinaryExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     if (m_larg)
         m_larg->getQueryParameters(params);
@@ -491,29 +492,29 @@ void BinaryExpr::getQueryParameters(QuerySchemaParameterList& params)
 }
 
 //=========================================
-ConstExpr::ConstExpr(int token, const QVariant& val)
-        : BaseExpr(token)
+ConstExpression::ConstExpression(int token, const QVariant& val)
+        : Expression(token)
         , value(val)
 {
     m_cl = PredicateExpr_Const;
 }
 
-ConstExpr::ConstExpr(const ConstExpr& expr)
-        : BaseExpr(expr)
+ConstExpression::ConstExpression(const ConstExpression& expr)
+        : Expression(expr)
         , value(expr.value)
 {
 }
 
-ConstExpr::~ConstExpr()
+ConstExpression::~ConstExpression()
 {
 }
 
-ConstExpr* ConstExpr::copy() const
+ConstExpression* ConstExpression::copy() const
 {
-    return new ConstExpr(*this);
+    return new ConstExpression(*this);
 }
 
-Field::Type ConstExpr::type() const
+Field::Type ConstExpression::type() const
 {
     if (m_token == SQL_NULL)
         return Field::Null;
@@ -547,13 +548,13 @@ Field::Type ConstExpr::type() const
     return Field::InvalidType;
 }
 
-QString ConstExpr::debugString() const
+QString ConstExpression::debugString() const
 {
     return QLatin1String("ConstExpr('") + tokenToDebugString() + "'," + toString().toString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-EscapedString ConstExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString ConstExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
     if (m_token == SQL_NULL)
@@ -574,65 +575,65 @@ EscapedString ConstExpr::toString(QuerySchemaParameterValueListIterator* params)
     return EscapedString(value.toString());
 }
 
-void ConstExpr::getQueryParameters(QuerySchemaParameterList& params)
+void ConstExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     Q_UNUSED(params);
 }
 
-bool ConstExpr::validate(ParseInfo& parseInfo)
+bool ConstExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
 
     return type() != Field::InvalidType;
 }
 
 //=========================================
-QueryParameterExpr::QueryParameterExpr(const QString& message)
-        : ConstExpr(QUERY_PARAMETER, message)
+QueryParameterExpression::QueryParameterExpression(const QString& message)
+        : ConstExpression(QUERY_PARAMETER, message)
         , m_type(Field::Text)
 {
     m_cl = PredicateExpr_QueryParameter;
 }
 
-QueryParameterExpr::QueryParameterExpr(const QueryParameterExpr& expr)
-        : ConstExpr(expr)
+QueryParameterExpression::QueryParameterExpression(const QueryParameterExpression& expr)
+        : ConstExpression(expr)
         , m_type(expr.m_type)
 {
 }
 
-QueryParameterExpr::~QueryParameterExpr()
+QueryParameterExpression::~QueryParameterExpression()
 {
 }
 
-QueryParameterExpr* QueryParameterExpr::copy() const
+QueryParameterExpression* QueryParameterExpression::copy() const
 {
-    return new QueryParameterExpr(*this);
+    return new QueryParameterExpression(*this);
 }
 
-Field::Type QueryParameterExpr::type() const
+Field::Type QueryParameterExpression::type() const
 {
     return m_type;
 }
 
-void QueryParameterExpr::setType(Field::Type type)
+void QueryParameterExpression::setType(Field::Type type)
 {
     m_type = type;
 }
 
-QString QueryParameterExpr::debugString() const
+QString QueryParameterExpression::debugString() const
 {
     return QString("QueryParameterExpr('") + QString::fromLatin1("[%2]").arg(value.toString())
            + QString("',type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
-EscapedString QueryParameterExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString QueryParameterExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     return params ? params->getPreviousValueAsString(type())
                                 : EscapedString("[%1]").arg(EscapedString(value.toString()));
 }
 
-void QueryParameterExpr::getQueryParameters(QuerySchemaParameterList& params)
+void QueryParameterExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     QuerySchemaParameter param;
     param.message = value.toString();
@@ -640,15 +641,15 @@ void QueryParameterExpr::getQueryParameters(QuerySchemaParameterList& params)
     params.append(param);
 }
 
-bool QueryParameterExpr::validate(ParseInfo& parseInfo)
+bool QueryParameterExpression::validate(ParseInfo& parseInfo)
 {
     Q_UNUSED(parseInfo);
     return type() != Field::InvalidType;
 }
 
 //=========================================
-VariableExpr::VariableExpr(const QString& _name)
-        : BaseExpr(0/*undefined*/)
+VariableExpression::VariableExpression(const QString& _name)
+        : Expression(0/*undefined*/)
         , name(_name)
         , field(0)
         , tablePositionForField(-1)
@@ -657,8 +658,8 @@ VariableExpr::VariableExpr(const QString& _name)
     m_cl = PredicateExpr_Variable;
 }
 
-VariableExpr::VariableExpr(const VariableExpr& expr)
-        : BaseExpr(expr)
+VariableExpression::VariableExpression(const VariableExpression& expr)
+        : Expression(expr)
         , name(expr.name)
         , field(expr.field)
         , tablePositionForField(expr.tablePositionForField)
@@ -666,34 +667,34 @@ VariableExpr::VariableExpr(const VariableExpr& expr)
 {
 }
 
-VariableExpr::~VariableExpr()
+VariableExpression::~VariableExpression()
 {
 }
 
-VariableExpr* VariableExpr::copy() const
+VariableExpression* VariableExpression::copy() const
 {
-    return new VariableExpr(*this);
+    return new VariableExpression(*this);
 }
 
-QString VariableExpr::debugString() const
+QString VariableExpression::debugString() const
 {
     return QString("VariableExpr(") + name
            + QString(",type=%1)").arg(field ? Driver::defaultSQLTypeName(type()) : QString("FIELD NOT DEFINED YET"));
 }
 
-EscapedString VariableExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString VariableExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
     return EscapedString(name);
 }
 
-void VariableExpr::getQueryParameters(QuerySchemaParameterList& params)
+void VariableExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     Q_UNUSED(params);
 }
 
 //! We're assuming it's called after VariableExpr::validate()
-Field::Type VariableExpr::type() const
+Field::Type VariableExpression::type() const
 {
     if (field)
         return field->type();
@@ -704,9 +705,9 @@ Field::Type VariableExpr::type() const
 
 #define IMPL_ERROR(errmsg) parseInfo.errMsg = "Implementation error"; parseInfo.errDescr = errmsg
 
-bool VariableExpr::validate(ParseInfo& parseInfo)
+bool VariableExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
     field = 0;
     tablePositionForField = -1;
@@ -862,8 +863,8 @@ PREDICATE_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
 
 //=========================================
 
-FunctionExpr::FunctionExpr(const QString& _name, NArgExpr* args_)
-        : BaseExpr(0/*undefined*/)
+FunctionExpression::FunctionExpression(const QString& _name, NArgExpression* args_)
+        : Expression(0/*undefined*/)
         , name(_name)
         , args(args_)
 {
@@ -875,8 +876,8 @@ FunctionExpr::FunctionExpr(const QString& _name, NArgExpr* args_)
         args->setParent(this);
 }
 
-FunctionExpr::FunctionExpr(const FunctionExpr& expr)
-        : BaseExpr(0/*undefined*/)
+FunctionExpression::FunctionExpression(const FunctionExpression& expr)
+        : Expression(0/*undefined*/)
         , name(expr.name)
         , args(expr.args ? args->copy() : 0)
 {
@@ -884,17 +885,17 @@ FunctionExpr::FunctionExpr(const FunctionExpr& expr)
         args->setParent(this);
 }
 
-FunctionExpr::~FunctionExpr()
+FunctionExpression::~FunctionExpression()
 {
     delete args;
 }
 
-FunctionExpr* FunctionExpr::copy() const
+FunctionExpression* FunctionExpression::copy() const
 {
-    return new FunctionExpr(*this);
+    return new FunctionExpression(*this);
 }
 
-QString FunctionExpr::debugString() const
+QString FunctionExpression::debugString() const
 {
     QString res;
     res.append(QString("FunctionExpr(") + name);
@@ -904,31 +905,31 @@ QString FunctionExpr::debugString() const
     return res;
 }
 
-EscapedString FunctionExpr::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString FunctionExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     return name + "(" + (args ? args->toString(params) : EscapedString()) + ")";
 }
 
-void FunctionExpr::getQueryParameters(QuerySchemaParameterList& params)
+void FunctionExpression::getQueryParameters(QuerySchemaParameterList& params)
 {
     args->getQueryParameters(params);
 }
 
-Field::Type FunctionExpr::type() const
+Field::Type FunctionExpression::type() const
 {
 //! @todo
     return Field::InvalidType;
 }
 
-bool FunctionExpr::validate(ParseInfo& parseInfo)
+bool FunctionExpression::validate(ParseInfo& parseInfo)
 {
-    if (!BaseExpr::validate(parseInfo))
+    if (!Expression::validate(parseInfo))
         return false;
 
     return args ? args->validate(parseInfo) : true;
 }
 
-bool FunctionExpr::isBuiltInAggregate(const QByteArray& fname)
+bool FunctionExpression::isBuiltInAggregate(const QByteArray& fname)
 {
     return _builtInAggregates->contains(fname.toUpper());
 }

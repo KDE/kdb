@@ -52,7 +52,7 @@ Field::Field(TableSchema *tableSchema)
     setConstraints(NoConstraints);
 }
 
-Field::Field(QuerySchema *querySchema, BaseExpr* expr)
+Field::Field(QuerySchema *querySchema, Expression* expr)
 {
     init();
     m_parent = querySchema;
@@ -96,7 +96,7 @@ Field::Field(const Field& f)
         m_customProperties = new CustomPropertiesMap(f.customProperties());
 
     if (f.m_expr) {//deep copy the expression
-//! @todo  m_expr = new BaseExpr(*f.m_expr);
+//! @todo  m_expr = new Expression(*f.m_expr);
 
 //  m_expr->m_field = this;
     } else
@@ -648,7 +648,7 @@ QDebug operator<<(QDebug dbg, const Field& field)
     return dbg.space();
 }
 
-void Field::setExpression(Predicate::BaseExpr *expr)
+void Field::setExpression(Predicate::Expression *expr)
 {
     assert(!m_parent || dynamic_cast<QuerySchema*>(m_parent));
     if (m_expr == expr)

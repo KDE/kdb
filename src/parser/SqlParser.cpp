@@ -867,9 +867,9 @@ typedef union YYSTYPE
 	struct realType realValue;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
-	Predicate::BaseExpr *expr;
-	Predicate::NArgExpr *exprList;
-	Predicate::ConstExpr *constExpr;
+	Predicate::Expression *expr;
+	Predicate::NArgExpression *exprList;
+	Predicate::ConstExpression *constExpr;
 	Predicate::QuerySchema *querySchema;
 	SelectOptionsInternal *selectOptions;
 	OrderByColumnInternal::List *orderByColumns;
@@ -2739,133 +2739,133 @@ YYACCEPT;
 #line 861 "SqlParser.y"
     {
 //	PreDbg << "AND " << $3.debugString();
-	(yyval.expr) = new BinaryExpr( PredicateExpr_Logical, (yyvsp[(1) - (3)].expr), AND, (yyvsp[(3) - (3)].expr) );
+	(yyval.expr) = new BinaryExpression( PredicateExpr_Logical, (yyvsp[(1) - (3)].expr), AND, (yyvsp[(3) - (3)].expr) );
 ;}
     break;
 
   case 45:
 #line 866 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr( PredicateExpr_Logical, (yyvsp[(1) - (3)].expr), OR, (yyvsp[(3) - (3)].expr) );
+	(yyval.expr) = new BinaryExpression( PredicateExpr_Logical, (yyvsp[(1) - (3)].expr), OR, (yyvsp[(3) - (3)].expr) );
 ;}
     break;
 
   case 46:
 #line 870 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr( PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), XOR, (yyvsp[(3) - (3)].expr) );
+	(yyval.expr) = new BinaryExpression( PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), XOR, (yyvsp[(3) - (3)].expr) );
 ;}
     break;
 
   case 48:
 #line 880 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '>', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '>', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 49:
 #line 884 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), GREATER_OR_EQUAL, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), GREATER_OR_EQUAL, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 50:
 #line 888 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '<', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '<', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 51:
 #line 892 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), LESS_OR_EQUAL, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), LESS_OR_EQUAL, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 52:
 #line 896 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '=', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), '=', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 54:
 #line 906 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_EQUAL, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_EQUAL, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 55:
 #line 911 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_EQUAL2, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_EQUAL2, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 56:
 #line 915 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), LIKE, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), LIKE, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 57:
 #line 919 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), SQL_IN, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), SQL_IN, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 58:
 #line 923 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), SIMILAR_TO, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), SIMILAR_TO, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 59:
 #line 927 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_SIMILAR_TO, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Relational, (yyvsp[(1) - (3)].expr), NOT_SIMILAR_TO, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 61:
 #line 937 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( SQL_IS_NULL, (yyvsp[(1) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( SQL_IS_NULL, (yyvsp[(1) - (2)].expr) );
 ;}
     break;
 
   case 62:
 #line 941 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( SQL_IS_NOT_NULL, (yyvsp[(1) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( SQL_IS_NOT_NULL, (yyvsp[(1) - (2)].expr) );
 ;}
     break;
 
   case 64:
 #line 951 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), BITWISE_SHIFT_LEFT, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), BITWISE_SHIFT_LEFT, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 65:
 #line 955 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), BITWISE_SHIFT_RIGHT, (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), BITWISE_SHIFT_RIGHT, (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 67:
 #line 965 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '+', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '+', (yyvsp[(3) - (3)].expr));
 	PreDbg << *(yyval.expr);
 ;}
     break;
@@ -2873,77 +2873,77 @@ YYACCEPT;
   case 68:
 #line 970 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '-', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '-', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 69:
 #line 974 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '&', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '&', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 70:
 #line 978 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '|', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '|', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 72:
 #line 988 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '/', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '/', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 73:
 #line 992 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '*', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '*', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 74:
 #line 996 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '%', (yyvsp[(3) - (3)].expr));
+	(yyval.expr) = new BinaryExpression(PredicateExpr_Arithm, (yyvsp[(1) - (3)].expr), '%', (yyvsp[(3) - (3)].expr));
 ;}
     break;
 
   case 76:
 #line 1007 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( '-', (yyvsp[(2) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( '-', (yyvsp[(2) - (2)].expr) );
 ;}
     break;
 
   case 77:
 #line 1011 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( '+', (yyvsp[(2) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( '+', (yyvsp[(2) - (2)].expr) );
 ;}
     break;
 
   case 78:
 #line 1015 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( '~', (yyvsp[(2) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( '~', (yyvsp[(2) - (2)].expr) );
 ;}
     break;
 
   case 79:
 #line 1019 "SqlParser.y"
     {
-	(yyval.expr) = new UnaryExpr( NOT, (yyvsp[(2) - (2)].expr) );
+	(yyval.expr) = new UnaryExpression( NOT, (yyvsp[(2) - (2)].expr) );
 ;}
     break;
 
   case 80:
 #line 1023 "SqlParser.y"
     {
-	(yyval.expr) = new VariableExpr( *(yyvsp[(1) - (1)].stringValue) );
+	(yyval.expr) = new VariableExpression( *(yyvsp[(1) - (1)].stringValue) );
 	
 //TODO: simplify this later if that's 'only one field name' expression
 	PreDbg << "  + identifier: " << *(yyvsp[(1) - (1)].stringValue);
@@ -2954,7 +2954,7 @@ YYACCEPT;
   case 81:
 #line 1031 "SqlParser.y"
     {
-	(yyval.expr) = new QueryParameterExpr( *(yyvsp[(1) - (1)].stringValue) );
+	(yyval.expr) = new QueryParameterExpression( *(yyvsp[(1) - (1)].stringValue) );
 	PreDbg << "  + query parameter:" << *(yyval.expr);
 	delete (yyvsp[(1) - (1)].stringValue);
 ;}
@@ -2964,7 +2964,7 @@ YYACCEPT;
 #line 1037 "SqlParser.y"
     {
 	PreDbg << "  + function:" << *(yyvsp[(1) - (2)].stringValue) << "(" << *(yyvsp[(2) - (2)].exprList) << ")";
-	(yyval.expr) = new FunctionExpr(*(yyvsp[(1) - (2)].stringValue), (yyvsp[(2) - (2)].exprList));
+	(yyval.expr) = new FunctionExpression(*(yyvsp[(1) - (2)].stringValue), (yyvsp[(2) - (2)].exprList));
 	delete (yyvsp[(1) - (2)].stringValue);
 ;}
     break;
@@ -2972,7 +2972,7 @@ YYACCEPT;
   case 83:
 #line 1044 "SqlParser.y"
     {
-	(yyval.expr) = new VariableExpr( *(yyvsp[(1) - (3)].stringValue) + "." + *(yyvsp[(3) - (3)].stringValue) );
+	(yyval.expr) = new VariableExpression( *(yyvsp[(1) - (3)].stringValue) + "." + *(yyvsp[(3) - (3)].stringValue) );
 	PreDbg << "  + identifier.identifier:" << *(yyvsp[(1) - (3)].stringValue) << "." << *(yyvsp[(3) - (3)].stringValue);
 	delete (yyvsp[(1) - (3)].stringValue);
 	delete (yyvsp[(3) - (3)].stringValue);
@@ -2982,7 +2982,7 @@ YYACCEPT;
   case 84:
 #line 1051 "SqlParser.y"
     {
-	(yyval.expr) = new ConstExpr( SQL_NULL, QVariant() );
+	(yyval.expr) = new ConstExpression( SQL_NULL, QVariant() );
 	PreDbg << "  + NULL";
 //	$$ = new Field();
 	//$$->setName(QString::null);
@@ -2992,7 +2992,7 @@ YYACCEPT;
   case 85:
 #line 1058 "SqlParser.y"
     {
-	(yyval.expr) = new ConstExpr( CHARACTER_STRING_LITERAL, *(yyvsp[(1) - (1)].stringValue) );
+	(yyval.expr) = new ConstExpression( CHARACTER_STRING_LITERAL, *(yyvsp[(1) - (1)].stringValue) );
 	PreDbg << "  + constant " << (yyvsp[(1) - (1)].stringValue);
 	delete (yyvsp[(1) - (1)].stringValue);
 ;}
@@ -3013,7 +3013,7 @@ YYACCEPT;
 //		val = (quint64)$1;
 //TODO ok?
 
-	(yyval.expr) = new ConstExpr( INTEGER_CONST, val );
+	(yyval.expr) = new ConstExpression( INTEGER_CONST, val );
 	PreDbg << "  + int constant: " << val.toString();
 ;}
     break;
@@ -3021,7 +3021,7 @@ YYACCEPT;
   case 87:
 #line 1081 "SqlParser.y"
     {
-	(yyval.expr) = new ConstExpr( REAL_CONST, QPoint( (yyvsp[(1) - (1)].realValue).integer, (yyvsp[(1) - (1)].realValue).fractional ) );
+	(yyval.expr) = new ConstExpression( REAL_CONST, QPoint( (yyvsp[(1) - (1)].realValue).integer, (yyvsp[(1) - (1)].realValue).fractional ) );
 	PreDbg << "  + real constant: " << (yyvsp[(1) - (1)].realValue).integer << "." << (yyvsp[(1) - (1)].realValue).fractional;
 ;}
     break;
@@ -3030,7 +3030,7 @@ YYACCEPT;
 #line 1092 "SqlParser.y"
     {
 	PreDbg << "(expr)";
-	(yyval.expr) = new UnaryExpr('(', (yyvsp[(2) - (3)].expr));
+	(yyval.expr) = new UnaryExpression('(', (yyvsp[(2) - (3)].expr));
 ;}
     break;
 
@@ -3055,7 +3055,7 @@ YYACCEPT;
   case 92:
 #line 1115 "SqlParser.y"
     {
-	(yyval.exprList) = new NArgExpr(0, 0);
+	(yyval.exprList) = new NArgExpression(0, 0);
 	(yyval.exprList)->add( (yyvsp[(1) - (3)].expr) );
 	(yyval.exprList)->add( (yyvsp[(3) - (3)].expr) );
 ;}
@@ -3079,7 +3079,7 @@ YYACCEPT;
   case 95:
 #line 1174 "SqlParser.y"
     {
-	(yyval.exprList) = new NArgExpr(PredicateExpr_TableList, IDENTIFIER); //ok?
+	(yyval.exprList) = new NArgExpression(PredicateExpr_TableList, IDENTIFIER); //ok?
 	(yyval.exprList)->add((yyvsp[(1) - (1)].expr));
 ;}
     break;
@@ -3088,7 +3088,7 @@ YYACCEPT;
 #line 1182 "SqlParser.y"
     {
 	PreDbg << "FROM: '" << *(yyvsp[(1) - (1)].stringValue) << "'";
-	(yyval.expr) = new VariableExpr(*(yyvsp[(1) - (1)].stringValue));
+	(yyval.expr) = new VariableExpression(*(yyvsp[(1) - (1)].stringValue));
 
 	/*
 //TODO: this isn't ok for more tables:
@@ -3119,10 +3119,10 @@ YYACCEPT;
 #line 1210 "SqlParser.y"
     {
 	//table + alias
-	(yyval.expr) = new BinaryExpr(
+	(yyval.expr) = new BinaryExpression(
 		PredicateExpr_SpecialBinary,
-		new VariableExpr(*(yyvsp[(1) - (2)].stringValue)), 0,
-		new VariableExpr(*(yyvsp[(2) - (2)].stringValue))
+		new VariableExpression(*(yyvsp[(1) - (2)].stringValue)), 0,
+		new VariableExpression(*(yyvsp[(2) - (2)].stringValue))
 	);
 	delete (yyvsp[(1) - (2)].stringValue);
 	delete (yyvsp[(2) - (2)].stringValue);
@@ -3133,10 +3133,10 @@ YYACCEPT;
 #line 1221 "SqlParser.y"
     {
 	//table + alias
-	(yyval.expr) = new BinaryExpr(
+	(yyval.expr) = new BinaryExpression(
 		PredicateExpr_SpecialBinary,
-		new VariableExpr(*(yyvsp[(1) - (3)].stringValue)), AS,
-		new VariableExpr(*(yyvsp[(3) - (3)].stringValue))
+		new VariableExpression(*(yyvsp[(1) - (3)].stringValue)), AS,
+		new VariableExpression(*(yyvsp[(3) - (3)].stringValue))
 	);
 	delete (yyvsp[(1) - (3)].stringValue);
 	delete (yyvsp[(3) - (3)].stringValue);
@@ -3155,7 +3155,7 @@ YYACCEPT;
   case 100:
 #line 1243 "SqlParser.y"
     {
-	(yyval.exprList) = new NArgExpr(0,0);
+	(yyval.exprList) = new NArgExpression(0,0);
 	(yyval.exprList)->add( (yyvsp[(1) - (1)].expr) );
 	PreDbg << "ColViews: ColItem";
 ;}
@@ -3184,9 +3184,9 @@ YYACCEPT;
   case 103:
 #line 1266 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(
+	(yyval.expr) = new BinaryExpression(
 		PredicateExpr_SpecialBinary, (yyvsp[(1) - (3)].expr), AS,
-		new VariableExpr(*(yyvsp[(3) - (3)].stringValue))
+		new VariableExpression(*(yyvsp[(3) - (3)].stringValue))
 	);
 	PreDbg << " added column expr:" << *(yyval.expr);
 	delete (yyvsp[(3) - (3)].stringValue);
@@ -3196,9 +3196,9 @@ YYACCEPT;
   case 104:
 #line 1275 "SqlParser.y"
     {
-	(yyval.expr) = new BinaryExpr(
+	(yyval.expr) = new BinaryExpression(
 		PredicateExpr_SpecialBinary, (yyvsp[(1) - (2)].expr), 0,
-		new VariableExpr(*(yyvsp[(2) - (2)].stringValue))
+		new VariableExpression(*(yyvsp[(2) - (2)].stringValue))
 	);
 	PreDbg << " added column expr:" << *(yyval.expr);
 	delete (yyvsp[(2) - (2)].stringValue);
@@ -3224,7 +3224,7 @@ YYACCEPT;
   case 107:
 #line 1340 "SqlParser.y"
     {
-	(yyval.expr) = new VariableExpr("*");
+	(yyval.expr) = new VariableExpression("*");
 	PreDbg << "all columns";
 
 //	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
@@ -3238,7 +3238,7 @@ YYACCEPT;
     {
 	QString s( *(yyvsp[(1) - (3)].stringValue) );
 	s += ".*";
-	(yyval.expr) = new VariableExpr(s);
+	(yyval.expr) = new VariableExpression(s);
 	PreDbg << "  + all columns from " << s;
 	delete (yyvsp[(1) - (3)].stringValue);
 ;}

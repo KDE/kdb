@@ -512,7 +512,7 @@ using namespace Predicate;
 	struct realType realValue;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
-	Predicate::BaseExpr *expr;
+	Predicate::Expression *expr;
 	Predicate::NArgExpr *exprList;
 	Predicate::ConstExpr *constExpr;
 	Predicate::QuerySchema *querySchema;

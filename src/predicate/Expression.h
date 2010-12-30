@@ -57,29 +57,29 @@ namespace Predicate
 PREDICATE_EXPORT QString exprClassName(int c);
 
 class ParseInfo;
-class NArgExpr;
-class UnaryExpr;
-class BinaryExpr;
-class ConstExpr;
-class VariableExpr;
-class FunctionExpr;
-class QueryParameterExpr;
+class NArgExpression;
+class UnaryExpression;
+class BinaryExpression;
+class ConstExpression;
+class VariableExpression;
+class FunctionExpression;
+class QueryParameterExpression;
 class QuerySchemaParameterValueListIterator;
 //class QuerySchemaParameterList;
 
 //! A base class for all expressions
-class PREDICATE_EXPORT BaseExpr
+class PREDICATE_EXPORT Expression
 {
 public:
-    typedef QList<BaseExpr*> List;
-    typedef QList<BaseExpr*>::ConstIterator ListIterator;
+    typedef QList<Expression*> List;
+    typedef QList<Expression*>::ConstIterator ListIterator;
 
-    explicit BaseExpr(int token);
-    virtual ~BaseExpr();
+    explicit Expression(int token);
+    virtual ~Expression();
 
     //! @return a deep copy of this object.
 //! @todo a nonpointer will be returned here when we move to implicit data sharing
-    virtual BaseExpr* copy() const = 0;
+    virtual Expression* copy() const = 0;
 
     int token() const {
         return m_token;
@@ -87,11 +87,11 @@ public:
 
     virtual Field::Type type() const;
 
-    BaseExpr* parent() const {
+    Expression* parent() const {
         return m_par;
     }
 
-    virtual void setParent(BaseExpr *p) {
+    virtual void setParent(Expression *p) {
         m_par = p;
     }
 
@@ -112,7 +112,7 @@ public:
         return tokenToDebugString(m_token);
     }
 
-    //! @return debug string, used in QDebug operator<<(QDebug, const BaseExpr&)
+    //! @return debug string, used in QDebug operator<<(QDebug, const Expression&)
     virtual QString debugString() const;
 
     static QString tokenToDebugString(int token);
@@ -125,59 +125,59 @@ public:
     }
 
     /*! Convenience type casts. */
-    NArgExpr* toNArg();
-    UnaryExpr* toUnary();
-    BinaryExpr* toBinary();
-    ConstExpr* toConst();
-    VariableExpr* toVariable();
-    FunctionExpr* toFunction();
-    QueryParameterExpr* toQueryParameter();
+    NArgExpression* toNArg();
+    UnaryExpression* toUnary();
+    BinaryExpression* toBinary();
+    ConstExpression* toConst();
+    VariableExpression* toVariable();
+    FunctionExpression* toFunction();
+    QueryParameterExpression* toQueryParameter();
 
 protected:
     int m_cl; //!< class
-    BaseExpr *m_par; //!< parent expression
+    Expression *m_par; //!< parent expression
     int m_token;
 };
 
 //! A base class N-argument operation
-class PREDICATE_EXPORT NArgExpr : public BaseExpr
+class PREDICATE_EXPORT NArgExpression : public Expression
 {
 public:
-    NArgExpr(int aClass, int token);
-    NArgExpr(const NArgExpr& expr);
-    virtual ~NArgExpr();
+    NArgExpression(int aClass, int token);
+    NArgExpression(const NArgExpression& expr);
+    virtual ~NArgExpression();
     //! @return a deep copy of this object.
-    virtual NArgExpr* copy() const;
-    void add(BaseExpr *expr);
-    void prepend(BaseExpr *expr);
-    BaseExpr *arg(int n);
+    virtual NArgExpression* copy() const;
+    void add(Expression *expr);
+    void prepend(Expression *expr);
+    Expression *arg(int n);
     int args();
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
-    BaseExpr::List list;
+    Expression::List list;
 };
 
 //! An unary argument operation: + - NOT (or !) ~ "IS NULL" "IS NOT NULL"
-class PREDICATE_EXPORT UnaryExpr : public BaseExpr
+class PREDICATE_EXPORT UnaryExpression : public Expression
 {
 public:
-    UnaryExpr(int token, BaseExpr *arg);
-    UnaryExpr(const UnaryExpr& expr);
-    virtual ~UnaryExpr();
+    UnaryExpression(int token, Expression *arg);
+    UnaryExpression(const UnaryExpression& expr);
+    virtual ~UnaryExpression();
     //! @return a deep copy of this object.
-    virtual UnaryExpr* copy() const;
+    virtual UnaryExpression* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    BaseExpr *arg() const {
+    Expression *arg() const {
         return m_arg;
     }
     virtual bool validate(ParseInfo& parseInfo);
 
-    BaseExpr *m_arg;
+    Expression *m_arg;
 };
 
 /*! A base class for binary operation
@@ -188,42 +188,42 @@ public:
     * e.g. "f1 f2" : token == 0
     * e.g. "f1 AS f2" : token == AS
 */
-class PREDICATE_EXPORT BinaryExpr : public BaseExpr
+class PREDICATE_EXPORT BinaryExpression : public Expression
 {
 public:
-    BinaryExpr(int aClass, BaseExpr *left_expr, int token, BaseExpr *right_expr);
-    BinaryExpr(const BinaryExpr& expr);
-    virtual ~BinaryExpr();
+    BinaryExpression(int aClass, Expression *left_expr, int token, Expression *right_expr);
+    BinaryExpression(const BinaryExpression& expr);
+    virtual ~BinaryExpression();
     //! @return a deep copy of this object.
-    virtual BinaryExpr* copy() const;
+    virtual BinaryExpression* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    BaseExpr *left() const {
+    Expression *left() const {
         return m_larg;
     }
-    BaseExpr *right() const {
+    Expression *right() const {
         return m_rarg;
     }
     virtual bool validate(ParseInfo& parseInfo);
     virtual QString tokenToString() const;
 
-    BaseExpr *m_larg;
-    BaseExpr *m_rarg;
+    Expression *m_larg;
+    Expression *m_rarg;
 };
 
 /*! String, integer, float constants also includes NULL value.
  token can be: IDENTIFIER, SQL_NULL, CHARACTER_STRING_LITERAL,
  INTEGER_CONST, REAL_CONST */
-class PREDICATE_EXPORT ConstExpr : public BaseExpr
+class PREDICATE_EXPORT ConstExpression : public Expression
 {
 public:
-    ConstExpr(int token, const QVariant& val);
-    ConstExpr(const ConstExpr& expr);
-    virtual ~ConstExpr();
+    ConstExpression(int token, const QVariant& val);
+    ConstExpression(const ConstExpression& expr);
+    virtual ~ConstExpression();
     //! @return a deep copy of this object.
-    virtual ConstExpr* copy() const;
+    virtual ConstExpression* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
@@ -234,14 +234,14 @@ public:
 
 //! Query parameter used to getting user input of constant values.
 //! It contains a message that is displayed to the user.
-class PREDICATE_EXPORT QueryParameterExpr : public ConstExpr
+class PREDICATE_EXPORT QueryParameterExpression : public ConstExpression
 {
 public:
-    explicit QueryParameterExpr(const QString& message);
-    QueryParameterExpr(const QueryParameterExpr& expr);
-    virtual ~QueryParameterExpr();
+    explicit QueryParameterExpression(const QString& message);
+    QueryParameterExpression(const QueryParameterExpression& expr);
+    virtual ~QueryParameterExpression();
     //! @return a deep copy of this object.
-    virtual QueryParameterExpr* copy() const;
+    virtual QueryParameterExpression* copy() const;
     virtual Field::Type type() const;
     /*! Sets expected type of the parameter. The default is String.
      This method is called from parent's expression validate().
@@ -261,14 +261,14 @@ protected:
 };
 
 //! Variables like <i>fieldname</i> or <i>tablename</i>.<i>fieldname</i>
-class PREDICATE_EXPORT VariableExpr : public BaseExpr
+class PREDICATE_EXPORT VariableExpression : public Expression
 {
 public:
-    explicit VariableExpr(const QString& _name);
-    VariableExpr(const VariableExpr& expr);
-    virtual ~VariableExpr();
+    explicit VariableExpression(const QString& _name);
+    VariableExpression(const VariableExpression& expr);
+    virtual ~VariableExpression();
     //! @return a deep copy of this object.
-    virtual VariableExpr* copy() const;
+    virtual VariableExpression* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
@@ -305,14 +305,14 @@ public:
 //! - aggregation functions like SUM, COUNT, MAX, ...
 //! - builtin functions like CURRENT_TIME()
 //! - user defined functions
-class PREDICATE_EXPORT FunctionExpr : public BaseExpr
+class PREDICATE_EXPORT FunctionExpression : public Expression
 {
 public:
-    explicit FunctionExpr(const QString& _name, NArgExpr* args_ = 0);
-    FunctionExpr(const FunctionExpr& expr);
-    virtual ~FunctionExpr();
-    //! @return a deep copy of this object.
-    virtual FunctionExpr* copy() const;
+    explicit FunctionExpression(const QString& _name, NArgExpression* args_ = 0);
+    FunctionExpression(const FunctionExpression& expr);
+    virtual ~FunctionExpression();
+    //! @return a deep copy of this obect.
+    virtual FunctionExpression* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
@@ -323,12 +323,12 @@ public:
     static bool isBuiltInAggregate(const QByteArray& fname);
 
     QString name;
-    NArgExpr* args;
+    NArgExpression* args;
 };
 
 } //namespace Predicate
 
 //! Sends information about expression  @a expr to debug output @a dbg.
-PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::BaseExpr& expr);
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Expression& expr);
 
 #endif

@@ -68,7 +68,7 @@ struct SelectOptionsInternal {
     ~SelectOptionsInternal() {
         delete orderByColumns; // delete because this is internal temp. structure
     }
-    Predicate::BaseExpr* whereExpr;
+    Predicate::Expression* whereExpr;
     OrderByColumnInternal::List* orderByColumns;
 };
 

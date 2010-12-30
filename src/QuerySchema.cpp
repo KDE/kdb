@@ -359,7 +359,7 @@ public:
     QVector<int> tablesBoundToColumns;
 
     /*! WHERE expression */
-    BaseExpr *whereExpr;
+    Expression *whereExpr;
 
     QHash<QString, QueryColumnInfo*> columnInfosByNameExpanded;
 
@@ -780,7 +780,7 @@ void QuerySchema::removeField(Predicate::Field *field)
     FieldList::removeField(field);
 }
 
-FieldList& QuerySchema::addExpression(BaseExpr* expr, bool visible)
+FieldList& QuerySchema::addExpression(Expression* expr, bool visible)
 {
     return addField(new Field(this, expr), visible);
 }
@@ -1335,7 +1335,7 @@ void QuerySchema::computeFieldsExpanded() const
                             QString::fromLatin1("[multiple_visible_fields_%1]")
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
-                            new ConstExpr(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                            new ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                         if (!d->ownedVisibleColumns) {
                             d->ownedVisibleColumns = new Field::List();
 //Qt 4       d->ownedVisibleColumns->setAutoDelete(true);
@@ -1393,7 +1393,7 @@ void QuerySchema::computeFieldsExpanded() const
                         QString::fromLatin1("[multiple_visible_fields_%1]")
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
-                        new ConstExpr(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                        new ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                     if (!d->ownedVisibleColumns) {
                         d->ownedVisibleColumns = new Field::List();
 //Qt 4      d->ownedVisibleColumns->setAutoDelete(true);
@@ -1706,7 +1706,7 @@ EscapedString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
     return d->autoIncrementSQLFieldsList;
 }
 
-void QuerySchema::setWhereExpression(BaseExpr *expr)
+void QuerySchema::setWhereExpression(Expression *expr)
 {
     delete d->whereExpr;
     d->whereExpr = expr;
@@ -1726,14 +1726,14 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
 //! @todo date, time
     }
 
-    BinaryExpr * newExpr = new BinaryExpr(
+    BinaryExpression * newExpr = new BinaryExpression(
         PredicateExpr_Relational,
-        new ConstExpr(token, value),
+        new ConstExpression(token, value),
         relation,
-        new VariableExpr((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
+        new VariableExpression((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
     );
     if (d->whereExpr) {
-        d->whereExpr = new BinaryExpr(
+        d->whereExpr = new BinaryExpression(
             PredicateExpr_Logical,
             d->whereExpr,
             AND,
@@ -1760,7 +1760,7 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
 
 */
 
-BaseExpr *QuerySchema::whereExpression() const
+Expression *QuerySchema::whereExpression() const
 {
     return d->whereExpr;
 }

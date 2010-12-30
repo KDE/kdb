@@ -39,7 +39,7 @@ namespace Predicate
 class TableSchema;
 class QuerySchema;
 class FieldList;
-class BaseExpr;
+class Expression;
 
 //! Meta-data for a field
 /*! Predicate::Field provides information about single database field.
@@ -56,7 +56,7 @@ class BaseExpr;
  - description (user readable name additional text, can be useful for developers)
  - width (a hint for displaying in tabular mode or as text box)
 
- Field can also have assigned expression (see Predicate::BaseExpr class,
+ Field can also have assigned expression (see Predicate::Expression class,
  and expression() method).
  If an expression is defined, then field's name is
 
@@ -65,7 +65,7 @@ class BaseExpr;
 
  Notes for advanced use: Field obeject is designed to be owned by a parent object.
  Such a parent object can be Predicate::TableSchema, if the field defines single table column,
- or Predicate::QuerySchema, if the field defines an expression (Predicate::BaseExpr class).
+ or Predicate::QuerySchema, if the field defines an expression (Predicate::Expression class).
 
  Using expression class for fields allos to define expressions within queries like
  "SELECT AVG(price) FROM products"
@@ -602,14 +602,14 @@ public:
         return m_type == Field::Asterisk;
     }
 
-    /*! @return Predicate::BaseExpr object if the field value is an
+    /*! @return Predicate::Expression object if the field value is an
      expression.  Unless the expression is set with setExpression(), it is null.
     */
-    inline Predicate::BaseExpr *expression() {
+    inline Predicate::Expression *expression() {
         return m_expr;
     }
 
-    inline const Predicate::BaseExpr *expression() const {
+    inline const Predicate::Expression *expression() const {
         return m_expr;
     }
 
@@ -622,7 +622,7 @@ public:
      Because the field defines an expression, it should be assigned to a query,
      not to a table.
     */
-    void setExpression(Predicate::BaseExpr *expr);
+    void setExpression(Predicate::Expression *expr);
 
     /*! @return true if there is expression defined for this field.
      This method is provided for better readibility
@@ -667,7 +667,7 @@ protected:
      Used internally by query schemas, e.g. to declare asterisks or
      to add expression columns.
      No other properties are set, so these should be set later. */
-    Field(QuerySchema *querySchema, BaseExpr* expr = 0);
+    Field(QuerySchema *querySchema, Expression* expr = 0);
 
     /*! @internal Used by constructors. */
     void init();
@@ -691,7 +691,7 @@ protected:
     uint m_width;
     QVector<QString> m_hints;
 
-    Predicate::BaseExpr *m_expr;
+    Predicate::Expression *m_expr;
     CustomPropertiesMap* m_customProperties;
 
     //! @internal Used in m_typeNames member to handle i18n-ed type names

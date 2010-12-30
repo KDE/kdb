@@ -349,7 +349,7 @@ public:
 
     /*! Adds a field built on top of @a expr expression.
      This creates a new Field object and adds it to the query schema using addField(). */
-    FieldList& addExpression(BaseExpr* expr, bool visible = true);
+    FieldList& addExpression(Expression* expr, bool visible = true);
 
     /*! @return visibility flag for column at @a position.
      By default column is visible. */
@@ -773,14 +773,14 @@ public:
     /*! Sets a WHERE expression @a exp. It will be owned by this query,
      so you can forget about it. Previously set WHERE expression will be deleted.
      You can pass 0 to remove expresssion. */
-    void setWhereExpression(BaseExpr *expr);
+    void setWhereExpression(Expression *expr);
 
     /*! @return WHERE expression or 0 if this query has no WHERE expression */
-    BaseExpr *whereExpression() const;
+    Expression *whereExpression() const;
 
     /*! Adds a part to WHERE expression.
      Simplifies creating of WHERE expression, if used instead
-     of setWhereExpression(BaseExpr *expr). */
+     of setWhereExpression(Expression *expr). */
     void addToWhereExpression(Predicate::Field *field, const QVariant& value, int relation = '=');
 
     /*! Sets a list of columns for ORDER BY section of the query.
