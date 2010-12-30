@@ -44,7 +44,7 @@
 /**
  * @brief Make a number from the major, minor and release number of a Predicate version
  *
- * This function can be used for preprocessing when KDE_IS_VERSION is not
+ * This function can be used for preprocessing when PREDICATE_IS_VERSION is not
  * appropriate.
  */
 #define PREDICATE_MAKE_VERSION( a,b,c ) (((a) << 16) | ((b) << 8) | (c))
@@ -54,7 +54,7 @@
  *
  * This macro contains the Predicate version in number form. As it is a macro,
  * it contains the version at compile time. See versionString() if you need
- * the KDE version used at runtime.
+ * the Predicate version used at runtime.
  */
 #define PREDICATE_VERSION \
   PREDICATE_MAKE_VERSION(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE)
@@ -76,7 +76,7 @@
  * Otherwise you might risk to break the next Predicate release.
  * Therefore be careful that development version have a
  * version number lower than the released version, so do not check 
- * e.g. for Predicate 2.1 with KDE_IS_VERSION(2,1,0)
+ * e.g. for Predicate 2.1 with PREDICATE_IS_VERSION(2,1,0)
  * but with the actual version number at a time a needed feature was introduced.
  */
 #define PREDICATE_IS_VERSION(a,b,c) ( PREDICATE_VERSION >= PREDICATE_MAKE_VERSION(a,b,c) )
