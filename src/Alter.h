@@ -81,7 +81,7 @@ class Connection;
  Already opened Connection object is needed.
 
  Use case:
- \code
+ @code
   Connection *conn = ...
 
   // add some actions (in reality this is performed by tracking user's actions)
@@ -104,7 +104,7 @@ class Connection;
 
   AlterTableHandler::execute( *conn );
 
- \endcode
+ @endcode
 
  Actions for Alter
 */
@@ -168,7 +168,7 @@ public:
         InsertFieldAction& toInsertFieldAction();
         MoveFieldPositionAction& toMoveFieldPositionAction();
 
-        //! \return true if the action is NULL; used in the Table Designer
+        //! @return true if the action is NULL; used in the Table Designer
         //! for temporarily collecting actions that have no effect at all.
         bool isNull() const {
             return m_null;
@@ -210,7 +210,7 @@ public:
 
         virtual void updateAlteringRequirements() {}
 
-        /*! Simplifies \a fieldActions dictionary. If this action has to be inserted
+        /*! Simplifies @a fieldActions dictionary. If this action has to be inserted
          Into the dictionary, an ActionDict is created first and then a copy of this action
          is inserted into it. */
         virtual void simplifyActions(ActionDictDict &fieldActions) {
@@ -255,12 +255,12 @@ public:
         explicit FieldActionBase(bool);
         virtual ~FieldActionBase();
 
-        //! \return field name for this action
+        //! @return field name for this action
         QString fieldName() const {
             return m_fieldName;
         }
 
-        /*! \return field's unique identifier
+        /*! @return field's unique identifier
          This id is needed because in the meantime there can be more than one
          field sharing the same name, so we need to identify them unambiguously.
          After the (valid) altering is completed all the names will be unique.
@@ -418,23 +418,23 @@ public:
 
     virtual ~AlterTableHandler();
 
-    /*! Appends \a action for the alter table tool. */
+    /*! Appends @a action for the alter table tool. */
     void addAction(ActionBase* action);
 
     /*! Provided for convenience, @see addAction(const ActionBase& action). */
     AlterTableHandler& operator<< (ActionBase* action);
 
-    /*! Removes an action from the alter table tool at index \a index. */
+    /*! Removes an action from the alter table tool at index @a index. */
     void removeAction(int index);
 
     /*! Removes all actions from the alter table tool. */
     void clear();
 
-    /*! Sets \a actions for the alter table tool. Previous actions are cleared.
-     \a actions will be owned by the AlterTableHandler object. */
+    /*! Sets @a actions for the alter table tool. Previous actions are cleared.
+     @a actions will be owned by the AlterTableHandler object. */
     void setActions(const ActionList& actions);
 
-    /*! \return a list of actions for this AlterTable object.
+    /*! @return a list of actions for this AlterTable object.
      Use ActionBase::ListIterator to iterate over the list items. */
     const ActionList& actions() const;
 
@@ -462,7 +462,7 @@ public:
         bool onlyComputeRequirements;
     };
 
-    /*! Performs table alteration using predefined actions for table named \a tableName,
+    /*! Performs table alteration using predefined actions for table named @a tableName,
      assuming it already exists. The Connection object passed to the constructor must exist,
      must be connected and a database must be used. The connection must not be read-only.
 
@@ -478,7 +478,7 @@ public:
      (then, you can get a detailed error message from Predicate::Object).
      When the action has been cancelled (stopped), args.result is set to cancelled value.
      If args.debugString is not 0, it will be filled with debugging output.
-     \return the new table schema object created as a result of schema altering.
+     @return the new table schema object created as a result of schema altering.
      The old table is returned if recreating table schema was not necessary or args.simulate is true.
      0 is returned if args.result is not true. */
     TableSchema* execute(const QString& tableName, ExecutionArguments* args);
@@ -490,8 +490,8 @@ public:
      This function is used only in the alter table test suite. */
 //  tristate simulateExecution(const QString& tableName, QString& debugString);
 
-    /*! Helper. \return a combination of AlteringRequirements values decribing altering type required
-     when a given property field's \a propertyName is altered.
+    /*! Helper. @return a combination of AlteringRequirements values decribing altering type required
+     when a given property field's @a propertyName is altered.
      Used internally AlterTableHandler. Moreover it can be also used in the Table Designer's code
      as a temporary replacement before AlterTableHandler is fully implemented.
      Thus, it is possible to identify properties that have no PhysicalAlteringRequired flag set

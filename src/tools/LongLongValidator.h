@@ -57,13 +57,13 @@ public:
     //! Sets the numeric base value.
     virtual void setBase(int base);
 
-    //! \return the current minimum value allowed
+    //! @return the current minimum value allowed
     virtual qint64 bottom() const;
 
-    //! \return the current maximum value allowed
+    //! @return the current maximum value allowed
     virtual qint64 top() const;
 
-    //! \return the current numeric base
+    //! @return the current numeric base
     virtual int base() const;
 
 private:

@@ -95,72 +95,72 @@ public:
         ReadOnlyConnection = 1 //!< set to perform read only connection
     };
 
-    /*! Creates connection using \a conn_data as parameters.
-     \return 0 and sets error message on error.
-     driverName member of \a conn_data will be updated with this driver name.
-     \a options can be a combination of CreateConnectionOptions enum values.
+    /*! Creates connection using @a conn_data as parameters.
+     @return 0 and sets error message on error.
+     driverName member of @a conn_data will be updated with this driver name.
+     @a options can be a combination of CreateConnectionOptions enum values.
      */
     Connection *createConnection(const ConnectionData& connData, int options = 0);
 
-    /*! \return Set of created connections. */
+    /*! @return Set of created connections. */
     const QSet<Connection*> connections() const;
 
-    //! \return a name of the driver (DriverName field of the .desktop info file).
+    //! @return a name of the driver (DriverName field of the .desktop info file).
     //! Provided for convenience and optimization. This is the same as info().name().
     QString name() const;
 
-    //! \return true if the the driver is file-based.
+    //! @return true if the the driver is file-based.
     //! Provided for convenience and optimization. This is the same as info().isFileBased().
     bool isFileBased() const;
 
     /*! Info about the driver. */
     DriverInfo info() const;
 
-    /*! \return true if \a n is a system object's name,
+    /*! @return true if @a n is a system object's name,
      eg. name of build-in system table that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation.
      By default calls Driver::isPredicateSystemObjectName() static method.
      Note for driver developers: Also call Driver::isSystemObjectName()
      from your reimplementation.
-     \sa isSystemFieldName().
+     @see isSystemFieldName().
     */
     virtual bool isSystemObjectName(const QString& n) const;
 
-    /*! \return true if \a n is a kexibd-related 'system' object's
-     name, i.e. when \a n starts with "kexi__" prefix.
+    /*! @return true if @a n is a kexibd-related 'system' object's
+     name, i.e. when @a n starts with "kexi__" prefix.
     */
     static bool isPredicateSystemObjectName(const QString& n);
 
-    /*! \return true if \a n is a system database's name,
+    /*! @return true if @a n is a system database's name,
      eg. name of build-in, system database that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation. For implementation.
-     \sa isSystemObjectName().
+     @see isSystemObjectName().
     */
     virtual bool isSystemDatabaseName(const QString& n) const = 0;
 
-    /*! \return true if \a n is a system field's name, build-in system
+    /*! @return true if @a n is a system field's name, build-in system
      field that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation.
-     \sa isSystemObjectName().
+     @see isSystemObjectName().
     */
     bool isSystemFieldName(const QString& n) const;
 
-    /*! \return true if \a word is a driver-specific keyword.
+    /*! @return true if @a word is a driver-specific keyword.
      @see Predicate::isKexiSQLKeyword(const QByteArray&) */
     bool isDriverSpecificKeyword(const QByteArray& word) const;
 
-    /*! \return Driver's features that are combination of Driver::Features
+    /*! @return Driver's features that are combination of Driver::Features
     enum. */
     int features() const;
 
-    /*! \return true if transaction are supported (single or
+    /*! @return true if transaction are supported (single or
      multiple). */
     bool transactionsSupported() const;
 
-    /*! \return admin tools object providing a number of database administration
+    /*! @return admin tools object providing a number of database administration
      tools for the driver. Tools availablility varies from driver to driver.
      You can check it using features().  */
     AdminTools& adminTools() const;
@@ -171,7 +171,7 @@ public:
     /*! used when we do not have Driver instance yet */
     static QString defaultSQLTypeName(int id_t);
 
-    /*! \return true if this driver's implementation is valid.
+    /*! @return true if this driver's implementation is valid.
      Just few constriants are checked to ensure that driver
      developer didn't forget about something.
      This method is called automatically on createConnection(),
@@ -183,7 +183,7 @@ public:
      It's usually compared to drivers' and Predicate library version. */
     virtual DatabaseVersionInfo version() const = 0;
 
-    /*! Escapes and converts value \a v (for type \a ftype)
+    /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.
      Reimplement this if you need other behaviour (eg. for 'date' type handling)
      This implementation return date, datetime and time values in ISO format,
@@ -196,7 +196,7 @@ public:
         return valueToSQL(Field::typeForString(ftype), v);
     }
 
-    //! Like above method, for \a field.
+    //! Like above method, for @a field.
     inline EscapedString valueToSQL(const Field *field, const QVariant& v) const {
         return valueToSQL((field ? field->type() : Field::InvalidType), v);
     }
@@ -235,21 +235,21 @@ public:
 //    enum EscapePolicy { EscapeAsNecessary = 0x04, EscapeAlways = 0x08 };
 
     //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
-    /*! Escape database identifier (\a str) in order that keywords
+    /*! Escape database identifier (@a str) in order that keywords
        can be used as table names, column names, etc. */
     inline QByteArray escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
 
     inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
-    //! \return property value for \a propeName available for this driver.
+    //! @return property value for @a propeName available for this driver.
     //! If there's no such property defined for driver, Null QVariant value is returned.
     QVariant propertyValue(const QByteArray& propName) const;
 
-    //! \return translated property caption for \a propeName.
+    //! @return translated property caption for @a propeName.
     //! If there's no such property defined for driver, empty string value is returned.
     QString propertyCaption(const QByteArray& propName) const;
 
-    //! \return a list of property names available for this driver.
+    //! @return a list of property names available for this driver.
     QList<QByteArray> propertyNames() const;
 
     //! @internal
@@ -288,7 +288,7 @@ protected:
     */
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const = 0;
 
-    /*! \return true if \a n is a system field's name, build-in system
+    /*! @return true if @a n is a system field's name, build-in system
      field that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation. For implementation.*/
@@ -303,18 +303,18 @@ protected:
      @see adminTools() */
     virtual AdminTools* drv_createAdminTools() const;
 
-    /*! \return connection \a conn, does not delete it nor affect.
-     Returns 0 if \a conn is not owned by this driver.
-     After this, you are owner of \a conn object, so you should
+    /*! @return connection @a conn, does not delete it nor affect.
+     Returns 0 if @a conn is not owned by this driver.
+     After this, you are owner of @a conn object, so you should
      eventually delete it. Better use Connection destructor. */
     Connection* removeConnection(Connection *conn);
 
     /*! Used to initialise the dictionary of driver-specific keywords.
       Should be called by the Driver's constructor.
-      \a keywords should be 0-terminated array of null-terminated strings. */
+      @a keywords should be 0-terminated array of null-terminated strings. */
     void initDriverSpecificKeywords(const char** keywords);
 
-    /* \return SQL statement @a sql modified by adding limiting command,
+    /* @return SQL statement @a sql modified by adding limiting command,
      (if possible and if @add is true). Used for optimization for the server side.
      Can be reimplemented for other drivers. */
     inline virtual EscapedString addLimitTo1(const EscapedString& sql, bool add) {
@@ -333,7 +333,7 @@ protected:
     DriverPrivate * const d;
 };
 
-/*! \return true if the \a word is an reserved KexiSQL's keyword
+/*! @return true if the @a word is an reserved KexiSQL's keyword
  (see keywords.cpp for a list of reserved keywords). */
 PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
 

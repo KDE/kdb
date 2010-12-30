@@ -35,8 +35,8 @@ class Driver;
 class PREDICATE_EXPORT ObjectNameValidator : public Utils::Validator
 {
 public:
-    /*! \a drv is a Predicate driver on which isSystemObjectName() will be
-     called inside check(). If \a drv is 0, Predicate::Driver::isPredicateSystemObjectName()
+    /*! @a drv is a Predicate driver on which isSystemObjectName() will be
+     called inside check(). If @a drv is 0, Predicate::Driver::isPredicateSystemObjectName()
      static function is called instead. */
     ObjectNameValidator(Driver *drv, QObject * parent = 0);
     virtual ~ObjectNameValidator();

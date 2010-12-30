@@ -36,13 +36,13 @@ public:
     AdminTools();
     virtual ~AdminTools();
 
-    /*! Performs vacuum (compacting) for connection \a data.
+    /*! Performs vacuum (compacting) for connection @a data.
      Can be implemented for your driver.
      Note: in most cases the database should not be opened.
 
      Currently it is implemented for SQLite drivers.
 
-     \return true on success, false on failure
+     @return true on success, false on failure
      (then you can get error status from the AdminTools object). */
     virtual bool vacuum(const ConnectionData& data, const QString& databaseName);
     //virtual bool vacuum(Connection& conn);

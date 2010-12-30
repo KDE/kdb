@@ -41,7 +41,7 @@ namespace Predicate
  Note: some engines (e.g. MySQL with InnoDB) requires that indices at both sides
  have to be explicitly created.
 
- \todo (js) It is planned that this will be handled by Predicate internally and transparently.
+ @todo (js) It is planned that this will be handled by Predicate internally and transparently.
 
  Each (of the two) key can be defined (just like index) as list of fields owned by one table.
  Indeed, relationship info can retrieved from Relationship object in two ways:
@@ -93,19 +93,19 @@ public:
 
     virtual ~Relationship();
 
-    /*! \return index defining master side of this relationship
+    /*! @return index defining master side of this relationship
      or null if there is no information defined. */
     IndexSchema* masterIndex() const {
         return m_masterIndex;
     }
 
-    /*! \return index defining referenced side of this relationship.
+    /*! @return index defining referenced side of this relationship.
      or null if there is no information defined. */
     IndexSchema* detailsIndex() const {
         return m_detailsIndex;
     }
 
-    /*! \return ordered list of field pairs -- alternative form
+    /*! @return ordered list of field pairs -- alternative form
      for representation of relationship or null if there is no information defined.
      Each pair has a form of <master-side-field, details-side-field>. */
     Field::PairList* fieldPairs() {
@@ -116,15 +116,15 @@ public:
         return m_pairs.isEmpty();
     }
 
-    /*! \return table assigned at "master / one" side of this relationship.
+    /*! @return table assigned at "master / one" side of this relationship.
      or null if there is no information defined. */
     TableSchema* masterTable() const;
 
-    /*! \return table assigned at "details / many / foreign" side of this relationship.
+    /*! @return table assigned at "details / many / foreign" side of this relationship.
      or null if there is no information defined. */
     TableSchema* detailsTable() const;
 
-    /*! Sets \a masterIndex and \a detailsIndex indices for this relationship.
+    /*! Sets @a masterIndex and @a detailsIndex indices for this relationship.
      This also sets information about tables for master- and details- sides.
      Notes:
      - both indices must contain the same number of fields
@@ -142,7 +142,7 @@ protected:
 
     void createIndices(QuerySchema *query, Field *field1, Field *field2);
 
-    /*! Internal version of setIndices(). \a ownedByMaster parameter is passed
+    /*! Internal version of setIndices(). @a ownedByMaster parameter is passed
      to IndexSchema::attachRelationship() */
     void setIndices(IndexSchema* masterIndex, IndexSchema* detailsIndex, bool ownedByMaster);
 

@@ -1285,7 +1285,7 @@ void QuerySchema::computeFieldsExpanded() const
                     //add all fields from this table
                     const Field::List *tab_fields = table->fields();
                     foreach(Field *tab_f, *tab_fields) {
-//! \todo (js): perhaps not all fields should be appended here
+//! @todo (js): perhaps not all fields should be appended here
 //      d->detailedVisibility += isFieldVisible(fieldPosition);
 //      list.append(tab_f);
                         QueryColumnInfo *ci = new QueryColumnInfo(tab_f, QByteArray()/*no field for asterisk!*/,

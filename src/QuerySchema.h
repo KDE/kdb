@@ -55,7 +55,7 @@ public:
                     QueryColumnInfo *foreignColumn = 0);
     ~QueryColumnInfo();
 
-    //! \return alias if it is not empty, field's name otherwise.
+    //! @return alias if it is not empty, field's name otherwise.
     inline QByteArray aliasOrName() const {
         if (alias.isEmpty()) {
             return field->name().toLatin1();
@@ -64,7 +64,7 @@ public:
         }
     }
 
-    //! \return field's caption if it is not empty, field's alias otherwise.
+    //! @return field's caption if it is not empty, field's alias otherwise.
     //! If alias is also empty - returns field's name.
     inline QString captionOrAliasOrName() const {
         return field->caption().isEmpty() ? QString(aliasOrName()) : field->caption();
@@ -73,7 +73,7 @@ public:
     Field *field;
     QByteArray alias;
 
-    /*! \return index of column with visible lookup value within the 'fields expanded' vector.
+    /*! @return index of column with visible lookup value within the 'fields expanded' vector.
      -1 means no visible lookup value is available because there is no lookup for the column defined.
      Cached for efficiency as we use this information frequently.
      @see LookupFieldSchema::visibleVolumn() */
@@ -86,7 +86,7 @@ public:
         m_indexForVisibleLookupValue = index;
     }
 
-    //! \return non-0 if this column is a visible column for other column
+    //! @return non-0 if this column is a visible column for other column
     QueryColumnInfo *foreignColumn() const {
         return m_foreignColumn;
     }
@@ -99,7 +99,7 @@ private:
      @see indexForVisibleLookupValue() */
     int m_indexForVisibleLookupValue;
 
-    //! Non-0 if this column is a visible column for \a m_foreignColumn
+    //! Non-0 if this column is a visible column for @a m_foreignColumn
     QueryColumnInfo *m_foreignColumn;
 };
 
@@ -112,7 +112,7 @@ public:
     OrderByColumn();
     OrderByColumn(QueryColumnInfo& column, bool ascending = true, int pos = -1);
 
-    //! Like above but used when the field \a field is not present on the list of columns.
+    //! Like above but used when the field @a field is not present on the list of columns.
     //! (e.g. SELECT a FROM t ORDER BY b; where T is a table with fields (a,b)).
     explicit OrderByColumn(Field& field, bool ascending = true);
 
@@ -135,19 +135,19 @@ public:
         return m_field;
     }
 
-    //! \return true if ascending sorting should be performed (the default).
+    //! @return true if ascending sorting should be performed (the default).
     inline bool ascending() const {
         return m_ascending;
     }
 
-    //! \return true if this column is thesame as \a col
+    //! @return true if this column is thesame as @a col
     bool operator== (const OrderByColumn& col) const {
         return m_column == col.m_column && m_field == col.m_field
                && m_ascending == col.m_ascending;
     }
 
-    /*! \return a string like "name ASC" usable for building a SQL statement.
-     If \a includeTableNames is true (the default) field is output in a form
+    /*! @return a string like "name ASC" usable for building a SQL statement.
+     If @a includeTableNames is true (the default) field is output in a form
      of "tablename.fieldname" (but only if fieldname is not a name of alias).
 
      @a escapingType can be used to alter default escaping type.
@@ -200,9 +200,9 @@ public:
                 : OrderByColumnListBase::iterator(o) {}
     };
 
-    /*! Appends multiple fields for sorting. \a querySchema
+    /*! Appends multiple fields for sorting. @a querySchema
      is used to find appropriate field or alias name.
-     \return false if there is at least one name for which a field or alias name does not exist
+     @return false if there is at least one name for which a field or alias name does not exist
      (all the newly appended fields are removed in this case) */
     bool appendFields(QuerySchema& querySchema,
                       const QString& field1, bool ascending1 = true,
@@ -211,33 +211,33 @@ public:
                       const QString& field4 = QString(), bool ascending4 = true,
                       const QString& field5 = QString(), bool ascending5 = true);
 
-    /*! Appends column \a columnInfo. Ascending sorting is set is \a ascending is true. */
+    /*! Appends column @a columnInfo. Ascending sorting is set is @a ascending is true. */
     void appendColumn(QueryColumnInfo& columnInfo, bool ascending = true);
 
-    /*! Appends a field \a field. Ascending sorting is set is \a ascending is true.
-     Read documentation of \ref OrderByColumn(const Field& field, bool ascending = true)
+    /*! Appends a field @a field. Ascending sorting is set is @a ascending is true.
+     Read documentation of @ref OrderByColumn(const Field& field, bool ascending = true)
      for more info. */
     void appendField(Field& field, bool ascending = true);
 
-    /*! Appends field with a name \a field. Ascending sorting is set is \a ascending is true.
-     \return true on successful appending, and false if there is no such field or alias
-     name in the \a querySchema. */
+    /*! Appends field with a name @a field. Ascending sorting is set is @a ascending is true.
+     @return true on successful appending, and false if there is no such field or alias
+     name in the @a querySchema. */
     bool appendField(QuerySchema& querySchema, const QString& fieldName,
                      bool ascending = true);
 
-    /*! Appends a column that is at position \a pos (counted from 0).
-     \return true on successful adding and false if there is no such position \a pos. */
+    /*! Appends a column that is at position @a pos (counted from 0).
+     @return true on successful adding and false if there is no such position @a pos. */
     bool appendColumn(QuerySchema& querySchema, bool ascending = true, int pos = -1);
 
-    /*! Appends \a column to the list. */
+    /*! Appends @a column to the list. */
     void appendColumn(const OrderByColumn& column);
 
-    /*! \return true if the list is empty. */
+    /*! @return true if the list is empty. */
     bool isEmpty() const {
         return OrderByColumnListBase::isEmpty();
     }
 
-    /*! \return number of elements of the list. */
+    /*! @return number of elements of the list. */
     uint count() const {
         return OrderByColumnListBase::count();
     }
@@ -258,8 +258,8 @@ public:
         return OrderByColumnListBase::constEnd();
     }
 
-    /*! \return a string like "name ASC, 2 DESC" usable for building a SQL statement.
-     If \a includeTableNames is true (the default) fields are output in a form
+    /*! @return a string like "name ASC, 2 DESC" usable for building a SQL statement.
+     If @a includeTableNames is true (the default) fields are output in a form
      of "tablename.fieldname".
 
      @a escapingType can be used to alter default escaping type.
@@ -280,7 +280,7 @@ public:
     QuerySchema();
 
     /*! Creates query schema object that is equivalent to "SELECT * FROM table"
-     sql command. Schema of \a table is used to contruct this query --
+     sql command. Schema of @a table is used to contruct this query --
      it is defined by just adding all the fields to the query in natural order.
      To avoid problems (e.g. with fields added outside of Kexi using ALTER TABLE)
      we do not use "all-tables query asterisk" (see QueryAsterisk) item to achieve
@@ -289,23 +289,23 @@ public:
      Properties such as the name and caption of the query are inherited
      from table schema.
 
-     We consider that query schema based on \a table is not (a least yet) stored
+     We consider that query schema based on @a table is not (a least yet) stored
      in a system table, so query connection is set to NULL
-     (even if \a tableSchema's connection is not NULL).
+     (even if @a tableSchema's connection is not NULL).
      Id of the created query is set to 0. */
     explicit QuerySchema(TableSchema& tableSchema);
 
-    /*! Copy constructor. Creates deep copy of \a querySchema.
+    /*! Copy constructor. Creates deep copy of @a querySchema.
      QueryAsterisk objects are deeply copied while only pointers to Field objects are copied. */
     QuerySchema(const QuerySchema& querySchema);
 
     virtual ~QuerySchema();
 
-    /*! Inserts \a field to the columns list at \a position.
+    /*! Inserts @a field to the columns list at @a position.
      Inserted field will not be owned by this QuerySchema object,
      but still by corresponding TableSchema.
 
-     As \a field object you can also pass Predicate::QueryAsterisk,
+     As @a field object you can also pass Predicate::QueryAsterisk,
      (see QueryAsterisk class description).
 
      Note: After inserting a field, corresponding table will be automatically
@@ -324,22 +324,22 @@ public:
 
     /* Like above method, but you can also explicitly bound the new column
      to specific position on tables list.
-     If \a visible is true (the default), the field will be visible.
+     If @a visible is true (the default), the field will be visible.
      If bindToTable==-1, no particular table should be bound.
      @see tableBoundToColumn(uint columnPosition) */
     FieldList& insertField(uint position, Field *field,
                            int bindToTable, bool visible = true);
 
-    /*! Adds \a field to the columns list.
-     If \a visible is true (the default), the field will be visible.
-     \sa insertField() */
+    /*! Adds @a field to the columns list.
+     If @a visible is true (the default), the field will be visible.
+     @see insertField() */
     FieldList& addField(Field* field, bool visible = true);
 
-    /*! Adds \a field to the columns list. Also binds to a table
-     at \a bindToTable position. Use bindToTable==-1 if no table should be bound.
-     If \a visible is true (the default), the field will be visible.
-     \sa insertField()
-     \sa tableBoundToColumn(uint columnPosition)
+    /*! Adds @a field to the columns list. Also binds to a table
+     at @a bindToTable position. Use bindToTable==-1 if no table should be bound.
+     If @a visible is true (the default), the field will be visible.
+     @see insertField()
+     @see tableBoundToColumn(uint columnPosition)
     */
     FieldList& addField(Field* field, int bindToTable,
                         bool visible = true);
@@ -347,32 +347,32 @@ public:
     /*! Removes field from the columns list. Use with care. */
     virtual void removeField(Field *field);
 
-    /*! Adds a field built on top of \a expr expression.
+    /*! Adds a field built on top of @a expr expression.
      This creates a new Field object and adds it to the query schema using addField(). */
     FieldList& addExpression(BaseExpr* expr, bool visible = true);
 
-    /*! \return visibility flag for column at \a position.
+    /*! @return visibility flag for column at @a position.
      By default column is visible. */
     bool isColumnVisible(uint position) const;
 
-    //! Sets visibility flag for column at \a position to \a v.
+    //! Sets visibility flag for column at @a position to @a v.
     void setColumnVisible(uint position, bool v);
 
-    /*! Adds \a asterisk at the and of columns list. */
+    /*! Adds @a asterisk at the and of columns list. */
     FieldList& addAsterisk(QueryAsterisk *asterisk, bool visible = true);
 
     /*! Removes all columns and their aliases from the columns list,
      removes all tables and their aliases from the tables list within this query.
      Sets master table information to NULL.
      Does not destroy any objects though. Clears name and all other properties.
-     \sa FieldList::clear() */
+     @see FieldList::clear() */
     virtual void clear();
 
     /*! If query was created using a connection,
       returns this connection object, otherwise NULL. */
     Connection* connection() const;
 
-    /*! \return table that is master to this query.
+    /*! @return table that is master to this query.
      All potentially-editable columns within this query belong just to this table.
      This method also can return NULL if there are no tables at all,
      or if previously assigned master table schema has been removed
@@ -384,41 +384,41 @@ public:
      (e.g. "T" table is returned for "SELECT T1.A, T2.B FROM T T1, T T2" statement). */
     TableSchema* masterTable() const;
 
-    /*! Sets master table of this query to \a table.
+    /*! Sets master table of this query to @a table.
       This table should be also added to query's tables list
-      using addTable(). If \a table equals NULL, nothing is performed.
-      \sa masterTable() */
+      using addTable(). If @a table equals NULL, nothing is performed.
+      @see masterTable() */
     void setMasterTable(TableSchema *table);
 
-    /*! \return list of tables used in a query.
+    /*! @return list of tables used in a query.
      This also includes master table.
-     \sa masterTable() */
+     @see masterTable() */
     TableSchema::List* tables() const;
 
-    /*! Adds \a table schema as one of tables used in a query.
-     if \a alias is not empty, it will be assigned to this table
+    /*! Adds @a table schema as one of tables used in a query.
+     if @a alias is not empty, it will be assigned to this table
      using setTableAlias(position, alias)
     */
     void addTable(TableSchema *table, const QByteArray& alias = QByteArray());
 
-    /*! Removes \a table schema from this query.
-     This does not destroy \a table object but only takes it out of the list.
+    /*! Removes @a table schema from this query.
+     This does not destroy @a table object but only takes it out of the list.
      If this table was master for the query, master table information is also
      invalidated. */
     void removeTable(TableSchema *table);
 
-    /*! \return table with name \a tableName or 0 if this query has no such table. */
+    /*! @return table with name @a tableName or 0 if this query has no such table. */
     TableSchema* table(const QString& tableName) const;
 
-    /*! \return true if the query uses \a table. */
+    /*! @return true if the query uses @a table. */
     bool contains(TableSchema *table) const;
 
     /*! Convenience function.
-     \return table field by searching through all tables in this query.
+     @return table field by searching through all tables in this query.
      The field does not need to be included on the list of query columns.
      Similarly, query aliases are not taken into account.
 
-     \a tableOrTableAndFieldName string may contain table name and field name
+     @a tableOrTableAndFieldName string may contain table name and field name
      with '.' character between them, e.g. "mytable.myfield".
      This is recommended way to avoid ambiguity.
      0 is returned if the query has no such
@@ -433,7 +433,7 @@ public:
     */
     Field* findTableField(const QString &tableOrTableAndFieldName) const;
 
-    /*! \return alias of a column at \a position or null string
+    /*! @return alias of a column at @a position or null string
      If there is no alias for this column
      or if there is no such column within the query defined.
      If the column is an expression and has no alias defined,
@@ -445,18 +445,18 @@ public:
     int columnAliasesCount() const;
 
     /*! Provided for convenience.
-     \return true if a column at \a position has non empty alias defined
+     @return true if a column at @a position has non empty alias defined
      within the query.
      If there is no alias for this column,
      or if there is no such column in the query defined, false is returned. */
     bool hasColumnAlias(uint position) const;
 
-    /*! Sets \a alias for a column at \a position, within the query.
-     Passing empty string to \a alias clears alias for a given column. */
+    /*! Sets @a alias for a column at @a position, within the query.
+     Passing empty string to @a alias clears alias for a given column. */
     void setColumnAlias(uint position, const QByteArray& alias);
 
-    /*! \return a table position (within FROM section),
-     that is bound to column at \a columnPosition (within SELECT section).
+    /*! @return a table position (within FROM section),
+     that is bound to column at @a columnPosition (within SELECT section).
      This information can be used to find if there is alias defined for
      a table that is referenced by a given column.
 
@@ -471,8 +471,8 @@ public:
      defined query statement.
 
      -1 is returned if:
-      - \a columnPosition is out of range (i.e. < 0 or >= fieldCount())
-      - a column at \a columnPosition is not bound to any table (i.e.
+      - @a columnPosition is out of range (i.e. < 0 or >= fieldCount())
+      - a column at @a columnPosition is not bound to any table (i.e.
         no database field is used for this column,
         e.g. "1" constant for "SELECT 1 from table" query statement)
     */
@@ -481,13 +481,13 @@ public:
     /*! @return number of table aliases */
     int tableAliasesCount() const;
 
-    /*! \return alias of a table at \a position (within FROM section)
+    /*! @return alias of a table at @a position (within FROM section)
      or null string if there is no alias for this table
      or if there is no such table within the query defined. */
     QByteArray tableAlias(uint position) const;
 
-    /*! \return table position (within FROM section) that has attached
-     alias \a name.
+    /*! @return table position (within FROM section) that has attached
+     alias @a name.
      If there is no such alias, -1 is returned.
      Only first table's position attached for this alias is returned.
      It is not especially bad, since aliases rarely can be duplicated,
@@ -499,41 +499,41 @@ public:
     */
     int tablePositionForAlias(const QByteArray& name) const;
 
-    /*! \return table position (within FROM section) for \a tableName.
+    /*! @return table position (within FROM section) for @a tableName.
      -1 is returend if there's no such table declared in the FROM section.
-     \sa tablePositions()
+     @see tablePositions()
     */
     int tablePosition(const QString& tableName) const;
 
-    /*! \return a list of all \a tableName table occurrences (within FROM section).
+    /*! @return a list of all @a tableName table occurrences (within FROM section).
      E.g. for "SELECT * FROM table t, table t2" [0, 1] list is returned.
      Empty list is returned there's no such table declared
      in the FROM section at all.
-     \sa tablePosition()
+     @see tablePosition()
     */
     QList<int> tablePositions(const QString& tableName) const;
 
     /*! Provided for convenience.
-     \return true if a table at \a position (within FROM section of the the query)
+     @return true if a table at @a position (within FROM section of the the query)
      has non empty alias defined.
      If there is no alias for this table,
      or if there is no such table in the query defined, false is returned. */
     bool hasTableAlias(uint position) const;
 
-    /*! \return column position that has defined alias \a name.
+    /*! @return column position that has defined alias @a name.
      If there is no such alias, -1 is returned. */
     int columnPositionForAlias(const QByteArray& name) const;
 
-    /*! Sets \a alias for a table at \a position (within FROM section
+    /*! Sets @a alias for a table at @a position (within FROM section
      of the the query).
-     Passing empty sting to \a alias clears alias for a given table
-     (only for specified \a position). */
+     Passing empty sting to @a alias clears alias for a given table
+     (only for specified @a position). */
     void setTableAlias(uint position, const QByteArray& alias);
 
-    /*! \return a list of relationships defined for this query */
+    /*! @return a list of relationships defined for this query */
     Relationship::List* relationships() const;
 
-    /*! Adds a new relationship defined by \a field1 and \a field2.
+    /*! Adds a new relationship defined by @a field1 and @a field2.
      Both fields should belong to two different tables of this query.
      This is convenience function useful for a typical cases.
      It automatically creates Relationship object for this query.
@@ -542,10 +542,10 @@ public:
      This functiuon does nothing if the arguments are invalid. */
     Relationship* addRelationship(Field *field1, Field *field2);
 
-    /*! \return list of QueryAsterisk objects defined for this query */
+    /*! @return list of QueryAsterisk objects defined for this query */
     Field::List* asterisks() const;
 
-    /*! \return field for \a identifier or 0 if no field for this name
+    /*! @return field for @a identifier or 0 if no field for this name
      was found within the query. fieldsExpanded() method is used
      to lookup expanded list of the query fields, so queries with asterisks
      are processed well.
@@ -553,9 +553,9 @@ public:
      but only its alias. If a Field.has no alias:
      - field's name is checked
      - field's table and field's name are checked in a form of "tablename.fieldname",
-       so you can provide \a identifier in this form to avoid ambiguity.
+       so you can provide @a identifier in this form to avoid ambiguity.
 
-     If there are more than one fields with the same name equal to \a identifier,
+     If there are more than one fields with the same name equal to @a identifier,
      first-found is returned (checking is performed from first to last query field).
      Structures needed to compute result of this method are cached,
      so only first usage costs o(n) - another usages cost o(1).
@@ -577,14 +577,14 @@ public:
         return field(name, true);
     }
 
-    /*! \return field id or NULL if there is no such a field. */
+    /*! @return field id or NULL if there is no such a field. */
     inline Field* field(uint id) {
         return FieldList::field(id);
     }
 
     /*! Like QuerySchema::field(const QString& name) but returns not only Field
-     object for \a identifier but entire QueryColumnInfo object.
-     \a identifier can be:
+     object for @a identifier but entire QueryColumnInfo object.
+     @a identifier can be:
      - a fieldname
      - an aliasname
      - a tablename.fieldname
@@ -605,7 +605,7 @@ public:
         //!< is appended after internal fields
     };
 
-    /*! \return fully expanded list of fields.
+    /*! @return fully expanded list of fields.
      QuerySchema::fields() returns vector of fields used for the query columns,
      but in a case when there are asterisks defined for the query,
      it does not expand QueryAsterisk objects to field lists but return every
@@ -613,7 +613,7 @@ public:
      This could be inconvenient when you need just a fully expanded list of fields,
      so this method does the work for you.
 
-     If \a options is Unique, each field is returned in the vector only once
+     If @a options is Unique, each field is returned in the vector only once
      (first found field is selected).
      Note however, that the same field can be returned more than once if it has attached
      a different alias.
@@ -624,10 +624,10 @@ public:
      fieldsExpanded(Default) will return [ a, b, a ] list while
      fieldsExpanded(Unique) will return [ a, b ] list.
 
-     If \a options is WithInternalFields or WithInternalFieldsAndRecordID,
+     If @a options is WithInternalFields or WithInternalFieldsAndRecordID,
      additional internal fields are also appended to the vector.
 
-     If \a options is WithInternalFieldsAndRecordId,
+     If @a options is WithInternalFieldsAndRecordId,
      one fake BigInteger column is appended to make space for Record ID column used
      by Predicate::Cursor implementations. For example, let persons be TABLE( surname, city_id ),
      let city_number reference cities.is in TABLE cities( id, name ) and let query q be defined
@@ -648,12 +648,12 @@ public:
     */
     QueryColumnInfo::Vector fieldsExpanded(FieldsExpandedOptions options = Default) const;
 
-    /*! \return list of fields internal fields used for lookup columns. */
+    /*! @return list of fields internal fields used for lookup columns. */
     QueryColumnInfo::Vector internalFields() const;
 
-    /*! \return info for expanded of internal field at index \a index.
+    /*! @return info for expanded of internal field at index @a index.
      The returned field can be either logical or internal (for lookup),
-     the latter case is true if \a index &gt;= fieldsExpanded().count().
+     the latter case is true if @a index &gt;= fieldsExpanded().count().
      Equivalent of QuerySchema::fieldsExpanded(WithInternalFields).at(index). */
     QueryColumnInfo* expandedOrInternalField(uint index) const;
 
@@ -664,14 +664,14 @@ public:
         ExpandedList                    //!< A map for expanded list is created
     };
 
-    /*! \return a hash for fast lookup of query columns' order.
-     - If \a options is UnexpandedList, each QueryColumnInfo pointer is mapped to the index
+    /*! @return a hash for fast lookup of query columns' order.
+     - If @a options is UnexpandedList, each QueryColumnInfo pointer is mapped to the index
        within (unexpanded) list of fields, i.e. "*" or "table.*" asterisks are considered
        to be single items.
-     - If \a options is UnexpandedListWithoutAsterisks, each QueryColumnInfo pointer
+     - If @a options is UnexpandedListWithoutAsterisks, each QueryColumnInfo pointer
        is mapped to the index within (unexpanded) list of columns that come from asterisks
        like "*" or "table.*" are not included in the map at all.
-     - If \a options is ExpandedList (the default) this method provides is exactly opposite
+     - If @a options is ExpandedList (the default) this method provides is exactly opposite
        information compared to vector returned by fieldsExpanded().
 
      This method's result is cached by the QuerySchema object.
@@ -695,7 +695,7 @@ public:
     */
     QHash<QueryColumnInfo*, int> columnsOrder(ColumnsOrderOptions options = ExpandedList) const;
 
-    /*! \return table describing order of primary key (PKEY) fields within the query.
+    /*! @return table describing order of primary key (PKEY) fields within the query.
      Indexing is performed against vector returned by fieldsExpanded().
      It is usable for e.g. Conenction::updateRecord(), when we need
      to locate each primary key's field in a constant time.
@@ -719,7 +719,7 @@ public:
     */
     QVector<int> pkeyFieldsOrder() const;
 
-    /*! \return number of master table's primary key fields included in this query.
+    /*! @return number of master table's primary key fields included in this query.
      This method is useful to quickly check whether the vector returned by pkeyFieldsOrder()
      if filled completely.
 
@@ -739,20 +739,20 @@ public:
     */
     uint pkeyFieldsCount();
 
-    /*! \return a list of field infos for all auto-incremented fields
+    /*! @return a list of field infos for all auto-incremented fields
      from master table of this query. This result is cached for efficiency.
      fieldsExpanded() is used for that.
     */
     QueryColumnInfo::List* autoIncrementFields() const;
 
-    /*! \return a preset statement (if any). */
+    /*! @return a preset statement (if any). */
     EscapedString statement() const;
 
     /*! Forces a query statement (i.e. no statement is composed from QuerySchema's content) */
     void setStatement(const EscapedString& statement);
 
-    /*! \return a string that is a result of concatenating all column names
-     for \a infolist, with "," between each one.
+    /*! @return a string that is a result of concatenating all column names
+     for @a infolist, with "," between each one.
      This is usable e.g. as argument like "field1,field2"
      for "INSERT INTO (xxx) ..". The result of this method is effectively cached,
      and it is invalidated when set of fields changes (e.g. using clear()
@@ -766,16 +766,16 @@ public:
     static EscapedString sqlColumnsList(const QueryColumnInfo::List& infolist, Connection *conn = 0,
         Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
-    /*! \return cached sql list created using sqlColumnsList() on a list returned
+    /*! @return cached sql list created using sqlColumnsList() on a list returned
      by autoIncrementFields(). */
     EscapedString autoIncrementSQLFieldsList(Connection *conn) const;
 
-    /*! Sets a WHERE expression \a exp. It will be owned by this query,
+    /*! Sets a WHERE expression @a exp. It will be owned by this query,
      so you can forget about it. Previously set WHERE expression will be deleted.
      You can pass 0 to remove expresssion. */
     void setWhereExpression(BaseExpr *expr);
 
-    /*! \return WHERE expression or 0 if this query has no WHERE expression */
+    /*! @return WHERE expression or 0 if this query has no WHERE expression */
     BaseExpr *whereExpression() const;
 
     /*! Adds a part to WHERE expression.
@@ -797,11 +797,11 @@ public:
      is completely built. */
     void setOrderByColumnList(const OrderByColumnList& list);
 
-    /*! \return a list of columns listed in ORDER BY section of the query.
-     Read notes for \ref setOrderByColumnList(). */
+    /*! @return a list of columns listed in ORDER BY section of the query.
+     Read notes for @ref setOrderByColumnList(). */
     OrderByColumnList& orderByColumnList() const;
 
-    /*! \return query schema parameters. These are taked from the WHERE section
+    /*! @return query schema parameters. These are taked from the WHERE section
      (a tree of expression items). */
     QuerySchemaParameterList parameters() const;
 
@@ -822,17 +822,17 @@ protected:
  1. "Single-table" asterisk, that references all fields of given table used
  in the query.
  Example SQL statement:
- \code
+ @code
  SELECT staff.*, cars.model from staff, cars WHERE staff.car = cars.number;
- \endcode
+ @endcode
  The "staff.*" element is our "single-table" asterisk;
  this tells us that we want to get all fields of table "staff".
 
  2. "All-tables" asterisk, that references all fields of all tables used in the query.
  Example SQL statement:
- \code
+ @code
  SELECT * from staff, cars WHERE staff.car = cars.number;
- \endcode
+ @endcode
  The "*" is our "all-tables" asterisk;
  this tells us that we want to get all fields of all used tables (here: "staff" and "cars").
 
@@ -843,7 +843,7 @@ class PREDICATE_EXPORT QueryAsterisk : public Field
 {
 public:
     /*! Constructs query asterisk definition object.
-     Pass table schema to \a table if this asterisk should be
+     Pass table schema to @a table if this asterisk should be
      of type "single-table", otherwise (if you want to define
      "all-tables" type asterisk), omit this parameter.
 
@@ -855,12 +855,12 @@ public:
 
     virtual ~QueryAsterisk();
 
-    /*! \return Query object for that this asterisk object is defined */
+    /*! @return Query object for that this asterisk object is defined */
     QuerySchema *query() const {
         return static_cast<QuerySchema*>(m_parent);
     }
 
-    /*! \return Table schema for this asterisk
+    /*! @return Table schema for this asterisk
      if it has "single-table" type (1st type)
      or NULL if it has "all-tables" type (2nd type) defined. */
     virtual TableSchema* table() const {
@@ -868,7 +868,7 @@ public:
     }
 
     /*! Sets table schema for this asterisk.
-     \a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
+     @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
     virtual void setTable(TableSchema *table);
 
     /*! This is convenience method that returns true
@@ -884,7 +884,7 @@ public:
     }
 
 protected:
-    //! \return a deep copy of this object. Used in FieldList(const FieldList& fl).
+    //! @return a deep copy of this object. Used in FieldList(const FieldList& fl).
     virtual Field* copy() const;
 
     /*! Table schema for this asterisk */

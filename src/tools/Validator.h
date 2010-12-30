@@ -33,7 +33,7 @@ namespace Utils
 
 //! @short A validator extending QValidator with offline-checking for value's validity
 /*!
- The offline-checking for value's validity is provided by \ref Validator::check() method.
+ The offline-checking for value's validity is provided by @ref Validator::check() method.
  The validator groups two purposes into one container:
  - string validator for line editors (online checking, "on typing");
  - offline-checking for QVariant values, reimplementing validate().
@@ -56,17 +56,17 @@ public:
      By default the validator does not accepts empty values. */
     void setAcceptsEmptyValue(bool set);
 
-    /*! \return true if the validator accepts empty values
+    /*! @return true if the validator accepts empty values
       @see setAcceptsEmptyValue() */
     bool acceptsEmptyValue() const;
 
-    /*! Checks if value \a v is ok and returns one of \a Result value:
-     - \a Error is returned on error;
-     - \a Ok on success;
-     - \a Warning if there is something to warn about.
-     In any case except \a Ok, i18n'ed message will be set in \a message
-     and (optionally) datails are set in \a details, e.g. for use in a message box.
-     \a valueName can be used to contruct \a message as well, for example:
+    /*! Checks if value @a v is ok and returns one of @a Result value:
+     - @a Error is returned on error;
+     - @a Ok on success;
+     - @a Warning if there is something to warn about.
+     In any case except @a Ok, i18n'ed message will be set in @a message
+     and (optionally) datails are set in @a details, e.g. for use in a message box.
+     @a valueName can be used to contruct @a message as well, for example:
      "[valueName] is not a valid login name".
      Depending on acceptsEmptyValue(), immediately accepts empty values or not. */
     Result check(const QString &valueName, const QVariant& v, QString &message,
@@ -78,11 +78,11 @@ public:
     //! A generic error/warning message "... value has to be entered."
     static const QString msgColumnNotEmpty();
 
-    //! Adds a child validator \a v
+    //! Adds a child validator @a v
     void addChildValidator(Validator* v);
 
 protected:
-    /* Used by check(), for reimplementation, by default returns \a Error.*/
+    /* Used by check(), for reimplementation, by default returns @a Error.*/
     virtual Result internalCheck(const QString &valueName, const QVariant& v,
                                  QString &message, QString &details);
 
@@ -126,15 +126,15 @@ public:
      You can add more validators with addSubvalidator(). */
     MultiValidator(QObject * parent = 0);
 
-    /*! Constructs multivalidator with one validator \a validator.
+    /*! Constructs multivalidator with one validator @a validator.
      It will be owned if has no parent defined.
      You can add more validators with addSubvalidator(). */
     MultiValidator(QValidator *validator, QObject * parent = 0);
 
     ~MultiValidator();
 
-    /*! Adds validator \a validator as another subvalidator.
-     Subvalidator will be owned by this multivalidator if \a owned is true
+    /*! Adds validator @a validator as another subvalidator.
+     Subvalidator will be owned by this multivalidator if @a owned is true
      and its parent is NULL. */
     void addSubvalidator(QValidator* validator, bool owned = true);
 

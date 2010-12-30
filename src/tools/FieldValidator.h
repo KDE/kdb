@@ -43,7 +43,7 @@ namespace Utils
 class PREDICATE_EXPORT FieldValidator : public Utils::MultiValidator
 {
 public:
-    //! Setups the validator for \a field. Does not keep a pointer to \a field.
+    //! Setups the validator for @a field. Does not keep a pointer to @a field.
     FieldValidator(const Field &field, QWidget * parent);
     ~FieldValidator();
 };

@@ -89,7 +89,7 @@ public:
 
     bool isEmpty() const;
 
-    //! Inserts value \a val for db-aware buffer's column \a ci
+    //! Inserts value @a val for db-aware buffer's column @a ci
     inline void insert(QueryColumnInfo& ci, QVariant &val) {
         if (m_dbBuffer) {
             m_dbBuffer->insert(&ci, val);
@@ -97,25 +97,25 @@ public:
         }
     }
 
-    //! Inserts value \a val for not-db-aware buffer's column \a fname
+    //! Inserts value @a val for not-db-aware buffer's column @a fname
     inline void insert(const QString& fname, QVariant &val) {
         if (m_simpleBuffer) m_simpleBuffer->insert(fname, val);
     }
 
-    /*! Useful only for db-aware buffer. \return value for column \a ci
+    /*! Useful only for db-aware buffer. @return value for column @a ci
      If there is no value assigned for the buffer, this method tries to remember and return
-     default value obtained from \a ci if \a useDefaultValueIfPossible is true.
+     default value obtained from @a ci if @a useDefaultValueIfPossible is true.
      Note that if the column is declared as unique (especially: primary key),
      default value will not be used. */
     const QVariant* at(QueryColumnInfo& ci, bool useDefaultValueIfPossible = true) const;
 
-    //! Useful only for not-db-aware buffer. \return value for field \a f
+    //! Useful only for not-db-aware buffer. @return value for field @a f
     const QVariant* at(Field& f) const;
 
-    //! Useful only for not-db-aware buffer. \return value for field \a fname
+    //! Useful only for not-db-aware buffer. @return value for field @a fname
     const QVariant* at(const QString& fname) const;
 
-    //! Useful only for db-aware buffer: \return true if the value available as
+    //! Useful only for db-aware buffer: @return true if the value available as
     //! at( ci ) is obtained from column's default value
     inline bool hasDefaultValueAt(QueryColumnInfo& ci) const {
         return m_defaultValuesDbBuffer->contains(&ci) && (*m_defaultValuesDbBuffer)[ &ci ];

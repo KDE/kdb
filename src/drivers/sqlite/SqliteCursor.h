@@ -39,9 +39,9 @@ public:
     virtual ~SQLiteCursor();
     virtual QVariant value(uint i);
 
-    /*! [PROTOTYPE] \return internal buffer data. */
+    /*! [PROTOTYPE] @return internal buffer data. */
 //TODO  virtual const char *** bufferData()
-    /*! [PROTOTYPE] \return current record data or NULL if there is no current records. */
+    /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
     virtual const char ** recordData() const;
 
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
@@ -52,10 +52,10 @@ public:
     virtual QString serverResultName() const;
 
 protected:
-    /*! Cursor will operate on \a conn, raw \a statement will be used to execute query. */
+    /*! Cursor will operate on @a conn, raw @a statement will be used to execute query. */
     SQLiteCursor(Connection* conn, const EscapedString& statement, uint options = NoOptions);
 
-    /*! Cursor will operate on \a conn, \a query schema will be used to execute query. */
+    /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     SQLiteCursor(Connection* conn, QuerySchema* query,
                  uint options = NoOptions);
 

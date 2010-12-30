@@ -39,13 +39,13 @@ public:
 
     virtual ~SQLiteDriver();
 
-    /*! \return true if \a n is a system object name;
+    /*! @return true if @a n is a system object name;
       for this driver any object with name prefixed with "sqlite_"
       is considered as system object.
     */
     virtual bool isSystemObjectName(const QString& n) const;
 
-    /*! \return false for this driver. */
+    /*! @return false for this driver. */
     virtual bool isSystemDatabaseName(const QString&) const {
         return false;
     }
@@ -54,7 +54,7 @@ public:
     virtual EscapedString escapeString(const QString& str) const;
     virtual EscapedString escapeString(const QByteArray& str) const;
 
-    //! Escape BLOB value \a array
+    //! Escape BLOB value @a array
     virtual EscapedString escapeBLOB(const QByteArray& array) const;
 
 protected:
@@ -63,7 +63,7 @@ protected:
     virtual Connection *drv_createConnection(const ConnectionData& connData);
     virtual AdminTools* drv_createAdminTools() const;
 
-    /*! \return true if \a n is a system field name;
+    /*! @return true if @a n is a system field name;
       for this driver fields with name equal "_ROWID_"
       is considered as system field.
     */

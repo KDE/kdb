@@ -223,7 +223,7 @@ bool parseData(Parser *p, const char *data)
 }
 
 
-/* Adds \a column to \a querySchema. \a column can be in a form of
+/* Adds @a column to @a querySchema. @a column can be in a form of
  table.field, tableAlias.field or field
 */
 bool addColumn(ParseInfo& parseInfo, BaseExpr* columnExpr)

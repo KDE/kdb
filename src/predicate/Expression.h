@@ -53,7 +53,7 @@ namespace Predicate
 //! Custom tokens are not used in parser but used as extension in expression classes.
 //#define PREDICATE_CUSTOM_TOKEN 0x1000
 
-//! \return class name of class \a c
+//! @return class name of class @a c
 PREDICATE_EXPORT QString exprClassName(int c);
 
 class ParseInfo;
@@ -77,7 +77,7 @@ public:
     explicit BaseExpr(int token);
     virtual ~BaseExpr();
 
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
 //! @todo a nonpointer will be returned here when we move to implicit data sharing
     virtual BaseExpr* copy() const = 0;
 
@@ -97,8 +97,8 @@ public:
 
     virtual bool validate(ParseInfo& parseInfo);
 
-    /*! \return string as a representation of this expression element by running recursive calls.
-     \a param, if not 0, points to a list item containing value of a query parameter
+    /*! @return string as a representation of this expression element by running recursive calls.
+     @a param, if not 0, points to a list item containing value of a query parameter
      (used in QueryParameterExpr). */
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const = 0;
 
@@ -106,7 +106,7 @@ public:
      The leaf nodes are objects of QueryParameterExpr class. */
     virtual void getQueryParameters(QuerySchemaParameterList& params) = 0;
 
-    /*! \return single character if the token is < 256
+    /*! @return single character if the token is < 256
      or token name, e.g. LESS_OR_EQUAL (for debugging). */
     inline QString tokenToDebugString() const {
         return tokenToDebugString(m_token);
@@ -117,7 +117,7 @@ public:
 
     static QString tokenToDebugString(int token);
 
-    /*! \return string for token, like "<=" or ">" */
+    /*! @return string for token, like "<=" or ">" */
     virtual QString tokenToString() const;
 
     int exprClass() const {
@@ -146,7 +146,7 @@ public:
     NArgExpr(int aClass, int token);
     NArgExpr(const NArgExpr& expr);
     virtual ~NArgExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual NArgExpr* copy() const;
     void add(BaseExpr *expr);
     void prepend(BaseExpr *expr);
@@ -166,7 +166,7 @@ public:
     UnaryExpr(int token, BaseExpr *arg);
     UnaryExpr(const UnaryExpr& expr);
     virtual ~UnaryExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual UnaryExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
@@ -194,7 +194,7 @@ public:
     BinaryExpr(int aClass, BaseExpr *left_expr, int token, BaseExpr *right_expr);
     BinaryExpr(const BinaryExpr& expr);
     virtual ~BinaryExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual BinaryExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
@@ -222,7 +222,7 @@ public:
     ConstExpr(int token, const QVariant& val);
     ConstExpr(const ConstExpr& expr);
     virtual ~ConstExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual ConstExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
@@ -240,7 +240,7 @@ public:
     explicit QueryParameterExpr(const QString& message);
     QueryParameterExpr(const QueryParameterExpr& expr);
     virtual ~QueryParameterExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual QueryParameterExpr* copy() const;
     virtual Field::Type type() const;
     /*! Sets expected type of the parameter. The default is String.
@@ -267,7 +267,7 @@ public:
     explicit VariableExpr(const QString& _name);
     VariableExpr(const VariableExpr& expr);
     virtual ~VariableExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual VariableExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;
@@ -311,7 +311,7 @@ public:
     explicit FunctionExpr(const QString& _name, NArgExpr* args_ = 0);
     FunctionExpr(const FunctionExpr& expr);
     virtual ~FunctionExpr();
-    //! \return a deep copy of this object.
+    //! @return a deep copy of this object.
     virtual FunctionExpr* copy() const;
     virtual Field::Type type() const;
     virtual QString debugString() const;

@@ -75,7 +75,7 @@ public:
 
     virtual ~Cursor();
 
-    /*! \return connection used for the cursor */
+    /*! @return connection used for the cursor */
     inline Connection* connection() const {
         return m_conn;
     }
@@ -89,9 +89,9 @@ public:
      Otherwise, true is returned if cursor is successfully closed and then opened. */
     bool reopen();
 
-//  /*! Opens the cursor using \a statement.
-//   Omit \a statement if cursor is already initialized with statement
-//   at creation time. If \a statement is not empty, existing statement
+//  /*! Opens the cursor using @a statement.
+//   Omit @a statement if cursor is already initialized with statement
+//   at creation time. If @a statement is not empty, existing statement
 //   (if any) is overwritten. */
 //  bool open( const QString& statement = QString() );
 
@@ -99,36 +99,36 @@ public:
       If the cursor is closed, nothing happens. */
     virtual bool close();
 
-    /*! \return query schema used to define this cursor
+    /*! @return query schema used to define this cursor
      or NULL if the cursor is not defined by a query schema but by a raw statement. */
     inline QuerySchema *query() const {
         return m_query;
     }
 
-    //! \return query parameters assigned to this cursor
+    //! @return query parameters assigned to this cursor
     QList<QVariant> queryParameters() const;
 
-    //! Sets query parameters \a params for this cursor.
+    //! Sets query parameters @a params for this cursor.
     void setQueryParameters(const QList<QVariant>& params);
 
-    /*! \return raw query statement used to define this cursor
+    /*! @return raw query statement used to define this cursor
      or null string if raw statement instead (but QuerySchema is defined instead). */
     inline EscapedString rawStatement() const {
         return m_rawStatement;
     }
 
-    /*! \return logically or'd cursor's options,
+    /*! @return logically or'd cursor's options,
       selected from Cursor::Options enum. */
     inline uint options() const {
         return m_options;
     }
 
-    /*! \return true if the cursor is opened. */
+    /*! @return true if the cursor is opened. */
     inline bool isOpened() const {
         return m_opened;
     }
 
-    /*! \return true if the cursor is buffered. */
+    /*! @return true if the cursor is buffered. */
     bool isBuffered() const;
 
     /*! Sets this cursor to buffered type or not. See description
@@ -139,12 +139,12 @@ public:
     void setBuffered(bool buffered);
 
     /*! Moves current position to the first record and retrieves it.
-      \return true if the first record was retrieved.
+      @return true if the first record was retrieved.
       False could mean that there was an error or there is no record available. */
     bool moveFirst();
 
     /*! Moves current position to the last record and retrieves it.
-      \return true if the last record was retrieved.
+      @return true if the last record was retrieved.
       False could mean that there was an error or there is no record available. */
     virtual bool moveLast();
 
@@ -155,17 +155,17 @@ public:
      Currently it's only supported for buffered cursors. */
     virtual bool movePrev();
 
-    /*! \return true if current position is after last record. */
+    /*! @return true if current position is after last record. */
     inline bool eof() const {
         return m_afterLast;
     }
 
-    /*! \return true if current position is before first record. */
+    /*! @return true if current position is before first record. */
     inline bool bof() const {
         return m_at == 0;
     }
 
-    /*! \return current internal position of the cursor's query.
+    /*! @return current internal position of the cursor's query.
      We are counting records from 0.
      Value -1 means that cursor does not point to any valid record
      (this happens eg. after open(), close(),
@@ -174,13 +174,13 @@ public:
         return m_readAhead ? 0 : (m_at - 1);
     }
 
-    /*! \return number of fields available for this cursor.
+    /*! @return number of fields available for this cursor.
      This never includes ROWID column or other internal columns (e.g. lookup). */
     inline uint fieldCount() const {
         return m_query ? m_logicalFieldCount : m_fieldCount;
     }
 
-    /*! \return true if ROWID information is available for each record.
+    /*! @return true if ROWID information is available for each record.
      ROWID information is available
      if DriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
      for a Predicate database driver and the master table has no primary key defined.
@@ -190,15 +190,15 @@ public:
         return m_containsRecordIdInfo;
     }
 
-    /*! \return a value stored in column number \a i (counting from 0).
+    /*! @return a value stored in column number @a i (counting from 0).
      Is has unspecified behaviour if the cursor is not at valid record.
      Note for driver developers:
-     If \a i is >= than m_fieldCount, null QVariant value should be returned.
+     If @a i is >= than m_fieldCount, null QVariant value should be returned.
      To return a value typically you can use a pointer to internal structure
      that contain current record data (buffered or unbuffered). */
     virtual QVariant value(uint i) = 0;
 
-    /*! [PROTOTYPE] \return current record data or NULL if there is no current records. */
+    /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
     virtual const char ** recordData() const = 0;
 
     /*! Sets a list of columns for ORDER BY section of the query.
@@ -222,13 +222,13 @@ public:
                               const QString& column3 = QString(), const QString& column4 = QString(),
                               const QString& column5 = QString());
 
-    /*! \return a list of fields contained in ORDER BY section of the query.
+    /*! @return a list of fields contained in ORDER BY section of the query.
      @see setOrderBy(const QStringList&) */
     QueryColumnInfo::Vector orderByColumnList() const;
 
     /*! Allocates a new RecordData and stores data in it (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
-     \return newly created record data object or 0 on error. */
+     @return newly created record data object or 0 on error. */
     inline RecordData* storeCurrentRecord() const {
         RecordData* data = new RecordData(m_fieldsToStoreInRecord);
         if (!drv_storeCurrentRecord(data)) {
@@ -238,9 +238,9 @@ public:
         return data;
     }
 
-    /*! Puts current record's data into \a data (makes a deep copy of each field).
+    /*! Puts current record's data into @a data (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
-     \return true on success. */
+     @return true on success. */
     inline bool storeCurrentRecord(RecordData* data) const {
         data->resize(m_fieldsToStoreInRecord);
         return drv_storeCurrentRecord(data);
@@ -254,17 +254,17 @@ public:
 
     bool deleteAllRecords();
 
-    /*! \return Debug information. */
+    /*! @return Debug information. */
     QString debugString() const;
 
     //! Outputs debug information.
     void debug() const;
 
 protected:
-    /*! Cursor will operate on \a conn, raw \a statement will be used to execute query. */
+    /*! Cursor will operate on @a conn, raw @a statement will be used to execute query. */
     Cursor(Connection* conn, const EscapedString& statement, uint options = NoOptions);
 
-    /*! Cursor will operate on \a conn, \a query schema will be used to execute query. */
+    /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     Cursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
 
     void init();
@@ -274,7 +274,7 @@ protected:
     bool getNextRecord();
 
     /* Note for driver developers: this method should initialize engine-specific cursor's
-     resources using m_sql statement. It is not required to store \a sql statement somewhere
+     resources using m_sql statement. It is not required to store @a sql statement somewhere
      in your Cursor subclass (it is already stored in m_query or m_rawStatement,
      depending query type) - only pass it to proper engine's function. */
     virtual bool drv_open(const EscapedString& sql) = 0;
@@ -303,7 +303,7 @@ protected:
     virtual void drv_bufferMovePointerNext() = 0;
     /*! Like drv_bufferMovePointerNext() but execute "your_pointer--". */
     virtual void drv_bufferMovePointerPrev() = 0;
-    /*! Moves pointer (that points to the buffer) to a new place: \a at.
+    /*! Moves pointer (that points to the buffer) to a new place: @a at.
     */
     virtual void drv_bufferMovePointerTo(qint64 at) = 0;
 
@@ -320,9 +320,9 @@ protected:
     //! @internal clears buffer with reimplemented drv_clearBuffer(). */
     void clearBuffer();
 
-    /*! Puts current record's data into \a data (makes a deep copy of each field).
+    /*! Puts current record's data into @a data (makes a deep copy of each field).
      This method has unspecified behaviour if the cursor is not at valid record.
-     \return true on success.
+     @return true on success.
      Note: For reimplementation in driver's code. Shortly, this method translates
      a record data from internal representation (probably also used in buffer)
      to simple public RecordData representation. */

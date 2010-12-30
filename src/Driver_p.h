@@ -111,7 +111,7 @@ public:
      Connection::anyAvailableDatabaseName().
      Example: for PostgreSQL this is "template1".
 
-     \sa Connection::SetAvailableDatabaseName()
+     @see Connection::SetAvailableDatabaseName()
     */
     QString ALWAYS_AVAILABLE_DATABASE_NAME;
 

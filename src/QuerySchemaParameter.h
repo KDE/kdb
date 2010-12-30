@@ -49,10 +49,10 @@ public:
     QuerySchemaParameterValueListIterator(Driver* driver, const QList<QVariant>& params);
     ~QuerySchemaParameterValueListIterator();
 
-    //! \return previous value
+    //! @return previous value
     QVariant getPreviousValue();
 
-    //! \return previous value as string formatted using driver's escaping
+    //! @return previous value as string formatted using driver's escaping
     EscapedString getPreviousValueAsString(Field::Type type);
 protected:
     class Private;

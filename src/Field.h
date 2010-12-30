@@ -150,7 +150,7 @@ public:
         Unsigned = 1
     };
 
-    /*! Creates a database field as a child of \a tableSchema table
+    /*! Creates a database field as a child of @a tableSchema table
      No other properties are set (even the name), so these should be set later. */
     explicit Field(TableSchema *tableSchema);
 
@@ -173,142 +173,142 @@ public:
 
     virtual ~Field();
 
-    //! Converts type \a type to QVariant equivalent as accurate as possible
+    //! Converts type @a type to QVariant equivalent as accurate as possible
     static QVariant::Type variantType(uint type);
 
-    /*! \return a i18n-ed type name for \a type (\a type has to be an element from Field::Type,
+    /*! @return a i18n-ed type name for @a type (@a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeName(uint type);
 
-    /*! \return list of all available i18n-ed type names. */
+    /*! @return list of all available i18n-ed type names. */
     static QStringList typeNames();
 
-    /*! \return type string for \a type, e.g. "Integer" for Integer type
-     (not-i18n-ed, \a type has to be an element from Field::Type,
+    /*! @return type string for @a type, e.g. "Integer" for Integer type
+     (not-i18n-ed, @a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeString(uint type);
 
-    /*! \return type for a given \a typeString */
+    /*! @return type for a given @a typeString */
     static Type typeForString(const QString& typeString);
 
-    /*! \return type group for a given \a typeGroupString */
+    /*! @return type group for a given @a typeGroupString */
     static TypeGroup typeGroupForString(const QString& typeGroupString);
 
-    /*! \return group for \a type */
+    /*! @return group for @a type */
     static TypeGroup typeGroup(uint type);
 
-    /*! \return a i18n-ed group name for \a typeGroup
-     (\a typeGroup has to be an element from Field::TypeGroup) */
+    /*! @return a i18n-ed group name for @a typeGroup
+     (@a typeGroup has to be an element from Field::TypeGroup) */
     static QString typeGroupName(uint typeGroup);
 
-    /*! \return list of all available i18n-ed type group names. */
+    /*! @return list of all available i18n-ed type group names. */
     static QStringList typeGroupNames();
 
-    /*! \return type group string for \a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
-     (not-i18n-ed, \a type has to be an element from Field::Type,
+    /*! @return type group string for @a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
+     (not-i18n-ed, @a type has to be an element from Field::Type,
      not greater than Field::LastType) */
     static QString typeGroupString(uint typeGroup);
 
-    /* ! \return the name of this field */
+    /* ! @return the name of this field */
     inline QString name() const {
         return m_name;
     }
 
-    /*! \return table schema of table that owns this field
+    /*! @return table schema of table that owns this field
      or null if it has no table assigned.
      @see query() */
     virtual TableSchema* table() const;
 
-    /*! Sets \a table schema of table that owns this field.
-     This does not adds the field to \a table object.
+    /*! Sets @a table schema of table that owns this field.
+     This does not adds the field to @a table object.
      You do not need to call this method by hand.
      Call TableSchema::addField(Field *field) instead.
      @see setQuery() */
     virtual void setTable(TableSchema *table);
 
     /*! For special use when the field defines expression.
-     \return query schema of query that owns this field
+     @return query schema of query that owns this field
      or null if it has no query assigned.
      @see table() */
     QuerySchema* query() const;
 
     /*! For special use when field defines expression.
-     Sets \a query schema of query that owns this field.
-     This does not adds the field to \a query object.
+     Sets @a query schema of query that owns this field.
+     This does not adds the field to @a query object.
      You do not need to call this method by hand.
      Call QuerySchema::addField() instead.
      @see setQuery() */
     void setQuery(QuerySchema *query);
 
-    /*! \return true if the field is autoincrement (e.g. integer/numeric) */
+    /*! @return true if the field is autoincrement (e.g. integer/numeric) */
     inline bool isAutoIncrement() const {
         return constraints() & AutoInc;
     }
 
-    /*! \return true if the field is member of single-field primary key */
+    /*! @return true if the field is member of single-field primary key */
     inline bool isPrimaryKey() const {
         return constraints() & PrimaryKey;
     }
 
-    /*! \return true if the field is member of single-field unique key */
+    /*! @return true if the field is member of single-field unique key */
     inline bool isUniqueKey() const {
         return constraints() & Unique;
     }
 
-    /*! \return true if the field is member of single-field foreign key */
+    /*! @return true if the field is member of single-field foreign key */
     inline bool isForeignKey() const {
         return constraints() & ForeignKey;
     }
 
-    /*! \return true if the field is not allowed to be null */
+    /*! @return true if the field is not allowed to be null */
     inline bool isNotNull() const {
         return constraints() & NotNull;
     }
 
-    /*! \return true if the field is not allowed to be null */
+    /*! @return true if the field is not allowed to be null */
     inline bool isNotEmpty() const {
         return constraints() & NotEmpty;
     }
 
-    /*! \return true if the field is indexed using single-field database index. */
+    /*! @return true if the field is indexed using single-field database index. */
     inline bool isIndexed() const {
         return constraints() & Indexed;
     }
 
-    /*! \return true if the field is of any numeric type (integer or floating point) */
+    /*! @return true if the field is of any numeric type (integer or floating point) */
     inline bool isNumericType() const {
         return Field::isNumericType(type());
     }
 
     /*! static version of isNumericType() method
-     *! \return true if the field is of any numeric type (integer or floating point)*/
+     *! @return true if the field is of any numeric type (integer or floating point)*/
     static bool isNumericType(uint type);
 
-    /*! \return true if the field is of any integer type */
+    /*! @return true if the field is of any integer type */
     inline bool isIntegerType() const {
         return Field::isIntegerType(type());
     }
 
     /*! static version of isIntegerType() method
-     *! \return true if the field is of any integer type */
+     *! @return true if the field is of any integer type */
     static bool isIntegerType(uint type);
 
-    /*! \return true if the field is of any floating point numeric type */
+    /*! @return true if the field is of any floating point numeric type */
     inline bool isFPNumericType() const {
         return Field::isFPNumericType(type());
     }
 
     /*! static version of isFPNumericType() method
-     *! \return true if the field is of any floating point numeric type */
+     *! @return true if the field is of any floating point numeric type */
     static bool isFPNumericType(uint type);
 
-    /*! \return true if the field is of any date or time related type */
+    /*! @return true if the field is of any date or time related type */
     inline bool isDateTimeType() const {
         return Field::isDateTimeType(type());
     }
 
     /*! static version of isDateTimeType() method
-     *! \return true if the field is of any date or time related type */
+     *! @return true if the field is of any date or time related type */
     static bool isDateTimeType(uint type);
 
     /*! @return true if the field is of any text type */
@@ -317,7 +317,7 @@ public:
     }
 
     /*! static version of isTextType() method
-     *! \return true if the field is of any text type */
+     *! @return true if the field is of any text type */
     static bool isTextType(uint type);
 
     uint options() const {
@@ -333,38 +333,38 @@ public:
         return variantType(type());
     }
 
-    /*! \return a type for this field. If there's expression assigned,
+    /*! @return a type for this field. If there's expression assigned,
      type of the expression is returned instead. */
     Type type() const;
 
-    //! \return a i18n-ed type name for this field
+    //! @return a i18n-ed type name for this field
     inline QString typeName() const {
         return Field::typeName(type());
     }
 
-    //! \return type group for this field
+    //! @return type group for this field
     inline TypeGroup typeGroup() const {
         return Field::typeGroup(type());
     }
 
-    //! \return a i18n-ed type group name for this field
+    //! @return a i18n-ed type group name for this field
     inline QString typeGroupName() const {
         return Field::typeGroupName(type());
     }
 
-    //! \return a type string for this field,
+    //! @return a type string for this field,
     //! for example "Integer" string for Field::Integer type.
     inline QString typeString() const {
         return Field::typeString(type());
     }
 
-    //! \return a type group string for this field,
+    //! @return a type group string for this field,
     //! for example "Integer" string for Field::IntegerGroup.
     inline QString typeGroupString() const {
         return Field::typeGroupString(type());
     }
 
-    /*! \return (optional) subtype for this field.
+    /*! @return (optional) subtype for this field.
      Subtype is a string providing additional hint for field's type.
      E.g. for BLOB type, it can be a MIME type or certain QVariant type name,
      for example: "QPixmap", "QColor" or "QFont" */
@@ -373,30 +373,30 @@ public:
     }
 
     /*! Sets (optional) subtype for this field.
-     \sa subType() */
+     @see subType() */
     inline void setSubType(const QString& subType) {
         m_subType = subType;
     }
 
-    //! \return default value for this field. Null value means there
+    //! @return default value for this field. Null value means there
     //! is no default value declared. The variant value is compatible with field's type.
     inline QVariant defaultValue() const {
         return m_defaultValue;
     }
 
-    /*! \return length of text, only meaningful if the field type is text.
+    /*! @return length of text, only meaningful if the field type is text.
      0 means "default length". */
     inline uint length() const {
         return m_length;
     }
 
-    /*! \return precision for numeric and other fields that have both length (scale)
+    /*! @return precision for numeric and other fields that have both length (scale)
      and precision (floating point types). */
     inline uint precision() const {
         return m_precision;
     }
 
-    /*! \return scale for numeric and other fields that have both length (scale)
+    /*! @return scale for numeric and other fields that have both length (scale)
      and precision (floating point types).
      The scale of a numeric is the count of decimal digits in the fractional part,
      to the right of the decimal point. The precision of a numeric is the total count
@@ -408,7 +408,7 @@ public:
     }
 
 //! @todo should we keep extended properties here or move them to a QVariant dictionary?
-    /*! \return number of decimal places that should be visible to the user,
+    /*! @return number of decimal places that should be visible to the user,
      e.g. within table view widget, form or printout.
      Only meaningful if the field type is floating point or (in the future: decimal or currency).
 
@@ -427,33 +427,33 @@ public:
         return m_visibleDecimalPlaces;
     }
 
-    /*! \return the constraints defined for this field. */
+    /*! @return the constraints defined for this field. */
     inline uint constraints() const {
         return m_constraints;
     }
 
-    /*! \return order of this field in containing table (counting starts from 0)
+    /*! @return order of this field in containing table (counting starts from 0)
     (-1 if unspecified). */
     inline int order() const {
         return m_order;
     }
 
-    /*! \return caption of this field. */
+    /*! @return caption of this field. */
     inline QString caption() const {
         return m_caption;
     }
 
-    /*! \return caption of this field or - if empty - return its name. */
+    /*! @return caption of this field or - if empty - return its name. */
     inline QString captionOrName() const {
         return m_caption.isEmpty() ? m_name : m_caption;
     }
 
-    /*! \return description text for this field. */
+    /*! @return description text for this field. */
     inline QString description() const {
         return m_desc;
     }
 
-    /*! \return width of this field (usually in pixels or points)
+    /*! @return width of this field (usually in pixels or points)
     0 (the default) means there is no hint for the width. */
     inline uint width() const {
         return m_width;
@@ -464,36 +464,36 @@ public:
         return m_options & Unsigned;
     }
 
-    /*! \return true if this Field.has EMPTY property (i.e. it is of type
+    /*! @return true if this Field.has EMPTY property (i.e. it is of type
     string or is a BLOB). */
     inline bool hasEmptyProperty() const {
         return Field::hasEmptyProperty(type());
     }
 
     /*! static version of hasEmptyProperty() method
-     \return true if this field type has EMPTY property (i.e. it is string or BLOB type) */
+     @return true if this field type has EMPTY property (i.e. it is string or BLOB type) */
     static bool hasEmptyProperty(uint type);
 
-    /*! \return true if this field can be auto-incremented.
-     Actually, returns true for integer field type. \sa IntegerType, isAutoIncrement() */
+    /*! @return true if this field can be auto-incremented.
+     Actually, returns true for integer field type. @see IntegerType, isAutoIncrement() */
     inline bool isAutoIncrementAllowed() const {
         return Field::isAutoIncrementAllowed(type());
     }
 
     /*! static version of isAutoIncrementAllowed() method
-     \return true if this field type can be auto-incremented. */
+     @return true if this field type can be auto-incremented. */
     static bool isAutoIncrementAllowed(uint type);
 
-    /*! Sets type \a t for this field. This does nothing if there's already expression assigned,
+    /*! Sets type @a t for this field. This does nothing if there's already expression assigned,
      see expression(). */
     void setType(Type t);
 
-    /*! Sets name \a name for this field. */
+    /*! Sets name @a name for this field. */
     void setName(const QString& name);
 
-    /*! Sets constraints to \a c. If PrimaryKey is set in \a c, also
+    /*! Sets constraints to @a c. If PrimaryKey is set in @a c, also
      constraits implied by being primary key are enforced (see setPrimaryKey()).
-     If Indexed is not set in \a c, constraits implied by not being are
+     If Indexed is not set in @a c, constraits implied by not being are
      enforced as well (see setIndexed()). */
     void setConstraints(uint c);
 
@@ -522,7 +522,7 @@ public:
     /*! Sets default value decoded from QByteArray.
       Decoding errors are detected (value is strictly checked against field type)
       - if one is encountered, default value is cleared (defaultValue()==QVariant()).
-      \return true if given value was valid for field type. */
+      @return true if given value was valid for field type. */
     bool setDefaultValue(const QByteArray& def);
 
     /*! Sets auto increment flag. Only available to set true,
@@ -574,17 +574,17 @@ public:
      do setIndexed(true) for the same reason. */
     void setIndexed(bool s);
 
-    /*! Sets caption for this field to \a caption. */
+    /*! Sets caption for this field to @a caption. */
     void setCaption(const QString& caption) {
         m_caption = caption;
     }
 
-    /*! Sets description for this field to \a description. */
+    /*! Sets description for this field to @a description. */
     void setDescription(const QString& description) {
         m_desc = description;
     }
 
-    /*! Sets visible width for this field to \a w
+    /*! Sets visible width for this field to @a w
      (usually in pixels or points). 0 means there is no hint for the width. */
     void setWidth(uint w) {
         m_width = w;
@@ -602,7 +602,7 @@ public:
         return m_type == Field::Asterisk;
     }
 
-    /*! \return Predicate::BaseExpr object if the field value is an
+    /*! @return Predicate::BaseExpr object if the field value is an
      expression.  Unless the expression is set with setExpression(), it is null.
     */
     inline Predicate::BaseExpr *expression() {
@@ -613,18 +613,18 @@ public:
         return m_expr;
     }
 
-    /*! Sets expression data \a expr. If there was
+    /*! Sets expression data @a expr. If there was
      already expression set, it is destroyed before new assignment.
-     This Field object becames owner of \a expr object,
+     This Field object becames owner of @a expr object,
      so you do not have to worry about deleting it later.
-     If the \a expr is null, current field's expression is deleted, if exists.
+     If the @a expr is null, current field's expression is deleted, if exists.
 
      Because the field defines an expression, it should be assigned to a query,
      not to a table.
     */
     void setExpression(Predicate::BaseExpr *expr);
 
-    /*! \return true if there is expression defined for this field.
+    /*! @return true if there is expression defined for this field.
      This method is provided for better readibility
      - does the same as expression()!=NULL but */
     inline bool isExpression() const {
@@ -632,7 +632,7 @@ public:
     }
 
 //<TMP>
-    /*! \return the hints for enum fields. */
+    /*! @return the hints for enum fields. */
     QVector<QString> enumHints() const {
         return m_hints;
     }
@@ -645,25 +645,25 @@ public:
     }
 //</TMP>
 
-    /*! \return custom property \a propertyName.
-     If there is no such a property, \a defaultValue is returned. */
+    /*! @return custom property @a propertyName.
+     If there is no such a property, @a defaultValue is returned. */
     QVariant customProperty(const QByteArray& propertyName,
                             const QVariant& defaultValue = QVariant()) const;
 
-    //! Sets value \a value for custom property \a propertyName
+    //! Sets value @a value for custom property @a propertyName
     void setCustomProperty(const QByteArray& propertyName, const QVariant& value);
 
     //! A data type used for handling custom properties of a field
     typedef QHash<QByteArray, QVariant> CustomPropertiesMap;
 
-    //! \return all custom properties
+    //! @return all custom properties
     inline CustomPropertiesMap customProperties() const {
         return m_customProperties ? *m_customProperties : CustomPropertiesMap();
     }
 
 protected:
-    /*! Creates a database field as a child of \a querySchema table
-     Assigns \a expr expression to this field, if present.
+    /*! Creates a database field as a child of @a querySchema table
+     Assigns @a expr expression to this field, if present.
      Used internally by query schemas, e.g. to declare asterisks or
      to add expression columns.
      No other properties are set, so these should be set later. */
@@ -672,7 +672,7 @@ protected:
     /*! @internal Used by constructors. */
     void init();
 
-    //! \return a deep copy of this object. Used in @ref FieldList(const FieldList& fl).
+    //! @return a deep copy of this object. Used in @ref FieldList(const FieldList& fl).
     virtual Field* copy() const;
 
     FieldList *m_parent; //!< In most cases this points to a TableSchema

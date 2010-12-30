@@ -544,7 +544,7 @@ Field::setPrimaryKey(bool p)
         setNotEmpty(true);
         setIndexed(true);
     } else {
-//! \todo is this ok for all engines?
+//! @todo is this ok for all engines?
         setAutoIncrement(false);
     }
 }

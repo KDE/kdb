@@ -48,7 +48,7 @@ public:
     virtual EscapedString escapeString(const QByteArray& str) const;
     virtual QString sqlTypeName(int id_t, int p = 0) const;
 
-    //! Escape BLOB value \a array
+    //! Escape BLOB value @a array
     virtual EscapedString escapeBLOB(const QByteArray& array) const;
 
     //! @return QVariant type for PostgreSQL type @a pgsqlType.

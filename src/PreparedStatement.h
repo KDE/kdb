@@ -54,7 +54,7 @@ typedef QList<QVariant> PreparedStatementParameters;
   Let's assume tableSchema contains two columns NUMBER integer and TEXT text.
   Following code inserts 10000 records with random numbers and text strings
   obtained elsewhere using getText(i).
-  \code
+  @code
   bool insertMultiple(Predicate::Connection* conn, Predicate::TableSchema* tableSchema)
   {
     Predicate::PreparedStatement statement = conn->prepareStatement(
@@ -67,7 +67,7 @@ typedef QList<QVariant> PreparedStatementParameters;
     }
     return true;
   }
-  \endcode
+  @endcode
 
   If you do not call clearParameters() after every insert, you can insert
   the same value multiple times using execute() what increases efficiency even more.

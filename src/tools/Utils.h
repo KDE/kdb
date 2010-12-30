@@ -38,7 +38,7 @@ namespace Predicate
 namespace Utils
 {
 
-//! \return true if \a o has parent \a par.
+//! @return true if @a o has parent @a par.
 inline bool hasParent(QObject* par, QObject* o)
 {
     if (!o || !par)
@@ -48,7 +48,7 @@ inline bool hasParent(QObject* par, QObject* o)
     return o == par;
 }
 
-//! \return parent object of \a o that is of type \a type or NULL if no such parent
+//! @return parent object of @a o that is of type @a type or NULL if no such parent
 template<class type>
 inline type findParent(QObject* o, const char* className = 0)
 {
@@ -74,13 +74,13 @@ inline type findParent(QObject* o, const char* className = 0)
     return 0;
   }*/
 
-/*! \return first found child of \a o, inheriting \a className.
+/*! @return first found child of @a o, inheriting @a className.
  If objName is 0 (the default), all object names match.
  Returned pointer type is casted. */
 PREDICATE_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName);
 
-/*! \return first found child of \a o, that inherit \a className.
- If \a objName is 0 (the default), all object names match.
+/*! @return first found child of @a o, that inherit @a className.
+ If @a objName is 0 (the default), all object names match.
  Returned pointer type is casted. */
 template<class type>
 inline type findFirstChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName = 0)
@@ -93,51 +93,51 @@ inline type findFirstChild(QObject *o, const char* className /* compat with Qt3 
 PREDICATE_EXPORT int indexOfPropertyWithSuperclasses(
     const QObject *object, const char* name);
 
-//! Finds property for name \a name and object \a object returns it index;
+//! Finds property for name @a name and object @a object returns it index;
 //! otherwise returns a null QMetaProperty.
 PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
         const char* name);
 
-//! Finds property for index \a index and object \a object returns it index;
+//! Finds property for index @a index and object @a object returns it index;
 //! otherwise returns a null QMetaProperty.
 PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
         int index);
 
-//! \return true is \a object object is of class name \a className
+//! @return true is @a object object is of class name @a className
 inline bool objectIsA(QObject* object, const char* className)
 {
     return 0 == qstrcmp(object->metaObject()->className(), className);
 }
 
-//! \return true is \a object object is of the class names inside \a classNames
+//! @return true is @a object object is of the class names inside @a classNames
 PREDICATE_EXPORT bool objectIsA(QObject* object, const QList<QByteArray>& classNames);
 
-//! \return a list of methods for \a metaObject meta object.
-//! The methods are of type declared in \a types and have access declared
-//! in \a access.
+//! @return a list of methods for @a metaObject meta object.
+//! The methods are of type declared in @a types and have access declared
+//! in @a access.
 PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObject(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
     = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
     QFlags<QMetaMethod::Access> access
     = QFlags<QMetaMethod::Access>(QMetaMethod::Private | QMetaMethod::Protected | QMetaMethod::Public));
 
-//! Like \ref KexiUtils::methodsForMetaObject() but includes methods from all
-//! parent meta objects of the \a metaObject.
+//! Like @ref KexiUtils::methodsForMetaObject() but includes methods from all
+//! parent meta objects of the @a metaObject.
 PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObjectWithParents(
     const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
     = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
     QFlags<QMetaMethod::Access> access
     = QFlags<QMetaMethod::Access>(QMetaMethod::Private | QMetaMethod::Protected | QMetaMethod::Public));
 
-//! \return a list with all this class's properties.
+//! @return a list with all this class's properties.
 PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObject(
     const QMetaObject *metaObject);
 
-//! \return a list with all this class's properties including thise inherited.
+//! @return a list with all this class's properties including thise inherited.
 PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObjectWithInherited(
     const QMetaObject *metaObject);
 
-//! \return a list of enum keys for meta property \a metaProperty.
+//! @return a list of enum keys for meta property @a metaProperty.
 PREDICATE_EXPORT QStringList enumKeysForProperty(const QMetaProperty& metaProperty);
 
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()
@@ -151,11 +151,11 @@ inline QDateTime stringToHackedQTime(const QString& s)
 
 #if 0
 //! @todo
-/*! \return filter string in QFileDialog format for a mime type pointed by \a mime
- If \a kdeFormat is true, QFileDialog-compatible filter string is generated,
+/*! @return filter string in QFileDialog format for a mime type pointed by @a mime
+ If @a kdeFormat is true, QFileDialog-compatible filter string is generated,
  eg. "Image files (*.png *.xpm *.jpg)", otherwise KFileDialog -compatible
  filter string is generated, eg. "*.png *.xpm *.jpg|Image files (*.png *.xpm *.jpg)".
- "\\n" is appended if \a kdeFormat is true, otherwise ";;" is appended. */
+ "\\n" is appended if @a kdeFormat is true, otherwise ";;" is appended. */
 PREDICATE_EXPORT QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true);
 
 /*! @overload QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true) */
@@ -166,22 +166,22 @@ PREDICATE_EXPORT QString fileDialogFilterString(const QString& mimeString, bool 
 PREDICATE_EXPORT QString fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat);
 
 /*! A global setting for minimal readable font.
- \a init is a widget that should be passed if no qApp->mainWidget() is available yet.
+ @a init is a widget that should be passed if no qApp->mainWidget() is available yet.
  The size of font is not smaller than he one returned by
  KGlobalSettings::smallestReadableFont(). */
 PREDICATE_EXPORT QFont smallFont(QWidget *init = 0);
 #endif
 
-/*! \return a color being a result of blending \a c1 with \a c2 with \a factor1
- and \a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
+/*! @return a color being a result of blending @a c1 with @a c2 with @a factor1
+ and @a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
 PREDICATE_EXPORT QColor blendedColors(const QColor& c1, const QColor& c2, int factor1 = 1, int factor2 = 1);
 
-/*! \return a contrast color for a color \a c:
- If \a c is light color, darker color created using c.dark(200) is returned;
+/*! @return a contrast color for a color @a c:
+ If @a c is light color, darker color created using c.dark(200) is returned;
  otherwise lighter color created using c.light(200) is returned. */
 PREDICATE_EXPORT QColor contrastColor(const QColor& c);
 
-/*! \return a lighter color for a color \a c and a factor \a factor.
+/*! @return a lighter color for a color @a c and a factor @a factor.
  For colors like Qt::red or Qt::green where hue and saturation are near to 255,
  hue is decreased so the result will be more bleached.
  For black color the result is dark gray rather than black. */
@@ -189,42 +189,42 @@ PREDICATE_EXPORT QColor bleachedColor(const QColor& c, int factor);
 
 #if 0
 //! @todo
-/*! \return icon set computed as a result of colorizing \a icon pixmap with "buttonText"
- color of \a palette palette. This function is useful for displaying monochromed icons
+/*! @return icon set computed as a result of colorizing @a icon pixmap with "buttonText"
+ color of @a palette palette. This function is useful for displaying monochromed icons
  on the list view or table view header, to avoid bloat, but still have the color compatible
  with accessibility settings. */
 PREDICATE_EXPORT QIcon colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette);
 
-/*! \return empty (fully transparent) pixmap that can be used as a place for icon of size \a iconGroup */
+/*! @return empty (fully transparent) pixmap that can be used as a place for icon of size @a iconGroup */
 PREDICATE_EXPORT QPixmap emptyIcon(KIconLoader::Group iconGroup);
 #endif
 
-/*! Serializes \a map to \a array.
+/*! Serializes @a map to @a array.
  KexiUtils::deserializeMap() can be used to deserialize this array back to map. */
 PREDICATE_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray& array);
 PREDICATE_EXPORT void serializeMap(const QMap<QString, QString>& map, QString& string);
 
-/*! \return a map deserialized from a byte array \a array.
- \a array need to contain data previously serialized using KexiUtils::serializeMap(). */
+/*! @return a map deserialized from a byte array @a array.
+ @a array need to contain data previously serialized using KexiUtils::serializeMap(). */
 PREDICATE_EXPORT QMap<QString, QString> deserializeMap(const QByteArray& array);
 
-/*! \return a map deserialized from \a string.
- \a string need to contain data previously serialized using KexiUtils::serializeMap(). */
+/*! @return a map deserialized from @a string.
+ @a string need to contain data previously serialized using KexiUtils::serializeMap(). */
 PREDICATE_EXPORT QMap<QString, QString> deserializeMap(const QString& string);
 
-/*! \return a valid filename converted from \a string by:
+/*! @return a valid filename converted from @a string by:
  - replacing \\, /, :, *, ?, ", <, >, |, \n \\t characters with a space
  - simplifing whitespace by removing redundant space characters using QString::simplified()
  Do not pass full paths here, but only filename strings. */
 PREDICATE_EXPORT QString stringToFileName(const QString& string);
 
-/*! Performs a simple \a string  encryption using rot47-like algorithm.
+/*! Performs a simple @a string  encryption using rot47-like algorithm.
  Each character's unicode value is increased by 47 + i (where i is index of the character).
  The resulting string still contains redable characters.
  Do not use this for data that can be accessed by attackers! */
 PREDICATE_EXPORT void simpleCrypt(QString& string);
 
-/*! Performs a simple \a string decryption using rot47-like algorithm,
+/*! Performs a simple @a string decryption using rot47-like algorithm,
  using opposite operations to KexiUtils::simpleCrypt(). */
 PREDICATE_EXPORT void simpleDecrypt(QString& string);
 
@@ -233,24 +233,24 @@ PREDICATE_EXPORT QString ptrToStringInternal(void* ptr, uint size);
 //! @internal
 PREDICATE_EXPORT void* stringToPtrInternal(const QString& str, uint size);
 
-//! \return a pointer \a ptr safely serialized to string
+//! @return a pointer @a ptr safely serialized to string
 template<class type>
 QString ptrToString(type *ptr)
 {
     return ptrToStringInternal(ptr, sizeof(type*));
 }
 
-//! \return a pointer of type \a type safely deserialized from \a str
+//! @return a pointer of type @a type safely deserialized from @a str
 template<class type>
 type* stringToPtr(const QString& str)
 {
     return static_cast<type*>(stringToPtrInternal(str, sizeof(type*)));
 }
 
-//! Sets focus for widget \a widget with reason \a reason.
+//! Sets focus for widget @a widget with reason @a reason.
 PREDICATE_EXPORT void setFocusWithReason(QWidget* widget, Qt::FocusReason reason);
 
-//! Unsets focus for widget \a widget with reason \a reason.
+//! Unsets focus for widget @a widget with reason @a reason.
 PREDICATE_EXPORT void unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason);
 
 //! @short A convenience class that simplifies usage of QWidget::getContentsMargins() and QWidget::setContentsMargins
@@ -259,26 +259,26 @@ class PREDICATE_EXPORT WidgetMargins
 public:
     //! Creates object with all margins set to 0
     WidgetMargins();
-    //! Creates object with margins copied from \a widget
+    //! Creates object with margins copied from @a widget
     WidgetMargins(QWidget *widget);
     //! Creates object with margins set to given values
     WidgetMargins(int _left, int _top, int _right, int _bottom);
     //! Creates object with all margins set to commonMargin
     WidgetMargins(int commonMargin);
-    //! Copies margins from \a widget to this object
+    //! Copies margins from @a widget to this object
     void copyFromWidget(QWidget *widget);
-    //! Creates margins from this object copied to \a widget
+    //! Creates margins from this object copied to @a widget
     void copyToWidget(QWidget *widget);
-    //! Adds the given margins \a margins to this object, and returns a reference to this object
+    //! Adds the given margins @a margins to this object, and returns a reference to this object
     WidgetMargins& operator+= (const WidgetMargins& margins);
 
     int left, top, right, bottom;
 };
 
-//! \return the sum of \a margins1 and \a margins1; each component is added separately.
+//! @return the sum of @a margins1 and @a margins1; each component is added separately.
 const WidgetMargins operator+ (const WidgetMargins& margins1, const WidgetMargins& margins2);
 
-//! Draws pixmap on painter \a p using predefined parameters.
+//! Draws pixmap on painter @a p using predefined parameters.
 //! Used in KexiDBImageBox and KexiBlobTableEdit.
 PREDICATE_EXPORT void drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
                                  const QPixmap& pixmap, Qt::Alignment alignment, bool scaledContents, bool keepAspectRatio);
@@ -494,7 +494,7 @@ protected:
 
 //! sometimes we leave a space in the form of empty QFrame and want to insert here
 //! a widget that must be instantiated by hand.
-//! This macro inserts a widget \a what into a frame \a where.
+//! This macro inserts a widget @a what into a frame @a where.
 #define GLUE_WIDGET(what, where) \
     { Q3VBoxLayout *lyr = new Q3VBoxLayout(where); \
         lyr->addWidget(what); }

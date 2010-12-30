@@ -37,16 +37,16 @@ class Connection;
 class PREDICATE_EXPORT FieldList
 {
 public:
-    /*! Creates empty list of fields. If \a owner is true, the list will be
+    /*! Creates empty list of fields. If @a owner is true, the list will be
      owner of any added field, what means that these field
      will be removed on the list destruction. Otherwise, the list
      just points any field that was added.
-     \sa isOwner()
+     @see isOwner()
     */
     explicit FieldList(bool owner = false);
 
     /*! Copy constructor.
-     If \a deepCopyFields is true, all fields are deeply copied, else only pointer are copied.
+     If @a deepCopyFields is true, all fields are deeply copied, else only pointer are copied.
      Reimplemented in QuerySchema constructor. */
     explicit FieldList(const FieldList& fl, bool deepCopyFields = true);
 
@@ -54,20 +54,20 @@ public:
      these are also deleted. */
     virtual ~FieldList();
 
-    /*! \return number of fields in the list. */
+    /*! @return number of fields in the list. */
     inline uint fieldCount() const {
         return m_fields.count();
     }
 
-    /*! \return true if the list is empty. */
+    /*! @return true if the list is empty. */
     inline bool isEmpty() const {
         return m_fields.isEmpty();
     }
 
-    /*! Adds \a field at the and of field list. */
+    /*! Adds @a field at the and of field list. */
     FieldList& addField(Field *field);
 
-    /*! Inserts \a field into a specified position (\a index).
+    /*! Inserts @a field into a specified position (@a index).
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
@@ -79,31 +79,31 @@ public:
      this implementation in your subclass. */
     virtual void removeField(Field *field);
 
-    /*! \return field id or NULL if there is no such a field. */
+    /*! @return field id or NULL if there is no such a field. */
     inline Field* field(uint id) {
         return m_fields.value(id);
     }
 
-    /*! \return field id or NULL if there is no such a field. */
+    /*! @return field id or NULL if there is no such a field. */
     inline const Field* field(uint id) const {
         return m_fields.value(id);
     }
 
-    /*! \return field with name \a name or NULL if there is no such a field. */
+    /*! @return field with name @a name or NULL if there is no such a field. */
     virtual Field* field(const QString& name) const;
 
-    /*! \return true if this list contains given \a field. */
+    /*! @return true if this list contains given @a field. */
     inline bool hasField(const Field& field) const {
         return m_fields.contains(const_cast<Field*>(&field));
     }
 
-    /*! \return first occurrence of \a field in the list
+    /*! @return first occurrence of @a field in the list
      or -1 if this list does not contain this field. */
     inline int indexOf(const Field& field) const {
         return m_fields.indexOf(const_cast<Field*>(&field));
     }
 
-    /*! \return list of field names for this list. */
+    /*! @return list of field names for this list. */
     QStringList names() const;
 
     inline Field::ListIterator fieldsIterator() const {
@@ -117,10 +117,10 @@ public:
         return &m_fields;
     }
 
-    /*! \return list of autoincremented fields. The list is owned by this FieldList object. */
+    /*! @return list of autoincremented fields. The list is owned by this FieldList object. */
     Field::List* autoIncrementFields() const;
 
-    /*! \return true if fields in the list are owned by this list. */
+    /*! @return true if fields in the list are owned by this list. */
     inline bool isOwner() const {
         return m_fields.autoDelete();
     }
@@ -153,13 +153,13 @@ public:
     /*! Like above, but with a list of field indices */
     FieldList* subList(const QList<uint>& list);
 
-    /*! \return a string that is a result of all field names concatenated
-     and with \a separator. This is usable e.g. as argument like "field1,field2"
+    /*! @return a string that is a result of all field names concatenated
+     and with @a separator. This is usable e.g. as argument like "field1,field2"
      for "INSERT INTO (xxx) ..". The result of this method is effectively cached,
      and it is invalidated when set of fields changes (e.g. using clear()
      or addField()).
 
-     \a tableAlias, if provided is prepended to each field, so the resulting
+     @a tableAlias, if provided is prepended to each field, so the resulting
      names will be in form tableAlias.fieldName. This option is used for building
      queries with joins, where fields have to be spicified without ambiguity.
      See @ref Connection::selectStatement() for example use.
@@ -171,18 +171,18 @@ public:
                                 const QString& tableAlias = QString(),
                                 Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
-    /*! Like above, but this is convenient static function, so you can pass any \a list here. */
+    /*! Like above, but this is convenient static function, so you can pass any @a list here. */
     static EscapedString sqlFieldsList(const Field::List& list, Connection *conn,
                                        const QString& separator = QString(','),
                                        const QString& tableAlias = QString(),
                                        Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 
-    /*! @internal Renames field \a oldName to \a newName.
+    /*! @internal Renames field @a oldName to @a newName.
      Do not use this for physical renaming columns. Use AlterTableHandler instead. */
     void renameField(const QString& oldName, const QString& newName);
 
     /*! @internal
-     \overload void renameField(const QString& oldName, const QString& newName) */
+     @overload void renameField(const QString& oldName, const QString& newName) */
     void renameField(Field *field, const QString& newName);
 
 protected:

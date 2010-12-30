@@ -80,13 +80,13 @@ public:
          of column names of a table/query, "Field List" in MSA. */
         Type type() const;
 
-        /*! Sets record source type to \a type. */
+        /*! Sets record source type to @a type. */
         void setType(Type type);
 
         /*! @return record source type name. @see setTypeByName() */
         QString typeName() const;
 
-        /*! Sets record source type by name using \a typeName. Accepted (cast sensitive)
+        /*! Sets record source type by name using @a typeName. Accepted (cast sensitive)
          names are "table", "query", "sql", "valuelist", "fieldlist".
          For other value NoType type is set. */
         void setTypeByName(const QString& typeName);
@@ -130,7 +130,7 @@ public:
 //! @todo in later implementation there can be more columns
     int boundColumn() const;
 
-    /*! Sets bound column number to \a column. @see boundColumn() */
+    /*! Sets bound column number to @a column. @see boundColumn() */
     void setBoundColumn(int column);
 
     /*! @return a list of visible column: a list of integers specifying a column that has
@@ -138,14 +138,14 @@ public:
      Empty list means unspecified value. */
     QList<uint> visibleColumns() const;
 
-    /*! Sets a list of visible columns to \a list.
+    /*! Sets a list of visible columns to @a list.
      Columns will be separated with a single space character when displayed. */
     void setVisibleColumns(const QList<uint>& list);
 
     /*! A helper method.
      If visibleColumns() contains one item, this item is returned (a typical case).
      If visibleColumns() contains no item, -1 is returned.
-     If visibleColumns() multiple items, \a fieldsCount - 1 is returned. */
+     If visibleColumns() multiple items, @a fieldsCount - 1 is returned. */
     int visibleColumn(uint fieldsCount) const;
 
     /*! @return a number of ordered integers specifying column widths;
@@ -168,8 +168,8 @@ public:
     uint maximumListRows() const;
 
     /*! Sets maximum number of rows that can be displayed in a combo box popup
-     or a list box. If \a rows is 0, PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS is set.
-     If \a rows is greater than PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS,
+     or a list box. If @a rows is 0, PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS is set.
+     If @a rows is greater than PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS,
      PREDICATE_LOOKUP_FIELD_MAX_LIST_ROWS is set. */
     void setMaximumListRows(uint rows);
 
@@ -199,11 +199,11 @@ public:
      @return a new LookupFieldSchema object even if lookupEl contains no valid contents. */
     static LookupFieldSchema* loadFromDom(const QDomElement& lookupEl);
 
-    /*! Saves data of lookup column schema to \a parentEl DOM element of \a doc document. */
+    /*! Saves data of lookup column schema to @a parentEl DOM element of @a doc document. */
     static void saveToDom(LookupFieldSchema& lookupSchema, QDomDocument& doc, QDomElement& parentEl);
 
-    /*! Sets property of name \a propertyName and value \a value for the lookup schema \a lookup
-     \return true on successful set and false on failure because of invalid value or invalid property name. */
+    /*! Sets property of name @a propertyName and value @a value for the lookup schema @a lookup
+     @return true on successful set and false on failure because of invalid value or invalid property name. */
     static bool setProperty(
         LookupFieldSchema& lookup, const QByteArray& propertyName,
         const QVariant& value);

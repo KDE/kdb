@@ -35,7 +35,7 @@ class QuerySchema;
 class TableSchema;
 
 /**
- * Provides detailed i18n'ed error description about the \a Parser .
+ * Provides detailed i18n'ed error description about the @a Parser .
  */
 class PREDICATE_EXPORT ParserError
 {
@@ -49,10 +49,10 @@ public:
     /**
      * Constructor.
      *
-     * \param type The errortype.
-     * \param error A description of the error.
-     * \param hint Token where the Error.happend.
-     * \param at The position where the Error.happend.
+     * @param type The errortype.
+     * @param error A description of the error.
+     * @param hint Token where the Error.happend.
+     * @param at The position where the Error.happend.
      */
     ParserError(const QString &type, const QString &error, const QString &hint, int at);
 
@@ -62,21 +62,21 @@ public:
     ~ParserError();
 
     /**
-     * \return the errortype.
+     * @return the errortype.
      */
     QString type() {
         return m_type;
     }
 
     /**
-     * \return a descriping error message.
+     * @return a descriping error message.
      */
     QString error() {
         return m_error;
     }
 
     /**
-     * \return position where the Error.happend.
+     * @return position where the Error.happend.
      */
     int at() {
         return m_at;
@@ -100,16 +100,16 @@ private:
  *
  * For example if we like to use the SELECT statement
  * "SELECT dir.path, media.filename FROM dir, media WHERE dir.id=media.dirId AND media.id=%s"
- * we are able to use the \a Connection::prepareStatement method which takes the type of
- * the statement (in our case \a PreparedStatement::SelectStatement ), a list of fields (in
- * our case dir.path and media.filename) and returns a \a PreparedStatement instance.
- * By using the \a QuerySchema::addRelationship and \a QuerySchema::addToWhereExpression methods
+ * we are able to use the @a Connection::prepareStatement method which takes the type of
+ * the statement (in our case @a PreparedStatement::SelectStatement ), a list of fields (in
+ * our case dir.path and media.filename) and returns a @a PreparedStatement instance.
+ * By using the @a QuerySchema::addRelationship and @a QuerySchema::addToWhereExpression methods
  * the SQL statement could be extended with relationships and WHERE expressions.
  *
- * For more, see \a Predicate::PreparedStatement and \a Connection::selectStatement() . A more
+ * For more, see @a Predicate::PreparedStatement and @a Connection::selectStatement() . A more
  * complex example that looks at what the user has defined and carefully builds
- * \a Predicate::QuerySchema object, including the WHERE expression can be found in
- * the Query Designer's source code in the method \a KexiQueryDesignerGuiEditor::buildSchema().
+ * @a Predicate::QuerySchema object, including the WHERE expression can be found in
+ * the Query Designer's source code in the method @a KexiQueryDesignerGuiEditor::buildSchema().
  */
 class PREDICATE_EXPORT Parser
 {
@@ -131,7 +131,7 @@ public:
 
     /**
      * constructs an empty object of the parser
-     * \param connection is used for things like wildcard resolution. If 0 parser works in "pure mode"
+     * @param connection is used for things like wildcard resolution. If 0 parser works in "pure mode"
      */
     Parser(Connection *connection);
     ~Parser();
@@ -147,17 +147,17 @@ public:
     void clear();
 
     /**
-     * \return the resulting operation or OP_Error if failed
+     * @return the resulting operation or OP_Error if failed
      */
     OPCode operation() const;
 
     /**
-     * \return the resulting operation as string.
+     * @return the resulting operation as string.
      */
     QString operationString() const;
 
     /**
-     * \return a pointer to a table schema on CREATE TABLE
+     * @return a pointer to a table schema on CREATE TABLE
      * or 0 on any other operation or error. Returned object is owned by you.
      * You can call this method only once every time after doing parse().
      * Next time, the call will return 0.
@@ -165,7 +165,7 @@ public:
     TableSchema *table();
 
     /**
-     * \return a pointer to a query schema if 'SELECT ...' was called
+     * @return a pointer to a query schema if 'SELECT ...' was called
      * or 0 on any other operation or error. Returned object is owned by you.
      * You can call this method only once every time after doing parse().
      * Next time, the call will return 0.
@@ -173,56 +173,56 @@ public:
     QuerySchema *query();
 
     /**
-     * \return a pointer to the used database connection or 0 if not set
+     * @return a pointer to the used database connection or 0 if not set
      * You can call this method only once every time after doing parse().
      * Next time, the call will return 0.
      */
     Connection *db() const;
 
     /**
-     * \return detailed information about last error.
+     * @return detailed information about last error.
      * If no error occurred ParserError isNull()
      */
     ParserError error() const;
 
     /**
-     * \return the statement passed on the last \a parse method-call.
+     * @return the statement passed on the last @a parse method-call.
      */
     EscapedString statement() const;
 
     /**
-     * \internal
+     * @internal
      * sets the operation (only parser will need to call this)
      */
     void setOperation(OPCode op);
 
     /**
-     * \internal
+     * @internal
      * creates a new table (only parser will need to call this)
      */
     void createTable(const char *t);
 
     /**
-     * \internal
-     * sets \a query schema object (only parser will need to call this)
+     * @internal
+     * sets @a query schema object (only parser will need to call this)
      */
 //todo: other query types
     void setQuerySchema(QuerySchema *query);
 
     /**
-     * \internal
-     * \return query schema
+     * @internal
+     * @return query schema
      */
     QuerySchema *select() const;
 
     /**
-     * \internal
+     * @internal
      * INTERNAL use only: sets a error
      */
     void setError(const ParserError &err);
 
     /**
-     * \return true if the \param str is an reserved
+     * @return true if the @param str is an reserved
      * keyword (see tokens.cpp for a list of reserved
      * keywords).
      */
@@ -233,7 +233,7 @@ protected:
 
     ParserError m_error; //!< detailed information about last error.
     class Private;
-    Private * const d; //!< \internal d-pointer class.
+    Private * const d; //!< @internal d-pointer class.
 };
 
 }

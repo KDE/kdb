@@ -38,9 +38,9 @@ class Result;
 /*! Helper for setting temporary message title for an Predicate::Result object.
  Message title is a text prepended to error or warning messages.
  Use it as follows:
- \code
+ @code
  Predicate::MessageTitleSetter ts(&m_result, tr("Terrible error occurred"));
- \endcode
+ @endcode
  After leaving the current code block, myResultableObject's message title will be set back to the previous value.
 */
 class PREDICATE_EXPORT MessageTitleSetter
@@ -115,7 +115,7 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option)
 
-    /*! Constructs mesage handler, \a parent is a widget that will be a parent
+    /*! Constructs mesage handler, @a parent is a widget that will be a parent
      for displaying gui elements (e.g. message boxes). Can be 0 for non-gui usage. */
     explicit MessageHandler(QWidget *parent = 0);
     virtual ~MessageHandler();
@@ -130,7 +130,7 @@ public:
         m_enableMessages = enable;
     }
 
-    /*! Shows error message with \a title (it is not caption) and details. */
+    /*! Shows error message with @a title (it is not caption) and details. */
     virtual void showErrorMessage(
         MessageHandler::MessageType messageType,
         const QString &msg,
@@ -138,7 +138,7 @@ public:
         const QString &caption = QString()
     ) = 0;
 
-    /*! Shows error message with \a msg text. Existing error message from \a obj object
+    /*! Shows error message with @a msg text. Existing error message from @a obj object
      is also copied, if present. */
     virtual void showErrorMessage(
         const Predicate::Result& result,
@@ -148,10 +148,10 @@ public:
     ) = 0;
 
     /*! Interactively asks a question. For GUI version, message boxes are used.
-     \a defaultResult is returned in case when no message handler is installed.
-     \a message should contain translated string.
+     @a defaultResult is returned in case when no message handler is installed.
+     @a message should contain translated string.
      Value of ButtonCode is returned.
-     Reimplement this. This implementation does nothing, just returns \a defaultResult. */
+     Reimplement this. This implementation does nothing, just returns @a defaultResult. */
     virtual MessageHandler::ButtonCode askQuestion(
             MessageHandler::QuestionType messageType,
             const QString& message,

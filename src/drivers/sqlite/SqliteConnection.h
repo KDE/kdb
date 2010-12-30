@@ -59,12 +59,12 @@ protected:
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
-    /*! Creates new database using connection. Note: Do not pass \a dbName
+    /*! Creates new database using connection. Note: Do not pass @a dbName
       arg because for file-based engine (that has one database per connection)
       it is defined during connection. */
     virtual bool drv_createDatabase(const QString &dbName = QString());
 
-    /*! Opens existing database using connection. Do not pass \a dbName
+    /*! Opens existing database using connection. Do not pass @a dbName
       arg because for file-based engine (that has one database per connection)
       it is defined during connection. If you pass it,
       database file name will be changed. */

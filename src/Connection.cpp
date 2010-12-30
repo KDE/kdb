@@ -198,7 +198,7 @@ public:
         queries_byname.insert(query->name(), query);
     }
 
-    /*! @internal Removes \a querySchema from internal structures and
+    /*! @internal Removes @a querySchema from internal structures and
      destroys it. Does not make any change at the backend. */
     void removeQuery(QuerySchema* querySchema) {
         queries_byname.remove(querySchema->name());
@@ -217,8 +217,8 @@ public:
         queries.clear();
     }
 
-    Connection* const conn; //!< The \a Connection instance this \a ConnectionPrivate belongs to.
-    ConnectionData connData; //!< the \a ConnectionData used within that connection.
+    Connection* const conn; //!< The @a Connection instance this @a ConnectionPrivate belongs to.
+    ConnectionData connData; //!< the @a ConnectionData used within that connection.
 
     /*! Default Transaction.handle.
     If transactions are supported: Any operation on database (e.g. inserts)
@@ -699,7 +699,7 @@ bool Connection::closeDatabase()
 
     bool ret = true;
 
-    /*! \todo (js) add CLEVER algorithm here for nested transactions */
+    /*! @todo (js) add CLEVER algorithm here for nested transactions */
     if (m_driver->transactionsSupported()) {
         //rollback all transactions
         d->dont_remove_transactions = true; //lock!
@@ -873,7 +873,7 @@ QStringList Connection::tableNames(bool also_system_tables)
     return list;
 }
 
-//! \todo (js): this will depend on Predicate lib version
+//! @todo (js): this will depend on Predicate lib version
 QStringList Connection::predicateSystemTableNames()
 {
     if (Predicate_predicateSystemTableNames.isEmpty()) {
@@ -1450,7 +1450,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
     }
     if (!s_where.isEmpty())
         sql += " WHERE " + s_where;
-//! \todo (js) add other sql parts
+//! @todo (js) add other sql parts
     //(use wasWhere here)
 
     // ORDER BY
@@ -1547,7 +1547,7 @@ static FieldList* createFieldListForKexi__Fields(TableSchema *kexi__fieldsSchema
            );
 }
 
-//! builds a list of values for field's \a f properties. Used by createTable().
+//! builds a list of values for field's @a f properties. Used by createTable().
 void buildValuesForKexi__Fields(QList<QVariant>& vals, Field* f)
 {
     vals.clear();
@@ -1820,7 +1820,7 @@ tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
     }
 
     if (alsoRemoveSchema) {
-//! \todo js: update any structure (e.g. queries) that depend on this table!
+//! @todo js: update any structure (e.g. queries) that depend on this table!
         tristate res = removeDataBlock(tableSchema->id(), "extended_schema");
         if (!res)
             return false;
@@ -2623,11 +2623,11 @@ static void createExtendedTableSchemaFieldElementIfNeeded(QDomDocument* doc,
 }
 
 /*! @internal used by storeExtendedTableSchemaData()
- Creates DOM node for \a propertyName and \a propertyValue.
+ Creates DOM node for @a propertyName and @a propertyValue.
  Creates enclosing EXTENDED_TABLE_SCHEMA element if EXTENDED_TABLE_SCHEMA is true.
  Updates extendedTableSchemaStringIsEmpty and extendedTableSchemaMainEl afterwards.
  If extendedTableSchemaFieldEl is null, creates <field> element (with optional
- "custom" attribute is \a custom is false). */
+ "custom" attribute is @a custom is false). */
 static void addFieldPropertyToExtendedTableSchemaData(
     const Field& f, const char* propertyName, const QVariant& propertyValue,
     QDomDocument* doc, QDomElement* extendedTableSchemaMainEl,

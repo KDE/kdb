@@ -51,26 +51,26 @@ public:
     TableSchema();
 
     /*! Copy constructor.
-     if \a copyId is true, it's copied as well, otherwise the table id becomes -1,
+     if @a copyId is true, it's copied as well, otherwise the table id becomes -1,
      what is usable when we want to store the copy as an independent table. */
     TableSchema(const TableSchema& ts, bool copyId = true);
 
-    /*! Copy constructor like \ref TableSchema(const TableSchema&, bool).
-     \a id is set as the table identifier. This is rarely usable, e.g.
+    /*! Copy constructor like @ref TableSchema(const TableSchema&, bool).
+     @a id is set as the table identifier. This is rarely usable, e.g.
      in project and data migration routines when we need to need deal with unique identifiers;
      @see KexiMigrate::performImport(). */
     TableSchema(const TableSchema& ts, int id);
 
     virtual ~TableSchema();
 
-    /*! Inserts \a field into a specified position (\a index).
-     'order' property of \a field is set automatically. */
+    /*! Inserts @a field into a specified position (@a index).
+     'order' property of @a field is set automatically. */
     virtual FieldList& insertField(uint index, Field *field);
 
     /*! Reimplemented for internal reasons. */
     virtual void removeField(Field *field);
 
-    /*! \return list of fields that are primary key of this table.
+    /*! @return list of fields that are primary key of this table.
      This method never returns 0 value,
      if there is no primary key, empty IndexSchema object is returned.
      IndexSchema object is owned by the table schema. */
@@ -78,7 +78,7 @@ public:
         return m_pkey;
     }
 
-    /*! Sets table's primary key index to \a pkey. Pass pkey==0 if you want to unassign
+    /*! Sets table's primary key index to @a pkey. Pass pkey==0 if you want to unassign
      existing primary key ("primary" property of given IndexSchema object will be
      cleared then so this index becomes ordinary index, still existing on table indeices list).
 
@@ -99,17 +99,17 @@ public:
     }
 
     /*! Removes all fields from the list, clears name and all other properties.
-      \sa FieldList::clear() */
+      @see FieldList::clear() */
     virtual void clear();
 
     /*! Sends information about fields of this table schema to debug output @a dbg. */
     QDebug debugFields(QDebug dbg) const;
 
-    /*! \return connection object if table was created/retrieved using a connection,
+    /*! @return connection object if table was created/retrieved using a connection,
       otherwise 0. */
     Connection* connection() const;
 
-    /*! \return true if this is Predicate storage system's table
+    /*! @return true if this is Predicate storage system's table
      (used internally by Predicate). This helps in hiding such tables
      in applications (if desired) and will also enable lookup of system
      tables for schema export/import functionality.
@@ -129,11 +129,11 @@ public:
 
     /*! Sets PredicateSystem flag to on or off. When on, native flag is forced to be on.
      When off, native flag is not affected.
-     \sa isPredicateSystem() */
+     @see isPredicateSystem() */
     void setPredicateSystem(bool set);
 
 #if 0
-    /*! \return true if this is schema of native database object,
+    /*! @return true if this is schema of native database object,
      When this is predicateSystem table, native flag is forced to be on. */
     virtual bool isNative() const {
         return m_native || m_isPredicateSystem;
@@ -143,33 +143,33 @@ public:
     /* Sets native flag. Does not allow to set this off for system Predicate table. */
     //virtual void setNative(bool set);
 
-    /*! \return query schema object that is defined by "select * from <this_table_name>"
+    /*! @return query schema object that is defined by "select * from <this_table_name>"
      This query schema object is owned by the table schema object.
      It is convenient way to get such a query when it is not available otherwise.
      Always returns non-0. */
     QuerySchema* query();
 
-    /*! \return any field not being a part of primary key of this table.
+    /*! @return any field not being a part of primary key of this table.
      If there is no such field, returns 0. */
     Field* anyNonPKField();
 
-    /*! Sets lookup field schema \a lookupFieldSchema for \a fieldName.
-     Passing null \a lookupFieldSchema will remove the previously set lookup field.
-     \return true if \a lookupFieldSchema has been added,
-     or false if there is no such field \a fieldName. */
+    /*! Sets lookup field schema @a lookupFieldSchema for @a fieldName.
+     Passing null @a lookupFieldSchema will remove the previously set lookup field.
+     @return true if @a lookupFieldSchema has been added,
+     or false if there is no such field @a fieldName. */
     bool setLookupFieldSchema(const QString& fieldName, LookupFieldSchema *lookupFieldSchema);
 
-    /*! \return lookup field schema for \a field.
+    /*! @return lookup field schema for @a field.
      0 is returned if there is no such field in the table or this Field.has no lookup schema.
      Note that even id non-zero is returned here, you may want to check whether lookup field's
      recordSource().name() is empty (if so, the field should behave as there was no lookup field
      defined at all). */
     LookupFieldSchema *lookupFieldSchema(const Field& field) const;
 
-    /*! \overload LookupFieldSchema *TableSchema::lookupFieldSchema( Field& field ) const */
+    /*! @overload LookupFieldSchema *TableSchema::lookupFieldSchema( Field& field ) const */
     LookupFieldSchema *lookupFieldSchema(const QString& fieldName);
 
-    /*! \return list of lookup field schemas for this table.
+    /*! @return list of lookup field schemas for this table.
      The order is the same as the order of fields within the table. */
     const QVector<LookupFieldSchema*>& lookupFieldsList();
 
@@ -200,7 +200,7 @@ private:
     friend class Connection;
 };
 
-/*! Internal table with a name \a name. Rarely used.
+/*! Internal table with a name @a name. Rarely used.
  Use Connection::createTable() to create a table using this schema.
  The table will not be visible as user table.
  For example, 'kexi__blobs' table is created this way by Kexi application. */

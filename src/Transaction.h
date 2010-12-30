@@ -74,11 +74,11 @@ public:
 
     Connection* connection() const;
 
-    /*! \return true if transaction is avtive (ie. started)
+    /*! @return true if transaction is avtive (ie. started)
      Returns false also if transaction is uninitialised (null). */
     bool active() const;
 
-    /*! \return true if transaction is uinitialised (null). */
+    /*! @return true if transaction is uinitialised (null). */
     bool isNull() const;
 
     /*! shortcut that offers uinitialised (null) transaction */
@@ -119,7 +119,7 @@ protected:
 class PREDICATE_EXPORT TransactionGuard
 {
 public:
-    /*! Constructor #1: Starts new transaction constructor for \a connection.
+    /*! Constructor #1: Starts new transaction constructor for @a connection.
      Started Transaction handle is available via transaction().*/
     explicit TransactionGuard(Connection& conn);
 
@@ -133,7 +133,7 @@ public:
     /*! Rollbacks not committed transaction. */
     ~TransactionGuard();
 
-    /*! Assigns transaction \a trans to this guard.
+    /*! Assigns transaction @a trans to this guard.
      Previously assigned transaction will be unassigned from this guard. */
     void setTransaction(const Transaction& trans) {
         m_trans = trans;

@@ -44,7 +44,7 @@ public:
     /*! Creates a new empty record. */
     inline RecordData() : m_data(0), m_numCols(0) {}
 
-    /*! Creates a new record data with \a numCols columns.
+    /*! Creates a new record data with @a numCols columns.
      Values are initialized to null. */
     inline explicit RecordData(int numCols) { init(numCols); }
 

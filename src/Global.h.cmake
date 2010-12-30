@@ -82,10 +82,10 @@
 #define PREDICATE_IS_VERSION(a,b,c) ( PREDICATE_VERSION >= PREDICATE_MAKE_VERSION(a,b,c) )
 
 
-/*! \namespace Predicate
-\brief High-level database connectivity library with database backend drivers
+/*! @namespace Predicate
+@brief High-level database connectivity library with database backend drivers
 
-\section Framework
+@section Framework
 DriverManager
 
 Database access
@@ -106,7 +106,7 @@ Data representation
  - Field
 
 
-\section Drivers
+@section Drivers
 
 Drivers are loaded using DriverManager::driver(const QString& name).  The names
 of drivers are given in their drivers .desktop file in the DriverName field.

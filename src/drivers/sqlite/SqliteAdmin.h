@@ -30,7 +30,7 @@ public:
     virtual ~SQLiteAdminTools();
 
 #ifndef PREDICATE_SQLITE_NO_VACUUM
-    /*! Performs vacuum (compacting) for connection \a conn. */
+    /*! Performs vacuum (compacting) for connection @a conn. */
     virtual bool vacuum(const Predicate::ConnectionData& data, const QString& databaseName);
 #endif
 };

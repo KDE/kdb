@@ -50,7 +50,7 @@ public:
     virtual EscapedString escapeString(const QString& str) const;
     virtual EscapedString escapeString(const QByteArray& str) const;
 
-    //! Escape BLOB value \a array
+    //! Escape BLOB value @a array
     virtual EscapedString escapeBLOB(const QByteArray& array) const;
 
 protected:
