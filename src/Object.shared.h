@@ -27,8 +27,9 @@
 namespace Predicate
 {
 
-/*! Provides common attributes for Predicate object like id, name, caption, help text.
- Predicate object is typically object definition storable in database, like table schema or query schema.
+/*! Provides common attributes for Predicate object like id, name, caption,
+ help text. Predicate object is typically object definition storable
+ in database, like table schema or query schema.
 */
 shared class export=PREDICATE_EXPORT Object
 {
@@ -67,7 +68,8 @@ public:
 
     /*!
     @getter
-    @return the description of this object, which is explanation of the object's purpose, etc.
+    @return the description of this object, which is explanation
+            of the object's purpose, etc.
     It can be any text and can be used in user interfaces and translated.
     @setter
     Sets the description for this object.
@@ -81,9 +83,11 @@ public:
     is not retrieved using kexi__* schema storage system,
     but just based on the information about native database object.
 
-    Native database objects have no additional metadata like caption or description properties.
+    Native database objects have no additional metadata like caption
+    or description properties.
 
-    Native objects schemas are used mostly for representing kexi system (kexi__*) tables in memory for later reference.
+    Native objects schemas are used mostly for representing kexi system
+    (kexi__*) tables in memory for later reference.
     @see Connection::tableNames().
 
     By default (on allocation) objects are not native.
