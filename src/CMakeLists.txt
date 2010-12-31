@@ -63,6 +63,9 @@ set(predicate_LIB_SRCS
    ConnectionData.cpp
    VersionInfo.cpp
    ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp
+   Field.cpp
+   QuerySchemaParameter.cpp
+   Expression.cpp
    FieldList.cpp
    TableSchema.cpp
    IndexSchema.cpp
@@ -73,13 +76,10 @@ set(predicate_LIB_SRCS
    Connection.cpp
    keywords.cpp
    Object.cpp
-   Field.cpp
    Utils.cpp
-   Expression.cpp
    RecordData.cpp
    Cursor.cpp
    Transaction.cpp
-   QuerySchemaParameter.cpp
    Global.cpp
    Relationship.cpp
    RecordEditBuffer.cpp

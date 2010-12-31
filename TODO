@@ -122,8 +122,9 @@ TODO: move to Connection::prepareStatement() and all the drv_*() to ConnectionIn
 ** DriverManager no longer inherits QObject
 *  Driver_p.h
 *  Driver_p.cpp
-  Expression.h
-  Expression.cpp
+*  Expression.h
+*  Expression.cpp
+** Expresion classes are now is ExpressionClass enum
 TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
 *  Error.h
 *  Field.h

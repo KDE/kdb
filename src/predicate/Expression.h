@@ -25,36 +25,34 @@
 
 #include <Predicate/Global.h>
 #include <Predicate/Field.h>
-#include <Predicate/QuerySchema.h>
+#include <Predicate/QuerySchemaParameter.h>
 
 #include <QtDebug>
-#include <QList>
-#include <QByteArray>
 
 namespace Predicate
 {
 
-//! classes
-//todo: enum ExpressionClass
-//todo:     UnknownExpression = 0,
-#define PredicateExpr_Unknown 0
-#define PredicateExpr_Unary 1
-#define PredicateExpr_Arithm 2
-#define PredicateExpr_Logical 3
-#define PredicateExpr_Relational 4
-#define PredicateExpr_SpecialBinary 5
-#define PredicateExpr_Const 6
-#define PredicateExpr_Variable 7
-#define PredicateExpr_Function 8
-#define PredicateExpr_Aggregation 9
-#define PredicateExpr_TableList 10
-#define PredicateExpr_QueryParameter 11
+//! Classes of expressions
+enum ExpressionClass {
+    UnknownExpressionClass,
+    UnaryExpressionClass,
+    ArithmeticExpressionClass,
+    LogicalExpressionClass,
+    RelationalExpressionClass,
+    SpecialBinaryExpressionClass,
+    ConstExpressionClass,
+    VariableExpressionClass,
+    FunctionExpressionClass,
+    AggregationExpressionClass,
+    TableListExpressionClass,
+    QueryParameterExpressionClass
+};
 
 //! Custom tokens are not used in parser but used as extension in expression classes.
 //#define PREDICATE_CUSTOM_TOKEN 0x1000
 
 //! @return class name of class @a c
-PREDICATE_EXPORT QString exprClassName(int c);
+static QString expressionClassName(ExpressionClass c);
 
 class ParseInfo;
 class NArgExpression;
@@ -65,7 +63,6 @@ class VariableExpression;
 class FunctionExpression;
 class QueryParameterExpression;
 class QuerySchemaParameterValueListIterator;
-//class QuerySchemaParameterList;
 
 //! A base class for all expressions
 class PREDICATE_EXPORT Expression
@@ -74,24 +71,23 @@ public:
     typedef QList<Expression*> List;
     typedef QList<Expression*>::ConstIterator ListIterator;
 
-    explicit Expression(int token);
     virtual ~Expression();
 
     //! @return a deep copy of this object.
 //! @todo a nonpointer will be returned here when we move to implicit data sharing
     virtual Expression* copy() const = 0;
 
-    int token() const {
+    inline int token() const {
         return m_token;
     }
 
     virtual Field::Type type() const;
 
-    Expression* parent() const {
+    inline Expression* parent() const {
         return m_par;
     }
 
-    virtual void setParent(Expression *p) {
+    inline virtual void setParent(Expression *p) {
         m_par = p;
     }
 
@@ -120,7 +116,7 @@ public:
     /*! @return string for token, like "<=" or ">" */
     virtual QString tokenToString() const;
 
-    int exprClass() const {
+    inline ExpressionClass expressionClass() const {
         return m_cl;
     }
 
@@ -134,7 +130,10 @@ public:
     QueryParameterExpression* toQueryParameter();
 
 protected:
-    int m_cl; //!< class
+    Expression(ExpressionClass aClass, int token);
+
+private:
+    ExpressionClass m_cl; //!< class
     Expression *m_par; //!< parent expression
     int m_token;
 };
@@ -143,7 +142,7 @@ protected:
 class PREDICATE_EXPORT NArgExpression : public Expression
 {
 public:
-    NArgExpression(int aClass, int token);
+    NArgExpression(ExpressionClass aClass, int token);
     NArgExpression(const NArgExpression& expr);
     virtual ~NArgExpression();
     //! @return a deep copy of this object.
@@ -172,11 +171,12 @@ public:
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    Expression *arg() const {
+    inline Expression *arg() const {
         return m_arg;
     }
     virtual bool validate(ParseInfo& parseInfo);
 
+private:
     Expression *m_arg;
 };
 
@@ -191,7 +191,7 @@ public:
 class PREDICATE_EXPORT BinaryExpression : public Expression
 {
 public:
-    BinaryExpression(int aClass, Expression *left_expr, int token, Expression *right_expr);
+    BinaryExpression(ExpressionClass aClass, Expression *left_expr, int token, Expression *right_expr);
     BinaryExpression(const BinaryExpression& expr);
     virtual ~BinaryExpression();
     //! @return a deep copy of this object.
@@ -200,15 +200,22 @@ public:
     virtual QString debugString() const;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    Expression *left() const {
+    inline Expression *left() const {
         return m_larg;
     }
-    Expression *right() const {
+    inline void setLeft(Expression *leftArg) {
+        m_larg = leftArg;
+    }
+    inline Expression *right() const {
         return m_rarg;
+    }
+    inline void setRight(Expression *rightArg) {
+        m_rarg = rightArg;
     }
     virtual bool validate(ParseInfo& parseInfo);
     virtual QString tokenToString() const;
 
+private:
     Expression *m_larg;
     Expression *m_rarg;
 };
@@ -230,6 +237,8 @@ public:
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
     QVariant value;
+protected:
+    ConstExpression(ExpressionClass aClass, int token, const QVariant& val);
 };
 
 //! Query parameter used to getting user input of constant values.
@@ -319,8 +328,8 @@ public:
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual bool validate(ParseInfo& parseInfo);
 
-    static QList<QByteArray> builtInAggregates();
-    static bool isBuiltInAggregate(const QByteArray& fname);
+    static QList<QString> builtInAggregates();
+    static bool isBuiltInAggregate(const QString& fname);
 
     QString name;
     NArgExpression* args;

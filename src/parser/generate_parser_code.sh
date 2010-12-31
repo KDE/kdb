@@ -11,7 +11,7 @@ echo '#ifndef _SQLPARSER_H_
 #include "Parser.h"
 #include "SqlTypes.h"
 
-bool parseData(KexiDB::Parser *p, const char *data);' > SqlParser.h
+bool parseData(Predicate::Parser *p, const char *data);' > SqlParser.h
 
 cat SqlParser.tab.h >> SqlParser.h
 echo '#endif' >> SqlParser.h

@@ -27,6 +27,7 @@
 #include <Predicate/Object.h>
 #include <Predicate/TableSchema.h>
 #include <Predicate/Relationship.h>
+#include <Predicate/QuerySchemaParameter.h>
 
 namespace Predicate
 {
@@ -34,8 +35,6 @@ namespace Predicate
 class Connection;
 class QueryAsterisk;
 class QuerySchemaPrivate;
-class QuerySchemaParameter;
-typedef QList<QuerySchemaParameter> QuerySchemaParameterList;
 
 //! @short Helper class that assigns additional information for the column in a query
 /*! The following information is assigned:

@@ -22,38 +22,36 @@
 
 #include "Expression.h"
 #include "Utils.h"
+#include "QuerySchema.h"
 #include "parser/SqlParser.h"
 #include "parser/Parser_p.h"
 #include "tools/Static.h"
 
 #include <ctype.h>
 
-#include <QtDebug>
-
-
-PREDICATE_EXPORT QString Predicate::exprClassName(int c)
+PREDICATE_EXPORT QString Predicate::expressionClassName(ExpressionClass c)
 {
-    if (c == PredicateExpr_Unary)
+    if (c == UnaryExpressionClass)
         return "Unary";
-    else if (c == PredicateExpr_Arithm)
+    else if (c == ArithmeticExpressionClass)
         return "Arithm";
-    else if (c == PredicateExpr_Logical)
+    else if (c == LogicalExpressionClass)
         return "Logical";
-    else if (c == PredicateExpr_Relational)
+    else if (c == RelationalExpressionClass)
         return "Relational";
-    else if (c == PredicateExpr_SpecialBinary)
+    else if (c == SpecialBinaryExpressionClass)
         return "SpecialBinary";
-    else if (c == PredicateExpr_Const)
+    else if (c == ConstExpressionClass)
         return "Const";
-    else if (c == PredicateExpr_Variable)
+    else if (c == VariableExpressionClass)
         return "Variable";
-    else if (c == PredicateExpr_Function)
+    else if (c == FunctionExpressionClass)
         return "Function";
-    else if (c == PredicateExpr_Aggregation)
+    else if (c == AggregationExpressionClass)
         return "Aggregation";
-    else if (c == PredicateExpr_TableList)
+    else if (c == TableListExpressionClass)
         return "TableList";
-    else if (c == PredicateExpr_QueryParameter)
+    else if (c == QueryParameterExpressionClass)
         return "QueryParameter";
 
     return "Unknown";
@@ -63,8 +61,8 @@ using namespace Predicate;
 
 //=========================================
 
-Expression::Expression(int token)
-        : m_cl(PredicateExpr_Unknown)
+Expression::Expression(ExpressionClass aClass, int token)
+        : m_cl(aClass)
         , m_par(0)
         , m_token(token)
 {
@@ -149,11 +147,9 @@ QueryParameterExpression* Expression::toQueryParameter()
 
 //=========================================
 
-NArgExpression::NArgExpression(int aClass, int token)
-        : Expression(token)
+NArgExpression::NArgExpression(ExpressionClass aClass, int token)
+        : Expression(aClass, token)
 {
-    m_cl = aClass;
-//Qt 4 list.setAutoDelete(true);
 }
 
 NArgExpression::NArgExpression(const NArgExpression& expr)
@@ -175,8 +171,8 @@ NArgExpression* NArgExpression::copy() const
 
 QString NArgExpression::debugString() const
 {
-    QString s = QString("NArgExpr(")
-                + "class=" + exprClassName(m_cl);
+    QString s = QString("NArgExpression(")
+                + "class=" + expressionClassName(expressionClass());
     foreach(Expression *expr, list) {
         s += ", ";
         s += expr->debugString();
@@ -240,10 +236,9 @@ bool NArgExpression::validate(ParseInfo& parseInfo)
 
 //=========================================
 UnaryExpression::UnaryExpression(int token, Expression *arg)
-        : Expression(token)
+        : Expression(UnaryExpressionClass, token)
         , m_arg(arg)
 {
-    m_cl = PredicateExpr_Unary;
     if (m_arg)
         m_arg->setParent(this);
 }
@@ -268,7 +263,7 @@ UnaryExpression* UnaryExpression::copy() const
 
 QString UnaryExpression::debugString() const
 {
-    return "UnaryExpr('"
+    return "UnaryExpression('"
            + tokenToDebugString() + "', "
            + (m_arg ? m_arg->debugString() : QString("<NONE>"))
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
@@ -276,17 +271,17 @@ QString UnaryExpression::debugString() const
 
 EscapedString UnaryExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
-    if (m_token == '(') //parentheses (special case)
+    if (token() == '(') //parentheses (special case)
         return "(" + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + ")";
-    if (m_token < 255 && isprint(m_token))
+    if (token() < 255 && isprint(token()))
         return tokenToDebugString() + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
-    if (m_token == NOT)
+    if (token() == NOT)
         return "NOT " + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
-    if (m_token == SQL_IS_NULL)
+    if (token() == SQL_IS_NULL)
         return (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + " IS NULL";
-    if (m_token == SQL_IS_NOT_NULL)
+    if (token() == SQL_IS_NOT_NULL)
         return (m_arg ? m_arg->toString(params) : EscapedString("<NULL>")) + " IS NOT NULL";
-    return EscapedString("{INVALID_OPERATOR#%1} ").arg(m_token) + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
+    return EscapedString("{INVALID_OPERATOR#%1} ").arg(token()) + (m_arg ? m_arg->toString(params) : EscapedString("<NULL>"));
 }
 
 void UnaryExpression::getQueryParameters(QuerySchemaParameterList& params)
@@ -299,7 +294,7 @@ Field::Type UnaryExpression::type() const
 {
     //NULL IS NOT NULL : BOOLEAN
     //NULL IS NULL : BOOLEAN
-    switch (m_token) {
+    switch (token()) {
     case SQL_IS_NULL:
     case SQL_IS_NOT_NULL:
         return Field::Boolean;
@@ -307,7 +302,7 @@ Field::Type UnaryExpression::type() const
     const Field::Type t = m_arg->type();
     if (t == Field::Null)
         return Field::Null;
-    if (m_token == NOT)
+    if (token() == NOT)
         return Field::Boolean;
 
     return t;
@@ -352,12 +347,11 @@ bool UnaryExpression::validate(ParseInfo& parseInfo)
 }
 
 //=========================================
-BinaryExpression::BinaryExpression(int aClass, Expression *left_expr, int token, Expression *right_expr)
-        : Expression(token)
+BinaryExpression::BinaryExpression(ExpressionClass aClass, Expression *left_expr, int token, Expression *right_expr)
+        : Expression(aClass, token)
         , m_larg(left_expr)
         , m_rarg(right_expr)
 {
-    m_cl = aClass;
     if (m_larg)
         m_larg->setParent(this);
     if (m_rarg)
@@ -411,11 +405,11 @@ Field::Type BinaryExpression::type() const
     if (lt == Field::InvalidType || rt == Field::InvalidType)
         return Field::InvalidType;
     if (lt == Field::Null || rt == Field::Null) {
-        if (m_token != OR) //note that NULL OR something   != NULL
+        if (token() != OR) //note that NULL OR something   != NULL
             return Field::Null;
     }
 
-    switch (m_token) {
+    switch (token()) {
     case BITWISE_SHIFT_RIGHT:
     case BITWISE_SHIFT_LEFT:
     case CONCATENATION:
@@ -437,8 +431,8 @@ Field::Type BinaryExpression::type() const
 
 QString BinaryExpression::debugString() const
 {
-    return QString("BinaryExpr(")
-           + "class=" + exprClassName(m_cl)
+    return QString("BinaryExpression(")
+           + "class=" + expressionClassName(expressionClass())
            + "," + (m_larg ? m_larg->debugString() : QString("<NONE>"))
            + ",'" + tokenToDebugString() + "',"
            + (m_rarg ? m_rarg->debugString() : QString("<NONE>"))
@@ -447,10 +441,10 @@ QString BinaryExpression::debugString() const
 
 QString BinaryExpression::tokenToString() const
 {
-    if (m_token < 255 && isprint(m_token))
+    if (token() < 255 && isprint(token()))
         return tokenToDebugString();
     // other arithmetic operations: << >>
-    switch (m_token) {
+    switch (token()) {
     case BITWISE_SHIFT_RIGHT: return ">>";
     case BITWISE_SHIFT_LEFT: return "<<";
         // other relational operations: <= >= <> (or !=) LIKE IN
@@ -472,7 +466,7 @@ QString BinaryExpression::tokenToString() const
         /* not handled here */
     default:;
     }
-    return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(m_token);
+    return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(token());
 }
 
 EscapedString BinaryExpression::toString(QuerySchemaParameterValueListIterator* params) const
@@ -493,10 +487,15 @@ void BinaryExpression::getQueryParameters(QuerySchemaParameterList& params)
 
 //=========================================
 ConstExpression::ConstExpression(int token, const QVariant& val)
-        : Expression(token)
+        : Expression(ConstExpressionClass, token)
         , value(val)
 {
-    m_cl = PredicateExpr_Const;
+}
+
+ConstExpression::ConstExpression(ExpressionClass aClass, int token, const QVariant& val)
+        : Expression(aClass, token)
+        , value(val)
+{
 }
 
 ConstExpression::ConstExpression(const ConstExpression& expr)
@@ -516,9 +515,9 @@ ConstExpression* ConstExpression::copy() const
 
 Field::Type ConstExpression::type() const
 {
-    if (m_token == SQL_NULL)
+    if (token() == SQL_NULL)
         return Field::Null;
-    else if (m_token == INTEGER_CONST) {
+    else if (token() == INTEGER_CONST) {
 //! @todo ok?
 //! @todo add sign info?
         if (value.type() == QVariant::Int || value.type() == QVariant::UInt) {
@@ -530,19 +529,19 @@ Field::Type ConstExpression::type() const
             return Field::Integer;
         }
         return Field::BigInteger;
-    } else if (m_token == CHARACTER_STRING_LITERAL) {
+    } else if (token() == CHARACTER_STRING_LITERAL) {
 //! @todo Field::defaultTextLength() is hardcoded now!
         if (value.toString().length() > (int)Field::defaultTextLength())
             return Field::LongText;
         else
             return Field::Text;
-    } else if (m_token == REAL_CONST)
+    } else if (token() == REAL_CONST)
         return Field::Double;
-    else if (m_token == DATE_CONST)
+    else if (token() == DATE_CONST)
         return Field::Date;
-    else if (m_token == DATETIME_CONST)
+    else if (token() == DATETIME_CONST)
         return Field::DateTime;
-    else if (m_token == TIME_CONST)
+    else if (token() == TIME_CONST)
         return Field::Time;
 
     return Field::InvalidType;
@@ -550,26 +549,26 @@ Field::Type ConstExpression::type() const
 
 QString ConstExpression::debugString() const
 {
-    return QLatin1String("ConstExpr('") + tokenToDebugString() + "'," + toString().toString()
+    return QLatin1String("ConstExpression('") + tokenToDebugString() + "'," + toString().toString()
            + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
 EscapedString ConstExpression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     Q_UNUSED(params);
-    if (m_token == SQL_NULL)
+    if (token() == SQL_NULL)
         return EscapedString("NULL");
-    else if (m_token == CHARACTER_STRING_LITERAL)
+    else if (token() == CHARACTER_STRING_LITERAL)
 //! @todo better escaping!
         return EscapedString("'") + value.toString() + "'";
-    else if (m_token == REAL_CONST)
+    else if (token() == REAL_CONST)
         return EscapedString::number(value.toPoint().x()) + "." + EscapedString::number(value.toPoint().y());
-    else if (m_token == DATE_CONST)
+    else if (token() == DATE_CONST)
         return EscapedString("'") + value.toDate().toString(Qt::ISODate) + "'";
-    else if (m_token == DATETIME_CONST)
+    else if (token() == DATETIME_CONST)
         return EscapedString("'") + EscapedString(value.toDateTime().date().toString(Qt::ISODate))
                + " " + value.toDateTime().time().toString(Qt::ISODate) + "'";
-    else if (m_token == TIME_CONST)
+    else if (token() == TIME_CONST)
         return EscapedString("'") + value.toTime().toString(Qt::ISODate) + "'";
 
     return EscapedString(value.toString());
@@ -590,10 +589,9 @@ bool ConstExpression::validate(ParseInfo& parseInfo)
 
 //=========================================
 QueryParameterExpression::QueryParameterExpression(const QString& message)
-        : ConstExpression(QUERY_PARAMETER, message)
+        : ConstExpression(QueryParameterExpressionClass, QUERY_PARAMETER, message)
         , m_type(Field::Text)
 {
-    m_cl = PredicateExpr_QueryParameter;
 }
 
 QueryParameterExpression::QueryParameterExpression(const QueryParameterExpression& expr)
@@ -623,7 +621,7 @@ void QueryParameterExpression::setType(Field::Type type)
 
 QString QueryParameterExpression::debugString() const
 {
-    return QString("QueryParameterExpr('") + QString::fromLatin1("[%2]").arg(value.toString())
+    return QString("QueryParameterExpression('") + QString::fromLatin1("[%2]").arg(value.toString())
            + QString("',type=%1)").arg(Driver::defaultSQLTypeName(type()));
 }
 
@@ -649,13 +647,12 @@ bool QueryParameterExpression::validate(ParseInfo& parseInfo)
 
 //=========================================
 VariableExpression::VariableExpression(const QString& _name)
-        : Expression(0/*undefined*/)
+        : Expression(VariableExpressionClass, 0/*undefined*/)
         , name(_name)
         , field(0)
         , tablePositionForField(-1)
         , tableForQueryAsterisk(0)
 {
-    m_cl = PredicateExpr_Variable;
 }
 
 VariableExpression::VariableExpression(const VariableExpression& expr)
@@ -678,7 +675,7 @@ VariableExpression* VariableExpression::copy() const
 
 QString VariableExpression::debugString() const
 {
-    return QString("VariableExpr(") + name
+    return QString("VariableExpression(") + name
            + QString(",type=%1)").arg(field ? Driver::defaultSQLTypeName(type()) : QString("FIELD NOT DEFINED YET"));
 }
 
@@ -863,21 +860,25 @@ PREDICATE_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
 
 //=========================================
 
+inline ExpressionClass classForFunctionName(const QString& name)
+{
+    if (FunctionExpression::isBuiltInAggregate(name))
+        return AggregationExpressionClass;
+    else
+        return FunctionExpressionClass;
+}
+
 FunctionExpression::FunctionExpression(const QString& _name, NArgExpression* args_)
-        : Expression(0/*undefined*/)
+        : Expression(classForFunctionName(_name), 0/*undefined*/)
         , name(_name)
         , args(args_)
 {
-    if (isBuiltInAggregate(name.toLatin1()))
-        m_cl = PredicateExpr_Aggregation;
-    else
-        m_cl = PredicateExpr_Function;
     if (args)
         args->setParent(this);
 }
 
 FunctionExpression::FunctionExpression(const FunctionExpression& expr)
-        : Expression(0/*undefined*/)
+        : Expression(expr.expressionClass(), 0/*undefined*/)
         , name(expr.name)
         , args(expr.args ? args->copy() : 0)
 {
@@ -898,7 +899,7 @@ FunctionExpression* FunctionExpression::copy() const
 QString FunctionExpression::debugString() const
 {
     QString res;
-    res.append(QString("FunctionExpr(") + name);
+    res.append(QString("FunctionExpression(") + name);
     if (args)
         res.append(QString(",") + args->debugString());
     res.append(QString(",type=%1)").arg(Driver::defaultSQLTypeName(type())));
@@ -929,7 +930,7 @@ bool FunctionExpression::validate(ParseInfo& parseInfo)
     return args ? args->validate(parseInfo) : true;
 }
 
-bool FunctionExpression::isBuiltInAggregate(const QByteArray& fname)
+bool FunctionExpression::isBuiltInAggregate(const QString& fname)
 {
-    return _builtInAggregates->contains(fname.toUpper());
+    return _builtInAggregates->contains(fname.toLatin1().toUpper());
 }

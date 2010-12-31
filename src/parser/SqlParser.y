@@ -513,8 +513,8 @@ using namespace Predicate;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
 	Predicate::Expression *expr;
-	Predicate::NArgExpr *exprList;
-	Predicate::ConstExpr *constExpr;
+        Predicate::NArgExpression *exprList;
+        Predicate::ConstExpression *ConstExpression;
 	Predicate::QuerySchema *querySchema;
 	SelectOptionsInternal *selectOptions;
 	OrderByColumnInternal::List *orderByColumns;
@@ -860,15 +860,15 @@ aExpr2:
 aExpr3 AND aExpr2
 {
 //	PreDbg << "AND " << $3.debugString();
-	$$ = new BinaryExpr( PredicateExpr_Logical, $1, AND, $3 );
+        $$ = new BinaryExpression( LogicalExpressionClass, $1, AND, $3 );
 }
 | aExpr3 OR aExpr2
 {
-	$$ = new BinaryExpr( PredicateExpr_Logical, $1, OR, $3 );
+        $$ = new BinaryExpression( LogicalExpressionClass, $1, OR, $3 );
 }
 | aExpr3 XOR aExpr2
 {
-	$$ = new BinaryExpr( PredicateExpr_Arithm, $1, XOR, $3 );
+        $$ = new BinaryExpression( ArithmeticExpressionClass, $1, XOR, $3 );
 }
 |
 aExpr3
@@ -878,23 +878,23 @@ aExpr3
 aExpr3:
 aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '>', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, '>', $3);
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, GREATER_OR_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, GREATER_OR_EQUAL, $3);
 }
 | aExpr4 '<' %prec LESS_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '<', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, '<', $3);
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, LESS_OR_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, LESS_OR_EQUAL, $3);
 }
 | aExpr4 '=' aExpr3
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, '=', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, '=', $3);
 }
 |
 aExpr4
@@ -904,28 +904,28 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_EQUAL, $3);
 }
 |
 aExpr5 NOT_EQUAL2 aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_EQUAL2, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_EQUAL2, $3);
 }
 | aExpr5 LIKE aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, LIKE, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, LIKE, $3);
 }
 | aExpr5 SQL_IN aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, SQL_IN, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, SQL_IN, $3);
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, SIMILAR_TO, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, SIMILAR_TO, $3);
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-	$$ = new BinaryExpr(PredicateExpr_Relational, $1, NOT_SIMILAR_TO, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_SIMILAR_TO, $3);
 }
 |
 aExpr5
@@ -935,11 +935,11 @@ aExpr5
 aExpr5:
 aExpr5 SQL_IS_NULL
 {
-	$$ = new UnaryExpr( SQL_IS_NULL, $1 );
+        $$ = new UnaryExpression( SQL_IS_NULL, $1 );
 }
 | aExpr5 SQL_IS_NOT_NULL
 {
-	$$ = new UnaryExpr( SQL_IS_NOT_NULL, $1 );
+        $$ = new UnaryExpression( SQL_IS_NOT_NULL, $1 );
 }
 |
 aExpr6
@@ -949,11 +949,11 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, BITWISE_SHIFT_LEFT, $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, BITWISE_SHIFT_LEFT, $3);
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, BITWISE_SHIFT_RIGHT, $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, BITWISE_SHIFT_RIGHT, $3);
 }
 |
 aExpr7
@@ -963,20 +963,20 @@ aExpr7
 aExpr7:
 aExpr8 '+' aExpr7
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '+', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '+', $3);
 	PreDbg << *$$;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '-', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '-', $3);
 }
 | aExpr8 '&' aExpr7
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '&', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '&', $3);
 }
 | aExpr8 '|' aExpr7
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '|', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '|', $3);
 }
 |
 aExpr8
@@ -986,15 +986,15 @@ aExpr8
 aExpr8:
 aExpr9 '/' aExpr8
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '/', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '/', $3);
 }
 | aExpr9 '*' aExpr8
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '*', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '*', $3);
 }
 | aExpr9 '%' aExpr8
 {
-	$$ = new BinaryExpr(PredicateExpr_Arithm, $1, '%', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '%', $3);
 }
 |
 aExpr9
@@ -1005,23 +1005,23 @@ aExpr9:
 /* --- unary logical left --- */
 '-' aExpr9
 {
-	$$ = new UnaryExpr( '-', $2 );
+        $$ = new UnaryExpression( '-', $2 );
 }
 | '+' aExpr9
 {
-	$$ = new UnaryExpr( '+', $2 );
+        $$ = new UnaryExpression( '+', $2 );
 }
 | '~' aExpr9
 {
-	$$ = new UnaryExpr( '~', $2 );
+        $$ = new UnaryExpression( '~', $2 );
 }
 | NOT aExpr9
 {
-	$$ = new UnaryExpr( NOT, $2 );
+        $$ = new UnaryExpression( NOT, $2 );
 }
 | IDENTIFIER
 {
-	$$ = new VariableExpr( *$1 );
+        $$ = new VariableExpression( *$1 );
 	
 //TODO: simplify this later if that's 'only one field name' expression
 	PreDbg << "  + identifier: " << *$1;
@@ -1029,34 +1029,34 @@ aExpr9:
 }
 | QUERY_PARAMETER
 {
-	$$ = new QueryParameterExpr( *$1 );
+        $$ = new QueryParameterExpression( *$1 );
 	PreDbg << "  + query parameter:" << *$$;
 	delete $1;
 }
 | IDENTIFIER aExprList
 {
 	PreDbg << "  + function:" << *$1 << "(" << *$2 << ")";
-	$$ = new FunctionExpr(*$1, $2);
+        $$ = new FunctionExpression(*$1, $2);
 	delete $1;
 }
 /*TODO: shall we also support db name? */
 | IDENTIFIER '.' IDENTIFIER
 {
-	$$ = new VariableExpr( *$1 + "." + *$3 );
+        $$ = new VariableExpression( *$1 + "." + *$3 );
 	PreDbg << "  + identifier.identifier:" << *$1 << "." << *$3;
 	delete $1;
 	delete $3;
 }
 | SQL_NULL
 {
-	$$ = new ConstExpr( SQL_NULL, QVariant() );
+        $$ = new ConstExpression( SQL_NULL, QVariant() );
 	PreDbg << "  + NULL";
 //	$$ = new Field();
 	//$$->setName(QString::null);
 }
 | CHARACTER_STRING_LITERAL
 {
-	$$ = new ConstExpr( CHARACTER_STRING_LITERAL, *$1 );
+        $$ = new ConstExpression( CHARACTER_STRING_LITERAL, *$1 );
 	PreDbg << "  + constant " << $1;
 	delete $1;
 }
@@ -1074,12 +1074,12 @@ aExpr9:
 //		val = (quint64)$1;
 //TODO ok?
 
-	$$ = new ConstExpr( INTEGER_CONST, val );
+        $$ = new ConstExpression( INTEGER_CONST, val );
 	PreDbg << "  + int constant: " << val.toString();
 }
 | REAL_CONST
 {
-	$$ = new ConstExpr( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
+        $$ = new ConstExpression( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
 	PreDbg << "  + real constant: " << $1.integer << "." << $1.fractional;
 }
 |
@@ -1091,14 +1091,14 @@ aExpr10:
 '(' aExpr ')'
 {
 	PreDbg << "(expr)";
-	$$ = new UnaryExpr('(', $2);
+        $$ = new UnaryExpression('(', $2);
 }
 ;
 
 aExprList:
 '(' aExprList2 ')'
 {
-//	$$ = new NArgExpr(0, 0);
+//	$$ = new NArgExpression(UnknownExpressionClass, 0);
 //	$$->add( $1 );
 //	$$->add( $3 );
 	$$ = $2;
@@ -1113,7 +1113,7 @@ aExpr ',' aExprList2
 }
 | aExpr ',' aExpr
 {
-	$$ = new NArgExpr(0, 0);
+        $$ = new NArgExpression(UnknownExpressionClass, 0);
 	$$->add( $1 );
 	$$->add( $3 );
 }
@@ -1172,7 +1172,7 @@ FlatTableList ',' FlatTable
 }
 |FlatTable
 {
-	$$ = new NArgExpr(PredicateExpr_TableList, IDENTIFIER); //ok?
+        $$ = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
 	$$->add($1);
 }
 ;
@@ -1181,7 +1181,7 @@ FlatTable:
 IDENTIFIER
 {
 	PreDbg << "FROM: '" << *$1 << "'";
-	$$ = new VariableExpr(*$1);
+        $$ = new VariableExpression(*$1);
 
 	/*
 //TODO: this isn't ok for more tables:
@@ -1209,10 +1209,10 @@ IDENTIFIER
 | IDENTIFIER IDENTIFIER
 {
 	//table + alias
-	$$ = new BinaryExpr(
-		PredicateExpr_SpecialBinary,
-		new VariableExpr(*$1), 0,
-		new VariableExpr(*$2)
+        $$ = new BinaryExpression(
+                SpecialBinaryExpressionClass,
+                new VariableExpression(*$1), 0,
+                new VariableExpression(*$2)
 	);
 	delete $1;
 	delete $2;
@@ -1220,10 +1220,10 @@ IDENTIFIER
 | IDENTIFIER AS IDENTIFIER
 {
 	//table + alias
-	$$ = new BinaryExpr(
-		PredicateExpr_SpecialBinary,
-		new VariableExpr(*$1), AS,
-		new VariableExpr(*$3)
+        $$ = new BinaryExpression(
+                SpecialBinaryExpressionClass,
+                new VariableExpression(*$1), AS,
+                new VariableExpression(*$3)
 	);
 	delete $1;
 	delete $3;
@@ -1241,7 +1241,7 @@ ColViews ',' ColItem
 }
 |ColItem
 {
-	$$ = new NArgExpr(0,0);
+        $$ = new NArgExpression(UnknownExpressionClass, 0);
 	$$->add( $1 );
 	PreDbg << "ColViews: ColItem";
 }
@@ -1264,18 +1264,18 @@ ColExpression
 }
 | ColExpression AS IDENTIFIER
 {
-	$$ = new BinaryExpr(
-		PredicateExpr_SpecialBinary, $1, AS,
-		new VariableExpr(*$3)
+        $$ = new BinaryExpression(
+                SpecialBinaryExpressionClass, $1, AS,
+                new VariableExpression(*$3)
 	);
 	PreDbg << " added column expr:" << *$$;
 	delete $3;
 }
 | ColExpression IDENTIFIER
 {
-	$$ = new BinaryExpr(
-		PredicateExpr_SpecialBinary, $1, 0,
-		new VariableExpr(*$2)
+        $$ = new BinaryExpression(
+                SpecialBinaryExpressionClass, $1, 0,
+                new VariableExpression(*$2)
 	);
 	PreDbg << " added column expr:" << *$$;
 	delete $2;
@@ -1290,13 +1290,13 @@ aExpr
 /* HANDLED BY 'IDENTIFIER aExprList'
 | IDENTIFIER '(' ColViews ')'
 {
-	$$ = new FunctionExpr( $1, $3 );
+        $$ = new FunctionExpression( $1, $3 );
 }*/
 /*
 | SUM '(' ColExpression ')'
 {
-	FunctionExpr(
-//	$$ = new AggregationExpr( SUM,  );
+        FunctionExpression(
+//	$$ = new AggregationExpression( SUM,  );
 //TODO
 //	$$->setName("SUM(" + $3->name() + ")");
 //wait	$$->containsGroupingAggregate(true);
@@ -1338,7 +1338,7 @@ aExpr
 ColWildCard:
 '*'
 {
-	$$ = new VariableExpr("*");
+        $$ = new VariableExpression("*");
 	PreDbg << "all columns";
 
 //	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
@@ -1349,13 +1349,13 @@ ColWildCard:
 {
 	QString s( *$1 );
 	s += ".*";
-	$$ = new VariableExpr(s);
+        $$ = new VariableExpression(s);
 	PreDbg << "  + all columns from " << s;
 	delete $1;
 }
 /*| ERROR_DIGIT_BEFORE_IDENTIFIER
 {
-	$$ = new VariableExpr($1);
+        $$ = new VariableExpression($1);
 	PreDbg << "  Invalid identifier! " << $1;
 	setError(QObject::tr("Invalid identifier \"%1\"",$1));
 }*/

@@ -1727,14 +1727,14 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
     }
 
     BinaryExpression * newExpr = new BinaryExpression(
-        PredicateExpr_Relational,
+        RelationalExpressionClass,
         new ConstExpression(token, value),
         relation,
         new VariableExpression((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
     );
     if (d->whereExpr) {
         d->whereExpr = new BinaryExpression(
-            PredicateExpr_Logical,
+            LogicalExpressionClass,
             d->whereExpr,
             AND,
             newExpr

@@ -20,11 +20,14 @@
 #ifndef PREDICATE_QUERYSCHEMAPARAMETER_H
 #define PREDICATE_QUERYSCHEMAPARAMETER_H
 
-#include <Predicate/QuerySchema.h>
 #include <QtDebug>
+#include <Predicate/Field.h>
 
 namespace Predicate
 {
+
+class Driver;
+class EscapedString;
 
 //! @short A single parameter of a query schema
 class PREDICATE_EXPORT QuerySchemaParameter
@@ -37,6 +40,7 @@ public:
     QString message; //!< A user-visible message that will be displayed to ask for value of the parameter
 };
 
+typedef QList<QuerySchemaParameter> QuerySchemaParameterList;
 typedef QList<QuerySchemaParameter>::Iterator QuerySchemaParameterListIterator;
 typedef QList<QuerySchemaParameter>::ConstIterator QuerySchemaParameterListConstIterator;
 

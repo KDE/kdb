@@ -3,6 +3,8 @@ Predicate CHANGELOG
 2010-12-30
 Predicate
 *(*Expr) classes renamed to *Expression
+*expression classes put into enum
+*Expression attributes made private, improved related includes (QuerySchemaParameter)
 
 2010-12-17
 Predicate
