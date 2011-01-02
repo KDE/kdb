@@ -426,6 +426,7 @@ def process():
     data_class_ctor = ''
     data_class_copy_ctor = ''
     data_class_ctor_changed = False
+    data_class_copy_ctor_changed = False
     position_for_include_QSharedData_h = get_pos_for_QSharedData_h()
 
     line_number = -1 # used for writing #include <QSharedData>
@@ -458,6 +459,7 @@ def process():
             toMap_impl = ''
             fromMap_impl = ''
             data_class_ctor_changed = False
+            data_class_copy_ctor_changed = False
             lst = shlex.split(line) # better than default split()
             # syntax: shared class export=<EXPORT> inherits=<INHERITANCE> <NAME>
             # INHERITANCE is e.g. inherits="public Foo" - use quotes
@@ -558,16 +560,18 @@ def process():
             member['custom_setter'] = param_exists(lst, 'custom_setter')
             #print member
             if not data_class_ctor_changed:
-                data_class_ctor = """    //! Internal data class used to implement implicitly shared class %s. Provides thread-safe reference counting.
+                data_class_ctor = """    //! Internal data class used to implement implicitly shared class %s.\n    //! Provides thread-safe reference counting.
     class Data : public QSharedData
     {
     public:
         Data()
 """ % shared_class_name
+            if not data_class_copy_ctor_changed:
                 data_class_copy_ctor = """
         Data(const Data& other)
         : QSharedData(other)
 """
+                data_class_copy_ctor_changed = True
             if member['default']:
                 data_class_ctor += '        '
                 if data_class_ctor_changed:
