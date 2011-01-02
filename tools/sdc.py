@@ -468,6 +468,7 @@ def process():
             inherits = param(lst, 'inherits')
             lst = get_shared_class_option(lst, 'operator==')
             lst = get_shared_class_option(lst, 'with_from_to_map')
+            lst = get_shared_class_option(lst, 'virtual_dtor')
             lst = get_shared_class_option_with_value(lst, 'namespace')
             shared_class_name = lst[-1]
             main_ctor = """    };
@@ -491,8 +492,8 @@ def process():
     }
 """ % (shared_class_name, shared_class_name)
             main_ctor += """
-    ~%s();
-""" % shared_class_name
+    %s~%s();
+""" % (('virtual ' if shared_class_options['virtual_dtor'] else ''), shared_class_name)
             if export:
                 name = export + ' ' + shared_class_name
             if inherits:
