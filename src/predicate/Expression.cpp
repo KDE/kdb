@@ -162,6 +162,7 @@ NArgExpression::NArgExpression(const NArgExpression& expr)
 
 NArgExpression::~NArgExpression()
 {
+    qDeleteAll(list);
 }
 
 NArgExpression* NArgExpression::copy() const
