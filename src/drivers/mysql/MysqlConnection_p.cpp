@@ -86,6 +86,7 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
 #ifndef Q_WS_WIN
                 sockets.append("/var/lib/mysql/mysql.sock");
                 sockets.append("/var/run/mysqld/mysqld.sock");
+                sockets.append("/var/run/mysql/mysql.sock");
                 sockets.append("/tmp/mysql.sock");
 
                 foreach(const QString& socket, sockets) {
