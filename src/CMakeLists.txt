@@ -191,4 +191,6 @@ install( FILES
   DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/tools COMPONENT Devel
 )
 
+add_subdirectory( tests )
+
 #TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})
