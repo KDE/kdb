@@ -29,6 +29,7 @@ add_library(predicate_postgresql SHARED ${predicate_postgresql_SRCS})
 target_link_libraries(predicate_postgresql
   ${PostgreSQL_LIBRARIES}
   predicate
+  ${QT_QTNETWORK_LIBRARY}
 )
 set_target_properties(predicate_postgresql PROPERTIES PREFIX "")
 
