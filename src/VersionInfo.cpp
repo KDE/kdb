@@ -37,7 +37,7 @@ ServerVersionInfo::~ServerVersionInfo()
 bool ServerVersionInfo::isNull() const
 {
 //! @todo add this to SDC:        bool operator==(const Data& other) const { return false; }
-    *d.data() == Data();
+    return (*d.data() == Data());
 };
 
 //------------------------
@@ -54,5 +54,5 @@ PREDICATE_EXPORT DatabaseVersionInfo Predicate::version()
 
 bool DatabaseVersionInfo::isNull() const
 {
-    *this == DatabaseVersionInfo();
+    return (*this == DatabaseVersionInfo());
 }

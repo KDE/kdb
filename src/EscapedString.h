@@ -114,26 +114,26 @@ public:
     inline void clear() { m_valid = true; QByteArray::clear(); }
 
 #ifdef Q_COMPILER_MANGLES_RETURN_TYPE
-    inline const char at(int i) const { QByteArray::at(i); }
-    inline const char operator[](int i) const { QByteArray::operator[](i); }
-    inline const char operator[](uint i) const { QByteArray::operator[](i); }
+    inline const char at(int i) const { return QByteArray::at(i); }
+    inline const char operator[](int i) const { return QByteArray::operator[](i); }
+    inline const char operator[](uint i) const { return QByteArray::operator[](i); }
 #else
-    inline char at(int i) const { QByteArray::at(i); }
-    inline char operator[](int i) const { QByteArray::operator[](i); }
-    inline char operator[](uint i) const { QByteArray::operator[](i); }
+    inline char at(int i) const { return QByteArray::at(i); }
+    inline char operator[](int i) const { return QByteArray::operator[](i); }
+    inline char operator[](uint i) const { return QByteArray::operator[](i); }
 #endif
-    inline QByteRef operator[](int i) { QByteArray::operator[](i); }
-    inline QByteRef operator[](uint i) { QByteArray::operator[](i); }
+    inline QByteRef operator[](int i) { return QByteArray::operator[](i); }
+    inline QByteRef operator[](uint i) { return QByteArray::operator[](i); }
 
-    inline int indexOf(char c, int from = 0) const { QByteArray::indexOf(c, from); }
-    inline int indexOf(const char *c, int from = 0) const { QByteArray::indexOf(c, from); }
-    inline int indexOf(const QByteArray &a, int from = 0) const { QByteArray::indexOf(a, from); }
+    inline int indexOf(char c, int from = 0) const { return QByteArray::indexOf(c, from); }
+    inline int indexOf(const char *c, int from = 0) const { return QByteArray::indexOf(c, from); }
+    inline int indexOf(const QByteArray &a, int from = 0) const { return QByteArray::indexOf(a, from); }
     inline int indexOf(const EscapedString &s, int from = 0) const {
         return s.isValid() ? QByteArray::indexOf(s, from) : -1;
     }
-    inline int lastIndexOf(char c, int from = -1) const { QByteArray::lastIndexOf(c, from); }
-    inline int lastIndexOf(const char *c, int from = -1) const { QByteArray::lastIndexOf(c, from); }
-    inline int lastIndexOf(const QByteArray &a, int from = -1) const { QByteArray::lastIndexOf(a, from); }
+    inline int lastIndexOf(char c, int from = -1) const { return QByteArray::lastIndexOf(c, from); }
+    inline int lastIndexOf(const char *c, int from = -1) const { return QByteArray::lastIndexOf(c, from); }
+    inline int lastIndexOf(const QByteArray &a, int from = -1) const { return QByteArray::lastIndexOf(a, from); }
     inline int lastIndexOf(const EscapedString &s, int from = 0) const {
         return s.isValid() ? QByteArray::lastIndexOf(s, from) : -1;
     }
