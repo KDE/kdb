@@ -19,7 +19,6 @@
 
 
 #include "TestStaticSetOfStrings.h"
-#include "qtest_kde.h"
 #include <QtTest/QtTest>
 
 const char* TestStaticSetOfStrings::keywords[] = {
