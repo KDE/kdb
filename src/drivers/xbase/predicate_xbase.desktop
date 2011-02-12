@@ -2,7 +2,6 @@
 Name=xbase
 Caption=xBase
 Comment=Predicate driver for handling xBase databases
-Comment[en_GB]=Predicate driver for handling xBase databases
 FileName=xbase
 Type=File
 #TODO MimeTypes=

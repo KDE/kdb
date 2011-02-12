@@ -2,7 +2,6 @@
 Name=pqxx
 Caption=PostgreSQL (pqxx)
 Comment=Predicate driver for handling PostgreSQL databases (based on libpqxx)
-Comment[en_GB]=Predicate driver for handling PostgreSQL databases (based on libpqxx)
 FileName=pqxx
 Type=Network
 Version=1.0
