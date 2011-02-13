@@ -1,7 +1,16 @@
 [Desktop Entry]
 Name=oracle
+Name[nl]=oracle
+Name[pt]=oracle
+Name[sv]=Oracle
+Name[uk]=Oracle
+Name[x-test]=xxoraclexx
 Caption=Oracle
 Comment=Predicate driver for handling Oracle databases
+Comment[pt]=Controlador do Predicate para lidar com bases de dados Oracle
+Comment[sv]=Predikatdrivrutin för att hantera Oracle-databaser
+Comment[uk]=Драйвер Predicate для роботи з базами даних Oracle
+Comment[x-test]=xxPredicate driver for handling Oracle databasesxx
 FileName=oracle
 Type=Network
 Version=1.0
