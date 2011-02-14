@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=oracle
+Name[cs]=oracle
 Name[nl]=oracle
 Name[pt]=oracle
 Name[sv]=Oracle
@@ -7,6 +8,7 @@ Name[uk]=Oracle
 Name[x-test]=xxoraclexx
 Caption=Oracle
 Comment=Predicate driver for handling Oracle databases
+Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van Oracle databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados Oracle
 Comment[sv]=Predikatdrivrutin för att hantera Oracle-databaser
 Comment[uk]=Драйвер Predicate для роботи з базами даних Oracle
