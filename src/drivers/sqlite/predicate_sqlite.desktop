@@ -1,15 +1,19 @@
 [Desktop Entry]
 Name=sqlite
 Name[cs]=sqlite
+Name[et]=sqlite
 Name[nl]=sqlite
 Name[pt]=sqlite
+Name[pt_BR]=sqlite
 Name[sv]=Sqlite
 Name[uk]=SQLite
 Name[x-test]=xxsqlitexx
 Caption=SQLite
 Comment=Predicate driver for handling SQLite databases
+Comment[et]=Predicate'i draiver SQLite'i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van SQLite databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados SQLite
+Comment[pt_BR]=Driver do Predicate para lidar com bancos de dados SQLite
 Comment[sv]=Predikatdrivrutin för att hantera SQLite-databaser
 Comment[uk]=Драйвер Predicate для роботи з базами даних SQLite
 Comment[x-test]=xxPredicate driver for handling SQLite databasesxx

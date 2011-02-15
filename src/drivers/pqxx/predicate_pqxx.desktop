@@ -1,15 +1,19 @@
 [Desktop Entry]
 Name=pqxx
 Name[cs]=pqxx
+Name[et]=pqxx
 Name[nl]=pqxx
 Name[pt]=pqxx
+Name[pt_BR]=pqxx
 Name[sv]=PQXX
 Name[uk]=pqxx
 Name[x-test]=xxpqxxxx
 Caption=PostgreSQL (pqxx)
 Comment=Predicate driver for handling PostgreSQL databases (based on libpqxx)
+Comment[et]=Predicate'i draiver PostgreSQL-i andmebaaside (libpqxx alusel) jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van PostgreSQL databases gebaseerd op libpqxx)
 Comment[pt]=Controlador do Predicate para lidar com bases de dados PostgreSQL (baseado na 'libpqxx')
+Comment[pt_BR]=Driver do Predicate para lidar com bancos de dados PostgreSQL (baseado no libpqxx)
 Comment[sv]=Predikatdrivrutin för att hantera PostgreSQL-databaser (baserade på libpqxx)
 Comment[uk]=Драйвер Predicate для роботи з базами даних PostgreSQL (засновано на libpqxx)
 Comment[x-test]=xxPredicate driver for handling PostgreSQL databases (based on libpqxx)xx

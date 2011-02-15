@@ -2,8 +2,10 @@
 Type=ServiceType
 X-KDE-ServiceType=Kexi/DBDriver
 Comment=Kexi SQL-Driver plugin
+Comment[et]=Kexi SQL-draiveri plugin
 Comment[nl]=Kexi SQL-stuurprogramma-plugin
 Comment[pt]='Plugin' do Controlador de SQL do Kexi
+Comment[pt_BR]=Plug-in do controlador SQL do Kexi
 Comment[sv]=Kexi SQL-insticksdrivrutin
 Comment[uk]=Додаток SQL-драйвера Kexi
 Comment[x-test]=xxKexi SQL-Driver pluginxx
