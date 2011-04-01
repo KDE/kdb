@@ -2,6 +2,7 @@
 Name=odbc
 Name[cs]=odbc
 Name[de]=odbc
+Name[es]=odbc
 Name[et]=odbc
 Name[nds]=ODBC
 Name[nl]=odbc
@@ -12,6 +13,7 @@ Name[uk]=ODBC
 Name[x-test]=xxodbcxx
 Caption=ODBC
 Comment=Predicate driver for handling ODBC databases
+Comment[es]=Controlador para  manejo de bases de datos ODBC en Predicate
 Comment[et]=Predicate'i draiver ODBC andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van ODBC databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados ODBC

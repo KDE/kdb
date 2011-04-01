@@ -2,6 +2,7 @@
 Name=sqlite
 Name[cs]=sqlite
 Name[de]=sqlite
+Name[es]=sqlite
 Name[et]=sqlite
 Name[nds]=SQLite
 Name[nl]=sqlite
@@ -12,6 +13,7 @@ Name[uk]=SQLite
 Name[x-test]=xxsqlitexx
 Caption=SQLite
 Comment=Predicate driver for handling SQLite databases
+Comment[es]=Controlador para  manejo de bases de datosSQLite en Predicate
 Comment[et]=Predicate'i draiver SQLite'i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van SQLite databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados SQLite

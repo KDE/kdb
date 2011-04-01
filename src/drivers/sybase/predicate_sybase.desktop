@@ -2,6 +2,7 @@
 Name=sybase
 Name[cs]=sybase
 Name[de]=sybase
+Name[es]=sybase
 Name[et]=sybase
 Name[nds]=Sybase
 Name[nl]=sybase
@@ -12,6 +13,7 @@ Name[uk]=Sybase
 Name[x-test]=xxsybasexx
 Caption=Sybase
 Comment=Predicate driver for handling Sybase databases
+Comment[es]=Controlador para  manejo de bases de datos Sybase en Predicate
 Comment[et]=Predicate'i draiver Sybase'i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van Sybase databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados Sybase

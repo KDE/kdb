@@ -2,6 +2,7 @@
 Name=postgresql
 Name[cs]=postgresql
 Name[de]=postgresql
+Name[es]=postgresql
 Name[et]=postgresql
 Name[nds]=PostgreSQL
 Name[nl]=postgresql
@@ -12,6 +13,7 @@ Name[uk]=PostgreSQL
 Name[x-test]=xxpostgresqlxx
 Caption=PostgreSQL
 Comment=Predicate driver for handling PostgreSQL databases
+Comment[es]=Controlador para  manejo de bases de datos PostgreSQL en Predicate
 Comment[et]=Predicate'i draiver PostgreSQL-i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van PostgreSQL databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados PostgreSQL

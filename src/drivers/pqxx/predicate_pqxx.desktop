@@ -2,6 +2,7 @@
 Name=pqxx
 Name[cs]=pqxx
 Name[de]=pqxx
+Name[es]=pqxx
 Name[et]=pqxx
 Name[nl]=pqxx
 Name[pt]=pqxx
@@ -11,6 +12,7 @@ Name[uk]=pqxx
 Name[x-test]=xxpqxxxx
 Caption=PostgreSQL (pqxx)
 Comment=Predicate driver for handling PostgreSQL databases (based on libpqxx)
+Comment[es]=Controlador para  manejo de bases de datos PostgreSQL (basado en libpqxx) en Predicate
 Comment[et]=Predicate'i draiver PostgreSQL-i andmebaaside (libpqxx alusel) jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van PostgreSQL databases gebaseerd op libpqxx)
 Comment[pt]=Controlador do Predicate para lidar com bases de dados PostgreSQL (baseado na 'libpqxx')

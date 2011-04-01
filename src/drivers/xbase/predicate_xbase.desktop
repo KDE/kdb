@@ -2,6 +2,7 @@
 Name=xbase
 Name[cs]=xbase
 Name[de]=xbase
+Name[es]=xbase
 Name[et]=xbase
 Name[nds]=xbase
 Name[nl]=xbase
@@ -12,6 +13,7 @@ Name[uk]=xBase
 Name[x-test]=xxxbasexx
 Caption=xBase
 Comment=Predicate driver for handling xBase databases
+Comment[es]=Controlador para  manejo de bases de datos xBase en Predicate
 Comment[et]=Predicate'i draiver xBase'i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van xBase databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados do xBase

@@ -2,6 +2,7 @@
 Name=mysql
 Name[cs]=mysql
 Name[de]=mysql
+Name[es]=mysql
 Name[et]=mysql
 Name[nds]=MySQL
 Name[nl]=mysql
@@ -12,6 +13,7 @@ Name[uk]=MySQL
 Name[x-test]=xxmysqlxx
 Caption=MySQL
 Comment=Predicate driver for handling MySQL databases
+Comment[es]=Controlador para  manejo de bases de datos MySQL en Predicate
 Comment[et]=Predicate'i draiver MySQL-i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van MySQL databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados MySQL

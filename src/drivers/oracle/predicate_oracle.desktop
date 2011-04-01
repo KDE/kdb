@@ -2,6 +2,7 @@
 Name=oracle
 Name[cs]=oracle
 Name[de]=oracle
+Name[es]=oracle
 Name[et]=oracle
 Name[nds]=Oracle
 Name[nl]=oracle
@@ -12,6 +13,7 @@ Name[uk]=Oracle
 Name[x-test]=xxoraclexx
 Caption=Oracle
 Comment=Predicate driver for handling Oracle databases
+Comment[es]=Controlador para  manejo de bases de datos Oracle en Predicate
 Comment[et]=Predicate'i draiver Oracle'i andmebaaside jaoks
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van Oracle databases
 Comment[pt]=Controlador do Predicate para lidar com bases de dados Oracle
