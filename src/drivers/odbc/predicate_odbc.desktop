@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=odbc
+Name[bg]=odbc
 Name[cs]=odbc
 Name[de]=odbc
 Name[es]=odbc
@@ -17,6 +18,7 @@ Name[uk]=ODBC
 Name[x-test]=xxodbcxx
 Caption=ODBC
 Comment=Predicate driver for handling ODBC databases
+Comment[bg]=Драйвер за бази от данни ODBC
 Comment[es]=Controlador para  manejo de bases de datos ODBC en Predicate
 Comment[et]=Predicate'i draiver ODBC andmebaaside jaoks
 Comment[fr]=Pilote de prédicats pour gérer les bases de données ODBC

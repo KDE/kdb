@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=sybase
+Name[bg]=sybase
 Name[cs]=sybase
 Name[de]=sybase
 Name[es]=sybase
@@ -17,6 +18,7 @@ Name[uk]=Sybase
 Name[x-test]=xxsybasexx
 Caption=Sybase
 Comment=Predicate driver for handling Sybase databases
+Comment[bg]=Драйвер за бази от данни Sybase
 Comment[es]=Controlador para  manejo de bases de datos Sybase en Predicate
 Comment[et]=Predicate'i draiver Sybase'i andmebaaside jaoks
 Comment[fr]=Pilote de prédicats pour gérer les bases de données Sybase

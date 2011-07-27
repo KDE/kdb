@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=xbase
+Name[bg]=xbase
 Name[cs]=xbase
 Name[de]=xbase
 Name[es]=xbase
@@ -17,6 +18,7 @@ Name[uk]=xBase
 Name[x-test]=xxxbasexx
 Caption=xBase
 Comment=Predicate driver for handling xBase databases
+Comment[bg]=Драйвер за бази от данни xBase
 Comment[es]=Controlador para  manejo de bases de datos xBase en Predicate
 Comment[et]=Predicate'i draiver xBase'i andmebaaside jaoks
 Comment[fr]=Pilote de prédicats pour gérer les bases de données xBase

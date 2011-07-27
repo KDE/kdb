@@ -1,5 +1,6 @@
 [Desktop Entry]
 Name=postgresql
+Name[bg]=postgresql
 Name[cs]=postgresql
 Name[de]=postgresql
 Name[es]=postgresql
@@ -17,6 +18,7 @@ Name[uk]=PostgreSQL
 Name[x-test]=xxpostgresqlxx
 Caption=PostgreSQL
 Comment=Predicate driver for handling PostgreSQL databases
+Comment[bg]=Драйвер за бази от данни PostgreSQL
 Comment[es]=Controlador para  manejo de bases de datos PostgreSQL en Predicate
 Comment[et]=Predicate'i draiver PostgreSQL-i andmebaaside jaoks
 Comment[fr]=Pilote de prédicats pour gérer les bases de données PostgreSQL
