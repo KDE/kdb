@@ -409,7 +409,7 @@ bool OracleConnection::drv_alterTableName
 Q_ULLONG OracleConnection::drv_lastInsertRecordId()
 {
   KexiDBDrvDbg;
-  int res;
+  int res = 0;
   try
   {
     d->rs=d->stmt->executeQuery(EscapedString("SELECT LAST_NUMBER-1 FROM user_sequences WHERE "
@@ -451,7 +451,7 @@ QString OracleConnection::serverResultName() const
 bool OracleConnection::drv_containsTable( const QString &tableName )
 {
   KexiDBDrvDbg;
-	bool success;
+	bool success = false;
 	return resultExists(EscapedString("SELECT TABLE_NAME FROM ALL_TABLES WHERE TABLE_NAME LIKE %1")
 		.arg(escapeString(tableName).upper()), &success) && success;
 }

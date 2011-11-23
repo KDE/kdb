@@ -153,7 +153,7 @@ bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 
 bool SQLiteConnection::drv_containsTable(const QString &tableName)
 {
-    bool success;
+    bool success = false;
     return resultExists(EscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }

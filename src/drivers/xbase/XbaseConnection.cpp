@@ -155,7 +155,7 @@ QString xBaseConnection::serverErrorMsg()
 
 bool xBaseConnection::drv_containsTable( const QString &tableName )
 {
-  bool success;
+  bool success = false;
   // this will be called on the SQLite database
   return resultExists(EscapedString("SHOW TABLES LIKE %1")
     .arg(escapeString(tableName)), &success) && success;

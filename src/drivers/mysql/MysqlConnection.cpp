@@ -200,7 +200,7 @@ QString MysqlConnection::serverResultName() const
 
 bool MysqlConnection::drv_containsTable(const QString& tableName)
 {
-    bool success;
+    bool success = false;
     return resultExists(EscapedString("SHOW TABLES LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }

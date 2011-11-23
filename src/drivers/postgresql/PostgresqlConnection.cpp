@@ -275,7 +275,7 @@ quint64 PostgresqlConnection::drv_lastInsertRecordId()
 
 bool PostgresqlConnection::drv_containsTable(const QString &tableName)
 {
-    bool success;
+    bool success = false;
     return resultExists(EscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }

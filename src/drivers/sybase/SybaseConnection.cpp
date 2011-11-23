@@ -167,7 +167,7 @@ QString SybaseConnection::serverResultName() const
 
 bool SybaseConnection::drv_containsTable(const QString &tableName)
 {
-    bool success;
+    bool success = false;
     return resultExists(EscapedString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
                         .arg(escapeString(tableName)), &success) && success;
 }
