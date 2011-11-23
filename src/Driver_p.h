@@ -251,7 +251,7 @@ public:
     AdminTools *adminTools;
 
     /*! Driver-specific SQL keywords that need to be escaped if used as an
-      identifier (e.g. for a table or column name) that aren't also Kexi SQL
+      identifier (e.g. for a table or column name) that aren't also PredicateSQL
       keywords.  These don't necessarily need to be escaped when displayed by
       the front-end, because they won't confuse the parser.  However, they do
       need to be escaped before sending to the DB-backend which will have
@@ -259,12 +259,12 @@ public:
     */
     Utils::StaticSetOfStrings driverSpecificSQLKeywords;
 
-    /*! Kexi SQL keywords that need to be escaped if used as an identifier (e.g.
+    /*! PredicateSQL keywords that need to be escaped if used as an identifier (e.g.
     for a table or column name).  These keywords will be escaped by the
     front-end, even if they are not recognised by the backend to provide
     UI consistency and to allow DB migration without changing the queries.
     */
-    static const char* kexiSQLKeywords[];
+    static const char* predicateSQLKeywords[];
 protected:
     /*! Used by Driver::setInfo() to initialize properties based on the info. */
     void initInternalProperties();

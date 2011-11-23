@@ -1,15 +1,15 @@
 ---------------------------------------------------------
- KexiDB module IDEAS, ISSUES, PROPOSALS
+ IDEAS, ISSUES, PROPOSALS for Predicate
  Copyright (C) 2003 Jarosław Staniek staniek at kde.org
  Started: 2003-08-01
- Kexi home page: Users: http://www.koffice.org/kexi/ Developers: http://kexi-project.org
+ Predicate home page: http://community.kde.org/Predicate
 
  Changes: 
  2005-09-16 Global BLOBs Storage
 ---------------------------------------------------------
 
 |
-| This document is expected to be independent of given KexiDB dirver implementation,
+| This document is expected to be independent of given Predicate dirver implementation,
 | but proposals are described here are after certain decisions has been made:
 | -drivers are (by current importance): SQLite (embedded), 
 |  ODBC (universality reasons ), Mysql (historical reasons), PostgreSQL
@@ -19,11 +19,11 @@
 
 1. EXTENSION: Option for setting user-defined error messages on selected error types.
 
-Since new KexiDB has fully i18n'd user-visible messages, it outperforms other products as MSA 
+Since new Predicate has fully i18n'd user-visible messages, it outperforms other products as MSA 
 (that often shows confusing message coming directly from the engine). There is possibility 
 to provide users with table of error messages that they can personalize. These settings can 
 be properties of table (query, form, etc.) and thus can be inherited (eg. by form from a table).
-By default, i18n'd messages from KexiDB can be presented.
+By default, i18n'd messages from Predicate can be presented.
 
 <EXAMPLE>
 Before we set our message for UNIQUE KEY conflict for table Cars (name varchar UNIQUE, price integer),
@@ -33,7 +33,7 @@ This field must be unique."
 Now, we want more descriptive message: "There should be only one car named 'Dodge'!".
 We write this not as above, but rather: "There should be only one car named %field%!", 
 since %field% is automatically substituted by given field value. After this we get message 
-that is easier to understand for everyday user. Of course Kexi (and competitors too) never will 
+that is easier to understand for everyday user. Of course Predicate (and competitors too) never will 
 be so clever as a human in building such messages automatically.
 </EXAMPLE>
 
@@ -45,7 +45,7 @@ This note is also useful for other types of properties that can be inherited by 
 
 -----------------------------------------------------------------
 
-2. KexiDB classes inheritance diagram
+2. Predicate classes inheritance diagram
 
 TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO 
 
@@ -83,10 +83,10 @@ BaseExpr
 Table or query schemas are extended with additional properties, 
 usually not available from most db engines or even related to gui.
 
-//This table contains list of kexi object stored within project (tables, queries, etc.)
+//This table contains list of Predicate object stored within project (tables, queries, etc.)
 kexi__objects
 	o_id integer unsigned primary key auto_increment,
-	o_type byte, //type id taken from KexiDB::ObjectTypes
+	o_type byte, //type id taken from Predicate::ObjectTypes
 	o_name varchar(200),
 	o_caption varchar(200), //optional, enriched name, can contain non-latin1 characters
 	o_help varchar
@@ -100,7 +100,7 @@ kexi__objectdata
                         //if not needed, leave it as NULL
 
 
-//This table contains fields that are members of given kexi object.
+//This table contains fields that are members of given Predicate object.
 //Not all object types should be allowed, now allowed are tables and queries
 kexi__fields
 	t_id integer REFERENCES kexi__objects(o_id),
@@ -132,12 +132,12 @@ kexi__db
 //Predefined properties stored in kexi__db:
 property="kexidb_major_ver", value=<major_version>
 	Where: <version> is a string containing integer in textual form that denotes 
-	KexiDB implementation major version used to create or update this database.
-	This property is useful for KexiDB library and applications to denote 
-	what KexiDB features could be available. This ensures backward compatibility
+	Predicate implementation major version used to create or update this database.
+	This property is useful for Predicate library and applications to denote 
+	what Predicate features could be available. This ensures backward compatibility
 	and (at least in some cases) -- forward compatibility.
 property="kexidb_minor_ver", value=<minor_version>
-	like above -- minor KexiDB version
+	like above -- minor Predicate version
 property="project_caption", value=<string>
 property="project_desc", value=<string>
 

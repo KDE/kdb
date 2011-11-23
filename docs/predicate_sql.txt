@@ -1,13 +1,12 @@
 ---------------------------------------------------------
- KexiDB Common SQL definition
+ Predicate Common SQL definition
  Copyright (C) 2003 Jarosław Staniek staniek at kde.org
  Started: 2003-09-10
- Kexi home page: http://www.koffice.org/kexi/
 ---------------------------------------------------------
 
 0. Preface
 ----------
-Below is definition (formal grammar and comments) for SQL used externally by KexiDB.
+Below is definition (formal grammar and comments) for SQL used externally by Predicate.
 "Externally" means that this language is visible to the user and can be used 
 by her/him to define queries.
 
@@ -29,8 +28,8 @@ are currently in everyday use, mainly:
 
 Note
 ----
-CREATE TABLE statement could be added to KexiDBSQL for advanced users convenience, 
-although tables can be easier created with gui. CREATE TABLE for KexiDB have 
-non-standard options KexiDB-specific.
+CREATE TABLE statement could be added to PredicateSQL for advanced users convenience, 
+although tables can be easier created with gui. CREATE TABLE for Predicate has 
+non-standard Predicate-specific options.
 
 TODO.......

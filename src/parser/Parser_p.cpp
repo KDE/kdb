@@ -139,7 +139,7 @@ void yyerror(const char *str)
             if (!lexerErr.isEmpty())
                 lexerErr.prepend(": ");
 
-            if (Predicate::isKexiSQLKeyword(ctoken))
+            if (Predicate::isPredicateSQLKeyword(ctoken))
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
                                              QObject::tr("\"%1\" is a reserved keyword")
                                                 .arg(QString(ctoken)) + lexerErr,

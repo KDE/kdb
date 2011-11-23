@@ -510,15 +510,6 @@ using namespace Predicate;
 		}
 	}
 
-#if 0
-	struct yyval
-	{
-		QString parserUserName;
-		int integerValue;
-		KexiDBField::ColumnType coltype;
-	}
-#endif
-
 %}
 
 %union {

@@ -149,7 +149,7 @@ public:
     bool isSystemFieldName(const QString& n) const;
 
     /*! @return true if @a word is a driver-specific keyword.
-     @see Predicate::isKexiSQLKeyword(const QByteArray&) */
+     @see Predicate::isPredicateSQLKeyword(const QByteArray&) */
     bool isDriverSpecificKeyword(const QByteArray& word) const;
 
     /*! @return Driver's features that are combination of Driver::Features
@@ -333,9 +333,9 @@ protected:
     DriverPrivate * const d;
 };
 
-/*! @return true if the @a word is an reserved KexiSQL's keyword
+/*! @return true if the @a word is an reserved PredicateSQL keyword
  (see keywords.cpp for a list of reserved keywords). */
-PREDICATE_EXPORT bool isKexiSQLKeyword(const QByteArray& word);
+PREDICATE_EXPORT bool isPredicateSQLKeyword(const QByteArray& word);
 
 } //namespace Predicate
 

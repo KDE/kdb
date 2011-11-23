@@ -3,9 +3,9 @@
    Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
 
    This file has been automatically generated from
-   koffice/kexi/tools/sql_keywords/sql_keywords.sh and
-   koffice/kexi/kexidb/parser/sqlscanner.l
-   and koffice/kexi/tools/sql_keywords/kexi_reserved.
+   predicate/tools/sql_keywords.sh and
+   Predicate/parser/SqlScanner.l
+   and tools/predicate_keywords.txt.
 
    Please edit the sql_keywords.sh, not this file!
 
@@ -29,7 +29,7 @@
 
 namespace Predicate
 {
-const char* DriverPrivate::kexiSQLKeywords[] = {
+const char* DriverPrivate::predicateSQLKeywords[] = {
     "AND",
     "AS",
     "CREATE",

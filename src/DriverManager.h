@@ -71,7 +71,7 @@ public:
     /*! HTML information about possible problems encountered.
      It's displayed in 'details' section, if an error encountered.
      Currently it contains a list of incompatible db drivers.
-     Used in KexiStartupHandler::detectDriverForFile(). */
+     Can be used in code that finds driver depending on file format. */
 //! @todo make just QStringList
     QString possibleProblemsInfoMsg() const;
 

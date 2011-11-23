@@ -298,8 +298,8 @@ QByteArray Driver::escapeIdentifier(const QByteArray& str, int options) const
     else if (d->driverSpecificSQLKeywords.isEmpty())
         needOuterQuotes = true;
 
-// ... or if it's a keyword in Kexi's SQL dialect,
-    else if (Predicate::isKexiSQLKeyword(str))
+// ... or if it's a keyword in PredicateSQL dialect,
+    else if (Predicate::isPredicateSQLKeyword(str))
         needOuterQuotes = true;
 
 // ... or if it's a keyword in the backends SQL dialect,
@@ -342,10 +342,10 @@ void Driver::setInfo( const DriverInfo& info )
 
 PREDICATE_GLOBAL_STATIC_WITH_ARGS(
     Utils::StaticSetOfStrings,
-    Predicate_kexiSQLKeywords,
-    (DriverPrivate::kexiSQLKeywords) )
+    Predicate_predicateSQLKeywords,
+    (DriverPrivate::predicateSQLKeywords) )
 
-PREDICATE_EXPORT bool Predicate::isKexiSQLKeyword(const QByteArray& word)
+PREDICATE_EXPORT bool Predicate::isPredicateSQLKeyword(const QByteArray& word)
 {
-    return Predicate_kexiSQLKeywords->contains(word);
+    return Predicate_predicateSQLKeywords->contains(word);
 }
