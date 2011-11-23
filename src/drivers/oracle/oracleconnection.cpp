@@ -58,7 +58,7 @@ bool OracleConnection::drv_connect(ServerVersionInfo* version)
 	  version.release = versionRe.cap(3).toInt();
 	  return true;
 	}
-	catch (oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
 	{
 	  KexiDBDrvDbg <<ea.what();
 	  d->errmsg=ea.what();
@@ -112,7 +112,7 @@ bool OracleConnection::drv_getDatabasesList(QStringList* list)
 		
 		return true;
 	}
-	catch (oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
   {
        KexiDBDrvDbg <<ea.what()<<"\n";
        d->errmsg=ea.what();
@@ -141,7 +141,7 @@ bool OracleConnection::drv_createDatabase( const QString &dbName) {
 		if (res) d->createSequences();
 		return res;
 	}
-	catch (oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
 	{
 	  KexiDBDrvDbg << ea.what();
 	  d->errmsg=ea.what();
@@ -167,7 +167,7 @@ bool OracleConnection::drv_databaseExists
 	  //KexiDBDrvDbg << dbName <<":"<<res;
     return res;
 	}
-	catch ( oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
 	{
 	  KexiDBDrvDbg << ea.what();
 	  d->errmsg=ea.what();
@@ -240,20 +240,20 @@ bool OracleConnection::drv_dropDatabase( const QString& /*dbName*/)
                    +"END LOOP;\n"                                                   
                    +"END;\n";   
                    
-  drop[3]=drop[3] +"CURSOR C_KEXI IS SELECT * FROM USER_OBJECTS\n"              
-	                +"WHERE OBJECT_NAME LIKE 'KEXI__SEQ%';\n"                        
-	                +"BEGIN\n"                                                   
-	                +"FOR V_KEXI IN C_KEXI LOOP\n"                               
-	                +"EXECUTE IMMEDIATE 'DROP SEQUENCE ' || V_KEXI.OBJECT_NAME;\n"   
-                  +"END LOOP;\n"                                                   
-                  +"END;\n";                                              
+  drop[3]=drop[3] +"CURSOR C_KEXI IS SELECT * FROM USER_OBJECTS\n"
+	                +"WHERE OBJECT_NAME LIKE 'KEXI__SEQ%';\n"
+	                +"BEGIN\n"
+	                +"FOR V_KEXI IN C_KEXI LOOP\n"
+	                +"EXECUTE IMMEDIATE 'DROP SEQUENCE ' || V_KEXI.OBJECT_NAME;\n"
+                  +"END LOOP;\n"
+                  +"END;\n";
  for(int i=0; i<4; i++)
- {                               
+ {
     try
     {
 	    d->stmt->execute(drop[i].latin1());
 	  }
-	  catch (oracle::occi::SQLException ea)
+	  catch (const oracle::occi::SQLException &ea)
 	  {
 	    KexiDBDrvDbg <<ea.what();
 	    d->errmsg=ea.what();
@@ -285,7 +285,7 @@ bool OracleConnection::drv_setAutoCommit(bool on)
 	  d->stmt->setAutoCommit(on);
 	  KexiDBDrvDbg <<":true";
 	  return true;
-	}catch ( oracle::occi::SQLException ea){
+	}catch (const oracle::occi::SQLException &ea){
 	  KexiDBDrvDbg <<ea.what();
 	  d->errmsg=ea.what();
     d->errno=ea.getErrorCode();
@@ -419,7 +419,7 @@ Q_ULLONG OracleConnection::drv_lastInsertRecordId()
     d->rs=0;
     return res;
   }
-  catch(oracle::occi::SQLException ea)
+  catch(const oracle::occi::SQLException &ea)
   {
     KexiDBDrvDbg<<ea.what();
     d->errmsg=ea.what();

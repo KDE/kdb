@@ -47,23 +47,23 @@ connection)
 	//KexiDBDrvDbg;
    try{
       env = Environment::createEnvironment();
-   }catch (oracle::occi::SQLException ea){
+   }catch (const oracle::occi::SQLException &ea){
       errno=ea.getErrorCode();
       errmsg=strdup(ea.what());
       KexiDBDrvDbg <<errmsg;
-   }	
-    
+   }
+
 }
 
 OracleConnectionInternal::~OracleConnectionInternal()
 {
  KexiDBDrvDbg;
  try{
-	 	Environment::terminateEnvironment(env);
-	 	env=0;
-	 	KexiDBDrvDbg;
+	 Environment::terminateEnvironment(env);
+	 env=0;
+	 KexiDBDrvDbg;
 	}
-	catch (oracle::occi::SQLException ea){
+	catch (const oracle::occi::SQLException &ea){
       errno=ea.getErrorCode();
       errmsg=strdup(ea.what());
       KexiDBDrvDbg <<errmsg;
@@ -111,7 +111,7 @@ bool OracleConnectionInternal::db_connect(const KexiDB::ConnectionData& data)
                                     connectStr.latin1());
     stmt = oraconn->createStatement();
   }
-  catch (oracle::occi::SQLException ea)
+  catch (const oracle::occi::SQLException &ea)
   {
      errno=ea.getErrorCode();
      errmsg=ea.what();
@@ -133,7 +133,7 @@ bool OracleConnectionInternal::db_disconnect()
     oraconn=0;
 	  return true;
 	  }
-	 catch (oracle::occi::SQLException ea)
+	 catch (const oracle::occi::SQLException &ea)
 	 {
 	  errmsg=ea.getMessage().c_str();
 	  KexiDBDrvDbg<<errmsg;
@@ -156,7 +156,7 @@ bool OracleConnectionInternal::useDatabase(const QString &dbName)
 		rs=0;
 		return !user.compare(dbName);
 	}
-	catch (oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
   {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
@@ -176,7 +176,7 @@ bool OracleConnectionInternal::executeSQL(const EscapedString& statement) {
       rs=stmt->getResultSet();
       return true;
     }
-    catch (oracle::occi::SQLException ea)
+    catch (const oracle::occi::SQLException &ea)
     {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
@@ -193,7 +193,7 @@ QString OracleConnectionInternal::getServerVersion()
 	{ 
 		return QString(oraconn->getServerVersion().c_str());
 	}
-	catch (oracle::occi::SQLException ea)
+	catch (const oracle::occi::SQLException &ea)
   {
        errno=ea.getErrorCode();
        errmsg=strdup(ea.what());
