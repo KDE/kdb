@@ -3,6 +3,14 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2011-11-23
+Predicate
+*Port sql keywords list gen. from kexidb; add more renames from kexidb
+*Port KexiDB 2 commit 225a51c6ee: exceptions in form const class &var
+*Port KexiDB 2 commit e3db10e10: add methods for removing columns from RecordEditBuffer
+*Port 'pass a paramameter by reference' fix from KexiDB 2 commit f47a59d6
+*Port 'Initialize variables' fix from KexiDB 2, commit 8600a381ebfd296
+
 2011-02-04
 Predicate
 *Fix Solaris build in the parser
