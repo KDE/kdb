@@ -84,7 +84,6 @@ public:
             , pkeyFieldsOrder(0)
             , pkeyFieldsCount(0)
             , tablesBoundToColumns(64, -1) // will be resized if needed
-            , whereExpr(0)
             , ownedVisibleColumns(0)
             , regenerateExprAliases(false) {
 //Qt 4   columnAliases.setAutoDelete(true);
@@ -118,8 +117,8 @@ public:
                 columnsOrderExpanded = new QHash<QueryColumnInfo*, int>(*copy->columnsOrderExpanded);
             if (copy->pkeyFieldsOrder)
                 pkeyFieldsOrder = new QVector<int>(*copy->pkeyFieldsOrder);
-            if (copy->whereExpr)
-                whereExpr = copy->whereExpr->copy();
+            if (!copy->whereExpr.isNull())
+                whereExpr = copy->whereExpr.clone();
             if (copy->fakeRecordIdCol)
                 fakeRecordIdCol = new QueryColumnInfo(*copy->fakeRecordIdCol);
             if (copy->fakeRecordIdField)
@@ -129,12 +128,14 @@ public:
         }
     }
     ~QuerySchemaPrivate() {
-        if (fieldsExpanded)
+        if (fieldsExpanded) {
             qDeleteAll(*fieldsExpanded);
-        delete fieldsExpanded;
-        if (internalFields)
+            delete fieldsExpanded;
+        }
+        if (internalFields) {
             qDeleteAll(*internalFields);
-        delete internalFields;
+            delete internalFields;
+        }
         delete fieldsExpandedWithInternalAndRecordId;
         delete fieldsExpandedWithInternal;
         delete autoincFields;
@@ -142,7 +143,6 @@ public:
         delete columnsOrderWithoutAsterisks;
         delete columnsOrderExpanded;
         delete pkeyFieldsOrder;
-        delete whereExpr;
         delete fakeRecordIdCol;
         delete fakeRecordIdField;
         delete ownedVisibleColumns;
@@ -170,9 +170,11 @@ public:
             qDeleteAll(*fieldsExpanded);
             delete fieldsExpanded;
             fieldsExpanded = 0;
-            qDeleteAll(*internalFields);
-            delete internalFields;
-            internalFields = 0;
+            if (internalFields) {
+                qDeleteAll(*internalFields);
+                delete internalFields;
+                internalFields = 0;
+            }
             delete columnsOrder;
             columnsOrder = 0;
             delete columnsOrderWithoutAsterisks;
@@ -365,7 +367,7 @@ public:
     QVector<int> tablesBoundToColumns;
 
     /*! WHERE expression */
-    Expression *whereExpr;
+    Expression whereExpr;
 
     QHash<QString, QueryColumnInfo*> columnInfosByNameExpanded;
 
@@ -673,6 +675,7 @@ void QuerySchema::clear()
     d->clear();
 }
 
+#warning TODO move visible to overload
 FieldList& QuerySchema::insertField(uint position, Field *field, bool visible)
 {
     return insertField(position, field, -1/*don't bind*/, visible);
@@ -684,6 +687,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field)
     return insertField(position, field, -1/*don't bind*/, true);
 }
 
+#warning TODO move visible to overload
 FieldList& QuerySchema::insertField(uint position, Field *field,
                                     int bindToTable, bool visible)
 {
@@ -763,11 +767,13 @@ int QuerySchema::tableBoundToColumn(uint columnPosition) const
     return res;
 }
 
+#warning TODO move visible to overload
 Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, bool visible)
 {
     return insertField(m_fields.count(), field, visible);
 }
 
+#warning TODO move visible to overload
 Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, int bindToTable,
         bool visible)
 {
@@ -786,7 +792,8 @@ void QuerySchema::removeField(Predicate::Field *field)
     FieldList::removeField(field);
 }
 
-FieldList& QuerySchema::addExpression(Expression* expr, bool visible)
+#warning TODO move visible to overload
+FieldList& QuerySchema::addExpression(const Expression& expr, bool visible)
 {
     return addField(new Field(this, expr), visible);
 }
@@ -802,6 +809,7 @@ void QuerySchema::setColumnVisible(uint position, bool v)
         d->visibility.setBit(position, v);
 }
 
+#warning TODO move visible to overload
 FieldList& QuerySchema::addAsterisk(QueryAsterisk *asterisk, bool visible)
 {
     if (!asterisk)
@@ -925,8 +933,8 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
             }
         }
     }
-    if (query.whereExpression()) {
-        dbg.nospace() << " - WHERE EXPRESSION:\n" << *query.whereExpression() << '\n';
+    if (!query.whereExpression().isNull()) {
+        dbg.nospace() << " - WHERE EXPRESSION:\n" << query.whereExpression() << '\n';
     }
     if (!query.orderByColumnList().isEmpty()) {
         dbg.space() << QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList().count());
@@ -1341,7 +1349,7 @@ void QuerySchema::computeFieldsExpanded() const
                             QString::fromLatin1("[multiple_visible_fields_%1]")
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
-                            new ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                            ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                         if (!d->ownedVisibleColumns) {
                             d->ownedVisibleColumns = new Field::List();
 //Qt 4       d->ownedVisibleColumns->setAutoDelete(true);
@@ -1399,7 +1407,7 @@ void QuerySchema::computeFieldsExpanded() const
                         QString::fromLatin1("[multiple_visible_fields_%1]")
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
-                        new ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                        ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                     if (!d->ownedVisibleColumns) {
                         d->ownedVisibleColumns = new Field::List();
 //Qt 4      d->ownedVisibleColumns->setAutoDelete(true);
@@ -1708,13 +1716,13 @@ EscapedString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
     return d->autoIncrementSQLFieldsList;
 }
 
-void QuerySchema::setWhereExpression(Expression *expr)
+void QuerySchema::setWhereExpression(const Expression& expr)
 {
-    delete d->whereExpr;
-    d->whereExpr = expr;
+    d->whereExpr = expr.clone();
 }
 
-void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& value, int relation)
+void QuerySchema::addToWhereExpression(Predicate::Field *field,
+                                       const QVariant& value, int relation)
 {
     int token;
     if (value.isNull())
@@ -1728,21 +1736,22 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
 //! @todo date, time
     }
 
-    BinaryExpression * newExpr = new BinaryExpression(
+    BinaryExpression newExpr(
         RelationalExpressionClass,
-        new ConstExpression(token, value),
+        ConstExpression(token, value),
         relation,
-        new VariableExpression((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
+        VariableExpression((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
     );
-    if (d->whereExpr) {
-        d->whereExpr = new BinaryExpression(
+    if (d->whereExpr.isNull()) {
+        d->whereExpr = newExpr;
+    }
+    else {
+        d->whereExpr = BinaryExpression(
             LogicalExpressionClass,
             d->whereExpr,
             AND,
             newExpr
         );
-    } else {
-        d->whereExpr = newExpr;
     }
 }
 
@@ -1762,7 +1771,7 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field, const QVariant& 
 
 */
 
-Expression *QuerySchema::whereExpression() const
+Expression QuerySchema::whereExpression() const
 {
     return d->whereExpr;
 }
@@ -1783,10 +1792,10 @@ OrderByColumnList& QuerySchema::orderByColumnList() const
 
 QuerySchemaParameterList QuerySchema::parameters() const
 {
-    if (!whereExpression())
+    if (whereExpression().isNull())
         return QuerySchemaParameterList();
     QuerySchemaParameterList params;
-    whereExpression()->getQueryParameters(params);
+    whereExpression().getQueryParameters(params);
     return params;
 }
 

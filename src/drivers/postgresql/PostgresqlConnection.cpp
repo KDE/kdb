@@ -23,8 +23,8 @@
 #include "PostgresqlPreparedStatement.h"
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlCursor.h"
-#include <Predicate/Error.h>
-#include <Predicate/Global.h>
+#include <Predicate/Error>
+#include <Predicate/Global>
 
 #include <QFileInfo>
 #include <QHostAddress>

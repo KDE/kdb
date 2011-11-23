@@ -21,7 +21,7 @@
 #ifndef POSTGRESQLPREPAREDSTATEMENT_H
 #define POSTGRESQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface.h>
+#include <Predicate/Interfaces/PreparedStatementInterface>
 #include "PostgresqlConnection_p.h"
 
 namespace Predicate

@@ -24,15 +24,14 @@
 
 #include <sqlite3.h>
 
-#include <Predicate/Driver.h>
-#include <Predicate/Cursor.h>
-#include <Predicate/Error.h>
-#include <Predicate/tools/Utils.h>
+#include <Predicate/Driver>
+#include <Predicate/Cursor>
+#include <Predicate/Error>
+#include <Predicate/Tools/Utils>
 
-#include <qfile.h>
-#include <qdir.h>
-#include <qregexp.h>
-
+#include <QFile>
+#include <QDir>
+#include <QRegExp>
 #include <QtDebug>
 
 //remove debug

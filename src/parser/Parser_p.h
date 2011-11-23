@@ -26,10 +26,10 @@
 #include <QCache>
 #include <QString>
 
-#include <Predicate/QuerySchema.h>
-#include <Predicate/TableSchema.h>
-#include <Predicate/Connection.h>
-#include <Predicate/Expression.h>
+#include <Predicate/QuerySchema>
+#include <Predicate/TableSchema>
+#include <Predicate/Connection>
+#include <Predicate/Expression>
 #include "SqlTypes.h"
 #include "Parser.h"
 

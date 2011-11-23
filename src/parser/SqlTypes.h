@@ -64,12 +64,34 @@ struct OrderByColumnInternal {
 
 //! @internal
 struct SelectOptionsInternal {
-    SelectOptionsInternal() : whereExpr(0), orderByColumns(0) {}
+    SelectOptionsInternal() : orderByColumns(0) {}
     ~SelectOptionsInternal() {
         delete orderByColumns; // delete because this is internal temp. structure
     }
-    Predicate::Expression* whereExpr;
+    Predicate::Expression whereExpr;
     OrderByColumnInternal::List* orderByColumns;
 };
+
+class ExpressionPtr
+{
+public:
+    inline ExpressionPtr(Predicate::Expression *exp) : e(exp) {}
+    inline Predicate::Expression toExpr() {
+        Predicate::Expression exp(*e);
+        delete e;
+        e = 0;
+        return exp;
+    }
+    inline Predicate::NArgExpression toNArg() {
+        Predicate::NArgExpression exp(e->toNArg());
+        delete e;
+        e = 0;
+        return exp;
+    }
+//private:
+    Predicate::Expression *e;
+};
+
+QDebug operator<<(QDebug dbg, const ExpressionPtr& expr);
 
 #endif

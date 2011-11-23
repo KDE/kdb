@@ -29,8 +29,8 @@
 #include "MysqlConnection_p.h"
 #include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
-#include <Predicate/Global.h>
-#include <Predicate/Error.h>
+#include <Predicate/Global>
+#include <Predicate/Error>
 
 
 using namespace Predicate;

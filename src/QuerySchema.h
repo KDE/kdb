@@ -23,11 +23,11 @@
 #include <QVector>
 #include <QHash>
 
-#include <Predicate/FieldList.h>
-#include <Predicate/Object.h>
-#include <Predicate/TableSchema.h>
-#include <Predicate/Relationship.h>
-#include <Predicate/QuerySchemaParameter.h>
+#include <Predicate/FieldList>
+#include <Predicate/Object>
+#include <Predicate/TableSchema>
+#include <Predicate/Relationship>
+#include <Predicate/QuerySchemaParameter>
 
 namespace Predicate
 {
@@ -347,8 +347,9 @@ public:
     virtual void removeField(Field *field);
 
     /*! Adds a field built on top of @a expr expression.
-     This creates a new Field object and adds it to the query schema using addField(). */
-    FieldList& addExpression(Expression* expr, bool visible = true);
+     This creates a new Field object and adds it to the query schema using addField().
+     @a expr will be owned by the query object. */
+    FieldList& addExpression(const Expression& expr, bool visible = true);
 
     /*! @return visibility flag for column at @a position.
      By default column is visible. */
@@ -769,13 +770,13 @@ public:
      by autoIncrementFields(). */
     EscapedString autoIncrementSQLFieldsList(Connection *conn) const;
 
-    /*! Sets a WHERE expression @a exp. It will be owned by this query,
-     so you can forget about it. Previously set WHERE expression will be deleted.
-     You can pass 0 to remove expresssion. */
-    void setWhereExpression(Expression *expr);
+    /*! Sets a WHERE expression @a exp.
+     Previously set WHERE expression will be removed.
+     You can pass null expression (Expression()) to remove existing WHERE expresssion. */
+    void setWhereExpression(const Expression& expr);
 
     /*! @return WHERE expression or 0 if this query has no WHERE expression */
-    Expression *whereExpression() const;
+    Expression whereExpression() const;
 
     /*! Adds a part to WHERE expression.
      Simplifies creating of WHERE expression, if used instead

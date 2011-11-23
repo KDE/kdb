@@ -21,8 +21,8 @@
 #ifndef _MYSQLCURSOR_H_
 #define _MYSQLCURSOR_H_
 
-#include <Predicate/Cursor.h>
-#include <Predicate/Connection.h>
+#include <Predicate/Cursor>
+#include <Predicate/Connection>
 
 namespace Predicate
 {

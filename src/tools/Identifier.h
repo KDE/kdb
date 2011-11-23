@@ -21,7 +21,7 @@
 #ifndef PREDICATE_TOOLS_IDENTIFIER_H
 #define PREDICATE_TOOLS_IDENTIFIER_H
 
-#include <Predicate/tools/Validator.h>
+#include <Predicate/Tools/Validator>
 
 namespace Predicate
 {

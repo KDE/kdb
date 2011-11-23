@@ -20,7 +20,7 @@
 #ifndef PREDICATE_DRIVER_SQLITE_H
 #define PREDICATE_DRIVER_SQLITE_H
 
-#include <Predicate/Driver.h>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

@@ -23,7 +23,7 @@
 #include <QString>
 #include <QVariant>
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
 
 namespace Predicate
 {

@@ -22,7 +22,7 @@
 #ifndef MYSQLDRIVER_H
 #define MYSQLDRIVER_H
 
-#include <Predicate/Driver.h>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

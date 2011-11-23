@@ -18,7 +18,8 @@
 */
 
 #include "Admin.h"
-#include "Driver_p.h"
+#include <Predicate/Admin>
+#include <Predicate/Private/Driver>
 
 using namespace Predicate;
 

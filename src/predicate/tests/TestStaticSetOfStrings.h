@@ -22,7 +22,7 @@
 #define TESTSTATICSETOFSTRINGS_H
 
 #include <QtCore/QObject>
-#include <Predicate/tools/Utils.h>
+#include <Predicate/Tools/Utils>
 
 class TestStaticSetOfStrings : public QObject
 {

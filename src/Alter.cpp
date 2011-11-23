@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "Alter.h"
-#include "Utils.h"
-#include "tools/Utils.h"
-#include "tools/Static.h"
+#include <Predicate/Alter>
+#include <Predicate/Utils>
+#include <Predicate/Tools/Utils>
+#include <Predicate/Tools/Static>
 
 #include <QMap>
 

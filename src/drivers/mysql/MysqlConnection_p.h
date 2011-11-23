@@ -20,7 +20,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef PREDICATE_MYSQLCLIENT_P_H
 #define PREDICATE_MYSQLCLIENT_P_H
 
-#include <Predicate/Connection_p.h>
+#include <Predicate/Private/Connection>
 
 #ifdef Q_WS_WIN
 #include <my_Global.h>

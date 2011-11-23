@@ -20,10 +20,10 @@
 #ifndef KEXIDBOBJECTNAMEVALIDATOR_H
 #define KEXIDBOBJECTNAMEVALIDATOR_H
 
-#include <Predicate/Global.h>
-#include <Predicate/tools/Validator.h>
 #include <QtCore/QString>
 #include <QtCore/QPointer>
+#include <Predicate/Global>
+#include <Predicate/Tools/Validator>
 
 namespace Predicate
 {

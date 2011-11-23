@@ -23,7 +23,7 @@
 #include "DriverManager_p.h"
 #include "Driver_p.h"
 #include "Driver_p.h"
-#include "tools/Static.h"
+#include "Tools/Static.h"
 
 #include <assert.h>
 

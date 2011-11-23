@@ -22,7 +22,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <QMap>
 
-#include <Predicate/Connection_p.h>
+#include <Predicate/Private/Connection>
 
 //#include <config.h>
 #include <sqlfront.h>

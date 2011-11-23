@@ -21,9 +21,9 @@
 #ifndef PREDICATE_CURSOR_POSTGRESQL_H
 #define PREDICATE_CURSOR_POSTGRESQL_H
 
-#include <Predicate/Cursor.h>
-#include <Predicate/Connection.h>
-#include <Predicate/Utils.h>
+#include <Predicate/Cursor>
+#include <Predicate/Connection>
+#include <Predicate/Utils>
 
 namespace Predicate
 {

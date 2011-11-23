@@ -27,7 +27,7 @@
 #include "MysqlConnection_p.h"
 #include "MysqlConnection.h"
 
-#include <Predicate/ConnectionData.h>
+#include <Predicate/ConnectionData>
 
 #ifdef MYSQLMIGRATE_H
 #define NAMESPACE KexiMigration

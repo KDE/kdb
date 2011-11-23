@@ -26,7 +26,7 @@
 #include "Connection.h"
 #include "ConnectionData.h"
 #include "Admin.h"
-#include "tools/Static.h"
+#include "Tools/Static.h"
 
 #include <QtDebug>
 

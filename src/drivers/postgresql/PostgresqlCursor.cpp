@@ -23,8 +23,8 @@
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlDriver.h"
 
-#include <Predicate/Error.h>
-#include <Predicate/Global.h>
+#include <Predicate/Error>
+#include <Predicate/Global>
 
 
 #include <QtDebug>

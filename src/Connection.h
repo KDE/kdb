@@ -27,16 +27,16 @@
 #include <QVariant>
 #include <QPointer>
 
-#include <Predicate/ConnectionData.h>
-#include <Predicate/TableSchema.h>
-#include <Predicate/QuerySchema.h>
-#include <Predicate/QuerySchemaParameter.h>
-#include <Predicate/Transaction.h>
-#include <Predicate/Driver.h>
-#include <Predicate/PreparedStatement.h>
-#include <Predicate/RecordData.h>
-#include <Predicate/Utils.h>
-#include <Predicate/tools/Tristate.h>
+#include <Predicate/ConnectionData>
+#include <Predicate/TableSchema>
+#include <Predicate/QuerySchema>
+#include <Predicate/QuerySchemaParameter>
+#include <Predicate/Transaction>
+#include <Predicate/Driver>
+#include <Predicate/PreparedStatement>
+#include <Predicate/RecordData>
+#include <Predicate/Utils>
+#include <Predicate/Tools/Tristate>
 
 namespace Predicate
 {

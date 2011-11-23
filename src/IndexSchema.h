@@ -25,9 +25,9 @@
 #include <QSet>
 #include <QtDebug>
 
-#include <Predicate/Object.h>
-#include <Predicate/FieldList.h>
-#include <Predicate/Relationship.h>
+#include <Predicate/Object>
+#include <Predicate/FieldList>
+#include <Predicate/Relationship>
 
 namespace Predicate
 {

@@ -27,7 +27,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "SybaseConnection_p.h"
 
-#include <Predicate/ConnectionData.h>
+#include <Predicate/ConnectionData>
 
 #ifdef SYBASEMIGRATE_H
 #define NAMESPACE KexiMigration

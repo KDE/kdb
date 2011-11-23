@@ -30,7 +30,7 @@
 #include <QHash>
 #include <QtDebug>
 
-#include <Predicate/tools/Utils.h>
+#include <Predicate/Tools/Utils>
 #include <Predicate/predicate_export.h>
 
 namespace Predicate
@@ -58,7 +58,6 @@ class Expression;
 
  Field can also have assigned expression (see Predicate::Expression class,
  and expression() method).
- If an expression is defined, then field's name is
 
  Note that aliases for fields are defined within query, not in Field object,
  because the same field can be used in different queries with different alias.
@@ -334,7 +333,7 @@ public:
     }
 
     /*! @return a type for this field. If there's expression assigned,
-     type of the expression is returned instead. */
+     type of the expression (after evaluation) is returned instead. */
     Type type() const;
 
     //! @return a i18n-ed type name for this field
@@ -484,8 +483,9 @@ public:
      @return true if this field type can be auto-incremented. */
     static bool isAutoIncrementAllowed(uint type);
 
-    /*! Sets type @a t for this field. This does nothing if there's already expression assigned,
-     see expression(). */
+    /*! Sets type @a t for this field.
+     This does nothing if there's expression assigned.
+     @see setExpression() */
     void setType(Type t);
 
     /*! Sets name @a name for this field. */
@@ -605,31 +605,25 @@ public:
     /*! @return Predicate::Expression object if the field value is an
      expression.  Unless the expression is set with setExpression(), it is null.
     */
-    inline Predicate::Expression *expression() {
-        return m_expr;
-    }
+    Expression expression();
 
-    inline const Predicate::Expression *expression() const {
-        return m_expr;
-    }
+    const Expression expression() const;
 
     /*! Sets expression data @a expr. If there was
-     already expression set, it is destroyed before new assignment.
-     This Field object becames owner of @a expr object,
-     so you do not have to worry about deleting it later.
-     If the @a expr is null, current field's expression is deleted, if exists.
+     already expression set, it is removed before new assignment.
+     This Field object becames logical owner of @a expr object,
+     so do not use the expresion for other objects (you can call ExpressioN::clone()).
+     Current field's expression is deleted, if exists.
 
      Because the field defines an expression, it should be assigned to a query,
      not to a table.
     */
-    void setExpression(Predicate::Expression *expr);
+    void setExpression(const Expression& expr);
 
     /*! @return true if there is expression defined for this field.
      This method is provided for better readibility
-     - does the same as expression()!=NULL but */
-    inline bool isExpression() const {
-        return m_expr != NULL;
-    }
+     - does the same as expression().isNull(). */
+    bool isExpression() const;
 
 //<TMP>
     /*! @return the hints for enum fields. */
@@ -667,7 +661,10 @@ protected:
      Used internally by query schemas, e.g. to declare asterisks or
      to add expression columns.
      No other properties are set, so these should be set later. */
-    Field(QuerySchema *querySchema, Expression* expr = 0);
+    Field(QuerySchema *querySchema, const Expression& expr);
+
+    /*! @overload Field(QuerySchema*, const Expression&) */
+    Field(QuerySchema *querySchema);
 
     /*! @internal Used by constructors. */
     void init();
@@ -691,7 +688,7 @@ protected:
     uint m_width;
     QVector<QString> m_hints;
 
-    Predicate::Expression *m_expr;
+    Expression* m_expr;
     CustomPropertiesMap* m_customProperties;
 
     //! @internal Used in m_typeNames member to handle i18n-ed type names

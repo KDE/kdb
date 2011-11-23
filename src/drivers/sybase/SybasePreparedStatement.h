@@ -20,8 +20,8 @@
 #ifndef SYBASEPREPAREDSTATEMENT_H
 #define SYBASEPREPAREDSTATEMENT_H
 
-#include <Predicate/PreparedStatement.h>
-#include <Predicate/Connection_p.h>
+#include <Predicate/PreparedStatement>
+#include <Predicate/Private/Connection>
 
 namespace Predicate
 {

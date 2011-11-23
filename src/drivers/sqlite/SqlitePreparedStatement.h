@@ -20,7 +20,7 @@
 #ifndef PREDICATE_SQLITEPREPAREDSTATEMENT_H
 #define PREDICATE_SQLITEPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface.h>
+#include <Predicate/Interfaces/PreparedStatementInterface>
 #include "SqliteConnection_p.h"
 
 namespace Predicate

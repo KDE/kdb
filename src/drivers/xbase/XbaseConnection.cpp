@@ -26,7 +26,7 @@
 #include "XbaseCursor.h"
 #include "XbaseConnection.h"
 #include "XbaseConnection_p.h"
-#include <Predicate/Error.h>
+#include <Predicate/Error>
 
 using namespace Predicate;
 

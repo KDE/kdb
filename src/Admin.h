@@ -20,7 +20,7 @@
 #ifndef PREDICATE_ADMIN_H
 #define PREDICATE_ADMIN_H
 
-#include <Predicate/Result.h>
+#include <Predicate/Result>
 
 namespace Predicate
 {

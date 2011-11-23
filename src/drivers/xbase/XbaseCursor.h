@@ -20,8 +20,8 @@
 #ifndef _XBASECURSOR_H_
 #define _XBASECURSOR_H_
 
-#include <Predicate/Cursor.h>
-#include <Predicate/Connection.h>
+#include <Predicate/Cursor>
+#include <Predicate/Connection>
 
 namespace Predicate {
 

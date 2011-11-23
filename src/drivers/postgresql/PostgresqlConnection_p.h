@@ -21,7 +21,7 @@
 #ifndef POSTGRESQLSQLCONNECTIONINTERNAL_H
 #define POSTGRESQLSQLCONNECTIONINTERNAL_H
 
-#include <Predicate/Connection_p.h>
+#include <Predicate/Private/Connection>
 
 #include <libpq-fe.h>
 

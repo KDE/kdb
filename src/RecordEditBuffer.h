@@ -22,8 +22,8 @@
 
 #include <QMap>
 
-#include <Predicate/Field.h>
-#include <Predicate/QuerySchema.h>
+#include <Predicate/Field>
+#include <Predicate/QuerySchema>
 
 namespace Predicate
 {

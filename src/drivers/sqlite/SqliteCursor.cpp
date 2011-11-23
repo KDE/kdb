@@ -22,9 +22,9 @@
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 
-#include <Predicate/Error.h>
-#include <Predicate/Driver.h>
-#include <Predicate/tools/Utils.h>
+#include <Predicate/Error>
+#include <Predicate/Driver>
+#include <Predicate/Tools/Utils>
 
 #include <assert.h>
 #include <string.h>

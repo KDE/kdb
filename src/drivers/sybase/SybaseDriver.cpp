@@ -23,9 +23,9 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "SybaseDriver.h"
 #include "SybaseConnection.h"
-#include <Predicate/Field.h>
-#include <Predicate/Driver_p.h>
-#include <Predicate/Utils.h>
+#include <Predicate/Field>
+#include <Predicate/Private/Driver>
+#include <Predicate/Utils>
 
 using namespace Predicate;
 

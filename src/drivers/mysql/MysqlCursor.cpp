@@ -21,8 +21,8 @@
 #include "MysqlCursor.h"
 #include "MysqlConnection.h"
 #include "MysqlConnection_p.h"
-#include <Predicate/Error.h>
-#include <Predicate/Utils.h>
+#include <Predicate/Error>
+#include <Predicate/Utils>
 
 #include <QtDebug>
 #include <limits.h>

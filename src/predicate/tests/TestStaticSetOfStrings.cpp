@@ -50,13 +50,13 @@ void TestStaticSetOfStrings::initTestCase()
 
 void TestStaticSetOfStrings::testContains()
 {
-    QCOMPARE(strings.contains("ANY"), true); //test a random string
-    QCOMPARE(strings.contains(QString("backward").toUpper().toLocal8Bit()), true);
-    QCOMPARE(strings.contains("BIGIN"), false); //test a sub-string
-    QCOMPARE(strings.contains("XXXXXXXXXX"), false); //test some garbage
-    QCOMPARE(strings.isEmpty(), false);
-    QCOMPARE(strings.contains("ABORT"), true); //test start of list
-    QCOMPARE(strings.contains("BINARY"), true); //test end of list
+    QVERIFY(strings.contains("ANY")); //test a random string
+    QVERIFY(strings.contains(QString("backward").toUpper().toLocal8Bit()));
+    QVERIFY(!strings.contains("BIGIN")); //test a sub-string
+    QVERIFY(!strings.contains("XXXXXXXXXX")); //test some garbage
+    QVERIFY(!strings.isEmpty());
+    QVERIFY(strings.contains("ABORT")); //test start of list
+    QVERIFY(strings.contains("BINARY")); //test end of list
 }
 
 void TestStaticSetOfStrings::cleanupTestCase()

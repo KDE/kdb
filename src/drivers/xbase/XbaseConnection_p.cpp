@@ -27,9 +27,9 @@
 #include "XbaseConnection_p.h"
 #include "XbaseExport.h"
 
-#include <Predicate/DriverManager.h>
-#include <Predicate/Utils.h>
-#include <Predicate/ConnectionData.h>
+#include <Predicate/DriverManager>
+#include <Predicate/Utils>
+#include <Predicate/ConnectionData>
 #include <migration/keximigrate.h>
 #include <migration/migratemanager.h>
 

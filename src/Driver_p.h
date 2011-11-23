@@ -32,9 +32,9 @@
 #include <QSet>
 #include <QtPlugin>
 
-#include <Predicate/Connection.h>
-#include <Predicate/Admin.h>
-#include <Predicate/tools/Utils.h>
+#include <Predicate/Connection>
+#include <Predicate/Admin>
+#include <Predicate/Tools/Utils>
 
 class KService;
 

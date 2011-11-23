@@ -41,7 +41,7 @@ transliteration_table.cpp.orig.bz2 file.
 
 If you find invalid or missing transliterations, please edit
 transliteration_table.cpp (using UTF-8-compliant text editor, e.g. Kate).
-Then please send the transliteration_table.cpp file to the Kexi Team.
+Then please send the transliteration_table.cpp file to the Predicate Team.
 
 5. Credits
  Jaroslaw Staniek <staniek at kde.org>

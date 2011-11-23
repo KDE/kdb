@@ -36,8 +36,8 @@
 #include "LookupFieldSchema.h"
 #include "parser/Parser.h"
 
-#include "tools/Utils.h"
-#include "tools/Identifier.h"
+#include "Tools/Utils.h"
+#include "Tools/Identifier.h"
 #include "Interfaces/PreparedStatementInterface.h"
 
 #include <QDir>
@@ -1216,7 +1216,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                     sql += '*';
             } else {
                 if (f->isExpression()) {
-                    sql += f->expression()->toString();
+                    sql += f->expression().toString();
                 } else {
                     if (!f->table()) //sanity check
                         return EscapedString();
@@ -1437,15 +1437,15 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         s_where += s_where_sub;
     }
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
-    if (querySchema->whereExpression()) {
+    if (!querySchema->whereExpression().isNull()) {
         QuerySchemaParameterValueListIterator paramValuesIt(m_driver, params);
         QuerySchemaParameterValueListIterator *paramValuesItPtr = params.isEmpty() ? 0 : &paramValuesIt;
         if (wasWhere) {
 //! @todo () are not always needed
             s_where = '(' + s_where + ") AND ("
-                + querySchema->whereExpression()->toString(paramValuesItPtr) + ')';
+                + querySchema->whereExpression().toString(paramValuesItPtr) + ')';
         } else {
-            s_where = querySchema->whereExpression()->toString(paramValuesItPtr);
+            s_where = querySchema->whereExpression().toString(paramValuesItPtr);
         }
     }
     if (!s_where.isEmpty())

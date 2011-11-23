@@ -334,6 +334,8 @@ def data_member_found(lst):
         return True
     if len(lst) > 2 and lst[0] == 'protected' and lst[1] == 'data_member':
         return True
+    if len(lst) > 1 and lst[0] == 'data_method':
+        return True
     return False
 
 # sets shared_class_options[option_name] to proper value; returns lst with removed element option_name if exists
@@ -416,6 +418,24 @@ def get_pos_for_QSharedData_h():
     infile.seek(prev_pos)
     return last_include
 
+# replaces "Foo<ABC<DEF>>" with "Foo< ABC< DEF > >" to avoid build errors
+def fix_templates(s):
+    result=''
+    for c in s:
+        if c == '>':
+            result += ' '
+        result += c
+        if c == '<':
+            result += ' '
+    return result
+
+def other_comment(line):
+    ln = line.strip(' ')
+    return ln.startswith('/**') \
+      or ln.startswith('/*!') \
+      or ln .startswith('//!') \
+      or ln.startswith('///')
+    
 def process():
     global infile, outfile, generated_code_inserted, data_class_ctor, data_class_copy_ctor, shared_class_name, shared_class_options, shared_class_inserted, data_class_members, members_list, data_accesors, member, main_ctor, toMap_impl, fromMap_impl
     outfile.write(warningHeader())
@@ -544,12 +564,18 @@ def process():
             #print lst
             # syntax: data_member <TYPE> <NAME> [default=<DEFAULT_VAL>] [default_setter=<DEFAULT_SETTER_VAL>]
             # output: getter, setter methods, data memeber
-            if lst[0] == 'protected':
+            if lst[0] == 'data_method':
+                #if member.has_key('docs'):
+                #    data_class_members += member['docs'] + '\n'
+                #    del member['docs']
+                data_class_members += "        %s;\n" % (' '.join(lst[1:]))
+                continue
+            elif lst[0] == 'protected':
                 member['access'] = 'protected'
                 lst = lst[1:]
             else:
                 member['access'] = 'public'
-            member['type'] = lst[1]
+            member['type'] = fix_templates(lst[1])
             member['name'] = lst[2]
             members_list.append(member['name']);
             member['default'] = param(lst, 'default')
@@ -559,6 +585,7 @@ def process():
             member['no_setter'] = param_exists(lst, 'no_setter')
             member['setter'] = param(lst, 'setter')
             member['custom_setter'] = param_exists(lst, 'custom_setter')
+            member['mutable'] = param_exists(lst, 'mutable')
             #print member
             if not data_class_ctor_changed:
                 data_class_ctor = """    //! Internal data class used to implement implicitly shared class %s.\n    //! Provides thread-safe reference counting.
@@ -599,7 +626,7 @@ def process():
                         data_class_members += ", "
                     setter = makeSetter(member['name'], member['setter'])
                     data_class_members += "%s::%s()\n" % (shared_class_name, setter)
-            data_class_members += "        %s %s;\n" % (member['type'], member['name'])
+            data_class_members += "        %s%s %s;\n" % (('mutable ' if member['mutable'] else ''), member['type'], member['name'])
             if shared_class_options['with_from_to_map']:
                 toMap_impl += '    map[\"%s\"] = %s;\n' % (member['name'], generate_toString_conversion(member['name'], member['type']))
                 fromMap_impl += '    %s\n' % generate_fromString_conversion(member['name'], member['type'])
@@ -608,10 +635,36 @@ def process():
             after_member = True
         elif len(lst) > 0 and lst[0] == '};' and line[:2] == '};' and shared_class_inserted:
             insert_generated_code()
-            outfile.write('\nprivate:\n');
+#            outfile.write('\nprivate:\n');
+            outfile.write('\nprotected:\n');
             outfile.write('    QSharedDataPointer<Data> d;\n');
             outfile.write(line)
         else:
+            if False and other_comment(line):
+                prev_pos = infile.tell()
+                prev_line_number = line_number
+                ln = line[:-1].strip(' ')
+                result = ''
+                print "'" + ln + "'"
+                if ln.startswith('/**') or ln.startswith('/*!'):
+                    while True:
+                        result += line
+                        if not line or ln.endswith('*/'):
+                            result = result[:-1]
+                            break
+                        line = infile.readline()
+                        line_number += 1
+                        ln = line[:-1].strip(' ')
+                    print "!!"
+                    print result
+                    print "!!"
+                if result:
+                    member['docs'] = result
+                infile.seek(prev_pos)
+                line = infile.readline()
+                lst = line.split()
+                line_number = prev_line_number
+
             if not after_member or len(lst) > 0:
                 if shared_class_inserted:
                     insert_generated_code()

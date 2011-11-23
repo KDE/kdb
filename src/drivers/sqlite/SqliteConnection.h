@@ -22,7 +22,7 @@
 
 #include <QStringList>
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
 
 namespace Predicate
 {

@@ -1,12 +1,3 @@
-
-include_directories(
-  ${Predicate_SOURCE_DIR}
-  ${Predicate_SOURCE_DIR}/Predicate
-  ${Predicate_BINARY_DIR}
-  ${Predicate_BINARY_DIR}/Predicate
-  ${QT_INCLUDES}
-)
-
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
   -D__PREDICATE__=
@@ -65,7 +56,14 @@ set(predicate_LIB_SRCS
    ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp
    Field.cpp
    QuerySchemaParameter.cpp
-   Expression.cpp
+   expression/Expression.cpp
+   expression/NArgExpression.cpp
+   expression/UnaryExpression.cpp
+   expression/BinaryExpression.cpp
+   expression/ConstExpression.cpp
+   expression/QueryParameterExpression.cpp
+   expression/VariableExpression.cpp
+   expression/FunctionExpression.cpp
    FieldList.cpp
    TableSchema.cpp
    IndexSchema.cpp
@@ -95,16 +93,16 @@ set(predicate_LIB_SRCS
    parser/Parser.cpp
    parser/Parser_p.cpp
 
-   tools/Validator.cpp
-   tools/FieldValidator.cpp
-   tools/LongLongValidator.cpp
-   tools/DbObjectNameValidator.cpp
-   tools/Identifier.cpp
-   tools/Utils.cpp
-   tools/Static.cpp
-   tools/transliteration/transliteration_table.cpp
-#TODO tools/debuggui.cpp
-#TODO tools/SimpleCommandLineApp.cpp
+   Tools/Validator.cpp
+   Tools/FieldValidator.cpp
+   Tools/LongLongValidator.cpp
+   Tools/DbObjectNameValidator.cpp
+   Tools/Identifier.cpp
+   Tools/Utils.cpp
+   Tools/Static.cpp
+   Tools/transliteration/transliteration_table.cpp
+#TODO Tools/debuggui.cpp
+#TODO Tools/SimpleCommandLineApp.cpp
 )
 
 set(predicate_MOC_SRCS
@@ -136,61 +134,70 @@ install(TARGETS predicate ${INSTALL_TARGETS_DEFAULT_ARGS})
 ########### install files ###############
 
 install( FILES
-  Admin.h
-  Alter.h
-  Connection.h
-  Connection_p.h
-  ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData.h
-  Cursor.h
-  Cursor_p.h
-  DbProperties.h
-  Driver.h
-  Driver_p.h
-  DriverManager.h
-  DriverManager_p.h
-  ${CMAKE_CURRENT_BINARY_DIR}/Result.h
-  Error.h
-  EscapedString.h
-  Expression.h
-  Field.h
-  FieldList.h
-  IndexSchema.h
-  LookupFieldSchema.h
-  MessageHandler.h
-  ${CMAKE_CURRENT_BINARY_DIR}/Object.h
+  Admin.h includes/Predicate/Admin
+  Alter.h includes/Predicate/Alter
+  Connection.h includes/Predicate/Connection
+  ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData.h includes/Predicate/ConnectionData
+  Cursor.h includes/Predicate/Cursor
+  DbProperties.h includes/Predicate/DbProperties
+  Driver.h includes/Predicate/Driver
+  DriverManager.h includes/Predicate/DriverManager
+  ${CMAKE_CURRENT_BINARY_DIR}/Result.h includes/Predicate/Result
+  Error.h includes/Predicate/Error
+  EscapedString.h includes/Predicate/EscapedString
+  expression/Expression.h includes/Predicate/Expression
+  Field.h includes/Predicate/Field
+  FieldList.h includes/Predicate/FieldList
+  IndexSchema.h includes/Predicate/IndexSchema
+  LookupFieldSchema.h includes/Predicate/LookupFieldSchema
+  MessageHandler.h includes/Predicate/MessageHandler
+  ${CMAKE_CURRENT_BINARY_DIR}/Object.h includes/Predicate/Object
   predicate_export.h
   predicate_global.h
-  PreparedStatement.h
-  QuerySchema.h
-  QuerySchemaParameter.h
-  RecordData.h
-  Relationship.h
-  RecordEditBuffer.h
-  TableSchema.h
-  Transaction.h
-  Utils.h
-  ${CMAKE_CURRENT_BINARY_DIR}/Global.h
-  ${CMAKE_CURRENT_BINARY_DIR}/VersionInfo.h
-  parser/Parser.h
-  Interfaces/PreparedStatementInterface.h
+  PreparedStatement.h includes/Predicate/PreparedStatement
+  QuerySchema.h includes/Predicate/QuerySchema
+  QuerySchemaParameter.h includes/Predicate/QuerySchemaParameter
+  RecordData.h includes/Predicate/RecordData
+  Relationship.h includes/Predicate/Relationship
+  RecordEditBuffer.h includes/Predicate/RecordEditBuffer
+  TableSchema.h includes/Predicate/TableSchema
+  Transaction.h includes/Predicate/Transaction
+  Utils.h includes/Predicate/Utils
+  ${CMAKE_CURRENT_BINARY_DIR}/Global.h  includes/Predicate/Global
+  ${CMAKE_CURRENT_BINARY_DIR}/VersionInfo.h includes/Predicate/VersionInfo
+  parser/Parser.h includes/Predicate/Parser
   DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
 )
 
+# Predicate/Private includes
 install( FILES
-  tools/Validator.h
-  tools/Utils.h
-  tools/Tristate.h
-  tools/Static.h
-#todo  tools/SimpleCommandLineApp.h
-  tools/SharedPtr.h
-  tools/LongLongValidator.h
-  tools/Identifier.h
-  tools/FieldValidator.h
-  tools/DbObjectNameValidator.h
-
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/tools COMPONENT Devel
+  Connection_p.h includes/Predicate/Private/Connection
+  Driver_p.h includes/Predicate/Private/Driver
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Private COMPONENT Devel
 )
 
+# Predicate/Interfaces includes
+install( FILES
+  Interfaces/PreparedStatementInterface.h includes/Predicate/Interfaces/PreparedStatementInterface
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Interfaces COMPONENT Devel
+)
+
+install( FILES
+  Tools/Validator.h includes/Predicate/Tools/Validator
+  Tools/Utils.h includes/Predicate/Tools/Utils
+  Tools/Tristate.h includes/Predicate/Tools/Tristate
+  Tools/Static.h includes/Predicate/Tools/Static
+#todo  Tools/SimpleCommandLineApp.h includes/Predicate/Tools/SimpleCommandLineApp
+#  Tools/SharedPtr.h
+  Tools/LongLongValidator.h
+  Tools/Identifier.h
+  Tools/FieldValidator.h
+  Tools/DbObjectNameValidator.h
+
+  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Tools COMPONENT Devel
+)
+
+enable_testing()
 add_subdirectory( tests )
 
 #TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})

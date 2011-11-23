@@ -52,14 +52,21 @@ Field::Field(TableSchema *tableSchema)
     setConstraints(NoConstraints);
 }
 
-Field::Field(QuerySchema *querySchema, Expression* expr)
+Field::Field(QuerySchema *querySchema, const Expression& expr)
 {
     init();
     m_parent = querySchema;
     m_order = querySchema->fieldCount();
     setConstraints(NoConstraints);
-    if (expr)
-        setExpression(expr);
+    setExpression(expr);
+}
+
+Field::Field(QuerySchema *querySchema)
+{
+    init();
+    m_parent = querySchema;
+    m_order = querySchema->fieldCount();
+    setConstraints(NoConstraints);
 }
 
 Field::Field(const QString& name, Type ctype,
@@ -77,7 +84,6 @@ Field::Field(const QString& name, Type ctype,
         , m_caption(caption)
         , m_desc(description)
         , m_width(width)
-        , m_expr(0)
         , m_customProperties(0)
         , m_type(ctype)
 {
@@ -86,6 +92,7 @@ Field::Field(const QString& name, Type ctype,
         if (m_type == Field::Text)
             m_length = defaultTextLength();
     }
+    m_expr = new Expression();
 }
 
 /*! Copy constructor. */
@@ -95,18 +102,19 @@ Field::Field(const Field& f)
     if (f.m_customProperties)
         m_customProperties = new CustomPropertiesMap(f.customProperties());
 
-    if (f.m_expr) {//deep copy the expression
+    if (!f.m_expr->isNull()) {//deep copy the expression
 //! @todo  m_expr = new Expression(*f.m_expr);
-
+            m_expr = new Expression(f.m_expr->clone());
 //  m_expr->m_field = this;
-    } else
-        m_expr = 0;
+    }
+    else
+        m_expr = new Expression();
 }
 
 Field::~Field()
 {
-    delete m_expr;
     delete m_customProperties;
+    delete m_expr;
 }
 
 Field* Field::copy() const
@@ -126,13 +134,13 @@ void Field::init()
     m_defaultValue = QVariant(QString());
     m_order = -1;
     m_width = 0;
-    m_expr = 0;
     m_customProperties = 0;
+    m_expr = new Expression();
 }
 
 Field::Type Field::type() const
 {
-    if (m_expr)
+    if (!m_expr->isNull())
         return m_expr->type();
     return m_type;
 }
@@ -176,6 +184,7 @@ QString Field::typeName(uint type)
 
 QStringList Field::typeNames()
 {
+    m_typeNames.init();
     return m_typeNames.names;
 }
 
@@ -193,6 +202,7 @@ QString Field::typeGroupName(uint typeGroup)
 
 QStringList Field::typeGroupNames()
 {
+    m_typeGroupNames.init();
     return m_typeGroupNames.names;
 }
 
@@ -331,8 +341,9 @@ Field::setName(const QString& n)
 void
 Field::setType(Type t)
 {
-    if (m_expr) {
-        PreWarn << "could not set type" << Field::typeName(t) << "because the Field.has expression assigned!";
+    if (!m_expr->isNull()) {
+        PreWarn << "could not set type" << Field::typeName(t)
+                << "because the Field has expression assigned!";
         return;
     }
     m_type = t;
@@ -595,7 +606,7 @@ void Field::setIndexed(bool s)
 
 QDebug operator<<(QDebug dbg, const Field& field)
 {
-    Predicate::Connection *conn = field.table() ? field.table()->connection() : 0;
+    Connection *conn = field.table() ? field.table()->connection() : 0;
     dbg.nospace() << (field.name().isEmpty() ? "<NONAME> " : field.name());
     if (field.options() & Field::Unsigned)
         dbg.space() << "UNSIGNED";
@@ -626,9 +637,9 @@ QDebug operator<<(QDebug dbg, const Field& field)
         dbg.space() << QString::fromLatin1("DEFAULT=[%1]").arg(field.defaultValue().typeName());
         dbg.nospace() << Predicate::variantToString(field.defaultValue());
     }
-    if (field.expression()) {
+    if (field.isExpression()) {
         dbg.space() << "EXPRESSION=";
-        dbg.nospace() << *field.expression();
+        dbg.nospace() << field.expression();
     }
     const Field::CustomPropertiesMap customProperties(field.customProperties());
     if (!customProperties.isEmpty()) {
@@ -648,15 +659,26 @@ QDebug operator<<(QDebug dbg, const Field& field)
     return dbg.space();
 }
 
-void Field::setExpression(Predicate::Expression *expr)
+bool Field::isExpression() const
+{
+    return !m_expr->isNull();
+}
+
+Expression Field::expression()
+{
+    return *m_expr;
+}
+
+const Expression Field::expression() const {
+    return *m_expr;
+}
+
+void Field::setExpression(const Expression& expr)
 {
     assert(!m_parent || dynamic_cast<QuerySchema*>(m_parent));
-    if (m_expr == expr)
+    if (*m_expr == expr)
         return;
-    if (m_expr) {
-        delete m_expr;
-    }
-    m_expr = expr;
+    *m_expr = expr;
 }
 
 QVariant Field::customProperty(const QByteArray& propertyName,

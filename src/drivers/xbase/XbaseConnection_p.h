@@ -22,7 +22,7 @@
 
 #include <QPointer>
 
-#include <Predicate/Connection_p.h>
+#include <Predicate/Private/Connection>
 
 namespace Predicate {
 

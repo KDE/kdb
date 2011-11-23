@@ -1,10 +1,21 @@
 Predicate CHANGELOG
 
-2010-12-30
+TODO: add explanation of expressions equality with examples, similar to
+      bool QDomNode::operator== ( const QDomNode & n ) const
+
+2011-02-04
+Predicate
+*Fix Solaris build in the parser
+**BUG:265349
+
+2010-12-30..2011-01-31
 Predicate
 *(*Expr) classes renamed to *Expression
 *expression classes put into enum
 *Expression attributes made private, improved related includes (QuerySchemaParameter)
+*convenience includes added, now it's possible to use #include <Predicate/Connection>
+*Unit test for Expression class added
+TODO: add tests for the other Expression* classes
 
 2010-12-17
 Predicate

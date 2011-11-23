@@ -18,7 +18,7 @@
 */
 
 #include "SqlitePreparedStatement.h"
-#include <Predicate/PreparedStatement.h>
+#include <Predicate/PreparedStatement>
 
 #include <QtDebug>
 

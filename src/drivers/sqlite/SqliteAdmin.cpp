@@ -22,8 +22,8 @@
 #include "SqliteAdmin.h"
 #include "SqliteVacuum.h"
 
-#include <Predicate/DriverManager.h>
-#include <Predicate/Driver_p.h>
+#include <Predicate/DriverManager>
+#include <Predicate/Private/Driver>
 
 SQLiteAdminTools::SQLiteAdminTools()
         : Predicate::AdminTools()

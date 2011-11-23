@@ -21,7 +21,7 @@
 #ifndef PREDICATE_DRIVER_POSTGRESQL_H
 #define PREDICATE_DRIVER_POSTGRESQL_H
 
-#include <Predicate/Driver.h>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

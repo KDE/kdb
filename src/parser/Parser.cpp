@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <Connection.h>
-#include <TableSchema.h>
+#include <Predicate/Connection>
+#include <Predicate/TableSchema>
 #include "Parser.h"
 #include "Parser_p.h"
 #include "SqlParser.h"

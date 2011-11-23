@@ -229,27 +229,27 @@ bool parseData(Parser *p, const char *data)
 /* Adds @a column to @a querySchema. @a column can be in a form of
  table.field, tableAlias.field or field
 */
-bool addColumn(ParseInfo& parseInfo, Expression* columnExpr)
+bool addColumn(ParseInfo& parseInfo, Expression& columnExpr)
 {
-    if (!columnExpr->validate(parseInfo)) {
+    if (!columnExpr.validate(parseInfo)) {
         setError(parseInfo.errMsg, parseInfo.errDescr);
         return false;
     }
 
-    VariableExpression *v_e = columnExpr->toVariable();
-    if (columnExpr->expressionClass() == VariableExpressionClass && v_e) {
+    VariableExpression v_e(columnExpr.toVariable());
+    if (columnExpr.expressionClass() == VariableExpressionClass && !v_e.isNull()) {
         //it's a variable:
-        if (v_e->name == "*") {//all tables asterisk
+        if (v_e.name() == "*") {//all tables asterisk
             if (parseInfo.querySchema->tables()->isEmpty()) {
                 setError(QObject::tr("\"*\" could not be used if no tables are specified"));
                 return false;
             }
             parseInfo.querySchema->addAsterisk(new QueryAsterisk(parseInfo.querySchema));
-        } else if (v_e->tableForQueryAsterisk) {//one-table asterisk
+        } else if (v_e.tableForQueryAsterisk()) {//one-table asterisk
             parseInfo.querySchema->addAsterisk(
-                new QueryAsterisk(parseInfo.querySchema, v_e->tableForQueryAsterisk));
-        } else if (v_e->field) {//"table.field" or "field" (bound to a table or not)
-            parseInfo.querySchema->addField(v_e->field, v_e->tablePositionForField);
+                new QueryAsterisk(parseInfo.querySchema, v_e.tableForQueryAsterisk()));
+        } else if (v_e.field()) {//"table.field" or "field" (bound to a table or not)
+            parseInfo.querySchema->addField(v_e.field(), v_e.tablePositionForField());
         } else {
             IMPL_ERROR("addColumn(): unknown case!");
             return false;
@@ -391,15 +391,23 @@ bool addColumn(ParseInfo& parseInfo, Expression* columnExpr)
 
 //! clean up no longer needed temporary objects
 #define CLEANUP \
-    delete colViews; \
-    delete tablesList; \
+    /*delete colViews;*/ \
+    /*delete tablesList;*/ \
     delete options
 
 QuerySchema* buildSelectQuery(
-    QuerySchema* querySchema, NArgExpression* colViews, NArgExpression* tablesList,
-    SelectOptionsInternal* options)
+    QuerySchema* querySchema, NArgExpression* _colViews,
+    NArgExpression* _tablesList, SelectOptionsInternal* options)
 {
     ParseInfo parseInfo(querySchema);
+
+    // remove from heap (using heap was requered because parser uses union)
+    Predicate::NArgExpression colViews(*_colViews);
+    delete _colViews;
+
+    // remove from heap (using heap was requered because parser uses union)
+    Predicate::NArgExpression tablesList(*_tablesList);
+    delete _tablesList;
 
     //-------tables list
 // assert( tablesList ); //&& tablesList->exprClass() == TableListExpressionClass );
@@ -410,24 +418,24 @@ QuerySchema* buildSelectQuery(
     //used to collect information about first repeated table name or alias:
 // QDict<char> tableNamesAndTableAliases(997, false);
 // QString repeatedTableNameOrTableAlias;
-    if (tablesList) {
-        for (int i = 0; i < tablesList->args(); i++, columnNum++) {
-            Expression *e = tablesList->arg(i);
-            VariableExpression* t_e = 0;
+    if (!tablesList.isEmpty()) {
+        for (int i = 0; i < tablesList.argCount(); i++, columnNum++) {
+            Expression e(tablesList.arg(i));
+            VariableExpression t_e;
             QString aliasString;
-            if (e->expressionClass() == SpecialBinaryExpressionClass) {
-                BinaryExpression* t_with_alias = e->toBinary();
-                assert(t_with_alias);
-                assert(t_with_alias->left()->expressionClass() == VariableExpressionClass);
-                assert(t_with_alias->right()->expressionClass() == VariableExpressionClass
-                       && (t_with_alias->token() == AS || t_with_alias->token() == 0));
-                t_e = t_with_alias->left()->toVariable();
-                aliasString = t_with_alias->right()->toVariable()->name.toLatin1();
+            if (e.expressionClass() == SpecialBinaryExpressionClass) {
+                BinaryExpression t_with_alias = e.toBinary();
+                assert(e.isBinary());
+                assert(t_with_alias.left().expressionClass() == VariableExpressionClass);
+                assert(t_with_alias.right().expressionClass() == VariableExpressionClass
+                       && (t_with_alias.token() == AS || t_with_alias.token() == 0));
+                t_e = t_with_alias.left().toVariable();
+                aliasString = t_with_alias.right().toVariable().name().toLatin1();
             } else {
-                t_e = e->toVariable();
+                t_e = e.toVariable();
             }
-            assert(t_e);
-            QString tname = t_e->name.toLatin1();
+            assert(t_e.isVariable());
+            QString tname = t_e.name().toLatin1();
             TableSchema *s = parser->db()->tableSchema(tname);
             if (!s) {
                 setError(//QObject::tr("Field List Error"),
@@ -477,27 +485,27 @@ QuerySchema* buildSelectQuery(
         querySchema->setMasterTable(querySchema->tables()->first());
 
     //-------add fields
-    if (colViews) {
+    if (!colViews.isEmpty()) {
         columnNum = 0;
-        for (QMutableListIterator<Expression*> it(colViews->list); it.hasNext(); columnNum++) {
-            Expression *e = it.next();
+        for (int i = 0; i < colViews.argCount(); i++, columnNum++) {
+            Expression e(colViews.arg(i));
 //Qt4   bool moveNext = true; //used to avoid ++it when an item is taken from the list
-            Expression *columnExpr = e;
-            VariableExpression* aliasVariable = 0;
-            if (e->expressionClass() == SpecialBinaryExpressionClass && e->toBinary()
-                    && (e->token() == AS || e->token() == 0)) {
+            Expression columnExpr(e);
+            VariableExpression aliasVariable;
+            if (e.expressionClass() == SpecialBinaryExpressionClass && e.isBinary()
+                    && (e.token() == AS || e.token() == 0)) {
                 //SpecialBinaryExpressionClass: with alias
-                columnExpr = e->toBinary()->left();
+                columnExpr = e.toBinary().left();
                 //   isFieldWithAlias = true;
-                aliasVariable = e->toBinary()->right()->toVariable();
-                if (!aliasVariable) {
+                aliasVariable = e.toBinary().right().toVariable();
+                if (aliasVariable.isNull()) {
                     setError(QObject::tr("Invalid alias definition for column \"%1\"")
-                                  .arg(columnExpr->toString().toString())); //ok?
+                                  .arg(columnExpr.toString().toString())); //ok?
                     break;
                 }
             }
 
-            const int c = columnExpr->expressionClass();
+            const int c = columnExpr.expressionClass();
             const bool isExpressionField =
                 c == ConstExpressionClass
                 || c == UnaryExpressionClass
@@ -513,24 +521,26 @@ QuerySchema* buildSelectQuery(
             } else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
 //  PreDbg << colViews->list.count() << " " << it.current()->debugString();
-                it.remove();
+#warning ok?  //predicate: it.remove();
 //Qt4    moveNext = false;
-            } else if (aliasVariable) {
-                //take first (left) argument of the special binary expr, will be owned, do not destroy
-                e->toBinary()->setLeft(0);
-            } else {
-                setError(QObject::tr("Invalid \"%1\" column definition").arg(e->toString().toString())); //ok?
+            } else if (aliasVariable.isNull()) {
+                setError(QObject::tr("Invalid \"%1\" column definition")
+                         .arg(e.toString().toString())); //ok?
                 break;
+            }
+            else {
+                //take first (left) argument of the special binary expr, will be owned, do not destroy
+                e.toBinary().setLeft(Expression());
             }
 
             if (!addColumn(parseInfo, columnExpr)) {
                 break;
             }
 
-            if (aliasVariable) {
+            if (!aliasVariable.isNull()) {
 //    PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
 //     << columnNum;
-                querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
+                querySchema->setColumnAlias(columnNum, aliasVariable.name().toLatin1());
             }
             /*  if (e->exprClass() == SpecialBinaryExpressionClass && dynamic_cast<BinaryExpression*>(e)
                   && (e->type()==AS || e->type()==0))
@@ -560,8 +570,8 @@ QuerySchema* buildSelectQuery(
     //----- SELECT options
     if (options) {
         //----- WHERE expr.
-        if (options->whereExpr) {
-            if (!options->whereExpr->validate(parseInfo)) {
+        if (!options->whereExpr.isNull()) {
+            if (!options->whereExpr.validate(parseInfo)) {
                 setError(parseInfo.errMsg, parseInfo.errDescr);
                 CLEANUP;
                 return false;

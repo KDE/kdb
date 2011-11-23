@@ -21,7 +21,7 @@
 #define PREDICATE_QUERYSCHEMAPARAMETER_H
 
 #include <QtDebug>
-#include <Predicate/Field.h>
+#include <Predicate/Field>
 
 namespace Predicate
 {

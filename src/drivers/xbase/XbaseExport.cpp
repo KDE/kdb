@@ -24,10 +24,10 @@
 
 #include <QtDebug>
 
-#include <Predicate/Field.h>
-#include <Predicate/RecordData.h>
-#include <Predicate/Cursor.h>
-#include <Predicate/DriverManager.h>
+#include <Predicate/Field>
+#include <Predicate/RecordData>
+#include <Predicate/Cursor>
+#include <Predicate/DriverManager>
 #include <core/kexi.h>
 #include <migration/keximigratedata.h>
 

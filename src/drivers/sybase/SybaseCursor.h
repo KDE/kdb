@@ -20,8 +20,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef _SYBASECURSOR_H_
 #define _SYBASECURSOR_H_
 
-#include <Predicate/Cursor.h>
-#include <Predicate/Connection.h>
+#include <Predicate/Cursor>
+#include <Predicate/Connection>
 
 namespace Predicate
 {

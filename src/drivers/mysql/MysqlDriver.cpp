@@ -21,9 +21,9 @@
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include <Predicate/Field.h>
-#include <Predicate/Driver_p.h>
-#include <Predicate/Utils.h>
+#include <Predicate/Field>
+#include <Predicate/Private/Driver>
+#include <Predicate/Utils>
 
 #include <QVariant>
 #include <QFile>

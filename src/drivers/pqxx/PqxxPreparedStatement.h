@@ -24,8 +24,8 @@
 //
 #ifndef PQXXPREPAREDSTATEMENT_H
 #define PQXXPREPAREDSTATEMENT_H
-#include <Predicate/PreparedStatement.h>
-#include <Predicate/Connection_p.h>
+#include <Predicate/PreparedStatement>
+#include <Predicate/Private/Connection>
 
 /**
   @author Adam Pigg <adam@piggz.co.uk>

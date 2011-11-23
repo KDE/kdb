@@ -20,9 +20,9 @@
 #ifndef XBASECONNECTION_H
 #define XBASECONNECTION_H
 
-#include <qstringlist.h>
+#include <QStringList>
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
 #include "XbaseCursor.h"
 
 namespace Predicate {

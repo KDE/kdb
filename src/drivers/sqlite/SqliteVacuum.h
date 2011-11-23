@@ -23,7 +23,7 @@
 #include <qobject.h>
 #include <qstring.h>
 
-#include <Predicate/tools/Tristate.h>
+#include <Predicate/Tools/Tristate>
 
 class Q3Process;
 class QProgressDialog;

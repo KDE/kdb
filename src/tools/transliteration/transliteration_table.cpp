@@ -3,7 +3,7 @@
    by ./generate_transliteration_table.sh script. */
 
 
-#include "tools/transliteration/transliteration_table.h"
+#include "Tools/transliteration/transliteration_table.h"
 const char *const transliteration_table[TRANSLITERATION_TABLE_SIZE + 1] = {
 
 

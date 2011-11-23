@@ -25,8 +25,8 @@
 #include <QString>
 #include <QtDebug>
 
-#include <Predicate/Field.h>
-#include <Predicate/Driver.h>
+#include <Predicate/Field>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

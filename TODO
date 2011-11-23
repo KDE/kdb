@@ -5,6 +5,7 @@ Legend: [ ] TODO [x] done [p] in progress
 General hints:
 *Use explicit ctors where possible
 *check other==this in operator=() overloads
+*look at http://ebn.kde.org/krazy/reports/playground/libs/predicate-git/index.html
 
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
@@ -139,6 +140,7 @@ TODO: change KexiDBExpr_Unknown to UnknownType, and ints to enums, etc.
 *  IndexSchema.h
 *  IndexSchema.cpp
 *  keywords.cpp
+TODO: enable generation of this file as custom target using kexi/tools/sql_keywords/sql_keywords.sh and kexi/kexidb/parser/sqlscanner.l and koffice/kexi/tools/sql_keywords/kexi_reserved
   LookupFieldSchema.h
   LookupFieldSchema.cpp
   MessageHandler.h

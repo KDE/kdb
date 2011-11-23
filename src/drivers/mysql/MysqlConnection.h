@@ -22,9 +22,9 @@
 #ifndef MYSQLCONNECTION_H
 #define MYSQLCONNECTION_H
 
-#include <qstringlist.h>
+#include <QStringList>
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
 #include "MysqlCursor.h"
 
 namespace Predicate

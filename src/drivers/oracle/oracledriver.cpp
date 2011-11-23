@@ -20,7 +20,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "oracledriver.h"
 #include "oracleconnection.h"
-#include <Predicate/Driver_p.h>
+#include <Predicate/Private/Driver>
 //#include <occiCommon.h>
 #include <QtDebug>
 

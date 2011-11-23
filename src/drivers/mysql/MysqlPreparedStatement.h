@@ -20,7 +20,7 @@
 #ifndef MYSQLPREPAREDSTATEMENT_H
 #define MYSQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface.h>
+#include <Predicate/Interfaces/PreparedStatementInterface>
 #include "MysqlConnection_p.h"
 
 //! @todo 1.1 - unfinished: #define PREDICATE_USE_MYSQL_STMT; for 1.0 we're using unoptimized version

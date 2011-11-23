@@ -20,7 +20,7 @@
 #ifndef PREDICATE_DBPROPERTIES_H
 #define PREDICATE_DBPROPERTIES_H
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
 
 namespace Predicate
 {

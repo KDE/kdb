@@ -23,16 +23,16 @@
 #include <QtDebug>
 #include <QTextStream>
 
-#include <Predicate/DriverManager.h>
-#include <Predicate/Driver.h>
-#include <Predicate/Connection.h>
-#include <Predicate/Cursor.h>
-#include <Predicate/Field.h>
-#include <Predicate/TableSchema.h>
-#include <Predicate/QuerySchema.h>
-#include <Predicate/IndexSchema.h>
-#include <Predicate/parser/Parser.h>
-#include <Predicate/Utils.h>
+#include <Predicate/DriverManager>
+#include <Predicate/Driver>
+#include <Predicate/Connection>
+#include <Predicate/Cursor>
+#include <Predicate/Field>
+#include <Predicate/TableSchema>
+#include <Predicate/QuerySchema>
+#include <Predicate/IndexSchema>
+#include <Predicate/Parser>
+#include <Predicate/Utils>
 
 #include <iostream>
 

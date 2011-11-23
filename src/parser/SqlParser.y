@@ -468,14 +468,30 @@
 #include <QList>
 #include <QVariant>
 
-#include <Predicate/Connection.h>
-#include <Predicate/QuerySchema.h>
-#include <Predicate/Field.h>
-#include <Predicate/TableSchema.h>
+#include <Predicate/Connection>
+#include <Predicate/QuerySchema>
+#include <Predicate/Field>
+#include <Predicate/TableSchema>
 
 #include "Parser.h"
 #include "Parser_p.h"
 #include "SqlTypes.h"
+#ifdef Q_OS_SOLARIS
+#include <alloca.h>
+#endif
+
+inline static Predicate::Expression fromPtr(Predicate::Expression* e)
+{
+    Predicate::Expression exp(*e);
+    delete e;
+    return exp;
+}
+
+QDebug operator<<(QDebug dbg, const ExpressionPtr& expr)
+{
+    dbg.nospace() << expr.e;
+    return dbg.space();
+}
 
 int yylex();
 
@@ -512,9 +528,9 @@ using namespace Predicate;
 	struct realType realValue;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
-	Predicate::Expression *expr;
+        Predicate::Expression *expr;
         Predicate::NArgExpression *exprList;
-        Predicate::ConstExpression *ConstExpression;
+        Predicate::ConstExpression *constExpression;
 	Predicate::QuerySchema *querySchema;
 	SelectOptionsInternal *selectOptions;
 	OrderByColumnInternal::List *orderByColumns;
@@ -705,30 +721,30 @@ Select ColViews
 {
 	PreDbg << "Select ColViews=" << *$2;
 
-	if (!($$ = buildSelectQuery( $1, $2 )))
+        if (!($$ = buildSelectQuery( $1, $2 )))
 		return 0;
 }
 | Select ColViews Tables
 {
-	if (!($$ = buildSelectQuery( $1, $2, $3 )))
+        if (!($$ = buildSelectQuery( $1, $2, $3 )))
 		return 0;
 }
 | Select Tables
 {
 	PreDbg << "Select ColViews Tables";
-	if (!($$ = buildSelectQuery( $1, 0, $2 )))
+        if (!($$ = buildSelectQuery( $1, 0, $2 )))
 		return 0;
 }
 | Select ColViews SelectOptions
 {
 	PreDbg << "Select ColViews Conditions";
-	if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
+        if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
 		return 0;
 }
 | Select ColViews Tables SelectOptions
 {
 	PreDbg << "Select ColViews Tables SelectOptions";
-	if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
+        if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
 		return 0;
 }
 ;
@@ -748,27 +764,31 @@ WhereClause
 {
 	PreDbg << "WhereClause";
 	$$ = new SelectOptionsInternal;
-	$$->whereExpr = $1;
+        $$->whereExpr = *$1;
+        delete $1;
 }
 | ORDER BY OrderByClause
 {
 	PreDbg << "OrderByClause";
 	$$ = new SelectOptionsInternal;
 	$$->orderByColumns = $3;
+        delete $3;
 }
 | WhereClause ORDER BY OrderByClause
 {
 	PreDbg << "WhereClause ORDER BY OrderByClause";
 	$$ = new SelectOptionsInternal;
-	$$->whereExpr = $1;
+        $$->whereExpr = *$1;
+        delete $1;
 	$$->orderByColumns = $4;
 } 
 | ORDER BY OrderByClause WhereClause
 {
 	PreDbg << "OrderByClause WhereClause";
 	$$ = new SelectOptionsInternal;
-	$$->whereExpr = $4;
-	$$->orderByColumns = $3;
+        $$->whereExpr = *$4;
+        delete $4;
+        $$->orderByColumns = $3;
 }
 ;
 
@@ -860,15 +880,21 @@ aExpr2:
 aExpr3 AND aExpr2
 {
 //	PreDbg << "AND " << $3.debugString();
-        $$ = new BinaryExpression( LogicalExpressionClass, $1, AND, $3 );
+        $$ = new BinaryExpression(LogicalExpressionClass, *$1, AND, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr3 OR aExpr2
 {
-        $$ = new BinaryExpression( LogicalExpressionClass, $1, OR, $3 );
+        $$ = new BinaryExpression( LogicalExpressionClass, *$1, OR, *$3 );
+        delete $1;
+        delete $3;
 }
 | aExpr3 XOR aExpr2
 {
-        $$ = new BinaryExpression( ArithmeticExpressionClass, $1, XOR, $3 );
+        $$ = new BinaryExpression( ArithmeticExpressionClass, *$1, XOR, *$3 );
+        delete $1;
+        delete $3;
 }
 |
 aExpr3
@@ -878,23 +904,33 @@ aExpr3
 aExpr3:
 aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, '>', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '>', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, GREATER_OR_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, GREATER_OR_EQUAL, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr4 '<' %prec LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, '<', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '<', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, LESS_OR_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, LESS_OR_EQUAL, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr4 '=' aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, '=', $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '=', *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr4
@@ -904,28 +940,40 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_EQUAL, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_EQUAL, *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr5 NOT_EQUAL2 aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_EQUAL2, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_EQUAL2, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr5 LIKE aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, LIKE, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, LIKE, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr5 SQL_IN aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, SQL_IN, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, SQL_IN, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, SIMILAR_TO, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, SIMILAR_TO, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, $1, NOT_SIMILAR_TO, $3);
+        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_SIMILAR_TO, *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr5
@@ -935,11 +983,13 @@ aExpr5
 aExpr5:
 aExpr5 SQL_IS_NULL
 {
-        $$ = new UnaryExpression( SQL_IS_NULL, $1 );
+        $$ = new UnaryExpression( SQL_IS_NULL, *$1 );
+        delete $1;
 }
 | aExpr5 SQL_IS_NOT_NULL
 {
-        $$ = new UnaryExpression( SQL_IS_NOT_NULL, $1 );
+        $$ = new UnaryExpression( SQL_IS_NOT_NULL, *$1 );
+        delete $1;
 }
 |
 aExpr6
@@ -949,11 +999,15 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, BITWISE_SHIFT_LEFT, $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, BITWISE_SHIFT_LEFT, *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, BITWISE_SHIFT_RIGHT, $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, BITWISE_SHIFT_RIGHT, *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr7
@@ -963,20 +1017,27 @@ aExpr7
 aExpr7:
 aExpr8 '+' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '+', $3);
-	PreDbg << *$$;
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '+', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '-', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '-', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr8 '&' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '&', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '&', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr8 '|' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '|', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '|', *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr8
@@ -986,15 +1047,21 @@ aExpr8
 aExpr8:
 aExpr9 '/' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '/', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '/', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr9 '*' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '*', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '*', *$3);
+        delete $1;
+        delete $3;
 }
 | aExpr9 '%' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, $1, '%', $3);
+        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '%', *$3);
+        delete $1;
+        delete $3;
 }
 |
 aExpr9
@@ -1005,19 +1072,23 @@ aExpr9:
 /* --- unary logical left --- */
 '-' aExpr9
 {
-        $$ = new UnaryExpression( '-', $2 );
+        $$ = new UnaryExpression( '-', *$2 );
+        delete $2;
 }
 | '+' aExpr9
 {
-        $$ = new UnaryExpression( '+', $2 );
+        $$ = new UnaryExpression( '+', *$2 );
+        delete $2;
 }
 | '~' aExpr9
 {
-        $$ = new UnaryExpression( '~', $2 );
+        $$ = new UnaryExpression( '~', *$2 );
+        delete $2;
 }
 | NOT aExpr9
 {
-        $$ = new UnaryExpression( NOT, $2 );
+        $$ = new UnaryExpression( NOT, *$2 );
+        delete $2;
 }
 | IDENTIFIER
 {
@@ -1036,8 +1107,9 @@ aExpr9:
 | IDENTIFIER aExprList
 {
 	PreDbg << "  + function:" << *$1 << "(" << *$2 << ")";
-        $$ = new FunctionExpression(*$1, $2);
+        $$ = new FunctionExpression(*$1, *$2);
 	delete $1;
+        delete $2;
 }
 /*TODO: shall we also support db name? */
 | IDENTIFIER '.' IDENTIFIER
@@ -1091,7 +1163,8 @@ aExpr10:
 '(' aExpr ')'
 {
 	PreDbg << "(expr)";
-        $$ = new UnaryExpression('(', $2);
+        $$ = new UnaryExpression('(', *$2);
+        delete $2;
 }
 ;
 
@@ -1109,13 +1182,16 @@ aExprList2:
 aExpr ',' aExprList2
 {
 	$$ = $3;
-	$$->prepend( $1 );
+        $$->prepend( *$1 );
+        delete $1;
 }
 | aExpr ',' aExpr
 {
         $$ = new NArgExpression(UnknownExpressionClass, 0);
-	$$->add( $1 );
-	$$->add( $3 );
+        $$->append( *$1 );
+        $$->append( *$3 );
+        delete $1;
+        delete $3;
 }
 ;
 
@@ -1168,12 +1244,13 @@ FlatTableList:
 FlatTableList ',' FlatTable
 {
 	$$ = $1;
-	$$->add($3);
+        $$->append(*$3);
 }
 |FlatTable
 {
         $$ = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
-	$$->add($1);
+        $$->append(*$1);
+        delete $1;
 }
 ;
 
@@ -1211,8 +1288,8 @@ IDENTIFIER
 	//table + alias
         $$ = new BinaryExpression(
                 SpecialBinaryExpressionClass,
-                new VariableExpression(*$1), 0,
-                new VariableExpression(*$2)
+                VariableExpression(*$1), 0,
+                VariableExpression(*$2)
 	);
 	delete $1;
 	delete $2;
@@ -1222,8 +1299,8 @@ IDENTIFIER
 	//table + alias
         $$ = new BinaryExpression(
                 SpecialBinaryExpressionClass,
-                new VariableExpression(*$1), AS,
-                new VariableExpression(*$3)
+                VariableExpression(*$1), AS,
+                VariableExpression(*$3)
 	);
 	delete $1;
 	delete $3;
@@ -1236,13 +1313,15 @@ ColViews:
 ColViews ',' ColItem
 {
 	$$ = $1;
-	$$->add( $3 );
+        $$->append(*$3);
+        delete $3;
 	PreDbg << "ColViews: ColViews , ColItem";
 }
 |ColItem
 {
         $$ = new NArgExpression(UnknownExpressionClass, 0);
-	$$->add( $1 );
+        $$->append(*$1);
+        delete $1;
 	PreDbg << "ColViews: ColItem";
 }
 ;
@@ -1265,19 +1344,21 @@ ColExpression
 | ColExpression AS IDENTIFIER
 {
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass, $1, AS,
-                new VariableExpression(*$3)
+                SpecialBinaryExpressionClass, *$1, AS,
+                VariableExpression(*$3)
 	);
 	PreDbg << " added column expr:" << *$$;
+        delete $1;
 	delete $3;
 }
 | ColExpression IDENTIFIER
 {
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass, $1, 0,
-                new VariableExpression(*$2)
+                SpecialBinaryExpressionClass, *$1, 0,
+                VariableExpression(*$2)
 	);
 	PreDbg << " added column expr:" << *$$;
+        delete $1;
 	delete $2;
 }
 ;
@@ -1330,7 +1411,7 @@ aExpr
 | DISTINCT '(' ColExpression ')' 
 {
 	$$ = $3;
-//TODO
+//! @todo DISTINCT '(' ColExpression ')'
 //	$$->setName("DISTINCT(" + $3->name() + ")");
 }
 ;

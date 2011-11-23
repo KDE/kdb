@@ -24,8 +24,8 @@
 #include <QStringList>
 #include <QSharedData>
 
-#include <Predicate/FieldList.h>
-#include <Predicate/Result.h>
+#include <Predicate/FieldList>
+#include <Predicate/Result>
 
 namespace Predicate
 {

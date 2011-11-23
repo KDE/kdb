@@ -22,7 +22,7 @@
 #include "DriverManager.h"
 #include "LookupFieldSchema.h"
 #include "predicate_global.h"
-#include "tools/Static.h"
+#include "Tools/Static.h"
 
 #include <QMap>
 #include <QHash>

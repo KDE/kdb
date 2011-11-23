@@ -20,8 +20,8 @@
 // ** bits of SQLiteConnection related to table altering **
 
 #include "SqliteConnection.h"
-#include <Predicate/Utils.h>
-#include <Predicate/tools/Static.h>
+#include <Predicate/Utils>
+#include <Predicate/Tools/Static>
 #include <QHash>
 
 using namespace Predicate;

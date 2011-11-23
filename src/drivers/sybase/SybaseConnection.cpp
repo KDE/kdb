@@ -29,7 +29,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "SybaseConnection_p.h"
 #include "SybaseCursor.h"
 #include "SybasePreparedStatement.h"
-#include <Predicate/Error.h>
+#include <Predicate/Error>
 
 
 using namespace Predicate;

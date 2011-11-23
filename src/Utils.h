@@ -26,7 +26,7 @@
 #include <QByteArray>
 #include <QtDebug>
 
-#include <Predicate/QuerySchema.h>
+#include <Predicate/QuerySchema>
 
 class QDomNode;
 class QDomElement;

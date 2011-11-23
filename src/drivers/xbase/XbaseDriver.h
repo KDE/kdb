@@ -20,7 +20,7 @@
 #ifndef PREDICATE_DRIVER_XBASE_H
 #define PREDICATE_DRIVER_XBASE_H
 
-#include <Predicate/Driver.h>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

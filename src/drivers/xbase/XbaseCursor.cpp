@@ -20,8 +20,8 @@
 #include "XbaseCursor.h"
 #include "XbaseConnection.h"
 
-#include <Predicate/Error.h>
-#include <Predicate/Utils.h>
+#include <Predicate/Error>
+#include <Predicate/Utils>
 
 #include <QtDebug>
 #include <limits.h>

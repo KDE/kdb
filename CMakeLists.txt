@@ -67,6 +67,17 @@ include(CreateSharedDataClasses)
 set(QT_MIN_VERSION 4.5.0)
 find_package(Qt4 REQUIRED)
 
+include_directories(
+  ${Predicate_SOURCE_DIR}
+  ${Predicate_SOURCE_DIR}/Predicate
+  ${Predicate_SOURCE_DIR}/Predicate/includes
+  ${Predicate_SOURCE_DIR}/Predicate/expression
+  ${Predicate_SOURCE_DIR}/Predicate/parser
+  ${Predicate_BINARY_DIR}
+  ${Predicate_BINARY_DIR}/Predicate
+  ${QT_INCLUDES}
+)
+
 #### Subdirs ####
 add_subdirectory( Predicate )
 add_subdirectory( Drivers )

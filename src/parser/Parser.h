@@ -22,10 +22,9 @@
 #define KEXIDBPARSER_H
 
 #include <QObject>
-#include <QVariant>
 
-#include <Predicate/Field.h>
-#include <Predicate/Expression.h>
+#include <Predicate/Field>
+#include <Predicate/Expression>
 
 namespace Predicate
 {

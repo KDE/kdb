@@ -20,13 +20,12 @@
 #ifndef PREDICATE_ALTER_H
 #define PREDICATE_ALTER_H
 
-#include <Predicate/Connection.h>
+#include <Predicate/Connection>
+#include <Predicate/Tools/Utils>
 
 #include <QList>
 #include <QHash>
-
 #include <QtDebug>
-#include <Predicate/tools/Utils.h>
 
 namespace Predicate
 {

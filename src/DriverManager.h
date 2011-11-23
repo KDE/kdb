@@ -25,7 +25,7 @@
 //#include <klibloader.h>
 //#include <kservice.h>
 
-#include <Predicate/Driver.h>
+#include <Predicate/Driver>
 
 namespace Predicate
 {

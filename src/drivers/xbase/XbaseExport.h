@@ -20,7 +20,7 @@
 #ifndef XBASE_EXPORT_H
 #define XBASE_EXPORT_H
 
-#include <Predicate/TableSchema.h>
+#include <Predicate/TableSchema>
 
 namespace Kexi {
   class ObjectStatus;

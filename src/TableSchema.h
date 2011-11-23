@@ -27,9 +27,9 @@
 #include <QVector>
 #include <QtDebug>
 
-#include <Predicate/FieldList.h>
-#include <Predicate/IndexSchema.h>
-#include <Predicate/Relationship.h>
+#include <Predicate/FieldList>
+#include <Predicate/IndexSchema>
+#include <Predicate/Relationship>
 
 namespace Predicate
 {

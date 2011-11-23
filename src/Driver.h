@@ -24,12 +24,12 @@
 #include <QByteArray>
 #include <QDateTime>
 
-#include <Predicate/Global.h>
-#include <Predicate/VersionInfo.h>
-#include <Predicate/Field.h>
-#include <Predicate/DriverInfo.h>
-#include <Predicate/Result.h>
-#include <Predicate/EscapedString.h>
+#include <Predicate/Global>
+#include <Predicate/VersionInfo>
+#include <Predicate/Field>
+#include <Predicate/DriverInfo>
+#include <Predicate/Result>
+#include <Predicate/EscapedString>
 
 namespace Predicate
 {

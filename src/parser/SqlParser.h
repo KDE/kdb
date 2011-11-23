@@ -403,7 +403,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 508 "SqlParser.y"
+#line 521 "SqlParser.y"
 
 	QString* stringValue;
 	qint64 integerValue;
@@ -411,9 +411,9 @@ typedef union YYSTYPE
 	struct realType realValue;
 	Predicate::Field::Type colType;
 	Predicate::Field *field;
-	Predicate::Expression *expr;
+        Predicate::Expression *expr;
         Predicate::NArgExpression *exprList;
-        Predicate::ConstExpression *ConstExpression;
+        Predicate::ConstExpression *constExpression;
 	Predicate::QuerySchema *querySchema;
 	SelectOptionsInternal *selectOptions;
 	OrderByColumnInternal::List *orderByColumns;

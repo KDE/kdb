@@ -21,7 +21,7 @@
 #define PREDICATE_TOOLS_FIELDVALIDATOR_H
 
 #include <Predicate/predicate_export.h>
-#include <Predicate/tools/Validator.h>
+#include <Predicate/Tools/Validator>
 
 class QWidget;
 

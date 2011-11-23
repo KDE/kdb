@@ -22,8 +22,8 @@
 
 #include <qstring.h>
 
-#include <Predicate/Cursor.h>
-#include <Predicate/Connection.h>
+#include <Predicate/Cursor>
+#include <Predicate/Connection>
 
 namespace Predicate
 {
