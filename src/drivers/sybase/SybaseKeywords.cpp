@@ -6,8 +6,8 @@
    Currently copied from Mysql keywords. Pending.
 
    This file has been automatically generated from
-   koffice/kexi/tools/sql_keywords/sql_keywords.sh and
-   ../../3rdparty/kexisql3/src/tokenize.c.
+   tools/sql_keywords/sql_keywords.sh and
+   tokenize.c.
 
    Please edit the sql_keywords.sh, not this file!
 
