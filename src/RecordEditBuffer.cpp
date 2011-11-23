@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -89,6 +89,33 @@ const QVariant* RecordEditBuffer::at(const QString& fname) const
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
         return 0;
     return &(*m_simpleBufferIt).value();
+}
+
+void RecordEditBuffer::removeAt(const QueryColumnInfo& ci)
+{
+    if (!m_dbBuffer) {
+        PreWarn << "not db-aware buffer!";
+        return;
+    }
+    m_dbBuffer->remove(const_cast<QueryColumnInfo*>(&ci)); // const_cast ok here, we won't modify ci
+}
+
+void RecordEditBuffer::removeAt(const Field& f)
+{
+    if (!m_simpleBuffer) {
+        PreWarn << "this is db-aware buffer!";
+        return;
+    }
+    m_simpleBuffer->remove(f.name());
+}
+
+void RecordEditBuffer::removeAt(const QString& fname)
+{
+    if (!m_simpleBuffer) {
+        PreWarn << "this is db-aware buffer!";
+        return;
+    }
+    m_simpleBuffer->remove(fname);
 }
 
 void RecordEditBuffer::clear()

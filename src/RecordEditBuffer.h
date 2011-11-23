@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003, 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003, 2011 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -101,6 +101,15 @@ public:
     inline void insert(const QString& fname, QVariant &val) {
         if (m_simpleBuffer) m_simpleBuffer->insert(fname, val);
     }
+
+    //! Removes value from db-aware buffer's column \a ci
+    void removeAt(const QueryColumnInfo& ci);
+
+    //! Removes value from not-db-aware buffer's column \a fname
+    void removeAt(const Field& f);
+
+    //! Removes value from not-db-aware buffer's column \a fname
+    void removeAt(const QString& fname);
 
     /*! Useful only for db-aware buffer. @return value for column @a ci
      If there is no value assigned for the buffer, this method tries to remember and return
