@@ -3,6 +3,10 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-03-28
+Predicate
+*fixed functions returning field's type group name and type group string; they were completely broken but probably only GUI was affected
+
 2011-11-23
 Predicate
 *Port sql keywords list gen. from kexidb; add more renames from kexidb
