@@ -49,6 +49,22 @@ PREDICATE_CREATE_SHARED_DATA_CLASSES(
 configure_file(Global.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Global.h )
 
 set(predicate_LIB_SRCS
+   parser/SqlScanner.cpp
+   parser/SqlParser.cpp
+   parser/Parser.cpp
+   parser/Parser_p.cpp
+
+   Tools/Validator.cpp
+   Tools/FieldValidator.cpp
+   Tools/LongLongValidator.cpp
+   Tools/DbObjectNameValidator.cpp
+   Tools/Identifier.cpp
+   Tools/Utils.cpp
+   Tools/Static.cpp
+   Tools/transliteration/transliteration_table.cpp
+#TODO Tools/debuggui.cpp
+#TODO Tools/SimpleCommandLineApp.cpp
+
    EscapedString.cpp
    Result.cpp
    ConnectionData.cpp
@@ -87,22 +103,6 @@ set(predicate_LIB_SRCS
    Admin.cpp
    LookupFieldSchema.cpp
    Alter.cpp
-
-   parser/SqlScanner.cpp
-   parser/SqlParser.cpp
-   parser/Parser.cpp
-   parser/Parser_p.cpp
-
-   Tools/Validator.cpp
-   Tools/FieldValidator.cpp
-   Tools/LongLongValidator.cpp
-   Tools/DbObjectNameValidator.cpp
-   Tools/Identifier.cpp
-   Tools/Utils.cpp
-   Tools/Static.cpp
-   Tools/transliteration/transliteration_table.cpp
-#TODO Tools/debuggui.cpp
-#TODO Tools/SimpleCommandLineApp.cpp
 )
 
 set(predicate_MOC_SRCS
