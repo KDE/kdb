@@ -39,7 +39,7 @@ class ConnectionTestThread : public QThread
 public:
     ConnectionTestThread(ConnectionTestDialog *dlg, const ConnectionData& connData);
     virtual void run();
-signals:
+Q_SIGNALS:
     void error(const QString& msg, const QString& details);
 protected:
     void emitError(const Resultable& resultable);
@@ -58,10 +58,10 @@ public:
 
     int exec();
 
-public slots:
+public Q_SLOTS:
     void error(const QString& msg, const QString& details);
 
-protected slots:
+protected Q_SLOTS:
     void slotTimeout();
     virtual void reject();
 

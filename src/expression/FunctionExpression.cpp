@@ -21,33 +21,28 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
 
 #include <ctype.h>
 
 using namespace Predicate;
 
-static const char* FunctionExpr_builtIns_[] = {
-    "SUM", "MIN", "MAX", "AVG", "COUNT", "STD", "STDDEV", "VARIANCE", 0 };
-
-class BuiltInAggregates : public QSet<QByteArray>
+class BuiltInAggregates : public QSet<QString>
 {
 public:
-    BuiltInAggregates() : QSet<QByteArray>() {
-        for (const char **p = FunctionExpr_builtIns_; *p; p++)
-            insert(QByteArray::fromRawData(*p, qstrlen(*p)));
-    }
-    QStringList toStringList() const {
-        QStringList result;
-        foreach (const QByteArray& f, *this) {
-            result.append(f);
-        }
-        return result;
+    BuiltInAggregates()
+    {
+        insert(QLatin1String("SUM"));
+        insert(QLatin1String("MIN"));
+        insert(QLatin1String("MAX"));
+        insert(QLatin1String("AVG"));
+        insert(QLatin1String("COUNT"));
+        insert(QLatin1String("STD"));
+        insert(QLatin1String("STDDEV"));
+        insert(QLatin1String("VARIANCE"));
     }
 };
 
@@ -90,15 +85,16 @@ QDebug FunctionExpressionData::debug(QDebug dbg) const
         dbg.nospace() << ',';
         args.data()->debug(dbg);
     }
-    dbg.nospace() << QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
+    dbg.nospace() << QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
     return dbg.space();
 }
 
 EscapedString FunctionExpressionData::toString(
     QuerySchemaParameterValueListIterator* params) const
 {
-    return name + '(' +
-           (args.data() ? args.data()->toString(params) : EscapedString()) + ')';
+    return EscapedString(name + QLatin1Char('('))
+           + (args.data() ? args.data()->toString(params) : EscapedString())
+           + EscapedString(')');
 }
 
 void FunctionExpressionData::getQueryParameters(QuerySchemaParameterList& params)
@@ -170,13 +166,13 @@ FunctionExpression::~FunctionExpression()
 // static
 bool FunctionExpression::isBuiltInAggregate(const QString& function)
 {
-    return _builtInAggregates->contains(function.toLatin1().toUpper());
+    return _builtInAggregates->contains(function.toUpper());
 }
 
 // static
 QStringList FunctionExpression::builtInAggregates()
 {
-    return _builtInAggregates->toStringList();
+    return _builtInAggregates->toList();
 }
 
 QString FunctionExpression::name() const

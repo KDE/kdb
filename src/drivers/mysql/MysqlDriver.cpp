@@ -121,41 +121,41 @@ EscapedString MysqlDriver::escapeString(const QString& str) const
     QChar *new_string = new QChar[ old_length * 3 + 1 ]; // a worst case approximation
 //! @todo move new_string to Driver::m_new_string or so...
     int new_length = 0;
-    new_string[new_length++] = '\''; //prepend '
+    new_string[new_length++] = QLatin1Char('\''); //prepend '
     for (i = 0; i < old_length; i++, new_length++) {
         const unsigned int ch = str[i].unicode();
         if (ch == '\\') {
-            new_string[new_length++] = '\\';
-            new_string[new_length] = '\\';
+            new_string[new_length++] = QLatin1Char('\\');
+            new_string[new_length] = QLatin1Char('\\');
         } else if (ch <= '\'') {//check for speedup
             if (ch == '\'') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = '\'';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('\'');
             } else if (ch == '"') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = '"';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('"');
             } else if (ch == '\n') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = 'n';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('n');
             } else if (ch == '\r') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = 'r';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('r');
             } else if (ch == '\t') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = 't';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('t');
             } else if (ch == '\b') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = 'b';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('b');
             } else if (ch == '\0') {
-                new_string[new_length++] = '\\';
-                new_string[new_length] = '0';
+                new_string[new_length++] = QLatin1Char('\\');
+                new_string[new_length] = QLatin1Char('0');
             } else
                 new_string[new_length] = str[i];
         } else
             new_string[new_length] = str[i];
     }
 
-    new_string[new_length++] = '\''; //append '
+    new_string[new_length++] = QLatin1Char('\''); //append '
     EscapedString result(QString(new_string, new_length));
     delete [] new_string;
     return result;

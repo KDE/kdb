@@ -101,7 +101,7 @@ static QString findPluginsDir()
 */
 //! @todo try in XDG_* http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html ?
     foreach (const QString& path, qApp->libraryPaths()) {
-        const QString pluginsDir(path + "/predicate");
+        const QString pluginsDir(path + QLatin1String("/predicate"));
         if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable())
             return pluginsDir;
     }
@@ -110,46 +110,48 @@ static QString findPluginsDir()
 
 void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
 {
-    QDir dir(pluginsDir, "predicate_*.desktop");
+    QDir dir(pluginsDir, QLatin1String("predicate_*.desktop"));
     const QFileInfoList infoFiles( dir.entryInfoList(QDir::Files|QDir::Readable) );
     foreach (const QFileInfo& infoFile, infoFiles) {
         QSettings config(infoFile.absoluteFilePath(), QSettings::IniFormat);
-        config.beginGroup("Desktop Entry");
+        config.beginGroup(QLatin1String("Desktop Entry"));
         DriverInfo info;
-        info.setName( config.value("Name").toString().toLower() );
+        info.setName( config.value(QLatin1String("Name")).toString().toLower() );
         if (m_driversInfo.contains(info.name())) {
             qWarning() << "More than one driver named" << info.name() << "-- skipping this one";
             continue;
         }
-        info.setVersion( config.value("Version").toString() );
-        const QString expectedVersion(QString("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()));
+        info.setVersion(config.value(QLatin1String("Version")).toString());
+        const QString expectedVersion(QString::fromLatin1("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()));
         if (expectedVersion != info.version()) {
             qWarning() << "Incompatible database driver's" << info.name()
                 << "version: found version" << info.version() << "expected version" << expectedVersion
                 << "-- skipping this one";
         }
 #ifdef Q_OS_WIN
-        QString suffix = ".dll";
+        const QLatin1String suffix(".dll");
 #else
-        QString suffix = ".so";
+        const QLatin1String suffix(".so");
 #endif
-        info.setAbsoluteFilePath( pluginsDir + "/predicate_" + config.value("Name").toString() + suffix );
-        info.setCaption( config.value("Caption").toString() );
+        info.setAbsoluteFilePath(pluginsDir + QLatin1String("/predicate_")
+            + config.value(QLatin1String("Name")).toString() + suffix);
+        info.setCaption(config.value(QLatin1String("Caption")).toString());
 //! @todo read translated [..]
-        info.setComment( config.value("Comment").toString() );
+        info.setComment(config.value(QLatin1String("Comment")).toString());
         if (info.caption().isEmpty())
-            info.setCaption( info.name() );
-        info.setFileBased( config.value("Type", "Network").toString().toLower()=="file" );
+            info.setCaption(info.name());
+        info.setFileBased(config.value(QLatin1String("Type"),
+                                       QLatin1String("Network")).toString().toLower() == QLatin1String("file"));
         QStringList mimeTypes;
         if (info.isFileBased()) {
-            mimeTypes = config.value("MimeTypes").toStringList();
+            mimeTypes = config.value(QLatin1String("MimeTypes")).toStringList();
             QStringList mimeTypesTrimmed;
             foreach (const QString& mimeType, mimeTypes)
                 mimeTypesTrimmed.append(mimeType.trimmed().toLower());
             mimeTypes = mimeTypesTrimmed;
             info.setMimeTypes(mimeTypes);
         }
-        info.setImportingAllowed(config.value("AllowImporting", true).toBool());
+        info.setImportingAllowed(config.value(QLatin1String("AllowImporting"), true).toBool());
 
         m_driversInfo.insert(info.name().toLower(), info);
         foreach (const QString& mimeType, mimeTypes) {
@@ -180,7 +182,7 @@ bool DriverManagerInternal::lookupDrivers()
     qDebug() << "qApp->libraryPaths():" << qApp->libraryPaths();
     bool foundAtLeastOne = false;
     foreach (const QString& path, qApp->libraryPaths()) {
-        const QString pluginsDir(path + "/predicate");
+        const QString pluginsDir(path + QLatin1String("/predicate"));
         if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable()) {
             foundAtLeastOne = true;
             lookupDriversForDirectory(pluginsDir);
@@ -328,21 +330,23 @@ Driver* DriverManagerInternal::driver(const QString& name)
     
     const uint* foundMajor = (const uint*)lib.resolve("version_major");
     if (!foundMajor) {
-       m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".").arg("version_major").arg(name));
+       m_result = Result(ERR_DRIVERMANAGER,
+                         QObject::tr("Could not find \"%1\" entry point of library \"%2\".")
+                         .arg(QLatin1String("version_major")).arg(name));
        return 0;
     }
     const uint* foundMinor = (const uint*)lib.resolve("version_minor");
     if (!foundMinor) {
        m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".")
-                         .arg("version_minor").arg(name));
+                         .arg(QLatin1String("version_minor")).arg(name));
        return 0;
     }
     if (!Predicate::version().matches(*foundMajor, *foundMinor)) {
         m_result = Result(ERR_INCOMPAT_DRIVER_VERSION,
             QObject::tr("Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
                  .arg(name)
-                 .arg(QString("%1.%2").arg(*foundMajor).arg(*foundMinor))
-                 .arg(QString("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()))
+                 .arg(QString::fromLatin1("%1.%2").arg(*foundMajor).arg(*foundMinor))
+                 .arg(QString::fromLatin1("%1.%2").arg(Predicate::version().major()).arg(Predicate::version().minor()))
             );
         return 0;
     }

@@ -151,7 +151,9 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 
     QByteArray conninfo;
 
-    if (data().hostName().isEmpty() || data().hostName() == "localhost") {
+    if (data().hostName().isEmpty()
+        || 0 == QString::compare(data().hostName(), QLatin1String("localhost"), Qt::CaseInsensitive))
+    {
         if (!data().localSocketFileName().isEmpty()) {
             QFileInfo fileInfo(data().localSocketFileName());
             if (fileInfo.exists()) {

@@ -62,8 +62,10 @@ PostgresqlDriver::PostgresqlDriver()
     initPgsqlToVariantMap();
 
     //predefined properties
-    d->properties["client_library_version"] = "";//TODO
-    d->properties["default_server_encoding"] = ""; //TODO
+    //! @todo pgsql client_library_version
+    d->properties["client_library_version"] = QString();
+    //! @todo pgsql default_server_encoding
+    d->properties["default_server_encoding"] = QString();
 
     d->typeNames[Field::Byte] = QLatin1String("SMALLINT");
     d->typeNames[Field::ShortInteger] = QLatin1String("SMALLINT");

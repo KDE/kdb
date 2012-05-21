@@ -188,7 +188,7 @@ public:
         };
 
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions()) {
-            Q_UNUSED(debugOptions); return "ActionBase";
+            Q_UNUSED(debugOptions); return QLatin1String("ActionBase");
         }
 
 //! @todo add QDebug operator <<

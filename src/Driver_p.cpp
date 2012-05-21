@@ -39,8 +39,8 @@ DriverBehaviour::DriverBehaviour()
         , USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED(false)
         , _1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY(false)
         , SELECT_1_SUBQUERY_SUPPORTED(false)
-        , BOOLEAN_TRUE_LITERAL('1')
-        , BOOLEAN_FALSE_LITERAL('0')
+        , BOOLEAN_TRUE_LITERAL(QLatin1Char('1'))
+        , BOOLEAN_FALSE_LITERAL(QLatin1Char('0'))
 {
 }
 
@@ -56,11 +56,11 @@ DriverPrivate::DriverPrivate()
 {
     adminTools = 0;
 
-    properties["client_library_version"] = "";
+    properties["client_library_version"] = QString();
     propertyCaptions["client_library_version"] =
         QObject::tr("Client library version");
 
-    properties["default_server_encoding"] = "";
+    properties["default_server_encoding"] = QString();
     propertyCaptions["default_server_encoding"] =
         QObject::tr("Default character encoding on server");
 }
@@ -97,7 +97,7 @@ void DriverPrivate::initInternalProperties()
     propertyCaptions["transaction_nested"] = QObject::tr("Nested transactions support");
 
     properties["predicate_driver_version"] =
-        QString("%1.%2").arg(version().major()).arg(version().minor());
+        QString::fromLatin1("%1.%2").arg(version().major()).arg(version().minor());
     propertyCaptions["predicate_driver_version"] =
         QObject::tr("Predicate driver version");
 }

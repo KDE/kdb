@@ -28,8 +28,8 @@ bool Predicate::Utils::isIdentifier(const QString& s)
     uint i;
     const uint sLength = s.length();
     for (i = 0; i < sLength; i++) {
-        QChar c = s.at(i).toLower();
-        if (!(c == '_' || c >= 'a' && c <= 'z' || i > 0 && c >= '0' && c <= '9'))
+        const char c = s.at(i).toLower().toLatin1();
+        if (c == 0 || !(c == '_' || c >= 'a' && c <= 'z' || i > 0 && c >= '0' && c <= '9'))
             break;
     }
     return i > 0 && i == sLength;
@@ -38,18 +38,21 @@ bool Predicate::Utils::isIdentifier(const QString& s)
 QString Predicate::Utils::string2FileName(const QString &s)
 {
     QString fn = s.simplified();
-    fn.replace(' ', "_"); fn.replace('$', "_");
-    fn.replace('\\', "-"); fn.replace('/', "-");
-    fn.replace(':', "-"); fn.replace('*', "-");
+    fn.replace(QLatin1Char(' '), QLatin1String("_"));
+    fn.replace(QLatin1Char('$'), QLatin1String("_"));
+    fn.replace(QLatin1Char('\\'), QLatin1String("-"));
+    fn.replace(QLatin1Char('/'), QLatin1String("-"));
+    fn.replace(QLatin1Char(':'), QLatin1String("-"));
+    fn.replace(QLatin1Char('*'), QLatin1String("-"));
     return fn;
 }
 
 inline QString char2Identifier(const QChar& c)
 {
     if (c.unicode() >= TRANSLITERATION_TABLE_SIZE)
-        return QString(QChar('_'));
+        return QLatin1String("_");
     const char *const s = transliteration_table[c.unicode()];
-    return s ? QString::fromLatin1(s) : QString(QChar('_'));
+    return s ? QString::fromLatin1(s) : QLatin1String("_");
 }
 
 QString Predicate::Utils::string2Identifier(const QString &s)
@@ -60,26 +63,27 @@ QString Predicate::Utils::string2Identifier(const QString &s)
     if (id.isEmpty())
         return QString();
     r.reserve(id.length());
-    id.replace(' ', "_");
-    QChar c = id[0];
+    id.replace(QLatin1Char(' '), QLatin1String("_"));
+    const QChar c = id[0];
+    const char ch = c.toLatin1();
     QString add;
     bool wasUnderscore = false;
 
-    if (c >= '0' && c <= '9') {
-        r += '_';
+    if (ch >= '0' && ch <= '9') {
+        r += QLatin1Char('_');
         r += c;
     } else {
         add = char2Identifier(c);
         r += add;
-        wasUnderscore = add == "_";
+        wasUnderscore = add == QLatin1String("_");
     }
 
     const uint idLength = id.length();
     for (uint i = 1; i < idLength; i++) {
         add = char2Identifier(id.at(i));
-        if (wasUnderscore && add == "_")
+        if (wasUnderscore && add == QLatin1String("_"))
             continue;
-        wasUnderscore = add == "_";
+        wasUnderscore = add == QLatin1String("_");
         r += add;
     }
     return r;
@@ -108,15 +112,15 @@ IdentifierValidator::~IdentifierValidator()
 QValidator::State IdentifierValidator::validate(QString& input, int& pos) const
 {
     uint i;
-    for (i = 0; (int)i < input.length() && input.at(i) == ' '; i++)
+    for (i = 0; (int)i < input.length() && input.at(i) == QLatin1Char(' '); i++)
         ;
     pos -= i; //i chars will be removed from beginning
-    if ((int)i < input.length() && input.at(i) >= '0' && input.at(i) <= '9')
+    if ((int)i < input.length() && input.at(i) >= QLatin1Char('0') && input.at(i) <= QLatin1Char('9'))
         pos++; //_ will be added at the beginning
-    bool addspace = (input.right(1) == " ");
+    bool addspace = (input.right(1) == QLatin1String(" "));
     input = string2Identifier(input);
     if (addspace)
-        input += "_";
+        input += QLatin1Char('_');
     if (pos > input.length())
         pos = input.length();
     return input.isEmpty() ? QValidator::Intermediate : Acceptable;

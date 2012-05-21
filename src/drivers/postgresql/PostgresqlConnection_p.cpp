@@ -42,8 +42,9 @@ PostgresqlConnectionInternal::~PostgresqlConnectionInternal()
 void PostgresqlConnectionInternal::storeResult()
 {
     QString msg = QLatin1String(PQerrorMessage(conn));
-    if (msg.endsWith('\n'))
+    if (msg.endsWith(QLatin1Char('\n'))) {
         msg.chop(1);
+    }
     setServerMessage(msg);
 /*    if (d->res) {
         setServerResultCode(PQresultStatus(d->res));

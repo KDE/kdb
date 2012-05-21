@@ -47,7 +47,7 @@ QDebug operator<<(QDebug dbg, const Object& object)
     QString desc = object.description();
     if (desc.length() > 120) {
         desc.truncate(120);
-        desc += "...";
+        desc += QLatin1String("...");
     }
     dbg.space() << "ID=" << object.id() << "NAME=" << object.name() << "CAPTION=" << object.caption() << "DESC=" << desc;
     return dbg.space();

@@ -20,6 +20,7 @@
 
 #include <Predicate/Connection>
 #include <Predicate/TableSchema>
+#include <Predicate/Tools/Static>
 #include "Parser.h"
 #include "Parser_p.h"
 #include "SqlParser.h"
@@ -32,6 +33,27 @@ PREDICATE_GLOBAL_STATIC_WITH_ARGS(StaticSetOfStrings, _reservedKeywords, (_token
 //--------------------
 
 using namespace Predicate;
+
+//! Cache
+class ParserStatic
+{
+public:
+    ParserStatic()
+     : operationStrings((QString[]){
+            QLatin1String("None"),
+            QLatin1String("Error"),
+            QLatin1String("CreateTable"),
+            QLatin1String("AlterTable"),
+            QLatin1String("Select"),
+            QLatin1String("Insert"),
+            QLatin1String("Update"),
+            QLatin1String("Delete")})
+    {
+    }
+    const QString operationStrings[];
+};
+
+PREDICATE_GLOBAL_STATIC(ParserStatic, Predicate_parserStatic)
 
 Parser::Parser(Connection *db)
         : d(new Private)
@@ -49,27 +71,10 @@ Parser::OPCode Parser::operation() const
     return (OPCode)d->operation;
 }
 
-QString
-Parser::operationString() const
+QString Parser::operationString() const
 {
-    switch ((OPCode)d->operation) {
-    case OP_Error:
-        return "Error";
-    case OP_CreateTable:
-        return "CreateTable";
-    case OP_AlterTable:
-        return "AlterTable";
-    case OP_Select:
-        return "Select";
-    case OP_Insert:
-        return "Insert";
-    case OP_Update:
-        return "Update";
-    case OP_Delete:
-        return "Delete";
-    default: //OP_None
-        return "None";
-    }
+    Q_ASSERT(d->operation < sizeof(Predicate_parserStatic->operationStrings));
+    return Predicate_parserStatic->operationStrings[d->operation];
 }
 
 TableSchema *Parser::table()
@@ -118,7 +123,7 @@ Parser::createTable(const char *t)
     if (d->table)
         return;
 
-    d->table = new Predicate::TableSchema(t);
+    d->table = new Predicate::TableSchema(QLatin1String(t));
 }
 
 void
@@ -173,11 +178,11 @@ ParserError::ParserError()
 // m_isNull = true;
 }
 
-ParserError::ParserError(const QString &type, const QString &error, const QString &hint, int at)
+ParserError::ParserError(const QString &type, const QString &error, const QByteArray &token, int at)
 {
     m_type = type;
     m_error = error;
-    m_hint = hint;
+    m_token = token;
     m_at = at;
 }
 

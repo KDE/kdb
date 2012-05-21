@@ -35,7 +35,7 @@
 
 using namespace Predicate;
 
-QueryColumnInfo::QueryColumnInfo(Field *f, const QByteArray& _alias, bool _visible,
+QueryColumnInfo::QueryColumnInfo(Field *f, const QString& _alias, bool _visible,
                                  QueryColumnInfo *foreignColumn)
         : field(f), alias(_alias), visible(_visible), m_indexForVisibleLookupValue(-1)
         , m_foreignColumn(foreignColumn)
@@ -46,15 +46,18 @@ QueryColumnInfo::~QueryColumnInfo()
 {
 }
 
+QString QueryColumnInfo::aliasOrName() const
+{
+    return alias.isEmpty() ? field->name() : alias;
+}
+
 QDebug operator<<(QDebug dbg, const QueryColumnInfo& info)
 {
-    QString s;
-    if (info.field->table()) {
-        s = info.field->table()->name() + '.';
-    }
-    dbg.nospace() << s << *info.field
+    dbg.nospace()
+        << (info.field->table() ? (info.field->table()->name() + QLatin1Char('.')) : QString())
+        << *info.field
         << (info.alias.isEmpty() ? QString()
-            : (QLatin1String(" AS ") + QString(info.alias)))
+            : (QLatin1String(" AS ") + info.alias))
             + (info.visible ? QString() : QLatin1String(" [INVISIBLE]"));
     return dbg.space();
 }
@@ -191,7 +194,7 @@ public:
         }
     }
 
-    inline void setColumnAlias(uint position, const QByteArray& alias) {
+    inline void setColumnAlias(uint position, const QString& alias) {
         if (alias.isEmpty()) {
             columnAliases.remove(position);
             maxIndexWithAlias = -1;
@@ -200,7 +203,7 @@ public:
         }
     }
 
-    inline void setTableAlias(uint position, const QByteArray& alias) {
+    inline void setTableAlias(uint position, const QString& alias) {
         tableAliases.insert(position, alias.toLower());
         tablePositionsForAliases.insert(alias.toLower(), position);
     }
@@ -210,7 +213,7 @@ public:
         return columnAliases.count();
     }
 
-    inline QByteArray columnAlias(uint position) {
+    inline QString columnAlias(uint position) {
         tryRegenerateExprAliases();
         return columnAliases.value(position);
     }
@@ -220,15 +223,15 @@ public:
         return columnAliases.contains(position);
     }
 
-    inline void removeTablePositionForAlias(const QByteArray& alias) {
+    inline void removeTablePositionForAlias(const QString& alias) {
         tablePositionsForAliases.remove(alias.toLower());
     }
 
-    inline int tablePositionForAlias(const QByteArray& alias) const {
+    inline int tablePositionForAlias(const QString& alias) const {
         return tablePositionsForAliases.value(alias.toLower(), -1);
     }
 
-    inline int columnPositionForAlias(const QByteArray& alias) const {
+    inline int columnPositionForAlias(const QString& alias) const {
         return columnPositionsForAliases.value(alias.toLower(), -1);
     }
 
@@ -251,7 +254,7 @@ protected:
             return;
         //regenerate missing aliases for experessions
         uint colNum = 0; //used to generate a name
-        QByteArray columnAlias;
+        QString columnAlias;
         uint p = -1;
         foreach(Field* f, *query->fields()) {
             p++;
@@ -260,7 +263,7 @@ protected:
                 do { //find 1st unused
                     colNum++;
                     columnAlias = QObject::tr("expr", "short for 'expression' word, e.g. 'expr' (only latin letters, please)")
-                                  .toLatin1() + QByteArray::number(colNum);
+                                  + QString::number(colNum);
                 } while (-1 != tablePositionForAlias(columnAlias));
 
                 setColumnAliasInternal(p, columnAlias);
@@ -269,24 +272,24 @@ protected:
         regenerateExprAliases = false;
     }
 
-    void setColumnAliasInternal(uint position, const QByteArray& alias) {
+    void setColumnAliasInternal(uint position, const QString& alias) {
         columnAliases.insert(position, alias.toLower());
         columnPositionsForAliases.insert(alias.toLower(), position);
         maxIndexWithAlias = qMax(maxIndexWithAlias, (int)position);
     }
 
     /*! Used to mapping columns to its aliases for this query */
-    QHash<int, QByteArray> columnAliases;
+    QHash<int, QString> columnAliases;
 
     /*! Collects table positions for aliases: used in tablePositionForAlias(). */
-    QHash<QByteArray, int> tablePositionsForAliases;
+    QHash<QString, int> tablePositionsForAliases;
 
     /*! Collects column positions for aliases: used in columnPositionForAlias(). */
-    QHash<QByteArray, int> columnPositionsForAliases;
+    QHash<QString, int> columnPositionsForAliases;
 
 public:
     /*! Used to mapping tables to its aliases for this query */
-    QHash<int, QByteArray> tableAliases;
+    QHash<int, QString> tableAliases;
 
     /*! Helper used with aliases */
     int maxIndexWithAlias;
@@ -414,7 +417,7 @@ OrderByColumn::~OrderByColumn()
 
 QDebug operator<<(QDebug dbg, const OrderByColumn& order)
 {
-    const QString orderString(order.ascending() ? "ASCENDING" : "DESCENDING");
+    const QLatin1String orderString(order.ascending() ? "ASCENDING" : "DESCENDING");
     if (order.column()) {
         if (order.position() > -1) {
             dbg.nospace() << QString::fromLatin1("COLUMN_AT_POSITION_%1(").arg(order.position() + 1);
@@ -471,7 +474,8 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
             tableName = escapeIdentifier(m_field->table()->name(), conn, escapingType);
             tableName += '.';
         }
-        fieldName = escapeIdentifier(m_field ? m_field->name() : "??"/*error*/, conn, escapingType);
+        fieldName = escapeIdentifier(
+            m_field ? m_field->name() : QLatin1String("??")/*error*/, conn, escapingType);
     }
     return tableName + fieldName + orderString;
 }
@@ -738,7 +742,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
     //--move items to make a place for a new one
     for (uint i = fieldCount() - 1; i > position; i--)
         d->tablesBoundToColumns[i] = d->tablesBoundToColumns[i-1];
-    d->tablesBoundToColumns[ position ] = bindToTable;
+    d->tablesBoundToColumns.insert(position, bindToTable);
 
     PreDbg << "bound to table" << bindToTable;
     if (bindToTable == -1)
@@ -748,7 +752,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
         << " alias=" << tableAlias(bindToTable);
     QString s;
     for (uint i = 0; i < fieldCount();i++)
-        s += (QString::number(d->tablesBoundToColumns[i]) + ' ');
+        s += (QString::number(d->tablesBoundToColumns[i]) + QLatin1Char(' '));
     PreDbg << "tablesBoundToColumns == [" << s << "]";
 
     if (field->isExpression())
@@ -815,7 +819,8 @@ FieldList& QuerySchema::addAsterisk(QueryAsterisk *asterisk, bool visible)
     if (!asterisk)
         return *this;
     //make unique name
-    asterisk->setName((asterisk->table() ? asterisk->table()->name() + ".*" : "*")
+    asterisk->setName((asterisk->table() ? asterisk->table()->name() + QLatin1String(".*")
+                                         : QLatin1String("*"))
                        + QString::number(asterisks()->count()));
     return addField(asterisk, visible);
 }
@@ -832,7 +837,7 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
     TableSchema *mt = query.masterTable();
     dbg.nospace() << "QUERY";
     dbg.space() << static_cast<const Object&>(query) << '\n';
-    dbg.nospace() << " - MASTERTABLE=" << (mt ? mt->name() : "<NULL>")
+    dbg.nospace() << " - MASTERTABLE=" << (mt ? mt->name() : QLatin1String("<NULL>"))
         << "\n - COLUMNS:\n";
     if (query.fieldCount() > 0)
         dbg.nospace() << static_cast<const FieldList&>(query) << '\n';
@@ -872,13 +877,13 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
     for (uint i = 0; i < query.fieldCount(); i++) {
         const int tablePos = query.tableBoundToColumn(i);
         if (tablePos >= 0) {
-            const QByteArray tAlias(query.tableAlias(tablePos));
+            const QString tAlias(query.tableAlias(tablePos));
             if (!tAlias.isEmpty()) {
                 bindingsExist = true;
                 dbg.space() << "FIELD";
                 dbg.space() << static_cast<const FieldList&>(query).field(i)->name();
                 dbg.space() << "USES ALIAS";
-                dbg.space() << QString(tAlias);
+                dbg.space() << tAlias;
                 dbg.space() << "OF TABLE";
                 dbg.space() << query.tables()->at(tablePos)->name() << '\n';
             }
@@ -910,10 +915,11 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
         int i = -1;
         foreach(Field *f, *query.fields()) {
             i++;
-            const QByteArray alias(query.columnAlias(i));
+            const QString alias(query.columnAlias(i));
             if (!alias.isEmpty()) {
                 dbg.nospace() << QString::fromLatin1("FIELD #%1:").arg(i);
-                dbg.space() << (f->name().isEmpty() ? "<NONAME>" : f->name()) << " -> " << alias << '\n';
+                dbg.space() << (f->name().isEmpty()
+                    ? QLatin1String("<NONAME>") : f->name()) << " -> " << alias << '\n';
             }
         }
     }
@@ -926,10 +932,11 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
         int i = -1;
         foreach(TableSchema* table, *query.tables()) {
             i++;
-            const QByteArray alias(query.tableAlias(i));
+            const QString alias(query.tableAlias(i));
             if (!alias.isEmpty()) {
                 dbg.nospace() << QString::fromLatin1("table #%1:").arg(i);
-                dbg.space() << (table->name().isEmpty() ? "<NONAME>" : table->name()) << " -> " << alias << '\n';
+                dbg.space() << (table->name().isEmpty()
+                    ? QLatin1String("<NONAME>") : table->name()) << " -> " << alias << '\n';
             }
         }
     }
@@ -975,7 +982,7 @@ TableSchema::List* QuerySchema::tables() const
     return &d->tables;
 }
 
-void QuerySchema::addTable(TableSchema *table, const QByteArray& alias)
+void QuerySchema::addTable(TableSchema *table, const QString& alias)
 {
     PreDbg << (void *)table << "alias=" << alias;
     if (!table)
@@ -991,7 +998,7 @@ void QuerySchema::addTable(TableSchema *table, const QByteArray& alias)
         foreach(TableSchema *table, d->tables) {
             num++;
             if (table->name().toLower() == tableNameLower) {
-                const QString& tAlias = tableAlias(num);
+                const QString tAlias = tableAlias(num);
                 if (tAlias == aliasLower) {
                     PreWarn << "table with" << tAlias << "alias already added!";
                     return;
@@ -1056,7 +1063,7 @@ int QuerySchema::columnAliasesCount() const
     return d->columnAliasesCount();
 }
 
-QByteArray QuerySchema::columnAlias(uint position) const
+QString QuerySchema::columnAlias(uint position) const
 {
     return d->columnAlias(position);
 }
@@ -1066,13 +1073,13 @@ bool QuerySchema::hasColumnAlias(uint position) const
     return d->hasColumnAlias(position);
 }
 
-void QuerySchema::setColumnAlias(uint position, const QByteArray& alias)
+void QuerySchema::setColumnAlias(uint position, const QString& alias)
 {
     if (position >= (uint)m_fields.count()) {
         PreWarn << "position"  << position << "out of range!";
         return;
     }
-    QByteArray fixedAlias(alias.trimmed());
+    const QString fixedAlias(alias.trimmed());
     Field *f = FieldList::field(position);
     if (f->captionOrName().isEmpty() && fixedAlias.isEmpty()) {
         PreWarn << "position" << position << "could not remove alias when no name is specified for expression column!";
@@ -1086,12 +1093,12 @@ int QuerySchema::tableAliasesCount() const
     return d->tableAliases.count();
 }
 
-QByteArray QuerySchema::tableAlias(uint position) const
+QString QuerySchema::tableAlias(uint position) const
 {
     return d->tableAliases.value(position);
 }
 
-int QuerySchema::tablePositionForAlias(const QByteArray& name) const
+int QuerySchema::tablePositionForAlias(const QString& name) const
 {
     return d->tablePositionForAlias(name);
 }
@@ -1127,20 +1134,20 @@ bool QuerySchema::hasTableAlias(uint position) const
     return d->tableAliases.contains(position);
 }
 
-int QuerySchema::columnPositionForAlias(const QByteArray& name) const
+int QuerySchema::columnPositionForAlias(const QString& name) const
 {
     return d->columnPositionForAlias(name);
 }
 
-void QuerySchema::setTableAlias(uint position, const QByteArray& alias)
+void QuerySchema::setTableAlias(uint position, const QString& alias)
 {
     if (position >= (uint)d->tables.count()) {
         PreWarn << "position"  << position << "out of range!";
         return;
     }
-    QByteArray fixedAlias(alias.trimmed());
+    const QString fixedAlias(alias.trimmed());
     if (fixedAlias.isEmpty()) {
-        QByteArray oldAlias(d->tableAliases.take(position));
+        const QString oldAlias(d->tableAliases.take(position));
         if (!oldAlias.isEmpty()) {
             d->removeTablePositionForAlias(oldAlias);
         }
@@ -1180,7 +1187,8 @@ Field* QuerySchema::field(const QString& identifier, bool expanded)
 QueryColumnInfo* QuerySchema::columnInfo(const QString& identifier, bool expanded) const
 {
     computeFieldsExpanded();
-    return expanded ? d->columnInfosByNameExpanded[identifier] : d->columnInfosByName[identifier];
+    return expanded ? d->columnInfosByNameExpanded.value(identifier)
+            : d->columnInfosByName.value(identifier);
 }
 
 QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions options) const
@@ -1199,18 +1207,18 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
             tmpFieldsExpandedWithInternal = new QueryColumnInfo::Vector(size);
             const uint fieldsExpandedVectorSize = d->fieldsExpanded->size();
             for (uint i = 0; i < fieldsExpandedVectorSize; i++)
-                (*tmpFieldsExpandedWithInternal)[i] = d->fieldsExpanded->at(i);
+                tmpFieldsExpandedWithInternal->insert(i, d->fieldsExpanded->at(i));
             const uint internalFieldsCount = d->internalFields ? d->internalFields->size() : 0;
             if (internalFieldsCount > 0) {
                 for (uint i = 0; i < internalFieldsCount; i++)
-                    (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = d->internalFields->at(i);
+                    tmpFieldsExpandedWithInternal->insert(fieldsExpandedVectorSize + i, d->internalFields->at(i));
             }
             if (options == WithInternalFieldsAndRecordId) {
                 if (!d->fakeRecordIdField) {
-                    d->fakeRecordIdField = new Field("rowID", Field::BigInteger);
-                    d->fakeRecordIdCol = new QueryColumnInfo(d->fakeRecordIdField, QByteArray(), true);
+                    d->fakeRecordIdField = new Field(QLatin1String("rowID"), Field::BigInteger);
+                    d->fakeRecordIdCol = new QueryColumnInfo(d->fakeRecordIdField, QString(), true);
                 }
-                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldsCount] = d->fakeRecordIdCol;
+                tmpFieldsExpandedWithInternal->insert(fieldsExpandedVectorSize + internalFieldsCount, d->fakeRecordIdCol);
             }
         }
         return *tmpFieldsExpandedWithInternal;
@@ -1220,7 +1228,7 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
         return *d->fieldsExpanded;
 
     //options == Unique:
-    QSet<QByteArray> columnsAlreadyFound;
+    QSet<QString> columnsAlreadyFound;
     const uint fieldsExpandedCount(d->fieldsExpanded->count());
     QueryColumnInfo::Vector result(fieldsExpandedCount);   //initial size is set
 // QMapConstIterator<QueryColumnInfo*, bool> columnsAlreadyFoundIt;
@@ -1232,7 +1240,7 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
 //  uint foundColumnIndex = -1;
         if (!columnsAlreadyFound.contains(ci->aliasOrName())) {// columnsAlreadyFoundIt==columnsAlreadyFound.constEnd())
             columnsAlreadyFound.insert(ci->aliasOrName());
-            result[uniqueListCount++] = ci;
+            result.insert(uniqueListCount++, ci);
         }
     }
     result.resize(uniqueListCount); //update result size
@@ -1254,8 +1262,9 @@ inline QString lookupColumnKey(Field *foreignField, Field* field)
 {
     QString res;
     if (field->table()) // can be 0 for anonymous fields built as joined multiple visible columns
-        res = field->table()->name() + '.';
-    return res + field->name() + '_' + foreignField->table()->name() + '.' + foreignField->name();
+        res = field->table()->name() + QLatin1Char('.');
+    return res + field->name() + QLatin1Char('_') + foreignField->table()->name()
+               + QLatin1Char('.') + foreignField->name();
 }
 
 void QuerySchema::computeFieldsExpanded() const
@@ -1287,7 +1296,7 @@ void QuerySchema::computeFieldsExpanded() const
                 const Field::List *ast_fields = static_cast<QueryAsterisk*>(f)->table()->fields();
                 foreach(Field *ast_f, *ast_fields) {
 //     d->detailedVisibility += isFieldVisible(fieldPosition);
-                    QueryColumnInfo *ci = new QueryColumnInfo(ast_f, QByteArray()/*no field for asterisk!*/,
+                    QueryColumnInfo *ci = new QueryColumnInfo(ast_f, QString()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     list.append(ci);
                     PreDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
@@ -1302,7 +1311,7 @@ void QuerySchema::computeFieldsExpanded() const
 //! @todo (js): perhaps not all fields should be appended here
 //      d->detailedVisibility += isFieldVisible(fieldPosition);
 //      list.append(tab_f);
-                        QueryColumnInfo *ci = new QueryColumnInfo(tab_f, QByteArray()/*no field for asterisk!*/,
+                        QueryColumnInfo *ci = new QueryColumnInfo(tab_f, QString()/*no field for asterisk!*/,
                                 isColumnVisible(fieldPosition));
                         list.append(ci);
                         PreDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
@@ -1358,7 +1367,7 @@ void QuerySchema::computeFieldsExpanded() const
                     }
 
                     lookup_list.append(
-                        new QueryColumnInfo(visibleColumn, QByteArray(), true/*visible*/, ci/*foreign*/));
+                        new QueryColumnInfo(visibleColumn, QString(), true/*visible*/, ci/*foreign*/));
                     /*
                               //add visibleField to the list of SELECTed fields if it is not yes present there
                               if (!findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
@@ -1379,7 +1388,7 @@ void QuerySchema::computeFieldsExpanded() const
                 if (lookupFieldSchema->boundColumn() >= lookupQueryFieldsExpanded.count())
                     continue;
                 QueryColumnInfo *boundColumnInfo = 0;
-                if (!(boundColumnInfo = lookupQueryFieldsExpanded[ lookupFieldSchema->boundColumn()]))
+                if (!(boundColumnInfo = lookupQueryFieldsExpanded.value(lookupFieldSchema->boundColumn())))
                     continue;
                 Field *boundField = boundColumnInfo->field;
                 if (!boundField)
@@ -1398,7 +1407,7 @@ void QuerySchema::computeFieldsExpanded() const
                 Field *visibleColumn = 0;
                 // for single visible column, just add it as-is
                 if (visibleColumns.count() == 1) {
-                    visibleColumn = lookupQueryFieldsExpanded[ visibleColumns.first()]->field;
+                    visibleColumn = lookupQueryFieldsExpanded.value(visibleColumns.first())->field;
                 } else {
                     // for multiple visible columns, build an expression column
                     // (the expression object will be owned by column info)
@@ -1416,7 +1425,7 @@ void QuerySchema::computeFieldsExpanded() const
                 }
 
                 lookup_list.append(
-                    new QueryColumnInfo(visibleColumn, QByteArray(), true/*visible*/, ci/*foreign*/));
+                    new QueryColumnInfo(visibleColumn, QString(), true/*visible*/, ci/*foreign*/));
                 /*
                         //add visibleField to the list of SELECTed fields if it is not yes present there
                         if (!findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
@@ -1452,40 +1461,48 @@ void QuerySchema::computeFieldsExpanded() const
     i = -1;
     foreach(QueryColumnInfo* ci, list) {
         i++;
-        (*d->fieldsExpanded)[i] = ci;
+        d->fieldsExpanded->insert(i, ci);
         d->columnsOrderExpanded->insert(ci, i);
         //remember field by name/alias/table.name if there's no such string yet in d->columnInfosByNameExpanded
         if (!ci->alias.isEmpty()) {
             //store alias and table.alias
-            if (!d->columnInfosByNameExpanded[ ci->alias ])
+            if (!d->columnInfosByNameExpanded.contains(ci->alias)) {
                 d->columnInfosByNameExpanded.insert(ci->alias, ci);
+            }
             QString tableAndAlias(ci->alias);
             if (ci->field->table())
-                tableAndAlias.prepend(ci->field->table()->name() + '.');
-            if (!d->columnInfosByNameExpanded[ tableAndAlias ])
+                tableAndAlias.prepend(ci->field->table()->name() + QLatin1Char('.'));
+            if (!d->columnInfosByNameExpanded.contains(tableAndAlias)) {
                 d->columnInfosByNameExpanded.insert(tableAndAlias, ci);
+            }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName[ ci->alias ])
+                if (!d->columnInfosByName.contains(ci->alias)) {
                     d->columnInfosByName.insert(ci->alias, ci);
-                if (!d->columnInfosByName[ tableAndAlias ])
+                }
+                if (!d->columnInfosByName.contains(tableAndAlias)) {
                     d->columnInfosByName.insert(tableAndAlias, ci);
+                }
             }
         } else {
             //no alias: store name and table.name
-            if (!d->columnInfosByNameExpanded[ ci->field->name()])
+            if (!d->columnInfosByNameExpanded.contains(ci->field->name())) {
                 d->columnInfosByNameExpanded.insert(ci->field->name(), ci);
+            }
             QString tableAndName(ci->field->name());
             if (ci->field->table())
-                tableAndName.prepend(ci->field->table()->name() + '.');
-            if (!d->columnInfosByNameExpanded[ tableAndName ])
+                tableAndName.prepend(ci->field->table()->name() + QLatin1Char('.'));
+            if (!d->columnInfosByNameExpanded.contains(tableAndName)) {
                 d->columnInfosByNameExpanded.insert(tableAndName, ci);
+            }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName[ ci->field->name()])
+                if (!d->columnInfosByName.contains(ci->field->name())) {
                     d->columnInfosByName.insert(ci->field->name(), ci);
-                if (!d->columnInfosByName[ tableAndName ])
+                }
+                if (!d->columnInfosByName.contains(tableAndName)) {
                     d->columnInfosByName.insert(tableAndName, ci);
+                }
             }
         }
     }
@@ -1526,7 +1543,7 @@ void QuerySchema::computeFieldsExpanded() const
     foreach(QueryColumnInfo *ci, lookup_list) {
         i++;
         //add it to the internal list
-        (*d->internalFields)[i] = ci;
+        d->internalFields->insert(i, ci);
         d->columnsOrderExpanded->insert(ci, list.count() + i);
     }
 
@@ -1572,7 +1589,7 @@ void QuerySchema::computeFieldsExpanded() const
             if (lookupFieldSchema->boundColumn() >= lookupQueryFieldsExpanded.count())
                 continue;
             QueryColumnInfo *boundColumnInfo = 0;
-            if (!(boundColumnInfo = lookupQueryFieldsExpanded[ lookupFieldSchema->boundColumn()]))
+            if (!(boundColumnInfo = lookupQueryFieldsExpanded.value(lookupFieldSchema->boundColumn())))
                 continue;
             Field *boundField = boundColumnInfo->field;
             if (!boundField)
@@ -1636,7 +1653,7 @@ QVector<int> QuerySchema::pkeyFieldsOrder() const
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
             PreDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
 //   (*d->pkeyFieldsOrder)[j]=i;
-            (*d->pkeyFieldsOrder)[fieldIndex] = i;
+            d->pkeyFieldsOrder->insert(fieldIndex, i);
             d->pkeyFieldsCount++;
 //   j++;
         }
@@ -1740,7 +1757,7 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field,
         RelationalExpressionClass,
         ConstExpression(token, value),
         relation,
-        VariableExpression((field->table() ? (field->table()->name() + '.') : QString()) + field->name())
+        VariableExpression((field->table() ? (field->table()->name() + QLatin1Char('.')) : QString()) + field->name())
     );
     if (d->whereExpr.isNull()) {
         d->whereExpr = newExpr;
@@ -1883,7 +1900,7 @@ void QueryAsterisk::setTable(TableSchema *table)
 QDebug operator<<(QDebug dbg, const QueryAsterisk& asterisk)
 {
     if (asterisk.isAllTableAsterisk()) {
-        dbg.nospace() <<"ALL-TABLES ASTERISK (*) ON TABLES(";
+        dbg.nospace() << "ALL-TABLES ASTERISK (*) ON TABLES(";
         bool first = true;
         foreach(TableSchema *table, *asterisk.query()->tables()) {
             if (first)

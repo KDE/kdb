@@ -129,7 +129,7 @@ bool SQLiteConnection::drv_getServerVersion(Predicate::ServerVersionInfo* versio
 {
     PreDrvDbg;
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
-    QRegExp re("(\\d+)\\.(\\d+)\\.(\\d+)");
+    QRegExp re(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (re.exactMatch(version->string())) {
         version->setMajor(re.cap(1).toUInt());
         version->setMinor(re.cap(2).toUInt());

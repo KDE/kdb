@@ -21,12 +21,11 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
+#include "parser/SqlParser.h"
 
 #include <ctype.h>
 
@@ -58,7 +57,7 @@ QDebug UnaryExpressionData::debug(QDebug dbg) const
         dbg.nospace() << *a;
     else
         dbg.nospace() << "<NONE>";
-    dbg.nospace() << QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
+    dbg.nospace() << QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
     return dbg.space();
 }
 

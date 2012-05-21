@@ -483,35 +483,32 @@ bool Cursor::deleteAllRecords()
     return m_conn->deleteAllRecords(m_query);
 }
 
-QString Cursor::debugString() const
+QDebug operator<<(QDebug dbg, const Cursor& cursor)
 {
-    QString dbg = "CURSOR( ";
-    if (!m_query) {
-        dbg += "RAW STATEMENT: '";
-        dbg += m_rawStatement.toString();
-        dbg += "'\n";
-    } else {
-        dbg += "QuerySchema: '";
-        dbg += m_conn->selectStatement(m_query).toString();
-        dbg += "'\n";
+    dbg.nospace() << "CURSOR(";
+    if (!cursor.query()) {
+        dbg.nospace() << "RAW STATEMENT:" << cursor.rawStatement().toString()
+                      << "\n";
     }
-    if (isOpened())
-        dbg += " OPENED";
-    else
-        dbg += " NOT_OPENED";
-    if (isBuffered())
-        dbg += " BUFFERED";
-    else
-        dbg += " NOT_BUFFERED";
-    dbg += " AT=";
-    dbg += QString::number((unsigned long)at());
-    dbg += " )";
-    return dbg;
-}
-
-void Cursor::debug() const
-{
-    PreDbg << debugString();
+    else {
+        dbg.nospace() << "QuerySchema:"
+                      << cursor.connection()->selectStatement(cursor.query()).toString()
+                      << "\n";
+    }
+    if (cursor.isOpened()) {
+        dbg.space() << "OPENED";
+    }
+    else {
+        dbg.space() << "NOT_OPENED";
+    }
+    if (cursor.isBuffered()) {
+        dbg.space() << "BUFFERED";
+    }
+    else {
+        dbg.space() << "NOT_BUFFERED";
+    }
+    dbg.nospace() << "AT=" << cursor.at() << ")";
+    return dbg.space();
 }
 
 void Cursor::setOrderByColumnList(const QStringList& columnNames)

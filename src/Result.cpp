@@ -121,7 +121,7 @@ void Result::prependMessage(int code, const QString& message)
         if (d->message.isEmpty())
             d->message = message;
         else
-            d->message = message + " " + d->message;
+            d->message = message + QLatin1Char(' ') + d->message;
     }
 //    if (m_hasError)
 #warning TODO ERRMSG(this);

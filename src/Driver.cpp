@@ -201,7 +201,7 @@ bool Driver::isSystemObjectName(const QString& n) const
 bool Driver::isPredicateSystemObjectName(const QString& n)
 {
     const QString lcName = n.toLower();
-    if (!lcName.startsWith("kexi__"))
+    if (!lcName.startsWith(QLatin1String("kexi__")))
         return false;
     return Connection::predicateSystemTableNames().contains(lcName);
 }

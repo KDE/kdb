@@ -62,7 +62,7 @@ public:
 //2.0     is destroyed before DriverManagerInternal) */
 //2.0    void aboutDelete(Driver* drv);
 
-protected slots:
+protected Q_SLOTS:
     /*! Used to destroy all drivers on QApplication quit, so even if there are
      DriverManager's static instances that are destroyed on program
      "static destruction", drivers are not kept after QApplication death.

@@ -102,7 +102,7 @@ bool Validator::acceptsEmptyValue() const
 
 const QString Validator::msgColumnNotEmpty()
 {
-    return QT_TR_NOOP("\"%1\" value has to be entered.");
+    return QLatin1String(QT_TR_NOOP("\"%1\" value has to be entered."));
 }
 
 //-----------------------------------------------------------

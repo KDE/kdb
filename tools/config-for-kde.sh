@@ -28,7 +28,7 @@ if [ -z "$KDEDIRS" ] ; then
 fi
 
 if [ -d "/usr/lib64" ] ; then
-    c=lib64
+    _libdir=lib64
 else
     _libdir=lib
 fi

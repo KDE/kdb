@@ -21,12 +21,11 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
+#include "parser/Parser_p.h"
 
 #include <ctype.h>
 

@@ -382,7 +382,7 @@ def generate_toString_conversion(name, _type):
 # generates conversion code from string to many types, used by Data(QMap<..>)
 # @todo more types
 def generate_fromString_conversion(name, _type):
-    s = 'map[\"%s\"]' % name
+    s = 'map[QLatin1String(\"%s\")]' % name
     if _type == 'bool': # 0 or 1
         return """%s = %s.toInt(ok) == 1;
     if (ok && !(*ok))
@@ -628,7 +628,7 @@ def process():
                     data_class_members += "%s::%s()\n" % (shared_class_name, setter)
             data_class_members += "        %s%s %s;\n" % (('mutable ' if member['mutable'] else ''), member['type'], member['name'])
             if shared_class_options['with_from_to_map']:
-                toMap_impl += '    map[\"%s\"] = %s;\n' % (member['name'], generate_toString_conversion(member['name'], member['type']))
+                toMap_impl += '    map[QLatin1String(\"%s\")] = %s;\n' % (member['name'], generate_toString_conversion(member['name'], member['type']))
                 fromMap_impl += '    %s\n' % generate_fromString_conversion(member['name'], member['type'])
             update_data_accesors()
             member = {}

@@ -75,7 +75,7 @@ bool DatabaseProperties::setCaption(const QString& _name, const QString& caption
 {
     QString name(_name.trimmed());
     //captions have ' ' prefix
-    name.prepend(" ");
+    name.prepend(QLatin1String(" "));
     bool ok;
     //we need to know whether update or insert
     bool exists = m_conn->resultExists(
@@ -130,7 +130,7 @@ QString DatabaseProperties::caption(const QString& _name)
     QString result;
     QString name(_name.trimmed());
     //captions have ' ' prefix
-    name.prepend(" ");
+    name.prepend(QLatin1String(" "));
     if (true != m_conn->querySingleString(
                 EscapedString("SELECT db_value FROM kexi__db WHERE db_property=")
                     + m_conn->escapeString(name), &result))

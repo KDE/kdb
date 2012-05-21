@@ -323,7 +323,7 @@ EscapedString EscapedString::arg(const QByteArray &a, int fieldWidth, const QCha
 {
     if (!m_valid)
         return EscapedString::invalid();
-    return EscapedString(toString().arg(QString(a), fieldWidth, fillChar));
+    return EscapedString(toString().arg(QLatin1String(a), fieldWidth, fillChar));
 }
 
 EscapedString EscapedString::arg(int a, int fieldWidth, int base, const QChar & fillChar) const

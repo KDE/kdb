@@ -147,8 +147,11 @@ public:
                        const QString& n17 = QString(), const QString& n18 = QString()
                       );
 
-    /*! Like above, but with a QStringList */
+    /*! Like above, but for QStringList. */
     FieldList* subList(const QStringList& list);
+
+    /*! @overload subList(const QStringList&) */
+    FieldList* subList(const QList<QByteArray>& list);
 
     /*! Like above, but with a list of field indices */
     FieldList* subList(const QList<uint>& list);
@@ -167,13 +170,13 @@ public:
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed.
     */
-    EscapedString sqlFieldsList(Connection *conn, const QString& separator = QString(','),
+    EscapedString sqlFieldsList(Connection *conn, const QString& separator = QLatin1String(","),
                                 const QString& tableAlias = QString(),
                                 Predicate::EscapingType escapingType = Predicate::DriverEscaping) const;
 
     /*! Like above, but this is convenient static function, so you can pass any @a list here. */
     static EscapedString sqlFieldsList(const Field::List& list, Connection *conn,
-                                       const QString& separator = QString(','),
+                                       const QString& separator = QLatin1String(","),
                                        const QString& tableAlias = QString(),
                                        Predicate::EscapingType escapingType = Predicate::DriverEscaping);
 

@@ -38,7 +38,8 @@ QDebug operator<<(QDebug dbg, const RecordData& data)
         dbg.nospace() << QString::fromLatin1("RECORD DATA (%1 COLUMNS):").arg(data.size());
         for (int i = 0; i < data.size(); i++) {
             dbg.space()
-                << QString::fromLatin1("%1:[%2]%3").arg(i).arg(data[i].typeName()).arg(data[i].toString());
+                << QString::fromLatin1("%1:[%2]%3").arg(i)
+                       .arg(QLatin1String(data[i].typeName())).arg(data[i].toString());
         }
     }
     return dbg.space();

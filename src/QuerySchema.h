@@ -50,27 +50,21 @@ public:
     typedef QList<QueryColumnInfo*> List;
     typedef QList<QueryColumnInfo*>::ConstIterator ListIterator;
 
-    QueryColumnInfo(Field *f, const QByteArray& _alias, bool _visible,
+    QueryColumnInfo(Field *f, const QString& _alias, bool _visible,
                     QueryColumnInfo *foreignColumn = 0);
     ~QueryColumnInfo();
 
     //! @return alias if it is not empty, field's name otherwise.
-    inline QByteArray aliasOrName() const {
-        if (alias.isEmpty()) {
-            return field->name().toLatin1();
-        } else {
-            return QByteArray((const char*)alias);
-        }
-    }
+    QString aliasOrName() const;
 
     //! @return field's caption if it is not empty, field's alias otherwise.
     //! If alias is also empty - returns field's name.
     inline QString captionOrAliasOrName() const {
-        return field->caption().isEmpty() ? QString(aliasOrName()) : field->caption();
+        return field->caption().isEmpty() ? aliasOrName() : field->caption();
     }
 
     Field *field;
-    QByteArray alias;
+    QString alias;
 
     /*! @return index of column with visible lookup value within the 'fields expanded' vector.
      -1 means no visible lookup value is available because there is no lookup for the column defined.
@@ -399,7 +393,7 @@ public:
      if @a alias is not empty, it will be assigned to this table
      using setTableAlias(position, alias)
     */
-    void addTable(TableSchema *table, const QByteArray& alias = QByteArray());
+    void addTable(TableSchema *table, const QString& alias = QString());
 
     /*! Removes @a table schema from this query.
      This does not destroy @a table object but only takes it out of the list.
@@ -439,7 +433,7 @@ public:
      If the column is an expression and has no alias defined,
      a new unique alias will be generated automatically on this call.
     */
-    QByteArray columnAlias(uint position) const;
+    QString columnAlias(uint position) const;
 
     /*! @return number of column aliases */
     int columnAliasesCount() const;
@@ -453,7 +447,7 @@ public:
 
     /*! Sets @a alias for a column at @a position, within the query.
      Passing empty string to @a alias clears alias for a given column. */
-    void setColumnAlias(uint position, const QByteArray& alias);
+    void setColumnAlias(uint position, const QString& alias);
 
     /*! @return a table position (within FROM section),
      that is bound to column at @a columnPosition (within SELECT section).
@@ -484,7 +478,7 @@ public:
     /*! @return alias of a table at @a position (within FROM section)
      or null string if there is no alias for this table
      or if there is no such table within the query defined. */
-    QByteArray tableAlias(uint position) const;
+    QString tableAlias(uint position) const;
 
     /*! @return table position (within FROM section) that has attached
      alias @a name.
@@ -497,7 +491,7 @@ public:
      e.g. "SELECT 1 from table1 t, table2 t" is ok
      but "SELECT t.id from table1 t, table2 t" is not.
     */
-    int tablePositionForAlias(const QByteArray& name) const;
+    int tablePositionForAlias(const QString& name) const;
 
     /*! @return table position (within FROM section) for @a tableName.
      -1 is returend if there's no such table declared in the FROM section.
@@ -522,13 +516,13 @@ public:
 
     /*! @return column position that has defined alias @a name.
      If there is no such alias, -1 is returned. */
-    int columnPositionForAlias(const QByteArray& name) const;
+    int columnPositionForAlias(const QString& name) const;
 
     /*! Sets @a alias for a table at @a position (within FROM section
      of the the query).
      Passing empty sting to @a alias clears alias for a given table
      (only for specified @a position). */
-    void setTableAlias(uint position, const QByteArray& alias);
+    void setTableAlias(uint position, const QString& alias);
 
     /*! @return a list of relationships defined for this query */
     Relationship::List* relationships() const;

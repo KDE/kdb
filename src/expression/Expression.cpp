@@ -31,33 +31,34 @@
 
 using namespace Predicate;
 
+//! Cache
+class ExpressionClassNames
+{
+public:
+    ExpressionClassNames()
+     : names((QString[]){
+            QLatin1String("Unknown"),
+            QLatin1String("Unary"),
+            QLatin1String("Arithm"),
+            QLatin1String("Logical"),
+            QLatin1String("Relational"),
+            QLatin1String("SpecialBinary"),
+            QLatin1String("Const"),
+            QLatin1String("Variable"),
+            QLatin1String("Function"),
+            QLatin1String("Aggregation"),
+            QLatin1String("TableList"),
+            QLatin1String("QueryParameter")})
+    {
+    }
+    const QString names[];
+};
+
 PREDICATE_EXPORT QString Predicate::expressionClassName(ExpressionClass c)
 {
-#warning TODO: change to map
-    if (c == UnaryExpressionClass)
-        return "Unary";
-    else if (c == ArithmeticExpressionClass)
-        return "Arithm";
-    else if (c == LogicalExpressionClass)
-        return "Logical";
-    else if (c == RelationalExpressionClass)
-        return "Relational";
-    else if (c == SpecialBinaryExpressionClass)
-        return "SpecialBinary";
-    else if (c == ConstExpressionClass)
-        return "Const";
-    else if (c == VariableExpressionClass)
-        return "Variable";
-    else if (c == FunctionExpressionClass)
-        return "Function";
-    else if (c == AggregationExpressionClass)
-        return "Aggregation";
-    else if (c == TableListExpressionClass)
-        return "TableList";
-    else if (c == QueryParameterExpressionClass)
-        return "QueryParameter";
-
-    return "Unknown";
+    PREDICATE_GLOBAL_STATIC(ExpressionClassNames, Predicate_expressionClassNames)
+    Q_ASSERT(c < sizeof(Predicate_expressionClassNames->names));
+    return Predicate_expressionClassNames->names[c];
 }
 
 PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Expression& expr)
@@ -102,7 +103,7 @@ Field::Type ExpressionData::type() const
 
 QDebug ExpressionData::debug(QDebug dbg) const
 {
-    dbg.nospace() << QString("Exp(%1,type=%1)")
+    dbg.nospace() << QString::fromLatin1("Exp(%1,type=%1)")
                    .arg(token).arg(Driver::defaultSQLTypeName(type()));
     return dbg.space();
 }
@@ -195,11 +196,11 @@ QString Expression::tokenToDebugString(int token)
 {
     if (token < 254) {
         if (isprint(token))
-            return QString(QChar(uchar(token)));
+            return QString(QLatin1Char(uchar(token)));
         else
             return QString::number(token);
     }
-    return QString(safe_tname(token));
+    return QLatin1String(safe_tname(token));
 }
 
 Field::Type Expression::type() const

@@ -1,3 +1,4 @@
+remove_definitions(-DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII)
 
 macro(build_test __test_name)
     set(_test_name Test${__test_name})

@@ -125,7 +125,6 @@ Field* Field::copy() const
 void Field::init()
 {
     m_parent = 0;
-    m_name = "";
     m_type = InvalidType;
     m_length = 0;
     m_precision = 0;
@@ -191,7 +190,8 @@ QStringList Field::typeNames()
 QString Field::typeString(uint type)
 {
     m_typeNames.init();
-    return (type <= LastType) ? m_typeNames.at((int)LastType + 1 + type) : QString("Type%1").arg(type);
+    return (type <= LastType) ? m_typeNames.at((int)LastType + 1 + type)
+                              : (QLatin1String("Type") + QString::number(type));
 }
 
 QString Field::typeGroupName(uint typeGroup)
@@ -209,7 +209,8 @@ QStringList Field::typeGroupNames()
 QString Field::typeGroupString(uint typeGroup)
 {
     m_typeGroupNames.init();
-    return m_typeGroupNames.value((int)LastTypeGroup + 1 + typeGroup, QString("TypeGroup%1").arg(typeGroup));
+    return m_typeGroupNames.value((int)LastTypeGroup + 1 + typeGroup,
+                                  QLatin1String("TypeGroup") + QString::number(typeGroup));
 }
 
 Field::Type Field::typeForString(const QString& typeString)
@@ -468,7 +469,7 @@ Field::setDefaultValue(const QByteArray& def)
         break;
     }
     case Date: {//YYYY-MM-DD
-        QDate date = QDate::fromString(def, Qt::ISODate);
+        QDate date = QDate::fromString(QLatin1String(def), Qt::ISODate);
         if (!date.isValid())
             m_defaultValue = QVariant();
         else
@@ -476,7 +477,7 @@ Field::setDefaultValue(const QByteArray& def)
         break;
     }
     case DateTime: {//YYYY-MM-DDTHH:MM:SS
-        QDateTime dt = QDateTime::fromString(def, Qt::ISODate);
+        QDateTime dt = QDateTime::fromString(QLatin1String(def), Qt::ISODate);
         if (!dt.isValid())
             m_defaultValue = QVariant();
         else
@@ -484,7 +485,7 @@ Field::setDefaultValue(const QByteArray& def)
         break;
     }
     case Time: {//HH:MM:SS
-        QTime time = QTime::fromString(def, Qt::ISODate);
+        QTime time = QTime::fromString(QLatin1String(def), Qt::ISODate);
         if (!time.isValid())
             m_defaultValue = QVariant();
         else
@@ -511,14 +512,14 @@ Field::setDefaultValue(const QByteArray& def)
         if (def.isNull() || (def.length() > 255))
             m_defaultValue = QVariant();
         else
-            m_defaultValue = QVariant((QString)def);
+            m_defaultValue = QVariant(QLatin1String(def));
         break;
     }
     case LongText: {
         if (def.isNull())
             m_defaultValue = QVariant();
         else
-            m_defaultValue = QVariant((QString)def);
+            m_defaultValue = QVariant(QLatin1String(def));
         break;
     }
     case BLOB: {
@@ -607,7 +608,7 @@ void Field::setIndexed(bool s)
 QDebug operator<<(QDebug dbg, const Field& field)
 {
     Connection *conn = field.table() ? field.table()->connection() : 0;
-    dbg.nospace() << (field.name().isEmpty() ? "<NONAME> " : field.name());
+    dbg.nospace() << (field.name().isEmpty() ? QLatin1String("<NONAME> ") : field.name());
     if (field.options() & Field::Unsigned)
         dbg.space() << "UNSIGNED";
     dbg.space() << ((conn && conn->driver())
@@ -634,7 +635,8 @@ QDebug operator<<(QDebug dbg, const Field& field)
     if (field.constraints() & Field::NotEmpty)
         dbg.space() << "NOTEMPTY";
     if (!field.defaultValue().isNull()) {
-        dbg.space() << QString::fromLatin1("DEFAULT=[%1]").arg(field.defaultValue().typeName());
+        dbg.space() << QString::fromLatin1("DEFAULT=[%1]")
+                           .arg(QLatin1String(field.defaultValue().typeName()));
         dbg.nospace() << Predicate::variantToString(field.defaultValue());
     }
     if (field.isExpression()) {
@@ -653,7 +655,8 @@ QDebug operator<<(QDebug dbg, const Field& field)
             else
                 dbg.nospace() << ',';
             dbg.space() << QString::fromLatin1("%1 = %2 (%3)")
-                .arg(QString(it.key())).arg(it.value().toString()).arg(it.value().typeName());
+                .arg(QLatin1String(it.key())).arg(it.value().toString())
+                .arg(QLatin1String(it.value().typeName()));
         }
     }
     return dbg.space();
@@ -701,12 +704,12 @@ void Field::setCustomProperty(const QByteArray& propertyName, const QVariant& va
 //-------------------------------------------------------
 #define ADDTYPE(type, i18, str) \
     (*this)[Field::type] = i18; \
-    (*this)[Field::type+Field::LastType+1] = str; \
+    (*this)[Field::type+Field::LastType+1] = QLatin1String(str); \
     str2num[ QString::fromLatin1(str).toLower() ] = type; \
     names.append(i18)
 #define ADDGROUP(type, i18, str) \
     (*this)[Field::type] = i18; \
-    (*this)[Field::type+Field::LastTypeGroup+1] = str; \
+    (*this)[Field::type+Field::LastTypeGroup+1] = QLatin1String(str); \
     str2num[ QString::fromLatin1(str).toLower() ] = type; \
     names.append(i18)
 

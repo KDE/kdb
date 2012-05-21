@@ -137,20 +137,23 @@ bool RecordEditBuffer::isEmpty() const
     return true;
 }
 
-void RecordEditBuffer::debug()
+QDebug operator<<(QDebug dbg, const RecordEditBuffer& buffer)
 {
-    if (isDBAware()) {
-        PreDbg << "RecordEditBuffer type=DB-AWARE, " << m_dbBuffer->count() << " items";
-        for (DBMap::ConstIterator it = m_dbBuffer->constBegin(); it != m_dbBuffer->constEnd(); ++it) {
-            PreDbg << "* field name=" << it.key()->field->name() << " val="
-            << (it.value().isNull() ? QString("<NULL>") : it.value().toString())
-            << (hasDefaultValueAt(*it.key()) ? " DEFAULT" : "");
+    if (buffer.isDBAware()) {
+        dbg.space() << "RecordEditBuffer type=DB-AWARE,";
+        dbg.space() << buffer.dbBuffer().count() << " items\n";
+        for (RecordEditBuffer::DBMap::ConstIterator it = buffer.dbBuffer().constBegin(); it != buffer.dbBuffer().constEnd(); ++it) {
+            dbg.nospace() << "* field name=" << it.key()->field->name() << "val="
+            << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString())
+            << (buffer.hasDefaultValueAt(*it.key()) ? " DEFAULT\n" : "\n");
         }
-        return;
+        return dbg.space();
     }
-    PreDbg << "RecordEditBuffer type=SIMPLE, " << m_simpleBuffer->count() << " items";
-    for (SimpleMap::ConstIterator it = m_simpleBuffer->constBegin(); it != m_simpleBuffer->constEnd(); ++it) {
-        PreDbg << "* field name=" << it.key() << " val="
-        << (it.value().isNull() ? QString("<NULL>") : it.value().toString());
+    dbg.space() << "RecordEditBuffer type=SIMPLE,";
+    dbg.space() << buffer.simpleBuffer().count() << " items\n";
+    for (RecordEditBuffer::SimpleMap::ConstIterator it = buffer.simpleBuffer().constBegin(); it != buffer.simpleBuffer().constEnd(); ++it) {
+        dbg.space() << "* field name=" << it.key() << "val="
+        << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString()) << "\n";
     }
+    return dbg.space();
 }

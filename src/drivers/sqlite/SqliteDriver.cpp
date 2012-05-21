@@ -54,11 +54,11 @@ SQLiteDriver::SQLiteDriver()
 
     //special method for autoincrement definition
     beh->SPECIAL_AUTO_INCREMENT_DEF = true;
-    beh->AUTO_INCREMENT_FIELD_OPTION = ""; //not available
-    beh->AUTO_INCREMENT_TYPE = "INTEGER";
-    beh->AUTO_INCREMENT_PK_FIELD_OPTION = "PRIMARY KEY";
+    beh->AUTO_INCREMENT_FIELD_OPTION = QString(); //not available
+    beh->AUTO_INCREMENT_TYPE = QLatin1String("INTEGER");
+    beh->AUTO_INCREMENT_PK_FIELD_OPTION = QLatin1String("PRIMARY KEY");
     beh->AUTO_INCREMENT_REQUIRES_PK = true;
-    beh->ROW_ID_FIELD_NAME = "OID";
+    beh->ROW_ID_FIELD_NAME = QLatin1String("OID");
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = true;
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
     beh->SELECT_1_SUBQUERY_SUPPORTED = true;
@@ -69,22 +69,22 @@ SQLiteDriver::SQLiteDriver()
     initDriverSpecificKeywords(keywords);
 
     //predefined properties
-    d->properties["client_library_version"] = sqlite3_libversion();
-    d->properties["default_server_encoding"] = "UTF8"; //OK?
+    d->properties["client_library_version"] = QLatin1String(sqlite3_libversion());
+    d->properties["default_server_encoding"] = QLatin1String("UTF8"); //OK?
 
-    d->typeNames[Field::Byte] = "Byte";
-    d->typeNames[Field::ShortInteger] = "ShortInteger";
-    d->typeNames[Field::Integer] = "Integer";
-    d->typeNames[Field::BigInteger] = "BigInteger";
-    d->typeNames[Field::Boolean] = "Boolean";
-    d->typeNames[Field::Date] = "Date";       // In fact date/time types could be declared as datetext etc.
-    d->typeNames[Field::DateTime] = "DateTime"; // to force text affinity..., see http://sqlite.org/datatype3.html
-    d->typeNames[Field::Time] = "Time";       //
-    d->typeNames[Field::Float] = "Float";
-    d->typeNames[Field::Double] = "Double";
-    d->typeNames[Field::Text] = "Text";
-    d->typeNames[Field::LongText] = "CLOB";
-    d->typeNames[Field::BLOB] = "BLOB";
+    d->typeNames[Field::Byte] = QLatin1String("Byte");
+    d->typeNames[Field::ShortInteger] = QLatin1String("ShortInteger");
+    d->typeNames[Field::Integer] = QLatin1String("Integer");
+    d->typeNames[Field::BigInteger] = QLatin1String("BigInteger");
+    d->typeNames[Field::Boolean] = QLatin1String("Boolean");
+    d->typeNames[Field::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
+    d->typeNames[Field::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
+    d->typeNames[Field::Time] = QLatin1String("Time");
+    d->typeNames[Field::Float] = QLatin1String("Float");
+    d->typeNames[Field::Double] = QLatin1String("Double");
+    d->typeNames[Field::Text] = QLatin1String("Text");
+    d->typeNames[Field::LongText] = QLatin1String("CLOB");
+    d->typeNames[Field::BLOB] = QLatin1String("BLOB");
 }
 
 SQLiteDriver::~SQLiteDriver()
@@ -101,15 +101,16 @@ SQLiteDriver::drv_createConnection(const ConnectionData& connData)
 
 bool SQLiteDriver::isSystemObjectName(const QString& n) const
 {
-    return Driver::isSystemObjectName(n) || n.toLower().startsWith("sqlite_");
+    return Driver::isSystemObjectName(n)
+           || n.toLower().startsWith(QLatin1String("sqlite_"));
 }
 
 bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
 {
-    QString lcName = n.toLower();
-    return (lcName == "_rowid_")
-           || (lcName == "rowid")
-           || (lcName == "oid");
+    QString lcName(n.toLower());
+    return (lcName == QLatin1String("_rowid_"))
+           || (lcName == QLatin1String("rowid"))
+           || (lcName == QLatin1String("oid"));
 }
 
 EscapedString SQLiteDriver::escapeString(const QString& str) const

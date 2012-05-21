@@ -21,12 +21,11 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
+#include "parser/SqlParser.h"
 
 #include <ctype.h>
 
@@ -136,28 +135,28 @@ QString BinaryExpressionData::tokenToString() const
         return Expression::tokenToDebugString(token);
     // other arithmetic operations: << >>
     switch (token) {
-    case BITWISE_SHIFT_RIGHT: return ">>";
-    case BITWISE_SHIFT_LEFT: return "<<";
+    case BITWISE_SHIFT_RIGHT: return QLatin1String(">>");
+    case BITWISE_SHIFT_LEFT: return QLatin1String("<<");
         // other relational operations: <= >= <> (or !=) LIKE IN
-    case NOT_EQUAL: return "<>";
-    case NOT_EQUAL2: return "!=";
-    case LESS_OR_EQUAL: return "<=";
-    case GREATER_OR_EQUAL: return ">=";
-    case LIKE: return "LIKE";
-    case SQL_IN: return "IN";
+    case NOT_EQUAL: return QLatin1String("<>");
+    case NOT_EQUAL2: return QLatin1String("!=");
+    case LESS_OR_EQUAL: return QLatin1String("<=");
+    case GREATER_OR_EQUAL: return QLatin1String(">=");
+    case LIKE: return QLatin1String("LIKE");
+    case SQL_IN: return QLatin1String("IN");
         // other logical operations: OR (or ||) AND (or &&) XOR
-    case SIMILAR_TO: return "SIMILAR TO";
-    case NOT_SIMILAR_TO: return "NOT SIMILAR TO";
-    case OR: return "OR";
-    case AND: return "AND";
-    case XOR: return "XOR";
+    case SIMILAR_TO: return QLatin1String("SIMILAR TO");
+    case NOT_SIMILAR_TO: return QLatin1String("NOT SIMILAR TO");
+    case OR: return QLatin1String("OR");
+    case AND: return QLatin1String("AND");
+    case XOR: return QLatin1String("XOR");
         // other string operations: || (as CONCATENATION)
-    case CONCATENATION: return "||";
+    case CONCATENATION: return QLatin1String("||");
         // SpecialBinary "pseudo operators":
         /* not handled here */
     default:;
     }
-    return QString("{INVALID_BINARY_OPERATOR#%1} ").arg(token);
+    return QString::fromLatin1("{INVALID_BINARY_OPERATOR#%1} ").arg(token);
 }
 
 EscapedString BinaryExpressionData::toString(QuerySchemaParameterValueListIterator* params) const

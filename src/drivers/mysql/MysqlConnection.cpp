@@ -70,7 +70,7 @@ bool MysqlConnection::drv_connect()
 bool MysqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
 {
     // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
-    version->setString(mysql_get_server_info(d->mysql));
+    version->setString(QLatin1String(mysql_get_server_info(d->mysql)));
 
     // get the version info using 'version' built-in variable:
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
@@ -78,7 +78,7 @@ bool MysqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version
     QString versionString;
     tristate res = querySingleString(EscapedString("SELECT @@version"),
                                      &versionString, /*column*/0, false /*!addLimitTo1*/);
-    QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)");
+    QRegExp versionRe(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (res == false) // sanity
         return false;
     if (versionRe.exactMatch(versionString)) {
@@ -113,7 +113,7 @@ bool MysqlConnection::drv_getDatabasesList(QStringList* list)
     if (res != 0) {
         MYSQL_ROW row;
         while ((row = mysql_fetch_row(res)) != 0) {
-            *list << QString(row[0]);
+            *list << QString::fromUtf8(row[0]);
         }
         mysql_free_result(res);
         return true;

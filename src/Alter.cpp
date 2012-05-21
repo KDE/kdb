@@ -216,10 +216,11 @@ void AlterTableHandler::ChangeFieldPropertyAction::updateAlteringRequirements()
 
 QString AlterTableHandler::ChangeFieldPropertyAction::debugString(const DebugOptions& debugOptions)
 {
-    QString s = QString("Set \"%1\" property for table field \"%2\" to \"%3\"")
+    QString s = QString::fromLatin1("Set \"%1\" property for table field \"%2\" to \"%3\"")
                 .arg(m_propertyName).arg(fieldName()).arg(m_newValue.toString());
-    if (debugOptions.showUID)
-        s.append(QString(" (UID=%1)").arg(m_fieldUID));
+    if (debugOptions.showUID) {
+        s.append(QString::fromLatin1(" (UID=%1)").arg(m_fieldUID));
+    }
     return s;
 }
 
@@ -247,12 +248,14 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
         debugOptions.showFieldDebug = debugTarget != 0;
         debugString += action->debugString(debugOptions);
     } else {
-        if (!debugTarget)
-            debugString += "[No action]"; //hmm
+        if (!debugTarget) {
+            debugString += QLatin1String("[No action]"); //hmm
+        }
     }
     if (debugTarget) {
-        if (!debugString.isEmpty())
-            *debugTarget += debugString + '\n';
+        if (!debugString.isEmpty()) {
+            *debugTarget += debugString + QLatin1Char('\n');
+        }
     } else {
         PreDbg << debugString;
 #ifdef KEXI_DEBUG_GUI
@@ -271,9 +274,9 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
         fieldName = dynamic_cast<AlterTableHandler::FieldActionBase*>(it.value())->fieldName();
     }
     else {
-        fieldName = "??";
+        fieldName = QLatin1String("??");
     }
-    QString dbg(QString("Action dict for field \"%1\" (%2, UID=%3):")
+    QString dbg(QString::fromLatin1("Action dict for field \"%1\" (%2, UID=%3):")
                         .arg(fieldName).arg(dict->count()).arg(fieldUID));
     PreDbg << dbg;
 #ifdef KEXI_DEBUG_GUI
@@ -319,7 +322,7 @@ static void debugFieldActions(const AlterTableHandler::ActionDictDict &fieldActi
 void AlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDict &fieldActions)
 {
     ActionDict *actionsLikeThis = fieldActions.value(uid());
-    if (m_propertyName == "name") {
+    if (m_propertyName == QLatin1String("name")) {
         // Case 1. special: name1 -> name2, i.e. rename action
         QString newName(newValue().toString());
         // try to find rename(newName, otherName) action
@@ -402,7 +405,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(TableSc
         return result;
     }
 
-    if (m_propertyName == "name") {
+    if (m_propertyName == QLatin1String("name")) {
         if (fieldHash->value(field->name()) == field->name())
             fieldHash->remove(field->name());
         fieldHash->insert(newValue().toString(), field->name());
@@ -434,7 +437,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
     return true;
 
     //2. Harder cases, that often require special care
-    if (m_propertyName == "name") {
+    if (m_propertyName == QLatin1String("name")) {
         /*mysql:
          A. Get real field type (it's safer):
             let <TYPE> be the 2nd "Type" column from result of "DESCRIBE tablename oldfieldname"
@@ -443,7 +446,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
           ( http://dev.mysql.com/doc/refman/5.0/en/alter-table.html )
         */
     }
-    if (m_propertyName == "type") {
+    if (m_propertyName == QLatin1String("type")) {
         /*mysql:
          A. Like A. for "name" property above
          B. Construct <TYPE> string, eg. "varchar(50)" using the driver
@@ -454,11 +457,11 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
          TODO: more cases to check
         */
     }
-    if (m_propertyName == "length") {
+    if (m_propertyName == QLatin1String("length")) {
         //use "select max( length(o_name) ) from kexi__Objects"
 
     }
-    if (m_propertyName == "primaryKey") {
+    if (m_propertyName == QLatin1String("primaryKey")) {
 //! @todo
     }
 
@@ -499,9 +502,10 @@ void AlterTableHandler::RemoveFieldAction::updateAlteringRequirements()
 
 QString AlterTableHandler::RemoveFieldAction::debugString(const DebugOptions& debugOptions)
 {
-    QString s = QString("Remove table field \"%1\"").arg(fieldName());
-    if (debugOptions.showUID)
-        s.append(QString(" (UID=%1)").arg(uid()));
+    QString s = QString::fromLatin1("Remove table field \"%1\"").arg(fieldName());
+    if (debugOptions.showUID) {
+        s.append(QString::fromLatin1(" (UID=%1)").arg(uid()));
+    }
     return s;
 }
 
@@ -586,12 +590,14 @@ void AlterTableHandler::InsertFieldAction::updateAlteringRequirements()
 
 QString AlterTableHandler::InsertFieldAction::debugString(const DebugOptions& debugOptions)
 {
-    QString s = QString("Insert table field \"%1\" at position %2")
+    QString s = QString::fromLatin1("Insert table field \"%1\" at position %2")
                 .arg(m_field->name()).arg(m_index);
-    if (debugOptions.showUID)
-        s.append(QString(" (UID=%1)").arg(m_fieldUID));
-    if (debugOptions.showFieldDebug)
-        s.append(QString(" (%1)").arg(Predicate::debugString<Field>(*m_field)));
+    if (debugOptions.showUID) {
+        s.append(QString::fromLatin1(" (UID=%1)").arg(m_fieldUID));
+    }
+    if (debugOptions.showFieldDebug) {
+        s.append(QString::fromLatin1(" (%1)").arg(Predicate::debugString<Field>(*m_field)));
+    }
     return s;
 }
 
@@ -628,7 +634,7 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
             ChangeFieldPropertyAction* changePropertyAction = dynamic_cast<ChangeFieldPropertyAction*>(it.value());
             if (changePropertyAction) {
                 //if this field is going to be renamed, also update fieldName()
-                if (changePropertyAction->propertyName() == "name") {
+                if (changePropertyAction->propertyName() == QLatin1String("name")) {
                     setFieldName(changePropertyAction->newValue().toString());
                 }
                 values.insert(changePropertyAction->propertyName().toLatin1(), changePropertyAction->newValue());
@@ -721,10 +727,11 @@ void AlterTableHandler::MoveFieldPositionAction::updateAlteringRequirements()
 
 QString AlterTableHandler::MoveFieldPositionAction::debugString(const DebugOptions& debugOptions)
 {
-    QString s = QString("Move table field \"%1\" to position %2")
+    QString s = QString::fromLatin1("Move table field \"%1\" to position %2")
                 .arg(fieldName()).arg(m_index);
-    if (debugOptions.showUID)
-        s.append(QString(" (UID=%1)").arg(uid()));
+    if (debugOptions.showUID) {
+        s.append(QString::fromLatin1(" (UID=%1)").arg(uid()));
+    }
     return s;
 }
 
@@ -892,7 +899,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
         }
     }
     // - Debug
-    QString dbg = QString("** Overall altering requirements: %1").arg(args->requirements);
+    QString dbg = QString::fromLatin1("** Overall altering requirements: %1").arg(args->requirements);
     PreDbg << dbg;
 
     if (args->onlyComputeRequirements) {
@@ -906,15 +913,16 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
     if (args->simulate)
         Utils::addAlterTableActionDebug(dbg, 0);
 #endif
-    dbg = QString("** Ordered, simplified actions (%1, was %2):")
-          .arg(currentActionsCount).arg(allActionsCount);
+    dbg = QString::fromLatin1("** Ordered, simplified actions (%1, was %2):")
+            .arg(currentActionsCount).arg(allActionsCount);
     PreDbg << dbg;
 #ifdef KEXI_DEBUG_GUI
     if (args->simulate)
         Utils::addAlterTableActionDebug(dbg, 0);
 #endif
     for (int i = 0; i < allActionsCount; i++) {
-        debugAction(actionsVector.at(i), 1, args->simulate, QString("%1: ").arg(i + 1), args->debugString);
+        debugAction(actionsVector.at(i), 1, args->simulate,
+                    QString::fromLatin1("%1: ").arg(i + 1), args->debugString);
     }
 
     if (args->requirements == 0) {//nothing to do
@@ -933,7 +941,8 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
     if (recreateTable) {
         QString tempDestTableName;
         while (true) {
-            tempDestTableName = QString("%1_temp%2%3").arg(newTable->name()).arg(QString::number(rand(), 16)).arg(QString::number(rand(), 16));
+            tempDestTableName = QString::fromLatin1("%1_temp%2%3")
+                .arg(newTable->name()).arg(QString::number(rand(), 16)).arg(QString::number(rand(), 16));
             if (!d->conn->tableSchema(tempDestTableName))
                 break;
         }

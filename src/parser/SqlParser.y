@@ -636,7 +636,7 @@ ColDef:
 IDENTIFIER ColType
 {
 	PreDbg << "adding field " << *$1;
-	field->setName($1->toLatin1());
+	field->setName(*$1);
 	parser->table()->addField(field);
 	field = 0;
 	delete $1;
@@ -840,7 +840,7 @@ IDENTIFIER
 }
 | IDENTIFIER '.' IDENTIFIER
 {
-	$$ = new QVariant( *$1 + "." + *$3 );
+	$$ = new QVariant( *$1 + QLatin1Char('.') + *$3 );
 	PreDbg << "OrderByColumnId: " << *$$;
 	delete $1;
 	delete $3;
@@ -1105,7 +1105,7 @@ aExpr9:
 /*TODO: shall we also support db name? */
 | IDENTIFIER '.' IDENTIFIER
 {
-        $$ = new VariableExpression( *$1 + "." + *$3 );
+        $$ = new VariableExpression( *$1 + QLatin1Char('.') + *$3 );
 	PreDbg << "  + identifier.identifier:" << *$1 << "." << *$3;
 	delete $1;
 	delete $3;
@@ -1410,7 +1410,7 @@ aExpr
 ColWildCard:
 '*'
 {
-        $$ = new VariableExpression("*");
+        $$ = new VariableExpression(QLatin1String("*"));
 	PreDbg << "all columns";
 
 //	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
@@ -1420,7 +1420,7 @@ ColWildCard:
 | IDENTIFIER '.' '*'
 {
 	QString s( *$1 );
-	s += ".*";
+	s += QLatin1String(".*");
         $$ = new VariableExpression(s);
 	PreDbg << "  + all columns from " << s;
 	delete $1;

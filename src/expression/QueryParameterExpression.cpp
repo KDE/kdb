@@ -21,12 +21,11 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
+#include "parser/SqlParser.h"
 
 #include <ctype.h>
 
@@ -60,9 +59,8 @@ QueryParameterExpressionData* QueryParameterExpressionData::clone()
 
 QDebug QueryParameterExpressionData::debug(QDebug dbg) const
 {
-    dbg.nospace() << "QueryParExp("
-        + QString::fromLatin1("[%2]").arg(value.toString())
-        + QString(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
+    dbg.nospace() << QString::fromLatin1("QueryParExp([%1],type=%2)")
+        .arg(value.toString()).arg(Driver::defaultSQLTypeName(type()));
     return dbg.space();
 }
 

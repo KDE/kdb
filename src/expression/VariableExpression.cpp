@@ -21,12 +21,11 @@
  */
 
 #include <Predicate/Expression>
-#include "Expression_p.h"
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
-#include "parser/SqlParser.h"
-#include "parser/Parser_p.h"
 #include <Predicate/Tools/Static>
+#include "Expression_p.h"
+#include "parser/Parser_p.h"
 
 #include <ctype.h>
 
@@ -92,7 +91,10 @@ Field::Type VariableExpressionData::type() const
     return Field::InvalidType;
 }
 
-#define IMPL_ERROR(errmsg) parseInfo.errMsg = "Implementation error"; parseInfo.errDescr = errmsg
+#define IMPL_ERROR(errmsg) { \
+    parseInfo.errMsg = QLatin1String("Implementation error"); \
+    parseInfo.errDescr = errmsg; \
+}
 
 bool VariableExpressionData::validate(ParseInfo& parseInfo)
 {
@@ -104,7 +106,7 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
 
     /* taken from parser's addColumn(): */
     PreDbg << "checking variable name: " << name;
-    int dotPos = name.indexOf('.');
+    int dotPos = name.indexOf(QLatin1Char('.'));
     QString tableName, fieldName;
 //! @todo shall we also support db name?
     if (dotPos > 0) {
@@ -113,7 +115,7 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
     }
     if (tableName.isEmpty()) {//fieldname only
         fieldName = name;
-        if (fieldName == "*") {
+        if (fieldName == QLatin1String("*")) {
 //   querySchema->addAsterisk( new QueryAsterisk(querySchema) );
             return true;
         }
@@ -153,11 +155,11 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
     if (ts) {//table.fieldname
         //check if "table" is covered by an alias
         const QList<int> tPositions = parseInfo.querySchema->tablePositions(tableName);
-        QByteArray tableAlias;
+        QString tableAlias;
         bool covered = true;
         foreach(int position, tPositions) {
             tableAlias = parseInfo.querySchema->tableAlias(position);
-            if (tableAlias.isEmpty() || tableAlias.toLower() == tableName.toLatin1()) {
+            if (tableAlias.isEmpty() || tableAlias.toLower() == tableName) {
                 covered = false; //uncovered
                 break;
             }
@@ -166,14 +168,17 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
         if (covered) {
             parseInfo.errMsg = QObject::tr("Could not access the table directly using its name");
             parseInfo.errDescr = QObject::tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
-                                      "you can write \"%3\"").arg(tableName, tableName + "." + fieldName, tableAlias + "." + QString(fieldName));
+                                             "you can write \"%3\"")
+                .arg(tableName,
+                     tableName + QLatin1Char('.') + fieldName,
+                     tableAlias + QLatin1Char('.') + fieldName);
             return false;
         }
     }
 
     int tablePosition = -1;
     if (!ts) {//try to find tableAlias
-        tablePosition = parseInfo.querySchema->tablePositionForAlias(tableName.toLatin1());
+        tablePosition = parseInfo.querySchema->tablePositionForAlias(tableName);
         if (tablePosition >= 0) {
             ts = parseInfo.querySchema->tables()->at(tablePosition);
             if (ts) {
@@ -189,13 +194,13 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
     }
 
     if (!parseInfo.repeatedTablesAndAliases.contains(tableName)) {  //for sanity
-        IMPL_ERROR(tableName + "." + fieldName + ", !positionsList ");
+        IMPL_ERROR(QString::fromLatin1("%1.%2, !positionsList ").arg(tableName, fieldName))
         return false;
     }
     const QList<int> positionsList(parseInfo.repeatedTablesAndAliases.value(tableName));
 
     //it's a table.*
-    if (fieldName == "*") {
+    if (fieldName == QLatin1String("*")) {
         if (positionsList.count() > 1) {
             parseInfo.errMsg = QObject::tr("Ambiguous \"%1.*\" expression").arg(tableName);
             parseInfo.errDescr = QObject::tr("More than one \"%1\" table or alias defined").arg(tableName);

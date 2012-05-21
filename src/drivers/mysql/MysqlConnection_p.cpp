@@ -58,7 +58,7 @@ MysqlConnectionInternal::~MysqlConnectionInternal()
 void MysqlConnectionInternal::storeResult()
 {
     setServerResultCode(mysql_errno(mysql));
-    setServerMessage(mysql_error(mysql));
+    setServerMessage(QLatin1String(mysql_error(mysql)));
 }
 
 /* ************************************************************************** */
@@ -78,16 +78,19 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
     PreDrvDbg;
     QByteArray localSocket;
     QString hostName = data.hostName();
-    if (hostName.isEmpty() || hostName.toLower() == "localhost") {
+    if (   hostName.isEmpty()
+        || 0 == QString::compare(hostName, QLatin1String("localhost"), Qt::CaseInsensitive))
+    {
         if (data.useLocalSocketFile()) {
             if (data.localSocketFileName().isEmpty()) {
                 //! @todo move the list of default sockets to a generic method
                 QStringList sockets;
 #ifndef Q_WS_WIN
-                sockets.append("/var/lib/mysql/mysql.sock");
-                sockets.append("/var/run/mysqld/mysqld.sock");
-                sockets.append("/var/run/mysql/mysql.sock");
-                sockets.append("/tmp/mysql.sock");
+                sockets
+                    << QLatin1String("/var/lib/mysql/mysql.sock")
+                    << QLatin1String("/var/run/mysqld/mysqld.sock")
+                    << QLatin1String("/var/run/mysql/mysql.sock")
+                    << QLatin1String("/tmp/mysql.sock");
 
                 foreach(const QString& socket, sockets) {
                     if (QFile(socket).exists()) {
@@ -100,7 +103,7 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
                 localSocket = QFile::encodeName(data.localSocketFileName());
         } else {
             //we're not using local socket
-            hostName = "127.0.0.1"; //this will force mysql to connect to localhost
+            hostName = QLatin1String("127.0.0.1"); //this will force mysql to connect to localhost
         }
     }
 
@@ -149,7 +152,7 @@ bool MysqlConnectionInternal::executeSQL(const EscapedString& statement)
 
 QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 {
-    return QString(str).replace('`', "'");
+    return QString(str).replace(QLatin1Char('`'), QLatin1String("'"));
 }
 
 //--------------------------------------

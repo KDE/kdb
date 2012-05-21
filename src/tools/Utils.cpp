@@ -43,14 +43,19 @@
 
 using namespace Predicate::Utils;
 
-QObject* Predicate::Utils::findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName)
+QObject* Predicate::Utils::findFirstQObjectChild(QObject *o,
+                                                 const char* className /* compat with Qt3 */,
+                                                 const char* objName)
 {
     if (!o)
         return 0;
     const QObjectList list(o->children());
     foreach(QObject *child, list) {
-        if (child->inherits(className) && (!objName || child->objectName() == objName))
+        if (   child->inherits(className)
+            && (!objName || child->objectName() == QLatin1String(objName)))
+        {
             return child;
+        }
     }
     //try children
     foreach(QObject *child, list) {
@@ -332,7 +337,7 @@ QMap<QString, QString> Predicate::Utils::deserializeMap(const QString& string)
 QString Predicate::Utils::stringToFileName(const QString& string)
 {
     QString _string(string);
-    _string.replace(QRegExp("[\\\\/:\\*?\"<>|]"), " ");
+    _string.replace(QRegExp(QLatin1String("[\\\\/:\\*?\"<>|]")), QLatin1String(" "));
     return _string.simplified();
 }
 
@@ -621,9 +626,12 @@ KTextEditorFrame::KTextEditorFrame(QWidget * parent, Qt::WindowFlags f)
 void KTextEditorFrame::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::StyleChange) {
-        if (style()->objectName() != "oxygen") // oxygen already nicely paints the frame
+        if (style()->objectName() != QLatin1String("oxygen")) {
+            // oxygen already nicely paints the frame
             setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
-        else
+        }
+        else {
             setFrameStyle(QFrame::NoFrame);
+        }
     }
 }

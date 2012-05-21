@@ -20,14 +20,17 @@
 #include "LookupFieldSchema.h"
 #include "Utils.h"
 
+#include <Predicate/Tools/Static>
+
 #include <QDomElement>
 #include <QVariant>
 #include <QStringList>
+#include <QHash>
 
 #include <QtDebug>
 
-namespace Predicate
-{
+using namespace Predicate;
+
 //! @internal
 class LookupFieldSchema::RecordSource::Private
 {
@@ -61,11 +64,33 @@ public:
     bool columnHeadersVisible;
     bool limitToList;
 };
-}
+
+//! Cache
+class LookupFieldSchemaStatic
+{
+public:
+    LookupFieldSchemaStatic()
+     : typeNames((QString[]){
+            QString(),
+            QLatin1String("table"),
+            QLatin1String("query"),
+            QLatin1String("sql"),
+            QLatin1String("valuelist"),
+            QLatin1String("fieldlist")})
+    {
+        typesForNames.insert(QLatin1String("table"), LookupFieldSchema::RecordSource::Table);
+        typesForNames.insert(QLatin1String("query"), LookupFieldSchema::RecordSource::Query);
+        typesForNames.insert(QLatin1String("sql"), LookupFieldSchema::RecordSource::SQLStatement);
+        typesForNames.insert(QLatin1String("valuelist"), LookupFieldSchema::RecordSource::ValueList);
+        typesForNames.insert(QLatin1String("fieldlist"), LookupFieldSchema::RecordSource::FieldList);
+    }
+    const QString typeNames[];
+    QHash<QString, LookupFieldSchema::RecordSource::Type> typesForNames;
+};
+
+PREDICATE_GLOBAL_STATIC(LookupFieldSchemaStatic, Predicate_lookupFieldSchemaStatic)
 
 //----------------------------
-
-using namespace Predicate;
 
 LookupFieldSchema::RecordSource::RecordSource()
         : d(new Private)
@@ -106,31 +131,13 @@ void LookupFieldSchema::RecordSource::setName(const QString& name)
 
 QString LookupFieldSchema::RecordSource::typeName() const
 {
-    switch (d->type) {
-    case Table: return "table";
-    case Query: return "query";
-    case SQLStatement: return "sql";
-    case ValueList: return "valuelist";
-    case FieldList: return "fieldlist";
-    default:;
-    }
-    return QString();
+    Q_ASSERT(d->type < sizeof(Predicate_lookupFieldSchemaStatic->typeNames));
+    return Predicate_lookupFieldSchemaStatic->typeNames[d->type];
 }
 
 void LookupFieldSchema::RecordSource::setTypeByName(const QString& typeName)
 {
-    if (typeName == "table")
-        setType(Table);
-    else if (typeName == "query")
-        setType(Query);
-    else if (typeName == "sql")
-        setType(SQLStatement);
-    else if (typeName == "valuelist")
-        setType(ValueList);
-    else if (typeName == "fieldlist")
-        setType(FieldList);
-    else
-        setType(NoType);
+    setType(Predicate_lookupFieldSchemaStatic->typesForNames.value(typeName, NoType));
 }
 
 QStringList LookupFieldSchema::RecordSource::values() const
@@ -159,7 +166,7 @@ QDebug operator<<(QDebug dbg, const LookupFieldSchema::RecordSource& source)
     dbg.space() << "NAME:";
     dbg.space() << source.name();
     dbg.space() << "VALUES:";
-    dbg.space() << source.values().join("|");
+    dbg.space() << source.values().join(QLatin1String("|"));
     return dbg.space();
 }
 
@@ -244,7 +251,7 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
     LookupFieldSchema::RecordSource recordSource;
     for (QDomNode node = lookupEl.firstChild(); !node.isNull(); node = node.nextSibling()) {
         QDomElement el = node.toElement();
-        QString name(el.tagName());
+        const QByteArray name(el.tagName().toLatin1());
         if (name == "row-source") {
             /*<row-source>
               empty
@@ -257,11 +264,14 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
               </values>
              </row-source> */
             for (el = el.firstChild().toElement(); !el.isNull(); el = el.nextSibling().toElement()) {
-                if (el.tagName() == "type")
+                const QByteArray childName(el.tagName().toLatin1());
+                if (childName == "type") {
                     recordSource.setTypeByName(el.text());
-                else if (el.tagName() == "name")
+                }
+                else if (childName == "name") {
                     recordSource.setName(el.text());
 //! @todo handle fieldlist (retrieve from external table or so?), use RecordSource::setValues()
+                }
             }
         } else if (name == "bound-column") {
             /* <bound-column>
@@ -318,11 +328,15 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setLimitToList(val.toBool());
-        } else if (name == "display-widget") {
-            if (el.text() == "combobox")
+        }
+        else if (name == "display-widget") {
+            const QByteArray displayWidgetName(el.text().toLatin1());
+            if (displayWidgetName == "combobox") {
                 lookupFieldSchema->setDisplayWidget(LookupFieldSchema::ComboBox);
-            else if (el.text() == "listbox")
+            }
+            else if (displayWidgetName == "listbox") {
                 lookupFieldSchema->setDisplayWidget(LookupFieldSchema::ListBox);
+            }
         }
     }
     lookupFieldSchema->setRecordSource(recordSource);
@@ -334,41 +348,43 @@ void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument&
 {
     QDomElement lookupColumnEl, rowSourceEl, rowSourceTypeEl, nameEl;
     if (!lookupSchema.recordSource().name().isEmpty()) {
-        lookupColumnEl = doc.createElement("lookup-column");
+        lookupColumnEl = doc.createElement(QLatin1String("lookup-column"));
         parentEl.appendChild(lookupColumnEl);
 
-        rowSourceEl = doc.createElement("row-source");
+        rowSourceEl = doc.createElement(QLatin1String("row-source"));
         lookupColumnEl.appendChild(rowSourceEl);
 
-        rowSourceTypeEl = doc.createElement("type");
+        rowSourceTypeEl = doc.createElement(QLatin1String("type"));
         rowSourceEl.appendChild(rowSourceTypeEl);
         rowSourceTypeEl.appendChild(doc.createTextNode(lookupSchema.recordSource().typeName()));   //can be empty
 
-        nameEl = doc.createElement("name");
+        nameEl = doc.createElement(QLatin1String("name"));
         rowSourceEl.appendChild(nameEl);
         nameEl.appendChild(doc.createTextNode(lookupSchema.recordSource().name()));
     }
 
     const QStringList& values(lookupSchema.recordSource().values());
     if (!values.isEmpty()) {
-        QDomElement valuesEl(doc.createElement("values"));
+        QDomElement valuesEl(doc.createElement(QLatin1String("values")));
         rowSourceEl.appendChild(valuesEl);
         for (QStringList::ConstIterator it = values.constBegin(); it != values.constEnd(); ++it) {
-            QDomElement valueEl(doc.createElement("value"));
+            QDomElement valueEl(doc.createElement(QLatin1String("value")));
             valuesEl.appendChild(valueEl);
             valueEl.appendChild(doc.createTextNode(*it));
         }
     }
 
     if (lookupSchema.boundColumn() >= 0)
-        Predicate::saveNumberElementToDom(doc, lookupColumnEl, "bound-column", lookupSchema.boundColumn());
+        Predicate::saveNumberElementToDom(doc, lookupColumnEl,
+                                          QLatin1String("bound-column"),
+                                          lookupSchema.boundColumn());
 
     QList<uint> visibleColumns(lookupSchema.visibleColumns());
     if (!visibleColumns.isEmpty()) {
-        QDomElement visibleColumnEl(doc.createElement("visible-column"));
+        QDomElement visibleColumnEl(doc.createElement(QLatin1String("visible-column")));
         lookupColumnEl.appendChild(visibleColumnEl);
         foreach(uint visibleColumn, visibleColumns) {
-            QDomElement numberEl(doc.createElement("number"));
+            QDomElement numberEl(doc.createElement(QLatin1String("number")));
             visibleColumnEl.appendChild(numberEl);
             numberEl.appendChild(doc.createTextNode(QString::number(visibleColumn)));
         }
@@ -376,27 +392,34 @@ void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument&
 
     const QList<int> columnWidths(lookupSchema.columnWidths());
     if (!columnWidths.isEmpty()) {
-        QDomElement columnWidthsEl(doc.createElement("column-widths"));
+        QDomElement columnWidthsEl(doc.createElement(QLatin1String("column-widths")));
         lookupColumnEl.appendChild(columnWidthsEl);
         foreach(int columnWidth, columnWidths) {
-            QDomElement columnWidthEl(doc.createElement("number"));
+            QDomElement columnWidthEl(doc.createElement(QLatin1String("number")));
             columnWidthsEl.appendChild(columnWidthEl);
             columnWidthEl.appendChild(doc.createTextNode(QString::number(columnWidth)));
         }
     }
 
     if (lookupSchema.columnHeadersVisible() != PREDICATE_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
-        Predicate::saveBooleanElementToDom(doc, lookupColumnEl, "show-column-headers", lookupSchema.columnHeadersVisible());
+        Predicate::saveBooleanElementToDom(doc, lookupColumnEl,
+                                           QLatin1String("show-column-headers"),
+                                           lookupSchema.columnHeadersVisible());
     if (lookupSchema.maximumListRows() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
-        Predicate::saveNumberElementToDom(doc, lookupColumnEl, "list-rows", lookupSchema.maximumListRows());
+        Predicate::saveNumberElementToDom(doc, lookupColumnEl,
+                                          QLatin1String("list-rows"),
+                                          lookupSchema.maximumListRows());
     if (lookupSchema.limitToList() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST)
-        Predicate::saveBooleanElementToDom(doc, lookupColumnEl, "limit-to-list", lookupSchema.limitToList());
+        Predicate::saveBooleanElementToDom(doc, lookupColumnEl,
+                                           QLatin1String("limit-to-list"),
+                                           lookupSchema.limitToList());
 
     if (lookupSchema.displayWidget() != PREDICATE_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET) {
-        QDomElement displayWidgetEl(doc.createElement("display-widget"));
+        QDomElement displayWidgetEl(doc.createElement(QLatin1String("display-widget")));
         lookupColumnEl.appendChild(displayWidgetEl);
         displayWidgetEl.appendChild(
-            doc.createTextNode((lookupSchema.displayWidget() == ListBox) ? "listbox" : "combobox"));
+            doc.createTextNode(
+                QLatin1String((lookupSchema.displayWidget() == ListBox) ? "listbox" : "combobox")));
     }
 }
 

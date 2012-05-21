@@ -91,18 +91,19 @@ void yyerror(const char *str)
        )
     {
         PreDbg << parser->statement();
-        QString ptrline = "";
-        for (int i = 0; i < current; i++)
-            ptrline += " ";
+        QString ptrline;
+        for (int i = 0; i < current; i++) {
+            ptrline += QLatin1String(" ");
+        }
 
-        ptrline += "^";
+        ptrline += QLatin1String("^");
 
         PreDbg << ptrline;
 
         //lexer may add error messages
         QString lexerErr = parser->error().error();
 
-        QString errtypestr(str);
+        QString errtypestr = QLatin1String(str);
         if (lexerErr.isEmpty()) {
 #if 0
             if (errtypestr.startsWith("parse error, unexpected ")) {
@@ -131,23 +132,25 @@ void yyerror(const char *str)
 
             } else
 #endif
-                if (errtypestr.startsWith("parse error, expecting `IDENTIFIER'"))
-                    lexerErr = QObject::tr("identifier was expected");
+            if (errtypestr.startsWith(QString::fromLatin1("parse error, expecting `IDENTIFIER'"))) {
+                lexerErr = QObject::tr("identifier was expected");
+            }
         }
 
         if (!otherError) {
-            if (!lexerErr.isEmpty())
-                lexerErr.prepend(": ");
+            if (!lexerErr.isEmpty()) {
+                lexerErr.prepend(QLatin1String(": "));
+            }
 
             if (Predicate::isPredicateSQLKeyword(ctoken))
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
                                              QObject::tr("\"%1\" is a reserved keyword")
-                                                .arg(QString(ctoken)) + lexerErr,
+                                                .arg(QLatin1String(ctoken)) + lexerErr,
                                              ctoken, current));
             else
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
                                              QObject::tr("Syntax Error near \"%1\"")
-                                                .arg(QString(ctoken)) + lexerErr,
+                                                .arg(QLatin1String(ctoken)) + lexerErr,
                                              ctoken, current));
         }
     }
@@ -161,11 +164,11 @@ void setError(const QString& errName, const QString& errDesc)
 
 void setError(const QString& errDesc)
 {
-    setError("other error", errDesc);
+    setError(QObject::tr("Other error"), errDesc);
 }
 
 /* this is better than assert() */
-#define IMPL_ERROR(errmsg) setError("Implementation error", errmsg)
+#define IMPL_ERROR(errmsg) setError(QObject::tr("Implementation error"), QLatin1String(errmsg))
 
 bool parseData(Parser *p, const char *data)
 {
@@ -239,7 +242,7 @@ bool addColumn(ParseInfo& parseInfo, Expression& columnExpr)
     VariableExpression v_e(columnExpr.toVariable());
     if (columnExpr.expressionClass() == VariableExpressionClass && !v_e.isNull()) {
         //it's a variable:
-        if (v_e.name() == "*") {//all tables asterisk
+        if (v_e.name() == QLatin1String("*")) {//all tables asterisk
             if (parseInfo.querySchema->tables()->isEmpty()) {
                 setError(QObject::tr("\"*\" could not be used if no tables are specified"));
                 return false;
@@ -430,12 +433,12 @@ QuerySchema* buildSelectQuery(
                 assert(t_with_alias.right().expressionClass() == VariableExpressionClass
                        && (t_with_alias.token() == AS || t_with_alias.token() == 0));
                 t_e = t_with_alias.left().toVariable();
-                aliasString = t_with_alias.right().toVariable().name().toLatin1();
+                aliasString = t_with_alias.right().toVariable().name();
             } else {
                 t_e = e.toVariable();
             }
             assert(t_e.isVariable());
-            QString tname = t_e.name().toLatin1();
+            QString tname = t_e.name();
             TableSchema *s = parser->db()->tableSchema(tname);
             if (!s) {
                 setError(//QObject::tr("Field List Error"),
@@ -475,7 +478,7 @@ QuerySchema* buildSelectQuery(
                   }
                 }*/
 //   PreDbg << "addTable: " << tname;
-            querySchema->addTable(s, aliasString.toLatin1());
+            querySchema->addTable(s, aliasString);
         }
     }
 
@@ -540,7 +543,7 @@ QuerySchema* buildSelectQuery(
             if (!aliasVariable.isNull()) {
 //    PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
 //     << columnNum;
-                querySchema->setColumnAlias(columnNum, aliasVariable.name().toLatin1());
+                querySchema->setColumnAlias(columnNum, aliasVariable.name());
             }
             /*  if (e->exprClass() == SpecialBinaryExpressionClass && dynamic_cast<BinaryExpression*>(e)
                   && (e->type()==AS || e->type()==0))

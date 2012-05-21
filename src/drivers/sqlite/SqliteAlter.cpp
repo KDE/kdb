@@ -65,7 +65,7 @@ tristate SQLiteConnection::drv_changeFieldProperty(TableSchema &table, Field& fi
     /* if (propertyName=="name") {
 
       }*/
-    if (propertyName == "type") {
+    if (propertyName == QLatin1String("type")) {
         bool ok;
         Field::Type type = Predicate::intToFieldType(value.toUInt(&ok));
         if (!ok || Field::InvalidType == type) {

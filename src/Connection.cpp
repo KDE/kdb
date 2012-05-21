@@ -606,11 +606,11 @@ bool Connection::createDatabase(const QString &dbName)
     }
 
     //-insert Predicate version info:
-    TableSchema *table = d->table("kexi__db");
+    TableSchema *table = d->table(QLatin1String("kexi__db"));
     if (!table)
         createDatabase_ERROR;
-    if (!insertRecord(table, "predicate_major_ver", Predicate::version().major())
-            || !insertRecord(table, "predicate_minor_ver", Predicate::version().minor()))
+    if (!insertRecord(table, QLatin1String("predicate_major_ver"), Predicate::version().major())
+            || !insertRecord(table, QLatin1String("predicate_minor_ver"), Predicate::version().minor()))
         createDatabase_ERROR;
 
     if (trans.active() && !commitTransaction(trans))
@@ -654,7 +654,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
     if (!d->usedDatabase.isEmpty() && !closeDatabase()) //close db if already used
         return false;
 
-    d->usedDatabase = "";
+    d->usedDatabase.clear();
 
     if (!drv_useDatabase(my_dbName, cancelled, msgHandler)) {
         if (cancelled && *cancelled)
@@ -677,10 +677,10 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
         //-get global database information
         bool ok;
 //  static QString notfound_str = QObject::tr("\"%1\" database property not found");
-        const int major = d->dbProperties.value("predicate_major_ver").toInt(&ok);
+        const int major = d->dbProperties.value(QLatin1String("predicate_major_ver")).toInt(&ok);
         if (!ok)
             return false;
-        const int minor = d->dbProperties.value("predicate_minor_ver").toInt(&ok);
+        const int minor = d->dbProperties.value(QLatin1String("predicate_minor_ver")).toInt(&ok);
         if (!ok)
             return false;
         d->databaseVersion.setMajor(major);
@@ -708,7 +708,7 @@ bool Connection::closeDatabase()
                 ret = false;
             } else {
                 PreDbg << "transaction rolled back!";
-                PreDbg << "trans.refcount==" << (tr.m_data ? QString::number(tr.m_data->refcount) : "(null)");
+                PreDbg << "trans.refcount==" << (tr.m_data ? QString::number(tr.m_data->refcount) : QLatin1String("(null)"));
             }
         }
         d->dont_remove_transactions = false; //unlock!
@@ -729,7 +729,7 @@ bool Connection::closeDatabase()
     if (!drv_closeDatabase())
         return false;
 
-    d->usedDatabase = "";
+    d->usedDatabase.clear();
 // PreDbg << ret;
     return ret;
 }
@@ -878,10 +878,10 @@ QStringList Connection::predicateSystemTableNames()
 {
     if (Predicate_predicateSystemTableNames.isEmpty()) {
         Predicate_predicateSystemTableNames
-        << "kexi__objects"
-        << "kexi__objectdata"
-        << "kexi__fields"
-        << "kexi__db"
+        << QLatin1String("kexi__objects")
+        << QLatin1String("kexi__objectdata")
+        << QLatin1String("kexi__fields")
+        << QLatin1String("kexi__db")
         ;
     }
     return Predicate_predicateSystemTableNames;
@@ -951,15 +951,15 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
             first = false;
         else
             sql += ", ";
-        EscapedString v = EscapedString(escapeIdentifier(field->name())) + " ";
+        EscapedString v = EscapedString(escapeIdentifier(field->name())) + ' ';
         const bool autoinc = field->isAutoIncrement();
         const bool pk = field->isPrimaryKey() || (autoinc && m_driver->beh->AUTO_INCREMENT_REQUIRES_PK);
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         if (autoinc && m_driver->beh->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
-                v += m_driver->beh->AUTO_INCREMENT_TYPE + " " + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION;
+                v += m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION;
             else
-                v += m_driver->beh->AUTO_INCREMENT_TYPE + " " + m_driver->beh->AUTO_INCREMENT_FIELD_OPTION;
+                v += m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_FIELD_OPTION;
         } else {
             if (autoinc && !m_driver->beh->AUTO_INCREMENT_TYPE.isEmpty())
                 v += m_driver->beh->AUTO_INCREMENT_TYPE;
@@ -967,7 +967,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
                 v += m_driver->sqlTypeName(field->type(), field->precision());
 
             if (field->isUnsigned())
-                v += (" " + m_driver->beh->UNSIGNED_TYPE_KEYWORD);
+                v += (QLatin1Char(' ') + m_driver->beh->UNSIGNED_TYPE_KEYWORD);
 
             if (field->isFPNumericType() && field->precision() > 0) {
                 if (field->scale() > 0)
@@ -978,8 +978,8 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
                 v += QString::fromLatin1("(%1)").arg(field->length());
 
             if (autoinc)
-                v += (" " +
-                      (pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION));
+                v += (QLatin1Char(' ')
+                      + (pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION));
             else
                 //! @todo here is automatically a single-field key created
                 if (pk)
@@ -1018,9 +1018,9 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
             return false;                                      \
         \
         bool res = executeSQL(                                      \
-                   "INSERT INTO " + escapeIdentifier(tableSchema->name()) \
-                   + " (" + tableSchema->sqlFieldsList(this) + ") VALUES (" + vals + ')'      \
-                             ); \
+                   EscapedString("INSERT INTO " + escapeIdentifier(tableSchema->name()) \
+                   + " (" + tableSchema->sqlFieldsList(this) + ") VALUES (" + vals + ')' \
+                             )); \
         \
         if ( !drv_afterInsert( tableSchema->name(), tableSchema ) ) \
             return false;                                      \
@@ -1055,13 +1055,13 @@ C_INS_REC_ALL
         QListIterator<Field*> it(*flist); \
         vals \
         it.toFront(); \
-        QString tableName( (it.hasNext() && it.peekNext()->table()) ? it.next()->table()->name() : "??" ); \
+        QString tableName((it.hasNext() && it.peekNext()->table()) ? it.next()->table()->name() : QLatin1String("??")); \
         if ( !drv_beforeInsert( tableName, fields ) )            \
             return false;                                       \
         bool res = executeSQL(                                  \
-                   "INSERT INTO " + escapeIdentifier(tableName) \
+                   EscapedString("INSERT INTO " + escapeIdentifier(tableName) \
                    + '(' + fields->sqlFieldsList(this) + ") VALUES (" + value + ')' \
-                             ); \
+                             )); \
         if ( !drv_afterInsert( tableName, fields ) )    \
             return false;                               \
         return res;                             \
@@ -1121,10 +1121,10 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
     EscapedString sql;
     sql.reserve(4096);
     QList<QVariant>::ConstIterator it = values.constBegin();
-    QByteArray tableName = escapeIdentifier(flist->first()->table()->name());
+    const QString tableName(flist->first()->table()->name());
     while (it != values.constEnd() && f) {
         if (sql.isEmpty()) {
-            sql = "INSERT INTO " + tableName + '(' +
+            sql = "INSERT INTO " + escapeIdentifier(tableName) + '(' +
                   fields->sqlFieldsList(this) + ") VALUES (";
         }
         else {
@@ -1233,9 +1233,10 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                     }
                     sql += escapeIdentifier(f->name(), options.escapingType);
                 }
-                QString aliasString(querySchema->columnAlias(number));
-                if (!aliasString.isEmpty())
-                    sql += (" AS " + aliasString);
+                const QString aliasString(querySchema->columnAlias(number));
+                if (!aliasString.isEmpty()) {
+                    sql += QLatin1String(" AS ") + aliasString;
+                }
 //! @todo add option that allows to omit "AS" keyword
             }
             LookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns && f->table())
@@ -1256,9 +1257,9 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                             && (boundField = lookupTable->field(lookupFieldSchema->boundColumn()))) {
                         //add LEFT OUTER JOIN
                         if (!s_additional_joins.isEmpty())
-                            s_additional_joins += " ";
-                        QString internalUniqueTableAlias(
-                            "__predicate_" + lookupTable->name() + '_'
+                            s_additional_joins += ' ';
+                        const QString internalUniqueTableAlias(
+                            QLatin1String("__predicate_") + lookupTable->name() + QLatin1Char('_')
                             + QString::number(internalUniqueTableAliasNumber++));
                         s_additional_joins += EscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
                             .arg(EscapedString(escapeIdentifier(lookupTable->name(), options.escapingType)),
@@ -1287,8 +1288,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         s_additional_fields += visibleColumns->sqlFieldsList(
-                                                   this, " || ' ' || ", internalUniqueTableAlias,
-                                                   options.escapingType);
+                            this, QLatin1String(" || ' ' || "), internalUniqueTableAlias,
+                            options.escapingType);
                     }
                     delete visibleColumns;
                 } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
@@ -1316,8 +1317,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
                     QString internalUniqueQueryAlias(
-                        predicate_subquery_prefix + lookupQuery->name() + '_'
-                        + QByteArray::number(internalUniqueQueryAliasNumber++));
+                        QLatin1String(predicate_subquery_prefix) + lookupQuery->name() + QLatin1Char('_')
+                        + QString::number(internalUniqueQueryAliasNumber++));
                     s_additional_joins += EscapedString("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
                         .arg(selectStatement(lookupQuery, params, options),
                              EscapedString(internalUniqueQueryAlias),
@@ -1341,9 +1342,9 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                         if (!expression.isEmpty())
                             expression += " || ' ' || ";
                         expression += (
-                            internalUniqueQueryAlias + '.' +
-                            escapeIdentifier(fieldsExpanded.value(visibleColumnIndex)->aliasOrName(),
-                                             options.escapingType)
+                            internalUniqueQueryAlias.toLatin1() + '.'
+                            + escapeIdentifier(fieldsExpanded.value(visibleColumnIndex)->aliasOrName(),
+                                               options.escapingType)
                         );
                     }
                     s_additional_fields += expression;
@@ -1382,9 +1383,9 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                 if (!s_from.isEmpty())
                     s_from += ", ";
                 s_from += escapeIdentifier(table->name(), options.escapingType);
-                QByteArray aliasString = querySchema->tableAlias(number);
+                const QString aliasString(querySchema->tableAlias(number));
                 if (!aliasString.isEmpty())
-                    s_from += (" AS " + aliasString);
+                    s_from += (QLatin1String(" AS ") + aliasString);
                 number++;
             }
         }
@@ -1510,7 +1511,7 @@ quint64 Connection::lastInsertedAutoIncValue(const QString& aiFieldName, const Q
     }
     RecordData rdata;
     if (foundRecordId <= 0 || true != querySingleRecord(
-                  "SELECT " + tableName + '.' + aiFieldName
+                  EscapedString("SELECT ") + tableName + '.' + aiFieldName
                 + " FROM " + tableName
                 + " WHERE " + m_driver->beh->ROW_ID_FIELD_NAME
                 + '=' + EscapedString::number(foundRecordId), &rdata))
@@ -1533,17 +1534,18 @@ static FieldList* createFieldListForKexi__Fields(TableSchema *kexi__fieldsSchema
     if (!kexi__fieldsSchema)
         return 0;
     return kexi__fieldsSchema->subList(
-               "t_id",
-               "f_type",
-               "f_name",
-               "f_length",
-               "f_precision",
-               "f_constraints",
-               "f_options",
-               "f_default",
-               "f_order",
-               "f_caption",
-               "f_help"
+               QList<QByteArray>()
+               << "t_id"
+               << "f_type"
+               << "f_name"
+               << "f_length"
+               << "f_precision"
+               << "f_constraints"
+               << "f_options"
+               << "f_default"
+               << "f_order"
+               << "f_caption"
+               << "f_help"
            );
 }
 
@@ -1572,7 +1574,7 @@ bool Connection::storeMainFieldSchema(Field *field)
 {
     if (!field || !field->table())
         return false;
-    FieldList *fl = createFieldListForKexi__Fields(d->table("kexi__fields"));
+    FieldList *fl = createFieldListForKexi__Fields(d->table(QLatin1String("kexi__fields")));
     if (!fl)
         return false;
 
@@ -1582,8 +1584,8 @@ bool Connection::storeMainFieldSchema(Field *field)
     bool first = true;
     EscapedString sql("UPDATE kexi__fields SET ");
     foreach(Field *f, *fl->fields()) {
-        sql.append((first ? "" : ", ") +
-                   f->name() + '=' + m_driver->valueToSQL(f, *valsIt));
+        sql.append((first ? QString() : QLatin1String(", ")) +
+                   f->name() + QLatin1Char('=') + m_driver->valueToSQL(f, *valsIt));
         if (first)
             first = false;
         ++valsIt;
@@ -1601,7 +1603,7 @@ bool Connection::storeMainFieldSchema(Field *field)
         m_result.prependMessage(QObject::tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
-//setError( errorNum(), QObject::tr("Creating table failed.") + " " + errorMsg());
+//setError( errorNum(), QObject::tr("Creating table failed.") + QLatin1Char(' ') + errorMsg());
 
 //! Creates a table according to the given schema
 /*! Creates a table according to the given TableSchema, adding the table and
@@ -1692,14 +1694,14 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
         if (!storeNewObjectData(tableSchema))
             createTable_ERR;
 
-        TableSchema *ts = d->table("kexi__fields");
+        TableSchema *ts = d->table(QLatin1String("kexi__fields"));
         if (!ts)
             return false;
         //for sanity: remove field info (if any) for this table id
-        if (!Predicate::deleteRecord(this, ts, "t_id", tableSchema->id()))
+        if (!Predicate::deleteRecord(this, ts, QLatin1String("t_id"), tableSchema->id()))
             return false;
 
-        FieldList *fl = createFieldListForKexi__Fields(d->table("kexi__fields"));
+        FieldList *fl = createFieldListForKexi__Fields(d->table(QLatin1String("kexi__fields")));
         if (!fl)
             return false;
 
@@ -1747,8 +1749,9 @@ bool Connection::removeObject(uint objId)
 {
     clearResult();
     //remove table schema from kexi__* tables
-    if (!Predicate::deleteRecord(this, d->table("kexi__objects"), "o_id", objId) //schema entry
-            || !Predicate::deleteRecord(this, d->table("kexi__objectdata"), "o_id", objId)) {//data blocks
+    if (   !Predicate::deleteRecord(this, d->table(QLatin1String("kexi__objects")), QLatin1String("o_id"), objId) //schema entry
+        || !Predicate::deleteRecord(this, d->table(QLatin1String("kexi__objectdata")), QLatin1String("o_id"), objId)) //data blocks
+    {
         m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Could not remove object's data."));
         return false;
     }
@@ -1810,8 +1813,8 @@ tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
             return false;
     }
 
-    TableSchema *ts = d->table("kexi__fields");
-    if (!Predicate::deleteRecord(this, ts, "t_id", tableSchema->id())) //field entries
+    TableSchema *ts = d->table(QLatin1String("kexi__fields"));
+    if (!Predicate::deleteRecord(this, ts, QLatin1String("t_id"), tableSchema->id())) //field entries
         return false;
 
     //remove table schema from kexi__objects table
@@ -1821,7 +1824,7 @@ tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
 
     if (alsoRemoveSchema) {
 //! @todo js: update any structure (e.g. queries) that depend on this table!
-        tristate res = removeDataBlock(tableSchema->id(), "extended_schema");
+        tristate res = removeDataBlock(tableSchema->id(), QLatin1String("extended_schema"));
         if (!res)
             return false;
         d->removeTable(*tableSchema);
@@ -2372,7 +2375,7 @@ tristate Connection::loadObjectData(int type, const QString& name, Object* objec
 
 bool Connection::storeObjectDataInternal(Object* object, bool newObject)
 {
-    TableSchema *ts = d->table("kexi__objects");
+    TableSchema *ts = d->table(QLatin1String("kexi__objects"));
     if (!ts)
         return false;
     if (newObject) {
@@ -2393,7 +2396,8 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
         FieldList *fl;
         bool ok;
         if (object->id() <= 0) {//get new ID
-            fl = ts->subList("o_type", "o_name", "o_caption", "o_desc");
+            fl = ts->subList(
+                QList<QByteArray>() << "o_type" << "o_name" << "o_caption" << "o_desc");
             ok = fl != 0;
             if (ok && !insertRecord(fl, QVariant(object->type()), QVariant(object->name()),
                                     QVariant(object->caption()), QVariant(object->description())))
@@ -2405,14 +2409,15 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
                 return false;
             //fetch newly assigned ID
 //! @todo safe to cast it?
-            int obj_id = (int)lastInsertedAutoIncValue("o_id", *ts);
+            int obj_id = (int)lastInsertedAutoIncValue(QLatin1String("o_id"), *ts);
             PreDbg << "######## NEW obj_id == " << obj_id;
             if (obj_id <= 0)
                 return false;
             object->setId(obj_id);
             return true;
         } else {
-            fl = ts->subList("o_id", "o_type", "o_name", "o_caption", "o_desc");
+            fl = ts->subList(
+                QList<QByteArray>() << "o_id" << "o_type" << "o_name" << "o_caption" << "o_desc");
             ok = fl != 0;
             if (ok && !insertRecord(fl, QVariant(object->id()), QVariant(object->type()), QVariant(object->name()),
                                     QVariant(object->caption()), QVariant(object->description())))
@@ -2603,9 +2608,10 @@ static void createExtendedTableSchemaMainElementIfNeeded(
     if (!extendedTableSchemaStringIsEmpty)
         return;
     //init document
-    *extendedTableSchemaMainEl = doc->createElement("EXTENDED_TABLE_SCHEMA");
+    *extendedTableSchemaMainEl = doc->createElement(QLatin1String("EXTENDED_TABLE_SCHEMA"));
     doc->appendChild(*extendedTableSchemaMainEl);
-    extendedTableSchemaMainEl->setAttribute("version", QString::number(PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION));
+    extendedTableSchemaMainEl->setAttribute(QLatin1String("version"),
+                                            QString::number(PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION));
     *extendedTableSchemaStringIsEmpty = false;
 }
 
@@ -2616,10 +2622,10 @@ static void createExtendedTableSchemaFieldElementIfNeeded(QDomDocument* doc,
 {
     if (!extendedTableSchemaFieldEl->isNull())
         return;
-    *extendedTableSchemaFieldEl = doc->createElement("field");
+    *extendedTableSchemaFieldEl = doc->createElement(QLatin1String("field"));
     if (append)
         extendedTableSchemaMainEl->appendChild(*extendedTableSchemaFieldEl);
-    extendedTableSchemaFieldEl->setAttribute("name", fieldName);
+    extendedTableSchemaFieldEl->setAttribute(QLatin1String("name"), fieldName);
 }
 
 /*! @internal used by storeExtendedTableSchemaData()
@@ -2641,28 +2647,28 @@ static void addFieldPropertyToExtendedTableSchemaData(
         doc, extendedTableSchemaMainEl, f.name(), extendedTableSchemaFieldEl);
 
     //create <property>
-    QDomElement extendedTableSchemaFieldPropertyEl = doc->createElement("property");
+    QDomElement extendedTableSchemaFieldPropertyEl = doc->createElement(QLatin1String("property"));
     extendedTableSchemaFieldEl->appendChild(extendedTableSchemaFieldPropertyEl);
     if (custom)
-        extendedTableSchemaFieldPropertyEl.setAttribute("custom", "true");
-    extendedTableSchemaFieldPropertyEl.setAttribute("name", propertyName);
+        extendedTableSchemaFieldPropertyEl.setAttribute(QLatin1String("custom"), QLatin1String("true"));
+    extendedTableSchemaFieldPropertyEl.setAttribute(QLatin1String("name"), QLatin1String(propertyName));
     QDomElement extendedTableSchemaFieldPropertyValueEl;
     switch (propertyValue.type()) {
     case QVariant::String:
-        extendedTableSchemaFieldPropertyValueEl = doc->createElement("string");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement(QLatin1String("string"));
         break;
     case QVariant::ByteArray:
-        extendedTableSchemaFieldPropertyValueEl = doc->createElement("cstring");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement(QLatin1String("cstring"));
         break;
     case QVariant::Int:
     case QVariant::Double:
     case QVariant::UInt:
     case QVariant::LongLong:
     case QVariant::ULongLong:
-        extendedTableSchemaFieldPropertyValueEl = doc->createElement("number");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement(QLatin1String("number"));
         break;
     case QVariant::Bool:
-        extendedTableSchemaFieldPropertyValueEl = doc->createElement("bool");
+        extendedTableSchemaFieldPropertyValueEl = doc->createElement(QLatin1String("bool"));
         break;
     default:
 //! @todo add more QVariant types
@@ -2676,7 +2682,7 @@ static void addFieldPropertyToExtendedTableSchemaData(
 bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
 {
 //! @todo future: save in older versions if neeed
-    QDomDocument doc("EXTENDED_TABLE_SCHEMA");
+    QDomDocument doc(QLatin1String("EXTENDED_TABLE_SCHEMA"));
     QDomElement extendedTableSchemaMainEl;
     bool extendedTableSchemaStringIsEmpty = true;
 
@@ -2719,15 +2725,15 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
     // Store extended schema information (see ExtendedTableSchemaInformation in Kexi Wiki)
     if (extendedTableSchemaStringIsEmpty) {
 #ifdef KEXI_DEBUG_GUI
-        Utils::addAlterTableActionDebug(QString("** Extended table schema REMOVED."));
+        Utils::addAlterTableActionDebug(QLatin1String("** Extended table schema REMOVED."));
 #endif
-        if (!removeDataBlock(tableSchema->id(), "extended_schema"))
+        if (!removeDataBlock(tableSchema->id(), QLatin1String("extended_schema")))
             return false;
     } else {
 #ifdef KEXI_DEBUG_GUI
-        Utils::addAlterTableActionDebug(QString("** Extended table schema set to:\n") + doc->toString(4));
+        Utils::addAlterTableActionDebug(QLatin1String("** Extended table schema set to:\n") + doc->toString(4));
 #endif
-        if (!storeDataBlock(tableSchema->id(), doc.toString(1), "extended_schema"))
+        if (!storeDataBlock(tableSchema->id(), doc.toString(1), QLatin1String("extended_schema")))
             return false;
     }
     return true;
@@ -2749,7 +2755,8 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
 
     // Load extended schema information, if present (see ExtendedTableSchemaInformation in Kexi Wiki)
     QString extendedTableSchemaString;
-    tristate res = loadDataBlock(tableSchema->id(), &extendedTableSchemaString, "extended_schema");
+    tristate res = loadDataBlock(tableSchema->id(),
+                                 &extendedTableSchemaString, QLatin1String("extended_schema"));
     if (!res)
         loadExtendedTableSchemaData_ERR;
     // extendedTableSchemaString will be just empty if there is no such data block
@@ -2766,17 +2773,17 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
 
 //! @todo look at the current format version (PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION)
 
-    if (doc.doctype().name() != "EXTENDED_TABLE_SCHEMA")
+    if (doc.doctype().name() != QLatin1String("EXTENDED_TABLE_SCHEMA"))
         loadExtendedTableSchemaData_ERR3(extendedTableSchemaString);
 
     QDomElement docEl = doc.documentElement();
-    if (docEl.tagName() != "EXTENDED_TABLE_SCHEMA")
+    if (docEl.tagName() != QLatin1String("EXTENDED_TABLE_SCHEMA"))
         loadExtendedTableSchemaData_ERR3(extendedTableSchemaString);
 
     for (QDomNode n = docEl.firstChild(); !n.isNull(); n = n.nextSibling()) {
         QDomElement fieldEl = n.toElement();
-        if (fieldEl.tagName() == "field") {
-            Field *f = tableSchema->field(fieldEl.attribute("name"));
+        if (fieldEl.tagName() == QLatin1String("field")) {
+            Field *f = tableSchema->field(fieldEl.attribute(QLatin1String("name")));
             if (f) {
                 //set properties of the field:
 //! @todo more properties
@@ -2785,9 +2792,9 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                     QDomElement propEl = propNode.toElement();
                     bool ok;
                     int intValue;
-                    if (propEl.tagName() == "property") {
-                        QByteArray propertyName = propEl.attribute("name").toLatin1();
-                        if (propEl.attribute("custom") == "true") {
+                    if (propEl.tagName() == QLatin1String("property")) {
+                        QByteArray propertyName = propEl.attribute(QLatin1String("name")).toLatin1();
+                        if (propEl.attribute(QLatin1String("custom")) == QLatin1String("true")) {
                             //custom property
                             f->setCustomProperty(propertyName,
                                                  Predicate::loadPropertyValueFromDom(propEl.firstChild()));
@@ -2798,7 +2805,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                                 f->setVisibleDecimalPlaces(intValue);
                         }
 //! @todo more properties...
-                    } else if (propEl.tagName() == "lookup-column") {
+                    } else if (propEl.tagName() == QLatin1String("lookup-column")) {
                         LookupFieldSchema *lookupFieldSchema = LookupFieldSchema::loadFromDom(propEl);
                         if (lookupFieldSchema)
                             qDebug() << *lookupFieldSchema;
@@ -2806,8 +2813,8 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                     }
                 }
             } else {
-                PreWarn << "no such field:"
-                << fieldEl.attribute("name") << "in table:" << tableSchema->name();
+                PreWarn << "no such field:" << fieldEl.attribute(QLatin1String("name"))
+                    << "in table:" << tableSchema->name();
             }
         }
     }
@@ -2962,8 +2969,9 @@ tristate Connection::loadDataBlock(int objectID, QString* dataString, const QStr
     return querySingleString(
                EscapedString("SELECT o_data FROM kexi__objectdata WHERE o_id=%1 AND %2")
                              .arg(EscapedString::number(objectID),
-                                  EscapedString(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
-                                                      dataID.isEmpty() ? QVariant() : QVariant(dataID)))),
+                                  EscapedString(Predicate::sqlWhere(m_driver, Field::Text,
+                                                QLatin1String("o_sub_id"),
+                                                dataID.isEmpty() ? QVariant() : QVariant(dataID)))),
                dataString);
 }
 
@@ -2973,7 +2981,7 @@ bool Connection::storeDataBlock(int objectID, const QString &dataString, const Q
         return false;
     EscapedString sql(
         EscapedString("SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
-    EscapedString sql_sub(Predicate::sqlWhere(m_driver, Field::Text, "o_sub_id",
+    EscapedString sql_sub(Predicate::sqlWhere(m_driver, Field::Text, QLatin1String("o_sub_id"),
                                               dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     bool ok, exists;
@@ -2996,10 +3004,12 @@ bool Connection::removeDataBlock(int objectID, const QString& dataID)
     if (objectID <= 0)
         return false;
     if (dataID.isEmpty())
-        return Predicate::deleteRecord(this, "kexi__objectdata", "o_id", QString::number(objectID));
+        return Predicate::deleteRecord(this, QLatin1String("kexi__objectdata"),
+                                       QLatin1String("o_id"), QString::number(objectID));
     else
-        return Predicate::deleteRecord(this, "kexi__objectdata",
-                                 "o_id", Field::Integer, objectID, "o_sub_id", Field::Text, dataID);
+        return Predicate::deleteRecord(this, QLatin1String("kexi__objectdata"),
+                                       QLatin1String("o_id"), Field::Integer, objectID,
+                                       QLatin1String("o_sub_id"), Field::Text, dataID);
 }
 
 QuerySchema* Connection::setupQuerySchema(const RecordData &data)
@@ -3009,7 +3019,7 @@ QuerySchema* Connection::setupQuerySchema(const RecordData &data)
     if (!ok)
         return false;
     QString sql;
-    if (!loadDataBlock(objID, &sql, "sql")) {
+    if (!loadDataBlock(objID, &sql, QLatin1String("sql"))) {
         m_result = Result(ERR_OBJECT_NOT_FOUND,
                           QObject::tr("Could not find definition for query \"%1\". Removing this query is recommended.")
                           .arg(data[2].toString()));
@@ -3097,7 +3107,7 @@ bool Connection::isInternalTableSchema(const QString& tableName)
     return (d->predicateSystemTables().contains(d->table(tableName)))
            // these are here for compatiblility because we're no longer instantiate
            // them but can exist in projects created with previous Kexi versions:
-           || tableName == "kexi__final" || tableName == "kexi__useractions";
+           || tableName == QLatin1String("kexi__final") || tableName == QLatin1String("kexi__useractions");
 }
 
 //! Creates kexi__* tables.
@@ -3106,37 +3116,40 @@ bool Connection::setupPredicateSystemSchema()
     if (!d->predicateSystemTables().isEmpty())
         return true; //already set up
 
-    TableSchema *t_objects = newPredicateSystemTableSchema("kexi__objects");
-    t_objects->addField(new Field("o_id", Field::Integer, Field::PrimaryKey | Field::AutoInc, Field::Unsigned))
-    .addField(new Field("o_type", Field::Byte, 0, Field::Unsigned))
-    .addField(new Field("o_name", Field::Text))
-    .addField(new Field("o_caption", Field::Text))
-    .addField(new Field("o_desc", Field::LongText));
+    TableSchema *t_objects = newPredicateSystemTableSchema(QLatin1String("kexi__objects"));
+    t_objects->addField(new Field(QLatin1String("o_id"),
+                                  Field::Integer, Field::PrimaryKey | Field::AutoInc, Field::Unsigned))
+    .addField(new Field(QLatin1String("o_type"), Field::Byte, 0, Field::Unsigned))
+    .addField(new Field(QLatin1String("o_name"), Field::Text))
+    .addField(new Field(QLatin1String("o_caption"), Field::Text))
+    .addField(new Field(QLatin1String("o_desc"), Field::LongText));
 
     qDebug() << *t_objects;
 
-    TableSchema *t_objectdata = newPredicateSystemTableSchema("kexi__objectdata");
-    t_objectdata->addField(new Field("o_id", Field::Integer, Field::NotNull, Field::Unsigned))
-    .addField(new Field("o_data", Field::LongText))
-    .addField(new Field("o_sub_id", Field::Text));
+    TableSchema *t_objectdata = newPredicateSystemTableSchema(QLatin1String("kexi__objectdata"));
+    t_objectdata->addField(new Field(QLatin1String("o_id"),
+                                     Field::Integer, Field::NotNull, Field::Unsigned))
+    .addField(new Field(QLatin1String("o_data"), Field::LongText))
+    .addField(new Field(QLatin1String("o_sub_id"), Field::Text));
 
-    TableSchema *t_fields = newPredicateSystemTableSchema("kexi__fields");
-    t_fields->addField(new Field("t_id", Field::Integer, 0, Field::Unsigned))
-    .addField(new Field("f_type", Field::Byte, 0, Field::Unsigned))
-    .addField(new Field("f_name", Field::Text))
-    .addField(new Field("f_length", Field::Integer))
-    .addField(new Field("f_precision", Field::Integer))
-    .addField(new Field("f_constraints", Field::Integer))
-    .addField(new Field("f_options", Field::Integer))
-    .addField(new Field("f_default", Field::Text))
+    TableSchema *t_fields = newPredicateSystemTableSchema(QLatin1String("kexi__fields"));
+    t_fields->addField(new Field(QLatin1String("t_id"), Field::Integer, 0, Field::Unsigned))
+    .addField(new Field(QLatin1String("f_type"), Field::Byte, 0, Field::Unsigned))
+    .addField(new Field(QLatin1String("f_name"), Field::Text))
+    .addField(new Field(QLatin1String("f_length"), Field::Integer))
+    .addField(new Field(QLatin1String("f_precision"), Field::Integer))
+    .addField(new Field(QLatin1String("f_constraints"), Field::Integer))
+    .addField(new Field(QLatin1String("f_options"), Field::Integer))
+    .addField(new Field(QLatin1String("f_default"), Field::Text))
     //these are additional properties:
-    .addField(new Field("f_order", Field::Integer))
-    .addField(new Field("f_caption", Field::Text))
-    .addField(new Field("f_help", Field::LongText));
+    .addField(new Field(QLatin1String("f_order"), Field::Integer))
+    .addField(new Field(QLatin1String("f_caption"), Field::Text))
+    .addField(new Field(QLatin1String("f_help"), Field::LongText));
 
-    TableSchema *t_db = newPredicateSystemTableSchema("kexi__db");
-    t_db->addField(new Field("db_property", Field::Text, Field::NoConstraints, Field::NoOptions, 32))
-    .addField(new Field("db_value", Field::LongText));
+    TableSchema *t_db = newPredicateSystemTableSchema(QLatin1String("kexi__db"));
+    t_db->addField(new Field(QLatin1String("db_property"),
+                             Field::Text, Field::NoConstraints, Field::NoOptions, 32))
+    .addField(new Field(QLatin1String("db_value"), Field::LongText));
 
     return true;
 }

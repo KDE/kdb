@@ -183,17 +183,19 @@ void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg, Q
         return;
     //lower level message is added to the details, if there is alread message specified
     if (!result.messageTitle().isEmpty())
-        msg += "<p>" + result.messageTitle();
+        msg += QLatin1String("<p>") + result.messageTitle();
 
     if (msg.isEmpty())
-        msg = "<p>" + result.message();
+        msg = QLatin1String("<p>") + result.message();
     else
-        details += "<p>" + result.message();
+        details += QLatin1String("<p>") + result.message();
 
     if (!result.serverMessage().isEmpty())
-        details += "<p><b>" + QObject::tr("Message from server:") + "</b> " + result.serverMessage();
+        details += QLatin1String("<p><b>") + QObject::tr("Message from server:")
+                   + QLatin1String("</b> ") + result.serverMessage();
     if (!result.recentSQLString().isEmpty())
-        details += "<p><b>" + QObject::tr("SQL statement:") + QString("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
+        details += QLatin1String("<p><b>") + QObject::tr("SQL statement:")
+                   + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
     int serverResultCode;
     QString serverResultName;
     if (result.serverResultCode() != 0) {
@@ -210,19 +212,21 @@ void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg, Q
             || serverResultCode != 0)
            )
     {
-        details += (QString("<p><b>") + QObject::tr("Server result code:") + "</b> " + QString::number(serverResultCode));
+        details += (QLatin1String("<p><b>") + QObject::tr("Server result code:")
+                    + QLatin1String("</b> ") + QString::number(serverResultCode));
         if (!serverResultName.isEmpty()) {
-            details += QString(" (%1)").arg(serverResultName);
+            details += QString::fromLatin1(" (%1)").arg(serverResultName);
         }
     }
     else {
         if (!serverResultName.isEmpty()) {
-            details += (QString("<p><b>") + QObject::tr("Server result:") + "</b> " + serverResultName);
+            details += (QLatin1String("<p><b>") + QObject::tr("Server result:")
+                        + QLatin1String("</b> ") + serverResultName);
         }
     }
 
-    if (!details.isEmpty() && !details.startsWith("<qt>")) {
-        if (!details.startsWith("<p>"))
+    if (!details.isEmpty() && !details.startsWith(QLatin1String("<qt>"))) {
+        if (!details.startsWith(QLatin1String("<p>")))
             details.prepend(QLatin1String("<p>"));
     }
 }
@@ -254,8 +258,8 @@ int Predicate::idForObjectName(Connection* conn, const QString& objName, int obj
 TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name)
         : m_name(name)
 {
-    m_table = conn->tableSchema(QString(name));
-    m_query = m_table ? 0 : conn->querySchema(QString(name));
+    m_table = conn->tableSchema(QLatin1String(name));
+    m_query = m_table ? 0 : conn->querySchema(QLatin1String(name));
     if (!m_table && !m_query)
         PreWarn << "tableOrQuery is neither table nor query!";
 }
@@ -263,8 +267,8 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name)
 
 TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name, bool table)
         : m_name(name)
-        , m_table(table ? conn->tableSchema(QString(name)) : 0)
-        , m_query(table ? 0 : conn->querySchema(QString(name)))
+        , m_table(table ? conn->tableSchema(QLatin1String(name)) : 0)
+        , m_query(table ? 0 : conn->querySchema(QLatin1String(name)))
 {
     if (table && !m_table)
         PreWarn << "no table specified!";
@@ -338,7 +342,7 @@ QString TableOrQuerySchema::captionOrName() const
 {
     Object *object = m_table ? static_cast<Object *>(m_table) : static_cast<Object *>(m_query);
     if (!object)
-        return m_name;
+        return QLatin1String(m_name);
     return object->caption().isEmpty() ? object->name() : object->caption();
 }
 
@@ -643,7 +647,7 @@ bool Predicate::splitToTableAndFieldParts(const QString& string,
                                           QString& tableName, QString& fieldName,
                                           SplitToTableAndFieldPartsOptions option)
 {
-    const int id = string.indexOf('.');
+    const int id = string.indexOf(QLatin1Char('.'));
     if (option & SetFieldNameIfNoTableName && id == -1) {
         tableName.clear();
         fieldName = string;
@@ -668,12 +672,12 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
     if (decimalPlaces < 0) {
         QString s(QString::number(value, 'f', 10 /*reasonable precision*/));
         uint i = s.length() - 1;
-        while (i > 0 && s[i] == '0')
+        while (i > 0 && s[i] == QLatin1Char('0'))
             i--;
-        if (s[i] == '.') //remove '.'
+        if (s[i] == QLatin1Char('.')) //remove '.'
             i--;
 //Qt4 port        s = s.left(i + 1).replace('.', KGlobal::locale()->decimalSymbol());
-        s = s.left(i + 1).replace('.', QLocale().decimalPoint());
+        s = s.left(i + 1).replace(QLatin1Char('.'), QLocale().decimalPoint());
         return s;
     }
     if (decimalPlaces == 0)
@@ -958,7 +962,7 @@ QString Predicate::loadStringPropertyValueFromDom(const QDomNode& node, bool* ok
     if (valueType != "string") {
         if (ok)
             *ok = false;
-        return 0;
+        return QString();
     }
     return QDomNode(node).toElement().text();
 }
@@ -975,7 +979,7 @@ QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node)
     } else if (valueType == "cstring") {
         return text.toLatin1();
     } else if (valueType == "number") { // integer or double
-        if (text.indexOf('.') != -1) {
+        if (text.indexOf(QLatin1Char('.')) != -1) {
             double val = text.toDouble(&ok);
             if (ok)
                 return val;
@@ -988,7 +992,7 @@ QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node)
                 return valLong;
         }
     } else if (valueType == "bool") {
-        return QVariant(text.toLower() == "true" || text == "1");
+        return QVariant(text.toLower() == QLatin1String("true") || text == QLatin1String("1"));
     }
 //! @todo add more QVariant types
     PreWarn << "unknown type" << valueType;
@@ -1000,7 +1004,7 @@ QDomElement Predicate::saveNumberElementToDom(QDomDocument& doc, QDomElement& pa
 {
     QDomElement el(doc.createElement(elementName));
     parentEl.appendChild(el);
-    QDomElement numberEl(doc.createElement("number"));
+    QDomElement numberEl(doc.createElement(QLatin1String("number")));
     el.appendChild(numberEl);
     numberEl.appendChild(doc.createTextNode(QString::number(value)));
     return el;
@@ -1011,10 +1015,10 @@ QDomElement Predicate::saveBooleanElementToDom(QDomDocument& doc, QDomElement& p
 {
     QDomElement el(doc.createElement(elementName));
     parentEl.appendChild(el);
-    QDomElement numberEl(doc.createElement("bool"));
+    QDomElement numberEl(doc.createElement(QLatin1String("bool")));
     el.appendChild(numberEl);
     numberEl.appendChild(doc.createTextNode(
-                             value ? QString::fromLatin1("true") : QString::fromLatin1("false")));
+                             value ? QLatin1String("true") : QLatin1String("false")));
     return el;
 }
 
@@ -1031,8 +1035,8 @@ struct Predicate_EmptyValueForTypeCache {
         ADD(Field::Float, 0.0);
         ADD(Field::Double, 0.0);
 //! @todo ok? we have no better defaults
-        ADD(Field::Text, QString(" "));
-        ADD(Field::LongText, QString(" "));
+        ADD(Field::Text, QLatin1String(" "));
+        ADD(Field::LongText, QLatin1String(" "));
         ADD(Field::BLOB, QByteArray());
 #undef ADD
     }
@@ -1070,7 +1074,7 @@ struct Predicate_NotEmptyValueForTypeCache {
             if (i == Field::Date || i == Field::DateTime || i == Field::Time)
                 continue; //'current' value will be returned
             if (i == Field::Text || i == Field::LongText) {
-                ADD(i, QVariant(QString("")));
+                ADD(i, QVariant(QLatin1String("")));
                 continue;
             }
             if (i == Field::BLOB) {
@@ -1115,7 +1119,7 @@ QVariant Predicate::notEmptyValueForType(Field::Type type)
 
 QString Predicate::escapeIdentifier(const QString& string)
 {
-    const char quote = '"';
+    const QLatin1Char quote('"');
     // find out the length ot the destination string
     const int origStringLength = string.length();
     int newStringLength = 1 + 1;
@@ -1130,7 +1134,7 @@ QString Predicate::escapeIdentifier(const QString& string)
     newStringLength += 2; // for quotes
     // create
     QString escapedQuote(quote);
-    escapedQuote.append(quote);
+    escapedQuote.append(QLatin1Char(quote));
     QString newString;
     newString.reserve(newStringLength);
     newString.append(quote);
@@ -1169,7 +1173,7 @@ QString Predicate::escapeString(const QString& string)
     // create
     QString newString;
     newString.reserve(newStringLength);
-    newString.append(quote);
+    newString.append(QLatin1Char(quote));
     for (int i = 0; i < origStringLength; i++) {
         const QChar c = string.at(i);
         const ushort unicode = c.unicode();
@@ -1188,7 +1192,7 @@ QString Predicate::escapeString(const QString& string)
         else
             newString.append(c);
     }
-    newString.append(quote);
+    newString.append(QLatin1Char(quote));
     return newString;
 }
 

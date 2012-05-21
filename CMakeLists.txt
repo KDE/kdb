@@ -63,8 +63,14 @@ include(InstallSettings)
 include(MacroLogFeature)
 include(CreateSharedDataClasses)
 
+# Qt string handling optimizations: http://qt-project.org/doc/qt-4.8/qstring.html#more-efficient-string-construction
+add_definitions(-DQT_USE_QSTRINGBUILDER -DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII)
+
+# Increase compatbility with Qt
+add_definitions(-DQT_NO_KEYWORD)
+
 #### Qt4 ####
-set(QT_MIN_VERSION 4.5.0)
+set(QT_MIN_VERSION 4.7.0)
 find_package(Qt4 REQUIRED)
 
 include_directories(

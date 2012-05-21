@@ -130,15 +130,12 @@ public:
         return m_defaultValuesDbBuffer->contains(&ci) && (*m_defaultValuesDbBuffer)[ &ci ];
     }
 
-    inline const SimpleMap simpleBuffer() {
+    inline const SimpleMap simpleBuffer() const {
         return *m_simpleBuffer;
     }
-    inline const DBMap dbBuffer() {
+    inline const DBMap dbBuffer() const {
         return *m_dbBuffer;
     }
-
-    //! For debugging purposes
-    void debug();
 
 protected:
     SimpleMap *m_simpleBuffer;
@@ -150,5 +147,8 @@ protected:
 };
 
 } //namespace Predicate
+
+//! Sends information about object @a buffer to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::RecordEditBuffer& buffer);
 
 #endif

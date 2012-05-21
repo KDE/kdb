@@ -403,7 +403,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 521 "SqlParser.y"
+#line 515 "SqlParser.y"
 
 	QString* stringValue;
 	qint64 integerValue;

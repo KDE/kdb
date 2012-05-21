@@ -223,7 +223,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
         if (len == 0) {
             return QVariant(QDate());
         } else {
-            return QVariant(QDate::fromString(QByteArray::fromRawData(data, len), Qt::ISODate));
+            return QVariant(QDate::fromString(QLatin1String(QByteArray::fromRawData(data, len)), Qt::ISODate));
         }
     case QVariant::Time:
         if (len == 0) {

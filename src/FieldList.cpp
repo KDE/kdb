@@ -80,7 +80,7 @@ void FieldList::renameField(const QString& oldName, const QString& newName)
     Field *field = m_fields_by_name.value(oldName.toLower());
     if (!field) {
         PreFatal << "FieldList::renameField() no field found "
-        << QString("\"%1\"").arg(oldName);
+        << QString::fromLatin1("\"%1\"").arg(oldName);
         return;
     }
     renameFieldInternal(field, newName.toLower());
@@ -90,7 +90,7 @@ void FieldList::renameField(Predicate::Field *field, const QString& newName)
 {
     if (!field || field != m_fields_by_name.value(field->name().toLower())) {
         PreFatal << "FieldList::renameField() no field found "
-        << (field ? QString("\"%1\"").arg(field->name()) : QString());
+        << (field ? QString::fromLatin1("\"%1\"").arg(field->name()) : QString());
         return;
     }
     renameFieldInternal(field, newName.toLower());
@@ -149,7 +149,7 @@ PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::FieldList& list)
 
 static QString subListWarning1(const QString& fname)
 {
-    return QString("FieldList::subList() could not find field \"%1\"").arg(fname);
+    return QString::fromLatin1("FieldList::subList() could not find field \"%1\"").arg(fname);
 }
 
 FieldList* FieldList::subList(const QString& n1, const QString& n2,
@@ -197,6 +197,28 @@ FieldList* FieldList::subList(const QStringList& list)
     return fl;
 }
 
+#undef _ADD_FIELD
+
+#define _ADD_FIELD(fname) \
+    { \
+        if (fname.isEmpty()) return fl; \
+        f = m_fields_by_name.value(QLatin1String(fname.toLower())); \
+        if (!f) { PreWarn << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
+        fl->addField(f); \
+    }
+
+FieldList* FieldList::subList(const QList<QByteArray>& list)
+{
+    Field *f;
+    FieldList *fl = new FieldList(false);
+    for (QList<QByteArray>::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
+        _ADD_FIELD((*it));
+    }
+    return fl;
+}
+
+#undef _ADD_FIELD
+
 FieldList* FieldList::subList(const QList<uint>& list)
 {
     Field *f;
@@ -204,7 +226,7 @@ FieldList* FieldList::subList(const QList<uint>& list)
     foreach(uint index, list) {
         f = field(index);
         if (!f) {
-            PreWarn << QString("FieldList::subList() could not find field at position %1").arg(index);
+            PreWarn << QString::fromLatin1("FieldList::subList() could not find field at position %1").arg(index);
             delete fl;
             return 0;
         }
@@ -249,7 +271,7 @@ EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn
         result += (tableAliasAndDot +
                    ((conn && escapingType == DriverEscaping)
                         ? conn->escapeIdentifier(f->name())
-                        : Predicate::escapeIdentifier(f->name()))
+                        : Predicate::escapeIdentifier(f->name()).toUtf8())
                   );
     }
     return result;

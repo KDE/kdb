@@ -91,7 +91,7 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 	//we're using QString:toLongLong() here because atoll() is not so portable:
 	ECOUNT;
 	bool ok;
-	yylval.integerValue = QString(yytext).toLongLong( &ok );
+	yylval.integerValue = QByteArray(yytext).toLongLong( &ok );
 	if (!ok) {
 		setError(QObject::tr("Invalid integer number"),QObject::tr("This integer number may be too large."));
 		return SCAN_ERROR;

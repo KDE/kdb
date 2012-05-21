@@ -53,7 +53,7 @@ public:
      clicked "Cancel" button in the progress dialog. */
     tristate run();
 
-public slots:
+public Q_SLOTS:
     void readFromStdout();
     void processExited();
     void cancelClicked();

@@ -254,12 +254,6 @@ public:
 
     bool deleteAllRecords();
 
-    /*! @return Debug information. */
-    QString debugString() const;
-
-    //! Outputs debug information.
-    void debug() const;
-
 protected:
     /*! Cursor will operate on @a conn, raw @a statement will be used to execute query. */
     Cursor(Connection* conn, const EscapedString& statement, uint options = NoOptions);
@@ -382,5 +376,8 @@ private:
 };
 
 } //namespace Predicate
+
+//! Sends information about object @a cursor to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Cursor& cursor);
 
 #endif

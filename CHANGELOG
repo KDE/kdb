@@ -3,6 +3,12 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-05-21
+Predicate
+*Qt string handling optimizations added
+**-DQT_USE_QSTRINGBUILDER -DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII
+**http://qt-project.org/doc/qt-4.8/qstring.html#more-efficient-string-construction
+
 2012-03-28
 Predicate
 *fixed functions returning field's type group name and type group string; they were completely broken but probably only GUI was affected

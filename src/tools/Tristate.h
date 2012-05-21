@@ -81,7 +81,7 @@ static const char dontKnow = cancelled;
  * Other use for tristate class could be to allow cancellation within
  * a callback function or a Qt slot. Example:
  * \code
- * public slots:
+ * public Q_SLOTS:
  *   void validateData(tristate& result);
  * \endcode
  * Having the single parameter, signals and slots have still simple look.

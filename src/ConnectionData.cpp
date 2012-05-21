@@ -43,7 +43,7 @@ QString ConnectionData::serverInfoString(ServerInfoStringOptions options) const
             }
         }
     }
-    return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QLatin1String("") : (d->userName + '@'))
+    return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QLatin1String("") : (d->userName + QLatin1Char('@')))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
-           + (d->port != 0 ? (QLatin1String(":") + QString::number(d->port)) : QString());
+           + (d->port != 0 ? (QLatin1Char(':') + QString::number(d->port)) : QString());
 }

@@ -27,12 +27,12 @@ int schemaTest()
         return 1;
     }
 
-    Predicate::TableSchema *t = conn->tableSchema("persons");
+    Predicate::TableSchema *t = conn->tableSchema(QLatin1String("persons"));
     if (t)
         qDebug() << *t;
     else
         qDebug() << "!persons";
-    t = conn->tableSchema("cars");
+    t = conn->tableSchema(QLatin1String("cars"));
     if (t)
         qDebug() << *t;
     else

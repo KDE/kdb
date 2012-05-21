@@ -48,12 +48,12 @@ public:
     /**
      * Constructor.
      *
-     * @param type The errortype.
+     * @param type The error type.
      * @param error A description of the error.
-     * @param hint Token where the Error.happend.
-     * @param at The position where the Error.happend.
+     * @param token Token where the Error happend.
+     * @param at The position where the Error happend.
      */
-    ParserError(const QString &type, const QString &error, const QString &hint, int at);
+    ParserError(const QString &type, const QString &error, const QByteArray &token, int at);
 
     /**
      * Destructor.
@@ -84,7 +84,7 @@ public:
 private:
     QString m_type;
     QString m_error;
-    QString m_hint;
+    QByteArray m_token;
     int m_at;
 //  bool m_isNull;
 };
