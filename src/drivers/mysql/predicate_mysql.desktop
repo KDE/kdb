@@ -36,4 +36,4 @@ Comment[uk]=Драйвер Predicate для роботи з базами дан�
 Comment[x-test]=xxPredicate driver for handling MySQL databasesxx
 FileName=mysql
 Type=Network
-Version=1.0
+Version=0.0

@@ -37,4 +37,4 @@ Comment[x-test]=xxPredicate driver for handling SQLite databasesxx
 FileName=sqlite
 Type=File
 MimeTypes=application/x-kexiproject-sqlite3,application/x-sqlite3
-Version=1.0
+Version=0.0
