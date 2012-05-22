@@ -1,13 +1,18 @@
+#set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+
+cmake_minimum_required(VERSION 2.8)
+
 project( Predicate )
 
-cmake_minimum_required(VERSION 2.6)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+
+include(MacroEnsureOutOfSourceBuild)
+MACRO_ENSURE_OUT_OF_SOURCE_BUILD()
 
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
   cmake_policy(SET CMP0005 NEW)
 endif(COMMAND cmake_policy)
-
-set(CMAKE_MODULE_PATH ${Predicate_SOURCE_DIR}/cmake/modules)
 
 # define the generic version of the Predicate libraries here
 # this makes it easy to advance it when the next Predicate release comes
