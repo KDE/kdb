@@ -22,12 +22,17 @@
 #  make install
 #
 
+if [ $# -lt 1 ] ; then
+    echo "Usage: $0 {predicate-source-dir}"
+    exit 1
+fi
+
 if [ -z "$KDEDIRS" ] ; then
     echo "Please set \$KDEDIRS"
     exit 1
 fi
 
-if [ -d "/usr/lib64" ] ; then
+if [ `getconf LONG_BIT` -eq "64" ] ; then
     _libdir=lib64
 else
     _libdir=lib

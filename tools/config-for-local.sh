@@ -21,13 +21,18 @@
 #  make install
 #
 
+if [ $# -lt 1 ] ; then
+    echo "Usage: $0 {predicate-source-dir}"
+    exit 1
+fi
+
 if [ -z "$PREDICATE_INSTALL_PREFIX" ] ; then
     echo "Please set \$PREDICATE_INSTALL_PREFIX"
     exit 1
 fi
 
-if [ -d "/usr/lib64" ] ; then
-    c=lib64
+if [ `getconf LONG_BIT` -eq "64" ] ; then
+    _libdir=lib64
 else
     _libdir=lib
 fi
