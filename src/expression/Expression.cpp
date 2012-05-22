@@ -103,7 +103,7 @@ Field::Type ExpressionData::type() const
 
 QDebug ExpressionData::debug(QDebug dbg) const
 {
-    dbg.nospace() << QString::fromLatin1("Exp(%1,type=%1)")
+    dbg.nospace() << QString::fromLatin1("Exp(%1,type=%2)")
                    .arg(token).arg(Driver::defaultSQLTypeName(type()));
     return dbg.space();
 }
