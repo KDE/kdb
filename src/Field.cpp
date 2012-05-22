@@ -87,12 +87,12 @@ Field::Field(const QString& name, Type ctype,
         , m_customProperties(0)
         , m_type(ctype)
 {
+    m_expr = new Expression();
     setConstraints(cconst);
     if (m_length == 0) {//0 means default length:
         if (m_type == Field::Text)
             m_length = defaultTextLength();
     }
-    m_expr = new Expression();
 }
 
 /*! Copy constructor. */
