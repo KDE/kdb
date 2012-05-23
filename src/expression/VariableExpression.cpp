@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/Parser_p.h"
 
 #include <ctype.h>
@@ -37,7 +36,7 @@ VariableExpressionData::VariableExpressionData()
  , tablePositionForField(-1)
  , tableForQueryAsterisk(0)
 {
-    qDebug() << "VariableExpressionData" << ref;
+    ExpressionDebug << "VariableExpressionData" << ref;
 }
 
 VariableExpressionData::VariableExpressionData(const QString& aName)
@@ -47,17 +46,17 @@ VariableExpressionData::VariableExpressionData(const QString& aName)
  , tablePositionForField(-1)
  , tableForQueryAsterisk(0)
 {
-   qDebug() << "VariableExpressionData" << ref;
+   ExpressionDebug << "VariableExpressionData" << ref;
 }
 
 VariableExpressionData::~VariableExpressionData()
 {
-    qDebug() << "~VariableExpressionData" << ref;
+    ExpressionDebug << "~VariableExpressionData" << ref;
 }
 
 VariableExpressionData* VariableExpressionData::clone()
 {
-    qDebug() << "VariableExpressionData::clone" << *this;
+    ExpressionDebug << "VariableExpressionData::clone" << *this;
     return new VariableExpressionData(*this);
 }
 
@@ -245,7 +244,7 @@ bool VariableExpressionData::validate(ParseInfo& parseInfo)
 VariableExpression::VariableExpression()
  : Expression(new VariableExpressionData)
 {
-    qDebug() << "VariableExpression() ctor" << *this;
+    ExpressionDebug << "VariableExpression() ctor" << *this;
 }
 
 VariableExpression::VariableExpression(const QString& name)
@@ -262,7 +261,7 @@ VariableExpression::VariableExpression(const VariableExpression& expr)
 VariableExpression::VariableExpression(ExpressionData* data)
     : Expression(data)
 {
-    qDebug() << "VariableExpression ctor (ExpressionData*)" << *this;
+    ExpressionDebug << "VariableExpression ctor (ExpressionData*)" << *this;
 }
 
 VariableExpression::~VariableExpression()

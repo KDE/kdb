@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/SqlParser.h"
 
 #include <ctype.h>
@@ -35,7 +34,7 @@ QueryParameterExpressionData::QueryParameterExpressionData()
  : ConstExpressionData()
  , m_type(Field::InvalidType)
 {
-    qDebug() << "QueryParameterExpressionData" << ref;
+    ExpressionDebug << "QueryParameterExpressionData" << ref;
 }
 
 QueryParameterExpressionData::QueryParameterExpressionData(
@@ -43,17 +42,17 @@ QueryParameterExpressionData::QueryParameterExpressionData(
  : ConstExpressionData(value)
  , m_type(type)
 {
-   qDebug() << "QueryParameterExpressionData" << ref;
+   ExpressionDebug << "QueryParameterExpressionData" << ref;
 }
 
 QueryParameterExpressionData::~QueryParameterExpressionData()
 {
-    qDebug() << "~QueryParameterExpressionData" << ref;
+    ExpressionDebug << "~QueryParameterExpressionData" << ref;
 }
 
 QueryParameterExpressionData* QueryParameterExpressionData::clone()
 {
-    qDebug() << "QueryParameterExpressionData::clone" << *this;
+    ExpressionDebug << "QueryParameterExpressionData::clone" << *this;
     return new QueryParameterExpressionData(*this);
 }
 
@@ -95,7 +94,7 @@ Field::Type QueryParameterExpressionData::type() const
 QueryParameterExpression::QueryParameterExpression()
  : ConstExpression(new QueryParameterExpressionData)
 {
-    qDebug() << "QueryParameterExpression() ctor" << *this;
+    ExpressionDebug << "QueryParameterExpression() ctor" << *this;
 }
 
 QueryParameterExpression::QueryParameterExpression(const QString& message)
@@ -112,7 +111,7 @@ QueryParameterExpression::QueryParameterExpression(const QueryParameterExpressio
 QueryParameterExpression::QueryParameterExpression(ExpressionData* data)
     : ConstExpression(data)
 {
-    qDebug() << "QueryParameterExpression ctor (ExpressionData*)" << *this;
+    ExpressionDebug << "QueryParameterExpression ctor (ExpressionData*)" << *this;
 }
 
 QueryParameterExpression::~QueryParameterExpression()

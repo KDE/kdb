@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/SqlParser.h"
 
 #include <ctype.h>
@@ -34,17 +33,17 @@ using namespace Predicate;
 UnaryExpressionData::UnaryExpressionData()
  : ExpressionData()
 {
-    qDebug() << "UnaryExpressionData" << ref;
+    ExpressionDebug << "UnaryExpressionData" << ref;
 }
 
 UnaryExpressionData::~UnaryExpressionData()
 {
-    qDebug() << "~UnaryExpressionData" << ref;
+    ExpressionDebug << "~UnaryExpressionData" << ref;
 }
 
 UnaryExpressionData* UnaryExpressionData::clone()
 {
-    qDebug() << "UnaryExpressionData::clone" << *this;
+    ExpressionDebug << "UnaryExpressionData::clone" << *this;
     return new UnaryExpressionData(*this);
 }
 
@@ -160,7 +159,7 @@ bool UnaryExpressionData::validate(ParseInfo& parseInfo)
 UnaryExpression::UnaryExpression()
  : Expression(new UnaryExpressionData)
 {
-    qDebug() << "UnaryExpression() ctor" << *this;
+    ExpressionDebug << "UnaryExpression() ctor" << *this;
 }
 
 UnaryExpression::UnaryExpression(int token, const Expression& arg)
@@ -173,7 +172,7 @@ UnaryExpression::UnaryExpression(int token, const Expression& arg)
 UnaryExpression::UnaryExpression(ExpressionData* data)
  : Expression(data)
 {
-    qDebug() << "UnaryExpression(ExpressionData*) ctor" << *this;
+    ExpressionDebug << "UnaryExpression(ExpressionData*) ctor" << *this;
 }
 
 UnaryExpression::UnaryExpression(const UnaryExpression& expr)

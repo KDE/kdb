@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/SqlParser.h"
 
 #include <ctype.h>
@@ -34,7 +33,7 @@ using namespace Predicate;
 BinaryExpressionData::BinaryExpressionData()
  : ExpressionData()
 {
-    qDebug() << "BinaryExpressionData" << ref;
+    ExpressionDebug << "BinaryExpressionData" << ref;
 }
 
 BinaryExpressionData::~BinaryExpressionData()
@@ -103,7 +102,7 @@ Field::Type BinaryExpressionData::type() const
 
 BinaryExpressionData* BinaryExpressionData::clone()
 {
-    qDebug() << "BinaryExpressionData::clone" << *this;
+    ExpressionDebug << "BinaryExpressionData::clone" << *this;
     return new BinaryExpressionData(*this);
 }
 
@@ -197,7 +196,7 @@ static ExpressionClass classForArgs(ExpressionClass aClass,
 BinaryExpression::BinaryExpression()
  : Expression(new BinaryExpressionData)
 {
-    qDebug() << "BinaryExpression() ctor" << *this;
+    ExpressionDebug << "BinaryExpression() ctor" << *this;
 }
 
 BinaryExpression::BinaryExpression(ExpressionClass aClass,
@@ -216,7 +215,7 @@ BinaryExpression::BinaryExpression(const BinaryExpression& expr)
 BinaryExpression::BinaryExpression(ExpressionData* data)
  : Expression(data)
 {
-    qDebug() << "BinaryExpression(ExpressionData*) ctor" << *this;
+    ExpressionDebug << "BinaryExpression(ExpressionData*) ctor" << *this;
     appendChild(Expression());
     appendChild(Expression());
 }

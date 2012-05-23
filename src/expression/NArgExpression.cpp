@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/Parser_p.h"
 
 #include <ctype.h>
@@ -34,17 +33,17 @@ using namespace Predicate;
 NArgExpressionData::NArgExpressionData()
  : ExpressionData()
 {
-    qDebug() << "NArgExpressionData" << ref;
+    ExpressionDebug << "NArgExpressionData" << ref;
 }
 
 NArgExpressionData::~NArgExpressionData()
 {
-    qDebug() << "~NArgExpressionData" << ref;
+    ExpressionDebug << "~NArgExpressionData" << ref;
 }
 
 NArgExpressionData* NArgExpressionData::clone()
 {
-    qDebug() << "NArgExpressionData::clone" << *this;
+    ExpressionDebug << "NArgExpressionData::clone" << *this;
     return new NArgExpressionData(*this);
 }
 
@@ -96,19 +95,19 @@ void NArgExpressionData::getQueryParameters(QuerySchemaParameterList& params)
 NArgExpression::NArgExpression()
  : Expression(new NArgExpressionData)
 {
-    qDebug() << "NArgExpression() ctor" << *this;
+    ExpressionDebug << "NArgExpression() ctor" << *this;
 }
 
 NArgExpression::NArgExpression(ExpressionData* data)
  : Expression(data)
 {
-    qDebug() << "NArgExpression(ExpressionData*) ctor" << *this;
+    ExpressionDebug << "NArgExpression(ExpressionData*) ctor" << *this;
 }
 
 NArgExpression::NArgExpression(ExpressionClass aClass, int token)
         : Expression(new NArgExpressionData, aClass, token)
 {
-    qDebug() << "NArgExpression(ExpressionClass, int) ctor" << *this;
+    ExpressionDebug << "NArgExpression(ExpressionClass, int) ctor" << *this;
 }
 
 NArgExpression::NArgExpression(const NArgExpression& expr)

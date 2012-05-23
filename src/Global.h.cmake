@@ -183,4 +183,12 @@ enum ObjectType {
 # define FUTURE_I18N_NOOP(x) (x)
 #endif
 
+// debugging options
+#cmakedefine PREDICATE_EXPRESSION_DEBUG
+#ifdef PREDICATE_EXPRESSION_DEBUG
+# define ExpressionDebug qDebug()
+#else
+# define ExpressionDebug if (1) {} else qDebug()
+#endif
+
 #endif

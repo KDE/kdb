@@ -30,7 +30,7 @@
 
 #include <QtDebug>
 
-#include "Expression_p.h"
+#include "ExpressionData.h"
 
 namespace Predicate
 {
@@ -50,8 +50,6 @@ class VariableExpression;
 class FunctionExpression;
 class QueryParameterExpression;
 class QuerySchemaParameterValueListIterator;
-
-//class ExpressionData;
 
 //! A base class for all expressions
 class PREDICATE_EXPORT Expression
@@ -84,10 +82,6 @@ public:
     */
     ExpressionClass expressionClass() const;
 
-    // //! @return a deep copy of this object.
-    // //! @todo a nonpointer will be returned here when we move to implicit data sharing
-    //virtual Expression* copy() const = 0;
-
     /*! @return type of this expression, based on effect of its evaluation. */
     Field::Type type() const;
 
@@ -103,9 +97,6 @@ public:
     /*! Collects query parameters (messages and types) reculsively and saves them to params.
      The leaf nodes are objects of QueryParameterExpr class. */
     void getQueryParameters(QuerySchemaParameterList& params);
-
-    //! @return debug string, used in QDebug operator<<(QDebug, const Expression&)
-//    virtual QString debugString() const;
 
     static QString tokenToDebugString(int token);
 
@@ -185,8 +176,6 @@ public:
     NArgExpression(ExpressionClass aClass, int token);
     NArgExpression(const NArgExpression& expr);
     virtual ~NArgExpression();
-    //! @return a deep copy of this object.
-    //virtual NArgExpression* copy() const;
     void append(const Expression& expr);
     void prepend(const Expression& expr);
     Expression arg(int n) const;
@@ -233,8 +222,6 @@ public:
                      int token, const Expression& rightExpr);
     BinaryExpression(const BinaryExpression& expr);
     virtual ~BinaryExpression();
-    // //! @return a deep copy of this object.
-    //virtual BinaryExpression* copy() const;
     Expression left() const;
     void setLeft(const Expression& leftExpr);
     Expression right() const;
@@ -279,9 +266,6 @@ public:
     explicit QueryParameterExpression(const QString& message);
     QueryParameterExpression(const QueryParameterExpression& expr);
     virtual ~QueryParameterExpression();
-    // //! @return a deep copy of this object.
-    //virtual QueryParameterExpression* copy() const;  
-//    virtual Field::Type type() const;
     /*! Sets expected type of the parameter. The default is String.
      This method is called from parent's expression validate().
      This depends on the type of the related expression.
@@ -347,8 +331,6 @@ public:
     FunctionExpression(const QString& name, NArgExpression& args);
     FunctionExpression(const FunctionExpression& expr);
     virtual ~FunctionExpression();
-    // //! @return a deep copy of this obect.
-    // virtual FunctionExpression* copy() const;
 
     QString name() const;
     NArgExpression arguments() const;
@@ -361,7 +343,7 @@ protected:
     friend class Expression;
 };
 
-} //namespace Predicate
+} // namespace Predicate
 
 //! Sends information about expression  @a expr to debug output @a dbg.
 PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Expression& expr);

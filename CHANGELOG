@@ -3,6 +3,10 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-05-23
+Predicate
+*Allow to set debugging for Expression classes in the build options
+
 2012-05-21
 Predicate
 *Qt string handling optimizations added

@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 #include "parser/SqlParser.h"
 
 #include <ctype.h>
@@ -35,17 +34,17 @@ ConstExpressionData::ConstExpressionData(const QVariant& aValue)
  : ExpressionData()
  , value(aValue)
 {
-    qDebug() << "ConstExpressionData" << ref;
+    ExpressionDebug << "ConstExpressionData" << ref;
 }
 
 ConstExpressionData::~ConstExpressionData()
 {
-    qDebug() << "~ConstExpressionData" << ref;
+    ExpressionDebug << "~ConstExpressionData" << ref;
 }
 
 ConstExpressionData* ConstExpressionData::clone()
 {
-    qDebug() << "ConstExpressionData::clone" << *this;
+    ExpressionDebug << "ConstExpressionData::clone" << *this;
     return new ConstExpressionData(*this);
 }
 
@@ -134,7 +133,7 @@ bool ConstExpressionData::validate(ParseInfo& parseInfo)
 ConstExpression::ConstExpression()
  : Expression(new ConstExpressionData(QVariant()))
 {
-    qDebug() << "ConstExpression() ctor" << *this;
+    ExpressionDebug << "ConstExpression() ctor" << *this;
 }
 
 ConstExpression::ConstExpression(int token, const QVariant& value)

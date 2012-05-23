@@ -24,7 +24,6 @@
 #include <Predicate/Utils>
 #include <Predicate/QuerySchema>
 #include <Predicate/Tools/Static>
-#include "Expression_p.h"
 
 #include <ctype.h>
 
@@ -53,14 +52,14 @@ PREDICATE_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
 FunctionExpressionData::FunctionExpressionData()
  : ExpressionData()
 {
-    qDebug() << "FunctionExpressionData" << ref;
+    ExpressionDebug << "FunctionExpressionData" << ref;
 }
 
 FunctionExpressionData::FunctionExpressionData(const QString& aName)
         : ExpressionData()
         , name(aName)
 {
-    qDebug() << "FunctionExpressionData" << ref;
+    ExpressionDebug << "FunctionExpressionData" << ref;
 /*    if (aArgs) {
         args = *aArgs;
         args->setParent(this);
@@ -69,12 +68,12 @@ FunctionExpressionData::FunctionExpressionData(const QString& aName)
 
 FunctionExpressionData::~FunctionExpressionData()
 {
-    qDebug() << "~FunctionExpressionData" << ref;
+    ExpressionDebug << "~FunctionExpressionData" << ref;
 }
 
 FunctionExpressionData* FunctionExpressionData::clone()
 {
-    qDebug() << "FunctionExpressionData::clone" << *this;
+    ExpressionDebug << "FunctionExpressionData::clone" << *this;
     return new FunctionExpressionData(*this);
 }
 
@@ -129,7 +128,7 @@ inline ExpressionClass classForFunctionName(const QString& name)
 FunctionExpression::FunctionExpression()
  : Expression(new FunctionExpressionData)
 {
-    qDebug() << "FunctionExpression() ctor" << *this;
+    ExpressionDebug << "FunctionExpression() ctor" << *this;
 }
 
 FunctionExpression::FunctionExpression(const QString& name)
@@ -156,7 +155,7 @@ FunctionExpression::FunctionExpression(const FunctionExpression& expr)
 FunctionExpression::FunctionExpression(ExpressionData* data)
     : Expression(data)
 {
-    qDebug() << "FunctionExpression ctor (ExpressionData*)" << *this;
+    ExpressionDebug << "FunctionExpression ctor (ExpressionData*)" << *this;
 }
 
 FunctionExpression::~FunctionExpression()

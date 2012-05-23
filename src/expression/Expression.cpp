@@ -72,7 +72,7 @@ ExpressionData::ExpressionData()
 : token(0)
 , expressionClass(Predicate::UnknownExpressionClass)
 {
-    qDebug() << "ExpressionData" << ref;
+    ExpressionDebug << "ExpressionData" << ref;
 }
 
 /*Data(const Data& other)
@@ -82,17 +82,17 @@ ExpressionData::ExpressionData()
 , parent(other.parent)
 , children(other.children)
 {
-    qDebug() << "ExpressionData" << ref;
+    ExpressionDebug << "ExpressionData" << ref;
 }*/
 
 ExpressionData::~ExpressionData()
 {
-    qDebug() << "~ExpressionData" << ref;
+    ExpressionDebug << "~ExpressionData" << ref;
 }
 
 ExpressionData* ExpressionData::clone()
 {
-    qDebug() << "ExpressionData::clone" << *this;
+    ExpressionDebug << "ExpressionData::clone" << *this;
     return new ExpressionData(*this);
 }
 
@@ -141,7 +141,7 @@ void ExpressionData::getQueryParameters(QuerySchemaParameterList& params)
 Expression::Expression()
     : d(new ExpressionData)
 {
-    qDebug() << "Expression ctor ()" << *this << d->ref;
+    ExpressionDebug << "Expression ctor ()" << *this << d->ref;
 }
 
 Expression::Expression(ExpressionData* data, ExpressionClass aClass, int token)
@@ -154,7 +154,7 @@ Expression::Expression(ExpressionData* data, ExpressionClass aClass, int token)
 Expression::Expression(ExpressionData* data)
     : d(data)
 {
-    qDebug() << "Expression ctor (ExpressionData*)" << *this;
+    ExpressionDebug << "Expression ctor (ExpressionData*)" << *this;
 }
 
 Expression::~Expression()

@@ -12,6 +12,10 @@ if (WIN32)
   )
 endif (WIN32)
 
+########### options ###############
+
+option(PREDICATE_EXPRESSION_DEBUG "Enable debugging of Expression classes" OFF)
+
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
@@ -146,6 +150,7 @@ install( FILES
   Error.h includes/Predicate/Error
   EscapedString.h includes/Predicate/EscapedString
   expression/Expression.h includes/Predicate/Expression
+  expression/ExpressionData.h
   Field.h includes/Predicate/Field
   FieldList.h includes/Predicate/FieldList
   IndexSchema.h includes/Predicate/IndexSchema

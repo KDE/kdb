@@ -23,11 +23,8 @@
 #ifndef PREDICATE_EXPRESSION_P_H
 #define PREDICATE_EXPRESSION_P_H
 
-//#include "Expression.h"
 #include "Utils.h"
 #include "QuerySchema.h"
-//#include "parser/SqlParser.h"
-//#include "parser/Parser_p.h"
 #include "Tools/Static.h"
 
 #include <ctype.h>
