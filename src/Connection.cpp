@@ -1078,13 +1078,16 @@ C_INS_REC_ALL
 bool Connection::insertRecord(TableSchema* tableSchema, const QList<QVariant>& values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    const Field::List *fields = tableSchema->fields();
-    Field::ListIterator fieldsIt(fields->constBegin());
-    Field *f = *fieldsIt;
+    const Field::List *flist = tableSchema->fields();
+    if (flist->isEmpty()) {
+        return false;
+    }
+    Field::ListIterator fieldsIt(flist->constBegin());
     QList<QVariant>::ConstIterator it = values.constBegin();
     EscapedString sql;
     sql.reserve(4096);
-    while (f && (it != values.end())) {
+    while (fieldsIt != flist->constEnd() && (it != values.end())) {
+        Field *f = *fieldsIt;
         if (sql.isEmpty()) {
             sql = "INSERT INTO " + escapeIdentifier(tableSchema->name()) +
                   " VALUES (";
@@ -1096,7 +1099,6 @@ bool Connection::insertRecord(TableSchema* tableSchema, const QList<QVariant>& v
 //  PreDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
-        f = *fieldsIt;
     }
     sql += ')';
     m_result.setSql(sql);
@@ -1114,15 +1116,16 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
     const Field::List *flist = fields->fields();
-    Field::ListIterator fieldsIt(flist->constBegin());
-    Field *f = *fieldsIt;
-    if (!f)
+    if (flist->isEmpty()) {
         return false;
+    }
+    Field::ListIterator fieldsIt(flist->constBegin());
     EscapedString sql;
     sql.reserve(4096);
     QList<QVariant>::ConstIterator it = values.constBegin();
     const QString tableName(flist->first()->table()->name());
-    while (it != values.constEnd() && f) {
+    while (fieldsIt != flist->constEnd() && it != values.constEnd()) {
+        Field *f = *fieldsIt;
         if (sql.isEmpty()) {
             sql = "INSERT INTO " + escapeIdentifier(tableName) + '(' +
                   fields->sqlFieldsList(this) + ") VALUES (";
@@ -1136,7 +1139,6 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
         ++fieldsIt;
         if (fieldsIt == flist->constEnd())
             break;
-        f = *fieldsIt;
     }
     sql += ')';
     m_result.setSql(sql);
