@@ -106,7 +106,7 @@ set(predicate_LIB_SRCS
    DbProperties.cpp
    Admin.cpp
    LookupFieldSchema.cpp
-   Alter.cpp
+#TODO Alter.cpp
 )
 
 set(predicate_MOC_SRCS
@@ -139,7 +139,7 @@ install(TARGETS predicate ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install( FILES
   Admin.h includes/Predicate/Admin
-  Alter.h includes/Predicate/Alter
+#TODO  Alter.h includes/Predicate/Alter
   Connection.h includes/Predicate/Connection
   ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData.h includes/Predicate/ConnectionData
   Cursor.h includes/Predicate/Cursor

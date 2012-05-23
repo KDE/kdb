@@ -45,7 +45,7 @@ class Cursor;
 class ConnectionPrivate;
 class RecordEditBuffer;
 class DatabaseProperties;
-class AlterTableHandler;
+//class AlterTableHandler;
 
 class PREDICATE_EXPORT ConnectionSqlInterface : public Resultable
 {
@@ -1306,7 +1306,7 @@ private:
     friend class TableSchema; //!< for removeMe()
     friend class DatabaseProperties; //!< for setError()
     friend class ConnectionPrivate;
-    friend class AlterTableHandler;
+//    friend class AlterTableHandler;
 };
 
 } //namespace Predicate
