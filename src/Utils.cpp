@@ -100,7 +100,7 @@ bool Predicate::isEmptyValue(Field *f, const QVariant &v)
 }
 
 EscapedString Predicate::sqlWhere(Driver *drv, Field::Type t,
-                            const QString& fieldName, const QVariant value)
+                            const QString& fieldName, const QVariant& value)
 {
     if (value.isNull())
         return EscapedString(fieldName) + " is NULL";

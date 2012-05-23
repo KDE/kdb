@@ -107,7 +107,7 @@ Constructs an sql string like "fielname = value" for specific @a drv driver,
  field type @a t, @a fieldName and @a value. If @a value is null, "fieldname is NULL"
  string is returned. */
 PREDICATE_EXPORT EscapedString sqlWhere(Driver *drv, Field::Type t,
-                                        const QString& fieldName, const QVariant value);
+                                        const QString& fieldName, const QVariant& value);
 
 /*! @return identifier for object @a objName of type @a objType
  or 0 if such object does not exist. */
