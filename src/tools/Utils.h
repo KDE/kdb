@@ -29,7 +29,6 @@
 #include <QFont>
 #include <QFrame>
 
-class QColor;
 class QMetaProperty;
 
 namespace Predicate
@@ -60,85 +59,6 @@ inline type findParent(QObject* o, const char* className = 0)
     return 0;
 }
 
-/* //! Const version of findParent()
-  template<class type>
-  inline const type findParentConst(const QObject* o, const char* className = 0)
-  {
-    if (!o) // || !className || className[0]=='\0')
-      return 0;
-    while ((o=o->parent())) {
-      if (dynamic_cast< type >(o) && (!className || o->inherits(className)))
-        return dynamic_cast< type >(o);
-    }
-    return 0;
-  }*/
-
-/*! @return first found child of @a o, inheriting @a className.
- If objName is 0 (the default), all object names match.
- Returned pointer type is casted. */
-PREDICATE_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className, const char* objName);
-
-/*! @return first found child of @a o, that inherit @a className.
- If @a objName is 0 (the default), all object names match.
- Returned pointer type is casted. */
-template<class type>
-inline type findFirstChild(QObject *o, const char* className, const char* objName = 0)
-{
-    return ::qobject_cast< type >(findFirstQObjectChild(o, className, objName));
-}
-
-//! Finds property name and returns its index; otherwise returns -1.
-//! Like QMetaObject::indexOfProperty() but also looks at superclasses.
-PREDICATE_EXPORT int indexOfPropertyWithSuperclasses(
-    const QObject *object, const char* name);
-
-//! Finds property for name @a name and object @a object returns it index;
-//! otherwise returns a null QMetaProperty.
-PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
-        const char* name);
-
-//! Finds property for index @a index and object @a object returns it index;
-//! otherwise returns a null QMetaProperty.
-PREDICATE_EXPORT QMetaProperty findPropertyWithSuperclasses(const QObject* object,
-        int index);
-
-//! @return true is @a object object is of class name @a className
-inline bool objectIsA(QObject* object, const char* className)
-{
-    return 0 == qstrcmp(object->metaObject()->className(), className);
-}
-
-//! @return true is @a object object is of the class names inside @a classNames
-PREDICATE_EXPORT bool objectIsA(QObject* object, const QList<QByteArray>& classNames);
-
-//! @return a list of methods for @a metaObject meta object.
-//! The methods are of type declared in @a types and have access declared
-//! in @a access.
-PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObject(
-    const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
-    = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
-    QFlags<QMetaMethod::Access> access
-    = QFlags<QMetaMethod::Access>(QMetaMethod::Private | QMetaMethod::Protected | QMetaMethod::Public));
-
-//! Like @ref KexiUtils::methodsForMetaObject() but includes methods from all
-//! parent meta objects of the @a metaObject.
-PREDICATE_EXPORT QList<QMetaMethod> methodsForMetaObjectWithParents(
-    const QMetaObject *metaObject, QFlags<QMetaMethod::MethodType> types
-    = QFlags<QMetaMethod::MethodType>(QMetaMethod::Method | QMetaMethod::Signal | QMetaMethod::Slot),
-    QFlags<QMetaMethod::Access> access
-    = QFlags<QMetaMethod::Access>(QMetaMethod::Private | QMetaMethod::Protected | QMetaMethod::Public));
-
-//! @return a list with all this class's properties.
-PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObject(
-    const QMetaObject *metaObject);
-
-//! @return a list with all this class's properties including thise inherited.
-PREDICATE_EXPORT QList<QMetaProperty> propertiesForMetaObjectWithInherited(
-    const QMetaObject *metaObject);
-
-//! @return a list of enum keys for meta property @a metaProperty.
-PREDICATE_EXPORT QStringList enumKeysForProperty(const QMetaProperty& metaProperty);
-
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()
 inline QDateTime stringToHackedQTime(const QString& s)
 {
@@ -147,33 +67,6 @@ inline QDateTime stringToHackedQTime(const QString& s)
     //  PreDbg << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate ) ).toString(Qt::ISODate);
     return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
 }
-
-/*! @return a color being a result of blending @a c1 with @a c2 with @a factor1
- and @a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
-PREDICATE_EXPORT QColor blendedColors(const QColor& c1, const QColor& c2, int factor1 = 1, int factor2 = 1);
-
-/*! @return a contrast color for a color @a c:
- If @a c is light color, darker color created using c.dark(200) is returned;
- otherwise lighter color created using c.light(200) is returned. */
-PREDICATE_EXPORT QColor contrastColor(const QColor& c);
-
-/*! @return a lighter color for a color @a c and a factor @a factor.
- For colors like Qt::red or Qt::green where hue and saturation are near to 255,
- hue is decreased so the result will be more bleached.
- For black color the result is dark gray rather than black. */
-PREDICATE_EXPORT QColor bleachedColor(const QColor& c, int factor);
-
-#if 0
-//! @todo
-/*! @return icon set computed as a result of colorizing @a icon pixmap with "buttonText"
- color of @a palette palette. This function is useful for displaying monochromed icons
- on the list view or table view header, to avoid bloat, but still have the color compatible
- with accessibility settings. */
-PREDICATE_EXPORT QIcon colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette);
-
-/*! @return empty (fully transparent) pixmap that can be used as a place for icon of size @a iconGroup */
-PREDICATE_EXPORT QPixmap emptyIcon(KIconLoader::Group iconGroup);
-#endif
 
 /*! Serializes @a map to @a array.
  KexiUtils::deserializeMap() can be used to deserialize this array back to map. */
@@ -222,58 +115,6 @@ type* stringToPtr(const QString& str)
 {
     return static_cast<type*>(stringToPtrInternal(str, sizeof(type*)));
 }
-
-//! Sets focus for widget @a widget with reason @a reason.
-PREDICATE_EXPORT void setFocusWithReason(QWidget* widget, Qt::FocusReason reason);
-
-//! Unsets focus for widget @a widget with reason @a reason.
-PREDICATE_EXPORT void unsetFocusWithReason(QWidget* widget, Qt::FocusReason reason);
-
-//! @short A convenience class that simplifies usage of QWidget::getContentsMargins() and QWidget::setContentsMargins
-class PREDICATE_EXPORT WidgetMargins
-{
-public:
-    //! Creates object with all margins set to 0
-    WidgetMargins();
-    //! Creates object with margins copied from @a widget
-    WidgetMargins(QWidget *widget);
-    //! Creates object with margins set to given values
-    WidgetMargins(int _left, int _top, int _right, int _bottom);
-    //! Creates object with all margins set to commonMargin
-    WidgetMargins(int commonMargin);
-    //! Copies margins from @a widget to this object
-    void copyFromWidget(QWidget *widget);
-    //! Creates margins from this object copied to @a widget
-    void copyToWidget(QWidget *widget);
-    //! Adds the given margins @a margins to this object, and returns a reference to this object
-    WidgetMargins& operator+= (const WidgetMargins& margins);
-
-    int left, top, right, bottom;
-};
-
-//! @return the sum of @a margins1 and @a margins1; each component is added separately.
-const WidgetMargins operator+ (const WidgetMargins& margins1, const WidgetMargins& margins2);
-
-//! Draws pixmap on painter @a p using predefined parameters.
-//! Used in KexiDBImageBox and KexiBlobTableEdit.
-PREDICATE_EXPORT void drawPixmap(QPainter& p, const WidgetMargins& margins, const QRect& rect,
-                                 const QPixmap& pixmap, Qt::Alignment alignment, bool scaledContents, bool keepAspectRatio);
-
-//! A helper for automatic deleting of contents of containers.
-template <typename Container>
-class PREDICATE_EXPORT ContainerDeleter
-{
-public:
-    ContainerDeleter(Container& container) : m_container(container) {}
-    ~ContainerDeleter() {
-        clear();
-    }
-    void clear() {
-        qDeleteAll(m_container); m_container.clear();
-    }
-private:
-    Container& m_container;
-};
 
 //! @short Autodeleted hash
 template <class Key, class T>
