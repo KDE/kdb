@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -301,10 +301,6 @@ Connection::Connection(Driver *driver, const ConnectionData& connData)
         , m_destructor_started(false)
         , m_insideCloseDatabase(false)
 {
-//Qt3 m_cursors.setAutoDelete(true);
-// d->transactions.setAutoDelete(true);
-    //reasonable sizes: TODO
-// d->transactions.resize(101);//woohoo! so many transactions?
 }
 
 void Connection::destroy()
@@ -638,11 +634,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
         my_dbName = dbName;
     if (my_dbName.isEmpty())
         return false;
-// if (my_dbName.isEmpty()) {
-//  const QStringList& db_lst = databaseNames();
-//  if (!db_lst.isEmpty())
-//   my_dbName = db_lst.first();
-// }
+
     if (d->usedDatabase == my_dbName)
         return true; //already used
 
@@ -1350,8 +1342,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                         );
                     }
                     s_additional_fields += expression;
-//subqueries_for_lookup_data.append(lookupQuery);
-                } else {
+                }
+                else {
                     PreWarn << "unsupported record source type" << recordSource.typeName();
                     return EscapedString();
                 }
@@ -1411,7 +1403,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         sql += ' ' + s_additional_joins + ' ';
     }
 
-//@todo: we're using WHERE for joins now; use INNER/LEFT/RIGHT JOIN later
+//! @todo: we're using WHERE for joins now; use INNER/LEFT/RIGHT JOIN later
 
     //WHERE
     bool wasWhere = false; //for later use
@@ -1605,7 +1597,6 @@ bool Connection::storeMainFieldSchema(Field *field)
         m_result.prependMessage(QObject::tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
-//setError( errorNum(), QObject::tr("Creating table failed.") + QLatin1Char(' ') + errorMsg());
 
 //! Creates a table according to the given schema
 /*! Creates a table according to the given TableSchema, adding the table and
@@ -1779,7 +1770,7 @@ tristate Connection::dropTable(TableSchema* tableSchema)
 
 tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
 {
-// Each SQL identifier needs to be escaped in the generated query.
+    // Each SQL identifier needs to be escaped in the generated query.
     clearResult();
     if (!tableSchema)
         return false;
@@ -1861,7 +1852,7 @@ tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableS
 //! @todo (js) implement real altering
 //! @todo (js) update any structure (e.g. query) that depend on this table!
     bool ok, empty;
-#if 0//TODO ucomment:
+#if 0//TODO uncomment:
     empty = isEmpty(tableSchema, ok) && ok;
 #else
     empty = true;
@@ -2161,8 +2152,6 @@ bool Connection::rollbackTransaction(const Transaction trans, bool ignore_inacti
 {
     if (!isDatabaseUsed())
         return false;
-// if (!checkIsDatabaseUsed())
-//  return false;
     if (!m_driver->transactionsSupported()
             && !(m_driver->d->features & Driver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
@@ -2209,8 +2198,6 @@ void Connection::setDefaultTransaction(const Transaction& trans)
 {
     if (!isDatabaseUsed())
         return;
-// if (!checkIsDatabaseUsed())
-    // return;
     if (!(m_driver->d->features & Driver::IgnoreTransactions)
             && (!trans.active() || !m_driver->transactionsSupported())) {
         return;
