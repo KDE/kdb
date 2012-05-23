@@ -555,7 +555,8 @@ void Predicate::connectionTestDialog(QWidget* parent, const ConnectionData& data
 int Predicate::recordCount(Connection* conn, const EscapedString& sql)
 {
     int count = -1; //will be changed only on success of querySingleNumber()
-    conn->querySingleNumber(EscapedString("SELECT COUNT() FROM (") + sql + ')', &count);
+    conn->querySingleNumber(EscapedString("SELECT COUNT() FROM (") + sql
+        + ") AS predicate__subquery", &count);
     return count;
 }
 
@@ -585,8 +586,8 @@ int Predicate::recordCount(QuerySchema* querySchema)
     int count = -1; //will be changed only on success of querySingleNumber()
     querySchema->connection()->querySingleNumber(
         EscapedString("SELECT COUNT(*) FROM (")
-            + querySchema->connection()->selectStatement(querySchema) + ')',
-        &count
+            + querySchema->connection()->selectStatement(querySchema)
+            + ") AS predicate__subquery", &count
     );
     return count;
 }
