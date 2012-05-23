@@ -31,7 +31,6 @@
 
 class QColor;
 class QMetaProperty;
-class KAction;
 
 namespace Predicate
 {
@@ -77,13 +76,13 @@ inline type findParent(QObject* o, const char* className = 0)
 /*! @return first found child of @a o, inheriting @a className.
  If objName is 0 (the default), all object names match.
  Returned pointer type is casted. */
-PREDICATE_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName);
+PREDICATE_EXPORT QObject* findFirstQObjectChild(QObject *o, const char* className, const char* objName);
 
 /*! @return first found child of @a o, that inherit @a className.
  If @a objName is 0 (the default), all object names match.
  Returned pointer type is casted. */
 template<class type>
-inline type findFirstChild(QObject *o, const char* className /* compat with Qt3 */, const char* objName = 0)
+inline type findFirstChild(QObject *o, const char* className, const char* objName = 0)
 {
     return ::qobject_cast< type >(findFirstQObjectChild(o, className, objName));
 }
@@ -148,29 +147,6 @@ inline QDateTime stringToHackedQTime(const QString& s)
     //  PreDbg << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate ) ).toString(Qt::ISODate);
     return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
 }
-
-#if 0
-//! @todo
-/*! @return filter string in QFileDialog format for a mime type pointed by @a mime
- If @a kdeFormat is true, QFileDialog-compatible filter string is generated,
- eg. "Image files (*.png *.xpm *.jpg)", otherwise KFileDialog -compatible
- filter string is generated, eg. "*.png *.xpm *.jpg|Image files (*.png *.xpm *.jpg)".
- "\\n" is appended if @a kdeFormat is true, otherwise ";;" is appended. */
-PREDICATE_EXPORT QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true);
-
-/*! @overload QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true) */
-PREDICATE_EXPORT QString fileDialogFilterString(const QString& mimeString, bool kdeFormat = true);
-
-/*! Like QString fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat = true)
- but returns a list of filter strings. */
-PREDICATE_EXPORT QString fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat);
-
-/*! A global setting for minimal readable font.
- @a init is a widget that should be passed if no qApp->mainWidget() is available yet.
- The size of font is not smaller than he one returned by
- KGlobalSettings::smallestReadableFont(). */
-PREDICATE_EXPORT QFont smallFont(QWidget *init = 0);
-#endif
 
 /*! @return a color being a result of blending @a c1 with @a c2 with @a factor1
  and @a factor1 factors: (c1*factor1+c2*factor2)/(factor1+factor2). */
@@ -480,24 +456,7 @@ private:
     Private * const d;
 };
 
-/*! A modified QFrame which sets up sunken styled panel frame style depending
- on the current widget style. The widget also reacts on style changes. */
-class PREDICATE_EXPORT KTextEditorFrame : public QFrame
-{
-public:
-    KTextEditorFrame(QWidget * parent = 0, Qt::WindowFlags f = 0);
-protected:
-    virtual void changeEvent(QEvent *event);
-};
-}
-}
+} // Utils
+} // Predicate
 
-//! sometimes we leave a space in the form of empty QFrame and want to insert here
-//! a widget that must be instantiated by hand.
-//! This macro inserts a widget @a what into a frame @a where.
-#define GLUE_WIDGET(what, where) \
-    { Q3VBoxLayout *lyr = new Q3VBoxLayout(where); \
-        lyr->addWidget(what); }
-
-
-#endif //KEXIUTILS_UTILS_H
+#endif //PREDICATE_TOOLS_UTILS_H

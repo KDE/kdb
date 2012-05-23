@@ -75,7 +75,6 @@ bool MysqlCursor::drv_close()
     mysql_free_result(d->mysqlres);
     d->mysqlres = 0;
     d->mysqlrow = 0;
-//js: done in superclass: m_numFields=0;
     d->lengths = 0;
     m_opened = false;
     d->numRows = 0;
@@ -114,20 +113,7 @@ QVariant MysqlCursor::value(uint pos)
 //! @todo js: use MYSQL_FIELD::type here!
 
     return Predicate::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
-    /* moved to cstringToVariant()
-      //from most to least frequently used types:
-      if (!f || f->isTextType())
-        return QVariant( QString::fromUtf8((const char*)d->mysqlrow[pos], d->lengths[pos]) );
-      else if (f->isIntegerType())
-    //! @todo support BigInteger
-        return QVariant( Q3CString((const char*)d->mysqlrow[pos], d->lengths[pos]).toInt() );
-      else if (f->isFPNumericType())
-        return QVariant( Q3CString((const char*)d->mysqlrow[pos], d->lengths[pos]).toDouble() );
-
-      //default
-      return QVariant(QString::fromUtf8((const char*)d->mysqlrow[pos], d->lengths[pos]));*/
 }
-
 
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
@@ -195,7 +181,3 @@ const char** MysqlCursor::recordData() const
     //! @todo
     return 0;
 }
-
-/*void MysqlCursor::drv_clearServerResult()
-{
-}*/

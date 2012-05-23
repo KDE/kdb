@@ -18,7 +18,6 @@
 */
 
 #include "Utils.h"
-//#include "kexiutils_global.h"
 
 #include <QRegExp>
 #include <QPainter>
@@ -32,19 +31,13 @@
 #include <QtDebug>
 #include <QCoreApplication>
 
-//#include <KApplication>
-//#include <KIconEffect>
-//#include <KIconLoader>
-//#include <KGlobalSettings>
-//#include <KAction>
-
 #include <Predicate/Global.h>
 #include "predicate_global.h"
 
 using namespace Predicate::Utils;
 
 QObject* Predicate::Utils::findFirstQObjectChild(QObject *o,
-                                                 const char* className /* compat with Qt3 */,
+                                                 const char* className,
                                                  const char* objName)
 {
     if (!o)
@@ -179,53 +172,6 @@ QStringList Predicate::Utils::enumKeysForProperty(const QMetaProperty& metaPrope
     return result;
 }
 
-#if 0
-//! @todo
-QString Predicate::Utils::fileDialogFilterString(const KMimeType::Ptr& mime, bool kdeFormat)
-{
-    if (mime.isNull())
-        return QString();
-
-    QString str;
-    if (kdeFormat) {
-        if (mime->patterns().isEmpty())
-            str = "*";
-        else
-            str = mime->patterns().join(" ");
-        str += "|";
-    }
-    str += mime->comment();
-    if (!mime->patterns().isEmpty() || !kdeFormat) {
-        str += " (";
-        if (mime->patterns().isEmpty())
-            str += "*";
-        else
-            str += mime->patterns().join("; ");
-        str += ")";
-    }
-    if (kdeFormat)
-        str += "\n";
-    else
-        str += ";;";
-    return str;
-}
-
-QString Predicate::Utils::fileDialogFilterString(const QString& mimeString, bool kdeFormat)
-{
-    KMimeType::Ptr ptr = KMimeType::mimeType(mimeString);
-    return fileDialogFilterString(ptr, kdeFormat);
-}
-
-QString Predicate::Utils::fileDialogFilterStrings(const QStringList& mimeStrings, bool kdeFormat)
-{
-    QString ret;
-    QStringList::ConstIterator endIt = mimeStrings.constEnd();
-    for (QStringList::ConstIterator it = mimeStrings.constBegin(); it != endIt; ++it)
-        ret += fileDialogFilterString(*it, kdeFormat);
-    return ret;
-}
-#endif
-
 QColor Predicate::Utils::blendedColors(const QColor& c1, const QColor& c2, int factor1, int factor2)
 {
     return QColor(
@@ -260,32 +206,6 @@ QColor Predicate::Utils::bleachedColor(const QColor& c, int factor)
     c2.setHsv(h, s, qMin(255, v + factor - 100));
     return c2;
 }
-
-#if 0
-//! @todo
-QIcon Predicate::Utils::colorizeIconToTextColor(const QPixmap& icon, const QPalette& palette)
-{
-#ifdef __GNUC__
-#warning Predicate::Utils::colorizeIconToTextColor OK?
-#else
-#pragma WARNING(port Predicate::Utils::colorizeIconToTextColor OK?)
-#endif
-    QPixmap pm(
-        KIconEffect().apply(icon, KIconEffect::Colorize, 1.0f,
-                            palette.color(QPalette::Active, QPalette::ButtonText), false));
-    KIconEffect::semiTransparent(pm);
-    return QIcon(pm);
-}
-
-QPixmap Predicate::Utils::emptyIcon(KIconLoader::Group iconGroup)
-{
-    QPixmap noIcon(IconSize(iconGroup), IconSize(iconGroup));
-    QBitmap bmpNoIcon(noIcon.size());
-    bmpNoIcon.fill(Qt::color0);
-    noIcon.setMask(bmpNoIcon);
-    return noIcon;
-}
-#endif
 
 void Predicate::Utils::serializeMap(const QMap<QString, QString>& map, QByteArray& array)
 {
@@ -543,27 +463,6 @@ const WidgetMargins Predicate::Utils::operator+ (
 
 //---------
 
-#if 0
-//! @todo
-
-PREDICATE_GLOBAL_STATIC(QFont, _smallFont)
-
-QFont Predicate::Utils::smallFont(QWidget *init)
-{
-    if (init) {
-        *_smallFont = init->font();
-        const int wdth = KGlobalSettings::desktopGeometry(init).width();
-        int size = 10 + qMax(0, wdth - 1100) / 100;
-        size = qMin(init->fontInfo().pixelSize(), size);
-        size = qMax(KGlobalSettings::smallestReadableFont().pixelSize(), size);
-        _smallFont->setPixelSize(size);
-    }
-    return *_smallFont;
-}
-#endif
-
-//---------
-
 //! @internal
 class StaticSetOfStrings::Private
 {
@@ -612,26 +511,4 @@ bool StaticSetOfStrings::contains(const QByteArray& string) const
             d->set->insert(QByteArray::fromRawData(*p, qstrlen(*p)));
     }
     return d->set->contains(string);
-}
-
-//---------------------
-
-KTextEditorFrame::KTextEditorFrame(QWidget * parent, Qt::WindowFlags f)
-        : QFrame(parent, f)
-{
-    QEvent dummy(QEvent::StyleChange);
-    changeEvent(&dummy);
-}
-
-void KTextEditorFrame::changeEvent(QEvent *event)
-{
-    if (event->type() == QEvent::StyleChange) {
-        if (style()->objectName() != QLatin1String("oxygen")) {
-            // oxygen already nicely paints the frame
-            setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
-        }
-        else {
-            setFrameStyle(QFrame::NoFrame);
-        }
-    }
 }
