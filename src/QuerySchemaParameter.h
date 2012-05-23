@@ -44,8 +44,8 @@ typedef QList<QuerySchemaParameter> QuerySchemaParameterList;
 typedef QList<QuerySchemaParameter>::Iterator QuerySchemaParameterListIterator;
 typedef QList<QuerySchemaParameter>::ConstIterator QuerySchemaParameterListConstIterator;
 
-//! @short An iteratof for a list of values of query schema parameters providing
-//! Allows to iterate over parameters and return QVariant value or well-formatted string.
+//! @short An iterator for a list of values of query schema parameters
+//! Allows to iterate over parameters and returns QVariant value or well-formatted string.
 //! The iterator is initially set to the last item because of the parser requirements
 class PREDICATE_EXPORT QuerySchemaParameterValueListIterator
 {
