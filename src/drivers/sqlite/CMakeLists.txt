@@ -68,3 +68,5 @@ set_target_properties(predicate_sqlite PROPERTIES PREFIX "")
 
 install(TARGETS predicate_sqlite DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_sqlite.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+
+add_subdirectory(icu)

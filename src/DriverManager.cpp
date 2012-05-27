@@ -179,16 +179,12 @@ bool DriverManagerInternal::lookupDrivers()
      Looks for "predicate" directory in $INSTALL/plugins, $QT_PLUGIN_PATH, and directory of the application executable.
      Plugin path "Plugins" entry can be added to qt.conf to override; see http://doc.trolltech.com/4.6/qt-conf.html.
     */
-    qDebug() << "qApp->libraryPaths():" << qApp->libraryPaths();
-    bool foundAtLeastOne = false;
-    foreach (const QString& path, qApp->libraryPaths()) {
-        const QString pluginsDir(path + QLatin1String("/predicate"));
-        if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable()) {
-            foundAtLeastOne = true;
-            lookupDriversForDirectory(pluginsDir);
-        }
+    const QStringList libraryPaths(Predicate::libraryPaths());
+    qDebug() << "libraryPaths:" << libraryPaths;
+    foreach (const QString& path, libraryPaths) {
+        lookupDriversForDirectory(path);
     }
-    if (!foundAtLeastOne) {
+    if (libraryPaths.isEmpty()) {
         m_result = Result(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers."));
         return false;
     }

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,13 +40,16 @@ EXPORT_PREDICATE_DRIVER(SQLiteDriver, sqlite)
 class Predicate::SQLiteDriverPrivate
 {
 public:
-    SQLiteDriverPrivate() {
+    SQLiteDriverPrivate() 
+     : collate(QLatin1String(" COLLATE ''"))
+    {
     }
+    EscapedString collate;
 };
 
 SQLiteDriver::SQLiteDriver()
         : Driver()
-        , dp(0) //TODO new SQLiteDriverPrivate())
+        , dp(new SQLiteDriverPrivate)
 {
     d->isDBOpenedAfterCreate = true;
     d->features = SingleTransactions | CursorForward
@@ -89,7 +92,7 @@ SQLiteDriver::SQLiteDriver()
 
 SQLiteDriver::~SQLiteDriver()
 {
-//    delete dp;
+    delete dp;
 }
 
 
@@ -141,4 +144,9 @@ QByteArray SQLiteDriver::drv_escapeIdentifier(const QByteArray& str) const
 AdminTools* SQLiteDriver::drv_createAdminTools() const
 {
     return new SQLiteAdminTools();
+}
+
+EscapedString SQLiteDriver::collationSQL() const
+{
+    return dp->collate;
 }

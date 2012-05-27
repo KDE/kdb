@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -34,15 +34,21 @@ public:
     SQLiteConnectionInternal(Connection* connection);
     virtual ~SQLiteConnectionInternal();
 
-    virtual void storeResult() {}
+    virtual void storeResult();
+
+    //! @return true is loading extensions is enabled
+    bool extensionsLoadingEnabled() const;
+
+    //! Sets loading extensions flag to @a set
+    void setExtensionsLoadingEnabled(bool set);
 
     static QString serverResultName(int serverResultCode);
 
     sqlite3 *data;
     bool data_owned; //!< true if data pointer should be freed on destruction
-//moved to Result    QString errmsg; //<! server-specific message of last operation
-//moved to Result    char *errmsg_p; //<! temporary: server-specific message of last operation
-//moved to Result    int res; //<! result code of last operation on server
+
+private:
+    bool m_extensionsLoadingEnabled;
 };
 
 }

@@ -103,7 +103,7 @@ class PREDICATE_EXPORT OrderByColumn
 public:
     typedef QList<OrderByColumn*>::ConstIterator ListConstIterator;
     OrderByColumn();
-    OrderByColumn(QueryColumnInfo& column, bool ascending = true, int pos = -1);
+    explicit OrderByColumn(QueryColumnInfo& column, bool ascending = true, int pos = -1);
 
     //! Like above but used when the field @a field is not present on the list of columns.
     //! (e.g. SELECT a FROM t ORDER BY b; where T is a table with fields (a,b)).

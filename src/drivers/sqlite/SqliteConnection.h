@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -100,6 +100,12 @@ protected:
 
 private:
     bool drv_useDatabaseInternal(bool *cancelled, MessageHandler* msgHandler, bool createIfMissing);
+
+    //! Closes database without altering stored result number and message
+    void drv_closeDatabaseSilently();
+
+    //! Loads extension from library at @a path (absolute path is recommended)
+    bool loadExtension(const QString& path);
 
     friend class SQLiteDriver;
     friend class SQLiteCursor;

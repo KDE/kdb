@@ -1421,3 +1421,15 @@ QString Predicate::defaultFileBasedDriverIcon()
     return mimeType->iconName();
 #endif
 }
+
+QStringList Predicate::libraryPaths()
+{
+    QStringList result;
+    foreach (const QString& path, qApp->libraryPaths()) {
+        const QString dir(path + QLatin1String("/predicate"));
+        if (QDir(dir).exists() && QDir(dir).isReadable()) {
+            result += dir;
+        }
+    }
+    return result;
+}

@@ -469,6 +469,12 @@ QString debugString(const T& object)
     return result;
 }
 
+/*! @return a list of paths that Predicate will search when dynamically loading libraries (plugins)
+ This is basicaly list of directories returned QCoreApplication::libraryPaths() that have readable
+ subdirectory "predicate".
+ @see QCoreApplication::libraryPaths() */
+PREDICATE_EXPORT QStringList libraryPaths();
+
 } // namespace Predicate
 
 //! Sends information about table or query schema @a schema to debug output @a dbg.

@@ -458,7 +458,7 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
                                    Connection *conn, Predicate::EscapingType escapingType) const
 {
     const QByteArray orderString(m_ascending ? "" : " DESC");
-    EscapedString fieldName, tableName;
+    EscapedString fieldName, tableName, collationString;
     if (m_column) {
         if (m_pos > -1)
             return EscapedString::number(m_pos + 1) + orderString;
@@ -469,15 +469,22 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
             }
             fieldName = escapeIdentifier(m_column->aliasOrName(), conn, escapingType);
         }
-    } else {
-        if (includeTableName) {
+        if (m_column->field->isTextType()) {
+            collationString = conn->driver()->collationSQL();
+        }
+    }
+    else {
+        if (m_field && includeTableName) {
             tableName = escapeIdentifier(m_field->table()->name(), conn, escapingType);
             tableName += '.';
         }
         fieldName = escapeIdentifier(
             m_field ? m_field->name() : QLatin1String("??")/*error*/, conn, escapingType);
+        if (m_field && m_field->isTextType()) {
+            collationString = conn->driver()->collationSQL();
+        }
     }
-    return tableName + fieldName + orderString;
+    return tableName + fieldName + orderString + collationString;
 }
 
 //=======================================

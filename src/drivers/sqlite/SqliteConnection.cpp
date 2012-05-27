@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -44,6 +44,7 @@ SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
         : ConnectionInternal(connection)
         , data(0)
         , data_owned(true)
+        , m_extensionsLoadingEnabled(false)
 {
 }
 
@@ -85,6 +86,10 @@ static const char* serverResultNames[] = {
     "SQLITE_NOTADB", // 26
 };
 
+void SQLiteConnectionInternal::storeResult()
+{
+}
+
 // static
 QString SQLiteConnectionInternal::serverResultName(int serverResultCode)
 {
@@ -95,6 +100,19 @@ QString SQLiteConnectionInternal::serverResultName(int serverResultCode)
     else if (serverResultCode == SQLITE_DONE)
         return QLatin1String("SQLITE_DONE");
     return QString();
+}
+
+bool SQLiteConnectionInternal::extensionsLoadingEnabled() const
+{
+    return m_extensionsLoadingEnabled;
+}
+
+void SQLiteConnectionInternal::setExtensionsLoadingEnabled(bool set)
+{
+    if (set == m_extensionsLoadingEnabled)
+        return;
+    sqlite3_enable_load_extension(data, set);
+    m_extensionsLoadingEnabled = set;
 }
 
 /*! Used by driver */
@@ -194,7 +212,7 @@ bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
 bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
                                                MessageHandler* msgHandler, bool createIfMissing)
 {
-//! @todo add option (command line or in kexirc?)
+//! @todo add option (command line or in predicaterc?)
 //! @todo   int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
     int openFlags = 0;
     if (isReadOnly()) {
@@ -229,14 +247,25 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
         if (!drv_executeSQL(EscapedString("PRAGMA secure_delete = on"))) {
-            storeResult();
-            Result result = d->connection->result(); // save
-/*            const QString errmsg(d->errmsg); // save
-            const int res = d->res; // save*/
-            drv_closeDatabase();
-/*            d->errmsg = errmsg;
-            d->res = res;*/
-            d->setResult(result);
+            drv_closeDatabaseSilently();
+            return false;
+        }
+        // Load ICU extension for unicode collations
+        const QStringList libraryPaths(Predicate::libraryPaths());
+        QString icuExtensionFilename;
+        foreach (const QString& path, libraryPaths) {
+            icuExtensionFilename = path + QLatin1String("/predicate_sqlite3_icu.so");
+            if (QFileInfo(icuExtensionFilename).exists() && loadExtension(icuExtensionFilename)) {
+                break;
+            }
+        }
+        if (icuExtensionFilename.isEmpty()) {
+            drv_closeDatabaseSilently();
+            return false;
+        }
+        // load ROOT collation for use as default collation
+        if (!drv_executeSQL(EscapedString("SELECT icu_load_collation('', '')"))) {
+            drv_closeDatabaseSilently();
             return false;
         }
     }
@@ -285,6 +314,13 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
                  + tr("Check the file's permissions and whether it is already opened and locked by another application."));
     }*/
     return m_result.serverResultCode() == SQLITE_OK;
+}
+
+void SQLiteConnection::drv_closeDatabaseSilently()
+{
+    Result result = d->connection->result(); // save
+    drv_closeDatabase();
+    d->setResult(result);
 }
 
 bool SQLiteConnection::drv_closeDatabase()
@@ -382,4 +418,29 @@ bool SQLiteConnection::isReadOnly() const
 //! @todo port
     //return (d->data ? sqlite3_is_readonly(d->data) : false)
     //       || Connection::isReadOnly();
+}
+
+bool SQLiteConnection::loadExtension(const QString& path)
+{
+    bool tempEnable = false;
+    if (!d->extensionsLoadingEnabled()) {
+        tempEnable = true;
+        d->setExtensionsLoadingEnabled(true);
+    }
+    char *errmsg_p = 0;
+    m_result.setServerResultCode(
+        sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p));
+    if (errmsg_p) {
+        clearResult();
+        d->setServerMessage(QLatin1String(errmsg_p));
+        sqlite3_free(errmsg_p);
+    }
+    bool ok = SQLITE_OK == m_result.serverResultCode();
+    if (tempEnable) {
+        d->setExtensionsLoadingEnabled(false);
+    }
+    if (!ok) {
+        PreWarn << "Could not load SQLite extension" << path;
+    }
+    return ok;
 }
