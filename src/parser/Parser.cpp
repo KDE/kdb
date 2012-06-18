@@ -39,7 +39,7 @@ class ParserStatic
 {
 public:
     ParserStatic()
-     : operationStrings((QString[]){
+     : operationStrings((QLatin1String[]){
             QLatin1String("None"),
             QLatin1String("Error"),
             QLatin1String("CreateTable"),
@@ -50,7 +50,7 @@ public:
             QLatin1String("Delete")})
     {
     }
-    const QString operationStrings[];
+    const QLatin1String operationStrings[8];
 };
 
 PREDICATE_GLOBAL_STATIC(ParserStatic, Predicate_parserStatic)

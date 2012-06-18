@@ -36,7 +36,7 @@ class ExpressionClassNames
 {
 public:
     ExpressionClassNames()
-     : names((QString[]){
+     : names((QLatin1String[]){
             QLatin1String("Unknown"),
             QLatin1String("Unary"),
             QLatin1String("Arithm"),
@@ -51,7 +51,7 @@ public:
             QLatin1String("QueryParameter")})
     {
     }
-    const QString names[];
+    const QLatin1String names[12];
 };
 
 PREDICATE_EXPORT QString Predicate::expressionClassName(ExpressionClass c)
