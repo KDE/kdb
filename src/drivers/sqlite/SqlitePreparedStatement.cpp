@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -224,7 +224,9 @@ bool SQLitePreparedStatement::execute(
     int par = 1; // par.index counted from 1
     Field::ListIterator itFields(fieldList.constBegin());
     for (QList<QVariant>::ConstIterator it = parameters.constBegin();
-            itFields != fieldList.constEnd(); ++it, ++itFields, par++) {
+         itFields != fieldList.constEnd();
+         it += (it == parameters.constEnd() ? 0 : 1), ++itFields, par++)
+    {
         if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))
             return false;
     }
