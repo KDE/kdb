@@ -325,7 +325,7 @@ public:
 
     /*! A cache for autoIncrementSQLFieldsList(). */
     EscapedString autoIncrementSQLFieldsList;
-    QWeakPointer<Driver> lastUsedDriverForAutoIncrementSQLFieldsList;
+    QWeakPointer<const Driver> lastUsedDriverForAutoIncrementSQLFieldsList;
 
     /*! A hash for fast lookup of query columns' order (unexpanded version). */
     QHash<QueryColumnInfo*, int> *columnsOrder;
@@ -440,8 +440,8 @@ QDebug operator<<(QDebug dbg, const OrderByColumn& order)
     return dbg.space();
 }
 
-static QByteArray escapeIdentifier(const QString& name, Connection *conn,
-                                   Predicate::EscapingType escapingType)
+static QString escapeIdentifier(const QString& name, Connection *conn,
+                                Predicate::EscapingType escapingType)
 {
     switch (escapingType) {
     case DriverEscaping:
@@ -449,9 +449,9 @@ static QByteArray escapeIdentifier(const QString& name, Connection *conn,
             return conn->escapeIdentifier(name);
         break;
     case PredicateEscaping:
-        return Predicate::escapeIdentifier(name).toUtf8();
+        return Predicate::escapeIdentifier(name);
     }
-    return '"' + name.toUtf8() + '"';
+    return QLatin1Char('"') + name + QLatin1Char('"');
 }
 
 EscapedString OrderByColumn::toSQLString(bool includeTableName,
@@ -464,10 +464,10 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
             return EscapedString::number(m_pos + 1) + orderString;
         else {
             if (includeTableName && m_column->alias.isEmpty()) {
-                tableName = escapeIdentifier(m_column->field->table()->name(), conn, escapingType);
+                tableName = EscapedString(escapeIdentifier(m_column->field->table()->name(), conn, escapingType));
                 tableName += '.';
             }
-            fieldName = escapeIdentifier(m_column->aliasOrName(), conn, escapingType);
+            fieldName = EscapedString(escapeIdentifier(m_column->aliasOrName(), conn, escapingType));
         }
         if (m_column->field->isTextType()) {
             collationString = conn->driver()->collationSQL();
@@ -475,11 +475,11 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
     }
     else {
         if (m_field && includeTableName) {
-            tableName = escapeIdentifier(m_field->table()->name(), conn, escapingType);
+            tableName = EscapedString(escapeIdentifier(m_field->table()->name(), conn, escapingType));
             tableName += '.';
         }
-        fieldName = escapeIdentifier(
-            m_field ? m_field->name() : QLatin1String("??")/*error*/, conn, escapingType);
+        fieldName = EscapedString(escapeIdentifier(
+            m_field ? m_field->name() : QLatin1String("??")/*error*/, conn, escapingType));
         if (m_field && m_field->isTextType()) {
             collationString = conn->driver()->collationSQL();
         }
@@ -1730,7 +1730,8 @@ EscapedString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist,
 
 EscapedString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
 {
-    QWeakPointer<Driver> driverWeakPointer = DriverManagerInternal::self()->driverWeakPointer(conn->driver());
+    QWeakPointer<const Driver> driverWeakPointer
+            = DriverManagerInternal::self()->driverWeakPointer(*conn->driver());
     if (   d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
         || d->autoIncrementSQLFieldsList.isEmpty())
     {

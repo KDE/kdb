@@ -71,7 +71,7 @@ class LookupFieldSchemaStatic
 public:
     LookupFieldSchemaStatic()
      : typeNames((QString[]){
-            QString(),
+            QString(), // no type
             QLatin1String("table"),
             QLatin1String("query"),
             QLatin1String("sql"),
@@ -84,7 +84,7 @@ public:
         typesForNames.insert(QLatin1String("valuelist"), LookupFieldSchema::RecordSource::ValueList);
         typesForNames.insert(QLatin1String("fieldlist"), LookupFieldSchema::RecordSource::FieldList);
     }
-    const QString typeNames[];
+    const QString typeNames[6];
     QHash<QString, LookupFieldSchema::RecordSource::Type> typesForNames;
 };
 

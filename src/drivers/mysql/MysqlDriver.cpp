@@ -181,9 +181,9 @@ EscapedString MysqlDriver::escapeString(const QByteArray& str) const
 /*! Add back-ticks to an identifier, and replace any back-ticks within
  * the name with single quotes.
  */
-QByteArray MysqlDriver::drv_escapeIdentifier(const QString& str) const
+QString MysqlDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QByteArray(str.toUtf8()).replace('`', "'");
+    return QString(str).replace(QLatin1Char('"'), QLatin1String("\"\""));
 }
 
 QByteArray MysqlDriver::drv_escapeIdentifier(const QByteArray& str) const

@@ -50,7 +50,7 @@ typedef QList<QuerySchemaParameter>::ConstIterator QuerySchemaParameterListConst
 class PREDICATE_EXPORT QuerySchemaParameterValueListIterator
 {
 public:
-    QuerySchemaParameterValueListIterator(Driver* driver, const QList<QVariant>& params);
+    QuerySchemaParameterValueListIterator(const Driver &driver, const QList<QVariant>& params);
     ~QuerySchemaParameterValueListIterator();
 
     //! @return previous value

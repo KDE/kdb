@@ -54,7 +54,7 @@ QDebug operator<<(QDebug dbg, const QuerySchemaParameterList& list)
 class QuerySchemaParameterValueListIterator::Private
 {
 public:
-    Private(Driver* driver, const QList<QVariant>& aParams)
+    Private(const Driver &driver, const QList<QVariant>& aParams)
             : driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
             , params(aParams)
     {
@@ -63,14 +63,14 @@ public:
         --paramsIt;
         paramsItPosition = params.count();
     }
-    QWeakPointer<Driver> driverWeakPointer;
+    QWeakPointer<const Driver> driverWeakPointer;
     const QList<QVariant> params;
     QList<QVariant>::ConstIterator paramsIt;
     uint paramsItPosition;
 };
 
 QuerySchemaParameterValueListIterator::QuerySchemaParameterValueListIterator(
-    Driver* driver, const QList<QVariant>& params)
+    const Driver &driver, const QList<QVariant>& params)
         : d(new Private(driver, params))
 {
 }

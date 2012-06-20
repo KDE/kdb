@@ -241,9 +241,9 @@ EscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
            + '\'';
 }
 
-QByteArray PostgresqlDriver::drv_escapeIdentifier(const QString& str) const
+QString PostgresqlDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QByteArray(str.toUtf8()).replace('"', "\"\"");
+    return QString(str).replace(QLatin1Char('"'), QLatin1String("\"\""));
 }
 
 QByteArray PostgresqlDriver::drv_escapeIdentifier(const QByteArray& str) const

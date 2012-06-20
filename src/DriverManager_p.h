@@ -43,8 +43,8 @@ public:
 
     /*! @return weak pointer reference for driver @a driver or null pointer if @a driver is 0.
      Used to be able to track drivers lifetime using QSharedPointers/QWeakPointers. */
-    QWeakPointer<Driver> driverWeakPointer(Driver* driver) {
-        return m_driverWeakPointers.value(driver);
+    QWeakPointer<const Driver> driverWeakPointer(const Driver &driver) {
+        return m_driverWeakPointers.value(&driver);
     }
 
     DriverInfo driverInfo(const QString &name);
@@ -76,7 +76,7 @@ private:
     QMap<QString, DriverInfo> m_infos_by_mimetype;
     QMap<QString, DriverInfo> m_driversInfo; //!< used to store drivers information
     QMap<QString, QSharedPointer<Driver>* > m_drivers; //!< for owning drivers
-    QMap<Driver*, QWeakPointer<Driver> > m_driverWeakPointers;
+    QMap<const Driver*, QWeakPointer<const Driver> > m_driverWeakPointers;
     QString m_pluginsDir;
 
 //pred    QString m_serverErrMsg;

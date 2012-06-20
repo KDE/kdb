@@ -359,6 +359,8 @@ PREDICATE_EXPORT QVariant notEmptyValueForType(Field::Type type);
     Use it for user-visible backend-independent statements. */
 PREDICATE_EXPORT QString escapeIdentifier(const QString& string);
 
+PREDICATE_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
+
 /*! @return escaped string @a string using PredicateSQL dialect,
             i.e. doubles single quotes and inserts the string into single quotes.
     Quotes are always added.

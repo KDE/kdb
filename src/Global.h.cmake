@@ -172,6 +172,12 @@ enum ObjectType {
     IndexObjectType = 256 //!< special
 };
 
+//! Escaping type
+enum EscapingType {
+    DriverEscaping = 0,
+    PredicateEscaping = 1
+};
+
 }
 
 #ifndef futureI18n

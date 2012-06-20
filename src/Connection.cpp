@@ -52,8 +52,8 @@ namespace Predicate
 {
 
 Connection::SelectStatementOptions::SelectStatementOptions()
-        : escapingType(DriverEscaping)
-        , alsoRetrieveRecordId(false)
+        : /*escapingType(DriverEscaping)*/
+          alsoRetrieveRecordId(false)
         , addVisibleLookupColumns(true)
 {
 }
@@ -936,7 +936,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
 // Each SQL identifier needs to be escaped in the generated query.
     EscapedString sql;
     sql.reserve(4096);
-    sql = "CREATE TABLE " + escapeIdentifier(tableSchema.name()) + " (";
+    sql = EscapedString("CREATE TABLE ") + escapeIdentifier(tableSchema.name()) + " (";
     bool first = true;
     foreach(Field *field, tableSchema.m_fields) {
         if (first)
@@ -1010,9 +1010,11 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
             return false;                                      \
         \
         bool res = executeSQL(                                      \
-                   EscapedString("INSERT INTO " + escapeIdentifier(tableSchema->name()) \
-                   + " (" + tableSchema->sqlFieldsList(this) + ") VALUES (" + vals + ')' \
-                             )); \
+                   EscapedString("INSERT INTO ") + escapeIdentifier(tableSchema->name()) \
+                       + " (" \
+                       + tableSchema->sqlFieldsList(this) \
+                       + ") VALUES (" + vals + ")" \
+                   ); \
         \
         if ( !drv_afterInsert( tableSchema->name(), tableSchema ) ) \
             return false;                                      \
@@ -1051,9 +1053,10 @@ C_INS_REC_ALL
         if ( !drv_beforeInsert( tableName, fields ) )            \
             return false;                                       \
         bool res = executeSQL(                                  \
-                   EscapedString("INSERT INTO " + escapeIdentifier(tableName) \
-                   + '(' + fields->sqlFieldsList(this) + ") VALUES (" + value + ')' \
-                             )); \
+                       EscapedString(QLatin1String("INSERT INTO ") + escapeIdentifier(tableName)) \
+                       + " (" + fields->sqlFieldsList(this) \
+                       + ") VALUES (" + value + ')' \
+                   ); \
         if ( !drv_afterInsert( tableName, fields ) )    \
             return false;                               \
         return res;                             \
@@ -1081,8 +1084,8 @@ bool Connection::insertRecord(TableSchema* tableSchema, const QList<QVariant>& v
     while (fieldsIt != flist->constEnd() && (it != values.end())) {
         Field *f = *fieldsIt;
         if (sql.isEmpty()) {
-            sql = "INSERT INTO " + escapeIdentifier(tableSchema->name()) +
-                  " VALUES (";
+            sql = EscapedString("INSERT INTO ") + escapeIdentifier(tableSchema->name())
+                  + " VALUES (";
         }
         else {
             sql += ',';
@@ -1119,7 +1122,7 @@ bool Connection::insertRecord(FieldList* fields, const QList<QVariant>& values)
     while (fieldsIt != flist->constEnd() && it != values.constEnd()) {
         Field *f = *fieldsIt;
         if (sql.isEmpty()) {
-            sql = "INSERT INTO " + escapeIdentifier(tableName) + '(' +
+            sql = EscapedString("INSERT INTO ") + escapeIdentifier(tableName) + '(' +
                   fields->sqlFieldsList(this) + ") VALUES (";
         }
         else {
@@ -1161,9 +1164,11 @@ bool Connection::executeSQL(const EscapedString& statement)
     return true;
 }
 
-EscapedString Connection::selectStatement(QuerySchema* querySchema,
-                                    const QList<QVariant>& params,
-                                    const SelectStatementOptions& options)
+static EscapedString selectStatementInternal(const Driver *driver,
+                                             Connection *connection,
+                                             QuerySchema* querySchema,
+                                             const QList<QVariant>& params,
+                                             const Connection::SelectStatementOptions& options)
 {
 //"SELECT FROM ..." is theoretically allowed "
 //if (querySchema.fieldCount()<1)
@@ -1197,17 +1202,19 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
     uint internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
     number = 0;
     QList<QuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
-    QByteArray predicate_subquery_prefix("__predicate_subquery_");
+    EscapedString predicate_subquery_prefix("__predicate_subquery_");
     foreach(Field *f, *querySchema->fields()) {
         if (querySchema->isColumnVisible(number)) {
             if (!sql.isEmpty())
                 sql += ", ";
 
             if (f->isQueryAsterisk()) {
-                if (!singleTable && static_cast<QueryAsterisk*>(f)->isSingleTableAsterisk()) //single-table *
-                    sql += escapeIdentifier(f->table()->name(), options.escapingType) + ".*";
-                else //all-tables * (or simplified table.* when there's only one table)
+                if (!singleTable && static_cast<QueryAsterisk*>(f)->isSingleTableAsterisk()) { //single-table *
+                    sql += Predicate::escapeIdentifier(driver, f->table()->name()) + QLatin1String(".*");
+                }
+                else { //all-tables * (or simplified table.* when there's only one table)
                     sql += '*';
+                }
             } else {
                 if (f->isExpression()) {
                     sql += f->expression().toString();
@@ -1223,9 +1230,9 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                         tableName = f->table()->name();
 
                     if (!singleTable) {
-                        sql += (escapeIdentifier(tableName, options.escapingType) + '.');
+                        sql += Predicate::escapeIdentifier(driver, tableName) + QLatin1Char('.');
                     }
-                    sql += escapeIdentifier(f->name(), options.escapingType);
+                    sql += Predicate::escapeIdentifier(driver, f->name());
                 }
                 const QString aliasString(querySchema->columnAlias(number));
                 if (!aliasString.isEmpty()) {
@@ -1256,12 +1263,12 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                             QLatin1String("__predicate_") + lookupTable->name() + QLatin1Char('_')
                             + QString::number(internalUniqueTableAliasNumber++));
                         s_additional_joins += EscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
-                            .arg(EscapedString(escapeIdentifier(lookupTable->name(), options.escapingType)),
-                                 EscapedString(internalUniqueTableAlias),
-                                 EscapedString(escapeIdentifier(f->table()->name(), options.escapingType)),
-                                 EscapedString(escapeIdentifier(f->name(), options.escapingType)),
-                                 EscapedString(internalUniqueTableAlias),
-                                 EscapedString(escapeIdentifier(boundField->name(), options.escapingType)));
+                            .arg(Predicate::escapeIdentifier(driver, lookupTable->name()))
+                            .arg(internalUniqueTableAlias)
+                            .arg(Predicate::escapeIdentifier(driver, f->table()->name()))
+                            .arg(Predicate::escapeIdentifier(driver, f->name()))
+                            .arg(internalUniqueTableAlias)
+                            .arg(Predicate::escapeIdentifier(driver, boundField->name()));
 
                         //add visibleField to the list of SELECTed fields //if it is not yet present there
 //not needed      if (!querySchema.findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
@@ -1282,8 +1289,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         s_additional_fields += visibleColumns->sqlFieldsList(
-                            this, QLatin1String(" || ' ' || "), internalUniqueTableAlias,
-                            options.escapingType);
+                                                   connection, QLatin1String(" || ' ' || "), internalUniqueTableAlias,
+                                                   driver ? Predicate::DriverEscaping : Predicate::PredicateEscaping);
                     }
                     delete visibleColumns;
                 } else if (recordSource.type() == LookupFieldSchema::RecordSource::Query) {
@@ -1310,16 +1317,16 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                     //add LEFT OUTER JOIN
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
-                    QString internalUniqueQueryAlias(
-                        QLatin1String(predicate_subquery_prefix) + lookupQuery->name() + QLatin1Char('_')
-                        + QString::number(internalUniqueQueryAliasNumber++));
+                    EscapedString internalUniqueQueryAlias
+                        = predicate_subquery_prefix + escapeString(lookupQuery->name()) + '_'
+                        + QString::number(internalUniqueQueryAliasNumber++);
                     s_additional_joins += EscapedString("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
-                        .arg(selectStatement(lookupQuery, params, options),
-                             EscapedString(internalUniqueQueryAlias),
-                             EscapedString(escapeIdentifier(f->table()->name(), options.escapingType)),
-                             EscapedString(escapeIdentifier(f->name(), options.escapingType)),
-                             EscapedString(internalUniqueQueryAlias),
-                             EscapedString(escapeIdentifier(boundColumnInfo->aliasOrName(), options.escapingType)));
+                        .arg(Predicate::selectStatement(lookupQuery, params, options))
+                        .arg((internalUniqueQueryAlias))
+                        .arg(Predicate::escapeIdentifier(driver, f->table()->name()))
+                        .arg(Predicate::escapeIdentifier(driver, f->name()))
+                        .arg(internalUniqueQueryAlias)
+                        .arg(Predicate::escapeIdentifier(driver, boundColumnInfo->aliasOrName()));
 
                     if (!s_additional_fields.isEmpty())
                         s_additional_fields += ", ";
@@ -1336,9 +1343,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
                         if (!expression.isEmpty())
                             expression += " || ' ' || ";
                         expression += (
-                            internalUniqueQueryAlias.toLatin1() + '.'
-                            + escapeIdentifier(fieldsExpanded.value(visibleColumnIndex)->aliasOrName(),
-                                               options.escapingType)
+                            internalUniqueQueryAlias + '.'
+                            + Predicate::escapeIdentifier(driver, fieldsExpanded.value(visibleColumnIndex)->aliasOrName())
                         );
                     }
                     s_additional_fields += expression;
@@ -1356,13 +1362,13 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
     if (!s_additional_fields.isEmpty())
         sql += (", " + s_additional_fields);
 
-    if (options.alsoRetrieveRecordId) { //append rowid column
+    if (driver && options.alsoRetrieveRecordId) { //append rowid column
         EscapedString s;
         if (!sql.isEmpty())
             s = ", ";
         if (querySchema->masterTable())
-            s += (escapeIdentifier(querySchema->masterTable()->name()) + '.');
-        s += m_driver->beh->ROW_ID_FIELD_NAME;
+            s += EscapedString(escapeIdentifier(querySchema->masterTable()->name())) + '.';
+        s += driver->behaviour()->ROW_ID_FIELD_NAME;
         sql += s;
     }
 
@@ -1376,7 +1382,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
             foreach(TableSchema *table, *tables) {
                 if (!s_from.isEmpty())
                     s_from += ", ";
-                s_from += escapeIdentifier(table->name(), options.escapingType);
+                s_from += Predicate::escapeIdentifier(driver, table->name());
                 const QString aliasString(querySchema->tableAlias(number));
                 if (!aliasString.isEmpty())
                     s_from += (QLatin1String(" AS ") + aliasString);
@@ -1388,10 +1394,10 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         foreach(QuerySchema* subQuery, subqueries_for_lookup_data) {
             if (!s_from.isEmpty())
                 s_from += ", ";
-            s_from += '(';
-            s_from += selectStatement(subQuery, params, options);
-            s_from += (") AS " + predicate_subquery_prefix
-                       + EscapedString::number(subqueries_for_lookup_data_counter++));
+            s_from += '('
+                      + selectStatementInternal(driver, connection, subQuery, params, options);
+                      + ") AS " + predicate_subquery_prefix
+                      + EscapedString::number(subqueries_for_lookup_data_counter++);
         }
         sql += s_from;
     }
@@ -1416,14 +1422,11 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         foreach(Field::Pair pair, *rel->fieldPairs()) {
             if (!s_where_sub.isEmpty())
                 s_where_sub += " AND ";
-            s_where_sub += (
-                               escapeIdentifier(pair.first->table()->name(), options.escapingType) +
-                               '.' +
-                               escapeIdentifier(pair.first->name(), options.escapingType) +
-                               " = " +
-                               escapeIdentifier(pair.second->table()->name(), options.escapingType) +
-                               '.' +
-                               escapeIdentifier(pair.second->name(), options.escapingType));
+            s_where_sub +=
+               EscapedString(Predicate::escapeIdentifier(driver, pair.first->table()->name())) + '.' +
+               Predicate::escapeIdentifier(driver, pair.first->name()) + " = " +
+               Predicate::escapeIdentifier(driver, pair.second->table()->name()) + '.' +
+               Predicate::escapeIdentifier(driver, pair.second->name());
         }
         if (rel->fieldPairs()->count() > 1) {
             s_where_sub.prepend('(');
@@ -1432,8 +1435,8 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
         s_where += s_where_sub;
     }
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
-    if (!querySchema->whereExpression().isNull()) {
-        QuerySchemaParameterValueListIterator paramValuesIt(m_driver, params);
+    if (driver && !querySchema->whereExpression().isNull()) {
+        QuerySchemaParameterValueListIterator paramValuesIt(*driver, params);
         QuerySchemaParameterValueListIterator *paramValuesItPtr = params.isEmpty() ? 0 : &paramValuesIt;
         if (wasWhere) {
 //! @todo () are not always needed
@@ -1451,7 +1454,7 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
     // ORDER BY
     EscapedString orderByString(
         querySchema->orderByColumnList().toSQLString(
-            !singleTable/*includeTableName*/, this, options.escapingType)
+            !singleTable/*includeTableName*/, connection, driver ? Predicate::DriverEscaping : Predicate::PredicateEscaping)
     );
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());
     if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
@@ -1470,13 +1473,35 @@ EscapedString Connection::selectStatement(QuerySchema* querySchema,
             automaticPKOrderBy.appendColumn(*ci);
         }
         orderByString = automaticPKOrderBy.toSQLString(!singleTable/*includeTableName*/,
-                        this, options.escapingType);
+                        connection, driver ? Predicate::DriverEscaping : Predicate::PredicateEscaping);
     }
     if (!orderByString.isEmpty())
         sql += (" ORDER BY " + orderByString);
 
     //PreDbg << sql;
     return sql;
+}
+
+EscapedString Predicate::selectStatement(const Driver &driver,
+                                         QuerySchema* querySchema,
+                                         const QList<QVariant>& params,
+                                         const Connection::SelectStatementOptions& options)
+{
+    return selectStatementInternal(&driver, 0, querySchema, params, options);
+}
+
+EscapedString Predicate::selectStatement(QuerySchema* querySchema,
+                                         const QList<QVariant>& params,
+                                         const Connection::SelectStatementOptions& options)
+{
+    return selectStatementInternal(0, 0, querySchema, params, options);
+}
+
+EscapedString Connection::selectStatement(QuerySchema* querySchema,
+                                    const QList<QVariant>& params,
+                                    const SelectStatementOptions& options)
+{
+    return selectStatementInternal(driver(), this, querySchema, params, options);
 }
 
 EscapedString Connection::selectStatement(TableSchema* tableSchema,
@@ -3209,7 +3234,7 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
     //update the record:
     EscapedString sql;
     sql.reserve(4096);
-    sql = "UPDATE " + escapeIdentifier(mt->name()) + " SET ";
+    sql = EscapedString("UPDATE ") + escapeIdentifier(mt->name()) + " SET ";
     EscapedString sqlset, sqlwhere;
     sqlset.reserve(1024);
     sqlwhere.reserve(1024);
@@ -3224,8 +3249,8 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
             sqlset += ',';
         Field* currentField = it.key()->field;
         affectedFields.addField(currentField);
-        sqlset += (escapeIdentifier(currentField->name()) + '=' +
-                   m_driver->valueToSQL(currentField, it.value()));
+        sqlset += EscapedString(escapeIdentifier(currentField->name())) + '=' +
+                  m_driver->valueToSQL(currentField, it.value());
     }
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
@@ -3248,14 +3273,14 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
                     //js todo: pass the field's name somewhere!
                     return false;
                 }
-                sqlwhere += (escapeIdentifier(f->name()) + '=' +
-                             m_driver->valueToSQL(f, val));
+                sqlwhere += EscapedString(escapeIdentifier(f->name())) + '=' +
+                            m_driver->valueToSQL(f, val);
                 i++;
             }
         }
     } else { //use RecordId
-        sqlwhere = (escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME) + '='
-                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]));
+        sqlwhere = EscapedString(escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME)) + '='
+                   + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]);
     }
     sql += (sqlset + " WHERE " + sqlwhere);
     PreDbg << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
@@ -3308,7 +3333,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
     //insert the record:
     EscapedString sql;
     sql.reserve(4096);
-    sql = "INSERT INTO " + escapeIdentifier(mt->name()) + " (";
+    sql = EscapedString("INSERT INTO ") + escapeIdentifier(mt->name()) + " (";
     RecordEditBuffer::DBMap b = buf->dbBuffer();
 
     // add default values, if available (for any column without value explicitly set)
@@ -3468,7 +3493,7 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
     //update the record:
     EscapedString sql;
     sql.reserve(4096);
-    sql = "DELETE FROM " + escapeIdentifier(mt->name()) + " WHERE ";
+    sql = EscapedString("DELETE FROM ") + escapeIdentifier(mt->name()) + " WHERE ";
     EscapedString sqlwhere;
     sqlwhere.reserve(1024);
 
@@ -3492,13 +3517,13 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
 //js todo: pass the field's name somewhere!
                 return false;
             }
-            sqlwhere += (escapeIdentifier(f->name()) + '=' +
-                         m_driver->valueToSQL(f, val));
+            sqlwhere += EscapedString(escapeIdentifier(f->name())) + '=' +
+                         m_driver->valueToSQL(f, val);
             i++;
         }
     } else {//use RecordId
-        sqlwhere = (escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME) + '='
-                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]));
+        sqlwhere = EscapedString(escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME)) + '='
+                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]);
     }
     sql += sqlwhere;
     PreDbg << " -- SQL == " << sql;
@@ -3522,7 +3547,7 @@ bool Connection::deleteAllRecords(QuerySchema* query)
     if (!pkey || pkey->fields()->isEmpty())
         PreWarn << "-- WARNING: NO MASTER TABLE's PKEY";
 
-    EscapedString sql("DELETE FROM " + escapeIdentifier(mt->name()));
+    EscapedString sql = EscapedString("DELETE FROM ") + escapeIdentifier(mt->name());
 
     PreDbg << "-- SQL == " << sql;
 

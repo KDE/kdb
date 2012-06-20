@@ -1150,6 +1150,39 @@ QString Predicate::escapeIdentifier(const QString& string)
     return newString;
 }
 
+QByteArray Predicate::escapeIdentifier(const QByteArray& string)
+{
+    const char quote = '"';
+    // find out the length ot the destination string
+    const int origStringLength = string.length();
+    int newStringLength = 1 + 1;
+    for (int i = 0; i < origStringLength; i++) {
+        if (string.at(i) == quote)
+            newStringLength += 2;
+        else
+            newStringLength++;
+    }
+    if (newStringLength == origStringLength)
+        return string;
+    newStringLength += 2; // for quotes
+    // create
+    QByteArray escapedQuote;
+    escapedQuote.append(quote);
+    escapedQuote.append(quote);
+    QByteArray newString;
+    newString.reserve(newStringLength);
+    newString.append(quote);
+    for (int i = 0; i < origStringLength; i++) {
+        const char c = string.at(i);
+        if (c == quote)
+            newString.append(escapedQuote);
+        else
+            newString.append(c);
+    }
+    newString.append(quote);
+    return newString;
+}
+
 QString Predicate::escapeString(const QString& string)
 {
     const char quote = '\'';

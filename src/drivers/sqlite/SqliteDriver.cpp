@@ -131,9 +131,9 @@ EscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
     return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscapeXHex));
 }
 
-QByteArray SQLiteDriver::drv_escapeIdentifier(const QString& str) const
+QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const
 {
-    return QByteArray(str.toUtf8()).replace('"', "\"\"");
+    return QString(str).replace(QLatin1Char('"'), QLatin1String("\"\""));
 }
 
 QByteArray SQLiteDriver::drv_escapeIdentifier(const QByteArray& str) const

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -41,9 +41,6 @@ class ConnectionInternal;
 class DriverManager;
 class DriverBehaviour;
 class DriverPrivate;
-
-//! Escaping type
-enum EscapingType { DriverEscaping = 0, PredicateEscaping = 1 };
 
 //! Database driver's abstraction.
 /*! This class is a prototype of the database driver.
@@ -127,7 +124,7 @@ public:
     */
     virtual bool isSystemObjectName(const QString& n) const;
 
-    /*! @return true if @a n is a kexibd-related 'system' object's
+    /*! @return true if @a n is a related to Predicate's 'system' object's
      name, i.e. when @a n starts with "kexi__" prefix.
     */
     static bool isPredicateSystemObjectName(const QString& n);
@@ -201,19 +198,8 @@ public:
         return valueToSQL((field ? field->type() : Field::InvalidType), v);
     }
 
-    /*! not compatible with all drivers - reimplement */
-    inline virtual EscapedString dateTimeToSQL(const QDateTime& v) const {
-
-        /*! (was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
-          Now it's ISO 8601 DateTime format - with "T" delimiter:
-          http://www.w3.org/TR/NOTE-datetime
-          (e.g. "1994-11-05T13:15:30" not "1994-11-05 13:15:30")
-          @todo add support for time zones?
-        */
-//old   const QDateTime dt( v.toDateTime() );
-//old   return QString("\'")+dt.date().toString(Qt::ISODate)+" "+dt.time().toString(Qt::ISODate)+"\'";
-        return EscapedString('\'') + v.toString(Qt::ISODate);// + '\'';
-    }
+    /*! @todo not compatible with all drivers - reimplement */
+    inline virtual EscapedString dateTimeToSQL(const QDateTime& v) const;
 
     /*! Driver-specific SQL string escaping.
      Implement escaping for any character like " or ' as your
@@ -247,7 +233,7 @@ public:
     //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
     /*! Escape database identifier (@a str) in order that keywords
        can be used as table names, column names, etc. */
-    inline QByteArray escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
+    inline QString escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
 
     inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
@@ -261,6 +247,8 @@ public:
 
     //! @return a list of property names available for this driver.
     QList<QByteArray> propertyNames() const;
+
+    const DriverBehaviour* behaviour() const { return beh; }
 
     //! @internal
     virtual ~Driver();
@@ -291,7 +279,7 @@ protected:
      marks characters - it is automatically done by escapeIdentifier() using
      DriverBehaviour::QUOTATION_MARKS_FOR_IDENTIFIER.
     */
-    virtual QByteArray drv_escapeIdentifier(const QString& str) const = 0;
+    virtual QString drv_escapeIdentifier(const QString& str) const = 0;
 
     /*! This is overloaded version of drv_escapeIdentifier( const QString& str )
      to be implemented in the same way.
@@ -346,6 +334,55 @@ protected:
 /*! @return true if the @a word is an reserved PredicateSQL keyword
  (see keywords.cpp for a list of reserved keywords). */
 PREDICATE_EXPORT bool isPredicateSQLKeyword(const QByteArray& word);
+
+///*! SQL string escaping of PredicateSQL type. */
+//PREDICATE_EXPORT QString escapeString(const QString& str);
+
+///*! Like @ref Predicate::escapeIdentifier(const QString&, int) const
+//    but static version, thus only PredicateEscaping type is supported. */
+//PREDICATE_EXPORT QString escapeIdentifier(const QString& str,
+//                                          int options = Predicate::PredicateEscaping
+//                                                        | Predicate::Driver::EscapeAsNecessary);
+
+PREDICATE_EXPORT QString escapeIdentifier(const QString& string);
+
+inline PREDICATE_EXPORT QString escapeIdentifier(const Predicate::Driver* driver,
+                                                 const QString& str)
+{
+    return driver ? driver->escapeIdentifier(str)
+                  : Predicate::escapeIdentifier(str);
+}
+                                                      
+///*! Like @ref escapeIdentifier(const QString&, int) const */
+//PREDICATE_EXPORT QByteArray escapeIdentifier(const QByteArray& str,
+//                                             int options = Predicate::Driver::EscapeKexi
+//                                                           | Predicate::Driver::EscapeAsNecessary);
+
+PREDICATE_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
+
+inline PREDICATE_EXPORT QByteArray escapeIdentifier(const Predicate::Driver* driver,
+                                                    const QByteArray& str)
+{
+    return driver ? driver->escapeIdentifier(str)
+                  : Predicate::escapeIdentifier(str);
+}
+
+/*! Escapes and converts value \a v (for type \a ftype)
+    to string representation required by PredicateSQL commands.
+    For Date/Time type Predicate::dateTimeToSQL() is used.
+    For BLOB type Predicate::escapeBlob() with BLOBEscape0xHex conversion type is used. */
+PREDICATE_EXPORT EscapedString valueToSQL(uint ftype, const QVariant& v);
+
+/*! Converts value \a v to string representation required by PredicateSQL commands:
+    ISO 8601 DateTime format - with "T" delimiter/
+    For specification see http://www.w3.org/TR/NOTE-datetime.
+    Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
+    @todo Add support for time zones */
+PREDICATE_EXPORT EscapedString dateTimeToSQL(const QDateTime& v);
+
+inline EscapedString Driver::dateTimeToSQL(const QDateTime& v) const {
+    return Predicate::dateTimeToSQL(v);
+}
 
 } //namespace Predicate
 

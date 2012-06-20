@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -255,13 +255,13 @@ EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn
     EscapedString result;
     result.reserve(256);
     bool start = true;
-    QByteArray tableAliasAndDot;
+    QString tableAliasAndDot;
     if (!tableAlias.isEmpty()) {
         tableAliasAndDot
                  = ((conn && escapingType == DriverEscaping)
                         ? conn->escapeIdentifier(tableAlias)
-                        : Predicate::escapeIdentifier(tableAlias).toUtf8())
-                   + '.';
+                        : Predicate::escapeIdentifier(tableAlias))
+                   + QLatin1Char('.');
     }
     foreach(Field *f, list) {
         if (!start)
@@ -271,7 +271,7 @@ EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn
         result += (tableAliasAndDot +
                    ((conn && escapingType == DriverEscaping)
                         ? conn->escapeIdentifier(f->name())
-                        : Predicate::escapeIdentifier(f->name()).toUtf8())
+                        : Predicate::escapeIdentifier(f->name()))
                   );
     }
     return result;

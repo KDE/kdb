@@ -712,9 +712,9 @@ public:
         SelectStatementOptions();
         ~SelectStatementOptions();
 
-        //! Escaping mode can be of PredicateSQL dialect. DriverEscaping by default.
-        //! Use for user-visible backend-independent statements.
-        Predicate::EscapingType escapingType;
+//        //! Escaping mode can be of PredicateSQL dialect. DriverEscaping by default.
+//        //! Use for user-visible backend-independent statements.
+//        Predicate::EscapingType escapingType;
 
         //! True if record ID should be also retrieved. False by default.
         bool alsoRetrieveRecordId;
@@ -726,7 +726,7 @@ public:
     };
 
     /*! @return "SELECT ..." statement's string needed for executing query
-     defined by @a querySchema and @a params. */
+     defined by @a querySchema, @a params and @a options. */
     EscapedString selectStatement(QuerySchema* querySchema,
                                   const QList<QVariant>& params,
                                   const SelectStatementOptions& options = SelectStatementOptions());
@@ -901,7 +901,7 @@ public:
      Invalid strings are set to null in addition, that is EscapedString::isNull() is true,
      not just isEmpty().
     */
-    virtual QByteArray escapeIdentifier(const QString& id) const {
+    virtual QString escapeIdentifier(const QString& id) const {
         return m_driver->escapeIdentifier(id);
     }
 
@@ -1291,9 +1291,9 @@ private:
     //! @internal
     //! @return identifier escaped by driver (if predicateSqlEscaping is false)
     //! or by the Predicate's built-in escape routine. 
-    inline QByteArray escapeIdentifier(const QString& id, EscapingType escapingType) const {
+    inline QString escapeIdentifier(const QString& id, EscapingType escapingType) const {
         return escapingType == PredicateEscaping
-            ? Predicate::escapeIdentifier(id).toUtf8() : escapeIdentifier(id);
+            ? Predicate::escapeIdentifier(id) : escapeIdentifier(id);
     }
 
     ConnectionPrivate* d; //!< @internal d-pointer class.
@@ -1308,6 +1308,42 @@ private:
     friend class ConnectionPrivate;
 //    friend class AlterTableHandler;
 };
+
+/*! @return "SELECT ..." statement's string needed for executing query
+    defined by @a querySchema, @a params and @a options. 
+    @a driver is used to generate driver-dependent statement. */
+PREDICATE_EXPORT EscapedString selectStatement(const Predicate::Driver &driver,
+                                               Predicate::QuerySchema *querySchema,
+                                               const QList<QVariant>& params,
+                                               const Predicate::Connection::SelectStatementOptions& options
+                                                = Predicate::Connection::SelectStatementOptions());
+
+/*! @overload QString selectStatement(const Predicate::Driver&,
+    Predicate::QuerySchema*, const QList<QVariant>&, const Predicate::Connection::SelectStatementOptions&); */
+PREDICATE_EXPORT inline EscapedString selectStatement(const Predicate::Driver &driver,
+                                                      Predicate::QuerySchema *querySchema,
+                                                      const Predicate::Connection::SelectStatementOptions& options
+                                                        = Predicate::Connection::SelectStatementOptions())
+{
+    return Predicate::selectStatement(driver, querySchema, QList<QVariant>(), options);
+}
+
+/*! @return "SELECT ..." PredicateSQL statement's string needed for executing query
+    defined by @a querySchema, @a params and @a options. */
+PREDICATE_EXPORT EscapedString selectStatement(Predicate::QuerySchema *querySchema,
+                                               const QList<QVariant>& params,
+                                               const Predicate::Connection::SelectStatementOptions& options
+                                                 = Predicate::Connection::SelectStatementOptions());
+
+
+/*! @overload QString selectStatement(Predicate::QuerySchema*, const QList<QVariant>&,
+    const Predicate::Connection::SelectStatementOptions&); */
+PREDICATE_EXPORT inline EscapedString selectStatement(Predicate::QuerySchema *querySchema,
+                                                      const Predicate::Connection::SelectStatementOptions& options
+                                                       = Predicate::Connection::SelectStatementOptions())
+{
+    return Predicate::selectStatement(querySchema, QList<QVariant>(), options);
+}
 
 } //namespace Predicate
 
