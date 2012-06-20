@@ -20,8 +20,6 @@
 #ifndef PREDICATE_CURSOR_P_H
 #define PREDICATE_CURSOR_P_H
 
-#include <qstring.h>
-
 #include <Predicate/Connection.h>
 
 namespace Predicate

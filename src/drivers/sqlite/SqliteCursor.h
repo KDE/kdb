@@ -20,7 +20,7 @@
 #ifndef PREDICATE_SQLITECURSOR_H
 #define PREDICATE_SQLITECURSOR_H
 
-#include <qstring.h>
+#include <QString>
 
 #include <Predicate/Cursor>
 #include <Predicate/Connection>

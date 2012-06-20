@@ -19,7 +19,7 @@
 
 #include "TestExpressions.h"
 #include <QtTest/QtTest>
-#include <qdom.h>
+#include <QDomElement>
 
 #include <Predicate/Expression>
 

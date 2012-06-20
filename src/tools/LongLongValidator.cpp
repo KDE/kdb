@@ -21,7 +21,7 @@
 
 #include "LongLongValidator.h"
 
-#include <qwidget.h>
+#include <QWidget>
 
 using namespace Predicate::Utils;
 

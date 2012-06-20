@@ -22,7 +22,7 @@
 
 #include <Predicate/predicate_export.h>
 
-#include <qvalidator.h>
+#include <QValidator>
 class QWidget;
 
 namespace Predicate
