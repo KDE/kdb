@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -34,23 +34,24 @@ SQLiteAdminTools::~SQLiteAdminTools()
 {
 }
 
-#ifndef PREDICATE_SQLITE_NO_VACUUM
+#ifdef PREDICATE_SQLITE_VACUUM
 bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
 {
-    clearError();
+    clearResult();
     Predicate::DriverManager manager;
-    Predicate::Driver *drv = manager.driver(data.driverName);
+    Predicate::Driver *drv = manager.driver(data.driverName());
     QString title(QObject::tr("Could not compact database \"%1\".").arg(QDir::convertSeparators(databaseName)));
     if (!drv) {
-        setError(&manager, title);
+        m_result = Predicate::Result(title);
         return false;
     }
-    SQLiteVacuum vacuum(data.dbPath() + QDir::separator() + databaseName);
+    SQLiteVacuum vacuum(databaseName);
     tristate result = vacuum.run();
-    if (!result) {
-        setError(title);
+    if (false == result) {
+        m_result = Predicate::Result(title);
         return false;
-    } else //success or cancelled
+    } else { //success or cancelled
         return true;
+    }
 }
 #endif

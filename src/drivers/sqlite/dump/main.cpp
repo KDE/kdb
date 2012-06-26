@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,23 +17,35 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITEADMIN_H
-#define PREDICATE_SQLITEADMIN_H
+#include <iostream>
+#include <string>
 
-#include "SqliteGlobal.h"
-#include <Predicate/Admin>
+#include <sqlite3.h>
 
-//! @short An interface containing a set of tools for SQLite database administration.
-class SQLiteAdminTools : public Predicate::AdminTools
+#include <Predicate/Global.h>
+
+using namespace std;
+
+extern "C" int shell_main(const char *inFilename);
+    
+void usage()
 {
-public:
-    SQLiteAdminTools();
-    virtual ~SQLiteAdminTools();
+    cout << PREDICATE_SQLITE_DUMP_TOOL " version " PREDICATE_VERSION_STRING << endl
+         << "A tool for executing DUMP command on SQLite 3 databases." << endl
+         << "Usage: " PREDICATE_SQLITE_DUMP_TOOL " <database>" << endl;
+}
 
-#ifdef PREDICATE_SQLITE_VACUUM
-    /*! Performs vacuum (compacting) for connection @a conn. */
-    virtual bool vacuum(const Predicate::ConnectionData& data, const QString& databaseName);
-#endif
-};
+int main(int argc, char **argv)
+{
+    if (argc < 2) {
+        usage();
+        return 1;
+    }
+    string arg(argv[1]);
+    if (arg == "-h" || arg == "--help") {
+        usage();
+        return 0;
+    }
 
-#endif
+    return shell_main(arg.c_str());
+}

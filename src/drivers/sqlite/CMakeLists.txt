@@ -1,4 +1,12 @@
+# Generate SqliteGlobal.h
+configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h )
 
+option(WITH_PREDICATE_SQLITE_VACUUM "Enable support for SQLite vacuum (compacting) feature" ON)
+add_feature_info(PREDICATE_SQLITE_VACUUM WITH_PREDICATE_SQLITE_VACUUM "Enable support for SQLite vacuum (compacting) feature")
+if (PREDICATE_SQLITE_VACUUM)
+  set(PREDICATE_SQLITE_DUMP_TOOL predicate_sqlite3_dump)
+  ADD_DEFINITIONS(-DPREDICATE_SQLITE_DUMP_TOOL=\"${PREDICATE_SQLITE_DUMP_TOOL}\")
+endif (PREDICATE_SQLITE_VACUUM)
 
 # definitins used for the sqlite driver and the shell
 ADD_DEFINITIONS(
@@ -24,13 +32,13 @@ ADD_DEFINITIONS(
 
 include_directories(
   ${Predicate_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
   ${QT_INCLUDES}
 )
 
 ADD_DEFINITIONS(
   -D__PREDICATE__=
   -DPREDICATE_DRIVER_NAME="sqlite"
-  -DPREDICATE_SQLITE_NO_VACUUM=1 #TODO remove
 )
 
 if(MSVC)
@@ -50,14 +58,17 @@ set(predicate_sqlite_SRCS
    SqliteKeywords.cpp 
    SqlitePreparedStatement.cpp
    SqliteAdmin.cpp
-#todo   SqliteVacuum.cpp
    SqliteAlter.cpp
 )
 
 set(predicate_sqlite_MOC_SRCS
    SqliteDriver.h
-#todo   SqliteVacuum.h
 )
+
+if (PREDICATE_SQLITE_VACUUM)
+  list(APPEND predicate_sqlite_SRCS SqliteVacuum.cpp)
+  list(APPEND predicate_sqlite_MOC_SRCS SqliteVacuum.h)
+endif (PREDICATE_SQLITE_VACUUM)
 
 qt_wrap_cpp(predicate_sqlite predicate_sqlite_SRCS ${predicate_sqlite_MOC_SRCS})
 
@@ -70,3 +81,7 @@ install(TARGETS predicate_sqlite DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_sqlite.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
 
 add_subdirectory(icu)
+
+if (PREDICATE_SQLITE_VACUUM)
+  add_subdirectory(dump)
+endif (PREDICATE_SQLITE_VACUUM)

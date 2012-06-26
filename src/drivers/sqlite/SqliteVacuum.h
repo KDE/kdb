@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,15 +17,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef SQLITE_VACUUM_H
-#define SQLITE_VACUUM_H
+#ifndef PREDICATE_SQLITEVACUUM_H
+#define PREDICATE_SQLITEVACUUM_H
 
 #include <QObject>
 #include <QString>
+#include <QProcess>
 
 #include <Predicate/Tools/Tristate>
 
-class Q3Process;
 class QProgressDialog;
 
 //! @short Helper class performing interactive compacting (VACUUM) of the SQLite database
@@ -54,13 +54,16 @@ public:
     tristate run();
 
 public Q_SLOTS:
-    void readFromStdout();
-    void processExited();
+    void readFromStdErr();
+    void dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+    void sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void cancelClicked();
 
 protected:
     QString m_filePath;
-    Q3Process *m_process;
+    QString m_tmpFilePath;
+    QProcess *m_dumpProcess;
+    QProcess *m_sqliteProcess;
     QProgressDialog* m_dlg;
     int m_percent;
     tristate m_result;
