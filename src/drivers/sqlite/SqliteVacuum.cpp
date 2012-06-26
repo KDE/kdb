@@ -64,6 +64,7 @@ SQLiteVacuum::~SQLiteVacuum()
     if (m_dlg)
         m_dlg->close();
     delete m_dlg;
+    QFile::remove(m_tmpFilePath);
 }
 
 tristate SQLiteVacuum::run()
@@ -120,6 +121,14 @@ tristate SQLiteVacuum::run()
     delete tempFile;
     PreDrvDbg << "SQLiteVacuum::run():" << m_tmpFilePath;
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
+    if (!m_sqliteProcess->waitForStarted()) {
+        delete m_dumpProcess;
+        m_dumpProcess = 0;
+        delete m_sqliteProcess;
+        m_sqliteProcess = 0;
+        m_result = false;
+        return m_result;
+    }
     
     m_dlg = new QProgressDialog(0);
     m_dlg->setWindowTitle(tr("Compacting database"));
@@ -134,10 +143,13 @@ tristate SQLiteVacuum::run()
     m_dlg->setAutoClose(true);
     m_dlg->setRange(0, 100);
     m_dlg->exec();
-    while (m_dumpProcess->state() == QProcess::Running) {
+    while (m_dumpProcess->state() == QProcess::Running
+           && m_sqliteProcess->state()  == QProcess::Running)
+    {
         readFromStdErr();
-        usleep(50000);
+        qApp->processEvents(QEventLoop::AllEvents, 50000);
     }
+
     readFromStdErr();
 
     return m_result;
@@ -187,6 +199,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     if (!QFile::rename(m_tmpFilePath, m_filePath)) {
         PreDrvWarn << "SQLiteVacuum::sqliteProcessFinished(): Rename"
 	  << m_tmpFilePath << "to" << m_filePath << "failed.";
+        m_result == false;
     }
 
     if (m_result == true) {
@@ -200,8 +213,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
 
 void SQLiteVacuum::cancelClicked()
 {
-    if (!(m_dumpProcess->exitStatus() == QProcess::NormalExit)) {
-        m_dumpProcess->write("q"); //quit
-        m_result = cancelled;
-    }
+    m_sqliteProcess->terminate();
+    m_result = cancelled;
+    QFile::remove(m_tmpFilePath);
 }
