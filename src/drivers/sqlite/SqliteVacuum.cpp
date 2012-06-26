@@ -57,10 +57,14 @@ SQLiteVacuum::SQLiteVacuum(const QString& filePath)
 
 SQLiteVacuum::~SQLiteVacuum()
 {
-    m_dumpProcess->waitForFinished();
-    delete m_dumpProcess;
-    m_sqliteProcess->waitForFinished();
-    delete m_sqliteProcess;
+    if (m_dumpProcess) {
+        m_dumpProcess->waitForFinished();
+        delete m_dumpProcess;
+    }
+    if (m_sqliteProcess) {
+        m_sqliteProcess->waitForFinished();
+        delete m_sqliteProcess;
+    }
     if (m_dlg)
         m_dlg->close();
     delete m_dlg;
