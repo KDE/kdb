@@ -78,7 +78,7 @@ class QuerySchema;
 class PREDICATE_EXPORT Relationship
 {
 public:
-    typedef Utils::AutodeletedList<Relationship*> List;
+    typedef QList<Relationship*> List;
     typedef QList<Relationship*>::ConstIterator ListIterator;
 
     /*! Creates uninitialized Relationship object.

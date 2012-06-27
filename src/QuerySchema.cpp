@@ -127,6 +127,15 @@ public:
         }
     }
     ~QuerySchemaPrivate() {
+        delete orderByColumnList;
+        delete autoincFields;
+        delete columnsOrder;
+        delete columnsOrderWithoutAsterisks;
+        delete columnsOrderExpanded;
+        delete pkeyFieldsOrder;
+        delete fakeRecordIdCol;
+        delete fakeRecordIdField;
+        delete ownedVisibleColumns;
         if (fieldsExpanded) {
             qDeleteAll(*fieldsExpanded);
             delete fieldsExpanded;
@@ -137,15 +146,6 @@ public:
         }
         delete fieldsExpandedWithInternalAndRecordId;
         delete fieldsExpandedWithInternal;
-        delete orderByColumnList;
-        delete autoincFields;
-        delete columnsOrder;
-        delete columnsOrderWithoutAsterisks;
-        delete columnsOrderExpanded;
-        delete pkeyFieldsOrder;
-        delete fakeRecordIdCol;
-        delete fakeRecordIdField;
-        delete ownedVisibleColumns;
     }
 
     void clear() {
@@ -169,14 +169,6 @@ public:
             orderByColumnList->clear();
         }
         if (fieldsExpanded) {
-            qDeleteAll(*fieldsExpanded);
-            delete fieldsExpanded;
-            fieldsExpanded = 0;
-            if (internalFields) {
-                qDeleteAll(*internalFields);
-                delete internalFields;
-                internalFields = 0;
-            }
             delete columnsOrder;
             columnsOrder = 0;
             delete columnsOrderWithoutAsterisks;
@@ -190,6 +182,14 @@ public:
             columnInfosByName.clear();
             delete ownedVisibleColumns;
             ownedVisibleColumns = 0;
+            qDeleteAll(*fieldsExpanded);
+            delete fieldsExpanded;
+            fieldsExpanded = 0;
+            if (internalFields) {
+                qDeleteAll(*internalFields);
+                delete internalFields;
+                internalFields = 0;
+            }
         }
     }
 
@@ -435,6 +435,7 @@ OrderByColumn* OrderByColumn::copy(QuerySchema* fromQuery, QuerySchema* toQuery)
         }
         return new OrderByColumn(*columnInfo, m_ascending, m_pos);
     }
+    Q_ASSERT(m_field || m_column);
     return 0;
 }
 
@@ -511,7 +512,7 @@ EscapedString OrderByColumn::toSQLString(bool includeTableName,
             collationString = conn->driver()->collationSQL();
         }
     }
-    return tableName + fieldName + orderString + collationString;
+    return tableName + fieldName + collationString + orderString;
 }
 
 //=======================================
