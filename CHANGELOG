@@ -31,6 +31,8 @@ CCBUG:246928
 **fixed crash because of invalid deletion order of query structures
 **fixed crash because of invalid deletion relationship structures
 CCBUG:298197
+*Krazy fixes: removed 'const' refs in public classes [constref]
+*Finally removed the libpqxx-based driver, libpq-based one is now official
 
 2012-06-25..26
 SQLite Driver
@@ -148,11 +150,6 @@ Predicate
 Predicate
 *EscapedString introduced: specialized string for escaping. In addition to byte array, contains "validity" flag that is transferred when strings are concatenated or in general when any operation with invalid escaped string is performed.
 *SQLite, MySQL, PostgreSQL Ported to EscapedString-based API
-
-TODO: use QStringBuilder http://doc.qt.nokia.com/4.6/qstring.html
-add
-     #define QT_USE_FAST_CONCATENATION
-     #define QT_USE_FAST_OPERATOR_PLUS
 
 2010-10-30..2010-11-03
 PostgreSQL Driver
