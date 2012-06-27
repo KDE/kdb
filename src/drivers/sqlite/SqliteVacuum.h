@@ -64,7 +64,7 @@ protected:
     QString m_tmpFilePath;
     QProcess *m_dumpProcess;
     QProcess *m_sqliteProcess;
-    QProgressDialog* m_dlg;
+    QProgressDialog* m_dlg; // krazy:exclude=qclasses
     int m_percent;
     tristate m_result;
 };

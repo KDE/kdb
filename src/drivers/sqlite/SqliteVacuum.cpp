@@ -33,7 +33,6 @@
 #include <QCursor>
 #include <QLocale>
 #include <QTemporaryFile>
-#include <QProgressDialog>
 
 #ifdef Q_WS_WIN
 #include <windows.h>
@@ -134,7 +133,7 @@ tristate SQLiteVacuum::run()
         return m_result;
     }
     
-    m_dlg = new QProgressDialog(0);
+    m_dlg = new QProgressDialog(0); // krazy:exclude=qclasses
     m_dlg->setWindowTitle(tr("Compacting database"));
     m_dlg->setLabelText(
         QLatin1String("<qt>") + tr("Compacting database \"%1\"...")
@@ -209,7 +208,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     if (m_result == true) {
         const uint newSize = QFileInfo(m_filePath).size();
         const uint decrease = 100 - 100 * newSize / origSize;
-        QMessageBox::information(0, QString(),
+        QMessageBox::information(0, QString(), // krazy:exclude=qclasses
             QObject::tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
                 .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
     }

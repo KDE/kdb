@@ -49,7 +49,7 @@ protected:
     Driver *m_driver;
 };
 
-class ConnectionTestDialog : public QProgressDialog
+class ConnectionTestDialog : public QProgressDialog // krazy:exclude=qclasses
 {
     Q_OBJECT
 public:
