@@ -128,13 +128,8 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
                 << "version: found version" << info.version() << "expected version" << expectedVersion
                 << "-- skipping this one";
         }
-#ifdef Q_OS_WIN
-        const QLatin1String suffix(".dll");
-#else
-        const QLatin1String suffix(".so");
-#endif
         info.setAbsoluteFilePath(pluginsDir + QLatin1String("/predicate_")
-            + config.value(QLatin1String("Name")).toString() + suffix);
+            + config.value(QLatin1String("Name")).toString() + QLatin1String(PREDICATE_SHARED_LIB_EXTENSION));
         info.setCaption(config.value(QLatin1String("Caption")).toString());
 //! @todo read translated [..]
         info.setComment(config.value(QLatin1String("Comment")).toString());

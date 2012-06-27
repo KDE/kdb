@@ -254,7 +254,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
         const QStringList libraryPaths(Predicate::libraryPaths());
         QString icuExtensionFilename;
         foreach (const QString& path, libraryPaths) {
-            icuExtensionFilename = path + QLatin1String("/predicate_sqlite3_icu.so");
+            icuExtensionFilename = path + QLatin1String("/predicate_sqlite3_icu" PREDICATE_SHARED_LIB_EXTENSION);
             if (QFileInfo(icuExtensionFilename).exists() && loadExtension(icuExtensionFilename)) {
                 break;
             }

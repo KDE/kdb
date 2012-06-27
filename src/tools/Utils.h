@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -299,5 +299,14 @@ private:
 
 } // Utils
 } // Predicate
+
+//! @def PREDICATE_SHARED_LIB_EXTENSION operating system-dependent extension for shared library files
+#if defined(Q_OS_WIN)
+#define PREDICATE_SHARED_LIB_EXTENSION ".dll"
+#elif defined(Q_OS_MAC)
+#define PREDICATE_SHARED_LIB_EXTENSION ".dylib"
+#else
+#define PREDICATE_SHARED_LIB_EXTENSION ".so"
+#endif
 
 #endif //PREDICATE_TOOLS_UTILS_H
