@@ -15,7 +15,7 @@
 #           set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
 #
 # This module allows to depend on a particular minimum version of SQLite.
-# To acomplish that one should use the apropriate cmake syntax for
+# To acomplish that one should use the appropriate cmake syntax for
 # find_package(). For example to depend on SQLite >= 3.6.16 one should use:
 #
 #  find_package(SQLite 3.6.16 REQUIRED)

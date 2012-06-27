@@ -115,7 +115,7 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option)
 
-    /*! Constructs mesage handler, @a parent is a widget that will be a parent
+    /*! Constructs message handler, @a parent is a widget that will be a parent
      for displaying gui elements (e.g. message boxes). Can be 0 for non-gui usage. */
     explicit MessageHandler(QWidget *parent = 0);
     virtual ~MessageHandler();
