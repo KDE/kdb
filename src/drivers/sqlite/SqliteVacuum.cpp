@@ -203,7 +203,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     if (!QFile::rename(m_tmpFilePath, m_filePath)) {
         PreDrvWarn << "SQLiteVacuum::sqliteProcessFinished(): Rename"
 	  << m_tmpFilePath << "to" << m_filePath << "failed.";
-        m_result == false;
+        m_result = false;
     }
 
     if (m_result == true) {

@@ -577,7 +577,7 @@ QuerySchema* buildSelectQuery(
             if (!options->whereExpr.validate(parseInfo)) {
                 setError(parseInfo.errMsg, parseInfo.errDescr);
                 CLEANUP;
-                return false;
+                return 0;
             }
             querySchema->setWhereExpression(options->whereExpr);
         }
