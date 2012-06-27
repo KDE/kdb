@@ -195,7 +195,8 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
 
 bool SQLitePreparedStatement::execute(
     PreparedStatement::Type type,
-    const Field::List& fieldList,
+    const Field::List& selectFieldList,
+    FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
     if (!m_handle)
@@ -222,9 +223,9 @@ bool SQLitePreparedStatement::execute(
     */
 
     int par = 1; // par.index counted from 1
-    Field::ListIterator itFields(fieldList.constBegin());
+    Field::ListIterator itFields(selectFieldList.constBegin());
     for (QList<QVariant>::ConstIterator it = parameters.constBegin();
-         itFields != fieldList.constEnd();
+         itFields != selectFieldList.constEnd();
          it += (it == parameters.constEnd() ? 0 : 1), ++itFields, par++)
     {
         if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))

@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2005 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2010-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -41,13 +41,21 @@ bool PostgresqlPreparedStatement::prepare(const EscapedString& statement)
 
 bool PostgresqlPreparedStatement::execute(
     PreparedStatement::Type type,
-    const Field::List& fieldList,
+    const Field::List& selectFieldList,
+    FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
-    /*if (conn->connection->insertRecord(fieldList, parameters)) {
-        return true;
-    }*/
-    return false;
+    if (type == PreparedStatement::InsertStatement) {
+        const int missingValues = insertFieldList.fieldCount() - parameters.count();
+        PreparedStatementParameters myParameters(parameters);
+        if (missingValues > 0) {
+    //! @todo can be more efficient
+            for (int i = 0; i < missingValues; i++) {
+                myParameters.append(QVariant());
+            }
+        }
+        return connection->insertRecord(&insertFieldList, myParameters);
+    }
+//! @todo support select
+    return false;  
 }
-
-

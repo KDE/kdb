@@ -48,7 +48,7 @@ bool PreparedStatement::execute(const PreparedStatementParameters& parameters)
             return false;
         d->dirty = false;
     }
-    return d->iface->execute(d->type, *d->fieldsForParameters, parameters);
+    return d->iface->execute(d->type, *d->fieldsForParameters, d->fields, parameters);
 }
 
 bool PreparedStatement::generateStatementString(EscapedString * s)

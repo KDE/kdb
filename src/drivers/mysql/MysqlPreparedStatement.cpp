@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2012 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -240,7 +240,8 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
 
 bool MysqlPreparedStatement::execute(
     PreparedStatement::Type type,
-    const Field::List& fieldList,
+    const Field::List& selectFieldList,
+    FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
 #ifdef PREDICATE_USE_MYSQL_STMT
@@ -302,12 +303,18 @@ bool MysqlPreparedStatement::execute(
     }
 #else
     m_resetRequired = true;
-#if 0 //TODO
-    if (type == PreparedStatement::InsertStatement && connection->insertRecord(fieldList, parameters)) {
-        return true;
+    if (type == PreparedStatement::InsertStatement) {
+        const int missingValues = insertFieldList.fieldCount() - parameters.count();
+        PreparedStatementParameters myParameters(parameters);
+        if (missingValues > 0) {
+    //! @todo can be more efficient
+            for (int i = 0; i < missingValues; i++) {
+                myParameters.append(QVariant());
+            }
+        }
+        return connection->insertRecord(&insertFieldList, myParameters);
     }
-#endif
-//TODO handle Select...
+//! @todo support select
 
 #endif // !PREDICATE_USE_MYSQL_STMT
     return false;

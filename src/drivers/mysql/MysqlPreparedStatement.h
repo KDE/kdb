@@ -41,7 +41,8 @@ protected:
 
     virtual bool execute(
         PreparedStatement::Type type,
-        const Field::List& fieldList,
+        const Field::List& selectFieldList,
+        FieldList& insertFieldList,
         const PreparedStatementParameters& parameters);
 
     bool init();
