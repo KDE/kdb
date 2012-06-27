@@ -430,17 +430,16 @@ bool SQLiteConnection::loadExtension(const QString& path)
     char *errmsg_p = 0;
     m_result.setServerResultCode(
         sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p));
+    bool ok = SQLITE_OK == m_result.serverResultCode();
+    PreWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
+            << path << ":" << errmsg_p;
     if (errmsg_p) {
         clearResult();
         d->setServerMessage(QLatin1String(errmsg_p));
         sqlite3_free(errmsg_p);
     }
-    bool ok = SQLITE_OK == m_result.serverResultCode();
     if (tempEnable) {
         d->setExtensionsLoadingEnabled(false);
-    }
-    if (!ok) {
-        PreWarn << "Could not load SQLite extension" << path;
     }
     return ok;
 }
