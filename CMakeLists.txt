@@ -66,6 +66,7 @@ endif (NOT WIN32)
 include(MacroOptionalFindPackage)
 include(InstallSettings)
 include(MacroLogFeature)
+include(FeatureSummary)
 include(CreateSharedDataClasses)
 
 # Qt string handling optimizations: http://qt-project.org/doc/qt-4.8/qstring.html#more-efficient-string-construction
@@ -101,3 +102,5 @@ macro_display_feature_log()
 if(NOT WIN32)
   install(FILES ${Predicate_BINARY_DIR}/predicate.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif(NOT WIN32)
+
+feature_summary(WHAT ALL)
