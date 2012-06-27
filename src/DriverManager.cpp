@@ -437,9 +437,9 @@ Result DriverManager::result() const {
     return s_self->result();
 }
 
-const Resultable& DriverManager::resultable() const
+Resultable DriverManager::resultable() const
 {
-    return static_cast<const Resultable&>(*s_self);
+    return Resultable(static_cast<const Resultable&>(*s_self));
 }
 
 QStringList DriverManager::driverNames()

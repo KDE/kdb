@@ -171,7 +171,7 @@ public:
 
     /*! @return list of lookup field schemas for this table.
      The order is the same as the order of fields within the table. */
-    const QVector<LookupFieldSchema*>& lookupFieldsList();
+    QVector<LookupFieldSchema*> lookupFieldsList();
 
 protected:
     /*! Automatically retrieves table schema via connection. */

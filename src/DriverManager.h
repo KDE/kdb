@@ -45,7 +45,7 @@ public:
 
     //! @return Resultable object for the recent operation.
     //! It adds serverResultName() in addition to the result().
-    const Resultable& resultable() const;
+    Resultable resultable() const;
 
     /*! Tries to load db driver with named name @a name.
       The name is case insensitive.

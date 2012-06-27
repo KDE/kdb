@@ -406,7 +406,7 @@ LookupFieldSchema *TableSchema::lookupFieldSchema(const QString& fieldName)
     return lookupFieldSchema(*f);
 }
 
-const QVector<LookupFieldSchema*>& TableSchema::lookupFieldsList()
+QVector<LookupFieldSchema*> TableSchema::lookupFieldsList()
 {
     if (d->lookupFields.isEmpty())
         return d->lookupFieldsList;
