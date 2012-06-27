@@ -45,7 +45,8 @@ bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QStri
         m_result = Predicate::Result(title);
         return false;
     }
-    SQLiteVacuum vacuum(databaseName);
+    QFileInfo file(databaseName);
+    SQLiteVacuum vacuum(QDir::convertSeparators(file.absoluteFilePath()));
     tristate result = vacuum.run();
     if (false == result) {
         m_result = Predicate::Result(title);
