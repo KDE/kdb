@@ -11,7 +11,7 @@ set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
 set(SQLITE_MIN_VERSION 3.6.16)
 set(SQLITE_RECOMMENDED_VERSION 3.7.12)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
-find_package(Sqlite 3.6.16)
+find_package(Sqlite 3.6.16 REQUIRED)
 macro_log_feature(SQLITE_FOUND "SQLite" "Embedded SQL database engine with enabled extensions loading"
                   "http://www.sqlite.org" FALSE "${SQLITE_MIN_VERSION}"
                   "Recommended as Predicate's default database driver.")
