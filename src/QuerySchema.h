@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -111,6 +111,12 @@ public:
 
     ~OrderByColumn();
 
+    /*! @return copy of this OrderByColumn object.
+     In @a fromQuery and @a toQuery is needed if column() is assigned to this info.
+     Then, column info within @a toQuery will be assigned to the new OrderByColumn object,
+     corresponding to column() from "this" OrderByColumn object. */
+    OrderByColumn* copy(QuerySchema* fromQuery, QuerySchema* toQuery) const;
+
     //! A column to sort.
     inline QueryColumnInfo* column() const {
         return m_column;
@@ -170,8 +176,9 @@ public:
     /*! Constructs empty list of ordered columns. */
     OrderByColumnList();
 
-    /*! Copy constructor. */
-    OrderByColumnList(const OrderByColumnList& other);
+    /*! A copy constructor. */
+    OrderByColumnList(const OrderByColumnList& other,
+                      QuerySchema* fromQuery, QuerySchema* toQuery);
 
     ~OrderByColumnList();
 
@@ -221,9 +228,6 @@ public:
     /*! Appends a column that is at position @a pos (counted from 0).
      @return true on successful adding and false if there is no such position @a pos. */
     bool appendColumn(QuerySchema& querySchema, bool ascending = true, int pos = -1);
-
-    /*! Appends @a column to the list. */
-    void appendColumn(const OrderByColumn& column);
 
     /*! @return true if the list is empty. */
     bool isEmpty() const {

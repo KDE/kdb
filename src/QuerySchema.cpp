@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -80,6 +80,7 @@ public:
             , internalFields(0)
             , fieldsExpandedWithInternalAndRecordId(0)
             , fieldsExpandedWithInternal(0)
+            , orderByColumnList(0)
             , autoincFields(0)
             , columnsOrder(0)
             , columnsOrderWithoutAsterisks(0)
@@ -88,46 +89,36 @@ public:
             , pkeyFieldsCount(0)
             , tablesBoundToColumns(64, -1) // will be resized if needed
             , ownedVisibleColumns(0)
-            , regenerateExprAliases(false) {
-//Qt 4   columnAliases.setAutoDelete(true);
-//Qt 4   tableAliases.setAutoDelete(true);
-//Qt 4   asterisks.setAutoDelete(true);
-//Qt 4   relations.setAutoDelete(true);
-//Qt 4   tablePositionsForAliases.setAutoDelete(true);
-//Qt 4   columnPositionsForAliases.setAutoDelete(true);
+            , regenerateExprAliases(false)
+    {
         visibility.fill(false);
         if (copy) {
             // deep copy
             *this = *copy;
-            if (copy->fieldsExpanded)
-                fieldsExpanded = new QueryColumnInfo::Vector(*copy->fieldsExpanded);
-            if (copy->internalFields)
-                internalFields = new QueryColumnInfo::Vector(*copy->internalFields);
-            if (copy->fieldsExpandedWithInternalAndRecordId)
-                fieldsExpandedWithInternalAndRecordId = new QueryColumnInfo::Vector(
-                    *copy->fieldsExpandedWithInternalAndRecordId);
-            if (copy->fieldsExpandedWithInternal)
-                fieldsExpandedWithInternal = new QueryColumnInfo::Vector(
-                    *copy->fieldsExpandedWithInternal);
-            if (copy->autoincFields)
-                autoincFields = new QueryColumnInfo::List(*copy->autoincFields);
-            if (copy->columnsOrder)
-                columnsOrder = new QHash<QueryColumnInfo*, int>(*copy->columnsOrder);
-            if (copy->columnsOrderWithoutAsterisks)
-                columnsOrderWithoutAsterisks = new QHash<QueryColumnInfo*, int>(
-                    *copy->columnsOrderWithoutAsterisks);
-            if (copy->columnsOrderExpanded)
-                columnsOrderExpanded = new QHash<QueryColumnInfo*, int>(*copy->columnsOrderExpanded);
-            if (copy->pkeyFieldsOrder)
-                pkeyFieldsOrder = new QVector<int>(*copy->pkeyFieldsOrder);
-            if (!copy->whereExpr.isNull())
+            // <clear, so computeFieldsExpanded() will re-create it>
+            fieldsExpanded = 0;
+            internalFields = 0;
+            columnsOrder = 0;
+            columnsOrderWithoutAsterisks = 0;
+            columnsOrderExpanded = 0;
+            autoincFields = 0;
+            autoIncrementSQLFieldsList.clear();
+            columnInfosByNameExpanded.clear();
+            columnInfosByName.clear();
+            ownedVisibleColumns = 0;
+            fieldsExpandedWithInternalAndRecordId = 0;
+            fieldsExpandedWithInternal = 0;
+            pkeyFieldsOrder = 0;
+            fakeRecordIdCol = 0;
+            fakeRecordIdField = 0;
+            ownedVisibleColumns = 0;
+            // </clear, so computeFieldsExpanded() will re-create it>
+            if (!copy->whereExpr.isNull()) {
                 whereExpr = copy->whereExpr.clone();
-            if (copy->fakeRecordIdCol)
-                fakeRecordIdCol = new QueryColumnInfo(*copy->fakeRecordIdCol);
-            if (copy->fakeRecordIdField)
-                fakeRecordIdField = new Field(*copy->fakeRecordIdField);
-            if (copy->ownedVisibleColumns)
-                ownedVisibleColumns = new Field::List(*copy->ownedVisibleColumns);
+            }
+        }
+        else {
+            orderByColumnList = new OrderByColumnList;
         }
     }
     ~QuerySchemaPrivate() {
@@ -168,7 +159,9 @@ public:
     }
 
     void clearCachedData() {
-        orderByColumnList.clear();
+        if (orderByColumnList) {
+            orderByColumnList->clear();
+        }
         if (fieldsExpanded) {
             qDeleteAll(*fieldsExpanded);
             delete fieldsExpanded;
@@ -318,7 +311,7 @@ public:
     QueryColumnInfo::Vector *fieldsExpandedWithInternal;
 
     /*! A list of fields for ORDER BY section. @see QuerySchema::orderByColumnList(). */
-    OrderByColumnList orderByColumnList;
+    OrderByColumnList* orderByColumnList;
 
     /*! A cache for autoIncrementFields(). */
     QueryColumnInfo::List *autoincFields;
@@ -411,6 +404,34 @@ OrderByColumn::OrderByColumn(Field& field, bool ascending)
 {
 }
 
+OrderByColumn* OrderByColumn::copy(QuerySchema* fromQuery, QuerySchema* toQuery) const
+{
+    if (m_field) {
+        return new OrderByColumn(*m_field, m_ascending);
+    }
+    if (m_column) {
+        QueryColumnInfo* columnInfo;
+        if (fromQuery && toQuery) {
+            int columnIndex = fromQuery->columnsOrder().value(m_column);
+            if (columnIndex < 0) {
+                PreDbg << "OrderByColumn::copy(): Index not found for column" << *m_column;
+                return 0;
+            }
+            columnInfo = toQuery->expandedOrInternalField(columnIndex);
+            if (!columnInfo) {
+                PreDbg << "OrderByColumn::copy(): Column info not found at index"
+                       << columnIndex << "in toQuery";
+                return 0;
+            }
+        }
+        else {
+            columnInfo = m_column;
+        }
+        return new OrderByColumn(*columnInfo, m_ascending, m_pos);
+    }
+    return 0;
+}
+
 OrderByColumn::~OrderByColumn()
 {
 }
@@ -494,11 +515,15 @@ OrderByColumnList::OrderByColumnList()
 {
 }
 
-OrderByColumnList::OrderByColumnList(const OrderByColumnList& other)
+OrderByColumnList::OrderByColumnList(const OrderByColumnList& other,
+                                     QuerySchema* fromQuery, QuerySchema* toQuery)
         : OrderByColumnListBase()
 {
     for (QList<OrderByColumn*>::ConstIterator it(other.constBegin()); it != other.constEnd(); ++it) {
-        appendColumn(**it);
+        OrderByColumn* order = (*it)->copy(fromQuery, toQuery);
+        if (order) {
+            append(order);
+        }
     }
 }
 
@@ -571,11 +596,6 @@ bool OrderByColumnList::appendField(QuerySchema& querySchema,
     }
     PreWarn << "no such field" << fieldName;
     return false;
-}
-
-void OrderByColumnList::appendColumn(const OrderByColumn& column)
-{
-    append(new OrderByColumn(column));
 }
 
 QDebug operator<<(QDebug dbg, const OrderByColumnList& list)
@@ -667,6 +687,9 @@ QuerySchema::QuerySchema(const QuerySchema& querySchema)
             copiedField = f;
         addField(copiedField);
     }
+    // this deep copy must be after the 'd' initialization because fieldsExpanded() is used there
+    d->orderByColumnList = new OrderByColumnList(*querySchema.d->orderByColumnList,
+                                                 const_cast<QuerySchema*>(&querySchema), this);
 }
 
 QuerySchema::~QuerySchema()
@@ -1803,16 +1826,14 @@ Expression QuerySchema::whereExpression() const
 
 void QuerySchema::setOrderByColumnList(const OrderByColumnList& list)
 {
-    d->orderByColumnList.clear();
-    for (QList<OrderByColumn*>::ConstIterator it(list.constBegin()); it != list.constEnd(); ++it) {
-        d->orderByColumnList.appendColumn(**it);
-    }
+    delete d->orderByColumnList;
+    d->orderByColumnList = new OrderByColumnList(list, 0, 0);
 // all field names should be found, exit otherwise ..........?
 }
 
 OrderByColumnList& QuerySchema::orderByColumnList() const
 {
-    return d->orderByColumnList;
+    return *d->orderByColumnList;
 }
 
 QuerySchemaParameterList QuerySchema::parameters() const
