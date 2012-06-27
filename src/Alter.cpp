@@ -33,6 +33,9 @@ class AlterTableHandler::Private
 public:
     Private() {}
     ~Private() {}
+    ~Private() {
+        qDeleteAll(actions);
+    }
     ActionList actions;
 #warning replace QPointer<Connection> conn;
     Connection* conn;
@@ -790,6 +793,7 @@ void AlterTableHandler::clear()
 
 void AlterTableHandler::setActions(const ActionList& actions)
 {
+    qDeleteAll(d->actions);
     d->actions = actions;
 }
 
