@@ -3,9 +3,92 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-06-27
+Predicate
+*Add KexiDB fix: Fix deep copying of query schema and ORDER BY structures
+**This removes crashes related, e.g. in reports based on queries with joins
+**(2012-03-13 calligra master commit 9408a8234ac60)
+CCBUG:246928
+CCBUG:281737
+*Add KexiDB fix: Properly deep-copy query asterisks when cloning query objects
+**This fixes crash for reports based on queries
+**(2012-03-18 calligra master commit f0992d35f4ab9)
+CCBUG:246928
+*Add KexiDB fix: Fix the filename extension when loading on different platforms
+**(2012-03-19 calligra master commit 4e465d91b208e)
+*Add KexiDB fix: QuerySchema: removed memory leak
+**(2012-03-22 calligra master commit a99069676e4e)
+*Add KexiDB fix: AlterTableHandler: remove memory leak
+**(2012-03-22 calligra master commit 8081997afd0e)
+*Add KexiDB fix: Fix compilation for clang
+**Clang has some additional restriction, patch by Matthew Rezny
+**(2012-04-20 calligra master commit c804712c97b2)
+*Add KexiDB fix: Add sqlite's message to the "Could not load SQLite extension" warning
+**(2012-04-23 calligra master commit 74642dd2ee6c)
+*Add KexiDB fix: Fix crashes when saving query design
+**(2012-05-03 calligra master commit 0fefd8dbbe33)
+**put DESC/ASC after COLLATE section, not before (needed at least for sqlite driver)
+**fixed crash because of invalid deletion order of query structures
+**fixed crash because of invalid deletion relationship structures
+CCBUG:298197
+
+2012-06-25..26
+SQLite Driver
+*Add KexiDB fix: Ported database compacting code to Predicate that uses system SQLite
+**(2012-02-02 calligra master commit 42ffb1c08d74b)
+CCBUG:293548
+TODO: SQLite Vacuum not tested (but predicate_sqlite3_dump works)
+TODO: add test for SQLite Vacuum
+*Add KexiDB fix: Allow to cancel database compacting; remove temp. file if needed
+**(2012-03-02 calligra master commit d4d64077d66)
+*Add KexiDB fix: Fixed crashes when compacting database fails
+**(2012-03-07 calligra master commit 5cdecef8bfe)
+*Add KexiDB fix: Fixed error when compacting db opened from recent lists
+**(2012-03-07 calligra master commit 9ec3e68ff43)
+MySQL Driver
+*Add KexiDB fix: Fixed crash in prepared statement execution for inserting data when number of items to insert is smaller than expected; this case could be found when importing CSV data in Kexi with fewer columns specified than expected
+**(2012-03-07 calligra master commit 7661374b40c)
+CCBUG:279980
+CCBUG:254068
+PostgreSQL Driver
+*Add KexiDB fix: Fixed crash when inserting incomplete rows
+**(2012-03-07 calligra master commit 38da0b59e08)
+CCBUG:279980
+CCBUG:254068
+
+2012-06-20
+Predicate
+*Add KexiDB fix: Query SQL generated in the Query Designer should be of KEXISQL type
+**(2012-01-02 calligra master commit 1072a0f5d)
+CCBUG:290354
+*Add KexiDB fix: Clean up #includes: use the same style for Qt everywhere, e.g. #include <QObject> instead of #include <qobject.h>
+SQLite Driver
+*Add KexiDB fix: fixed crash in prepared statement execution for inserting data when number of items to insert is smaller than expected; this case could be found when importing CSV data in Kexi with fewer columns specified than expected
+**(2012-02-27 calligra master commit 1e9be96a9e)
+CCBUG:279980
+*Add KexiDB fix: predicate_sqlite3_dump, based on fragments from SQLite's shell.c (from SQLite 3.7.10)
+**(2012-03-02 calligra master commit 983553232e, ca6b463f755060)
+CCBUG:293548
+
+2012-05-27
+Predicate
+*Add KexiDB fix: Use ICU (http://icu-project.org) for high quality collating in unicode text columns using sqlite extension
+**(2011-12-20 calligra master commit 8f6f75d5b9ebf048)
+CCBUG:278411
+
 2012-05-23
 Predicate
 *Allow to set debugging for Expression classes in the build options
+*Add KexiDB fix: avoid 'invalid read' in code for inserting records into tables
+**(2011-12-14 calligra master commit 64eab6eccab72c296)
+*Add KexiDB fix: Subqueries in Postgresql must have an alias. Tested with postgres and sqlite.
+**(2011-10-19 calligra master commit ea4d2bd4f74922724)
+
+2012-05-22
+Predicate
+*Field: fix crash - initialize expression before it is use
+*Make drivers match 0.0 version of predicate
+*Force out-of-source build
 
 2012-05-21
 Predicate
