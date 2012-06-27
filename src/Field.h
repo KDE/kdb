@@ -612,7 +612,7 @@ public:
     /*! Sets expression data @a expr. If there was
      already expression set, it is removed before new assignment.
      This Field object becames logical owner of @a expr object,
-     so do not use the expresion for other objects (you can call ExpressioN::clone()).
+     so do not use the expression for other objects (you can call ExpressioN::clone()).
      Current field's expression is deleted, if exists.
 
      Because the field defines an expression, it should be assigned to a query,

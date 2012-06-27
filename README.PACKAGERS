@@ -36,7 +36,7 @@ for a number of database types or data sources. The following matrix lists them:
  MySQL        predicate_mysqldriver.so
               predicate_mysqldriver.desktop
  PostgreSQL   predicate_postgresqldriver.so
-              predicate_pqxxsqldriver.desktop
+              predicate_postgresqldriver.desktop
 
 (other drivers are not currently distributed)
 

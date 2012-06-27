@@ -930,7 +930,7 @@ protected:
      or before database is used
      (if DriverBehaviour::USING_DATABASE_REQUIRED_TO_CONNECT is false),
      i.e. for PostgreSQL it is called after.
-     In any case it is called after successfull drv_connect().
+     In any case it is called after successful drv_connect().
      @return true on success. */
     virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version) = 0;
 
