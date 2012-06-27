@@ -851,6 +851,9 @@ public:
      */
     QueryAsterisk(QuerySchema *query, TableSchema *table = 0);
 
+    /*! Constructs a deep copu of query asterisk definition object @a asterisk. */
+    QueryAsterisk(const QueryAsterisk& asterisk);
+
     virtual ~QueryAsterisk();
 
     /*! @return Query object for that this asterisk object is defined */

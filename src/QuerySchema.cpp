@@ -116,6 +116,11 @@ public:
             if (!copy->whereExpr.isNull()) {
                 whereExpr = copy->whereExpr.clone();
             }
+            // "*this = *copy" causes copying pointers; pull of them without destroying,
+            // will be deep-copied in the QuerySchema ctor.
+            asterisks.setAutoDelete(false);
+            asterisks.clear();
+            asterisks.setAutoDelete(true);
         }
         else {
             orderByColumnList = new OrderByColumnList;
@@ -665,7 +670,7 @@ QuerySchema::QuerySchema(TableSchema& tableSchema)
 //replaced by explicit field list: //add all fields of the table as asterisk:
 //replaced by explicit field list: addField( new QueryAsterisk(this) );
 
-    // add explicit field list to avoid problems (e.g. with fields added outside of Kexi):
+    // add explicit field list to avoid problems (e.g. with fields added outside of the app):
     foreach(Field* f, *d->masterTable->fields()) {
         addField(f);
     }
@@ -681,10 +686,13 @@ QuerySchema::QuerySchema(const QuerySchema& querySchema)
         Field *copiedField;
         if (dynamic_cast<QueryAsterisk*>(f)) {
             copiedField = f->copy();
-            if (static_cast<const Predicate::FieldList *>(f->m_parent) == &querySchema)
+            if (static_cast<const Predicate::FieldList *>(f->m_parent) == &querySchema) {
                 copiedField->m_parent = this;
-        } else
+            }
+        }
+        else {
             copiedField = f;
+        }
         addField(copiedField);
     }
     // this deep copy must be after the 'd' initialization because fieldsExpanded() is used there
@@ -1671,7 +1679,6 @@ QVector<int> QuerySchema::pkeyFieldsOrder() const
     //get order of PKEY fields (e.g. for records updating or inserting )
     IndexSchema *pkey = tbl->primaryKey();
     PreDbg << *pkey;
-    //debug(); //20080107, sebsauer; this seems to crash in kexi on query SQL text view
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
     const uint fCount = fieldsExpanded().count();
@@ -1909,6 +1916,12 @@ QueryAsterisk::QueryAsterisk(QuerySchema *query, TableSchema *table)
     assert(query);
     m_parent = query;
     setType(Field::Asterisk);
+}
+
+QueryAsterisk::QueryAsterisk(const QueryAsterisk &asterisk)
+        : Field(asterisk)
+        , m_table(asterisk.table())
+{
 }
 
 QueryAsterisk::~QueryAsterisk()
