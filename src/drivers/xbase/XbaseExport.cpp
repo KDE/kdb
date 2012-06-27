@@ -154,7 +154,7 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicat
 
 int xBaseExportPrivate::fieldLength(Predicate::Field* f ) {
   if ( f->type() == Predicate::Field::Text ) {
-    return f->length();
+    return f->maxLength();
   }
   // return the max possible (string)length of the types
   // see http://linux.techass.com/projects/xdb/xbasedocs/xbase_c3.html

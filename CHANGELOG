@@ -33,6 +33,10 @@ CCBUG:246928
 CCBUG:298197
 *Krazy fixes: removed 'const' refs in public classes [constref]
 *Finally removed the libpqxx-based driver, libpq-based one is now official
+*Add KexiDB fix: Remove limits for Text data type, leave as option
+**Now by default there are no limits in Text data type
+**(2012-06-06 calligra master commit 094bc376058c)
+CCBUG:301277
 
 2012-06-25..26
 SQLite Driver

@@ -134,7 +134,7 @@ struct Predicate_AlterTableHandlerStatic {
         I("caption", MainSchemaAlteringRequired);
         I("description", MainSchemaAlteringRequired);
         I2("unsigned", PhysicalAlteringRequired, DataConversionRequired); // always?
-        I2("length", PhysicalAlteringRequired, DataConversionRequired); // always?
+        I2("maxLength", PhysicalAlteringRequired, DataConversionRequired); // always?
         I2("precision", PhysicalAlteringRequired, DataConversionRequired); // always?
         I("width", MainSchemaAlteringRequired);
         // defaultValue: depends on backend, for mysql it can only by a constant or now()...
@@ -460,8 +460,8 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
          TODO: more cases to check
         */
     }
-    if (m_propertyName == QLatin1String("length")) {
-        //use "select max( length(o_name) ) from kexi__Objects"
+    if (m_propertyName == "maxLength") {
+        //! @todo use "select max( length(o_name) ) from kexi__objects"
 
     }
     if (m_propertyName == QLatin1String("primaryKey")) {

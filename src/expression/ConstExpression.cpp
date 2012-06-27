@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -66,11 +66,14 @@ Field::Type ConstExpressionData::type() const
         }
         return Field::BigInteger;
     case CHARACTER_STRING_LITERAL:
-//! @todo Field::defaultTextLength() is hardcoded now!
-        if (value.toString().length() > (int)Field::defaultTextLength())
+        if (Field::defaultMaxLength() > 0
+            && uint(value.toString().length()) > Field::defaultMaxLength())
+        {
             return Field::LongText;
-        else
+        }
+        else {
             return Field::Text;
+        }
     case REAL_CONST:
         return Field::Double;
     case DATE_CONST:
