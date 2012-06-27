@@ -137,6 +137,7 @@ public:
         }
         delete fieldsExpandedWithInternalAndRecordId;
         delete fieldsExpandedWithInternal;
+        delete orderByColumnList;
         delete autoincFields;
         delete columnsOrder;
         delete columnsOrderWithoutAsterisks;
