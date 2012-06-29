@@ -45,7 +45,6 @@ PREDICATE_GLOBAL_STATIC(DriverManagerInternal, s_self);
 DriverManagerInternal::DriverManagerInternal() /* protected */
  : lookupDriversNeeded(true)
 {
-//pred    m_serverResultNum = 0;
 }
 
 DriverManagerInternal::~DriverManagerInternal()
@@ -54,8 +53,6 @@ DriverManagerInternal::~DriverManagerInternal()
     qDeleteAll(m_drivers);
     m_drivers.clear();
     m_driverWeakPointers.clear();
-//    if (s_self == this)
-//        s_self = 0;
     PreDbg << "ok";
 }
 
@@ -374,63 +371,16 @@ Driver* DriverManagerInternal::driver(const QString& name)
     return drv;
 }
 
-/*void DriverManagerInternal::incRefCount()
-{
-    m_refCount++;
-    PreDbg << m_refCount;
-}
-
-void DriverManagerInternal::decRefCount()
-{
-    m_refCount--;
-    PreDbg << m_refCount;
-// if (m_refCount<1) {
-//  PreDbg<<"reached m_refCount<1 -->deletelater()";
-//  s_self=0;
-//  deleteLater();
-// }
-}*/
-
-#warning is DriverManagerInternal::aboutDelete() needed?
-/*2.0
-void DriverManagerInternal::aboutDelete(Driver* drv)
-{
-    m_drivers.remove(drv->name().toLower());
-}*/
-
-
-
 // ---------------------------
 // --- DriverManager impl. ---
 // ---------------------------
 
 DriverManager::DriverManager()
 {
-//    d_int->incRefCount();
-// if ( !s_self )
-//  s_self = this;
-// lookupDrivers();
 }
 
 DriverManager::~DriverManager()
 {
-    PreDbg;
-    /* Connection *conn;
-      for ( conn = m_connections.first(); conn ; conn = m_connections.next() ) {
-        conn->disconnect();
-        conn->m_driver = 0; //don't let the connection touch our driver now
-        m_connections.remove();
-        delete conn;
-      }*/
-
-//    d_int->decRefCount();
-/*    if (d_int->refCount() == 0) {
-        //delete internal drv manager!
-        delete d_int;
-    }*/
-// if ( s_self == this )
-    //s_self = 0;
-    PreDbg << "ok";
 }
 
 Result DriverManager::result() const {
@@ -459,27 +409,6 @@ DriverInfo DriverManager::driverInfo(const QString &name)
     return i;
 }
 
-/*KService::Ptr DriverManager::serviceInfo(const QString &name)
-{
-    if (!d_int->lookupDrivers()) {
-        setError(d_int);
-        return KService::Ptr();
-    }
-
-    clearError();
-    KService::Ptr ptr = d_int->m_services_lcase.value(name.toLower());
-    if (ptr)
-        return ptr;
-    setError(ERR_DRIVERMANAGER, QObject::tr("No such driver service: \"%1\".").arg(name));
-    return KService::Ptr();
-}
-
-const DriverManager::ServicesHash& DriverManager::services()
-{
-    d_int->lookupDrivers();
-    return d_int->m_services;
-}*/
-
 QStringList DriverManager::driversForMimeType(const QString &mimeType)
 {
     if (!s_self->lookupDrivers()) {
@@ -499,28 +428,6 @@ Driver* DriverManager::driver(const QString& name)
     Driver *drv = s_self->driver(name);
     return drv;
 }
-
-/*QString DriverManager::serverErrorMsg()
-{
-    return d_int->m_serverErrMsg;
-}
-
-int DriverManager::serverResult()
-{
-    return d_int->m_serverResultNum;
-}
-
-QString DriverManager::serverResultName()
-{
-    return d_int->m_serverResultName;
-}
-
-void DriverManager::drv_clearServerResult()
-{
-    d_int->m_serverErrMsg.clear();
-    d_int->m_serverResultNum = 0;
-//    d_int->m_serverResultName.clear();
-}*/
 
 QString DriverManager::possibleProblemsInfoMsg() const
 {

@@ -22,9 +22,6 @@
 #ifndef PREDICATE_DRIVER_MNGR_H
 #define PREDICATE_DRIVER_MNGR_H
 
-//#include <klibloader.h>
-//#include <kservice.h>
-
 #include <Predicate/Driver>
 
 namespace Predicate
@@ -74,9 +71,6 @@ public:
      Can be used in code that finds driver depending on file format. */
 //! @todo make just QStringList
     QString possibleProblemsInfoMsg() const;
-
-protected:
-//???    virtual void drv_clearServerResult();
 };
 
 } //namespace Predicate
