@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -723,6 +723,7 @@ struct Predicate_BuiltinFieldProperties {
         ADD("caption");
         ADD("description");
         ADD("maxLength");
+        ADD("maxLengthIsDefault");
         ADD("precision");
         ADD("defaultValue");
         ADD("width");
@@ -791,6 +792,11 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
         field.setMaxLength((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
     if (!ok)
         return false;
+    if ((it = values.find("maxLengthIsDefault")) != values.constEnd()
+            && (*it).toBool())
+    {
+        field.setMaxLengthStrategy(Field::DefaultMaxLength);
+    }
     if ((it = values.find("precision")) != values.constEnd())
         field.setPrecision((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
     if (!ok)
@@ -925,6 +931,9 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         }
         if ("maxLength" == propertyName)
             GET_INT(setMaxLength);
+        if ("maxLengthIsDefault" == propertyName) {
+            field.setMaxLengthStrategy(Field::DefaultMaxLength);
+        }
         if ("precision" == propertyName)
             GET_INT(setPrecision);
         if ("defaultValue" == propertyName) {
@@ -965,38 +974,54 @@ QString Predicate::loadStringPropertyValueFromDom(const QDomNode& node, bool* ok
             *ok = false;
         return QString();
     }
+    if (ok)
+        *ok = true;
     return QDomNode(node).toElement().text();
 }
 
-QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node)
+QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node, bool* ok)
 {
     QByteArray valueType = node.nodeName().toLatin1();
-    if (valueType.isEmpty())
+    if (valueType.isEmpty()) {
+        if (ok)
+            *ok = false;
         return QVariant();
+    }
+    if (ok)
+        *ok = true;
     const QString text(QDomNode(node).toElement().text());
-    bool ok;
+    bool _ok;
     if (valueType == "string") {
         return text;
-    } else if (valueType == "cstring") {
+    }
+    else if (valueType == "cstring") {
         return text.toLatin1();
-    } else if (valueType == "number") { // integer or double
+    }
+    else if (valueType == "number") { // integer or double
         if (text.indexOf(QLatin1Char('.')) != -1) {
-            double val = text.toDouble(&ok);
-            if (ok)
+            double val = text.toDouble(&_ok);
+            if (_ok)
                 return val;
-        } else {
-            const int val = text.toInt(&ok);
-            if (ok)
+        }
+        else {
+            const int val = text.toInt(&_ok);
+            if (_ok)
                 return val;
-            const qint64 valLong = text.toLongLong(&ok);
-            if (ok)
+            const qint64 valLong = text.toLongLong(&_ok);
+            if (_ok)
                 return valLong;
         }
-    } else if (valueType == "bool") {
-        return QVariant(text.toLower() == QLatin1String("true") || text == QLatin1String("1"));
     }
+    else if (valueType == "bool") {
+        return text.compare(QLatin1String("true"), Qt::CaseInsensitive) == 0
+               || text == QLatin1String("1");
+    }
+    else {
 //! @todo add more QVariant types
-    PreWarn << "unknown type" << valueType;
+        PreWarn << "Predicate::loadPropertyValueFromDom(): unknown type '" << valueType << "'";
+    }
+    if (ok)
+        *ok = false;
     return QVariant();
 }
 

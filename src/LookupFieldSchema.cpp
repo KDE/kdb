@@ -255,9 +255,11 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
         if (name == "row-source") {
             /*<row-source>
               empty
-              | <type>table|query|sql|valuelist|fieldlist</type>  #required because there can be table and query with the same name
-                        "fieldlist" (basically a list of column names of a table/query,
-                              "Field List" as in MSA)
+              | <type>table|query|sql|valuelist|fieldlist</type> #required because there can be
+                                                                 #table and query with the same name
+                                                                 #"fieldlist" (basically a list of
+                                                                 #column names of a table/query,
+                                                                 #"Field List" as in MSA)
               <name>string</name> #table/query name, etc. or KEXISQL SELECT QUERY
               <values><value>...</value> #for "valuelist" type
                 <value>...</value>
@@ -277,7 +279,12 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             /* <bound-column>
                 <number>number</number> #in later implementation there can be more columns
                </bound-column> */
-            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
+            bool ok;
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild(), &ok);
+            if (!ok) {
+                delete lookupFieldSchema;
+                return 0;
+            }
             if (val.type() == QVariant::Int)
                 lookupFieldSchema->setBoundColumn(val.toInt());
         } else if (name == "visible-column") {
@@ -287,8 +294,15 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
               [..]
                </visible-column> */
             QList<uint> list;
-            for (QDomNode childNode = el.firstChild(); !childNode.isNull(); childNode = childNode.nextSibling()) {
-                const QVariant val = Predicate::loadPropertyValueFromDom(childNode);
+            for (QDomNode childNode = el.firstChild(); !childNode.isNull();
+                 childNode = childNode.nextSibling())
+            {
+                bool ok;
+                const QVariant val = Predicate::loadPropertyValueFromDom(childNode, &ok);
+                if (!ok) {
+                    delete lookupFieldSchema;
+                    return 0;
+                }
                 if (val.type() == QVariant::Int)
                     list.append(val.toUInt());
             }
@@ -302,7 +316,12 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             QVariant val;
             QList<int> columnWidths;
             for (el = el.firstChild().toElement(); !el.isNull(); el = el.nextSibling().toElement()) {
-                QVariant val = Predicate::loadPropertyValueFromDom(el);
+                bool ok;
+                QVariant val = Predicate::loadPropertyValueFromDom(el, &ok);
+                if (!ok) {
+                    delete lookupFieldSchema;
+                    return 0;
+                }
                 if (val.type() == QVariant::Int)
                     columnWidths.append(val.toInt());
             }
@@ -311,21 +330,36 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
             /* <show-column-headers>
                 <bool>true/false</bool>
                </show-column-headers> */
-            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
+            bool ok;
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild(), &ok);
+            if (!ok) {
+                delete lookupFieldSchema;
+                return 0;
+            }
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setColumnHeadersVisible(val.toBool());
         } else if (name == "list-rows") {
             /* <list-rows>
                 <number>1..100</number>
                </list-rows> */
-            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
+            bool ok;
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild(), &ok);
+            if (!ok) {
+                delete lookupFieldSchema;
+                return 0;
+            }
             if (val.type() == QVariant::Int)
                 lookupFieldSchema->setMaximumListRows(val.toUInt());
         } else if (name == "limit-to-list") {
             /* <limit-to-list>
                 <bool>true/false</bool>
                </limit-to-list> */
-            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild());
+            bool ok;
+            const QVariant val = Predicate::loadPropertyValueFromDom(el.firstChild(), &ok);
+            if (!ok) {
+                delete lookupFieldSchema;
+                return 0;
+            }
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setLimitToList(val.toBool());
         }

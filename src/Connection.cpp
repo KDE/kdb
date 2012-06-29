@@ -46,7 +46,13 @@
 #include <QtXml>
 #include <QtDebug>
 
-#define PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION 1
+/*! Version number of extended table schema.
+
+  List of changes:
+  * 2: (Kexi 2.5.0) Added maxLengthIsDefault property (type: bool, if true, Field::maxLengthStrategy() == Field::DefaultMaxLength)
+  * 1: (Kexi 1.x) Initial version
+*/
+#define PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION 2
 
 namespace Predicate
 {
@@ -2717,6 +2723,15 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
                 &extendedTableSchemaMainEl, &extendedTableSchemaFieldEl,
                 &extendedTableSchemaStringIsEmpty);
         }
+        if (f->type() == Field::Text) {
+            if (f->maxLengthStrategy() == Field::DefaultMaxLength) {
+                addFieldPropertyToExtendedTableSchemaData(
+                    *f, "maxLengthIsDefault", true, &doc,
+                    &extendedTableSchemaMainEl, &extendedTableSchemaFieldEl,
+                    &extendedTableSchemaStringIsEmpty);
+            }
+        }
+
         // boolean field with "not null"
 
         // add custom properties
@@ -2810,28 +2825,44 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                 //set properties of the field:
 //! @todo more properties
                 for (QDomNode propNode = fieldEl.firstChild();
-                        !propNode.isNull(); propNode = propNode.nextSibling()) {
-                    QDomElement propEl = propNode.toElement();
+                     !propNode.isNull(); propNode = propNode.nextSibling())
+                {
+                    const QDomElement propEl = propNode.toElement();
                     bool ok;
                     int intValue;
                     if (propEl.tagName() == QLatin1String("property")) {
                         QByteArray propertyName = propEl.attribute(QLatin1String("name")).toLatin1();
                         if (propEl.attribute(QLatin1String("custom")) == QLatin1String("true")) {
                             //custom property
-                            f->setCustomProperty(propertyName,
-                                                 Predicate::loadPropertyValueFromDom(propEl.firstChild()));
-                        } else if (propertyName == "visibleDecimalPlaces"
-                                   && Predicate::supportsVisibleDecimalPlacesProperty(f->type())) {
-                            intValue = Predicate::loadIntPropertyValueFromDom(propEl.firstChild(), &ok);
-                            if (ok)
-                                f->setVisibleDecimalPlaces(intValue);
+                            const QVariant v(Predicate::loadPropertyValueFromDom(propEl.firstChild(), &ok));
+                            if (ok) {
+                                f->setCustomProperty(propertyName, v);
+                            }
+                        }
+                        else if (propertyName == "visibleDecimalPlaces") {
+                            if (Predicate::supportsVisibleDecimalPlacesProperty(f->type())) {
+                                intValue = Predicate::loadIntPropertyValueFromDom(propEl.firstChild(), &ok);
+                                if (ok)
+                                    f->setVisibleDecimalPlaces(intValue);
+                            }
+                        }
+                        else if (propertyName == "maxLengthIsDefault") {
+                            if (f->type() == Field::Text) {
+                                const bool maxLengthIsDefault
+                                    = Predicate::loadPropertyValueFromDom(propEl.firstChild(), &ok).toBool();
+                                if (ok) {
+                                    f->setMaxLengthStrategy(
+                                        maxLengthIsDefault ? Field::DefaultMaxLength : Field::DefinedMaxLength);
+                                }
+                            }
                         }
 //! @todo more properties...
                     } else if (propEl.tagName() == QLatin1String("lookup-column")) {
                         LookupFieldSchema *lookupFieldSchema = LookupFieldSchema::loadFromDom(propEl);
-                        if (lookupFieldSchema)
+                        if (lookupFieldSchema) {
                             qDebug() << *lookupFieldSchema;
-                        tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
+                            tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
+                        }
                     }
                 }
             } else {

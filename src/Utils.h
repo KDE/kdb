@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -309,7 +309,7 @@ PREDICATE_EXPORT bool setFieldProperty(Field& field, const QByteArray& propertyN
  notation: &lt;number&gt;int&lt;/number&gt; or &lt;bool&gt;bool&lt;/bool&gt;, etc. Supported types are
  "string", "cstring", "bool", "number". For invalid values null QVariant is returned.
  You can check the validity of the returned value using QVariant::type(). */
-PREDICATE_EXPORT QVariant loadPropertyValueFromDom(const QDomNode& node);
+PREDICATE_EXPORT QVariant loadPropertyValueFromDom(const QDomNode& node, bool *ok);
 
 /*! Convenience version of loadPropertyValueFromDom(). @return int value. */
 PREDICATE_EXPORT int loadIntPropertyValueFromDom(const QDomNode& node, bool* ok);
