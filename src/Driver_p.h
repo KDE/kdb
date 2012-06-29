@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -190,6 +190,13 @@ public:
         http://troels.arvin.dk/db/rdbms/#data_types-boolean
     */
     QString BOOLEAN_FALSE_LITERAL;
+
+    /*! Specifies maximum length for Text type. If 0, there is are limits and length argument is not needed,
+     e.g. VARCHAR works for the driver this is the case for SQLite and PostgreSQL.
+     If greater than 0, this value should be used to express maximum value, e.g. VARCHAR(...).
+     This is the case for MySQL.
+     The default is 0. */
+    uint TEXT_TYPE_MAX_LENGTH;
 };
 
 /*! Private driver's data members. Available for implementation. */

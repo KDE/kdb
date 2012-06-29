@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -136,7 +136,14 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //TODO is here escaping needed?
-    return executeSQL(EscapedString("USE ") + escapeIdentifier(dbName));
+    if (!executeSQL(EscapedString("USE ") + escapeIdentifier(dbName))) {
+        return false;
+    }
+    if (!executeSQL(EscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
+        // needed to turn warnings about trimming string values into SQL errors
+        return false;
+    }
+    return true;
 }
 
 /*! Executes the given SQL statement on the server.
