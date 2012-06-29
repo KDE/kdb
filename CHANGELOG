@@ -3,6 +3,23 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-06-29
+*Add KexiDB fix: Add option for setting default length limit of Text values
+**Added maxLengthIsDefault property of table field for Text types to extended schema
+**stores a hint that limit comes from default setting
+**(2012-06-07 calligra master commit 963e905f6da)
+**(2012-06-08 calligra master commit 27c2f308272)
+CCBUG:301277
+MySQL Driver
+*Add KexiDB fix: Set limit to 255 for Text type in MySQL Driver
+**set limit to 255 characters for Text type (VARCHAR)
+**call "SET SESSION sql_mode='TRADITIONAL'" on opening database - needed to turn warnings about trimming string values into SQL errors
+**practical solution for 'Kexi shows no indication that text is trimmed' bug in case of MySQL: error is displayed eg. "Record inserting on the server failed.Message from server: Data too long for column 'hn' at row 1. SQL statement: INSERT INTO table4 (hn) VALUES ('...................'). Server result: 1406"
+**More info on VARCHAR support in databases: http://www.ispirer.com/wiki/sqlways/mysql/data-types/varchar_n
+**(2012-06-08 calligra master commit da2bf9b689e)
+CCBUG:301277
+CCBUG:301136
+
 2012-06-27
 Predicate
 *Add KexiDB fix: Fix deep copying of query schema and ORDER BY structures
