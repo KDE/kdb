@@ -3,6 +3,11 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-06-30
+Predicate
+*Fixed getting out-of-bound arg for N-arg expression: null expression is now returned if no other found
+*More unit tests added for expressions
+
 2012-06-29
 *Add KexiDB fix: Add option for setting default length limit of Text values
 **Added maxLengthIsDefault property of table field for Text types to extended schema
