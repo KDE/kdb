@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2011-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,8 +27,21 @@
 
 using namespace Predicate;
 
+Q_DECLARE_METATYPE(Predicate::ExpressionClass)
+Q_DECLARE_METATYPE(Predicate::EscapedString)
+
 void TestExpressions::initTestCase()
 {
+}
+
+//! compares two expression @a e1 and @a e2 based on strings/debug strings
+//! and token strings
+template <typename T>
+void compareStrings(T &e1, T &e2)
+{
+    QCOMPARE(e1.toString(), e2.toString());
+    QCOMPARE(e1.tokenToDebugString(), e2.tokenToDebugString());
+    QCOMPARE(e1.tokenToString(), e2.tokenToString());
 }
 
 void TestExpressions::testNullExpression()
@@ -65,6 +78,16 @@ void TestExpressions::testNullExpression()
     e1 = e2;
     QVERIFY(e1.isNull());
     QCOMPARE(e1, e2);
+    QCOMPARE(e1.toString(), EscapedString("NULL"));
+    QCOMPARE(e1.tokenToDebugString(), QLatin1String("0"));
+    QCOMPARE(e1.tokenToString(), QString());
+    compareStrings(e1, e2);
+
+    Expression e3(e2);
+    QVERIFY(e3.isNull());
+    QCOMPARE(e2, e3);
+    compareStrings(e2, e3);
+    //ExpressionDebug << "$$$" << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
 }
 
 void TestExpressions::testCloneExpression()
@@ -74,9 +97,8 @@ void TestExpressions::testCloneExpression()
     QVERIFY(e1 != e1.clone());
     QVERIFY(e1 != e1clone);
     QVERIFY(e1.clone() != e1clone);
+    compareStrings(e1, e1clone);
 }
-
-Q_DECLARE_METATYPE(Predicate::ExpressionClass)
 
 void TestExpressions::testExpressionClassName_data()
 {
@@ -146,10 +168,50 @@ void TestExpressions::testNArgExpression()
     QCOMPARE(nNull.argCount(), 0); // n-arg expression should have class, otherwise is null and cannot have children
 
     NArgExpression nArithm(ArithmeticExpressionClass, '+');
-    nArithm.append(e);
+    ConstExpression c1(INTEGER_CONST, 1);
+    nArithm.append(c1);
     QVERIFY(!nArithm.isEmpty());
+    //ExpressionDebug << "1-" << nArithm.toString() << nArithm.argCount();
     QCOMPARE(nArithm.argCount(), 1);
-    QCOMPARE(nArithm.arg(0), e);
+    QCOMPARE(nArithm.arg(0).toConst(), c1);
+
+    NArgExpression n1(ArithmeticExpressionClass, '+');
+    n1.append(n1);
+    QCOMPARE(n1.argCount(), 0); // append should fail since appending expression
+                                // to itself is not allowed
+    n1.prepend(n1);
+    QCOMPARE(n1.argCount(), 0); // append should fail since prepending expression
+                                // to itself is not allowed
+
+    NArgExpression n2(ArithmeticExpressionClass, '+');
+    ConstExpression c2(INTEGER_CONST, 2);
+    n2.append(c2);
+    n2.append(c2); // cannot append the same expression twice
+    QCOMPARE(n2.argCount(), 1);
+    QCOMPARE(n2.arg(0).toConst(), c2);
+
+    NArgExpression n3(ArithmeticExpressionClass, '+');
+    ConstExpression c3(INTEGER_CONST, 3);
+    n3.prepend(c3);
+    n3.prepend(c3); // cannot prepend the same expression twice
+    QCOMPARE(n3.argCount(), 1);
+    QCOMPARE(n3.arg(0).toConst(), c3);
+    n3.append(c3); // cannot append/prepend the same expression twice
+    QCOMPARE(n3.argCount(), 1);
+    QCOMPARE(n3.arg(0).toConst(), c3);
+
+    NArgExpression n4(ArithmeticExpressionClass, '+');
+    NArgExpression n5(ArithmeticExpressionClass, '+');
+    ConstExpression c4(INTEGER_CONST, 4);
+    n4.append(c4);
+    n5.append(c4); // c4 moves from n4 to n5
+    QVERIFY(n4.isEmpty());
+    QCOMPARE(n5.argCount(), 1);
+    QCOMPARE(c4.parent().toNArg(), n5);
+    n4.prepend(c4); // c4 moves from n5 to n4
+    QCOMPARE(n4.argCount(), 1);
+    QVERIFY(n5.isEmpty());
+    QCOMPARE(c4.parent().toNArg(), n4);
 }
 
 void TestExpressions::cleanupTestCase()

@@ -72,7 +72,7 @@ ExpressionData::ExpressionData()
 : token(0)
 , expressionClass(Predicate::UnknownExpressionClass)
 {
-    ExpressionDebug << "ExpressionData" << ref;
+    //ExpressionDebug << "ExpressionData" << ref;
 }
 
 /*Data(const Data& other)
@@ -87,7 +87,7 @@ ExpressionData::ExpressionData()
 
 ExpressionData::~ExpressionData()
 {
-    ExpressionDebug << "~ExpressionData" << ref;
+    //ExpressionDebug << "~ExpressionData" << ref;
 }
 
 ExpressionData* ExpressionData::clone()
@@ -159,8 +159,8 @@ Expression::Expression(ExpressionData* data)
 
 Expression::~Expression()
 {
-    if (d->parent)
-         d->parent->children.removeOne(d);
+    //if (d->parent)
+    //     d->parent->children.removeOne(d);
 }
 
 bool Expression::isNull() const
@@ -227,13 +227,13 @@ void Expression::setParent(const Expression& parent)
 {
     if (isNull())
         return;
+    if (parent.isNull())
+        return;
     parent.appendChild(d);
 }
 
 void Expression::appendChild(const Expression& child)
 {
-    if (isNull())
-        return;
     appendChild(child.d);
 }
 
@@ -241,6 +241,14 @@ void Expression::prependChild(const Expression& child)
 {
     if (isNull())
         return;
+    if (child.isNull())
+        return;
+    if (d == child.d) // expression cannot be own child
+        return;
+    if (child.parent().d == d) // cannot prepend child twice
+        return;
+    if (child.parent().d) // remove from old parent
+        child.parent().d->children.removeOne(child.d);
     d->children.prepend(child.d);
     child.d->parent = d;
 }
@@ -256,6 +264,14 @@ void Expression::appendChild(const ExplicitlySharedExpressionDataPointer& child)
 {
     if (isNull())
         return;
+    if (!child)
+        return;
+    if (d == child) // expression cannot be own child
+        return;
+    if (child->parent == d) // cannot append child twice
+        return;
+    if (child->parent) // remove from old parent
+        child->parent->children.removeOne(child);
     d->children.append(child);
     child->parent = d;
 }

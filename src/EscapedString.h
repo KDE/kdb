@@ -560,11 +560,6 @@ inline EscapedString operator+(char a1, const EscapedString &a2)
     return EscapedString(a1 + a2.toByteArray());
 }
 
-inline bool operator==(const EscapedString &a1, const EscapedString &a2)
-{
-    return a1.isValid() == a2.isValid() && a1.toByteArray() == a2.toByteArray();
-}
-
 inline bool operator==(const EscapedString &a1, const QByteArray &a2)
 {
     return a1.isValid() && a1.toByteArray() == a2;

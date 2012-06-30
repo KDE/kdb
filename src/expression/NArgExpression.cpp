@@ -141,7 +141,9 @@ void NArgExpression::prepend(const Expression& expr)
 
 Expression NArgExpression::arg(int n) const
 {
-    const ExplicitlySharedExpressionDataPointer p = d->children.value(n);
+    qDebug() << "NArgExpression::arg" << n << argCount();
+    ExplicitlySharedExpressionDataPointer p = d->children.value(n);
+    qDebug() << "NArgExpression::arg" << n << argCount();
     return p ? Expression(p.data()) : Expression();
 }
 

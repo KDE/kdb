@@ -135,10 +135,10 @@ public:
 
     bool operator!=(const Expression& e) const;
     
-protected:
     /*! @return the parent expression. */
     Expression parent() const;
 
+protected:
     /*! @return the list of children expressions. */
     QList<ExplicitlySharedExpressionDataPointer> children() const;
 
