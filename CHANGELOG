@@ -3,9 +3,33 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+2012-01-03
+Predicate
+*remove warnings, fix invalid overloads
+*improve API of ParseInfo and export it
+*const expression: added boolean type
+*unit tests for N-arg and const expressions
+
+2012-07-01..02
+Predicate
+*N-arg Expression: added more methods
+**insert(int, Expression)
+**remove(Expression)
+**removeAt(int)
+**takeAt(int)
+**indexOf(Expression, int)
+**lastIndexOf(Expression, int)
+**more unit tests
+
 2012-06-30
 Predicate
 *Fixed getting out-of-bound arg for N-arg expression: null expression is now returned if no other found
+*unit test build is now option
+*unit test coverage (gcov) added as option (false by default)
+*Added rule: Expressions cannot be own child
+*Disabled adding null expressions as child
+*Fixed expression destruction
+*Added rule: Cannot append/prepend the same expression twice
 *More unit tests added for expressions
 
 2012-06-29
