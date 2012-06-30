@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -141,7 +141,8 @@ void NArgExpression::prepend(const Expression& expr)
 
 Expression NArgExpression::arg(int n) const
 {
-    d->children.at(n);
+    const ExplicitlySharedExpressionDataPointer p = d->children.value(n);
+    return p ? Expression(p.data()) : Expression();
 }
 
 int NArgExpression::argCount() const

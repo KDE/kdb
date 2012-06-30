@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    Design based on nexp.h : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -74,15 +74,18 @@ public:
     /*!
     @return the token for this expression. Tokens are characters (e.g. '+', '-')
     or identifiers (e.g. SQL_NULL) of elements used by the PredicateSQL parser.
+    By default token is 0.
     */
     int token() const;
 
     /*!
     @return class identifier of this expression.
+    Default expressionClass is UnknownExpressionClass.
     */
     ExpressionClass expressionClass() const;
 
-    /*! @return type of this expression, based on effect of its evaluation. */
+    /*! @return type of this expression, based on effect of its evaluation.
+     Default type is Field::InvalidType. */
     Field::Type type() const;
 
     /*! @return true if evaluation of this expression succeeded. */
@@ -178,6 +181,9 @@ public:
     virtual ~NArgExpression();
     void append(const Expression& expr);
     void prepend(const Expression& expr);
+
+    //! @return expression index @n in the list of arguments.
+    //! If the index @a is out of bounds, the function returns null expression.
     Expression arg(int n) const;
     int argCount() const;
     int isEmpty() const;
