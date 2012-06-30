@@ -15,6 +15,7 @@ endif (WIN32)
 ########### options ###############
 
 option(PREDICATE_EXPRESSION_DEBUG "Enable debugging of Expression classes" OFF)
+add_feature_info(PREDICATE_EXPRESSION_DEBUG PREDICATE_EXPRESSION_DEBUG "Enable debugging of Expression classes")
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
@@ -124,8 +125,11 @@ target_link_libraries(predicate
   ${QT_QTCORE_LIBRARY}
   ${QT_QTGUI_LIBRARY}
   ${QT_QTXML_LIBRARY}
-#  kexiutils
 )
+
+if (BUILD_TEST_COVERAGE)
+    target_link_libraries(predicate gcov)
+endif (BUILD_TEST_COVERAGE)
 
 set_target_properties(predicate PROPERTIES
   VERSION ${GENERIC_PREDICATE_LIB_VERSION}
