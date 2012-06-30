@@ -28,9 +28,16 @@ class TestExpressions : public QObject
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
-    void testExpression();
+
+    void testNullExpression();
+    void testCloneExpression();
+    void testExpressionClassName_data();
+    void testExpressionClassName();
+    void testExpressionToken();
+    void testNArgExpression();
+
     void cleanupTestCase();
-    
+
 private:
 };
 
