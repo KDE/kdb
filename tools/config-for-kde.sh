@@ -7,7 +7,7 @@
 #  0. Set $KDEDIRS
 #  1. mkdir -p {predicate-build-dir}
 #  2. cd {predicate-build-dir}
-#  3. {predicate-source-dir}/tools/config-for-kde.sh {predicate-source-dir}
+#  3. {predicate-source-dir}/tools/config-for-kde.sh
 #
 # "Dry run" mode:
 #  Add --dry-run parameter. This only displays the resulting cmake command
@@ -22,8 +22,10 @@
 #  make install
 #
 
-if [ $# -lt 1 ] ; then
-    echo "Usage: $0 {predicate-source-dir}"
+SOURCE_DIR=$(readlink -f $(dirname $0)/..)
+
+if [ ! -d "$SOURCE_DIR" ] ; then
+    echo "Predicate source directory not found"
     exit 1
 fi
 
@@ -40,7 +42,7 @@ fi
 
 export PREDICATE_INSTALL_PREFIX=$KDEDIRS
 
-cmd="cmake $1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$PREDICATE_INSTALL_PREFIX \
+cmd="cmake ${SOURCE_DIR} -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$PREDICATE_INSTALL_PREFIX \
     -DLIB_INSTALL_DIR=$PREDICATE_INSTALL_PREFIX/$_libdir -DPLUGIN_INSTALL_DIR=$_libdir/kde4/plugins \
     -DQT_PLUGINS_DIR=$PREDICATE_INSTALL_PREFIX/$_libdir/kde4/plugins"
 
@@ -48,7 +50,7 @@ echo "------------------------------------------"
 echo "CMake will be executed using this command:"
 echo
 echo $cmd
-if [ "$1" == "--dry-run" -o "$2" == "--dry-run" ] ; then
+if [ "$1" == "--dry-run" ] ; then
     exit 0
 fi
 echo
