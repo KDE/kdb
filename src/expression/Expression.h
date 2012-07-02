@@ -142,22 +142,32 @@ protected:
     /*! @return the list of children expressions. */
     QList<ExplicitlySharedExpressionDataPointer> children() const;
 
-    /*! Sets the parent expression. */
-    void setParent(const Expression& parent);
-    
     void appendChild(const Expression& child);
 
     void prependChild(const Expression& child);
 
-    void removeChild(const Expression& child);
+    Expression takeChild(int i);
 
-    void appendChild(const ExplicitlySharedExpressionDataPointer& child) const;
+    bool removeChild(const Expression& child);
 
-    Expression(ExpressionData* data);
+    void removeChild(int i);
+
+    void insertChild(int i, const Expression& child);
+
+    //! Used for inserting placeholders, e.g. in BinaryExpression::BinaryExpression()
+    void insertEmptyChild(int i);
+
+    void appendChild(const ExplicitlySharedExpressionDataPointer& child);
+
+    int indexOfChild(const Expression& child, int from = 0) const;
+
+    int lastIndexOfChild(const Expression& child, int from = -1) const;
+
+    bool checkBeforeInsert(const ExplicitlySharedExpressionDataPointer& child);
+
+    explicit Expression(ExpressionData* data);
 
     Expression(ExpressionData* data, ExpressionClass aClass, int token);
-
-    //friend QDebug Predicate::operator<<(QDebug, const Expression&);
 
     //! @internal
     ExplicitlySharedExpressionDataPointer d;
@@ -171,22 +181,72 @@ protected:
     friend class FunctionExpression;
 };
 
-//! A base class N-argument operation
+//! A base class N-argument expression
 class PREDICATE_EXPORT NArgExpression : public Expression
 {
 public:
+    /*! Constructs a null N-argument expression.
+      @see Expression::isNull() */
     NArgExpression();
+
+    //! Constructs an N-argument expression of class @a aClass and token @a token.
     NArgExpression(ExpressionClass aClass, int token);
+
+    /*! Constructs a copy of other N-argument expression @a expr.
+     Resulting object is not a deep copy but rather reference to the object @a expr. */
     NArgExpression(const NArgExpression& expr);
+
+    //! Destroys the expression.
     virtual ~NArgExpression();
+
+    //! Inserts expression argument @a expr at the end of this expression.
     void append(const Expression& expr);
+
+    //! Inserts expression argument @a expr at the beginning of this expression.
     void prepend(const Expression& expr);
+
+    /*! Inserts expression argument @a expr at index position @a i in this expression.
+     If @a i is 0, the expression is prepended to the list of arguments.
+     If @a i is argCount(), the value is appended to the list of arguments.
+     @a i must be a valid index position in the list (i.e., 0 <= i < argCount()). */
+    void insert(int i, const Expression& expr);
+
+    /*! Removes the expression argument @a expr and returns true on success;
+        otherwise returns false. */
+    bool remove(const Expression& expr);
+
+    /*! Removes the expression at index position @a i.
+     @a i must be a valid index position in the list (i.e., 0 <= i < argCount()). */
+    void removeAt(int i);
+
+    /*! Removes the expression at index position @a i and returns it.
+      @a i must be a valid index position in the list (i.e., 0 <= i < argCount()).
+      If you don't use the return value, removeAt() is more efficient. */
+    Expression takeAt(int i);
+
+    /*! @return the index position of the first occurrence of expression argument
+      @a expr in this expression, searching forward from index position @a from.
+      @return -1 if no argument matched.
+      @see lastIndexOf() */
+    int indexOf(const Expression& expr, int from = 0) const;
+
+    /*! @return the index position of the last occurrence of expression argument
+      @a expr in this expression, searching backward from index position @a from.
+      If from is -1 (the default), the search starts at the last item.
+      Returns -1 if no argument matched.
+      @see indexOf() */
+    int lastIndexOf(const Expression& expr, int from = -1) const;
 
     //! @return expression index @n in the list of arguments.
     //! If the index @a is out of bounds, the function returns null expression.
     Expression arg(int n) const;
+
+    //! @return the number of expression arguments in this expression.
     int argCount() const;
-    int isEmpty() const;
+
+    //! @return true if the expression contains no arguments; otherwise returns false.
+    bool isEmpty() const;
+
 protected:
     explicit NArgExpression(ExpressionData* data);
     

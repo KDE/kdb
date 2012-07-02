@@ -37,38 +37,45 @@ void TestExpressions::initTestCase()
 //! compares two expression @a e1 and @a e2 based on strings/debug strings
 //! and token strings
 template <typename T>
-void compareStrings(T &e1, T &e2)
+static void compareStrings(const T &e1, const T &e2)
 {
     QCOMPARE(e1.toString(), e2.toString());
     QCOMPARE(e1.tokenToDebugString(), e2.tokenToDebugString());
     QCOMPARE(e1.tokenToString(), e2.tokenToString());
+    qDebug() << "compareStrings():"
+             << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
+}
+
+static void testCloneExpression(const Expression& e1)
+{
+    Expression e1clone = e1.clone();
+    QVERIFY(e1 != e1.clone());
+    QVERIFY(e1 != e1clone);
+    QVERIFY(e1.clone() != e1clone);
+    compareStrings(e1, e1clone);
 }
 
 void TestExpressions::testNullExpression()
 {
-/* test for dom    
-    QDomDocument doc("mydocument");
-    QDomElement elem = doc.documentElement();
-    QCOMPARE(elem, doc.documentElement());
-    QDomElement elem2 = doc.createElement("2");
-    QDomElement elem3 = doc.createElement("2");
-    QCOMPARE(elem2, elem3);
-    elem.appendChild(elem2);
-    elem.appendChild(elem3);
-    QCOMPARE(elem2, elem3);*/
-    
     QVERIFY(Expression() != Expression());
-    
+
     Expression e1;
     Expression e2;
     QVERIFY(e1.isNull());
     QVERIFY(!e1.isBinary());
+    QVERIFY(e1.toBinary().isNull());
     QVERIFY(!e1.isConst());
+    QVERIFY(e1.toConst().isNull());
     QVERIFY(!e1.isFunction());
+    QVERIFY(e1.toFunction().isNull());
     QVERIFY(!e1.isNArg());
+    QVERIFY(e1.toNArg().isNull());
     QVERIFY(!e1.isQueryParameter());
+    QVERIFY(e1.toQueryParameter().isNull());
     QVERIFY(!e1.isUnary());
+    QVERIFY(e1.toUnary().isNull());
     QVERIFY(!e1.isVariable());
+    QVERIFY(e1.toVariable().isNull());
     QCOMPARE(e1.expressionClass(), UnknownExpressionClass);
     QCOMPARE(e1.token(), 0);
     QVERIFY(e1 != Expression());
@@ -88,16 +95,9 @@ void TestExpressions::testNullExpression()
     QCOMPARE(e2, e3);
     compareStrings(e2, e3);
     //ExpressionDebug << "$$$" << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
-}
 
-void TestExpressions::testCloneExpression()
-{
-    Expression e1;
-    Expression e1clone = e1.clone();
-    QVERIFY(e1 != e1.clone());
-    QVERIFY(e1 != e1clone);
-    QVERIFY(e1.clone() != e1clone);
-    compareStrings(e1, e1clone);
+    e1 = Expression();
+    testCloneExpression(e1);
 }
 
 void TestExpressions::testExpressionClassName_data()
@@ -162,56 +162,195 @@ void TestExpressions::testNArgExpression()
     QVERIFY(emptyNarg.arg(-1).isNull());
     QVERIFY(emptyNarg.arg(0).isNull());
 
+    // -- append(Expression), prepend(Expression)
     Expression e;
     NArgExpression nNull;
     nNull.append(e);
     QCOMPARE(nNull.argCount(), 0); // n-arg expression should have class, otherwise is null and cannot have children
 
-    NArgExpression nArithm(ArithmeticExpressionClass, '+');
-    ConstExpression c1(INTEGER_CONST, 1);
-    nArithm.append(c1);
-    QVERIFY(!nArithm.isEmpty());
-    //ExpressionDebug << "1-" << nArithm.toString() << nArithm.argCount();
-    QCOMPARE(nArithm.argCount(), 1);
-    QCOMPARE(nArithm.arg(0).toConst(), c1);
+    NArgExpression n;
+    NArgExpression n2;
+    ConstExpression c;
+    ConstExpression c1;
+    ConstExpression c2;
+    ConstExpression c3;
 
-    NArgExpression n1(ArithmeticExpressionClass, '+');
-    n1.append(n1);
-    QCOMPARE(n1.argCount(), 0); // append should fail since appending expression
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 1);
+    n.append(c1);
+    QVERIFY(!n.isEmpty());
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(c1.parent().toNArg(), n);
+
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.append(n);
+    QCOMPARE(n.argCount(), 0); // append should fail since appending expression
                                 // to itself is not allowed
-    n1.prepend(n1);
-    QCOMPARE(n1.argCount(), 0); // append should fail since prepending expression
+    n.prepend(n);
+    QCOMPARE(n.argCount(), 0); // append should fail since prepending expression
                                 // to itself is not allowed
 
-    NArgExpression n2(ArithmeticExpressionClass, '+');
-    ConstExpression c2(INTEGER_CONST, 2);
-    n2.append(c2);
-    n2.append(c2); // cannot append the same expression twice
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 2);
+    n.append(c1);
+    n.append(c1); // cannot append the same expression twice
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(n.arg(0).toConst(), c1);
+
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 3);
+    n.prepend(c1);
+    n.prepend(c1); // cannot prepend the same expression twice
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    n.append(c1); // cannot append/prepend the same expression twice
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(n.arg(0).toConst(), c1);
+
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n2 = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 4);
+    n.append(c1);
+    n2.append(c1); // c moves from n to n2
+    QVERIFY(n.isEmpty());
     QCOMPARE(n2.argCount(), 1);
-    QCOMPARE(n2.arg(0).toConst(), c2);
+    QCOMPARE(c1.parent().toNArg(), n2);
+    n.prepend(c1); // c moves from n2 to n
+    QCOMPARE(n.argCount(), 1);
+    QVERIFY(n2.isEmpty());
+    QCOMPARE(c1.parent().toNArg(), n);
 
-    NArgExpression n3(ArithmeticExpressionClass, '+');
-    ConstExpression c3(INTEGER_CONST, 3);
-    n3.prepend(c3);
-    n3.prepend(c3); // cannot prepend the same expression twice
-    QCOMPARE(n3.argCount(), 1);
-    QCOMPARE(n3.arg(0).toConst(), c3);
-    n3.append(c3); // cannot append/prepend the same expression twice
-    QCOMPARE(n3.argCount(), 1);
-    QCOMPARE(n3.arg(0).toConst(), c3);
+    // -- insert(int, Expression)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 3);
+    c2 = ConstExpression(INTEGER_CONST, 4);
+    // i must be a valid index position in the list (i.e., 0 <= i < argCount()).
+    n.insert(-10, c1);
+    QVERIFY(n.isEmpty());
+    n.insert(1, c1);
+    QVERIFY(n.isEmpty());
+    // if i is 0, the expression is prepended to the list of arguments
+    n.insert(0, c1);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(c1.parent().toNArg(), n);
+    n.insert(0, c2);
+    QCOMPARE(n.argCount(), 2);
+    QCOMPARE(n.arg(0).toConst(), c2);
+    QCOMPARE(n.arg(1).toConst(), c1);
 
-    NArgExpression n4(ArithmeticExpressionClass, '+');
-    NArgExpression n5(ArithmeticExpressionClass, '+');
-    ConstExpression c4(INTEGER_CONST, 4);
-    n4.append(c4);
-    n5.append(c4); // c4 moves from n4 to n5
-    QVERIFY(n4.isEmpty());
-    QCOMPARE(n5.argCount(), 1);
-    QCOMPARE(c4.parent().toNArg(), n5);
-    n4.prepend(c4); // c4 moves from n5 to n4
-    QCOMPARE(n4.argCount(), 1);
-    QVERIFY(n5.isEmpty());
-    QCOMPARE(c4.parent().toNArg(), n4);
+    // if i is argCount(), the value is appended to the list of arguments
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.insert(0, c1);
+    n.insert(1, c2);
+    QCOMPARE(n.argCount(), 2);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(n.arg(1).toConst(), c2);
+
+    // expression cannot be own child
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.insert(0, n);
+    QVERIFY(n.isEmpty());
+
+    // cannot insert child twice
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.insert(0, c1);
+    n.insert(1, c1);
+    QCOMPARE(n.argCount(), 1);
+
+    // -- remove(Expression)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.append(c1);
+    n.append(c2);
+    n.remove(c1); // remove first
+    QCOMPARE(n.argCount(), 1);
+    QCOMPARE(n.arg(0).toConst(), c2);
+
+    // -- remove(Expression)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.prepend(c1);
+    n.append(c2);
+    c3 = ConstExpression(INTEGER_CONST, 5);
+    QVERIFY(!n.remove(c3)); // not found
+    QCOMPARE(n.argCount(), 2);
+    n.append(c3);
+    QCOMPARE(n.argCount(), 3);
+    QVERIFY(n.remove(c2)); // remove 2nd of 3, leaves c1 and c3
+    QCOMPARE(n.argCount(), 2);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(n.arg(1).toConst(), c3);
+
+    // -- removeAt(int)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n.prepend(c1);
+    n.append(c2);
+    n.removeAt(-1); // not found
+    QCOMPARE(n.argCount(), 2);
+    n.removeAt(3); // not found
+    QCOMPARE(n.argCount(), 2);
+    n.append(c3);
+    n.removeAt(1); // remove 2nd of 3, leaves c1 and c3
+    QCOMPARE(n.argCount(), 2);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(n.arg(1).toConst(), c3);
+    n.removeAt(0);
+    QCOMPARE(n.argCount(), 1);
+    n.removeAt(0);
+    QCOMPARE(n.argCount(), 0);
+
+    // -- takeAt(int)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    n2 = n;
+    c1 = ConstExpression(INTEGER_CONST, 1);
+    c2 = ConstExpression(INTEGER_CONST, 2);
+    c3 = ConstExpression(INTEGER_CONST, 3);
+    n.append(c1);
+    n.append(c2);
+    n.append(c3);
+    n.takeAt(-1); // not found
+    QCOMPARE(n.argCount(), 3);
+    n.takeAt(3); // not found
+    QCOMPARE(n.argCount(), 3);
+    e = n.takeAt(1);
+    QCOMPARE(e.toConst(), c2); // e is 2nd
+    QCOMPARE(n.argCount(), 2); // 1 arg taken
+    QCOMPARE(n, n2);
+
+    // -- indexOf(Expression, int)
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c = ConstExpression(INTEGER_CONST, 0);
+    c1 = ConstExpression(INTEGER_CONST, 1);
+    c2 = ConstExpression(INTEGER_CONST, 2);
+    c3 = ConstExpression(INTEGER_CONST, 3);
+    n.append(c1);
+    n.append(c2);
+    n.append(c3);
+
+    QCOMPARE(n.indexOf(c), -1);
+    QCOMPARE(n.indexOf(c1), 0);
+    QCOMPARE(n.indexOf(c2), 1);
+    QCOMPARE(n.indexOf(c3), 2);
+    QCOMPARE(n.indexOf(c1, 1), -1);
+    QCOMPARE(n.indexOf(c2, 1), 1);
+
+    // -- lastIndexOf(Expression, int)
+    QCOMPARE(n.lastIndexOf(c), -1);
+    QCOMPARE(n.lastIndexOf(c1), 0);
+    QCOMPARE(n.lastIndexOf(c2), 1);
+    QCOMPARE(n.lastIndexOf(c3), 2);
+    QCOMPARE(n.lastIndexOf(c1, 1), 0);
+    QCOMPARE(n.lastIndexOf(c2, 0), -1);
+
+    // -- cloning
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 7);
+    c2 = ConstExpression(INTEGER_CONST, 8);
+    n.prepend(c1);
+    n.append(c2);
+    testCloneExpression(n);
+    QCOMPARE(n.tokenToDebugString(), QString("+"));
+    QCOMPARE(n.toString(), EscapedString("7, 8"));
 }
 
 void TestExpressions::cleanupTestCase()

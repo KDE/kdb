@@ -141,10 +141,40 @@ void NArgExpression::prepend(const Expression& expr)
 
 Expression NArgExpression::arg(int n) const
 {
-    qDebug() << "NArgExpression::arg" << n << argCount();
+    //qDebug() << "NArgExpression::arg" << n << argCount();
     ExplicitlySharedExpressionDataPointer p = d->children.value(n);
-    qDebug() << "NArgExpression::arg" << n << argCount();
+    //qDebug() << "NArgExpression::arg" << n << argCount();
     return p ? Expression(p.data()) : Expression();
+}
+
+void NArgExpression::insert(int i, const Expression& expr)
+{
+    insertChild(i, expr);
+}
+
+bool NArgExpression::remove(const Expression& expr)
+{
+    return removeChild(expr);
+}
+
+void NArgExpression::removeAt(int i)
+{
+    removeChild(i);
+}
+
+Expression NArgExpression::takeAt(int i)
+{
+    return takeChild(i);
+}
+
+int NArgExpression::indexOf(const Expression& expr, int from) const
+{
+    return indexOfChild(expr, from);
+}
+
+int NArgExpression::lastIndexOf(const Expression& expr, int from) const
+{
+    return lastIndexOfChild(expr, from);
 }
 
 int NArgExpression::argCount() const
@@ -152,7 +182,7 @@ int NArgExpression::argCount() const
     return d->children.count();
 }
 
-int NArgExpression::isEmpty() const
+bool NArgExpression::isEmpty() const
 {
     return d->children.isEmpty();
 }

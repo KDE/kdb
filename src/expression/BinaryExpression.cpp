@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -111,14 +111,14 @@ QDebug BinaryExpressionData::debug(QDebug dbg) const
     dbg.nospace() << "BinaryExp(class="
         << expressionClassName(expressionClass)
         << ",";
-    if (left().constData()) {
+    if (children.count() == 2 && left().constData()) {
         dbg.nospace() << *left();
     }
     else {
         dbg.nospace() << "<NONE>";
     }
     dbg.nospace() << "," << Expression::tokenToDebugString(token) << ",";
-    if (right().constData()) {
+    if (children.count() == 2 && right().constData()) {
         dbg.nospace() << *left();
     }
     else {
@@ -196,6 +196,8 @@ static ExpressionClass classForArgs(ExpressionClass aClass,
 BinaryExpression::BinaryExpression()
  : Expression(new BinaryExpressionData)
 {
+    insertEmptyChild(0);
+    insertEmptyChild(1);
     ExpressionDebug << "BinaryExpression() ctor" << *this;
 }
 
@@ -205,6 +207,8 @@ BinaryExpression::BinaryExpression(ExpressionClass aClass,
                                    const Expression& rightExpr)
     : Expression(new BinaryExpressionData, classForArgs(aClass, leftExpr, rightExpr), token)
 {
+    appendChild(leftExpr.d);
+    appendChild(rightExpr.d);
 }
 
 BinaryExpression::BinaryExpression(const BinaryExpression& expr)
@@ -216,8 +220,8 @@ BinaryExpression::BinaryExpression(ExpressionData* data)
  : Expression(data)
 {
     ExpressionDebug << "BinaryExpression(ExpressionData*) ctor" << *this;
-    appendChild(Expression());
-    appendChild(Expression());
+//    insertEmptyChild(0);
+//    insertEmptyChild(1);
 }
 
 BinaryExpression::~BinaryExpression()

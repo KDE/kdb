@@ -143,7 +143,7 @@ FunctionExpression::FunctionExpression(const QString& name, NArgExpression& args
 {
     if (!args.isNull()) {
         d->convert<FunctionExpressionData>()->args = args.d;
-        args.setParent(*this);
+        appendChild(args);
     }
 }
 

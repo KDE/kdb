@@ -223,15 +223,6 @@ QList<ExplicitlySharedExpressionDataPointer> Expression::children() const
     return d->children;
 }
 
-void Expression::setParent(const Expression& parent)
-{
-    if (isNull())
-        return;
-    if (parent.isNull())
-        return;
-    parent.appendChild(d);
-}
-
 void Expression::appendChild(const Expression& child)
 {
     appendChild(child.d);
@@ -239,39 +230,93 @@ void Expression::appendChild(const Expression& child)
 
 void Expression::prependChild(const Expression& child)
 {
-    if (isNull())
+    if (!checkBeforeInsert(child.d))
         return;
-    if (child.isNull())
-        return;
-    if (d == child.d) // expression cannot be own child
-        return;
-    if (child.parent().d == d) // cannot prepend child twice
-        return;
-    if (child.parent().d) // remove from old parent
-        child.parent().d->children.removeOne(child.d);
     d->children.prepend(child.d);
     child.d->parent = d;
 }
 
-void Expression::removeChild(const Expression& child)
+void Expression::insertChild(int i, const Expression& child)
 {
-    if (isNull())
+    if (!checkBeforeInsert(child.d))
         return;
-    d->children.removeOne(child.d);
+    if (i < 0 || i > d->children.count())
+        return;
+    d->children.insert(i, child.d);
+    child.d->parent = d;
 }
-    
-void Expression::appendChild(const ExplicitlySharedExpressionDataPointer& child) const
+
+void Expression::insertEmptyChild(int i)
 {
     if (isNull())
         return;
+    if (i < 0 || i > d->children.count())
+        return;
+    Expression child;
+    //ExplicitlySharedExpressionDataPointer child = new Expression();
+    d->children.insert(i, child.d);
+    child.d->parent = d;
+}
+
+bool Expression::removeChild(const Expression& child)
+{
+    if (isNull() || child.isNull())
+        return false;
+    child.d->parent.reset(); // no longer parent
+    return d->children.removeOne(child.d);
+}
+
+void Expression::removeChild(int i)
+{
+    if (isNull())
+        return;
+    if (i < 0 || i >= d->children.count())
+        return;
+    d->children.removeAt(i);
+}
+
+Expression Expression::takeChild(int i)
+{
+    if (isNull())
+        return Expression();
+    if (i < 0 || i >= d->children.count())
+        return Expression();
+    ExplicitlySharedExpressionDataPointer child = d->children.takeAt(i);
     if (!child)
-        return;
+        return Expression();
+    child->parent.reset();
+    return Expression(child.data());
+}
+
+int Expression::indexOfChild(const Expression& child, int from) const
+{
+    return d->children.indexOf(child.d, from);
+}
+
+int Expression::lastIndexOfChild(const Expression& child, int from) const
+{
+    return d->children.lastIndexOf(child.d, from);
+}
+
+bool Expression::checkBeforeInsert(const ExplicitlySharedExpressionDataPointer& child)
+{
+    if (isNull())
+        return false;
+    if (!child)
+        return false;
     if (d == child) // expression cannot be own child
-        return;
-    if (child->parent == d) // cannot append child twice
-        return;
+        return false;
+    if (child->parent == d) // cannot insert child twice
+        return false;
     if (child->parent) // remove from old parent
         child->parent->children.removeOne(child);
+    return true;
+}
+
+void Expression::appendChild(const ExplicitlySharedExpressionDataPointer& child)
+{
+    if (!checkBeforeInsert(child))
+        return;
     d->children.append(child);
     child->parent = d;
 }

@@ -30,7 +30,6 @@ private Q_SLOTS:
     void initTestCase();
 
     void testNullExpression();
-    void testCloneExpression();
     void testExpressionClassName_data();
     void testExpressionClassName();
     void testExpressionToken();
