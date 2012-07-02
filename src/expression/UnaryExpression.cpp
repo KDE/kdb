@@ -109,7 +109,7 @@ Field::Type UnaryExpressionData::type() const
     return t;
 }
 
-bool UnaryExpressionData::validate(ParseInfo& parseInfo)
+bool UnaryExpressionData::validate(ParseInfo *parseInfo)
 {
     ExplicitlySharedExpressionDataPointer a = arg();
     if (!a.constData())

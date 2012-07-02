@@ -107,7 +107,7 @@ Field::Type FunctionExpressionData::type() const
     return Field::InvalidType;
 }
 
-bool FunctionExpressionData::validate(ParseInfo& parseInfo)
+bool FunctionExpressionData::validate(ParseInfo *parseInfo)
 {
     if (!ExpressionData::validate(parseInfo))
         return false;

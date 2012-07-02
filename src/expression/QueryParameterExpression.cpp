@@ -78,7 +78,7 @@ void QueryParameterExpressionData::getQueryParameters(QuerySchemaParameterList& 
     params.append(param);
 }
 
-bool QueryParameterExpressionData::validate(ParseInfo& parseInfo)
+bool QueryParameterExpressionData::validate(ParseInfo *parseInfo)
 {
     Q_UNUSED(parseInfo);
     return type() != Field::InvalidType;

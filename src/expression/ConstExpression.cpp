@@ -124,7 +124,7 @@ void ConstExpressionData::getQueryParameters(QuerySchemaParameterList& params)
     Q_UNUSED(params);
 }
 
-bool ConstExpressionData::validate(ParseInfo& parseInfo)
+bool ConstExpressionData::validate(ParseInfo *parseInfo)
 {
     if (!ExpressionData::validate(parseInfo))
         return false;

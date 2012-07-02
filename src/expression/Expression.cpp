@@ -114,8 +114,9 @@ QDebug operator<<(QDebug dbg, const ExpressionData& expr)
     return dbg.space();
 }
 
-bool ExpressionData::validate(ParseInfo& /*parseInfo*/)
+bool ExpressionData::validate(ParseInfo *parseInfo)
 {
+    Q_UNUSED(parseInfo);
     return true;
 }
 
@@ -183,7 +184,7 @@ ExpressionClass Expression::expressionClass() const
     return d->expressionClass;
 }
 
-bool Expression::validate(ParseInfo& parseInfo)
+bool Expression::validate(ParseInfo *parseInfo)
 {
     return d->validate(parseInfo);
 }

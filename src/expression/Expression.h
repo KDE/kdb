@@ -89,7 +89,7 @@ public:
     Field::Type type() const;
 
     /*! @return true if evaluation of this expression succeeded. */
-    bool validate(ParseInfo& parseInfo);
+    bool validate(ParseInfo *parseInfo);
 
     /*! @return string as a representation of this expression element
                 by running recursive calls.

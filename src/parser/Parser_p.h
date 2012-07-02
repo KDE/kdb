@@ -75,7 +75,7 @@ void yyerror(const char *str);
 void setError(const QString& errName, const QString& errDesc);
 void setError(const QString& errDesc);
 //bool parseData(Predicate::Parser *p, const char *data);
-bool addColumn(Predicate::ParseInfo& parseInfo, Predicate::Expression* columnExpr);
+bool addColumn(Predicate::ParseInfo* parseInfo, Predicate::Expression* columnExpr);
 Predicate::QuerySchema* buildSelectQuery(
     Predicate::QuerySchema* querySchema, Predicate::NArgExpression* colViews,
     Predicate::NArgExpression* tablesList = 0, SelectOptionsInternal * options = 0);

@@ -47,7 +47,7 @@ NArgExpressionData* NArgExpressionData::clone()
     return new NArgExpressionData(*this);
 }
 
-bool NArgExpressionData::validate(ParseInfo& parseInfo)
+bool NArgExpressionData::validate(ParseInfo *parseInfo)
 {
     if (!ExpressionData::validate(parseInfo))
         return false;

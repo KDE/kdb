@@ -40,7 +40,7 @@ BinaryExpressionData::~BinaryExpressionData()
 {
 }
 
-bool BinaryExpressionData::validate(ParseInfo& parseInfo)
+bool BinaryExpressionData::validate(ParseInfo *parseInfo)
 {
     if (!ExpressionData::validate(parseInfo) || children.count() != 2)
         return false;

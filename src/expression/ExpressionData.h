@@ -82,7 +82,7 @@ public:
     virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual ExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -106,7 +106,7 @@ public:
     //virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
 //    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual NArgExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -124,7 +124,7 @@ public:
     virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
 //    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual UnaryExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -148,7 +148,7 @@ public:
     virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual BinaryExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -170,7 +170,7 @@ public:
     virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     //virtual QString tokenToString() const;
     virtual ConstExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -190,7 +190,7 @@ public:
     virtual Field::Type type() const; //!< @return type of this expression;
     virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     //virtual QString tokenToString() const;
     virtual QueryParameterExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -234,7 +234,7 @@ public:
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     //virtual QString tokenToString() const;
     virtual VariableExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
@@ -259,7 +259,7 @@ public:
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validate(ParseInfo& parseInfo);
+    virtual bool validate(ParseInfo *parseInfo);
     //virtual QString tokenToString() const;
     virtual FunctionExpressionData* clone();
     //! Sends information about this expression  to debug output @a dbg.
