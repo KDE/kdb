@@ -39,9 +39,9 @@ DriverBehaviour::DriverBehaviour()
         , USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED(false)
         , _1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY(false)
         , SELECT_1_SUBQUERY_SUPPORTED(false)
-        , TEXT_TYPE_MAX_LENGTH(0)
         , BOOLEAN_TRUE_LITERAL(QLatin1Char('1'))
         , BOOLEAN_FALSE_LITERAL(QLatin1Char('0'))
+        , TEXT_TYPE_MAX_LENGTH(0)
 {
 }
 

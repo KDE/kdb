@@ -567,18 +567,11 @@ public:
        will return the same pointer.
      - Calling field("T.A") will return the same pointer as field("A").
      */
-    virtual Field* field(const QString& name, bool expanded);
+    virtual Field* field(const QString& name, bool expanded) const;
 
     /*! This is overloaded method Field* field(const QString& name, bool expanded)
      with expanded = true. This method is also a product of inheritance from FieldList.  */
-    inline virtual Field* field(const QString& name) {
-        return field(name, true);
-    }
-
-    /*! @return field id or NULL if there is no such a field. */
-    inline Field* field(uint id) {
-        return FieldList::field(id);
-    }
+    virtual Field* field(const QString& name) const;
 
     /*! Like QuerySchema::field(const QString& name) but returns not only Field
      object for @a identifier but entire QueryColumnInfo object.

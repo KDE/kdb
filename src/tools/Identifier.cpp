@@ -29,7 +29,7 @@ bool Predicate::Utils::isIdentifier(const QString& s)
     const uint sLength = s.length();
     for (i = 0; i < sLength; i++) {
         const char c = s.at(i).toLower().toLatin1();
-        if (c == 0 || !(c == '_' || c >= 'a' && c <= 'z' || i > 0 && c >= '0' && c <= '9'))
+        if (c == 0 || !(c == '_' || (c >= 'a' && c <= 'z') || (i > 0 && c >= '0' && c <= '9')))
             break;
     }
     return i > 0 && i == sLength;

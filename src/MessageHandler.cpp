@@ -65,5 +65,6 @@ MessageHandler::ButtonCode MessageHandler::askQuestion(
     Q_UNUSED(buttonNo);
     Q_UNUSED(dontShowAskAgainName);
     Q_UNUSED(options);
+    Q_UNUSED(msgHandler);
     return defaultResult;
 }

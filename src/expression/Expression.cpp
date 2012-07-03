@@ -129,6 +129,7 @@ QString ExpressionData::tokenToString() const
 
 EscapedString ExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
 {
+    Q_UNUSED(params);
     return EscapedString();
 }
 

@@ -3384,8 +3384,9 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
-    if (!getRecordId && !pkey)
+    if (!getRecordId && !pkey) {
         PreWarn << " -- WARNING: NO MASTER TABLE's PKEY";
+    }
 
     EscapedString sqlcols, sqlvals;
     sqlcols.reserve(1024);
@@ -3605,9 +3606,9 @@ bool Connection::deleteAllRecords(QuerySchema* query)
         return false;
     }
     IndexSchema *pkey = mt->primaryKey();
-    if (!pkey || pkey->fields()->isEmpty())
+    if (!pkey || pkey->fields()->isEmpty()) {
         PreWarn << "-- WARNING: NO MASTER TABLE's PKEY";
-
+    }
     EscapedString sql = EscapedString("DELETE FROM ") + escapeIdentifier(mt->name());
 
     PreDbg << "-- SQL == " << sql;

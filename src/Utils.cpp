@@ -260,8 +260,9 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name)
 {
     m_table = conn->tableSchema(QLatin1String(name));
     m_query = m_table ? 0 : conn->querySchema(QLatin1String(name));
-    if (!m_table && !m_query)
+    if (!m_table && !m_query) {
         PreWarn << "tableOrQuery is neither table nor query!";
+    }
 }
 
 
@@ -270,42 +271,48 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name,
         , m_table(table ? conn->tableSchema(QLatin1String(name)) : 0)
         , m_query(table ? 0 : conn->querySchema(QLatin1String(name)))
 {
-    if (table && !m_table)
+    if (table && !m_table) {
         PreWarn << "no table specified!";
-    if (!table && !m_query)
+    }
+    if (!table && !m_query) {
         PreWarn << "no query specified!";
+    }
 }
 
 TableOrQuerySchema::TableOrQuerySchema(FieldList &tableOrQuery)
         : m_table(dynamic_cast<TableSchema*>(&tableOrQuery))
         , m_query(dynamic_cast<QuerySchema*>(&tableOrQuery))
 {
-    if (!m_table && !m_query)
+    if (!m_table && !m_query) {
         PreWarn << "tableOrQuery is nether table nor query!";
+    }
 }
 
 TableOrQuerySchema::TableOrQuerySchema(Connection *conn, int id)
 {
     m_table = conn->tableSchema(id);
     m_query = m_table ? 0 : conn->querySchema(id);
-    if (!m_table && !m_query)
+    if (!m_table && !m_query) {
         PreWarn << "no table or query found for id==" << id;
+    }
 }
 
 TableOrQuerySchema::TableOrQuerySchema(TableSchema* table)
         : m_table(table)
         , m_query(0)
 {
-    if (!m_table)
+    if (!m_table) {
         PreWarn << "no table specified!";
+    }
 }
 
 TableOrQuerySchema::TableOrQuerySchema(QuerySchema* query)
         : m_table(0)
         , m_query(query)
 {
-    if (!m_query)
+    if (!m_query) {
         PreWarn << "no query specified!";
+    }
 }
 
 uint TableOrQuerySchema::fieldCount() const

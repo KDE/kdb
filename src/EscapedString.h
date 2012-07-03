@@ -363,6 +363,7 @@ public:
                                  const QByteArray &include = QByteArray(),
                                  char percent = '%') const
     {
+        Q_UNUSED(percent);
         return m_valid ? EscapedString(QByteArray::toPercentEncoding(exclude, include))
                        : EscapedString::invalid();
     }

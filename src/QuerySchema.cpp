@@ -1218,7 +1218,12 @@ void QuerySchema::setStatement(const EscapedString& statement)
     d->statement = statement;
 }
 
-Field* QuerySchema::field(const QString& identifier, bool expanded)
+Field* QuerySchema::field(const QString& name) const
+{
+    return field(name, true);
+}
+
+Field* QuerySchema::field(const QString& identifier, bool expanded) const
 {
     QueryColumnInfo *ci = columnInfo(identifier, expanded);
     return ci ? ci->field : 0;

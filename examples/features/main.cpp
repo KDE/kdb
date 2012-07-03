@@ -173,7 +173,7 @@ APPNAME ", version " PREDICATE_VERSION_STRING
 
 int main(int argc, char** argv)
 {
-    int minargs = 2;
+//    int minargs = 2;
 #ifndef NO_GUI
     bool gui = false;
 #endif
@@ -208,9 +208,9 @@ int main(int argc, char** argv)
     } else 
 #endif
     if (test_name == "parser") {
-        minargs = 3;
+//        minargs = 3;
     } else if (test_name == "dr_prop") {
-        minargs = 1;
+//        minargs = 1;
         db_name_required = false;
     }
 
