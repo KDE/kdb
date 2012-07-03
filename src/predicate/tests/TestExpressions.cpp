@@ -24,6 +24,7 @@
 
 #include <Predicate/Expression>
 #include <parser/SqlParser.h>
+#include "parser/Parser_p.h"
 
 using namespace Predicate;
 
@@ -154,6 +155,14 @@ void TestExpressions::testExpressionToken()
 
 void TestExpressions::testNArgExpression()
 {
+    NArgExpression n;
+    NArgExpression n2;
+    ConstExpression c;
+    ConstExpression c1;
+    ConstExpression c2;
+    ConstExpression c3;
+
+    // -- empty
     NArgExpression emptyNarg;
     QVERIFY(emptyNarg.isNArg());
     QVERIFY(emptyNarg.clone().isNArg());
@@ -162,18 +171,31 @@ void TestExpressions::testNArgExpression()
     QVERIFY(emptyNarg.arg(-1).isNull());
     QVERIFY(emptyNarg.arg(0).isNull());
 
+    // -- copy ctor
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 7);
+    c2 = ConstExpression(INTEGER_CONST, 8);
+    n.append(c1);
+    n.append(c2);
+    NArgExpression copied_n(n);
+    QCOMPARE(n.argCount(), copied_n.argCount());
+    compareStrings(n, copied_n);
+
+    // -- cloning
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c1 = ConstExpression(INTEGER_CONST, 7);
+    c2 = ConstExpression(INTEGER_CONST, 8);
+    n.prepend(c1);
+    n.append(c2);
+    testCloneExpression(n);
+    QCOMPARE(n.tokenToDebugString(), QString("+"));
+    QCOMPARE(n.toString(), EscapedString("7, 8"));
+
     // -- append(Expression), prepend(Expression)
     Expression e;
     NArgExpression nNull;
     nNull.append(e);
     QCOMPARE(nNull.argCount(), 0); // n-arg expression should have class, otherwise is null and cannot have children
-
-    NArgExpression n;
-    NArgExpression n2;
-    ConstExpression c;
-    ConstExpression c1;
-    ConstExpression c2;
-    ConstExpression c3;
 
     n = NArgExpression(ArithmeticExpressionClass, '+');
     c1 = ConstExpression(INTEGER_CONST, 1);
@@ -341,16 +363,174 @@ void TestExpressions::testNArgExpression()
     QCOMPARE(n.lastIndexOf(c3), 2);
     QCOMPARE(n.lastIndexOf(c1, 1), 0);
     QCOMPARE(n.lastIndexOf(c2, 0), -1);
+}
 
-    // -- cloning
+void TestExpressions::testValidate()
+{
+    NArgExpression n;
+    ConstExpression c;
+    ConstExpression c1;
+
+    QuerySchema *query = 0;
+    ParseInfoInternal parseInfo(query);
+
+    c = ConstExpression(SQL_NULL, QVariant());
+    QCOMPARE(c.type(), Field::Null);
+    QVERIFY(c.validate(&parseInfo));
+
     n = NArgExpression(ArithmeticExpressionClass, '+');
-    c1 = ConstExpression(INTEGER_CONST, 7);
-    c2 = ConstExpression(INTEGER_CONST, 8);
-    n.prepend(c1);
-    n.append(c2);
+    c = ConstExpression(INTEGER_CONST, 0);
+    c1 = ConstExpression(INTEGER_CONST, 1);
+    n.append(c);
+    n.append(c1);
+    QCOMPARE(n.type(), Field::InvalidType); // N-arg expression is abstract, unspecified type
+    QVERIFY(n.validate(&parseInfo));
     testCloneExpression(n);
-    QCOMPARE(n.tokenToDebugString(), QString("+"));
-    QCOMPARE(n.toString(), EscapedString("7, 8"));
+
+    // null
+    c = ConstExpression(SQL_NULL, QVariant());
+    QCOMPARE(c.type(), Field::Null);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // integer
+    c = ConstExpression(INTEGER_CONST, -0x7f);
+    QCOMPARE(c.type(), Field::Byte);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, -10);
+    QCOMPARE(c.type(), Field::Byte);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, 0);
+    QCOMPARE(c.type(), Field::Byte);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, 20);
+    QCOMPARE(c.type(), Field::Byte);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, 255);
+    QCOMPARE(c.type(), Field::Byte);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, -0x80);
+    QCOMPARE(c.type(), Field::ShortInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, -0x7fff);
+    QCOMPARE(c.type(), Field::ShortInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, 256);
+    QCOMPARE(c.type(), Field::ShortInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, 0xffff);
+    QCOMPARE(c.type(), Field::ShortInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, -0x8000);
+    QCOMPARE(c.type(), Field::Integer);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, uint(0x10000));
+    QCOMPARE(c.type(), Field::Integer);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, qlonglong(-0x100000));
+    QCOMPARE(c.type(), Field::BigInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(INTEGER_CONST, qulonglong(0x1000000));
+    QCOMPARE(c.type(), Field::BigInteger);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // string
+    int oldMaxLen = Field::defaultMaxLength(); // save
+    Field::setDefaultMaxLength(0);
+    c = ConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
+    QCOMPARE(c.type(), Field::Text);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    Field::setDefaultMaxLength(10);
+    c = ConstExpression(CHARACTER_STRING_LITERAL, QString());
+    QCOMPARE(c.type(), Field::Text);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(CHARACTER_STRING_LITERAL, QVariant());
+    QCOMPARE(c.type(), Field::Text);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
+    QCOMPARE(c.type(), Field::LongText);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    Field::setDefaultMaxLength(oldMaxLen); // restore
+
+    // bool
+    c = ConstExpression(SQL_TRUE, true);
+    QCOMPARE(c.type(), Field::Boolean);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(SQL_FALSE, true);
+    QCOMPARE(c.type(), Field::Boolean);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // real
+    c = ConstExpression(REAL_CONST, QVariant());
+    QCOMPARE(c.type(), Field::Double);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    c = ConstExpression(REAL_CONST, 3.14159);
+    QCOMPARE(c.type(), Field::Double);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // date
+    c = ConstExpression(DATE_CONST, QDate::currentDate());
+    QCOMPARE(c.type(), Field::Date);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // date/time
+    c = ConstExpression(DATETIME_CONST, QDateTime::currentDateTime());
+    QCOMPARE(c.type(), Field::DateTime);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // time
+    c = ConstExpression(TIME_CONST, QTime::currentTime());
+    QCOMPARE(c.type(), Field::Time);
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+
+    // setValue()
+    c = ConstExpression(INTEGER_CONST, 124);
+    QCOMPARE(c.value(), QVariant(124));
+    c.setValue(299);
+    QCOMPARE(c.value(), QVariant(299));
+    testCloneExpression(c);
 }
 
 void TestExpressions::cleanupTestCase()

@@ -74,6 +74,9 @@ Field::Type ConstExpressionData::type() const
         else {
             return Field::Text;
         }
+    case SQL_TRUE:
+    case SQL_FALSE:
+        return Field::Boolean;
     case REAL_CONST:
         return Field::Double;
     case DATE_CONST:
@@ -104,6 +107,10 @@ EscapedString ConstExpressionData::toString(QuerySchemaParameterValueListIterato
     case CHARACTER_STRING_LITERAL:
 //! @todo better escaping!
         return EscapedString('\'') + value.toString() + '\'';
+    case SQL_TRUE:
+        return EscapedString("TRUE");
+    case SQL_FALSE:
+        return EscapedString("FALSE");
     case REAL_CONST:
         return EscapedString::number(value.toPoint().x()) + '.'
                 + EscapedString::number(value.toPoint().y());
@@ -115,6 +122,9 @@ EscapedString ConstExpressionData::toString(QuerySchemaParameterValueListIterato
                 + ' ' + value.toDateTime().time().toString(Qt::ISODate) + '\'';
     case TIME_CONST:
         return EscapedString('\'') + value.toTime().toString(Qt::ISODate) + '\'';
+    case INTEGER_CONST:
+    default:
+        break;
     }
     return EscapedString(value.toString());
 }
