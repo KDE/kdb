@@ -80,6 +80,7 @@ if (BUILD_TESTING)
     set(CMAKE_C_FLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
     set(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
   endif (BUILD_TEST_COVERAGE)
+  add_definitions(-DBUILD_TESTING)
 endif (BUILD_TESTING)
 
 # Qt string handling optimizations: http://qt-project.org/doc/qt-4.8/qstring.html#more-efficient-string-construction

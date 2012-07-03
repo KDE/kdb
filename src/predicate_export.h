@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2005 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -29,6 +29,20 @@
 # else
 #  define PREDICATE_EXPORT Q_DECL_IMPORT
 # endif
+#endif
+
+#ifdef DBUILD_TESTING
+#if defined _WIN32 || defined _WIN64
+# if MAKE_PREDICATE_LIB
+#       define PREDICATE_TEST_EXPORT Q_DECL_EXPORT
+#   else
+#       define PREDICATE_TEST_EXPORT Q_DECL_IMPORT
+#   endif
+# else /* not windows */
+#   define PREDICATE_TEST_EXPORT Q_DECL_EXPORT
+# endif
+#else /* not compiling tests */
+#   define PREDICATE_TEST_EXPORT
 #endif
 
 #endif

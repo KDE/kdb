@@ -71,7 +71,7 @@ public:
 };
 
 /*! Internal info used on parsing (writable). */
-class ParseInfoInternal : public ParseInfo
+class PREDICATE_TEST_EXPORT ParseInfoInternal : public ParseInfo
 {
 public:
     //! Constructs parse info structure for query @a query.
