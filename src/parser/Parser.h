@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -87,6 +87,35 @@ private:
     QByteArray m_token;
     int m_at;
 //  bool m_isNull;
+};
+
+class ParseInfoInternal;
+
+/*! Info used on parsing. */
+class PREDICATE_EXPORT ParseInfo
+{
+public:
+    ~ParseInfo();
+
+    //! @return positions of tables/aliases having the same name @a tableOrAliasName.
+    QList<int> tablesAndAliasesForName(const QString &tableOrAliasName) const;
+
+    //! @return query schema for this parsing
+    QuerySchema* querySchema() const;
+
+    //! @return error message for the parsing process
+    QString errorMessage() const;
+
+    //! @return detailed error description for the parsing process
+    QString errorDescription() const;
+
+protected:
+    //! Constructs parse info structure for query @a query.
+    explicit ParseInfo(QuerySchema *query);
+
+    Q_DISABLE_COPY(ParseInfo)
+    class Private;
+    Private * const d;
 };
 
 /**

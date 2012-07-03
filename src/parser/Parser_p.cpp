@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -61,14 +61,33 @@ void Parser::Private::clear()
 
 //-------------------------------------
 
-ParseInfo::ParseInfo(Predicate::QuerySchema *query)
-        : querySchema(query)
+ParseInfoInternal::ParseInfoInternal(QuerySchema *query)
+: ParseInfo(query)
 {
-//Qt 4 repeatedTablesAndAliases.setAutoDelete(true);
 }
 
-ParseInfo::~ParseInfo()
+ParseInfoInternal::~ParseInfoInternal()
 {
+}
+
+void ParseInfoInternal::appendPositionForTableOrAliasName(const QString &tableOrAliasName, int pos)
+{
+    QList<int> *list = d->repeatedTablesAndAliases.value(tableOrAliasName);
+    if (!list) {
+        list = new QList<int>();
+        d->repeatedTablesAndAliases.insert(tableOrAliasName, list);
+    }
+    list->append(pos);
+}
+
+void ParseInfoInternal::setErrorMessage(const QString &message)
+{
+    d->errorMessage = message;
+}
+
+void ParseInfoInternal::setErrorDescription(const QString &description)
+{
+    d->errorDescription = description;
 }
 
 //-------------------------------------
@@ -235,7 +254,7 @@ bool parseData(Parser *p, const char *data)
 bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
 {
     if (!columnExpr->validate(parseInfo)) {
-        setError(parseInfo->errMsg, parseInfo->errDescr);
+        setError(parseInfo->errorMessage(), parseInfo->errorDescription());
         return false;
     }
 
@@ -243,16 +262,16 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
     if (columnExpr->expressionClass() == VariableExpressionClass && !v_e.isNull()) {
         //it's a variable:
         if (v_e.name() == QLatin1String("*")) {//all tables asterisk
-            if (parseInfo->querySchema->tables()->isEmpty()) {
+            if (parseInfo->querySchema()->tables()->isEmpty()) {
                 setError(QObject::tr("\"*\" could not be used if no tables are specified"));
                 return false;
             }
-            parseInfo->querySchema->addAsterisk(new QueryAsterisk(parseInfo->querySchema));
+            parseInfo->querySchema()->addAsterisk(new QueryAsterisk(parseInfo->querySchema()));
         } else if (v_e.tableForQueryAsterisk()) {//one-table asterisk
-            parseInfo->querySchema->addAsterisk(
-                new QueryAsterisk(parseInfo->querySchema, v_e.tableForQueryAsterisk()));
+            parseInfo->querySchema()->addAsterisk(
+                new QueryAsterisk(parseInfo->querySchema(), v_e.tableForQueryAsterisk()));
         } else if (v_e.field()) {//"table.field" or "field" (bound to a table or not)
-            parseInfo->querySchema->addField(v_e.field(), v_e.tablePositionForField());
+            parseInfo->querySchema()->addField(v_e.field(), v_e.tablePositionForField());
         } else {
             IMPL_ERROR("addColumn(): unknown case!");
             return false;
@@ -261,7 +280,7 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
     }
 
     //it's complex expression
-    parseInfo->querySchema->addExpression(*columnExpr);
+    parseInfo->querySchema()->addExpression(*columnExpr);
 
 #if 0
     PreDbg << "found variable name: " << varName;
@@ -275,11 +294,11 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
     if (tableName.isEmpty()) {//fieldname only
         fieldName = varName;
         if (fieldName == "*") {
-            parseInfo->querySchema->addAsterisk(new QueryAsterisk(parseInfo->querySchema));
+            parseInfo->querySchema()->addAsterisk(new QueryAsterisk(parseInfo->querySchema()));
         } else {
             //find first table that has this field
             Field *firstField = 0;
-            foreach(TableSchema *ts, *parseInfo->querySchema->tables()) {
+            foreach(TableSchema *ts, *parseInfo->querySchema()->tables()) {
                 Field *f = ts->field(fieldName);
                 if (f) {
                     if (!firstField) {
@@ -301,19 +320,19 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
                 return false;
             }
             //ok
-            parseInfo->querySchema->addField(firstField);
+            parseInfo->querySchema()->addField(firstField);
         }
     } else {//table.fieldname or tableAlias.fieldname
         tableName = tableName.toLower();
-        TableSchema *ts = parseInfo->querySchema->table(tableName);
+        TableSchema *ts = parseInfo->querySchema()->table(tableName);
         if (ts) {//table.fieldname
             //check if "table" is covered by an alias
-            const QList<int> tPositions(parseInfo->querySchema->tablePositions(tableName));
+            const QList<int> tPositions(parseInfo->querySchema()->tablePositions(tableName));
             QList<int>::ConstIterator it = tPositions.constBegin();
             QByteArray tableAlias;
             bool covered = true;
             foreach(int position, tPositions) {
-                tableAlias = parseInfo->querySchema->tableAlias(position).toLower();
+                tableAlias = parseInfo->querySchema()->tableAlias(position).toLower();
                 if (tableAlias.isEmpty() || tableAlias == tableName.toLatin1()) {
                     covered = false; //uncovered
                     break;
@@ -333,9 +352,9 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
 
         int tablePosition = -1;
         if (!ts) {//try to find tableAlias
-            tablePosition = parseInfo->querySchema->tablePositionForAlias(tableName.toLatin1());
+            tablePosition = parseInfo->querySchema()->tablePositionForAlias(tableName.toLatin1());
             if (tablePosition >= 0) {
-                ts = parseInfo->querySchema->tables()->at(tablePosition);
+                ts = parseInfo->querySchema()->tables()->at(tablePosition);
                 if (ts) {
 //     PreDbg << " --it's a tableAlias.name";
                 }
@@ -356,7 +375,7 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
                              QObject::tr("More than one \"%1\" table or alias defined").arg(tableName));
                     return false;
                 }
-                parseInfo->querySchema->addAsterisk(new QueryAsterisk(parseInfo->querySchema, ts));
+                parseInfo->querySchema()->addAsterisk(new QueryAsterisk(parseInfo->querySchema(), ts));
             } else {
 //    PreDbg << " --it's a table.name";
                 Field *realField = ts->field(fieldName);
@@ -365,7 +384,7 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
                     // (so the column is ambiguous)
                     int numberOfTheSameFields = 0;
                     foreach(int position, positionsList) {
-                        TableSchema *otherTS = parseInfo->querySchema->tables()->at(position);
+                        TableSchema *otherTS = parseInfo->querySchema()->tables()->at(position);
                         if (otherTS->field(fieldName))
                             numberOfTheSameFields++;
                         if (numberOfTheSameFields > 1) {
@@ -376,7 +395,7 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
                         }
                     }
 
-                    parseInfo->querySchema->addField(realField, tablePosition);
+                    parseInfo->querySchema()->addField(realField, tablePosition);
                 } else {
                     setError(QObject::tr("Field not found"), QObject::tr("Table \"%1\" has no \"%2\" field")
                                                            .arg(tableName, fieldName));
@@ -402,7 +421,7 @@ QuerySchema* buildSelectQuery(
     QuerySchema* querySchema, NArgExpression* _colViews,
     NArgExpression* _tablesList, SelectOptionsInternal* options)
 {
-    ParseInfo parseInfo(querySchema);
+    ParseInfoInternal parseInfo(querySchema);
 
     // remove from heap (using heap was requered because parser uses union)
     Predicate::NArgExpression colViews(*_colViews);
@@ -456,9 +475,7 @@ QuerySchema* buildSelectQuery(
             }
             // 1. collect information about first repeated table name or alias
             //    (potential ambiguity)
-            QList<int> list(parseInfo.repeatedTablesAndAliases.value(tableOrAliasName));
-            list.append(i);
-            parseInfo.repeatedTablesAndAliases.insert(tableOrAliasName, list);
+            parseInfo.appendPositionForTableOrAliasName(tableOrAliasName, i);
             /*  if (repeatedTableNameOrTableAlias.isEmpty()) {
                   if (tableNamesAndTableAliases[tname])
                     repeatedTableNameOrTableAlias=tname;
@@ -575,7 +592,7 @@ QuerySchema* buildSelectQuery(
         //----- WHERE expr.
         if (!options->whereExpr.isNull()) {
             if (!options->whereExpr.validate(&parseInfo)) {
-                setError(parseInfo.errMsg, parseInfo.errDescr);
+                setError(parseInfo.errorMessage(), parseInfo.errorDescription());
                 CLEANUP;
                 return 0;
             }

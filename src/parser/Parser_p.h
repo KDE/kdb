@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -54,19 +54,42 @@ public:
     bool initialized;
 };
 
-
-/*! Data used on parsing. @internal */
-class ParseInfo
+class ParseInfo::Private
 {
 public:
-    ParseInfo(QuerySchema *query);
-    ~ParseInfo();
+    Private() {}
+    ~Private() {
+        qDeleteAll(repeatedTablesAndAliases);
+    }
 
     //! collects positions of tables/aliases with the same names
-    QHash< QString, QList<int> > repeatedTablesAndAliases;
+    QHash< QString, QList<int>* > repeatedTablesAndAliases;
 
-    QString errMsg, errDescr; //helpers
+    QString errorMessage, errorDescription; // helpers
+
     QuerySchema *querySchema;
+};
+
+/*! Internal info used on parsing (writable). */
+class ParseInfoInternal : public ParseInfo
+{
+public:
+    //! Constructs parse info structure for query @a query.
+    explicit ParseInfoInternal(QuerySchema *query);
+
+    ~ParseInfoInternal();
+
+    //! Appends position @a pos for table or alias @a tableOrAliasName.
+    void appendPositionForTableOrAliasName(const QString &tableOrAliasName, int pos);
+
+    //! Sets error message to @a message.
+    void setErrorMessage(const QString &message);
+
+    //! Sets error description to @a description.
+    void setErrorDescription(const QString &description);
+
+private:
+    Q_DISABLE_COPY(ParseInfoInternal)
 };
 
 }

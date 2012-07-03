@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -73,7 +73,7 @@ Parser::OPCode Parser::operation() const
 
 QString Parser::operationString() const
 {
-    Q_ASSERT(d->operation < sizeof(Predicate_parserStatic->operationStrings));
+    Q_ASSERT(size_t(d->operation) < sizeof(Predicate_parserStatic->operationStrings));
     return Predicate_parserStatic->operationStrings[d->operation];
 }
 
@@ -190,3 +190,36 @@ ParserError::~ParserError()
 {
 }
 
+//-------------------------------------
+
+ParseInfo::ParseInfo(Predicate::QuerySchema *query)
+ : d(new Private)
+{
+    d->querySchema = query;
+}
+
+ParseInfo::~ParseInfo()
+{
+    delete d;
+}
+
+QList<int> ParseInfo::tablesAndAliasesForName(const QString &tableOrAliasName) const
+{
+    const QList<int> *list = d->repeatedTablesAndAliases.value(tableOrAliasName);
+    return list ? *list : QList<int>();
+}
+
+QuerySchema* ParseInfo::querySchema() const
+{
+    return d->querySchema;
+}
+
+QString ParseInfo::errorMessage() const
+{
+    return d->errorMessage;
+}
+
+QString ParseInfo::errorDescription() const
+{
+    return d->errorDescription;
+}
