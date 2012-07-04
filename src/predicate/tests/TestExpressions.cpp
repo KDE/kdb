@@ -47,13 +47,20 @@ static void compareStrings(const T &e1, const T &e2)
              << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
 }
 
-static void testCloneExpression(const Expression& e1)
+//! tests clone and copy ctor for @a e1
+template <typename T>
+static void testCloneExpression(const T &e1)
 {
     Expression e1clone = e1.clone();
     QVERIFY(e1 != e1.clone());
     QVERIFY(e1 != e1clone);
     QVERIFY(e1.clone() != e1clone);
-    compareStrings(e1, e1clone);
+    compareStrings(Expression(e1), e1clone);
+
+    const T copied(e1);
+    QVERIFY(e1 == copied);
+    QVERIFY(e1.clone() != copied);
+    compareStrings(e1, copied);
 }
 
 void TestExpressions::testNullExpression()
@@ -171,23 +178,14 @@ void TestExpressions::testNArgExpression()
     QVERIFY(emptyNarg.arg(-1).isNull());
     QVERIFY(emptyNarg.arg(0).isNull());
 
-    // -- copy ctor
+    // -- copy ctor & cloning
     n = NArgExpression(ArithmeticExpressionClass, '+');
     c1 = ConstExpression(INTEGER_CONST, 7);
     c2 = ConstExpression(INTEGER_CONST, 8);
     n.append(c1);
     n.append(c2);
-    NArgExpression copied_n(n);
-    QCOMPARE(n.argCount(), copied_n.argCount());
-    compareStrings(n, copied_n);
-
-    // -- cloning
-    n = NArgExpression(ArithmeticExpressionClass, '+');
-    c1 = ConstExpression(INTEGER_CONST, 7);
-    c2 = ConstExpression(INTEGER_CONST, 8);
-    n.prepend(c1);
-    n.append(c2);
     testCloneExpression(n);
+
     QCOMPARE(n.tokenToDebugString(), QString("+"));
     QCOMPARE(n.toString(), EscapedString("7, 8"));
 
