@@ -20,11 +20,10 @@
 #include "TestExpressions.h"
 
 #include <QtTest/QtTest>
-#include <QDomElement>
 
 #include <Predicate/Expression>
 #include <parser/SqlParser.h>
-#include "parser/Parser_p.h"
+#include <parser/Parser_p.h>
 
 using namespace Predicate;
 
@@ -394,66 +393,84 @@ void TestExpressions::testValidate()
     // integer
     c = ConstExpression(INTEGER_CONST, -0x7f);
     QCOMPARE(c.type(), Field::Byte);
+    QCOMPARE(c.value(), QVariant(-0x7f));
+    QVERIFY(c.validate(&parseInfo));
+    testCloneExpression(c);
+    c.setValue(-0x80);
+    QCOMPARE(c.type(), Field::ShortInteger); // type has been changed by setValue
+    QCOMPARE(c.value(), QVariant(-0x80));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, -10);
     QCOMPARE(c.type(), Field::Byte);
+    QCOMPARE(c.value(), QVariant(-10));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, 0);
     QCOMPARE(c.type(), Field::Byte);
+    QCOMPARE(c.value(), QVariant(0));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, 20);
     QCOMPARE(c.type(), Field::Byte);
+    QCOMPARE(c.value(), QVariant(20));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, 255);
     QCOMPARE(c.type(), Field::Byte);
+    QCOMPARE(c.value(), QVariant(255));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, -0x80);
     QCOMPARE(c.type(), Field::ShortInteger);
+    QCOMPARE(c.value(), QVariant(-0x80));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, -0x7fff);
     QCOMPARE(c.type(), Field::ShortInteger);
+    QCOMPARE(c.value(), QVariant(-0x7fff));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, 256);
     QCOMPARE(c.type(), Field::ShortInteger);
+    QCOMPARE(c.value(), QVariant(256));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, 0xffff);
     QCOMPARE(c.type(), Field::ShortInteger);
+    QCOMPARE(c.value(), QVariant(0xffff));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, -0x8000);
     QCOMPARE(c.type(), Field::Integer);
+    QCOMPARE(c.value(), QVariant(-0x8000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, uint(0x10000));
     QCOMPARE(c.type(), Field::Integer);
+    QCOMPARE(c.value(), QVariant(0x10000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, qlonglong(-0x100000));
     QCOMPARE(c.type(), Field::BigInteger);
+    QCOMPARE(c.value(), QVariant(-0x100000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(INTEGER_CONST, qulonglong(0x1000000));
     QCOMPARE(c.type(), Field::BigInteger);
+    QCOMPARE(c.value(), QVariant(0x1000000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
@@ -462,22 +479,30 @@ void TestExpressions::testValidate()
     Field::setDefaultMaxLength(0);
     c = ConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
     QCOMPARE(c.type(), Field::Text);
+    QCOMPARE(c.value(), QVariant("01234567890"));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     Field::setDefaultMaxLength(10);
     c = ConstExpression(CHARACTER_STRING_LITERAL, QString());
     QCOMPARE(c.type(), Field::Text);
+    QCOMPARE(c.value(), QVariant(QString()));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(CHARACTER_STRING_LITERAL, QVariant());
     QCOMPARE(c.type(), Field::Text);
+    QCOMPARE(c.value(), QVariant());
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
     QCOMPARE(c.type(), Field::LongText);
+    QCOMPARE(c.value(), QVariant("01234567890"));
+    QVERIFY(c.validate(&parseInfo));
+    c.setValue("ąćę");
+    QCOMPARE(c.value(), QVariant("ąćę"));
+    QCOMPARE(c.type(), Field::Text);
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
@@ -486,40 +511,68 @@ void TestExpressions::testValidate()
     // bool
     c = ConstExpression(SQL_TRUE, true);
     QCOMPARE(c.type(), Field::Boolean);
+    QCOMPARE(c.value(), QVariant(true));
+    QVERIFY(c.validate(&parseInfo));
+    c.setValue(false);
+    QCOMPARE(c.value(), QVariant(false));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
-    c = ConstExpression(SQL_FALSE, true);
+    c = ConstExpression(SQL_FALSE, false);
     QCOMPARE(c.type(), Field::Boolean);
+    QCOMPARE(c.value(), QVariant(false));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     // real
     c = ConstExpression(REAL_CONST, QVariant());
     QCOMPARE(c.type(), Field::Double);
+    QCOMPARE(c.value(), QVariant());
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     c = ConstExpression(REAL_CONST, 3.14159);
     QCOMPARE(c.type(), Field::Double);
+    QCOMPARE(c.value(), QVariant(3.14159));
+    QVERIFY(c.validate(&parseInfo));
+    c.setValue(-18.012);
+    QCOMPARE(c.value(), QVariant(-18.012));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     // date
-    c = ConstExpression(DATE_CONST, QDate::currentDate());
+    QDate date(QDate::currentDate());
+    c = ConstExpression(DATE_CONST, date);
     QCOMPARE(c.type(), Field::Date);
+    QCOMPARE(c.value(), QVariant(date));
+    QVERIFY(c.validate(&parseInfo));
+    date = date.addDays(17);
+    c.setValue(date);
+    QCOMPARE(c.value(), QVariant(date));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     // date/time
-    c = ConstExpression(DATETIME_CONST, QDateTime::currentDateTime());
+    QDateTime dateTime(QDateTime::currentDateTime());
+    c = ConstExpression(DATETIME_CONST, dateTime);
     QCOMPARE(c.type(), Field::DateTime);
+    QCOMPARE(c.value(), QVariant(dateTime));
+    QVERIFY(c.validate(&parseInfo));
+    dateTime = dateTime.addDays(-17);
+    c.setValue(dateTime);
+    QCOMPARE(c.value(), QVariant(dateTime));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
     // time
-    c = ConstExpression(TIME_CONST, QTime::currentTime());
+    QTime time(QTime::currentTime());
+    c = ConstExpression(TIME_CONST, time);
     QCOMPARE(c.type(), Field::Time);
+    QCOMPARE(c.value(), QVariant(time));
+    QVERIFY(c.validate(&parseInfo));
+    time.addSecs(1200);
+    c.setValue(time);
+    QCOMPARE(c.value(), QVariant(time));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
 
