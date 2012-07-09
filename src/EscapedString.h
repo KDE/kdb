@@ -39,7 +39,10 @@ public:
     inline EscapedString() : m_valid(true) {}
 
     explicit inline EscapedString(char ch)
-        : QByteArray(&ch, 1), m_valid(true) {}
+        : QByteArray(1, ch), m_valid(true) {}
+
+    explicit inline EscapedString(const QLatin1Char &ch)
+        : QByteArray(1, ch.toLatin1()), m_valid(true) {}
 
     explicit inline EscapedString(const char* string)
         : QByteArray(string), m_valid(true) {}
@@ -516,49 +519,61 @@ inline EscapedString operator+(const EscapedString &a1, const QString &a2)
 {
     if (!a1.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1.toByteArray() + a2.toUtf8());
+    return a1 + EscapedString(a2);
 }
 inline EscapedString operator+(const EscapedString &a1, const QByteArray &a2)
 {
     if (!a1.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1.toByteArray() + a2);
+    return a1 + EscapedString(a2);
 }
 inline EscapedString operator+(const EscapedString &a1, const char* a2)
 {
     if (!a1.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1.toByteArray() + a2);
+    return a1 + EscapedString(a2);
+}
+inline EscapedString operator+(const EscapedString &a1, const QLatin1Char &a2)
+{
+    if (!a1.isValid())
+        return EscapedString::invalid();
+    return a1 + EscapedString(a2.toLatin1());
 }
 inline EscapedString operator+(const EscapedString &a1, char a2)
 {
     if (!a1.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1.toByteArray() + a2);
+    return a1 + EscapedString(a2);
 }
 inline EscapedString operator+(const QString &a1, const EscapedString &a2)
 {
     if (!a2.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1.toLatin1() + a2.toByteArray());
+    return EscapedString(a1) + a2;
 }
 inline EscapedString operator+(const QByteArray &a1, const EscapedString &a2)
 {
     if (!a2.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1 + a2.toByteArray());
+    return EscapedString(a1) + a2;
 }
 inline EscapedString operator+(const char* a1, const EscapedString &a2)
 {
     if (!a2.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1 + a2.toByteArray());
+    return EscapedString(a1) + a2;
+}
+inline EscapedString operator+(const QLatin1Char &a1, const EscapedString &a2)
+{
+    if (!a2.isValid())
+        return EscapedString::invalid();
+    return EscapedString(a1.toLatin1()) + a2;
 }
 inline EscapedString operator+(char a1, const EscapedString &a2)
 {
     if (!a2.isValid())
         return EscapedString::invalid();
-    return EscapedString(a1 + a2.toByteArray());
+    return EscapedString(a1) + a2;
 }
 
 inline bool operator==(const EscapedString &a1, const QByteArray &a2)

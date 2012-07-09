@@ -91,10 +91,11 @@ Field::Type ConstExpressionData::type() const
 
 QDebug ConstExpressionData::debug(QDebug dbg) const
 {
-    dbg.nospace() <<
-           (QLatin1String("ConstExp(") + Expression::tokenToDebugString(token)
-           + QLatin1String(",") + toString().toString()
-           + QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()))).toLocal8Bit().constData();
+    const QString res = QLatin1String("ConstExp(")
+        + Expression::tokenToDebugString(token)
+        + QLatin1String(",") + toString().toString()
+        + QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
+    dbg.nospace() << res.toLocal8Bit().constData();
     return dbg.space();
 }
 

@@ -268,11 +268,11 @@ EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn
             result += separator;
         else
             start = false;
-        result += (tableAliasAndDot +
+        result = (result + tableAliasAndDot +
                    ((conn && escapingType == DriverEscaping)
                         ? conn->escapeIdentifier(f->name())
                         : Predicate::escapeIdentifier(f->name()))
-                  );
+                 );
     }
     return result;
 }

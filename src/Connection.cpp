@@ -955,7 +955,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         if (autoinc && m_driver->beh->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
-                v += m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION;
+                v += (m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION);
             else
                 v += m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_FIELD_OPTION;
         } else {
