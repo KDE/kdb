@@ -48,8 +48,9 @@ ConstExpressionData* ConstExpressionData::clone()
     return new ConstExpressionData(*this);
 }
 
-Field::Type ConstExpressionData::type() const
+Field::Type ConstExpressionData::typeInternal(CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     switch (token) {
     case SQL_NULL:
         return Field::Null;
@@ -89,19 +90,21 @@ Field::Type ConstExpressionData::type() const
     return Field::InvalidType;
 }
 
-QDebug ConstExpressionData::debug(QDebug dbg) const
+void ConstExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     const QString res = QLatin1String("ConstExp(")
         + Expression::tokenToDebugString(token)
         + QLatin1String(",") + toString().toString()
         + QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
     dbg.nospace() << res.toLocal8Bit().constData();
-    return dbg.space();
 }
 
-EscapedString ConstExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString ConstExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                    CallStack* callStack) const
 {
     Q_UNUSED(params);
+    Q_UNUSED(callStack);
     switch (token) {
     case SQL_NULL:
         return EscapedString("NULL");
@@ -135,9 +138,9 @@ void ConstExpressionData::getQueryParameters(QuerySchemaParameterList& params)
     Q_UNUSED(params);
 }
 
-bool ConstExpressionData::validate(ParseInfo *parseInfo)
+bool ConstExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validate(parseInfo))
+    if (!ExpressionData::validateInternal(parseInfo, callStack))
         return false;
 
     return type() != Field::InvalidType;

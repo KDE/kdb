@@ -47,38 +47,38 @@ NArgExpressionData* NArgExpressionData::clone()
     return new NArgExpressionData(*this);
 }
 
-bool NArgExpressionData::validate(ParseInfo *parseInfo)
+bool NArgExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validate(parseInfo))
+    if (!ExpressionData::validateInternal(parseInfo, callStack))
         return false;
 
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
-        if (!data->validate(parseInfo))
+        if (!data->validate(parseInfo, callStack))
             return false;
     }
     return true;
 }
 
-QDebug NArgExpressionData::debug(QDebug dbg) const
+void NArgExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
     dbg.nospace() << "NArgExp(class="
         << expressionClassName(expressionClass);
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         dbg.nospace() << ", ";
-        dbg.nospace() << *data;
+        data->debug(dbg, callStack);
     }
     dbg.nospace() << ")";
-    return dbg.space();
 }
 
-EscapedString NArgExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString NArgExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                   CallStack* callStack) const
 {
     EscapedString s;
     s.reserve(256);
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         if (!s.isEmpty())
             s += ", ";
-        s += data->toString(params);
+        s += data->toString(params, callStack);
     }
     return s;
 }

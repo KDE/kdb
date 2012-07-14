@@ -40,14 +40,14 @@ BinaryExpressionData::~BinaryExpressionData()
 {
 }
 
-bool BinaryExpressionData::validate(ParseInfo *parseInfo)
+bool BinaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validate(parseInfo) || children.count() != 2)
+    if (!ExpressionData::validateInternal(parseInfo, callStack) || children.count() != 2)
         return false;
 
-    if (!left()->validate(parseInfo))
+    if (!left()->validate(parseInfo, callStack))
         return false;
-    if (!right()->validate(parseInfo))
+    if (!right()->validate(parseInfo, callStack))
         return false;
 
 //! @todo compare types..., BITWISE_SHIFT_RIGHT requires integers, etc...
@@ -67,12 +67,12 @@ bool BinaryExpressionData::validate(ParseInfo *parseInfo)
     return true;
 }
 
-Field::Type BinaryExpressionData::type() const
+Field::Type BinaryExpressionData::typeInternal(CallStack* callStack) const
 {
     if (children.count() != 2)
         return Field::InvalidType;
-    const Field::Type lt = left()->type();
-    const Field::Type rt = right()->type();
+    const Field::Type lt = left()->type(callStack);
+    const Field::Type rt = right()->type(callStack);
     if (lt == Field::InvalidType || rt == Field::InvalidType)
         return Field::InvalidType;
     if (lt == Field::Null || rt == Field::Null) {
@@ -106,26 +106,25 @@ BinaryExpressionData* BinaryExpressionData::clone()
     return new BinaryExpressionData(*this);
 }
 
-QDebug BinaryExpressionData::debug(QDebug dbg) const
+void BinaryExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
     dbg.nospace() << "BinaryExp(class="
         << expressionClassName(expressionClass)
         << ",";
     if (children.count() == 2 && left().constData()) {
-        dbg.nospace() << *left();
+        left()->debug(dbg, callStack);
     }
     else {
         dbg.nospace() << "<NONE>";
     }
     dbg.nospace() << "," << Expression::tokenToDebugString(token) << ",";
     if (children.count() == 2 && right().constData()) {
-        dbg.nospace() << *left();
+        right()->debug(dbg, callStack);
     }
     else {
         dbg.nospace() << "<NONE>";
     }
     dbg.nospace() << ",type=" << Driver::defaultSQLTypeName(type()) << ")";
-    return dbg.space();
 }
 
 QString BinaryExpressionData::tokenToString() const
@@ -158,11 +157,12 @@ QString BinaryExpressionData::tokenToString() const
     return QString::fromLatin1("{INVALID_BINARY_OPERATOR#%1} ").arg(token);
 }
 
-EscapedString BinaryExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString BinaryExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                     CallStack* callStack) const
 {
 #define INFIX(a) \
-    (left().constData() ? left()->toString(params) : EscapedString("<NULL>")) \
-    + " " + a + " " + (right().constData() ? right()->toString(params) : EscapedString("<NULL>"))
+    (left().constData() ? left()->toString(params, callStack) : EscapedString("<NULL>")) \
+    + " " + a + " " + (right().constData() ? right()->toString(params, callStack) : EscapedString("<NULL>"))
     return INFIX(tokenToString());
 #undef INFIX
 }

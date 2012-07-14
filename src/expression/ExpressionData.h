@@ -36,6 +36,8 @@ class ConstExpressionData;
 class QueryParameterExpressionData;
 class ParseInfo;
 
+typedef QList<const ExpressionData*> CallStack;
+
 //! Classes of expressions
 enum ExpressionClass {
     UnknownExpressionClass,
@@ -79,20 +81,41 @@ public:
     ExpressionClass expressionClass;
     ExplicitlySharedExpressionDataPointer parent;
     QList<ExplicitlySharedExpressionDataPointer> children;
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
+    Field::Type type() const; //!< @return type of this expression;
+    EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
+    bool validate(ParseInfo *parseInfo);
     virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual ExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
 
     template <typename T>
     const T* convertConst() const { return dynamic_cast<const T*>(this); }
 
     template <typename T>
     T* convert() { return dynamic_cast<T*>(this); }
+
+    //! Sends information about this expression  to debug output @a dbg.
+    QDebug debug(QDebug dbg, CallStack* callStack) const;
+
+    Field::Type type(CallStack* callStack) const;
+
+    EscapedString toString(QuerySchemaParameterValueListIterator* params,
+                           CallStack* callStack) const;
+
+    bool validate(ParseInfo *parseInfo, CallStack* callStack);
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
+
+    bool addToCallStack(QDebug *dbg, QList<const ExpressionData*>* callStack) const;
 };
 
 //! Internal data class used to implement implicitly shared class NArgExpression.
@@ -103,14 +126,17 @@ public:
     NArgExpressionData();
     virtual ~NArgExpressionData();
 
-    //virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
-//    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual NArgExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class UnaryExpression.
@@ -121,20 +147,22 @@ public:
     UnaryExpressionData();
     virtual ~UnaryExpressionData();
 
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
-//    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual UnaryExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
-
     inline ExplicitlySharedExpressionDataPointer arg() const {
-        if (children.isEmpty())
-            return ExplicitlySharedExpressionDataPointer();
-        return children.first();
+        return children.isEmpty() ? ExplicitlySharedExpressionDataPointer() : children.first();
     }
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class BinaryExpression.
@@ -145,17 +173,22 @@ public:
     BinaryExpressionData();
     virtual ~BinaryExpressionData();
 
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
     virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual BinaryExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
-
     inline ExplicitlySharedExpressionDataPointer left() const { return children[0]; }
     inline ExplicitlySharedExpressionDataPointer right() const { return children[1]; }
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class ConstExpression.
@@ -167,14 +200,19 @@ public:
     virtual ~ConstExpressionData();
 
     QVariant value;
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
-    //virtual QString tokenToString() const;
     virtual ConstExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class QueryParameterExpression.
@@ -187,14 +225,19 @@ public:
     virtual ~QueryParameterExpressionData();
 
     Field::Type m_type;
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
-    virtual bool validate(ParseInfo *parseInfo);
-    //virtual QString tokenToString() const;
     virtual QueryParameterExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class VariableExpression.
@@ -228,17 +271,22 @@ public:
      This is set to NULL if this variable is not an asterisk of that form. */
     TableSchema *tableForQueryAsterisk;
 
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
+    virtual VariableExpressionData* clone();
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validate(ParseInfo *parseInfo);
-    //virtual QString tokenToString() const;
-    virtual VariableExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 //! Internal data class used to implement implicitly shared class FunctionExpression.
@@ -253,17 +301,22 @@ public:
     QString name;
     ExplicitlySharedExpressionDataPointer args;
 
-    virtual Field::Type type() const; //!< @return type of this expression;
-    virtual EscapedString toString(QuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QuerySchemaParameterList& params);
+    virtual FunctionExpressionData* clone();
+
+protected:
+    //! Sends information about this expression  to debug output @a dbg (internal).
+    virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
+
+    virtual EscapedString toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                           CallStack* callStack) const;
+
+    virtual Field::Type typeInternal(CallStack* callStack) const;
+
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validate(ParseInfo *parseInfo);
-    //virtual QString tokenToString() const;
-    virtual FunctionExpressionData* clone();
-    //! Sends information about this expression  to debug output @a dbg.
-    virtual QDebug debug(QDebug dbg) const;
+    virtual bool validateInternal(ParseInfo *parseInfo, CallStack* callStack);
 };
 
 } // namespace Predicate

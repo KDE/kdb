@@ -362,11 +362,99 @@ void TestExpressions::testNArgExpression()
     QCOMPARE(n.lastIndexOf(c2, 0), -1);
 }
 
+void TestExpressions::testUnaryExpression()
+{
+    UnaryExpression u;
+    UnaryExpression u2;
+    ConstExpression c;
+    ConstExpression c1;
+
+    // -- empty
+    UnaryExpression emptyUnary;
+    QVERIFY(emptyUnary.isUnary());
+    QVERIFY(emptyUnary.clone().isUnary());
+    QVERIFY(emptyUnary.arg().isNull());
+
+    u = UnaryExpression('-', Expression());
+    QVERIFY(u.arg().isNull());
+
+    // -- copy ctor & cloning
+    c1 = ConstExpression(INTEGER_CONST, 7);
+    u = UnaryExpression('-', c1);
+    testCloneExpression(u);
+    QCOMPARE(u.tokenToDebugString(), QString("-"));
+    QCOMPARE(u.toString(), EscapedString("-7"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    u2 = UnaryExpression('-', u);
+    testCloneExpression(u);
+    QCOMPARE(u2.tokenToDebugString(), QString("-"));
+    QCOMPARE(u2.toString(), EscapedString("--7"));
+    QCOMPARE(u, u2.arg().toUnary());
+
+    u = UnaryExpression('(', c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), EscapedString("(7)"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    c1 = ConstExpression(SQL_TRUE, true);
+    u = UnaryExpression(NOT, c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), EscapedString("NOT TRUE"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    c1 = ConstExpression(SQL_NULL, QVariant());
+    u = UnaryExpression(SQL_IS_NULL, c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), EscapedString("NULL IS NULL"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    c1 = ConstExpression(SQL_NULL, QVariant());
+    u = UnaryExpression(SQL_IS_NOT_NULL, c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), EscapedString("NULL IS NOT NULL"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    c1 = ConstExpression(INTEGER_CONST, 17);
+    u = UnaryExpression(SQL, c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), EscapedString("{INVALID_OPERATOR#%1} 17").arg(SQL));
+    QCOMPARE(c1, u.arg().toConst());
+
+    // -- exchanging arg between two unary expressions
+    c = ConstExpression(INTEGER_CONST, 17);
+    u = UnaryExpression('-', c);
+    c1 = ConstExpression(INTEGER_CONST, 3);
+    u2 = UnaryExpression('+', c1);
+    u2.setArg(c); // this should take c arg from u to u2
+    QCOMPARE(c, u2.arg().toConst()); // c is now in u2
+    QVERIFY(u.arg().isNull()); // u has null arg now
+
+    c = ConstExpression(INTEGER_CONST, 17);
+    u = UnaryExpression('-', c);
+    u2 = UnaryExpression('+', c);
+    // u2 takes c arg from u
+    QCOMPARE(c, u2.arg().toConst()); // c is now in u2
+    QVERIFY(u.arg().isNull()); // u has null arg now
+
+    // -- cycles
+    c = ConstExpression(INTEGER_CONST, 17);
+    u = UnaryExpression('-', c);
+    c1 = ConstExpression(INTEGER_CONST, 3);
+    u2 = UnaryExpression('+', c1);
+    u2.setArg(u);
+    u.setArg(u2);
+    QCOMPARE(u.toString(), EscapedString("-+<CYCLE!>"));
+    QCOMPARE(u2.toString(), EscapedString("+-<CYCLE!>"));
+}
+
 void TestExpressions::testValidate()
 {
     NArgExpression n;
     ConstExpression c;
     ConstExpression c1;
+    UnaryExpression u;
+    UnaryExpression u2;
 
     QuerySchema *query = 0;
     ParseInfoInternal parseInfo(query);
@@ -582,6 +670,15 @@ void TestExpressions::testValidate()
     c.setValue(299);
     QCOMPARE(c.value(), QVariant(299));
     testCloneExpression(c);
+
+    // cycles detected by validate()
+    c = ConstExpression(INTEGER_CONST, 17);
+    u = UnaryExpression('-', c);
+    c1 = ConstExpression(INTEGER_CONST, 3);
+    u2 = UnaryExpression('+', c1);
+    u2.setArg(u);
+    u.setArg(u2);
+    QVERIFY(!u.validate(&parseInfo));
 }
 
 void TestExpressions::cleanupTestCase()

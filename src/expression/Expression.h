@@ -51,17 +51,14 @@ class FunctionExpression;
 class QueryParameterExpression;
 class QuerySchemaParameterValueListIterator;
 
-//! A base class for all expressions
+//! The Expression class represents a base class for all expressions.
 class PREDICATE_EXPORT Expression
 {
 public:
+    /*! Constructs a null expression.
+      @see Expression::isNull() */
     Expression();
 
-    /*Expression(const QExplicitlySharedDataPointer<Data> &data)
-     : d(data)
-    {
-    }*/
-// 
     virtual ~Expression();
 
     //! @return true if this expression is null. 
@@ -129,7 +126,7 @@ public:
     bool isFunction() const;
     bool isQueryParameter() const;
 
-    QDebug debug(QDebug dbg) const;
+    QDebug debug(QDebug dbg, CallStack* callStack) const;
 
     bool operator==(const Expression& e) const;
 
@@ -181,7 +178,7 @@ protected:
     friend class FunctionExpression;
 };
 
-//! A base class N-argument expression
+//! The NArgExpression class represents a base class N-argument expression.
 class PREDICATE_EXPORT NArgExpression : public Expression
 {
 public:
@@ -193,7 +190,7 @@ public:
     NArgExpression(ExpressionClass aClass, int token);
 
     /*! Constructs a copy of other N-argument expression @a expr.
-     Resulting object is not a deep copy but rather reference to the object @a expr. */
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     NArgExpression(const NArgExpression& expr);
 
     //! Destroys the expression.
@@ -254,17 +251,30 @@ protected:
     friend class FunctionExpression;
 };
 
-//! An unary argument operation: + - NOT (or !) ~ "IS NULL" "IS NOT NULL"
+//! The UnaryExpression class represents unary expression (with a single argument).
+/*! operation: + - NOT (or !) ~ "IS NULL" "IS NOT NULL"
+  */
 class PREDICATE_EXPORT UnaryExpression : public Expression
 {
 public:
+    /*! Constructs a null unary expression.
+      @see Expression::isNull() */
     UnaryExpression();
+
+    //! Constructs unary expression with token @a token and argument @a arg.
     UnaryExpression(int token, const Expression& arg);
+
+    /*! Constructs a copy of other unary expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     UnaryExpression(const UnaryExpression& expr);
+
     virtual ~UnaryExpression();
-    // //! @return a deep copy of this object.
-    //virtual UnaryExpression* copy() const;
+
+    //! @return expression that is argument for this unary expression
     Expression arg() const;
+
+    //! Sets expression argument @a expr for this unary expression.
+    void setArg(const Expression &arg);
 
 protected:
     explicit UnaryExpression(ExpressionData* data);
@@ -272,7 +282,8 @@ protected:
     friend class Expression;
 };
 
-/*! A base class for binary operation
+//! The BinaryExpression class represents binary operation.
+/*
  - arithmetic operations: + - / * % << >> & | ||
  - relational operations: = (or ==) < > <= >= <> (or !=) LIKE IN 'SIMILAR TO' 'NOT SIMILAR TO'
  - logical operations: OR (or ||) AND (or &&) XOR
@@ -283,14 +294,27 @@ protected:
 class PREDICATE_EXPORT BinaryExpression : public Expression
 {
 public:
+    /*! Constructs a null binary expression.
+      @see Expression::isNull() */
     BinaryExpression();
+
+    /*! Constructs binary expression with class @a aClass, left expression @a leftExpr,
+     token @a token, and right expression @a rightExpr. */
     BinaryExpression(ExpressionClass aClass, const Expression& leftExpr,
                      int token, const Expression& rightExpr);
+
+    /*! Constructs a copy of other unary expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     BinaryExpression(const BinaryExpression& expr);
+
     virtual ~BinaryExpression();
+
     Expression left() const;
+
     void setLeft(const Expression& leftExpr);
+
     Expression right() const;
+
     void setRight(const Expression& rightExpr);
 
 protected:
@@ -299,20 +323,29 @@ protected:
     friend class Expression;
 };
 
-/*! String, integer, float constants also includes NULL value.
- token can be: IDENTIFIER, SQL_NULL, CHARACTER_STRING_LITERAL,
+
+//! The ConstExpression class represents const expression.
+/*! Types are string, integer, float constants. Also includes NULL value.
+ Token can be: IDENTIFIER, SQL_NULL, CHARACTER_STRING_LITERAL,
  INTEGER_CONST, REAL_CONST */
 class PREDICATE_EXPORT ConstExpression : public Expression
 {
 public:
+    /*! Constructs a null const expression.
+      @see Expression::isNull() */
     ConstExpression();
+
+    /*! Constructs const expression token @a token and value @a value. */
     ConstExpression(int token, const QVariant& value);
+
+    /*! Constructs a copy of other const expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     ConstExpression(const ConstExpression& expr);
+
     virtual ~ConstExpression();
-    // //! @return a deep copy of this object.
-    //virtual ConstExpression* copy() const;
 
     QVariant value() const;
+
     void setValue(const QVariant& value);
 
 protected:
@@ -323,40 +356,57 @@ protected:
     friend class Expression;
 };
 
-//! Query parameter used to getting user input of constant values.
-//! It contains a message that is displayed to the user.
+//! The QueryParameterExpression class represents query parameter expression.
+/*! Query parameter is used to getting user input of constant values.
+ It contains a message that is displayed to the user.
+*/
 class PREDICATE_EXPORT QueryParameterExpression : public ConstExpression
 {
 public:
+    /*! Constructs a null query parameter expression.
+      @see Expression::isNull() */
     QueryParameterExpression();
+
+    /*! Constructs query parameter expression with message @a message. */
     explicit QueryParameterExpression(const QString& message);
+
+    /*! Constructs a copy of other query parameter expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     QueryParameterExpression(const QueryParameterExpression& expr);
+
     virtual ~QueryParameterExpression();
+
     /*! Sets expected type of the parameter. The default is String.
      This method is called from parent's expression validate().
      This depends on the type of the related expression.
      For instance: query "SELECT * FROM cars WHERE name=[enter name]",
      "[enter name]" has parameter of the same type as "name" field.
      "=" binary expression's validate() will be called for the left side
-     of the expression and then the right side will have type set to String.
-    */
+     of the expression and then the right side will have type set to String. */
     void setType(Field::Type type);
+
 protected:
     explicit QueryParameterExpression(ExpressionData* data);
 
     friend class Expression;
 };
 
-//! Variables like <i>fieldname</i> or <i>tablename</i>.<i>fieldname</i>
+//! The VariableExpression class represents variables such as <i>fieldname</i> or <i>tablename</i>.<i>fieldname</i>
 class PREDICATE_EXPORT VariableExpression : public Expression
 {
 public:
+    /*! Constructs a null variable expression.
+      @see Expression::isNull() */
     VariableExpression();
+
+    /*! Constructs variable expression with name @a name. */
     explicit VariableExpression(const QString& name);
+
+    /*! Constructs a copy of other variable expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     VariableExpression(const VariableExpression& expr);
+
     virtual ~VariableExpression();
-    // //! @return a deep copy of this object.
-    //virtual VariableExpression* copy() const;
 
     /*! Verbatim name as returned by scanner. */
     QString name() const;
@@ -386,23 +436,38 @@ protected:
     friend class Expression;
 };
 
-//! - aggregation functions like SUM, COUNT, MAX, ...
-//! - builtin functions like CURRENT_TIME()
-//! - user defined functions
+//! The FunctionExpression class represents expression that use functional notation F(x, ...)
+/*! The functions list include:
+ - aggregation functions like SUM, COUNT, MAX, ...
+ - builtin functions like CURRENT_TIME()
+ - user defined functions */
 class PREDICATE_EXPORT FunctionExpression : public Expression
 {
 public:
+    /*! Constructs a null function expression.
+      @see Expression::isNull() */
     FunctionExpression();
+
+    /*! Constructs function expression with name @a name, without arguments. */
     explicit FunctionExpression(const QString& name);
+
+    /*! Constructs function expression with name @a name and arguments @a args. */
     FunctionExpression(const QString& name, NArgExpression& args);
+
+    /*! Constructs a copy of other function expression @a expr.
+     Resulting object is not a deep copy but rather a reference to the object @a expr. */
     FunctionExpression(const FunctionExpression& expr);
+
     virtual ~FunctionExpression();
 
     QString name() const;
+
     NArgExpression arguments() const;
 
     static QStringList builtInAggregates();
+
     static bool isBuiltInAggregate(const QString& function);
+
 protected:
     explicit FunctionExpression(ExpressionData* data);
 

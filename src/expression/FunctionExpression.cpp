@@ -77,22 +77,21 @@ FunctionExpressionData* FunctionExpressionData::clone()
     return new FunctionExpressionData(*this);
 }
 
-QDebug FunctionExpressionData::debug(QDebug dbg) const
+void FunctionExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
     dbg.nospace() << "FunctionExp(" << name;
     if (args.data()) {
         dbg.nospace() << ',';
-        args.data()->debug(dbg);
+        args.data()->debug(dbg, callStack);
     }
     dbg.nospace() << QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
-    return dbg.space();
 }
 
-EscapedString FunctionExpressionData::toString(
-    QuerySchemaParameterValueListIterator* params) const
+EscapedString FunctionExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                       CallStack* callStack) const
 {
     return EscapedString(name + QLatin1Char('('))
-           + (args.data() ? args.data()->toString(params) : EscapedString())
+           + (args.data() ? args.data()->toString(params, callStack) : EscapedString())
            + EscapedString(')');
 }
 
@@ -101,15 +100,16 @@ void FunctionExpressionData::getQueryParameters(QuerySchemaParameterList& params
     args->getQueryParameters(params);
 }
 
-Field::Type FunctionExpressionData::type() const
+Field::Type FunctionExpressionData::typeInternal(CallStack* callStack) const
 {
 //! @todo
+    Q_UNUSED(callStack);
     return Field::InvalidType;
 }
 
-bool FunctionExpressionData::validate(ParseInfo *parseInfo)
+bool FunctionExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validate(parseInfo))
+    if (!ExpressionData::validateInternal(parseInfo, callStack))
         return false;
 
     return args.data() ? args.data()->validate(parseInfo) : true;

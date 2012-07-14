@@ -60,18 +60,20 @@ VariableExpressionData* VariableExpressionData::clone()
     return new VariableExpressionData(*this);
 }
 
-QDebug VariableExpressionData::debug(QDebug dbg) const
+void VariableExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     dbg.nospace() << "VariableExp(" << name
         << QString::fromLatin1(",type=%1)")
           .arg(field ? Driver::defaultSQLTypeName(type())
                      : QLatin1String("FIELD NOT DEFINED YET"));
-    return dbg.space();
 }
 
-EscapedString VariableExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString VariableExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                       CallStack* callStack) const
 {
     Q_UNUSED(params);
+    Q_UNUSED(callStack);
     return EscapedString(name);
 }
 
@@ -81,8 +83,9 @@ void VariableExpressionData::getQueryParameters(QuerySchemaParameterList& params
 }
 
 //! We're assuming it's called after VariableExpr::validate()
-Field::Type VariableExpressionData::type() const
+Field::Type VariableExpressionData::typeInternal(CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     if (field)
         return field->type();
 
@@ -97,10 +100,10 @@ static void validateImplError(ParseInfo *parseInfo_, const QString &errmsg)
     parseInfo->setErrorDescription(errmsg);
 }
 
-bool VariableExpressionData::validate(ParseInfo *parseInfo_)
+bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* callStack)
 {
     ParseInfoInternal *parseInfo = static_cast<ParseInfoInternal*>(parseInfo_);
-    if (!ExpressionData::validate(parseInfo))
+    if (!ExpressionData::validateInternal(parseInfo, callStack))
         return false;
     field = 0;
     tablePositionForField = -1;

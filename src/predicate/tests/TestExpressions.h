@@ -34,6 +34,7 @@ private Q_SLOTS:
     void testExpressionClassName();
     void testExpressionToken();
     void testNArgExpression();
+    void testUnaryExpression();
     void testValidate();
 
     void cleanupTestCase();

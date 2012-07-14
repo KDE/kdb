@@ -47,36 +47,47 @@ UnaryExpressionData* UnaryExpressionData::clone()
     return new UnaryExpressionData(*this);
 }
 
-QDebug UnaryExpressionData::debug(QDebug dbg) const
+void UnaryExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
-    dbg.nospace() << "UnaryExp('"
-           << Expression::tokenToDebugString(token) << "', ";
-    ExplicitlySharedExpressionDataPointer a = arg();
-    if (a.data())
-        dbg.nospace() << *a;
-    else
+    dbg.nospace() << "UnaryExp("
+           << Expression::tokenToDebugString(token) << ",";
+    if (children.isEmpty()) {
         dbg.nospace() << "<NONE>";
-    dbg.nospace() << QString::fromLatin1(",type=%1)").arg(Driver::defaultSQLTypeName(type()));
-    return dbg.space();
+    }
+    else {
+        ExplicitlySharedExpressionDataPointer a = arg();
+        if (a.data()) {
+            a->debug(dbg, callStack);
+        }
+        else {
+            dbg.nospace() << "<NONE>";
+        }
+    }
+    dbg.nospace() << QString::fromLatin1(",type=%1)")
+        .arg(Driver::defaultSQLTypeName(type())).toLatin1().constData();
 }
 
-EscapedString UnaryExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
+EscapedString UnaryExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                    CallStack* callStack) const
 {
     ExplicitlySharedExpressionDataPointer a = arg();
-
-    if (token == '(') //parentheses (special case)
-        return "(" + (a.constData() ? a->toString(params) : EscapedString("<NULL>")) + ")";
-    if (token < 255 && isprint(token))
+    if (token == '(') { //parentheses (special case)
+        return "(" + (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>")) + ")";
+    }
+    if (token < 255 && isprint(token)) {
         return Expression::tokenToDebugString(token)
-                + (a.constData() ? a->toString(params) : EscapedString("<NULL>"));
-    if (token == NOT)
-        return "NOT " + (a.constData() ? a->toString(params) : EscapedString("<NULL>"));
-    if (token == SQL_IS_NULL)
-        return (a.constData() ? a->toString(params) : EscapedString("<NULL>")) + " IS NULL";
-    if (token == SQL_IS_NOT_NULL)
-        return (a.constData() ? a->toString(params) : EscapedString("<NULL>")) + " IS NOT NULL";
+                + (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>"));
+    }
+    switch (token) {
+    case NOT:
+        return "NOT " + (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>"));
+    case SQL_IS_NULL:
+        return (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>")) + " IS NULL";
+    case SQL_IS_NOT_NULL:
+        return (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>")) + " IS NOT NULL";
+    }
     return EscapedString("{INVALID_OPERATOR#%1} ")
-        .arg(token) + (a.constData() ? a->toString(params) : EscapedString("<NULL>"));
+        .arg(token) + (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>"));
 }
 
 void UnaryExpressionData::getQueryParameters(QuerySchemaParameterList& params)
@@ -86,8 +97,11 @@ void UnaryExpressionData::getQueryParameters(QuerySchemaParameterList& params)
         a->getQueryParameters(params);
 }
 
-Field::Type UnaryExpressionData::type() const
+Field::Type UnaryExpressionData::typeInternal(CallStack* callStack) const
 {
+    if (children.isEmpty()) {
+        return Field::InvalidType;
+    }
     ExplicitlySharedExpressionDataPointer a = arg();
     if (!a.constData())
         return Field::InvalidType;
@@ -100,7 +114,7 @@ Field::Type UnaryExpressionData::type() const
         return Field::Boolean;
     }
 
-    const Field::Type t = a->type();
+    const Field::Type t = a->type(callStack);
     if (t == Field::Null)
         return Field::Null;
     if (token == NOT)
@@ -109,16 +123,16 @@ Field::Type UnaryExpressionData::type() const
     return t;
 }
 
-bool UnaryExpressionData::validate(ParseInfo *parseInfo)
+bool UnaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
     ExplicitlySharedExpressionDataPointer a = arg();
     if (!a.constData())
         return false;
 
-    if (!ExpressionData::validate(parseInfo))
+    if (!ExpressionData::validateInternal(parseInfo, callStack))
         return false;
 
-    if (!a->validate(parseInfo))
+    if (!a->validate(parseInfo, callStack))
         return false;
 
 //! @todo compare types... e.g. NOT applied to Text makes no sense...
@@ -159,14 +173,14 @@ bool UnaryExpressionData::validate(ParseInfo *parseInfo)
 UnaryExpression::UnaryExpression()
  : Expression(new UnaryExpressionData)
 {
+//    insertEmptyChild(0);
     ExpressionDebug << "UnaryExpression() ctor" << *this;
 }
 
 UnaryExpression::UnaryExpression(int token, const Expression& arg)
         : Expression(new UnaryExpressionData, UnaryExpressionClass, token)
 {
-    if (!arg.isNull())
-        appendChild(arg);
+    appendChild(arg.d);
 }
 
 UnaryExpression::UnaryExpression(ExpressionData* data)
@@ -186,5 +200,14 @@ UnaryExpression::~UnaryExpression()
 
 Expression UnaryExpression::arg() const
 {
-    return Expression(d->convertConst<UnaryExpressionData>()->arg().data());
+    ExpressionData *data = d->convertConst<UnaryExpressionData>()->arg().data();
+    return data ? Expression(data) : Expression();
+}
+
+void UnaryExpression::setArg(const Expression &arg)
+{
+    if (!d->children.isEmpty()) {
+        removeChild(0);
+    }
+    insertChild(0, arg);
 }

@@ -56,16 +56,17 @@ QueryParameterExpressionData* QueryParameterExpressionData::clone()
     return new QueryParameterExpressionData(*this);
 }
 
-QDebug QueryParameterExpressionData::debug(QDebug dbg) const
+void QueryParameterExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     dbg.nospace() << QString::fromLatin1("QueryParExp([%1],type=%2)")
         .arg(value.toString()).arg(Driver::defaultSQLTypeName(type()));
-    return dbg.space();
 }
 
-EscapedString QueryParameterExpressionData::toString(
-    QuerySchemaParameterValueListIterator* params) const
+EscapedString QueryParameterExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                                             CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     return params ? params->getPreviousValueAsString(type())
            : EscapedString("[%1]").arg(EscapedString(value.toString()));
 }
@@ -78,14 +79,15 @@ void QueryParameterExpressionData::getQueryParameters(QuerySchemaParameterList& 
     params.append(param);
 }
 
-bool QueryParameterExpressionData::validate(ParseInfo *parseInfo)
+bool QueryParameterExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
     Q_UNUSED(parseInfo);
     return type() != Field::InvalidType;
 }
 
-Field::Type QueryParameterExpressionData::type() const
+Field::Type QueryParameterExpressionData::typeInternal(CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     return m_type;
 }
 

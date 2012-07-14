@@ -63,7 +63,8 @@ PREDICATE_EXPORT QString Predicate::expressionClassName(ExpressionClass c)
 
 PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Expression& expr)
 {
-    return expr.debug(dbg.nospace());
+    CallStack callStack;
+    return expr.debug(dbg.nospace(), &callStack);
 }
 
 //=========================================
@@ -96,25 +97,45 @@ ExpressionData* ExpressionData::clone()
     return new ExpressionData(*this);
 }
 
-Field::Type ExpressionData::type() const
+Field::Type ExpressionData::typeInternal(CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     return Field::InvalidType;
 }
 
-QDebug ExpressionData::debug(QDebug dbg) const
+Field::Type ExpressionData::type(CallStack* callStack) const
 {
-    dbg.nospace() << QString::fromLatin1("Exp(%1,type=%2)")
-                   .arg(token).arg(Driver::defaultSQLTypeName(type()));
-    return dbg.space();
+    if (!addToCallStack(0, callStack)) {
+        return Field::InvalidType;
+    }
+    const Field::Type t = typeInternal(callStack);
+    callStack->removeLast();
+    return t;
 }
 
-QDebug operator<<(QDebug dbg, const ExpressionData& expr)
+Field::Type ExpressionData::type() const
 {
-    expr.debug(dbg.nospace());
-    return dbg.space();
+    CallStack callStack;
+    return type(&callStack);
 }
 
 bool ExpressionData::validate(ParseInfo *parseInfo)
+{
+    CallStack callStack;
+    return validate(parseInfo, &callStack);
+}
+
+bool ExpressionData::validate(ParseInfo *parseInfo, CallStack* callStack)
+{
+    if (!addToCallStack(0, callStack)) {
+        return false;
+    }
+    bool result = validateInternal(parseInfo, callStack);
+    callStack->removeLast();
+    return result;
+}
+
+bool ExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
     Q_UNUSED(parseInfo);
     return true;
@@ -129,6 +150,24 @@ QString ExpressionData::tokenToString() const
 
 EscapedString ExpressionData::toString(QuerySchemaParameterValueListIterator* params) const
 {
+    CallStack callStack;
+    return toString(params, &callStack);
+}
+
+EscapedString ExpressionData::toString(QuerySchemaParameterValueListIterator* params,
+                                       CallStack* callStack) const
+{
+    if (!addToCallStack(0, callStack)) {
+        return EscapedString("<CYCLE!>");
+    }
+    EscapedString s = toStringInternal(params, callStack);
+    callStack->removeLast();
+    return s;
+}
+
+EscapedString ExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
+                                               CallStack* callStack) const
+{
     Q_UNUSED(params);
     return EscapedString();
 }
@@ -136,6 +175,42 @@ EscapedString ExpressionData::toString(QuerySchemaParameterValueListIterator* pa
 void ExpressionData::getQueryParameters(QuerySchemaParameterList& params)
 {
     Q_UNUSED(params);
+}
+
+bool ExpressionData::addToCallStack(QDebug *dbg, QList<const ExpressionData*>* callStack) const
+{
+    if (callStack->contains(this)) {
+        if (dbg)
+            dbg->nospace() << "<CYCLE!>";
+        qWarning() << "Cycle detected in"
+            << expressionClassName(expressionClass) << Expression::tokenToDebugString(token);
+        return false;
+    }
+    callStack->append(this);
+    return true;
+}
+
+QDebug ExpressionData::debug(QDebug dbg, CallStack* callStack) const
+{
+    if (!addToCallStack(&dbg, callStack)) {
+        return dbg.nospace();
+    }
+    debugInternal(dbg, callStack);
+    callStack->removeLast();
+    return dbg.nospace();
+}
+
+QDebug operator<<(QDebug dbg, const ExpressionData& expr)
+{
+    CallStack callStack;
+    return expr.debug(dbg.nospace(), &callStack);
+}
+
+void ExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
+{
+    Q_UNUSED(callStack);
+    dbg.nospace() << QString::fromLatin1("Exp(%1,type=%2)")
+                   .arg(token).arg(Driver::defaultSQLTypeName(type()));
 }
 
 //=========================================
@@ -274,6 +349,7 @@ void Expression::removeChild(int i)
         return;
     if (i < 0 || i >= d->children.count())
         return;
+    qDebug() << d->children.count() << d->children.at(i);
     d->children.removeAt(i);
 }
 
@@ -335,9 +411,11 @@ void Expression::getQueryParameters(QuerySchemaParameterList& params)
     d->getQueryParameters(params);
 }
 
-QDebug Expression::debug(QDebug dbg) const
+QDebug Expression::debug(QDebug dbg, CallStack* callStack) const
 {
-    return d->debug(dbg);
+    if (d)
+        d->debug(dbg, callStack);
+    return dbg.space();
 }
 
 bool Expression::operator==(const Expression& e) const
