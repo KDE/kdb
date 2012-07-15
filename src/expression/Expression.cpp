@@ -138,6 +138,7 @@ bool ExpressionData::validate(ParseInfo *parseInfo, CallStack* callStack)
 bool ExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
     Q_UNUSED(parseInfo);
+    Q_UNUSED(callStack);
     return true;
 }
 
@@ -169,7 +170,8 @@ EscapedString ExpressionData::toStringInternal(QuerySchemaParameterValueListIter
                                                CallStack* callStack) const
 {
     Q_UNUSED(params);
-    return EscapedString();
+    Q_UNUSED(callStack);
+    return EscapedString("<NULL!>");
 }
 
 void ExpressionData::getQueryParameters(QuerySchemaParameterList& params)
@@ -325,8 +327,8 @@ void Expression::insertChild(int i, const Expression& child)
 
 void Expression::insertEmptyChild(int i)
 {
-    if (isNull())
-        return;
+    //if (isNull())
+    //    return;
     if (i < 0 || i > d->children.count())
         return;
     Expression child;
@@ -402,7 +404,7 @@ void Expression::appendChild(const ExplicitlySharedExpressionDataPointer& child)
 EscapedString Expression::toString(QuerySchemaParameterValueListIterator* params) const
 {
     if (isNull())
-        return EscapedString("NULL");
+        return EscapedString("<NULL!>");
     return d->toString(params);
 }
 
@@ -499,6 +501,27 @@ VariableExpression Expression::toVariable() const
 FunctionExpression Expression::toFunction() const
 {
     return CAST(FunctionExpression);
+}
+
+void Expression::setLeftOrRight(const Expression& e, int index)
+{
+    if (this == &e) {
+        qWarning() << "Expression::setLeftOrRight(): Expression cannot be own child";
+        return;
+    }
+    if (d->children.indexOf(e.d) == index) { // cannot set twice
+        return;
+    }
+    if (d->children[index == 0 ? 1 : 0] == e.d) { // this arg was at right, remove
+        d->children[index] = e.d;
+        d->children[index == 0 ? 1 : 0] = new ExpressionData;
+    }
+    else {
+        if (e.d->parent) { // remove from old parent
+            e.d->parent->children.removeOne(e.d);
+        }
+        d->children[index] = e.d;
+    }
 }
 
 #undef CAST

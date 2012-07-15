@@ -180,6 +180,8 @@ public:
     inline ExplicitlySharedExpressionDataPointer right() const { return children[1]; }
 
 protected:
+    void setLeft(const ExpressionData& left);
+
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, CallStack* callStack) const;
 

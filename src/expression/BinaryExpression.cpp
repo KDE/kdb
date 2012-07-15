@@ -207,8 +207,14 @@ BinaryExpression::BinaryExpression(ExpressionClass aClass,
                                    const Expression& rightExpr)
     : Expression(new BinaryExpressionData, classForArgs(aClass, leftExpr, rightExpr), token)
 {
-    appendChild(leftExpr.d);
-    appendChild(rightExpr.d);
+    if (isNull()) {
+        insertEmptyChild(0);
+        insertEmptyChild(1);
+    }
+    else {
+        appendChild(leftExpr.d);
+        appendChild(rightExpr.d);
+    }
 }
 
 BinaryExpression::BinaryExpression(const BinaryExpression& expr)
@@ -220,8 +226,8 @@ BinaryExpression::BinaryExpression(ExpressionData* data)
  : Expression(data)
 {
     ExpressionDebug << "BinaryExpression(ExpressionData*) ctor" << *this;
-//    insertEmptyChild(0);
-//    insertEmptyChild(1);
+    insertEmptyChild(0);
+    insertEmptyChild(1);
 }
 
 BinaryExpression::~BinaryExpression()
@@ -235,7 +241,7 @@ Expression BinaryExpression::left() const
 
 void BinaryExpression::setLeft(const Expression& leftExpr)
 {
-    d->children[0] = leftExpr.d;
+    Expression::setLeftOrRight(leftExpr, 0);
 }
 
 Expression BinaryExpression::right() const
@@ -245,5 +251,5 @@ Expression BinaryExpression::right() const
 
 void BinaryExpression::setRight(const Expression& rightExpr)
 {
-    d->children[1] = rightExpr.d;
+    Expression::setLeftOrRight(rightExpr, 1);
 }

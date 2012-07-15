@@ -35,6 +35,9 @@ private Q_SLOTS:
     void testExpressionToken();
     void testNArgExpression();
     void testUnaryExpression();
+    void testBinaryExpression();
+    void testBinaryExpressionCloning_data();
+    void testBinaryExpressionCloning();
     void testValidate();
 
     void cleanupTestCase();

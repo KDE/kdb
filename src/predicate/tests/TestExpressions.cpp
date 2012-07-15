@@ -92,7 +92,7 @@ void TestExpressions::testNullExpression()
     e1 = e2;
     QVERIFY(e1.isNull());
     QCOMPARE(e1, e2);
-    QCOMPARE(e1.toString(), EscapedString("NULL"));
+    QCOMPARE(e1.toString(), EscapedString("<NULL!>"));
     QCOMPARE(e1.tokenToDebugString(), QLatin1String("0"));
     QCOMPARE(e1.tokenToString(), QString());
     compareStrings(e1, e2);
@@ -192,7 +192,8 @@ void TestExpressions::testNArgExpression()
     Expression e;
     NArgExpression nNull;
     nNull.append(e);
-    QCOMPARE(nNull.argCount(), 0); // n-arg expression should have class, otherwise is null and cannot have children
+    QCOMPARE(nNull.argCount(), 0); // n-arg expression should have class, otherwise is null
+                                   // and cannot have children
 
     n = NArgExpression(ArithmeticExpressionClass, '+');
     c1 = ConstExpression(INTEGER_CONST, 1);
@@ -205,10 +206,10 @@ void TestExpressions::testNArgExpression()
     n = NArgExpression(ArithmeticExpressionClass, '+');
     n.append(n);
     QCOMPARE(n.argCount(), 0); // append should fail since appending expression
-                                // to itself is not allowed
+                               // to itself is not allowed
     n.prepend(n);
     QCOMPARE(n.argCount(), 0); // append should fail since prepending expression
-                                // to itself is not allowed
+                               // to itself is not allowed
 
     n = NArgExpression(ArithmeticExpressionClass, '+');
     c1 = ConstExpression(INTEGER_CONST, 2);
@@ -448,6 +449,150 @@ void TestExpressions::testUnaryExpression()
     QCOMPARE(u2.toString(), EscapedString("+-<CYCLE!>"));
 }
 
+void TestExpressions::testBinaryExpression()
+{
+    BinaryExpression b;
+    BinaryExpression b2;
+    ConstExpression c;
+    ConstExpression c1;
+
+    // -- empty
+    BinaryExpression emptyBinary;
+    QVERIFY(emptyBinary.isNull());
+    QVERIFY(emptyBinary.isBinary());
+    QVERIFY(emptyBinary.clone().isBinary());
+    QVERIFY(emptyBinary.left().isNull());
+    QVERIFY(emptyBinary.right().isNull());
+
+    b = BinaryExpression(ArithmeticExpressionClass, Expression(), '-', Expression());
+    QVERIFY(b.left().isNull());
+    QVERIFY(b.right().isNull());
+    QVERIFY(b.isNull()); // it's null because args are null
+    qDebug() << b.toString();
+    QCOMPARE(b.toString(), EscapedString("<NULL!>"));
+    c = ConstExpression(INTEGER_CONST, 10);
+    b = BinaryExpression(ArithmeticExpressionClass, c, '-', Expression());
+    QVERIFY(b.left().isNull());
+    QVERIFY(b.right().isNull());
+    QVERIFY(b.isNull()); // it's null because one arg is null
+    qDebug() << b.toString();
+    QCOMPARE(b.toString(), EscapedString("<NULL!>"));
+    b = BinaryExpression(ArithmeticExpressionClass, Expression(), '-', c);
+    QVERIFY(b.left().isNull());
+    QVERIFY(b.right().isNull());
+    QVERIFY(b.isNull()); // it's null because one arg is null
+    qDebug() << b.toString();
+    QCOMPARE(b.toString(), EscapedString("<NULL!>"));
+
+    // -- copy ctor & cloning
+    c = ConstExpression(INTEGER_CONST, 3);
+    c1 = ConstExpression(INTEGER_CONST, 4);
+    b = BinaryExpression(ArithmeticExpressionClass, c, '/', c1);
+    testCloneExpression(b);
+    QCOMPARE(b.tokenToDebugString(), QString("/"));
+    QCOMPARE(b.toString(), EscapedString("3 / 4"));
+    QCOMPARE(c1, b.right().toConst());
+
+    b2 = BinaryExpression(ArithmeticExpressionClass, b, '*', b.clone());
+    testCloneExpression(b2);
+    QCOMPARE(b2.tokenToDebugString(), QString("*"));
+    QCOMPARE(b2.toString(), EscapedString("3 / 4 * 3 / 4"));
+    QCOMPARE(b, b2.left().toBinary());
+
+    // -- cycles
+    // --- ref to parent
+    b = BinaryExpression(ArithmeticExpressionClass,
+        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    EscapedString s = b.toString();
+    b.setLeft(b); // should not work
+    qDebug() << b.toString();
+    QCOMPARE(s, b.toString());
+    // --- cannot set twice
+    c = b.left().toConst();
+    b.setLeft(c);
+    QCOMPARE(s, b.toString());
+    // --- ref to grandparent
+    b = BinaryExpression(ArithmeticExpressionClass,
+        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    c = ConstExpression(INTEGER_CONST, 10);
+    b2 = BinaryExpression(ArithmeticExpressionClass, b, '-', c);
+    qDebug() << b2.toString();
+    QCOMPARE(b2.toString(), EscapedString("1 + 2 - 10"));
+    b.setRight(b2);
+    qDebug() << b2.toString();
+    QCOMPARE(b2.toString(), EscapedString("1 + <CYCLE!> - 10"));
+
+    // -- moving right argument to left should remove right arg
+    b = BinaryExpression(ArithmeticExpressionClass,
+        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    c = b.right().toConst();
+    b.setLeft(c);
+    qDebug() << b.toString();
+    QCOMPARE(b.toString(), EscapedString("2 + <NULL!>"));
+
+    // -- moving left argument to right should remove left arg
+    b = BinaryExpression(ArithmeticExpressionClass,
+        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    c = b.left().toConst();
+    b.setRight(c);
+    qDebug() << b.toString();
+    QCOMPARE(b.toString(), EscapedString("<NULL!> + 1"));
+}
+
+void TestExpressions::testBinaryExpressionCloning_data()
+{
+    QTest::addColumn<ExpressionClass>("expClass");
+    QTest::addColumn<int>("type1");
+    QTest::addColumn<QVariant>("const1");
+    QTest::addColumn<int>("token");
+    QTest::addColumn<int>("type2");
+    QTest::addColumn<QVariant>("const2");
+    QTest::addColumn<QString>("string");
+
+#define T(expClass, type1, const1, token, type2, const2, string) \
+        QTest::newRow(Expression::tokenToDebugString(token).toLatin1()) \
+            << expClass << int(type1) << QVariant(const1) << int(token) \
+            << int(type2) << QVariant(const2) << QString(string)
+
+    T(ArithmeticExpressionClass, INTEGER_CONST, 3, '/', INTEGER_CONST, 4, "3 / 4");
+    T(ArithmeticExpressionClass, INTEGER_CONST, 3, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 4, "3 >> 4");
+    T(ArithmeticExpressionClass, INTEGER_CONST, 3, BITWISE_SHIFT_LEFT, INTEGER_CONST, 4, "3 << 4");
+    T(RelationalExpressionClass, INTEGER_CONST, 3, NOT_EQUAL, INTEGER_CONST, 4, "3 <> 4");
+    T(RelationalExpressionClass, INTEGER_CONST, 3, NOT_EQUAL2, INTEGER_CONST, 4, "3 != 4");
+    T(RelationalExpressionClass, INTEGER_CONST, 3, LESS_OR_EQUAL, INTEGER_CONST, 4, "3 <= 4");
+    T(RelationalExpressionClass, INTEGER_CONST, 3, GREATER_OR_EQUAL, INTEGER_CONST, 4, "3 >= 4");
+    T(ArithmeticExpressionClass, CHARACTER_STRING_LITERAL, "ABC", LIKE, CHARACTER_STRING_LITERAL, "A%", "'ABC' LIKE 'A%'");
+    T(LogicalExpressionClass, INTEGER_CONST, 3, SQL_IN, INTEGER_CONST, 4, "3 IN 4");
+    T(LogicalExpressionClass, INTEGER_CONST, 3, SIMILAR_TO, INTEGER_CONST, 4, "3 SIMILAR TO 4");
+    T(LogicalExpressionClass, INTEGER_CONST, 3, NOT_SIMILAR_TO, INTEGER_CONST, 4, "3 NOT SIMILAR TO 4");
+    T(LogicalExpressionClass, SQL_TRUE, true, OR, SQL_FALSE, false, "TRUE OR FALSE");
+    T(LogicalExpressionClass, INTEGER_CONST, 3, AND, INTEGER_CONST, 4, "3 AND 4");
+    T(LogicalExpressionClass, INTEGER_CONST, 3, XOR, INTEGER_CONST, 4, "3 XOR 4");
+    T(ArithmeticExpressionClass, CHARACTER_STRING_LITERAL, "AB", CONCATENATION, CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
+#undef T
+}
+
+void TestExpressions::testBinaryExpressionCloning()
+{
+    QFETCH(ExpressionClass, expClass);
+    QFETCH(int, type1);
+    QFETCH(QVariant, const1);
+    QFETCH(int, token);
+    QFETCH(int, type2);
+    QFETCH(QVariant, const2);
+    QFETCH(QString, string);
+
+    ConstExpression c(type1, const1);
+    ConstExpression c1(type2, const2);
+    BinaryExpression b(expClass, c, token, c1);
+    testCloneExpression(b);
+    QCOMPARE(b.tokenToDebugString(), Expression::tokenToDebugString(token));
+    qDebug() << Expression::tokenToDebugString(token) << b.toString();
+    QCOMPARE(b.toString(), EscapedString(string));
+    QCOMPARE(c, b.left().toConst());
+    QCOMPARE(c1, b.right().toConst());
+}
+
 void TestExpressions::testValidate()
 {
     NArgExpression n;
@@ -471,12 +616,14 @@ void TestExpressions::testValidate()
     QCOMPARE(n.type(), Field::InvalidType); // N-arg expression is abstract, unspecified type
     QVERIFY(n.validate(&parseInfo));
     testCloneExpression(n);
+    qDebug() << c << c1 << n;
 
     // null
     c = ConstExpression(SQL_NULL, QVariant());
     QCOMPARE(c.type(), Field::Null);
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // integer
     c = ConstExpression(INTEGER_CONST, -0x7f);
@@ -489,78 +636,91 @@ void TestExpressions::testValidate()
     QCOMPARE(c.value(), QVariant(-0x80));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, -10);
     QCOMPARE(c.type(), Field::Byte);
     QCOMPARE(c.value(), QVariant(-10));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, 0);
     QCOMPARE(c.type(), Field::Byte);
     QCOMPARE(c.value(), QVariant(0));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, 20);
     QCOMPARE(c.type(), Field::Byte);
     QCOMPARE(c.value(), QVariant(20));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, 255);
     QCOMPARE(c.type(), Field::Byte);
     QCOMPARE(c.value(), QVariant(255));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, -0x80);
     QCOMPARE(c.type(), Field::ShortInteger);
     QCOMPARE(c.value(), QVariant(-0x80));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, -0x7fff);
     QCOMPARE(c.type(), Field::ShortInteger);
     QCOMPARE(c.value(), QVariant(-0x7fff));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, 256);
     QCOMPARE(c.type(), Field::ShortInteger);
     QCOMPARE(c.value(), QVariant(256));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, 0xffff);
     QCOMPARE(c.type(), Field::ShortInteger);
     QCOMPARE(c.value(), QVariant(0xffff));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, -0x8000);
     QCOMPARE(c.type(), Field::Integer);
     QCOMPARE(c.value(), QVariant(-0x8000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, uint(0x10000));
     QCOMPARE(c.type(), Field::Integer);
     QCOMPARE(c.value(), QVariant(0x10000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, qlonglong(-0x100000));
     QCOMPARE(c.type(), Field::BigInteger);
     QCOMPARE(c.value(), QVariant(-0x100000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(INTEGER_CONST, qulonglong(0x1000000));
     QCOMPARE(c.type(), Field::BigInteger);
     QCOMPARE(c.value(), QVariant(0x1000000));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // string
     int oldMaxLen = Field::defaultMaxLength(); // save
@@ -570,6 +730,7 @@ void TestExpressions::testValidate()
     QCOMPARE(c.value(), QVariant("01234567890"));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     Field::setDefaultMaxLength(10);
     c = ConstExpression(CHARACTER_STRING_LITERAL, QString());
@@ -577,22 +738,26 @@ void TestExpressions::testValidate()
     QCOMPARE(c.value(), QVariant(QString()));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(CHARACTER_STRING_LITERAL, QVariant());
     QCOMPARE(c.type(), Field::Text);
     QCOMPARE(c.value(), QVariant());
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
     QCOMPARE(c.type(), Field::LongText);
     QCOMPARE(c.value(), QVariant("01234567890"));
     QVERIFY(c.validate(&parseInfo));
+    qDebug() << c;
     c.setValue("ąćę");
     QCOMPARE(c.value(), QVariant("ąćę"));
     QCOMPARE(c.type(), Field::Text);
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     Field::setDefaultMaxLength(oldMaxLen); // restore
 
@@ -601,16 +766,19 @@ void TestExpressions::testValidate()
     QCOMPARE(c.type(), Field::Boolean);
     QCOMPARE(c.value(), QVariant(true));
     QVERIFY(c.validate(&parseInfo));
+    qDebug() << c;
     c.setValue(false);
     QCOMPARE(c.value(), QVariant(false));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(SQL_FALSE, false);
     QCOMPARE(c.type(), Field::Boolean);
     QCOMPARE(c.value(), QVariant(false));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // real
     c = ConstExpression(REAL_CONST, QVariant());
@@ -618,15 +786,18 @@ void TestExpressions::testValidate()
     QCOMPARE(c.value(), QVariant());
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     c = ConstExpression(REAL_CONST, 3.14159);
     QCOMPARE(c.type(), Field::Double);
     QCOMPARE(c.value(), QVariant(3.14159));
     QVERIFY(c.validate(&parseInfo));
+    qDebug() << c;
     c.setValue(-18.012);
     QCOMPARE(c.value(), QVariant(-18.012));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // date
     QDate date(QDate::currentDate());
@@ -634,11 +805,13 @@ void TestExpressions::testValidate()
     QCOMPARE(c.type(), Field::Date);
     QCOMPARE(c.value(), QVariant(date));
     QVERIFY(c.validate(&parseInfo));
+    qDebug() << c;
     date = date.addDays(17);
     c.setValue(date);
     QCOMPARE(c.value(), QVariant(date));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // date/time
     QDateTime dateTime(QDateTime::currentDateTime());
@@ -646,23 +819,27 @@ void TestExpressions::testValidate()
     QCOMPARE(c.type(), Field::DateTime);
     QCOMPARE(c.value(), QVariant(dateTime));
     QVERIFY(c.validate(&parseInfo));
+    qDebug() << c;
     dateTime = dateTime.addDays(-17);
     c.setValue(dateTime);
     QCOMPARE(c.value(), QVariant(dateTime));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // time
     QTime time(QTime::currentTime());
     c = ConstExpression(TIME_CONST, time);
     QCOMPARE(c.type(), Field::Time);
     QCOMPARE(c.value(), QVariant(time));
+    qDebug() << c;
     QVERIFY(c.validate(&parseInfo));
     time.addSecs(1200);
     c.setValue(time);
     QCOMPARE(c.value(), QVariant(time));
     QVERIFY(c.validate(&parseInfo));
     testCloneExpression(c);
+    qDebug() << c;
 
     // setValue()
     c = ConstExpression(INTEGER_CONST, 124);
@@ -670,6 +847,7 @@ void TestExpressions::testValidate()
     c.setValue(299);
     QCOMPARE(c.value(), QVariant(299));
     testCloneExpression(c);
+    qDebug() << c;
 
     // cycles detected by validate()
     c = ConstExpression(INTEGER_CONST, 17);
@@ -679,6 +857,7 @@ void TestExpressions::testValidate()
     u2.setArg(u);
     u.setArg(u2);
     QVERIFY(!u.validate(&parseInfo));
+    qDebug() << c << u << c1 << u2;
 }
 
 void TestExpressions::cleanupTestCase()

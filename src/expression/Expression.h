@@ -162,6 +162,9 @@ protected:
 
     bool checkBeforeInsert(const ExplicitlySharedExpressionDataPointer& child);
 
+    //! Only for BinaryExpression::setLeft() and BinaryExpression::setRight()
+    void setLeftOrRight(const Expression& right, int index);
+
     explicit Expression(ExpressionData* data);
 
     Expression(ExpressionData* data, ExpressionClass aClass, int token);
@@ -326,8 +329,8 @@ protected:
 
 //! The ConstExpression class represents const expression.
 /*! Types are string, integer, float constants. Also includes NULL value.
- Token can be: IDENTIFIER, SQL_NULL, CHARACTER_STRING_LITERAL,
- INTEGER_CONST, REAL_CONST */
+ Token can be: IDENTIFIER, SQL_NULL, SQL_TRUE, SQL_FALSE, CHARACTER_STRING_LITERAL,
+ INTEGER_CONST, REAL_CONST, DATE_CONST, DATETIME_CONST, TIME_CONST. */
 class PREDICATE_EXPORT ConstExpression : public Expression
 {
 public:
@@ -349,8 +352,8 @@ public:
     void setValue(const QVariant& value);
 
 protected:
-    ConstExpression(ExpressionData* data, ExpressionClass aClass,
-                    int token);
+    //! Internal, used by QueryParameterExpression(const QString& message).
+    ConstExpression(ExpressionData* data, ExpressionClass aClass, int token);
     explicit ConstExpression(ExpressionData* data);
 
     friend class Expression;
