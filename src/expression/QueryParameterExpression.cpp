@@ -82,7 +82,7 @@ void QueryParameterExpressionData::getQueryParameters(QuerySchemaParameterList& 
 bool QueryParameterExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
     Q_UNUSED(parseInfo);
-    return type() != Field::InvalidType;
+    return typeInternal(callStack) != Field::InvalidType;
 }
 
 Field::Type QueryParameterExpressionData::typeInternal(CallStack* callStack) const
