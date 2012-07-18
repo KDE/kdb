@@ -70,6 +70,7 @@ void UnaryExpressionData::debugInternal(QDebug dbg, CallStack* callStack) const
 EscapedString UnaryExpressionData::toStringInternal(QuerySchemaParameterValueListIterator* params,
                                                     CallStack* callStack) const
 {
+    Q_UNUSED(callStack);
     ExplicitlySharedExpressionDataPointer a = arg();
     if (token == '(') { //parentheses (special case)
         return "(" + (a.constData() ? a->toString(params, callStack) : EscapedString("<NULL>")) + ")";
@@ -129,9 +130,6 @@ bool UnaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* call
     if (!a.constData())
         return false;
 
-    if (!ExpressionData::validateInternal(parseInfo, callStack))
-        return false;
-
     if (!a->validate(parseInfo, callStack))
         return false;
 
@@ -145,7 +143,7 @@ bool UnaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* call
     }
 #endif
 
-    return true;
+    return typeInternal(callStack) != Field::InvalidType;
 #if 0
     Expression *n = l.at(0);
 

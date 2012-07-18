@@ -42,15 +42,13 @@ BinaryExpressionData::~BinaryExpressionData()
 
 bool BinaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validateInternal(parseInfo, callStack) || children.count() != 2)
+    if (children.count() != 2)
         return false;
 
     if (!left()->validate(parseInfo, callStack))
         return false;
     if (!right()->validate(parseInfo, callStack))
         return false;
-
-//! @todo compare types..., BITWISE_SHIFT_RIGHT requires integers, etc...
 
     //update type for query parameters
 #warning TODO
@@ -64,40 +62,121 @@ bool BinaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* cal
         queryParameter->setType(right()->type());
     }
 #endif
-    return true;
+    return typeInternal(callStack) != Field::InvalidType;
 }
 
 Field::Type BinaryExpressionData::typeInternal(CallStack* callStack) const
 {
-    if (children.count() != 2)
+    if (children.count() != 2 || expressionClass == UnknownExpressionClass)
         return Field::InvalidType;
     const Field::Type lt = left()->type(callStack);
     const Field::Type rt = right()->type(callStack);
     if (lt == Field::InvalidType || rt == Field::InvalidType)
         return Field::InvalidType;
-    if (lt == Field::Null || rt == Field::Null) {
-        if (token != OR) //note that NULL OR something != NULL
+
+    const bool ltNull = lt == Field::Null;
+    const bool rtNull = rt == Field::Null;
+    const bool ltText = Field::isTextType(lt);
+    const bool rtText = Field::isTextType(rt);
+    const bool ltInt = Field::isIntegerType(lt);
+    const bool rtInt = Field::isIntegerType(rt);
+    const bool ltFP = Field::isFPNumericType(lt);
+    const bool rtFP = Field::isFPNumericType(rt);
+    const bool ltBool = lt == Field::Boolean;
+    const bool rtBool = rt == Field::Boolean;
+    const Field::TypeGroup ltGroup = Field::typeGroup(lt);
+    const Field::TypeGroup rtGroup = Field::typeGroup(rt);
+
+    if (ltNull || rtNull) {
+        switch (token) {
+        case OR: // NULL OR something == something
+            if (ltNull) {
+                return rtBool ? Field::Boolean : Field::InvalidType;
+            }
+            else if (rtNull) {
+                return ltBool ? Field::Boolean : Field::InvalidType;
+            }
+        default:
             return Field::Null;
+        }
     }
 
     switch (token) {
-    case BITWISE_SHIFT_RIGHT:
-    case BITWISE_SHIFT_LEFT:
+    case OR:
+    case AND:
+    case XOR:
+        return (ltBool && rtBool) ? Field::Boolean : Field::InvalidType;
     case CONCATENATION:
-        return lt;
+        if (lt == Field::Text && rt == Field::Text) {
+            return Field::Text;
+        }
+        else if (ltText && rtText) {
+            return Field::LongText;
+        }
+        else if ((ltText && rtNull)
+            || (rtText && ltNull))
+        {
+            return Field::Null;
+        }
+        return Field::InvalidType;
+    default:;
     }
 
-    const bool ltInt = Field::isIntegerType(lt);
-    const bool rtInt = Field::isIntegerType(rt);
-    if (ltInt && rtInt)
-        return Predicate::maximumForIntegerTypes(lt, rt);
+    if (expressionClass == RelationalExpressionClass) {
+        if ((ltText && rtText)
+            || (ltInt && rtInt)
+            || (ltFP && rtFP) || (ltInt && rtFP) || (ltFP && rtInt)
+            || (ltBool && rtBool) || (ltBool && rtInt) || (ltInt && rtBool)
+            || (ltBool && rtFP) || (ltFP && rtBool)
+            || (ltGroup == Field::DateTimeGroup && rtGroup == Field::DateTimeGroup))
+        {
+            return Field::Boolean;
+        }
+        return Field::InvalidType;
+    }
 
-    if (Field::isFPNumericType(lt) && (rtInt || lt == rt))
-        return lt;
-    if (Field::isFPNumericType(rt) && (ltInt || lt == rt))
-        return rt;
+    if (expressionClass == ArithmeticExpressionClass) {
+        if (ltInt && rtInt) {
+            /* From documentation of Predicate::maximumForIntegerTypes():
+             In case of ArithmeticExpressionClass:
+             returned type may not fit to the result of evaluated expression that involves the arguments.
+             For example, 100 is within Byte type, maximumForIntegerTypes(Byte, Byte) is Byte but result
+             of 100 * 100 exceeds the range of Byte.
 
-    return Field::Boolean;
+             Solution: for types smaller than Integer (e.g. Byte and ShortInteger) we are returning
+             Integer type.
+            */
+            Field::Type t = Predicate::maximumForIntegerTypes(lt, rt);
+            if (t == Field::Byte || t == Field::ShortInteger) {
+                return Field::Integer;
+            }
+            return t;
+        }
+
+        switch (token) {
+        case '&':
+        case BITWISE_SHIFT_RIGHT:
+        case BITWISE_SHIFT_LEFT:
+            if (ltFP && rtFP) {
+                return Field::Integer;
+            }
+            else if (ltFP && rtInt) { // inherit from right
+                return rt;
+            }
+            else if (rtFP && ltInt) { // inherit from left
+                return lt;
+            }
+            break;
+        default:;
+        }
+
+        /* inherit floating point (Float or Double) type */
+        if (ltFP && (rtInt || lt == rt))
+            return lt;
+        if (rtFP && (ltInt || lt == rt))
+            return rt;
+    }
+    return Field::InvalidType;
 }
 
 BinaryExpressionData* BinaryExpressionData::clone()
@@ -177,20 +256,19 @@ void BinaryExpressionData::getQueryParameters(QuerySchemaParameterList& params)
 
 //=========================================
 
-static ExpressionClass classForArgs(ExpressionClass aClass,
-                                    const Expression& leftExpr,
+static ExpressionClass classForArgs(const Expression& leftExpr,
+                                    int token,
                                     const Expression& rightExpr)
 {
-    bool ok = true;
     if (leftExpr.isNull()) {
         qWarning() << "BinaryExpression set to null because left argument is not specified";
-        ok = false;
+        return UnknownExpressionClass;
     }
     if (rightExpr.isNull()) {
         qWarning() << "BinaryExpression set to null because right argument is not specified";
-        ok = false;
+        return UnknownExpressionClass;
     }
-    return ok ? aClass : UnknownExpressionClass;
+    return Expression::classForToken(token);
 }
 
 BinaryExpression::BinaryExpression()
@@ -201,11 +279,10 @@ BinaryExpression::BinaryExpression()
     ExpressionDebug << "BinaryExpression() ctor" << *this;
 }
 
-BinaryExpression::BinaryExpression(ExpressionClass aClass,
-                                   const Expression& leftExpr,
+BinaryExpression::BinaryExpression(const Expression& leftExpr,
                                    int token,
                                    const Expression& rightExpr)
-    : Expression(new BinaryExpressionData, classForArgs(aClass, leftExpr, rightExpr), token)
+    : Expression(new BinaryExpressionData, classForArgs(leftExpr, token, rightExpr), token)
 {
     if (isNull()) {
         insertEmptyChild(0);

@@ -115,6 +115,7 @@ set(predicate_MOC_SRCS
 #  Cursor.h
   Utils_p.h
   Driver.h
+  Field.h
 #  Connection.h
 )
 

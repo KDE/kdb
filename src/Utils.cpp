@@ -110,7 +110,7 @@ EscapedString Predicate::sqlWhere(Driver *drv, Field::Type t,
 //! Cache
 struct TypeCache {
     TypeCache() {
-        for (uint t = 0; t <= Field::LastType; t++) {
+        for (Field::Type t = Field::FirstType; t <= Field::LastType; t = Field::Type(int(t) + 1)) {
             const Field::TypeGroup tg = Field::typeGroup(t);
             TypeGroupList list;
             QStringList name_list, str_list;
@@ -764,7 +764,7 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
             constraints ^= Predicate::Field::flag; \
     }
 
-    uint constraints = field.constraints();
+    Field::Constraints constraints = field.constraints();
     bool ok = true;
     if ((it = values.find("primaryKey")) != values.constEnd())
         SET_BOOLEAN_FLAG(PrimaryKey, (*it).toBool());
@@ -781,7 +781,7 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
         SET_BOOLEAN_FLAG(NotEmpty, !(*it).toBool());
     field.setConstraints(constraints);
 
-    uint options = 0;
+    Field::Options options;
     if ((it = values.find("unsigned")) != values.constEnd()) {
         options |= Field::Unsigned;
         if (!(*it).toBool())
@@ -898,7 +898,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         if ("type" == propertyName)
             return setIntToFieldType(field, value);
 
-        uint constraints = field.constraints();
+        Field::Constraints constraints = field.constraints();
         if ("primaryKey" == propertyName)
             SET_BOOLEAN_FLAG(PrimaryKey, value.toBool());
         if ("indexed" == propertyName)
@@ -913,7 +913,7 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         if ("allowEmpty" == propertyName)
             SET_BOOLEAN_FLAG(NotEmpty, !value.toBool());
 
-        uint options = 0;
+        Field::Options options;
         if ("unsigned" == propertyName) {
             options |= Field::Unsigned;
             if (!value.toBool())

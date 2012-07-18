@@ -109,10 +109,7 @@ Field::Type FunctionExpressionData::typeInternal(CallStack* callStack) const
 
 bool FunctionExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validateInternal(parseInfo, callStack))
-        return false;
-
-    return args.data() ? args.data()->validate(parseInfo) : true;
+    return args.data() ? args.data()->validate(parseInfo, callStack) : true;
 }
 
 //=========================================

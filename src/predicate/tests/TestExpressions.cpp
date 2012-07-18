@@ -29,6 +29,7 @@ using namespace Predicate;
 
 Q_DECLARE_METATYPE(Predicate::ExpressionClass)
 Q_DECLARE_METATYPE(Predicate::EscapedString)
+Q_DECLARE_METATYPE(Predicate::Field::Type)
 
 void TestExpressions::initTestCase()
 {
@@ -464,20 +465,20 @@ void TestExpressions::testBinaryExpression()
     QVERIFY(emptyBinary.left().isNull());
     QVERIFY(emptyBinary.right().isNull());
 
-    b = BinaryExpression(ArithmeticExpressionClass, Expression(), '-', Expression());
+    b = BinaryExpression(Expression(), '-', Expression());
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
     QVERIFY(b.isNull()); // it's null because args are null
     qDebug() << b.toString();
     QCOMPARE(b.toString(), EscapedString("<NULL!>"));
     c = ConstExpression(INTEGER_CONST, 10);
-    b = BinaryExpression(ArithmeticExpressionClass, c, '-', Expression());
+    b = BinaryExpression(c, '-', Expression());
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
     QVERIFY(b.isNull()); // it's null because one arg is null
     qDebug() << b.toString();
     QCOMPARE(b.toString(), EscapedString("<NULL!>"));
-    b = BinaryExpression(ArithmeticExpressionClass, Expression(), '-', c);
+    b = BinaryExpression(Expression(), '-', c);
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
     QVERIFY(b.isNull()); // it's null because one arg is null
@@ -487,13 +488,13 @@ void TestExpressions::testBinaryExpression()
     // -- copy ctor & cloning
     c = ConstExpression(INTEGER_CONST, 3);
     c1 = ConstExpression(INTEGER_CONST, 4);
-    b = BinaryExpression(ArithmeticExpressionClass, c, '/', c1);
+    b = BinaryExpression(c, '/', c1);
     testCloneExpression(b);
     QCOMPARE(b.tokenToDebugString(), QString("/"));
     QCOMPARE(b.toString(), EscapedString("3 / 4"));
     QCOMPARE(c1, b.right().toConst());
 
-    b2 = BinaryExpression(ArithmeticExpressionClass, b, '*', b.clone());
+    b2 = BinaryExpression(b, '*', b.clone());
     testCloneExpression(b2);
     QCOMPARE(b2.tokenToDebugString(), QString("*"));
     QCOMPARE(b2.toString(), EscapedString("3 / 4 * 3 / 4"));
@@ -501,8 +502,8 @@ void TestExpressions::testBinaryExpression()
 
     // -- cycles
     // --- ref to parent
-    b = BinaryExpression(ArithmeticExpressionClass,
-        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    b = BinaryExpression(
+            ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
     EscapedString s = b.toString();
     b.setLeft(b); // should not work
     qDebug() << b.toString();
@@ -512,10 +513,10 @@ void TestExpressions::testBinaryExpression()
     b.setLeft(c);
     QCOMPARE(s, b.toString());
     // --- ref to grandparent
-    b = BinaryExpression(ArithmeticExpressionClass,
-        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    b = BinaryExpression(
+            ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
     c = ConstExpression(INTEGER_CONST, 10);
-    b2 = BinaryExpression(ArithmeticExpressionClass, b, '-', c);
+    b2 = BinaryExpression(b, '-', c);
     qDebug() << b2.toString();
     QCOMPARE(b2.toString(), EscapedString("1 + 2 - 10"));
     b.setRight(b2);
@@ -523,16 +524,16 @@ void TestExpressions::testBinaryExpression()
     QCOMPARE(b2.toString(), EscapedString("1 + <CYCLE!> - 10"));
 
     // -- moving right argument to left should remove right arg
-    b = BinaryExpression(ArithmeticExpressionClass,
-        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    b = BinaryExpression(
+            ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
     c = b.right().toConst();
     b.setLeft(c);
     qDebug() << b.toString();
     QCOMPARE(b.toString(), EscapedString("2 + <NULL!>"));
 
     // -- moving left argument to right should remove left arg
-    b = BinaryExpression(ArithmeticExpressionClass,
-        ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
+    b = BinaryExpression(
+            ConstExpression(INTEGER_CONST, 1), '+', ConstExpression(INTEGER_CONST, 2));
     c = b.left().toConst();
     b.setRight(c);
     qDebug() << b.toString();
@@ -541,7 +542,6 @@ void TestExpressions::testBinaryExpression()
 
 void TestExpressions::testBinaryExpressionCloning_data()
 {
-    QTest::addColumn<ExpressionClass>("expClass");
     QTest::addColumn<int>("type1");
     QTest::addColumn<QVariant>("const1");
     QTest::addColumn<int>("token");
@@ -549,32 +549,31 @@ void TestExpressions::testBinaryExpressionCloning_data()
     QTest::addColumn<QVariant>("const2");
     QTest::addColumn<QString>("string");
 
-#define T(expClass, type1, const1, token, type2, const2, string) \
+#define T(type1, const1, token, type2, const2, string) \
         QTest::newRow(Expression::tokenToDebugString(token).toLatin1()) \
-            << expClass << int(type1) << QVariant(const1) << int(token) \
+            << int(type1) << QVariant(const1) << int(token) \
             << int(type2) << QVariant(const2) << QString(string)
 
-    T(ArithmeticExpressionClass, INTEGER_CONST, 3, '/', INTEGER_CONST, 4, "3 / 4");
-    T(ArithmeticExpressionClass, INTEGER_CONST, 3, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 4, "3 >> 4");
-    T(ArithmeticExpressionClass, INTEGER_CONST, 3, BITWISE_SHIFT_LEFT, INTEGER_CONST, 4, "3 << 4");
-    T(RelationalExpressionClass, INTEGER_CONST, 3, NOT_EQUAL, INTEGER_CONST, 4, "3 <> 4");
-    T(RelationalExpressionClass, INTEGER_CONST, 3, NOT_EQUAL2, INTEGER_CONST, 4, "3 != 4");
-    T(RelationalExpressionClass, INTEGER_CONST, 3, LESS_OR_EQUAL, INTEGER_CONST, 4, "3 <= 4");
-    T(RelationalExpressionClass, INTEGER_CONST, 3, GREATER_OR_EQUAL, INTEGER_CONST, 4, "3 >= 4");
-    T(ArithmeticExpressionClass, CHARACTER_STRING_LITERAL, "ABC", LIKE, CHARACTER_STRING_LITERAL, "A%", "'ABC' LIKE 'A%'");
-    T(LogicalExpressionClass, INTEGER_CONST, 3, SQL_IN, INTEGER_CONST, 4, "3 IN 4");
-    T(LogicalExpressionClass, INTEGER_CONST, 3, SIMILAR_TO, INTEGER_CONST, 4, "3 SIMILAR TO 4");
-    T(LogicalExpressionClass, INTEGER_CONST, 3, NOT_SIMILAR_TO, INTEGER_CONST, 4, "3 NOT SIMILAR TO 4");
-    T(LogicalExpressionClass, SQL_TRUE, true, OR, SQL_FALSE, false, "TRUE OR FALSE");
-    T(LogicalExpressionClass, INTEGER_CONST, 3, AND, INTEGER_CONST, 4, "3 AND 4");
-    T(LogicalExpressionClass, INTEGER_CONST, 3, XOR, INTEGER_CONST, 4, "3 XOR 4");
-    T(ArithmeticExpressionClass, CHARACTER_STRING_LITERAL, "AB", CONCATENATION, CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
+    T(INTEGER_CONST, 3, '/', INTEGER_CONST, 4, "3 / 4");
+    T(INTEGER_CONST, 3, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 4, "3 >> 4");
+    T(INTEGER_CONST, 3, BITWISE_SHIFT_LEFT, INTEGER_CONST, 4, "3 << 4");
+    T(INTEGER_CONST, 3, NOT_EQUAL, INTEGER_CONST, 4, "3 <> 4");
+    T(INTEGER_CONST, 3, NOT_EQUAL2, INTEGER_CONST, 4, "3 != 4");
+    T(INTEGER_CONST, 3, LESS_OR_EQUAL, INTEGER_CONST, 4, "3 <= 4");
+    T(INTEGER_CONST, 3, GREATER_OR_EQUAL, INTEGER_CONST, 4, "3 >= 4");
+    T(CHARACTER_STRING_LITERAL, "ABC", LIKE, CHARACTER_STRING_LITERAL, "A%", "'ABC' LIKE 'A%'");
+    T(INTEGER_CONST, 3, SQL_IN, INTEGER_CONST, 4, "3 IN 4");
+    T(INTEGER_CONST, 3, SIMILAR_TO, INTEGER_CONST, 4, "3 SIMILAR TO 4");
+    T(INTEGER_CONST, 3, NOT_SIMILAR_TO, INTEGER_CONST, 4, "3 NOT SIMILAR TO 4");
+    T(SQL_TRUE, true, OR, SQL_FALSE, false, "TRUE OR FALSE");
+    T(INTEGER_CONST, 3, AND, INTEGER_CONST, 4, "3 AND 4");
+    T(INTEGER_CONST, 3, XOR, INTEGER_CONST, 4, "3 XOR 4");
+    T(CHARACTER_STRING_LITERAL, "AB", CONCATENATION, CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
 #undef T
 }
 
 void TestExpressions::testBinaryExpressionCloning()
 {
-    QFETCH(ExpressionClass, expClass);
     QFETCH(int, type1);
     QFETCH(QVariant, const1);
     QFETCH(int, token);
@@ -584,7 +583,7 @@ void TestExpressions::testBinaryExpressionCloning()
 
     ConstExpression c(type1, const1);
     ConstExpression c1(type2, const2);
-    BinaryExpression b(expClass, c, token, c1);
+    BinaryExpression b(c, token, c1);
     testCloneExpression(b);
     QCOMPARE(b.tokenToDebugString(), Expression::tokenToDebugString(token));
     qDebug() << Expression::tokenToDebugString(token) << b.toString();
@@ -593,13 +592,10 @@ void TestExpressions::testBinaryExpressionCloning()
     QCOMPARE(c1, b.right().toConst());
 }
 
-void TestExpressions::testValidate()
+void TestExpressions::testConstExpressionValidate()
 {
-    NArgExpression n;
     ConstExpression c;
     ConstExpression c1;
-    UnaryExpression u;
-    UnaryExpression u2;
 
     QuerySchema *query = 0;
     ParseInfoInternal parseInfo(query);
@@ -607,16 +603,6 @@ void TestExpressions::testValidate()
     c = ConstExpression(SQL_NULL, QVariant());
     QCOMPARE(c.type(), Field::Null);
     QVERIFY(c.validate(&parseInfo));
-
-    n = NArgExpression(ArithmeticExpressionClass, '+');
-    c = ConstExpression(INTEGER_CONST, 0);
-    c1 = ConstExpression(INTEGER_CONST, 1);
-    n.append(c);
-    n.append(c1);
-    QCOMPARE(n.type(), Field::InvalidType); // N-arg expression is abstract, unspecified type
-    QVERIFY(n.validate(&parseInfo));
-    testCloneExpression(n);
-    qDebug() << c << c1 << n;
 
     // null
     c = ConstExpression(SQL_NULL, QVariant());
@@ -848,6 +834,16 @@ void TestExpressions::testValidate()
     QCOMPARE(c.value(), QVariant(299));
     testCloneExpression(c);
     qDebug() << c;
+}
+
+void TestExpressions::testUnaryExpressionValidate()
+{
+    ConstExpression c;
+    ConstExpression c1;
+    UnaryExpression u;
+    UnaryExpression u2;
+    QuerySchema *query = 0;
+    ParseInfoInternal parseInfo(query);
 
     // cycles detected by validate()
     c = ConstExpression(INTEGER_CONST, 17);
@@ -858,6 +854,205 @@ void TestExpressions::testValidate()
     u.setArg(u2);
     QVERIFY(!u.validate(&parseInfo));
     qDebug() << c << u << c1 << u2;
+}
+
+void TestExpressions::testNArgExpressionValidate()
+{
+    NArgExpression n;
+    ConstExpression c;
+    ConstExpression c1;
+
+    QuerySchema *query = 0;
+    ParseInfoInternal parseInfo(query);
+
+    c = ConstExpression(SQL_NULL, QVariant());
+    QCOMPARE(c.type(), Field::Null);
+    QVERIFY(c.validate(&parseInfo));
+
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    c = ConstExpression(INTEGER_CONST, 0);
+    c1 = ConstExpression(INTEGER_CONST, 1);
+    n.append(c);
+    n.append(c1);
+    QCOMPARE(n.type(), Field::InvalidType); // N-arg expression is abstract, unspecified type
+    QVERIFY(n.validate(&parseInfo));
+    testCloneExpression(n);
+    qDebug() << c << c1 << n;
+}
+
+void TestExpressions::testBinaryExpressionValidate_data()
+{
+    QTest::addColumn<int>("type1");
+    QTest::addColumn<QVariant>("const1");
+    QTest::addColumn<int>("token");
+    QTest::addColumn<int>("type2");
+    QTest::addColumn<QVariant>("const2");
+    QTest::addColumn<Predicate::Field::Type>("type3");
+
+    QuerySchema *query = 0;
+    ParseInfoInternal parseInfo(query);
+
+    // invalid
+    ConstExpression c(INTEGER_CONST, 7);
+    BinaryExpression b(c, '+', Expression());
+    QCOMPARE(b.type(), Field::InvalidType);
+    QVERIFY(!b.validate(&parseInfo)); // unknown class
+    testCloneExpression(b);
+    qDebug() << b;
+
+    b = BinaryExpression(Expression(), '/', Expression());
+    QCOMPARE(b.type(), Field::InvalidType);
+    QVERIFY(!b.validate(&parseInfo)); // unknown class
+    testCloneExpression(b);
+    qDebug() << b;
+
+    // invalid left or right
+    BinaryExpression b2(b, '*', c.clone());
+    QCOMPARE(b2.type(), Field::InvalidType);
+    QVERIFY(!b2.validate(&parseInfo)); // unknown class
+    testCloneExpression(b2);
+    qDebug() << b2;
+    BinaryExpression b3(c.clone(), '*', b);
+    QCOMPARE(b3.type(), Field::InvalidType);
+    QVERIFY(!b3.validate(&parseInfo)); // unknown class
+    testCloneExpression(b3);
+    qDebug() << b3;
+
+#define T1(type1, const1, token, type2, const2, type3) \
+        QTest::newRow( \
+            QByteArray::number(__LINE__) + ": " + Expression::tokenToDebugString(type1).toLatin1() + " " \
+             + QVariant(const1).toString().toLatin1() + " " \
+             + Expression::tokenToDebugString(token).toLatin1() + " " \
+             + Expression::tokenToDebugString(type2).toLatin1() + " " \
+             + QVariant(const2).toString().toLatin1()) \
+            << int(type1) << QVariant(const1) \
+            << int(token) << int(type2) << QVariant(const2) \
+            << type3
+// tests both f(x, y) and f(y, x)
+#define T(type1, const1, token, type2, const2, type3) \
+        T1(type1, const1, token, type2, const2, type3); \
+        T1(type2, const2, token, type1, const1, type3)
+
+    // null
+    T(SQL_NULL, QVariant(), '+', INTEGER_CONST, 7, Field::Null);
+    // NULL OR bool == bool
+    T(SQL_NULL, QVariant(), OR, SQL_TRUE, true, Field::Boolean);
+    T(SQL_NULL, QVariant(), OR, CHARACTER_STRING_LITERAL, "xyz", Field::InvalidType);
+    // integer
+    // -- ArithmeticExpressionClass only: resulting type is Integer or more
+    //    see explanation for Predicate::maximumForIntegerTypes()
+    T(INTEGER_CONST, 50, '+', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '-', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '*', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '/', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '&', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '|', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, '%', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 50, BITWISE_SHIFT_LEFT, INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 20, Field::Integer);
+    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 300, Field::Integer);
+    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 300, Field::Integer);
+    T(INTEGER_CONST, 50, '+', INTEGER_CONST, qulonglong(INT_MAX), Field::BigInteger);
+    T(INTEGER_CONST, INT_MAX, '+', INTEGER_CONST, qulonglong(INT_MAX), Field::BigInteger);
+
+    T(INTEGER_CONST, 50, '<', INTEGER_CONST, 20, Field::Boolean);
+    T(INTEGER_CONST, 50, '=', INTEGER_CONST, 20, Field::Boolean);
+    T(INTEGER_CONST, 50, '>', INTEGER_CONST, 20, Field::Boolean);
+    T(INTEGER_CONST, 50, '<', INTEGER_CONST, INT_MAX, Field::Boolean);
+    T(INTEGER_CONST, 50, '<', INTEGER_CONST, qulonglong(INT_MAX), Field::Boolean);
+    T(INTEGER_CONST, qulonglong(INT_MAX), '<', INTEGER_CONST, INT_MAX, Field::Boolean);
+    T(INTEGER_CONST, 300, LESS_OR_EQUAL, INTEGER_CONST, 20, Field::Boolean);
+    T(INTEGER_CONST, 300, GREATER_OR_EQUAL, INTEGER_CONST, 300, Field::Boolean);
+    T(INTEGER_CONST, 300, '>', INTEGER_CONST, 300, Field::Boolean);
+
+    T(INTEGER_CONST, 300, OR, INTEGER_CONST, 20, Field::InvalidType);
+    T(INTEGER_CONST, 300, AND, INTEGER_CONST, 20, Field::InvalidType);
+    T(INTEGER_CONST, 300, XOR, INTEGER_CONST, 20, Field::InvalidType);
+    T(INTEGER_CONST, 300, OR, SQL_NULL, QVariant(), Field::InvalidType);
+    // real
+    T(REAL_CONST, 0.5, '+', REAL_CONST, -9.4, Field::Double);
+    T(REAL_CONST, 0.5, '-', REAL_CONST, -9.4, Field::Double);
+    T(REAL_CONST, 0.5, '*', REAL_CONST, -9.4, Field::Double);
+    T(REAL_CONST, 0.5, '/', REAL_CONST, -9.4, Field::Double);
+    T(REAL_CONST, 0.5, '&', REAL_CONST, -9.4, Field::Integer);
+    T(REAL_CONST, 0.5, '&', INTEGER_CONST, 9, Field::Byte);
+    T(REAL_CONST, 0.5, '&', INTEGER_CONST, 1000, Field::ShortInteger);
+    T(REAL_CONST, 0.5, '&', INTEGER_CONST, qulonglong(INT_MAX), Field::BigInteger);
+    T(REAL_CONST, 0.5, '%', REAL_CONST, -9.4, Field::Double);
+    T(REAL_CONST, 0.5, BITWISE_SHIFT_RIGHT, REAL_CONST, 9.4, Field::Integer);
+    T(REAL_CONST, 0.5, BITWISE_SHIFT_LEFT, REAL_CONST, 9.4, Field::Integer);
+    T(REAL_CONST, 0.5, '+', INTEGER_CONST, 300, Field::Double);
+    T(REAL_CONST, 0.5, '-', INTEGER_CONST, 300, Field::Double);
+    T(REAL_CONST, 0.5, '/', INTEGER_CONST, 300, Field::Double);
+    T(REAL_CONST, 0.5, '-', SQL_NULL, QVariant(), Field::Null);
+
+    T(REAL_CONST, 0.5, '>', REAL_CONST, -9.4, Field::Boolean);
+    T(REAL_CONST, 0.5, '>', INTEGER_CONST, 300, Field::Boolean);
+    T(REAL_CONST, 0.5, '=', INTEGER_CONST, 300, Field::Boolean);
+    T(REAL_CONST, 0.5, '<', INTEGER_CONST, qulonglong(INT_MAX), Field::Boolean);
+    T(REAL_CONST, 0.5, LESS_OR_EQUAL, INTEGER_CONST, 300, Field::Boolean);
+    T(REAL_CONST, 0.5, GREATER_OR_EQUAL, INTEGER_CONST, 300, Field::Boolean);
+    T(REAL_CONST, 0.5, '>', SQL_NULL, QVariant(), Field::Null);
+
+    T(REAL_CONST, 30.2, OR, REAL_CONST, 20, Field::InvalidType);
+    T(REAL_CONST, 30.2, AND, REAL_CONST, 20, Field::InvalidType);
+    T(REAL_CONST, 30.2, XOR, REAL_CONST, 20, Field::InvalidType);
+    // string
+    T(CHARACTER_STRING_LITERAL, "ab", CONCATENATION, CHARACTER_STRING_LITERAL, "cd", Field::Text);
+    T(SQL_NULL, QVariant(), CONCATENATION, CHARACTER_STRING_LITERAL, "cd", Field::Null);
+    T(INTEGER_CONST, 50, CONCATENATION, INTEGER_CONST, 20, Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "ab", CONCATENATION, INTEGER_CONST, 20, Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "ab", GREATER_OR_EQUAL, CHARACTER_STRING_LITERAL, "cd", Field::Boolean);
+    T(CHARACTER_STRING_LITERAL, "ab", '<', INTEGER_CONST, 3, Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "ab", '+', CHARACTER_STRING_LITERAL, "cd", Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "A", OR, REAL_CONST, 20, Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "A", AND, REAL_CONST, 20, Field::InvalidType);
+    T(CHARACTER_STRING_LITERAL, "A", XOR, REAL_CONST, 20, Field::InvalidType);
+    // bool
+    T(SQL_TRUE, true, '<', SQL_FALSE, false, Field::Boolean);
+    T(SQL_TRUE, true, '=', SQL_FALSE, false, Field::Boolean);
+    T(SQL_TRUE, true, '+', SQL_FALSE, false, Field::InvalidType);
+    T(SQL_TRUE, true, '<', INTEGER_CONST, 20, Field::Boolean);
+    T(SQL_TRUE, true, '<', REAL_CONST, -10.1, Field::Boolean);
+    T(SQL_TRUE, true, '-', SQL_NULL, QVariant(), Field::Null);
+    T(SQL_TRUE, true, '<', SQL_NULL, QVariant(), Field::Null);
+    T(SQL_TRUE, true, OR, SQL_FALSE, false, Field::Boolean);
+    T(SQL_TRUE, true, AND, SQL_FALSE, false, Field::Boolean);
+    T(SQL_TRUE, true, XOR, SQL_FALSE, false, Field::Boolean);
+    // date/time
+    T(DATE_CONST, QDate(2001, 1, 2), '=', DATE_CONST, QDate(2002, 1, 2), Field::Boolean);
+    T(DATETIME_CONST, QDateTime(QDate(2001, 1, 2), QTime(1, 2, 3)), LESS_OR_EQUAL, DATE_CONST, QDateTime::currentDateTime(), Field::Boolean);
+    T(TIME_CONST, QTime(1, 2, 3), '<', DATE_CONST, QTime::currentTime(), Field::Boolean);
+    T(DATE_CONST, QDate(2001, 1, 2), '=', INTEGER_CONST, 17, Field::InvalidType);
+    T(DATE_CONST, QDate(2001, 1, 2), '=', SQL_NULL, QVariant(), Field::Null);
+    T(DATE_CONST, QDate(2001, 1, 2), OR, SQL_FALSE, false, Field::InvalidType);
+    T(DATE_CONST, QDate(2001, 1, 2), AND, SQL_FALSE, false, Field::InvalidType);
+    T(DATE_CONST, QDate(2001, 1, 2), XOR, SQL_FALSE, false, Field::InvalidType);
+#undef T
+#undef T1
+}
+
+void TestExpressions::testBinaryExpressionValidate()
+{
+    QFETCH(int, type1);
+    QFETCH(QVariant, const1);
+    QFETCH(int, token);
+    QFETCH(int, type2);
+    QFETCH(QVariant, const2);
+    QFETCH(Predicate::Field::Type, type3);
+
+    QuerySchema *query = 0;
+    ParseInfoInternal parseInfo(query);
+
+    ConstExpression c(type1, const1);
+    ConstExpression c1(type2, const2);
+    BinaryExpression b(c, token, c1);
+    qDebug() << b.type();
+    qDebug() << type3;
+    QCOMPARE(b.type(), type3);
+    QVERIFY(b.validate(&parseInfo) == (type3 != Field::InvalidType));
+    testCloneExpression(b);
 }
 
 void TestExpressions::cleanupTestCase()

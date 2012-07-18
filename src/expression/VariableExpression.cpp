@@ -102,9 +102,8 @@ static void validateImplError(ParseInfo *parseInfo_, const QString &errmsg)
 
 bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* callStack)
 {
+    Q_UNUSED(callStack);
     ParseInfoInternal *parseInfo = static_cast<ParseInfoInternal*>(parseInfo_);
-    if (!ExpressionData::validateInternal(parseInfo, callStack))
-        return false;
     field = 0;
     tablePositionForField = -1;
     tableForQueryAsterisk = 0;

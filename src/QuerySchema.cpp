@@ -1799,7 +1799,6 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field,
     }
 
     BinaryExpression newExpr(
-        RelationalExpressionClass,
         ConstExpression(token, value),
         relation,
         VariableExpression((field->table() ? (field->table()->name() + QLatin1Char('.')) : QString()) + field->name())
@@ -1809,7 +1808,6 @@ void QuerySchema::addToWhereExpression(Predicate::Field *field,
     }
     else {
         d->whereExpr = BinaryExpression(
-            LogicalExpressionClass,
             d->whereExpr,
             AND,
             newExpr

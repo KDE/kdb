@@ -2912,10 +2912,10 @@ Field* Connection::setupField(const RecordData &data)
     int f_prec = data.at(4).toInt(&ok);
     if (!ok)
         return 0;
-    int f_constr = data.at(5).toInt(&ok);
+    Field::Constraints f_constr = (Field::Constraints)data.at(5).toInt(&ok);
     if (!ok)
         return 0;
-    int f_opts = data.at(6).toInt(&ok);
+    Field::Options f_opts = (Field::Options)data.at(6).toInt(&ok);
     if (!ok)
         return 0;
 

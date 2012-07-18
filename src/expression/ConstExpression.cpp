@@ -140,10 +140,8 @@ void ConstExpressionData::getQueryParameters(QuerySchemaParameterList& params)
 
 bool ConstExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validateInternal(parseInfo, callStack))
-        return false;
-
-    return type() != Field::InvalidType;
+    Q_UNUSED(parseInfo);
+    return typeInternal(callStack) != Field::InvalidType;
 }
 
 //=========================================

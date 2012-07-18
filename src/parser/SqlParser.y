@@ -871,19 +871,19 @@ aExpr2:
 aExpr3 AND aExpr2
 {
 //	PreDbg << "AND " << $3.debugString();
-        $$ = new BinaryExpression(LogicalExpressionClass, *$1, AND, *$3);
+        $$ = new BinaryExpression(*$1, AND, *$3);
         delete $1;
         delete $3;
 }
 | aExpr3 OR aExpr2
 {
-        $$ = new BinaryExpression( LogicalExpressionClass, *$1, OR, *$3 );
+        $$ = new BinaryExpression(*$1, OR, *$3);
         delete $1;
         delete $3;
 }
 | aExpr3 XOR aExpr2
 {
-        $$ = new BinaryExpression( ArithmeticExpressionClass, *$1, XOR, *$3 );
+        $$ = new BinaryExpression(*$1, XOR, *$3);
         delete $1;
         delete $3;
 }
@@ -895,31 +895,31 @@ aExpr3
 aExpr3:
 aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '>', *$3);
+        $$ = new BinaryExpression(*$1, '>', *$3);
         delete $1;
         delete $3;
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, GREATER_OR_EQUAL, *$3);
+        $$ = new BinaryExpression(*$1, GREATER_OR_EQUAL, *$3);
         delete $1;
         delete $3;
 }
 | aExpr4 '<' %prec LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '<', *$3);
+        $$ = new BinaryExpression(*$1, '<', *$3);
         delete $1;
         delete $3;
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, LESS_OR_EQUAL, *$3);
+        $$ = new BinaryExpression(*$1, LESS_OR_EQUAL, *$3);
         delete $1;
         delete $3;
 }
 | aExpr4 '=' aExpr3
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, '=', *$3);
+        $$ = new BinaryExpression(*$1, '=', *$3);
         delete $1;
         delete $3;
 }
@@ -931,38 +931,38 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_EQUAL, *$3);
+        $$ = new BinaryExpression(*$1, NOT_EQUAL, *$3);
         delete $1;
         delete $3;
 }
 |
 aExpr5 NOT_EQUAL2 aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_EQUAL2, *$3);
+        $$ = new BinaryExpression(*$1, NOT_EQUAL2, *$3);
         delete $1;
         delete $3;
 }
 | aExpr5 LIKE aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, LIKE, *$3);
+        $$ = new BinaryExpression(*$1, LIKE, *$3);
         delete $1;
         delete $3;
 }
 | aExpr5 SQL_IN aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, SQL_IN, *$3);
+        $$ = new BinaryExpression(*$1, SQL_IN, *$3);
         delete $1;
         delete $3;
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, SIMILAR_TO, *$3);
+        $$ = new BinaryExpression(*$1, SIMILAR_TO, *$3);
         delete $1;
         delete $3;
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(RelationalExpressionClass, *$1, NOT_SIMILAR_TO, *$3);
+        $$ = new BinaryExpression(*$1, NOT_SIMILAR_TO, *$3);
         delete $1;
         delete $3;
 }
@@ -990,13 +990,13 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, BITWISE_SHIFT_LEFT, *$3);
+        $$ = new BinaryExpression(*$1, BITWISE_SHIFT_LEFT, *$3);
         delete $1;
         delete $3;
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, BITWISE_SHIFT_RIGHT, *$3);
+        $$ = new BinaryExpression(*$1, BITWISE_SHIFT_RIGHT, *$3);
         delete $1;
         delete $3;
 }
@@ -1008,25 +1008,25 @@ aExpr7
 aExpr7:
 aExpr8 '+' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '+', *$3);
+        $$ = new BinaryExpression(*$1, '+', *$3);
         delete $1;
         delete $3;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '-', *$3);
+        $$ = new BinaryExpression(*$1, '-', *$3);
         delete $1;
         delete $3;
 }
 | aExpr8 '&' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '&', *$3);
+        $$ = new BinaryExpression(*$1, '&', *$3);
         delete $1;
         delete $3;
 }
 | aExpr8 '|' aExpr7
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '|', *$3);
+        $$ = new BinaryExpression(*$1, '|', *$3);
         delete $1;
         delete $3;
 }
@@ -1038,19 +1038,19 @@ aExpr8
 aExpr8:
 aExpr9 '/' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '/', *$3);
+        $$ = new BinaryExpression(*$1, '/', *$3);
         delete $1;
         delete $3;
 }
 | aExpr9 '*' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '*', *$3);
+        $$ = new BinaryExpression(*$1, '*', *$3);
         delete $1;
         delete $3;
 }
 | aExpr9 '%' aExpr8
 {
-        $$ = new BinaryExpression(ArithmeticExpressionClass, *$1, '%', *$3);
+        $$ = new BinaryExpression(*$1, '%', *$3);
         delete $1;
         delete $3;
 }
@@ -1278,7 +1278,6 @@ IDENTIFIER
 {
 	//table + alias
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass,
                 VariableExpression(*$1), 0,
                 VariableExpression(*$2)
 	);
@@ -1289,7 +1288,6 @@ IDENTIFIER
 {
 	//table + alias
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass,
                 VariableExpression(*$1), AS,
                 VariableExpression(*$3)
 	);
@@ -1335,7 +1333,7 @@ ColExpression
 | ColExpression AS IDENTIFIER
 {
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass, *$1, AS,
+                *$1, AS,
                 VariableExpression(*$3)
 	);
 	PreDbg << " added column expr:" << *$$;
@@ -1345,7 +1343,7 @@ ColExpression
 | ColExpression IDENTIFIER
 {
         $$ = new BinaryExpression(
-                SpecialBinaryExpressionClass, *$1, 0,
+                *$1, 0,
                 VariableExpression(*$2)
 	);
 	PreDbg << " added column expr:" << *$$;

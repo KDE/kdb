@@ -77,6 +77,9 @@ class Expression;
 */
 class PREDICATE_EXPORT Field
 {
+    Q_GADGET
+    Q_ENUMS(Type TypeGroup)
+    Q_FLAGS(Constraints Constraint Options Option)
 public:
     typedef Utils::AutodeletedList<Field*> List; //!< list of fields
     typedef QVector<Field*> Vector; //!< vector of fields
@@ -87,8 +90,8 @@ public:
     /*! Unified (most common used) types of fields. */
     enum Type {
         InvalidType = 0, /*!< Unsupported/Unimplemented type */
-        FirstType = 1, /*! First type */
         Byte = 1,        /*!< 1 byte, signed or unsigned */
+        FirstType = 1, /*! First type */
         ShortInteger = 2,/*!< 2 bytes, signed or unsigned */
         Integer = 3,     /*!< 4 bytes, signed or unsigned */
         BigInteger = 4,  /*!< 8 bytes, signed or unsigned */
@@ -128,7 +131,7 @@ public:
     };
 
     /*! Possible constraints defined for a field. */
-    enum Constraints {
+    enum Constraint {
         NoConstraints = 0,
         AutoInc = 1,
         Unique = 2,
@@ -138,12 +141,14 @@ public:
         NotEmpty = 32, //!< only legal for string-like and blob fields
         Indexed = 64
     };
+    Q_DECLARE_FLAGS(Constraints, Constraint)
 
     /*! Possible options defined for a field. */
-    enum Options {
+    enum Option {
         NoOptions = 0,
         Unsigned = 1
     };
+    Q_DECLARE_FLAGS(Options, Option)
 
     /*! Creates a database field as a child of @a tableSchema table.
      No other properties are set (even the name), so these should be set later. */
@@ -156,9 +161,9 @@ public:
 
     /*! Creates a database field with specified properties.
      For meaning of @a maxLength argument please refer to setMaxLength(). */
-    Field(const QString& name, Type ctype,
-          uint cconst = NoConstraints,
-          uint options = NoOptions,
+    Field(const QString& name, Type type,
+          Constraints constr = NoConstraints,
+          Options options = NoOptions,
           uint maxLength = 0, uint precision = 0,
           QVariant defaultValue = QVariant(),
           const QString& caption = QString(),
@@ -171,11 +176,11 @@ public:
     virtual ~Field();
 
     //! Converts type @a type to QVariant equivalent as accurate as possible
-    static QVariant::Type variantType(uint type);
+    static QVariant::Type variantType(Type type);
 
     /*! @return a i18n-ed type name for @a type (@a type has to be an element from Field::Type,
      not greater than Field::LastType) */
-    static QString typeName(uint type);
+    static QString typeName(Type type);
 
     /*! @return list of all available i18n-ed type names. */
     static QStringList typeNames();
@@ -183,7 +188,7 @@ public:
     /*! @return type string for @a type, e.g. "Integer" for Integer type
      (not-i18n-ed, @a type has to be an element from Field::Type,
      not greater than Field::LastType) */
-    static QString typeString(uint type);
+    static QString typeString(Type type);
 
     /*! @return type for a given @a typeString */
     static Type typeForString(const QString& typeString);
@@ -192,11 +197,11 @@ public:
     static TypeGroup typeGroupForString(const QString& typeGroupString);
 
     /*! @return group for @a type */
-    static TypeGroup typeGroup(uint type);
+    static TypeGroup typeGroup(Type type);
 
     /*! @return a i18n-ed group name for @a typeGroup
      (@a typeGroup has to be an element from Field::TypeGroup) */
-    static QString typeGroupName(uint typeGroup);
+    static QString typeGroupName(TypeGroup typeGroup);
 
     /*! @return list of all available i18n-ed type group names. */
     static QStringList typeGroupNames();
@@ -204,7 +209,7 @@ public:
     /*! @return type group string for @a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
      (not-i18n-ed, @a type has to be an element from Field::Type,
      not greater than Field::LastType) */
-    static QString typeGroupString(uint typeGroup);
+    static QString typeGroupString(TypeGroup typeGroup);
 
     /* ! @return the name of this field */
     inline QString name() const {
@@ -279,7 +284,7 @@ public:
 
     /*! static version of isNumericType() method
      *! @return true if the field is of any numeric type (integer or floating point)*/
-    static bool isNumericType(uint type);
+    static bool isNumericType(Type type);
 
     /*! @return true if the field is of any integer type */
     inline bool isIntegerType() const {
@@ -288,7 +293,7 @@ public:
 
     /*! static version of isIntegerType() method
      *! @return true if the field is of any integer type */
-    static bool isIntegerType(uint type);
+    static bool isIntegerType(Type type);
 
     /*! @return true if the field is of any floating point numeric type */
     inline bool isFPNumericType() const {
@@ -297,7 +302,7 @@ public:
 
     /*! static version of isFPNumericType() method
      *! @return true if the field is of any floating point numeric type */
-    static bool isFPNumericType(uint type);
+    static bool isFPNumericType(Type type);
 
     /*! @return true if the field is of any date or time related type */
     inline bool isDateTimeType() const {
@@ -306,7 +311,7 @@ public:
 
     /*! static version of isDateTimeType() method
      *! @return true if the field is of any date or time related type */
-    static bool isDateTimeType(uint type);
+    static bool isDateTimeType(Type type);
 
     /*! @return true if the field is of any text type */
     inline bool isTextType() const {
@@ -315,13 +320,13 @@ public:
 
     /*! static version of isTextType() method
      *! @return true if the field is of any text type */
-    static bool isTextType(uint type);
+    static bool isTextType(Type type);
 
-    uint options() const {
+    Options options() const {
         return m_options;
     }
 
-    void setOptions(uint options) {
+    void setOptions(Options options) {
         m_options = options;
     }
 
@@ -468,7 +473,7 @@ public:
     }
 
     /*! @return the constraints defined for this field. */
-    inline uint constraints() const {
+    inline Constraints constraints() const {
         return m_constraints;
     }
 
@@ -512,7 +517,7 @@ public:
 
     /*! static version of hasEmptyProperty() method
      @return true if this field type has EMPTY property (i.e. it is string or BLOB type) */
-    static bool hasEmptyProperty(uint type);
+    static bool hasEmptyProperty(Type type);
 
     /*! @return true if this field can be auto-incremented.
      Actually, returns true for integer field type. @see IntegerType, isAutoIncrement() */
@@ -522,7 +527,7 @@ public:
 
     /*! static version of isAutoIncrementAllowed() method
      @return true if this field type can be auto-incremented. */
-    static bool isAutoIncrementAllowed(uint type);
+    static bool isAutoIncrementAllowed(Type type);
 
     /*! Sets type @a t for this field.
      This does nothing if there's expression assigned.
@@ -536,7 +541,7 @@ public:
      constraits implied by being primary key are enforced (see setPrimaryKey()).
      If Indexed is not set in @a c, constraits implied by not being are
      enforced as well (see setIndexed()). */
-    void setConstraints(uint c);
+    void setConstraints(Constraints c);
 
     /*! Sets scale for this field. Only works for floating-point types.
      @see scale() */
@@ -713,12 +718,12 @@ protected:
     //!< object that field is assigned.
     QString m_name;
     QString m_subType;
-    uint m_constraints;
+    Constraints m_constraints;
     MaxLengthStrategy m_maxLengthStrategy;
     uint m_maxLength; //!< also used for storing scale for floating point types
     uint m_precision;
     int m_visibleDecimalPlaces; //!< used in visibleDecimalPlaces()
-    uint m_options;
+    Options m_options;
     QVariant m_defaultValue;
     int m_order;
     QString m_caption;
@@ -768,9 +773,18 @@ private:
     friend class QuerySchema;
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(Field::Constraints)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Field::Options)
+
 } //namespace Predicate
 
 //! Sends information about field @a field to debug output @a dbg.
 PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::Field& field);
+
+//! Sends information about field type @a type to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, Predicate::Field::Type type);
+
+//! Sends information about field type group @a typeGroup to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, Predicate::Field::TypeGroup typeGroup);
 
 #endif

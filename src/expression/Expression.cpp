@@ -524,4 +524,42 @@ void Expression::setLeftOrRight(const Expression& e, int index)
     }
 }
 
+// static
+ExpressionClass Expression::classForToken(int token)
+{
+    switch (token) {
+    case '+':
+    case '-':
+    case '*':
+    case '/':
+    case '&':
+    case '|':
+    case '%':
+    case BITWISE_SHIFT_RIGHT:
+    case BITWISE_SHIFT_LEFT:
+    case CONCATENATION:
+        return ArithmeticExpressionClass;
+    case '=':
+    case '<':
+    case '>':
+    case NOT_EQUAL:
+    case NOT_EQUAL2:
+    case LESS_OR_EQUAL:
+    case GREATER_OR_EQUAL:
+    case LIKE:
+    case SQL_IN:
+    case SIMILAR_TO:
+    case NOT_SIMILAR_TO:
+        return RelationalExpressionClass;
+    case OR:
+    case AND:
+    case XOR:
+        return LogicalExpressionClass;
+    case AS:
+        return SpecialBinaryExpressionClass;
+    default:;
+    }
+    return UnknownExpressionClass;
+}
+
 #undef CAST

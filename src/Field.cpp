@@ -72,8 +72,8 @@ Field::Field(QuerySchema *querySchema)
     setConstraints(NoConstraints);
 }
 
-Field::Field(const QString& name, Type ctype,
-             uint cconst, uint options, uint maxLength, uint precision,
+Field::Field(const QString& name, Type type,
+             Constraints constr, Options options, uint maxLength, uint precision,
              QVariant defaultValue, const QString& caption, const QString& description,
              uint width)
         : m_parent(0)
@@ -87,11 +87,11 @@ Field::Field(const QString& name, Type ctype,
         , m_desc(description)
         , m_width(width)
         , m_customProperties(0)
-        , m_type(ctype)
+        , m_type(type)
 {
     m_expr = new Expression();
     setMaxLength(maxLength);
-    setConstraints(cconst);
+    setConstraints(constr);
 }
 
 /*! Copy constructor. */
@@ -144,7 +144,7 @@ Field::Type Field::type() const
     return m_type;
 }
 
-QVariant::Type Field::variantType(uint type)
+QVariant::Type Field::variantType(Type type)
 {
     switch (type) {
     case Byte:
@@ -175,7 +175,7 @@ QVariant::Type Field::variantType(uint type)
     return QVariant::Invalid;
 }
 
-QString Field::typeName(uint type)
+QString Field::typeName(Type type)
 {
     m_typeNames.init();
     return m_typeNames.value(type, QString::number(type));
@@ -187,14 +187,14 @@ QStringList Field::typeNames()
     return m_typeNames.names;
 }
 
-QString Field::typeString(uint type)
+QString Field::typeString(Type type)
 {
     m_typeNames.init();
     return (type <= LastType) ? m_typeNames.at((int)LastType + 1 + type)
                               : (QLatin1String("Type") + QString::number(type));
 }
 
-QString Field::typeGroupName(uint typeGroup)
+QString Field::typeGroupName(TypeGroup typeGroup)
 {
     m_typeGroupNames.init();
     return (typeGroup <= LastTypeGroup) ? m_typeGroupNames.at(typeGroup) : typeGroupString(typeGroup);
@@ -206,7 +206,7 @@ QStringList Field::typeGroupNames()
     return m_typeGroupNames.names;
 }
 
-QString Field::typeGroupString(uint typeGroup)
+QString Field::typeGroupString(TypeGroup typeGroup)
 {
     m_typeGroupNames.init();
     return m_typeGroupNames.value((int)LastTypeGroup + 1 + typeGroup,
@@ -225,7 +225,7 @@ Field::TypeGroup Field::typeGroupForString(const QString& typeGroupString)
     return m_typeGroupNames.str2num.value(typeGroupString.toLower(), InvalidGroup);
 }
 
-bool Field::isIntegerType(uint type)
+bool Field::isIntegerType(Type type)
 {
     switch (type) {
     case Field::Byte:
@@ -238,7 +238,7 @@ bool Field::isIntegerType(uint type)
     return false;
 }
 
-bool Field::isNumericType(uint type)
+bool Field::isNumericType(Type type)
 {
     switch (type) {
     case Field::Byte:
@@ -253,12 +253,12 @@ bool Field::isNumericType(uint type)
     return false;
 }
 
-bool Field::isFPNumericType(uint type)
+bool Field::isFPNumericType(Type type)
 {
     return type == Field::Float || type == Field::Double;
 }
 
-bool Field::isDateTimeType(uint type)
+bool Field::isDateTimeType(Type type)
 {
     switch (type) {
     case Field::Date:
@@ -270,7 +270,7 @@ bool Field::isDateTimeType(uint type)
     return false;
 }
 
-bool Field::isTextType(uint type)
+bool Field::isTextType(Type type)
 {
     switch (type) {
     case Field::Text:
@@ -281,17 +281,17 @@ bool Field::isTextType(uint type)
     return false;
 }
 
-bool Field::hasEmptyProperty(uint type)
+bool Field::hasEmptyProperty(Type type)
 {
     return Field::isTextType(type) || type == BLOB;
 }
 
-bool Field::isAutoIncrementAllowed(uint type)
+bool Field::isAutoIncrementAllowed(Type type)
 {
     return Field::isIntegerType(type);
 }
 
-Field::TypeGroup Field::typeGroup(uint type)
+Field::TypeGroup Field::typeGroup(Type type)
 {
     if (Field::isTextType(type))
         return TextGroup;
@@ -350,8 +350,7 @@ Field::setType(Type t)
     m_type = t;
 }
 
-void
-Field::setConstraints(uint c)
+void Field::setConstraints(Constraints c)
 {
     m_constraints = c;
     //pkey must be unique notnull
@@ -426,7 +425,8 @@ void
 Field::setUnsigned(bool u)
 {
     m_options |= Unsigned;
-    m_options ^= (!u * Unsigned);
+    if (!u)
+        m_options ^= Unsigned;
 }
 
 void
@@ -566,14 +566,14 @@ Field::setAutoIncrement(bool a)
     if (a && !isAutoIncrementAllowed())
         return;
     if (isAutoIncrement() != a)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::AutoInc);
+        m_constraints ^= Field::AutoInc;
 }
 
 void
 Field::setPrimaryKey(bool p)
 {
     if (isPrimaryKey() != p)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::PrimaryKey);
+        m_constraints ^= Field::PrimaryKey;
     if (p) {//also set implied constraints
         setUniqueKey(true);
         setNotNull(true);
@@ -589,7 +589,7 @@ void
 Field::setUniqueKey(bool u)
 {
     if (isUniqueKey() != u) {
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::Unique);
+        m_constraints ^= Field::Unique;
         if (u) { //also set implied constraints
             setNotNull(true);
             setIndexed(true);
@@ -601,26 +601,26 @@ void
 Field::setForeignKey(bool f)
 {
     if (isForeignKey() != f)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::ForeignKey);
+        m_constraints ^= Field::ForeignKey;
 }
 
 void
 Field::setNotNull(bool n)
 {
     if (isNotNull() != n)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::NotNull);
+        m_constraints ^=Field::NotNull;
 }
 
 void Field::setNotEmpty(bool n)
 {
     if (isNotEmpty() != n)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::NotEmpty);
+        m_constraints ^= Field::NotEmpty;
 }
 
 void Field::setIndexed(bool s)
 {
     if (isIndexed() != s)
-        m_constraints = static_cast<Field::Constraints>(m_constraints ^ Field::Indexed);
+        m_constraints ^= Field::Indexed;
     if (!s) {//also set implied constraints
         setPrimaryKey(false);
         setUniqueKey(false);
@@ -684,6 +684,16 @@ QDebug operator<<(QDebug dbg, const Field& field)
         }
     }
     return dbg.space();
+}
+
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, Predicate::Field::Type type)
+{
+    return dbg.space() << Field::typeString(type).toLatin1().constData();
+}
+
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, Predicate::Field::TypeGroup typeGroup)
+{
+    return dbg.space() << Field::typeGroupString(typeGroup).toLatin1().constData();
 }
 
 bool Field::isExpression() const

@@ -419,7 +419,10 @@ PREDICATE_EXPORT bool isDefaultValueAllowed(Field* field);
 PREDICATE_EXPORT void getLimitsForType(Field::Type type, int &minValue, int &maxValue);
 
 /*! @return type that's maximum of two integer types @a t1 and @a t2, e.g. Integer for (Byte, Integer).
- If one of the types is not of the integer group, Field::InvalidType is returned. */
+ If one of the types is not of the integer group, Field::InvalidType is returned.
+ Returned type may not fit to the result of evaluated expression that involves the arguments.
+ For example, 100 is within Byte type, maximumForIntegerTypes(Byte, Byte) is Byte but result
+ of 100 * 100 exceeds the range of Byte. */
 PREDICATE_EXPORT Field::Type maximumForIntegerTypes(Field::Type t1, Field::Type t2);
 
 /*! @return QVariant value converted from null-terminated @a data string.

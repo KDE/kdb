@@ -100,6 +100,10 @@ public:
 
     static QString tokenToDebugString(int token);
 
+    //! @return expression class for token @a token.
+    //! @todo support more tokens
+    static ExpressionClass classForToken(int token);
+
     /*! @return single character if the token is < 256
      or token name, e.g. LESS_OR_EQUAL (for debugging). */
     inline QString tokenToDebugString() const {
@@ -301,10 +305,9 @@ public:
       @see Expression::isNull() */
     BinaryExpression();
 
-    /*! Constructs binary expression with class @a aClass, left expression @a leftExpr,
+    /*! Constructs binary expression with left expression @a leftExpr,
      token @a token, and right expression @a rightExpr. */
-    BinaryExpression(ExpressionClass aClass, const Expression& leftExpr,
-                     int token, const Expression& rightExpr);
+    BinaryExpression(const Expression& leftExpr, int token, const Expression& rightExpr);
 
     /*! Constructs a copy of other unary expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */

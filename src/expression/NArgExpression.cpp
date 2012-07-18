@@ -49,9 +49,6 @@ NArgExpressionData* NArgExpressionData::clone()
 
 bool NArgExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* callStack)
 {
-    if (!ExpressionData::validateInternal(parseInfo, callStack))
-        return false;
-
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         if (!data->validate(parseInfo, callStack))
             return false;
