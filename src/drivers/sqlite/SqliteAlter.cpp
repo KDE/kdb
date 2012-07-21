@@ -59,7 +59,7 @@ static SQLiteTypeAffinity affinityForType(Field::Type type)
     return Predicate_SQLite_affinityForType->affinity[type];
 }
 
-tristate SQLiteConnection::drv_changeFieldProperty(TableSchema &table, Field& field,
+tristate SQLiteConnection::drv_changeFieldProperty(TableSchema *table, Field *field,
         const QString& propertyName, const QVariant& value)
 {
     /* if (propertyName=="name") {
@@ -99,11 +99,11 @@ tristate SQLiteConnection::drv_changeFieldProperty(TableSchema &table, Field& fi
 
  See alter_table_type_conversions.ods for details.
 */
-tristate SQLiteConnection::changeFieldType(TableSchema &table, Field& field,
+tristate SQLiteConnection::changeFieldType(TableSchema *table, Field *field,
         Field::Type type)
 {
     Q_UNUSED(table);
-    const Field::Type oldType = field.type();
+    const Field::Type oldType = field->type();
     const SQLiteTypeAffinity oldAffinity = affinityForType(oldType);
     const SQLiteTypeAffinity newAffinity = affinityForType(type);
     if (oldAffinity != newAffinity) {

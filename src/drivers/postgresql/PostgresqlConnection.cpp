@@ -213,7 +213,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     result = PQexec(d->conn, "SET DATESTYLE TO 'ISO'");
     status = PQresultStatus(result);
     if (status != PGRES_COMMAND_OK)
-        qWarning("Failed to set DATESTYLE to 'ISO': %1", PQerrorMessage(d->conn));
+        qWarning() << "Failed to set DATESTYLE to 'ISO':" << PQerrorMessage(d->conn);
     PQclear(result);
     return true;
 }

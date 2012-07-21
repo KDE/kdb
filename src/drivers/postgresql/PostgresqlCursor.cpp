@@ -85,7 +85,7 @@ bool PostgresqlCursor::drv_open(const EscapedString& sql)
     PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(m_conn->driver());
     
     m_realTypes.resize(m_fieldsToStoreInRecord);
-    for (int i = 0; i < m_fieldsToStoreInRecord; i++) {
+    for (int i = 0; i < int(m_fieldsToStoreInRecord); i++) {
         const int pqtype = PQftype(d->res, i);
         m_realTypes[i] = drv->pgsqlToVariantType(pqtype);
     }
@@ -104,7 +104,7 @@ bool PostgresqlCursor::drv_close()
 //Gets the next record...does not need to do much, just return fetchend if at end of result set
 void PostgresqlCursor::drv_getNextRecord()
 {
-    if (at() >= m_numRows) {
+    if (at() >= qint64(m_numRows)) {
         m_fetchResult = FetchEnd;
     }
     else if (at() < 0) {
@@ -191,9 +191,10 @@ QVariant PostgresqlCursor::pValue(uint pos) const
     //}
     const qint64 row = at();
 
+#if 0
     Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
-
+#endif
 // PreDrvDbg << "pos:" << pos;
 
     const QVariant::Type type = m_realTypes[pos];

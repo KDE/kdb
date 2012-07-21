@@ -199,6 +199,7 @@ bool SQLitePreparedStatement::execute(
     FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
+    Q_UNUSED(insertFieldList);
     if (!m_handle)
         return false;
     if (m_resetRequired) {

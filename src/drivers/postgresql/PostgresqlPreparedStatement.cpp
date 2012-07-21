@@ -45,6 +45,7 @@ bool PostgresqlPreparedStatement::execute(
     FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
+    Q_UNUSED(selectFieldList);
     if (type == PreparedStatement::InsertStatement) {
         const int missingValues = insertFieldList.fieldCount() - parameters.count();
         PreparedStatementParameters myParameters(parameters);

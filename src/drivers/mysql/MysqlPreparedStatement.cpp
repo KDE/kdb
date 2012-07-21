@@ -244,6 +244,7 @@ bool MysqlPreparedStatement::execute(
     FieldList& insertFieldList,
     const PreparedStatementParameters& parameters)
 {
+    Q_UNUSED(selectFieldList);
 #ifdef PREDICATE_USE_MYSQL_STMT
     if (!m_statement || m_realParamCount <= 0)
         return false;

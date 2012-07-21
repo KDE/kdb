@@ -90,11 +90,11 @@ protected:
 
     void storeResult();
 
-    virtual tristate drv_changeFieldProperty(TableSchema &table, Field& field,
+    virtual tristate drv_changeFieldProperty(TableSchema* table, Field* field,
             const QString& propertyName, const QVariant& value);
 
     //! for drv_changeFieldProperty()
-    tristate changeFieldType(TableSchema &table, Field& field, Field::Type type);
+    tristate changeFieldType(TableSchema *table, Field *field, Field::Type type);
 
     SQLiteConnectionInternal* d;
 
