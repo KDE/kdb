@@ -495,37 +495,37 @@ QDebug operator<<(QDebug dbg, const ExpressionPtr& expr)
 
 int yylex();
 
-//	using namespace std;
+//    using namespace std;
 using namespace Predicate;
 
 #define YY_NO_UNPUT
 #define YYSTACK_USE_ALLOCA 1
 #define YYMAXDEPTH 255
 
-	extern "C"
-	{
-		int yywrap()
-		{
-			return 1;
-		}
-	}
+    extern "C"
+    {
+        int yywrap()
+        {
+            return 1;
+        }
+    }
 
 %}
 
 %union {
-	QString* stringValue;
-	qint64 integerValue;
-	bool booleanValue;
-	struct realType realValue;
-	Predicate::Field::Type colType;
-	Predicate::Field *field;
-        Predicate::Expression *expr;
-        Predicate::NArgExpression *exprList;
-        Predicate::ConstExpression *constExpression;
-	Predicate::QuerySchema *querySchema;
-	SelectOptionsInternal *selectOptions;
-	OrderByColumnInternal::List *orderByColumns;
-	QVariant *variantValue;
+    QString* stringValue;
+    qint64 integerValue;
+    bool booleanValue;
+    struct realType realValue;
+    Predicate::Field::Type colType;
+    Predicate::Field *field;
+    Predicate::Expression *expr;
+    Predicate::NArgExpression *exprList;
+    Predicate::ConstExpression *constExpression;
+    Predicate::QuerySchema *querySchema;
+    SelectOptionsInternal *selectOptions;
+    OrderByColumnInternal::List *orderByColumns;
+    QVariant *variantValue;
 }
 
 //%left '=' NOT_EQUAL '>' GREATER_OR_EQUAL '<' LESS_OR_EQUAL LIKE '%' NOT
@@ -533,13 +533,13 @@ using namespace Predicate;
 //%left ASTERISK SLASH
 
 /* precedence: lowest to highest */
-%left		UNION EXCEPT
-%left		INTERSECT
-%left		OR
-%left		AND XOR
-%right	NOT
-//%right		'='
-//%nonassoc	'<' '>'
+%left     UNION EXCEPT
+%left     INTERSECT
+%left     OR
+%left     AND XOR
+%right    NOT
+//%right        '='
+//%nonassoc    '<' '>'
 //%nonassoc '=' '<' '>' "<=" ">=" "<>" ":=" LIKE ILIKE SIMILAR
 //%nonassoc '=' LESS_THAN GREATER_THAN LESS_OR_EQUAL GREATER_OR_EQUAL NOT_EQUAL
 %nonassoc '=' '<' '>'
@@ -547,27 +547,27 @@ using namespace Predicate;
 %nonassoc LESS_OR_EQUAL GREATER_OR_EQUAL 
 %nonassoc NOT_EQUAL NOT_EQUAL2
 %nonassoc SQL_IN LIKE ILIKE SIMILAR_TO NOT_SIMILAR_TO
-//%nonassoc	LIKE ILIKE SIMILAR
-//%nonassoc	ESCAPE
-//%nonassoc	OVERLAPS
-%nonassoc	BETWEEN
-//%nonassoc	IN_P
-//%left		POSTFIXOP		// dummy for postfix Op rules 
-//%left		Op OPERATOR		// multi-character ops and user-defined operators 
-//%nonassoc	NOTNULL
-//%nonassoc	ISNULL
-//%nonassoc	IS NULL_P TRUE_P FALSE_P UNKNOWN // sets precedence for IS NULL, etc 
-%left		'+' '-'
-%left		'*' '/' '%'
-%left		'^'
-%left UMINUS
+//%nonassoc    LIKE ILIKE SIMILAR
+//%nonassoc    ESCAPE
+//%nonassoc    OVERLAPS
+%nonassoc    BETWEEN
+//%nonassoc    IN_P
+//%left        POSTFIXOP        // dummy for postfix Op rules
+//%left        Op OPERATOR        // multi-character ops and user-defined operators
+//%nonassoc    NOTNULL
+//%nonassoc    ISNULL
+//%nonassoc    IS NULL_P TRUE_P FALSE_P UNKNOWN // sets precedence for IS NULL, etc
+%left        '+' '-'
+%left        '*' '/' '%'
+%left        '^'
+%left        UMINUS
 // Unary Operators 
-//%left		AT ZONE			// sets precedence for AT TIME ZONE
-//%right		UMINUS
-%left		'[' ']'
-%left		'(' ')'
-//%left		TYPECAST
-%left		'.'
+//%left        AT ZONE            // sets precedence for AT TIME ZONE
+//%right        UMINUS
+%left        '[' ']'
+%left        '(' ')'
+//%left        TYPECAST
+%left        '.'
 
 /*
  * These might seem to be low-precedence, but actually they are not part
@@ -576,7 +576,7 @@ using namespace Predicate;
  * They wouldn't be given a precedence at all, were it not that we need
  * left-associativity among the JOIN rules themselves.
  */
-/*%left		JOIN UNIONJOIN CROSS LEFT FULL RIGHT INNER_P NATURAL
+/*%left        JOIN UNIONJOIN CROSS LEFT FULL RIGHT INNER_P NATURAL
 */
 %%
 
@@ -585,8 +585,8 @@ StatementList
 {
 //todo: multiple statements
 //todo: not only "select" statements
-	parser->setOperation(Parser::OP_Select);
-	parser->setQuerySchema($1);
+    parser->setOperation(Parser::OP_Select);
+    parser->setQuerySchema($1);
 }
 ;
 
@@ -598,12 +598,12 @@ Statement ';' StatementList
 | Statement
 | Statement ';'
 {
-	$$ = $1;
+    $$ = $1;
 }
 ;
 
-/*		Statement CreateTableStatement 		{ YYACCEPT; }
-	| Statement SelectStatement 		{  }
+/*        Statement CreateTableStatement         { YYACCEPT; }
+    | Statement SelectStatement         {  }
 */
 Statement :
 CreateTableStatement
@@ -612,16 +612,16 @@ YYACCEPT;
 }
 | SelectStatement
 {
-	$$ = $1;
+    $$ = $1;
 }
 ;
 
 CreateTableStatement :
 CREATE TABLE IDENTIFIER
 {
-	parser->setOperation(Parser::OP_CreateTable);
-	parser->createTable($3->toLatin1());
-	delete $3;
+    parser->setOperation(Parser::OP_CreateTable);
+    parser->createTable($3->toLatin1());
+    delete $3;
 }
 '(' ColDefs ')'
 ;
@@ -635,24 +635,24 @@ ColDefs ',' ColDef|ColDef
 ColDef:
 IDENTIFIER ColType
 {
-	PreDbg << "adding field " << *$1;
-	field->setName(*$1);
-	parser->table()->addField(field);
-	field = 0;
-	delete $1;
+    PreDbg << "adding field " << *$1;
+    field->setName(*$1);
+    parser->table()->addField(field);
+    field = 0;
+    delete $1;
 }
 | IDENTIFIER ColType ColKeys
 {
-	PreDbg << "adding field " << *$1;
-	field->setName(*$1);
-	delete $1;
-	parser->table()->addField(field);
+    PreDbg << "adding field " << *$1;
+    field->setName(*$1);
+    delete $1;
+    parser->table()->addField(field);
 
-//	if(field->isPrimaryKey())
-//		parser->table()->addPrimaryKey(field->name());
+//    if(field->isPrimaryKey())
+//        parser->table()->addPrimaryKey(field->name());
 
-//	delete field;
-//	field = 0;
+//    delete field;
+//    field = 0;
 }
 ;
 
@@ -665,128 +665,128 @@ ColKeys ColKey|ColKey
 ColKey:
 PRIMARY KEY
 {
-	field->setPrimaryKey(true);
-	PreDbg << "primary";
+    field->setPrimaryKey(true);
+    PreDbg << "primary";
 }
 | NOT SQL_NULL
 {
-	field->setNotNull(true);
-	PreDbg << "not_null";
+    field->setNotNull(true);
+    PreDbg << "not_null";
 }
 | AUTO_INCREMENT
 {
-	field->setAutoIncrement(true);
-	PreDbg << "ainc";
+    field->setAutoIncrement(true);
+    PreDbg << "ainc";
 }
 ;
 
 ColType:
 SQL_TYPE
 {
-	field = new Field();
-	field->setType($1);
+    field = new Field();
+    field->setType($1);
 }
 | SQL_TYPE '(' INTEGER_CONST ')'
 {
-	PreDbg << "sql + length";
-	field = new Field();
-	field->setPrecision($3);
-	field->setType($1);
+    PreDbg << "sql + length";
+    field = new Field();
+    field->setPrecision($3);
+    field->setType($1);
 }
 | VARCHAR '(' INTEGER_CONST ')'
 {
-	field = new Field();
-	field->setPrecision($3);
-	field->setType(Field::Text);
+    field = new Field();
+    field->setPrecision($3);
+    field->setType(Field::Text);
 }
 |
 {
-	// SQLITE compatibillity
-	field = new Field();
-	field->setType(Field::InvalidType);
+    // SQLITE compatibillity
+    field = new Field();
+    field->setType(Field::InvalidType);
 }
 ;
 
 SelectStatement:
 Select ColViews
 {
-	PreDbg << "Select ColViews=" << *$2;
+    PreDbg << "Select ColViews=" << *$2;
 
-        if (!($$ = buildSelectQuery( $1, $2 )))
-		return 0;
+    if (!($$ = buildSelectQuery( $1, $2 )))
+        return 0;
 }
 | Select ColViews Tables
 {
-        if (!($$ = buildSelectQuery( $1, $2, $3 )))
-		return 0;
+    if (!($$ = buildSelectQuery( $1, $2, $3 )))
+        return 0;
 }
 | Select Tables
 {
-	PreDbg << "Select ColViews Tables";
-        if (!($$ = buildSelectQuery( $1, 0, $2 )))
-		return 0;
+    PreDbg << "Select ColViews Tables";
+    if (!($$ = buildSelectQuery( $1, 0, $2 )))
+        return 0;
 }
 | Select ColViews SelectOptions
 {
-	PreDbg << "Select ColViews Conditions";
-        if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
-		return 0;
+    PreDbg << "Select ColViews Conditions";
+    if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
+        return 0;
 }
 | Select ColViews Tables SelectOptions
 {
-	PreDbg << "Select ColViews Tables SelectOptions";
-        if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
-		return 0;
+    PreDbg << "Select ColViews Tables SelectOptions";
+    if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
+        return 0;
 }
 ;
 
 Select:
 SELECT
 {
-	PreDbg << "SELECT";
-//	parser->createSelect();
-//	parser->setOperation(Parser::OP_Select);
-	$$ = new QuerySchema();
+    PreDbg << "SELECT";
+//    parser->createSelect();
+//    parser->setOperation(Parser::OP_Select);
+    $$ = new QuerySchema();
 }
 ;
 
 SelectOptions: /* todo: more options (having, group by, limit...) */
 WhereClause
 {
-	PreDbg << "WhereClause";
-	$$ = new SelectOptionsInternal;
-        $$->whereExpr = *$1;
-        delete $1;
+    PreDbg << "WhereClause";
+    $$ = new SelectOptionsInternal;
+    $$->whereExpr = *$1;
+    delete $1;
 }
 | ORDER BY OrderByClause
 {
-	PreDbg << "OrderByClause";
-	$$ = new SelectOptionsInternal;
-	$$->orderByColumns = $3;
-        delete $3;
+    PreDbg << "OrderByClause";
+    $$ = new SelectOptionsInternal;
+    $$->orderByColumns = $3;
+    delete $3;
 }
 | WhereClause ORDER BY OrderByClause
 {
-	PreDbg << "WhereClause ORDER BY OrderByClause";
-	$$ = new SelectOptionsInternal;
-        $$->whereExpr = *$1;
-        delete $1;
-	$$->orderByColumns = $4;
+    PreDbg << "WhereClause ORDER BY OrderByClause";
+    $$ = new SelectOptionsInternal;
+    $$->whereExpr = *$1;
+    delete $1;
+    $$->orderByColumns = $4;
 } 
 | ORDER BY OrderByClause WhereClause
 {
-	PreDbg << "OrderByClause WhereClause";
-	$$ = new SelectOptionsInternal;
-        $$->whereExpr = *$4;
-        delete $4;
-        $$->orderByColumns = $3;
+    PreDbg << "OrderByClause WhereClause";
+    $$ = new SelectOptionsInternal;
+    $$->whereExpr = *$4;
+    delete $4;
+    $$->orderByColumns = $3;
 }
 ;
 
 WhereClause:
 WHERE aExpr
 {
-	$$ = $2;
+    $$ = $2;
 }
 ;
 
@@ -795,70 +795,70 @@ WHERE aExpr
 OrderByClause:
 OrderByColumnId
 {
-	PreDbg << "ORDER BY IDENTIFIER";
-	$$ = new OrderByColumnInternal::List;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *$1 );
-	$$->append( orderByColumn );
-	delete $1;
+    PreDbg << "ORDER BY IDENTIFIER";
+    $$ = new OrderByColumnInternal::List;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *$1 );
+    $$->append( orderByColumn );
+    delete $1;
 }
 | OrderByColumnId OrderByOption
 {
-	PreDbg << "ORDER BY IDENTIFIER OrderByOption";
-	$$ = new OrderByColumnInternal::List;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *$1 );
-	orderByColumn.ascending = $2;
-	$$->append( orderByColumn );
-	delete $1;
+    PreDbg << "ORDER BY IDENTIFIER OrderByOption";
+    $$ = new OrderByColumnInternal::List;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *$1 );
+    orderByColumn.ascending = $2;
+    $$->append( orderByColumn );
+    delete $1;
 }
 | OrderByColumnId ',' OrderByClause
 {
-	$$ = $3;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *$1 );
-	$$->append( orderByColumn );
-	delete $1;
+    $$ = $3;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *$1 );
+    $$->append( orderByColumn );
+    delete $1;
 }
 | OrderByColumnId OrderByOption ',' OrderByClause
 {
-	$$ = $4;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *$1 );
-	orderByColumn.ascending = $2;
-	$$->append( orderByColumn );
-	delete $1;
+    $$ = $4;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *$1 );
+    orderByColumn.ascending = $2;
+    $$->append( orderByColumn );
+    delete $1;
 }
 ;
 
 OrderByColumnId:
 IDENTIFIER
 {
-	$$ = new QVariant( *$1 );
-	PreDbg << "OrderByColumnId: " << *$$;
-	delete $1;
+    $$ = new QVariant( *$1 );
+    PreDbg << "OrderByColumnId: " << *$$;
+    delete $1;
 }
 | IDENTIFIER '.' IDENTIFIER
 {
-	$$ = new QVariant( *$1 + QLatin1Char('.') + *$3 );
-	PreDbg << "OrderByColumnId: " << *$$;
-	delete $1;
-	delete $3;
+    $$ = new QVariant( *$1 + QLatin1Char('.') + *$3 );
+    PreDbg << "OrderByColumnId: " << *$$;
+    delete $1;
+    delete $3;
 }
 | INTEGER_CONST
 {
-	$$ = new QVariant($1);
-	PreDbg << "OrderByColumnId: " << *$$;
+    $$ = new QVariant($1);
+    PreDbg << "OrderByColumnId: " << *$$;
 }
 
 OrderByOption:
 ASC
 {
-	$$ = true;
+    $$ = true;
 }
 | DESC
 {
-	$$ = false;
+    $$ = false;
 }
 ;
 
@@ -870,22 +870,22 @@ aExpr2
 aExpr2:
 aExpr3 AND aExpr2
 {
-//	PreDbg << "AND " << $3.debugString();
-        $$ = new BinaryExpression(*$1, AND, *$3);
-        delete $1;
-        delete $3;
+//    PreDbg << "AND " << $3.debugString();
+    $$ = new BinaryExpression(*$1, AND, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr3 OR aExpr2
 {
-        $$ = new BinaryExpression(*$1, OR, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, OR, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr3 XOR aExpr2
 {
-        $$ = new BinaryExpression(*$1, XOR, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, XOR, *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr3
@@ -895,33 +895,33 @@ aExpr3
 aExpr3:
 aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(*$1, '>', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '>', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(*$1, GREATER_OR_EQUAL, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, GREATER_OR_EQUAL, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr4 '<' %prec LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(*$1, '<', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '<', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-        $$ = new BinaryExpression(*$1, LESS_OR_EQUAL, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, LESS_OR_EQUAL, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr4 '=' aExpr3
 {
-        $$ = new BinaryExpression(*$1, '=', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '=', *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr4
@@ -931,40 +931,40 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-        $$ = new BinaryExpression(*$1, NOT_EQUAL, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, NOT_EQUAL, *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr5 NOT_EQUAL2 aExpr4
 {
-        $$ = new BinaryExpression(*$1, NOT_EQUAL2, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, NOT_EQUAL2, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr5 LIKE aExpr4
 {
-        $$ = new BinaryExpression(*$1, LIKE, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, LIKE, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr5 SQL_IN aExpr4
 {
-        $$ = new BinaryExpression(*$1, SQL_IN, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, SQL_IN, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(*$1, SIMILAR_TO, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, SIMILAR_TO, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-        $$ = new BinaryExpression(*$1, NOT_SIMILAR_TO, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, NOT_SIMILAR_TO, *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr5
@@ -974,13 +974,13 @@ aExpr5
 aExpr5:
 aExpr5 SQL_IS_NULL
 {
-        $$ = new UnaryExpression( SQL_IS_NULL, *$1 );
-        delete $1;
+    $$ = new UnaryExpression( SQL_IS_NULL, *$1 );
+    delete $1;
 }
 | aExpr5 SQL_IS_NOT_NULL
 {
-        $$ = new UnaryExpression( SQL_IS_NOT_NULL, *$1 );
-        delete $1;
+    $$ = new UnaryExpression( SQL_IS_NOT_NULL, *$1 );
+    delete $1;
 }
 |
 aExpr6
@@ -990,15 +990,15 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-        $$ = new BinaryExpression(*$1, BITWISE_SHIFT_LEFT, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, BITWISE_SHIFT_LEFT, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-        $$ = new BinaryExpression(*$1, BITWISE_SHIFT_RIGHT, *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, BITWISE_SHIFT_RIGHT, *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr7
@@ -1008,27 +1008,27 @@ aExpr7
 aExpr7:
 aExpr8 '+' aExpr7
 {
-        $$ = new BinaryExpression(*$1, '+', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '+', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
-        $$ = new BinaryExpression(*$1, '-', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '-', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr8 '&' aExpr7
 {
-        $$ = new BinaryExpression(*$1, '&', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '&', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr8 '|' aExpr7
 {
-        $$ = new BinaryExpression(*$1, '|', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '|', *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr8
@@ -1038,21 +1038,21 @@ aExpr8
 aExpr8:
 aExpr9 '/' aExpr8
 {
-        $$ = new BinaryExpression(*$1, '/', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '/', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr9 '*' aExpr8
 {
-        $$ = new BinaryExpression(*$1, '*', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '*', *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr9 '%' aExpr8
 {
-        $$ = new BinaryExpression(*$1, '%', *$3);
-        delete $1;
-        delete $3;
+    $$ = new BinaryExpression(*$1, '%', *$3);
+    delete $1;
+    delete $3;
 }
 |
 aExpr9
@@ -1063,87 +1063,87 @@ aExpr9:
 /* --- unary logical left --- */
 '-' aExpr9
 {
-        $$ = new UnaryExpression( '-', *$2 );
-        delete $2;
+    $$ = new UnaryExpression( '-', *$2 );
+    delete $2;
 }
 | '+' aExpr9
 {
-        $$ = new UnaryExpression( '+', *$2 );
-        delete $2;
+    $$ = new UnaryExpression( '+', *$2 );
+    delete $2;
 }
 | '~' aExpr9
 {
-        $$ = new UnaryExpression( '~', *$2 );
-        delete $2;
+    $$ = new UnaryExpression( '~', *$2 );
+    delete $2;
 }
 | NOT aExpr9
 {
-        $$ = new UnaryExpression( NOT, *$2 );
-        delete $2;
+    $$ = new UnaryExpression( NOT, *$2 );
+    delete $2;
 }
 | IDENTIFIER
 {
-        $$ = new VariableExpression( *$1 );
-	
+    $$ = new VariableExpression( *$1 );
+
 //TODO: simplify this later if that's 'only one field name' expression
-	PreDbg << "  + identifier: " << *$1;
-	delete $1;
+    PreDbg << "  + identifier: " << *$1;
+    delete $1;
 }
 | QUERY_PARAMETER
 {
-        $$ = new QueryParameterExpression( *$1 );
-	PreDbg << "  + query parameter:" << *$$;
-	delete $1;
+    $$ = new QueryParameterExpression( *$1 );
+    PreDbg << "  + query parameter:" << *$$;
+    delete $1;
 }
 | IDENTIFIER aExprList
 {
-	PreDbg << "  + function:" << *$1 << "(" << *$2 << ")";
-        $$ = new FunctionExpression(*$1, *$2);
-	delete $1;
-        delete $2;
+    PreDbg << "  + function:" << *$1 << "(" << *$2 << ")";
+    $$ = new FunctionExpression(*$1, *$2);
+    delete $1;
+    delete $2;
 }
 /*TODO: shall we also support db name? */
 | IDENTIFIER '.' IDENTIFIER
 {
-        $$ = new VariableExpression( *$1 + QLatin1Char('.') + *$3 );
-	PreDbg << "  + identifier.identifier:" << *$1 << "." << *$3;
-	delete $1;
-	delete $3;
+    $$ = new VariableExpression( *$1 + QLatin1Char('.') + *$3 );
+    PreDbg << "  + identifier.identifier:" << *$1 << "." << *$3;
+    delete $1;
+    delete $3;
 }
 | SQL_NULL
 {
-        $$ = new ConstExpression( SQL_NULL, QVariant() );
-	PreDbg << "  + NULL";
-//	$$ = new Field();
-	//$$->setName(QString::null);
+    $$ = new ConstExpression( SQL_NULL, QVariant() );
+    PreDbg << "  + NULL";
+//    $$ = new Field();
+    //$$->setName(QString::null);
 }
 | CHARACTER_STRING_LITERAL
 {
-        $$ = new ConstExpression( CHARACTER_STRING_LITERAL, *$1 );
-	PreDbg << "  + constant " << $1;
-	delete $1;
+    $$ = new ConstExpression( CHARACTER_STRING_LITERAL, *$1 );
+    PreDbg << "  + constant " << $1;
+    delete $1;
 }
 | INTEGER_CONST
 {
-	QVariant val;
-	if ($1 <= INT_MAX && $1 >= INT_MIN)
-		val = (int)$1;
-	else if ($1 <= UINT_MAX && $1 >= 0)
-		val = (uint)$1;
-	else if ($1 <= LLONG_MAX && $1 >= LLONG_MIN)
-		val = (qint64)$1;
+    QVariant val;
+    if ($1 <= INT_MAX && $1 >= INT_MIN)
+        val = (int)$1;
+    else if ($1 <= UINT_MAX && $1 >= 0)
+        val = (uint)$1;
+    else if ($1 <= LLONG_MAX && $1 >= LLONG_MIN)
+        val = (qint64)$1;
 
-//	if ($1 < ULLONG_MAX)
-//		val = (quint64)$1;
+//    if ($1 < ULLONG_MAX)
+//        val = (quint64)$1;
 //TODO ok?
 
-        $$ = new ConstExpression( INTEGER_CONST, val );
-	PreDbg << "  + int constant: " << val.toString();
+    $$ = new ConstExpression( INTEGER_CONST, val );
+    PreDbg << "  + int constant: " << val.toString();
 }
 | REAL_CONST
 {
-        $$ = new ConstExpression( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
-	PreDbg << "  + real constant: " << $1.integer << "." << $1.fractional;
+    $$ = new ConstExpression( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
+    PreDbg << "  + real constant: " << $1.integer << "." << $1.fractional;
 }
 |
 aExpr10
@@ -1153,73 +1153,73 @@ aExpr10
 aExpr10:
 '(' aExpr ')'
 {
-	PreDbg << "(expr)";
-        $$ = new UnaryExpression('(', *$2);
-        delete $2;
+    PreDbg << "(expr)";
+    $$ = new UnaryExpression('(', *$2);
+    delete $2;
 }
 ;
 
 aExprList:
 '(' aExprList2 ')'
 {
-//	$$ = new NArgExpression(UnknownExpressionClass, 0);
-//	$$->add( $1 );
-//	$$->add( $3 );
-	$$ = $2;
+//    $$ = new NArgExpression(UnknownExpressionClass, 0);
+//    $$->add( $1 );
+//    $$->add( $3 );
+    $$ = $2;
 }
 ;
 
 aExprList2:
 aExpr ',' aExprList2
 {
-	$$ = $3;
-        $$->prepend( *$1 );
-        delete $1;
+    $$ = $3;
+    $$->prepend( *$1 );
+    delete $1;
 }
 | aExpr ',' aExpr
 {
-        $$ = new NArgExpression(UnknownExpressionClass, 0);
-        $$->append( *$1 );
-        $$->append( *$3 );
-        delete $1;
-        delete $3;
+    $$ = new NArgExpression(UnknownExpressionClass, 0);
+    $$->append( *$1 );
+    $$->append( *$3 );
+    delete $1;
+    delete $3;
 }
 ;
 
 Tables:
 FROM FlatTableList
 {
-	$$ = $2;
+    $$ = $2;
 }
 /*
 | Tables LEFT JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "LEFT JOIN: '" << *$4 << "' ON " << $6;
-	addTable($4->toQString());
-	delete $4;
+    PreDbg << "LEFT JOIN: '" << *$4 << "' ON " << $6;
+    addTable($4->toQString());
+    delete $4;
 }
 | Tables LEFT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7;
-	addTable($5);
+    PreDbg << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7;
+    addTable($5);
 }
 | Tables INNER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "INNER JOIN: '" << *$4 << "' ON " << $6;
-	addTable($4->toQString());
-	delete $4;
+    PreDbg << "INNER JOIN: '" << *$4 << "' ON " << $6;
+    addTable($4->toQString());
+    delete $4;
 }
 | Tables RIGHT JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "RIGHT JOIN: '" << *$4 << "' ON " << $6;
-	addTable(*$4);
-	delete $4;
+    PreDbg << "RIGHT JOIN: '" << *$4 << "' ON " << $6;
+    addTable(*$4);
+    delete $4;
 }
 | Tables RIGHT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-	PreDbg << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7;
-	addTable($5->toQString());
-	delete $5;
+    PreDbg << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7;
+    addTable($5->toQString());
+    delete $5;
 }*/
 ;
 
@@ -1227,72 +1227,72 @@ FROM FlatTableList
 FlatTableList:
 aFlatTableList
 {
-	$$
+    $$
 }
 ;*/
 
 FlatTableList:
 FlatTableList ',' FlatTable
 {
-	$$ = $1;
-        $$->append(*$3);
+    $$ = $1;
+    $$->append(*$3);
 }
 |FlatTable
 {
-        $$ = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
-        $$->append(*$1);
-        delete $1;
+    $$ = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
+    $$->append(*$1);
+    delete $1;
 }
 ;
 
 FlatTable:
 IDENTIFIER
 {
-	PreDbg << "FROM: '" << *$1 << "'";
-        $$ = new VariableExpression(*$1);
+    PreDbg << "FROM: '" << *$1 << "'";
+    $$ = new VariableExpression(*$1);
 
-	/*
+    /*
 //TODO: this isn't ok for more tables:
-	Field::ListIterator it = parser->select()->fieldsIterator();
-	for(Field *item; (item = it.current()); ++it)
-	{
-		if(item->table() == dummy)
-		{
-			item->setTable(schema);
-		}
+    Field::ListIterator it = parser->select()->fieldsIterator();
+    for(Field *item; (item = it.current()); ++it)
+    {
+        if(item->table() == dummy)
+        {
+            item->setTable(schema);
+        }
 
-		if(item->table() && !item->isQueryAsterisk())
-		{
-			Field *f = item->table()->field(item->name());
-			if(!f)
-			{
-				ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
-				parser->setError(err);
-				yyerror("fieldlisterror");
-			}	
-		}
-	}*/
-	delete $1;
+        if(item->table() && !item->isQueryAsterisk())
+        {
+            Field *f = item->table()->field(item->name());
+            if(!f)
+            {
+                ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
+                parser->setError(err);
+                yyerror("fieldlisterror");
+            }
+        }
+    }*/
+    delete $1;
 }
 | IDENTIFIER IDENTIFIER
 {
-	//table + alias
-        $$ = new BinaryExpression(
-                VariableExpression(*$1), 0,
-                VariableExpression(*$2)
-	);
-	delete $1;
-	delete $2;
+    //table + alias
+    $$ = new BinaryExpression(
+        VariableExpression(*$1), 0,
+        VariableExpression(*$2)
+    );
+    delete $1;
+    delete $2;
 }
 | IDENTIFIER AS IDENTIFIER
 {
-	//table + alias
-        $$ = new BinaryExpression(
-                VariableExpression(*$1), AS,
-                VariableExpression(*$3)
-	);
-	delete $1;
-	delete $3;
+    //table + alias
+    $$ = new BinaryExpression(
+        VariableExpression(*$1), AS,
+        VariableExpression(*$3)
+    );
+    delete $1;
+    delete $3;
 }
 ;
 
@@ -1301,133 +1301,133 @@ IDENTIFIER
 ColViews:
 ColViews ',' ColItem
 {
-	$$ = $1;
-        $$->append(*$3);
-        delete $3;
-	PreDbg << "ColViews: ColViews , ColItem";
+    $$ = $1;
+    $$->append(*$3);
+    delete $3;
+    PreDbg << "ColViews: ColViews , ColItem";
 }
 |ColItem
 {
-        $$ = new NArgExpression(UnknownExpressionClass, 0);
-        $$->append(*$1);
-        delete $1;
-	PreDbg << "ColViews: ColItem";
+    $$ = new NArgExpression(UnknownExpressionClass, 0);
+    $$->append(*$1);
+    delete $1;
+    PreDbg << "ColViews: ColItem";
 }
 ;
 
 ColItem:
 ColExpression
 {
-//	$$ = new Field();
-//	dummy->addField($$);
-//	$$->setExpression( $1 );
-//	parser->select()->addField($$);
-	$$ = $1;
-	PreDbg << " added column expr:" << *$1;
+//    $$ = new Field();
+//    dummy->addField($$);
+//    $$->setExpression( $1 );
+//    parser->select()->addField($$);
+    $$ = $1;
+    PreDbg << " added column expr:" << *$1;
 }
 | ColWildCard
 {
-	$$ = $1;
-	PreDbg << " added column wildcard:" << *$1;
+    $$ = $1;
+    PreDbg << " added column wildcard:" << *$1;
 }
 | ColExpression AS IDENTIFIER
 {
-        $$ = new BinaryExpression(
-                *$1, AS,
-                VariableExpression(*$3)
-	);
-	PreDbg << " added column expr:" << *$$;
-        delete $1;
-	delete $3;
+    $$ = new BinaryExpression(
+        *$1, AS,
+        VariableExpression(*$3)
+    );
+    PreDbg << " added column expr:" << *$$;
+    delete $1;
+    delete $3;
 }
 | ColExpression IDENTIFIER
 {
-        $$ = new BinaryExpression(
-                *$1, 0,
-                VariableExpression(*$2)
-	);
-	PreDbg << " added column expr:" << *$$;
-        delete $1;
-	delete $2;
+    $$ = new BinaryExpression(
+        *$1, 0,
+        VariableExpression(*$2)
+    );
+    PreDbg << " added column expr:" << *$$;
+    delete $1;
+    delete $2;
 }
 ;
 
 ColExpression:
 aExpr
 {
-	$$ = $1;
+    $$ = $1;
 }
 /* HANDLED BY 'IDENTIFIER aExprList'
 | IDENTIFIER '(' ColViews ')'
 {
-        $$ = new FunctionExpression( $1, $3 );
+    $$ = new FunctionExpression( $1, $3 );
 }*/
 /*
 | SUM '(' ColExpression ')'
 {
-        FunctionExpression(
-//	$$ = new AggregationExpression( SUM,  );
+    FunctionExpression(
+//    $$ = new AggregationExpression( SUM,  );
 //TODO
-//	$$->setName("SUM(" + $3->name() + ")");
-//wait	$$->containsGroupingAggregate(true);
-//wait	parser->select()->grouped(true);
+//    $$->setName("SUM(" + $3->name() + ")");
+//wait    $$->containsGroupingAggregate(true);
+//wait    parser->select()->grouped(true);
 }
 | SQL_MIN '(' ColExpression ')'
 {
-	$$ = $3;
+    $$ = $3;
 //TODO
-//	$$->setName("MIN(" + $3->name() + ")");
-//wait	$$->containsGroupingAggregate(true);
-//wait	parser->select()->grouped(true);
+//    $$->setName("MIN(" + $3->name() + ")");
+//wait    $$->containsGroupingAggregate(true);
+//wait    parser->select()->grouped(true);
 }
 | SQL_MAX '(' ColExpression ')'
 {
-	$$ = $3;
+    $$ = $3;
 //TODO
-//	$$->setName("MAX(" + $3->name() + ")");
-//wait	$$->containsGroupingAggregate(true);
-//wait	parser->select()->grouped(true);
+//    $$->setName("MAX(" + $3->name() + ")");
+//wait    $$->containsGroupingAggregate(true);
+//wait    parser->select()->grouped(true);
 }
 | AVG '(' ColExpression ')'
 {
-	$$ = $3;
+    $$ = $3;
 //TODO
-//	$$->setName("AVG(" + $3->name() + ")");
-//wait	$$->containsGroupingAggregate(true);
-//wait	parser->select()->grouped(true);
+//    $$->setName("AVG(" + $3->name() + ")");
+//wait    $$->containsGroupingAggregate(true);
+//wait    parser->select()->grouped(true);
 }*/
 //?
 | DISTINCT '(' ColExpression ')' 
 {
-	$$ = $3;
+    $$ = $3;
 //! @todo DISTINCT '(' ColExpression ')'
-//	$$->setName("DISTINCT(" + $3->name() + ")");
+//    $$->setName("DISTINCT(" + $3->name() + ")");
 }
 ;
 
 ColWildCard:
 '*'
 {
-        $$ = new VariableExpression(QLatin1String("*"));
-	PreDbg << "all columns";
+    $$ = new VariableExpression(QLatin1String("*"));
+    PreDbg << "all columns";
 
-//	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
-//	parser->select()->addAsterisk(ast);
-//	requiresTable = true;
+//    QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
+//    parser->select()->addAsterisk(ast);
+//    requiresTable = true;
 }
 | IDENTIFIER '.' '*'
 {
-	QString s( *$1 );
-	s += QLatin1String(".*");
-        $$ = new VariableExpression(s);
-	PreDbg << "  + all columns from " << s;
-	delete $1;
+    QString s( *$1 );
+    s += QLatin1String(".*");
+    $$ = new VariableExpression(s);
+    PreDbg << "  + all columns from " << s;
+    delete $1;
 }
 /*| ERROR_DIGIT_BEFORE_IDENTIFIER
 {
-        $$ = new VariableExpression($1);
-	PreDbg << "  Invalid identifier! " << $1;
-	setError(QObject::tr("Invalid identifier \"%1\"",$1));
+    $$ = new VariableExpression($1);
+    PreDbg << "  Invalid identifier! " << $1;
+    setError(QObject::tr("Invalid identifier \"%1\"",$1));
 }*/
 ;
 

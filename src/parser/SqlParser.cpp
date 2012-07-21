@@ -127,20 +127,20 @@ QDebug operator<<(QDebug dbg, const ExpressionPtr& expr)
 
 int yylex();
 
-//	using namespace std;
+//    using namespace std;
 using namespace Predicate;
 
 #define YY_NO_UNPUT
 #define YYSTACK_USE_ALLOCA 1
 #define YYMAXDEPTH 255
 
-	extern "C"
-	{
-		int yywrap()
-		{
-			return 1;
-		}
-	}
+    extern "C"
+    {
+        int yywrap()
+        {
+            return 1;
+        }
+    }
 
 
 
@@ -531,19 +531,19 @@ typedef union YYSTYPE
 /* Line 293 of yacc.c  */
 #line 515 "SqlParser.y"
 
-	QString* stringValue;
-	qint64 integerValue;
-	bool booleanValue;
-	struct realType realValue;
-	Predicate::Field::Type colType;
-	Predicate::Field *field;
-        Predicate::Expression *expr;
-        Predicate::NArgExpression *exprList;
-        Predicate::ConstExpression *constExpression;
-	Predicate::QuerySchema *querySchema;
-	SelectOptionsInternal *selectOptions;
-	OrderByColumnInternal::List *orderByColumns;
-	QVariant *variantValue;
+    QString* stringValue;
+    qint64 integerValue;
+    bool booleanValue;
+    struct realType realValue;
+    Predicate::Field::Type colType;
+    Predicate::Field *field;
+    Predicate::Expression *expr;
+    Predicate::NArgExpression *exprList;
+    Predicate::ConstExpression *constExpression;
+    Predicate::QuerySchema *querySchema;
+    SelectOptionsInternal *selectOptions;
+    OrderByColumnInternal::List *orderByColumns;
+    QVariant *variantValue;
 
 
 
@@ -2107,8 +2107,8 @@ yyreduce:
     {
 //todo: multiple statements
 //todo: not only "select" statements
-	parser->setOperation(Parser::OP_Select);
-	parser->setQuerySchema((yyvsp[(1) - (1)].querySchema));
+    parser->setOperation(Parser::OP_Select);
+    parser->setQuerySchema((yyvsp[(1) - (1)].querySchema));
 }
     break;
 
@@ -2126,7 +2126,7 @@ yyreduce:
 /* Line 1806 of yacc.c  */
 #line 600 "SqlParser.y"
     {
-	(yyval.querySchema) = (yyvsp[(1) - (2)].querySchema);
+    (yyval.querySchema) = (yyvsp[(1) - (2)].querySchema);
 }
     break;
 
@@ -2144,7 +2144,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 614 "SqlParser.y"
     {
-	(yyval.querySchema) = (yyvsp[(1) - (1)].querySchema);
+    (yyval.querySchema) = (yyvsp[(1) - (1)].querySchema);
 }
     break;
 
@@ -2153,9 +2153,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 621 "SqlParser.y"
     {
-	parser->setOperation(Parser::OP_CreateTable);
-	parser->createTable((yyvsp[(3) - (3)].stringValue)->toLatin1());
-	delete (yyvsp[(3) - (3)].stringValue);
+    parser->setOperation(Parser::OP_CreateTable);
+    parser->createTable((yyvsp[(3) - (3)].stringValue)->toLatin1());
+    delete (yyvsp[(3) - (3)].stringValue);
 }
     break;
 
@@ -2172,11 +2172,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 637 "SqlParser.y"
     {
-	PreDbg << "adding field " << *(yyvsp[(1) - (2)].stringValue);
-	field->setName(*(yyvsp[(1) - (2)].stringValue));
-	parser->table()->addField(field);
-	field = 0;
-	delete (yyvsp[(1) - (2)].stringValue);
+    PreDbg << "adding field " << *(yyvsp[(1) - (2)].stringValue);
+    field->setName(*(yyvsp[(1) - (2)].stringValue));
+    parser->table()->addField(field);
+    field = 0;
+    delete (yyvsp[(1) - (2)].stringValue);
 }
     break;
 
@@ -2185,16 +2185,16 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 645 "SqlParser.y"
     {
-	PreDbg << "adding field " << *(yyvsp[(1) - (3)].stringValue);
-	field->setName(*(yyvsp[(1) - (3)].stringValue));
-	delete (yyvsp[(1) - (3)].stringValue);
-	parser->table()->addField(field);
+    PreDbg << "adding field " << *(yyvsp[(1) - (3)].stringValue);
+    field->setName(*(yyvsp[(1) - (3)].stringValue));
+    delete (yyvsp[(1) - (3)].stringValue);
+    parser->table()->addField(field);
 
-//	if(field->isPrimaryKey())
-//		parser->table()->addPrimaryKey(field->name());
+//    if(field->isPrimaryKey())
+//        parser->table()->addPrimaryKey(field->name());
 
-//	delete field;
-//	field = 0;
+//    delete field;
+//    field = 0;
 }
     break;
 
@@ -2211,8 +2211,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 667 "SqlParser.y"
     {
-	field->setPrimaryKey(true);
-	PreDbg << "primary";
+    field->setPrimaryKey(true);
+    PreDbg << "primary";
 }
     break;
 
@@ -2221,8 +2221,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 672 "SqlParser.y"
     {
-	field->setNotNull(true);
-	PreDbg << "not_null";
+    field->setNotNull(true);
+    PreDbg << "not_null";
 }
     break;
 
@@ -2231,8 +2231,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 677 "SqlParser.y"
     {
-	field->setAutoIncrement(true);
-	PreDbg << "ainc";
+    field->setAutoIncrement(true);
+    PreDbg << "ainc";
 }
     break;
 
@@ -2241,8 +2241,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 685 "SqlParser.y"
     {
-	field = new Field();
-	field->setType((yyvsp[(1) - (1)].colType));
+    field = new Field();
+    field->setType((yyvsp[(1) - (1)].colType));
 }
     break;
 
@@ -2251,10 +2251,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 690 "SqlParser.y"
     {
-	PreDbg << "sql + length";
-	field = new Field();
-	field->setPrecision((yyvsp[(3) - (4)].integerValue));
-	field->setType((yyvsp[(1) - (4)].colType));
+    PreDbg << "sql + length";
+    field = new Field();
+    field->setPrecision((yyvsp[(3) - (4)].integerValue));
+    field->setType((yyvsp[(1) - (4)].colType));
 }
     break;
 
@@ -2263,9 +2263,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 697 "SqlParser.y"
     {
-	field = new Field();
-	field->setPrecision((yyvsp[(3) - (4)].integerValue));
-	field->setType(Field::Text);
+    field = new Field();
+    field->setPrecision((yyvsp[(3) - (4)].integerValue));
+    field->setType(Field::Text);
 }
     break;
 
@@ -2274,9 +2274,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 703 "SqlParser.y"
     {
-	// SQLITE compatibillity
-	field = new Field();
-	field->setType(Field::InvalidType);
+    // SQLITE compatibillity
+    field = new Field();
+    field->setType(Field::InvalidType);
 }
     break;
 
@@ -2285,10 +2285,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 712 "SqlParser.y"
     {
-	PreDbg << "Select ColViews=" << *(yyvsp[(2) - (2)].exprList);
+    PreDbg << "Select ColViews=" << *(yyvsp[(2) - (2)].exprList);
 
-        if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (2)].querySchema), (yyvsp[(2) - (2)].exprList) )))
-		return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (2)].querySchema), (yyvsp[(2) - (2)].exprList) )))
+        return 0;
 }
     break;
 
@@ -2297,8 +2297,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 719 "SqlParser.y"
     {
-        if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (3)].querySchema), (yyvsp[(2) - (3)].exprList), (yyvsp[(3) - (3)].exprList) )))
-		return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (3)].querySchema), (yyvsp[(2) - (3)].exprList), (yyvsp[(3) - (3)].exprList) )))
+        return 0;
 }
     break;
 
@@ -2307,9 +2307,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 724 "SqlParser.y"
     {
-	PreDbg << "Select ColViews Tables";
-        if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (2)].querySchema), 0, (yyvsp[(2) - (2)].exprList) )))
-		return 0;
+    PreDbg << "Select ColViews Tables";
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (2)].querySchema), 0, (yyvsp[(2) - (2)].exprList) )))
+        return 0;
 }
     break;
 
@@ -2318,9 +2318,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 730 "SqlParser.y"
     {
-	PreDbg << "Select ColViews Conditions";
-        if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (3)].querySchema), (yyvsp[(2) - (3)].exprList), 0, (yyvsp[(3) - (3)].selectOptions) )))
-		return 0;
+    PreDbg << "Select ColViews Conditions";
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (3)].querySchema), (yyvsp[(2) - (3)].exprList), 0, (yyvsp[(3) - (3)].selectOptions) )))
+        return 0;
 }
     break;
 
@@ -2329,9 +2329,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 736 "SqlParser.y"
     {
-	PreDbg << "Select ColViews Tables SelectOptions";
-        if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (4)].querySchema), (yyvsp[(2) - (4)].exprList), (yyvsp[(3) - (4)].exprList), (yyvsp[(4) - (4)].selectOptions) )))
-		return 0;
+    PreDbg << "Select ColViews Tables SelectOptions";
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[(1) - (4)].querySchema), (yyvsp[(2) - (4)].exprList), (yyvsp[(3) - (4)].exprList), (yyvsp[(4) - (4)].selectOptions) )))
+        return 0;
 }
     break;
 
@@ -2340,10 +2340,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 745 "SqlParser.y"
     {
-	PreDbg << "SELECT";
-//	parser->createSelect();
-//	parser->setOperation(Parser::OP_Select);
-	(yyval.querySchema) = new QuerySchema();
+    PreDbg << "SELECT";
+//    parser->createSelect();
+//    parser->setOperation(Parser::OP_Select);
+    (yyval.querySchema) = new QuerySchema();
 }
     break;
 
@@ -2352,10 +2352,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 755 "SqlParser.y"
     {
-	PreDbg << "WhereClause";
-	(yyval.selectOptions) = new SelectOptionsInternal;
-        (yyval.selectOptions)->whereExpr = *(yyvsp[(1) - (1)].expr);
-        delete (yyvsp[(1) - (1)].expr);
+    PreDbg << "WhereClause";
+    (yyval.selectOptions) = new SelectOptionsInternal;
+    (yyval.selectOptions)->whereExpr = *(yyvsp[(1) - (1)].expr);
+    delete (yyvsp[(1) - (1)].expr);
 }
     break;
 
@@ -2364,10 +2364,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 762 "SqlParser.y"
     {
-	PreDbg << "OrderByClause";
-	(yyval.selectOptions) = new SelectOptionsInternal;
-	(yyval.selectOptions)->orderByColumns = (yyvsp[(3) - (3)].orderByColumns);
-        delete (yyvsp[(3) - (3)].orderByColumns);
+    PreDbg << "OrderByClause";
+    (yyval.selectOptions) = new SelectOptionsInternal;
+    (yyval.selectOptions)->orderByColumns = (yyvsp[(3) - (3)].orderByColumns);
+    delete (yyvsp[(3) - (3)].orderByColumns);
 }
     break;
 
@@ -2376,11 +2376,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 769 "SqlParser.y"
     {
-	PreDbg << "WhereClause ORDER BY OrderByClause";
-	(yyval.selectOptions) = new SelectOptionsInternal;
-        (yyval.selectOptions)->whereExpr = *(yyvsp[(1) - (4)].expr);
-        delete (yyvsp[(1) - (4)].expr);
-	(yyval.selectOptions)->orderByColumns = (yyvsp[(4) - (4)].orderByColumns);
+    PreDbg << "WhereClause ORDER BY OrderByClause";
+    (yyval.selectOptions) = new SelectOptionsInternal;
+    (yyval.selectOptions)->whereExpr = *(yyvsp[(1) - (4)].expr);
+    delete (yyvsp[(1) - (4)].expr);
+    (yyval.selectOptions)->orderByColumns = (yyvsp[(4) - (4)].orderByColumns);
 }
     break;
 
@@ -2389,11 +2389,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 777 "SqlParser.y"
     {
-	PreDbg << "OrderByClause WhereClause";
-	(yyval.selectOptions) = new SelectOptionsInternal;
-        (yyval.selectOptions)->whereExpr = *(yyvsp[(4) - (4)].expr);
-        delete (yyvsp[(4) - (4)].expr);
-        (yyval.selectOptions)->orderByColumns = (yyvsp[(3) - (4)].orderByColumns);
+    PreDbg << "OrderByClause WhereClause";
+    (yyval.selectOptions) = new SelectOptionsInternal;
+    (yyval.selectOptions)->whereExpr = *(yyvsp[(4) - (4)].expr);
+    delete (yyvsp[(4) - (4)].expr);
+    (yyval.selectOptions)->orderByColumns = (yyvsp[(3) - (4)].orderByColumns);
 }
     break;
 
@@ -2402,7 +2402,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 788 "SqlParser.y"
     {
-	(yyval.expr) = (yyvsp[(2) - (2)].expr);
+    (yyval.expr) = (yyvsp[(2) - (2)].expr);
 }
     break;
 
@@ -2411,12 +2411,12 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 797 "SqlParser.y"
     {
-	PreDbg << "ORDER BY IDENTIFIER";
-	(yyval.orderByColumns) = new OrderByColumnInternal::List;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (1)].variantValue) );
-	(yyval.orderByColumns)->append( orderByColumn );
-	delete (yyvsp[(1) - (1)].variantValue);
+    PreDbg << "ORDER BY IDENTIFIER";
+    (yyval.orderByColumns) = new OrderByColumnInternal::List;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (1)].variantValue) );
+    (yyval.orderByColumns)->append( orderByColumn );
+    delete (yyvsp[(1) - (1)].variantValue);
 }
     break;
 
@@ -2425,13 +2425,13 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 806 "SqlParser.y"
     {
-	PreDbg << "ORDER BY IDENTIFIER OrderByOption";
-	(yyval.orderByColumns) = new OrderByColumnInternal::List;
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (2)].variantValue) );
-	orderByColumn.ascending = (yyvsp[(2) - (2)].booleanValue);
-	(yyval.orderByColumns)->append( orderByColumn );
-	delete (yyvsp[(1) - (2)].variantValue);
+    PreDbg << "ORDER BY IDENTIFIER OrderByOption";
+    (yyval.orderByColumns) = new OrderByColumnInternal::List;
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (2)].variantValue) );
+    orderByColumn.ascending = (yyvsp[(2) - (2)].booleanValue);
+    (yyval.orderByColumns)->append( orderByColumn );
+    delete (yyvsp[(1) - (2)].variantValue);
 }
     break;
 
@@ -2440,11 +2440,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 816 "SqlParser.y"
     {
-	(yyval.orderByColumns) = (yyvsp[(3) - (3)].orderByColumns);
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (3)].variantValue) );
-	(yyval.orderByColumns)->append( orderByColumn );
-	delete (yyvsp[(1) - (3)].variantValue);
+    (yyval.orderByColumns) = (yyvsp[(3) - (3)].orderByColumns);
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (3)].variantValue) );
+    (yyval.orderByColumns)->append( orderByColumn );
+    delete (yyvsp[(1) - (3)].variantValue);
 }
     break;
 
@@ -2453,12 +2453,12 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 824 "SqlParser.y"
     {
-	(yyval.orderByColumns) = (yyvsp[(4) - (4)].orderByColumns);
-	OrderByColumnInternal orderByColumn;
-	orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (4)].variantValue) );
-	orderByColumn.ascending = (yyvsp[(2) - (4)].booleanValue);
-	(yyval.orderByColumns)->append( orderByColumn );
-	delete (yyvsp[(1) - (4)].variantValue);
+    (yyval.orderByColumns) = (yyvsp[(4) - (4)].orderByColumns);
+    OrderByColumnInternal orderByColumn;
+    orderByColumn.setColumnByNameOrNumber( *(yyvsp[(1) - (4)].variantValue) );
+    orderByColumn.ascending = (yyvsp[(2) - (4)].booleanValue);
+    (yyval.orderByColumns)->append( orderByColumn );
+    delete (yyvsp[(1) - (4)].variantValue);
 }
     break;
 
@@ -2467,9 +2467,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 836 "SqlParser.y"
     {
-	(yyval.variantValue) = new QVariant( *(yyvsp[(1) - (1)].stringValue) );
-	PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
-	delete (yyvsp[(1) - (1)].stringValue);
+    (yyval.variantValue) = new QVariant( *(yyvsp[(1) - (1)].stringValue) );
+    PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
+    delete (yyvsp[(1) - (1)].stringValue);
 }
     break;
 
@@ -2478,10 +2478,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 842 "SqlParser.y"
     {
-	(yyval.variantValue) = new QVariant( *(yyvsp[(1) - (3)].stringValue) + QLatin1Char('.') + *(yyvsp[(3) - (3)].stringValue) );
-	PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
-	delete (yyvsp[(1) - (3)].stringValue);
-	delete (yyvsp[(3) - (3)].stringValue);
+    (yyval.variantValue) = new QVariant( *(yyvsp[(1) - (3)].stringValue) + QLatin1Char('.') + *(yyvsp[(3) - (3)].stringValue) );
+    PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
+    delete (yyvsp[(1) - (3)].stringValue);
+    delete (yyvsp[(3) - (3)].stringValue);
 }
     break;
 
@@ -2490,8 +2490,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 849 "SqlParser.y"
     {
-	(yyval.variantValue) = new QVariant((yyvsp[(1) - (1)].integerValue));
-	PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
+    (yyval.variantValue) = new QVariant((yyvsp[(1) - (1)].integerValue));
+    PreDbg << "OrderByColumnId: " << *(yyval.variantValue);
 }
     break;
 
@@ -2500,7 +2500,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 856 "SqlParser.y"
     {
-	(yyval.booleanValue) = true;
+    (yyval.booleanValue) = true;
 }
     break;
 
@@ -2509,7 +2509,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 860 "SqlParser.y"
     {
-	(yyval.booleanValue) = false;
+    (yyval.booleanValue) = false;
 }
     break;
 
@@ -2518,10 +2518,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 872 "SqlParser.y"
     {
-//	PreDbg << "AND " << $3.debugString();
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), AND, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+//    PreDbg << "AND " << $3.debugString();
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), AND, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2530,9 +2530,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 879 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), OR, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), OR, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2541,9 +2541,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 885 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), XOR, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), XOR, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2552,9 +2552,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 897 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '>', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '>', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2563,9 +2563,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 903 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), GREATER_OR_EQUAL, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), GREATER_OR_EQUAL, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2574,9 +2574,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 909 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '<', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '<', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2585,9 +2585,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 915 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), LESS_OR_EQUAL, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), LESS_OR_EQUAL, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2596,9 +2596,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 921 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '=', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '=', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2607,9 +2607,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 933 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_EQUAL, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_EQUAL, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2618,9 +2618,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 940 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_EQUAL2, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_EQUAL2, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2629,9 +2629,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 946 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), LIKE, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), LIKE, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2640,9 +2640,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 952 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), SQL_IN, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), SQL_IN, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2651,9 +2651,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 958 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), SIMILAR_TO, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), SIMILAR_TO, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2662,9 +2662,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 964 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_SIMILAR_TO, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), NOT_SIMILAR_TO, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2673,8 +2673,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 976 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( SQL_IS_NULL, *(yyvsp[(1) - (2)].expr) );
-        delete (yyvsp[(1) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( SQL_IS_NULL, *(yyvsp[(1) - (2)].expr) );
+    delete (yyvsp[(1) - (2)].expr);
 }
     break;
 
@@ -2683,8 +2683,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 981 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( SQL_IS_NOT_NULL, *(yyvsp[(1) - (2)].expr) );
-        delete (yyvsp[(1) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( SQL_IS_NOT_NULL, *(yyvsp[(1) - (2)].expr) );
+    delete (yyvsp[(1) - (2)].expr);
 }
     break;
 
@@ -2693,9 +2693,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 992 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), BITWISE_SHIFT_LEFT, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), BITWISE_SHIFT_LEFT, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2704,9 +2704,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 998 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), BITWISE_SHIFT_RIGHT, *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), BITWISE_SHIFT_RIGHT, *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2715,9 +2715,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1010 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '+', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '+', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2726,9 +2726,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1016 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '-', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '-', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2737,9 +2737,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1022 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '&', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '&', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2748,9 +2748,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1028 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '|', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '|', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2759,9 +2759,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1040 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '/', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '/', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2770,9 +2770,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1046 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '*', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '*', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2781,9 +2781,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1052 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '%', *(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.expr) = new BinaryExpression(*(yyvsp[(1) - (3)].expr), '%', *(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2792,8 +2792,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1065 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( '-', *(yyvsp[(2) - (2)].expr) );
-        delete (yyvsp[(2) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( '-', *(yyvsp[(2) - (2)].expr) );
+    delete (yyvsp[(2) - (2)].expr);
 }
     break;
 
@@ -2802,8 +2802,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1070 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( '+', *(yyvsp[(2) - (2)].expr) );
-        delete (yyvsp[(2) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( '+', *(yyvsp[(2) - (2)].expr) );
+    delete (yyvsp[(2) - (2)].expr);
 }
     break;
 
@@ -2812,8 +2812,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1075 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( '~', *(yyvsp[(2) - (2)].expr) );
-        delete (yyvsp[(2) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( '~', *(yyvsp[(2) - (2)].expr) );
+    delete (yyvsp[(2) - (2)].expr);
 }
     break;
 
@@ -2822,8 +2822,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1080 "SqlParser.y"
     {
-        (yyval.expr) = new UnaryExpression( NOT, *(yyvsp[(2) - (2)].expr) );
-        delete (yyvsp[(2) - (2)].expr);
+    (yyval.expr) = new UnaryExpression( NOT, *(yyvsp[(2) - (2)].expr) );
+    delete (yyvsp[(2) - (2)].expr);
 }
     break;
 
@@ -2832,11 +2832,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1085 "SqlParser.y"
     {
-        (yyval.expr) = new VariableExpression( *(yyvsp[(1) - (1)].stringValue) );
-	
+    (yyval.expr) = new VariableExpression( *(yyvsp[(1) - (1)].stringValue) );
+
 //TODO: simplify this later if that's 'only one field name' expression
-	PreDbg << "  + identifier: " << *(yyvsp[(1) - (1)].stringValue);
-	delete (yyvsp[(1) - (1)].stringValue);
+    PreDbg << "  + identifier: " << *(yyvsp[(1) - (1)].stringValue);
+    delete (yyvsp[(1) - (1)].stringValue);
 }
     break;
 
@@ -2845,9 +2845,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1093 "SqlParser.y"
     {
-        (yyval.expr) = new QueryParameterExpression( *(yyvsp[(1) - (1)].stringValue) );
-	PreDbg << "  + query parameter:" << *(yyval.expr);
-	delete (yyvsp[(1) - (1)].stringValue);
+    (yyval.expr) = new QueryParameterExpression( *(yyvsp[(1) - (1)].stringValue) );
+    PreDbg << "  + query parameter:" << *(yyval.expr);
+    delete (yyvsp[(1) - (1)].stringValue);
 }
     break;
 
@@ -2856,10 +2856,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1099 "SqlParser.y"
     {
-	PreDbg << "  + function:" << *(yyvsp[(1) - (2)].stringValue) << "(" << *(yyvsp[(2) - (2)].exprList) << ")";
-        (yyval.expr) = new FunctionExpression(*(yyvsp[(1) - (2)].stringValue), *(yyvsp[(2) - (2)].exprList));
-	delete (yyvsp[(1) - (2)].stringValue);
-        delete (yyvsp[(2) - (2)].exprList);
+    PreDbg << "  + function:" << *(yyvsp[(1) - (2)].stringValue) << "(" << *(yyvsp[(2) - (2)].exprList) << ")";
+    (yyval.expr) = new FunctionExpression(*(yyvsp[(1) - (2)].stringValue), *(yyvsp[(2) - (2)].exprList));
+    delete (yyvsp[(1) - (2)].stringValue);
+    delete (yyvsp[(2) - (2)].exprList);
 }
     break;
 
@@ -2868,10 +2868,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1107 "SqlParser.y"
     {
-        (yyval.expr) = new VariableExpression( *(yyvsp[(1) - (3)].stringValue) + QLatin1Char('.') + *(yyvsp[(3) - (3)].stringValue) );
-	PreDbg << "  + identifier.identifier:" << *(yyvsp[(1) - (3)].stringValue) << "." << *(yyvsp[(3) - (3)].stringValue);
-	delete (yyvsp[(1) - (3)].stringValue);
-	delete (yyvsp[(3) - (3)].stringValue);
+    (yyval.expr) = new VariableExpression( *(yyvsp[(1) - (3)].stringValue) + QLatin1Char('.') + *(yyvsp[(3) - (3)].stringValue) );
+    PreDbg << "  + identifier.identifier:" << *(yyvsp[(1) - (3)].stringValue) << "." << *(yyvsp[(3) - (3)].stringValue);
+    delete (yyvsp[(1) - (3)].stringValue);
+    delete (yyvsp[(3) - (3)].stringValue);
 }
     break;
 
@@ -2880,10 +2880,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1114 "SqlParser.y"
     {
-        (yyval.expr) = new ConstExpression( SQL_NULL, QVariant() );
-	PreDbg << "  + NULL";
-//	$$ = new Field();
-	//$$->setName(QString::null);
+    (yyval.expr) = new ConstExpression( SQL_NULL, QVariant() );
+    PreDbg << "  + NULL";
+//    $$ = new Field();
+    //$$->setName(QString::null);
 }
     break;
 
@@ -2892,9 +2892,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1121 "SqlParser.y"
     {
-        (yyval.expr) = new ConstExpression( CHARACTER_STRING_LITERAL, *(yyvsp[(1) - (1)].stringValue) );
-	PreDbg << "  + constant " << (yyvsp[(1) - (1)].stringValue);
-	delete (yyvsp[(1) - (1)].stringValue);
+    (yyval.expr) = new ConstExpression( CHARACTER_STRING_LITERAL, *(yyvsp[(1) - (1)].stringValue) );
+    PreDbg << "  + constant " << (yyvsp[(1) - (1)].stringValue);
+    delete (yyvsp[(1) - (1)].stringValue);
 }
     break;
 
@@ -2903,20 +2903,20 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1127 "SqlParser.y"
     {
-	QVariant val;
-	if ((yyvsp[(1) - (1)].integerValue) <= INT_MAX && (yyvsp[(1) - (1)].integerValue) >= INT_MIN)
-		val = (int)(yyvsp[(1) - (1)].integerValue);
-	else if ((yyvsp[(1) - (1)].integerValue) <= UINT_MAX && (yyvsp[(1) - (1)].integerValue) >= 0)
-		val = (uint)(yyvsp[(1) - (1)].integerValue);
-	else if ((yyvsp[(1) - (1)].integerValue) <= LLONG_MAX && (yyvsp[(1) - (1)].integerValue) >= LLONG_MIN)
-		val = (qint64)(yyvsp[(1) - (1)].integerValue);
+    QVariant val;
+    if ((yyvsp[(1) - (1)].integerValue) <= INT_MAX && (yyvsp[(1) - (1)].integerValue) >= INT_MIN)
+        val = (int)(yyvsp[(1) - (1)].integerValue);
+    else if ((yyvsp[(1) - (1)].integerValue) <= UINT_MAX && (yyvsp[(1) - (1)].integerValue) >= 0)
+        val = (uint)(yyvsp[(1) - (1)].integerValue);
+    else if ((yyvsp[(1) - (1)].integerValue) <= LLONG_MAX && (yyvsp[(1) - (1)].integerValue) >= LLONG_MIN)
+        val = (qint64)(yyvsp[(1) - (1)].integerValue);
 
-//	if ($1 < ULLONG_MAX)
-//		val = (quint64)$1;
+//    if ($1 < ULLONG_MAX)
+//        val = (quint64)$1;
 //TODO ok?
 
-        (yyval.expr) = new ConstExpression( INTEGER_CONST, val );
-	PreDbg << "  + int constant: " << val.toString();
+    (yyval.expr) = new ConstExpression( INTEGER_CONST, val );
+    PreDbg << "  + int constant: " << val.toString();
 }
     break;
 
@@ -2925,8 +2925,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1144 "SqlParser.y"
     {
-        (yyval.expr) = new ConstExpression( REAL_CONST, QPoint( (yyvsp[(1) - (1)].realValue).integer, (yyvsp[(1) - (1)].realValue).fractional ) );
-	PreDbg << "  + real constant: " << (yyvsp[(1) - (1)].realValue).integer << "." << (yyvsp[(1) - (1)].realValue).fractional;
+    (yyval.expr) = new ConstExpression( REAL_CONST, QPoint( (yyvsp[(1) - (1)].realValue).integer, (yyvsp[(1) - (1)].realValue).fractional ) );
+    PreDbg << "  + real constant: " << (yyvsp[(1) - (1)].realValue).integer << "." << (yyvsp[(1) - (1)].realValue).fractional;
 }
     break;
 
@@ -2935,9 +2935,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1155 "SqlParser.y"
     {
-	PreDbg << "(expr)";
-        (yyval.expr) = new UnaryExpression('(', *(yyvsp[(2) - (3)].expr));
-        delete (yyvsp[(2) - (3)].expr);
+    PreDbg << "(expr)";
+    (yyval.expr) = new UnaryExpression('(', *(yyvsp[(2) - (3)].expr));
+    delete (yyvsp[(2) - (3)].expr);
 }
     break;
 
@@ -2946,10 +2946,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1164 "SqlParser.y"
     {
-//	$$ = new NArgExpression(UnknownExpressionClass, 0);
-//	$$->add( $1 );
-//	$$->add( $3 );
-	(yyval.exprList) = (yyvsp[(2) - (3)].exprList);
+//    $$ = new NArgExpression(UnknownExpressionClass, 0);
+//    $$->add( $1 );
+//    $$->add( $3 );
+    (yyval.exprList) = (yyvsp[(2) - (3)].exprList);
 }
     break;
 
@@ -2958,9 +2958,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1174 "SqlParser.y"
     {
-	(yyval.exprList) = (yyvsp[(3) - (3)].exprList);
-        (yyval.exprList)->prepend( *(yyvsp[(1) - (3)].expr) );
-        delete (yyvsp[(1) - (3)].expr);
+    (yyval.exprList) = (yyvsp[(3) - (3)].exprList);
+    (yyval.exprList)->prepend( *(yyvsp[(1) - (3)].expr) );
+    delete (yyvsp[(1) - (3)].expr);
 }
     break;
 
@@ -2969,11 +2969,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1180 "SqlParser.y"
     {
-        (yyval.exprList) = new NArgExpression(UnknownExpressionClass, 0);
-        (yyval.exprList)->append( *(yyvsp[(1) - (3)].expr) );
-        (yyval.exprList)->append( *(yyvsp[(3) - (3)].expr) );
-        delete (yyvsp[(1) - (3)].expr);
-        delete (yyvsp[(3) - (3)].expr);
+    (yyval.exprList) = new NArgExpression(UnknownExpressionClass, 0);
+    (yyval.exprList)->append( *(yyvsp[(1) - (3)].expr) );
+    (yyval.exprList)->append( *(yyvsp[(3) - (3)].expr) );
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].expr);
 }
     break;
 
@@ -2982,7 +2982,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1191 "SqlParser.y"
     {
-	(yyval.exprList) = (yyvsp[(2) - (2)].exprList);
+    (yyval.exprList) = (yyvsp[(2) - (2)].exprList);
 }
     break;
 
@@ -2991,8 +2991,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1236 "SqlParser.y"
     {
-	(yyval.exprList) = (yyvsp[(1) - (3)].exprList);
-        (yyval.exprList)->append(*(yyvsp[(3) - (3)].expr));
+    (yyval.exprList) = (yyvsp[(1) - (3)].exprList);
+    (yyval.exprList)->append(*(yyvsp[(3) - (3)].expr));
 }
     break;
 
@@ -3001,9 +3001,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1241 "SqlParser.y"
     {
-        (yyval.exprList) = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
-        (yyval.exprList)->append(*(yyvsp[(1) - (1)].expr));
-        delete (yyvsp[(1) - (1)].expr);
+    (yyval.exprList) = new NArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
+    (yyval.exprList)->append(*(yyvsp[(1) - (1)].expr));
+    delete (yyvsp[(1) - (1)].expr);
 }
     break;
 
@@ -3012,31 +3012,31 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1250 "SqlParser.y"
     {
-	PreDbg << "FROM: '" << *(yyvsp[(1) - (1)].stringValue) << "'";
-        (yyval.expr) = new VariableExpression(*(yyvsp[(1) - (1)].stringValue));
+    PreDbg << "FROM: '" << *(yyvsp[(1) - (1)].stringValue) << "'";
+    (yyval.expr) = new VariableExpression(*(yyvsp[(1) - (1)].stringValue));
 
-	/*
+    /*
 //TODO: this isn't ok for more tables:
-	Field::ListIterator it = parser->select()->fieldsIterator();
-	for(Field *item; (item = it.current()); ++it)
-	{
-		if(item->table() == dummy)
-		{
-			item->setTable(schema);
-		}
+    Field::ListIterator it = parser->select()->fieldsIterator();
+    for(Field *item; (item = it.current()); ++it)
+    {
+        if(item->table() == dummy)
+        {
+            item->setTable(schema);
+        }
 
-		if(item->table() && !item->isQueryAsterisk())
-		{
-			Field *f = item->table()->field(item->name());
-			if(!f)
-			{
-				ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
-				parser->setError(err);
-				yyerror("fieldlisterror");
-			}	
-		}
-	}*/
-	delete (yyvsp[(1) - (1)].stringValue);
+        if(item->table() && !item->isQueryAsterisk())
+        {
+            Field *f = item->table()->field(item->name());
+            if(!f)
+            {
+                ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
+                parser->setError(err);
+                yyerror("fieldlisterror");
+            }
+        }
+    }*/
+    delete (yyvsp[(1) - (1)].stringValue);
 }
     break;
 
@@ -3045,13 +3045,13 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1278 "SqlParser.y"
     {
-	//table + alias
-        (yyval.expr) = new BinaryExpression(
-                VariableExpression(*(yyvsp[(1) - (2)].stringValue)), 0,
-                VariableExpression(*(yyvsp[(2) - (2)].stringValue))
-	);
-	delete (yyvsp[(1) - (2)].stringValue);
-	delete (yyvsp[(2) - (2)].stringValue);
+    //table + alias
+    (yyval.expr) = new BinaryExpression(
+        VariableExpression(*(yyvsp[(1) - (2)].stringValue)), 0,
+        VariableExpression(*(yyvsp[(2) - (2)].stringValue))
+    );
+    delete (yyvsp[(1) - (2)].stringValue);
+    delete (yyvsp[(2) - (2)].stringValue);
 }
     break;
 
@@ -3060,13 +3060,13 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1288 "SqlParser.y"
     {
-	//table + alias
-        (yyval.expr) = new BinaryExpression(
-                VariableExpression(*(yyvsp[(1) - (3)].stringValue)), AS,
-                VariableExpression(*(yyvsp[(3) - (3)].stringValue))
-	);
-	delete (yyvsp[(1) - (3)].stringValue);
-	delete (yyvsp[(3) - (3)].stringValue);
+    //table + alias
+    (yyval.expr) = new BinaryExpression(
+        VariableExpression(*(yyvsp[(1) - (3)].stringValue)), AS,
+        VariableExpression(*(yyvsp[(3) - (3)].stringValue))
+    );
+    delete (yyvsp[(1) - (3)].stringValue);
+    delete (yyvsp[(3) - (3)].stringValue);
 }
     break;
 
@@ -3075,10 +3075,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1303 "SqlParser.y"
     {
-	(yyval.exprList) = (yyvsp[(1) - (3)].exprList);
-        (yyval.exprList)->append(*(yyvsp[(3) - (3)].expr));
-        delete (yyvsp[(3) - (3)].expr);
-	PreDbg << "ColViews: ColViews , ColItem";
+    (yyval.exprList) = (yyvsp[(1) - (3)].exprList);
+    (yyval.exprList)->append(*(yyvsp[(3) - (3)].expr));
+    delete (yyvsp[(3) - (3)].expr);
+    PreDbg << "ColViews: ColViews , ColItem";
 }
     break;
 
@@ -3087,10 +3087,10 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1310 "SqlParser.y"
     {
-        (yyval.exprList) = new NArgExpression(UnknownExpressionClass, 0);
-        (yyval.exprList)->append(*(yyvsp[(1) - (1)].expr));
-        delete (yyvsp[(1) - (1)].expr);
-	PreDbg << "ColViews: ColItem";
+    (yyval.exprList) = new NArgExpression(UnknownExpressionClass, 0);
+    (yyval.exprList)->append(*(yyvsp[(1) - (1)].expr));
+    delete (yyvsp[(1) - (1)].expr);
+    PreDbg << "ColViews: ColItem";
 }
     break;
 
@@ -3099,12 +3099,12 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1320 "SqlParser.y"
     {
-//	$$ = new Field();
-//	dummy->addField($$);
-//	$$->setExpression( $1 );
-//	parser->select()->addField($$);
-	(yyval.expr) = (yyvsp[(1) - (1)].expr);
-	PreDbg << " added column expr:" << *(yyvsp[(1) - (1)].expr);
+//    $$ = new Field();
+//    dummy->addField($$);
+//    $$->setExpression( $1 );
+//    parser->select()->addField($$);
+    (yyval.expr) = (yyvsp[(1) - (1)].expr);
+    PreDbg << " added column expr:" << *(yyvsp[(1) - (1)].expr);
 }
     break;
 
@@ -3113,8 +3113,8 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1329 "SqlParser.y"
     {
-	(yyval.expr) = (yyvsp[(1) - (1)].expr);
-	PreDbg << " added column wildcard:" << *(yyvsp[(1) - (1)].expr);
+    (yyval.expr) = (yyvsp[(1) - (1)].expr);
+    PreDbg << " added column wildcard:" << *(yyvsp[(1) - (1)].expr);
 }
     break;
 
@@ -3123,13 +3123,13 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1334 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(
-                *(yyvsp[(1) - (3)].expr), AS,
-                VariableExpression(*(yyvsp[(3) - (3)].stringValue))
-	);
-	PreDbg << " added column expr:" << *(yyval.expr);
-        delete (yyvsp[(1) - (3)].expr);
-	delete (yyvsp[(3) - (3)].stringValue);
+    (yyval.expr) = new BinaryExpression(
+        *(yyvsp[(1) - (3)].expr), AS,
+        VariableExpression(*(yyvsp[(3) - (3)].stringValue))
+    );
+    PreDbg << " added column expr:" << *(yyval.expr);
+    delete (yyvsp[(1) - (3)].expr);
+    delete (yyvsp[(3) - (3)].stringValue);
 }
     break;
 
@@ -3138,13 +3138,13 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1344 "SqlParser.y"
     {
-        (yyval.expr) = new BinaryExpression(
-                *(yyvsp[(1) - (2)].expr), 0,
-                VariableExpression(*(yyvsp[(2) - (2)].stringValue))
-	);
-	PreDbg << " added column expr:" << *(yyval.expr);
-        delete (yyvsp[(1) - (2)].expr);
-	delete (yyvsp[(2) - (2)].stringValue);
+    (yyval.expr) = new BinaryExpression(
+        *(yyvsp[(1) - (2)].expr), 0,
+        VariableExpression(*(yyvsp[(2) - (2)].stringValue))
+    );
+    PreDbg << " added column expr:" << *(yyval.expr);
+    delete (yyvsp[(1) - (2)].expr);
+    delete (yyvsp[(2) - (2)].stringValue);
 }
     break;
 
@@ -3153,7 +3153,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1357 "SqlParser.y"
     {
-	(yyval.expr) = (yyvsp[(1) - (1)].expr);
+    (yyval.expr) = (yyvsp[(1) - (1)].expr);
 }
     break;
 
@@ -3162,9 +3162,9 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1401 "SqlParser.y"
     {
-	(yyval.expr) = (yyvsp[(3) - (4)].expr);
+    (yyval.expr) = (yyvsp[(3) - (4)].expr);
 //! @todo DISTINCT '(' ColExpression ')'
-//	$$->setName("DISTINCT(" + $3->name() + ")");
+//    $$->setName("DISTINCT(" + $3->name() + ")");
 }
     break;
 
@@ -3173,12 +3173,12 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1410 "SqlParser.y"
     {
-        (yyval.expr) = new VariableExpression(QLatin1String("*"));
-	PreDbg << "all columns";
+    (yyval.expr) = new VariableExpression(QLatin1String("*"));
+    PreDbg << "all columns";
 
-//	QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
-//	parser->select()->addAsterisk(ast);
-//	requiresTable = true;
+//    QueryAsterisk *ast = new QueryAsterisk(parser->select(), dummy);
+//    parser->select()->addAsterisk(ast);
+//    requiresTable = true;
 }
     break;
 
@@ -3187,11 +3187,11 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1419 "SqlParser.y"
     {
-	QString s( *(yyvsp[(1) - (3)].stringValue) );
-	s += QLatin1String(".*");
-        (yyval.expr) = new VariableExpression(s);
-	PreDbg << "  + all columns from " << s;
-	delete (yyvsp[(1) - (3)].stringValue);
+    QString s( *(yyvsp[(1) - (3)].stringValue) );
+    s += QLatin1String(".*");
+    (yyval.expr) = new VariableExpression(s);
+    PreDbg << "  + all columns from " << s;
+    delete (yyvsp[(1) - (3)].stringValue);
 }
     break;
 
