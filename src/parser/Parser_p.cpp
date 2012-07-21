@@ -120,7 +120,7 @@ void yyerror(const char *str)
         PreDbg << ptrline;
 
         //lexer may add error messages
-        QString lexerErr = parser->error().error();
+        QString lexerErr = parser->error().message();
 
         QString errtypestr = QLatin1String(str);
         if (lexerErr.isEmpty()) {
@@ -581,7 +581,7 @@ QuerySchema* buildSelectQuery(
 //Qt4    colViews->list.next();
 //Qt4   }
         } // for
-        if (!parser->error().error().isEmpty()) { // we could not return earlier (inside the loop)
+        if (!parser->error().message().isEmpty()) { // we could not return earlier (inside the loop)
             // because we want run CLEANUP what could crash QMutableListIterator.
             CLEANUP;
             return 0;

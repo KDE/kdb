@@ -20,6 +20,7 @@
 #include "Connection.h"
 
 #include "Error.h"
+#include "Expression.h"
 #include "Connection_p.h"
 #include "ConnectionData.h"
 #include "Driver.h"

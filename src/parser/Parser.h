@@ -18,13 +18,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDBPARSER_H
-#define KEXIDBPARSER_H
+#ifndef PREDICATE_PARSER_H
+#define PREDICATE_PARSER_H
 
 #include <QObject>
-
-#include <Predicate/Field>
-#include <Predicate/Expression>
 
 namespace Predicate
 {
@@ -49,11 +46,11 @@ public:
      * Constructor.
      *
      * @param type The error type.
-     * @param error A description of the error.
+     * @param message A description of the error.
      * @param token Token where the Error happend.
-     * @param at The position where the Error happend.
+     * @param position The position where the error happened.
      */
-    ParserError(const QString &type, const QString &error, const QByteArray &token, int at);
+    ParserError(const QString &type, const QString &message, const QByteArray &token, int position);
 
     /**
      * Destructor.
@@ -63,30 +60,29 @@ public:
     /**
      * @return the errortype.
      */
-    QString type() {
+    QString type() const {
         return m_type;
     }
 
     /**
-     * @return a descriping error message.
+     * @return error message.
      */
-    QString error() {
-        return m_error;
+    QString message() const {
+        return m_message;
     }
 
     /**
-     * @return position where the Error.happend.
+     * @return position where the error happened.
      */
-    int at() {
-        return m_at;
+    int position() const {
+        return m_position;
     }
 
 private:
     QString m_type;
-    QString m_error;
+    QString m_message;
     QByteArray m_token;
-    int m_at;
-//  bool m_isNull;
+    int m_position;
 };
 
 class ParseInfoInternal;
@@ -266,5 +262,7 @@ protected:
 
 }
 
-#endif
+//! Sends information about parser error @a error to debug output @a dbg.
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::ParserError& error);
 
+#endif

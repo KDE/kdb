@@ -173,21 +173,28 @@ Parser::clear()
 //-------------------------------------
 
 ParserError::ParserError()
-        : m_at(-1)
+        : m_position(-1)
 {
 // m_isNull = true;
 }
 
-ParserError::ParserError(const QString &type, const QString &error, const QByteArray &token, int at)
+ParserError::ParserError(const QString &type, const QString &message, const QByteArray &token,
+                         int position)
 {
     m_type = type;
-    m_error = error;
+    m_message = message;
     m_token = token;
-    m_at = at;
+    m_position = position;
 }
 
 ParserError::~ParserError()
 {
+}
+
+QDebug operator<<(QDebug dbg, const Predicate::ParserError& error)
+{
+    return dbg.space() << "Predicate:ParserError: type=" << error.type() << "message=" << error.message()
+                       << "pos=" << error.position() << ")";
 }
 
 //-------------------------------------

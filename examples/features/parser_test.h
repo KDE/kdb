@@ -39,9 +39,7 @@ int parserTest(const Predicate::EscapedString &st, const QStringList &params)
         cout << Predicate::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
         cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toByteArray().constData() << '\n';
     } else {
-        Predicate::ParserError err = parser.error();
-        qDebug() << QString("Error = %1\ntype = %2\nat = %3").arg(err.error())
-        .arg(err.type()).arg(err.at());
+        qDebug() << parser.error();
         r = 1;
     }
     delete q;
