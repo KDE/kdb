@@ -782,7 +782,7 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
     //--move items to make a place for a new one
     for (uint i = fieldCount() - 1; i > position; i--)
         d->tablesBoundToColumns[i] = d->tablesBoundToColumns[i-1];
-    d->tablesBoundToColumns.insert(position, bindToTable);
+    d->tablesBoundToColumns[position] = bindToTable;
 
     PreDbg << "bound to table" << bindToTable;
     if (bindToTable == -1)
@@ -1251,19 +1251,21 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
                               + ((options == WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
             tmpFieldsExpandedWithInternal = new QueryColumnInfo::Vector(size);
             const uint fieldsExpandedVectorSize = d->fieldsExpanded->size();
-            for (uint i = 0; i < fieldsExpandedVectorSize; i++)
-                tmpFieldsExpandedWithInternal->insert(i, d->fieldsExpanded->at(i));
+            for (uint i = 0; i < fieldsExpandedVectorSize; i++) {
+                (*tmpFieldsExpandedWithInternal)[i] = d->fieldsExpanded->at(i);
+            }
             const uint internalFieldsCount = d->internalFields ? d->internalFields->size() : 0;
             if (internalFieldsCount > 0) {
-                for (uint i = 0; i < internalFieldsCount; i++)
-                    tmpFieldsExpandedWithInternal->insert(fieldsExpandedVectorSize + i, d->internalFields->at(i));
+                for (uint i = 0; i < internalFieldsCount; i++) {
+                    (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = d->internalFields->at(i);
+                }
             }
             if (options == WithInternalFieldsAndRecordId) {
                 if (!d->fakeRecordIdField) {
                     d->fakeRecordIdField = new Field(QLatin1String("rowID"), Field::BigInteger);
                     d->fakeRecordIdCol = new QueryColumnInfo(d->fakeRecordIdField, QString(), true);
                 }
-                tmpFieldsExpandedWithInternal->insert(fieldsExpandedVectorSize + internalFieldsCount, d->fakeRecordIdCol);
+                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldsCount] = d->fakeRecordIdCol;
             }
         }
         return *tmpFieldsExpandedWithInternal;
@@ -1285,7 +1287,7 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
 //  uint foundColumnIndex = -1;
         if (!columnsAlreadyFound.contains(ci->aliasOrName())) {// columnsAlreadyFoundIt==columnsAlreadyFound.constEnd())
             columnsAlreadyFound.insert(ci->aliasOrName());
-            result.insert(uniqueListCount++, ci);
+            result[uniqueListCount++] = ci;
         }
     }
     result.resize(uniqueListCount); //update result size
@@ -1506,7 +1508,7 @@ void QuerySchema::computeFieldsExpanded() const
     i = -1;
     foreach(QueryColumnInfo* ci, list) {
         i++;
-        d->fieldsExpanded->insert(i, ci);
+        (*d->fieldsExpanded)[i] = ci;
         d->columnsOrderExpanded->insert(ci, i);
         //remember field by name/alias/table.name if there's no such string yet in d->columnInfosByNameExpanded
         if (!ci->alias.isEmpty()) {
@@ -1588,7 +1590,7 @@ void QuerySchema::computeFieldsExpanded() const
     foreach(QueryColumnInfo *ci, lookup_list) {
         i++;
         //add it to the internal list
-        d->internalFields->insert(i, ci);
+        (*d->internalFields)[i] = ci;
         d->columnsOrderExpanded->insert(ci, list.count() + i);
     }
 
@@ -1697,7 +1699,7 @@ QVector<int> QuerySchema::pkeyFieldsOrder() const
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
             PreDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
 //   (*d->pkeyFieldsOrder)[j]=i;
-            d->pkeyFieldsOrder->insert(fieldIndex, i);
+            (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldsCount++;
 //   j++;
         }
