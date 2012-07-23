@@ -1933,7 +1933,7 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
     const QString oldTableName = tableSchema->name();
     const QString newTableName = newName.toLower().trimmed();
     if (oldTableName.toLower().trimmed() == newTableName) {
-        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could rename table \"%1\" using the same name.")
+        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could not rename table \"%1\" using the same name.")
                                                .arg(newTableName));
         return false;
     }
