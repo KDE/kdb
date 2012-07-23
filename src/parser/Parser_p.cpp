@@ -424,11 +424,11 @@ QuerySchema* buildSelectQuery(
     ParseInfoInternal parseInfo(querySchema);
 
     // remove from heap (using heap was requered because parser uses union)
-    Predicate::NArgExpression colViews(*_colViews);
+    NArgExpression colViews(*_colViews);
     delete _colViews;
 
     // remove from heap (using heap was requered because parser uses union)
-    Predicate::NArgExpression tablesList(*_tablesList);
+    NArgExpression tablesList(*_tablesList);
     delete _tablesList;
 
     //-------tables list

@@ -124,6 +124,7 @@ void TestExpressions::testExpressionClassName_data()
     T("Variable", VariableExpressionClass);
     T("Function", FunctionExpressionClass);
     T("Aggregation", AggregationExpressionClass);
+    T("FieldList", FieldListExpressionClass);
     T("TableList", TableListExpressionClass);
     T("QueryParameter", QueryParameterExpressionClass);
 #undef T

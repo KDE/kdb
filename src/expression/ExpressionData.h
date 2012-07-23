@@ -50,6 +50,7 @@ enum ExpressionClass {
     VariableExpressionClass,
     FunctionExpressionClass,
     AggregationExpressionClass,
+    FieldListExpressionClass,
     TableListExpressionClass,
     QueryParameterExpressionClass
 };

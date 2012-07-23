@@ -3087,7 +3087,7 @@ YYACCEPT;
 /* Line 1806 of yacc.c  */
 #line 1310 "SqlParser.y"
     {
-    (yyval.exprList) = new NArgExpression(UnknownExpressionClass, 0);
+    (yyval.exprList) = new NArgExpression(FieldListExpressionClass, 0);
     (yyval.exprList)->append(*(yyvsp[(1) - (1)].expr));
     delete (yyvsp[(1) - (1)].expr);
     PreDbg << "ColViews: ColItem";

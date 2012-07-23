@@ -47,11 +47,12 @@ public:
             QLatin1String("Variable"),
             QLatin1String("Function"),
             QLatin1String("Aggregation"),
+            QLatin1String("FieldList"),
             QLatin1String("TableList"),
             QLatin1String("QueryParameter")})
     {
     }
-    const QLatin1String names[12];
+    const QLatin1String names[13];
 };
 
 PREDICATE_EXPORT QString Predicate::expressionClassName(ExpressionClass c)

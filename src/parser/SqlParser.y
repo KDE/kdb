@@ -1308,7 +1308,7 @@ ColViews ',' ColItem
 }
 |ColItem
 {
-    $$ = new NArgExpression(UnknownExpressionClass, 0);
+    $$ = new NArgExpression(FieldListExpressionClass, 0);
     $$->append(*$1);
     delete $1;
     PreDbg << "ColViews: ColItem";
