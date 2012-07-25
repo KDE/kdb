@@ -1,4 +1,6 @@
 remove_definitions(-DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII)
+add_definitions(-DFILES_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+add_definitions(-DFILES_OUTPUT_DIR="${CMAKE_CURRENT_BINARY_DIR}")
 
 macro(build_test __test_name)
     set(_test_name Test${__test_name})
@@ -15,3 +17,4 @@ endmacro()
 
 build_test(StaticSetOfStrings)
 build_test(Expressions)
+build_test(SqlParser)
