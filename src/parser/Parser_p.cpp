@@ -429,6 +429,7 @@ QuerySchema* buildSelectQuery(
         colViews = *_colViews;
         delete _colViews;
     }
+    qDebug() << "==" << colViews.argCount() << colViews;
     NArgExpression tablesList;
     if (_tablesList) {
         tablesList = *_tablesList;
@@ -509,6 +510,8 @@ QuerySchema* buildSelectQuery(
         querySchema->setMasterTable(querySchema->tables()->first());
 
     //-------add fields
+    bool containsAsteriskColumn = false; // used to check duplicated asterisks (disallowed)
+
     if (!colViews.isEmpty()) {
         columnNum = 0;
         for (int i = 0; i < colViews.argCount(); i++, columnNum++) {
@@ -541,8 +544,19 @@ QuerySchema* buildSelectQuery(
                 || c == AggregationExpressionClass;
 
             if (c == VariableExpressionClass) {
-                //just a variable, do nothing, addColumn() will handle this
-            } else if (isExpressionField) {
+                if (columnExpr.toVariable().name() == QLatin1String("*")) {
+                    if (containsAsteriskColumn) {
+                        setError(QObject::tr("More than one asterisk (*) is not allowed"));
+                        CLEANUP;
+                        return 0;
+                    }
+                    else {
+                        containsAsteriskColumn = true;
+                    }
+                }
+                // addColumn() will handle this
+            }
+            else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
 //  PreDbg << colViews->list.count() << " " << it.current()->debugString();
 #warning ok?  //predicate: it.remove();
