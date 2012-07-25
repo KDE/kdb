@@ -187,6 +187,20 @@ void TestExpressions::testNArgExpression()
     n.append(c2);
     testCloneExpression(n);
 
+    // copy on stack
+    n = NArgExpression(ArithmeticExpressionClass, '+');
+    {
+        ConstExpression s1(INTEGER_CONST, 7);
+        ConstExpression s2(INTEGER_CONST, 8);
+        n.append(s1);
+        n.append(s2);
+        c1 = s1;
+        c2 = s2;
+    }
+    QCOMPARE(n.argCount(), 2);
+    QCOMPARE(n.arg(0).toConst(), c1);
+    QCOMPARE(n.arg(1).toConst(), c2);
+
     QCOMPARE(n.tokenToDebugString(), QString("+"));
     QCOMPARE(n.toString(), EscapedString("7, 8"));
 
