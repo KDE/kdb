@@ -40,6 +40,7 @@
 %token ANY
 %token ARE
 %token AS
+%token AS_EMPTY /* used for aliases with skipped AS keyword */
 %token ASIN
 %token ASC
 %token ASCII
@@ -1283,7 +1284,7 @@ IDENTIFIER
 {
     //table + alias
     $$ = new BinaryExpression(
-        VariableExpression(*$1), 0,
+        VariableExpression(*$1), AS_EMPTY,
         VariableExpression(*$2)
     );
     delete $1;
@@ -1348,7 +1349,7 @@ ColExpression
 | ColExpression IDENTIFIER
 {
     $$ = new BinaryExpression(
-        *$1, 0,
+        *$1, AS_EMPTY,
         VariableExpression(*$2)
     );
     PreDbg << " added column expr:" << *$$;

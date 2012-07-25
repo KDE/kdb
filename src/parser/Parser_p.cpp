@@ -455,7 +455,7 @@ QuerySchema* buildSelectQuery(
                 assert(e.isBinary());
                 assert(t_with_alias.left().expressionClass() == VariableExpressionClass);
                 assert(t_with_alias.right().expressionClass() == VariableExpressionClass
-                       && (t_with_alias.token() == AS || t_with_alias.token() == 0));
+                       && (t_with_alias.token() == AS || t_with_alias.token() == AS_EMPTY));
                 t_e = t_with_alias.left().toVariable();
                 aliasString = t_with_alias.right().toVariable().name();
             } else {
@@ -520,7 +520,7 @@ QuerySchema* buildSelectQuery(
             Expression columnExpr(e);
             VariableExpression aliasVariable;
             if (e.expressionClass() == SpecialBinaryExpressionClass && e.isBinary()
-                    && (e.token() == AS || e.token() == 0)) {
+                    && (e.token() == AS || e.token() == AS_EMPTY)) {
                 //SpecialBinaryExpressionClass: with alias
                 columnExpr = e.toBinary().left();
                 //   isFieldWithAlias = true;

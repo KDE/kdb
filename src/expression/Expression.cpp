@@ -564,6 +564,7 @@ ExpressionClass Expression::classForToken(int token)
     case XOR:
         return LogicalExpressionClass;
     case AS:
+    case AS_EMPTY:
         return SpecialBinaryExpressionClass;
     default:;
     }
