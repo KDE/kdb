@@ -21,6 +21,7 @@ select;
 ---------- CATEGORY: Aliases in select statement --------------
 -- Aliases for columns
 select id myid from persons;
+select id as myid from persons;
 -- Aliases for tables
 select id from persons p;
 -- ERROR: There's no "persons" table in this query (alias "p" covers it)
