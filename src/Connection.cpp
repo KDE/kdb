@@ -1476,7 +1476,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
 
     // ORDER BY
     EscapedString orderByString(
-        querySchema->orderByColumnList().toSQLString(
+        querySchema->orderByColumnList()->toSQLString(
             !singleTable/*includeTableName*/, connection, driver ? Predicate::DriverEscaping : Predicate::PredicateEscaping)
     );
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());

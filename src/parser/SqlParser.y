@@ -763,7 +763,6 @@ WhereClause
     PreDbg << "OrderByClause";
     $$ = new SelectOptionsInternal;
     $$->orderByColumns = $3;
-    delete $3;
 }
 | WhereClause ORDER BY OrderByClause
 {

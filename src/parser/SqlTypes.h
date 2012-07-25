@@ -39,7 +39,11 @@ struct realType {
 
 //! @internal
 struct OrderByColumnInternal {
-    typedef QList<OrderByColumnInternal> List;
+    class List : public QList<OrderByColumnInternal> {
+    public:
+        List() {}
+        ~List() {}
+    };
     typedef QList<OrderByColumnInternal>::ConstIterator ListConstIterator;
     OrderByColumnInternal()
             : columnNumber(-1)

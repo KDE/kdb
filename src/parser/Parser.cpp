@@ -193,6 +193,9 @@ ParserError::~ParserError()
 
 QDebug operator<<(QDebug dbg, const Predicate::ParserError& error)
 {
+    if (error.type().isEmpty() && error.message().isEmpty()) {
+        return dbg.space() << "Predicate:ParserError: None";
+    }
     return dbg.space() << "Predicate:ParserError: type=" << error.type() << "message=" << error.message()
                        << "pos=" << error.position() << ")";
 }

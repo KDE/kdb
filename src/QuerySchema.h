@@ -790,7 +790,10 @@ public:
 
     /*! @return a list of columns listed in ORDER BY section of the query.
      Read notes for @ref setOrderByColumnList(). */
-    OrderByColumnList& orderByColumnList() const;
+    OrderByColumnList* orderByColumnList();
+
+    /*! @see orderByColumnList() */
+    const OrderByColumnList* orderByColumnList() const;
 
     /*! @return query schema parameters. These are taked from the WHERE section
      (a tree of expression items). */

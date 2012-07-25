@@ -424,12 +424,16 @@ QuerySchema* buildSelectQuery(
     ParseInfoInternal parseInfo(querySchema);
 
     // remove from heap (using heap was requered because parser uses union)
-    NArgExpression colViews(*_colViews);
-    delete _colViews;
-
-    // remove from heap (using heap was requered because parser uses union)
-    NArgExpression tablesList(*_tablesList);
-    delete _tablesList;
+    NArgExpression colViews;
+    if (_colViews) {
+        colViews = *_colViews;
+        delete _colViews;
+    }
+    NArgExpression tablesList;
+    if (_tablesList) {
+        tablesList = *_tablesList;
+        delete _tablesList;
+    }
 
     //-------tables list
 // assert( tablesList ); //&& tablesList->exprClass() == TableListExpressionClass );
@@ -600,7 +604,7 @@ QuerySchema* buildSelectQuery(
         }
         //----- ORDER BY
         if (options->orderByColumns) {
-            OrderByColumnList &orderByColumnList = querySchema->orderByColumnList();
+            OrderByColumnList *orderByColumnList = querySchema->orderByColumnList();
             uint count = options->orderByColumns->count();
             OrderByColumnInternal::ListConstIterator it(options->orderByColumns->constEnd());
             --it;
@@ -610,11 +614,11 @@ QuerySchema* buildSelectQuery(
                 //first, try to find a column name or alias (outside of asterisks)
                 QueryColumnInfo *columnInfo = querySchema->columnInfo((*it).aliasOrName, false/*outside of asterisks*/);
                 if (columnInfo) {
-                    orderByColumnList.appendColumn(*columnInfo, (*it).ascending);
+                    orderByColumnList->appendColumn(*columnInfo, (*it).ascending);
                 } else {
                     //failed, try to find a field name within all the tables
                     if ((*it).columnNumber != -1) {
-                        if (!orderByColumnList.appendColumn(*querySchema,
+                        if (!orderByColumnList->appendColumn(*querySchema,
                                                             (*it).ascending, (*it).columnNumber - 1)) {
                             setError(QObject::tr("Could not define sorting - no column at position %1")
                                           .arg((*it).columnNumber));
@@ -629,7 +633,7 @@ QuerySchema* buildSelectQuery(
                             CLEANUP;
                             return 0;
                         }
-                        orderByColumnList.appendField(*f, (*it).ascending);
+                        orderByColumnList->appendField(*f, (*it).ascending);
                     }
                 }
             }

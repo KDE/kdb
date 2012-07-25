@@ -983,9 +983,9 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
     if (!query.whereExpression().isNull()) {
         dbg.nospace() << " - WHERE EXPRESSION:\n" << query.whereExpression() << '\n';
     }
-    if (!query.orderByColumnList().isEmpty()) {
-        dbg.space() << QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList().count());
-        dbg.nospace() << query.orderByColumnList();
+    if (!query.orderByColumnList()->isEmpty()) {
+        dbg.space() << QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList()->count());
+        dbg.nospace() << *query.orderByColumnList();
     }
     return dbg.nospace();
 }
@@ -1845,9 +1845,14 @@ void QuerySchema::setOrderByColumnList(const OrderByColumnList& list)
 // all field names should be found, exit otherwise ..........?
 }
 
-OrderByColumnList& QuerySchema::orderByColumnList() const
+OrderByColumnList* QuerySchema::orderByColumnList()
 {
-    return *d->orderByColumnList;
+    return d->orderByColumnList;
+}
+
+const OrderByColumnList* QuerySchema::orderByColumnList() const
+{
+    return d->orderByColumnList;
 }
 
 QuerySchemaParameterList QuerySchema::parameters() const
