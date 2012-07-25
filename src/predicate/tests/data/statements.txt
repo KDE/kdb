@@ -17,6 +17,8 @@ select 1, 2;
 select from cars;
 -- Totally empty statement (PredicateSQL EXTENSION)
 select;
+-- Keywords are case insensitive
+SElEcT * FroM cars;
 
 ---------- CATEGORY: Aliases in select statement --------------
 -- Aliases for columns
