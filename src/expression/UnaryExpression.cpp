@@ -171,7 +171,6 @@ bool UnaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* call
 UnaryExpression::UnaryExpression()
  : Expression(new UnaryExpressionData)
 {
-//    insertEmptyChild(0);
     ExpressionDebug << "UnaryExpression() ctor" << *this;
 }
 
@@ -192,14 +191,18 @@ UnaryExpression::UnaryExpression(const UnaryExpression& expr)
 {
 }
 
+UnaryExpression::UnaryExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
+}
+
 UnaryExpression::~UnaryExpression()
 {
 }
 
 Expression UnaryExpression::arg() const
 {
-    ExpressionData *data = d->convertConst<UnaryExpressionData>()->arg().data();
-    return data ? Expression(data) : Expression();
+    return Expression(d->convertConst<UnaryExpressionData>()->arg());
 }
 
 void UnaryExpression::setArg(const Expression &arg)

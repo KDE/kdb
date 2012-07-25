@@ -254,6 +254,15 @@ void BinaryExpressionData::getQueryParameters(QuerySchemaParameterList& params)
         right()->getQueryParameters(params);
 }
 
+ExplicitlySharedExpressionDataPointer BinaryExpressionData::left() const
+{
+    return (children.count() > 0) ? children.at(0) : ExplicitlySharedExpressionDataPointer();
+}
+ExplicitlySharedExpressionDataPointer BinaryExpressionData::right() const
+{
+    return (children.count() > 1) ? children.at(1) : ExplicitlySharedExpressionDataPointer();
+}
+
 //=========================================
 
 static ExpressionClass classForArgs(const Expression& leftExpr,
@@ -274,8 +283,6 @@ static ExpressionClass classForArgs(const Expression& leftExpr,
 BinaryExpression::BinaryExpression()
  : Expression(new BinaryExpressionData)
 {
-    insertEmptyChild(0);
-    insertEmptyChild(1);
     ExpressionDebug << "BinaryExpression() ctor" << *this;
 }
 
@@ -284,11 +291,7 @@ BinaryExpression::BinaryExpression(const Expression& leftExpr,
                                    const Expression& rightExpr)
     : Expression(new BinaryExpressionData, classForArgs(leftExpr, token, rightExpr), token)
 {
-    if (isNull()) {
-        insertEmptyChild(0);
-        insertEmptyChild(1);
-    }
-    else {
+    if (!isNull()) {
         appendChild(leftExpr.d);
         appendChild(rightExpr.d);
     }
@@ -303,8 +306,11 @@ BinaryExpression::BinaryExpression(ExpressionData* data)
  : Expression(data)
 {
     ExpressionDebug << "BinaryExpression(ExpressionData*) ctor" << *this;
-    insertEmptyChild(0);
-    insertEmptyChild(1);
+}
+
+BinaryExpression::BinaryExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
 }
 
 BinaryExpression::~BinaryExpression()
@@ -313,7 +319,7 @@ BinaryExpression::~BinaryExpression()
 
 Expression BinaryExpression::left() const
 {
-    return Expression(d->children.at(0).data());
+    return (d->children.count() > 0) ? Expression(d->children.at(0)) : Expression();
 }
 
 void BinaryExpression::setLeft(const Expression& leftExpr)
@@ -323,7 +329,7 @@ void BinaryExpression::setLeft(const Expression& leftExpr)
 
 Expression BinaryExpression::right() const
 {
-    return Expression(d->children.at(1).data());
+    return (d->children.count() > 1) ? Expression(d->children.at(1)) : Expression();
 }
 
 void BinaryExpression::setRight(const Expression& rightExpr)

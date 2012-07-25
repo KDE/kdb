@@ -173,6 +173,8 @@ protected:
 
     Expression(ExpressionData* data, ExpressionClass aClass, int token);
 
+    explicit Expression(const ExplicitlySharedExpressionDataPointer &ptr);
+
     //! @internal
     ExplicitlySharedExpressionDataPointer d;
 
@@ -253,7 +255,9 @@ public:
 
 protected:
     explicit NArgExpression(ExpressionData* data);
-    
+
+    explicit NArgExpression(const ExplicitlySharedExpressionDataPointer &ptr);
+
     friend class Expression;
     friend class FunctionExpression;
 };
@@ -285,6 +289,8 @@ public:
 
 protected:
     explicit UnaryExpression(ExpressionData* data);
+
+    explicit UnaryExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class Expression;
 };
@@ -326,6 +332,8 @@ public:
 protected:
     explicit BinaryExpression(ExpressionData* data);
 
+    explicit BinaryExpression(const ExplicitlySharedExpressionDataPointer &ptr);
+
     friend class Expression;
 };
 
@@ -358,6 +366,7 @@ protected:
     //! Internal, used by QueryParameterExpression(const QString& message).
     ConstExpression(ExpressionData* data, ExpressionClass aClass, int token);
     explicit ConstExpression(ExpressionData* data);
+    explicit ConstExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class Expression;
 };
@@ -393,6 +402,7 @@ public:
 
 protected:
     explicit QueryParameterExpression(ExpressionData* data);
+    explicit QueryParameterExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class Expression;
 };
@@ -438,6 +448,7 @@ public:
 
 protected:
     explicit VariableExpression(ExpressionData* data);
+    explicit VariableExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class Expression;
 };
@@ -476,6 +487,7 @@ public:
 
 protected:
     explicit FunctionExpression(ExpressionData* data);
+    explicit FunctionExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class Expression;
 };

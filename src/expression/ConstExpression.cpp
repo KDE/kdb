@@ -168,6 +168,11 @@ ConstExpression::ConstExpression(ExpressionData* data)
 {
 }
 
+ConstExpression::ConstExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
+}
+
 ConstExpression::ConstExpression(const ConstExpression& expr)
         : Expression(expr)
 {

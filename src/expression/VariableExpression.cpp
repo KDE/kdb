@@ -283,6 +283,11 @@ VariableExpression::VariableExpression(ExpressionData* data)
     ExpressionDebug << "VariableExpression ctor (ExpressionData*)" << *this;
 }
 
+VariableExpression::VariableExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
+}
+
 VariableExpression::~VariableExpression()
 {
 }

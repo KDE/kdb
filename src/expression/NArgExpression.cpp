@@ -110,10 +110,11 @@ NArgExpression::NArgExpression(ExpressionClass aClass, int token)
 NArgExpression::NArgExpression(const NArgExpression& expr)
         : Expression(expr)
 {
-    //list = expr.list;
-/*    foreach(Expression* e, expr.list) {
-        add(e->copy());
-    }*/
+}
+
+NArgExpression::NArgExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
 }
 
 NArgExpression::~NArgExpression()
@@ -138,10 +139,7 @@ void NArgExpression::prepend(const Expression& expr)
 
 Expression NArgExpression::arg(int n) const
 {
-    //qDebug() << "NArgExpression::arg" << n << argCount();
-    ExplicitlySharedExpressionDataPointer p = d->children.value(n);
-    //qDebug() << "NArgExpression::arg" << n << argCount();
-    return p ? Expression(p.data()) : Expression();
+    return Expression(d->children.value(n));
 }
 
 void NArgExpression::insert(int i, const Expression& expr)

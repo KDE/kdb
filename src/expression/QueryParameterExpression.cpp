@@ -116,6 +116,11 @@ QueryParameterExpression::QueryParameterExpression(ExpressionData* data)
     ExpressionDebug << "QueryParameterExpression ctor (ExpressionData*)" << *this;
 }
 
+QueryParameterExpression::QueryParameterExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : ConstExpression(ptr)
+{
+}
+
 QueryParameterExpression::~QueryParameterExpression()
 {
 }

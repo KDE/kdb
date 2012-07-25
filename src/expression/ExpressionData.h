@@ -177,8 +177,8 @@ public:
     virtual void getQueryParameters(QuerySchemaParameterList& params);
     virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual BinaryExpressionData* clone();
-    inline ExplicitlySharedExpressionDataPointer left() const { return children[0]; }
-    inline ExplicitlySharedExpressionDataPointer right() const { return children[1]; }
+    ExplicitlySharedExpressionDataPointer left() const;
+    ExplicitlySharedExpressionDataPointer right() const;
 
 protected:
     void setLeft(const ExpressionData& left);

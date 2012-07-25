@@ -155,6 +155,11 @@ FunctionExpression::FunctionExpression(ExpressionData* data)
     ExpressionDebug << "FunctionExpression ctor (ExpressionData*)" << *this;
 }
 
+FunctionExpression::FunctionExpression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : Expression(ptr)
+{
+}
+
 FunctionExpression::~FunctionExpression()
 {
 }

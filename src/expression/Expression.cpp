@@ -237,10 +237,17 @@ Expression::Expression(ExpressionData* data)
     ExpressionDebug << "Expression ctor (ExpressionData*)" << *this;
 }
 
+Expression::Expression(const ExplicitlySharedExpressionDataPointer &ptr)
+    : d(ptr ? ptr : ExplicitlySharedExpressionDataPointer(new ExpressionData))
+{
+}
+
 Expression::~Expression()
 {
-    //if (d->parent)
-    //     d->parent->children.removeOne(d);
+    //qDebug() << *this << d->ref;
+    if (d->parent && d->ref == 1) {
+         d->parent->children.removeOne(d);
+    }
 }
 
 bool Expression::isNull() const
@@ -295,7 +302,7 @@ QString Expression::tokenToString() const
 
 Expression Expression::parent() const
 {
-    return d->parent.data() ? Expression(d->parent.data()) : Expression();
+    return d->parent.data() ? Expression(d->parent) : Expression();
 }
 
 QList<ExplicitlySharedExpressionDataPointer> Expression::children() const
@@ -352,7 +359,7 @@ void Expression::removeChild(int i)
         return;
     if (i < 0 || i >= d->children.count())
         return;
-    qDebug() << d->children.count() << d->children.at(i);
+    //qDebug() << d->children.count() << d->children.at(i);
     d->children.removeAt(i);
 }
 
@@ -366,7 +373,7 @@ Expression Expression::takeChild(int i)
     if (!child)
         return Expression();
     child->parent.reset();
-    return Expression(child.data());
+    return Expression(child);
 }
 
 int Expression::indexOfChild(const Expression& child, int from) const
@@ -467,7 +474,7 @@ bool Expression::isQueryParameter() const
 }
 
 #define CAST(T) \
-    d->convert<T ## Data>() ? T(d.data()) : T()
+    d->convert<T ## Data>() ? T(d) : T()
 
 NArgExpression Expression::toNArg() const
 {
