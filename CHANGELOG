@@ -3,6 +3,42 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+UNIT TESTS TODO:
+*FunctionExpression
+*ExpresionData*
+*QueryParameterExpression
+*VariableExpression
+
+2012-07-25
+Predicate
+*properly remove children from parents
+*fix crash in ORDER BY parsing
+*added unit tests for parsing SELECT statements (ported from features test)
+*parser: make statements like 'select *, * from persons' fail
+*parser: add support for "SELECT" - totally empty statement (PredicateSQL EXTENSION)
+*parser: fix support for aliases with skipped AS keyword, e.g. "select id myid from persons"
+
+2012-07-19..23
+Predicate
+*Improve ParserError API
+*Query Schema: Undo change from QList::operator[] to QList::insert() - causes regressions
+*Added FiledList class or use in NArg expresssions
+
+2012-07-09..18
+Predicate
+*UnaryExpression
+**added unit tests
+**added addArg()
+*improved API docs for expression classes
+*added cycles protection in debug, type, toString and validation, however expressions can contain cycles
+*BinaryExpression
+**make sure two children are always present even for null expressions
+**greatly improved validation
+**added unit tests
+*Field
+**Constrants and Options now use QFlags and Qt enums
+**Type and TypeGroup are now Qt enums
+
 2012-01-03
 Predicate
 *remove warnings, fix invalid overloads
@@ -24,8 +60,8 @@ Predicate
 2012-06-30
 Predicate
 *Fixed getting out-of-bound arg for N-arg expression: null expression is now returned if no other found
-*unit test build is now option
-*unit test coverage (gcov) added as option (false by default)
+*Unit test build is now option
+*Unit test coverage (gcov) added as option (false by default)
 *Added rule: Expressions cannot be own child
 *Disabled adding null expressions as child
 *Fixed expression destruction
