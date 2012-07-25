@@ -708,7 +708,13 @@ SQL_TYPE
 ;
 
 SelectStatement:
-Select ColViews
+Select
+{
+    PreDbg << "Select";
+    if (!($$ = buildSelectQuery( $1, 0 )))
+        return 0;
+}
+| Select ColViews
 {
     PreDbg << "Select ColViews=" << *$2;
 
