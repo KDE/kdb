@@ -9,6 +9,11 @@ UNIT TESTS TODO:
 *QueryParameterExpression
 *VariableExpression
 
+2012-08-14
+Predicate
+*Fixed bug: New db file is created in current directory instead of the selected one
+CCBUG:305163
+
 2012-07-25
 Predicate
 *properly remove children from parents
