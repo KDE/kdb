@@ -555,7 +555,6 @@ bool Connection::createDatabase(const QString &dbName)
     }
     if (m_driver->isFileBased()) {
         //update connection data if filename differs
-        d->connData.setDatabaseName(dbName);
         if (QFileInfo(dbName).isAbsolute()) {
             d->connData.setDatabaseName(dbName);
         }
