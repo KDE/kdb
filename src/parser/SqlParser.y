@@ -1018,6 +1018,10 @@ aExpr8 '+' aExpr7
     delete $1;
     delete $3;
 }
+| aExpr8 CONCATENATION aExpr7
+{
+    $$ = new BinaryExpression(*$1, CONCATENATION, *$3);
+}
 | aExpr8 '-' %prec UMINUS aExpr7
 {
     $$ = new BinaryExpression(*$1, '-', *$3);

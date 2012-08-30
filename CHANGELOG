@@ -13,6 +13,9 @@ UNIT TESTS TODO:
 Predicate
 *Removed width attribute from Field
 *Added utility functions
+*Added support for string concatenation operator || to parser
+CCBUG:305793
+REVIEW:106199
 
 2012-08-14
 Predicate
