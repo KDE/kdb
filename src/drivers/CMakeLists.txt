@@ -34,22 +34,22 @@ endif(SQLITE_FOUND)
 
 INCLUDE (FindMySQL)
 IF (MYSQL_FOUND)
-   add_subdirectory( mysql )
+   macro_optional_add_subdirectory(mysql)
 ENDIF (MYSQL_FOUND)
 
 INCLUDE (FindPkgConfig)
 INCLUDE (FindPostgreSQL)
 
 IF (POSTGRESQL_FOUND)
-   add_subdirectory(postgresql)
+   macro_optional_add_subdirectory(postgresql)
 ENDIF (POSTGRESQL_FOUND)
 
 #INCLUDE(FindFreeTDS)
 #IF (FreeTDS_FOUND)
-#todo   add_subdirectory(sybase)
+#todo   macro_optional_add_subdirectory(sybase)
 #ENDIF (FreeTDS_FOUND)
 
 #INCLUDE(FindXBase)
 #IF(XBASE_FOUND)
-#todo   add_subdirectory(xbase)
+#todo   macro_optional_add_subdirectory(xbase)
 #ENDIF(XBASE_FOUND)

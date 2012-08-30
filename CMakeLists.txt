@@ -64,6 +64,7 @@ if (NOT WIN32)
 endif (NOT WIN32)
 
 include(MacroOptionalFindPackage)
+include(MacroOptionalAddSubdirectory)
 include(InstallSettings)
 include(MacroLogFeature)
 include(FeatureSummary)
