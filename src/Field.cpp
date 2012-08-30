@@ -74,8 +74,7 @@ Field::Field(QuerySchema *querySchema)
 
 Field::Field(const QString& name, Type type,
              Constraints constr, Options options, uint maxLength, uint precision,
-             QVariant defaultValue, const QString& caption, const QString& description,
-             uint width)
+             QVariant defaultValue, const QString& caption, const QString& description)
         : m_parent(0)
         , m_name(name.toLower())
         , m_precision(precision)
@@ -85,7 +84,6 @@ Field::Field(const QString& name, Type type,
         , m_order(-1)
         , m_caption(caption)
         , m_desc(description)
-        , m_width(width)
         , m_customProperties(0)
         , m_type(type)
 {
@@ -130,7 +128,6 @@ void Field::init()
     m_options = NoOptions;
     m_defaultValue = QVariant(QString());
     m_order = -1;
-    m_width = 0;
     m_customProperties = 0;
     m_expr = new Expression();
     setMaxLength(0); // do not move this line up!

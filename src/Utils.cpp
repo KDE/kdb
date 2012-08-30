@@ -733,7 +733,6 @@ struct Predicate_BuiltinFieldProperties {
         ADD("maxLengthIsDefault");
         ADD("precision");
         ADD("defaultValue");
-        ADD("width");
         ADD("visibleDecimalPlaces");
 //! @todo always update this when new builtins appear!
 #undef ADD
@@ -810,10 +809,6 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
         return false;
     if ((it = values.find("defaultValue")) != values.constEnd())
         field.setDefaultValue(*it);
-    if ((it = values.find("width")) != values.constEnd())
-        field.setWidth((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
-    if (!ok)
-        return false;
     if ((it = values.find("visibleDecimalPlaces")) != values.constEnd()
             && Predicate::supportsVisibleDecimalPlacesProperty(field.type()))
         field.setVisibleDecimalPlaces((*it).isNull() ? -1/*default*/ : (*it).toInt(&ok));
@@ -947,8 +942,6 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
             field.setDefaultValue(value);
             return true;
         }
-        if ("width" == propertyName)
-            GET_INT(setWidth);
 
         // last chance that never fails: custom field property
         field.setCustomProperty(propertyName, value);

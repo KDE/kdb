@@ -9,6 +9,10 @@ UNIT TESTS TODO:
 *QueryParameterExpression
 *VariableExpression
 
+2012-08-30
+Predicate
+*Removed width attribute from Field
+
 2012-08-14
 Predicate
 *Fixed bug: New db file is created in current directory instead of the selected one
