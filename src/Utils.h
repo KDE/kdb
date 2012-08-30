@@ -56,9 +56,11 @@ PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
                                    const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
                                    const QString &keyname2, Field::Type keytype2, const QVariant& keyval2);
 
-PREDICATE_EXPORT bool replaceRecord(Connection* conn, TableSchema *table,
-                                    const QString &keyname, const QString &keyval, const QString &valname,
-                                    const QVariant& val, int ftype);
+/*! Deletes record with three generic criterias. */
+PREDICATE_EXPORT bool deleteRecord(Connection* conn, const QString &tableName,
+                                    const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
+                                    const QString &keyname2, Field::Type keytype2, const QVariant& keyval2,
+                                    const QString &keyname3, Field::Type keytype3, const QVariant& keyval3);
 
 typedef QList<uint> TypeGroupList;
 
@@ -391,6 +393,25 @@ PREDICATE_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType ty
  described at http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
  This function is used by PostgreSQL Predicate and migration drivers. */
 PREDICATE_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length);
+
+/*! \return int list converted from string list.
+   If \a ok is not 0, *ok is set to result of the conversion. */
+PREDICATE_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok);
+
+/*! \return string converted from list \a list.
+   Separators are ',' characters, "," and "\\" are escaped.
+    @see Predicate::deserializeList() */
+PREDICATE_EXPORT QString serializeList(const QStringList &list);
+
+/*! \return string list converted from \a data which was built using serializeList().
+   Separators are ',' characters, escaping is assumed as "\\,". */
+PREDICATE_EXPORT QStringList deserializeList(const QString &data);
+
+/*! \return int list converted from \a data which was built using serializeList().
+   Separators are ',' characters, escaping is assumed as "\\,".
+   If \a ok is not 0, *ok is set to result of the conversion.
+   @see Predicate::stringListToIntList() */
+PREDICATE_EXPORT QList<int> deserializeIntList(const QString &data, bool *ok);
 
 /*! @return string value serialized from a variant value @a v.
  This functions works like QVariant::toString() except the case when @a v is of type ByteArray.

@@ -12,6 +12,7 @@ UNIT TESTS TODO:
 2012-08-30
 Predicate
 *Removed width attribute from Field
+*Added utility functions
 
 2012-08-14
 Predicate

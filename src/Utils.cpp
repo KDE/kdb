@@ -1,5 +1,8 @@
 /* This file is part of the KDE project
    Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (c) 2006, 2007 Thomas Braxton <kde.braxton@gmail.com>
+   Copyright (c) 1999 Preston Brown <pbrown@kde.org>
+   Copyright (c) 1997 Matthias Kalle Dalheimer <kalle@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -70,7 +73,6 @@ bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
                            + keyname + '=' + conn->driver()->valueToSQL(Field::Integer, QVariant(keyval)));
 }
 
-/*! Delete record with two generic criterias. */
 bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
                              const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
                              const QString &keyname2, Field::Type keytype2, const QVariant& keyval2)
@@ -80,16 +82,15 @@ bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
         + " AND " + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
 }
 
-bool Predicate::replaceRecord(Connection* conn, TableSchema *table,
-                              const QString &keyname, const QString &keyval, const QString &valname,
-                              const QVariant& val, int ftype)
+bool Predicate::deleteRecord(Connection* conn, const QString &tableName,
+                             const QString &keyname1, Field::Type keytype1, const QVariant& keyval1,
+                             const QString &keyname2, Field::Type keytype2, const QVariant& keyval2,
+                             const QString &keyname3, Field::Type keytype3, const QVariant& keyval3)
 {
-    if (!table || !Predicate::deleteRecord(conn, table, keyname, keyval))
-        return false;
-    return conn->executeSQL(EscapedString("INSERT INTO ") + table->name()
-                           + " (" + keyname + ',' + valname + ") VALUES ("
-                           + conn->driver()->valueToSQL(Field::Text, QVariant(keyval)) + ','
-                           + conn->driver()->valueToSQL(ftype, val) + ')');
+    return conn->executeSQL(EscapedString("DELETE FROM ") + tableName + " WHERE "
+                           + keyname1 + "=" + conn->driver()->valueToSQL(keytype1, keyval1)
+                           + " AND " + keyname2 + "=" + conn->driver()->valueToSQL(keytype2, keyval2)
+                           + " AND " + keyname3 + "=" + conn->driver()->valueToSQL(keytype3, keyval3));
 }
 
 bool Predicate::isEmptyValue(Field *f, const QVariant &v)
@@ -1351,10 +1352,96 @@ QByteArray Predicate::pgsqlByteaToByteArray(const char* data, int length)
     return array;
 }
 
-QString Predicate::variantToString(const QVariant& v)
+QList<int> Predicate::stringListToIntList(const QStringList &list, bool *ok)
 {
-    if (v.type() == QVariant::ByteArray)
+    QList<int> result;
+    foreach (const QString &item, list) {
+        int val = item.toInt(ok);
+        if (ok && !*ok) {
+            return QList<int>();
+        }
+        result.append(val);
+    }
+    if (ok) {
+        *ok = true;
+    }
+    return result;
+}
+
+// Based on KConfigGroupPrivate::serializeList() from kconfiggroup.cpp (kdelibs 4)
+QString Predicate::serializeList(const QStringList &list)
+{
+    QString value = QLatin1String("");
+
+    if (!list.isEmpty()) {
+        QStringList::ConstIterator it = list.constBegin();
+        const QStringList::ConstIterator end = list.constEnd();
+
+        value = QString(*it).replace(QLatin1Char('\\'), QLatin1String("\\\\"))
+                            .replace(QLatin1Char(','), QLatin1String("\\,"));
+
+        while (++it != end) {
+            // In the loop, so it is not done when there is only one element.
+            // Doing it repeatedly is a pretty cheap operation.
+            value.reserve(4096);
+
+            value += QLatin1Char(',');
+            value += QString(*it).replace(QLatin1Char('\\'), QLatin1String("\\\\"))
+                                 .replace(QLatin1Char(','), QLatin1String("\\,"));
+        }
+
+        // To be able to distinguish an empty list from a list with one empty element.
+        if (value.isEmpty())
+            value = QLatin1String("\\0");
+    }
+
+    return value;
+}
+
+// Based on KConfigGroupPrivate::deserializeList() from kconfiggroup.cpp (kdelibs 4)
+QStringList Predicate::deserializeList(const QString &data)
+{
+    if (data.isEmpty())
+        return QStringList();
+    if (data == QLatin1String("\\0"))
+        return QStringList(QString());
+    QStringList value;
+    QString val;
+    val.reserve(data.size());
+    bool quoted = false;
+    for (int p = 0; p < data.length(); p++) {
+        if (quoted) {
+            val += data[p];
+            quoted = false;
+        } else if (data[p].unicode() == QLatin1Char('\\')) {
+            quoted = true;
+        } else if (data[p].unicode() == QLatin1Char(',')) {
+            val.squeeze(); // release any unused memory
+            value.append(val);
+            val.clear();
+            val.reserve(data.size() - p);
+        } else {
+            val += data[p];
+        }
+    }
+    value.append(val);
+    return value;
+}
+
+QList<int> Predicate::deserializeIntList(const QString &data, bool *ok)
+{
+    return Predicate::stringListToIntList(
+        Predicate::deserializeList(data), ok);
+}
+
+QString Predicate::variantToString(const QVariant& v)
+ {
+    if (v.type() == QVariant::ByteArray) {
         return Predicate::escapeBLOB(v.toByteArray(), Predicate::BLOBEscapeHex);
+    }
+    else if (v.type() == QVariant::StringList) {
+        return serializeList(v.toStringList());
+    }
     return v.toString();
 }
 
@@ -1365,12 +1452,12 @@ QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool*
             *ok = true;
         return QVariant();
     }
-    if (QVariant::Invalid == type) {
+    switch (type) {
+    case QVariant::Invalid:
         if (ok)
             *ok = false;
         return QVariant();
-    }
-    if (type == QVariant::ByteArray) {//special case: hex string
+    case QVariant::ByteArray: {//special case: hex string
         const uint len = s.length();
         QByteArray ba;
         ba.resize(len / 2 + len % 2);
@@ -1389,6 +1476,12 @@ QVariant Predicate::stringToVariant(const QString& s, QVariant::Type type, bool*
             *ok = true;
         return ba;
     }
+    case QVariant::StringList:
+        *ok = true;
+        return Predicate::deserializeList(s);
+    default:;
+    }
+
     QVariant result(s);
     if (!result.convert(type)) {
         if (ok)
