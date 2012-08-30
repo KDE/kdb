@@ -106,7 +106,7 @@ public:
     //! Provided for convenience and optimization. This is the same as info().name().
     QString name() const;
 
-    //! @return true if the the driver is file-based.
+    //! @return true if the driver is file-based.
     //! Provided for convenience and optimization. This is the same as info().isFileBased().
     bool isFileBased() const;
 
