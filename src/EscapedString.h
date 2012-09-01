@@ -56,9 +56,6 @@ public:
     inline EscapedString(const EscapedString& string)
         : QByteArray(string), m_valid(string.isValid()) {}
 
-    //! @internal used to create invalid string
-    explicit inline EscapedString(bool) : m_valid(false) {}
-
     inline ~EscapedString() {}
 
     //! @return invalid escaped string.
@@ -491,6 +488,9 @@ public:
     inline DataPtr &data_ptr() { return QByteArray::data_ptr(); }
 
 private:
+    //! Used to create invalid string
+    explicit inline EscapedString(bool) : m_valid(false) {}
+
     //! Helper for methods having "bool* ok" argument
     inline bool checkValid(bool *ok) const {
         if (!m_valid) {
