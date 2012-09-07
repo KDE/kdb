@@ -6,6 +6,23 @@ General hints:
 *Use explicit ctors where possible
 *check other==this in operator=() overloads
 *look at http://ebn.kde.org/krazy/reports/playground/libs/predicate-git/index.html
+*Use prepared SQL statements everywhere and cache them instead of constructing SQL strings by hand
+*Move members of public classes to d-pointers
+*Remove boolean traps everywhere [http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html]
+**Connection: databaseNames, databaseExists, useDatabase, tableNames, commitTransaction, rollbackTransaction, querySingleRecord, querySingleString, querySingleNumber, resultExists, createTable, alterTableName, dropTable, drv_databaseExists, updateRecord, insertRecord, deleteRecord, querySingleRecordInternal, storeObjectDataInternal
+**replace Connection::dropDatabase() with Connection::dropCurrentDatabase()
+**make Connection::drv_useDatabase return tristate instead of using bool *cancelled
+**Driver: addLimitTo1
+**Cursor: updateRecord, insertRecord, deleteRecord,
+**FieldList: 2 ctors
+**IndexSchema: attachRelationship
+**QueryColumnInfo: ctor
+**OrderByColumn: 2 ctors, toSQLString
+**OrderByColumnList: appendFields, appendColumn x 2, appendField x 2, toSQLString
+**QuerySchema: insertField x 2, addField x 2, addExpression, addAsterisk, field, columnInfo, 
+**RecordEditBuffer: ctor, at
+**TableSchema: ctor 
+**TableOrQuerySchema: ctor
 
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
