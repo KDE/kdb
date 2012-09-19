@@ -3,11 +3,20 @@ Predicate CHANGELOG
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
 
+TODO: port KEXI_DEBUG_GUI; merge 3fa9e1a75c5fae1c from calligra/master
+TODO: port 'Field list: return bool from removeFiled(), add moveField()' 9ab089d7a1306d45be from calligra/master
+TODO: port 'Force lowercase letters for object ids; fix for not-all-lowercase namespace' 5d39c992354a from calligra/master
+TODO: port 'Fix possible crash when saving changes to design of table used elsewhere' e410a4f4fc9da from calligra/master
+
 UNIT TESTS TODO:
 *FunctionExpression
 *ExpresionData*
 *QueryParameterExpression
 *VariableExpression
+
+2012-09-19
+Predicate
+*fix loading maximumListRows property of lookup field schema
 
 2012-08-30
 Predicate
