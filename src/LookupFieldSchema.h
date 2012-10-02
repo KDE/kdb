@@ -86,7 +86,7 @@ public:
         /*! @return record source type name. @see setTypeByName() */
         QString typeName() const;
 
-        /*! Sets record source type by name using @a typeName. Accepted (cast sensitive)
+        /*! Sets record source type by name using @a typeName. Accepted (case sensitive)
          names are "table", "query", "sql", "valuelist", "fieldlist".
          For other value NoType type is set. */
         void setTypeByName(const QString& typeName);
