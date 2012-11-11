@@ -963,9 +963,9 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         if (autoinc && m_driver->beh->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
-                v += (m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION);
+                v.append(m_driver->beh->AUTO_INCREMENT_TYPE).append(' ').append(m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION);
             else
-                v += m_driver->beh->AUTO_INCREMENT_TYPE + QLatin1Char(' ') + m_driver->beh->AUTO_INCREMENT_FIELD_OPTION;
+                v.append(m_driver->beh->AUTO_INCREMENT_TYPE).append(' ').append(m_driver->beh->AUTO_INCREMENT_FIELD_OPTION);
         } else {
             if (autoinc && !m_driver->beh->AUTO_INCREMENT_TYPE.isEmpty())
                 v += m_driver->beh->AUTO_INCREMENT_TYPE;
@@ -973,7 +973,7 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
                 v += m_driver->sqlTypeName(field->type(), field->precision());
 
             if (field->isUnsigned())
-                v += (QLatin1Char(' ') + m_driver->beh->UNSIGNED_TYPE_KEYWORD);
+                v.append(' ').append(m_driver->beh->UNSIGNED_TYPE_KEYWORD);
 
             if (field->isFPNumericType() && field->precision() > 0) {
                 if (field->scale() > 0)
@@ -999,13 +999,14 @@ EscapedString Connection::createTableStatement(const TableSchema& tableSchema) c
                 }
             }
 
-            if (autoinc)
-                v += (QLatin1Char(' ')
-                      + (pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION));
-            else
+            if (autoinc) {
+                v.append(' ').append(pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION);
+            }
+            else {
                 //! @todo here is automatically a single-field key created
                 if (pk)
                     v += " PRIMARY KEY";
+            }
             if (!pk && field->isUniqueKey())
                 v += " UNIQUE";
 ///@todo IS this ok for all engines?: if (!autoinc && !field->isPrimaryKey() && field->isNotNull())
@@ -1240,7 +1241,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
 
             if (f->isQueryAsterisk()) {
                 if (!singleTable && static_cast<QueryAsterisk*>(f)->isSingleTableAsterisk()) { //single-table *
-                    sql += Predicate::escapeIdentifier(driver, f->table()->name()) + QLatin1String(".*");
+                    sql.append(Predicate::escapeIdentifier(driver, f->table()->name())).append(".*");
                 }
                 else { //all-tables * (or simplified table.* when there's only one table)
                     sql += '*';
@@ -1260,13 +1261,13 @@ static EscapedString selectStatementInternal(const Driver *driver,
                         tableName = f->table()->name();
 
                     if (!singleTable) {
-                        sql += Predicate::escapeIdentifier(driver, tableName) + QLatin1Char('.');
+                        sql.append(Predicate::escapeIdentifier(driver, tableName)).append('.');
                     }
                     sql += Predicate::escapeIdentifier(driver, f->name());
                 }
                 const QString aliasString(querySchema->columnAlias(number));
                 if (!aliasString.isEmpty()) {
-                    sql += QLatin1String(" AS ") + aliasString;
+                    sql.append(" AS ").append(aliasString);
                 }
 //! @todo add option that allows to omit "AS" keyword
             }
@@ -1415,7 +1416,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
                 s_from += Predicate::escapeIdentifier(driver, table->name());
                 const QString aliasString(querySchema->tableAlias(number));
                 if (!aliasString.isEmpty())
-                    s_from += (QLatin1String(" AS ") + aliasString);
+                    s_from.append(" AS ").append(aliasString);
                 number++;
             }
         }

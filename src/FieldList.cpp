@@ -265,7 +265,7 @@ EscapedString FieldList::sqlFieldsList(const Field::List& list, Connection *conn
     }
     foreach(Field *f, list) {
         if (!start)
-            result += separator;
+            result.append(separator);
         else
             start = false;
         result = (result + tableAliasAndDot +
