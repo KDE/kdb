@@ -141,6 +141,7 @@ void TestSqlParser::testParse_data()
     bool expectError = false;
     int lineNum = 1;
     QString dbPath;
+    bool clearTestName = false;
 
     for (; !in.atEnd(); ++lineNum) {
         QString line(in.readLine());
@@ -148,7 +149,11 @@ void TestSqlParser::testParse_data()
             eatComment(&line);
             eatEndComment(&line);
             if (line.startsWith("CATEGORY: ")) {
-                expectError = false;
+                if (clearTestName) {
+                    expectError = false;
+                    clearTestName = false;
+                    testName.clear();
+                }
                 category = line.mid(QString("CATEGORY: ").length()).trimmed();
                 //qDebug() << "CATEGORY:" << category;
             }
@@ -156,7 +161,11 @@ void TestSqlParser::testParse_data()
                 break;
             }
             else if (line.startsWith("SQLITEFILE: ")) {
-                expectError = false;
+                if (clearTestName) {
+                    expectError = false;
+                    clearTestName = false;
+                    testName.clear();
+                }
                 ok = dbPath.isEmpty();
                 QVERIFY2(ok, QString("Error at line %1: SQLite was file already specified (%2)")
                     .arg(lineNum).arg(dbPath).toLatin1());
@@ -167,12 +176,23 @@ void TestSqlParser::testParse_data()
                     .arg(lineNum).arg(dbPath).toLatin1());
             }
             else if (line.startsWith("ERROR: ")) {
-                expectError = true;
+                if (clearTestName) {
+                    expectError = true;
+                    clearTestName = false;
+                    testName.clear();
+                }
                 testName = line.mid(QString("ERROR: ").length()).trimmed();
             }
             else {
-                expectError = false;
-                testName = line;
+                if (clearTestName) {
+                    expectError = false;
+                    clearTestName = false;
+                    testName.clear();
+                }
+                if (!testName.isEmpty()) {
+                    testName.append(" ");
+                }
+                testName.append(line);
             }
         }
         else {
@@ -187,6 +207,7 @@ void TestSqlParser::testParse_data()
 
             QTest::newRow(QString("Category: \"%1\"; Test: \"%2\"").arg(category).arg(testName).toLatin1())
                 << fname << lineNum << sql << expectError;
+            clearTestName = true;
         }
     }
     input.close();
