@@ -20,6 +20,10 @@
 #ifndef TESTSQLPARSER_H
 #define TESTSQLPARSER_H
 
+#undef QT_USE_QSTRINGBUILDER
+#undef QT_NO_CAST_TO_ASCII
+#undef QT_NO_CAST_FROM_ASCII
+
 #include <QObject>
 #include <QScopedPointer>
 #include <Predicate/Connection>

@@ -20,6 +20,10 @@
 #ifndef TESTEXPRESSIONS_H
 #define TESTEXPRESSIONS_H
 
+#undef QT_USE_QSTRINGBUILDER
+#undef QT_NO_CAST_TO_ASCII
+#undef QT_NO_CAST_FROM_ASCII
+
 #include <QtCore/QObject>
 #include <Predicate/Tools/Utils>
 
