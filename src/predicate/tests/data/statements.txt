@@ -77,7 +77,7 @@ select id from cars order by owner;
 select id from cars order by owner, model, id;
 -- ORDER BY where column numbers are used instead of names
 select id, model from cars order by 2, 1;
--- ORDER BY column number 2 out of range - should be between 1 and 1
+-- ERROR: ORDER BY column number 2 out of range - should be between 1 and 1
 -- (there's only one visible field)
 select id from cars order by 2, 1;
 
