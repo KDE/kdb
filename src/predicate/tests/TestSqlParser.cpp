@@ -148,7 +148,10 @@ void TestSqlParser::testParse_data()
         if (line.startsWith("--")) { // comment
             eatComment(&line);
             eatEndComment(&line);
-            if (line.startsWith("CATEGORY: ")) {
+            if (line.startsWith("TODO:")) {
+                continue;
+            }
+            else if (line.startsWith("CATEGORY: ")) {
                 if (clearTestName) {
                     expectError = false;
                     clearTestName = false;
