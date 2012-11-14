@@ -17,7 +17,8 @@
 -- Boston, MA 02110-1301, USA.
 
 -- SQLITEFILE: sqlParserTest.kexi --
----------- CATEGORY: general --------------
+
+---------- CATEGORY: General --------------
 -- The same field used in two columns
 select id, id from persons;
 -- Whitespace between table-identifier, dot field-identifier/asterisk
@@ -37,6 +38,70 @@ select from cars;
 select;
 -- Keywords are case insensitive
 SElEcT * FroM cars;
+-- Constants
+select -12;
+select 7777777;
+select -1048576;
+select 16777216;
+select "01234567890";
+select 3.14159;
+-- TODO: Date/Time
+
+-- TRUE and FALSE constants (PredicateSQL EXTENSION)
+select TRUE, NOT FALSE;
+select NOT NOT TRUE;
+select NOT (NOT TRUE);
+select TRUE != FALSE;
+select TRUE <> FALSE;
+select TRUE OR FALSE;
+select TRUE XOR FALSE;
+select TRUE AND NOT FALSE;
+select TRUE < FALSE;
+select TRUE IS NULL;
+select TRUE <> TRUE OR FALSE == TRUE;
+-- ERROR: 'IS' is reserved keyword
+select TRUE IS NOT FALSE;
+-- IS NULL/IS NOT NULL
+select 1 IS NOT NULL;
+-- ERROR: Extra ';'
+select 1; 2;
+-- Unary operators
+select -1;
+select --1;
+select +1;
+select ++1;
+select +--+-1;
+-- Binary operators
+select 1+2;
+select 1-2;
+select 1*2;
+select 1/2;
+select 1&2;
+select 1|2;
+select 1%2;
+select 2 >> 4;
+select 2 <> 4;
+select 2 != -4;
+select 2 = -4;
+select 2 == -4;
+select 2 > 4;
+select 2 < 4;
+select 2 <= 4;
+select 2 >= -4;
+select 'ABC' LIKE 'A%';
+select 3 SIMILAR TO 4;
+select 3 NOT SIMILAR TO 4;
+select 'AB' || 'CD';
+-- ERROR: **
+select 1**2;
+-- ERROR: * or / are not unary operators
+select *2;
+select /2;
+-- ERROR: operators after argument
+select 2+;
+select 2-;
+select 2*;
+select 2/;
 
 ---------- CATEGORY: Aliases in select statement --------------
 -- Aliases for columns
@@ -73,10 +138,35 @@ select (2+3)*4 from cars;
 select one*two from persons;
 -- ERROR: Like "select p.id from persons p, cars p" but ambiguous column is inside a complex expression
 select id*2 from persons p, cars p;
+-- Operators precedence: arithmetic before relational
+select 1 + 2 < 3;
+-- *,/ before +,-
+select 1+2*3;
+-- Unary expressions before binary expressions
+select 1+-2;
+-- ERROR: column not found in expression
+select 2 * foo;
+-- ERROR: 'NOT' operator cannot be applied to integer
+select NOT 2 * 4;
+-- Nested '()'
+select ((2));
+select ((  (2 ) ));
+-- ERROR: unmatched '('
+select (2;
+select 2);
+select ((2);
+select (2)));
+-- column names in expression
+select id * id - 2 / id from cars;
+select model || "---" || model from cars;
 
----------- CATEGORY: Expressions in "WHERE" section of select statement --------------
+---------- CATEGORY: "WHERE" section --------------
+-- ERROR: Empty WHERE section
+select id from cars where;
+-- ERROR: WHERE section without columns
+select from cars where TRUE;
 -- Complex expressions in WHERE section
-select id from cars where (id > 2 OR cars.owner IS NULL) AND NOT 2 * id < 5;
+select id from cars where (id > 2 OR cars.owner IS NULL) AND 2 * id < 5;
 
 ---------- CATEGORY: "ORDER BY" section of select statement --------------
 -- Simple ORDER BY
@@ -85,6 +175,8 @@ select id from cars order by id;
 select id from cars order by id DESC;
 -- Simple ORDER BY with ASC
 select id from cars order by id ASC;
+-- Simple ORDER BY with ASC and DESC
+select id, model from cars order by id ASC, model DESC;
 -- Simple ORDER BY with WHERE
 select id from cars order by id WHERE id < 5;
 -- Simple ORDER BY with WHERE; opposite direction
@@ -99,13 +191,8 @@ select id, model from cars order by 2, 1;
 -- (there's only one visible field)
 select id from cars order by 2, 1;
 
----------- CATEGORY: Expressions --------------
--- Operators precedence: arithmetic before relational
-select 1 + 2 < 3;
--- *,/ before +,-
-select 1+2*3;
--- Unary expressions before binary expressions
-select 1+-2;
-
--- TODO
--- '--' comments
+---------- CATEGORY: JOINs -------
+-- Join persons and cars tables
+SELECT persons.name, persons.surname, persons.age, cars.model, ownership.since FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner;
+SELECT persons.name, persons.surname, persons.age, cars.model, ownership.since FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner ORDER BY 2, 4;
+SELECT persons.name, persons.surname as s, persons.age, cars.model, ownership.since as s2 FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner ORDER BY s2, s;
