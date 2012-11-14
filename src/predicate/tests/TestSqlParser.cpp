@@ -120,7 +120,7 @@ static void eatEndComment(QString* string)
     int i = string->length() - 1;
     for (; i >= 0 && string->at(i) == '-'; --i)
         ;
-    *string = string->left(i).trimmed();
+    *string = string->left(i+1).trimmed();
 }
 
 void TestSqlParser::testParse_data()
