@@ -202,16 +202,15 @@ TODO: more changes like these related to WHERE expression
   predicate_global.h
 
 parser:
-  parser/extract_tokens.sh
-  parser/generate_parser_code.sh
+* parser/extract_tokens.sh
+* parser/generate_parser_code.sh
   parser/Parser.h
   parser/Parser.cpp
   parser/Parser_p.h
   parser/Parser_p.cpp
-  parser/SqlParser.h
-  parser/SqlParser.cpp
+* parser/SqlParser.y
   parser/SqlTypes.h
-  parser/SqlScanner.cpp
+* parser/SqlScanner.l
   parser/tokens.cpp
 
 tools:

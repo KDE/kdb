@@ -13,6 +13,12 @@ UNIT TESTS TODO:
 *ExpresionData*
 *QueryParameterExpression
 *VariableExpression
+*Pass expression string to parser, parse it and compare with the original string
+
+2012-11-14
+Predicate
+*parser: added support for TRUE/FALSE constants
+*parser: improved test tool
 
 2012-09-19
 Predicate
