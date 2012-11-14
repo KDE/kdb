@@ -38,7 +38,7 @@
 #include <windows.h>
 void usleep(unsigned int usec)
 {
-	Sleep(usec/1000);
+    Sleep(usec/1000);
 }
 #else
 #include <unistd.h>
@@ -164,7 +164,7 @@ void SQLiteVacuum::readFromStdErr()
         QByteArray s(m_dumpProcess->readLine(1000));
         if (s.isEmpty())
             break;
-	PreDrvDbg << s;
+    PreDrvDbg << s;
         if (s.startsWith("DUMP: ")) {
             //set previously known progress
             m_dlg->setValue(m_percent);
@@ -201,7 +201,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
 
     if (!QFile::rename(m_tmpFilePath, m_filePath)) {
         PreDrvWarn << "SQLiteVacuum::sqliteProcessFinished(): Rename"
-	  << m_tmpFilePath << "to" << m_filePath << "failed.";
+      << m_tmpFilePath << "to" << m_filePath << "failed.";
         m_result = false;
     }
 
