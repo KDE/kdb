@@ -198,6 +198,16 @@ real				((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][-+]?{digit}
 	return SQL_NULL;
 }
 
+"TRUE" {
+        ECOUNT;
+        return SQL_TRUE;
+}
+
+"FALSE" {
+        ECOUNT;
+        return SQL_FALSE;
+}
+
 "ON" {
 	ECOUNT;
 	return SQL_ON;

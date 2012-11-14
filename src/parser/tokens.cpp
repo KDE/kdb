@@ -6,6 +6,7 @@ static const char* _tokens[] = {
 "BY",
 "CREATE",
 "DESC",
+"FALSE",
 "FROM",
 "IN",
 "INTEGER",
@@ -22,6 +23,7 @@ static const char* _tokens[] = {
 "SELECT",
 "SIMILAR",
 "TABLE",
+"TRUE",
 "WHERE",
 "XOR",
 0

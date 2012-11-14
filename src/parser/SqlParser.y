@@ -1127,6 +1127,14 @@ aExpr9:
 //    $$ = new Field();
     //$$->setName(QString::null);
 }
+| SQL_TRUE
+{
+    $$ = new ConstExpression( SQL_TRUE, true );
+}
+| SQL_FALSE
+{
+    $$ = new ConstExpression( SQL_FALSE, false );
+}
 | CHARACTER_STRING_LITERAL
 {
     $$ = new ConstExpression( CHARACTER_STRING_LITERAL, *$1 );
