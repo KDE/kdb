@@ -429,7 +429,7 @@ QuerySchema* buildSelectQuery(
         colViews = *_colViews;
         delete _colViews;
     }
-    qDebug() << "==" << colViews.argCount() << colViews;
+    //qDebug() << "==" << colViews.argCount() << colViews;
     NArgExpression tablesList;
     if (_tablesList) {
         tablesList = *_tablesList;

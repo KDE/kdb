@@ -231,16 +231,22 @@ void TestSqlParser::testParse()
 
     if (ok) {
         // sucess, so error cannot be expected
-        QVERIFY2(!expectError, (QString("\nFAIL!  : %1:%2: Unexpected success in statement: \"%3\"").arg(fname).arg(lineNum).arg(sql.toString()).toLatin1()));
+        QVERIFY2(!expectError,
+                 (QString("Unexpected success in statement: \"%1\"; Result: %2")
+                  .arg(sql.toString()).arg(result.toString()).toLatin1()));
+        if (!expectError) {
+            qDebug() << "Result:" << result.toString();
+        }
     }
     else {
         // failure, so error should be expected
-        QVERIFY2(expectError, QString("\nFAIL!  : %1:%2: Statement: \"%3\"; %4").arg(fname).arg(lineNum).arg(sql.toString()).arg(Predicate::debugString(parser->error())).toLatin1());
+        QVERIFY2(expectError, QString("Statement: \"%1\"; %2")
+                 .arg(sql.toString())
+                 .arg(Predicate::debugString(parser->error())).toLatin1());
+        if (expectError) {
+            qDebug() << parser->error();
+        }
     }
-    if (!ok && expectError) {
-        qDebug() << parser->error();
-    }
-    qDebug() << result.toString();
 }
 
 void TestSqlParser::cleanupTestCase()
