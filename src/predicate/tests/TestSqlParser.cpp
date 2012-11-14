@@ -177,10 +177,10 @@ void TestSqlParser::testParse_data()
             }
             else if (line.startsWith("ERROR: ")) {
                 if (clearTestName) {
-                    expectError = true;
                     clearTestName = false;
                     testName.clear();
                 }
+                expectError = true;
                 testName = line.mid(QString("ERROR: ").length()).trimmed();
             }
             else {
