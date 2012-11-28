@@ -28,7 +28,6 @@ SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal* conn)
         : PreparedStatementInterface()
         , SQLiteConnectionInternal(conn->connection)
         , m_handle(0)
-        , m_resetRequired(false)
 {
     data_owned = false;
     data = dynamic_cast<SQLiteConnectionInternal&>(*conn).data; //copy
@@ -202,14 +201,6 @@ bool SQLitePreparedStatement::execute(
     Q_UNUSED(insertFieldList);
     if (!m_handle)
         return false;
-    if (m_resetRequired) {
-        m_result.setServerResultCode(sqlite3_reset(m_handle));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
-            return false;
-        }
-        m_resetRequired = false;
-    }
 
 /*moved
     //for INSERT, we're iterating over inserting values
@@ -234,9 +225,9 @@ bool SQLitePreparedStatement::execute(
     }
 
     //real execution
-    m_result.setServerResultCode(sqlite3_step(m_handle));
-    m_resetRequired = true;
-    if (type == PreparedStatement::InsertStatement && SQLITE_DONE == m_result.serverResultCode()) {
+    sqlite3_step(m_handle);
+    m_result.setServerResultCode(sqlite3_reset(m_handle));
+    if (type == PreparedStatement::InsertStatement && SQLITE_OK == m_result.serverResultCode()) {
         return true;
     }
     if (type == PreparedStatement::SelectStatement) {

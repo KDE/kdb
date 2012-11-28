@@ -47,7 +47,6 @@ protected:
     bool bindValue(Field *field, const QVariant& value, int arg);
 
     sqlite3_stmt *m_handle;
-    bool m_resetRequired;
 };
 
 }
