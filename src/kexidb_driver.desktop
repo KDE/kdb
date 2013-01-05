@@ -3,6 +3,7 @@ Type=ServiceType
 X-KDE-ServiceType=Kexi/DBDriver
 Comment=Kexi SQL-Driver plugin
 Comment[bg]=Приставка на Kexi за SQL-драйвер
+Comment[bs]=Kexi SQL-Driver plugin
 Comment[cs]=Modul ovladače SQL pro Kexi
 Comment[de]=Kexi-SQL-Treibermodul
 Comment[es]=Complemento para el controlador SQL de Kexi
