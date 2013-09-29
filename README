@@ -4,8 +4,10 @@ part of the Calligra Suite [2] (formerly KOffice).
 
 It is consisted of a C++ Qt-only library and set of plugins.
 Because there is no dependency on Kexi, Calligra or even on KDE libraries,
-Predicate is available for very wide audience. Kexi 2.5 will use it too,
-thus deprecating KexiDB.
+Predicate is available for wider audience. Kexi will use it too, thus
+deprecating KexiDB.
 
-[1] http://www.calligra-suite.org/kexi
-[2] http://www.calligra-suite.org
+Project's home page: http://community.kde.org/Predicate
+
+[1] http://www.calligra.org/kexi
+[2] http://www.calligra.org
