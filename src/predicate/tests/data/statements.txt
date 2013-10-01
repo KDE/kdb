@@ -193,6 +193,10 @@ select id from cars order by 2, 1;
 
 ---------- CATEGORY: JOINs -------
 -- Join persons and cars tables
-SELECT persons.name, persons.surname, persons.age, cars.model, ownership.since FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner;
-SELECT persons.name, persons.surname, persons.age, cars.model, ownership.since FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner ORDER BY 2, 4;
-SELECT persons.name, persons.surname as s, persons.age, cars.model, ownership.since as s2 FROM persons, ownership, cars WHERE cars.id = ownership.car AND persons.id = ownership.owner ORDER BY s2, s;
+SELECT persons.name, persons.surname, persons.age, cars.model FROM persons, cars WHERE persons.id = cars.owner;
+-- Join persons and cars tables, skip table names where possible
+SELECT name, surname, age, model FROM persons, cars WHERE persons.id = owner;
+-- Join persons and cars tables, sort by surname+name
+SELECT persons.name, persons.surname, persons.age, cars.model FROM persons, cars WHERE persons.id = cars.owner ORDER BY 2, 1;
+-- Join persons and cars tables, sort using aliases
+SELECT persons.name as p_name, persons.surname, persons.age as p_age, cars.model FROM persons, cars WHERE persons.id = cars.owner ORDER BY p_age, p_name;
