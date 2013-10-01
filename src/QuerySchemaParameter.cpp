@@ -55,8 +55,8 @@ class QuerySchemaParameterValueListIterator::Private
 {
 public:
     Private(const Driver &driver, const QList<QVariant>& aParams)
-            : driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
-            , params(aParams)
+            : //driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
+            params(aParams)
     {
         //move to last item, as the order is reversed due to parser's internals
         paramsIt = params.constEnd(); //fromLast();

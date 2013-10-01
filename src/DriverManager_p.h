@@ -41,12 +41,6 @@ public:
       \return db driver, or 0 if error (then error message is also set) */
     Driver* driver(const QString& name);
 
-    /*! @return weak pointer reference for driver @a driver or null pointer if @a driver is 0.
-     Used to be able to track drivers lifetime using QSharedPointers/QWeakPointers. */
-    QWeakPointer<const Driver> driverWeakPointer(const Driver &driver) {
-        return m_driverWeakPointers.value(&driver);
-    }
-
     DriverInfo driverInfo(const QString &name);
 
     static DriverManagerInternal *self();
@@ -75,8 +69,7 @@ private:
 
     QMap<QString, DriverInfo> m_infos_by_mimetype;
     QMap<QString, DriverInfo> m_driversInfo; //!< used to store drivers information
-    QMap<QString, QSharedPointer<Driver>* > m_drivers; //!< for owning drivers
-    QMap<const Driver*, QWeakPointer<const Driver> > m_driverWeakPointers;
+    QMap<QString, Driver* > m_drivers; //!< for owning drivers
     QString m_pluginsDir;
 
 //pred    QString m_serverErrMsg;

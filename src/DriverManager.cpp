@@ -52,7 +52,6 @@ DriverManagerInternal::~DriverManagerInternal()
     PreDbg;
     qDeleteAll(m_drivers);
     m_drivers.clear();
-    m_driverWeakPointers.clear();
     PreDbg << "ok";
 }
 
@@ -65,7 +64,6 @@ void DriverManagerInternal::slotAppQuits()
     PreDbg << "let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
-    m_driverWeakPointers.clear();
 }
 
 //static
@@ -288,9 +286,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
 
     Driver *drv = 0;
     if (!name.isEmpty()) {
-        QSharedPointer<Driver> *dp = m_drivers.value(name.toLower());
-        if (dp && !dp->isNull())
-            drv = dp->data();
+        drv = m_drivers.value(name.toLower());
     }
     if (drv)
         return drv; //cached
@@ -365,9 +361,7 @@ Driver* DriverManagerInternal::driver(const QString& name)
         delete drv;
         return 0;
     }
-    QSharedPointer<Driver>* ptr = new QSharedPointer<Driver>(drv);
-    m_drivers.insert(info.name().toLower(), ptr); //cache it
-    m_driverWeakPointers.insert(drv, ptr->toWeakRef());
+    m_drivers.insert(info.name().toLower(), drv); //cache it
     return drv;
 }
 

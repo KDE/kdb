@@ -1769,13 +1769,13 @@ EscapedString QuerySchema::sqlColumnsList(const QueryColumnInfo::List& infolist,
 
 EscapedString QuerySchema::autoIncrementSQLFieldsList(Connection *conn) const
 {
-    QWeakPointer<const Driver> driverWeakPointer
-            = DriverManagerInternal::self()->driverWeakPointer(*conn->driver());
-    if (   d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
-        || d->autoIncrementSQLFieldsList.isEmpty())
+//    QWeakPointer<const Driver> driverWeakPointer
+//            = DriverManagerInternal::self()->driverWeakPointer(*conn->driver());
+    if (   /*d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
+        ||*/ d->autoIncrementSQLFieldsList.isEmpty())
     {
         d->autoIncrementSQLFieldsList = QuerySchema::sqlColumnsList(*autoIncrementFields(), conn);
-        d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
+        //d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
     }
     return d->autoIncrementSQLFieldsList;
 }
