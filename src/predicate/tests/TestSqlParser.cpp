@@ -200,6 +200,7 @@ void TestSqlParser::testParse_data()
         }
         else {
             EscapedString sql(line.trimmed());
+            clearTestName = true;
             if (sql.isEmpty()) {
                 expectError = false;
                 continue;
@@ -212,7 +213,6 @@ void TestSqlParser::testParse_data()
                           .arg(fname).arg(lineNum).arg(category).arg(testName).toLatin1()
                           + (expectError ? "; Error expected" :""))
                 << fname << lineNum << sql << expectError;
-            clearTestName = true;
         }
     }
     input.close();
