@@ -72,37 +72,6 @@ DriverManagerInternal *DriverManagerInternal::self()
     return s_self;
 }
 
-static QString findPluginsDir()
-{
-/*    QString fname(
-#ifdef Q_WS_WIN
-        "predicate.ini"
-#else
-        ".predicate"
-#endif
-    );
-    if (qApp) {
-        pluginsDir = qApp->applicationDirPath() + "/plugins";
-        if (QDir(pluginsDir).exists())
-            return pluginsDir;
-    }
-    if (QFileInfo(QDir::homePath() + "/" + fname).isReadable()) {
-        // we have a config file - try to find plugins dir here
-        QSettings config(QDir::homePath() + "/" + fname, QSettings::IniFormat);
-        pluginsDir = config.value("Plugins").toString();
-        if (QDir(pluginsDir).exists())
-            return pluginsDir;
-    }
-*/
-//! @todo try in XDG_* http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html ?
-    foreach (const QString& path, qApp->libraryPaths()) {
-        const QString pluginsDir(path + QLatin1String("/predicate"));
-        if (QDir(pluginsDir).exists() && QDir(pluginsDir).isReadable())
-            return pluginsDir;
-    }
-    return QString();
-}
-
 void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
 {
     QDir dir(pluginsDir, QLatin1String("predicate_*.desktop"));
