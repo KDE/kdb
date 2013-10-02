@@ -1584,3 +1584,35 @@ QStringList Predicate::libraryPaths()
     }
     return result;
 }
+
+//---------
+
+#ifdef PREDICATE_DEBUG_GUI
+
+static DebugGUIHandler s_debugGUIHandler = 0;
+
+void Predicate::setDebugGUIHandler(DebugGUIHandler handler)
+{
+    s_debugGUIHandler = handler;
+}
+
+void Predicate::debugGUI(const QString& text)
+{
+    if (s_debugGUIHandler)
+        s_debugGUIHandler(text);
+}
+
+static AlterTableActionDebugGUIHandler s_alterTableActionDebugHandler = 0;
+
+void Predicate::setAlterTableActionDebugHandler(AlterTableActionDebugGUIHandler handler)
+{
+    s_alterTableActionDebugHandler = handler;
+}
+
+void Predicate::alterTableActionDebugGUI(const QString& text, int nestingLevel)
+{
+    if (s_alterTableActionDebugHandler)
+        s_alterTableActionDebugHandler(text, nestingLevel);
+}
+
+#endif // PREDICATE_DEBUG_GUI

@@ -261,9 +261,9 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
         }
     } else {
         PreDbg << debugString;
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
         if (simulate)
-            Utils::addAlterTableActionDebug(debugString, nestingLevel);
+            Utils::alterTableActionDebugGUI(debugString, nestingLevel);
 #endif
     }
 }
@@ -282,9 +282,9 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
     QString dbg(QString::fromLatin1("Action dict for field \"%1\" (%2, UID=%3):")
                         .arg(fieldName).arg(dict->count()).arg(fieldUID));
     PreDbg << dbg;
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
     if (simulate)
-        Utils::addAlterTableActionDebug(dbg, 1);
+        Utils::alterTableActionDebugGUI(dbg, 1);
 #endif
     for (;it != dict->constEnd(); ++it) {
         debugAction(it.value(), 2, simulate);
@@ -293,9 +293,9 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
 
 static void debugFieldActions(const AlterTableHandler::ActionDictDict &fieldActions, bool simulate)
 {
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
     if (simulate)
-        Utils::addAlterTableActionDebug("** Simplified Field Actions:");
+        Utils::alterTableActionDebugGUI("** Simplified Field Actions:");
 #endif
     for (AlterTableHandler::ActionDictDictConstIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
         debugActionDict(it.value(), it.key(), simulate);
@@ -661,14 +661,14 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
                 //field() = f;
                 setField(f);
                 PreDbg << field();
-#ifdef KEXI_DEBUG_GUI
-                Utils::addAlterTableActionDebug(
+#ifdef PREDICATE_DEBUG_GUI
+                Utils::alterTableActionDebugGUI(
                     QString("** Property-set actions moved to field definition itself:\n")
                         + Predicate::debugString<Field>(field()), 0);
 #endif
             } else {
-#ifdef KEXI_DEBUG_GUI
-                Utils::addAlterTableActionDebug(
+#ifdef PREDICATE_DEBUG_GUI
+                Utils::alterTableActionDebugGUI(
                     QString("** Failed to set properties for field ") + Utils::debugString<Field>(field()), 0);
 #endif
                 PreWarn << "setFieldProperties() failed!";
@@ -913,16 +913,16 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
 
     const bool recreateTable = (args->requirements & PhysicalAlteringRequired);
 
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
     if (args->simulate)
-        Utils::addAlterTableActionDebug(dbg, 0);
+        Utils::alterTableActionDebugGUI(dbg, 0);
 #endif
     dbg = QString::fromLatin1("** Ordered, simplified actions (%1, was %2):")
             .arg(currentActionsCount).arg(allActionsCount);
     PreDbg << dbg;
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
     if (args->simulate)
-        Utils::addAlterTableActionDebug(dbg, 0);
+        Utils::alterTableActionDebugGUI(dbg, 0);
 #endif
     for (int i = 0; i < allActionsCount; i++) {
         debugAction(actionsVector.at(i), 1, args->simulate,

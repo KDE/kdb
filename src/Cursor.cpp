@@ -40,8 +40,8 @@ Cursor::Cursor(Connection* conn, const EscapedString& statement, uint options)
         , m_rawStatement(statement)
         , m_options(options)
 {
-#ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(QString("Create cursor: ") + statement.toString());
+#ifdef PREDICATE_DEBUG_GUI
+    Predicate::debugGUI(QLatin1String("Create cursor: ") + statement.toString());
 #endif
     init();
 }
@@ -51,8 +51,9 @@ Cursor::Cursor(Connection* conn, QuerySchema* query, uint options)
         , m_query(query)
         , m_options(options)
 {
-#ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(QString("Create cursor for query \"%1\": ").arg(query.name()) + query.debugString());
+#ifdef PREDICATE_DEBUG_GUI
+    Predicate::debugGUI(QString::fromLatin1("Create cursor for query \"%1\": ").arg(query->name())
+                        + Predicate::debugString(query));
 #endif
     init();
 }
@@ -103,11 +104,11 @@ void Cursor::init()
 
 Cursor::~Cursor()
 {
-#ifdef KEXI_DEBUG_GUI
+#ifdef PREDICATE_DEBUG_GUI
     if (m_query)
-        Utils::addKexiDBDebug(QString("~ Delete cursor for query"));
+        Predicate::debugGUI(QLatin1String("~ Delete cursor for query"));
     else
-        Utils::addKexiDBDebug(QString("~ Delete cursor: ") + m_rawStatement.toString());
+        Predicate::debugGUI(QLatin1String("~ Delete cursor: ") + m_rawStatement.toString());
 #endif
     /* if (!m_query)
         PreDbg << "Cursor::~Cursor() '" << m_rawStatement.toLatin1() << "'";

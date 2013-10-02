@@ -22,6 +22,9 @@ endif (WIN32)
 option(PREDICATE_EXPRESSION_DEBUG "Enable debugging of Expression classes" OFF)
 add_feature_info(PREDICATE_EXPRESSION_DEBUG PREDICATE_EXPRESSION_DEBUG "Enable debugging of Expression classes")
 
+option(PREDICATE_DEBUG_GUI "Enable GUI for debugging" OFF)
+add_feature_info(PREDICATE_DEBUG_GUI PREDICATE_DEBUG_GUI "Enable GUI for debugging")
+
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
 

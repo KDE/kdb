@@ -26,6 +26,7 @@
 #include <QByteArray>
 #include <QtDebug>
 
+#include <Predicate/Global>
 #include <Predicate/QuerySchema>
 
 class QDomNode;
@@ -494,6 +495,27 @@ QString debugString(const T& object)
     dbg << object;
     return result;
 }
+
+#ifdef PREDICATE_DEBUG_GUI
+//! A prototype of handler for GUI debugger
+typedef void(*DebugGUIHandler)(const QString&);
+
+//! Sets handler for GUI debugger
+PREDICATE_EXPORT void setDebugGUIHandler(DebugGUIHandler handler);
+
+//! Outputs string @a text to the GUI debugger
+PREDICATE_EXPORT void debugGUI(const QString& text);
+
+//! A prototype of handler for GUI debugger (specialized for the Alter Table feature)
+typedef void(*AlterTableActionDebugGUIHandler)(const QString&, int);
+
+//! Sets handler for GUI debugger (specialized for the Alter Table feature)
+PREDICATE_EXPORT void setAlterTableActionDebugHandler(AlterTableActionDebugGUIHandler handler);
+
+//! Outputs string @a text to the GUI debugger (specialized for the Alter Table feature);
+//! @a nestingLevel can be provided for nested outputs.
+PREDICATE_EXPORT void alterTableActionDebugGUI(const QString& text, int nestingLevel = 0);
+#endif
 
 /*! @return a list of paths that Predicate will search when dynamically loading libraries (plugins)
  This is basicaly list of directories returned QCoreApplication::libraryPaths() that have readable

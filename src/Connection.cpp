@@ -30,7 +30,7 @@
 #include "Relationship.h"
 #include "Transaction.h"
 #include "Cursor.h"
-#include <Predicate/Global.h>
+#include "Global.h"
 #include "RecordEditBuffer.h"
 #include "Utils.h"
 #include "DbProperties.h"
@@ -2786,14 +2786,15 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
 
     // Store extended schema information (see ExtendedTableSchemaInformation in Kexi Wiki)
     if (extendedTableSchemaStringIsEmpty) {
-#ifdef KEXI_DEBUG_GUI
-        Utils::addAlterTableActionDebug(QLatin1String("** Extended table schema REMOVED."));
+#ifdef PREDICATE_DEBUG_GUI
+        Predicate::alterTableActionDebugGUI(QLatin1String("** Extended table schema REMOVED."));
 #endif
         if (!removeDataBlock(tableSchema->id(), QLatin1String("extended_schema")))
             return false;
     } else {
-#ifdef KEXI_DEBUG_GUI
-        Utils::addAlterTableActionDebug(QLatin1String("** Extended table schema set to:\n") + doc->toString(4));
+#ifdef PREDICATE_DEBUG_GUI
+        Predicate::alterTableActionDebugGUI(
+                    QLatin1String("** Extended table schema set to:\n") + doc.toString(4));
 #endif
         if (!storeDataBlock(tableSchema->id(), doc.toString(1), QLatin1String("extended_schema")))
             return false;

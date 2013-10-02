@@ -371,8 +371,8 @@ Cursor* SQLiteConnection::prepareQuery(QuerySchema* query, uint cursor_options)
 
 bool SQLiteConnection::drv_executeSQL(const EscapedString& statement)
 {
-#ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(QString("ExecuteSQL (SQLite): ") + statement.toString());
+#ifdef PREDICATE_DEBUG_GUI
+    Predicate::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + statement.toString());
 #endif
 
     char *errmsg_p = 0;
@@ -391,8 +391,8 @@ bool SQLiteConnection::drv_executeSQL(const EscapedString& statement)
     }
 
     storeResult();
-#ifdef KEXI_DEBUG_GUI
-    Utils::addKexiDBDebug(m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure");
+#ifdef PREDICATE_DEBUG_GUI
+    Predicate::debugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
     return m_result.serverResultCode() == SQLITE_OK;
 }
