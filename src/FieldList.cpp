@@ -59,19 +59,21 @@ void FieldList::clear()
     m_sqlFields.clear();
 }
 
-FieldList& FieldList::insertField(uint index, Predicate::Field *field)
+FieldList& FieldList::insertField(uint index, Field *field)
 {
     Q_ASSERT(field);
     if (!field)
         return *this;
     if (index > (uint)m_fields.count()) {
-        PreFatal << "FieldList::insertField(): index (" << index << ") out of range";
+        PreFatal << "index (" << index << ") out of range";
         return *this;
     }
     m_fields.insert(index, field);
     if (!field->name().isEmpty())
         m_fields_by_name.insert(field->name().toLower(), field);
     m_sqlFields.clear();
+    delete m_autoinc_fields;
+    m_autoinc_fields = 0;
     return *this;
 }
 
@@ -79,24 +81,22 @@ void FieldList::renameField(const QString& oldName, const QString& newName)
 {
     Field *field = m_fields_by_name.value(oldName.toLower());
     if (!field) {
-        PreFatal << "FieldList::renameField() no field found "
-        << QString::fromLatin1("\"%1\"").arg(oldName);
+        PreFatal << "no field found" << QString::fromLatin1("\"%1\"").arg(oldName);
         return;
     }
     renameFieldInternal(field, newName.toLower());
 }
 
-void FieldList::renameField(Predicate::Field *field, const QString& newName)
+void FieldList::renameField(Field *field, const QString& newName)
 {
     if (!field || field != m_fields_by_name.value(field->name().toLower())) {
-        PreFatal << "FieldList::renameField() no field found "
-        << (field ? QString::fromLatin1("\"%1\"").arg(field->name()) : QString());
+        PreFatal << "no field found" << QString::fromLatin1("\"%1\"").arg(field->name());
         return;
     }
     renameFieldInternal(field, newName.toLower());
 }
 
-void FieldList::renameFieldInternal(Predicate::Field *field, const QString& newNameLower)
+void FieldList::renameFieldInternal(Field *field, const QString& newNameLower)
 {
     m_fields_by_name.remove(field->name().toLower());
     field->setName(newNameLower);
@@ -104,19 +104,39 @@ void FieldList::renameFieldInternal(Predicate::Field *field, const QString& newN
 }
 
 
-FieldList& FieldList::addField(Predicate::Field *field)
+FieldList& FieldList::addField(Field *field)
 {
     return insertField(m_fields.count(), field);
 }
 
-void FieldList::removeField(Predicate::Field *field)
+bool FieldList::removeField(Field *field)
 {
     Q_ASSERT(field);
     if (!field)
-        return;
-    m_fields_by_name.remove(field->name().toLower());
+        return false;
+    if (m_fields_by_name.remove(field->name().toLower()) < 1)
+        return false;
     m_fields.removeAt(m_fields.indexOf(field));
     m_sqlFields.clear();
+    delete m_autoinc_fields;
+    m_autoinc_fields = 0;
+    return true;
+}
+
+bool FieldList::moveField(Field *field, uint newIndex)
+{
+    Q_ASSERT(field);
+    if (!field || !m_fields.removeOne(field)) {
+        return false;
+    }
+    if (int(newIndex) > m_fields.count()) {
+        newIndex = m_fields.count();
+    }
+    m_fields.insert(newIndex, field);
+    m_sqlFields.clear();
+    delete m_autoinc_fields;
+    m_autoinc_fields = 0;
+    return true;
 }
 
 Field* FieldList::field(const QString& name) const
@@ -124,7 +144,7 @@ Field* FieldList::field(const QString& name) const
     return m_fields_by_name.value(name.toLower());
 }
 
-PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::FieldList& list)
+PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const FieldList& list)
 {
     if (list.fields()->isEmpty())
         dbg.nospace() << "<NO FIELDS>";
@@ -149,7 +169,7 @@ PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const Predicate::FieldList& list)
 
 static QString subListWarning1(const QString& fname)
 {
-    return QString::fromLatin1("FieldList::subList() could not find field \"%1\"").arg(fname);
+    return QString::fromLatin1("could not find field \"%1\"").arg(fname);
 }
 
 FieldList* FieldList::subList(const QString& n1, const QString& n2,
@@ -226,7 +246,7 @@ FieldList* FieldList::subList(const QList<uint>& list)
     foreach(uint index, list) {
         f = field(index);
         if (!f) {
-            PreWarn << QString::fromLatin1("FieldList::subList() could not find field at position %1").arg(index);
+            PreWarn << QString::fromLatin1("could not find field at position %1").arg(index);
             delete fl;
             return 0;
         }
