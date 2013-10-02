@@ -35,19 +35,7 @@ bool Predicate::Utils::isIdentifier(const QString& s)
     return i > 0 && i == sLength;
 }
 
-QString Predicate::Utils::string2FileName(const QString &s)
-{
-    QString fn = s.simplified();
-    fn.replace(QLatin1Char(' '), QLatin1String("_"));
-    fn.replace(QLatin1Char('$'), QLatin1String("_"));
-    fn.replace(QLatin1Char('\\'), QLatin1String("-"));
-    fn.replace(QLatin1Char('/'), QLatin1String("-"));
-    fn.replace(QLatin1Char(':'), QLatin1String("-"));
-    fn.replace(QLatin1Char('*'), QLatin1String("-"));
-    return fn;
-}
-
-inline QString char2Identifier(const QChar& c)
+inline QString charToIdentifier(const QChar& c)
 {
     if (c.unicode() >= TRANSLITERATION_TABLE_SIZE)
         return QLatin1String("_");
@@ -55,7 +43,7 @@ inline QString char2Identifier(const QChar& c)
     return s ? QString::fromLatin1(s) : QLatin1String("_");
 }
 
-QString Predicate::Utils::string2Identifier(const QString &s)
+QString Predicate::Utils::stringToIdentifier(const QString &s)
 {
     if (s.isEmpty())
         return QString();
@@ -73,14 +61,14 @@ QString Predicate::Utils::string2Identifier(const QString &s)
         r += QLatin1Char('_');
         r += c;
     } else {
-        add = char2Identifier(c);
+        add = charToIdentifier(c);
         r += add;
         wasUnderscore = add == QLatin1String("_");
     }
 
     const uint idLength = id.length();
     for (uint i = 1; i < idLength; i++) {
-        add = char2Identifier(id.at(i));
+        add = charToIdentifier(id.at(i));
         if (wasUnderscore && add == QLatin1String("_"))
             continue;
         wasUnderscore = add == QLatin1String("_");
@@ -118,7 +106,7 @@ QValidator::State IdentifierValidator::validate(QString& input, int& pos) const
     if ((int)i < input.length() && input.at(i) >= QLatin1Char('0') && input.at(i) <= QLatin1Char('9'))
         pos++; //_ will be added at the beginning
     bool addspace = (input.right(1) == QLatin1String(" "));
-    input = string2Identifier(input);
+    input = stringToIdentifier(input);
     if (addspace)
         input += QLatin1Char('_');
     if (pos > input.length())

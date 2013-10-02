@@ -36,15 +36,12 @@ PREDICATE_EXPORT bool isIdentifier(const QString& s);
  Non-alphanumeric characters (or spaces) are replaced with '_'.
  If a number is at the beginning, '_' is added at start.
  Empty strings are not changed. Case remains unchanged. */
-PREDICATE_EXPORT QString string2Identifier(const QString &s);
+PREDICATE_EXPORT QString stringToIdentifier(const QString &s);
 
 /*! @return useful message "Value of "valueName" column must be an identifier.
   "v" is not a valid identifier.". It is also used by IdentifierValidator.  */
 PREDICATE_EXPORT QString identifierExpectedMessage(const QString &valueName,
         const QVariant& v);
-
-//! @return Valid filename based on @a s
-PREDICATE_EXPORT QString string2FileName(const QString &s);
 
 //! Validates input for identifier name.
 class PREDICATE_EXPORT IdentifierValidator : public Validator
