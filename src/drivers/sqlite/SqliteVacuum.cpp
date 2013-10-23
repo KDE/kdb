@@ -186,10 +186,34 @@ void SQLiteVacuum::readFromStdErr()
 void SQLiteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     PreDrvDbg << exitCode << exitStatus;
+    if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
+        cancelClicked();
+        m_result = false;
+    }
+
     if (m_dlg) {
         m_dlg->close();
         delete m_dlg;
         m_dlg = 0;
+    }
+
+    if (true != m_result) {
+        return;
+    }
+    QFileInfo fi(m_filePath);
+    const uint origSize = fi.size();
+
+    if (!QFile::rename(m_tmpFilePath, fi.absoluteFilePath())) {
+        PreDrvWarn << "Rename" << m_tmpFilePath << "to" << fi.absoluteFilePath() << "failed.";
+        m_result = false;
+    }
+
+    if (m_result == true) {
+        const uint newSize = fi.size();
+        const uint decrease = 100 - 100 * newSize / origSize;
+        QMessageBox::information(0, QString(), // krazy:exclude=qclasses
+            QObject::tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
+                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
     }
 }
 
@@ -197,20 +221,9 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
 {
     PreDrvDbg << exitCode << exitStatus;
 
-    const uint origSize = QFileInfo(m_filePath).size();
-
-    if (!QFile::rename(m_tmpFilePath, m_filePath)) {
-        PreDrvWarn << "SQLiteVacuum::sqliteProcessFinished(): Rename"
-      << m_tmpFilePath << "to" << m_filePath << "failed.";
+    if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         m_result = false;
-    }
-
-    if (m_result == true) {
-        const uint newSize = QFileInfo(m_filePath).size();
-        const uint decrease = 100 - 100 * newSize / origSize;
-        QMessageBox::information(0, QString(), // krazy:exclude=qclasses
-            QObject::tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
-                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
+        return;
     }
 }
 
