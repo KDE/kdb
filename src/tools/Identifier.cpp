@@ -88,13 +88,21 @@ QString Predicate::Utils::identifierExpectedMessage(const QString &valueName, co
 
 //--------------------------------------------------------------------------------
 
+class IdentifierValidator::Private
+{
+public:
+    Private() : isLowerCaseForced(false) {}
+    bool isLowerCaseForced;
+};
+
 IdentifierValidator::IdentifierValidator(QObject * parent)
-        : Validator(parent)
+        : Validator(parent), d(new Private)
 {
 }
 
 IdentifierValidator::~IdentifierValidator()
 {
+    delete d;
 }
 
 QValidator::State IdentifierValidator::validate(QString& input, int& pos) const
@@ -106,7 +114,7 @@ QValidator::State IdentifierValidator::validate(QString& input, int& pos) const
     if ((int)i < input.length() && input.at(i) >= QLatin1Char('0') && input.at(i) <= QLatin1Char('9'))
         pos++; //_ will be added at the beginning
     bool addspace = (input.right(1) == QLatin1String(" "));
-    input = stringToIdentifier(input);
+    input = d->isLowerCaseForced ? stringToIdentifier(input).toLower() : stringToIdentifier(input);
     if (addspace)
         input += QLatin1Char('_');
     if (pos > input.length())
@@ -122,5 +130,15 @@ Validator::Result IdentifierValidator::internalCheck(
         return Validator::Ok;
     message = identifierExpectedMessage(valueName, v);
     return Validator::Error;
+}
+
+bool IdentifierValidator::isLowerCaseForced() const
+{
+    return d->isLowerCaseForced;
+}
+
+void IdentifierValidator::setLowerCaseForced(bool set)
+{
+    d->isLowerCaseForced = set;
 }
 
