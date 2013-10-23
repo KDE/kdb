@@ -3668,13 +3668,12 @@ tristate Connection::closeAllTableSchemaChangeListeners(TableSchema* schema)
     QSet<Connection::TableSchemaChangeListenerInterface*> *listeners = d->tableSchemaChangeListeners.value(schema);
     if (!listeners)
         return true;
-//Qt4??? QSet<Connection::TableSchemaChangeListenerInterface*>::ConstIterator tmpListeners(*listeners); //safer copy
-    tristate res = true;
+
     //try to close every window
-    for (QSet<Connection::TableSchemaChangeListenerInterface*>::ConstIterator it(listeners->constBegin());
-            it != listeners->constEnd() && res == true; ++it)
-    {
-        res = (*it)->closeListener();
+    tristate res = true;
+    QList<Connection::TableSchemaChangeListenerInterface*> list(listeners->toList());
+    foreach (Connection::TableSchemaChangeListenerInterface* listener, list) {
+        res = listener->closeListener();
     }
     return res;
 }
