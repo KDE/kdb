@@ -37,15 +37,20 @@ ObjectNameValidator::~ObjectNameValidator()
 }
 
 Validator::Result ObjectNameValidator::internalCheck(
-    const QString & /*valueName*/, const QVariant& v,
-    QString &message, QString &details)
+    const QString &valueName, const QVariant& value,
+    QString *message, QString *details)
 {
-    if (!m_drv ? !Driver::isPredicateSystemObjectName(v.toString())
-            : !m_drv->isSystemObjectName(v.toString()))
+    Q_UNUSED(valueName);
+    if (!m_drv ? !Driver::isPredicateSystemObjectName(value.toString())
+            : !m_drv->isSystemObjectName(value.toString()))
         return Validator::Ok;
-    message = QObject::tr("You cannot use name \"%1\" for your object. "
-                   "It is reserved for internal objects. Please choose another name.")
-                   .arg(v.toString());
-    details = QObject::tr("Names of internal database objects are starting with \"kexi__\".");
+    if (message) {
+        *message = QObject::tr("You cannot use name \"%1\" for your object. "
+                               "It is reserved for internal objects. Please choose another name.")
+                               .arg(value.toString());
+    }
+    if (details) {
+        *details = QObject::tr("Names of internal database objects are starting with \"kexi__\".");
+    }
     return Validator::Error;
 }

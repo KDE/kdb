@@ -67,11 +67,13 @@ Validator::~Validator()
 }
 
 Validator::Result Validator::check(const QString &valueName, const QVariant& v,
-                                   QString &message, QString &details)
+                                   QString *message, QString *details)
 {
     if (v.isNull() || (v.type() == QVariant::String && v.toString().isEmpty())) {
         if (!d->acceptsEmptyValue) {
-            message = Validator::msgColumnNotEmpty().arg(valueName);
+            if (message) {
+                *message = Validator::msgColumnNotEmpty().arg(valueName);
+            }
             return Error;
         }
         return Ok;
@@ -79,9 +81,13 @@ Validator::Result Validator::check(const QString &valueName, const QVariant& v,
     return internalCheck(valueName, v, message, details);
 }
 
-Validator::Result Validator::internalCheck(const QString & /*valueName*/,
-        const QVariant& /*v*/, QString & /*message*/, QString & /*details*/)
+Validator::Result Validator::internalCheck(const QString &valueName,
+        const QVariant& value, QString *message, QString *details)
 {
+    Q_UNUSED(valueName);
+    Q_UNUSED(value);
+    Q_UNUSED(message);
+    Q_UNUSED(details);
     return Error;
 }
 
@@ -153,14 +159,14 @@ void MultiValidator::fixup(QString & input) const
 }
 
 Validator::Result MultiValidator::internalCheck(
-    const QString &valueName, const QVariant& v,
-    QString &message, QString &details)
+    const QString &valueName, const QVariant& value,
+    QString *message, QString *details)
 {
     Result r;
     bool warning = false;
     foreach(QValidator* validator, d->subValidators) {
         if (dynamic_cast<Validator*>(validator))
-            r = dynamic_cast<Validator*>(validator)->internalCheck(valueName, v, message, details);
+            r = dynamic_cast<Validator*>(validator)->internalCheck(valueName, value, message, details);
         else
             r = Ok; //ignore
         if (r == Error)

@@ -123,12 +123,15 @@ QValidator::State IdentifierValidator::validate(QString& input, int& pos) const
 }
 
 Validator::Result IdentifierValidator::internalCheck(
-    const QString &valueName, const QVariant& v,
-    QString &message, QString & /*details*/)
+    const QString &valueName, const QVariant& value,
+    QString *message, QString *details)
 {
-    if (isIdentifier(v.toString()))
+    Q_UNUSED(details);
+    if (isIdentifier(value.toString()))
         return Validator::Ok;
-    message = identifierExpectedMessage(valueName, v);
+    if (message) {
+        *message = identifierExpectedMessage(valueName, value);
+    }
     return Validator::Error;
 }
 

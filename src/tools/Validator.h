@@ -60,7 +60,7 @@ public:
       @see setAcceptsEmptyValue() */
     bool acceptsEmptyValue() const;
 
-    /*! Checks if value @a v is ok and returns one of @a Result value:
+    /*! Checks if value @a value is ok and returns one of @a Result value:
      - @a Error is returned on error;
      - @a Ok on success;
      - @a Warning if there is something to warn about.
@@ -69,8 +69,8 @@ public:
      @a valueName can be used to contruct @a message as well, for example:
      "[valueName] is not a valid login name".
      Depending on acceptsEmptyValue(), immediately accepts empty values or not. */
-    Result check(const QString &valueName, const QVariant& v, QString &message,
-                 QString &details);
+    Result check(const QString &valueName, const QVariant& v, QString *message,
+                 QString *details);
 
     /*! This implementation always returns value QValidator::Acceptable. */
     virtual QValidator::State validate(QString & input, int & pos) const;
@@ -83,8 +83,8 @@ public:
 
 protected:
     /* Used by check(), for reimplementation, by default returns @a Error.*/
-    virtual Result internalCheck(const QString &valueName, const QVariant& v,
-                                 QString &message, QString &details);
+    virtual Result internalCheck(const QString &valueName, const QVariant& value,
+                                 QString *message, QString *details);
 
     friend class MultiValidator;
 
@@ -148,8 +148,8 @@ public:
 
 private:
     virtual Validator::Result internalCheck(
-        const QString &valueName, const QVariant& v,
-        QString &message, QString &details);
+        const QString &valueName, const QVariant& value,
+        QString *message, QString *details);
 
     class Private;
     Private* const d;

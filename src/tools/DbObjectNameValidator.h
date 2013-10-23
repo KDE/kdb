@@ -42,8 +42,8 @@ public:
     virtual ~ObjectNameValidator();
 
 protected:
-    virtual Utils::Validator::Result internalCheck(const QString &valueName, const QVariant& v,
-            QString &message, QString &details);
+    virtual Utils::Validator::Result internalCheck(const QString &valueName, const QVariant& value,
+            QString *message, QString *details);
     Driver* m_drv;
 };
 }

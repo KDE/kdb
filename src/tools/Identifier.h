@@ -59,8 +59,8 @@ public:
     void setLowerCaseForced(bool set);
 
 protected:
-    virtual Validator::Result internalCheck(const QString &valueName, const QVariant& v,
-                                            QString &message, QString &details);
+    virtual Validator::Result internalCheck(const QString &valueName, const QVariant& value,
+                                            QString *message, QString *details);
 
     class Private;
     Private* const d;
