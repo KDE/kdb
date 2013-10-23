@@ -378,107 +378,111 @@ LookupFieldSchema *LookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
 }
 
 /* static */
-void LookupFieldSchema::saveToDom(LookupFieldSchema& lookupSchema, QDomDocument& doc, QDomElement& parentEl)
+void LookupFieldSchema::saveToDom(const LookupFieldSchema &lookupSchema, QDomDocument *doc,
+                                  QDomElement *parentEl)
 {
+    Q_ASSERT(doc);
+    Q_ASSERT(parentEl);
     QDomElement lookupColumnEl, rowSourceEl, rowSourceTypeEl, nameEl;
     if (!lookupSchema.recordSource().name().isEmpty()) {
-        lookupColumnEl = doc.createElement(QLatin1String("lookup-column"));
-        parentEl.appendChild(lookupColumnEl);
+        lookupColumnEl = doc->createElement(QLatin1String("lookup-column"));
+        parentEl->appendChild(lookupColumnEl);
 
-        rowSourceEl = doc.createElement(QLatin1String("row-source"));
+        rowSourceEl = doc->createElement(QLatin1String("row-source"));
         lookupColumnEl.appendChild(rowSourceEl);
 
-        rowSourceTypeEl = doc.createElement(QLatin1String("type"));
+        rowSourceTypeEl = doc->createElement(QLatin1String("type"));
         rowSourceEl.appendChild(rowSourceTypeEl);
-        rowSourceTypeEl.appendChild(doc.createTextNode(lookupSchema.recordSource().typeName()));   //can be empty
+        rowSourceTypeEl.appendChild(doc->createTextNode(lookupSchema.recordSource().typeName()));   //can be empty
 
-        nameEl = doc.createElement(QLatin1String("name"));
+        nameEl = doc->createElement(QLatin1String("name"));
         rowSourceEl.appendChild(nameEl);
-        nameEl.appendChild(doc.createTextNode(lookupSchema.recordSource().name()));
+        nameEl.appendChild(doc->createTextNode(lookupSchema.recordSource().name()));
     }
 
     const QStringList& values(lookupSchema.recordSource().values());
     if (!values.isEmpty()) {
-        QDomElement valuesEl(doc.createElement(QLatin1String("values")));
+        QDomElement valuesEl(doc->createElement(QLatin1String("values")));
         rowSourceEl.appendChild(valuesEl);
         for (QStringList::ConstIterator it = values.constBegin(); it != values.constEnd(); ++it) {
-            QDomElement valueEl(doc.createElement(QLatin1String("value")));
+            QDomElement valueEl(doc->createElement(QLatin1String("value")));
             valuesEl.appendChild(valueEl);
-            valueEl.appendChild(doc.createTextNode(*it));
+            valueEl.appendChild(doc->createTextNode(*it));
         }
     }
 
     if (lookupSchema.boundColumn() >= 0)
-        Predicate::saveNumberElementToDom(doc, lookupColumnEl,
+        Predicate::saveNumberElementToDom(doc, &lookupColumnEl,
                                           QLatin1String("bound-column"),
                                           lookupSchema.boundColumn());
 
     QList<uint> visibleColumns(lookupSchema.visibleColumns());
     if (!visibleColumns.isEmpty()) {
-        QDomElement visibleColumnEl(doc.createElement(QLatin1String("visible-column")));
+        QDomElement visibleColumnEl(doc->createElement(QLatin1String("visible-column")));
         lookupColumnEl.appendChild(visibleColumnEl);
         foreach(uint visibleColumn, visibleColumns) {
-            QDomElement numberEl(doc.createElement(QLatin1String("number")));
+            QDomElement numberEl(doc->createElement(QLatin1String("number")));
             visibleColumnEl.appendChild(numberEl);
-            numberEl.appendChild(doc.createTextNode(QString::number(visibleColumn)));
+            numberEl.appendChild(doc->createTextNode(QString::number(visibleColumn)));
         }
     }
 
     const QList<int> columnWidths(lookupSchema.columnWidths());
     if (!columnWidths.isEmpty()) {
-        QDomElement columnWidthsEl(doc.createElement(QLatin1String("column-widths")));
+        QDomElement columnWidthsEl(doc->createElement(QLatin1String("column-widths")));
         lookupColumnEl.appendChild(columnWidthsEl);
         foreach(int columnWidth, columnWidths) {
-            QDomElement columnWidthEl(doc.createElement(QLatin1String("number")));
+            QDomElement columnWidthEl(doc->createElement(QLatin1String("number")));
             columnWidthsEl.appendChild(columnWidthEl);
-            columnWidthEl.appendChild(doc.createTextNode(QString::number(columnWidth)));
+            columnWidthEl.appendChild(doc->createTextNode(QString::number(columnWidth)));
         }
     }
 
     if (lookupSchema.columnHeadersVisible() != PREDICATE_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
-        Predicate::saveBooleanElementToDom(doc, lookupColumnEl,
+        Predicate::saveBooleanElementToDom(doc, &lookupColumnEl,
                                            QLatin1String("show-column-headers"),
                                            lookupSchema.columnHeadersVisible());
     if (lookupSchema.maximumListRows() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
-        Predicate::saveNumberElementToDom(doc, lookupColumnEl,
+        Predicate::saveNumberElementToDom(doc, &lookupColumnEl,
                                           QLatin1String("list-rows"),
                                           lookupSchema.maximumListRows());
     if (lookupSchema.limitToList() != PREDICATE_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST)
-        Predicate::saveBooleanElementToDom(doc, lookupColumnEl,
+        Predicate::saveBooleanElementToDom(doc, &lookupColumnEl,
                                            QLatin1String("limit-to-list"),
                                            lookupSchema.limitToList());
 
     if (lookupSchema.displayWidget() != PREDICATE_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET) {
-        QDomElement displayWidgetEl(doc.createElement(QLatin1String("display-widget")));
+        QDomElement displayWidgetEl(doc->createElement(QLatin1String("display-widget")));
         lookupColumnEl.appendChild(displayWidgetEl);
         displayWidgetEl.appendChild(
-            doc.createTextNode(
+            doc->createTextNode(
                 QLatin1String((lookupSchema.displayWidget() == ListBox) ? "listbox" : "combobox")));
     }
 }
 
 //static
 bool LookupFieldSchema::setProperty(
-    LookupFieldSchema& lookup, const QByteArray& propertyName, const QVariant& value)
+    LookupFieldSchema *lookup, const QByteArray& propertyName, const QVariant& value)
 {
+    Q_ASSERT(lookup);
     bool ok;
     if ("rowSource" == propertyName
             || "rowSourceType" == propertyName
             || "rowSourceValues" == propertyName) {
-        LookupFieldSchema::RecordSource recordSource(lookup.recordSource());
+        LookupFieldSchema::RecordSource recordSource(lookup->recordSource());
         if ("rowSource" == propertyName)
             recordSource.setName(value.toString());
         else if ("rowSourceType" == propertyName)
             recordSource.setTypeByName(value.toString());
         else if ("rowSourceValues" == propertyName)
             recordSource.setValues(value.toStringList());
-        lookup.setRecordSource(recordSource);
+        lookup->setRecordSource(recordSource);
     }
     else if ("boundColumn" == propertyName) {
         const int ival = value.toInt(&ok);
         if (!ok)
             return false;
-        lookup.setBoundColumn(ival);
+        lookup->setBoundColumn(ival);
     }
     else if ("visibleColumn" == propertyName) {
         QList<QVariant> variantList;
@@ -496,7 +500,7 @@ bool LookupFieldSchema::setProperty(
                 return false;
             visibleColumns.append(ival);
         }
-        lookup.setVisibleColumns(visibleColumns);
+        lookup->setVisibleColumns(visibleColumns);
     } else if ("columnWidths" == propertyName) {
         QList<QVariant> variantList(value.toList());
         QList<int> widths;
@@ -506,21 +510,21 @@ bool LookupFieldSchema::setProperty(
                 return false;
             widths.append(ival);
         }
-        lookup.setColumnWidths(widths);
+        lookup->setColumnWidths(widths);
     } else if ("showColumnHeaders" == propertyName) {
-        lookup.setColumnHeadersVisible(value.toBool());
+        lookup->setColumnHeadersVisible(value.toBool());
     } else if ("listRows" == propertyName) {
         const uint ival = value.toUInt(&ok);
         if (!ok)
             return false;
-        lookup.setMaximumListRows(ival);
+        lookup->setMaximumListRows(ival);
     } else if ("limitToList" == propertyName) {
-        lookup.setLimitToList(value.toBool());
+        lookup->setLimitToList(value.toBool());
     } else if ("displayWidget" == propertyName) {
         const uint ival = value.toUInt(&ok);
         if (!ok || ival > LookupFieldSchema::ListBox)
             return false;
-        lookup.setDisplayWidget((LookupFieldSchema::DisplayWidget)ival);
+        lookup->setDisplayWidget((LookupFieldSchema::DisplayWidget)ival);
     }
     return true;
 }

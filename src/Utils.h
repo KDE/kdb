@@ -261,7 +261,7 @@ enum SplitToTableAndFieldPartsOptions {
  If function fails, @a tableName and @a fieldName remain unchanged.
  @return true on success. */
 PREDICATE_EXPORT bool splitToTableAndFieldParts(const QString& string,
-        QString& tableName, QString& fieldName,
+        QString *tableName, QString *fieldName,
         SplitToTableAndFieldPartsOptions option = FailIfNoTableOrFieldName);
 
 /*! @return true if @a type supports "visibleDecimalPlaces" property. */
@@ -296,7 +296,7 @@ PREDICATE_EXPORT Field::Type intToFieldType(int type);
  Properties coming from extended schema are also supported.
  This function is used e.g. by AlterTableHandler when property information comes in form of text.
  */
-PREDICATE_EXPORT bool setFieldProperties(Field& field, const QHash<QByteArray, QVariant>& values);
+PREDICATE_EXPORT bool setFieldProperties(Field *field, const QHash<QByteArray, QVariant>& values);
 
 /*! Sets property value for @a field. @return true if the property has been found and
  the value is valid for this property. On failure contents of @a field is undefined.
@@ -305,8 +305,8 @@ PREDICATE_EXPORT bool setFieldProperties(Field& field, const QHash<QByteArray, Q
 
  This function is used e.g. by AlterTableHandler when property information comes in form of text.
  */
-PREDICATE_EXPORT bool setFieldProperty(Field& field, const QByteArray& propertyName,
-                                     const QVariant& value);
+PREDICATE_EXPORT bool setFieldProperty(Field *field, const QByteArray& propertyName,
+                                       const QVariant& value);
 
 /*! @return property value loaded from a DOM @a node, written in a QtDesigner-like
  notation: &lt;number&gt;int&lt;/number&gt; or &lt;bool&gt;bool&lt;/bool&gt;, etc. Supported types are
@@ -327,14 +327,14 @@ PREDICATE_EXPORT QString loadStringPropertyValueFromDom(const QDomNode& node, bo
   <height><number>15</number></height>
  @endcode
  @return the reference to element created with tag elementName. */
-PREDICATE_EXPORT QDomElement saveNumberElementToDom(QDomDocument& doc, QDomElement& parentEl,
+PREDICATE_EXPORT QDomElement saveNumberElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, int value);
 
 /*! Saves boolean element for value @a value to @a doc document within parent element
  @a parentEl. Like saveNumberElementToDom() but creates "bool" tags. True/false values will be
  saved as "true"/"false" strings.
  @return the reference to element created with tag elementName. */
-PREDICATE_EXPORT QDomElement saveBooleanElementToDom(QDomDocument& doc, QDomElement& parentEl,
+PREDICATE_EXPORT QDomElement saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value);
 
 /*! @return an empty value that can be set for a database field of type @a type having

@@ -1089,7 +1089,8 @@ Field* QuerySchema::findTableField(const QString &tableOrTableAndFieldName) cons
 {
     QString tableName, fieldName;
     if (!Predicate::splitToTableAndFieldParts(tableOrTableAndFieldName,
-                                           tableName, fieldName, Predicate::SetFieldNameIfNoTableName)) {
+                                              &tableName, &fieldName,
+                                              Predicate::SetFieldNameIfNoTableName)) {
         return 0;
     }
     if (tableName.isEmpty()) {

@@ -200,13 +200,13 @@ public:
     static LookupFieldSchema* loadFromDom(const QDomElement& lookupEl);
 
     /*! Saves data of lookup column schema to @a parentEl DOM element of @a doc document. */
-    static void saveToDom(LookupFieldSchema& lookupSchema, QDomDocument& doc, QDomElement& parentEl);
+    static void saveToDom(const LookupFieldSchema &lookupSchema, QDomDocument *doc,
+                          QDomElement *parentEl);
 
     /*! Sets property of name @a propertyName and value @a value for the lookup schema @a lookup
      @return true on successful set and false on failure because of invalid value or invalid property name. */
-    static bool setProperty(
-        LookupFieldSchema& lookup, const QByteArray& propertyName,
-        const QVariant& value);
+    static bool setProperty(LookupFieldSchema *lookup, const QByteArray& propertyName,
+                            const QVariant& value);
 
 private:
     Q_DISABLE_COPY(LookupFieldSchema)

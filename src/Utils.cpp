@@ -653,20 +653,22 @@ void Predicate::fromMap(const QMap<QString, QString>& map, ConnectionData& data)
 #endif
 
 bool Predicate::splitToTableAndFieldParts(const QString& string,
-                                          QString& tableName, QString& fieldName,
+                                          QString *tableName, QString *fieldName,
                                           SplitToTableAndFieldPartsOptions option)
 {
+    Q_ASSERT(tableName);
+    Q_ASSERT(fieldName);
     const int id = string.indexOf(QLatin1Char('.'));
     if (option & SetFieldNameIfNoTableName && id == -1) {
-        tableName.clear();
-        fieldName = string;
-        return !fieldName.isEmpty();
+        tableName->clear();
+        *fieldName = string;
+        return !fieldName->isEmpty();
     }
     if (id <= 0 || id == int(string.length() - 1))
         return false;
-    tableName = string.left(id);
-    fieldName = string.mid(id + 1);
-    return !tableName.isEmpty() && !fieldName.isEmpty();
+    *tableName = string.left(id);
+    *fieldName = string.mid(id + 1);
+    return !tableName->isEmpty() && !fieldName->isEmpty();
 }
 
 bool Predicate::supportsVisibleDecimalPlacesProperty(Field::Type type)
@@ -703,15 +705,16 @@ Field::Type Predicate::intToFieldType(int type)
     return (Field::Type)type;
 }
 
-static bool setIntToFieldType(Field& field, const QVariant& value)
+static bool setIntToFieldType(Field *field, const QVariant& value)
 {
+    Q_ASSERT(field);
     bool ok;
     const int intType = value.toInt(&ok);
     if (!ok || Field::InvalidType == intToFieldType(intType)) {//for sanity
         PreWarn << "invalid type";
         return false;
     }
-    field.setType((Field::Type)intType);
+    field->setType((Field::Type)intType);
     return true;
 }
 
@@ -750,8 +753,9 @@ bool Predicate::isBuiltinTableFieldProperty(const QByteArray& propertyName)
     return Predicate_builtinFieldProperties->set.contains(propertyName);
 }
 
-bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVariant>& values)
+bool Predicate::setFieldProperties(Field *field, const QHash<QByteArray, QVariant>& values)
 {
+    Q_ASSERT(field);
     QHash<QByteArray, QVariant>::ConstIterator it;
     if ((it = values.find("type")) != values.constEnd()) {
         if (!setIntToFieldType(field, *it))
@@ -764,14 +768,14 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
             constraints ^= Predicate::Field::flag; \
     }
 
-    Field::Constraints constraints = field.constraints();
+    Field::Constraints constraints = field->constraints();
     bool ok = true;
     if ((it = values.find("primaryKey")) != values.constEnd())
         SET_BOOLEAN_FLAG(PrimaryKey, (*it).toBool());
     if ((it = values.find("indexed")) != values.constEnd())
         SET_BOOLEAN_FLAG(Indexed, (*it).toBool());
     if ((it = values.find("autoIncrement")) != values.constEnd()
-            && Field::isAutoIncrementAllowed(field.type()))
+            && Field::isAutoIncrementAllowed(field->type()))
         SET_BOOLEAN_FLAG(AutoInc, (*it).toBool());
     if ((it = values.find("unique")) != values.constEnd())
         SET_BOOLEAN_FLAG(Unique, (*it).toBool());
@@ -779,7 +783,7 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
         SET_BOOLEAN_FLAG(NotNull, (*it).toBool());
     if ((it = values.find("allowEmpty")) != values.constEnd())
         SET_BOOLEAN_FLAG(NotEmpty, !(*it).toBool());
-    field.setConstraints(constraints);
+    field->setConstraints(constraints);
 
     Field::Options options;
     if ((it = values.find("unsigned")) != values.constEnd()) {
@@ -787,32 +791,32 @@ bool Predicate::setFieldProperties(Field& field, const QHash<QByteArray, QVarian
         if (!(*it).toBool())
             options ^= Field::Unsigned;
     }
-    field.setOptions(options);
+    field->setOptions(options);
 
     if ((it = values.find("name")) != values.constEnd())
-        field.setName((*it).toString());
+        field->setName((*it).toString());
     if ((it = values.find("caption")) != values.constEnd())
-        field.setCaption((*it).toString());
+        field->setCaption((*it).toString());
     if ((it = values.find("description")) != values.constEnd())
-        field.setDescription((*it).toString());
+        field->setDescription((*it).toString());
     if ((it = values.find("maxLength")) != values.constEnd())
-        field.setMaxLength((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+        field->setMaxLength((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
     if (!ok)
         return false;
     if ((it = values.find("maxLengthIsDefault")) != values.constEnd()
             && (*it).toBool())
     {
-        field.setMaxLengthStrategy(Field::DefaultMaxLength);
+        field->setMaxLengthStrategy(Field::DefaultMaxLength);
     }
     if ((it = values.find("precision")) != values.constEnd())
-        field.setPrecision((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+        field->setPrecision((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
     if (!ok)
         return false;
     if ((it = values.find("defaultValue")) != values.constEnd())
-        field.setDefaultValue(*it);
+        field->setDefaultValue(*it);
     if ((it = values.find("visibleDecimalPlaces")) != values.constEnd()
-            && Predicate::supportsVisibleDecimalPlacesProperty(field.type()))
-        field.setVisibleDecimalPlaces((*it).isNull() ? -1/*default*/ : (*it).toInt(&ok));
+            && Predicate::supportsVisibleDecimalPlacesProperty(field->type()))
+        field->setVisibleDecimalPlaces((*it).isNull() ? -1/*default*/ : (*it).toInt(&ok));
     if (!ok)
         return false;
 
@@ -848,20 +852,21 @@ bool Predicate::isExtendedTableFieldProperty(const QByteArray& propertyName)
     return Predicate_extendedProperties->set.contains(QByteArray(propertyName).toLower());
 }
 
-bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, const QVariant& value)
+bool Predicate::setFieldProperty(Field *field, const QByteArray& propertyName, const QVariant& value)
 {
+    Q_ASSERT(field);
 #define SET_BOOLEAN_FLAG(flag, value) { \
         constraints |= Field::flag; \
         if (!value) \
             constraints ^= Field::flag; \
-        field.setConstraints( constraints ); \
+        field->setConstraints( constraints ); \
         return true; \
     }
 #define GET_INT(method) { \
         const uint ival = value.toUInt(&ok); \
         if (!ok) \
             return false; \
-        field.method( ival ); \
+        field->method( ival ); \
         return true; \
     }
 
@@ -872,19 +877,19 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
     if (Predicate::isExtendedTableFieldProperty(propertyName)) {
         //a little speedup: identify extended property in O(1)
         if ("visibleDecimalPlaces" == propertyName
-                && Predicate::supportsVisibleDecimalPlacesProperty(field.type())) {
+                && Predicate::supportsVisibleDecimalPlacesProperty(field->type())) {
             GET_INT(setVisibleDecimalPlaces);
         } else {
-            if (!field.table()) {
+            if (!field->table()) {
                 PreWarn << "Cannot set" << propertyName << "property - no table assigned for field";
             } else {
-                LookupFieldSchema *lookup = field.table()->lookupFieldSchema(field);
+                LookupFieldSchema *lookup = field->table()->lookupFieldSchema(*field);
                 const bool hasLookup = lookup != 0;
                 if (!hasLookup)
                     lookup = new LookupFieldSchema();
-                if (LookupFieldSchema::setProperty(*lookup, propertyName, value)) {
+                if (LookupFieldSchema::setProperty(lookup, propertyName, value)) {
                     if (!hasLookup && lookup)
-                        field.table()->setLookupFieldSchema(field.name(), lookup);
+                        field->table()->setLookupFieldSchema(field->name(), lookup);
                     return true;
                 }
                 delete lookup;
@@ -894,13 +899,13 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
         if ("type" == propertyName)
             return setIntToFieldType(field, value);
 
-        Field::Constraints constraints = field.constraints();
+        Field::Constraints constraints = field->constraints();
         if ("primaryKey" == propertyName)
             SET_BOOLEAN_FLAG(PrimaryKey, value.toBool());
         if ("indexed" == propertyName)
             SET_BOOLEAN_FLAG(Indexed, value.toBool());
         if ("autoIncrement" == propertyName
-                && Field::isAutoIncrementAllowed(field.type()))
+                && Field::isAutoIncrementAllowed(field->type()))
             SET_BOOLEAN_FLAG(AutoInc, value.toBool());
         if ("unique" == propertyName)
             SET_BOOLEAN_FLAG(Unique, value.toBool());
@@ -914,38 +919,38 @@ bool Predicate::setFieldProperty(Field& field, const QByteArray& propertyName, c
             options |= Field::Unsigned;
             if (!value.toBool())
                 options ^= Field::Unsigned;
-            field.setOptions(options);
+            field->setOptions(options);
             return true;
         }
 
         if ("name" == propertyName) {
             if (value.toString().isEmpty())
                 return false;
-            field.setName(value.toString());
+            field->setName(value.toString());
             return true;
         }
         if ("caption" == propertyName) {
-            field.setCaption(value.toString());
+            field->setCaption(value.toString());
             return true;
         }
         if ("description" == propertyName) {
-            field.setDescription(value.toString());
+            field->setDescription(value.toString());
             return true;
         }
         if ("maxLength" == propertyName)
             GET_INT(setMaxLength);
         if ("maxLengthIsDefault" == propertyName) {
-            field.setMaxLengthStrategy(Field::DefaultMaxLength);
+            field->setMaxLengthStrategy(Field::DefaultMaxLength);
         }
         if ("precision" == propertyName)
             GET_INT(setPrecision);
         if ("defaultValue" == propertyName) {
-            field.setDefaultValue(value);
+            field->setDefaultValue(value);
             return true;
         }
 
         // last chance that never fails: custom field property
-        field.setCustomProperty(propertyName, value);
+        field->setCustomProperty(propertyName, value);
     }
 
     PreWarn << "property" << propertyName << "not found!";
@@ -1026,25 +1031,29 @@ QVariant Predicate::loadPropertyValueFromDom(const QDomNode& node, bool* ok)
     return QVariant();
 }
 
-QDomElement Predicate::saveNumberElementToDom(QDomDocument& doc, QDomElement& parentEl,
+QDomElement Predicate::saveNumberElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, int value)
 {
-    QDomElement el(doc.createElement(elementName));
-    parentEl.appendChild(el);
-    QDomElement numberEl(doc.createElement(QLatin1String("number")));
+    Q_ASSERT(doc);
+    Q_ASSERT(parentEl);
+    QDomElement el(doc->createElement(elementName));
+    parentEl->appendChild(el);
+    QDomElement numberEl(doc->createElement(QLatin1String("number")));
     el.appendChild(numberEl);
-    numberEl.appendChild(doc.createTextNode(QString::number(value)));
+    numberEl.appendChild(doc->createTextNode(QString::number(value)));
     return el;
 }
 
-QDomElement Predicate::saveBooleanElementToDom(QDomDocument& doc, QDomElement& parentEl,
+QDomElement Predicate::saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value)
 {
-    QDomElement el(doc.createElement(elementName));
-    parentEl.appendChild(el);
-    QDomElement numberEl(doc.createElement(QLatin1String("bool")));
+    Q_ASSERT(doc);
+    Q_ASSERT(parentEl);
+    QDomElement el(doc->createElement(elementName));
+    parentEl->appendChild(el);
+    QDomElement numberEl(doc->createElement(QLatin1String("bool")));
     el.appendChild(numberEl);
-    numberEl.appendChild(doc.createTextNode(
+    numberEl.appendChild(doc->createTextNode(
                              value ? QLatin1String("true") : QLatin1String("false")));
     return el;
 }

@@ -2773,7 +2773,7 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
         if (lookupFieldSchema) {
             createExtendedTableSchemaFieldElementIfNeeded(
                 &doc, &extendedTableSchemaMainEl, f->name(), &extendedTableSchemaFieldEl, false/* !append */);
-            LookupFieldSchema::saveToDom(*lookupFieldSchema, doc, extendedTableSchemaFieldEl);
+            LookupFieldSchema::saveToDom(*lookupFieldSchema, &doc, &extendedTableSchemaFieldEl);
 
             if (extendedTableSchemaFieldEl.hasChildNodes()) {
                 // this element provides the definition, so let's append it now
