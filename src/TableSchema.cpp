@@ -62,7 +62,7 @@ TableSchema::TableSchema(const QString& name)
         , d( new Private )
         , m_isPredicateSystem(false)
 {
-    setName(name.toLower());
+    setName(name);
     init(0);
 }
 

@@ -158,7 +158,6 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
     }
 
     //table.fieldname or tableAlias.fieldname
-    tableName = tableName.toLower();
     TableSchema *ts = parseInfo->querySchema()->table(tableName);
     if (ts) {//table.fieldname
         //check if "table" is covered by an alias

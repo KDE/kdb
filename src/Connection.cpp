@@ -143,7 +143,7 @@ public:
 
     inline void insertTable(TableSchema* tableSchema) {
         tables.insert(tableSchema->id(), tableSchema);
-        tables_byname.insert(tableSchema->name().toLower(), tableSchema);
+        tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
     /*! @internal. Inserts internal table to Connection's structures, so it can be found by name.
@@ -151,7 +151,7 @@ public:
     void insertInternalTable(TableSchema* tableSchema) {
         tableSchema->setPredicateSystem(true);
         _predicateSystemTables.insert(tableSchema);
-        tables_byname.insert(tableSchema->name().toLower(), tableSchema);
+        tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
     /*! @internal Removes table schema pointed by tableSchema.id() and tableSchema.name()
@@ -172,7 +172,7 @@ public:
 
     void renameTable(TableSchema* tableSchema, const QString& newName) {
         tables_byname.take(tableSchema->name());
-        tableSchema->setName(newName.toLower());
+        tableSchema->setName(newName);
         tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
@@ -1683,7 +1683,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
     }
     const bool internalTable = dynamic_cast<InternalTableSchema*>(tableSchema);
 
-    const QString tableName(tableSchema->name().toLower());
+    const QString tableName(tableSchema->name());
 
     if (!internalTable) {
         if (m_driver->isSystemObjectName(tableName)) {
@@ -1939,8 +1939,8 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
         return false;
     }
     const QString oldTableName = tableSchema->name();
-    const QString newTableName = newName.toLower().trimmed();
-    if (oldTableName.toLower().trimmed() == newTableName) {
+    const QString newTableName = newName.trimmed();
+    if (oldTableName.trimmed() == newTableName) {
         m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could not rename table \"%1\" using the same name.")
                                                .arg(newTableName));
         return false;
@@ -2380,6 +2380,10 @@ bool Connection::deleteCursor(Cursor *cursor)
 #warning fix Connection::setupObjectData() after refactoring
 bool Connection::setupObjectData(const RecordData &data, Object *object)
 {
+    if (data.count() < 5) {
+        PreWarn << "Aborting, schema data should have 5 elements, found" << data.count();
+        return false;
+    }
     bool ok;
     const int id = data[0].toInt(&ok);
     if (!ok)
@@ -2417,8 +2421,7 @@ tristate Connection::loadObjectData(int type, const QString& name, Object* objec
     if (true != querySingleRecord(
             EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
                           "FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
-                          .arg(EscapedString::number(type),
-                                       m_driver->valueToSQL(Field::Text, name.toLower())),
+                          .arg(EscapedString::number(type), m_driver->valueToSQL(Field::Text, name)),
             &data))
     {
         return cancelled;
@@ -2436,7 +2439,7 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
         if (true == querySingleNumber(
                 EscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
                               .arg(EscapedString::number(object->type()),
-                                   m_driver->valueToSQL(Field::Text, object->name().toLower())),
+                                   m_driver->valueToSQL(Field::Text, object->name())),
             &existingID))
         {
             //we already have stored a schema data with the same name and type:
@@ -2929,7 +2932,8 @@ Field* Connection::setupField(const RecordData &data)
     if (!ok)
         return 0;
 
-    if (!Utils::isIdentifier(data.at(2).toString())) {
+    QString name(data.at(2).toString().toLower());
+    if (!Utils::isIdentifier(name)) {
         m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\"")
                                                   .arg(data.at(2).toString()));
         ok = false;
