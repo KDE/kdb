@@ -40,7 +40,7 @@ namespace Utils
 
  It also offers error and warning messages for check() method.
  You may need to reimplement:
- -  QValidator::State IdentifierValidator::validate( QString& input, int& pos ) const;
+ -  QValidator::State validate( QString& input, int& pos ) const;
  -  Result check(const QString &valueName, QVariant v, QString &message, QString &details);
  */
 class PREDICATE_EXPORT Validator : public QValidator
