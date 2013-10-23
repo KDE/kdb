@@ -737,6 +737,7 @@ struct Predicate_BuiltinFieldProperties {
         ADD("maxLengthIsDefault");
         ADD("precision");
         ADD("defaultValue");
+        ADD("defaultWidth");
         ADD("visibleDecimalPlaces");
 //! @todo always update this when new builtins appear!
 #undef ADD
@@ -753,10 +754,94 @@ bool Predicate::isBuiltinTableFieldProperty(const QByteArray& propertyName)
     return Predicate_builtinFieldProperties->set.contains(propertyName);
 }
 
-bool Predicate::setFieldProperties(Field *field, const QHash<QByteArray, QVariant>& values)
+namespace Predicate {
+void getProperties(const LookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values)
+{
+    Q_ASSERT(values);
+    LookupFieldSchema::RecordSource recordSource;
+    if (lookup) {
+        recordSource = lookup->recordSource();
+    }
+    values->insert("rowSource", lookup ? recordSource.name() : QVariant());
+    values->insert("rowSourceType", lookup ? recordSource.typeName() : QVariant());
+    values->insert("rowSourceValues",
+        (lookup && !recordSource.values().isEmpty()) ? recordSource.values() : QVariant());
+    values->insert("boundColumn", lookup ? lookup->boundColumn() : QVariant());
+    QList<QVariant> variantList;
+    if (!lookup || lookup->visibleColumns().count() == 1) {
+        values->insert("visibleColumn", lookup ? lookup->visibleColumns().first() : QVariant());
+    }
+    else {
+        QList<uint> visibleColumns = lookup->visibleColumns();
+        foreach(const QVariant& variant, visibleColumns) {
+            variantList.append(variant);
+        }
+        values->insert("visibleColumn", variantList);
+    }
+    QList<int> columnWidths;
+    variantList.clear();
+    if (lookup) {
+        columnWidths = lookup->columnWidths();
+        foreach(const QVariant& variant, columnWidths) {
+            variantList.append(variant);
+        }
+    }
+    values->insert("columnWidths", lookup ? variantList : QVariant());
+    values->insert("showColumnHeaders", lookup ? lookup->columnHeadersVisible() : QVariant());
+    values->insert("listRows", lookup ? lookup->maximumListRows() : QVariant());
+    values->insert("limitToList", lookup ? lookup->limitToList() : QVariant());
+    values->insert("displayWidget", lookup ? uint(lookup->displayWidget()) : QVariant());
+}
+} // namespace Predicate
+
+void Predicate::getFieldProperties(const Field &field, QMap<QByteArray, QVariant> *values)
+{
+    Q_ASSERT(values);
+    values->clear();
+    // normal values
+    values->insert("type", field.type());
+    const uint constraints = field.constraints();
+    values->insert("primaryKey", constraints & Predicate::Field::PrimaryKey);
+    values->insert("indexed", constraints & Predicate::Field::Indexed);
+    values->insert("autoIncrement", Predicate::Field::isAutoIncrementAllowed(field.type())
+                                    && (constraints & Predicate::Field::AutoInc));
+    values->insert("unique", constraints & Predicate::Field::Unique);
+    values->insert("notNull", constraints & Predicate::Field::NotNull);
+    values->insert("allowEmpty", !(constraints & Predicate::Field::NotEmpty));
+    const uint options = field.options();
+    values->insert("unsigned", options & Predicate::Field::Unsigned);
+    values->insert("name", field.name());
+    values->insert("caption", field.caption());
+    values->insert("description", field.description());
+    values->insert("maxLength", field.maxLength());
+    values->insert("maxLengthIsDefault", field.maxLengthStrategy() & Field::DefaultMaxLength);
+    values->insert("precision", field.precision());
+    values->insert("defaultValue", field.defaultValue());
+#warning TODO    values->insert("defaultWidth", field.defaultWidth());
+    if (Predicate::supportsVisibleDecimalPlacesProperty(field.type())) {
+        values->insert("visibleDecimalPlaces", field.defaultValue());
+    }
+    // insert lookup-related values
+    LookupFieldSchema *lookup = field.table()->lookupFieldSchema(field);
+    Predicate::getProperties(lookup, values);
+}
+
+static bool containsLookupFieldSchemaProperties(const QMap<QByteArray, QVariant>& values)
+{
+    for (QMap<QByteArray, QVariant>::ConstIterator it(values.constBegin());
+         it != values.constEnd(); ++it)
+    {
+        if (Predicate::isLookupFieldSchemaProperty(it.key())) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Predicate::setFieldProperties(Field *field, const QMap<QByteArray, QVariant>& values)
 {
     Q_ASSERT(field);
-    QHash<QByteArray, QVariant>::ConstIterator it;
+    QMap<QByteArray, QVariant>::ConstIterator it;
     if ((it = values.find("type")) != values.constEnd()) {
         if (!setIntToFieldType(field, *it))
             return false;
@@ -814,11 +899,36 @@ bool Predicate::setFieldProperties(Field *field, const QHash<QByteArray, QVarian
         return false;
     if ((it = values.find("defaultValue")) != values.constEnd())
         field->setDefaultValue(*it);
+#warning TODO defaultWidth
+#if 0
+    if ((it = values.find("defaultWidth")) != values.constEnd())
+        field.setDefaultWidth((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+    if (!ok)
+        return false;
+#endif
+
+    // -- extended properties
     if ((it = values.find("visibleDecimalPlaces")) != values.constEnd()
             && Predicate::supportsVisibleDecimalPlacesProperty(field->type()))
         field->setVisibleDecimalPlaces((*it).isNull() ? -1/*default*/ : (*it).toInt(&ok));
     if (!ok)
         return false;
+
+    if (field->table() && containsLookupFieldSchemaProperties(values)) {
+        LookupFieldSchema *lookup = field->table()->lookupFieldSchema(*field);
+        QScopedPointer<LookupFieldSchema> createdLookup;
+        if (!lookup) { // create lookup if needed
+            createdLookup.reset(lookup = new LookupFieldSchema());
+        }
+        if (lookup->setProperties(values)) {
+            if (createdLookup) {
+                if (field->table()->setLookupFieldSchema(field->name(), lookup)) {
+                    createdLookup.take(); // ownership passed
+                    lookup = 0;
+                }
+            }
+        }
+    }
 
     return true;
 #undef SET_BOOLEAN_FLAG
@@ -852,6 +962,26 @@ bool Predicate::isExtendedTableFieldProperty(const QByteArray& propertyName)
     return Predicate_extendedProperties->set.contains(QByteArray(propertyName).toLower());
 }
 
+//! @internal for isLookupFieldSchemaProperty()
+struct Predicate_LookupFieldSchemaProperties {
+    Predicate_LookupFieldSchemaProperties() {
+        QMap<QByteArray, QVariant> tmp;
+        Predicate::getProperties(0, &tmp);
+        foreach (const QByteArray &p, tmp.keys()) {
+            set.insert(p.toLower());
+        }
+    }
+    QSet<QByteArray> set;
+};
+
+//! for isLookupFieldSchemaProperty()
+PREDICATE_GLOBAL_STATIC(Predicate_LookupFieldSchemaProperties, Predicate_lookupFieldSchemaProperties)
+
+bool Predicate::isLookupFieldSchemaProperty(const QByteArray& propertyName)
+{
+    return Predicate_lookupFieldSchemaProperties->set.contains(QByteArray(propertyName).toLower());
+}
+
 bool Predicate::setFieldProperty(Field *field, const QByteArray& propertyName, const QVariant& value)
 {
     Q_ASSERT(field);
@@ -879,20 +1009,22 @@ bool Predicate::setFieldProperty(Field *field, const QByteArray& propertyName, c
         if ("visibleDecimalPlaces" == propertyName
                 && Predicate::supportsVisibleDecimalPlacesProperty(field->type())) {
             GET_INT(setVisibleDecimalPlaces);
-        } else {
+        }
+        else if (Predicate::isLookupFieldSchemaProperty(propertyName)) {
             if (!field->table()) {
                 PreWarn << "Cannot set" << propertyName << "property - no table assigned for field";
             } else {
                 LookupFieldSchema *lookup = field->table()->lookupFieldSchema(*field);
-                const bool hasLookup = lookup != 0;
-                if (!hasLookup)
+                const bool createLookup = !lookup;
+                if (createLookup) // create lookup if needed
                     lookup = new LookupFieldSchema();
-                if (LookupFieldSchema::setProperty(lookup, propertyName, value)) {
-                    if (!hasLookup && lookup)
+                if (lookup->setProperty(propertyName, value)) {
+                    if (createLookup)
                         field->table()->setLookupFieldSchema(field->name(), lookup);
                     return true;
                 }
-                delete lookup;
+                if (createLookup)
+                    delete lookup; // not set, delete
             }
         }
     } else {//non-extended
@@ -949,6 +1081,11 @@ bool Predicate::setFieldProperty(Field *field, const QByteArray& propertyName, c
             return true;
         }
 
+#warning TODO defaultWidth
+#if 0
+        if ("defaultWidth" == propertyName)
+            GET_INT(setDefaultWidth);
+#endif
         // last chance that never fails: custom field property
         field->setCustomProperty(propertyName, value);
     }

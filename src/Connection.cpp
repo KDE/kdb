@@ -2776,7 +2776,7 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
         if (lookupFieldSchema) {
             createExtendedTableSchemaFieldElementIfNeeded(
                 &doc, &extendedTableSchemaMainEl, f->name(), &extendedTableSchemaFieldEl, false/* !append */);
-            LookupFieldSchema::saveToDom(*lookupFieldSchema, &doc, &extendedTableSchemaFieldEl);
+            lookupFieldSchema->saveToDom(&doc, &extendedTableSchemaFieldEl);
 
             if (extendedTableSchemaFieldEl.hasChildNodes()) {
                 // this element provides the definition, so let's append it now
@@ -2889,7 +2889,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                     } else if (propEl.tagName() == QLatin1String("lookup-column")) {
                         LookupFieldSchema *lookupFieldSchema = LookupFieldSchema::loadFromDom(propEl);
                         if (lookupFieldSchema) {
-                            qDebug() << *lookupFieldSchema;
+                            qDebug() << f->name() << *lookupFieldSchema;
                             tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
                         }
                     }

@@ -286,21 +286,31 @@ PREDICATE_EXPORT bool isBuiltinTableFieldProperty(const QByteArray& propertyName
 //! @return true if @a propertyName is an extended field property.
 PREDICATE_EXPORT bool isExtendedTableFieldProperty(const QByteArray& propertyName);
 
+//! @return true if @a propertyName is belongs to lookup field's schema.
+PREDICATE_EXPORT bool isLookupFieldSchemaProperty(const QByteArray& propertyName);
+
 /*! @return type of field for integer value @a type.
  If @a type cannot be casted to Predicate::Field::Type, Predicate::Field::InvalidType is returned.
  This can be used when type information is deserialized from a string or QVariant. */
 PREDICATE_EXPORT Field::Type intToFieldType(int type);
 
+/*! Gets property values for \a field.
+ Properties from extended schema are included. \a values is cleared before filling.
+ The same number of properties in the same order is returned.
+ This function is used e.g. for altering table design.
+ */
+PREDICATE_EXPORT void getFieldProperties(const Field &field, QMap<QByteArray, QVariant> *values);
+
 /*! Sets property values for @a field. @return true if all the values are valid and allowed.
  On failure contents of @a field is undefined.
- Properties coming from extended schema are also supported.
+ Properties from extended schema are also supported.
  This function is used e.g. by AlterTableHandler when property information comes in form of text.
  */
-PREDICATE_EXPORT bool setFieldProperties(Field *field, const QHash<QByteArray, QVariant>& values);
+PREDICATE_EXPORT bool setFieldProperties(Field *field, const QMap<QByteArray, QVariant>& values);
 
 /*! Sets property value for @a field. @return true if the property has been found and
  the value is valid for this property. On failure contents of @a field is undefined.
- Properties coming from extended schema are also supported as well as
+ Properties from extended schema are also supported as well as
    QVariant customProperty(const QString& propertyName) const;
 
  This function is used e.g. by AlterTableHandler when property information comes in form of text.
