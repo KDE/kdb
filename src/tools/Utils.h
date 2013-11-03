@@ -297,6 +297,16 @@ private:
     Private * const d;
 };
 
+/*! @return debugging string for object @a object of type @a T */
+template <typename T>
+QString debugString(const T& object)
+{
+    QString result;
+    QDebug dbg(&result);
+    dbg << object;
+    return result;
+}
+
 } // Utils
 } // Predicate
 

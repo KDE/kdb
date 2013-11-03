@@ -17,7 +17,6 @@
  * Boston, MA 02110-1301, USA.
 */
 
-
 #ifndef PREDICATE_UTILS_H
 #define PREDICATE_UTILS_H
 
@@ -425,8 +424,10 @@ PREDICATE_EXPORT QStringList deserializeList(const QString &data);
 PREDICATE_EXPORT QList<int> deserializeIntList(const QString &data, bool *ok);
 
 /*! @return string value serialized from a variant value @a v.
- This functions works like QVariant::toString() except the case when @a v is of type ByteArray.
- In this case Predicate::escapeBLOB(v.toByteArray(), Predicate::BLOBEscapeHex) is used.
+ This functions works like QVariant::toString() except the case when @a v is of type:
+ - QByteArray - in this case Predicate::escapeBLOB(v.toByteArray(), Predicate::BLOBEscapeHex) is used.
+ - QStringList - in this case Predicate::serializeList(v.toStringList()) is used.
+
  This function is needed for handling values of random type, for example "defaultValue"
  property of table fields can contain value of any type.
  Note: the returned string is an unescaped string. */
@@ -434,7 +435,8 @@ PREDICATE_EXPORT QString variantToString(const QVariant& v);
 
 /*! @return variant value of type @a type for a string @a s that was previously serialized using
  @ref variantToString( const QVariant& v ) function.
- @a ok is set to the result of the operation. */
+ @a ok is set to the result of the operation. With exception for types mentioned in documentation
+ of variantToString(), QVariant::convert() is used for conversion. */
 PREDICATE_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool* ok);
 
 /*! @return true if setting default value for @a field field is allowed. Fields with unique
@@ -495,16 +497,6 @@ PREDICATE_EXPORT QString defaultFileBasedDriverIcon();
 
 /*! @return default file-based driver name (currently, "sqlite"). */
 PREDICATE_EXPORT QString defaultFileBasedDriverName();
-
-/*! @return debugging string for object @a object of type @a T */
-template <typename T>
-QString debugString(const T& object)
-{
-    QString result;
-    QDebug dbg(&result);
-    dbg << object;
-    return result;
-}
 
 #ifdef PREDICATE_DEBUG_GUI
 //! A prototype of handler for GUI debugger

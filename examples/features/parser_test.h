@@ -36,7 +36,7 @@ int parserTest(const Predicate::EscapedString &st, const QStringList &params)
     foreach(const QString param, params)
     variantParams.append(param.toLocal8Bit());
     if (ok && q) {
-        cout << Predicate::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
+        cout << Predicate::Utils::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
         cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toByteArray().constData() << '\n';
     } else {
         qDebug() << parser.error();

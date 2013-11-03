@@ -245,7 +245,7 @@ void TestSqlParser::testParse()
         // failure, so error should be expected
         QVERIFY2(expectError, QString("Statement: \"%1\"; %2")
                  .arg(sql.toString())
-                 .arg(Predicate::debugString(parser->error())).toLatin1());
+                 .arg(Predicate::Utils::debugString(parser->error())).toLatin1());
         if (expectError) {
             qDebug() << parser->error();
         }
