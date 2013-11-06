@@ -1709,7 +1709,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
     TableSchema *existingTable = 0;
     if (replaceExisting) {
         //get previous table (do not retrieve, though)
-        existingTable = d->table(tableName);
+        existingTable = this->tableSchema(tableName);
         if (existingTable) {
             if (existingTable == tableSchema) {
                 clearResult();
@@ -1758,7 +1758,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
         if (!Predicate::deleteRecord(this, ts, QLatin1String("t_id"), tableSchema->id()))
             return false;
 
-        FieldList *fl = createFieldListForKexi__Fields(d->table(QLatin1String("kexi__fields")));
+        FieldList *fl = createFieldListForKexi__Fields(ts);
         if (!fl)
             return false;
 
@@ -1930,7 +1930,7 @@ tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableS
 bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName, bool replace)
 {
     clearResult();
-    if (tableSchema != d->table(tableSchema->id())) {
+    if (tableSchema != this->tableSchema(tableSchema->id())) {
         m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Unknown table \"%1\"").arg(tableSchema->name()));
         return false;
     }
@@ -2074,7 +2074,7 @@ bool Connection::drv_createTable(const TableSchema& tableSchema)
 
 bool Connection::drv_createTable(const QString& tableSchemaName)
 {
-    TableSchema *ts = d->table(tableSchemaName);
+    TableSchema *ts = tableSchema(tableSchemaName);
     if (!ts)
         return false;
     return drv_createTable(*ts);
@@ -2420,7 +2420,7 @@ tristate Connection::loadObjectData(int type, const QString& name, Object* objec
     RecordData data;
     if (true != querySingleRecord(
             EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
-                          "FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
+                          "FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
                           .arg(EscapedString::number(type), m_driver->valueToSQL(Field::Text, name)),
             &data))
     {
@@ -2437,10 +2437,9 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
     if (newObject) {
         int existingID;
         if (true == querySingleNumber(
-                EscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND lower(o_name)=%2")
+                EscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
                               .arg(EscapedString::number(object->type()),
-                                   m_driver->valueToSQL(Field::Text, object->name())),
-            &existingID))
+                                   m_driver->valueToSQL(Field::Text, object->name())), &existingID))
         {
             //we already have stored a schema data with the same name and type:
             //just update it's properties as it would be existing object
@@ -3027,7 +3026,7 @@ TableSchema* Connection::tableSchema(const QString& tableName)
     RecordData data;
     if (true != querySingleRecord(
             EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                          "WHERE lower(o_name)='%1' AND o_type=%2")
+                          "WHERE o_name='%1' AND o_type=%2")
                           .arg(EscapedString(tableName), EscapedString::number(TableObjectType)), &data))
     {
         return 0;
@@ -3143,7 +3142,7 @@ QuerySchema* Connection::querySchema(const QString& queryName)
     RecordData data;
     if (true != querySingleRecord(
             EscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                          "WHERE lower(o_name)='%1' AND o_type=%2")
+                          "WHERE o_name='%1' AND o_type=%2")
                           .arg(EscapedString(m_queryName), EscapedString::number(QueryObjectType)),
             &data))
     {
@@ -3193,7 +3192,7 @@ TableSchema* Connection::newPredicateSystemTableSchema(const QString& tableName)
 
 bool Connection::isInternalTableSchema(const QString& tableName)
 {
-    return (d->predicateSystemTables().contains(d->table(tableName)))
+    return (d->predicateSystemTables().contains(tableSchema(tableName)))
            // these are here for compatiblility because we're no longer instantiate
            // them but can exist in projects created with previous Kexi versions:
            || tableName == QLatin1String("kexi__final") || tableName == QLatin1String("kexi__useractions");

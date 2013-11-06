@@ -246,9 +246,11 @@ int Predicate::idForObjectName(Connection* conn, const QString& objName, int obj
 {
     RecordData data;
     if (true != conn->querySingleRecord(
-                EscapedString("SELECT o_id FROM kexi__objects WHERE lower(o_name)='%1' AND o_type=%2")
-                .arg(EscapedString(objName.toLower()), EscapedString::number(objType)), &data))
+                EscapedString("SELECT o_id FROM kexi__objects WHERE o_name='%1' AND o_type=%2")
+                .arg(EscapedString(objName), EscapedString::number(objType)), &data))
+    {
         return 0;
+    }
     bool ok;
     int id = data[0].toInt(&ok);
     return ok ? id : 0;

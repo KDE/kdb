@@ -179,7 +179,7 @@ bool SQLiteConnection::drv_containsTable(const QString &tableName)
 bool SQLiteConnection::drv_getTablesList(QStringList* list)
 {
     Predicate::Cursor *cursor;
-    if (!(cursor = executeQuery(EscapedString("SELECT lower(name) FROM sqlite_master WHERE type='table'")))) {
+    if (!(cursor = executeQuery(EscapedString("SELECT name FROM sqlite_master WHERE type='table'")))) {
         PreWarn << "!executeQuery()";
         return false;
     }
