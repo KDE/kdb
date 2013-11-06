@@ -756,7 +756,7 @@ public:
 
     /*! Added for convenience.
      @see setupObjectData(const RecordData*, Object*).
-     @return true on success, false on failure and cancelled when such object couldn't */
+     @return true on success, false on failure and cancelled when such object couldn't be found. */
     tristate loadObjectData(int id, Object* object);
 
     /*! Finds object schema data for object of type @a type and name @a name.
