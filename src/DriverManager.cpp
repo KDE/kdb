@@ -45,6 +45,7 @@ PREDICATE_GLOBAL_STATIC(DriverManagerInternal, s_self);
 DriverManagerInternal::DriverManagerInternal() /* protected */
  : lookupDriversNeeded(true)
 {
+    qsrand(QTime::currentTime().msec()); // needed e.g. to create random table names
 }
 
 DriverManagerInternal::~DriverManagerInternal()
