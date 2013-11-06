@@ -2518,7 +2518,7 @@ tristate Connection::querySingleRecordInternal(RecordData* data, const EscapedSt
             || cursor->eof()
             || !cursor->storeCurrentRecord(data))
     {
-        const tristate result = cursor->result().isError() ? false : cancelled;
+        const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
         PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
                    "m_result.sql()=" << m_result.sql();
         m_result = cursor->result();
@@ -2556,7 +2556,7 @@ tristate Connection::querySingleString(const EscapedString& sql, QString* value,
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
-        const tristate result = cursor->result().isError() ? false : cancelled;
+        const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
         PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         deleteCursor(cursor);
         return result;
