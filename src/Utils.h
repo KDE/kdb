@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2013 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -524,6 +524,24 @@ PREDICATE_EXPORT void alterTableActionDebugGUI(const QString& text, int nestingL
  subdirectory "predicate".
  @see QCoreApplication::libraryPaths() */
 PREDICATE_EXPORT QStringList libraryPaths();
+
+/*! @return new temporary name suitable for creating new table.
+ The name has mask tmp__{baseName}{rand} where baseName is passed as argument and {rand}
+ is a 10 digits long hexadecimal number. @a baseName can be empty. It is adviced to use
+ the returned name as quickly as possible for creating new physical table.
+ It is not 100% guaranteed that table with this name will not exist at an attempt of creation
+ but it is very unlikely. The function checks for existence of table in connection @a conn.*/
+PREDICATE_EXPORT QString temporaryTableName(Connection *conn, const QString &baseName);
+
+/*! @return absolute path to "sqlite3" program.
+ Empty string is returned if the program was not found. */
+PREDICATE_EXPORT QString sqlite3ProgramPath();
+
+/*! Imports file in SQL format from @a inputFileName into @a outputFileName.
+ Works for any SQLite 3 dump file. Requires access to executing the "sqlite3" command.
+ File named @a outputFileName will be silently overwritten with a new SQLite 3 database file.
+ @return true on success. */
+PREDICATE_EXPORT bool importSqliteFile(const QString &inputFileName, const QString &outputFileName);
 
 } // namespace Predicate
 

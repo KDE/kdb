@@ -1,5 +1,11 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+
+   Portions of kstandarddirs.cpp:
+   Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
+   Copyright (C) 1999,2007 Stephan Kulow <coolo@kde.org>
+   Copyright (C) 1999 Waldo Bastian <bastian@kde.org>
+   Copyright (C) 2009 David Faure <faure@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -306,6 +312,33 @@ QString debugString(const T& object)
     dbg << object;
     return result;
 }
+
+//! Used by findExe().
+enum FindExeOption { NoFindExeOptions = 0,
+                     IgnoreExecBit = 1 };
+Q_DECLARE_FLAGS(FindExeOptions, FindExeOption)
+
+/**
+ * Finds the executable in the system path.
+ *
+ * A valid executable must be a file and have its executable bit set.
+ *
+ * @param appname The name of the executable file for which to search.
+ *                if this contains a path separator, it will be resolved
+ *                according to the current working directory
+ *                (shell-like behaviour).
+ * @param path    The path which will be searched. If this is
+ *                null (default), the @c $PATH environment variable will
+ *                be searched.
+ * @param options if the flags passed include IgnoreExecBit the path returned
+ *                may not have the executable bit set.
+ *
+ * @return The path of the executable. If it was not found,
+ *         it will return QString().
+ */
+QString findExe(const QString& appname,
+                const QString& path = QString(),
+                FindExeOptions options = NoFindExeOptions);
 
 } // Utils
 } // Predicate

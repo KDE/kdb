@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2013 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,7 +19,7 @@
 
 #include "SqliteVacuum.h"
 
-#include <Predicate/Global>
+#include <Predicate/Utils>
 
 #include <QtDebug>
 #include <QMessageBox>
@@ -75,29 +75,28 @@ tristate SQLiteVacuum::run()
     const QString dump_app(QLatin1String(PREDICATE_SQLITE_DUMP_TOOL));
     PreDrvDbg << dump_app;
     if (dump_app.isEmpty()) {
-        PreDrvWarn << "SQLiteVacuum::run(): Could not find tool" << PREDICATE_SQLITE_DUMP_TOOL;
+        PreDrvWarn << "Could not find tool" << PREDICATE_SQLITE_DUMP_TOOL;
         m_result = false;
         return m_result;
     }
-    const QString sqlite_app(QLatin1String("sqlite3"));
+    const QString sqlite_app(Predicate::sqlite3ProgramPath());
     PreDrvDbg << sqlite_app;
     if (sqlite_app.isEmpty()) {
-        PreDrvWarn << "SQLiteVacuum::run(): Could not find tool" << sqlite_app;
         m_result = false;
         return m_result;
     }
     
     QFileInfo fi(m_filePath);
     if (!fi.isReadable()) {
-        PreDrvWarn << "SQLiteVacuum::run(): No such file" << m_filePath;
+        PreDrvWarn << "No readable file" << m_filePath;
         return false;
     }
 
-    PreDrvDbg << "SQLiteVacuum::run():" << m_filePath << QFileInfo(m_filePath).absoluteDir().path();
+    PreDrvDbg << fi.absoluteFilePath() << fi.absoluteDir().path();
 
     delete m_dumpProcess;
     m_dumpProcess = new QProcess(this);
-    m_dumpProcess->setWorkingDirectory(QFileInfo(m_filePath).absoluteDir().path());
+    m_dumpProcess->setWorkingDirectory(fi.absoluteDir().path());
     m_dumpProcess->setReadChannel(QProcess::StandardError);
     connect(m_dumpProcess, SIGNAL(readyReadStandardError()), this, SLOT(readFromStdErr()));
     connect(m_dumpProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
@@ -105,12 +104,12 @@ tristate SQLiteVacuum::run()
             
     delete m_sqliteProcess;
     m_sqliteProcess = new QProcess(this);
-    m_sqliteProcess->setWorkingDirectory(QFileInfo(m_filePath).absoluteDir().path());
+    m_sqliteProcess->setWorkingDirectory(fi.absoluteDir().path());
     connect(m_sqliteProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
             this, SLOT(sqliteProcessFinished(int,QProcess::ExitStatus)));
 
     m_dumpProcess->setStandardOutputProcess(m_sqliteProcess);
-    m_dumpProcess->start(dump_app, QStringList() << m_filePath);
+    m_dumpProcess->start(dump_app, QStringList() << fi.absoluteFilePath());
     if (!m_dumpProcess->waitForStarted()) {
         delete m_dumpProcess;
         m_dumpProcess = 0;
@@ -118,11 +117,11 @@ tristate SQLiteVacuum::run()
         return m_result;
     }
     
-    QTemporaryFile *tempFile = new QTemporaryFile(m_filePath);
+    QTemporaryFile *tempFile = new QTemporaryFile(fi.absoluteFilePath());
     tempFile->open();
     m_tmpFilePath = tempFile->fileName();
     delete tempFile;
-    PreDrvDbg << "SQLiteVacuum::run():" << m_tmpFilePath;
+    PreDrvDbg << m_tmpFilePath;
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
     if (!m_sqliteProcess->waitForStarted()) {
         delete m_dumpProcess;
@@ -137,7 +136,9 @@ tristate SQLiteVacuum::run()
     m_dlg->setWindowTitle(tr("Compacting database"));
     m_dlg->setLabelText(
         QLatin1String("<qt>") + tr("Compacting database \"%1\"...")
-            .arg(QLatin1String("<nobr>") + QDir::convertSeparators(QFileInfo(m_filePath).fileName()) + QLatin1String("</nobr>"))
+            .arg(QLatin1String("<nobr>")
+                 + QDir::convertSeparators(fi.fileName())
+                 + QLatin1String("</nobr>"))
     );
     m_dlg->adjustSize();
     m_dlg->resize(300, m_dlg->height());

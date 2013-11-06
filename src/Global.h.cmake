@@ -41,6 +41,9 @@
 #define PREDICATE_VERSION_RELEASE_STRING "@PREDICATE_VERSION_MINOR@"
 #define PREDICATE_VERSION_STRING "@PREDICATE_VERSION_STRING@"
 
+//! The subdirectory relative to the install prefix for executables.
+#define BIN_INSTALL_DIR "${BIN_INSTALL_DIR}"
+
 /**
  * @brief Make a number from the major, minor and release number of a Predicate version
  *
