@@ -216,6 +216,8 @@ install( FILES
 )
 
 enable_testing()
-add_subdirectory( tests )
+add_subdirectory( expression )
+add_subdirectory( parser )
+add_subdirectory( Tools )
 
 #TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})

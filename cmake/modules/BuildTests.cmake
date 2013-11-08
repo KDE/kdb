@@ -14,7 +14,3 @@ if (BUILD_TEST_COVERAGE)
 endif (BUILD_TEST_COVERAGE)
     add_test(${_test_name} ${CMAKE_CURRENT_BINARY_DIR}/${_test_name})
 endmacro()
-
-build_test(StaticSetOfStrings)
-build_test(Expressions)
-build_test(SqlParser)
