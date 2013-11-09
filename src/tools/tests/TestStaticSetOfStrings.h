@@ -20,7 +20,7 @@
 #ifndef TESTSTATICSETOFSTRINGS_H
 #define TESTSTATICSETOFSTRINGS_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include <Predicate/Tools/Utils>
 
 #undef QT_USE_QSTRINGBUILDER

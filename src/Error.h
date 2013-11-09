@@ -21,8 +21,8 @@
 #ifndef _KEXI_ERROR_H_
 #define _KEXI_ERROR_H_
 
-#include <QtCore/QString>
-#include <QtCore/QSharedData>
+#include <QString>
+#include <QSharedData>
 
 #include <Predicate/Global.h>
 #include <Predicate/predicate_export.h>

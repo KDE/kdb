@@ -20,7 +20,7 @@
 #ifndef PREDICATE_VERSIONINFO_H
 #define PREDICATE_VERSIONINFO_H
 
-#include <QtCore/QString>
+#include <QString>
 #include <Predicate/predicate_export.h>
 #ifdef __GNUC__
 # include <sys/types.h> // We use minor/major identifiers, force this include

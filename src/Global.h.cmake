@@ -21,7 +21,7 @@
 #define PREDICATE_GLOBAL_H
 
 #include <Predicate/predicate_export.h>
-#include <QtCore/QString>
+#include <QString>
 
 //global public definitions
 

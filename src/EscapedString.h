@@ -20,9 +20,9 @@
 #ifndef PREDICATE_ESCAPEDSTRING_H
 #define PREDICATE_ESCAPEDSTRING_H
 
-#include <QtCore/QByteArray>
-#include <QtCore/QString>
-#include <QtCore/QList>
+#include <QByteArray>
+#include <QString>
+#include <QList>
 
 #include <Predicate/predicate_export.h>
 

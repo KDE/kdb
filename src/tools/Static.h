@@ -24,8 +24,9 @@
 #ifndef PREDICATE_TOOLS_STATIC_H
 #define PREDICATE_TOOLS_STATIC_H
 
-#include <QtCore/QAtomicPointer>
-#include <QtCore/QString>
+#include <QAtomicPointer>
+#include <QString>
+
 #include <sys/types.h>
 
 #include <Predicate/predicate_export.h>

@@ -23,10 +23,10 @@
 #ifndef PREDICATE_MSGHANDLER_H
 #define PREDICATE_MSGHANDLER_H
 
-#include <QtCore/QPointer>
-#include <QtCore/QHash>
-#include <QtCore/QVariant>
-#include <QtGui/QWidget>
+#include <QPointer>
+#include <QHash>
+#include <QVariant>
+#include <QWidget>
 
 #include <Predicate/predicate_export.h>
 

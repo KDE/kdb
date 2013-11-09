@@ -20,8 +20,8 @@
 #ifndef KEXIDBOBJECTNAMEVALIDATOR_H
 #define KEXIDBOBJECTNAMEVALIDATOR_H
 
-#include <QtCore/QString>
-#include <QtCore/QPointer>
+#include <QString>
+#include <QPointer>
 #include <Predicate/Global>
 #include <Predicate/Tools/Validator>
 

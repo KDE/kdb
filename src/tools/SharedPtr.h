@@ -29,8 +29,8 @@
 #ifndef PREDICATE_TOOLS_SHAREDPTR_H
 #define PREDICATE_TOOLS_SHAREDPTR_H
 
-#include <QtCore/QExplicitlySharedDataPointer>
-#include <QtCore/QAtomicPointer>
+#include <QExplicitlySharedDataPointer>
+#include <QAtomicPointer>
 
 namespace Predicate
 {

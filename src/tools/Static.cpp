@@ -29,11 +29,10 @@
 
 #include "Static.h"
 
-#include <QtCore/QList>
-#include <QtCore/QSet>
-
-#include <QtCore/QCoreApplication>
-#include <QtCore/QTextCodec>
+#include <QList>
+#include <QSet>
+#include <QCoreApplication>
+#include <QTextCodec>
 
 #ifndef NDEBUG
 #define MYASSERT(x) if (!x) \

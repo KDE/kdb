@@ -24,7 +24,7 @@
 #undef QT_NO_CAST_TO_ASCII
 #undef QT_NO_CAST_FROM_ASCII
 
-#include <QtCore/QObject>
+#include <QObject>
 #include <Predicate/Tools/Utils>
 
 class TestExpressions : public QObject
