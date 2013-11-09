@@ -1450,7 +1450,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
         } else
             s_where += " AND ";
         EscapedString s_where_sub;
-        foreach(Field::Pair pair, *rel->fieldPairs()) {
+        foreach(const Field::Pair &pair, *rel->fieldPairs()) {
             if (!s_where_sub.isEmpty())
                 s_where_sub += " AND ";
             s_where_sub +=
