@@ -22,8 +22,10 @@
 
 int tablesTest()
 {
+#ifndef TABLETEST_DO_NOT_CREATE_DB
     if (dbCreationTest() != 0)
         return 1;
+#endif
 
     if (!conn->useDatabase()) {
         qDebug() << conn->result();
