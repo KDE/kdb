@@ -136,10 +136,11 @@ bool Transaction::isNull() const
 
 //---------------------------------------------------
 
-TransactionGuard::TransactionGuard(Connection& conn)
-        : m_trans(conn.beginTransaction())
-        , m_doNothing(false)
+TransactionGuard::TransactionGuard(Connection *conn)
+        : m_doNothing(false)
 {
+    Q_ASSERT(conn);
+    m_trans = conn->beginTransaction();
 }
 
 TransactionGuard::TransactionGuard(const Transaction& trans)

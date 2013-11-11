@@ -121,7 +121,7 @@ class PREDICATE_EXPORT TransactionGuard
 public:
     /*! Constructor #1: Starts new transaction constructor for @a connection.
      Started Transaction handle is available via transaction().*/
-    explicit TransactionGuard(Connection& conn);
+    explicit TransactionGuard(Connection *conn);
 
     /*! Constructor #2: Uses already started transaction. */
     explicit TransactionGuard(const Transaction& trans);

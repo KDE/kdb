@@ -31,7 +31,7 @@ namespace Predicate
 class SQLiteConnectionInternal : public ConnectionInternal
 {
 public:
-    SQLiteConnectionInternal(Connection* connection);
+    explicit SQLiteConnectionInternal(Connection* connection);
     virtual ~SQLiteConnectionInternal();
 
     virtual void storeResult();

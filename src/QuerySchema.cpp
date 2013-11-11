@@ -650,12 +650,13 @@ QuerySchema::QuerySchema()
     init();
 }
 
-QuerySchema::QuerySchema(TableSchema& tableSchema)
+QuerySchema::QuerySchema(TableSchema *tableSchema)
         : FieldList(false)
         , Object(Predicate::QueryObjectType)
         , d(new QuerySchemaPrivate(this))
 {
-    d->masterTable = &tableSchema;
+    Q_ASSERT(tableSchema);
+    d->masterTable = tableSchema;
     init();
     /*if (!d->masterTable) {
       PreWarn << "!d->masterTable";

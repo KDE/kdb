@@ -293,7 +293,7 @@ class PREDICATE_EXPORT StaticSetOfStrings
 {
 public:
     StaticSetOfStrings();
-    StaticSetOfStrings(const char* array[]);
+    explicit StaticSetOfStrings(const char* array[]);
     ~StaticSetOfStrings();
     void setStrings(const char* array[]);
     bool isEmpty() const;

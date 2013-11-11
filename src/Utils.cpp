@@ -282,10 +282,11 @@ TableOrQuerySchema::TableOrQuerySchema(Connection *conn, const QByteArray& name,
     }
 }
 
-TableOrQuerySchema::TableOrQuerySchema(FieldList &tableOrQuery)
-        : m_table(dynamic_cast<TableSchema*>(&tableOrQuery))
-        , m_query(dynamic_cast<QuerySchema*>(&tableOrQuery))
+TableOrQuerySchema::TableOrQuerySchema(FieldList *tableOrQuery)
+        : m_table(dynamic_cast<TableSchema*>(tableOrQuery))
+        , m_query(dynamic_cast<QuerySchema*>(tableOrQuery))
 {
+    Q_ASSERT(tableOrQuery);
     if (!m_table && !m_query) {
         PreWarn << "tableOrQuery is nether table nor query!";
     }

@@ -210,7 +210,7 @@ public:
      not greater than Field::LastType) */
     static QString typeGroupString(TypeGroup typeGroup);
 
-    /* ! @return the name of this field */
+    /*! @return the name of this field */
     inline QString name() const {
         return m_name;
     }

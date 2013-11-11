@@ -199,7 +199,7 @@ protected:
 class ConstExpressionData : public ExpressionData
 {
 public:
-    ConstExpressionData(const QVariant& aValue = QVariant());
+    explicit ConstExpressionData(const QVariant& aValue = QVariant());
     virtual ~ConstExpressionData();
 
     QVariant value;
@@ -249,7 +249,7 @@ class VariableExpressionData : public ExpressionData
 {
 public:
     VariableExpressionData();
-    VariableExpressionData(const QString& aName);
+    explicit VariableExpressionData(const QString& aName);
     virtual ~VariableExpressionData();
 
     /*! Verbatim name as returned by scanner. */
@@ -298,7 +298,7 @@ class FunctionExpressionData : public ExpressionData
 {
 public:
     FunctionExpressionData();
-    FunctionExpressionData(const QString& aName);
+    explicit FunctionExpressionData(const QString& aName);
     virtual ~FunctionExpressionData();
 
     QString name;
