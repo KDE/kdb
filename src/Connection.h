@@ -599,7 +599,7 @@ public:
 
     /*! It is a convenience function, does exactly the same as
      bool dropTable( TableSchema* tableSchema ) */
-    tristate dropTable(const QString& table);
+    tristate dropTable(const QString& tableName);
 
     /*! Alters @a tableSchema using @a newTableSchema in memory and on the db backend.
      @return true on success, cancelled if altering was cancelled. */
@@ -627,7 +627,7 @@ public:
 
     /*! It is a convenience function, does exactly the same as
      bool dropQuery( QuerySchema* querySchema ) */
-    bool dropQuery(const QString& query);
+    bool dropQuery(const QString& queryName);
 
     /*! Removes information about object with @a objId
      from internal "kexi__object" and "kexi__objectdata" tables.
@@ -883,7 +883,7 @@ public:
       Moved to public for KexiMigrate
       @todo fix this after refactoring
     */
-    virtual bool drv_dropTable(const QString& name);
+    virtual bool drv_dropTable(const QString& tableName);
 
     /*! Prepare a SQL statement and return a @a PreparedStatement instance. */
     PreparedStatement prepareStatement(PreparedStatement::Type type,
@@ -1055,13 +1055,13 @@ protected:
                                   const SelectStatementOptions& options = SelectStatementOptions());
 
     /*!
-     Creates table named by @a tableSchemaName. Schema object must be on
+     Creates table named by @a tableName. Schema object must be on
      schema tables' list before calling this method (otherwise false if returned).
      Just uses drv_createTable( const TableSchema& tableSchema ).
      Used internally, e.g. in createDatabase().
      @return true on success
     */
-    virtual bool drv_createTable(const QString& tableSchemaName);
+    virtual bool drv_createTable(const QString& tableName);
 
     /*! @return unique identifier of the most recently inserted record.
      Typically this is just primary key value.
@@ -1110,8 +1110,8 @@ protected:
         executed before an Insert statement.
       @see drv_afterInsert()
     */
-    virtual bool drv_beforeInsert(const QString& table, FieldList* fields) {
-        Q_UNUSED(table);
+    virtual bool drv_beforeInsert(const QString& tableName, FieldList* fields) {
+        Q_UNUSED(tableName);
         Q_UNUSED(fields);
         return true;
     }
@@ -1122,8 +1122,8 @@ protected:
         executed after an Insert statement.
       @see drv_beforeInsert()
     */
-    virtual bool drv_afterInsert(const QString& table, FieldList* fields) {
-        Q_UNUSED(table);
+    virtual bool drv_afterInsert(const QString& tableName, FieldList* fields) {
+        Q_UNUSED(tableName);
         Q_UNUSED(fields);
         return true;
     }
@@ -1134,8 +1134,8 @@ protected:
         executed before an Update statement.
     @see drv_afterUpdate()
     */
-    virtual bool drv_beforeUpdate(const QString& table, FieldList* fields) {
-        Q_UNUSED(table);
+    virtual bool drv_beforeUpdate(const QString& tableName, FieldList* fields) {
+        Q_UNUSED(tableName);
         Q_UNUSED(fields);
         return true;
     }
@@ -1146,8 +1146,8 @@ protected:
         executed after an Update statement.
       @see drv_beforeUpdate()
     */
-    virtual bool drv_afterUpdate(const QString& table, FieldList* fields) {
-        Q_UNUSED(table);
+    virtual bool drv_afterUpdate(const QString& tableName, FieldList* fields) {
+        Q_UNUSED(tableName);
         Q_UNUSED(fields);
         return true;
     }
@@ -1250,10 +1250,10 @@ protected:
     bool setupPredicateSystemSchema();
 
     /*! used internally by setupPredicateSystemSchema():
-     Allocates single table Predicate system object named @a tsname
+     Allocates single table Predicate system object named @a tableName
      and adds this to list of such objects (for later removal on closeDatabase()).
     */
-    TableSchema* newPredicateSystemTableSchema(const QString& tsname);
+    TableSchema* newPredicateSystemTableSchema(const QString& tableName);
 
     /*! Called by TableSchema -- signals destruction to Connection object
      To avoid having deleted table object on its list. */

@@ -1862,9 +1862,9 @@ bool Connection::removeObject(uint objId)
     return true;
 }
 
-bool Connection::drv_dropTable(const QString& name)
+bool Connection::drv_dropTable(const QString& tableName)
 {
-    return executeSQL(EscapedString("DROP TABLE ") + escapeIdentifier(name));
+    return executeSQL(EscapedString("DROP TABLE ") + escapeIdentifier(tableName));
 }
 
 //! Drops a table corresponding to the name in the given schema
@@ -1936,13 +1936,13 @@ tristate Connection::dropTable(TableSchema* tableSchema, bool alsoRemoveSchema)
     return commitAutoCommitTransaction(tg.transaction());
 }
 
-tristate Connection::dropTable(const QString& table)
+tristate Connection::dropTable(const QString& tableName)
 {
     clearResult();
-    TableSchema* ts = tableSchema(table);
+    TableSchema* ts = tableSchema(tableName);
     if (!ts) {
         m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Table \"%1\" does not exist.")
-                                                .arg(table));
+                                                .arg(tableName));
         return false;
     }
     return dropTable(ts);
@@ -2100,13 +2100,13 @@ bool Connection::dropQuery(QuerySchema* querySchema)
     return commitAutoCommitTransaction(tg.transaction());
 }
 
-bool Connection::dropQuery(const QString& query)
+bool Connection::dropQuery(const QString& queryName)
 {
     clearResult();
-    QuerySchema* qs = querySchema(query);
+    QuerySchema* qs = querySchema(queryName);
     if (!qs) {
         m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Query \"%1\" does not exist.")
-                                                .arg(query));
+                                                .arg(queryName));
         return false;
     }
     return dropQuery(qs);
@@ -2119,9 +2119,9 @@ bool Connection::drv_createTable(const TableSchema& tableSchema)
     return executeSQL(sql);
 }
 
-bool Connection::drv_createTable(const QString& tableSchemaName)
+bool Connection::drv_createTable(const QString& tableName)
 {
-    TableSchema *ts = tableSchema(tableSchemaName);
+    TableSchema *ts = tableSchema(tableName);
     if (!ts)
         return false;
     return drv_createTable(*ts);
