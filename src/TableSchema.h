@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_TABLE_H
-#define PREDICATE_TABLE_H
+#ifndef PREDICATE_TABLESCHEMA_H
+#define PREDICATE_TABLESCHEMA_H
 
 #include <QList>
 #include <QString>

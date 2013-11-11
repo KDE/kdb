@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_MNGR_H
-#define PREDICATE_DRIVER_MNGR_H
+#ifndef PREDICATE_DRIVER_MANAGER_H
+#define PREDICATE_DRIVER_MANAGER_H
 
 #include <Predicate/Driver>
 

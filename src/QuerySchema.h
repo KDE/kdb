@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_QUERY_H
-#define PREDICATE_QUERY_H
+#ifndef PREDICATE_QUERYSCHEMA_H
+#define PREDICATE_QUERYSCHEMA_H
 
 #include <QVector>
 #include <QHash>

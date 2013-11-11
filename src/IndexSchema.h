@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_INDEX_H
-#define PREDICATE_INDEX_H
+#ifndef PREDICATE_INDEXSCHEMA_H
+#define PREDICATE_INDEXSCHEMA_H
 
 #include <QList>
 #include <QString>
