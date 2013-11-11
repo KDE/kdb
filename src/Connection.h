@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -575,6 +575,19 @@ public:
     */
     bool createTable(TableSchema* tableSchema, bool replaceExisting = false);
 
+    /*! Creates a copy of table schema defined by @a tableSchema with data.
+     Name, caption and description will be copied from @a newData.
+     @return a table schema object. It is inserted into the Connection structures
+     and is owned by the Connection object. The created table schema object should not
+     be destroyed by hand afterwards.
+     0 is returned on failure. Table with destination name must not exist.
+     @see createTable() */
+    TableSchema *copyTable(const TableSchema &tableSchema, const Object &newData);
+
+    /*! It is a convenience function, does exactly the same as
+     TableSchema *copyTable(const TableSchema&, const Object&). */
+    TableSchema *copyTable(const QString& tableName, const Object &newData);
+
     /*! Drops a table defined by @a tableSchema (both table object as well as physically).
      If true is returned, schema information @a tableSchema is destoyed
      (because it's owned), so don't keep this anymore!
@@ -775,15 +788,25 @@ public:
      an optional @a dataID identifier.
      If there is already such record in the table, it's simply overwritten.
      @return true on success
-     @see loadDataBlock(). */
+     @see loadDataBlock() removeDataBlock() copyDataBlock(). */
     bool storeDataBlock(int objectID, const QString &dataString,
                         const QString& dataID = QString());
 
+    /*! Copies (potentially large) data, e.g. form's XML representation,
+     referenced by @a sourceObjectID pointed by optional @a dataID.
+     @return true on success. Does not fail if blocks do not exist.
+     Prior to copying, existing data blocks are removed even if there are no new blocks to copy.
+     Copied data blocks will have @a destObjectID object identifier assigned.
+     Note that if @a dataID is not specified, all data blocks found for the @a sourceObjectID
+     will be copied.
+     @see loadDataBlock() storeDataBlock() removeDataBlock(). */
+    bool copyDataBlock(int sourceObjectID, int destObjectID, const QString& dataID = QString());
+
     /*! Removes (potentially large) string data (e.g. xml form's representation),
-     referenced by objectID, and pointed by optional @a dataID.
+     referenced by @a objectID, and pointed by optional @a dataID.
      @return true on success. Does not fail if the block does not exist.
-     Note that if @a dataID is not specified, all data blocks for this dialog will be removed.
-     @see loadDataBlock() storeDataBlock(). */
+     Note that if @a dataID is not specified, all data blocks for the @a objectID will be removed.
+     @see loadDataBlock() storeDataBlock() copyDataBlock(). */
     bool removeDataBlock(int objectID, const QString& dataID = QString());
 
     class PREDICATE_EXPORT TableSchemaChangeListenerInterface
@@ -847,12 +870,18 @@ public:
     */
     virtual bool drv_alterTableName(TableSchema* tableSchema, const QString& newName);
 
+    /*! Copies table data from @a tableSchema to @a destinationTableSchema
+     Default implementation executes "INSERT INTO .. SELECT * FROM .."
+     @return true on success. */
+    virtual bool drv_copyTableData(const TableSchema &tableSchema,
+                                   const TableSchema &destinationTableSchema);
+
     /*! Physically drops table named with @a name.
      Default impelmentation executes "DROP TABLE.." command,
      so you rarely want to change this.
 
       Moved to public for KexiMigrate
-      @todo fix this after refatoring
+      @todo fix this after refactoring
     */
     virtual bool drv_dropTable(const QString& name);
 
