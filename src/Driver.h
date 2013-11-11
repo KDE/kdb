@@ -367,13 +367,13 @@ inline PREDICATE_EXPORT QByteArray escapeIdentifier(const Predicate::Driver* dri
                   : Predicate::escapeIdentifier(str);
 }
 
-/*! Escapes and converts value \a v (for type \a ftype)
+/*! Escapes and converts value @a v (for type @a ftype)
     to string representation required by PredicateSQL commands.
     For Date/Time type Predicate::dateTimeToSQL() is used.
     For BLOB type Predicate::escapeBlob() with BLOBEscape0xHex conversion type is used. */
 PREDICATE_EXPORT EscapedString valueToSQL(uint ftype, const QVariant& v);
 
-/*! Converts value \a v to string representation required by PredicateSQL commands:
+/*! Converts value @a v to string representation required by PredicateSQL commands:
     ISO 8601 DateTime format - with "T" delimiter/
     For specification see http://www.w3.org/TR/NOTE-datetime.
     Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".

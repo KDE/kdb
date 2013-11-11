@@ -40,7 +40,7 @@ namespace Utils
 typedef QSharedData Shared;
 
 /**
- * \class SharedPtr SharedPtr.h <Predicate::Utils::SharedPtr>
+ * @class SharedPtr SharedPtr.h <Predicate::Utils::SharedPtr>
  * 
  * Can be used to control the lifetime of an object that has derived
  * QSharedData. As long a someone holds

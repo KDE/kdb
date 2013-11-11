@@ -102,13 +102,13 @@ public:
         if (m_simpleBuffer) m_simpleBuffer->insert(fname, val);
     }
 
-    //! Removes value from db-aware buffer's column \a ci
+    //! Removes value from db-aware buffer's column @a ci
     void removeAt(const QueryColumnInfo& ci);
 
-    //! Removes value from not-db-aware buffer's column \a fname
+    //! Removes value from not-db-aware buffer's column @a fname
     void removeAt(const Field& f);
 
-    //! Removes value from not-db-aware buffer's column \a fname
+    //! Removes value from not-db-aware buffer's column @a fname
     void removeAt(const QString& fname);
 
     /*! Useful only for db-aware buffer. @return value for column @a ci

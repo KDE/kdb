@@ -37,8 +37,8 @@ public:
 
     ~DriverManagerInternal();
 
-    /*! Tries to load db driver \a name.
-      \return db driver, or 0 if error (then error message is also set) */
+    /*! Tries to load db driver @a name.
+      @return db driver, or 0 if error (then error message is also set) */
     Driver* driver(const QString& name);
 
     DriverInfo driverInfo(const QString &name);

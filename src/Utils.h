@@ -293,8 +293,8 @@ PREDICATE_EXPORT bool isLookupFieldSchemaProperty(const QByteArray& propertyName
  This can be used when type information is deserialized from a string or QVariant. */
 PREDICATE_EXPORT Field::Type intToFieldType(int type);
 
-/*! Gets property values for \a field.
- Properties from extended schema are included. \a values is cleared before filling.
+/*! Gets property values for @a field.
+ Properties from extended schema are included. @a values is cleared before filling.
  The same number of properties in the same order is returned.
  This function is used e.g. for altering table design.
  */
@@ -404,22 +404,22 @@ PREDICATE_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType ty
  This function is used by PostgreSQL Predicate and migration drivers. */
 PREDICATE_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length);
 
-/*! \return int list converted from string list.
-   If \a ok is not 0, *ok is set to result of the conversion. */
+/*! @return int list converted from string list.
+   If @a ok is not 0, *ok is set to result of the conversion. */
 PREDICATE_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok);
 
-/*! \return string converted from list \a list.
+/*! @return string converted from list @a list.
    Separators are ',' characters, "," and "\\" are escaped.
     @see Predicate::deserializeList() */
 PREDICATE_EXPORT QString serializeList(const QStringList &list);
 
-/*! \return string list converted from \a data which was built using serializeList().
+/*! @return string list converted from @a data which was built using serializeList().
    Separators are ',' characters, escaping is assumed as "\\,". */
 PREDICATE_EXPORT QStringList deserializeList(const QString &data);
 
-/*! \return int list converted from \a data which was built using serializeList().
+/*! @return int list converted from @a data which was built using serializeList().
    Separators are ',' characters, escaping is assumed as "\\,".
-   If \a ok is not 0, *ok is set to result of the conversion.
+   If @a ok is not 0, *ok is set to result of the conversion.
    @see Predicate::stringListToIntList() */
 PREDICATE_EXPORT QList<int> deserializeIntList(const QString &data, bool *ok);
 

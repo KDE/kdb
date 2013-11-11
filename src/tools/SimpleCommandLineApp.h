@@ -57,25 +57,25 @@ public:
 
     ~SimpleCommandLineApp();
 
-    //! \return program instance
+    //! @return program instance
     const KComponentData &componentData() const;
 
-    /*! Opens database \a databaseName for connection data
-     specified via the command line. \return true in success.
+    /*! Opens database @a databaseName for connection data
+     specified via the command line. @return true in success.
      In details: the database driver is loaded, the connection is opened
      and the database is used.
      Use Predicate::Object methods to get status of the operation on failure. */
     bool openDatabase(const QString& databaseName);
 
     /*! Closes database connection previously opened using openDatabase()
-     \return true on success. This method is called on destruction.
+     @return true on success. This method is called on destruction.
      Use Predicate::Object methods to get status of the operation on failure. */
     bool closeDatabase();
 
-    /*! \return connection data for this application. */
+    /*! @return connection data for this application. */
     Predicate::ConnectionData* connectionData() const;
 
-    /*! \return connection object for this application or 0 if there is no properly
+    /*! @return connection object for this application or 0 if there is no properly
      opened connection. */
     Predicate::Connection* connection() const;
 

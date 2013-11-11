@@ -404,7 +404,7 @@ public:
                            //!< or to unlimited (0).
     };
 
-    /*! \return a hint that indicates if the maximum length of text for this field is based on default setting
+    /*! @return a hint that indicates if the maximum length of text for this field is based on default setting
       (defaultMaxLength()) or was explicitly set.
       Only makes sense if the field type is Text. */
     MaxLengthStrategy maxLengthStrategy() const;
@@ -422,7 +422,7 @@ public:
       @see maxLengthStrategy(), setMaxLength() */
     void setMaxLengthStrategy(MaxLengthStrategy strategy);
 
-    /*! \return maximum length of text allowed for this field. Only meaningful if the type is Text.
+    /*! @return maximum length of text allowed for this field. Only meaningful if the type is Text.
       @see setMaxLength() */
     uint maxLength() const;
 

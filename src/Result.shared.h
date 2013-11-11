@@ -149,7 +149,7 @@ protected:
      as a single integer. Formally, this integer should be set to value
      that means "NO ERRORS" or "OK". This method is called by clearError().
      For reimplementation. By default does nothing.
-     \sa serverMessage()
+     @sa serverMessage()
     */
     virtual void drv_clearServerResultCode() {}
 #endif

@@ -49,7 +49,7 @@ public:
     ~SQLiteVacuum();
 
     /*! Performs compacting procedure.
-     \return true on success, false on failure and cancelled if user
+     @return true on success, false on failure and cancelled if user
      clicked "Cancel" button in the progress dialog. */
     tristate run();
 

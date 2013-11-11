@@ -879,7 +879,6 @@ QStringList Connection::tableNames(bool also_system_tables)
     return list;
 }
 
-//! @todo (js): this will depend on Predicate lib version
 QStringList Connection::predicateSystemTableNames()
 {
     if (Predicate_predicateSystemTableNames.isEmpty()) {
@@ -1662,14 +1661,6 @@ bool Connection::storeMainFieldSchema(Field *field)
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
 
-//! Creates a table according to the given schema
-/*! Creates a table according to the given TableSchema, adding the table and
-    column definitions to kexi__* tables.  Checks that a database is in use,
-    that the table name is not that of a system table, and that the schema
-    defines at least one column.
-    If the table exists, and replaceExisting is true, the table is replaced.
-    Otherwise, the table is not replaced.
-*/
 bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
 {
     if (!tableSchema || !checkIsDatabaseUsed())
@@ -1867,13 +1858,6 @@ bool Connection::drv_dropTable(const QString& tableName)
     return executeSQL(EscapedString("DROP TABLE ") + escapeIdentifier(tableName));
 }
 
-//! Drops a table corresponding to the name in the given schema
-/*! Drops a table according to the name given by the TableSchema, removing the
-    table and column definitions to kexi__* tables.  Checks first that the
-    table is not a system table.
-
-    @todo Should check that a database is currently in use? (c.f. createTable)
-*/
 tristate Connection::dropTable(TableSchema* tableSchema)
 {
     return dropTable(tableSchema, true);
@@ -3264,7 +3248,6 @@ bool Connection::isInternalTableSchema(const QString& tableName)
            || tableName == QLatin1String("kexi__final") || tableName == QLatin1String("kexi__useractions");
 }
 
-//! Creates kexi__* tables.
 bool Connection::setupPredicateSystemSchema()
 {
     if (!d->predicateSystemTables().isEmpty())

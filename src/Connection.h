@@ -204,7 +204,8 @@ public:
      The list contents may depend on Predicate library version;
      opened database can contain fewer 'system' tables than in current
      Predicate implementation, if the current one is newer than the one used
-     to build the database. */
+     to build the database.
+     @todo this will depend on Predicate lib version */
     static QStringList predicateSystemTableNames();
 
     /*! @return server version information for this connection.
@@ -566,6 +567,9 @@ public:
      is overwritten, then a new table schema gets the same identifier
      as existing table schema's identifier.
 
+     Table and column definitions are added to to kexi__* "system schema" tables.
+     Checks that a database is in use, and that the schema defines at least one column.
+
      Note that on error:
      - @a tableSchema is not inserted into Connection's structures,
        so you are still owner of this object
@@ -593,8 +597,12 @@ public:
      (because it's owned), so don't keep this anymore!
      No error is raised if the table does not exist physically
      - its schema is removed even in this case.
-    */
-//! @todo (js): update any structure (e.g. query) that depend on this table!
+
+     Removes the table and column definitions in kexi__* "system schema" tables.
+     First checks that the table is not a system table.
+
+     @todo Check that a database is currently in use? (c.f. createTable)
+     @todo Update any structure (e.g. query) that depends on this table */
     tristate dropTable(TableSchema* tableSchema);
 
     /*! It is a convenience function, does exactly the same as

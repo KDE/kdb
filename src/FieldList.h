@@ -77,12 +77,12 @@ public:
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass.
-     \return false if this field does not belong to this list. */
+     @return false if this field does not belong to this list. */
     virtual bool removeField(Field *field);
 
-    /*! Moves fiels \a field from its current position to new position \a newIndex.
-     If \a newIndex value is greater than fieldCount()-1, it is appended.
-     \return false if this field does not belong to this list. */
+    /*! Moves fiels @a field from its current position to new position @a newIndex.
+     If @a newIndex value is greater than fieldCount()-1, it is appended.
+     @return false if this field does not belong to this list. */
     virtual bool moveField(Field *field, uint newIndex);
 
     /*! @return field id or NULL if there is no such a field. */
