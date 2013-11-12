@@ -539,7 +539,6 @@ QuerySchema* buildSelectQuery(
                 || c == ArithmeticExpressionClass
                 || c == LogicalExpressionClass
                 || c == RelationalExpressionClass
-                || c == ConstExpressionClass
                 || c == FunctionExpressionClass
                 || c == AggregationExpressionClass;
 

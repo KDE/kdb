@@ -189,7 +189,6 @@ int AlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName)
         PreWarn << "property" << propertyName << "not found!";
     }
     return res;
-    return Predicate_alteringTypeForProperty->types[propertyName.toLower()];
 }
 
 //---
