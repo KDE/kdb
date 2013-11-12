@@ -2,6 +2,7 @@
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
    Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012 Dimitrios T. Tanis <dimitrios.tanis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -71,6 +72,9 @@ public:
      Can be used in code that finds driver depending on file format. */
 //! @todo make just QStringList
     QString possibleProblemsInfoMsg() const;
+
+    /*! @return true if there is at least one server-based database driver installed. */
+    bool hasDatabaseServerDrivers();
 };
 
 } //namespace Predicate

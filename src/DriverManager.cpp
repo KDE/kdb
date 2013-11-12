@@ -2,6 +2,7 @@
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
    Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012 Dimitrios T. Tanis <dimitrios.tanis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -404,4 +405,15 @@ QString DriverManager::possibleProblemsInfoMsg() const
         str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
     str += QLatin1String("</ul>");
     return str;
+}
+
+bool DriverManager::hasDatabaseServerDrivers()
+{
+    foreach(const QString& name, driverNames()) {
+        const DriverInfo info(driverInfo(name));
+        if (!info.isFileBased()) {
+            return true;
+        }
+    }
+    return false;
 }
