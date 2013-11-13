@@ -209,7 +209,7 @@ static EscapedString valueToSQLInternal(const Predicate::Driver *driver, uint ft
         if (v.type() == QVariant::String) {
             //workaround for values stored as string that should be casted to floating-point
             EscapedString s(v.toByteArray());
-            return s.replace(',', ".");
+            return s.replace(',', '.');
         }
         return EscapedString(v.toByteArray());
     }

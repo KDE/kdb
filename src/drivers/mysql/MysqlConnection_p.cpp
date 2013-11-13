@@ -159,7 +159,7 @@ bool MysqlConnectionInternal::executeSQL(const EscapedString& statement)
 
 QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 {
-    return QString(str).replace(QLatin1Char('`'), QLatin1String("'"));
+    return QString(str).replace(QLatin1Char('`'), QLatin1Char('\''));
 }
 
 //--------------------------------------
