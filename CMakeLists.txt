@@ -100,6 +100,7 @@ include_directories(
   ${Predicate_SOURCE_DIR}/Predicate/includes
   ${Predicate_SOURCE_DIR}/Predicate/expression
   ${Predicate_SOURCE_DIR}/Predicate/parser
+  ${Predicate_SOURCE_DIR}/Predicate/views
   ${Predicate_BINARY_DIR}
   ${Predicate_BINARY_DIR}/Predicate
   ${QT_INCLUDES}

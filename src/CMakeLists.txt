@@ -116,6 +116,9 @@ set(predicate_LIB_SRCS
    Admin.cpp
    LookupFieldSchema.cpp
 #TODO Alter.cpp
+
+   views/TableViewData.cpp
+   views/TableViewColumn.cpp
 )
 
 set(predicate_MOC_SRCS
@@ -125,6 +128,7 @@ set(predicate_MOC_SRCS
   Driver.h
   Field.h
 #  Connection.h
+  views/TableViewData.h
 )
 
 qt_wrap_cpp(predicate predicate_LIB_SRCS ${predicate_MOC_SRCS})
@@ -162,8 +166,6 @@ install( FILES
   ${CMAKE_CURRENT_BINARY_DIR}/Result.h includes/Predicate/Result
   Error.h includes/Predicate/Error
   EscapedString.h includes/Predicate/EscapedString
-  expression/Expression.h includes/Predicate/Expression
-  expression/ExpressionData.h
   Field.h includes/Predicate/Field
   FieldList.h includes/Predicate/FieldList
   IndexSchema.h includes/Predicate/IndexSchema
@@ -183,7 +185,15 @@ install( FILES
   Utils.h includes/Predicate/Utils
   ${CMAKE_CURRENT_BINARY_DIR}/Global.h  includes/Predicate/Global
   ${CMAKE_CURRENT_BINARY_DIR}/VersionInfo.h includes/Predicate/VersionInfo
+
   parser/Parser.h includes/Predicate/Parser
+
+  expression/Expression.h includes/Predicate/Expression
+  expression/ExpressionData.h
+
+  views/TableViewData.h includes/Predicate/TableViewData
+  views/TableViewColumn.h includes/Predicate/TableViewColumn
+
   DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
 )
 
@@ -211,6 +221,9 @@ install( FILES
   Tools/Identifier.h
   Tools/FieldValidator.h
   Tools/DbObjectNameValidator.h
+
+  views/TableViewData.h
+  views/TableViewColumn.h
 
   DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Tools COMPONENT Devel
 )
