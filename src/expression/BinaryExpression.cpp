@@ -51,7 +51,11 @@ bool BinaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* cal
         return false;
 
     //update type for query parameters
+#ifdef __GNUC__
 #warning TODO
+#else
+#pragma WARNING(TODO)
+#endif
 #if 0
     if (left()->isQueryParameter()) {
         QueryParameterExpression queryParameter = left()->toQueryParameter();

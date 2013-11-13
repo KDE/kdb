@@ -344,7 +344,11 @@ QDebug operator<<(QDebug dbg, const TableSchema& table)
     return dbg.space();
 }
 
+#ifdef __GNUC__
 #warning replace QPointer<Connection> m_conn;
+#else
+#pragma WARNING(replace QPointer<Connection> m_conn;)
+#endif
 
 Connection* TableSchema::connection() const
 {

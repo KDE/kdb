@@ -124,7 +124,11 @@ void Result::prependMessage(int code, const QString& message)
             d->message = message + QLatin1Char(' ') + d->message;
     }
 //    if (m_hasError)
+#ifdef __GNUC__
 #warning TODO ERRMSG(this);
+#else
+#pragma WARNING(TODO ERRMSG(this);)
+#endif
 }
 
 QDebug operator<<(QDebug dbg, const Result& result)

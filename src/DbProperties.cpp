@@ -19,7 +19,11 @@
 
 #include "DbProperties.h"
 
+#ifdef __GNUC__
 #warning replace QPointer<Connection> m_conn;
+#else
+#pragma WARNING(replace QPointer<Connection> m_conn;)
+#endif
 
 using namespace Predicate;
 

@@ -37,7 +37,11 @@ public:
         qDeleteAll(actions);
     }
     ActionList actions;
+#ifdef __GNUC__
 #warning replace QPointer<Connection> conn;
+#else
+#pragma WARNING(replace QPointer<Connection> conn;)
+#endif
     Connection* conn;
 };
 }

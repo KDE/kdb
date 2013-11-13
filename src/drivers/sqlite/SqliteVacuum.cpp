@@ -172,7 +172,11 @@ void SQLiteVacuum::readFromStdErr()
             //update progress info
             if (s.mid(6, 4) == "100%") {
                 m_percent = 100;
+#ifdef __GNUC__
 #warning TODO m_dlg->setAllowCancel(false);
+#else
+#pragma WARNING(TODO m_dlg->setAllowCancel(false);)
+#endif
                 m_dlg->setCursor(QCursor(Qt::WaitCursor));
             } else if (s.mid(7, 1) == "%") {
                 m_percent = s.mid(6, 1).toInt();

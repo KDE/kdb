@@ -24,7 +24,11 @@
 using namespace Predicate;
 using namespace Predicate::Utils;
 
+#ifdef __GNUC__
 #warning replace QPointer<Driver> m_drv;
+#else
+#pragma WARNING(replace QPointer<Driver> m_drv;)
+#endif
 
 ObjectNameValidator::ObjectNameValidator(Driver *drv, QObject * parent)
         : Validator(parent)

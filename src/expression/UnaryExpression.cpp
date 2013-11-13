@@ -136,7 +136,11 @@ bool UnaryExpressionData::validateInternal(ParseInfo *parseInfo, CallStack* call
 //! @todo compare types... e.g. NOT applied to Text makes no sense...
 
     // update type
+#ifdef __GNUC__
 #warning TODO
+#else
+#pragma WARNING(TODO)
+#endif
 #if 0 // TODO
     if (a->toQueryParameter()) {
         a->toQueryParameter()->setType(type());

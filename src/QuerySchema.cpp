@@ -720,7 +720,11 @@ void QuerySchema::clear()
     d->clear();
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 FieldList& QuerySchema::insertField(uint position, Field *field, bool visible)
 {
     return insertField(position, field, -1/*don't bind*/, visible);
@@ -732,7 +736,11 @@ FieldList& QuerySchema::insertField(uint position, Field *field)
     return insertField(position, field, -1/*don't bind*/, true);
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 FieldList& QuerySchema::insertField(uint position, Field *field,
                                     int bindToTable, bool visible)
 {
@@ -812,13 +820,21 @@ int QuerySchema::tableBoundToColumn(uint columnPosition) const
     return res;
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, bool visible)
 {
     return insertField(m_fields.count(), field, visible);
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 Predicate::FieldList& QuerySchema::addField(Predicate::Field* field, int bindToTable,
         bool visible)
 {
@@ -844,7 +860,11 @@ bool QuerySchema::removeField(Predicate::Field *field)
     return true;
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 FieldList& QuerySchema::addExpression(const Expression& expr, bool visible)
 {
     return addField(new Field(this, expr), visible);
@@ -861,7 +881,11 @@ void QuerySchema::setColumnVisible(uint position, bool v)
         d->visibility.setBit(position, v);
 }
 
+#ifdef __GNUC__
 #warning TODO move visible to overload
+#else
+#pragma WARNING(TODO move visible to overload)
+#endif
 FieldList& QuerySchema::addAsterisk(QueryAsterisk *asterisk, bool visible)
 {
     if (!asterisk)

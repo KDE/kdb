@@ -46,12 +46,19 @@ int cursor_options = 0;
 bool db_name_required = true;
 
 Predicate::ConnectionData conn_data;
+#ifdef __GNUC__
 #warning replace QPointer<Predicate::Connection> conn;
+#else
+#pragma WARNING(replace QPointer<Predicate::Connection> conn;)
+#endif
 Predicate::Connection* conn = 0;
+#ifdef __GNUC__
 #warning replace QPointer<Predicate::Driver> driver;
+#else
+#pragma WARNING(replace QPointer<Predicate::Driver> driver;)
+#endif
 Predicate::Driver* driver;
 QApplication *app = 0;
-//qtonly KComponentData *instance = 0;
 
 #include "dbcreation_test.h"
 #include "cursors_test.h"

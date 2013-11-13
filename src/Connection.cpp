@@ -2408,7 +2408,11 @@ bool Connection::deleteCursor(Cursor *cursor)
     return ret;
 }
 
+#ifdef __GNUC__
 #warning fix Connection::setupObjectData() after refactoring
+#else
+#pragma WARNING(fix Connection::setupObjectData() after refactoring)
+#endif
 bool Connection::setupObjectData(const RecordData &data, Object *object)
 {
     if (data.count() < 5) {

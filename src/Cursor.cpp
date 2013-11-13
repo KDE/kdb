@@ -32,7 +32,11 @@
 
 using namespace Predicate;
 
-#warning replace    QPointer<Connection> m_conn;
+#ifdef __GNUC__
+#warning replace QPointer<Connection> m_conn;
+#else
+#pragma WARNING(replace QPointer<Connection> m_conn;)
+#endif
 
 Cursor::Cursor(Connection* conn, const EscapedString& statement, uint options)
         : m_conn(conn)

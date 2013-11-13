@@ -558,7 +558,11 @@ QuerySchema* buildSelectQuery(
             else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
 //  PreDbg << colViews->list.count() << " " << it.current()->debugString();
-#warning ok?  //predicate: it.remove();
+#ifdef __GNUC__
+#warning ok? //predicate: it.remove();
+#else
+#pragma WARNING(ok?)
+#endif
 //Qt4    moveNext = false;
             } else if (aliasVariable.isNull()) {
                 setError(QObject::tr("Invalid \"%1\" column definition")

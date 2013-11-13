@@ -28,7 +28,12 @@ FieldList::FieldList(bool owner)
 {
 }
 
+#ifdef __GNUC__
 #warning (API) improve deepCopyFields
+#else
+#pragma WARNING((API) improve deepCopyFields)
+#endif
+
 FieldList::FieldList(const FieldList& fl, bool deepCopyFields)
         : m_fields(fl.m_fields.autoDelete())
         , m_autoinc_fields(0)
