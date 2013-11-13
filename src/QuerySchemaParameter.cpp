@@ -58,6 +58,7 @@ public:
             : //driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
             params(aParams)
     {
+        Q_UNUSED(driver);
         //move to last item, as the order is reversed due to parser's internals
         paramsIt = params.constEnd(); //fromLast();
         --paramsIt;
