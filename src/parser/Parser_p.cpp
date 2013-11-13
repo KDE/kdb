@@ -110,10 +110,7 @@ void yyerror(const char *str)
        )
     {
         PreDbg << parser->statement();
-        QString ptrline;
-        for (int i = 0; i < current; i++) {
-            ptrline += QLatin1String(" ");
-        }
+        QString ptrline(current, QLatin1Char(' '));
 
         ptrline += QLatin1String("^");
 
