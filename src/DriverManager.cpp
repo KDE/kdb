@@ -44,7 +44,7 @@ using namespace Predicate;
 PREDICATE_GLOBAL_STATIC(DriverManagerInternal, s_self);
 
 DriverManagerInternal::DriverManagerInternal() /* protected */
- : lookupDriversNeeded(true)
+ : m_lookupDriversNeeded(true)
 {
     qsrand(QTime::currentTime().msec()); // needed e.g. to create random table names
 }
@@ -123,7 +123,7 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
 
 bool DriverManagerInternal::lookupDrivers()
 {
-    if (!lookupDriversNeeded)
+    if (!m_lookupDriversNeeded)
         return true;
 
     if (qApp) {
@@ -133,7 +133,7 @@ bool DriverManagerInternal::lookupDrivers()
 //  PreWarn << "cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
-    lookupDriversNeeded = false;
+    m_lookupDriversNeeded = false;
     clearResult();
 
     /*! Try in all possible driver directories.
@@ -189,7 +189,7 @@ bool DriverManagerInternal::lookupDrivers()
                                " has version '%2' but required Predicate driver version is '%3.%4'\n"
                                " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
                               .arg(Predicate::version().major).arg(Predicate::version().minor);
-            possibleProblems += QString("\"%1\" database Driver.has version \"%2\" "
+            m_possibleProblems += QString("\"%1\" database Driver.has version \"%2\" "
                                         "but required driver version is \"%3.%4\"")
                                 .arg(srv_name).arg(srv_ver_str)
                                 .arg(Predicate::version().major).arg(Predicate::version().minor);
@@ -326,12 +326,6 @@ Driver* DriverManagerInternal::driver(const QString& name)
     }
 
     drv->setInfo( info );
-
-    if (!drv->isValid()) {
-        m_result = drv->result();
-        delete drv;
-        return 0;
-    }
     m_drivers.insert(info.name().toLower(), drv); //cache it
     return drv;
 }
@@ -396,12 +390,12 @@ Driver* DriverManager::driver(const QString& name)
 
 QString DriverManager::possibleProblemsInfoMsg() const
 {
-    if (s_self->possibleProblems.isEmpty())
+    if (s_self->m_possibleProblems.isEmpty())
         return QString();
     QString str;
     str.reserve(1024);
     str = QLatin1String("<ul>");
-    foreach (const QString& problem, s_self->possibleProblems)
+    foreach (const QString& problem, s_self->m_possibleProblems)
         str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
     str += QLatin1String("</ul>");
     return str;

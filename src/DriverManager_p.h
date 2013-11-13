@@ -45,17 +45,6 @@ public:
 
     static DriverManagerInternal *self();
 
-    /*! increments the refcount for the manager */
-//void incRefCount();
-
-    /*! decrements the refcount for the manager
-      if the refcount reaches a value less than 1 the manager is freed */
-//void decRefCount();
-
-//2.0    /*! Called from Driver dtor (because sometimes KLibrary (used by Driver)
-//2.0     is destroyed before DriverManagerInternal) */
-//2.0    void aboutDelete(Driver* drv);
-
 protected Q_SLOTS:
     /*! Used to destroy all drivers on QApplication quit, so even if there are
      DriverManager's static instances that are destroyed on program
@@ -71,19 +60,8 @@ private:
     QMap<QString, DriverInfo> m_driversInfo; //!< used to store drivers information
     QMap<QString, Driver* > m_drivers; //!< for owning drivers
     QString m_pluginsDir;
-
-//pred    QString m_serverErrMsg;
-//pred    int m_serverResultNum;
-//pred    QString m_serverResultName;
-//    //! result names for KParts::ComponentFactory::ComponentLoadingError
-//    QHash<int, QString> m_componentLoadingErrors;
-
-    QStringList possibleProblems;
-
-//pred    ulong refCount() const { return m_refCount; }
-
-//ulong m_refCount;
-    bool lookupDriversNeeded;
+    QStringList m_possibleProblems;
+    bool m_lookupDriversNeeded;
 
     friend class DriverManager;
 };

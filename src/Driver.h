@@ -168,13 +168,6 @@ public:
     /*! used when we do not have Driver instance yet */
     static QString defaultSQLTypeName(int id_t);
 
-    /*! @return true if this driver's implementation is valid.
-     Just few constriants are checked to ensure that driver
-     developer didn't forget about something.
-     This method is called automatically on createConnection(),
-     and proper error message is set properly on any error. */
-    virtual bool isValid();
-
     /*! Driver's static version information (major part), it is automatically defined
      in implementation by PREDICATE_DRIVER macro (see Driver_p.h)
      It's usually compared to drivers' and Predicate library version. */
@@ -228,8 +221,6 @@ public:
         return EscapedString();
     }
 
-//    enum EscapePolicy { EscapeAsNecessary = 0x04, EscapeAlways = 0x08 };
-
     //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
     /*! Escape database identifier (@a str) in order that keywords
        can be used as table names, column names, etc. */
@@ -270,7 +261,6 @@ protected:
      Connection object should inherit Connection and have a destructor
      that descructs all allocated driver-dependent connection structures. */
     virtual Connection *drv_createConnection(const ConnectionData& connData) = 0;
-//virtual ConnectionInternal* createConnectionInternalObject( Connection& conn ) = 0;
 
     /*! Driver-specific SQL string escaping.
      This method is used by escapeIdentifier().
@@ -292,7 +282,7 @@ protected:
      a given driver implementation. For implementation.*/
     virtual bool drv_isSystemFieldName(const QString& n) const = 0;
 
-    /* Creates admin tools object providing a number of database administration
+    /*! Creates admin tools object providing a number of database administration
      tools for the driver. This is called once per driver.
 
      Note for driver developers: Reimplement this method by returning
@@ -323,6 +313,13 @@ protected:
     /*! Used by the driver manager to set info for just loaded driver. */
     void setInfo( const DriverInfo& info );
 
+    /*! @return true if this driver's implementation is valid.
+     Just a few constraints are checked to ensure that driver developer didn't forget something.
+     This method is called automatically on createConnection(), and proper error message
+     is set properly on error.
+     Drivers can reimpement this method but should call Driver::isValid() first. */
+    virtual bool isValid();
+
     friend class Connection;
     friend class Cursor;
     friend class DriverManagerInternal;
@@ -335,15 +332,6 @@ protected:
  (see keywords.cpp for a list of reserved keywords). */
 PREDICATE_EXPORT bool isPredicateSQLKeyword(const QByteArray& word);
 
-///*! SQL string escaping of PredicateSQL type. */
-//PREDICATE_EXPORT QString escapeString(const QString& str);
-
-///*! Like @ref Predicate::escapeIdentifier(const QString&, int) const
-//    but static version, thus only PredicateEscaping type is supported. */
-//PREDICATE_EXPORT QString escapeIdentifier(const QString& str,
-//                                          int options = Predicate::PredicateEscaping
-//                                                        | Predicate::Driver::EscapeAsNecessary);
-
 PREDICATE_EXPORT QString escapeIdentifier(const QString& string);
 
 inline PREDICATE_EXPORT QString escapeIdentifier(const Predicate::Driver* driver,
@@ -353,11 +341,6 @@ inline PREDICATE_EXPORT QString escapeIdentifier(const Predicate::Driver* driver
                   : Predicate::escapeIdentifier(str);
 }
                                                       
-///*! Like @ref escapeIdentifier(const QString&, int) const */
-//PREDICATE_EXPORT QByteArray escapeIdentifier(const QByteArray& str,
-//                                             int options = Predicate::Driver::EscapeKexi
-//                                                           | Predicate::Driver::EscapeAsNecessary);
-
 PREDICATE_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
 
 inline PREDICATE_EXPORT QByteArray escapeIdentifier(const Predicate::Driver* driver,

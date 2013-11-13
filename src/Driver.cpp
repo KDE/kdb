@@ -65,8 +65,6 @@ Driver::Driver()
 
 Driver::~Driver()
 {
-    //DriverManagerInternal::self()->aboutDelete(this);
-// PreDbg;
     // make a copy because d->connections will be touched by ~Connection
     QSet<Connection*> connections(d->connections);
     qDeleteAll(connections);
@@ -79,26 +77,14 @@ Driver::~Driver()
 bool Driver::isValid()
 {
     clearResult();
-/* moved to DriverManagerInternal::driver():
-    if (Predicate::version().major != version().major
-            || Predicate::version().minor != version().minor) {
-        setError(ERR_INCOMPAT_DRIVER_VERSION,
-                 tr(
-                     "Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
-                 .arg(objectName(),
-                      QString("%1.%2").arg(version().major).arg(version().minor),
-                      QString("%1.%2").arg(Predicate::version().major).arg(Predicate::version().minor)));
+    QString inv_impl(tr("Invalid database driver's \"%1\" implementation.").arg(name()));
+    QString not_init(tr("Value of \"%1\" is not initialized for the driver."));
+    if (beh->ROW_ID_FIELD_NAME.isEmpty()) {
+        m_result = Result(ERR_INVALID_DRIVER_IMPL,
+                          inv_impl + QLatin1Char(' ')
+                          + not_init.arg(QLatin1String("DriverBehaviour::ROW_ID_FIELD_NAME")));
         return false;
     }
-
-    QString inv_impl( tr("Invalid database driver's \"%1\" implementation:\n").arg(name()) );
-    QString not_init( tr("Value of \"%1\" is not initialized for the driver.") );
-    if (beh->ROW_ID_FIELD_NAME.isEmpty()) {
-        setError(ERR_INVALID_DRIVER_IMPL,
-                 inv_impl + not_init.arg("DriverBehaviour::ROW_ID_FIELD_NAME"));
-        return false;
-    }*/
-
     return true;
 }
 
@@ -107,23 +93,10 @@ const QSet<Connection*> Driver::connections() const
     return d->connections;
 }
 
-/* moved to info()
-QString Driver::fileDBDriverMimeType() const
-{
-    return d->fileDBDriverMimeType;
-}*/
-
-//ported const KService* Driver::service() const
 DriverInfo Driver::info() const
 {
     return d->info;
 }
-
-/* moved to info()
-bool Driver::isFileDriver() const
-{
-    return d->isFileDriver;
-}*/
 
 QString Driver::name() const
 {
@@ -305,50 +278,6 @@ QList<QByteArray> Driver::propertyNames() const
     qSort(names);
     return names;
 }
-
-#if 0 // old
-QString Driver::escapeIdentifier(const QString& str, int options) const
-{
-    QByteArray cstr(str.toLatin1());
-    return QString(escapeIdentifier(cstr, options));
-}
-
-QByteArray Driver::escapeIdentifier(const QByteArray& str, int options) const
-{
-    bool needOuterQuotes = false;
-
-// Need to use quotes if ...
-// ... we have been told to, or ...
-    if (options & EscapeAlways)
-        needOuterQuotes = true;
-
-// ... or if the driver does not have a list of keywords,
-    else if (d->driverSpecificSQLKeywords.isEmpty())
-        needOuterQuotes = true;
-
-// ... or if it's a keyword in PredicateSQL dialect,
-    else if (Predicate::isPredicateSQLKeyword(str))
-        needOuterQuotes = true;
-
-// ... or if it's a keyword in the backends SQL dialect,
-    else if ((options & EscapeDriver) && d->driverSpecificSQLKeywords.contains(str))
-        needOuterQuotes = true;
-
-// ... or if the identifier has a space in it...
-    else if (str.indexOf(' ') != -1)
-        needOuterQuotes = true;
-
-    if (needOuterQuotes && (options & EscapeKexi)) {
-        const char quote = '"';
-        return quote + QByteArray(str).replace(quote, "\"\"") + quote;
-    } else if (needOuterQuotes) {
-        const char quote = beh->QUOTATION_MARKS_FOR_IDENTIFIER.toLatin1();
-        return quote + drv_escapeIdentifier(str) + quote;
-    } else {
-        return drv_escapeIdentifier(str);
-    }
-}
-#endif
 
 void Driver::initDriverSpecificKeywords(const char** keywords)
 {
