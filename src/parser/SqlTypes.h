@@ -23,6 +23,8 @@
 #include <QVariant>
 #include <QList>
 
+#include <Predicate/Expression>
+
 extern int current;
 extern QByteArray ctoken;
 
