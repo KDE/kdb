@@ -500,7 +500,7 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
                                                      .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
-        if (!file.isWritable()) {
+        if (!d->readOnly && !file.isWritable()) {
             if (!ignoreErrors)
                 m_result = Result(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not writable.")
                                                      .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
