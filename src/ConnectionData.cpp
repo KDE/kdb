@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -46,4 +46,14 @@ QString ConnectionData::serverInfoString(ServerInfoStringOptions options) const
     return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QString() : (d->userName + QLatin1Char('@')))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
            + (d->port != 0 ? (QLatin1Char(':') + QString::number(d->port)) : QString());
+}
+
+bool ConnectionData::passwordNeeded() const
+{
+    DriverManager mananager;
+    DriverInfo info = mananager.driverInfo(d->driverName);
+    const bool fileBased = info.isValid() && info.isFileBased();
+
+    return !d->savePassword && !fileBased; //!< @todo temp.: change this if there are
+                                           //!< file-based drivers requiring a password
 }

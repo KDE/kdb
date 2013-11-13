@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -203,6 +203,11 @@ public:
      User's name is added if @a options & AddUserToServerInfoString is true (the default).
     */
     QString serverInfoString(ServerInfoStringOptions options = AddUserToServerInfoString) const;
+
+    /*!
+    @return true if password is needed for performing connection.
+    The password has to be provided by the user. */
+    bool passwordNeeded() const;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ConnectionData::ServerInfoStringOptions)
