@@ -37,6 +37,8 @@ private Q_SLOTS:
     void initTestCase();
     void testParse_data();
     void testParse();
+    //! Test a few tokens, they should have certain values, needed for maintaining BC
+    void testTokens();
     void cleanupTestCase();
     
 private:

@@ -21,6 +21,7 @@
 #include <QtTest/QtTest>
 
 #include <Predicate/DriverManager>
+#include <Predicate/parser/SqlParser.h>
 
 using namespace Predicate;
 
@@ -250,6 +251,14 @@ void TestSqlParser::testParse()
             qDebug() << parser->error();
         }
     }
+}
+
+void TestSqlParser::testTokens()
+{
+    QCOMPARE(int(SQL_TYPE), 258);
+    QCOMPARE(int(CREATE), 269);
+    QCOMPARE(int(DATE_CONST), 289);
+    QCOMPARE(int(UMINUS), 318);
 }
 
 void TestSqlParser::cleanupTestCase()
