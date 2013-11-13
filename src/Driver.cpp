@@ -37,7 +37,7 @@ using namespace Predicate;
 
 /*! @internal Used in Driver::defaultSQLTypeName(int)
  when we do not have Driver instance yet, or when we cannot get one */
-static const char* Predicate_defaultSQLTypeNames[] = {
+static const char* const Predicate_defaultSQLTypeNames[] = {
     "InvalidType",
     "Byte",
     "ShortInteger",
