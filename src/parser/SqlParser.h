@@ -88,24 +88,24 @@ bool parseData(Predicate::Parser *p, const char *data);
      SQL_TRUE = 299,
      SQL_FALSE = 300,
      SCAN_ERROR = 301,
-     __LAST_TOKEN = 302,
-     EXCEPT = 303,
-     UNION = 304,
-     INTERSECT = 305,
-     OR = 306,
-     XOR = 307,
-     AND = 308,
-     NOT = 309,
-     GREATER_OR_EQUAL = 310,
-     NOT_EQUAL2 = 311,
-     NOT_EQUAL = 312,
-     NOT_SIMILAR_TO = 313,
-     SIMILAR_TO = 314,
-     ILIKE = 315,
-     LIKE = 316,
-     SQL_IN = 317,
-     BETWEEN = 318,
-     UMINUS = 319
+     EXCEPT = 302,
+     UNION = 303,
+     INTERSECT = 304,
+     OR = 305,
+     XOR = 306,
+     AND = 307,
+     NOT = 308,
+     GREATER_OR_EQUAL = 309,
+     NOT_EQUAL2 = 310,
+     NOT_EQUAL = 311,
+     NOT_SIMILAR_TO = 312,
+     SIMILAR_TO = 313,
+     ILIKE = 314,
+     LIKE = 315,
+     SQL_IN = 316,
+     BETWEEN = 317,
+     UMINUS = 318,
+     __LAST_TOKEN = 319
    };
 #endif
 
@@ -116,7 +116,7 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 514 "SqlParser.y"
+#line 512 "SqlParser.y"
 
     QString* stringValue;
     qint64 integerValue;
