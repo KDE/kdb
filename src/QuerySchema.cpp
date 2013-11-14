@@ -892,7 +892,7 @@ FieldList& QuerySchema::addAsterisk(QueryAsterisk *asterisk, bool visible)
         return *this;
     //make unique name
     asterisk->setName((asterisk->table() ? (asterisk->table()->name() + QLatin1String(".*"))
-                                         : QString::fromLatin1("*"))
+                                         : QString(QLatin1Char('*')))
                        + QString::number(asterisks()->count()));
     return addField(asterisk, visible);
 }
