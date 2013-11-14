@@ -1533,7 +1533,7 @@ QList<int> Predicate::stringListToIntList(const QStringList &list, bool *ok)
 // Based on KConfigGroupPrivate::serializeList() from kconfiggroup.cpp (kdelibs 4)
 QString Predicate::serializeList(const QStringList &list)
 {
-    QString value = QLatin1String("");
+    QString value;
 
     if (!list.isEmpty()) {
         QStringList::ConstIterator it = list.constBegin();
