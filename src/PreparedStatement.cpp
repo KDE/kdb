@@ -128,8 +128,8 @@ bool PreparedStatement::generateInsertStatementString(EscapedString * s)
     }
     s->append(")");
     s->prepend(EscapedString("INSERT INTO ") + table->name()
-              + (allTableFieldsUsed ? EscapedString() : (EscapedString(" (") + namesList + ")"))
-              + " VALUES (");
+               + (allTableFieldsUsed ? EscapedString() : (EscapedString(" (") + namesList + ')'))
+               + " VALUES (");
     d->fieldsForParameters = d->fields.fields();
     return true;
 }

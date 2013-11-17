@@ -1547,9 +1547,9 @@ QString Predicate::serializeList(const QStringList &list)
             // Doing it repeatedly is a pretty cheap operation.
             value.reserve(4096);
 
-            value += QLatin1Char(',');
-            value += QString(*it).replace(QLatin1Char('\\'), QLatin1String("\\\\"))
-                                 .replace(QLatin1Char(','), QLatin1String("\\,"));
+            value += QLatin1Char(',')
+                     + QString(*it).replace(QLatin1Char('\\'), QLatin1String("\\\\"))
+                                   .replace(QLatin1Char(','), QLatin1String("\\,"));
         }
 
         // To be able to distinguish an empty list from a list with one empty element.

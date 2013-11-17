@@ -58,8 +58,7 @@ QString Predicate::Utils::stringToIdentifier(const QString &s)
     bool wasUnderscore = false;
 
     if (ch >= '0' && ch <= '9') {
-        r += QLatin1Char('_');
-        r += c;
+        r += QLatin1Char('_') + c;
     } else {
         add = charToIdentifier(c);
         r += add;
