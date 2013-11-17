@@ -1343,7 +1343,7 @@ private:
     friend class TableSchema; //!< for removeMe()
     friend class DatabaseProperties; //!< for setError()
     friend class ConnectionPrivate;
-//    friend class AlterTableHandler;
+    friend class AlterTableHandler;
 };
 
 /*! @return "SELECT ..." statement's string needed for executing query

@@ -115,7 +115,7 @@ set(predicate_LIB_SRCS
    DbProperties.cpp
    Admin.cpp
    LookupFieldSchema.cpp
-#TODO Alter.cpp
+   Alter.cpp
 
    views/TableViewData.cpp
    views/TableViewColumn.cpp

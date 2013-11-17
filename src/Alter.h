@@ -365,8 +365,8 @@ public:
         void setIndex(int index) {
             m_index = index;
         }
-        Predicate::Field& field() const {
-            return *m_field;
+        Predicate::Field* field() const {
+            return m_field;
         }
         void setField(Predicate::Field* field);
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());

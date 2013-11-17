@@ -32,7 +32,6 @@ class AlterTableHandler::Private
 {
 public:
     Private() {}
-    ~Private() {}
     ~Private() {
         qDeleteAll(actions);
     }
@@ -407,7 +406,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(TableSc
     //1. Simpler cases first: changes that do not affect table schema at all
     // "caption", "description", "width", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
-        bool result = Predicate::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
+        bool result = Predicate::setFieldProperty(field, m_propertyName.toLatin1(), newValue());
         return result;
     }
 
@@ -435,7 +434,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
     //1. Simpler cases first: changes that do not affect table schema at all
     // "caption", "description", "width", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
-        result = Predicate::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
+        result = Predicate::setFieldProperty(field, m_propertyName.toLatin1(), newValue());
         return result;
     }
 
@@ -463,7 +462,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
          TODO: more cases to check
         */
     }
-    if (m_propertyName == "maxLength") {
+    if (m_propertyName == QLatin1String("maxLength")) {
         //! @todo use "select max( length(o_name) ) from kexi__objects"
 
     }
@@ -563,7 +562,7 @@ AlterTableHandler::InsertFieldAction::InsertFieldAction(const InsertFieldAction&
         : FieldActionBase(action) //action.fieldName(), action.uid())
         , m_index(action.index())
 {
-    m_field = new Predicate::Field(action.field());
+    m_field = new Predicate::Field(*action.field());
 }
 
 AlterTableHandler::InsertFieldAction::InsertFieldAction(bool)
@@ -602,7 +601,7 @@ QString AlterTableHandler::InsertFieldAction::debugString(const DebugOptions& de
         s.append(QString::fromLatin1(" (UID=%1)").arg(m_fieldUID));
     }
     if (debugOptions.showFieldDebug) {
-        s.append(QString::fromLatin1(" (%1)").arg(Predicate::debugString<Field>(*m_field)));
+        s.append(QString::fromLatin1(" (%1)").arg(Utils::debugString<Field>(*m_field)));
     }
     return s;
 }
@@ -659,15 +658,15 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
         fieldActions.insert(uid(), actionsForThisField);
         if (!values.isEmpty()) {
             //update field, so it will be created as one step
-            Predicate::Field *f = new Predicate::Field(field());
-            if (Predicate::setFieldProperties(*f, values)) {
+            Predicate::Field *f = new Predicate::Field(*field());
+            if (Predicate::setFieldProperties(f, values)) {
                 //field() = f;
                 setField(f);
                 PreDbg << field();
 #ifdef PREDICATE_DEBUG_GUI
                 Utils::alterTableActionDebugGUI(
                     QString("** Property-set actions moved to field definition itself:\n")
-                        + Predicate::debugString<Field>(field()), 0);
+                        + Utils::debugString<Field>(field()), 0);
 #endif
             } else {
 #ifdef PREDICATE_DEBUG_GUI
@@ -694,8 +693,8 @@ tristate AlterTableHandler::InsertFieldAction::updateTableSchema(TableSchema* ta
     //in most cases we won't add the field to fieldMap
     Q_UNUSED(field);
 //! @todo add it only when there should be fixed value (e.g. default) set for this new field...
-    fieldMap->remove(this->field().name());
-    table->insertField(index(), new Field(this->field()));
+    fieldMap->remove(this->field()->name());
+    table->insertField(index(), new Field(*this->field()));
     return true;
 }
 
@@ -956,8 +955,9 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
         newTable->setName(tempDestTableName);
     }
     PreDbg << *oldTable;
-    if (recreateTable && !args->debugString)
+    if (recreateTable && !args->debugString) {
         PreDbg << *newTable;
+    }
 
     // Update table schema in memory ----
     int lastUID = -1;
@@ -1046,7 +1046,7 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
             EscapedString sourceSQLString;
             if (!renamedFieldName.isEmpty()) {
                 //this field should be renamed
-                sourceSQLString = d->conn->escapeIdentifier(renamedFieldName);
+                sourceSQLString = EscapedString(d->conn->escapeIdentifier(renamedFieldName));
             } else if (!f->defaultValue().isNull()) {
                 //this Field.has a default value defined
 //! @todo support expressions (eg. TODAY()) as a default value
