@@ -207,7 +207,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
 //    if (f) { //We probably have a schema type query so can use kexi to determine the row type
     switch (type) { // from most to least frequently used types:
     case QVariant::String:
-        return d->unicode ? QString::fromUtf8(data, len) : QString::fromAscii(data, len);
+        return d->unicode ? QString::fromUtf8(data, len) : QString::fromLatin1(data, len);
     case QVariant::Int:
         return atoi(data); // the fastest way
     case QVariant::Bool:
@@ -230,7 +230,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
         if (len == 0) {
             return QVariant(QTime());
         } else {
-            QString s(QString::fromAscii(data, len));
+            QString s(QString::fromLatin1(data, len));
             if (hasTimeZone(s)) {
                 s.chop(3); // skip timezone
                 return QVariant(QTime::fromString(s, Qt::ISODate));
@@ -241,7 +241,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
         if (len < 10 /*ISO Date*/) {
             return QVariant(QDateTime());
         } else {
-            QString s(QString::fromAscii(data, len));
+            QString s(QString::fromLatin1(data, len));
             if (hasTimeZone(s)) {
                 s.chop(3); // skip timezone
                 if (s.isEmpty())
