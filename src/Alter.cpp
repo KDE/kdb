@@ -404,7 +404,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(TableSc
         QHash<QString, QString>* fieldHash)
 {
     //1. Simpler cases first: changes that do not affect table schema at all
-    // "caption", "description", "width", "visibleDecimalPlaces"
+    // "caption", "description", "defaultWidth", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
         bool result = Predicate::setFieldProperty(field, m_propertyName.toLatin1(), newValue());
         return result;
@@ -432,7 +432,7 @@ tristate AlterTableHandler::ChangeFieldPropertyAction::execute(Connection* conn,
     }
     bool result;
     //1. Simpler cases first: changes that do not affect table schema at all
-    // "caption", "description", "width", "visibleDecimalPlaces"
+    // "caption", "description", "defaultWidth", "visibleDecimalPlaces"
     if (SchemaAlteringRequired & alteringTypeForProperty(m_propertyName.toLatin1())) {
         result = Predicate::setFieldProperty(field, m_propertyName.toLatin1(), newValue());
         return result;
