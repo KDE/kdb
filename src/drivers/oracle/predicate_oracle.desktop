@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=oracle
 Name[bg]=oracle
+Name[bs]=oracle
 Name[cs]=oracle
 Name[de]=oracle
 Name[es]=oracle
@@ -26,6 +27,7 @@ Name[x-test]=xxoraclexx
 Caption=Oracle
 Comment=Predicate driver for handling Oracle databases
 Comment[bg]=Драйвер за бази от данни Oracle
+Comment[bs]=Predikati  upravljački program za Oracle baze podataka
 Comment[de]=Predicate-Treiber für die Handhabung von Oracle-Datenbanken
 Comment[es]=Controlador para  manejo de bases de datos Oracle en Predicate
 Comment[et]=Predicate'i draiver Oracle'i andmebaaside jaoks

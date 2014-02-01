@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=mysql
 Name[bg]=mysql
+Name[bs]=mysql
 Name[cs]=mysql
 Name[de]=mysql
 Name[es]=mysql
@@ -27,6 +28,7 @@ Name[x-test]=xxmysqlxx
 Caption=MySQL
 Comment=Predicate driver for handling MySQL databases
 Comment[bg]=Драйвер за бази от данни MySQL
+Comment[bs]=Predikatski  upravljački program za MySQL baze podataka
 Comment[de]=Predicate-Treiber für die Handhabung von MySQL-Datenbanken
 Comment[es]=Controlador para  manejo de bases de datos MySQL en Predicate
 Comment[et]=Predicate'i draiver MySQL-i andmebaaside jaoks
