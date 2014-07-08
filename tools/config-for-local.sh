@@ -6,7 +6,7 @@
 #  0. Set $PREDICATE_INSTALL_PREFIX, e.g. to $HOME/predicate/install
 #  1. mkdir -p {predicate-build-dir}
 #  2. cd {predicate-build-dir}
-#  3. {predicate-source-dir}/tools/cmakepredicate.sh {predicate-source-dir}
+#  3. {predicate-source-dir}/tools/config-for-local.sh {predicate-source-dir}
 #
 # "Dry run" mode:
 #  Add --dry-run parameter. This only displays the resulting cmake command
