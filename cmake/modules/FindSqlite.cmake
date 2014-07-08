@@ -117,7 +117,7 @@ macro(_check_recommended_sqlite_version)
         math(EXPR SQLITE_RECOMMENDED_VERSION_NUMBER
             "${SQLITE_RECOMMENDED_VERSION_MAJOR} * 1000000 + ${SQLITE_RECOMMENDED_VERSION_MINOR} * 1000 + ${SQLITE_RECOMMENDED_VERSION_PATCH}")
         if(SQLITE_RECOMMENDED_VERSION_NUMBER GREATER SQLITE_VERSION)
-            message(STATUS "WARNING: Recommended SQLite version is ${SQLITE_RECOMMENDED_VERSION}")
+            message(STATUS "WARNING: Recommended SQLite version is ${SQLITE_RECOMMENDED_VERSION} (but ${Sqlite_FIND_VERSION} is still OK)")
         endif(SQLITE_RECOMMENDED_VERSION_NUMBER GREATER SQLITE_VERSION)
     endif(SQLITE_RECOMMENDED_VERSION)
 endmacro(_check_recommended_sqlite_version)
