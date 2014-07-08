@@ -57,7 +57,7 @@ Cursor::Cursor(Connection* conn, QuerySchema* query, uint options)
 {
 #ifdef PREDICATE_DEBUG_GUI
     Predicate::debugGUI(QString::fromLatin1("Create cursor for query \"%1\": ").arg(query->name())
-                        + Predicate::debugString(query));
+                        + Utils::debugString(query));
 #endif
     init();
 }

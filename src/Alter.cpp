@@ -265,7 +265,7 @@ static void debugAction(AlterTableHandler::ActionBase *action, int nestingLevel,
         PreDbg << debugString;
 #ifdef PREDICATE_DEBUG_GUI
         if (simulate)
-            Utils::alterTableActionDebugGUI(debugString, nestingLevel);
+            Predicate::alterTableActionDebugGUI(debugString, nestingLevel);
 #endif
     }
 }
@@ -286,7 +286,7 @@ static void debugActionDict(AlterTableHandler::ActionDict *dict, int fieldUID, b
     PreDbg << dbg;
 #ifdef PREDICATE_DEBUG_GUI
     if (simulate)
-        Utils::alterTableActionDebugGUI(dbg, 1);
+        Predicate::alterTableActionDebugGUI(dbg, 1);
 #endif
     for (;it != dict->constEnd(); ++it) {
         debugAction(it.value(), 2, simulate);
@@ -297,7 +297,7 @@ static void debugFieldActions(const AlterTableHandler::ActionDictDict &fieldActi
 {
 #ifdef PREDICATE_DEBUG_GUI
     if (simulate)
-        Utils::alterTableActionDebugGUI("** Simplified Field Actions:");
+        Predicate::alterTableActionDebugGUI(QLatin1String("** Simplified Field Actions:"));
 #endif
     for (AlterTableHandler::ActionDictDictConstIterator it(fieldActions.constBegin()); it != fieldActions.constEnd(); ++it) {
         debugActionDict(it.value(), it.key(), simulate);
@@ -664,14 +664,14 @@ void AlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &field
                 setField(f);
                 PreDbg << field();
 #ifdef PREDICATE_DEBUG_GUI
-                Utils::alterTableActionDebugGUI(
-                    QString("** Property-set actions moved to field definition itself:\n")
-                        + Utils::debugString<Field>(field()), 0);
+                Predicate::alterTableActionDebugGUI(
+                    QLatin1String("** Property-set actions moved to field definition itself:\n")
+                        + Utils::debugString<Field>(*field()), 0);
 #endif
             } else {
 #ifdef PREDICATE_DEBUG_GUI
-                Utils::alterTableActionDebugGUI(
-                    QString("** Failed to set properties for field ") + Utils::debugString<Field>(field()), 0);
+                Predicate::alterTableActionDebugGUI(
+                    QLatin1String("** Failed to set properties for field ") + Utils::debugString<Field>(*field()), 0);
 #endif
                 PreWarn << "setFieldProperties() failed!";
                 delete f;
@@ -917,14 +917,14 @@ TableSchema* AlterTableHandler::execute(const QString& tableName, ExecutionArgum
 
 #ifdef PREDICATE_DEBUG_GUI
     if (args->simulate)
-        Utils::alterTableActionDebugGUI(dbg, 0);
+        Predicate::alterTableActionDebugGUI(dbg, 0);
 #endif
     dbg = QString::fromLatin1("** Ordered, simplified actions (%1, was %2):")
             .arg(currentActionsCount).arg(allActionsCount);
     PreDbg << dbg;
 #ifdef PREDICATE_DEBUG_GUI
     if (args->simulate)
-        Utils::alterTableActionDebugGUI(dbg, 0);
+        Predicate::alterTableActionDebugGUI(dbg, 0);
 #endif
     for (int i = 0; i < allActionsCount; i++) {
         debugAction(actionsVector.at(i), 1, args->simulate,
