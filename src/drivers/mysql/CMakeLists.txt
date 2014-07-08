@@ -28,15 +28,15 @@ qt_wrap_cpp(predicate_mysql predicate_mysql_SRCS ${predicate_mysql_MOC_SRCS})
 
 add_library(predicate_mysql SHARED ${predicate_mysql_SRCS})
 
-if(MSVC)
-  set(EXTRA_LIBRARIES ws2_32 msvcrtd)
-endif(MSVC)
-
 target_link_libraries(predicate_mysql
   ${MYSQL_LIBRARIES}
-  ${EXTRA_LIBRARIES}
   predicate
 )
+
+if(MSVC)
+  target_link_libraries(predicate_mysql ws2_32 msvcrtd)
+endif(MSVC)
+
 set_target_properties(predicate_mysql PROPERTIES PREFIX "")
 
 if(MSVC)
