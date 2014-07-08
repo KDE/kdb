@@ -88,8 +88,10 @@ if(PostgreSQL_ROOT_DIRECTORIES)
   file(TO_CMAKE_PATH ${PostgreSQL_ROOT_DIRECTORIES} PostgreSQL_ROOT_DIRECTORIES)
 endif(PostgreSQL_ROOT_DIRECTORIES)
 
-set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS}
-    "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
+set(PostgreSQL_KNOWN_VERSIONS "9.1" "9.0" "8.4" "8.3" "8.2" "8.1" "8.0")
+if(DEFINED PostgreSQL_ADDITIONAL_VERSIONS)
+  set(PostgreSQL_KNOWN_VERSIONS ${PostgreSQL_ADDITIONAL_VERSIONS} ${PostgreSQL_KNOWN_VERSIONS})
+endif(DEFINED PostgreSQL_ADDITIONAL_VERSIONS)
 
 # Define additional search paths for root directories.
 if ( WIN32 )
@@ -97,11 +99,14 @@ if ( WIN32 )
     set(PostgreSQL_ADDITIONAL_SEARCH_PATHS ${PostgreSQL_ADDITIONAL_SEARCH_PATHS} "C:/Program Files/PostgreSQL/${suffix}" )
   endforeach(suffix)
 endif( WIN32 )
-set( PostgreSQL_ROOT_DIRECTORIES
-   ${PostgreSQL_ROOT_DIRECTORIES}
-   ${PostgreSQL_ROOT}
-   ${PostgreSQL_ADDITIONAL_SEARCH_PATHS}
-)
+
+if(DEFINED PostgreSQL_ROOT)
+  set(PostgreSQL_ROOT_DIRECTORIES ${PostgreSQL_ROOT_DIRECTORIES} ${PostgreSQL_ROOT})
+endif(DEFINED PostgreSQL_ROOT)
+
+if(DEFINED PostgreSQL_ADDITIONAL_SEARCH_PATHS)
+  set(PostgreSQL_ROOT_DIRECTORIES ${PostgreSQL_ROOT_DIRECTORIES} ${PostgreSQL_ADDITIONAL_SEARCH_PATHS})
+endif(DEFINED PostgreSQL_ADDITIONAL_SEARCH_PATHS)
 
 #
 # Look for an installation.

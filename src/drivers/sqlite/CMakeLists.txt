@@ -74,7 +74,13 @@ qt_wrap_cpp(predicate_sqlite predicate_sqlite_SRCS ${predicate_sqlite_MOC_SRCS})
 
 add_library(predicate_sqlite SHARED ${predicate_sqlite_SRCS})
 
-target_link_libraries(predicate_sqlite ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS} ${SQLITE_LIBRARIES} predicate)
+target_link_libraries(predicate_sqlite ${SQLITE_LIBRARIES} predicate)
+if(DEFINED CMAKE_DL_LIBS)
+  target_link_libraries(predicate_sqlite ${CMAKE_DL_LIBS})
+endif(DEFINED CMAKE_DL_LIBS)
+if(DEFINED CMAKE_THREAD_LIBS)
+  target_link_libraries(predicate_sqlite ${CMAKE_THREAD_LIBS})
+endif(DEFINED CMAKE_THREAD_LIBS)
 set_target_properties(predicate_sqlite PROPERTIES PREFIX "")
 
 install(TARGETS predicate_sqlite DESTINATION ${PREDICATE_PLUGINS_DIR})
