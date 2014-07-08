@@ -71,14 +71,14 @@
 # 2) Use CMAKE_INCLUDE_PATH to set a path to <Your Path>/PostgreSQL<-version>. This will allow find_path()
 #    to locate PostgreSQL_INCLUDE_DIR by utilizing the PATH_SUFFIXES option. e.g. In your CMakeLists.txt file
 #    SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "<Your Path>/include")
-# 3) Set an environment variable called ${PostgreSQL_ROOT} that points to the root of where you have
+# 3) Set an environment variable called PostgreSQL_ROOT that points to the root of where you have
 #    installed PostgreSQL, e.g. <Your Path>.
 #
 # ----------------------------------------------------------------------------
 
 set(PostgreSQL_INCLUDE_PATH_DESCRIPTION "top-level directory containing the PostgreSQL include directories. E.g /usr/local/include/PostgreSQL/8.4 or C:/Program Files/PostgreSQL/8.4/include")
 set(PostgreSQL_INCLUDE_DIR_MESSAGE "Set the PostgreSQL_INCLUDE_DIR cmake cache entry to the ${PostgreSQL_INCLUDE_PATH_DESCRIPTION}")
-set(PostgreSQL_LIBRARY_PATH_DESCRIPTION "top-level directory containing the PostgreSQL libraries.")
+set(PostgreSQL_LIBRARY_PATH_DESCRIPTION "Top-level directory containing the PostgreSQL libraries.")
 set(PostgreSQL_LIBRARY_DIR_MESSAGE "Set the PostgreSQL_LIBRARY_DIR cmake cache entry to the ${PostgreSQL_LIBRARY_PATH_DESCRIPTION}")
 set(PostgreSQL_ROOT_DIR_MESSAGE "Set the PostgreSQL_ROOT system variable to where PostgreSQL is found on the machine E.g C:/Program Files/PostgreSQL/8.4")
 
@@ -130,8 +130,10 @@ find_path(PostgreSQL_TYPE_INCLUDE_DIR
    # Look in other places.
    ${PostgreSQL_ROOT_DIRECTORIES}
   PATH_SUFFIXES
+    postgresql
     pgsql/server
     postgresql/server
+    include/server
     include
   # Help the user find it if we cannot.
   DOC "The ${PostgreSQL_INCLUDE_DIR_MESSAGE}"
@@ -155,11 +157,20 @@ find_library( PostgreSQL_LIBRARY
 )
 get_filename_component(PostgreSQL_LIBRARY_DIR ${PostgreSQL_LIBRARY} PATH)
 
+if (PostgreSQL_INCLUDE_DIR AND EXISTS "${PostgreSQL_INCLUDE_DIR}/pg_config.h")
+  file(STRINGS "${PostgreSQL_INCLUDE_DIR}/pg_config.h" pgsql_version_str
+       REGEX "^#define[\t ]+PG_VERSION[\t ]+\".*\"")
+
+  string(REGEX REPLACE "^#define[\t ]+PG_VERSION[\t ]+\"([^\"]*)\".*" "\\1"
+         PostgreSQL_VERSION_STRING "${pgsql_version_str}")
+  unset(pgsql_version_str)
+endif()
+
 # Did we find anything?
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(PostgreSQL DEFAULT_MSG
-                                  PostgreSQL_LIBRARY PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR)
-
+find_package_handle_standard_args(PostgreSQL
+                                  REQUIRED_VARS PostgreSQL_LIBRARY PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR
+                                  VERSION_VAR PostgreSQL_VERSION_STRING)
 set( PostgreSQL_FOUND  ${POSTGRESQL_FOUND})
 
 # Now try to get the include and library path.
@@ -172,6 +183,6 @@ if(PostgreSQL_FOUND)
   #message("Final PostgreSQL include dir: ${PostgreSQL_INCLUDE_DIRS}")
   #message("Final PostgreSQL library dir: ${PostgreSQL_LIBRARY_DIRS}")
   #message("Final PostgreSQL libraries:   ${PostgreSQL_LIBRARIES}")
-endif(PostgreSQL_FOUND)
+endif()
 
 mark_as_advanced(PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR PostgreSQL_LIBRARY )
