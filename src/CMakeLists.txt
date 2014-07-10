@@ -140,6 +140,8 @@ target_link_libraries(predicate
   ${QT_QTXML_LIBRARY}
 )
 
+ADD_DEPENDENCIES(predicate _shared_classes) # generate shared classes before they can be used in Predicate
+
 if (BUILD_TEST_COVERAGE)
     target_link_libraries(predicate gcov)
 endif (BUILD_TEST_COVERAGE)
