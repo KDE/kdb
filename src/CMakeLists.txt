@@ -139,6 +139,7 @@ target_include_directories(KDb
     INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KDb>"
     PRIVATE expression generated interfaces parser parser/generated tools views
             ${CMAKE_CURRENT_BINARY_DIR}/kdb
+            ${ICU_INCLUDE_DIRS}
 )
 
 target_link_libraries(KDb
@@ -148,6 +149,7 @@ target_link_libraries(KDb
         Qt5::Widgets
     PRIVATE
         Qt5::Xml
+        ${ICU_I18N_LIBRARY}
 )
 
 if (BUILD_TEST_COVERAGE)
