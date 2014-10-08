@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -1254,12 +1254,18 @@ static EscapedString selectStatementInternal(const Driver *driver,
 
                     QString tableName;
                     int tablePosition = querySchema->tableBoundToColumn(number);
-                    if (tablePosition >= 0)
+                    if (tablePosition >= 0) {
                         tableName = querySchema->tableAlias(tablePosition);
-                    if (tableName.isEmpty())
-                        tableName = f->table()->name();
-
-                    if (!singleTable) {
+                    }
+                    if (options.addVisibleLookupColumns) { // try to find table/alias name harder
+                        if (tableName.isEmpty()) {
+                            tableName = querySchema->tableAlias(f->table()->name());
+                        }
+                        if (tableName.isEmpty()) {
+                            tableName = f->table()->name();
+                        }
+                    }
+                    if (!singleTable && !tableName.isEmpty()) {
                         sql.append(Predicate::escapeIdentifier(driver, tableName)).append('.');
                     }
                     sql += Predicate::escapeIdentifier(driver, f->name());
