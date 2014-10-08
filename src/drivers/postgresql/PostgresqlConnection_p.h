@@ -59,17 +59,6 @@ public:
     int resultCode; //!< result code of last operation on server
 };
 
-#if 0 //pred
-//! @internal
-class PostgresqlTransactionData : public TransactionData
-{
-public:
-    PostgresqlTransactionData(Connection *conn, bool nontransaction);
-    ~PostgresqlTransactionData();
-    pqxx::transaction_base *data;
-};
-#endif
-
 //! Internal PostgreSQL cursor data.
 /*! Provides a low-level abstraction for iterating over result sets. */
 class PostgresqlCursorData : public PostgresqlConnectionInternal

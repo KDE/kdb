@@ -52,7 +52,7 @@ FIXME - driver must be provided within KDE module file named with "predicate_" p
   - EXPORT_PREDICATE_DRIVER should be placed in driver's .cpp file
   - Driver inherits from QObject only because this enables Qt Plugin system
 
- @see SQLiteDriver MySqlDriver, PqxxSqlDriver, EXPORT_PREDICATE_DRIVER, PREDICATE_DRIVER
+ @see SQLiteDriver MySqlDriver PostgresqlDriver EXPORT_PREDICATE_DRIVER PREDICATE_DRIVER
 */
 class PREDICATE_EXPORT Driver : public QObject, public Resultable
 {

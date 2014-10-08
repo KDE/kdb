@@ -31,14 +31,6 @@
 
 using namespace Predicate;
 
-// unsigned int PostgresqlCursor_trans_num = 0; //!< debug helper
-
-// static QByteArray pgsqlByteaToByteArray(const pqxx::result::field& r)
-// {
-//     return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
-// }
-
-//==================================================================================
 // Constructor based on query statement
 PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint options)
         : Cursor(conn, statement, options)

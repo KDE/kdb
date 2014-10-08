@@ -390,7 +390,7 @@ enum BLOBEscapingType {
     //!< See http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
 };
 
-//! @todo reverse function for BLOBEscapeOctal is available: processBinaryData() in pqxxcursor.cpp - move it here
+//! @todo reverse function for BLOBEscapeOctal is available: processBinaryData() in PostgresqlCursor.cpp - move it here
 /*! @return a string containing escaped, printable representation of @a array.
  Escaping is controlled by @a type. For empty array, QString() is returned,
  so if you want to use this function in an SQL statement, empty arrays should be

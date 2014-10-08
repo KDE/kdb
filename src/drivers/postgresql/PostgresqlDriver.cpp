@@ -207,7 +207,7 @@ bool PostgresqlDriver::isSystemDatabaseName(const QString& n) const
 
 EscapedString PostgresqlDriver::escapeString(const QString& str) const
 {
-    //Cannot use pqxx or libpq escape functions as they require a db connection
+    //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
     return EscapedString("E'")
@@ -217,7 +217,7 @@ EscapedString PostgresqlDriver::escapeString(const QString& str) const
 
 EscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
 {
-    //Cannot use pqxx or libpq escape functions as they require a db connection
+    //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
     return EscapedString("'")
