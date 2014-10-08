@@ -1295,7 +1295,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
                         s_additional_joins += EscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
                             .arg(Predicate::escapeIdentifier(driver, lookupTable->name()))
                             .arg(internalUniqueTableAlias)
-                            .arg(Predicate::escapeIdentifier(driver, f->table()->name()))
+                            .arg(Predicate::escapeIdentifier(driver, querySchema->tableAliasOrName(f->table()->name())))
                             .arg(Predicate::escapeIdentifier(driver, f->name()))
                             .arg(internalUniqueTableAlias)
                             .arg(Predicate::escapeIdentifier(driver, boundField->name()));
@@ -1397,7 +1397,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
         if (!sql.isEmpty())
             s = ", ";
         if (querySchema->masterTable())
-            s += EscapedString(escapeIdentifier(querySchema->masterTable()->name())) + '.';
+            s += EscapedString(querySchema->tableAliasOrName(querySchema->masterTable()->name())) + '.';
         s += driver->behaviour()->ROW_ID_FIELD_NAME;
         sql += s;
     }
