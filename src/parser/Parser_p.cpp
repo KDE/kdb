@@ -468,12 +468,9 @@ QuerySchema* buildSelectQuery(
                 CLEANUP;
                 return 0;
             }
-            QString tableOrAliasName;
+            QString tableOrAliasName = Predicate::iifNotEmpty(aliasString, tname);
             if (!aliasString.isEmpty()) {
-                tableOrAliasName = aliasString;
 //    PreDbg << "- add alias for table: " << aliasString;
-            } else {
-                tableOrAliasName = tname;
             }
             // 1. collect information about first repeated table name or alias
             //    (potential ambiguity)
