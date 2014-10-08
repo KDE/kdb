@@ -50,7 +50,7 @@ echo "------------------------------------------"
 echo "CMake will be executed using this command:"
 echo
 echo $cmd
-if [ "$1" == "--dry-run" ] ; then
+if [ "$1" = "--dry-run" ] ; then
     exit 0
 fi
 echo
