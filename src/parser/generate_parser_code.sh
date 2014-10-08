@@ -1,10 +1,11 @@
 #!/bin/sh
 # generates parser and lexer code using bison and flex
 
-dir=`dirname $0`
-cd $dir
+builddir=$PWD
+srcdir=`dirname $0`
+cd $srcdir
 flex -oSqlScanner.cpp SqlScanner.l
-bison -dv SqlParser.y
+bison -dv SqlParser.y --report-file=$builddir/sqlparser.output
 echo '#ifndef _SQLPARSER_H_
 #define _SQLPARSER_H_
 #include <Predicate/Field.h>
