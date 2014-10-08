@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -483,6 +483,16 @@ public:
      or null string if there is no alias for this table
      or if there is no such table within the query defined. */
     QString tableAlias(uint position) const;
+
+    /*! @return alias of a table @a tableName (within FROM section)
+     or empty value if there is no alias for this table
+     or if there is no such table within the query defined. */
+    QString tableAlias(const QString& tableName) const;
+
+    /*! @return alias of a table @a tableName (within FROM section).
+    If there is no alias for this table, its name is returned.
+    Empty value is returned if there is no such table within the query defined. */
+    QString tableAliasOrName(const QString& tableName) const;
 
     /*! @return table position (within FROM section) that has attached
      alias @a name.

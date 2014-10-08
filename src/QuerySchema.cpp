@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -1170,6 +1170,24 @@ int QuerySchema::tableAliasesCount() const
 QString QuerySchema::tableAlias(uint position) const
 {
     return d->tableAliases.value(position);
+}
+
+QString QuerySchema::tableAlias(const QString& tableName) const
+{
+    const int pos = tablePosition(tableName);
+    if (pos == -1) {
+        return QString();
+    }
+    return d->tableAliases.value(pos);
+}
+
+QString QuerySchema::tableAliasOrName(const QString& tableName) const
+{
+    const int pos = tablePosition(tableName);
+    if (pos == -1) {
+        return QString();
+    }
+    return Predicate::iifNotEmpty(d->tableAliases.value(pos), tableName);
 }
 
 int QuerySchema::tablePositionForAlias(const QString& name) const
