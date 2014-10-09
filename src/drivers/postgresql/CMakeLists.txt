@@ -1,3 +1,5 @@
+add_feature_info(BUILD_POSTGRESQL_DB_DRIVER TRUE ${BUILD_POSTGRESQL_DB_DRIVER_DESC})
+
 include_directories(
   ${PostgreSQL_INCLUDE_DIRS}
 )

@@ -7,43 +7,59 @@ endif(COMMAND cmake_policy)
 
 set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
 
+# -----------------------
+
 # find SQLite:
 set(SQLITE_MIN_VERSION 3.6.16)
 set(SQLITE_RECOMMENDED_VERSION 3.8.6)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
-find_package(Sqlite ${SQLITE_MIN_VERSION})
-macro_log_feature(SQLITE_FOUND "SQLite" "Embedded SQL database engine with enabled extensions loading"
+macro_optional_find_package(Sqlite ${SQLITE_MIN_VERSION})
+macro_log_feature(SQLITE_FOUND "SQLite3" "Embedded SQL database engine with enabled extensions loading"
                   "http://www.sqlite.org" FALSE "${SQLITE_MIN_VERSION}"
-                  "Recommended as Predicate's default database driver.")
+                  "Required by SQLite database driver")
+
+set(BUILD_SQLITE_DB_DRIVER_DESC "SQLite database driver")
 if(SQLITE_FOUND)
     ##
     ## Test for ICU
     ##
-    find_package(ICU)
+    macro_optional_find_package(ICU)
     macro_log_feature(ICU_FOUND "ICU" "International Components for Unicode (ICU) Library"
                       "http://icu-project.org" FALSE "" "Required by SQLite database driver")
     if(ICU_FOUND)
         macro_optional_add_subdirectory(sqlite)
     else(ICU_FOUND)
-        message(STATUS "WARNING: Because of that, SQLite driver will not be built.")
+        add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because ICU not found)")
+        message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
     endif(ICU_FOUND)
 else(SQLITE_FOUND)
-    message(STATUS "Recommended package SQLite NOT found.")
+    add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because SQLite3 not found)")
+    message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
 endif(SQLITE_FOUND)
 
+# -----------------------
+
+set(BUILD_MYSQL_DB_DRIVER_DESC "MySQL database driver")
 macro_optional_find_package(MySQL)
 macro_log_feature(MYSQL_FOUND "libmysqlclient" "MySQL Client Library"
-                  "http://www.mysql.com" FALSE "" "Required by MySQL database driver")
-IF (MYSQL_FOUND)
+                  "http://www.mysql.com" FALSE "" "Required by ${BUILD_MYSQL_DB_DRIVER_DESC}")
+if(MYSQL_FOUND)
    macro_optional_add_subdirectory(mysql)
-ENDIF (MYSQL_FOUND)
+else()
+   add_feature_info(BUILD_MYSQL_DB_DRIVER FALSE "${BUILD_MYSQL_DB_DRIVER_DESC} (because MySQL Client Library not found)")
+endif(MYSQL_FOUND)
 
+# -----------------------
+
+set(BUILD_POSTGRESQL_DB_DRIVER_DESC "PostgreSQL database driver")
 macro_optional_find_package(PostgreSQL)
 macro_log_feature(POSTGRESQL_FOUND "libpq" "C API to PostgreSQL"
-                  "http://www.postgresql.org" FALSE "" "Required by PostgreSQL database driver")
-IF (POSTGRESQL_FOUND)
+                  "http://www.postgresql.org" FALSE "" "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}")
+if(POSTGRESQL_FOUND)
    macro_optional_add_subdirectory(postgresql)
-ENDIF (POSTGRESQL_FOUND)
+else()
+   add_feature_info(BUILD_POSTGRESQL_DB_DRIVER FALSE "${BUILD_POSTGRESQL_DB_DRIVER_DESC} (because C API to PostgreSQL not found)")
+endif(POSTGRESQL_FOUND)
 
 #macro_optional_find_package(FreeTDS)
 #macro_log_feature(FREETDS_FOUND "FreeTDS" "Open source implementation of the TDS (Tabular Data Stream) protocol"

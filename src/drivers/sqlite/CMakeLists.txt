@@ -1,8 +1,10 @@
+add_feature_info(BUILD_SQLITE_DB_DRIVER TRUE ${BUILD_SQLITE_DB_DRIVER_DESC})
+
 # Generate SqliteGlobal.h
 configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h )
 
-option(PREDICATE_SQLITE_VACUUM "Enable support for SQLite vacuum (compacting) feature" ON)
-add_feature_info(PREDICATE_SQLITE_VACUUM PREDICATE_SQLITE_VACUUM "Enable support for SQLite vacuum (compacting) feature")
+simple_option(PREDICATE_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
+
 if (PREDICATE_SQLITE_VACUUM)
   set(PREDICATE_SQLITE_DUMP_TOOL predicate_sqlite3_dump)
   ADD_DEFINITIONS(-DPREDICATE_SQLITE_DUMP_TOOL=\"${PREDICATE_SQLITE_DUMP_TOOL}\")
