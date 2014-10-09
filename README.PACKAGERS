@@ -13,12 +13,13 @@ Splitting Predicate into packages:
 Table Of Contents
 =================
 
-1. Predicate libraries
-2. Database drivers
+1.   Predicate libraries
+2.   Database and migration drivers
 2.1. Versions of client libraries
+3.   More information
 
 
-3. Predicate libraries
+1. Predicate libraries
 ======================
 
 List of Predicate libraries:
@@ -32,12 +33,16 @@ List of Predicate libraries:
 Predicate provides database drivers in a form of plugins for a number
 of database types or data sources. The following matrix lists them:
 
- Name         Database driver files
+ Name         Database driver files           Notes
  ------------------------------------------------------------------------
  SQLite       predicate_sqlite.so
               predicate_sqlite.desktop
+              predicate_sqlite_icu.so         SQLite plugin for unicode support
+              predicate_sqlite3_dump          A minimal command line tool
+                                              for compacting files
  MySQL        predicate_mysql.so
               predicate_mysql.desktop
+
  PostgreSQL   predicate_postgresql.so
               predicate_postgresql.desktop
 
@@ -76,3 +81,9 @@ Predicate's MySQL driver uses MySQL client library version 5.x.
 
 Predicate's PostgreSQL driver uses pq client library version 9.x.
 
+
+3. More information
+===================
+
+Predicate wiki page provides useful and most up-to-date information:
+http://community.kde.org/Predicate/Build
