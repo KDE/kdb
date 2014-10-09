@@ -495,6 +495,7 @@ int sqlite3_extension_init(
   char **pzErrMsg,
   const struct sqlite3_api_routines *pApi
 ){
+  (void)pzErrMsg;  /* Unused parameter */
   SQLITE_EXTENSION_INIT2(pApi)
   return sqlite3IcuInit(db);
 }
