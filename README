@@ -1,3 +1,8 @@
+                          README for Predicate
+
+1. About
+========
+
 Predicate is a database connectivity and creation library,
 a new iteration of KexiDB library developed within Kexi [1],
 part of the Calligra Suite [2] (formerly KOffice).
@@ -9,5 +14,17 @@ deprecating KexiDB.
 
 Project's home page: http://community.kde.org/Predicate
 
+Project maintainer: Jaroslaw Staniek <staniek@kde.org>
+
 [1] http://www.calligra.org/kexi
 [2] http://www.calligra.org
+
+
+2. Building Predicate
+=====================
+
+Predicate uses cmake build system.
+
+Predicate wiki page provides useful and most up-to-date information:
+
+http://community.kde.org/Predicate/Build
