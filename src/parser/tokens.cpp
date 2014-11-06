@@ -1,5 +1,6 @@
 /* WARNING! All changes made in this file will be lost! Run 'generate_parser_code.sh' instead. */
 static const char* const _tokens[] = {
+    "&&",
     "AND",
     "AS",
     "ASC",
@@ -23,6 +24,7 @@ static const char* const _tokens[] = {
     "SELECT",
     "SIMILAR",
     "TABLE",
+    "TO",
     "TRUE",
     "WHERE",
     "XOR",
