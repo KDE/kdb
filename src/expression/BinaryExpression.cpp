@@ -224,6 +224,7 @@ QString BinaryExpressionData::tokenToString() const
     case LESS_OR_EQUAL: return QLatin1String("<=");
     case GREATER_OR_EQUAL: return QLatin1String(">=");
     case LIKE: return QLatin1String("LIKE");
+    case NOT_LIKE: return QLatin1String("NOT LIKE");
     case SQL_IN: return QLatin1String("IN");
         // other logical operations: OR (or ||) AND (or &&) XOR
     case SIMILAR_TO: return QLatin1String("SIMILAR TO");

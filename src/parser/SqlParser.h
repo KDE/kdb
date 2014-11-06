@@ -113,7 +113,8 @@ extern int yydebug;
     NOT_SIMILAR_TO = 316,
     BETWEEN = 317,
     UMINUS = 318,
-    __LAST_TOKEN = 319
+    NOT_LIKE = 319,
+    __LAST_TOKEN = 320
   };
 #endif
 
@@ -122,7 +123,7 @@ extern int yydebug;
 typedef union YYSTYPE YYSTYPE;
 union YYSTYPE
 {
-#line 512 "SqlParser.y" /* yacc.c:1909  */
+#line 504 "SqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
     qint64 integerValue;
@@ -138,7 +139,7 @@ union YYSTYPE
     OrderByColumnInternal::List *orderByColumns;
     QVariant *variantValue;
 
-#line 135 "SqlParser.tab.h" /* yacc.c:1909  */
+#line 136 "SqlParser.tab.h" /* yacc.c:1909  */
 };
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1

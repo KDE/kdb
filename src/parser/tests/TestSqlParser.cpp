@@ -259,6 +259,7 @@ void TestSqlParser::testTokens()
     QCOMPARE(int(CREATE), 269);
     QCOMPARE(int(DATE_CONST), 289);
     QCOMPARE(int(UMINUS), 318);
+    QCOMPARE(int(NOT_LIKE), 319);
 }
 
 void TestSqlParser::cleanupTestCase()

@@ -163,6 +163,11 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
     return LIKE;
 }
 
+"NOT"{whitespace}+"LIKE" {
+    ECOUNT;
+    return NOT_LIKE;
+}
+
 "NOT"{whitespace}+"SIMILAR"{whitespace}+"TO" {
     ECOUNT;
     return NOT_SIMILAR_TO;

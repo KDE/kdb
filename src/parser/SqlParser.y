@@ -566,6 +566,10 @@ using namespace Predicate;
 //%left        TYPECAST
 %left        '.'
 
+%nonassoc NOT_LIKE
+
+// <-- To keep binary compatibility insert new tokens here.
+
 /*
  * These might seem to be low-precedence, but actually they are not part
  * of the arithmetic hierarchy at all in their use as JOIN operators.
@@ -949,6 +953,12 @@ aExpr5 NOT_EQUAL2 aExpr4
 | aExpr5 LIKE aExpr4
 {
     $$ = new BinaryExpression(*$1, LIKE, *$3);
+    delete $1;
+    delete $3;
+}
+| aExpr5 NOT_LIKE aExpr4
+{
+    $$ = new BinaryExpression(*$1, NOT_LIKE, *$3);
     delete $1;
     delete $3;
 }

@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2014 Radoslaw Wicik <radoslaw@wicik.pl>
 
    Design based on nexp.h : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -298,7 +299,8 @@ protected:
 //! The BinaryExpression class represents binary operation.
 /*
  - arithmetic operations: + - / * % << >> & | ||
- - relational operations: = (or ==) < > <= >= <> (or !=) LIKE IN 'SIMILAR TO' 'NOT SIMILAR TO'
+ - relational operations: = (or ==) < > <= >= <> (or !=) LIKE 'NOT LIKE' IN 'SIMILAR TO'
+                          'NOT SIMILAR TO'
  - logical operations: OR (or ||) AND (or &&) XOR
  - SpecialBinary "pseudo operators":
     * e.g. "f1 f2" : token == 0

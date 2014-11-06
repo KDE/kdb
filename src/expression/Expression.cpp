@@ -1,5 +1,6 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2014 Radoslaw Wicik <radoslaw@wicik.pl>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -555,6 +556,7 @@ ExpressionClass Expression::classForToken(int token)
     case LESS_OR_EQUAL:
     case GREATER_OR_EQUAL:
     case LIKE:
+    case NOT_LIKE:
     case SQL_IN:
     case SIMILAR_TO:
     case NOT_SIMILAR_TO:
