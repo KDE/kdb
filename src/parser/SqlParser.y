@@ -93,7 +93,6 @@
 //%token AVG
 //%token BEFORE
 //%token SQL_BEGIN
-//%token BETWEEN
 //%token BIGINT
 //%token BINARY
 //%token BIT_LENGTH
@@ -190,7 +189,6 @@
 //%token GO
 //%token GOTO
 //%token GRANT
-//%token GREATER_OR_EQUAL
 //conflict %token GROUP
 //%token HAVING
 //%token HOUR
@@ -199,7 +197,6 @@
 //%token IFNULL
 //%token SQL_IGNORE
 //%token IMMEDIATE
-//%token SQL_IN
 //%token INCLUDE
 //%token INDEX
 //%token INDICATOR
@@ -220,7 +217,6 @@
 //%token LCASE
 //%token LENGTH
 //%token LEVEL
-//%token LIKE
 //%token LINE_WIDTH
 //%token LOCAL
 //%token LOCATE
@@ -248,8 +244,6 @@
 //%token NODUP
 //%token NONE
 //%token NOT
-//%token NOT_EQUAL //<>
-//%token NOT_EQUAL2 //!=
 //%token NOW
 //%token NULLIF
 //%token NUMERIC
@@ -304,8 +298,6 @@
 //%token SHOWOPT
 //%token SIGN
 //%token SIMILAR
-//%token SIMILAR_TO */ /* helper */
-//%token NOT_SIMILAR_TO /* helper */
 //%token SIN
 //%token SQL_SIZE
 //%token SMALLINT
@@ -535,12 +527,7 @@ using namespace Predicate;
 %left     OR
 %left     AND XOR
 %right    NOT
-//%right        '='
-//%nonassoc    '<' '>'
-//%nonassoc '=' '<' '>' "<=" ">=" "<>" ":=" LIKE ILIKE SIMILAR
-//%nonassoc '=' LESS_THAN GREATER_THAN LESS_OR_EQUAL GREATER_OR_EQUAL NOT_EQUAL
 %nonassoc '=' '<' '>'
-//LESS_THAN GREATER_THAN 
 %nonassoc LESS_OR_EQUAL GREATER_OR_EQUAL 
 %nonassoc NOT_EQUAL NOT_EQUAL2
 %nonassoc SQL_IN LIKE ILIKE SIMILAR_TO NOT_SIMILAR_TO
@@ -943,8 +930,7 @@ aExpr5 NOT_EQUAL aExpr4
     delete $1;
     delete $3;
 }
-|
-aExpr5 NOT_EQUAL2 aExpr4
+| aExpr5 NOT_EQUAL2 aExpr4
 {
     $$ = new BinaryExpression(*$1, NOT_EQUAL2, *$3);
     delete $1;
