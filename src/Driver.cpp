@@ -304,5 +304,5 @@ PREDICATE_GLOBAL_STATIC_WITH_ARGS(
 
 PREDICATE_EXPORT bool Predicate::isPredicateSQLKeyword(const QByteArray& word)
 {
-    return Predicate_predicateSQLKeywords->contains(word);
+    return Predicate_predicateSQLKeywords->contains(word.toUpper());
 }
