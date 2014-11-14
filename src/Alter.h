@@ -365,7 +365,7 @@ public:
         void setIndex(int index) {
             m_index = index;
         }
-        Predicate::Field* field() const {
+        const Predicate::Field* field() const {
             return m_field;
         }
         void setField(Predicate::Field* field);
