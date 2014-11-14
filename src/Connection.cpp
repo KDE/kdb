@@ -1255,7 +1255,8 @@ static EscapedString selectStatementInternal(const Driver *driver,
                     QString tableName;
                     int tablePosition = querySchema->tableBoundToColumn(number);
                     if (tablePosition >= 0) {
-                        tableName = querySchema->tableAlias(tablePosition);
+                        tableName = Predicate::iifNotEmpty(querySchema->tableAlias(tablePosition),
+                                                           f->table()->name());
                     }
                     if (options.addVisibleLookupColumns) { // try to find table/alias name harder
                         if (tableName.isEmpty()) {

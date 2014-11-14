@@ -159,6 +159,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
 
     //table.fieldname or tableAlias.fieldname
     TableSchema *ts = parseInfo->querySchema()->table(tableName);
+    int tablePosition = -1;
     if (ts) {//table.fieldname
         //check if "table" is covered by an alias
         const QList<int> tPositions = parseInfo->querySchema()->tablePositions(tableName);
@@ -183,10 +184,11 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
                               tableAlias + QLatin1Char('.') + fieldName));
             return false;
         }
+        if (!tPositions.isEmpty()) {
+            tablePosition = tPositions.first();
+        }
     }
-
-    int tablePosition = -1;
-    if (!ts) {//try to find tableAlias
+    else {//try to find tableAlias
         tablePosition = parseInfo->querySchema()->tablePositionForAlias(tableName);
         if (tablePosition >= 0) {
             ts = parseInfo->querySchema()->tables()->at(tablePosition);
