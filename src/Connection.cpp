@@ -320,7 +320,6 @@ void Connection::destroy()
 Connection::~Connection()
 {
     m_destructor_started = true;
-// PreDbg;
     delete d;
     d = 0;
     /* if (m_driver) {
@@ -420,7 +419,7 @@ bool Connection::checkIsDatabaseUsed()
 
 QStringList Connection::databaseNames(bool also_system_db)
 {
-    PreDbg << also_system_db;
+    //PreDbg << also_system_db;
     if (!checkConnected())
         return QStringList();
 
@@ -446,9 +445,9 @@ QStringList Connection::databaseNames(bool also_system_db)
         return list;
     //filter system databases:
     for (QStringList::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
-        PreDbg << *it;
+        //PreDbg << *it;
         if (!m_driver->isSystemDatabaseName(*it)) {
-            PreDbg << "add " << *it;
+            //PreDbg << "add " << *it;
             non_system_list << (*it);
         }
     }
@@ -637,7 +636,7 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
 {
     if (cancelled)
         *cancelled = false;
-    PreDbg << dbName << kexiCompatible;
+    //PreDbg << dbName << kexiCompatible;
     if (!checkConnected())
         return false;
 
@@ -736,7 +735,6 @@ bool Connection::closeDatabase()
         return false;
 
     d->usedDatabase.clear();
-// PreDbg << ret;
     return ret;
 }
 
@@ -1503,7 +1501,7 @@ static EscapedString selectStatementInternal(const Driver *driver,
                 continue;
             if (pkeyFieldsIndex >= (int)fieldsExpanded.count()) {
                 PreWarn << "ORDER BY: (*it) >= fieldsExpanded.count() - "
-                << pkeyFieldsIndex << " >= " << fieldsExpanded.count();
+                        << pkeyFieldsIndex << " >= " << fieldsExpanded.count();
                 continue;
             }
             QueryColumnInfo *ci = fieldsExpanded[ pkeyFieldsIndex ];
@@ -2106,7 +2104,7 @@ bool Connection::dropQuery(const QString& queryName)
 bool Connection::drv_createTable(const TableSchema& tableSchema)
 {
     const EscapedString sql( createTableStatement(tableSchema) );
-    PreDbg << "******** " << sql;
+    //PreDbg << "******** " << sql;
     return executeSQL(sql);
 }
 
@@ -2507,7 +2505,7 @@ bool Connection::storeObjectDataInternal(Object* object, bool newObject)
             //fetch newly assigned ID
 //! @todo safe to cast it?
             int obj_id = (int)lastInsertedAutoIncValue(QLatin1String("o_id"), *ts);
-            PreDbg << "######## NEW obj_id == " << obj_id;
+            //PreDbg << "NEW obj_id == " << obj_id;
             if (obj_id <= 0)
                 return false;
             object->setId(obj_id);
@@ -2560,8 +2558,8 @@ tristate Connection::querySingleRecordInternal(RecordData* data, const EscapedSt
             || !cursor->storeCurrentRecord(data))
     {
         const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
-        PreWarn << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
-                   "m_result.sql()=" << m_result.sql();
+        //PreDbg << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
+        //          "m_result.sql()=" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
         return result;
@@ -2598,7 +2596,7 @@ tristate Connection::querySingleString(const EscapedString& sql, QString* value,
     }
     if (!cursor->moveFirst() || cursor->eof()) {
         const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
-        PreWarn << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
+        //PreDbg << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         deleteCursor(cursor);
         return result;
     }
@@ -2937,7 +2935,7 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
                 }
             } else {
                 PreWarn << "no such field:" << fieldEl.attribute(QLatin1String("name"))
-                    << "in table:" << tableSchema->name();
+                        << "in table:" << tableSchema->name();
             }
         }
     }
@@ -3331,7 +3329,7 @@ inline void updateRecordDataWithNewValues(QuerySchema* query, RecordData* data, 
         columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
         if (columnsOrderExpandedIt == columnsOrderExpanded->constEnd()) {
             PreWarn << "(Connection) \"now also assign new value in memory\" step"
-            "- could not find item" << it.key()->aliasOrName();
+                       "- could not find item" << it.key()->aliasOrName();
             continue;
         }
         (*data)[ columnsOrderExpandedIt.value() ] = it.value();
@@ -3343,7 +3341,6 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
 // Each SQL identifier needs to be escaped in the generated query.
 // qDebug() << *query;
 
-    PreDbg << "..";
     clearResult();
     //--get PKEY
     if (buf->dbBuffer().isEmpty()) {
@@ -3388,7 +3385,7 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
     }
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-        PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
+        //PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
         if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
             PreWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = Result(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
@@ -3417,7 +3414,7 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
                    + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]);
     }
     sql += (sqlset + " WHERE " + sqlwhere);
-    PreDbg << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
+    //PreDbg << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
 
     // preprocessing before update
     if (!drv_beforeUpdate(mt->name(), &affectedFields))
@@ -3442,7 +3439,6 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
 bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBuffer* buf, bool getRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    PreDbg << "..";
     clearResult();
     //--get PKEY
     /*disabled: there may be empty records (with autoinc)
@@ -3480,7 +3476,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
                 && !ci->field->defaultValue().isNull()
                 && !b.contains(ci))
         {
-            PreDbg << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
+            //PreDbg << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
             b.insert(ci, ci->field->defaultValue());
         }
     }
@@ -3606,7 +3602,6 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
 bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-    PreWarn << "..";
     clearResult();
     TableSchema *mt = query->masterTable();
     if (!mt) {
@@ -3634,7 +3629,7 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
 
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-        PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
+        //PreDbg << pkey->fieldCount() << " ? " << query->pkeyFieldsCount();
         if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
             PreWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = Result(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
@@ -3661,7 +3656,7 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
                     + m_driver->valueToSQL(Field::BigInteger, (*data)[data->size() - 1]);
     }
     sql += sqlwhere;
-    PreDbg << " -- SQL == " << sql;
+    //PreDbg << " -- SQL == " << sql;
 
     if (!executeSQL(sql)) {
         m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
@@ -3683,8 +3678,7 @@ bool Connection::deleteAllRecords(QuerySchema* query)
         PreWarn << "-- WARNING: NO MASTER TABLE's PKEY";
     }
     EscapedString sql = EscapedString("DELETE FROM ") + escapeIdentifier(mt->name());
-
-    PreDbg << "-- SQL == " << sql;
+    //PreDbg << "-- SQL == " << sql;
 
     if (!executeSQL(sql)) {
         m_result = Result(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
@@ -3722,7 +3716,7 @@ void Connection::unregisterForTablesSchemaChanges(TableSchemaChangeListenerInter
 
 QSet<Connection::TableSchemaChangeListenerInterface*>* Connection::tableSchemaChangeListeners(TableSchema* schema) const
 {
-    PreDbg << d->tableSchemaChangeListeners.count();
+    //PreDbg << d->tableSchemaChangeListeners.count();
     return d->tableSchemaChangeListeners.value(schema);
 }
 
