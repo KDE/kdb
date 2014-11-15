@@ -192,7 +192,7 @@ enum EscapingType {
 # define FUTURE_I18N_NOOP(x) (x)
 #endif
 
-// debugging options for expressions
+//! Debugging options for expressions
 #cmakedefine PREDICATE_EXPRESSION_DEBUG
 #ifdef PREDICATE_EXPRESSION_DEBUG
 # define ExpressionDebug qDebug()
@@ -200,7 +200,10 @@ enum EscapingType {
 # define ExpressionDebug if (1) {} else qDebug()
 #endif
 
-// GUI for debugging
+//! GUI for debugging
 #cmakedefine PREDICATE_DEBUG_GUI
+
+//! Include unfinished features
+#cmakedefine PREDICATE_UNFINISHED
 
 #endif

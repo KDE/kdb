@@ -142,11 +142,11 @@ struct Predicate_AlterTableHandlerStatic {
         I("defaultWidth", ExtendedSchemaAlteringRequired);
         // defaultValue: depends on backend, for mysql it can only by a constant or now()...
         // -- should we look at Driver here?
-#ifdef KEXI_NO_UNFINISHED
-//! @todo reenable
-        I("defaultValue", MainSchemaAlteringRequired);
-#else
+#ifdef PREDICATE_UNFINISHED
         I2("defaultValue", PhysicalAlteringRequired, MainSchemaAlteringRequired);
+#else
+        //! @todo reenable
+        I("defaultValue", MainSchemaAlteringRequired);
 #endif
         I2("primaryKey", PhysicalAlteringRequired, DataConversionRequired);
         I2("unique", PhysicalAlteringRequired, DataConversionRequired); // we may want to add an Index here

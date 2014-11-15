@@ -110,6 +110,8 @@ include_directories(
 add_subdirectory( Predicate )
 add_subdirectory( Drivers )
 
+simple_option(PREDICATE_UNFINISHED "Include unfinished features (useful for testing but may confuse end-user)" OFF)
+
 simple_option(BUILD_TESTING "Building of tests" OFF) # override default from CTest.cmake
 if (BUILD_TESTING)
   include(CTest)
