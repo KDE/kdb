@@ -29,9 +29,6 @@
 #include <QFile>
 #include <QtDebug>
 
-#ifdef Q_WS_WIN
-# include <config-win.h>
-#endif
 #include <mysql_version.h>
 #include <mysql.h>
 #define BOOL bool
