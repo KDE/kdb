@@ -35,19 +35,6 @@ namespace Predicate
 {
 namespace Utils
 {
-
-//
-// WARNING!!
-// This code uses undocumented Qt API
-// Do not copy it to your application! Use only the functions that are here!
-// Otherwise, it could break when a new version of Qt ships.
-//
-
-#if QT_VERSION < 0x040400
-# define Q_BASIC_ATOMIC_INITIALIZER     Q_ATOMIC_INIT
-# define testAndSetOrdered              testAndSet
-#endif
-
 /// @cond InternalDocs
 
 /**
