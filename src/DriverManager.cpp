@@ -138,7 +138,7 @@ bool DriverManagerInternal::lookupDrivers()
 
     /*! Try in all possible driver directories.
      Looks for "predicate" directory in $INSTALL/plugins, $QT_PLUGIN_PATH, and directory of the application executable.
-     Plugin path "Plugins" entry can be added to qt.conf to override; see http://doc.trolltech.com/4.6/qt-conf.html.
+     Plugin path "Plugins" entry can be added to qt.conf to override; see http://qt-project.org/doc/qt-4.8/qt-conf.html.
     */
     const QStringList libraryPaths(Predicate::libraryPaths());
     qDebug() << "libraryPaths:" << libraryPaths;

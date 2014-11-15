@@ -379,7 +379,7 @@ inline EscapedString Driver::dateTimeToSQL(const QDateTime& v) const {
 #define PREDICATE_DRIVER_INTERFACE_ID \
     "org.kde.Predicate.Driver/" PREDICATE_VERSION_MAJOR_STRING "." PREDICATE_VERSION_MINOR_STRING
 
-//! Declare Interface for Predicate drivers, loadable as Qt 4 plugins
+//! Declare Interface for Predicate drivers, loadable as Qt plugins
 Q_DECLARE_INTERFACE(Predicate::Driver, PREDICATE_DRIVER_INTERFACE_ID)
 
 #endif
