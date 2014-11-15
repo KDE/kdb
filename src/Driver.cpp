@@ -213,7 +213,7 @@ static EscapedString valueToSQLInternal(const Predicate::Driver *driver, uint ft
         }
         return EscapedString(v.toByteArray());
     }
-//TODO: here special encoding method needed
+//! @todo here special encoding method needed
     case Field::Boolean:
         return EscapedString(v.toInt() == 0
                  ? driver->behaviour()->BOOLEAN_FALSE_LITERAL

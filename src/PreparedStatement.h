@@ -30,7 +30,6 @@
 namespace Predicate
 {
 
-//class ConnectionInternal;
 class TableSchema;
 class PreparedStatementInterface;
 

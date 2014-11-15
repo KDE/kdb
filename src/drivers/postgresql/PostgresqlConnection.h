@@ -73,21 +73,13 @@ protected:
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
-//    virtual void drv_clearServerResult();
 
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
-//pred    virtual TransactionData* drv_beginTransaction();
-//pred    virtual bool drv_commitTransaction(TransactionData *);
-//pred    virtual bool drv_rollbackTransaction(TransactionData *);
-
     PostgresqlConnectionInternal *d;
-
-    //! temporary solution for executeSQL()...
-//pred    PostgresqlTransactionData *m_trans;
 
     friend class PostgresqlDriver;
     friend class PostgresqlCursorData;

@@ -119,13 +119,7 @@ NArgExpression::NArgExpression(const ExplicitlySharedExpressionDataPointer &ptr)
 
 NArgExpression::~NArgExpression()
 {
-    //qDeleteAll(list);
 }
-
-// NArgExpression* NArgExpression::copy() const
-// {
-//     return new NArgExpression(*this);
-// }
 
 void NArgExpression::append(const Expression& expr)
 {

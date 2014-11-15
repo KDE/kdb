@@ -40,13 +40,11 @@ public:
     virtual QVariant value(uint i);
 
     /*! [PROTOTYPE] @return internal buffer data. */
-//TODO  virtual const char *** bufferData()
+//! @todo virtual const char *** bufferData()
     /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
     virtual const char ** recordData() const;
 
     virtual bool drv_storeCurrentRecord(RecordData* data) const;
-
-//  virtual bool save(RecordData& data, RowEditBuffer& buf);
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
@@ -62,16 +60,14 @@ protected:
     virtual bool drv_open(const EscapedString& sql);
 
     virtual bool drv_close();
-//  virtual bool drv_moveFirst();
     virtual void drv_getNextRecord();
-//unused  virtual bool drv_getPrevRecord();
 
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 at);
 
-//TODO  virtual void drv_storeCurrentRecord();
+//! @todo virtual void drv_storeCurrentRecord();
 
     //PROTOTYPE:
     /*! Method called when cursor's buffer need to be cleared

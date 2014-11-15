@@ -43,15 +43,10 @@ public:
     virtual bool drv_open(const EscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
-//    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
-//        virtual bool save(RecordData& data, RowEditBuffer& buf);
-
-//    //! Implemented for Resultable
-//    virtual QString serverResultName() const;
 
 private:
     QVariant pValue(uint pos) const;

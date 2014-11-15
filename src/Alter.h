@@ -498,9 +498,6 @@ public:
     static int alteringTypeForProperty(const QByteArray& propertyName);
 
 protected:
-//  TableSchema* executeInternal(const QString& tableName, tristate& result, bool simulate = false,
-//   QString* debugString = 0);
-
     class Private;
     Private * const d;
 };

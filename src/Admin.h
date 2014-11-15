@@ -45,7 +45,6 @@ public:
      @return true on success, false on failure
      (then you can get error status from the AdminTools object). */
     virtual bool vacuum(const ConnectionData& data, const QString& databaseName);
-    //virtual bool vacuum(Connection& conn);
 
 protected:
     class Private;

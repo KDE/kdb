@@ -60,7 +60,7 @@ public:
     {
         Q_UNUSED(driver);
         //move to last item, as the order is reversed due to parser's internals
-        paramsIt = params.constEnd(); //fromLast();
+        paramsIt = params.constEnd();
         --paramsIt;
         paramsItPosition = params.count();
     }
@@ -90,7 +90,6 @@ QVariant QuerySchemaParameterValueListIterator::getPreviousValue()
     QVariant res(*d->paramsIt);
     --d->paramsItPosition;
     --d->paramsIt;
-// ++d->paramsIt;
     return res;
 }
 
@@ -103,6 +102,5 @@ EscapedString QuerySchemaParameterValueListIterator::getPreviousValueAsString(Fi
     EscapedString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));
     --d->paramsItPosition;
     --d->paramsIt;
-// ++d->paramsIt;
     return res;
 }

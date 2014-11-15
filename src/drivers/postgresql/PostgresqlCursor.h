@@ -44,8 +44,6 @@ public:
     virtual bool drv_open(const EscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
-    //virtual void drv_getPrevRecord();
-//    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
     virtual void drv_bufferMovePointerNext();
     virtual void drv_bufferMovePointerPrev();
@@ -58,8 +56,6 @@ private:
     QVector<QVariant::Type> m_realTypes;
 
     PostgresqlCursorData *d;
-    //bool m_implicityStarted;
-    //friend class PostgresqlConnection;
 };
 
 }

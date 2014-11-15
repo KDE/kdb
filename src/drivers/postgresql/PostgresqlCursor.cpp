@@ -38,7 +38,6 @@ PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const EscapedStr
         , d(new PostgresqlCursorData(conn))
 {
     m_options |= Buffered;
-    //m_implicityStarted = false;
 }
 
 //==================================================================================
@@ -48,7 +47,6 @@ PostgresqlCursor::PostgresqlCursor(Connection* conn, QuerySchema* query, uint op
         , d(new PostgresqlCursorData(conn))
 {
     m_options |= Buffered;
-    //m_implicityStarted = false;
 }
 
 //==================================================================================
@@ -177,10 +175,7 @@ inline bool hasTimeZone(const QString& s)
 //Return the value for a given column for the current record - Private const version
 QVariant PostgresqlCursor::pValue(uint pos) const
 {
-    //not needed: if (pos >= m_fieldsToStoreInRecord) {
 //  PreDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
-        //return QVariant();
-    //}
     const qint64 row = at();
 
 #if 0
@@ -196,7 +191,6 @@ QVariant PostgresqlCursor::pValue(uint pos) const
     const char *data = PQgetvalue(d->res, row, pos);
     const int len = PQgetlength(d->res, row, pos);
 
-//    if (f) { //We probably have a schema type query so can use kexi to determine the row type
     switch (type) { // from most to least frequently used types:
     case QVariant::String:
         return d->unicode ? QString::fromUtf8(data, len) : QString::fromLatin1(data, len);
@@ -293,10 +287,6 @@ const char** PostgresqlCursor::recordData() const
 bool PostgresqlCursor::drv_storeCurrentRecord(RecordData* data) const
 {
 // PreDrvDbg << "POSITION IS" << (long)m_at;
-
-// const uint realCount = m_fieldCount + (m_containsRecordIdInfo ? 1 : 0);
-//not needed data.resize(realCount);
-
     for (uint i = 0; i < m_fieldsToStoreInRecord; i++)
         (*data)[i] = pValue(i);
     return true;

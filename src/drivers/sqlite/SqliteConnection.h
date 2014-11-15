@@ -53,10 +53,10 @@ protected:
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
 
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
 
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
     /*! Creates new database using connection. Note: Do not pass @a dbName
@@ -78,10 +78,7 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString());
 
-    //virtual bool drv_createTable( const Predicate::Table& table );
-
     virtual bool drv_executeSQL(const EscapedString& statement);
-//  virtual bool drv_executeQuery( const EscapedString& statement );
 
     virtual quint64 drv_lastInsertRecordId();
 

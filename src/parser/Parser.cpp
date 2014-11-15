@@ -25,13 +25,6 @@
 #include "Parser_p.h"
 #include "SqlParser.h"
 
-/*moved to Driver
-#include "tokens.cpp"
-PREDICATE_GLOBAL_STATIC_WITH_ARGS(StaticSetOfStrings, _reservedKeywords, (_tokens))
-*/
-
-//--------------------
-
 using namespace Predicate;
 
 //! Cache
@@ -143,12 +136,6 @@ void Parser::init()
     d->initialized = true;
 }
 
-/*moved to Driver
-bool Parser::isReservedKeyword(const QByteArray& str)
-{
-  return _reservedKeywords->contains(str.toUpper());
-}*/
-
 bool
 Parser::parse(const EscapedString &statement)
 {
@@ -175,7 +162,6 @@ Parser::clear()
 ParserError::ParserError()
         : m_position(-1)
 {
-// m_isNull = true;
 }
 
 ParserError::ParserError(const QString &type, const QString &message, const QByteArray &token,

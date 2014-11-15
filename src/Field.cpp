@@ -102,7 +102,6 @@ Field::Field(const Field& f)
     if (!f.m_expr->isNull()) {//deep copy the expression
 //! @todo  m_expr = new Expression(*f.m_expr);
             m_expr = new Expression(f.m_expr->clone());
-//  m_expr->m_field = this;
     }
     else
         m_expr = new Expression();
@@ -460,7 +459,7 @@ Field::setDefaultValue(const QByteArray& def)
     }
     case Integer: {//4 bytes
         long v = def.toLong(&ok);
-//js: FIXME   if (!ok || (!(m_options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))) || ((m_options & Unsigned) && (v < 0 || v > 0x100000000)))
+//! @todo    if (!ok || (!(m_options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))) || ((m_options & Unsigned) && (v < 0 || v > 0x100000000)))
         if (!ok || (!(m_options & Unsigned) && (-v > (int)0x07FFFFFFF || v > (int)(0x080000000 - 1))))
             m_defaultValue = QVariant();
         else
@@ -471,7 +470,7 @@ Field::setDefaultValue(const QByteArray& def)
 //! @todo BigInteger support
         /*
               qint64 long v = def.toLongLong(&ok);
-        //TODO: 2-part decoding
+        //! @todo 2-part decoding
               if (!ok || (!(m_options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))))
                 m_defaultValue = QVariant();
               else

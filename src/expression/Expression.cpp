@@ -336,12 +336,9 @@ void Expression::insertChild(int i, const Expression& child)
 
 void Expression::insertEmptyChild(int i)
 {
-    //if (isNull())
-    //    return;
     if (i < 0 || i > d->children.count())
         return;
     Expression child;
-    //ExplicitlySharedExpressionDataPointer child = new Expression();
     d->children.insert(i, child.d);
     child.d->parent = d;
 }

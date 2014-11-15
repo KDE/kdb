@@ -36,19 +36,14 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
         , m_resetRequired(false)
 {
 // PreDrvDbg;
-
     mysql_owned = false;
     mysql = dynamic_cast<Predicate::MysqlConnectionInternal&>(*conn).mysql; //copy
-//    m_tempStatementString = generateStatementString();
-
     if (!init())
         done();
 }
 
 bool MysqlPreparedStatement::init()
 {
-//    if (m_tempStatementString.isEmpty())
-//        return false;
 #ifdef PREDICATE_USE_MYSQL_STMT
     m_statement = mysql_stmt_init(mysql);
     if (!m_statement) {

@@ -56,7 +56,6 @@ FieldList::~FieldList()
 
 void FieldList::clear()
 {
-// m_name.clear();
     m_fields_by_name.clear();
     delete m_autoinc_fields;
     m_autoinc_fields = 0;
@@ -263,9 +262,6 @@ FieldList* FieldList::subList(const QList<uint>& list)
 QStringList FieldList::names() const
 {
     QStringList r;
-// for (QDictIterator<Field> it(m_fields_by_name);it.current();++it) {
-//  r += it.currentKey().toLower();
-// }
     foreach(Field *f, m_fields) {
         r += f->name().toLower();
     }

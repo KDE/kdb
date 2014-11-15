@@ -81,14 +81,11 @@ public:
     /*! @return true if transaction is uinitialised (null). */
     bool isNull() const;
 
-    /*! shortcut that offers uinitialised (null) transaction */
-    //static const Transaction null;
-
     //helper for debugging
     static int globalCount();
     static int globalcount;
-protected:
 
+protected:
     TransactionData *m_data;
 
     friend class Connection;

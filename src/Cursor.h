@@ -89,12 +89,6 @@ public:
      Otherwise, true is returned if cursor is successfully closed and then opened. */
     bool reopen();
 
-//  /*! Opens the cursor using @a statement.
-//   Omit @a statement if cursor is already initialized with statement
-//   at creation time. If @a statement is not empty, existing statement
-//   (if any) is overwritten. */
-//  bool open( const QString& statement = QString() );
-
     /*! Closes previously opened cursor.
       If the cursor is closed, nothing happens. */
     virtual bool close();
@@ -274,9 +268,7 @@ protected:
     virtual bool drv_open(const EscapedString& sql) = 0;
 
     virtual bool drv_close() = 0;
-//  virtual bool drv_moveFirst() = 0;
     virtual void drv_getNextRecord() = 0;
-//unused  virtual bool drv_getPrevRecord() = 0;
 
     /*! Stores currently fetched record's values in appropriate place of the buffer.
      Note for driver developers:
@@ -322,16 +314,12 @@ protected:
      to simple public RecordData representation. */
     virtual bool drv_storeCurrentRecord(RecordData* data) const = 0;
 
-//    QPointer<Connection> m_conn;
     Connection *m_conn;
     QuerySchema *m_query;
-//  CursorData *m_data;
     EscapedString m_rawStatement;
     bool m_opened;
-//js (m_at==0 is enough)  bool m_beforeFirst : 1;
     bool m_atLast;
     bool m_afterLast;
-//  bool m_atLast;
     bool m_validRecord; //!< true if valid record is currently retrieved @ current position
     bool m_containsRecordIdInfo; //!< true if result contains extra column for record id;
                                  //!< used only for PostgreSQL now

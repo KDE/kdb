@@ -239,10 +239,6 @@ public:
 
     bool insertingEnabled;
 
-    /*! Used in acceptEditor() to avoid infinite recursion,
-     eg. when we're calling TableViewData::acceptRecordEdit() during cell accepting phase. */
-//  bool inside_acceptEditor;
-
     //! @see TableViewData::containsRecordIdInfo()
     bool containsRecordIdInfo;
 
@@ -292,10 +288,6 @@ TableViewData::TableViewData(Cursor *c)
             if (ci->indexForVisibleLookupValue() != -1) {
                 //Lookup field is defined
                 visibleLookupColumnInfo = d->cursor->query()->expandedOrInternalField(ci->indexForVisibleLookupValue());
-                /* not needed
-                if (visibleLookupColumnInfo) {
-                  // 2. Create a TableViewData object for each found lookup field
-                }*/
             }
             TableViewColumn* col = new TableViewColumn(*d->cursor->query(), ci, visibleLookupColumnInfo);
             addColumn(col);
@@ -619,8 +611,6 @@ bool TableViewData::saveRecord(RecordData *record, bool insert, bool repaint)
                 return false;
             }
         } else { // record updating
-//   if (d->containsRecordIdInfo)
-//    ROWID = record[columns.count()].toULongLong();
             if (!d->cursor->updateRecord(static_cast<RecordData*>(record), d->pRecordEditBuffer,
                                          d->containsRecordIdInfo /*use ROWID*/))
             {
@@ -743,9 +733,7 @@ void TableViewData::insertRecord(RecordData *record, uint index, bool repaint)
 void TableViewData::clearInternal(bool processEvents)
 {
     clearRecordEditBuffer();
-// qApp->processEvents( 1 );
-//TODO: this is time consuming: find better data model
-// TableViewDataBase::clear();
+//! @todo this is time consuming: find better data model
     const uint c = count();
 #ifndef TABLEVIEW_NO_PROCESS_EVENTS
     const bool _processEvents = processEvents && !qApp->closingDown();
@@ -792,8 +780,6 @@ bool TableViewData::preloadAllRecords()
 {
     if (!d->cursor)
         return false;
-
-    //const uint fcount = d->cursor->fieldCount() + (d->containsRecordIdInfo ? 1 : 0);
     if (!d->cursor->moveFirst() && d->cursor->result().isError())
         return false;
 

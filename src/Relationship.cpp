@@ -33,7 +33,6 @@ Relationship::Relationship()
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
-//Qt 4 m_pairs.setAutoDelete(true);
 }
 
 Relationship::Relationship(IndexSchema* masterIndex, IndexSchema* detailsIndex)
@@ -42,7 +41,6 @@ Relationship::Relationship(IndexSchema* masterIndex, IndexSchema* detailsIndex)
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
-//Qt 4 m_pairs.setAutoDelete(true);
     setIndices(masterIndex, detailsIndex);
 }
 
@@ -52,7 +50,6 @@ Relationship::Relationship(QuerySchema *query, Field *field1, Field *field2)
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
-//Qt 4 m_pairs.setAutoDelete(true);
     createIndices(query, field1, field2);
 }
 
@@ -78,13 +75,12 @@ void Relationship::createIndices(QuerySchema *query, Field *field1, Field *field
         PreWarn << "fields cannot belong to the same table";
         return;
     }
-// if (!query->hasField(field1) && !query->hasField(field2)) {
     if (!query->contains(field1->table()) || !query->contains(field2->table())) {
         PreWarn << "fields do not belong to this query";
         return;
     }
-//@todo: check more things: -types
-//@todo: find existing global db relationships
+//! @todo: check more things: -types
+//! @todo: find existing global db relationships
 
     Field *masterField = 0, *detailsField = 0;
     bool p1 = field1->isPrimaryKey(), p2 = field2->isPrimaryKey();
@@ -165,7 +161,6 @@ void Relationship::setIndices(IndexSchema* masterIndex, IndexSchema* detailsInde
             ++masterIt, ++detailsIt) {
         Field *masterField = *masterIt;
         Field *detailsField = *detailsIt;
-        // while (f1 && f2) {
         if (masterField->type() != detailsField->type()
                 && masterField->isIntegerType() != detailsField->isIntegerType()
                 && masterField->isTextType() != detailsField->isTextType()) {

@@ -54,7 +54,7 @@ namespace NAMESPACE
 class MysqlConnectionInternal : public ConnectionInternal
 {
 public:
-    MysqlConnectionInternal(Connection* connection);
+    explicit MysqlConnectionInternal(Connection* connection);
     virtual ~MysqlConnectionInternal();
 
     //! Connects to a MySQL database
@@ -89,7 +89,7 @@ public:
 class MysqlCursorData : public MysqlConnectionInternal
 {
 public:
-    MysqlCursorData(Connection* connection);
+    explicit MysqlCursorData(Connection* connection);
     virtual ~MysqlCursorData();
 
     MYSQL_RES *mysqlres;

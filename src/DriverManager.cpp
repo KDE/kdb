@@ -129,7 +129,7 @@ bool DriverManagerInternal::lookupDrivers()
     if (qApp) {
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
-//TODO: for Qt-only version check for KComponentData wrapper
+//! @todo for Qt-only version check for KComponentData wrapper
 //  PreWarn << "cannot work without KComponentData (KGlobal::mainComponent()==0)!";
 //  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 

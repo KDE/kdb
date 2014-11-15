@@ -64,11 +64,10 @@ protected:
 
     //! Implemented for Resultable
     virtual QString serverResultName() const;
-//    virtual void drv_clearServerResult();
 
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
-//TODO: move this somewhere to low level class (MIGRATION?)
+//! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
     MysqlConnectionInternal* d;

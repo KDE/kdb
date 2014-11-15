@@ -67,18 +67,10 @@ void Cursor::init()
     assert(m_conn);
     m_conn->addCursor(this);
     m_opened = false;
-// , m_atFirst(false)
-// , m_atLast(false)
-// , m_beforeFirst(false)
     m_atLast = false;
     m_afterLast = false;
     m_readAhead = false;
     m_at = 0;
-//js:todo: if (m_query)
-//  m_fieldCount = m_query->fieldsCount();
-// m_fieldCount = m_query ? m_query->fieldCount() : 0; //do not know
-    //<members related to buffering>
-// m_cols_pointers_mem_size = 0;
     m_records_in_buf = 0;
     m_buffering_completed = false;
     m_at_buffer = false;
@@ -148,7 +140,6 @@ bool Cursor::open()
         }
         Connection::SelectStatementOptions options;
         options.alsoRetrieveRecordId = m_containsRecordIdInfo; /*get record Id if needed*/
-//        m_conn->setSql(m_queryParameters
         m_result.setSql(m_queryParameters
                         ? m_conn->selectStatement(m_query, *m_queryParameters, options)
                         : m_conn->selectStatement(m_query, options));
@@ -158,9 +149,7 @@ bool Cursor::open()
             return false;
         }
     }
-//    m_result.setSql(m_conn->result().sql());
     m_opened = drv_open(m_result.sql());
-// m_beforeFirst = true;
     m_afterLast = false; //we are not @ the end
     m_at = 0; //we are before 1st rec
     if (!m_opened) {
@@ -170,8 +159,6 @@ bool Cursor::open()
     }
     m_validRecord = false;
 
-//luci: WHAT_EXACTLY_SHOULD_THAT_BE?
-// if (!m_readAhead) // jowenn: to ensure before first state, without cluttering implementation code
     if (m_conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
 //  PreDbg << "READ AHEAD:";
         m_readAhead = getNextRecord(); //true if any record in this query
@@ -190,7 +177,6 @@ bool Cursor::close()
     clearBuffer();
 
     m_opened = false;
-// m_beforeFirst = false;
     m_afterLast = false;
     m_readAhead = false;
     m_fieldCount = 0;
@@ -213,7 +199,6 @@ bool Cursor::moveFirst()
 {
     if (!m_opened)
         return false;
-// if (!m_beforeFirst) { //cursor isn't @ first record now: reopen
     if (!m_readAhead) {
         if (m_options & Buffered) {
             if (m_records_in_buf == 0 && m_buffering_completed) {
@@ -227,7 +212,6 @@ bool Cursor::moveFirst()
                 m_at_buffer = false;
                 m_at = 0;
                 //..and move to next, ie. 1st record
-//    m_afterLast = m_afterLast = !getNextRecord();
                 m_afterLast = !getNextRecord();
                 return !m_afterLast;
             }
@@ -248,18 +232,9 @@ bool Cursor::moveFirst()
         //we have a record already read-ahead: we now point @ that:
         m_at = 1;
     }
-// if (!m_atFirst) { //cursor isn't @ first record now: reopen
-//  reopen();
-// }
-// if (m_validRecord) {
-//  return true; //there is already valid record retrieved
-// }
     //get first record
-// if (drv_moveFirst() && drv_getRecord()) {
-//  m_beforeFirst = false;
     m_afterLast = false;
     m_readAhead = false; //1st record had been read
-// }
     return m_validRecord;
 }
 
@@ -271,7 +246,6 @@ bool Cursor::moveLast()
         return m_validRecord; //we already have valid last record retrieved
     }
     if (!getNextRecord()) { //at least next record must be retrieved
-//  m_beforeFirst = false;
         m_afterLast = true;
         m_validRecord = false;
         m_atLast = false;
@@ -279,25 +253,9 @@ bool Cursor::moveLast()
     }
     while (getNextRecord()) //move after last rec.
         ;
-// m_beforeFirst = false;
     m_afterLast = false;
     //cursor shows last record data
     m_atLast = true;
-// m_validRecord = true;
-
-    /*
-      //we are before or @ last record:
-    // if (m_atLast && m_validRecord) //we're already @ last rec.
-    //  return true;
-      if (m_validRecord) {
-        if (drv_getRecord())
-      }
-      if (!m_validRecord) {
-        if (drv_getRecord() && m_validRecord)
-          return true;
-        reopen();
-      }
-      */
     return true;
 }
 
@@ -306,7 +264,6 @@ bool Cursor::moveNext()
     if (!m_opened || m_afterLast)
         return false;
     if (getNextRecord()) {
-//  m_validRecord = true;
         return true;
     }
     return false;
@@ -379,16 +336,12 @@ bool Cursor::getNextRecord()
 
     if (m_options & Buffered) {//this cursor is buffered:
 //  PreDbg << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
-//js  if (m_at==-1) m_at=0;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
-///  if (m_at < (m_records_in_buf-1)) {//we have next record already buffered:
-//js   if (m_at_buffer && (m_at!=0)) {//we already have got a pointer to buffer
             if (m_at_buffer) {//we already have got a pointer to buffer
                 drv_bufferMovePointerNext(); //just move to next record in the buffer
             } else {//we have no pointer
                 //compute a place in the buffer that contain next record's data
                 drv_bufferMovePointerTo(m_at - 1 + 1);
-//    drv_bufferMovePointerTo(m_at+1);
                 m_at_buffer = true; //now current record is stored in the buffer
             }
         } else {//we are after last retrieved record: we need to physically fetch next record:
@@ -404,11 +357,7 @@ bool Cursor::getNextRecord()
 //     PreDbg<<"m_fetchResult != FetchOK ********";
                     m_validRecord = false;
                     m_afterLast = true;
-//js     m_at = m_records_in_buf;
                     m_at = -1; //position is invalid now and will not be used
-//     if ((FetchResult) m_fetchResult == FetchEnd) {
-//      return false;
-//     }
                     if (m_fetchResult == FetchError) {
                         m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Cannot fetch next record."));
                         return false;
@@ -523,8 +472,7 @@ void Cursor::setOrderByColumnList(const QStringList& columnNames)
 // all field names should be fooun, exit otherwise ..........
 
     // OK
-//TODO if (!m_orderByColumnList)
-//TODO
+//! @todo if (!m_orderByColumnList)
 }
 
 /*! Convenience method, similar to setOrderBy(const QStringList&). */

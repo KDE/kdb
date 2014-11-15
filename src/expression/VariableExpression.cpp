@@ -120,7 +120,6 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
     if (tableName.isEmpty()) {//fieldname only
         fieldName = name;
         if (fieldName == QLatin1String("*")) {
-//   querySchema->addAsterisk( new QueryAsterisk(querySchema) );
             return true;
         }
 
@@ -153,7 +152,6 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
         }
         //ok
         field = firstField; //store
-//  querySchema->addField(firstField);
         return true;
     }
 
@@ -223,7 +221,6 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
             return false;
         }
         tableForQueryAsterisk = ts;
-//   querySchema->addAsterisk( new QueryAsterisk(querySchema, ts) );
         return true;
     }
 
@@ -254,8 +251,6 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
     }
     field = realField; //store
     tablePositionForField = tablePosition;
-//    querySchema->addField(realField, tablePosition);
-
     return true;
 }
 

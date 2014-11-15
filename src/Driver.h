@@ -47,8 +47,7 @@ class DriverPrivate;
  Driver allows new connections to be created, and groups as their parent.
  Before destruction, all owned connections are destructed.
 
- Notes:
-FIXME - driver must be provided within KDE module file named with "predicate_" prefix
+@todo driver must be provided within KDE module file named with "predicate_" prefix
   - EXPORT_PREDICATE_DRIVER should be placed in driver's .cpp file
   - Driver inherits from QObject only because this enables Qt Plugin system
 

@@ -61,20 +61,16 @@ TransactionData::~TransactionData()
 
 //---------------------------------------------------
 
-// not needed // const Transaction Transaction::null;
-
 Transaction::Transaction()
         : QObject(0)
         , m_data(0)
 {
-// setObjectName("predicate_transaction");
 }
 
 Transaction::Transaction(const Transaction& trans)
         : QObject(0)
         , m_data(trans.m_data)
 {
-// setObjectName("predicate_transaction");
     if (m_data) {
         m_data->refcount++;
         Transaction::globalcount++;

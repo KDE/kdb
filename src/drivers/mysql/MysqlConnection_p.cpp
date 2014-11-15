@@ -68,8 +68,6 @@ void MysqlConnectionInternal::storeResult()
     none is specified).  If the server is on a remote machine, then a port is
     the port that the remote server is listening on.
  */
-//bool MysqlConnectionInternal::db_connect(QCString host, QCString user,
-//  QCString password, unsigned short int port, QString socket)
 bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
@@ -116,7 +114,6 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
 
     storeResult(); //store error msg, if any - can be destroyed after disconnect()
     db_disconnect();
-// setError(ERR_DB_SPECIFIC,err);
     return false;
 }
 
@@ -135,7 +132,7 @@ bool MysqlConnectionInternal::db_disconnect()
  */
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
-//TODO is here escaping needed?
+//! @todo is here escaping needed?
     if (!executeSQL(EscapedString("USE ") + escapeIdentifier(dbName))) {
         return false;
     }

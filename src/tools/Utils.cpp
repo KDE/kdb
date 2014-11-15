@@ -51,7 +51,7 @@
 #include <basetyps.h>
 #endif
 #ifdef Q_WS_WIN64
-// FIXME: did not find a reliable way to fix with kdewin mingw header
+//! @todo did not find a reliable way to fix with kdewin mingw header
 #define interface struct
 #endif
 #endif
@@ -205,8 +205,8 @@ bool StaticSetOfStrings::contains(const QByteArray& string) const
 
 //---------
 
-// Internal, from kdelibs' kstandarddirs.cpp
 #ifdef Q_WS_MAC
+//! Internal, from kdelibs' kstandarddirs.cpp
 static QString getBundle(const QString& path, bool ignore)
 {
     QFileInfo info;
@@ -230,7 +230,7 @@ static QString getBundle(const QString& path, bool ignore)
 }
 #endif
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 static QString checkExecutable(const QString& path, bool ignoreExecBit)
 {
 #ifdef Q_WS_MAC
@@ -271,7 +271,7 @@ static QString checkExecutable(const QString& path, bool ignoreExecBit)
 #endif
 }
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 #if defined _WIN32 || defined _WIN64
 # define KPATH_SEPARATOR ';'
 # define ESCAPE '^'
@@ -280,7 +280,7 @@ static QString checkExecutable(const QString& path, bool ignoreExecBit)
 # define ESCAPE '\\'
 #endif
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 static inline QString equalizePath(QString &str)
 {
 #ifdef Q_WS_WIN
@@ -294,7 +294,7 @@ static inline QString equalizePath(QString &str)
         return str;
 }
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 static void tokenize(QStringList& tokens, const QString& str,
                      const QString& delim)
 {
@@ -314,7 +314,7 @@ static void tokenize(QStringList& tokens, const QString& str,
     }
 }
 
-// Internal, based on kdelibs' kshell.cpp
+//! Internal, based on kdelibs' kshell.cpp
 static QString tildeExpand(const QString &fname)
 {
     if (!fname.isEmpty() && fname[0] == QLatin1Char('~')) {
@@ -330,7 +330,7 @@ static QString tildeExpand(const QString &fname)
     return fname;
 }
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 static QStringList systemPaths(const QString& pstr)
 {
     QStringList tokens;
@@ -353,7 +353,7 @@ static QStringList systemPaths(const QString& pstr)
     return exePaths;
 }
 
-// Internal, from kdelibs' kstandarddirs.cpp
+//! Internal, from kdelibs' kstandarddirs.cpp
 #ifdef Q_OS_WIN
 static QStringList executableExtensions()
 {
@@ -370,7 +370,7 @@ static QStringList executableExtensions()
 }
 #endif
 
-// Based on kdelibs' kstandarddirs.cpp
+//! Based on kdelibs' kstandarddirs.cpp
 QString Predicate::Utils::findExe(const QString& appname,
                                   const QString& path,
                                   FindExeOptions options)
@@ -400,11 +400,6 @@ QString Predicate::Utils::findExe(const QString& appname,
 
     QString p;
     QString result;
-//    p = installPath("libexec") + appname;
-//    result = checkExecutable(p, options & IgnoreExecBit);
-//    if (!result.isEmpty()) {
-//        return result;
-//    }
 
     const QStringList exePaths = systemPaths(path);
     for (QStringList::ConstIterator it = exePaths.begin(); it != exePaths.end(); ++it)

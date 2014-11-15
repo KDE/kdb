@@ -92,8 +92,6 @@ public:
         return isValid() == other.isValid()
                && static_cast<const QByteArray&>(*this) == other.toByteArray();
     }
-    //inline bool operator==(const QString &s2) const;
-
     inline int size() const { return QByteArray::size(); }
     inline bool isEmpty() const { return QByteArray::isEmpty(); }
     inline void resize(int size) { QByteArray::resize(size); }

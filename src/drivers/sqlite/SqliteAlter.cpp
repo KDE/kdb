@@ -62,9 +62,6 @@ static SQLiteTypeAffinity affinityForType(Field::Type type)
 tristate SQLiteConnection::drv_changeFieldProperty(TableSchema *table, Field *field,
         const QString& propertyName, const QVariant& value)
 {
-    /* if (propertyName=="name") {
-
-      }*/
     if (propertyName == QLatin1String("type")) {
         bool ok;
         Field::Type type = Predicate::intToFieldType(value.toUInt(&ok));

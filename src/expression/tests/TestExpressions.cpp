@@ -261,7 +261,7 @@ void TestExpressions::testNArgExpression()
     n = NArgExpression(ArithmeticExpressionClass, '+');
     c1 = ConstExpression(INTEGER_CONST, 3);
     c2 = ConstExpression(INTEGER_CONST, 4);
-    // i must be a valid index position in the list (i.e., 0 <= i < argCount()).
+    // it must be a valid index position in the list (i.e., 0 <= i < argCount()).
     n.insert(-10, c1);
     QVERIFY(n.isEmpty());
     n.insert(1, c1);

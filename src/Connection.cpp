@@ -97,18 +97,8 @@ public:
             , autoCommit(true)
             , takeTableEnabled(true)
     {
-//Qt 4   tableSchemaChangeListeners.setAutoDelete(true);
-//Qt 4   obsoleteQueries.setAutoDelete(true);
-
-//Qt 4   tables.setAutoDelete(true);
-//Qt 4   predicateSystemTables.setAutoDelete(true);//only system tables
-//Qt 4   queries.setAutoDelete(true);
-//Qt 4   queries_byname.setAutoDelete(false);//queries is owner, not me
-
-        //reasonable sizes: TODO
-        //Qt 4 tables.resize(101);
-        //Qt 4 queries.resize(101);
     }
+
     ~ConnectionPrivate() {
         qDeleteAll(cursors);
         delete m_parser;
@@ -322,16 +312,6 @@ Connection::~Connection()
     m_destructor_started = true;
     delete d;
     d = 0;
-    /* if (m_driver) {
-        if (m_is_connected) {
-          //delete own table schemas
-          d->tables.clear();
-          //delete own cursors:
-          m_cursors.clear();
-        }
-        //do not allow the driver to touch me: I will kill myself.
-        m_driver->m_connections.take( this );
-      }*/
 }
 
 ConnectionData Connection::data() const
@@ -485,7 +465,6 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
 
     if (m_driver->isFileBased()) {
         //for file-based db: file must exists and be accessible
-//js: moved from useDatabase():
         QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
             if (!ignoreErrors)
@@ -600,9 +579,6 @@ bool Connection::createDatabase(const QString &dbName)
         if (!trans.active())
             return false;
     }
-//not needed since closeDatabase() rollbacks transaction: TransactionGuard trans_g(this);
-// if (error())
-//  return false;
 
     //-create system tables schema objects
     if (!setupPredicateSystemSchema())
@@ -681,7 +657,6 @@ bool Connection::useDatabase(const QString &dbName, bool kexiCompatible, bool *c
     if (kexiCompatible && my_dbName.compare(anyAvailableDatabaseName(), Qt::CaseInsensitive) != 0) {
         //-get global database information
         bool ok;
-//  static QString notfound_str = QObject::tr("\"%1\" database property not found");
         const int major = d->dbProperties.value(QLatin1String("predicate_major_ver")).toInt(&ok);
         if (!ok)
             return false;
@@ -1306,21 +1281,8 @@ static EscapedString selectStatementInternal(const Driver *driver,
                             .arg(Predicate::escapeIdentifier(driver, boundField->name()));
 
                         //add visibleField to the list of SELECTed fields //if it is not yet present there
-//not needed      if (!querySchema.findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
-#if 0
-                        if (!querySchema.table(visibleField->table()->name())) {
-                            /* not true
-                                          //table should be added after FROM
-                                          if (!s_from_additional.isEmpty())
-                                            s_from_additional += QLatin1String(", ");
-                                          s_from_additional += escapeIdentifier(visibleField->table()->name(), options.predicateSqlEscaping);
-                                          */
-                        }
-#endif
                         if (!s_additional_fields.isEmpty())
                             s_additional_fields += ", ";
-//       s_additional_fields += (internalUniqueTableAlias + "." //escapeIdentifier(visibleField->table()->name(), options.predicateSqlEscaping) + "."
-//         escapeIdentifier(visibleField->name(), options.predicateSqlEscaping));
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         s_additional_fields += visibleColumns->sqlFieldsList(
@@ -1727,13 +1689,6 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
             return false;
         }
     }
-
-    /* if (replaceExisting) {
-      //get previous table (do not retrieve, though)
-      TableSchema *existingTable = d->tables_byname.take(name);
-      if (oldTable) {
-      }*/
-
     TransactionGuard tg;
     if (!beginAutoCommitTransaction(&tg))
         return false;
@@ -1769,17 +1724,7 @@ bool Connection::createTable(TableSchema* tableSchema, bool replaceExisting)
         if (!storeExtendedTableSchemaData(tableSchema))
             createTable_ERR;
     }
-
-    //finally:
-    /* if (replaceExisting) {
-        if (existingTable) {
-          d->tables.take(existingTable->id());
-          delete existingTable;
-        }
-      }*/
-
     bool res = commitAutoCommitTransaction(tg.transaction());
-
     if (res) {
         if (internalTable) {
             //insert the internal table into structures
@@ -1952,7 +1897,7 @@ tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableS
 //! @todo (js) implement real altering
 //! @todo (js) update any structure (e.g. query) that depend on this table!
     bool ok, empty;
-#if 0//TODO uncomment:
+#if 0 //! @todo uncomment:
     empty = isEmpty(tableSchema, ok) && ok;
 #else
     empty = true;
@@ -2033,7 +1978,7 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
     }
 
     // Update kexi__objects
-    //TODO
+    //! @todo
     if (!executeSQL(EscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
                     .arg(escapeString(tableSchema->name()), tableSchema->id()))) {
         alterTableName_ERR;
@@ -2217,8 +2162,6 @@ bool Connection::commitTransaction(const Transaction trans, bool ignore_inactive
 {
     if (!isDatabaseUsed())
         return false;
-// if (!checkIsDatabaseUsed())
-    //return false;
     if (!m_driver->transactionsSupported()
             && !(m_driver->d->features & Driver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;

@@ -223,21 +223,11 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 bool PostgresqlConnection::drv_closeDatabase()
 {
     PreDrvDbg;
-// if (isConnected())
-// {
     PQclear(d->res);
     d->res = 0;
     PQfinish(d->conn);
     d->conn = 0;
     return true;
-// }
-    /* js: not needed, right?
-      else
-      {
-        d->errmsg = "Not connected to database backend";
-        d->res = ERR_NO_CONNECTION;
-      }
-      return false;*/
 }
 
 //==================================================================================

@@ -155,21 +155,20 @@ bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, Me
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
-//TODO is here escaping needed?
+//! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
     return d->useDatabase(storedDbName);
 }
 
 bool MysqlConnection::drv_closeDatabase()
 {
-//TODO free resources
-//As far as I know, mysql doesn't support that
+//! @todo free resources, as far as I know, mysql doesn't support that
     return true;
 }
 
 bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
-//TODO is here escaping needed
+//! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
     return drv_executeSQL(EscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }

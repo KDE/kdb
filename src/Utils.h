@@ -230,14 +230,6 @@ PREDICATE_EXPORT int fieldCount(TableOrQuerySchema* tableOrQuery);
 PREDICATE_EXPORT void connectionTestDialog(QWidget* parent, const ConnectionData& data,
         MessageHandler& msgHandler);
 
-#if 0 // moved to ConnectionData
-/*! Saves connection data @a data into @a map. */
-PREDICATE_EXPORT QMap<QString, QString> toMap(const ConnectionData& data);
-
-/*! Restores connection data @a data from @a map. */
-PREDICATE_EXPORT void fromMap(const QMap<QString, QString>& map, ConnectionData& data);
-#endif
-
 //! Used in splitToTableAndFieldParts().
 enum SplitToTableAndFieldPartsOptions {
     FailIfNoTableOrFieldName = 0, //!< default value for splitToTableAndFieldParts()

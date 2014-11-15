@@ -202,18 +202,6 @@ bool SQLitePreparedStatement::execute(
     if (!m_handle)
         return false;
 
-/*moved
-    //for INSERT, we're iterating over inserting values
-    //for SELECT, we're iterating over WHERE conditions
-    const Field::List *fieldList = 0;
-    if (statement.type() == SelectStatement)
-        fieldList = &d->whereFields;
-    else if (d->type == InsertStatement)
-        fieldList = d->fields->fields();
-    else
-        assert(0); //impl. error
-    */
-
     int par = 1; // par.index counted from 1
     Field::ListIterator itFields(selectFieldList.constBegin());
     for (QList<QVariant>::ConstIterator it = parameters.constBegin();
@@ -232,8 +220,7 @@ bool SQLitePreparedStatement::execute(
     }
     if (type == PreparedStatement::SelectStatement) {
         //fetch result
-
-        //todo
+        //! @todo
     }
     return false;
 }

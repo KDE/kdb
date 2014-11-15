@@ -29,7 +29,6 @@ using namespace Predicate;
 
 Parser *parser = 0;
 Field *field = 0;
-//bool requiresTable;
 QList<Field*> fieldList;
 int current = 0;
 QByteArray ctoken;
@@ -138,13 +137,10 @@ void yyerror(const char *str)
                     }
                 }
 
-
-
 //    IDENTIFIER, expecting '")) {
                 e = errtypestr.mid(47);
                 PreDbg << e;
 //    ,' or ')'
-//  lexerErr QObject::tr("identifier was expected");
 
             } else
 #endif
@@ -193,7 +189,6 @@ bool parseData(Parser *p, const char *data)
     parser->clear();
     field = 0;
     fieldList.clear();
-// requiresTable = false;
 
     if (!data) {
         ParserError err(QObject::tr("Error"), QObject::tr("No query specified"), ctoken, current);
@@ -219,26 +214,9 @@ bool parseData(Parser *p, const char *data)
               {
                 PreDbg << " " << s->name();
               }*/
-        /*removed
-              Field::ListIterator it = parser->select()->fieldsIterator();
-              for(Field *item; (item = it.current()); ++it)
-              {
-                if(tableList.findRef(item->table()) == -1)
-                {
-                  ParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown table '%1' in field list",item->table()->name()), ctoken, current);
-                  parser->setError(err);
-
-                  yyerror("fieldlisterror");
-                  ok = false;
-                }
-              }*/
-        //take the dummy table out of the query
-//   parser->select()->removeTable(dummy);
     } else {
         ok = false;
     }
-
-//  tableDict.clear();
     yylex_destroy();
     parser = 0;
     return ok;
@@ -426,7 +404,6 @@ QuerySchema* buildSelectQuery(
         colViews = *_colViews;
         delete _colViews;
     }
-    //qDebug() << "==" << colViews.argCount() << colViews;
     NArgExpression tablesList;
     if (_tablesList) {
         tablesList = *_tablesList;
@@ -434,14 +411,10 @@ QuerySchema* buildSelectQuery(
     }
 
     //-------tables list
-// assert( tablesList ); //&& tablesList->exprClass() == TableListExpressionClass );
-
     uint columnNum = 0;
-    /*TODO: use this later if there are columns that use database fields,
-            e.g. "SELECT 1 from table1 t, table2 t") is ok however. */
+    /*! @todo use this later if there are columns that use database fields,
+              e.g. "SELECT 1 from table1 t, table2 t") is ok however. */
     //used to collect information about first repeated table name or alias:
-// QDict<char> tableNamesAndTableAliases(997, false);
-// QString repeatedTableNameOrTableAlias;
     if (!tablesList.isEmpty()) {
         for (int i = 0; i < tablesList.argCount(); i++, columnNum++) {
             Expression e(tablesList.arg(i));
@@ -462,9 +435,8 @@ QuerySchema* buildSelectQuery(
             QString tname = t_e.name();
             TableSchema *s = parser->db()->tableSchema(tname);
             if (!s) {
-                setError(//QObject::tr("Field List Error"),
+                setError(
                     QObject::tr("Table \"%1\" does not exist").arg(tname));
-                //   yyerror("fieldlisterror");
                 CLEANUP;
                 return 0;
             }
@@ -475,31 +447,12 @@ QuerySchema* buildSelectQuery(
             // 1. collect information about first repeated table name or alias
             //    (potential ambiguity)
             parseInfo.appendPositionForTableOrAliasName(tableOrAliasName, i);
-            /*  if (repeatedTableNameOrTableAlias.isEmpty()) {
-                  if (tableNamesAndTableAliases[tname])
-                    repeatedTableNameOrTableAlias=tname;
-                  else
-                    tableNamesAndTableAliases.insert(tname, (const char*)1);
-                }
-                if (!aliasString.isEmpty()) {
-                  PreDbg << "- add alias for table: " << aliasString;
-            //   querySchema->setTableAlias(columnNum, aliasString);
-                  //2. collect information about first repeated table name or alias
-                  //   (potential ambiguity)
-                  if (repeatedTableNameOrTableAlias.isEmpty()) {
-                    if (tableNamesAndTableAliases[aliasString])
-                      repeatedTableNameOrTableAlias=aliasString;
-                    else
-                      tableNamesAndTableAliases.insert(aliasString, (const char*)1);
-                  }
-                }*/
 //   PreDbg << "addTable: " << tname;
             querySchema->addTable(s, aliasString);
         }
     }
 
     /* set parent table if there's only one */
-// if (parser->select()->tables()->count()==1)
     if (querySchema->tables()->count() == 1)
         querySchema->setMasterTable(querySchema->tables()->first());
 
@@ -510,14 +463,12 @@ QuerySchema* buildSelectQuery(
         columnNum = 0;
         for (int i = 0; i < colViews.argCount(); i++, columnNum++) {
             Expression e(colViews.arg(i));
-//Qt4   bool moveNext = true; //used to avoid ++it when an item is taken from the list
             Expression columnExpr(e);
             VariableExpression aliasVariable;
             if (e.expressionClass() == SpecialBinaryExpressionClass && e.isBinary()
                     && (e.token() == AS || e.token() == AS_EMPTY)) {
                 //SpecialBinaryExpressionClass: with alias
                 columnExpr = e.toBinary().left();
-                //   isFieldWithAlias = true;
                 aliasVariable = e.toBinary().right().toVariable();
                 if (aliasVariable.isNull()) {
                     setError(QObject::tr("Invalid alias definition for column \"%1\"")
@@ -557,7 +508,6 @@ QuerySchema* buildSelectQuery(
 #else
 #pragma WARNING(ok?)
 #endif
-//Qt4    moveNext = false;
             } else if (aliasVariable.isNull()) {
                 setError(QObject::tr("Invalid \"%1\" column definition")
                          .arg(e.toString().toString())); //ok?
@@ -577,24 +527,6 @@ QuerySchema* buildSelectQuery(
 //     << columnNum;
                 querySchema->setColumnAlias(columnNum, aliasVariable.name());
             }
-            /*  if (e->exprClass() == SpecialBinaryExpressionClass && dynamic_cast<BinaryExpression*>(e)
-                  && (e->type()==AS || e->type()==0))
-                {
-                  //also add alias
-                  VariableExpr* aliasVariable =
-                    dynamic_cast<VariableExpr*>(dynamic_cast<BinaryExpression*>(e)->right());
-                  if (!aliasVariable) {
-                    setError(QObject::tr("Invalid column alias definition")); //ok?
-                    return 0;
-                  }
-                  PreDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
-                    << columnNum;
-                  querySchema->setColumnAlias(columnNum, aliasVariable->name.toLatin1());
-                }*/
-
-//Qt4   if (moveNext) {
-//Qt4    colViews->list.next();
-//Qt4   }
         } // for
         if (!parser->error().message().isEmpty()) { // we could not return earlier (inside the loop)
             // because we want run CLEANUP what could crash QMutableListIterator.

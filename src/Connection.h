@@ -45,7 +45,6 @@ class Cursor;
 class ConnectionPrivate;
 class RecordEditBuffer;
 class DatabaseProperties;
-//class AlterTableHandler;
 
 class PREDICATE_EXPORT ConnectionSqlInterface : public Resultable
 {
@@ -733,10 +732,6 @@ public:
         SelectStatementOptions();
         ~SelectStatementOptions();
 
-//        //! Escaping mode can be of PredicateSQL dialect. DriverEscaping by default.
-//        //! Use for user-visible backend-independent statements.
-//        Predicate::EscapingType escapingType;
-
         //! True if record ID should be also retrieved. False by default.
         bool alsoRetrieveRecordId;
 
@@ -1217,12 +1212,6 @@ protected:
      if it has been started outside this Connection object.
     */
     bool rollbackAutoCommitTransaction(const Transaction& trans);
-
-    /*! Creates cursor data and initializes cursor
-      using @a statement for later data retrieval. */
-//  virtual CursorData* drv_createCursor( const QString& statement ) = 0;
-    /*! Closes and deletes cursor data. */
-//  virtual bool drv_deleteCursor( CursorData *data ) = 0;
 
     /*! Helper: checks if connection is established;
       if not: error message is set up and false returned */

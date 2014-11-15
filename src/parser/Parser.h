@@ -230,7 +230,7 @@ public:
      * @internal
      * sets @a query schema object (only parser will need to call this)
      */
-//todo: other query types
+//! @todo other query types
     void setQuerySchema(QuerySchema *query);
 
     /**

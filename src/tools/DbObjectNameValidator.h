@@ -38,7 +38,7 @@ public:
     /*! @a drv is a Predicate driver on which isSystemObjectName() will be
      called inside check(). If @a drv is 0, Predicate::Driver::isPredicateSystemObjectName()
      static function is called instead. */
-    ObjectNameValidator(Driver *drv, QObject * parent = 0);
+    explicit ObjectNameValidator(Driver *drv, QObject * parent = 0);
     virtual ~ObjectNameValidator();
 
 protected:

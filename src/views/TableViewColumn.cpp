@@ -147,7 +147,7 @@ TableViewColumn::TableViewColumn(
         //last hance: use field name
         if (d->captionAliasOrName.isEmpty())
             d->captionAliasOrName = d->columnInfo->field->name();
-        //todo: compute other auto-name?
+        //! @todo compute other auto-name?
     }
     init();
     //setup column's readonly flag: true, if
@@ -157,13 +157,10 @@ TableViewColumn::TableViewColumn(
     const bool columnFromMasterTable = query.masterTable() == d->columnInfo->field->table();
     d->readOnly = !columnFromMasterTable
                  || (query.connection() && query.connection()->isReadOnly());
-//  || (query.connection() && (query.connection()->isReadOnly() || visibleLookupColumnInfo));
 //! @todo remove this when queries become editable            ^^^^^^^^^^^^^^
 // PreDbg() << "TableViewColumn: query.masterTable()=="
 //  << (query.masterTable() ? query.masterTable()->name() : "notable") << ", columnInfo->field->table()=="
 //  << (columnInfo->field->table() ? columnInfo->field->table()->name()  : "notable");
-
-// d->visible = query.isFieldVisible(&f);
 }
 
 TableViewColumn::TableViewColumn(bool)

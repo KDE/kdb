@@ -338,8 +338,6 @@ public:
      by fieldsExpanded() */
     QHash<QueryColumnInfo*, int> *columnsOrderExpanded;
 
-//  QValueList<bool> detailedVisibility;
-
     /*! order of PKEY fields (e.g. for updateRecord() ) */
     QVector<int> *pkeyFieldsOrder;
 
@@ -671,9 +669,6 @@ QuerySchema::QuerySchema(TableSchema *tableSchema)
     //inherit caption from a table
     setCaption(d->masterTable->caption());
 
-//replaced by explicit field list: //add all fields of the table as asterisk:
-//replaced by explicit field list: addField( new QueryAsterisk(this) );
-
     // add explicit field list to avoid problems (e.g. with fields added outside of the app):
     foreach(Field* f, *d->masterTable->fields()) {
         addField(f);
@@ -775,9 +770,6 @@ FieldList& QuerySchema::insertField(uint position, Field *field,
         if (!d->tables.contains(field->table()))
             d->tables.append(field->table());
     }
-// //visible by default
-// setFieldVisible(field, true);
-// d->visibility.setBit(fieldCount()-1, visible);
     //update visibility
     //--move bits to make a place for a new one
     for (uint i = fieldCount() - 1; i > position; i--)
@@ -942,7 +934,6 @@ QDebug operator<<(QDebug dbg, const QuerySchema& query)
 
     //it's safer to delete fieldsExpanded for now
     // (debugString() could be called before all fields are added)
-//causes a crash d->clearCachedData();
 
     //bindings
     dbg.nospace() << " - BINDINGS:\n";
@@ -1243,10 +1234,8 @@ void QuerySchema::setTableAlias(uint position, const QString& alias)
         if (!oldAlias.isEmpty()) {
             d->removeTablePositionForAlias(oldAlias);
         }
-//   d->maxIndexWithTableAlias = -1;
     } else {
         d->setTableAlias(position, fixedAlias);
-//  d->maxIndexWithTableAlias = qMax( d->maxIndexWithTableAlias, (int)index );
     }
 }
 
@@ -1330,14 +1319,11 @@ QueryColumnInfo::Vector QuerySchema::fieldsExpanded(FieldsExpandedOptions option
     QSet<QString> columnsAlreadyFound;
     const uint fieldsExpandedCount(d->fieldsExpanded->count());
     QueryColumnInfo::Vector result(fieldsExpandedCount);   //initial size is set
-// QMapConstIterator<QueryColumnInfo*, bool> columnsAlreadyFoundIt;
     //compute unique list
     uint uniqueListCount = 0;
     for (uint i = 0; i < fieldsExpandedCount; i++) {
         QueryColumnInfo *ci = d->fieldsExpanded->at(i);
-//  columnsAlreadyFoundIt = columnsAlreadyFound.find(ci);
-//  uint foundColumnIndex = -1;
-        if (!columnsAlreadyFound.contains(ci->aliasOrName())) {// columnsAlreadyFoundIt==columnsAlreadyFound.constEnd())
+        if (!columnsAlreadyFound.contains(ci->aliasOrName())) {
             columnsAlreadyFound.insert(ci->aliasOrName());
             result[uniqueListCount++] = ci;
         }
@@ -1394,13 +1380,11 @@ void QuerySchema::computeFieldsExpanded() const
             if (static_cast<QueryAsterisk*>(f)->isSingleTableAsterisk()) {
                 const Field::List *ast_fields = static_cast<QueryAsterisk*>(f)->table()->fields();
                 foreach(Field *ast_f, *ast_fields) {
-//     d->detailedVisibility += isFieldVisible(fieldPosition);
                     QueryColumnInfo *ci = new QueryColumnInfo(ast_f, QString()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     list.append(ci);
                     PreDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
                     d->columnsOrder->insert(ci, fieldPosition);
-//     list.append(ast_f);
                 }
             } else {//all-tables asterisk: iterate through table list
                 foreach(TableSchema *table, d->tables) {
@@ -1420,7 +1404,6 @@ void QuerySchema::computeFieldsExpanded() const
             }
         } else {
             //a single field
-//   d->detailedVisibility += isFieldVisible(fieldPosition);
             QueryColumnInfo *ci = new QueryColumnInfo(f, columnAlias(fieldPosition), isColumnVisible(fieldPosition));
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
@@ -1460,7 +1443,6 @@ void QuerySchema::computeFieldsExpanded() const
                             ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                         if (!d->ownedVisibleColumns) {
                             d->ownedVisibleColumns = new Field::List();
-//Qt 4       d->ownedVisibleColumns->setAutoDelete(true);
                         }
                         d->ownedVisibleColumns->append(visibleColumn);   // remember to delete later
                     }
@@ -1518,7 +1500,6 @@ void QuerySchema::computeFieldsExpanded() const
                         ConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                     if (!d->ownedVisibleColumns) {
                         d->ownedVisibleColumns = new Field::List();
-//Qt 4      d->ownedVisibleColumns->setAutoDelete(true);
                     }
                     d->ownedVisibleColumns->append(visibleColumn);   // remember to delete later
                 }
@@ -1540,8 +1521,7 @@ void QuerySchema::computeFieldsExpanded() const
     }
     //prepare clean vector for expanded list, and a map for order information
     if (!d->fieldsExpanded) {
-        d->fieldsExpanded = new QueryColumnInfo::Vector(list.count());  // Field::Vector( list.count() );
-//Qt 4  d->fieldsExpanded->setAutoDelete(true);
+        d->fieldsExpanded = new QueryColumnInfo::Vector(list.count());
         d->columnsOrderExpanded = new QHash<QueryColumnInfo*, int>();
     } else {//for future:
         qDeleteAll(*d->fieldsExpanded);
@@ -1613,8 +1593,7 @@ void QuerySchema::computeFieldsExpanded() const
     for (QMutableListIterator<QueryColumnInfo*> it(lookup_list); it.hasNext();) {
         QueryColumnInfo* ci = it.next();
         const QString key(lookupColumnKey(ci->foreignColumn()->field, ci->field));
-        if ( /* not needed   columnInfo( tableAndFieldName ) || */
-            lookup_dict.contains(key)) {
+        if (lookup_dict.contains(key)) {
             // this table.field is already fetched by this query
             it.remove();
             delete ci;
@@ -1636,7 +1615,6 @@ void QuerySchema::computeFieldsExpanded() const
     d->fieldsExpandedWithInternalAndRecordId = 0;
     if (!lookup_list.isEmpty() && !d->internalFields) {//create on demand
         d->internalFields = new QueryColumnInfo::Vector(lookup_list.count());
-//Qt 4  d->internalFields->setAutoDelete(true);
     }
     i = -1;
     foreach(QueryColumnInfo *ci, lookup_list) {
@@ -1750,10 +1728,8 @@ QVector<int> QuerySchema::pkeyFieldsOrder() const
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
             PreDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
-//   (*d->pkeyFieldsOrder)[j]=i;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldsCount++;
-//   j++;
         }
     }
     PreDbg << d->pkeyFieldsCount
@@ -1915,61 +1891,6 @@ QuerySchemaParameterList QuerySchema::parameters() const
     whereExpression().getQueryParameters(params);
     return params;
 }
-
-/*
-  new field1, Field *field2
-  if (!field1 || !field2) {
-    PreWarn << "!masterField || !detailsField";
-    return;
-  }
-  if (field1->isQueryAsterisk() || field2->isQueryAsterisk()) {
-    PreWarn << "relationship's fields cannot be asterisks";
-    return;
-  }
-  if (!hasField(field1) && !hasField(field2)) {
-    PreWarn << "fields do not belong to this query";
-    return;
-  }
-  if (field1->table() == field2->table()) {
-    PreWarn << "fields cannot belong to the same table";
-    return;
-  }
-//@todo: check more things: -types
-//@todo: find existing global db relationships
-
-  Field *masterField = 0, *detailsField = 0;
-  IndexSchema *masterIndex = 0, *detailsIndex = 0;
-  if (field1->isPrimaryKey() && field2->isPrimaryKey()) {
-    //2 primary keys
-    masterField = field1;
-    masterIndex = masterField->table()->primaryKey();
-    detailsField = field2;
-    detailsIndex = masterField->table()->primaryKey();
-  }
-  else if (field1->isPrimaryKey()) {
-    masterField = field1;
-    masterIndex = masterField->table()->primaryKey();
-    detailsField = field2;
-//@todo: check if it already exists
-    detailsIndex = new IndexSchema(detailsField->table());
-    detailsIndex->addField(detailsField);
-    detailsIndex->setForeigKey(true);
-  //  detailsField->setForeignKey(true);
-  }
-  else if (field2->isPrimaryKey()) {
-    detailsField = field1;
-    masterField = field2;
-    masterIndex = masterField->table()->primaryKey();
-//@todo
-  }
-
-  if (!masterIndex || !detailsIndex)
-    return; //failed
-
-  Relationship *rel = new Relationship(masterIndex, detailsIndex);
-
-  d->relations.append( rel );
-}*/
 
 //---------------------------------------------------
 

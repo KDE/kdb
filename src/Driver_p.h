@@ -208,32 +208,13 @@ public:
 
     QSet<Connection*> connections;
 
-    /*! Name of MIME type of files handled by this driver
-     if it is a file-based database's driver
-     (equal X-Kexi-FileDBDriverMime service property) */
-//moved to info:    QString fileDBDriverMimeType;
-
     /*! Info about the driver. */
     DriverInfo info;
-
-    //    /*! Internal constant flag: Set this in subclass if driver is a file driver */
-    //moved to info bool isFileDriver;
 
     /*! Internal constant flag: Set this in subclass if after successful
      drv_createDatabase() the database is in opened state (as after useDatabase()).
      For most engines this is not true. */
     bool isDBOpenedAfterCreate;
-
-    /*! List of system objects names, eg. build-in system tables that
-     cannot be used by user, and in most cases user even shouldn't see these.
-     The list contents is driver dependent (by default is empty)
-     - fill this in subclass ctor. */
-//  QStringList m_systemObjectNames;
-
-    /*! List of system fields names, build-in system fields that cannot be used by user,
-     and in most cases user even shouldn't see these.
-     The list contents is driver dependent (by default is empty) - fill this in subclass ctor. */
-//  QStringList m_systemFieldNames;
 
     /*! Features (like transactions, etc.) supported by this driver
      (sum of selected  Features enum items).
@@ -279,7 +260,7 @@ protected:
     friend class Driver;
 };
 
-// escaping types for Driver::escapeBLOBInternal()
+//! Escaping types for Driver::escapeBLOBInternal()
 #define BLOB_ESCAPING_TYPE_USE_X     0 //!< escaping like X'abcd0', used by sqlite
 #define BLOB_ESCAPING_TYPE_USE_0x    1 //!< escaping like 0xabcd0, used by mysql
 #define BLOB_ESCAPING_TYPE_USE_OCTAL 2 //!< escaping like 'abcd\\000', used by pgsql

@@ -167,18 +167,6 @@ Field::Type Predicate::defaultTypeForGroup(Field::TypeGroup typeGroup)
 
 void Predicate::getHTMLErrorMesage(const Resultable& resultable, QString& msg, QString &details)
 {
-/*    Connection *conn = 0;
-    if (!obj || !obj->error()) {
-        if (dynamic_cast<Cursor*>(obj)) {
-            conn = dynamic_cast<Cursor*>(obj)->connection();
-            obj = conn;
-        } else {
-            return;
-        }
-    }*/
-// if (dynamic_cast<Connection*>(obj)) {
-    // conn = dynamic_cast<Connection*>(obj);
-    //}
     const Result result(resultable.result());
     if (!result.isError())
         return;
@@ -430,12 +418,10 @@ void ConnectionTestThread::run()
     }
     std::auto_ptr<Connection> conn(m_driver->createConnection(m_connData));
     if (!conn.get() || m_driver->result().isError()) {
-        //kDebug() << "err 1";
         emitError(*m_driver);
         return;
     }
     if (!conn.get()->connect() || conn.get()->result().isError()) {
-        //kDebug() << "err 2";
         emitError(*conn.get());
         return;
     }
@@ -443,11 +429,9 @@ void ConnectionTestThread::run()
     // if we really want to know connection to the server succeeded.
     QString tmpDbName;
     if (!conn->useTemporaryDatabaseIfNeeded(&tmpDbName)) {
-        //kDebug() << "err 3";
         emitError(*conn.get());
         return;
     }
-    //kDebug() << "emitError(0)";
     emitError(Resultable());
 }
 
@@ -466,8 +450,6 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
     setLabelText(tr("<qt>Testing connection to <b>%1</b> database server...</qt>")
                  .arg(data.serverInfoString()));
     setModal(true);
-//Qt4    showCancelButton(true);
-//Qt4    progressBar()->setFormat(""); //hide %
     setRange(0, 0); //to show busy indicator
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(slotTimeout()));
     adjustSize();
@@ -526,8 +508,6 @@ void ConnectionTestDialog::slotTimeout()
                 QString(),
                 tr("Test Connection"));
         }
-//  slotCancel();
-//  reject();
         return;
     }
     m_elapsedTime += 20;
@@ -544,7 +524,6 @@ void ConnectionTestDialog::error(const QString& msg, const QString& details)
         m_msg = msg;
         m_details = details;
         PreDbg << "ERR!";
-//        m_msgHandler->showErrorMessage(msg, details);
     }
 }
 
@@ -621,40 +600,6 @@ int Predicate::fieldCount(TableOrQuerySchema* tableOrQuery)
     return -1;
 }
 
-#if 0 // moved to ConnectionData
-QMap<QString, QString> Predicate::toMap(const ConnectionData& data)
-{
-    QMap<QString, QString> m;
-    m["caption"] = data.caption;
-    m["description"] = data.description;
-    m["driverName"] = data.driverName;
-    m["hostName"] = data.hostName;
-    m["port"] = QString::number(data.port);
-    m["useLocalSocketFile"] = QString::number((int)data.useLocalSocketFile);
-    m["localSocketFileName"] = data.localSocketFileName;
-    m["password"] = data.password;
-    m["savePassword"] = QString::number((int)data.savePassword);
-    m["userName"] = data.userName;
-    m["fileName"] = data.fileName();
-    return m;
-}
-
-void Predicate::fromMap(const QMap<QString, QString>& map, ConnectionData& data)
-{
-    data.caption = map["caption"];
-    data.description = map["description"];
-    data.driverName = map["driverName"];
-    data.hostName = map["hostName"];
-    data.port = map["port"].toInt();
-    data.useLocalSocketFile = map["useLocalSocketFile"].toInt() == 1;
-    data.localSocketFileName = map["localSocketFileName"];
-    data.password = map["password"];
-    data.savePassword = map["savePassword"].toInt() == 1;
-    data.userName = map["userName"];
-    data.setFileName(map["fileName"]);
-}
-#endif
-
 bool Predicate::splitToTableAndFieldParts(const QString& string,
                                           QString *tableName, QString *fieldName,
                                           SplitToTableAndFieldPartsOptions option)
@@ -690,7 +635,6 @@ QString Predicate::formatNumberForVisibleDecimalPlaces(double value, int decimal
             i--;
         if (s[i] == QLatin1Char('.')) //remove '.'
             i--;
-//Qt4 port        s = s.left(i + 1).replace('.', KGlobal::locale()->decimalSymbol());
         s = s.left(i + 1).replace(QLatin1Char('.'), QLocale().decimalPoint());
         return s;
     }
@@ -1713,9 +1657,6 @@ QString Predicate::defaultFileBasedDriverMimeType()
 
 QString Predicate::defaultFileBasedDriverName()
 {
-/* not needed, it's hardcoded anyway:
-    DriverManager dm;
-    return dm.driversForMimeType(Predicate::defaultFileBasedDriverMimeType()).first().lower();*/
     return QLatin1String("sqlite");
 }
 

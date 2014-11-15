@@ -74,13 +74,9 @@ FieldValidator::FieldValidator(const Field &field, QWidget * parent)
 //! @todo add validator
 //  QValidator *validator = new KDateValidator(this);
 //  setValidator( validator );
-//moved  setInputMask( dateFormatter()->inputMask() );
     } else if (t == Field::Time) {
 //! @todo add validator
-//moved  setInputMask( timeFormatter()->inputMask() );
     } else if (t == Field::DateTime) {
-//moved  setInputMask(
-//moved   dateTimeInputMask( *dateFormatter(), *timeFormatter() ) );
     } else if (t == Field::Boolean) {
 //! @todo add BooleanValidator
         addSubvalidator(new QIntValidator(0, 1, 0));

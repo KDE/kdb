@@ -132,17 +132,6 @@ public:
      @see isPredicateSystem() */
     void setPredicateSystem(bool set);
 
-#if 0
-    /*! @return true if this is schema of native database object,
-     When this is predicateSystem table, native flag is forced to be on. */
-    virtual bool isNative() const {
-        return m_native || m_isPredicateSystem;
-    }
-#endif
-
-    /* Sets native flag. Does not allow to set this off for system Predicate table. */
-    //virtual void setNative(bool set);
-
     /*! @return query schema object that is defined by "select * from <this_table_name>"
      This query schema object is owned by the table schema object.
      It is convenient way to get such a query when it is not available otherwise.

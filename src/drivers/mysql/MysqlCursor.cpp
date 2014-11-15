@@ -81,10 +81,6 @@ bool MysqlCursor::drv_close()
     return true;
 }
 
-/*bool MysqlCursor::drv_moveFirst() {
-  return true; //TODO
-}*/
-
 void MysqlCursor::drv_getNextRecord()
 {
     if (at() >= d->numRows) {
@@ -134,16 +130,6 @@ bool MysqlCursor::drv_storeCurrentRecord(RecordData* data) const
         if (m_fieldsExpanded && !f)
             continue;
         (*data)[i] = Predicate::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
-        /* moved to cstringToVariant()
-            if (f && f->type()==Field::BLOB) {
-              data[i] = QByteArray(d->mysqlrow[i], d->mysqlres->lengths[i]);
-              PreDbg << data[i].toByteArray().size();
-            }
-        //! @todo more types!
-        //! @todo look at what type mysql declares!
-            else {
-              data[i] = QVariant(QString::fromUtf8((const char*)d->mysqlrow[i], d->lengths[i]));
-            }*/
     }
     return true;
 }
@@ -161,7 +147,6 @@ void MysqlCursor::drv_bufferMovePointerNext()
 
 void MysqlCursor::drv_bufferMovePointerPrev()
 {
-    //MYSQL_ROW_OFFSET ro=mysql_row_tell(d->mysqlres);
     mysql_data_seek(d->mysqlres, m_at - 1);
     d->mysqlrow = mysql_fetch_row(d->mysqlres);
     d->lengths = mysql_fetch_lengths(d->mysqlres);
@@ -170,7 +155,6 @@ void MysqlCursor::drv_bufferMovePointerPrev()
 
 void MysqlCursor::drv_bufferMovePointerTo(qint64 to)
 {
-    //MYSQL_ROW_OFFSET ro=mysql_row_tell(d->mysqlres);
     mysql_data_seek(d->mysqlres, to);
     d->mysqlrow = mysql_fetch_row(d->mysqlres);
     d->lengths = mysql_fetch_lengths(d->mysqlres);
