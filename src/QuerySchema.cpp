@@ -1053,27 +1053,20 @@ void QuerySchema::addTable(TableSchema *table, const QString& alias)
     if (!table)
         return;
 
-    //only append table if:
-    //-it has alias
-    //-it has no alias but there is no such table on the list
+    // only append table if: it has alias or it has no alias but there is no such table on the list
     if (alias.isEmpty() && d->tables.contains(table)) {
-        const QString tableNameLower(table->name().toLower());
-        const QString aliasLower(alias.toLower());
         int num = -1;
-        foreach(TableSchema *table, d->tables) {
+        foreach(TableSchema *t, d->tables) {
             num++;
-            if (table->name().toLower() == tableNameLower) {
-                const QString tAlias = tableAlias(num);
-                if (tAlias == aliasLower) {
-                    PreWarn << "table with" << tAlias << "alias already added!";
+            if (0 == t->name().compare(table->name(), Qt::CaseInsensitive)) {
+                if (tableAlias(num).isEmpty()) {
+                    PreDbg << "table" << table->name() << "without alias already added";
                     return;
                 }
             }
         }
     }
-
     d->tables.append(table);
-
     if (!alias.isEmpty())
         setTableAlias(d->tables.count() - 1, alias);
 }
