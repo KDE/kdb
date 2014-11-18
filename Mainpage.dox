@@ -1,0 +1,9 @@
+/**
+    \mainpage Predicate
+
+    %Predicate is a database connectivity and creation library.
+
+    - Development wiki: http://community.kde.org/Predicate
+ */
+// DOXYGEN_SET_PROJECT_NAME = Predicate
+EXCLUDE=tests Predicate/parser/SqlScanner.cpp Predicate/parser/SqlParser.cpp Predicate/parser/SqlParser.h Drivers/sqlite/icu
