@@ -110,15 +110,14 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
 
     /* taken from parser's addColumn(): */
     PreDbg << "checking variable name: " << name;
-    int dotPos = name.indexOf(QLatin1Char('.'));
     QString tableName, fieldName;
-//! @todo shall we also support db name?
-    if (dotPos > 0) {
-        tableName = name.left(dotPos);
-        fieldName = name.mid(dotPos + 1);
+    if (!Predicate::splitToTableAndFieldParts(name, &tableName, &fieldName,
+                                              Predicate::SetFieldNameIfNoTableName))
+    {
+        return false;
     }
+    //! @todo shall we also support db name?
     if (tableName.isEmpty()) {//fieldname only
-        fieldName = name;
         if (fieldName == QLatin1String("*")) {
             return true;
         }
