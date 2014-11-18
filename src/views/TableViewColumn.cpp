@@ -309,7 +309,7 @@ QueryColumnInfo* TableViewColumn::visibleLookupColumnInfo() const
     return d->visibleLookupColumnInfo;
 }
 
-//! \return true if data is stored in DB, not only in memeory.
+//! @return true if data is stored in DB, not only in memeory.
 bool TableViewColumn::isDBAware() const
 {
     return d->isDBAware;
