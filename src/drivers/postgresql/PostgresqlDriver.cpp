@@ -202,7 +202,8 @@ bool PostgresqlDriver::drv_isSystemFieldName(const QString&) const
 bool PostgresqlDriver::isSystemDatabaseName(const QString& n) const
 {
     return    0 == n.compare(QLatin1String("template1"), Qt::CaseInsensitive)
-           || 0 == n.compare(QLatin1String("template0"), Qt::CaseInsensitive);
+           || 0 == n.compare(QLatin1String("template0"), Qt::CaseInsensitive)
+           || 0 == n.compare(QLatin1String("postgres"), Qt::CaseInsensitive);
 }
 
 EscapedString PostgresqlDriver::escapeString(const QString& str) const
