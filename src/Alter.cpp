@@ -335,7 +335,7 @@ void AlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDic
         } else {
             ActionBase *removeActionForThisField = actionsLikeThis ? actionsLikeThis->value(":remove:") : 0;
             if (removeActionForThisField) {
-                //if this field is going to be removed, jsut change the action's field name
+                //if this field is going to be removed, just change the action's field name
                 // and do not add a new action
             } else {
                 //just insert a copy of the rename action

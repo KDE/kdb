@@ -468,7 +468,7 @@ bool Connection::databaseExists(const QString &dbName, bool ignoreErrors)
         QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
             if (!ignoreErrors)
-                m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Database file \"%1\" does not exist.")
+                m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("The database file \"%1\" does not exist.")
                                                         .arg(QDir::convertSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
@@ -752,7 +752,7 @@ bool Connection::dropDatabase(const QString &dbName)
                 || (m_driver->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = Result(ERR_NO_NAME_SPECIFIED,
-                              QObject::tr("Cannot drop database - name not specified."));
+                              QObject::tr("Cannot delete database - name not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
@@ -1748,7 +1748,7 @@ TableSchema *Connection::copyTable(const TableSchema &tableSchema, const Object 
     clearResult();
     if (this->tableSchema(tableSchema.name()) != &tableSchema) {
         m_result = Result(ERR_OBJECT_NOT_FOUND,
-                          QObject::tr("Table \"%1\" does not exist in the database.").arg(tableSchema.name()));
+                          QObject::tr("Table \"%1\" does not exist.").arg(tableSchema.name()));
         return 0;
     }
     TableSchema *copiedTable = new TableSchema(tableSchema, false /* !copyId*/);
@@ -1890,7 +1890,7 @@ tristate Connection::alterTable(TableSchema* tableSchema, TableSchema* newTableS
         return res;
 
     if (tableSchema == newTableSchema) {
-        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could not alter table \"%1\" using the same table.")
+        m_result = Result(ERR_OBJECT_THE_SAME, QObject::tr("Could not alter table \"%1\" using the same table as destination.")
                                                .arg(tableSchema->name()));
         return false;
     }
@@ -1912,11 +1912,11 @@ bool Connection::alterTableName(TableSchema* tableSchema, const QString& newName
 {
     clearResult();
     if (tableSchema != this->tableSchema(tableSchema->id())) {
-        m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Unknown table \"%1\"").arg(tableSchema->name()));
+        m_result = Result(ERR_OBJECT_NOT_FOUND, QObject::tr("Unknown table \"%1\".").arg(tableSchema->name()));
         return false;
     }
     if (newName.isEmpty() || !Utils::isIdentifier(newName)) {
-        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid table name \"%1\"").arg(newName));
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid table name \"%1\".").arg(newName));
         return false;
     }
     const QString oldTableName = tableSchema->name();
@@ -2118,7 +2118,7 @@ bool Connection::rollbackAutoCommitTransaction(const Transaction& trans)
 
 #define SET_BEGIN_TR_ERROR \
     { if (!m_result.isError()) \
-            m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Begin transaction failed")); }
+            m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Begin transaction failed.")); }
 
 Transaction Connection::beginTransaction()
 {
@@ -2187,7 +2187,7 @@ bool Connection::commitTransaction(const Transaction trans, bool ignore_inactive
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
-        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on commit transaction"));
+        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on commit transaction."));
     return ret;
 }
 
@@ -2220,7 +2220,7 @@ bool Connection::rollbackTransaction(const Transaction trans, bool ignore_inacti
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
-        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on rollback transaction"));
+        m_result = Result(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on rollback transaction."));
     return ret;
 }
 
@@ -2374,7 +2374,7 @@ bool Connection::setupObjectData(const RecordData &data, Object *object)
     object->setId(id);
     const QString name(data[2].toString());
     if (!Utils::isIdentifier(name)) {
-        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\"").arg(name));
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\".").arg(name));
         return false;
     }
     object->setName(name);
@@ -2523,7 +2523,7 @@ tristate Connection::querySingleRecord(QuerySchema* query, RecordData* data, boo
 bool Connection::checkIfColumnExists(Cursor *cursor, uint column)
 {
     if (column >= cursor->fieldCount()) {
-        m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Column %1 does not exist for the query.").arg(column));
+        m_result = Result(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Column \"%1\" does not exist in the query.").arg(column));
         return false;
     }
     return true;
@@ -2790,15 +2790,18 @@ bool Connection::storeExtendedTableSchemaData(TableSchema* tableSchema)
 bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
 {
 #define loadExtendedTableSchemaData_ERR \
-    { m_result = Result(QObject::tr("Error while loading extended table schema information.")); \
+    { m_result = Result(QObject::tr("Error while loading extended table schema.", \
+                                    "Extended schema for a table: loading error")); \
       return false; }
 #define loadExtendedTableSchemaData_ERR2(details) \
     { m_result = Result(details); \
-      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema information.")); \
+      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema.", \
+                                           "Extended schema for a table: loading error")); \
       return false; }
 #define loadExtendedTableSchemaData_ERR3(data) \
-    { m_result = Result(QObject::tr("Invalid XML data: ") + data.left(1024)); \
-      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema information.")); \
+    { m_result = Result(QObject::tr("Invalid XML data: %1").arg(data.left(1024))); \
+      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema.", \
+                                           "Extended schema for a table: loading error")); \
       return false; }
 
     // Load extended schema information, if present (see ExtendedTableSchemaInformation in Kexi Wiki)
@@ -2815,9 +2818,11 @@ bool Connection::loadExtendedTableSchemaData(TableSchema* tableSchema)
     QDomDocument doc;
     QString errorMsg;
     int errorLine, errorColumn;
-    if (!doc.setContent(extendedTableSchemaString, &errorMsg, &errorLine, &errorColumn))
-        loadExtendedTableSchemaData_ERR2(QObject::tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: ")
-            .arg(errorMsg, errorLine, errorColumn) + extendedTableSchemaString.left(1024));
+    if (!doc.setContent(extendedTableSchemaString, &errorMsg, &errorLine, &errorColumn)) {
+        loadExtendedTableSchemaData_ERR2(
+            QObject::tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: %4")
+            .arg(errorMsg).arg(errorLine).arg(errorColumn).arg(extendedTableSchemaString.left(1024)));
+    }
 
 //! @todo look at the current format version (PREDICATE_EXTENDED_TABLE_SCHEMA_VERSION)
 
@@ -2916,7 +2921,7 @@ Field* Connection::setupField(const RecordData &data)
 
     QString name(data.at(2).toString().toLower());
     if (!Utils::isIdentifier(name)) {
-        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\"")
+        m_result = Result(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\".")
                                                   .arg(data.at(2).toString()));
         ok = false;
         return 0;
@@ -3332,7 +3337,7 @@ bool Connection::updateRecord(QuerySchema* query, RecordData* data, RecordEditBu
         if (pkey->fieldCount() != query->pkeyFieldsCount()) { //sanity check
             PreWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = Result(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
-                              QObject::tr("Could not update record because it does not contain entire master table's primary key."));
+                              QObject::tr("Could not update record because it does not contain entire primary key of master table."));
             return false;
         }
         if (!pkey->fields()->isEmpty()) {
@@ -3392,7 +3397,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
         m_result = Result(ERR_INSERT_NO_MASTER_TABLE,
-                          QObject::tr("Could not insert record because there is no master table defined."));
+                          QObject::tr("Could not insert record because there is no master table specified."));
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
@@ -3432,7 +3437,7 @@ bool Connection::insertRecord(QuerySchema* query, RecordData* data, RecordEditBu
         if (!getRecordId && !pkey) {
             PreWarn << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY RECORDS: INSERT CANCELLED";
             m_result = Result(ERR_INSERT_NO_MASTER_TABLES_PKEY,
-                              QObject::tr("Could not insert record because master table has no primary key defined."));
+                              QObject::tr("Could not insert record because master table has no primary key specified."));
             return false;
         }
         if (pkey) {
@@ -3550,7 +3555,7 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
     if (!mt) {
         PreWarn << " -- NO MASTER TABLE!";
         m_result = Result(ERR_DELETE_NO_MASTER_TABLE,
-                          QObject::tr("Could not delete record because there is no master table defined."));
+                          QObject::tr("Could not delete record because there is no master table specified."));
         return false;
     }
     IndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
@@ -3559,7 +3564,7 @@ bool Connection::deleteRecord(QuerySchema* query, RecordData* data, bool useReco
     if (!useRecordId && !pkey) {
         PreWarn << " -- WARNING: NO MASTER TABLE's PKEY";
         m_result = Result(ERR_DELETE_NO_MASTER_TABLES_PKEY,
-                          QObject::tr("Could not delete record because there is no primary key for master table defined."));
+                          QObject::tr("Could not delete record because there is no primary key for master table specified."));
         return false;
     }
 
@@ -3718,3 +3723,7 @@ EscapedString Connection::escapeString(const QString& str) const
 {
     return m_driver->escapeString(str);
 }
+
+static const char *extraMessages[] = {
+    QT_TR_NOOP("Unknown error.")
+};

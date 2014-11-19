@@ -280,14 +280,14 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
         if (MessageHandler::Continue !=
                 askQuestion(
                     MessageHandler::WarningContinueCancel,
-                    tr("Do you want to open file \"%1\" as read-only?\n\n"
+                    futureTr("Do you want to open file \"%1\" as read-only?\n\n"
                         "The file is probably already open on this or another computer. "
                         "Could not gain exclusive access for writing the file.")
                     .arg(QDir::convertSeparators(data()->databaseName())),
-                    QObject::tr("Opening As Read-Only"),
+                    futureTr("Opening As Read-Only"),
                     MessageHandler::Continue,
                     MessageHandler::GuiItem()
-                            .setProperty("text", QObject::tr("Open As Read-Only"))
+                            .setProperty("text", futureTr("Open As Read-Only"))
                             .setProperty("icon", "document-open"),
                     MessageHandler::GuiItem(),
                     "askBeforeOpeningFileReadOnly",
@@ -304,14 +304,14 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
     if (d->res == SQLITE_CANTOPEN_WITH_LOCKED_READWRITE) {
         setError(ERR_ACCESS_RIGHTS,
-                 tr("The file is probably already open on this or another computer.") + "\n\n"
-                 + tr("Could not gain exclusive access for reading and writing the file.") + " "
-                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
+                 futureTr("The file is probably already open on this or another computer.\n\n"
+                          "Could not gain exclusive access for reading and writing the file. "
+                          "Check the file's permissions and whether it is already opened and locked by another application."));
     } else if (d->res == SQLITE_CANTOPEN_WITH_LOCKED_WRITE) {
         setError(ERR_ACCESS_RIGHTS,
-                 tr("The file is probably already open on this or another computer.") + "\n\n"
-                 + tr("Could not gain exclusive access for writing the file.") + " "
-                 + tr("Check the file's permissions and whether it is already opened and locked by another application."));
+                 futureTr("The file is probably already open on this or another computer.\n\n"
+                          "Could not gain exclusive access for writing the file. "
+                          "Check the file's permissions and whether it is already opened and locked by another application."));
     }*/
     return m_result.serverResultCode() == SQLITE_OK;
 }
@@ -335,7 +335,7 @@ bool SQLiteConnection::drv_closeDatabase()
     }
     if (SQLITE_BUSY == res) {
 #if 0 //this is ANNOYING, needs fixing (by closing cursors or waiting)
-        setError(ERR_CLOSE_FAILED, tr("Could not close busy database."));
+        setError(ERR_CLOSE_FAILED, futureTr("Could not close busy database."));
 #else
         return true;
 #endif

@@ -313,7 +313,7 @@ bool PostgresqlConnection::drv_rollbackTransaction(TransactionData *tdata)
 
         result = false;
     } catch (...) {
-        d->errmsg = QObject::tr("Unknown error.");
+        d->errmsg = predicateTr("Unknown error.");
         result = false;
     }
     if (m_trans == tdata)

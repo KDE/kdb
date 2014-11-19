@@ -78,15 +78,15 @@ void DriverPrivate::initInternalProperties()
 #if 0
     QString str;
     if (features & Driver::SingleTransactions)
-        str = QObject::tr("Single transactions");
+        str = futureTr("Single transactions support");
     else if (features & Driver::MultipleTransactions)
-        str = QObject::tr("Multiple transactions");
+        str = futureTr("Multiple transactions support");
     else if (features & Driver::NestedTransactions)
-        str = QObject::tr("Nested transactions");
+        str = futureTr("Nested transactions support");
     else if (features & Driver::IgnoreTransactions)
-        str = QObject::tr("Ignored");
+        str = futureTr("Ignored", "Ignored transactions");
     else
-        str = QObject::tr("None");
+        str = futureTr2("None", "No transactions");
 #endif
 // properties["transaction_support"] = features & Driver::TransactionsMask;
 // propertyCaptions["transaction_support"] = QObject::tr("Transaction support");

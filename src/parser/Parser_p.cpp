@@ -132,12 +132,12 @@ void yyerror(const char *str)
 
             if (Predicate::isPredicateSQLKeyword(ctoken))
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("\"%1\" is a reserved keyword")
+                                             QObject::tr("\"%1\" is a reserved keyword.")
                                                 .arg(QLatin1String(ctoken)) + lexerErr,
                                              ctoken, current));
             else
                 parser->setError(ParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("Syntax Error near \"%1\"")
+                                             QObject::tr("Syntax Error near \"%1\".")
                                                 .arg(QLatin1String(ctoken)) + lexerErr,
                                              ctoken, current));
         }
@@ -167,7 +167,7 @@ bool parseData(Parser *p, const char *data)
     fieldList.clear();
 
     if (!data) {
-        ParserError err(QObject::tr("Error"), QObject::tr("No query specified"), ctoken, current);
+        ParserError err(QObject::tr("Error"), QObject::tr("No query statement specified."), ctoken, current);
         parser->setError(err);
         yyerror("");
         parser = 0;
@@ -214,7 +214,7 @@ bool addColumn(ParseInfo *parseInfo, Expression *columnExpr)
         //it's a variable:
         if (v_e.name() == QLatin1String("*")) {//all tables asterisk
             if (parseInfo->querySchema()->tables()->isEmpty()) {
-                setError(QObject::tr("\"*\" could not be used if no tables are specified"));
+                setError(QObject::tr("\"*\" could not be used if no tables are specified."));
                 return false;
             }
             parseInfo->querySchema()->addAsterisk(new QueryAsterisk(parseInfo->querySchema()));
@@ -285,7 +285,7 @@ QuerySchema* buildSelectQuery(
             TableSchema *s = parser->db()->tableSchema(tname);
             if (!s) {
                 setError(
-                    QObject::tr("Table \"%1\" does not exist").arg(tname));
+                    QObject::tr("Table \"%1\" does not exist.").arg(tname));
                 CLEANUP;
                 return 0;
             }

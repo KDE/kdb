@@ -146,7 +146,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
             parseInfo->setErrorMessage(
                 QObject::tr("Field not found"));
             parseInfo->setErrorDescription(
-                QObject::tr("Table containing \"%1\" field not found").arg(fieldName));
+                QObject::tr("Table containing \"%1\" field not found.").arg(fieldName));
             return false;
         }
         //ok
@@ -175,7 +175,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
                 QObject::tr("Could not access the table directly using its name"));
             parseInfo->setErrorDescription(
                 QObject::tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
-                            "you can write \"%3\"")
+                            "you can write \"%3\".")
                          .arg(tableName,
                               tableName + QLatin1Char('.') + fieldName,
                               tableAlias + QLatin1Char('.') + fieldName));
@@ -199,7 +199,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
         parseInfo->setErrorMessage(
             QObject::tr("Table not found"));
         parseInfo->setErrorDescription(
-            QObject::tr("Unknown table \"%1\"").arg(tableName));
+            QObject::tr("Unknown table \"%1\".").arg(tableName));
         return false;
     }
 
@@ -216,7 +216,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
             parseInfo->setErrorMessage(
                 QObject::tr("Ambiguous \"%1.*\" expression").arg(tableName));
             parseInfo->setErrorDescription(
-                QObject::tr("More than one \"%1\" table or alias defined").arg(tableName));
+                QObject::tr("More than one \"%1\" table or alias defined.").arg(tableName));
             return false;
         }
         tableForQueryAsterisk = ts;
@@ -228,7 +228,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
     if (!realField) {
         parseInfo->setErrorMessage(QObject::tr("Field not found"));
         parseInfo->setErrorDescription(
-            QObject::tr("Table \"%1\" has no \"%2\" field").arg(tableName, fieldName));
+            QObject::tr("Table \"%1\" has no \"%2\" field.").arg(tableName, fieldName));
         return false;
     }
 
@@ -238,7 +238,7 @@ bool VariableExpressionData::validateInternal(ParseInfo *parseInfo_, CallStack* 
         parseInfo->setErrorMessage(
             QObject::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName));
         parseInfo->setErrorDescription(
-            QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field")
+            QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field.")
                         .arg(tableName, fieldName));
         return false;
     }

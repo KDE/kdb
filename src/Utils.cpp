@@ -447,7 +447,7 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         , m_stopWaiting(false)
 {
     setWindowTitle(tr("Test Connection"));
-    setLabelText(tr("<qt>Testing connection to <b>%1</b> database server...</qt>")
+    setLabelText(tr("Testing connection to \"%1\" database server...")
                  .arg(data.serverInfoString()));
     setModal(true);
     setRange(0, 0); //to show busy indicator

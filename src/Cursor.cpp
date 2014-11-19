@@ -505,3 +505,7 @@ void Cursor::setQueryParameters(const QList<QVariant>& params)
     else
         *m_queryParameters = params;
 }
+
+static const char *extraMessages[] = {
+    QT_TR_NOOP("No connection for cursor open operation specified.")
+};

@@ -183,14 +183,19 @@ enum EscapingType {
 
 }
 
-#ifndef futureI18n
-# define futureI18n QString
-# define futureI18n2(a,b) QString(b)
+//! Macros for marking future QObject::tr() translations.
+#ifndef futureTr
+# define futureTr QString
+# define futureTr2(a,b) QString(b)
 #endif
 
-#ifndef FUTURE_I18N_NOOP
-# define FUTURE_I18N_NOOP(x) (x)
+//! Macros for marking future QT_TR_NOOP translations.
+#ifndef FUTURE_TR_NOOP
+# define FUTURE_TR_NOOP(x) (x)
 #endif
+
+//! Macro to use in drivers to avoid redundant translations.
+#define predicateTr QObject::tr
 
 //! Debugging options for expressions
 #cmakedefine PREDICATE_EXPRESSION_DEBUG
