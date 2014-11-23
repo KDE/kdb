@@ -268,7 +268,7 @@ QDebug operator<<(QDebug dbg, const TableSchema& table)
 
 Connection* TableSchema::connection() const
 {
-    return (Connection*)m_conn;
+    return static_cast<Connection*>(m_conn);
 }
 
 void TableSchema::setPredicateSystem(bool set)
