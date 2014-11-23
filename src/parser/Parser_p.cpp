@@ -306,10 +306,9 @@ QuerySchema* buildSelectQuery(
         querySchema->setMasterTable(querySchema->tables()->first());
 
     //-------add fields
-    bool containsAsteriskColumn = false; // used to check duplicated asterisks (disallowed)
-
     if (!colViews.isEmpty()) {
         columnNum = 0;
+        bool containsAsteriskColumn = false; // used to check duplicated asterisks (disallowed)
         for (int i = 0; i < colViews.argCount(); i++, columnNum++) {
             Expression e(colViews.arg(i));
             Expression columnExpr(e);

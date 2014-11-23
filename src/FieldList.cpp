@@ -166,7 +166,7 @@ PREDICATE_EXPORT QDebug operator<<(QDebug dbg, const FieldList& list)
 #define _ADD_FIELD(fname) \
     { \
         if (fname.isEmpty()) return fl; \
-        f = m_fields_by_name.value(fname.toLower()); \
+        Field *f = m_fields_by_name.value(fname.toLower()); \
         if (!f) { PreWarn << subListWarning1(fname); delete fl; return 0; } \
         fl->addField(f); \
     }
@@ -188,7 +188,6 @@ FieldList* FieldList::subList(const QString& n1, const QString& n2,
 {
     if (n1.isEmpty())
         return 0;
-    Field *f;
     FieldList *fl = new FieldList(false);
     _ADD_FIELD(n1);
     _ADD_FIELD(n2);
@@ -213,7 +212,6 @@ FieldList* FieldList::subList(const QString& n1, const QString& n2,
 
 FieldList* FieldList::subList(const QStringList& list)
 {
-    Field *f;
     FieldList *fl = new FieldList(false);
     for (QStringList::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
         _ADD_FIELD((*it));
@@ -226,14 +224,13 @@ FieldList* FieldList::subList(const QStringList& list)
 #define _ADD_FIELD(fname) \
     { \
         if (fname.isEmpty()) return fl; \
-        f = m_fields_by_name.value(QLatin1String(fname.toLower())); \
+        Field *f = m_fields_by_name.value(QLatin1String(fname.toLower())); \
         if (!f) { PreWarn << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
         fl->addField(f); \
     }
 
 FieldList* FieldList::subList(const QList<QByteArray>& list)
 {
-    Field *f;
     FieldList *fl = new FieldList(false);
     for (QList<QByteArray>::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
         _ADD_FIELD((*it));
@@ -245,10 +242,9 @@ FieldList* FieldList::subList(const QList<QByteArray>& list)
 
 FieldList* FieldList::subList(const QList<uint>& list)
 {
-    Field *f;
     FieldList *fl = new FieldList(false);
     foreach(uint index, list) {
-        f = field(index);
+        Field *f = field(index);
         if (!f) {
             PreWarn << QString::fromLatin1("could not find field at position %1").arg(index);
             delete fl;

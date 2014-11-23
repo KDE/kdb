@@ -1634,10 +1634,9 @@ void QuerySchema::computeFieldsExpanded() const
             if (lookupTable
                     && (uint)lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
                     && (visibleColumns = lookupTable->subList(lookupFieldSchema->visibleColumns()))) {
-                Field *visibleColumn = 0;
                 // for single visible column, just add it as-is
                 if (visibleColumns->fieldCount() == 1) {
-                    visibleColumn = visibleColumns->fields()->first();
+                    Field *visibleColumn = visibleColumns->fields()->first();
                     const QString key(lookupColumnKey(ci->field, visibleColumn));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
