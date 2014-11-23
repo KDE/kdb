@@ -88,13 +88,6 @@ static void shellstaticFunc(
   sqlite3_result_text(context, zShellStatic, -1, SQLITE_STATIC);
 }
 
-struct previous_mode_data {
-  int valid;        /* Is there legit data in here? */
-  int mode;
-  int showHeader;
-  int colWidth[100];
-};
-
 /*
 ** An pointer to an instance of this structure is passed from
 ** the main program to the callback.  This is used to communicate
@@ -116,9 +109,6 @@ struct callback_data {
   int actualWidth[100];  /* Actual width of each column */
   char nullvalue[20];    /* The text to print when a NULL comes back from
                          ** the database */
-  struct previous_mode_data explainPrev;
-                         /* Holds the mode information just before
-                         ** .explain ON */
   char outfile[FILENAME_MAX]; /* Filename for *out */
   const char *zDbFilename;    /* name of the database file */
   const char *zVfs;           /* Name of VFS to use */

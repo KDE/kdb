@@ -277,56 +277,6 @@ bool PostgresqlConnection::drv_getTablesList(QStringList* list)
     return queryStringList(EscapedString("SELECT lower(relname) FROM pg_class WHERE relkind='r'"), list);
 }
 
-/*pred
-TransactionData* PostgresqlConnection::drv_beginTransaction()
-{
-    return new PostgresqlTransactionData(this);
-}
-
-bool PostgresqlConnection::drv_commitTransaction(TransactionData *tdata)
-{
-    bool result = true;
-    try {
-        static_cast<PostgresqlTransactionData*>(tdata)->data->commit();
-    } catch (const std::exception &e) {
-        //If an error ocurred then put the error description into _dbError
-        d->errmsg = QString::fromUtf8(e.what());
-        result = false;
-    } catch (...) {
-        //! @todo
-        setError();
-        result = false;
-    }
-    if (m_trans == tdata)
-        m_trans = 0;
-    return result;
-}
-
-bool PostgresqlConnection::drv_rollbackTransaction(TransactionData *tdata)
-{
-    bool result = true;
-    try {
-        static_cast<PostgresqlTransactionData*>(tdata)->data->abort();
-    } catch (const std::exception &e) {
-        //If an error ocurred then put the error description into _dbError
-        d->errmsg = QString::fromUtf8(e.what());
-
-        result = false;
-    } catch (...) {
-        d->errmsg = predicateTr("Unknown error.");
-        result = false;
-    }
-    if (m_trans == tdata)
-        m_trans = 0;
-    return result;
-}*/
-
-/*pred
-int PostgresqlConnection::serverResult()
-{
-    return d->resultCode;
-}*/
-
 QString PostgresqlConnection::serverResultName() const
 {
     if (m_result.serverResultCode() >= 0 && m_result.serverResultCode() <= PGRES_FATAL_ERROR) {
@@ -334,11 +284,6 @@ QString PostgresqlConnection::serverResultName() const
     }
     return QString();
 }
-
-/*void PostgresqlConnection::drv_clearServerResult()
-{
-    d->resultCode = 0;
-}*/
 
 PreparedStatementInterface* PostgresqlConnection::prepareStatementInternal()
 {

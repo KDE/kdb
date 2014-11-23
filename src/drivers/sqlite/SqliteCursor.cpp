@@ -54,6 +54,8 @@ public:
     SQLiteCursorData(Connection* conn)
             :
             SQLiteConnectionInternal(conn)
+            , prepared_st_handle(0)
+            , utail(0)
             , curr_coldata(0)
             , curr_colname(0)
             , cols_pointers_mem_size(0)
@@ -79,7 +81,6 @@ public:
     char *utail;
     const char **curr_coldata;
     const char **curr_colname;
-    int next_cols;
     uint cols_pointers_mem_size; //!< size of record's array of pointers to values
     QVector<const char**> records; //!< buffer data
 

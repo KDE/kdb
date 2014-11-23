@@ -50,11 +50,8 @@ bool SQLitePreparedStatement::prepare(const EscapedString& statement)
             0                        //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
         )
     );
+    //! @todo copy error msg
     return m_result.serverResultCode() == SQLITE_OK;
-        return true;
-
-//! @todo copy error msg
-    return false;
 }
 
 bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int par)

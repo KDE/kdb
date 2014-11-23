@@ -54,9 +54,6 @@ public:
     bool unicode;
     PGresult *res;
     QByteArray escapingBuffer;
-
-    QString errmsg; //!< server-specific message of last operation
-    int resultCode; //!< result code of last operation on server
 };
 
 //! Internal PostgreSQL cursor data.
