@@ -256,6 +256,7 @@ TableViewData::TableViewData()
         , d(new Private)
 {
     init();
+    d->cursor = 0;
 }
 
 // db-aware ctor
