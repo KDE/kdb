@@ -122,8 +122,8 @@ MessageHandler::ButtonCode Object::askQuestion(
                                        dontShowAskAgainName, options);
 
     if (m_msgHandler)
-        return m_msgHandler->askQuestion(messageType, message, caption, defaultResult, buttonYes, buttonNo,
-                                         dontShowAskAgainName, options);
+        return m_msgHandler->askQuestionInternal(messageType, message, caption, defaultResult, buttonYes, buttonNo,
+                                                 dontShowAskAgainName, options);
 
     return defaultResult;
 }*/
