@@ -11,7 +11,7 @@ set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
 
 # find SQLite:
 set(SQLITE_MIN_VERSION 3.6.16)
-set(SQLITE_RECOMMENDED_VERSION 3.8.6)
+set(SQLITE_RECOMMENDED_VERSION 3.8.7)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
 macro_optional_find_package(Sqlite ${SQLITE_MIN_VERSION})
 macro_log_feature(SQLITE_FOUND "SQLite3" "Embedded SQL database engine with enabled extensions loading"
