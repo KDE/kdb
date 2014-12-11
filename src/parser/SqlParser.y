@@ -425,9 +425,6 @@
 /*%type <integerValue> SIGNED_INTEGER */
 
 %{
-#ifndef YYDEBUG /* compat. */
-# define YYDEBUG 0
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <string>
@@ -522,16 +519,28 @@ using namespace Predicate;
 //%left ASTERISK SLASH
 
 /* precedence: lowest to highest */
-%left     UNION EXCEPT
+%left     UNION
+%left     EXCEPT
 %left     INTERSECT
 %left     OR
-%left     AND XOR
+%left     AND
+%left     XOR
 %right    NOT
-%nonassoc '=' '<' '>'
-%nonassoc LESS_OR_EQUAL GREATER_OR_EQUAL 
-%nonassoc NOT_EQUAL NOT_EQUAL2
-%nonassoc SQL_IN LIKE ILIKE SIMILAR_TO NOT_SIMILAR_TO
-//%nonassoc    LIKE ILIKE SIMILAR
+%nonassoc '='
+%nonassoc '<'
+%nonassoc '>'
+%nonassoc LESS_OR_EQUAL
+%nonassoc GREATER_OR_EQUAL
+%nonassoc NOT_EQUAL
+%nonassoc NOT_EQUAL2
+%nonassoc SQL_IN
+%nonassoc LIKE
+%nonassoc ILIKE
+%nonassoc SIMILAR_TO
+%nonassoc NOT_SIMILAR_TO
+//%nonassoc    LIKE
+//%nonassoc    ILIKE
+//%nonassoc    SIMILAR
 //%nonassoc    ESCAPE
 //%nonassoc    OVERLAPS
 %nonassoc    BETWEEN
@@ -540,7 +549,11 @@ using namespace Predicate;
 //%left        Op OPERATOR        // multi-character ops and user-defined operators
 //%nonassoc    NOTNULL
 //%nonassoc    ISNULL
-//%nonassoc    IS NULL_P TRUE_P FALSE_P UNKNOWN // sets precedence for IS NULL, etc
+//%nonassoc    IS               // sets precedence for IS NULL, etc
+//%nonassoc    NULL_P
+//%nonassoc    TRUE_P
+//%nonassoc    FALSE_P
+//%nonassoc    UNKNOWN
 %left        '+' '-'
 %left        '*' '/' '%'
 %left        '^'
@@ -548,8 +561,10 @@ using namespace Predicate;
 // Unary Operators 
 //%left        AT ZONE            // sets precedence for AT TIME ZONE
 //%right        UMINUS
-%left        '[' ']'
-%left        '(' ')'
+%left        '['
+%left        ']'
+%left        '('
+%left        ')'
 //%left        TYPECAST
 %left        '.'
 
@@ -564,7 +579,15 @@ using namespace Predicate;
  * They wouldn't be given a precedence at all, were it not that we need
  * left-associativity among the JOIN rules themselves.
  */
-/*%left        JOIN UNIONJOIN CROSS LEFT FULL RIGHT INNER_P NATURAL
+/*
+%left JOIN
+%left UNIONJOIN
+%left CROSS
+%left LEFT
+%left FULL
+%left RIGHT
+%left INNER_P
+%left NATURAL
 */
 
 %token __LAST_TOKEN /* sentinel */

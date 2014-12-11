@@ -5,7 +5,8 @@ builddir=$PWD
 srcdir=`dirname $0`
 cd $srcdir
 flex -oSqlScanner.cpp SqlScanner.l
-bison -dv SqlParser.y --report-file=$builddir/sqlparser.output
+bison -d SqlParser.y -Wall -fall -rall -t --report-file=$builddir/sqlparser.output
+
 echo '#ifndef _SQLPARSER_H_
 #define _SQLPARSER_H_
 #include <Predicate/Field.h>
