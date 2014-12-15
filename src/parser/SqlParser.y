@@ -362,7 +362,8 @@
 //%token YEAR
 //%token YEARS_BETWEEN
 
-%token '-' '+'
+%token '-'
+%token '+'
 %token '*'
 %token '%'
 %token '@'
@@ -372,7 +373,8 @@
 %token '$'
 //%token '<'
 //%token '>'
-%token '(' ')'
+%token '('
+%token ')'
 %token '?'
 %token '\''
 %token '/'
@@ -554,8 +556,11 @@ using namespace Predicate;
 //%nonassoc    TRUE_P
 //%nonassoc    FALSE_P
 //%nonassoc    UNKNOWN
-%left        '+' '-'
-%left        '*' '/' '%'
+%left        '+'
+%left        '-'
+%left        '*'
+%left        '/'
+%left        '%'
 %left        '^'
 %left        UMINUS
 // Unary Operators 

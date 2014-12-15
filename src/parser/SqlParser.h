@@ -124,7 +124,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2058 of yacc.c  */
-#line 501 "SqlParser.y"
+#line 503 "SqlParser.y"
 
     QString* stringValue;
     qint64 integerValue;
