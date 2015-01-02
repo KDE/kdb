@@ -16,25 +16,25 @@ endif(COMMAND cmake_policy)
 
 # define the generic version of the Predicate libraries here
 # this makes it easy to advance it when the next Predicate release comes
-set(PREDICATE_VERSION_MAJOR "00")
-set(GENERIC_PREDICATE_LIB_SOVERSION "0") # like PREDICATE_VERSION_MAJOR
-set(PREDICATE_VERSION_MINOR "00")
-set(PREDICATE_VERSION_RELEASE "1")
-set(PREDICATE_VERSION "0.0.1")
-set(PREDICATE_VERSION_STRING "${PREDICATE_VERSION}")
+set(PREDICATE_VERSION_STRING "1.0 Pre-Alpha")
+set(PREDICATE_VERSION_MAJOR 0)
+set(PREDICATE_VERSION_MINOR 9)
+set(PREDICATE_VERSION_RELEASE 0)
+set(GENERIC_PREDICATE_LIB_VERSION_MAJOR "0")
 
-set(GENERIC_PREDICATE_LIB_VERSION ${PREDICATE_VERSION})
+set(GENERIC_PREDICATE_LIB_VERSION "${GENERIC_PREDICATE_LIB_VERSION_MAJOR}.0.0")
+set(GENERIC_PREDICATE_LIB_SOVERSION "${GENERIC_PREDICATE_LIB_VERSION_MAJOR}")
 
 # If Git is installed and a '.git' directory is found,
 # we append the Git revision to AKONADI_VERSION_STRING
+set(PREDICATE_GIT_SHA1_STRING "")
 if(EXISTS "${Predicate_SOURCE_DIR}/.git")
   find_package(Git)
   if(GIT_FOUND)
     execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
                     WORKING_DIRECTORY ${Predicate_SOURCE_DIR}
-                    OUTPUT_VARIABLE predicate_git_revision)
-    string(REGEX REPLACE "\n" "" predicate_git_revision "${predicate_git_revision}")
-    set(PREDICATE_VERSION_STRING "${PREDICATE_VERSION_STRING} (revision: ${predicate_git_revision})")
+                    OUTPUT_VARIABLE PREDICATE_GIT_SHA1_STRING)
+    string(REGEX REPLACE "\n" "" PREDICATE_GIT_SHA1_STRING "${PREDICATE_GIT_SHA1_STRING}")
   endif()
 endif()
 

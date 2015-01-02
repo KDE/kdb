@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2008 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -32,14 +32,19 @@
  In external code: do not use this to get library version information.
  See Predicate::version() if you need the Predicate version used at runtime.
 */
-#cmakedefine PREDICATE_VERSION_MAJOR @PREDICATE_VERSION_MAJOR@
-#cmakedefine PREDICATE_VERSION_MINOR @PREDICATE_VERSION_MINOR@
-#cmakedefine PREDICATE_VERSION_RELEASE @PREDICATE_VERSION_RELEASE@
+#define PREDICATE_VERSION_MAJOR @PREDICATE_VERSION_MAJOR@
+#define PREDICATE_VERSION_MINOR @PREDICATE_VERSION_MINOR@
+#define PREDICATE_VERSION_RELEASE @PREDICATE_VERSION_RELEASE@
 
 #define PREDICATE_VERSION_MAJOR_STRING "@PREDICATE_VERSION_MAJOR@"
 #define PREDICATE_VERSION_MINOR_STRING "@PREDICATE_VERSION_MINOR@"
-#define PREDICATE_VERSION_RELEASE_STRING "@PREDICATE_VERSION_MINOR@"
-#define PREDICATE_VERSION_STRING "@PREDICATE_VERSION_STRING@"
+#define PREDICATE_VERSION_RELEASE_STRING "@PREDICATE_VERSION_RELEASE@"
+
+//! Version of Predicate as string, at compile time.
+#cmakedefine PREDICATE_VERSION_STRING "@PREDICATE_VERSION_STRING@"
+
+//! Indicates the git sha1 commit which was used for compilation of Predicate.
+#cmakedefine PREDICATE_GIT_SHA1_STRING "@PREDICATE_GIT_SHA1_STRING@"
 
 //! The subdirectory relative to the install prefix for executables.
 #define BIN_INSTALL_DIR "${BIN_INSTALL_DIR}"
