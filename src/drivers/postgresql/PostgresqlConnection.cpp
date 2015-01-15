@@ -19,9 +19,9 @@
 */
 
 #include "PostgresqlConnection.h"
+#include "PostgresqlConnection_p.h"
 
 #include "PostgresqlPreparedStatement.h"
-#include "PostgresqlConnection_p.h"
 #include "PostgresqlCursor.h"
 #include <Predicate/Error>
 #include <Predicate/Global>

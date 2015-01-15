@@ -18,11 +18,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include "Parser.h"
+#include "Parser_p.h"
+
 #include <Predicate/Connection>
 #include <Predicate/TableSchema>
 #include <Predicate/Tools/Static>
-#include "Parser.h"
-#include "Parser_p.h"
 #include "SqlParser.h"
 
 using namespace Predicate;

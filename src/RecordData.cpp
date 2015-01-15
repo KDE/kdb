@@ -22,8 +22,8 @@
    Original Project: buX (www.bux.at)
 */
 
-#include <Predicate/Global.h>
 #include <Predicate/RecordData.h>
+#include <Predicate/Global.h>
 
 using namespace Predicate;
 

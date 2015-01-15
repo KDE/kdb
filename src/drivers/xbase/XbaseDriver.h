@@ -17,8 +17,8 @@
 * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_XBASE_H
-#define PREDICATE_DRIVER_XBASE_H
+#ifndef PREDICATE_DRIVER_XBASEDRIVER_H
+#define PREDICATE_DRIVER_XBASEDRIVER_H
 
 #include <Predicate/Driver>
 
@@ -65,4 +65,4 @@ class xBaseDriver : public Driver
 
 }
 
-#endif
+#endif // PREDICATE_DRIVER_XBASEDRIVER_H

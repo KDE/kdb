@@ -21,6 +21,8 @@
 */
 
 #include "Utils.h"
+#include "Utils_p.h"
+
 #include "Cursor.h"
 #include "DriverManager.h"
 #include "LookupFieldSchema.h"
@@ -39,7 +41,6 @@
 
 #include <memory>
 
-#include "Utils_p.h"
 
 using namespace Predicate;
 

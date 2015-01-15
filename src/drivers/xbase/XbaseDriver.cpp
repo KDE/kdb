@@ -17,6 +17,8 @@
 * Boston, MA 02110-1301, USA.
 */
 
+#include "XbaseDriver.h"
+
 #include <Predicate/Connection>
 #include <Predicate/DriverManager>
 #include <Predicate/Private/Driver>
@@ -24,7 +26,6 @@
 
 #include <QtDebug>
 
-#include "XbaseDriver.h"
 #include "XbaseConnection.h"
 
 using namespace Predicate;

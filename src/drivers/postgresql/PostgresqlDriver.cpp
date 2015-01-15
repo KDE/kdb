@@ -18,11 +18,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include "PostgresqlDriver.h"
+
 #include <Predicate/Connection>
 #include <Predicate/DriverManager>
 #include <Predicate/Private/Driver>
 #include <Predicate/Utils>
-#include "PostgresqlDriver.h"
+
 #include "PostgresqlConnection.h"
 
 #include <libpq-fe.h>

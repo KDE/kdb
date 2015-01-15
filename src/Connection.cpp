@@ -18,10 +18,10 @@
 */
 
 #include "Connection.h"
+#include "Connection_p.h"
 
 #include "Error.h"
 #include "Expression.h"
-#include "Connection_p.h"
 #include "ConnectionData.h"
 #include "Driver.h"
 #include "Driver_p.h"

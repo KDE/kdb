@@ -23,12 +23,17 @@
 
 #include <QObject>
 
+#include "predicate_export.h"
+
+
+
 namespace Predicate
 {
 
 class Connection;
 class QuerySchema;
 class TableSchema;
+class EscapedString;
 
 /**
  * Provides detailed i18n'ed error description about the @a Parser .

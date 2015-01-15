@@ -19,10 +19,10 @@
 
 #include "Driver.h"
 #include "Driver_p.h"
+
 #include "DriverManager.h"
 #include "DriverManager_p.h"
 #include "Error.h"
-#include "DriverManager.h"
 #include "Connection.h"
 #include "ConnectionData.h"
 #include "Admin.h"

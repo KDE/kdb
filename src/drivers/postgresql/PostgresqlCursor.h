@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_CURSOR_POSTGRESQL_H
-#define PREDICATE_CURSOR_POSTGRESQL_H
+#ifndef PREDICATE_DRIVER_POSTGRESQLCURSOR_H
+#define PREDICATE_DRIVER_POSTGRESQLCURSOR_H
 
 #include <Predicate/Cursor>
 #include <Predicate/Connection>
@@ -60,4 +60,4 @@ private:
 
 }
 
-#endif
+#endif // PREDICATE_DRIVER_POSTGRESQLCURSOR_H

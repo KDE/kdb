@@ -22,7 +22,7 @@
 
 #include "DriverManager.h"
 #include "DriverManager_p.h"
-#include "Driver_p.h"
+
 #include "Driver_p.h"
 #include "Tools/Static.h"
 
