@@ -32,7 +32,7 @@ namespace Predicate
 class MysqlPreparedStatement : public PreparedStatementInterface, public MysqlConnectionInternal
 {
 public:
-    MysqlPreparedStatement(ConnectionInternal* conn);
+    explicit MysqlPreparedStatement(ConnectionInternal* conn);
 
     virtual ~MysqlPreparedStatement();
 

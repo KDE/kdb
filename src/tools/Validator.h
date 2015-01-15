@@ -48,7 +48,7 @@ class PREDICATE_EXPORT Validator : public QValidator
 public:
     enum Result { Error = 0, Ok = 1, Warning = 2 };
 
-    Validator(QObject * parent = 0);
+    explicit Validator(QObject *parent = 0);
 
     virtual ~Validator();
 
@@ -124,12 +124,12 @@ class PREDICATE_EXPORT MultiValidator : public Validator
 public:
     /*! Constructs multivalidator with no subvalidators defined.
      You can add more validators with addSubvalidator(). */
-    MultiValidator(QObject * parent = 0);
+    explicit MultiValidator(QObject *parent = 0);
 
     /*! Constructs multivalidator with one validator @a validator.
      It will be owned if has no parent defined.
      You can add more validators with addSubvalidator(). */
-    MultiValidator(QValidator *validator, QObject * parent = 0);
+    explicit MultiValidator(QValidator *validator, QObject *parent = 0);
 
     ~MultiValidator();
 

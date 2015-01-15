@@ -29,7 +29,7 @@ namespace Predicate
 class PostgresqlPreparedStatement : public PreparedStatementInterface, public PostgresqlConnectionInternal
 {
 public:
-    PostgresqlPreparedStatement(ConnectionInternal* conn);
+    explicit PostgresqlPreparedStatement(ConnectionInternal* conn);
 
     virtual ~PostgresqlPreparedStatement();
 

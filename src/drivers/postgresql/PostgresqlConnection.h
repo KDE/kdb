@@ -34,7 +34,7 @@ class PostgresqlConnectionInternal;
 class PostgresqlTransactionData : public TransactionData
 {
 public:
-    PostgresqlTransactionData(Connection *conn);
+    explicit PostgresqlTransactionData(Connection *conn);
     ~PostgresqlTransactionData();
 };
 

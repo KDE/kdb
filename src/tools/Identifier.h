@@ -47,7 +47,7 @@ PREDICATE_EXPORT QString identifierExpectedMessage(const QString &valueName,
 class PREDICATE_EXPORT IdentifierValidator : public Validator
 {
 public:
-    IdentifierValidator(QObject * parent = 0);
+    explicit IdentifierValidator(QObject * parent = 0);
     virtual ~IdentifierValidator();
     virtual State validate(QString & input, int & pos) const;
 

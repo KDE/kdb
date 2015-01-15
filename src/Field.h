@@ -693,7 +693,7 @@ protected:
     Field(QuerySchema *querySchema, const Expression& expr);
 
     /*! @overload Field(QuerySchema*, const Expression&) */
-    Field(QuerySchema *querySchema);
+    explicit Field(QuerySchema *querySchema);
 
     /*! @internal Used by constructors. */
     void init();

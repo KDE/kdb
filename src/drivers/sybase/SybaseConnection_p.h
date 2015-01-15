@@ -52,7 +52,7 @@ class SybaseConnectionInternal : public Predicate::ConnectionInternal
 {
 
 public:
-    SybaseConnectionInternal(Predicate::Connection* connection);
+    explicit SybaseConnectionInternal(Predicate::Connection* connection);
     virtual ~SybaseConnectionInternal();
 
     //! Connects to a Sybase database
@@ -95,7 +95,7 @@ public:
 class SybaseCursorData : public SybaseConnectionInternal
 {
 public:
-    SybaseCursorData(Predicate::Connection* connection);
+    explicit SybaseCursorData(Predicate::Connection* connection);
     virtual ~SybaseCursorData();
 
     //unsigned long *lengths;

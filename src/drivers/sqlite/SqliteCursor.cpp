@@ -51,7 +51,7 @@ static bool sqliteStringToBool(const QString& s)
 class Predicate::SQLiteCursorData : public SQLiteConnectionInternal
 {
 public:
-    SQLiteCursorData(Connection* conn)
+    explicit SQLiteCursorData(Connection* conn)
             :
             SQLiteConnectionInternal(conn)
             , prepared_st_handle(0)
