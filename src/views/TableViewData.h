@@ -107,7 +107,7 @@ public:
 
     Cursor* cursor() const;
 
-    inline uint columnsCount() const {
+    inline uint columnCount() const {
         return m_columns.count();
     }
 

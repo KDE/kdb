@@ -196,9 +196,9 @@ public:
             , realSortedColumn(0)
             , type(1)
             , pRecordEditBuffer(0)
-            , visibleColumnsCount(0)
-            , visibleColumnsIDs(100)
-            , globalColumnsIDs(100)
+            , visibleColumnCount(0)
+            , visibleColumnIDs(100)
+            , globalColumnIDs(100)
             , readOnly(false)
             , insertingEnabled(true)
             , containsRecordIdInfo(false)
@@ -228,9 +228,9 @@ public:
 
     ResultInfo result;
 
-    uint visibleColumnsCount;
+    uint visibleColumnCount;
 
-    QVector<int> visibleColumnsIDs, globalColumnsIDs;
+    QVector<int> visibleColumnIDs, globalColumnIDs;
 
     bool readOnly;
 
@@ -362,18 +362,18 @@ void TableViewData::addColumn(TableViewColumn* col)
 {
     m_columns.append(col);
     col->setData(this);
-    if (d->globalColumnsIDs.size() < (int)m_columns.count()) {//sanity
-        d->globalColumnsIDs.resize(d->globalColumnsIDs.size()*2);
+    if (d->globalColumnIDs.size() < (int)m_columns.count()) {//sanity
+        d->globalColumnIDs.resize(d->globalColumnIDs.size()*2);
     }
     if (col->isVisible()) {
-        d->visibleColumnsCount++;
-        if ((uint)d->visibleColumnsIDs.size() < d->visibleColumnsCount) {//sanity
-            d->visibleColumnsIDs.resize(d->visibleColumnsIDs.size()*2);
+        d->visibleColumnCount++;
+        if ((uint)d->visibleColumnIDs.size() < d->visibleColumnCount) {//sanity
+            d->visibleColumnIDs.resize(d->visibleColumnIDs.size()*2);
         }
-        d->visibleColumnsIDs[ m_columns.count()-1 ] = d->visibleColumnsCount - 1;
-        d->globalColumnsIDs[ d->visibleColumnsCount-1 ] = m_columns.count() - 1;
+        d->visibleColumnIDs[ m_columns.count()-1 ] = d->visibleColumnCount - 1;
+        d->globalColumnIDs[ d->visibleColumnCount-1 ] = m_columns.count() - 1;
     } else {
-        d->visibleColumnsIDs[ m_columns.count()-1 ] = -1;
+        d->visibleColumnIDs[ m_columns.count()-1 ] = -1;
     }
     d->autoIncrementedColumn = -2; //clear cache;
     if (!d->cursor || !d->cursor->query())
@@ -382,12 +382,12 @@ void TableViewData::addColumn(TableViewColumn* col)
 
 int TableViewData::globalColumnID(int visibleID) const
 {
-    return d->globalColumnsIDs.value(visibleID, -1);
+    return d->globalColumnIDs.value(visibleID, -1);
 }
 
 int TableViewData::visibleColumnID(int globalID) const
 {
-    return d->visibleColumnsIDs.value(globalID, -1);
+    return d->visibleColumnIDs.value(globalID, -1);
 }
 
 bool TableViewData::isDBAware() const
