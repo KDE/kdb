@@ -5,22 +5,24 @@
 #include "SqlTypes.h"
 
 bool parseData(Predicate::Parser *p, const char *data);
+const char* tokenName(unsigned int offset);
+unsigned int maxToken();
 /* A Bison parser, made by GNU Bison 2.7.  */
 
 /* Bison interface for Yacc-like parsers in C
-   
+
       Copyright (C) 1984, 1989-1990, 2000-2012 Free Software Foundation, Inc.
-   
+
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -33,7 +35,7 @@ bool parseData(Predicate::Parser *p, const char *data);
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-   
+
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -114,8 +116,7 @@ extern int yydebug;
      NOT_SIMILAR_TO = 316,
      BETWEEN = 317,
      UMINUS = 318,
-     NOT_LIKE = 319,
-     __LAST_TOKEN = 320
+     NOT_LIKE = 319
    };
 #endif
 
@@ -142,7 +143,7 @@ typedef union YYSTYPE
 
 
 /* Line 2058 of yacc.c  */
-#line 139 "SqlParser.tab.h"
+#line 138 "SqlParser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

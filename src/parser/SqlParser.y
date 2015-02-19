@@ -595,7 +595,6 @@ using namespace Predicate;
 %left NATURAL
 */
 
-%token __LAST_TOKEN /* sentinel */
 %%
 
 TopLevelStatement :

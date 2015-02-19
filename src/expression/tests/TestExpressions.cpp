@@ -136,8 +136,6 @@ void TestExpressions::testExpressionClassName()
     QTEST(expressionClassName(expClass), "name");
 }
 
-extern const char* tname(int offset);
-
 class TestedExpression : public Expression
 {
 public:
@@ -156,8 +154,8 @@ void TestExpressions::testExpressionToken()
         QCOMPARE(TestedExpression(i).tokenToString(),
                 isprint(i) ? QString(QLatin1Char(uchar(i))) : QString());
     }
-    for (int i = 255; i <= __LAST_TOKEN; ++i) {
-        QCOMPARE(Expression::tokenToDebugString(i), QLatin1String(tname(i - 255)));
+    for (int i = 255; i <= maxToken(); ++i) {
+        QCOMPARE(Expression::tokenToDebugString(i), QLatin1String(tokenName(i)));
     }
 }
 
