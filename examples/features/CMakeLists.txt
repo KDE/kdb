@@ -17,6 +17,6 @@ add_executable(predicatefeaturestest ${predicatefeaturestest_SRCS})
 
 target_link_libraries(
   predicatefeaturestest
-  ${QT_QTCORE_LIBRARY}
+  Qt5::Core
   predicate
 )

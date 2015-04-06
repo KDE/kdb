@@ -132,9 +132,9 @@ qt_wrap_cpp(predicate predicate_LIB_SRCS ${predicate_MOC_SRCS})
 
 add_library(predicate SHARED ${predicate_LIB_SRCS})
 target_link_libraries(predicate
-  ${QT_QTCORE_LIBRARY}
-  ${QT_QTGUI_LIBRARY}
-  ${QT_QTXML_LIBRARY}
+  Qt5::Core
+  Qt5::Gui
+  Qt5::Xml
 )
 
 ADD_DEPENDENCIES(predicate _shared_classes) # generate shared classes before they can be used in Predicate
