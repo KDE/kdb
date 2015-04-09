@@ -17,80 +17,83 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_GLOBAL_H
-#define PREDICATE_GLOBAL_H
+#ifndef KDB_GLOBAL_H
+#define KDB_GLOBAL_H
 
-#include <Predicate/predicate_export.h>
+#include "kdb_export.h"
 #include <QString>
 
-//global public definitions
+/*! @file KDbGlobal.h
+    Global public definitions
+*/
 
-/*! Predicate implementation version.
+/*! Implementation version of KDb.
  It is altered after every API change:
- - major number is increased after Predicate storage format change,
+ - major number is increased after KDb storage format change,
  - minor is increased after adding binary-incompatible change.
  In external code: do not use this to get library version information.
- See Predicate::version() if you need the Predicate version used at runtime.
+ See KDb::version() if you need to know the runtime version of KDb.
 */
-#define PREDICATE_VERSION_MAJOR @PREDICATE_VERSION_MAJOR@
-#define PREDICATE_VERSION_MINOR @PREDICATE_VERSION_MINOR@
-#define PREDICATE_VERSION_RELEASE @PREDICATE_VERSION_RELEASE@
+#define KDB_VERSION_MAJOR @KDB_VERSION_MAJOR@
+#define KDB_VERSION_MINOR @KDB_VERSION_MINOR@
+#define KDB_VERSION_RELEASE @KDB_VERSION_RELEASE@
 
-#define PREDICATE_VERSION_MAJOR_STRING "@PREDICATE_VERSION_MAJOR@"
-#define PREDICATE_VERSION_MINOR_STRING "@PREDICATE_VERSION_MINOR@"
-#define PREDICATE_VERSION_RELEASE_STRING "@PREDICATE_VERSION_RELEASE@"
+#define KDB_VERSION_MAJOR_STRING "@KDB_VERSION_MAJOR@"
+#define KDB_VERSION_MINOR_STRING "@KDB_VERSION_MINOR@"
+#define KDB_VERSION_RELEASE_STRING "@KDB_VERSION_RELEASE@"
 
-//! Version of Predicate as string, at compile time.
-#cmakedefine PREDICATE_VERSION_STRING "@PREDICATE_VERSION_STRING@"
+//! Version of KDb as string, at compile time.
+#cmakedefine KDB_VERSION_STRING "@KDB_VERSION_STRING@"
 
-//! Indicates the git sha1 commit which was used for compilation of Predicate.
-#cmakedefine PREDICATE_GIT_SHA1_STRING "@PREDICATE_GIT_SHA1_STRING@"
+//! Indicates the git sha1 commit which was used for compilation of KDb.
+#cmakedefine KDB_GIT_SHA1_STRING "@KDB_GIT_SHA1_STRING@"
 
 //! The subdirectory relative to the install prefix for executables.
 #define BIN_INSTALL_DIR "${BIN_INSTALL_DIR}"
 
 /**
- * @brief Make a number from the major, minor and release number of a Predicate version
+ * @brief Make a number from the major, minor and release number of a KDb version
  *
- * This function can be used for preprocessing when PREDICATE_IS_VERSION is not
+ * This function can be used for preprocessing when KDB_IS_VERSION is not
  * appropriate.
  */
-#define PREDICATE_MAKE_VERSION( a,b,c ) (((a) << 16) | ((b) << 8) | (c))
+#define KDB_MAKE_VERSION( a,b,c ) (((a) << 16) | ((b) << 8) | (c))
 
 /**
- * @brief Version of Predicate as number, at compile time
+ * @brief Version of KDb as a number, at compile time
  *
- * This macro contains the Predicate version in number form. As it is a macro,
+ * This macro contains the KDb version in number form. As it is a macro,
  * it contains the version at compile time. See versionString() if you need
- * the Predicate version used at runtime.
+ * the runtime version of KDb.
  */
-#define PREDICATE_VERSION \
-  PREDICATE_MAKE_VERSION(PREDICATE_VERSION_MAJOR, PREDICATE_VERSION_MINOR, PREDICATE_VERSION_RELEASE)
+#define KDB_VERSION \
+  KDB_MAKE_VERSION(KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_RELEASE)
 
 /**
- * @brief Check if the Predicate version matches a certain version or is higher
+ * @brief Check if the KDb version matches a certain version or is higher
  *
  * This macro is typically used to compile conditionally a part of code:
  * @code
- * #if PREDICATE_IS_VERSION(2,0,90)
- * // Code for Predicate 2.1
+ * #if KDB_IS_VERSION(3, 1, 0)
+ * // Code for KDb 3.1
  * #else
- * // Code for Predicate 2.0
+ * // Code for KDb older than 3.1
  * #endif
  * @endcode
  *
- * @warning Especially during development phases of Predicate, be careful
+ * @warning Especially during development phases of KDb, be careful
  * when choosing the version number that you are checking against.
- * Otherwise you might risk to break the next Predicate release.
+ * Otherwise you might risk to break the next KDb release.
  * Therefore be careful that development version have a
  * version number lower than the released version, so do not check 
- * e.g. for Predicate 2.1 with PREDICATE_IS_VERSION(2,1,0)
- * but with the actual version number at a time a needed feature was introduced.
+ * e.g. for KDb 3.1 with KDB_IS_VERSION(3, 1, 0)
+ * but with the actual version number at a time a needed feature was introduced,
+ * e.g. KDB_IS_VERSION(3, 0, 90) for beta 3.1
  */
-#define PREDICATE_IS_VERSION(a,b,c) ( PREDICATE_VERSION >= PREDICATE_MAKE_VERSION(a,b,c) )
+#define KDB_IS_VERSION(a,b,c) ( KDB_VERSION >= KDB_MAKE_VERSION(a,b,c) )
 
 
-/*! @namespace Predicate
+/*! @namespace KDb
 @brief High-level database connectivity library with database backend drivers
 
 @section Framework
@@ -102,24 +105,22 @@ Database access
 
 Database structure
  - Schema
-  - tableschema
-  - queryschema
-  - indexschema
+  - TableSchema
+  - QuerySchema
+  - IndexSchema
 
 Stored in the database.
-
 
 Data representation
  - Record
  - Field
-
 
 @section Drivers
 
 Drivers are loaded using DriverManager::driver(const QString& name).  The names
 of drivers are given in their drivers .desktop file in the DriverName field.
 
-Predicate supports two kinds of databases: file-based and network-based databases.
+KDb supports two kinds of databases: file-based and network-based databases.
 The type of a driver is available from several places. The DriverType
 field in the driver's .desktop file, is read by the DriverManager and
 available by calling DriverManager::driverInfo(const QString &name) and using
@@ -131,7 +132,7 @@ a connection and a cursor class, e.g SQLiteDriver, SQLiteConnection,
 SQLiteCursor.
 
 The driver classes subclass the Driver class.  They set Driver#m_typeNames,
-which maps Predicate Field::Type on to the types supported by the database.  They also
+which maps KDb Field::Type on to the types supported by the database.  They also
 provide functions for escaping strings and checking table names.  These may be
 used, for example, on a database backend that uses the database name as a
 filename.  In this case, it should be ensured that all the characters in the
@@ -144,27 +145,27 @@ The cursor classes subclass Cursor, and implement cursor functionality specific
 to the database backend.
 
 */
-namespace Predicate
+namespace KDb
 {
 
 #if !defined(_DEBUG) && !defined(DEBUG)
-# define PREDICATE_DEBUG if (true); else
+# define KDB_DEBUG if (true); else
 #else
-# define PREDICATE_DEBUG
+# define KDB_DEBUG
 #endif
 
-//! Debug command for the core Predicate code
-# define PreDbg PREDICATE_DEBUG qDebug() << "Predicate:"
-//! Debug command for Predicate driver's code
-# define PreDrvDbg PREDICATE_DEBUG qDebug() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
-//! Warning command for the core Predicate code
-# define PreWarn PREDICATE_DEBUG qWarning() << "Predicate:"
-//! Warning command for Predicate driver's code
-# define PreDrvWarn PREDICATE_DEBUG qWarning() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
-//! Fatal command for the core Predicate code
-# define PreFatal PREDICATE_DEBUG qCritical() << "Predicate:"
-//! Fatal command for Predicate driver's code
-# define PreDrvFatal PREDICATE_DEBUG qCritical() << "Predicate-drv(" PREDICATE_DRIVER_NAME "):"
+//! Debug command for the core KDb code
+# define KDbDbg KDB_DEBUG qDebug() << "KDb:"
+//! Debug command for KDb driver's code
+# define KDbDrvDbg KDB_DEBUG qDebug() << "KDb-drv(" KDB_DRIVER_NAME "):"
+//! Warning command for the core KDb code
+# define KDbWarn KDB_DEBUG qWarning() << "KDb:"
+//! Warning command for KDb driver's code
+# define KDbDrvWarn KDB_DEBUG qWarning() << "KDb-drv(" KDB_DRIVER_NAME "):"
+//! Fatal command for the core KDb code
+# define KDbFatal KDB_DEBUG qCritical() << "KDb:"
+//! Fatal command for KDb driver's code
+# define KDbDrvFatal KDB_DEBUG qCritical() << "KDb-drv(" KDB_DRIVER_NAME "):"
 
 /*! Object types set like table or query. */
 enum ObjectType {
@@ -174,7 +175,7 @@ enum ObjectType {
     QueryObjectType = 2,
     LastObjectType = 2, //ALWAYS UPDATE THIS
 
-    PredicateSystemTableObjectType = 128,//!< helper, not used in storage
+    KDbSystemTableObjectType = 128,//!< helper, not used in storage
     //!< (allows to select kexidb system tables
     //!< may be or'd with TableObjectType)
     IndexObjectType = 256 //!< special
@@ -183,7 +184,7 @@ enum ObjectType {
 //! Escaping type
 enum EscapingType {
     DriverEscaping = 0,
-    PredicateEscaping = 1
+    KDbEscaping = 1
 };
 
 }
@@ -200,20 +201,20 @@ enum EscapingType {
 #endif
 
 //! Macro to use in drivers to avoid redundant translations.
-#define predicateTr QObject::tr
+#define KDbTr QObject::tr
 
 //! Debugging options for expressions
-#cmakedefine PREDICATE_EXPRESSION_DEBUG
-#ifdef PREDICATE_EXPRESSION_DEBUG
+#cmakedefine KDB_EXPRESSION_DEBUG
+#ifdef KDB_EXPRESSION_DEBUG
 # define ExpressionDebug qDebug()
 #else
 # define ExpressionDebug if (1) {} else qDebug()
 #endif
 
 //! GUI for debugging
-#cmakedefine PREDICATE_DEBUG_GUI
+#cmakedefine KDB_DEBUG_GUI
 
 //! Include unfinished features
-#cmakedefine PREDICATE_UNFINISHED
+#cmakedefine KDB_UNFINISHED
 
 #endif
