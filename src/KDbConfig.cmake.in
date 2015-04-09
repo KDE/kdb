@@ -1,0 +1,23 @@
+# KDbConfig.cmake provides information about the installed KDb library.
+# It can be used directly from CMake via find_package(KDb NO_MODULE)
+#
+# The following CMake variables are provided:
+#   KDb_VERSION_MAJOR - the major version number of KDb
+#   KDb_VERSION_MINOR - the minor version number of KDb
+#   KDb_VERSION_PATCH - the patch version number of KDb
+#   KDb_INCLUDE_DIRS  - the include directories to use
+#
+# Additionally, the following imported library targets are created, which may be used directly
+# with target_link_libraries():
+#   KDb - the KDb library
+
+@PACKAGE_INIT@
+
+find_dependency(Qt5Core @REQUIRED_QT_VERSION@)
+find_dependency(Qt5Widget @REQUIRED_QT_VERSION@)
+find_dependency(Qt5Xml @REQUIRED_QT_VERSION@)
+
+include("${CMAKE_CURRENT_LIST_DIR}/KDbTargets.cmake")
+
+# "public" variables:
+# TODO
