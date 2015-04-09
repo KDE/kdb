@@ -3,10 +3,10 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: Predicate
+Name: KDb
 Description: A database connectivity and creation library
-Version: @PREDICATE_VERSION@
-URL: http://projects.kde.org/projects/predicate
+Version: @KDB_VERSION@
+URL: http://projects.kde.org/projects/kdb
 Requires: QtCore QtGui QtXml
 Libs: -L${libdir}
 Cflags: -I${includedir}
