@@ -32,9 +32,9 @@ select 1id from persons;
 select *;
 -- Empty tables set
 select 1, 2;
--- Empty column set (PredicateSQL EXTENSION)
+-- Empty column set (KDBSQL EXTENSION)
 select from cars;
--- Totally empty statement (PredicateSQL EXTENSION)
+-- Totally empty statement (KDBSQL EXTENSION)
 select;
 -- Keywords are case insensitive
 SElEcT * FroM cars;
@@ -47,7 +47,7 @@ select "01234567890";
 select 3.14159;
 -- TODO: Date/Time
 
--- TRUE and FALSE constants (PredicateSQL EXTENSION)
+-- TRUE and FALSE constants (KDBSQL EXTENSION)
 select TRUE, NOT FALSE;
 select NOT NOT TRUE;
 select NOT (NOT TRUE);
