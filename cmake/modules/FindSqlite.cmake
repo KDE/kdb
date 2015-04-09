@@ -1,6 +1,6 @@
 # - Find SQLite 3
 # This module can be used to find SQLite 3.
-# (THIS IS AN EXTENDED VERSION OF THE FUTURE FindSqlite.cmake FOR PREDICATE TO MAKE SURE
+# (THIS IS AN EXTENDED VERSION OF THE FUTURE FindSqlite.cmake FOR KDB TO MAKE SURE
 #  THE DETECTION WORKS AS EXPECTED)
 #
 # Accepted variables:
