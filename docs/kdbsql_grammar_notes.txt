@@ -2,8 +2,8 @@
    TAKEN FROM his compiler's parser
    AS EXAMPLE FOR LUCIJAN'S KEXISQL PARSER */
 
-   
-   
+
+
 exp:    exp3 { $$->prn(); }
         | exp OR exp3 { $$ = new NOpLog($1,OR,$3); $$->prn(); }
         ;

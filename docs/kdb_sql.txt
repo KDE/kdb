@@ -1,16 +1,16 @@
 ---------------------------------------------------------
- Predicate Common SQL definition
+ KDb Common SQL definition
  Copyright (C) 2003 Jarosław Staniek staniek at kde.org
  Started: 2003-09-10
 ---------------------------------------------------------
 
 0. Preface
 ----------
-Below is definition (formal grammar and comments) for SQL used externally by Predicate.
-"Externally" means that this language is visible to the user and can be used 
+Below is definition (formal grammar and comments) for SQL used externally by KDb.
+"Externally" means that this language is visible to the user and can be used
 by her/him to define queries.
 
-Many attempts has been done to create common part of many SQL versions that 
+Many attempts has been done to create common part of many SQL versions that
 are currently in everyday use, mainly:
 - SQLite
 - MySQL
@@ -28,8 +28,8 @@ are currently in everyday use, mainly:
 
 Note
 ----
-CREATE TABLE statement could be added to PredicateSQL for advanced users convenience, 
-although tables can be easier created with gui. CREATE TABLE for Predicate has 
-non-standard Predicate-specific options.
+CREATE TABLE statement could be added to KDbSQL for advanced users convenience,
+although tables can be easier created with gui. CREATE TABLE for KDb has
+non-standard KDb-specific options.
 
 TODO.......
