@@ -11,5 +11,5 @@ CMakeLists.txt.user*
 .directory
 .gdb_history
 .kdev_include_paths
-src/predicate/parser/SqlParser.output
+src/parser/KDbSqlParser.output
 .gdbinit
