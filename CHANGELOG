@@ -15,6 +15,9 @@ UNIT TESTS TODO:
 *VariableExpression
 *Pass expression string to parser, parse it and compare with the original string
 
+2015-04-09
+Predicate becomes KDb
+
 2012-11-14
 Predicate
 *parser: added support for TRUE/FALSE constants
