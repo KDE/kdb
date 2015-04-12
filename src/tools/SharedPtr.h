@@ -26,21 +26,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PREDICATE_TOOLS_SHAREDPTR_H
-#define PREDICATE_TOOLS_SHAREDPTR_H
+#ifndef KDB_TOOLS_SHAREDPTR_H
+#define KDB_TOOLS_SHAREDPTR_H
 
 #include <QExplicitlySharedDataPointer>
 #include <QAtomicPointer>
 
-namespace Predicate
-{
-namespace Utils
-{
-
 typedef QSharedData Shared;
 
 /**
- * @class SharedPtr SharedPtr.h <Predicate::Utils::SharedPtr>
+ * @class SharedPtr SharedPtr.h <KDbUtils::SharedPtr>
  * 
  * Can be used to control the lifetime of an object that has derived
  * QSharedData. As long a someone holds
@@ -217,9 +212,6 @@ Q_INLINE_TEMPLATE void SharedPtr<T>::clear()
 {
     attach(static_cast<T*>(0));
 }
-
-} //ns
-} //ns
 
 #endif
 

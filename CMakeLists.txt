@@ -1,74 +1,54 @@
-#set(CMAKE_DISABLE_SOURCE_CHANGES ON)
+cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
+project(KDb)
 
-cmake_minimum_required(VERSION 2.8)
+# ECM setup
+find_package(ECM 1.8.0 REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-project( Predicate )
+include(KDbGenerateHeaders)
+include(ECMGeneratePriFile)
+include(ECMPackageConfigHelpers)
+include(ECMPoQmTools)
+include(ECMSetupVersion)
 
-set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+include(KDEInstallDirs)
+include(KDEFrameworkCompilerSettings)
+include(KDECMakeSettings)
 
-include(MacroEnsureOutOfSourceBuild)
-MACRO_ENSURE_OUT_OF_SOURCE_BUILD()
-
-if(COMMAND cmake_policy)
-  cmake_policy(SET CMP0003 NEW)
-  cmake_policy(SET CMP0005 NEW)
-endif(COMMAND cmake_policy)
-
-# define the generic version of the Predicate libraries here
-# this makes it easy to advance it when the next Predicate release comes
-set(PREDICATE_VERSION_STRING "1.0 Pre-Alpha")
-set(PREDICATE_VERSION_MAJOR 0)
-set(PREDICATE_VERSION_MINOR 9)
-set(PREDICATE_VERSION_RELEASE 0)
-set(GENERIC_PREDICATE_LIB_VERSION_MAJOR "0")
-
-set(GENERIC_PREDICATE_LIB_VERSION "${GENERIC_PREDICATE_LIB_VERSION_MAJOR}.0.0")
-set(GENERIC_PREDICATE_LIB_SOVERSION "${GENERIC_PREDICATE_LIB_VERSION_MAJOR}")
-
-# If Git is installed and a '.git' directory is found,
-# we append the Git revision to AKONADI_VERSION_STRING
-set(PREDICATE_GIT_SHA1_STRING "")
-if(EXISTS "${Predicate_SOURCE_DIR}/.git")
-  find_package(Git)
-  if(GIT_FOUND)
-    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-                    WORKING_DIRECTORY ${Predicate_SOURCE_DIR}
-                    OUTPUT_VARIABLE PREDICATE_GIT_SHA1_STRING)
-    string(REGEX REPLACE "\n" "" PREDICATE_GIT_SHA1_STRING "${PREDICATE_GIT_SHA1_STRING}")
-  endif()
-endif()
-
-SET(BIN_INSTALL_DIR
-    "${CMAKE_INSTALL_PREFIX}/bin"
-    CACHE PATH "The subdirectory relative to the install prefix for executables (default is bin)"
-)
-
-SET(LIB_INSTALL_DIR
-    "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}"
-    CACHE PATH "The subdirectory relative to the install prefix where libraries will be installed (default is lib${LIB_SUFFIX})."
-)
-
-if(WIN32)
-  SET(PLUGIN_INSTALL_BASE_DIR ${BIN_INSTALL_DIR})
-else(WIN32)
-  SET(PLUGIN_INSTALL_BASE_DIR lib${LIB_SUFFIX})
-endif(WIN32)
-
-SET(PLUGIN_INSTALL_DIR
-    "${PLUGIN_INSTALL_BASE_DIR}/Predicate/plugins"
-    CACHE PATH "The subdirectory relative to the install prefix where plugins will be installed (default is ${PLUGIN_INSTALL_BASE_DIR}/Predicate/plugins)."
-)
-
-if (NOT WIN32)
-  configure_file(${Predicate_SOURCE_DIR}/predicate.pc.cmake ${Predicate_BINARY_DIR}/predicate.pc @ONLY)
-endif (NOT WIN32)
+include(FeatureSummary)
+include(GenerateExportHeader)
 
 include(MacroOptionalFindPackage)
 include(MacroOptionalAddSubdirectory)
 include(InstallSettings)
 include(MacroLogFeature)
-include(FeatureSummary)
-include(CreateSharedDataClasses)
+include(KDbCreateSharedDataClasses)
+
+set(KDB_VERSION "2.96.0") # Update this
+
+# define the generic version of the KDb framework here
+# this makes it easy to advance for the next KDb release
+set(KDB_VERSION_STRING "3.0 Pre-Alpha")
+set(KDB_VERSION_MAJOR 2)
+set(KDB_VERSION_MINOR 96)
+set(KDB_VERSION_RELEASE 0)
+set(GENERIC_KDB_LIB_VERSION_MAJOR "2")
+
+set(GENERIC_KDB_LIB_VERSION "${GENERIC_KDB_LIB_VERSION_MAJOR}.96.0")
+set(GENERIC_KDB_LIB_SOVERSION "${GENERIC_KDB_LIB_VERSION_MAJOR}")
+
+# If Git is installed and a '.git' directory is found,
+# we append the Git revision to AKONADI_VERSION_STRING
+set(KDB_GIT_SHA1_STRING "")
+if(EXISTS "${KDb_SOURCE_DIR}/.git")
+  find_package(Git)
+  if(GIT_FOUND)
+    execute_process(COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+                    WORKING_DIRECTORY ${KDb_SOURCE_DIR}
+                    OUTPUT_VARIABLE KDB_GIT_SHA1_STRING)
+    string(REGEX REPLACE "\n" "" KDB_GIT_SHA1_STRING "${KDB_GIT_SHA1_STRING}")
+  endif()
+endif()
 
 macro(add_simple_feature_info _NAME _DESCRIPTION _DEFAULT)
   if ("${_DEFAULT}" STREQUAL "${${_NAME}}")
@@ -84,33 +64,47 @@ macro(simple_option _NAME _DESCRIPTION _DEFAULT)
   add_simple_feature_info(${_NAME} ${_DESCRIPTION} ${_DEFAULT})
 endmacro(simple_option)
 
-# Qt string handling optimizations: http://qt-project.org/doc/qt-4.8/qstring.html#more-efficient-string-construction
-add_definitions(-DQT_USE_QSTRINGBUILDER -DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII)
+# Dependencies
+set(REQUIRED_QT_VERSION "5.2.0")
 
-# Increase compatbility with Qt
-add_definitions(-DQT_NO_KEYWORD)
+# Required Qt5 components to build this framework
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Core Gui Widgets)
 
-#### Qt4 ####
-set(QT_MIN_VERSION 4.7.0)
-find_package(Qt4 REQUIRED)
+#set(CMAKE_AUTOMOC ON)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-include_directories(
-  ${Predicate_SOURCE_DIR}
-  ${Predicate_SOURCE_DIR}/Predicate
-  ${Predicate_SOURCE_DIR}/Predicate/includes
-  ${Predicate_SOURCE_DIR}/Predicate/expression
-  ${Predicate_SOURCE_DIR}/Predicate/parser
-  ${Predicate_SOURCE_DIR}/Predicate/views
-  ${Predicate_BINARY_DIR}
-  ${Predicate_BINARY_DIR}/Predicate
-  ${QT_INCLUDES}
-)
+add_subdirectory(src)
+add_subdirectory(examples)
+add_subdirectory(tests)
 
-#### Subdirs ####
-add_subdirectory( Predicate )
-add_subdirectory( Drivers )
+# SET(BIN_INSTALL_DIR
+#     "${CMAKE_INSTALL_PREFIX}/bin"
+#     CACHE PATH "The subdirectory relative to the install prefix for executables (default is bin)"
+# )
 
-simple_option(PREDICATE_UNFINISHED "Include unfinished features (useful for testing but may confuse end-user)" OFF)
+# SET(LIB_INSTALL_DIR
+#     "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}"
+#     CACHE PATH "The subdirectory relative to the install prefix where libraries will be installed (default is lib${LIB_SUFFIX})."
+# )
+
+# if(WIN32)
+#   SET(PLUGIN_INSTALL_BASE_DIR ${BIN_INSTALL_DIR})
+# else(WIN32)
+#   SET(PLUGIN_INSTALL_BASE_DIR lib${LIB_SUFFIX})
+# endif(WIN32)
+
+# SET(PLUGIN_INSTALL_DIR
+#     "${PLUGIN_INSTALL_BASE_DIR}/KDb/plugins"
+#     CACHE PATH "The subdirectory relative to the install prefix where plugins will be installed (default is ${PLUGIN_INSTALL_BASE_DIR}/KDb/plugins)."
+# )
+
+if (NOT WIN32)
+  configure_file(${KDb_SOURCE_DIR}/kdb.pc.cmake ${KDb_BINARY_DIR}/kdb.pc @ONLY)
+endif (NOT WIN32)
+
+simple_option(KDB_UNFINISHED
+              "Include unfinished features (useful for testing but may confuse end-user)" OFF)
 
 simple_option(BUILD_TESTING "Building of tests" OFF) # override default from CTest.cmake
 if (BUILD_TESTING)
@@ -122,18 +116,16 @@ if (BUILD_TESTING)
     set(CMAKE_C_FLAGS "-g -O0 -Wall -W -fprofile-arcs -ftest-coverage")
     set(CMAKE_EXE_LINKER_FLAGS "-fprofile-arcs -ftest-coverage")
   endif (BUILD_TEST_COVERAGE)
-  add_subdirectory( tests )
 else ()
   set(BUILD_TEST_COVERAGE OFF)
   simple_option(BUILD_TEST_COVERAGE "Building of test coverage (disabled because BUILD_TESTING is OFF)" OFF)
 endif ()
 
-macro_display_feature_log()
-
-############### install stuff ###############
-
+# Install
 if(NOT WIN32)
-  install(FILES ${Predicate_BINARY_DIR}/predicate.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+  install(FILES ${KDb_BINARY_DIR}/kdb.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif(NOT WIN32)
 
-feature_summary(WHAT ALL)
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+
+macro_display_feature_log()

@@ -17,14 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_XBASECLIENT_P_H
-#define PREDICATE_XBASECLIENT_P_H
+#ifndef KDB_XBASECLIENT_P_H
+#define KDB_XBASECLIENT_P_H
 
 #include <QPointer>
 
-#include <Predicate/Private/Connection>
-
-namespace Predicate {
+#include <Predicate/Private/KDbConnection>
 
 class ConnectionData;
 
@@ -33,29 +31,29 @@ class ConnectionData;
 be shared by any module that needs direct access to the underlying
 database.  Used by the Predicate drivers.
 */
-class xBaseConnectionInternal : public Predicate::ConnectionInternal
+class xBaseConnectionInternal : public KDbConnectionInternal
 {
   public:
-    xBaseConnectionInternal(Predicate::Connection* connection, Predicate::Driver* internalDriver);
+    xBaseConnectionInternal(KDbConnection* connection, KDbDriver* internalDriver);
     virtual ~xBaseConnectionInternal();
 
     //! Connects to a xBase database
-    bool db_connect(const Predicate::ConnectionData& data);
+    bool db_connect(const KDbConnectionData& data);
 
     //! Disconnects from the database
-    bool db_disconnect(const Predicate::ConnectionData& data);
+    bool db_disconnect(const KDbConnectionData& data);
 
     //! Selects a database that is about to be used
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const EscapedString& statement);
+    bool executeSQL(const KDbEscapedString& statement);
 
     //! Stores last operation's result
     virtual void storeResult();
 
-    QPointer<Predicate::Driver> internalDriver;
-    QPointer<Predicate::Connection> internalConn;
+    QPointer<KDbDriver> internalDriver;
+    QPointer<KDbConnection> internalConn;
     QString tempDatabase;
 
     QHash<QString,QString> dbMap;
@@ -63,7 +61,5 @@ class xBaseConnectionInternal : public Predicate::ConnectionInternal
     QString errmsg; //!< server-specific message of last operation
     int res; //!< result code of last operation on server
 };
-
-}
 
 #endif

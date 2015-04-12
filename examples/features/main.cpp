@@ -23,16 +23,16 @@
 #include <QtDebug>
 #include <QTextStream>
 
-#include <Predicate/DriverManager>
-#include <Predicate/Driver>
-#include <Predicate/Connection>
-#include <Predicate/Cursor>
-#include <Predicate/Field>
-#include <Predicate/TableSchema>
-#include <Predicate/QuerySchema>
-#include <Predicate/IndexSchema>
-#include <Predicate/Parser>
-#include <Predicate/Utils>
+#include <KDbDriverManager>
+#include <KDbDriver>
+#include <KDbConnection>
+#include <KDbCursor>
+#include <KDbField>
+#include <KDbTableSchema>
+#include <KDbQuerySchema>
+#include <KDbIndexSchema>
+#include <KDbParser>
+#include <KDbUtils>
 
 #include <iostream>
 
@@ -45,19 +45,19 @@ QString test_name;
 int cursor_options = 0;
 bool db_name_required = true;
 
-Predicate::ConnectionData conn_data;
+KDbConnectionData conn_data;
 #ifdef __GNUC__
-#warning replace QPointer<Predicate::Connection> conn;
+#warning replace QPointer<KDbConnection> conn;
 #else
-#pragma WARNING(replace QPointer<Predicate::Connection> conn;)
+#pragma WARNING(replace QPointer<KDbConnection> conn;)
 #endif
-Predicate::Connection* conn = 0;
+KDbConnection* conn = 0;
 #ifdef __GNUC__
-#warning replace QPointer<Predicate::Driver> driver;
+#warning replace QPointer<KDbDriver> driver;
 #else
-#pragma WARNING(replace QPointer<Predicate::Driver> driver;)
+#pragma WARNING(replace QPointer<KDbDriver> driver;)
 #endif
-Predicate::Driver* driver;
+KDbDriver* driver;
 QApplication *app = 0;
 
 #include "dbcreation_test.h"
@@ -104,15 +104,15 @@ static QString takeOptionWithArg(QStringList &args, const QString &option,
     return args.takeAt(index); // option's argument
 }
 
-#define APPNAME "predicatefeaturestest"
+#define APPNAME "kdbfeaturestest"
 
 static void showHelp()
 {
     QTextStream s(stdout);
     s <<
-APPNAME ", version " PREDICATE_VERSION_STRING
+APPNAME ", version " KDB_VERSION_STRING
 "\n"
-"\nA set of tests for the Predicate library API."
+"\nA set of tests for the KDb library API."
 "\nEvery test is mostly driver-independent."
 "\n (c) 2003-2010, Kexi Team"
 "\n (c) 2003-2006, OpenOffice Software LLC."
@@ -157,7 +157,7 @@ APPNAME ", version " PREDICATE_VERSION_STRING
 "\n3. All other tests require <db_name> and <driver_name> arguments"
 "\n4. 'tables' test automatically runs 'dbcreation' test"
 "\n     <new_db_name> is removed if already exists"
-"\n5. <db_name> must be a valid database created using Predicate,"
+"\n5. <db_name> must be a valid database created using KDb,"
 "\n     e.g. using the \"tables\" test"
 "\n"
 "\nArguments:"
@@ -253,7 +253,7 @@ int main(int argc, char** argv)
 
     drv_name = args.first();
 
-    Predicate::DriverManager manager;
+    KDbDriverManager manager;
     const QStringList driverNames = manager.driverNames();
     qDebug() << "DRIVERS: " << driverNames;
     if (driverNames.isEmpty()) {
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
     if (!db_name.isEmpty() ) {
         //additional switches:
         if (bufCursors) {
-            cursor_options |= Predicate::Cursor::Buffered;
+            cursor_options |= KDbCursor::Buffered;
         }
         conn = driver->createConnection(conn_data);
 
@@ -296,12 +296,12 @@ int main(int argc, char** argv)
             qDebug() << driver->result();
             return finish(1);
         }
-        qDebug() << "main: Connection object created.";
+        qDebug() << "main: KDbConnection object created.";
         if (!conn->connect()) {
             qDebug() << conn->result();
             return finish(1);
         }
-        qDebug() << "main: Connection::connect() OK.";
+        qDebug() << "main: KDbConnection::connect() OK.";
     }
 
     //start test:
@@ -322,7 +322,7 @@ int main(int argc, char** argv)
         QStringList params;
         if (!queryParams.isEmpty())
             params = queryParams.split("|");
-        r = parserTest(Predicate::EscapedString(args[2]), params);
+        r = parserTest(KDbEscapedString(args[2]), params);
     } else if (test_name == "dr_prop")
         r = drPropTest();
     else {
@@ -343,8 +343,8 @@ int main(int argc, char** argv)
     if (conn && !conn->disconnect())
         r = 1;
 
-// qDebug() << "!!! Predicate::Transaction::globalcount == " << Predicate::Transaction::globalCount();
-// qDebug() << "!!! Predicate::TransactionData::globalcount == " << Predicate::TransactionData::globalCount();
+// qDebug() << "!!! KDbTransaction::globalcount == " << KDbTransaction::globalCount();
+// qDebug() << "!!! KDbTransactionData::globalcount == " << KDbTransactionData::globalCount();
 
     delete app;
 

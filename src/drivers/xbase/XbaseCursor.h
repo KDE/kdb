@@ -20,21 +20,19 @@
 #ifndef _XBASECURSOR_H_
 #define _XBASECURSOR_H_
 
-#include <Predicate/Cursor>
-#include <Predicate/Connection>
-
-namespace Predicate {
+#include "KDbCursor.h"
+#include "KDbConnection.h"
 
 class xBaseCursorData;
 
-class xBaseCursor: public Cursor {
+class xBaseCursor: public KDbCursor {
   public:
-        	xBaseCursor(Connection* conn, Cursor* internalCursor, const QString& statement = QString(), 
+    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const QString& statement = QString(),
       uint cursor_options = NoOptions );
-    xBaseCursor(Connection* conn, Cursor* internalCursor, QuerySchema* query, uint options = NoOptions);
+    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~xBaseCursor();
 
-    virtual bool drv_open(const EscapedString& sql);
+    virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     virtual QVariant value(uint);
@@ -45,9 +43,9 @@ class xBaseCursor: public Cursor {
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
     virtual const char** recordData() const;
-    virtual bool drv_storeCurrentRecord(RecordData* data) const;
+    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
   protected:
@@ -58,7 +56,5 @@ class xBaseCursor: public Cursor {
 
 
 };
-
-}
 
 #endif

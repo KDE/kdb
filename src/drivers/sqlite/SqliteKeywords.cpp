@@ -26,8 +26,6 @@
 
 #include "SqliteDriver.h"
 
-namespace Predicate
-{
 const char* SQLiteDriver::keywords[] = {
     "ABORT",
     "ATTACH",
@@ -56,4 +54,3 @@ const char* SQLiteDriver::keywords[] = {
     "VIEW",
     0
 };
-}

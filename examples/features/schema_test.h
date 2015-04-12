@@ -27,7 +27,7 @@ int schemaTest()
         return 1;
     }
 
-    Predicate::TableSchema *t = conn->tableSchema(QLatin1String("persons"));
+    KDbTableSchema *t = conn->tableSchema(QLatin1String("persons"));
     if (t)
         qDebug() << *t;
     else
@@ -40,8 +40,8 @@ int schemaTest()
     /*
     // some tests
       {
-        Predicate::Field::ListIterator iter = t->fieldsIterator();
-        Predicate::Field::List *lst = t->fields();
+        KDbField::ListIterator iter = t->fieldsIterator();
+        KDbField::List *lst = t->fields();
         lst->clear();
         for (;iter.current();++iter) {
           qDebug() << "FIELD=" << iter.current()->name();

@@ -21,7 +21,7 @@
 #define TABLEVIEW_TEST_H
 
 #include <widget/tableview/kexidatatableview.h>
-#include <Predicate/Cursor.h>
+#include <KDbCursor>
 
 #include <QDesktopWidget>
 
@@ -32,7 +32,7 @@ int tableViewTest()
         return 1;
     }
 
-    Predicate::TableSchema *persons = conn->tableSchema("persons");
+    KDbTableSchema *persons = conn->tableSchema("persons");
     if (!persons) {
         conn->debugError();
         qDebug() << "tableViewTest(): !persons";
@@ -40,8 +40,8 @@ int tableViewTest()
     }
 
 // KexiTableView *tv = new KexiTableView(0, "tv", /*KexiTableList *contents=*/0);
-// Predicate::Cursor *cursor = conn->executeQuery( "select * from persons", Predicate::Cursor::Buffered );
-    Predicate::Cursor *cursor = conn->prepareQuery(*persons , cursor_options);  //Predicate::Cursor::Buffered );
+// KDbCursor *cursor = conn->executeQuery( "select * from persons", KDbCursor::Buffered );
+    KDbCursor *cursor = conn->prepareQuery(*persons , cursor_options);  //KDbCursor::Buffered );
     if (!cursor) {
         conn->debugError();
         qDebug() << "tableViewTest(): !cursor";

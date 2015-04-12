@@ -17,21 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITECONN_P_H
-#define PREDICATE_SQLITECONN_P_H
+#ifndef KDB_SQLITECONN_P_H
+#define KDB_SQLITECONN_P_H
 
-#include <Predicate/Private/Connection>
+#include "KDbConnection_p.h"
 
 #include <sqlite3.h>
-
-namespace Predicate
-{
 
 /*! Internal SQLite connection data. Also used by SqliteCursor. */
 class SQLiteConnectionInternal : public ConnectionInternal
 {
 public:
-    explicit SQLiteConnectionInternal(Connection* connection);
+    explicit SQLiteConnectionInternal(KDbConnection* connection);
     virtual ~SQLiteConnectionInternal();
 
     virtual void storeResult();
@@ -50,7 +47,5 @@ public:
 private:
     bool m_extensionsLoadingEnabled;
 };
-
-}
 
 #endif

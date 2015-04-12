@@ -18,26 +18,24 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_POSTGRESQLCONNECTION_P_H
-#define PREDICATE_DRIVER_POSTGRESQLCONNECTION_P_H
+#ifndef KDB_DRIVER_POSTGRESQLCONNECTION_P_H
+#define KDB_DRIVER_POSTGRESQLCONNECTION_P_H
 
-#include <Predicate/Private/Connection>
+#include <Predicate/Private/KDbConnection>
 
 #include <libpq-fe.h>
 
-namespace Predicate
-{
 class PostgresqlConnectionInternal : public ConnectionInternal
 {
 public:
-    explicit PostgresqlConnectionInternal(Connection *conn);
+    explicit PostgresqlConnectionInternal(KDbConnection *conn);
 
     virtual ~PostgresqlConnectionInternal();
 
     //! Execute SQL statement on the database
     //! @a expectedStatus can be PGRES_COMMAND_OK for command
     //! not returning tuples, e.g. CREATE and PGRES_TUPLES_OK for command returning tuples, e.g. SELECT.
-    bool executeSQL(const EscapedString& statement, ExecStatusType expectedStatus);
+    bool executeSQL(const KDbEscapedString& statement, ExecStatusType expectedStatus);
 
     //! stores last result's message
     virtual void storeResult();
@@ -61,10 +59,8 @@ public:
 class PostgresqlCursorData : public PostgresqlConnectionInternal
 {
 public:
-    explicit PostgresqlCursorData(Connection* connection);
+    explicit PostgresqlCursorData(KDbConnection* connection);
     virtual ~PostgresqlCursorData();
 };
-
-}
 
 #endif // PREDICATE_DRIVER_POSTGRESQLCONNECTION_P_H

@@ -23,16 +23,14 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "SybaseDriver.h"
 #include "SybaseConnection.h"
-#include <Predicate/Field>
-#include <Predicate/Private/Driver>
-#include <Predicate/Utils>
-
-using namespace Predicate;
+#include "KDbField.h"
+#include "KDbDriver_p.h"
+#include "KDb.h"
 
 EXPORT_PREDICATE_DRIVER(SybaseDriver, sybase)
 
 SybaseDriver::SybaseDriver()
-    : Driver()
+    : KDbDriver()
 {
     // Sybase supports Nested Transactions. Ignore for now
     d->features = IgnoreTransactions | CursorForward;
@@ -64,37 +62,37 @@ SybaseDriver::SybaseDriver()
 
     // datatypes
     // integers
-    d->typeNames[Field::Byte] = "TINYINT";
-    d->typeNames[Field::ShortInteger] = "SMALLINT";
-    d->typeNames[Field::Integer] = "INT";
-    d->typeNames[Field::BigInteger] = "BIGINT";
+    d->typeNames[KDbField::Byte] = "TINYINT";
+    d->typeNames[KDbField::ShortInteger] = "SMALLINT";
+    d->typeNames[KDbField::Integer] = "INT";
+    d->typeNames[KDbField::BigInteger] = "BIGINT";
 
     // boolean
-    d->typeNames[Field::Boolean] = "BIT";
+    d->typeNames[KDbField::Boolean] = "BIT";
 
     // date and time. There's only one integrated datetime datatype in Sybase
     // Though there are smalldatetime (4 bytes) and datetime (8 bytes) data types
-    d->typeNames[Field::Date] = "DATETIME";
-    d->typeNames[Field::DateTime] = "DATETIME";
-    d->typeNames[Field::Time] = "DATETIME"; // or should we use timestamp ?
+    d->typeNames[KDbField::Date] = "DATETIME";
+    d->typeNames[KDbField::DateTime] = "DATETIME";
+    d->typeNames[KDbField::Time] = "DATETIME"; // or should we use timestamp ?
 
     // floating point
-    d->typeNames[Field::Float] = "REAL"; // 4 bytes
-    d->typeNames[Field::Double] = "DOUBLE PRECISION"; // 8 bytes
+    d->typeNames[KDbField::Float] = "REAL"; // 4 bytes
+    d->typeNames[KDbField::Double] = "DOUBLE PRECISION"; // 8 bytes
 
     // strings
-    d->typeNames[Field::Text] = "VARCHAR";
-    d->typeNames[Field::LongText] = "TEXT";
+    d->typeNames[KDbField::Text] = "VARCHAR";
+    d->typeNames[KDbField::LongText] = "TEXT";
 
     // Large Binary Objects
-    d->typeNames[Field::BLOB] = "IMAGE";
+    d->typeNames[KDbField::BLOB] = "IMAGE";
 }
 
 SybaseDriver::~SybaseDriver()
 {
 }
 
-Predicate::Connection*
+KDbConnection*
 SybaseDriver::drv_createConnection(const ConnectionData& connData)
 {
     return new SybaseConnection(this, connData);
@@ -117,7 +115,7 @@ bool SybaseDriver::isSystemDatabaseName(const QString &n) const
     if (i != systemDatabases.end())
         return true;
 
-    return Driver::isSystemObjectName(n);
+    return KDbDriver::isSystemObjectName(n);
 }
 
 bool SybaseDriver::drv_isSystemFieldName(const QString&) const
@@ -125,20 +123,20 @@ bool SybaseDriver::drv_isSystemFieldName(const QString&) const
     return false;
 }
 
-EscapedString SybaseDriver::escapeString(const QString& str) const
+KDbEscapedString SybaseDriver::escapeString(const QString& str) const
 {
-    return EscapedString("'") + EscapedString(str).replace("\'", "\\''") + '\'';
+    return KDbEscapedString("'") + KDbEscapedString(str).replace("\'", "\\''") + '\'';
 }
 
-EscapedString SybaseDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString SybaseDriver::escapeBLOB(const QByteArray& array) const
 {
-    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscape0xHex));
 }
 
-EscapedString SybaseDriver::escapeString(const QByteArray& str) const
+KDbEscapedString SybaseDriver::escapeString(const QByteArray& str) const
 {
     //! @todo needs any modification ?
-    return EscapedString("'") + EscapedString(str).replace("\'", "\\''") + '\'';
+    return KDbEscapedString("'") + KDbEscapedString(str).replace("\'", "\\''") + '\'';
 }
 
 QByteArray SybaseDriver::drv_escapeIdentifier(const QString& str) const
@@ -157,10 +155,10 @@ QByteArray SybaseDriver::drv_escapeIdentifier(const QByteArray& str) const
            + "\"";
 }
 
-EscapedString SybaseDriver::addLimitTo1(const QString& sql, bool add)
+KDbEscapedString SybaseDriver::addLimitTo1(const QString& sql, bool add)
 {
     // length of "select" is 6
     // eg: before:  select foo from foobar
     // after:   select TOP 1 foo from foobar
-    return add ? EscapedString(sql).trimmed().insert(6, " TOP 1 ") : EscapedString(sql);
+    return add ? KDbEscapedString(sql).trimmed().insert(6, " TOP 1 ") : KDbEscapedString(sql);
 }

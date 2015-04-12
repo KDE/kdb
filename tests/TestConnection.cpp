@@ -19,14 +19,14 @@
 
 #include "TestConnection.h"
 
-#include <Predicate/DriverManager>
-#include <Predicate/Connection>
+#include <KDbDriverManager>
+#include <KDbConnection>
 
 #include <QtDebug>
 #include <QFile>
 #include <QTest>
 
-Predicate::Connection *conn = 0;
+KDbConnection *conn = 0;
 
 #define TABLETEST_DO_NOT_CREATE_DB
 #include "../../tests/features/tables_test.h"
@@ -40,7 +40,7 @@ void TestConnection::testCreateDb()
     QString drv_name = "sqlite";
     QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "test.kexi"));
 
-    Predicate::DriverManager manager;
+    KDbDriverManager manager;
     QStringList names = manager.driverNames();
     qDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it) {
@@ -51,22 +51,22 @@ void TestConnection::testCreateDb()
     QVERIFY2(!names.isEmpty(), "No db drivers found");
 
     //get driver
-    const Predicate::DriverInfo drv_info = manager.driverInfo(drv_name);
+    const KDbDriverInfo drv_info = manager.driverInfo(drv_name);
     QVERIFY2(drv_info.isValid(), "Driver info empty");
-    Predicate::Driver *driver = manager.driver(drv_name);
-    QVERIFY2(!manager.result().isError() && driver, "Error in driver manager after DriverManager::driver() call");
+    KDbDriver *driver = manager.driver(drv_name);
+    QVERIFY2(!manager.result().isError() && driver, "Error in driver manager after KDbDriverManager::driver() call");
     QCOMPARE(drv_info.name(), drv_name);
     QVERIFY(drv_info.isFileBased());
 
     //open connection
-    Predicate::ConnectionData cdata;
+    KDbConnectionData cdata;
     cdata.setDatabaseName(db_name);
     conn = driver->createConnection(cdata);
     qDebug() << driver->result().message();
     QVERIFY2(!driver->result().isError() && conn, "Failed to create connection");
 
     {
-        QScopedPointer<Predicate::Connection> connGuard(conn);
+        QScopedPointer<KDbConnection> connGuard(conn);
 
         QVERIFY2(conn->connect(), "Failed to connect");
         if (conn->databaseExists(db_name)) {

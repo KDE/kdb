@@ -5,7 +5,7 @@ include_directories(
 )
 
 ADD_DEFINITIONS(
-  -D__PREDICATE__=
+  -D__KDB__=
   -DPREDICATE_DRIVER_NAME="xbase"
 )
 

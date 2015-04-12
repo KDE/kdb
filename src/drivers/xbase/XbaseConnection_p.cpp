@@ -27,15 +27,15 @@
 #include "XbaseConnection_p.h"
 #include "XbaseExport.h"
 
-#include <Predicate/DriverManager>
-#include <Predicate/Utils>
-#include <Predicate/ConnectionData>
+#include "KDbDriverManager.h"
+#include "KDb.h"
+#include "KDbConnectionData.h"
 #include <migration/keximigrate.h>
 #include <migration/migratemanager.h>
 
 #include <core/kexiprojectdata.h>
 
-xBaseConnectionInternal::xBaseConnectionInternal(Predicate::Connection* connection, Predicate::Driver* internalDriver )
+xBaseConnectionInternal::xBaseConnectionInternal(KDbConnection* connection, KDbDriver* internalDriver )
   : ConnectionInternal(connection),
   internalDriver(internalDriver)
 {
@@ -43,7 +43,7 @@ xBaseConnectionInternal::xBaseConnectionInternal(Predicate::Connection* connecti
 
 xBaseConnectionInternal::~xBaseConnectionInternal()
 {
-// deletion of internalDriver and internalConn will be handled by Driver* class ( creator )
+// deletion of internalDriver and internalConn will be handled by KDbDriver* class ( creator )
 }
 
 void xBaseConnectionInternal::storeResult()
@@ -56,7 +56,7 @@ void xBaseConnectionInternal::storeResult()
 
 //bool xBaseConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
+bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
 {
   // we have to migrate the xbase source database into a .kexi file
   // xbase source database directory will be in connectiondata
@@ -76,11 +76,11 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
         tempDatabase = temporaryKexiFile.fileName();
 
-  Predicate::ConnectionData* kexiConnectionData = 0;
-  kexiConnectionData = new Predicate::ConnectionData();
+  KDbConnectionData* kexiConnectionData = 0;
+  kexiConnectionData = new KDbConnectionData();
 
   // set destination file name here.
-  kexiConnectionData->driverName = Predicate::defaultFileBasedDriverName();
+  kexiConnectionData->driverName = KDb::defaultFileBasedDriverName();
   kexiConnectionData->setFileName( tempDatabase );
   PreDrvDbg << "Current file name: " << tempDatabase;
 
@@ -100,7 +100,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
   // Setup XBase connection data from input connection data passed
   //! TODO Check sanity of this
-  md->source = new Predicate::ConnectionData(data);
+  md->source = new KDbConnectionData(data);
   md->sourceName = "";
 
   sourceDriver->setData(md);
@@ -146,7 +146,7 @@ bool xBaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
 
 /*! Disconnects from the database.
 */
-bool xBaseConnectionInternal::db_disconnect(const Predicate::ConnectionData& data)
+bool xBaseConnectionInternal::db_disconnect(const KDbConnectionData& data)
 {
   //! Export back to xBase
   xBaseExport export2xBase;
@@ -178,7 +178,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement
 */
-bool xBaseConnectionInternal::executeSQL(const EscapedString& statement)
+bool xBaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
 //	PreDrvDbg << statement;
   if ( !internalConn ) {

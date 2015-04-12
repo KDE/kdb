@@ -21,7 +21,7 @@
 #define TESTSTATICSETOFSTRINGS_H
 
 #include <QObject>
-#include <Predicate/Tools/Utils>
+#include <KDbUtils>
 
 #undef QT_USE_QSTRINGBUILDER
 #undef QT_NO_CAST_TO_ASCII
@@ -37,7 +37,7 @@ private Q_SLOTS:
     
 private:
     static const char *keywords[];
-    Predicate::Utils::StaticSetOfStrings strings;
+    KDbUtils::StaticSetOfStrings strings;
 };
 
 #endif // TESTSTATICSETOFSTRINGS_H

@@ -17,10 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <Predicate/Connection>
-#include <Predicate/DriverManager>
-#include <Predicate/Private/Driver>
-#include <Predicate/Utils>
+#include "KDbConnection.h"
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
+#include "KDb.h"
 
 #include "SqliteDriver.h"
 #include "SqliteConnection.h"
@@ -31,24 +31,22 @@
 
 #include <sqlite3.h>
 
-using namespace Predicate;
-
 EXPORT_PREDICATE_DRIVER(SQLiteDriver, sqlite)
 
 //! driver specific private data
 //! @internal
-class Predicate::SQLiteDriverPrivate
+class KDbSQLiteDriverPrivate
 {
 public:
     SQLiteDriverPrivate() 
      : collate(QLatin1String(" COLLATE ''"))
     {
     }
-    EscapedString collate;
+    KDbEscapedString collate;
 };
 
 SQLiteDriver::SQLiteDriver()
-        : Driver()
+        : KDbDriver()
         , dp(new SQLiteDriverPrivate)
 {
     d->isDBOpenedAfterCreate = true;
@@ -75,19 +73,19 @@ SQLiteDriver::SQLiteDriver()
     d->properties["client_library_version"] = QLatin1String(sqlite3_libversion());
     d->properties["default_server_encoding"] = QLatin1String("UTF8"); //OK?
 
-    d->typeNames[Field::Byte] = QLatin1String("Byte");
-    d->typeNames[Field::ShortInteger] = QLatin1String("ShortInteger");
-    d->typeNames[Field::Integer] = QLatin1String("Integer");
-    d->typeNames[Field::BigInteger] = QLatin1String("BigInteger");
-    d->typeNames[Field::Boolean] = QLatin1String("Boolean");
-    d->typeNames[Field::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
-    d->typeNames[Field::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
-    d->typeNames[Field::Time] = QLatin1String("Time");
-    d->typeNames[Field::Float] = QLatin1String("Float");
-    d->typeNames[Field::Double] = QLatin1String("Double");
-    d->typeNames[Field::Text] = QLatin1String("Text");
-    d->typeNames[Field::LongText] = QLatin1String("CLOB");
-    d->typeNames[Field::BLOB] = QLatin1String("BLOB");
+    d->typeNames[KDbField::Byte] = QLatin1String("Byte");
+    d->typeNames[KDbField::ShortInteger] = QLatin1String("ShortInteger");
+    d->typeNames[KDbField::Integer] = QLatin1String("Integer");
+    d->typeNames[KDbField::BigInteger] = QLatin1String("BigInteger");
+    d->typeNames[KDbField::Boolean] = QLatin1String("Boolean");
+    d->typeNames[KDbField::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
+    d->typeNames[KDbField::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
+    d->typeNames[KDbField::Time] = QLatin1String("Time");
+    d->typeNames[KDbField::Float] = QLatin1String("Float");
+    d->typeNames[KDbField::Double] = QLatin1String("Double");
+    d->typeNames[KDbField::Text] = QLatin1String("Text");
+    d->typeNames[KDbField::LongText] = QLatin1String("CLOB");
+    d->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
 }
 
 SQLiteDriver::~SQLiteDriver()
@@ -96,7 +94,7 @@ SQLiteDriver::~SQLiteDriver()
 }
 
 
-Predicate::Connection*
+KDbConnection*
 SQLiteDriver::drv_createConnection(const ConnectionData& connData)
 {
     return new SQLiteConnection(this, connData);
@@ -104,7 +102,7 @@ SQLiteDriver::drv_createConnection(const ConnectionData& connData)
 
 bool SQLiteDriver::isSystemObjectName(const QString& n) const
 {
-    return Driver::isSystemObjectName(n)
+    return KDbDriver::isSystemObjectName(n)
            || n.toLower().startsWith(QLatin1String("sqlite_"));
 }
 
@@ -116,19 +114,19 @@ bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
            || (lcName == QLatin1String("oid"));
 }
 
-EscapedString SQLiteDriver::escapeString(const QString& str) const
+KDbEscapedString SQLiteDriver::escapeString(const QString& str) const
 {
-    return EscapedString("'") + EscapedString(str).replace('\'', "''") + '\'';
+    return KDbEscapedString("'") + KDbEscapedString(str).replace('\'', "''") + '\'';
 }
 
-EscapedString SQLiteDriver::escapeString(const QByteArray& str) const
+KDbEscapedString SQLiteDriver::escapeString(const QByteArray& str) const
 {
-    return EscapedString("'") + EscapedString(str).replace('\'', "''") + '\'';
+    return KDbEscapedString("'") + KDbEscapedString(str).replace('\'', "''") + '\'';
 }
 
-EscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
 {
-    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscapeXHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDbBLOBEscapeXHex));
 }
 
 QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const
@@ -146,7 +144,7 @@ AdminTools* SQLiteDriver::drv_createAdminTools() const
     return new SQLiteAdminTools();
 }
 
-EscapedString SQLiteDriver::collationSQL() const
+KDbEscapedString SQLiteDriver::collationSQL() const
 {
     return dp->collate;
 }

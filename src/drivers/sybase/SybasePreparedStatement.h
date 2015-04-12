@@ -20,16 +20,13 @@
 #ifndef SYBASEPREPAREDSTATEMENT_H
 #define SYBASEPREPAREDSTATEMENT_H
 
-#include <Predicate/PreparedStatement>
-#include <Predicate/Private/Connection>
+#include "KDbPreparedStatement.h"
+#include <Predicate/Private/KDbConnection>
 
-namespace Predicate
-{
-
-class SybasePreparedStatement : public PreparedStatement
+class SybasePreparedStatement : public KDbPreparedStatement
 {
 public:
-    SybasePreparedStatement(StatementType type, ConnectionInternal& conn, FieldList& fields);
+    SybasePreparedStatement(StatementType type, ConnectionInternal& conn, KDbFieldList& fields);
 
     virtual ~SybasePreparedStatement();
 
@@ -40,8 +37,8 @@ public:
     bool m_resetRequired;
 
 private:
-    Connection* m_conn;
+    KDbConnection* m_conn;
 
 };
-}
+
 #endif

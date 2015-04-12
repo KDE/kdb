@@ -24,10 +24,10 @@
 
 #include <QtDebug>
 
-#include <Predicate/Field>
-#include <Predicate/RecordData>
-#include <Predicate/Cursor>
-#include <Predicate/DriverManager>
+#include "KDbField.h"
+#include "KDbRecordData.h"
+#include "KDbCursor.h"
+#include "KDbDriverManager.h"
 #include <core/kexi.h>
 #include <migration/keximigratedata.h>
 
@@ -35,63 +35,61 @@
 
 #include "xbase.h"
 
-using namespace Predicate;
-
-class Predicate::xBaseExportPrivate {
+class KDbxBaseExportPrivate {
   public:
     xBaseExportPrivate() {
     }
 
     //! Converts kexidb field types to xbase types
-    char type(Predicate::Field::Type fieldType);
+    char type(KDbField::Type fieldType);
 
     //! Appends record to xbase table
-    bool appendRecord(const QString& sourceTableName , Predicate::RecordData* recordData);
+    bool appendRecord(const QString& sourceTableName , KDbRecordData* recordData);
 
     //! Returns max fieldlengths for xBase table
-    int fieldLength(Predicate::Field* f );
+    int fieldLength(KDbField* f );
 
     //! converts QVariant data to a format understood by xBase
     QByteArray fieldData(QVariant data, char type);
 
     //! Creates xBase indexes for the table
-    bool createIndexes(const QString& sourceTableName, Predicate::TableSchema* tableSchema);
+    bool createIndexes(const QString& sourceTableName, KDbTableSchema* tableSchema);
 
     xbXBase xbase;
     QHash<QString, QString> tableNamePathMap;
 };
 
-char xBaseExportPrivate::type(Predicate::Field::Type fieldType)
+char xBaseExportPrivate::type(KDbField::Type fieldType)
 {
   char xBaseType = '\0';
 
   switch( fieldType ) {
-    case Predicate::Field::Text:
-    case Predicate::Field::LongText:
+    case KDbField::Text:
+    case KDbField::LongText:
       xBaseType = XB_CHAR_FLD;
       break;
 
-    case Predicate::Field::Boolean:
+    case KDbField::Boolean:
       xBaseType = XB_LOGICAL_FLD;
       break;
 
-    case Predicate::Field::Float:
-    case Predicate::Field::Double:
+    case KDbField::Float:
+    case KDbField::Double:
       xBaseType = XB_FLOAT_FLD;
 
-    case Predicate::Field::ShortInteger:
-    case Predicate::Field::Integer:
-    case Predicate::Field::BigInteger:
+    case KDbField::ShortInteger:
+    case KDbField::Integer:
+    case KDbField::BigInteger:
       xBaseType = XB_NUMERIC_FLD;
       break;
 
-    case Predicate::Field::DateTime:
-    case Predicate::Field::Date:
-    case Predicate::Field::Time:
+    case KDbField::DateTime:
+    case KDbField::Date:
+    case KDbField::Time:
       xBaseType = XB_DATE_FLD;
       break;
 
-    case Predicate::Field::BLOB:
+    case KDbField::BLOB:
       xBaseType = XB_MEMO_FLD;
       break;
 
@@ -102,7 +100,7 @@ char xBaseExportPrivate::type(Predicate::Field::Type fieldType)
   return xBaseType;
 }
 
-bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicate::RecordData* recordData ) {
+bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecordData* recordData ) {
 
 // 	PreDrvDbg<<recordData->debugString();
   QString pathName = tableNamePathMap.value( sourceTableName );
@@ -152,8 +150,8 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , Predicat
   return true;
 }
 
-int xBaseExportPrivate::fieldLength(Predicate::Field* f ) {
-  if ( f->type() == Predicate::Field::Text ) {
+int xBaseExportPrivate::fieldLength(KDbField* f ) {
+  if ( f->type() == KDbField::Text ) {
     return f->maxLength();
   }
   // return the max possible (string)length of the types
@@ -199,7 +197,7 @@ QByteArray xBaseExportPrivate::fieldData(QVariant data, char type) {
   }
 }
 
-bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, Predicate::TableSchema* tableSchema) {
+bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KDbTableSchema* tableSchema) {
 
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toLatin1();
@@ -209,7 +207,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, Predicate
   QString dirName = QFileInfo( pathName ).path();
 
   for (uint i=0; i< (uint)fieldCount ; ++i) {
-    Predicate::Field* f = tableSchema->field(i);
+    KDbField* f = tableSchema->field(i);
 
     int returnCode;
     QString fieldName = f->name();
@@ -256,7 +254,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     result->clearStatus();
 
 
-  Predicate::DriverManager drvManager;
+  KDbDriverManager drvManager;
 
   if (!m_migrateData) {
     PreDrvDbg<<"Migration Data not set yet !!";
@@ -264,7 +262,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return false;
   }
 
-  Predicate::Driver *sourceDriver = drvManager.driver(
+  KDbDriver *sourceDriver = drvManager.driver(
     m_migrateData->source->driverName);
   if (!sourceDriver) {
     result->setStatus(&drvManager,
@@ -281,7 +279,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return false;
   }
 
-  Predicate::Connection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
+  KDbConnection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
 
   if (!sourceConn || sourceDriver->error()) {
     PreDrvDbg<<"Export failed";
@@ -317,7 +315,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
       return false;
     }
 
-    Predicate::TableSchema *tableSchema = sourceConn->tableSchema( tableCaption );
+    KDbTableSchema *tableSchema = sourceConn->tableSchema( tableCaption );
 
     if (!dest_createTable(tableCaption, tableSchema)) {
       if (result)
@@ -370,7 +368,7 @@ bool xBaseExport::dest_disconnect() {
   return true;
 }
 
-bool xBaseExport::dest_createTable(const QString& originalName, Predicate::TableSchema* tableSchema) {
+bool xBaseExport::dest_createTable(const QString& originalName, KDbTableSchema* tableSchema) {
   // Algorithm
   // 1. For each fields in the table schema.
   // 2.   Create a xbSchema entry and add it to xbSchema array.
@@ -383,7 +381,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, Predicate::Table
 
   uint i = 0;
   for (i = 0; i < fieldCount ; ++i) {
-    Predicate::Field* f = tableSchema->field(i);
+    KDbField* f = tableSchema->field(i);
 
     QByteArray ba = f->name().toLatin1();
     //! TODO Fieldname can only be 11 characters
@@ -400,7 +398,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, Predicate::Table
   xBaseTableSchema[i].FieldLen = 0;
   xBaseTableSchema[i].NoOfDecs = 0;
 
-  const Predicate::ConnectionData* connData = m_migrateData->destination->connectionData();
+  const KDbConnectionData* connData = m_migrateData->destination->connectionData();
   QString dirName = connData->fileName(); // this includes the forward slash after the dir name
 
   QString pathName = dirName + originalName + ".dbf";
@@ -423,15 +421,15 @@ bool xBaseExport::dest_createTable(const QString& originalName, Predicate::Table
   return true;
 }
 
-bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connection *srcConn,
-        Predicate::TableSchema* /*srcTable*/) {
+bool xBaseExport::dest_copyTable(const QString& srcTableName, KDbConnection *srcConn,
+        KDbTableSchema* /*srcTable*/) {
   // Algorithm
   // 1. pick each row
   // 2. Insert it into the xBase table
 
   // using the tableSchema as argument automatically appends rowid
   // info to the recordData which we don't want. Hence we use SQL query
-  Predicate::Cursor* cursor = srcConn->executeQuery(EscapedString( "SELECT * FROM %1" ).arg(srcTableName));
+  KDbCursor* cursor = srcConn->executeQuery(KDbEscapedString( "SELECT * FROM %1" ).arg(srcTableName));
 
   if (!cursor)
     return false;
@@ -440,7 +438,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, Predicate::Connect
     return false;
 
   while (!cursor->eof()) {
-    Predicate::RecordData *record = cursor->storeCurrentRecord();
+    KDbRecordData *record = cursor->storeCurrentRecord();
     if (!record) {
       return false;
     }

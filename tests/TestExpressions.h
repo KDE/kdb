@@ -25,7 +25,7 @@
 #undef QT_NO_CAST_FROM_ASCII
 
 #include <QObject>
-#include <Predicate/Tools/Utils>
+#include <KDbUtils>
 
 class TestExpressions : public QObject
 {

@@ -27,7 +27,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "SybaseConnection_p.h"
 
-#include <Predicate/ConnectionData>
+#include "KDbConnectionData.h"
 
 #ifdef SYBASEMIGRATE_H
 #define NAMESPACE KexiMigration
@@ -55,7 +55,7 @@ int connectionMessageHandler(DBPROCESS* dbproc, DBINT msgno, int msgstate, int s
 }
 
 /* ************************************************************************** */
-SybaseConnectionInternal::SybaseConnectionInternal(Predicate::Connection* connection)
+SybaseConnectionInternal::SybaseConnectionInternal(KDbConnection* connection)
         : ConnectionInternal(connection)
         , dbProcess(0)
         , res(0)
@@ -101,7 +101,7 @@ void SybaseConnectionInternal::messageHandler(DBINT msgno, int msgstate, int sev
  */
 //bool SybaseConnectionInternal::db_connect(QCString host, QCString user,
 //  QCString password, unsigned short int port, QString socket)
-bool SybaseConnectionInternal::db_connect(const Predicate::ConnectionData& data)
+bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
 {
     if (dbinit() == FAIL)
         return false;
@@ -245,7 +245,7 @@ bool SybaseConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement on the server.
  */
-bool SybaseConnectionInternal::executeSQL(const EscapedString& statement)
+bool SybaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
     // remove queries in buffer if any. flush existing results if any
     dbcancel(dbProcess);
@@ -273,7 +273,7 @@ QString SybaseConnectionInternal::escapeIdentifier(const QString& str) const
 
 //--------------------------------------
 
-SybaseCursorData::SybaseCursorData(Predicate::Connection* connection)
+SybaseCursorData::SybaseCursorData(KDbConnection* connection)
         : SybaseConnectionInternal(connection)
         , numRows(0)
 {

@@ -26,9 +26,9 @@
 
 #include <QObject>
 #include <QScopedPointer>
-#include <Predicate/Connection>
-#include <Predicate/Parser>
-#include <Predicate/EscapedString>
+#include <KDbConnection>
+#include <KDbParser>
+#include <KDbEscapedString>
 
 class TestSqlParser : public QObject
 {
@@ -44,10 +44,10 @@ private Q_SLOTS:
 private:
     //! Opens database needed for tests.
     bool openDatabase(const QString &path);
-    Predicate::EscapedString parse(const Predicate::EscapedString& statement, bool *ok);
+    KDbEscapedString parse(const KDbEscapedString& statement, bool *ok);
 
-    QScopedPointer<Predicate::Connection> m_conn;
-    QScopedPointer<Predicate::Parser> m_parser;
+    QScopedPointer<KDbConnection> m_conn;
+    QScopedPointer<KDbParser> m_parser;
 };
 
 #endif // TESTSTATICSETOFSTRINGS_H

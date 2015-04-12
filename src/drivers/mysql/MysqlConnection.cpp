@@ -29,16 +29,11 @@
 #include "MysqlConnection_p.h"
 #include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
-#include <Predicate/Global>
-#include <Predicate/Error>
+#include "KDbGlobal.h"
+#include "KDbError.h"
 
-
-using namespace Predicate;
-
-//--------------------------------------------------------------------------
-
-MysqlConnection::MysqlConnection(Driver *driver, const ConnectionData& connData)
-        : Connection(driver, connData)
+MysqlConnection::MysqlConnection(KDbDriver *driver, const ConnectionData& connData)
+        : KDbConnection(driver, connData)
         , d(new MysqlConnectionInternal(this))
 {
 }
@@ -58,7 +53,7 @@ bool MysqlConnection::drv_connect()
     // Get lower_case_table_name value so we know if there's case sensitivity supported
     // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
     int intLowerCaseTableNames = 0;
-    tristate res = querySingleNumber(EscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
+    tristate res = querySingleNumber(KDbEscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
                             &intLowerCaseTableNames,
                             0/*col*/, false/* !addLimitTo1 */);
     if (res == false) // sanity
@@ -67,7 +62,7 @@ bool MysqlConnection::drv_connect()
     return true;
 }
 
-bool MysqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
+bool MysqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
     version->setString(QLatin1String(mysql_get_server_info(d->mysql)));
@@ -76,7 +71,7 @@ bool MysqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
     // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-version.html
     QString versionString;
-    tristate res = querySingleString(EscapedString("SELECT @@version"),
+    tristate res = querySingleString(KDbEscapedString("SELECT @@version"),
                                      &versionString, /*column*/0, false /*!addLimitTo1*/);
     QRegExp versionRe(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (res == false) // sanity
@@ -95,12 +90,12 @@ bool MysqlConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-Cursor* MysqlConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
 {
     return new MysqlCursor(this, statement, cursor_options);
 }
 
-Cursor* MysqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
     return new MysqlCursor(this, query, cursor_options);
 }
@@ -128,10 +123,10 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
     /* db names can be lower case in mysql */
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
     bool exists = resultExists(
-      EscapedString("SHOW DATABASES LIKE %1").arg(escapeString(storedDbName)), &success);
+      KDbEscapedString("SHOW DATABASES LIKE %1").arg(escapeString(storedDbName)), &success);
     if (!exists || !success) {
         if (!ignoreErrors) {
-            m_result = Result(ERR_OBJECT_NOT_FOUND,
+            m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                               predicateTr("The database \"%1\" does not exist.").arg(storedDbName));
         }
         return false;
@@ -145,13 +140,13 @@ bool MysqlConnection::drv_createDatabase(const QString &dbName)
     PreDrvDbg << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
-    if (drv_executeSQL(EscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
+    if (drv_executeSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
         return true;
     d->storeResult();
     return false;
 }
 
-bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, MessageHandler* msgHandler)
+bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KDbMessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
@@ -170,10 +165,10 @@ bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    return drv_executeSQL(EscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
+    return drv_executeSQL(KDbEscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
-bool MysqlConnection::drv_executeSQL(const EscapedString& statement)
+bool MysqlConnection::drv_executeSQL(const KDbEscapedString& statement)
 {
     return d->executeSQL(statement);
 }
@@ -204,16 +199,16 @@ QString MysqlConnection::serverResultName() const
 bool MysqlConnection::drv_containsTable(const QString& tableName)
 {
     bool success = false;
-    return resultExists(EscapedString("SHOW TABLES LIKE %1")
+    return resultExists(KDbEscapedString("SHOW TABLES LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }
 
 bool MysqlConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList(EscapedString("SHOW TABLES"), list);
+    return queryStringList(KDbEscapedString("SHOW TABLES"), list);
 }
 
-PreparedStatementInterface* MysqlConnection::prepareStatementInternal()
+KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 {
     return new MysqlPreparedStatement(d);
 }

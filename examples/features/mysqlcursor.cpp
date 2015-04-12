@@ -20,15 +20,15 @@
 #include <kdebug.h>
 #include <kcomponentdata.h>
 
-#include <Predicate/DriverManager.h>
-#include <Predicate/Driver.h>
-#include <Predicate/Connection.h>
-#include <Predicate/Cursor.h>
+#include <KDbDriverManager>
+#include <KDbDriver>
+#include <KDbConnection>
+#include <KDbCursor>
 
 int main(int argc, char * argv[])
 {
     KComponentData componentData("newapi");
-    Predicate::DriverManager manager;
+    KDbDriverManager manager;
     QStringList names = manager.driverNames();
     qDebug() << "DRIVERS: ";
     for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
@@ -39,14 +39,14 @@ int main(int argc, char * argv[])
     }
 
     //get driver
-    Predicate::Driver *driver = manager.driver("mySQL");
+    KDbDriver *driver = manager.driver("mySQL");
     if (manager.error()) {
         qDebug() << manager.errorMsg();
         return 1;
     }
 
     //connection data that can be later reused
-    Predicate::ConnectionData conn_data;
+    KDbConnectionData conn_data;
 
     conn_data.userName = "root";
     if (argc > 1)
@@ -55,7 +55,7 @@ int main(int argc, char * argv[])
         conn_data.password = "mysql";
     conn_data.hostName = "localhost";
 
-    Predicate::Connection *conn = driver->createConnection(conn_data);
+    KDbConnection *conn = driver->createConnection(conn_data);
     if (driver->error()) {
         qDebug() << driver->errorMsg();
         return 1;
@@ -71,10 +71,10 @@ int main(int argc, char * argv[])
     }
 
     qDebug() << "Creating first cursor";
-    Predicate::Cursor *c = conn->executeQuery("select * from Applications");
+    KDbCursor *c = conn->executeQuery("select * from Applications");
     if (!c) qDebug() << conn->errorMsg();
     qDebug() << "Creating second cursor";
-    Predicate::Cursor *c2 = conn->executeQuery("select * from Applications");
+    KDbCursor *c2 = conn->executeQuery("select * from Applications");
     if (!c2) qDebug() << conn->errorMsg();
 
     QStringList l = conn->databaseNames();
@@ -85,10 +85,10 @@ int main(int argc, char * argv[])
 
     if (c) {
         while (c->moveNext()) {
-            qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-            qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+            qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+            qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
         }
-        qDebug() << "Cursor error:" << c->errorMsg();
+        qDebug() << "KDbCursor error:" << c->errorMsg();
     }
     if (c2) {
         while (c2->moveNext()) {
@@ -97,29 +97,29 @@ int main(int argc, char * argv[])
         }
     }
     if (c) {
-        qDebug() << "Cursor::prev";
+        qDebug() << "KDbCursor::prev";
         while (c->movePrev()) {
-            qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-            qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+            qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+            qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
 
         }
         qDebug() << "up/down";
         c->moveNext();
-        qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-        qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+        qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+        qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
         c->moveNext();
-        qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-        qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+        qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+        qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
         c->movePrev();
-        qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-        qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+        qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+        qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
         c->movePrev();
-        qDebug() << "Cursor: Value(0)" << c->value(0).toString();
-        qDebug() << "Cursor: Value(1)" << c->value(1).toString();
+        qDebug() << "KDbCursor: Value(0)" << c->value(0).toString();
+        qDebug() << "KDbCursor: Value(1)" << c->value(1).toString();
 
     }
 #if 0
-    Predicate::Table *t = conn->tableSchema("persons");
+    KDbTable *t = conn->tableSchema("persons");
     if (t)
         t->debug();
     t = conn->tableSchema("cars");

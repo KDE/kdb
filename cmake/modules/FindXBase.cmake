@@ -8,8 +8,8 @@
 
 IF (XBase_INCLUDE_DIR AND XBase_LIBRARIES )
 
-	# Already in cache
-	SET(XBASE_FOUND TRUE)
+        # Already in cache
+        SET(XBASE_FOUND TRUE)
 
 ELSE (XBase_INCLUDE_DIR AND XBase_LIBRARIES)
 

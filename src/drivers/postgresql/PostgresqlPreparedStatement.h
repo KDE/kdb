@@ -21,27 +21,25 @@
 #ifndef POSTGRESQLPREPAREDSTATEMENT_H
 #define POSTGRESQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface>
+#include <Predicate/Interfaces/KDbPreparedStatementInterface>
 #include "PostgresqlConnection_p.h"
 
-namespace Predicate
-{
-class PostgresqlPreparedStatement : public PreparedStatementInterface, public PostgresqlConnectionInternal
+class PostgresqlPreparedStatement : public KDbPreparedStatementInterface, public PostgresqlConnectionInternal
 {
 public:
     explicit PostgresqlPreparedStatement(ConnectionInternal* conn);
 
     virtual ~PostgresqlPreparedStatement();
 
-    virtual bool prepare(const EscapedString& statement);
+    virtual bool prepare(const KDbEscapedString& statement);
 
     virtual bool execute(
-        PreparedStatement::Type type,
-        const Field::List& selectFieldList,
-        FieldList& insertFieldList,
-        const PreparedStatementParameters& parameters);
+        KDbPreparedStatement::Type type,
+        const KDbField::List& selectFieldList,
+        KDbFieldList& insertFieldList,
+        const KDbPreparedStatementParameters& parameters);
 
 private:
 };
-}
+
 #endif

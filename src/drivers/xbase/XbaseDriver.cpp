@@ -19,20 +19,18 @@
 
 #include "XbaseDriver.h"
 
-#include <Predicate/Connection>
-#include <Predicate/DriverManager>
-#include <Predicate/Private/Driver>
-#include <Predicate/Utils>
+#include "KDbConnection.h"
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
+#include "KDb.h"
 
 #include <QtDebug>
 
 #include "XbaseConnection.h"
 
-using namespace Predicate;
-
 EXPORT_PREDICATE_DRIVER(xBaseDriver, xbase)
 
-class Predicate::xBaseDriverPrivate {
+class KDbxBaseDriverPrivate {
 
 public:
   xBaseDriverPrivate()
@@ -40,16 +38,16 @@ public:
   {
   }
 
-  Predicate::Driver* internalDriver;
+  KDbDriver* internalDriver;
 
 };
 
 xBaseDriver::xBaseDriver()
-  : Driver()
+  : KDbDriver()
   ,dp( new xBaseDriverPrivate() )
 {
-  Predicate::DriverManager manager;
-  dp->internalDriver = manager.driver(Predicate::defaultFileBasedDriverName());
+  KDbDriverManager manager;
+  dp->internalDriver = manager.driver(KDb::defaultFileBasedDriverName());
 
 //  d->isFileDriver = true ;
   d->isDBOpenedAfterCreate = true;
@@ -74,19 +72,19 @@ xBaseDriver::xBaseDriver()
   initDriverSpecificKeywords(keywords);
 
   // Ditto like SQLite , as it won't matter
-  d->typeNames[Field::Byte]="Byte";
-  d->typeNames[Field::ShortInteger]="ShortInteger";
-  d->typeNames[Field::Integer]="Integer";
-  d->typeNames[Field::BigInteger]="BigInteger";
-  d->typeNames[Field::Boolean]="Boolean";
-  d->typeNames[Field::Date]="Date";
-  d->typeNames[Field::DateTime]="DateTime";
-  d->typeNames[Field::Time]="Time";
-  d->typeNames[Field::Float]="Float";
-  d->typeNames[Field::Double]="Double";
-  d->typeNames[Field::Text]="Text";
-  d->typeNames[Field::LongText]="CLOB";
-  d->typeNames[Field::BLOB]="BLOB";
+  d->typeNames[KDbField::Byte]="Byte";
+  d->typeNames[KDbField::ShortInteger]="ShortInteger";
+  d->typeNames[KDbField::Integer]="Integer";
+  d->typeNames[KDbField::BigInteger]="BigInteger";
+  d->typeNames[KDbField::Boolean]="Boolean";
+  d->typeNames[KDbField::Date]="Date";
+  d->typeNames[KDbField::DateTime]="DateTime";
+  d->typeNames[KDbField::Time]="Time";
+  d->typeNames[KDbField::Float]="Float";
+  d->typeNames[KDbField::Double]="Double";
+  d->typeNames[KDbField::Text]="Text";
+  d->typeNames[KDbField::LongText]="CLOB";
+  d->typeNames[KDbField::BLOB]="BLOB";
 }
 
 xBaseDriver::~xBaseDriver()
@@ -94,7 +92,7 @@ xBaseDriver::~xBaseDriver()
   delete dp;
 }
 
-Predicate::Connection* xBaseDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* xBaseDriver::drv_createConnection(const ConnectionData& connData)
 {
     if ( !dp->internalDriver ) {
         return 0;
@@ -107,7 +105,7 @@ bool xBaseDriver::isSystemObjectName( const QString& n ) const
   if ( !dp->internalDriver ) {
     return false;
   }
-  return Driver::isSystemObjectName(n) || dp->internalDriver->isSystemObjectName(n);
+  return KDbDriver::isSystemObjectName(n) || dp->internalDriver->isSystemObjectName(n);
 }
 
 bool xBaseDriver::drv_isSystemFieldName( const QString& n ) const
@@ -118,23 +116,23 @@ bool xBaseDriver::drv_isSystemFieldName( const QString& n ) const
   return dp->internalDriver->isSystemFieldName(n);
 }
 
-EscapedString xBaseDriver::escapeString(const QString& str) const
+KDbEscapedString xBaseDriver::escapeString(const QString& str) const
 {
   if ( !dp->internalDriver ) {
-    return EscapedString("'") + str + '\'';
+    return KDbEscapedString("'") + str + '\'';
   }
   return dp->internalDriver->escapeString(str);
 }
 
-EscapedString xBaseDriver::escapeString(const QByteArray& str) const
+KDbEscapedString xBaseDriver::escapeString(const QByteArray& str) const
 {
   if ( !dp->internalDriver ) {
-    return EscapedString("'") + str + '\'';
+    return KDbEscapedString("'") + str + '\'';
   }
   return dp->internalDriver->escapeString(str);
 }
 
-EscapedString xBaseDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString xBaseDriver::escapeBLOB(const QByteArray& array) const
 {
   if ( !dp->internalDriver ) {
     return array;

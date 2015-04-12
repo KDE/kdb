@@ -29,15 +29,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "SybaseConnection_p.h"
 #include "SybaseCursor.h"
 #include "SybasePreparedStatement.h"
-#include <Predicate/Error>
+#include "KDbError.h"
 
-
-using namespace Predicate;
-
-//--------------------------------------------------------------------------
-
-SybaseConnection::SybaseConnection(Driver *driver, const ConnectionData& connData)
-        : Connection(driver, connData)
+SybaseConnection::SybaseConnection(KDbDriver *driver, const ConnectionData& connData)
+        : KDbConnection(driver, connData)
         , d(new SybaseConnectionInternal(this))
 {
 }
@@ -47,7 +42,7 @@ SybaseConnection::~SybaseConnection()
     destroy();
 }
 
-bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool SybaseConnection::drv_connect(KDbServerVersionInfo* version)
 {
     const bool ok = d->db_connect(*data());
     if (!ok)
@@ -59,11 +54,11 @@ bool SybaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
 
     QString serverVersionString;
 
-    if (!querySingleString(EscapedString("SELECT @@servername") , &version.string)) {
+    if (!querySingleString(KDbEscapedString("SELECT @@servername") , &version.string)) {
         PreDrvDbg << "Couldn't fetch server name";
     }
 
-    if (!querySingleString(EscapedString("SELECT @@version"), &serverVersionString)) {
+    if (!querySingleString(KDbEscapedString("SELECT @@version"), &serverVersionString)) {
         PreDrvDbg << "Couldn't fetch server version";
     }
 
@@ -82,12 +77,12 @@ bool SybaseConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-Cursor* SybaseConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
+KDbCursor* SybaseConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
 {
     return new SybaseCursor(this, statement, cursor_options);
 }
 
-Cursor* SybaseConnection::prepareQuery(QuerySchema* query, uint cursor_options)
+KDbCursor* SybaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
     return new SybaseCursor(this, query, cursor_options);
 }
@@ -98,16 +93,16 @@ bool SybaseConnection::drv_getDatabasesList(QStringList* list)
 
     // select * from master..sysdatabases ?
     // todo: verify.
-    return queryStringList(EscapedString("SELECT name FROM master..sysdatabases"), list) ;
+    return queryStringList(KDbEscapedString("SELECT name FROM master..sysdatabases"), list) ;
 }
 
 bool SybaseConnection::drv_createDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
     // mysql_create_db deprecated, use SQL here.
-    if (drv_executeSQL(EscapedString("CREATE DATABASE ") + dbName)) {
+    if (drv_executeSQL(KDbEscapedString("CREATE DATABASE ") + dbName)) {
         // set allow_nulls_by_default option to true
-        EscapedString allowNullsQuery = EscapedString("sp_dboption %1, allow_nulls_by_default, true").arg(dbName);
+        KDbEscapedString allowNullsQuery = KDbEscapedString("sp_dboption %1, allow_nulls_by_default, true").arg(dbName);
         if (drv_executeSQL(allowNullsQuery.data()))
             return true;
     }
@@ -115,7 +110,7 @@ bool SybaseConnection::drv_createDatabase(const QString &dbName)
     return false;
 }
 
-bool SybaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, MessageHandler* msgHandler)
+bool SybaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KDbMessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
@@ -133,10 +128,10 @@ bool SybaseConnection::drv_closeDatabase()
 bool SybaseConnection::drv_dropDatabase(const QString &dbName)
 {
 
-    return drv_executeSQL(EscapedString("DROP DATABASE ") + escapeString(dbName));
+    return drv_executeSQL(KDbEscapedString("DROP DATABASE ") + escapeString(dbName));
 }
 
-bool SybaseConnection::drv_executeSQL(const EscapedString& statement)
+bool SybaseConnection::drv_executeSQL(const KDbEscapedString& statement)
 {
     return d->executeSQL(statement);
 }
@@ -144,7 +139,7 @@ bool SybaseConnection::drv_executeSQL(const EscapedString& statement)
 quint64 SybaseConnection::drv_lastInsertRecordId()
 {
     int rowId = 0;
-    querySingleNumber(EscapedString("Select @@IDENTITY"), &rowId);
+    querySingleNumber(KDbEscapedString("Select @@IDENTITY"), &rowId);
     return (qint64)rowId;
 }
 
@@ -168,33 +163,33 @@ QString SybaseConnection::serverResultName() const
 bool SybaseConnection::drv_containsTable(const QString &tableName)
 {
     bool success = false;
-    return resultExists(EscapedString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
+    return resultExists(KDbEscapedString("SELECT name FROM sysobjects WHERE type='U' AND name=%1")
                         .arg(escapeString(tableName)), &success) && success;
 }
 
 bool SybaseConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList(EscapedString("SELECT name FROM sysobjects WHERE type='U'"), list);
+    return queryStringList(KDbEscapedString("SELECT name FROM sysobjects WHERE type='U'"), list);
 }
 
-PreparedStatement SybaseConnection::prepareStatement(PreparedStatement::StatementType type,
-        FieldList* fields)
+KDbPreparedStatement SybaseConnection::prepareStatement(KDbPreparedStatement::StatementType type,
+        KDbFieldList* fields)
 {
     return SybasePreparedStatement(type, *d, fields);
 }
 
-bool Predicate::SybaseConnection::drv_beforeInsert(const QString& table, FieldList* fields)
+bool KDbSybaseConnection::drv_beforeInsert(const QString& table, KDbFieldList* fields)
 {
 
     if (fields.autoIncrementFields()->isEmpty())
         return true;
 
     // explicit insertion into IDENTITY fields !!
-    return drv_executeSQL(EscapedString("SET IDENTITY_INSERT %1 ON").arg(escapeIdentifier(table)));
+    return drv_executeSQL(KDbEscapedString("SET IDENTITY_INSERT %1 ON").arg(escapeIdentifier(table)));
 
 }
 
-bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldList* fields)
+bool KDbSybaseConnection::drv_afterInsert(const QString& table, KDbFieldList* fields)
 {
     // should we instead just set a flag when an identity_insert has taken place and only check for that
     // flag here ?
@@ -203,20 +198,20 @@ bool Predicate::SybaseConnection::drv_afterInsert(const QString& table, FieldLis
         return true;
 
     // explicit insertion into IDENTITY fields has taken place. Turn off IDENTITY_INSERT
-    return drv_executeSQL(EscapedString("SET IDENTITY_INSERT %1 OFF").arg(escapeIdentifier(table)));
+    return drv_executeSQL(KDbEscapedString("SET IDENTITY_INSERT %1 OFF").arg(escapeIdentifier(table)));
 
 }
 
-bool Predicate::SybaseConnection::drv_beforeUpdate(const QString& table, FieldList* fields)
+bool KDbSybaseConnection::drv_beforeUpdate(const QString& table, KDbFieldList* fields)
 {
     if (fields->autoIncrementFields()->isEmpty())
         return true;
 
     // explicit update of IDENTITY fields has taken place.
-    return drv_executeSQL(EscapedString("SET IDENTITY_UPDATE %1 ON").arg(escapeIdentifier(table)));
+    return drv_executeSQL(KDbEscapedString("SET IDENTITY_UPDATE %1 ON").arg(escapeIdentifier(table)));
 }
 
-bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldList& fields)
+bool KDbSybaseConnection::drv_afterUpdate(const QString& table, KDbFieldList& fields)
 {
     // should we instead just set a flag when an identity_update has taken place and only check for that
     // flag here ?
@@ -225,6 +220,5 @@ bool Predicate::SybaseConnection::drv_afterUpdate(const QString& table, FieldLis
         return true;
 
     // explicit insertion into IDENTITY fields has taken place. Turn off IDENTITY_INSERT
-    return drv_executeSQL(EscapedString("SET IDENTITY_UPDATE %1 OFF").arg(escapeIdentifier(table)));
-
+    return drv_executeSQL(KDbEscapedString("SET IDENTITY_UPDATE %1 OFF").arg(escapeIdentifier(table)));
 }

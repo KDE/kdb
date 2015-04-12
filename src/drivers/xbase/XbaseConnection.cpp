@@ -26,12 +26,10 @@
 #include "XbaseCursor.h"
 #include "XbaseConnection.h"
 #include "XbaseConnection_p.h"
-#include <Predicate/Error>
+#include "KDbError.h"
 
-using namespace Predicate;
-
-xBaseConnection::xBaseConnection(Driver *driver, Driver* internalDriver, const ConnectionData& connData)
-  : Connection(driver, connData)
+xBaseConnection::xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const ConnectionData& connData)
+  : KDbConnection(driver, connData)
   , d(new xBaseConnectionInternal(this, internalDriver))
 {
 }
@@ -40,7 +38,7 @@ xBaseConnection::~xBaseConnection() {
   destroy();
 }
 
-bool xBaseConnection::drv_connect(Predicate::ServerVersionInfo* version)
+bool xBaseConnection::drv_connect(KDbServerVersionInfo* version)
 {
   Q_UNUSED(version);
   const bool ok = d->db_connect(*data());
@@ -57,20 +55,20 @@ bool xBaseConnection::drv_disconnect() {
   return d->db_disconnect(*data());
 }
 
-Cursor* xBaseConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
+KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
 {
   if ( !d->internalConn ) {
     return 0;
   }
-  Cursor* internalCursor = d->internalConn->prepareQuery(statement,cursor_options);
+  KDbCursor* internalCursor = d->internalConn->prepareQuery(statement,cursor_options);
   return new xBaseCursor( this, internalCursor, statement, cursor_options );
 }
 
-Cursor* xBaseConnection::prepareQuery(QuerySchema* query, uint cursor_options) {
+KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options) {
   if ( !d->internalConn ) {
     return 0;
   }
-  Cursor* internalCursor = d->internalConn->prepareQuery(query, cursor_options);
+  KDbCursor* internalCursor = d->internalConn->prepareQuery(query, cursor_options);
   return new xBaseCursor( this, internalCursor, query, cursor_options );
 }
 
@@ -91,7 +89,7 @@ bool xBaseConnection::drv_createDatabase( const QString &dbName) {
   return true;
 }
 
-bool xBaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, MessageHandler* msgHandler)
+bool xBaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KDbMessageHandler* msgHandler)
 {
   Q_UNUSED(cancelled);
   Q_UNUSED(msgHandler);
@@ -113,7 +111,7 @@ bool xBaseConnection::drv_dropDatabase( const QString &dbName) {
   return true;
 }
 
-bool xBaseConnection::drv_executeSQL( const EscapedString& statement ) {
+bool xBaseConnection::drv_executeSQL( const KDbEscapedString& statement ) {
   return d->executeSQL(statement);
 }
 
@@ -157,7 +155,7 @@ bool xBaseConnection::drv_containsTable( const QString &tableName )
 {
   bool success = false;
   // this will be called on the SQLite database
-  return resultExists(EscapedString("SHOW TABLES LIKE %1")
+  return resultExists(KDbEscapedString("SHOW TABLES LIKE %1")
     .arg(escapeString(tableName)), &success) && success;
 }
 
@@ -170,7 +168,7 @@ bool xBaseConnection::drv_getTablesList(QStringList* list)
   return true;
 }
 
-PreparedStatementInterface* xBaseConnection::prepareStatementInternal()
+KDbPreparedStatementInterface* xBaseConnection::prepareStatementInternal()
 {
     if ( !d->internalConn )
         return 0;

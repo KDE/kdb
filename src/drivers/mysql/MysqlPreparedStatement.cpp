@@ -21,13 +21,11 @@
 #include <QtDebug>
 #include <errmsg.h>
 
-using namespace Predicate;
-
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
 MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
-        : PreparedStatementInterface()
+        : KDbPreparedStatementInterface()
         , MysqlConnectionInternal(conn->connection)
 #ifdef PREDICATE_USE_MYSQL_STMT
         , m_statement(0)
@@ -37,7 +35,7 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
 {
 // PreDrvDbg;
     mysql_owned = false;
-    mysql = dynamic_cast<Predicate::MysqlConnectionInternal&>(*conn).mysql; //copy
+    mysql = dynamic_cast<KDbMysqlConnectionInternal&>(*conn).mysql; //copy
     if (!init())
         done();
 }
@@ -86,7 +84,7 @@ void MysqlPreparedStatement::done()
 #endif
 }
 
-bool MysqlPreparedStatement::prepare(const EscapedString& statement)
+bool MysqlPreparedStatement::prepare(const KDbEscapedString& statement)
 {
     Q_UNUSED(statement);
     return true;
@@ -100,7 +98,7 @@ bool MysqlPreparedStatement::prepare(const EscapedString& statement)
         m_mysqlBind[arg].is_null = &dummyNull; \
         m_mysqlBind[arg].length = &str_length; }
 
-bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int arg)
+bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, int arg)
 {
     if (value.isNull()) {
         // no value to bind or the value is null: bind NULL
@@ -121,18 +119,18 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
     }
 
     switch (field->type()) {
-    case Predicate::Field::Byte:
-    case Predicate::Field::ShortInteger:
-    case Predicate::Field::Integer: {
+    case KDbField::Byte:
+    case KDbField::ShortInteger:
+    case KDbField::Integer: {
         //! @todo what about unsigned > INT_MAX ?
         bool ok;
         const int intValue = value.toInt(&ok);
         if (ok) {
-            if (field->type() == Predicate::Field::Byte)
+            if (field->type() == KDbField::Byte)
                 m_mysqlBind[arg].buffer_type = MYSQL_TYPE_TINY;
-            else if (field->type() == Predicate::Field::ShortInteger)
+            else if (field->type() == KDbField::ShortInteger)
                 m_mysqlBind[arg].buffer_type = MYSQL_TYPE_SHORT;
-            else if (field->type() == Predicate::Field::Integer)
+            else if (field->type() == KDbField::Integer)
                 m_mysqlBind[arg].buffer_type = MYSQL_TYPE_LONG;
 
             m_mysqlBind[arg].is_null = (my_bool*)0;
@@ -147,15 +145,15 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
             BIND_NULL;
         break;
     }
-    case Predicate::Field::Float:
-    case Predicate::Field::Double:
+    case KDbField::Float:
+    case KDbField::Double:
         res = sqlite3_bind_double(prepared_st_handle, arg, value.toDouble());
         if (SQLITE_OK != res) {
             //! @todo msg?
             return false;
         }
         break;
-    case Predicate::Field::BigInteger: {
+    case KDbField::BigInteger: {
         //! @todo what about unsigned > LLONG_MAX ?
         bool ok;
         qint64 int64Value = value.toLongLong(&ok);
@@ -174,7 +172,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
         }
         break;
     }
-    case Predicate::Field::Boolean:
+    case KDbField::Boolean:
         res = sqlite3_bind_text(prepared_st_handle, arg,
                                 QString::number(value.toBool() ? 1 : 0).toLatin1(),
                                 1, SQLITE_TRANSIENT /*??*/);
@@ -183,7 +181,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
             return false;
         }
         break;
-    case Predicate::Field::Time:
+    case KDbField::Time:
         res = sqlite3_bind_text(prepared_st_handle, arg,
                                 value.toTime().toString(Qt::ISODate).toLatin1(),
                                 sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -192,7 +190,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
             return false;
         }
         break;
-    case Predicate::Field::Date:
+    case KDbField::Date:
         res = sqlite3_bind_text(prepared_st_handle, arg,
                                 value.toDate().toString(Qt::ISODate).toLatin1(),
                                 sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/);
@@ -201,7 +199,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
             return false;
         }
         break;
-    case Predicate::Field::DateTime:
+    case KDbField::DateTime:
         res = sqlite3_bind_text(prepared_st_handle, arg,
                                 value.toDateTime().toString(Qt::ISODate).toLatin1(),
                                 sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/);
@@ -210,7 +208,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
             return false;
         }
         break;
-    case Predicate::Field::BLOB: {
+    case KDbField::BLOB: {
         const QByteArray byteArray(value.toByteArray());
         res = sqlite3_bind_blob(prepared_st_handle, arg,
                                 (const char*)byteArray, byteArray.size(), SQLITE_TRANSIENT /*??*/);
@@ -221,7 +219,7 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
         break;
     }
     default:
-        PreWarn << "unsupported field type:"
+        KDbWarn << "unsupported field type:"
             << field->type() << "- NULL value bound to column #" << arg;
         res = sqlite3_bind_null(prepared_st_handle, arg);
         if (SQLITE_OK != res) {
@@ -234,10 +232,10 @@ bool MysqlPreparedStatement::bindValue(Field *field, const QVariant& value, int 
 #endif
 
 bool MysqlPreparedStatement::execute(
-    PreparedStatement::Type type,
-    const Field::List& selectFieldList,
-    FieldList& insertFieldList,
-    const PreparedStatementParameters& parameters)
+    KDbPreparedStatement::Type type,
+    const KDbField::List& selectFieldList,
+    KDbFieldList& insertFieldList,
+    const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(selectFieldList);
 #ifdef PREDICATE_USE_MYSQL_STMT
@@ -245,7 +243,7 @@ bool MysqlPreparedStatement::execute(
         return false;
     if (mysql_stmt_errno(m_statement) == CR_SERVER_LOST) {
         //sanity: connection lost: reconnect
-//! @todo Predicate::Connection should be reconnected as well!
+//! @todo KDbConnection should be reconnected as well!
         done();
         if (!init()) {
             done();
@@ -269,7 +267,7 @@ bool MysqlPreparedStatement::execute(
 
     //for INSERT, we're iterating over inserting values
     //for SELECT, we're iterating over WHERE conditions
-    Field::List *fieldList = 0;
+    KDbField::List *fieldList = 0;
     if (m_type == SelectStatement)
         fieldList = m_whereFields;
     else if (m_type == InsertStatement)
@@ -277,7 +275,7 @@ bool MysqlPreparedStatement::execute(
     else
         assert(0); //impl. error
 
-    Field::ListIterator itFields(fieldList->constBegin());
+    KDbField::ListIterator itFields(fieldList->constBegin());
     for (QList<QVariant>::ConstIterator it(parameters.constBegin());
             itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, par++) {
         if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))
@@ -299,9 +297,9 @@ bool MysqlPreparedStatement::execute(
     }
 #else
     m_resetRequired = true;
-    if (type == PreparedStatement::InsertStatement) {
+    if (type == KDbPreparedStatement::InsertStatement) {
         const int missingValues = insertFieldList.fieldCount() - parameters.count();
-        PreparedStatementParameters myParameters(parameters);
+        KDbPreparedStatementParameters myParameters(parameters);
         if (missingValues > 0) {
     //! @todo can be more efficient
             for (int i = 0; i < missingValues; i++) {

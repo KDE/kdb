@@ -20,11 +20,9 @@
 // ** bits of SQLiteConnection related to table altering **
 
 #include "SqliteConnection.h"
-#include <Predicate/Utils>
+#include "KDb.h"
 #include <Predicate/Tools/Static>
 #include <QHash>
-
-using namespace Predicate;
 
 enum SQLiteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
     NoAffinity = 0, IntAffinity = 1, TextAffinity = 2, BLOBAffinity = 3
@@ -33,39 +31,39 @@ enum SQLiteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinit
 //! @internal
 struct SQLiteTypeAffinityInternal {
     SQLiteTypeAffinityInternal() {
-        affinity.insert(Field::Byte, IntAffinity);
-        affinity.insert(Field::ShortInteger, IntAffinity);
-        affinity.insert(Field::Integer, IntAffinity);
-        affinity.insert(Field::BigInteger, IntAffinity);
-        affinity.insert(Field::Boolean, IntAffinity);
-        affinity.insert(Field::Date, TextAffinity);
-        affinity.insert(Field::DateTime, TextAffinity);
-        affinity.insert(Field::Time, TextAffinity);
-        affinity.insert(Field::Float, IntAffinity);
-        affinity.insert(Field::Double, IntAffinity);
-        affinity.insert(Field::Text, TextAffinity);
-        affinity.insert(Field::LongText, TextAffinity);
-        affinity.insert(Field::BLOB, BLOBAffinity);
+        affinity.insert(KDbField::Byte, IntAffinity);
+        affinity.insert(KDbField::ShortInteger, IntAffinity);
+        affinity.insert(KDbField::Integer, IntAffinity);
+        affinity.insert(KDbField::BigInteger, IntAffinity);
+        affinity.insert(KDbField::Boolean, IntAffinity);
+        affinity.insert(KDbField::Date, TextAffinity);
+        affinity.insert(KDbField::DateTime, TextAffinity);
+        affinity.insert(KDbField::Time, TextAffinity);
+        affinity.insert(KDbField::Float, IntAffinity);
+        affinity.insert(KDbField::Double, IntAffinity);
+        affinity.insert(KDbField::Text, TextAffinity);
+        affinity.insert(KDbField::LongText, TextAffinity);
+        affinity.insert(KDbField::BLOB, BLOBAffinity);
     }
-    QHash<Field::Type, SQLiteTypeAffinity> affinity;
+    QHash<KDbField::Type, SQLiteTypeAffinity> affinity;
 };
 
-PREDICATE_GLOBAL_STATIC(SQLiteTypeAffinityInternal, Predicate_SQLite_affinityForType)
+Q_GLOBAL_STATIC(SQLiteTypeAffinityInternal, KDb_SQLite_affinityForType)
 
 //! @return SQLite type affinity for @a type
 //! See doc/dev/alter_table_type_conversions.ods, page 2 for more info
-static SQLiteTypeAffinity affinityForType(Field::Type type)
+static SQLiteTypeAffinity affinityForType(KDbField::Type type)
 {
-    return Predicate_SQLite_affinityForType->affinity[type];
+    return KDb_SQLite_affinityForType->affinity[type];
 }
 
-tristate SQLiteConnection::drv_changeFieldProperty(TableSchema *table, Field *field,
+tristate SQLiteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbField *field,
         const QString& propertyName, const QVariant& value)
 {
     if (propertyName == QLatin1String("type")) {
         bool ok;
-        Field::Type type = Predicate::intToFieldType(value.toUInt(&ok));
-        if (!ok || Field::InvalidType == type) {
+        KDbField::Type type = KDb::intToFieldType(value.toUInt(&ok));
+        if (!ok || KDbField::InvalidType == type) {
             //! @todo msg
             return false;
         }
@@ -96,11 +94,11 @@ tristate SQLiteConnection::drv_changeFieldProperty(TableSchema *table, Field *fi
 
  See alter_table_type_conversions.ods for details.
 */
-tristate SQLiteConnection::changeFieldType(TableSchema *table, Field *field,
-        Field::Type type)
+tristate SQLiteConnection::changeFieldType(KDbTableSchema *table, KDbField *field,
+        KDbField::Type type)
 {
     Q_UNUSED(table);
-    const Field::Type oldType = field->type();
+    const KDbField::Type oldType = field->type();
     const SQLiteTypeAffinity oldAffinity = affinityForType(oldType);
     const SQLiteTypeAffinity newAffinity = affinityForType(type);
     if (oldAffinity != newAffinity) {

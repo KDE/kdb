@@ -20,16 +20,13 @@
 #ifndef MYSQLPREPAREDSTATEMENT_H
 #define MYSQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface>
+#include <Predicate/Interfaces/KDbPreparedStatementInterface>
 #include "MysqlConnection_p.h"
 
-//! @todo 1.1 - unfinished: #define PREDICATE_USE_MYSQL_STMT; for 1.0 we're using unoptimized version
-
-namespace Predicate
-{
+//! @todo 1.1 - unfinished: #define KDB_USE_MYSQL_STMT; for 1.0 we're using unoptimized version
 
 /*! Implementation of prepared statements for MySQL driver. */
-class MysqlPreparedStatement : public PreparedStatementInterface, public MysqlConnectionInternal
+class MysqlPreparedStatement : public KDbPreparedStatementInterface, public MysqlConnectionInternal
 {
 public:
     explicit MysqlPreparedStatement(ConnectionInternal* conn);
@@ -37,25 +34,25 @@ public:
     virtual ~MysqlPreparedStatement();
 
 protected:
-    virtual bool prepare(const EscapedString& statement);
+    virtual bool prepare(const KDbEscapedString& statement);
 
     virtual bool execute(
-        PreparedStatement::Type type,
-        const Field::List& selectFieldList,
-        FieldList& insertFieldList,
-        const PreparedStatementParameters& parameters);
+        KDbPreparedStatement::Type type,
+        const KDbField::List& selectFieldList,
+        KDbFieldList& insertFieldList,
+        const KDbPreparedStatementParameters& parameters);
 
     bool init();
     void done();
 
 #ifdef PREDICATE_USE_MYSQL_STMT
-    bool bindValue(Field *field, const QVariant& value, int arg);
+    bool bindValue(KDbField *field, const QVariant& value, int arg);
     int m_realParamCount;
     MYSQL_STMT *m_statement;
     MYSQL_BIND *m_mysqlBind;
 #endif
-    EscapedString m_tempStatementString;
+    KDbEscapedString m_tempStatementString;
     bool m_resetRequired;
 };
-}
+
 #endif

@@ -26,8 +26,6 @@
 
 #include "MysqlDriver.h"
 
-namespace Predicate
-{
 const char* MysqlDriver::keywords[] = {
     "ACTION",
     "ADD",
@@ -355,4 +353,3 @@ const char* MysqlDriver::keywords[] = {
     "ZEROFILL",
     0
 };
-}

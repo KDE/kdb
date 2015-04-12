@@ -17,22 +17,22 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITEADMIN_H
-#define PREDICATE_SQLITEADMIN_H
+#ifndef KDB_SQLITEADMIN_H
+#define KDB_SQLITEADMIN_H
 
 #include "SqliteGlobal.h"
-#include <Predicate/Admin>
+#include "KDbAdmin.h"
 
 //! @short An interface containing a set of tools for SQLite database administration.
-class SQLiteAdminTools : public Predicate::AdminTools
+class SQLiteAdminTools : public KDbAdminTools
 {
 public:
     SQLiteAdminTools();
     virtual ~SQLiteAdminTools();
 
-#ifdef PREDICATE_SQLITE_VACUUM
+#ifdef KDB_SQLITE_VACUUM
     /*! Performs vacuum (compacting) for connection @a conn. */
-    virtual bool vacuum(const Predicate::ConnectionData& data, const QString& databaseName);
+    virtual bool vacuum(const KDbConnectionData& data, const QString& databaseName);
 #endif
 };
 

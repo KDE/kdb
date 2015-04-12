@@ -20,22 +20,19 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef _SYBASECURSOR_H_
 #define _SYBASECURSOR_H_
 
-#include <Predicate/Cursor>
-#include <Predicate/Connection>
-
-namespace Predicate
-{
+#include "KDbCursor.h"
+#include "KDbConnection.h"
 
 class SybaseCursorData;
 
-class SybaseCursor: public Cursor
+class SybaseCursor: public KDbCursor
 {
 public:
-    SybaseCursor(Connection* conn, const EscapedString& statement,
+    SybaseCursor(KDbConnection* conn, const KDbEscapedString& statement,
                  uint cursor_options = NoOptions);
-    SybaseCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
+    SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~SybaseCursor();
-    virtual bool drv_open(const EscapedString& sql);
+    virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
 //   virtual bool drv_moveFirst();
     virtual void drv_getNextRecord();
@@ -48,10 +45,10 @@ public:
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
     virtual const char** recordData() const;
-    virtual bool drv_storeCurrentRecord(RecordData* data) const;
-//   virtual bool save(RecordData& data, RowEditBuffer& buf);
+    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
+//   virtual bool save(KDbRecordData& data, RowEditBuffer& buf);
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
 protected:
@@ -59,7 +56,5 @@ protected:
 
     SybaseCursorData *d;
 };
-
-}
 
 #endif

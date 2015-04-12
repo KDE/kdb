@@ -18,30 +18,27 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_POSTGRESQLCURSOR_H
-#define PREDICATE_DRIVER_POSTGRESQLCURSOR_H
+#ifndef KDB_DRIVER_POSTGRESQLCURSOR_H
+#define KDB_DRIVER_POSTGRESQLCURSOR_H
 
-#include <Predicate/Cursor>
-#include <Predicate/Connection>
-#include <Predicate/Utils>
-
-namespace Predicate
-{
+#include "KDbCursor.h"
+#include "KDbConnection.h"
+#include "KDb.h"
 
 class PostgresqlCursorData;
 
-class PostgresqlCursor: public Cursor
+class PostgresqlCursor: public KDbCursor
 {
 public:
-    explicit PostgresqlCursor(Connection* conn, const EscapedString& statement,
+    explicit PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& statement,
                               uint options = NoOptions);
-    PostgresqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
+    PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~PostgresqlCursor();
 
     virtual QVariant value(uint pos);
     virtual const char** recordData() const;
-    virtual bool drv_storeCurrentRecord(RecordData* data) const;
-    virtual bool drv_open(const EscapedString& sql);
+    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
+    virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     virtual void drv_appendCurrentRecordToBuffer();
@@ -57,7 +54,5 @@ private:
 
     PostgresqlCursorData *d;
 };
-
-}
 
 #endif // PREDICATE_DRIVER_POSTGRESQLCURSOR_H

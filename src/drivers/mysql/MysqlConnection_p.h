@@ -17,10 +17,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_MYSQLCLIENT_P_H
-#define PREDICATE_MYSQLCLIENT_P_H
+#ifndef KDB_MYSQLCLIENT_P_H
+#define KDB_MYSQLCLIENT_P_H
 
-#include <Predicate/Private/Connection>
+#include <Predicate/Private/KDbConnection>
 
 #ifdef Q_WS_WIN
 #include <my_Global.h>
@@ -37,13 +37,7 @@ typedef struct st_mysql MYSQL;
 #define NAMESPACE Predicate
 #endif
 
-namespace Predicate
-{
 class ConnectionData;
-}
-
-namespace NAMESPACE
-{
 
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
@@ -54,7 +48,7 @@ namespace NAMESPACE
 class MysqlConnectionInternal : public ConnectionInternal
 {
 public:
-    explicit MysqlConnectionInternal(Connection* connection);
+    explicit MysqlConnectionInternal(KDbConnection* connection);
     virtual ~MysqlConnectionInternal();
 
     //! Connects to a MySQL database
@@ -67,7 +61,7 @@ public:
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const EscapedString& statement);
+    bool executeSQL(const KDbEscapedString& statement);
 
     //! Stores last operation's result
     virtual void storeResult();
@@ -88,7 +82,7 @@ public:
 class MysqlCursorData : public MysqlConnectionInternal
 {
 public:
-    explicit MysqlCursorData(Connection* connection);
+    explicit MysqlCursorData(KDbConnection* connection);
     virtual ~MysqlCursorData();
 
     MYSQL_RES *mysqlres;
@@ -96,7 +90,5 @@ public:
     unsigned long *lengths;
     qint64 numRows;
 };
-
-}
 
 #endif

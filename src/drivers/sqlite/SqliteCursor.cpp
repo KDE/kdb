@@ -22,9 +22,9 @@
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 
-#include <Predicate/Error>
-#include <Predicate/Driver>
-#include <Predicate/Tools/Utils>
+#include "KDbError.h"
+#include "KDbDriver.h"
+#include "KDbUtils.h"
 
 #include <assert.h>
 #include <string.h>
@@ -37,8 +37,6 @@
 #include <QDateTime>
 #include <QByteArray>
 
-using namespace Predicate;
-
 //! safer interpretations of boolean values for SQLite
 static bool sqliteStringToBool(const QString& s)
 {
@@ -48,10 +46,10 @@ static bool sqliteStringToBool(const QString& s)
 
 //----------------------------------------------------
 
-class Predicate::SQLiteCursorData : public SQLiteConnectionInternal
+class KDbSQLiteCursorData : public SQLiteConnectionInternal
 {
 public:
-    explicit SQLiteCursorData(Connection* conn)
+    explicit SQLiteCursorData(KDbConnection* conn)
             :
             SQLiteConnectionInternal(conn)
             , prepared_st_handle(0)
@@ -84,7 +82,7 @@ public:
     uint cols_pointers_mem_size; //!< size of record's array of pointers to values
     QVector<const char**> records; //!< buffer data
 
-    inline QVariant getValue(Field *f, int i) {
+    inline QVariant getValue(KDbField *f, int i) {
         int type = sqlite3_column_type(prepared_st_handle, i);
         if (type == SQLITE_NULL) {
             return QVariant();
@@ -95,17 +93,17 @@ public:
                 return GET_sqlite3_column_text;
             else {
                 switch (f->type()) {
-                case Field::Date:
+                case KDbField::Date:
                     return QDate::fromString(GET_sqlite3_column_text, Qt::ISODate);
-                case Field::Time:
+                case KDbField::Time:
                     //QDateTime - a hack needed because QVariant(QTime) has broken isNull()
-                    return Utils::stringToHackedQTime(GET_sqlite3_column_text);
-                case Field::DateTime: {
+                    return KDbUtils::stringToHackedQTime(GET_sqlite3_column_text);
+                case KDbField::DateTime: {
                     QString tmp(GET_sqlite3_column_text);
                     tmp[10] = 'T'; //for ISODate compatibility
                     return QDateTime::fromString(tmp, Qt::ISODate);
                 }
-                case Field::Boolean:
+                case KDbField::Boolean:
                     return sqliteStringToBool(GET_sqlite3_column_text);
                 default:
                     return QVariant(); //!< @todo
@@ -113,13 +111,13 @@ public:
             }
         } else if (type == SQLITE_INTEGER) {
             switch (f->type()) {
-            case Field::Byte:
-            case Field::ShortInteger:
-            case Field::Integer:
+            case KDbField::Byte:
+            case KDbField::ShortInteger:
+            case KDbField::Integer:
                 return QVariant(sqlite3_column_int(prepared_st_handle, i));
-            case Field::BigInteger:
+            case KDbField::BigInteger:
                 return QVariant((qint64)sqlite3_column_int64(prepared_st_handle, i));
-            case Field::Boolean:
+            case KDbField::Boolean:
                 return sqlite3_column_int(prepared_st_handle, i) != 0;
             default:;
             }
@@ -135,7 +133,7 @@ public:
             else
                 return QVariant(); //!< @todo
         } else if (type == SQLITE_BLOB) {
-            if (f && f->type() == Field::BLOB) {
+            if (f && f->type() == KDbField::BLOB) {
 //! @todo efficient enough?
                 return QByteArray((const char*)sqlite3_column_blob(prepared_st_handle, i),
                                   sqlite3_column_bytes(prepared_st_handle, i));
@@ -146,15 +144,15 @@ public:
     }
 };
 
-SQLiteCursor::SQLiteCursor(Connection* conn, const EscapedString& statement, uint options)
-        : Cursor(conn, statement, options)
+SQLiteCursor::SQLiteCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options)
+        : KDbCursor(conn, statement, options)
         , d(new SQLiteCursorData(conn))
 {
     d->data = static_cast<SQLiteConnection*>(conn)->d->data;
 }
 
-SQLiteCursor::SQLiteCursor(Connection* conn, QuerySchema* query, uint options)
-        : Cursor(conn, query, options)
+SQLiteCursor::SQLiteCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+        : KDbCursor(conn, query, options)
         , d(new SQLiteCursorData(conn))
 {
     d->data = static_cast<SQLiteConnection*>(conn)->d->data;
@@ -166,7 +164,7 @@ SQLiteCursor::~SQLiteCursor()
     delete d;
 }
 
-bool SQLiteCursor::drv_open(const EscapedString& sql)
+bool SQLiteCursor::drv_open(const KDbEscapedString& sql)
 {
     //! @todo decode
     if (! d->data) {
@@ -308,7 +306,7 @@ const char ** SQLiteCursor::recordData() const
     return d->curr_coldata;
 }
 
-bool SQLiteCursor::drv_storeCurrentRecord(RecordData* data) const
+bool SQLiteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
     if (!m_fieldsExpanded) {//simple version: without types
         for (uint i = 0; i < m_fieldCount; i++) {
@@ -325,7 +323,7 @@ bool SQLiteCursor::drv_storeCurrentRecord(RecordData* data) const
             //ERR!
             break;
         }
-        Field *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
+        KDbField *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
 //  PreDrvDbg << "col=" << (col ? *col : 0);
         (*data)[i] = d->getValue(f, i);
     }
@@ -337,7 +335,7 @@ QVariant SQLiteCursor::value(uint i)
     if (i > (m_fieldCount - 1)) //range checking
         return QVariant();
 //! @todo allow disable range checking! - performance reasons
-    Predicate::Field *f = (m_fieldsExpanded && i < (uint)m_fieldsExpanded->count())
+    KDbField *f = (m_fieldsExpanded && i < (uint)m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(i)->field : 0;
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }

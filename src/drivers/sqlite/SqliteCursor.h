@@ -17,23 +17,20 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITECURSOR_H
-#define PREDICATE_SQLITECURSOR_H
+#ifndef KDB_SQLITECURSOR_H
+#define KDB_SQLITECURSOR_H
 
 #include <QString>
 
-#include <Predicate/Cursor>
-#include <Predicate/Connection>
-
-namespace Predicate
-{
+#include "KDbCursor.h"
+#include "KDbConnection.h"
 
 class SQLiteCursorData;
 
 /*!
 
 */
-class SQLiteCursor : public Cursor
+class SQLiteCursor : public KDbCursor
 {
 public:
     virtual ~SQLiteCursor();
@@ -44,20 +41,20 @@ public:
     /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
     virtual const char ** recordData() const;
 
-    virtual bool drv_storeCurrentRecord(RecordData* data) const;
+    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
 protected:
-    /*! Cursor will operate on @a conn, raw @a statement will be used to execute query. */
-    SQLiteCursor(Connection* conn, const EscapedString& statement, uint options = NoOptions);
+    /*! KDbCursor will operate on @a conn, raw @a statement will be used to execute query. */
+    SQLiteCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options = NoOptions);
 
-    /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
-    SQLiteCursor(Connection* conn, QuerySchema* query,
+    /*! KDbCursor will operate on @a conn, @a query schema will be used to execute query. */
+    SQLiteCursor(KDbConnection* conn, KDbQuerySchema* query,
                  uint options = NoOptions);
 
-    virtual bool drv_open(const EscapedString& sql);
+    virtual bool drv_open(const KDbEscapedString& sql);
 
     virtual bool drv_close();
     virtual void drv_getNextRecord();
@@ -81,8 +78,4 @@ protected:
     friend class SQLiteConnection;
 };
 
-} //namespace Predicate
-
 #endif
-
-

@@ -3,12 +3,12 @@ add_feature_info(BUILD_SQLITE_DB_DRIVER TRUE ${BUILD_SQLITE_DB_DRIVER_DESC})
 # Generate SqliteGlobal.h
 configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h )
 
-simple_option(PREDICATE_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
+simple_option(KDB_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
 
-if (PREDICATE_SQLITE_VACUUM)
-  set(PREDICATE_SQLITE_DUMP_TOOL predicate_sqlite3_dump)
-  ADD_DEFINITIONS(-DPREDICATE_SQLITE_DUMP_TOOL=\"${PREDICATE_SQLITE_DUMP_TOOL}\")
-endif (PREDICATE_SQLITE_VACUUM)
+if (KDB_SQLITE_VACUUM)
+  set(KDB_SQLITE_DUMP_TOOL kdb_sqlite3_dump)
+  ADD_DEFINITIONS(-DKDB_SQLITE_DUMP_TOOL=\"${KDB_SQLITE_DUMP_TOOL}\")
+endif (KDB_SQLITE_VACUUM)
 
 # definitins used for the sqlite driver and the shell
 ADD_DEFINITIONS(
@@ -33,14 +33,14 @@ ADD_DEFINITIONS(
 )
 
 include_directories(
-  ${Predicate_SOURCE_DIR}
+  ${KDb_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   ${QT_INCLUDES}
 )
 
 ADD_DEFINITIONS(
-  -D__PREDICATE__=
-  -DPREDICATE_DRIVER_NAME="sqlite"
+  -D__KDB__=
+  -DKDB_DRIVER_NAME="sqlite"
 )
 
 if(MSVC)
@@ -53,7 +53,7 @@ endif(MSVC)
 
 ########### next target ###############
 
-set(predicate_sqlite_SRCS
+set(kdb_sqlite_SRCS
    SqliteConnection.cpp 
    SqliteDriver.cpp 
    SqliteCursor.cpp 
@@ -63,33 +63,33 @@ set(predicate_sqlite_SRCS
    SqliteAlter.cpp
 )
 
-set(predicate_sqlite_MOC_SRCS
+set(kdb_sqlite_MOC_SRCS
    SqliteDriver.h
 )
 
-if (PREDICATE_SQLITE_VACUUM)
-  list(APPEND predicate_sqlite_SRCS SqliteVacuum.cpp)
-  list(APPEND predicate_sqlite_MOC_SRCS SqliteVacuum.h)
-endif (PREDICATE_SQLITE_VACUUM)
+if (KDB_SQLITE_VACUUM)
+  list(APPEND kdb_sqlite_SRCS SqliteVacuum.cpp)
+  list(APPEND kdb_sqlite_MOC_SRCS SqliteVacuum.h)
+endif (KDB_SQLITE_VACUUM)
 
-qt_wrap_cpp(predicate_sqlite predicate_sqlite_SRCS ${predicate_sqlite_MOC_SRCS})
+qt_wrap_cpp(kdb_sqlite kdb_sqlite_SRCS ${kdb_sqlite_MOC_SRCS})
 
-add_library(predicate_sqlite SHARED ${predicate_sqlite_SRCS})
+add_library(kdb_sqlite SHARED ${kdb_sqlite_SRCS})
 
-target_link_libraries(predicate_sqlite ${SQLITE_LIBRARIES} predicate)
+target_link_libraries(kdb_sqlite ${SQLITE_LIBRARIES} kdb)
 if(DEFINED CMAKE_DL_LIBS)
-  target_link_libraries(predicate_sqlite ${CMAKE_DL_LIBS})
+  target_link_libraries(kdb_sqlite ${CMAKE_DL_LIBS})
 endif(DEFINED CMAKE_DL_LIBS)
 if(DEFINED CMAKE_THREAD_LIBS)
-  target_link_libraries(predicate_sqlite ${CMAKE_THREAD_LIBS})
+  target_link_libraries(kdb_sqlite ${CMAKE_THREAD_LIBS})
 endif(DEFINED CMAKE_THREAD_LIBS)
-set_target_properties(predicate_sqlite PROPERTIES PREFIX "")
+set_target_properties(kdb_sqlite PROPERTIES PREFIX "")
 
-install(TARGETS predicate_sqlite DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_sqlite.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS kdb_sqlite DESTINATION ${KDB_PLUGINS_DIR})
+install(FILES kdb_sqlite.desktop DESTINATION ${KDB_PLUGINS_DIR})
 
 add_subdirectory(icu)
 
-if (PREDICATE_SQLITE_VACUUM)
+if (KDB_SQLITE_VACUUM)
   add_subdirectory(dump)
-endif (PREDICATE_SQLITE_VACUUM)
+endif (KDB_SQLITE_VACUUM)

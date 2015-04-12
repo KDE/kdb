@@ -18,14 +18,12 @@
 */
 
 #include "SqlitePreparedStatement.h"
-#include <Predicate/PreparedStatement>
+#include "KDbPreparedStatement.h"
 
 #include <QtDebug>
 
-using namespace Predicate;
-
 SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal* conn)
-        : PreparedStatementInterface()
+        : KDbPreparedStatementInterface()
         , SQLiteConnectionInternal(conn->connection)
         , m_handle(0)
 {
@@ -39,7 +37,7 @@ SQLitePreparedStatement::~SQLitePreparedStatement()
     m_handle = 0;
 }
 
-bool SQLitePreparedStatement::prepare(const EscapedString& statement)
+bool SQLitePreparedStatement::prepare(const KDbEscapedString& statement)
 {
     m_result.setServerResultCode(
         sqlite3_prepare(
@@ -54,7 +52,7 @@ bool SQLitePreparedStatement::prepare(const EscapedString& statement)
     return m_result.serverResultCode() == SQLITE_OK;
 }
 
-bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int par)
+bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, int par)
 {
     if (value.isNull()) {
         //no value to bind or the value is null: bind NULL
@@ -79,9 +77,9 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
     }
 
     switch (field->type()) {
-    case Field::Byte:
-    case Field::ShortInteger:
-    case Field::Integer: {
+    case KDbField::Byte:
+    case KDbField::ShortInteger:
+    case KDbField::Integer: {
         //! @todo what about unsigned > INT_MAX ?
         bool ok;
         const int intValue = value.toInt(&ok);
@@ -100,15 +98,15 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         }
         break;
     }
-    case Field::Float:
-    case Field::Double:
+    case KDbField::Float:
+    case KDbField::Double:
         m_result.setServerResultCode(sqlite3_bind_double(m_handle, par, value.toDouble()));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
         }
         break;
-    case Field::BigInteger: {
+    case KDbField::BigInteger: {
         //! @todo what about unsigned > LLONG_MAX ?
         bool ok;
         const qint64 int64Value = value.toLongLong(&ok);
@@ -127,7 +125,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         }
         break;
     }
-    case Field::Boolean:
+    case KDbField::Boolean:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par, value.toBool() ? "1" : "0",
                               1, SQLITE_TRANSIENT /*??*/));
@@ -136,7 +134,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
             return false;
         }
         break;
-    case Field::Time:
+    case KDbField::Time:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
                               value.toTime().toString(Qt::ISODate).toLatin1(),
@@ -146,7 +144,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
             return false;
         }
         break;
-    case Field::Date:
+    case KDbField::Date:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
                               value.toDate().toString(Qt::ISODate).toLatin1(),
@@ -156,7 +154,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
             return false;
         }
         break;
-    case Field::DateTime:
+    case KDbField::DateTime:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
                               value.toDateTime().toString(Qt::ISODate).toLatin1(),
@@ -166,7 +164,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
             return false;
         }
         break;
-    case Field::BLOB: {
+    case KDbField::BLOB: {
         const QByteArray byteArray(value.toByteArray());
         m_result.setServerResultCode(
             sqlite3_bind_blob(m_handle, par,
@@ -178,7 +176,7 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
         break;
     }
     default:
-        PreWarn << "unsupported field type:"
+        KDbWarn << "unsupported field type:"
             << field->type() << "- NULL value bound to column #" << par;
         m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
         if (SQLITE_OK != m_result.serverResultCode()) {
@@ -190,17 +188,17 @@ bool SQLitePreparedStatement::bindValue(Field *field, const QVariant& value, int
 }
 
 bool SQLitePreparedStatement::execute(
-    PreparedStatement::Type type,
-    const Field::List& selectFieldList,
-    FieldList& insertFieldList,
-    const PreparedStatementParameters& parameters)
+    KDbPreparedStatement::Type type,
+    const KDbField::List& selectFieldList,
+    KDbFieldList& insertFieldList,
+    const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(insertFieldList);
     if (!m_handle)
         return false;
 
     int par = 1; // par.index counted from 1
-    Field::ListIterator itFields(selectFieldList.constBegin());
+    KDbField::ListIterator itFields(selectFieldList.constBegin());
     for (QList<QVariant>::ConstIterator it = parameters.constBegin();
          itFields != selectFieldList.constEnd();
          it += (it == parameters.constEnd() ? 0 : 1), ++itFields, par++)
@@ -212,10 +210,10 @@ bool SQLitePreparedStatement::execute(
     //real execution
     sqlite3_step(m_handle);
     m_result.setServerResultCode(sqlite3_reset(m_handle));
-    if (type == PreparedStatement::InsertStatement && SQLITE_OK == m_result.serverResultCode()) {
+    if (type == KDbPreparedStatement::InsertStatement && SQLITE_OK == m_result.serverResultCode()) {
         return true;
     }
-    if (type == PreparedStatement::SelectStatement) {
+    if (type == KDbPreparedStatement::SelectStatement) {
         //fetch result
         //! @todo
     }

@@ -22,9 +22,7 @@
 #include "PostgresqlConnection.h"
 #include <QtDebug>
 
-using namespace Predicate;
-
-PostgresqlConnectionInternal::PostgresqlConnectionInternal(Connection *conn)
+PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *conn)
         : ConnectionInternal(conn)
         , conn(0)
         , unicode(true) // will be set in PostgresqlConnection::drv_useDatabase()
@@ -54,7 +52,7 @@ void PostgresqlConnectionInternal::storeResult()
     }*/
 }
 
-bool PostgresqlConnectionInternal::executeSQL(const EscapedString& statement, ExecStatusType expectedStatus)
+bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& statement, ExecStatusType expectedStatus)
 {
     if (res) { // for sanity
         PQclear(res);
@@ -75,7 +73,7 @@ bool PostgresqlConnectionInternal::executeSQL(const EscapedString& statement, Ex
 
 //--------------------------------------
 
-PostgresqlCursorData::PostgresqlCursorData(Connection* connection)
+PostgresqlCursorData::PostgresqlCursorData(KDbConnection* connection)
         : PostgresqlConnectionInternal(connection)
 {
     conn = static_cast<PostgresqlConnection*>(connection)->d->conn;

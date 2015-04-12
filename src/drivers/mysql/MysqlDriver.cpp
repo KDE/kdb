@@ -21,9 +21,9 @@
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include <Predicate/Field>
-#include <Predicate/Private/Driver>
-#include <Predicate/Utils>
+#include "KDbField.h"
+#include "KDbDriver_p.h"
+#include "KDb.h"
 
 #include <QVariant>
 #include <QFile>
@@ -33,8 +33,6 @@
 #include <mysql.h>
 #define BOOL bool
 
-using namespace Predicate;
-
 EXPORT_PREDICATE_DRIVER(MysqlDriver, mysql)
 
 /*! @todo Implement buffered/unbuffered cursor, rather than buffer everything.
@@ -43,7 +41,7 @@ EXPORT_PREDICATE_DRIVER(MysqlDriver, mysql)
  */
 
 MysqlDriver::MysqlDriver()
-    : Driver()
+    : KDbDriver()
 {
     d->features = IgnoreTransactions | CursorForward;
 
@@ -64,27 +62,27 @@ MysqlDriver::MysqlDriver()
 //OK? d->properties["client_library_version"] = mysql_get_client_version();
 #endif
 
-    d->typeNames[Field::Byte] = QLatin1String("TINYINT");
-    d->typeNames[Field::ShortInteger] = QLatin1String("SMALLINT");
-    d->typeNames[Field::Integer] = QLatin1String("INT");
-    d->typeNames[Field::BigInteger] = QLatin1String("BIGINT");
+    d->typeNames[KDbField::Byte] = QLatin1String("TINYINT");
+    d->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
+    d->typeNames[KDbField::Integer] = QLatin1String("INT");
+    d->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
     // Can use BOOLEAN here, but BOOL has been in MySQL longer
-    d->typeNames[Field::Boolean] = QLatin1String("BOOL");
-    d->typeNames[Field::Date] = QLatin1String("DATE");
-    d->typeNames[Field::DateTime] = QLatin1String("DATETIME");
-    d->typeNames[Field::Time] = QLatin1String("TIME");
-    d->typeNames[Field::Float] = QLatin1String("FLOAT");
-    d->typeNames[Field::Double] = QLatin1String("DOUBLE");
-    d->typeNames[Field::Text] = QLatin1String("VARCHAR");
-    d->typeNames[Field::LongText] = QLatin1String("LONGTEXT");
-    d->typeNames[Field::BLOB] = QLatin1String("BLOB");
+    d->typeNames[KDbField::Boolean] = QLatin1String("BOOL");
+    d->typeNames[KDbField::Date] = QLatin1String("DATE");
+    d->typeNames[KDbField::DateTime] = QLatin1String("DATETIME");
+    d->typeNames[KDbField::Time] = QLatin1String("TIME");
+    d->typeNames[KDbField::Float] = QLatin1String("FLOAT");
+    d->typeNames[KDbField::Double] = QLatin1String("DOUBLE");
+    d->typeNames[KDbField::Text] = QLatin1String("VARCHAR");
+    d->typeNames[KDbField::LongText] = QLatin1String("LONGTEXT");
+    d->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
 }
 
 MysqlDriver::~MysqlDriver()
 {
 }
 
-Predicate::Connection*
+KDbConnection*
 MysqlDriver::drv_createConnection(const ConnectionData& connData)
 {
     return new MysqlConnection(this, connData);
@@ -102,7 +100,7 @@ bool MysqlDriver::drv_isSystemFieldName(const QString&) const
     return false;
 }
 
-EscapedString MysqlDriver::escapeString(const QString& str) const
+KDbEscapedString MysqlDriver::escapeString(const QString& str) const
 {
     //escape as in http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 //! @todo support more characters, like %, _
@@ -115,11 +113,11 @@ EscapedString MysqlDriver::escapeString(const QString& str) const
             break;
     }
     if (i >= old_length) { //no characters to escape
-        return EscapedString("'") + EscapedString(str) + '\'';
+        return KDbEscapedString("'") + KDbEscapedString(str) + '\'';
     }
 
     QChar *new_string = new QChar[ old_length * 3 + 1 ]; // a worst case approximation
-//! @todo move new_string to Driver::m_new_string or so...
+//! @todo move new_string to KDbDriver::m_new_string or so...
     int new_length = 0;
     new_string[new_length++] = QLatin1Char('\''); //prepend '
     for (i = 0; i < old_length; i++, new_length++) {
@@ -156,22 +154,22 @@ EscapedString MysqlDriver::escapeString(const QString& str) const
     }
 
     new_string[new_length++] = QLatin1Char('\''); //append '
-    EscapedString result(QString(new_string, new_length));
+    KDbEscapedString result(QString(new_string, new_length));
     delete [] new_string;
     return result;
 }
 
-EscapedString MysqlDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString MysqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscape0xHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscape0xHex));
 }
 
-EscapedString MysqlDriver::escapeString(const QByteArray& str) const
+KDbEscapedString MysqlDriver::escapeString(const QByteArray& str) const
 {
 //! @todo optimize using mysql_real_escape_string()?
 //! see http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 
-    return EscapedString("'") + EscapedString(str)
+    return KDbEscapedString("'") + KDbEscapedString(str)
            .replace('\\', "\\\\")
            .replace('\'', "\\''")
            .replace('"', "\\\"")

@@ -20,13 +20,10 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef SYBASEDB_H
 #define SYBASEDB_H
 
-#include <Predicate/Driver>
-
-namespace Predicate
-{
+#include "KDbDriver.h"
 
 //! Sybase database driver.
-class SybaseDriver : public Driver
+class SybaseDriver : public KDbDriver
 {
     Q_OBJECT
     PREDICATE_DRIVER
@@ -34,7 +31,7 @@ class SybaseDriver : public Driver
 public:
     /*!
      * Constructor sets database features and
-     * maps the types in KexiDB::Field::Type to the Sybase types.
+     * maps the types in KexiDB::KDbField::Type to the Sybase types.
      */
     SybaseDriver();
 
@@ -43,22 +40,21 @@ public:
     virtual bool isSystemDatabaseName(const QString &n) const;
 
     //! Escape a string for use as a value
-    virtual EscapedString escapeString(const QString& str) const;
-    virtual EscapedString escapeString(const QByteArray& str) const;
+    virtual KDbEscapedString escapeString(const QString& str) const;
+    virtual KDbEscapedString escapeString(const QByteArray& str) const;
 
     //! Escape BLOB value \a array
-    virtual EscapedString escapeBLOB(const QByteArray& array) const;
+    virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
 
 protected:
     virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual Connection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n) const;
-    virtual EscapedString addLimitTo1(const QString& sql, bool add);
+    virtual KDbEscapedString addLimitTo1(const QString& sql, bool add);
 
 private:
     static const char *keywords[];
 };
-}
 
 #endif

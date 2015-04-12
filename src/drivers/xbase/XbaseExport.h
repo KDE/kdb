@@ -20,7 +20,7 @@
 #ifndef XBASE_EXPORT_H
 #define XBASE_EXPORT_H
 
-#include <Predicate/TableSchema>
+#include "KDbTableSchema.h"
 
 namespace Kexi {
   class ObjectStatus;
@@ -30,12 +30,10 @@ namespace KexiMigration {
   class Data;
 }
 
-namespace Predicate {
-
 class xBaseConnectionInternal;
 class xBaseExportPrivate;
 
-class xBaseExport : public Predicate::Object 
+class xBaseExport : public KDbObject
 {
   public:
     
@@ -55,11 +53,11 @@ class xBaseExport : public Predicate::Object
     bool dest_disconnect();
 
     //! Create a table in the destination database
-    bool dest_createTable(const QString& originalName, Predicate::TableSchema* tableSchema);
+    bool dest_createTable(const QString& originalName, KDbTableSchema* tableSchema);
 
     //! Copy table data from source to destination
-    bool dest_copyTable(const QString& srcTableName, Predicate::Connection *srcConn, 
-      Predicate::TableSchema* srcTable);
+    bool dest_copyTable(const QString& srcTableName, KDbConnection *srcConn,
+      KDbTableSchema* srcTable);
 
     //! Checks whether objectName is a system object name
     bool dest_isSystemObjectName(const QString& objectName);
@@ -69,9 +67,7 @@ class xBaseExport : public Predicate::Object
   private:
     xBaseExportPrivate* d;
 
-  friend class Predicate::xBaseConnectionInternal;
+  friend class KDbxBaseConnectionInternal;
 };
-
-}
 
 #endif // 

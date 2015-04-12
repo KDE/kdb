@@ -20,10 +20,10 @@
 
 #include "PostgresqlDriver.h"
 
-#include <Predicate/Connection>
-#include <Predicate/DriverManager>
-#include <Predicate/Private/Driver>
-#include <Predicate/Utils>
+#include "KDbConnection.h"
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
+#include "KDb.h"
 
 #include "PostgresqlConnection.h"
 
@@ -33,14 +33,12 @@
 
 #include <QtDebug>
 
-using namespace Predicate;
-
 EXPORT_PREDICATE_DRIVER(PostgresqlDriver, postgresql)
 
 //==================================================================================
 //
 PostgresqlDriver::PostgresqlDriver()
-        : Driver()
+        : KDbDriver()
 {
     d->features = SingleTransactions | CursorForward | CursorBackward;
 //! @todo enable this when kexidb supports multiple: d->features = MultipleTransactions | CursorForward | CursorBackward;
@@ -69,19 +67,19 @@ PostgresqlDriver::PostgresqlDriver()
     //! @todo pgsql default_server_encoding
     d->properties["default_server_encoding"] = QString();
 
-    d->typeNames[Field::Byte] = QLatin1String("SMALLINT");
-    d->typeNames[Field::ShortInteger] = QLatin1String("SMALLINT");
-    d->typeNames[Field::Integer] = QLatin1String("INTEGER");
-    d->typeNames[Field::BigInteger] = QLatin1String("BIGINT");
-    d->typeNames[Field::Boolean] = QLatin1String("BOOLEAN");
-    d->typeNames[Field::Date] = QLatin1String("DATE");
-    d->typeNames[Field::DateTime] = QLatin1String("TIMESTAMP");
-    d->typeNames[Field::Time] = QLatin1String("TIME");
-    d->typeNames[Field::Float] = QLatin1String("REAL");
-    d->typeNames[Field::Double] = QLatin1String("DOUBLE PRECISION");
-    d->typeNames[Field::Text] = QLatin1String("CHARACTER VARYING");
-    d->typeNames[Field::LongText] = QLatin1String("TEXT");
-    d->typeNames[Field::BLOB] = QLatin1String("BYTEA");
+    d->typeNames[KDbField::Byte] = QLatin1String("SMALLINT");
+    d->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
+    d->typeNames[KDbField::Integer] = QLatin1String("INTEGER");
+    d->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
+    d->typeNames[KDbField::Boolean] = QLatin1String("BOOLEAN");
+    d->typeNames[KDbField::Date] = QLatin1String("DATE");
+    d->typeNames[KDbField::DateTime] = QLatin1String("TIMESTAMP");
+    d->typeNames[KDbField::Time] = QLatin1String("TIME");
+    d->typeNames[KDbField::Float] = QLatin1String("REAL");
+    d->typeNames[KDbField::Double] = QLatin1String("DOUBLE PRECISION");
+    d->typeNames[KDbField::Text] = QLatin1String("CHARACTER VARYING");
+    d->typeNames[KDbField::LongText] = QLatin1String("TEXT");
+    d->typeNames[KDbField::BLOB] = QLatin1String("BYTEA");
 }
 
 PostgresqlDriver::~PostgresqlDriver()
@@ -173,9 +171,9 @@ void PostgresqlDriver::initPgsqlToVariantMap()
 //Override the default implementation to allow for NUMERIC type natively
 QString PostgresqlDriver::sqlTypeName(int id_t, int p) const
 {
-    if (id_t == Field::Null)
+    if (id_t == KDbField::Null)
         return QLatin1String("NULL");
-    if (id_t == Field::Float || id_t == Field::Double) {
+    if (id_t == KDbField::Float || id_t == KDbField::Double) {
         if (p > 0) {
             return QLatin1String("NUMERIC");
         } else {
@@ -186,14 +184,14 @@ QString PostgresqlDriver::sqlTypeName(int id_t, int p) const
     }
 }
 
-Predicate::Connection* PostgresqlDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* PostgresqlDriver::drv_createConnection(const ConnectionData& connData)
 {
     return new PostgresqlConnection(this, connData);
 }
 
 bool PostgresqlDriver::isSystemObjectName(const QString& n) const
 {
-    return Driver::isSystemObjectName(n);
+    return KDbDriver::isSystemObjectName(n);
 }
 
 bool PostgresqlDriver::drv_isSystemFieldName(const QString&) const
@@ -208,22 +206,22 @@ bool PostgresqlDriver::isSystemDatabaseName(const QString& n) const
            || 0 == n.compare(QLatin1String("postgres"), Qt::CaseInsensitive);
 }
 
-EscapedString PostgresqlDriver::escapeString(const QString& str) const
+KDbEscapedString PostgresqlDriver::escapeString(const QString& str) const
 {
     //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
-    return EscapedString("E'")
-           + EscapedString(str).replace("\\", "\\\\").replace("'", "\\\'")
+    return KDbEscapedString("E'")
+           + KDbEscapedString(str).replace("\\", "\\\\").replace("'", "\\\'")
            + "'";
 };
 
-EscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
+KDbEscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
 {
     //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
     //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
-    return EscapedString("'")
+    return KDbEscapedString("'")
            + QByteArray(str).replace("\\", "\\\\").replace("'", "\\\'")
            + "'";
 }
@@ -238,7 +236,7 @@ QByteArray PostgresqlDriver::drv_escapeIdentifier(const QByteArray& str) const
     return QByteArray(str).replace('"', "\"\"");
 }
 
-EscapedString PostgresqlDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString PostgresqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return EscapedString(Predicate::escapeBLOB(array, Predicate::BLOBEscapeOctal));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDbBLOBEscapeOctal));
 }

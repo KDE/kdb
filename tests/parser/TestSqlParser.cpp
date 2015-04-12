@@ -20,19 +20,17 @@
 #include "TestSqlParser.h"
 #include <QtTest/QtTest>
 
-#include <Predicate/DriverManager>
-#include <Predicate/parser/SqlParser.h>
+#include <KDbDriverManager>
+#include <KDbParser>
 
-using namespace Predicate;
-
-Q_DECLARE_METATYPE(Predicate::EscapedString)
+Q_DECLARE_METATYPE(KDbEscapedString)
 
 bool TestSqlParser::openDatabase(const QString &path)
 {
     QString driverName("sqlite");
-    DriverManager manager;
+    KDbDriverManager manager;
     qDebug() << manager.driverNames();
-    Driver *driver = manager.driver(driverName);
+    KDbDriver *driver = manager.driver(driverName);
     if (!driver || manager.result().isError()) {
         qDebug() << manager.result();
         return false;
@@ -76,26 +74,26 @@ void TestSqlParser::initTestCase()
 {
 }
 
-EscapedString TestSqlParser::parse(const EscapedString& statement, bool *ok)
+KDbEscapedString TestSqlParser::parse(const KDbEscapedString& statement, bool *ok)
 {
     Parser *parser = m_parser.data();
 
     *ok = parser->parse(statement);
     if (!*ok) {
         //qDebug() << parser->error();
-        return EscapedString();
+        return KDbEscapedString();
     }
 
-    QScopedPointer<Predicate::QuerySchema> q(parser->query());
+    QScopedPointer<KDbQuerySchema> q(parser->query());
     if (!q) {
         //qDebug() << parser->error();
         *ok = false;
-        return EscapedString();
+        return KDbEscapedString();
     }
     //qDebug() << *q.data();
 
     QList<QVariant> params;
-    EscapedString sql = m_conn->selectStatement(q.data(), params);
+    KDbEscapedString sql = m_conn->selectStatement(q.data(), params);
     //qDebug() << sql;
     *ok = true;
     return sql;
@@ -128,7 +126,7 @@ void TestSqlParser::testParse_data()
 {
     QTest::addColumn<QString>("fname");
     QTest::addColumn<int>("lineNum");
-    QTest::addColumn<EscapedString>("sql");
+    QTest::addColumn<KDbEscapedString>("sql");
     QTest::addColumn<bool>("expectError");
 
     QString dir(QFile::decodeName(FILES_DATA_DIR));
@@ -200,7 +198,7 @@ void TestSqlParser::testParse_data()
             }
         }
         else {
-            EscapedString sql(line.trimmed());
+            KDbEscapedString sql(line.trimmed());
             clearTestName = true;
             if (sql.isEmpty()) {
                 expectError = false;
@@ -223,14 +221,14 @@ void TestSqlParser::testParse()
 {
     QFETCH(QString, fname);
     QFETCH(int, lineNum);
-    QFETCH(EscapedString, sql);
+    QFETCH(KDbEscapedString, sql);
     QFETCH(bool, expectError);
 
     QVERIFY2(sql.endsWith(';'), QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum).toLatin1());
     sql.chop(1);
     //qDebug() << "SQL:" << sql.toString() << expectError;
     bool ok;
-    EscapedString result = parse(sql, &ok);
+    KDbEscapedString result = parse(sql, &ok);
     Parser *parser = m_parser.data();
 
     if (ok) {
@@ -246,7 +244,7 @@ void TestSqlParser::testParse()
         // failure, so error should be expected
         QVERIFY2(expectError, QString("Statement: \"%1\"; %2")
                  .arg(sql.toString())
-                 .arg(Predicate::Utils::debugString(parser->error())).toLatin1());
+                 .arg(KDbUtils::debugString(parser->error())).toLatin1());
         if (expectError) {
             qDebug() << parser->error();
         }

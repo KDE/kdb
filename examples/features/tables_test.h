@@ -33,23 +33,23 @@ int tablesTest()
     }
 
     conn->setAutoCommit(false);
-    Predicate::Transaction t = conn->beginTransaction();
+    KDbTransaction t = conn->beginTransaction();
     if (conn->result().isError()) {
         qDebug() << conn->result();
         return 1;
     }
 
     //now: lets create tables:
-    Predicate::Field *f;
-    Predicate::TableSchema *t_persons = new Predicate::TableSchema("persons");
+    KDbField *f;
+    KDbTableSchema *t_persons = new KDbTableSchema("persons");
     t_persons->setCaption("Persons in our factory");
-    t_persons->addField(f = new Predicate::Field("id", Predicate::Field::Integer, Predicate::Field::PrimaryKey | Predicate::Field::AutoInc, Predicate::Field::Unsigned));
+    t_persons->addField(f = new KDbField("id", KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
     f->setCaption("ID");
-    t_persons->addField(f = new Predicate::Field("age", Predicate::Field::Integer, 0, Predicate::Field::Unsigned));
+    t_persons->addField(f = new KDbField("age", KDbField::Integer, 0, KDbField::Unsigned));
     f->setCaption("Age");
-    t_persons->addField(f = new Predicate::Field("name", Predicate::Field::Text));
+    t_persons->addField(f = new KDbField("name", KDbField::Text));
     f->setCaption("Name");
-    t_persons->addField(f = new Predicate::Field("surname", Predicate::Field::Text));
+    t_persons->addField(f = new KDbField("surname", KDbField::Text));
     f->setCaption("Surname");
     if (!conn->createTable(t_persons)) {
         qDebug() << conn->result();
@@ -69,13 +69,13 @@ int tablesTest()
     qDebug() << "-- PERSONS data created --";
 
 
-    Predicate::TableSchema *t_cars = new Predicate::TableSchema("cars");
+    KDbTableSchema *t_cars = new KDbTableSchema("cars");
     t_cars->setCaption("Cars owned by persons");
-    t_cars->addField(f = new Predicate::Field("id", Predicate::Field::Integer, Predicate::Field::PrimaryKey | Predicate::Field::AutoInc, Predicate::Field::Unsigned));
+    t_cars->addField(f = new KDbField("id", KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
     f->setCaption("ID");
-    t_cars->addField(f = new Predicate::Field("owner", Predicate::Field::Integer, 0, Predicate::Field::Unsigned));
+    t_cars->addField(f = new KDbField("owner", KDbField::Integer, 0, KDbField::Unsigned));
     f->setCaption("Car owner");
-    t_cars->addField(f = new Predicate::Field("model", Predicate::Field::Text));
+    t_cars->addField(f = new KDbField("model", KDbField::Text));
     f->setCaption("Car model");
     if (!conn->createTable(t_cars)) {
         qDebug() << conn->result();

@@ -18,7 +18,7 @@
 */
 
 #include "TestIdentifier.h"
-#include <Predicate/Tools/Identifier>
+#include <KDbIdentifierValidator>
 #include <QTest>
 
 void TestIdentifier::initTestCase()
@@ -43,7 +43,7 @@ void TestIdentifier::testStringToIdentifier()
 {
     QFETCH(QString, string1);
     QFETCH(QString, string2);
-    QCOMPARE(Predicate::Utils::stringToIdentifier(string1), string2);
+    QCOMPARE(KDbUtils::stringToIdentifier(string1), string2);
 }
 
 void TestIdentifier::testIsIdentifier_data()
@@ -65,7 +65,7 @@ void TestIdentifier::testIsIdentifier()
 {
     QFETCH(QString, string);
     QFETCH(bool, result);
-    QCOMPARE(Predicate::Utils::isIdentifier(string), result);
+    QCOMPARE(KDbUtils::isIdentifier(string), result);
 }
 
 void TestIdentifier::cleanupTestCase()

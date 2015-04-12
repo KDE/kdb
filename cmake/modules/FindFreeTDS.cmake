@@ -8,8 +8,8 @@
 
 IF (FreeTDS_INCLUDE_DIR AND FreeTDS_LIBRARIES )
 
-	# Already in cache
-	SET(FREETDS_FOUND TRUE)
+       # Already in cache
+       SET(FREETDS_FOUND TRUE)
 
 ELSE (FreeTDS_INCLUDE_DIR AND FreeTDS_LIBRARIES)
 

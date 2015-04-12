@@ -19,7 +19,7 @@
 
 #include "SqliteVacuum.h"
 
-#include <Predicate/Utils>
+#include "KDb.h"
 
 #include <QtDebug>
 #include <QMessageBox>
@@ -79,7 +79,7 @@ tristate SQLiteVacuum::run()
         m_result = false;
         return m_result;
     }
-    const QString sqlite_app(Predicate::sqlite3ProgramPath());
+    const QString sqlite_app(KDb::sqlite3ProgramPath());
     PreDrvDbg << sqlite_app;
     if (sqlite_app.isEmpty()) {
         m_result = false;
@@ -137,7 +137,7 @@ tristate SQLiteVacuum::run()
     m_dlg->setLabelText(
         QLatin1String("<qt>") + tr("Compacting database \"%1\"...")
             .arg(QLatin1String("<nobr>")
-                 + QDir::convertSeparators(fi.fileName())
+                 + QDir::fromNativeSeparators(fi.fileName())
                  + QLatin1String("</nobr>"))
     );
     m_dlg->adjustSize();

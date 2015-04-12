@@ -17,14 +17,14 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITEVACUUM_H
-#define PREDICATE_SQLITEVACUUM_H
+#ifndef KDB_SQLITEVACUUM_H
+#define KDB_SQLITEVACUUM_H
 
 #include <QObject>
 #include <QString>
 #include <QProcess>
 
-#include <Predicate/Tools/Tristate>
+#include "KDbTristate.h"
 
 class QProgressDialog;
 

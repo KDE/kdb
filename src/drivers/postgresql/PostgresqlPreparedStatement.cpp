@@ -20,10 +20,9 @@
 
 #include "PostgresqlPreparedStatement.h"
 #include <QtDebug>
-using namespace Predicate;
 
 PostgresqlPreparedStatement::PostgresqlPreparedStatement(ConnectionInternal* conn)
-        : PreparedStatementInterface()
+        : KDbPreparedStatementInterface()
         , PostgresqlConnectionInternal(conn->connection)
 {
 }
@@ -33,22 +32,22 @@ PostgresqlPreparedStatement::~PostgresqlPreparedStatement()
 {
 }
 
-bool PostgresqlPreparedStatement::prepare(const EscapedString& statement)
+bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& statement)
 {
     Q_UNUSED(statement);
     return true;
 }
 
 bool PostgresqlPreparedStatement::execute(
-    PreparedStatement::Type type,
-    const Field::List& selectFieldList,
-    FieldList& insertFieldList,
-    const PreparedStatementParameters& parameters)
+    KDbPreparedStatement::Type type,
+    const KDbField::List& selectFieldList,
+    KDbFieldList& insertFieldList,
+    const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(selectFieldList);
-    if (type == PreparedStatement::InsertStatement) {
+    if (type == KDbPreparedStatement::InsertStatement) {
         const int missingValues = insertFieldList.fieldCount() - parameters.count();
-        PreparedStatementParameters myParameters(parameters);
+        KDbPreparedStatementParameters myParameters(parameters);
         if (missingValues > 0) {
     //! @todo can be more efficient
             for (int i = 0; i < missingValues; i++) {

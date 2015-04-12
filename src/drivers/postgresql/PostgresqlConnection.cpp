@@ -23,8 +23,8 @@
 
 #include "PostgresqlPreparedStatement.h"
 #include "PostgresqlCursor.h"
-#include <Predicate/Error>
-#include <Predicate/Global>
+#include "KDbError.h"
+#include "KDbGlobal.h"
 
 #include <QFileInfo>
 #include <QHostAddress>
@@ -33,10 +33,8 @@
 #define MIN_SERVER_VERSION_MAJOR 7
 #define MIN_SERVER_VERSION_MINOR 1
 
-using namespace Predicate;
-
-PostgresqlTransactionData::PostgresqlTransactionData(Connection *conn)
-        : TransactionData(conn)
+PostgresqlTransactionData::PostgresqlTransactionData(KDbConnection *conn)
+        : KDbTransactionData(conn)
 {
 }
 
@@ -46,8 +44,8 @@ PostgresqlTransactionData::~PostgresqlTransactionData()
 
 //==================================================================================
 
-PostgresqlConnection::PostgresqlConnection(Driver *driver, const ConnectionData& connData)
-        : Connection(driver, connData)
+PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const ConnectionData& connData)
+        : KDbConnection(driver, connData)
         , d(new PostgresqlConnectionInternal(this))
 {
 }
@@ -63,7 +61,7 @@ PostgresqlConnection::~PostgresqlConnection()
 
 //==================================================================================
 //Return a new query based on a query statment
-Cursor* PostgresqlConnection::prepareQuery(const EscapedString& statement,  uint cursor_options)
+KDbCursor* PostgresqlConnection::prepareQuery(const KDbEscapedString& statement,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new PostgresqlCursor(this, statement, 1); //Always used buffered cursor
@@ -71,7 +69,7 @@ Cursor* PostgresqlConnection::prepareQuery(const EscapedString& statement,  uint
 
 //==================================================================================
 //Return a new query based on a query object
-Cursor* PostgresqlConnection::prepareQuery(QuerySchema* query, uint cursor_options)
+KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new PostgresqlCursor(this, query, 1);//Always used buffered cursor
@@ -86,7 +84,7 @@ bool PostgresqlConnection::drv_connect()
     return true;
 }
 
-bool PostgresqlConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
+bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     // http://www.postgresql.org/docs/8.4/static/libpq-status.html
     qDebug() << "server_version:" << d->parameter("server_version");
@@ -123,14 +121,14 @@ bool PostgresqlConnection::drv_disconnect()
 //Return a list of database names
 bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 {
-    return queryStringList(EscapedString("SELECT datname FROM pg_database WHERE datallowconn = TRUE"), list);
+    return queryStringList(KDbEscapedString("SELECT datname FROM pg_database WHERE datallowconn = TRUE"), list);
 }
 
 //==================================================================================
 //Create a new database
 bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
-    return executeSQL(EscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
+    return executeSQL(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
 }
 
 QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
@@ -144,7 +142,7 @@ QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
 //==================================================================================
 //Use this as our connection instead of connect
 bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
-                                           MessageHandler* msgHandler)
+                                           KDbMessageHandler* msgHandler)
 {
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
@@ -237,7 +235,7 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     PreDrvDbg << dbName;
 
     //FIXME Maybe should check that dbname is no the currentdb
-    if (executeSQL(EscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
+    if (executeSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
         return true;
 
     return false;
@@ -245,7 +243,7 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 
 //==================================================================================
 //Execute an SQL statement
-bool PostgresqlConnection::drv_executeSQL(const EscapedString& statement)
+bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& statement)
 {
     return d->executeSQL(statement, PGRES_COMMAND_OK);
 }
@@ -268,13 +266,13 @@ quint64 PostgresqlConnection::drv_lastInsertRecordId()
 bool PostgresqlConnection::drv_containsTable(const QString &tableName)
 {
     bool success = false;
-    return resultExists(EscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
+    return resultExists(KDbEscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }
 
 bool PostgresqlConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList(EscapedString("SELECT lower(relname) FROM pg_class WHERE relkind='r'"), list);
+    return queryStringList(KDbEscapedString("SELECT lower(relname) FROM pg_class WHERE relkind='r'"), list);
 }
 
 QString PostgresqlConnection::serverResultName() const
@@ -285,12 +283,12 @@ QString PostgresqlConnection::serverResultName() const
     return QString();
 }
 
-PreparedStatementInterface* PostgresqlConnection::prepareStatementInternal()
+KDbPreparedStatementInterface* PostgresqlConnection::prepareStatementInternal()
 {
     return new PostgresqlPreparedStatement(d);
 }
 
-EscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
+KDbEscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
 {
     int error;
     d->escapingBuffer.resize(str.length() * 2 + 1);
@@ -301,14 +299,14 @@ EscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
 
     if (error != 0) {
         d->storeResult();
-        const_cast<Result&>(m_result) = Result(ERR_INVALID_ENCODING,
+        const_cast<KDbResult&>(m_result) = KDbResult(ERR_INVALID_ENCODING,
                           QObject::tr("Escaping string failed. Invalid multibyte encoding."));
-        return EscapedString();
+        return KDbEscapedString();
     }
-    return EscapedString("\'") + d->escapingBuffer + '\'';
+    return KDbEscapedString("\'") + d->escapingBuffer + '\'';
 }
 
-EscapedString PostgresqlConnection::escapeString(const QString& str) const
+KDbEscapedString PostgresqlConnection::escapeString(const QString& str) const
 {
     return escapeString(d->unicode ? str.toUtf8() : str.toLocal8Bit());
 }

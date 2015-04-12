@@ -1,6 +1,6 @@
 include_directories(
-  ${Predicate_SOURCE_DIR}
-  ${Predicate_BINARY_DIR}
+  ${KDb_SOURCE_DIR}
+  ${KDb_BINARY_DIR}
   ${QT_INCLUDES}
 )
 
@@ -11,12 +11,12 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicatefeaturestest_SRCS main.cpp )
+set(kdbfeaturestest_SRCS main.cpp )
 
-add_executable(predicatefeaturestest ${predicatefeaturestest_SRCS})
+add_executable(kdbfeaturestest ${kdbfeaturestest_SRCS})
 
 target_link_libraries(
-  predicatefeaturestest
+  kdbfeaturestest
   Qt5::Core
-  predicate
+  KDb
 )

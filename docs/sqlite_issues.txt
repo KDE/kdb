@@ -64,14 +64,14 @@ These checks should be made in Predicate SQLite driver. In fact for each driver 
 	in persons-cities relation. Modifying cities.id field, appropriate persons.city values in related 
 	records will be updated if there is cascade update enabled.
 	</Example>
-	IDEAS: 
-	A) Query result view (table view, forms, etc.) should allow editing fields from 
-		main (master) table of this query, so every field object Predicate::Field should have a method:
-		bool Predicate::Field::isWritable() to allow GUI check if editing is allowed. Look that given field object
+	IDEAS:
+	A) Query result view (table view, forms, etc.) should allow editing fields from
+		main (master) table of this query, so every field object KDbField should have a method:
+		bool KDbField::isWritable() to allow GUI check if editing is allowed. Look that given field object
 		should be allocated for given query independently from the same field allocated for table schema.
 		The first field object can disallow editing while the latter can allow editing (because it is 
 		component of regular table).
-	B) Also add method for QString Predicate::Field that returns i18n'd message about the reasons 
+	B) Also add method for QString KDbField that returns i18n'd message about the reasons
 		of disallowing for editing given field in a context of given query.
 
 

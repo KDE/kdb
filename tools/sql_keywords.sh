@@ -3,12 +3,12 @@
 # sql_keywords.sh
 #
 # Generate sets of driver-specific keywords.
-# This program generates files that can be used as part of Predicate drivers
+# This program generates files that can be used as part of KDb drivers
 # that list keywords specific to that driver, i.e. words that have to be
 # escaped if they are to be used as identifiers in the database.
 #
 # It extracts keywords from the lexer of the DB sources, deletes keywords that
-# are already going to be escaped because they are part of Predicate's SQL dialect,
+# are already going to be escaped because they are part of KDb's SQL dialect,
 # and writes the resulting keywords to a "char *keywords[]" construct in a .cpp 
 # file that can then be used in the driver.
 #
@@ -21,7 +21,7 @@
 # CHECK THE OUTPUT BEFORE INCLUDING IT IN A DRIVER!
 #
 # 2004 Martin Ellis <martin.ellis@kdemail.net>
-# 2011 Jarosław Staniek <staniek@kde.org> - adopted for Predicate
+# 2011 Jarosław Staniek <staniek@kde.org> - adopted for KDb
 
 set -e
 progname="sql_keywords.sh"
@@ -44,8 +44,7 @@ header () {
    Copyright (C) 2004 Jarosław Staniek <staniek@kde.org>
 
    This file has been automatically generated from
-   predicate/tools/$progname and
-   $inFile.
+   tools/$progname and $inFile.
 
    Please edit the $progname, not this file!
 
@@ -70,7 +69,6 @@ EOF1
   fi
   cat <<EOF2 >> "$outFile";
 
-namespace Predicate {
   ${array}[] = {
 EOF2
 }
@@ -100,7 +98,7 @@ EOF
 # sets:   keywords - array of keywords in the file
 readKeywords () {
   local filename="$1" 
-  local predicateSQL="$2"
+  local kdbSQL="$2"
   i=0
   while read keyword ; do
     keywords[$i]="$keyword"
@@ -109,15 +107,15 @@ readKeywords () {
 }
 
 # compareKeywords
-# reads: predicateSQL - 
+# reads: kdbSQL -
 #        driverSQL
-# sets:  keywords - driver keywords that are not keywords in Predicate
+# sets:  keywords - driver keywords that are not keywords in KDb
 compareKeywords () {
   numFound=0
   for(( i=0; i < ${#driverSQL[@]}; i++ )) ; do
     found="no"
-    for(( j=0; j < ${#predicateSQL[@]}; j++ )) ; do
-      if [ "${driverSQL[$i]}" == "${predicateSQL[$j]}" ] ; then
+    for(( j=0; j < ${#kdbSQL[@]}; j++ )) ; do
+      if [ "${driverSQL[$i]}" == "${kdbSQL[$j]}" ] ; then
         found="yes"
       fi
     done
@@ -130,21 +128,21 @@ compareKeywords () {
 
 
 # getDriverKeywords
-# params : predicate - 
-#          driver - 
+# params : kdb -
+#          driver -
 #          outFile -
 getDriverKeywords () {
-  local predicate="$1"
+  local kdb="$1"
   local driver="$2"
   local outFile="$3"
 
-  declare -a predicateSQL
+  declare -a kdbSQL
   declare -a driverSQL
 
   echo "Looking for driver-specific keywords in \"$driver\""
-  readKeywords $predicate
+  readKeywords $kdb
   for(( i=0; i < ${#keywords[@]}; i++ )) ; do
-    predicateSQL[$i]=${keywords[$i]}
+    kdbSQL[$i]=${keywords[$i]}
   done
   unset keywords
 
@@ -166,17 +164,17 @@ getDriverKeywords () {
 
 
 ################################################################################
-# Predicate lexer
+# KDb lexer
 
-checkPredicateKeywords () {
-  local scanner="../Predicate/parser/SqlScanner.l"
-  if [ ! -r predicate.all -o "$scanner" -nt "predicate.all" ] ; then
+checkKDbKeywords () {
+  local scanner="../src/parser/KDbSqlScanner.l"
+  if [ ! -r kdb.all -o "$scanner" -nt "kdb.all" ] ; then
     echo "Getting keywords"
     grep '^(\?"[a-zA-Z_0-9]' "$scanner" | \
        sed 's/(\?"\([^"]*\)"[^"]*/\1\n/g' | \
        awk '/^[a-zA-Z_0-9]+$/ {print $1;}' | 
-       sort | uniq > "predicate.all"
-    awk '/^[a-zA-Z_0-9]+$/ {print $1;}' predicate_keywords.txt >> "predicate.all"
+       sort | uniq > "kdb.all"
+    awk '/^[a-zA-Z_0-9]+$/ {print $1;}' kdb_keywords.txt >> "kdb.all"
   fi
 }
 
@@ -253,8 +251,8 @@ checkTarballs () {
     getSQLiteKeywords "$inFile" "$appVer.all"
   fi
   if [ "$appVer.all" -nt "$appVer.new" ] ; then
-    getDriverKeywords "predicate.all" "$appVer.all" "$appVer.new"
-    header "const char* ${appName}Driver::keywords" "${filePrefix}driver.h" "$inFile" "${filePrefix}keywords.cpp"
+    getDriverKeywords "kdb.all" "$appVer.all" "$appVer.new"
+    header "const char* const ${appName}Driver::keywords" "${filePrefix}driver.h" "$inFile" "${filePrefix}keywords.cpp"
     body   "$appVer.new" "${filePrefix}keywords.cpp"
     footer "${filePrefix}keywords.cpp"
   fi
@@ -273,8 +271,8 @@ checkTarballs () {
        fi
 
        if [ "$appVer.all" -nt "$appVer.new" ] ; then
-         getDriverKeywords "predicate.all" "$appVer.all" "$appVer.new"
-         header "const char* ${appName}Driver::keywords" "${filePrefix}driver.h" "$appVer/$pathInTar" "${filePrefix}keywords.cpp"
+         getDriverKeywords "kdb.all" "$appVer.all" "$appVer.new"
+         header "const char* const ${appName}Driver::keywords" "${filePrefix}driver.h" "$appVer/$pathInTar" "${filePrefix}keywords.cpp"
          body   "$appVer.new" "${filePrefix}keywords.cpp"
          footer "${filePrefix}keywords.cpp"
        fi
@@ -292,8 +290,8 @@ checkTarballs () {
        fi
 
        if [ "$appVer.all" -nt "$appVer.new" ] ; then
-         getDriverKeywords "predicate.all" "$appVer.all" "$appVer.new"
-         header "const char* ${appName}Driver::keywords" "${filePrefix}driver.h" "$appVer/$pathInTar" "${filePrefix}keywords.cpp"
+         getDriverKeywords "kdb.all" "$appVer.all" "$appVer.new"
+         header "const char* const ${appName}Driver::keywords" "${filePrefix}driver.h" "$appVer/$pathInTar" "${filePrefix}keywords.cpp"
          body   "$appVer.new" "${filePrefix}keywords.cpp"
          footer "${filePrefix}keywords.cpp"
        fi
@@ -306,11 +304,11 @@ checkTarballs () {
   done
 }
 
-checkPredicateKeywords
-src=`printf "Predicate/parser/SqlScanner.l\n"\
-"   and tools/predicate_keywords.txt"`
-header "const char* DriverPrivate::predicateSQLKeywords" "Driver_p.h" "$src" "keywords.cpp"
-body "predicate.all" "keywords.cpp"
+checkKDbKeywords
+src=`printf "src/parser/KDbSqlScanner.l\n"\
+"   and tools/kdb_keywords.txt"`
+header "const char* const DriverPrivate::kdbSQLKeywords" "Driver_p.h" "$src" "keywords.cpp"
+body "kdb.all" "keywords.cpp"
 footer "keywords.cpp"
 
 checkTarballs

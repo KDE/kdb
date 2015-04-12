@@ -22,11 +22,11 @@
 #include "SqliteAdmin.h"
 #include "SqliteVacuum.h"
 
-#include <Predicate/DriverManager>
-#include <Predicate/Private/Driver>
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
 
 SQLiteAdminTools::SQLiteAdminTools()
-        : Predicate::AdminTools()
+        : KDbAdminTools()
 {
 }
 
@@ -34,22 +34,22 @@ SQLiteAdminTools::~SQLiteAdminTools()
 {
 }
 
-#ifdef PREDICATE_SQLITE_VACUUM
-bool SQLiteAdminTools::vacuum(const Predicate::ConnectionData& data, const QString& databaseName)
+#ifdef KDB_SQLITE_VACUUM
+bool SQLiteAdminTools::vacuum(const KDbConnectionData& data, const QString& databaseName)
 {
     clearResult();
-    Predicate::DriverManager manager;
-    Predicate::Driver *drv = manager.driver(data.driverName());
-    QString title(QObject::tr("Could not compact database \"%1\".").arg(QDir::convertSeparators(databaseName)));
+    KDbDriverManager manager;
+    KDbDriver *drv = manager.driver(data.driverName());
+    QString title(QObject::tr("Could not compact database \"%1\".").arg(QDir::fromNativeSeparators(databaseName)));
     if (!drv) {
-        m_result = Predicate::Result(title);
+        m_result = KDbResult(title);
         return false;
     }
     QFileInfo file(databaseName);
-    SQLiteVacuum vacuum(QDir::convertSeparators(file.absoluteFilePath()));
+    SQLiteVacuum vacuum(QDir::fromNativeSeparators(file.absoluteFilePath()));
     tristate result = vacuum.run();
     if (false == result) {
-        m_result = Predicate::Result(title);
+        m_result = KDbResult(title);
         return false;
     } else { //success or cancelled
         return true;

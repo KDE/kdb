@@ -22,44 +22,41 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <qstringlist.h>
 
-#include <Predicate/Connection>
+#include "KDbConnection.h"
 #include "SybaseCursor.h"
-
-namespace Predicate
-{
 
 class SybaseConnectionInternal;
 
 /*! @short Provides database connection, allowing queries and data modification.
 */
-class SybaseConnection : public Connection
+class SybaseConnection : public KDbConnection
 {
 public:
     virtual ~SybaseConnection();
 
-    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
-    virtual PreparedStatement prepareStatement(PreparedStatement::StatementType type,
-            FieldList* fields);
+    virtual KDbPreparedStatement prepareStatement(KDbPreparedStatement::StatementType type,
+            KDbFieldList* fields);
 
 protected:
 
     /*! Used by driver */
-    SybaseConnection(Driver *driver, const ConnectionData& connData);
+    SybaseConnection(KDbDriver *driver, const ConnectionData& connData);
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
+    virtual bool drv_connect(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase(const QString &dbName = QString());
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 MessageHandler* msgHandler = 0);
+                                 KDbMessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const EscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 //    virtual void drv_clearServerResult();
 
@@ -68,18 +65,16 @@ protected:
 //TODO: move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
 
-    virtual bool drv_beforeInsert(const QString& table, FieldList* fields);
-    virtual bool drv_afterInsert(const QString& table, FieldList* fields);
+    virtual bool drv_beforeInsert(const QString& table, KDbFieldList* fields);
+    virtual bool drv_afterInsert(const QString& table, KDbFieldList* fields);
 
-    virtual bool drv_beforeUpdate(const QString& table, FieldList* fields);
-    virtual bool drv_afterUpdate(const QString& table, FieldList* fields);
+    virtual bool drv_beforeUpdate(const QString& table, KDbFieldList* fields);
+    virtual bool drv_afterUpdate(const QString& table, KDbFieldList* fields);
 
     SybaseConnectionInternal* d;
 
     friend class SybaseDriver;
     friend class SybaseCursor;
 };
-
-}
 
 #endif

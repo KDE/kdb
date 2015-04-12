@@ -4,27 +4,27 @@
 builddir=$PWD
 srcdir=`dirname $0`
 cd $srcdir
-flex -oSqlScanner.cpp SqlScanner.l
-bison -d SqlParser.y -Wall -fall -rall -t --report-file=$builddir/sqlparser.output
+flex -ogenerated/sqlscanner.cpp KDbSqlScanner.l
+bison -d KDbSqlParser.y -Wall -fall -rall -t --report-file=$builddir/KDbSqlParser.output
 
-echo '#ifndef _SQLPARSER_H_
-#define _SQLPARSER_H_
-#include <Predicate/Field.h>
-#include "Parser.h"
-#include "SqlTypes.h"
+echo '#ifndef KDBSQLPARSER_H
+#define KDBSQLPARSER_H
+#include "KDbField.h"
+#include "KDbParser.h"
+#include "KDbSqlTypes.h"
 
-bool parseData(Predicate::Parser *p, const char *data);
+bool parseData(KDbParser *p, const char *data);
 const char* tokenName(unsigned int offset);
-unsigned int maxToken();' > SqlParser.h
+unsigned int maxToken();' > generated/sqlparser.h
 
-cat SqlParser.tab.h >> SqlParser.h
-echo '#endif' >> SqlParser.h
-sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' SqlParser.h
+cat KDbSqlParser.tab.h >> generated/sqlparser.h
+echo '#endif' >> generated/sqlparser.h
+sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.h
 
-cat SqlParser.tab.c | sed -e "s/SqlParser\.tab\.c/SqlParser.cpp/g" > SqlParser.cpp
+cat KDbSqlParser.tab.c | sed -e "s/KDbSqlParser\.tab\.c/KDbSqlParser.cpp/g" > generated/sqlparser.cpp
 echo 'const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
-unsigned int maxToken() { return YYMAXUTOK; }' >> SqlParser.cpp
-sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' SqlParser.cpp
+unsigned int maxToken() { return YYMAXUTOK; }' >> generated/sqlparser.cpp
+sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.cpp
 
-./extract_tokens.sh > tokens.cpp
-rm -f SqlParser.tab.h SqlParser.tab.c
+./extract_tokens.sh > generated/tokens.cpp
+rm -f KDbSqlParser.tab.h KDbSqlParser.tab.c

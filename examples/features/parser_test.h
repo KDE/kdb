@@ -20,7 +20,7 @@
 #ifndef PARSER_TEST_H
 #define PARSER_TEST_H
 
-int parserTest(const Predicate::EscapedString &st, const QStringList &params)
+int parserTest(const KDbEscapedString &st, const QStringList &params)
 {
     int r = 0;
     if (!conn->useDatabase()) {
@@ -28,15 +28,15 @@ int parserTest(const Predicate::EscapedString &st, const QStringList &params)
         return 1;
     }
 
-    Predicate::Parser parser(conn);
+    KDbParser parser(conn);
 
     const bool ok = parser.parse(st);
-    Predicate::QuerySchema *q = parser.query();
+    KDbQuerySchema *q = parser.query();
     QList<QVariant> variantParams;
     foreach(const QString param, params)
     variantParams.append(param.toLocal8Bit());
     if (ok && q) {
-        cout << Predicate::Utils::debugString<Predicate::QuerySchema>(*q).toLatin1().constData() << '\n';
+        cout << KDbUtils::debugString<KDbQuerySchema>(*q).toLatin1().constData() << '\n';
         cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toByteArray().constData() << '\n';
     } else {
         qDebug() << parser.error();

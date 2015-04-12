@@ -26,8 +26,6 @@
 
 #include "PostgresqlDriver.h"
 
-namespace Predicate
-{
 const char* PostgresqlDriver::m_keywords[] = {
     "ABORT",
     "ABSOLUTE",
@@ -261,4 +259,3 @@ const char* PostgresqlDriver::m_keywords[] = {
     "ZONE",
     0
 };
-}

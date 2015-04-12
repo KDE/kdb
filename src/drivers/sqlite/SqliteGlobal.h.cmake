@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITEGLOBAL_H
-#define PREDICATE_SQLITEGLOBAL_H
+#ifndef KDB_SQLITEGLOBAL_H
+#define KDB_SQLITEGLOBAL_H
 
 //global SQLite driver's public definitions
 

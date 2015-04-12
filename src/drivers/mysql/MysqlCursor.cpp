@@ -21,25 +21,23 @@
 #include "MysqlCursor.h"
 #include "MysqlConnection.h"
 #include "MysqlConnection_p.h"
-#include <Predicate/Error>
-#include <Predicate/Utils>
+#include "KDbError.h"
+#include "KDb.h"
 
 #include <QtDebug>
 #include <limits.h>
 
 #define BOOL bool
 
-using namespace Predicate;
-
-MysqlCursor::MysqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint cursor_options)
-        : Cursor(conn, statement, cursor_options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, const KDbEscapedString& statement, uint cursor_options)
+        : KDbCursor(conn, statement, cursor_options)
         , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
 }
 
-MysqlCursor::MysqlCursor(Connection* conn, QuerySchema* query, uint options)
-        : Cursor(conn, query, options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+        : KDbCursor(conn, query, options)
         , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
@@ -51,7 +49,7 @@ MysqlCursor::~MysqlCursor()
     delete d;
 }
 
-bool MysqlCursor::drv_open(const EscapedString& sql)
+bool MysqlCursor::drv_open(const KDbEscapedString& sql)
 {
     if (mysql_real_query(d->mysql, sql.constData(), sql.length()) == 0) {
         if (mysql_errno(d->mysql) == 0) {
@@ -103,18 +101,18 @@ QVariant MysqlCursor::value(uint pos)
     if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
         return QVariant();
 
-    Predicate::Field *f = (m_fieldsExpanded && pos < (uint)m_fieldsExpanded->count())
+    KDbField *f = (m_fieldsExpanded && pos < (uint)m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 //! @todo js: use MYSQL_FIELD::type here!
 
-    return Predicate::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
+    return KDbcstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
 }
 
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
  */
-bool MysqlCursor::drv_storeCurrentRecord(RecordData* data) const
+bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
 // PreDrvDbg << "position is " << (long)m_at;
     if (d->numRows <= 0)
@@ -126,10 +124,10 @@ bool MysqlCursor::drv_storeCurrentRecord(RecordData* data) const
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
     const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
     for (uint i = 0; i < realCount; i++) {
-        Field *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
+        KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
-        (*data)[i] = Predicate::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
+        (*data)[i] = KDbcstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
     }
     return true;
 }

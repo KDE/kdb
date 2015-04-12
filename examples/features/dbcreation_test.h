@@ -38,20 +38,20 @@ int dbCreationTest()
         qDebug() << conn->result();
         return 1;
     }
-    /* Predicate::Cursor *cursor = conn->executeQuery( "select * from osoby", Predicate::Cursor::Buffered );
+    /* KDbCursor *cursor = conn->executeQuery( "select * from osoby", KDbCursor::Buffered );
       qDebug()<<"executeQuery() = "<<!!cursor;
       if (cursor) {
-        qDebug()<<"Cursor::moveLast() ---------------------";
-        qDebug()<<"-- Cursor::moveLast() == " << cursor->moveLast();
+        qDebug()<<"KDbCursor::moveLast() ---------------------";
+        qDebug()<<"-- KDbCursor::moveLast() == " << cursor->moveLast();
         cursor->moveLast();
-        qDebug()<<"Cursor::moveFirst() ---------------------";
-        qDebug()<<"-- Cursor::moveFirst() == " << cursor->moveFirst();
+        qDebug()<<"KDbCursor::moveFirst() ---------------------";
+        qDebug()<<"-- KDbCursor::moveFirst() == " << cursor->moveFirst();
     */
-    /*  qDebug()<<"Cursor::moveNext() == "<<cursor->moveNext();
-        qDebug()<<"Cursor::moveNext() == "<<cursor->moveNext();
-        qDebug()<<"Cursor::moveNext() == "<<cursor->moveNext();
-        qDebug()<<"Cursor::moveNext() == "<<cursor->moveNext();
-        qDebug()<<"Cursor::eof() == "<<cursor->eof();*/
+    /*  qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
+        qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
+        qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
+        qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
+        qDebug()<<"KDbCursor::eof() == "<<cursor->eof();*/
 //  conn->deleteCursor(cursor);
 // }
     return 0;

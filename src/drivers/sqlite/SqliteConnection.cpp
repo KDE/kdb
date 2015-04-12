@@ -24,10 +24,10 @@
 
 #include <sqlite3.h>
 
-#include <Predicate/Driver>
-#include <Predicate/Cursor>
-#include <Predicate/Error>
-#include <Predicate/Tools/Utils>
+#include "KDbDriver.h"
+#include "KDbCursor.h"
+#include "KDbError.h"
+#include "KDbUtils.h"
 
 #include <QFile>
 #include <QDir>
@@ -38,9 +38,7 @@
 #undef PreDrvDbg
 #define PreDrvDbg if (true); else qDebug()
 
-using namespace Predicate;
-
-SQLiteConnectionInternal::SQLiteConnectionInternal(Connection *connection)
+SQLiteConnectionInternal::SQLiteConnectionInternal(KDbConnection *connection)
         : ConnectionInternal(connection)
         , data(0)
         , data_owned(true)
@@ -116,8 +114,8 @@ void SQLiteConnectionInternal::setExtensionsLoadingEnabled(bool set)
 }
 
 /*! Used by driver */
-SQLiteConnection::SQLiteConnection(Driver *driver, const ConnectionData& connData)
-        : Connection(driver, connData)
+SQLiteConnection::SQLiteConnection(KDbDriver *driver, const ConnectionData& connData)
+        : KDbConnection(driver, connData)
         , d(new SQLiteConnectionInternal(this))
 {
 }
@@ -143,7 +141,7 @@ bool SQLiteConnection::drv_connect()
     return true;
 }
 
-bool SQLiteConnection::drv_getServerVersion(Predicate::ServerVersionInfo* version)
+bool SQLiteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     PreDrvDbg;
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
@@ -172,15 +170,15 @@ bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
 bool SQLiteConnection::drv_containsTable(const QString &tableName)
 {
     bool success = false;
-    return resultExists(EscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
+    return resultExists(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }
 
 bool SQLiteConnection::drv_getTablesList(QStringList* list)
 {
-    Predicate::Cursor *cursor;
-    if (!(cursor = executeQuery(EscapedString("SELECT name FROM sqlite_master WHERE type='table'")))) {
-        PreWarn << "!executeQuery()";
+    KDbCursor *cursor;
+    if (!(cursor = executeQuery(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table'")))) {
+        KDbWarn << "!executeQuery()";
         return false;
     }
     list->clear();
@@ -203,17 +201,17 @@ bool SQLiteConnection::drv_createDatabase(const QString &dbName)
 }
 
 bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
-                                       MessageHandler* msgHandler)
+                                       KDbMessageHandler* msgHandler)
 {
     Q_UNUSED(dbName);
     return drv_useDatabaseInternal(cancelled, msgHandler, false/*do not create if missing*/);
 }
 
 bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
-                                               MessageHandler* msgHandler, bool createIfMissing)
+                                               KDbMessageHandler* msgHandler, bool createIfMissing)
 {
-//! @todo add option (command line or in predicaterc?)
-//! @todo   int exclusiveFlag = Connection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
+//! @todo add option (command line or in kdbrc?)
+//! @todo   int exclusiveFlag = KDbConnection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
     int openFlags = 0;
     if (isReadOnly()) {
         openFlags |= SQLITE_OPEN_READONLY;
@@ -227,7 +225,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
 //! @todo add option
 //    int allowReadonly = 1;
-//    const bool wasReadOnly = Connection::isReadOnly();
+//    const bool wasReadOnly = KDbConnection::isReadOnly();
 
     m_result.setServerResultCode(
         sqlite3_open_v2(
@@ -246,15 +244,15 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
         // Works with 3.6.23. Earlier version just ignore this pragma.
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
-        if (!drv_executeSQL(EscapedString("PRAGMA secure_delete = on"))) {
+        if (!drv_executeSQL(KDbEscapedString("PRAGMA secure_delete = on"))) {
             drv_closeDatabaseSilently();
             return false;
         }
         // Load ICU extension for unicode collations
-        const QStringList libraryPaths(Predicate::libraryPaths());
+        const QStringList libraryPaths(KDb::libraryPaths());
         QString icuExtensionFilename;
         foreach (const QString& path, libraryPaths) {
-            icuExtensionFilename = path + QLatin1String("/predicate_sqlite3_icu" PREDICATE_SHARED_LIB_EXTENSION);
+            icuExtensionFilename = path + QLatin1String("/kdb_sqlite3_icu" KDB_SHARED_LIB_EXTENSION);
             if (QFileInfo(icuExtensionFilename).exists() && loadExtension(icuExtensionFilename)) {
                 break;
             }
@@ -264,7 +262,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
             return false;
         }
         // load ROOT collation for use as default collation
-        if (!drv_executeSQL(EscapedString("SELECT icu_load_collation('', '')"))) {
+        if (!drv_executeSQL(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -273,25 +271,25 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 //! @todo check exclusive status
     Q_UNUSED(cancelled);
     Q_UNUSED(msgHandler);
-//! @todo removed in predicate - reenable?
+//! @todo removed in kdb - reenable?
 /*
     if (d->res == SQLITE_OK && cancelled && !wasReadOnly && allowReadonly && isReadOnly()) {
         //opened as read only, ask
-        if (MessageHandler::Continue !=
+        if (KDbMessageHandler::Continue !=
                 askQuestion(
-                    MessageHandler::WarningContinueCancel,
+                    KDbMessageHandler::WarningContinueCancel,
                     futureTr("Do you want to open file \"%1\" as read-only?\n\n"
                         "The file is probably already open on this or another computer. "
                         "Could not gain exclusive access for writing the file.")
-                    .arg(QDir::convertSeparators(data()->databaseName())),
+                    .arg(QDir::fromNativeSeparators(data()->databaseName())),
                     futureTr("Opening As Read-Only"),
-                    MessageHandler::Continue,
-                    MessageHandler::GuiItem()
+                    KDbMessageHandler::Continue,
+                    KDbMessageHandler::KDbGuiItem()
                             .setProperty("text", futureTr("Open As Read-Only"))
                             .setProperty("icon", "document-open"),
-                    MessageHandler::GuiItem(),
+                    KDbMessageHandler::KDbGuiItem(),
                     "askBeforeOpeningFileReadOnly",
-                    MessageHandler::Notify,
+                    KDbMessageHandler::Notify,
                     msgHandler)
         {
             clearError();
@@ -318,7 +316,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
 void SQLiteConnection::drv_closeDatabaseSilently()
 {
-    Result result = d->connection->result(); // save
+    KDbResult result = d->connection->result(); // save
     drv_closeDatabase();
     d->setResult(result);
 }
@@ -348,31 +346,31 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     Q_UNUSED(dbName); // Each database is one single SQLite file.
     const QString filename = data().databaseName();
     if (QFile::exists(filename) && !QFile::remove(filename)) {
-        m_result = Result(ERR_ACCESS_RIGHTS,
+        m_result = KDbResult(ERR_ACCESS_RIGHTS,
                           QObject::tr("Could not remove file \"%1\". "
                              "Check the file's permissions and whether it is already "
                              "opened and locked by another application.")
-                   .arg(QDir::convertSeparators(filename)));
+                   .arg(QDir::fromNativeSeparators(filename)));
         return false;
     }
     return true;
 }
 
 //CursorData* SQLiteConnection::drv_createCursor( const QString& statement )
-Cursor* SQLiteConnection::prepareQuery(const EscapedString& statement, uint cursor_options)
+KDbCursor* SQLiteConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
 {
     return new SQLiteCursor(this, statement, cursor_options);
 }
 
-Cursor* SQLiteConnection::prepareQuery(QuerySchema* query, uint cursor_options)
+KDbCursor* SQLiteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
     return new SQLiteCursor(this, query, cursor_options);
 }
 
-bool SQLiteConnection::drv_executeSQL(const EscapedString& statement)
+bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& statement)
 {
-#ifdef PREDICATE_DEBUG_GUI
-    Predicate::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + statement.toString());
+#ifdef KDB_DEBUG_GUI
+    KDbdebugGUI(QLatin1String("ExecuteSQL (SQLite): ") + statement.toString());
 #endif
 
     char *errmsg_p = 0;
@@ -391,8 +389,8 @@ bool SQLiteConnection::drv_executeSQL(const EscapedString& statement)
     }
 
     storeResult();
-#ifdef PREDICATE_DEBUG_GUI
-    Predicate::debugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
+#ifdef KDB_DEBUG_GUI
+    KDbdebugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
     return m_result.serverResultCode() == SQLITE_OK;
 }
@@ -407,17 +405,17 @@ QString SQLiteConnection::serverResultName() const
     return SQLiteConnectionInternal::serverResultName(m_result.serverResultCode());
 }
 
-PreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
+KDbPreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
 {
     return new SQLitePreparedStatement(d);
 }
 
 bool SQLiteConnection::isReadOnly() const
 {
-    return Connection::isReadOnly();
+    return KDbConnection::isReadOnly();
 //! @todo port
     //return (d->data ? sqlite3_is_readonly(d->data) : false)
-    //       || Connection::isReadOnly();
+    //       || KDbConnection::isReadOnly();
 }
 
 bool SQLiteConnection::loadExtension(const QString& path)
@@ -431,7 +429,7 @@ bool SQLiteConnection::loadExtension(const QString& path)
     m_result.setServerResultCode(
         sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p));
     bool ok = SQLITE_OK == m_result.serverResultCode();
-    PreWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
+    KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
             << path << ":" << errmsg_p;
     if (errmsg_p) {
         clearResult();

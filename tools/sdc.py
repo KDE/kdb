@@ -101,14 +101,15 @@ def open_sdc():
             print inst
             sys.exit(1)
     outfile_sdc.write(warningHeader())
-    if not shared_class_options['namespace']:
-        syntax_error("Shared class option \"with_from_to_map\" needs \"namespace\" option")
     outfile_sdc.write("""#include "%s"
 #include <QVariant>
 
-using namespace %s;
+""" % get_file(out_fname))
 
-""" % (get_file(out_fname), shared_class_options['namespace']))
+    if shared_class_options['namespace']:
+        outfile_sdc.write("""using namespace %s;
+
+""" % shared_class_options['namespace'])
 
 """
     Inserts generated fromMap(), toMap() code into the output.

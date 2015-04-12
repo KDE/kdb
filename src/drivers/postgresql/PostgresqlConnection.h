@@ -23,55 +23,52 @@
 
 #include <QStringList>
 
-#include <Predicate/Connection>
-
-namespace Predicate
-{
+#include "KDbConnection.h"
 
 class PostgresqlConnectionInternal;
 
 //! @internal
-class PostgresqlTransactionData : public TransactionData
+class PostgresqlTransactionData : public KDbTransactionData
 {
 public:
-    explicit PostgresqlTransactionData(Connection *conn);
+    explicit PostgresqlTransactionData(KDbConnection *conn);
     ~PostgresqlTransactionData();
 };
 
-class PostgresqlConnection : public Connection
+class PostgresqlConnection : public KDbConnection
 {
 public:
     virtual ~PostgresqlConnection();
 
-    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
-    virtual PreparedStatementInterface* prepareStatementInternal();
+    virtual KDbPreparedStatementInterface* prepareStatementInternal();
 
     /*! Connection-specific string escaping.  */
-    virtual EscapedString escapeString(const QString& str) const;
-    virtual EscapedString escapeString(const QByteArray& str) const;
+    virtual KDbEscapedString escapeString(const QString& str) const;
+    virtual KDbEscapedString escapeString(const QByteArray& str) const;
 
 protected:
     /*! Used by driver */
-    PostgresqlConnection(Driver *driver, const ConnectionData& connData);
+    PostgresqlConnection(KDbDriver *driver, const ConnectionData& connData);
 
     virtual bool drv_isDatabaseUsed() const;
     virtual bool drv_connect();
-    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version);
+    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase(const QString &dbName = QString());
     //! Uses database. Note that if data().localSocketFileName() is not empty,
     //! only directory path is used for connecting; the local socket's filename stays ".s.PGSQL.5432".
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 MessageHandler* msgHandler = 0);
+                                 KDbMessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const EscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
 //! @todo move this somewhere to low level class (MIGRATION?)
@@ -85,5 +82,5 @@ protected:
     friend class PostgresqlCursorData;
     friend class PostgresqlTransactionData;
 };
-}
+
 #endif

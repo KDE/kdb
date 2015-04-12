@@ -24,45 +24,42 @@
 
 #include <QStringList>
 
-#include <Predicate/Connection>
+#include "KDbConnection.h"
 #include "MysqlCursor.h"
-
-namespace Predicate
-{
 
 class MysqlConnectionInternal;
 
 /*! @short Provides database connection, allowing queries and data modification.
 */
-class MysqlConnection : public Connection
+class MysqlConnection : public KDbConnection
 {
 public:
     virtual ~MysqlConnection();
 
-    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
-    virtual PreparedStatementInterface* prepareStatementInternal();
+    virtual KDbPreparedStatementInterface* prepareStatementInternal();
 
 protected:
     /*! Used by driver */
-    MysqlConnection(Driver *driver, const ConnectionData& connData);
+    MysqlConnection(KDbDriver *driver, const ConnectionData& connData);
 
     virtual bool drv_connect();
-    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version);
+    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     //! reimplemented using "SHOW DATABASES LIKE..." because MySQL stores db names in lower case.
     virtual bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true);
     virtual bool drv_createDatabase(const QString &dbName = QString());
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 MessageHandler* msgHandler = 0);
+                                 KDbMessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const EscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& statement);
     virtual quint64 drv_lastInsertRecordId();
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
 //! @todo move this somewhere to low level class (MIGRATION?)
@@ -75,7 +72,5 @@ protected:
     friend class MysqlDriver;
     friend class MysqlCursorData;
 };
-
-}
 
 #endif

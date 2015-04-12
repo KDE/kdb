@@ -18,18 +18,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_DRIVER_POSTGRESQLDRIVER_H
-#define PREDICATE_DRIVER_POSTGRESQLDRIVER_H
+#ifndef KDB_DRIVER_POSTGRESQLDRIVER_H
+#define KDB_DRIVER_POSTGRESQLDRIVER_H
 
-#include <Predicate/Driver>
+#include "KDbDriver.h"
 
-namespace Predicate
-{
-
-class Connection;
+class KDbConnection;
 
 //! PostgreSQL database driver.
-class PostgresqlDriver : public Driver
+class PostgresqlDriver : public KDbDriver
 {
     Q_OBJECT
     PREDICATE_DRIVER
@@ -44,12 +41,12 @@ public:
     virtual bool isSystemDatabaseName(const QString& n) const;
 
     //! Escape a string for use as a value
-    virtual EscapedString escapeString(const QString& str) const;
-    virtual EscapedString escapeString(const QByteArray& str) const;
+    virtual KDbEscapedString escapeString(const QString& str) const;
+    virtual KDbEscapedString escapeString(const QByteArray& str) const;
     virtual QString sqlTypeName(int id_t, int p = 0) const;
 
     //! Escape BLOB value @a array
-    virtual EscapedString escapeBLOB(const QByteArray& array) const;
+    virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
 
     //! @return QVariant type for PostgreSQL type @a pgsqlType.
     //! If type cannot be found QVariant::Invalid is returned. Used in cursors to speed up conversion.
@@ -60,7 +57,7 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual Connection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName(const QString& n)const;
 
 private:
@@ -69,7 +66,5 @@ private:
     static const char *m_keywords[];
     QMap<int, QVariant::Type> m_pgsqlToVariantTypes;
 };
-
-}
 
 #endif // PREDICATE_DRIVER_POSTGRESQLDRIVER_H

@@ -20,35 +20,32 @@
 #include "XbaseCursor.h"
 #include "XbaseConnection.h"
 
-#include <Predicate/Error>
-#include <Predicate/Utils>
+#include "KDbError.h"
+#include "KDb.h"
 
 #include <QtDebug>
 #include <limits.h>
 
-
-using namespace Predicate;
-
-class Predicate::xBaseCursorData {
+class KDbxBaseCursorData {
   public:
-    explicit xBaseCursorData(Predicate::Cursor* cursor = 0)
+    explicit xBaseCursorData(KDbCursor* cursor = 0)
       : internalCursor(cursor)
     {
     }
 
-    Predicate::Cursor* internalCursor;
+    KDbCursor* internalCursor;
 
 };
 
-xBaseCursor::xBaseCursor(Predicate::Connection* conn, Predicate::Cursor* internalCursor, const EscapedString& statement, uint cursor_options)
-  : Cursor(conn,statement,cursor_options)
+xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const KDbEscapedString& statement, uint cursor_options)
+  : KDbCursor(conn,statement,cursor_options)
   , d( new xBaseCursorData(internalCursor) )
 {
   init();
 }
 
-xBaseCursor::xBaseCursor(Connection* conn, Predicate::Cursor* internalCursor, QuerySchema* query, uint options)
-  : Cursor( conn, query, options )
+xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, uint options)
+  : KDbCursor( conn, query, options )
   , d( new xBaseCursorData(internalCursor) )
 {
   init();
@@ -68,7 +65,7 @@ void xBaseCursor::init() {
   setBuffered(false);
 }
 
-bool xBaseCursor::drv_open(const EscapedString& sql)
+bool xBaseCursor::drv_open(const KDbEscapedString& sql)
 {
 //	PreDrvDbg << m_sql;
   if (!d->internalCursor) {
@@ -82,7 +79,7 @@ bool xBaseCursor::drv_close() {
     return false;
   }
   m_opened = false;
-  Connection* internalConn = d->internalCursor->connection();
+  KDbConnection* internalConn = d->internalCursor->connection();
   internalConn->deleteCursor( d->internalCursor );
   return true;
 }
@@ -114,13 +111,13 @@ QVariant xBaseCursor::value(uint pos) {
 }
 
 
-bool xBaseCursor::drv_storeCurrentRecord(RecordData* data) const
+bool xBaseCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
   if (!d->internalCursor) {
     return false;
   }
 
-  RecordData* rData = d->internalCursor->storeCurrentRecord();
+  KDbRecordData* rData = d->internalCursor->storeCurrentRecord();
   if (!rData) {
     return false;
   }

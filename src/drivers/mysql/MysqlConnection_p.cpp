@@ -27,7 +27,7 @@
 #include "MysqlConnection_p.h"
 #include "MysqlConnection.h"
 
-#include <Predicate/ConnectionData>
+#include "KDbConnectionData.h"
 
 #ifdef MYSQLMIGRATE_H
 #define NAMESPACE KexiMigration
@@ -35,10 +35,8 @@
 #define NAMESPACE Predicate
 #endif
 
-using namespace NAMESPACE;
-
 /* ************************************************************************** */
-MysqlConnectionInternal::MysqlConnectionInternal(Connection* connection)
+MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : ConnectionInternal(connection)
         , mysql(0)
         , mysql_owned(true)
@@ -133,10 +131,10 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
-    if (!executeSQL(EscapedString("USE ") + escapeIdentifier(dbName))) {
+    if (!executeSQL(KDbEscapedString("USE ") + escapeIdentifier(dbName))) {
         return false;
     }
-    if (!executeSQL(EscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
+    if (!executeSQL(KDbEscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
         // needed to turn warnings about trimming string values into SQL errors
         return false;
     }
@@ -145,7 +143,7 @@ bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 
 /*! Executes the given SQL statement on the server.
  */
-bool MysqlConnectionInternal::executeSQL(const EscapedString& statement)
+bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
     if (mysql_real_query(mysql, statement.constData(), statement.length()) == 0)
         return true;
@@ -161,7 +159,7 @@ QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 
 //--------------------------------------
 
-MysqlCursorData::MysqlCursorData(Connection* connection)
+MysqlCursorData::MysqlCursorData(KDbConnection* connection)
         : MysqlConnectionInternal(connection)
         , mysqlres(0)
         , mysqlrow(0)

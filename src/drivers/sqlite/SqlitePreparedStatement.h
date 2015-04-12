@@ -17,18 +17,16 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SQLITEPREPAREDSTATEMENT_H
-#define PREDICATE_SQLITEPREPAREDSTATEMENT_H
+#ifndef KDB_SQLITEPREPAREDSTATEMENT_H
+#define KDB_SQLITEPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/PreparedStatementInterface>
+#include <Predicate/Interfaces/KDbPreparedStatementInterface>
 #include "SqliteConnection_p.h"
 
-namespace Predicate
-{
-class Field;
+class KDbField;
 
 /*! Implementation of prepared statements for the SQLite driver. */
-class SQLitePreparedStatement : public PreparedStatementInterface, public SQLiteConnectionInternal
+class SQLitePreparedStatement : public KDbPreparedStatementInterface, public SQLiteConnectionInternal
 {
 public:
     explicit SQLitePreparedStatement(ConnectionInternal* conn);
@@ -36,19 +34,17 @@ public:
     virtual ~SQLitePreparedStatement();
 
 protected:
-    virtual bool prepare(const EscapedString& statement);
+    virtual bool prepare(const KDbEscapedString& statement);
 
     virtual bool execute(
-        PreparedStatement::Type type,
-        const Field::List& selectFieldList,
-        FieldList& insertFieldList,
-        const PreparedStatementParameters& parameters);
+        KDbPreparedStatement::Type type,
+        const KDbField::List& selectFieldList,
+        KDbFieldList& insertFieldList,
+        const KDbPreparedStatementParameters& parameters);
 
-    bool bindValue(Field *field, const QVariant& value, int arg);
+    bool bindValue(KDbField *field, const QVariant& value, int arg);
 
     sqlite3_stmt *m_handle;
 };
-
-}
 
 #endif

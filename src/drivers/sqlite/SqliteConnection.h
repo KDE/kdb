@@ -17,39 +17,36 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_CONN_SQLITE_H
-#define PREDICATE_CONN_SQLITE_H
+#ifndef KDB_CONN_SQLITE_H
+#define KDB_CONN_SQLITE_H
 
 #include <QStringList>
 
-#include <Predicate/Connection>
-
-namespace Predicate
-{
+#include "KDbConnection.h"
 
 class SQLiteConnectionInternal;
-class Driver;
+class KDbDriver;
 
 //! SQLite-specific connection
-class SQLiteConnection : public Connection
+class SQLiteConnection : public KDbConnection
 {
 public:
     virtual ~SQLiteConnection();
 
-    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
-    virtual PreparedStatementInterface* prepareStatementInternal();
+    virtual KDbPreparedStatementInterface* prepareStatementInternal();
 
     /*! Reimplemented to provide real read-only flag of the connection */
     virtual bool isReadOnly() const;
 
 protected:
     /*! Used by driver */
-    SQLiteConnection(Driver *driver, const ConnectionData& connData);
+    SQLiteConnection(KDbDriver *driver, const ConnectionData& connData);
 
     virtual bool drv_connect();
-    virtual bool drv_getServerVersion(Predicate::ServerVersionInfo* version);
+    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
 
@@ -69,7 +66,7 @@ protected:
       it is defined during connection. If you pass it,
       database file name will be changed. */
     virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 MessageHandler* msgHandler = 0);
+                                 KDbMessageHandler* msgHandler = 0);
 
     virtual bool drv_closeDatabase();
 
@@ -78,25 +75,25 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString());
 
-    virtual bool drv_executeSQL(const EscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& statement);
 
     virtual quint64 drv_lastInsertRecordId();
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 
     void storeResult();
 
-    virtual tristate drv_changeFieldProperty(TableSchema* table, Field* field,
+    virtual tristate drv_changeFieldProperty(KDbTableSchema* table, KDbField* field,
             const QString& propertyName, const QVariant& value);
 
     //! for drv_changeFieldProperty()
-    tristate changeFieldType(TableSchema *table, Field *field, Field::Type type);
+    tristate changeFieldType(KDbTableSchema *table, KDbField *field, KDbField::Type type);
 
     SQLiteConnectionInternal* d;
 
 private:
-    bool drv_useDatabaseInternal(bool *cancelled, MessageHandler* msgHandler, bool createIfMissing);
+    bool drv_useDatabaseInternal(bool *cancelled, KDbMessageHandler* msgHandler, bool createIfMissing);
 
     //! Closes database without altering stored result number and message
     void drv_closeDatabaseSilently();
@@ -107,7 +104,5 @@ private:
     friend class SQLiteDriver;
     friend class SQLiteCursor;
 };
-
-}
 
 #endif

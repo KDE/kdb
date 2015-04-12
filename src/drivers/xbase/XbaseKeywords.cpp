@@ -29,7 +29,6 @@
 
 #include <xbaseDriver.h>
 
-namespace Predicate {
   const char* xBaseDriver::keywords[] = {
     "ABORT",
     "ATTACH",
@@ -58,4 +57,3 @@ namespace Predicate {
     "VIEW",
     0
   };
-}

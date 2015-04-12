@@ -20,11 +20,9 @@
 #include "SybasePreparedStatement.h"
 #include <QtDebug>
 
-using namespace Predicate;
-
 SybasePreparedStatement::SybasePreparedStatement(StatementType type, ConnectionInternal& conn,
-        FieldList& fields)
-        : Predicate::PreparedStatement(type, conn, fields)
+        KDbFieldList& fields)
+        : KDbPreparedStatement(type, conn, fields)
         , m_resetRequired(false)
         , m_conn(conn.connection)
 {

@@ -21,26 +21,23 @@
 #ifndef _MYSQLCURSOR_H_
 #define _MYSQLCURSOR_H_
 
-#include <Predicate/Cursor>
-#include <Predicate/Connection>
-
-namespace Predicate
-{
+#include "KDbCursor.h"
+#include "KDbConnection.h"
 
 class MysqlCursorData;
 
-class MysqlCursor: public Cursor
+class MysqlCursor: public KDbCursor
 {
 public:
-    MysqlCursor(Connection* conn, const EscapedString& statement,
+    MysqlCursor(KDbConnection* conn, const KDbEscapedString& statement,
                 uint cursor_options = NoOptions);
-    MysqlCursor(Connection* conn, QuerySchema* query, uint options = NoOptions);
+    MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~MysqlCursor();
 
     virtual QVariant value(uint pos);
     virtual const char** recordData() const;
-    virtual bool drv_storeCurrentRecord(RecordData* data) const;
-    virtual bool drv_open(const EscapedString& sql);
+    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
+    virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
     virtual void drv_appendCurrentRecordToBuffer();
@@ -52,7 +49,5 @@ private:
     QVariant pValue(uint pos) const;
     MysqlCursorData *d;
 };
-
-}
 
 #endif

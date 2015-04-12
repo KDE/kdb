@@ -17,12 +17,12 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef PREDICATE_SYBASECLIENT_P_H
-#define PREDICATE_SYBASECLIENT_P_H
+#ifndef KDB_SYBASECLIENT_P_H
+#define KDB_SYBASECLIENT_P_H
 
 #include <QMap>
 
-#include <Predicate/Private/Connection>
+#include <Predicate/Private/KDbConnection>
 
 //#include <config.h>
 #include <sqlfront.h>
@@ -35,28 +35,22 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #define NAMESPACE KexiDB
 #endif
 
-namespace Predicate
-{
 class ConnectionData;
-}
-
-namespace NAMESPACE
-{
 
 //! Internal Sybase connection data.
 /*! Provides a low-level API for accessing Sybase databases, that can
     be shared by any module that needs direct access to the underlying
     database.  Used by the Predicate and KexiMigration drivers.
  */
-class SybaseConnectionInternal : public Predicate::ConnectionInternal
+class SybaseConnectionInternal : public KDbConnectionInternal
 {
 
 public:
-    explicit SybaseConnectionInternal(Predicate::Connection* connection);
+    explicit SybaseConnectionInternal(KDbConnection* connection);
     virtual ~SybaseConnectionInternal();
 
     //! Connects to a Sybase database
-    bool db_connect(const Predicate::ConnectionData& data);
+    bool db_connect(const KDbConnectionData& data);
 
     //! Disconnects from the database
     bool db_disconnect();
@@ -65,7 +59,7 @@ public:
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const EscapedString& statement);
+    bool executeSQL(const KDbEscapedString& statement);
 
     //! Stores last operation's result
     virtual void storeResult();
@@ -77,7 +71,7 @@ public:
     void messageHandler(DBINT msgno, int msgstate, int severity, char* msgtext
                         , char* srvname, char* procname, int line);
 
-    // dbProcess-Connection map
+    // dbProcess-KDbConnection map
     static QMap<DBPROCESS*, SybaseConnectionInternal*> dbProcessConnectionMap;
 
     // Server specific stuff
@@ -95,13 +89,11 @@ public:
 class SybaseCursorData : public SybaseConnectionInternal
 {
 public:
-    explicit SybaseCursorData(Predicate::Connection* connection);
+    explicit SybaseCursorData(KDbConnection* connection);
     virtual ~SybaseCursorData();
 
     //unsigned long *lengths;
     unsigned long numRows;
 };
-
-}
 
 #endif

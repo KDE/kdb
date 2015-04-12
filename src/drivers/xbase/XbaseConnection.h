@@ -22,43 +22,41 @@
 
 #include <QStringList>
 
-#include <Predicate/Connection>
+#include "KDbConnection.h"
 #include "XbaseCursor.h"
-
-namespace Predicate {
 
 class xBaseConnectionInternal;
 
 /*! @short Provides database connection, allowing queries and data modification.
 */
-class xBaseConnection : public Connection
+class xBaseConnection : public KDbConnection
 {
 public:
     virtual ~xBaseConnection();
 
-    virtual Cursor* prepareQuery(const EscapedString& statement, uint cursor_options = 0);
-    virtual Cursor* prepareQuery(QuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
     //! @todo returns 0 for now
-    virtual PreparedStatementInterface* prepareStatementInternal();
+    virtual KDbPreparedStatementInterface* prepareStatementInternal();
 
   protected:
 
     /*! Used by driver */
-    xBaseConnection(Driver *driver, Driver* internalDriver, const ConnectionData& connData);
+    xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const ConnectionData& connData);
 
-    virtual bool drv_connect(Predicate::ServerVersionInfo* version);
+    virtual bool drv_connect(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase( const QString &dbName = QString() );
     virtual bool drv_useDatabase( const QString &dbName = QString(), bool *cancelled = 0, 
-      MessageHandler* msgHandler = 0 );
+      KDbMessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase( const QString &dbName = QString() );
-    virtual bool drv_executeSQL( const EscapedString& statement );
+    virtual bool drv_executeSQL( const KDbEscapedString& statement );
     virtual quint64 drv_lastInsertRecordId();
 
-    //! Implemented for Resultable
+    //! Implemented for KDbResultable
     virtual QString serverResultName() const;
 //    virtual void drv_clearServerResult();
 
@@ -72,7 +70,5 @@ public:
     friend class xBaseDriver;
     friend class xBaseCursor;
 };
-
-}
 
 #endif

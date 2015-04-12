@@ -23,17 +23,15 @@
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlDriver.h"
 
-#include <Predicate/Error>
-#include <Predicate/Global>
+#include "KDbError.h"
+#include "KDbGlobal.h"
 
 
 #include <QtDebug>
 
-using namespace Predicate;
-
 // Constructor based on query statement
-PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const EscapedString& statement, uint options)
-        : Cursor(conn, statement, options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options)
+        : KDbCursor(conn, statement, options)
         , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
 {
@@ -42,8 +40,8 @@ PostgresqlCursor::PostgresqlCursor(Predicate::Connection* conn, const EscapedStr
 
 //==================================================================================
 //Constructor base on query object
-PostgresqlCursor::PostgresqlCursor(Connection* conn, QuerySchema* query, uint options)
-        : Cursor(conn, query, options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+        : KDbCursor(conn, query, options)
         , d(new PostgresqlCursorData(conn))
 {
     m_options |= Buffered;
@@ -60,7 +58,7 @@ PostgresqlCursor::~PostgresqlCursor()
 
 //==================================================================================
 //Create a cursor result set
-bool PostgresqlCursor::drv_open(const EscapedString& sql)
+bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
 {
     if (!d->executeSQL(sql, PGRES_TUPLES_OK))
         return false;
@@ -155,7 +153,7 @@ inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
     case TIMESTAMPOID:
         return QString::fromUtf8(r.c_str(), r.size()); //TODO check formatting
     case BYTEAOID:
-        return Predicate::pgsqlByteaToByteArray(r.c_str(), r.size());
+        return KDb::pgsqlByteaToByteArray(r.c_str(), r.size());
     case BPCHAROID:
     case VARCHAROID:
     case TEXTOID:
@@ -179,7 +177,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
     const qint64 row = at();
 
 #if 0
-    Predicate::Field *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
+    KDbField *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 #endif
 // PreDrvDbg << "pos:" << pos;
@@ -258,9 +256,9 @@ QVariant PostgresqlCursor::pValue(uint pos) const
             return QString::fromUtf8((*m_res)[at()][pos].c_str()); //utf8?
         } else if (f->isFPNumericType()) {
             return (*m_res)[at()][pos].as(double());
-        } else if (f->type() == Field::Boolean) {
+        } else if (f->type() == KDbField::Boolean) {
             return QString((*m_res)[at()][pos].c_str()).toLower() == "t" ? QVariant(true) : QVariant(false);
-        } else if (f->typeGroup() == Field::BLOBGroup) {
+        } else if (f->typeGroup() == KDbField::BLOBGroup) {
 //   PreDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size();
             return ::pgsqlByteaToByteArray((*m_res)[at()][pos]);
         } else {
@@ -284,7 +282,7 @@ const char** PostgresqlCursor::recordData() const
 
 //==================================================================================
 //Store the current record in [data]
-bool PostgresqlCursor::drv_storeCurrentRecord(RecordData* data) const
+bool PostgresqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
 // PreDrvDbg << "POSITION IS" << (long)m_at;
     for (uint i = 0; i < m_fieldsToStoreInRecord; i++)
@@ -331,4 +329,3 @@ void PostgresqlCursor::drv_bufferMovePointerTo(qint64 to)
 {
     Q_UNUSED(to);
 }
-

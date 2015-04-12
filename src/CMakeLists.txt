@@ -1,7 +1,9 @@
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Widgets Xml)
+
 ADD_DEFINITIONS(
 #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
-  -D__PREDICATE__=
-  -DMAKE_PREDICATE_LIB=1
+  -D__KDB__=
+  -DMAKE_KDB_LIB=1
   -DYYERROR_VERBOSE=1
 )
 if(CMAKE_BUILD_TYPE EQUAL Debug OR CMAKE_BUILD_TYPE EQUAL RelWithDebInfo)
@@ -19,8 +21,8 @@ endif (WIN32)
 
 ########### options ###############
 
-simple_option(PREDICATE_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
-simple_option(PREDICATE_DEBUG_GUI "GUI for debugging" OFF)
+simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
+simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
@@ -30,202 +32,279 @@ ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
 
 # Create custom command for flex/lex (note the outputs)
 ADD_CUSTOM_COMMAND(
-COMMAND ${Predicate_SOURCE_DIR}/Predicate/parser/generate_parser_code.sh
+COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/parser/generate_parser_code.sh
 TARGET parser
 OUTPUTS
-  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.h
-  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.cpp
-  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.h
-  ${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp)
+  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.cpp
+  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.cpp)
 
 # mark files as generated
-SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlParser.cpp GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${Predicate_SOURCE_DIR}/Predicate/parser/SqlScanner.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.cpp GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.h GENERATED)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.cpp GENERATED)
 
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp GENERATED)
-
-PREDICATE_CREATE_SHARED_DATA_CLASSES(
-    Result.shared.h
-    VersionInfo.shared.h
-    ConnectionData.shared.h
-    Object.shared.h
-)
+SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp GENERATED)
 
 ########### next target ###############
 
-# Generate Global.h
-configure_file(Global.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/Global.h )
+# Generate KDbGlobal.h
+configure_file(KDbGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/KDbGlobal.h )
 
-set(predicate_LIB_SRCS
-   parser/SqlScanner.cpp
-   parser/SqlParser.cpp
-   parser/Parser.cpp
-   parser/Parser_p.cpp
+set(kdb_LIB_SRCS
+   parser/generated/sqlscanner.cpp
+   parser/generated/sqlparser.cpp
+   parser/KDbParser.cpp
+   parser/KDbParser_p.cpp
 
-   Tools/Validator.cpp
-   Tools/FieldValidator.cpp
-   Tools/LongLongValidator.cpp
-   Tools/DbObjectNameValidator.cpp
-   Tools/Identifier.cpp
-   Tools/Utils.cpp
-   Tools/Static.cpp
-   Tools/transliteration/transliteration_table.cpp
-#TODO Tools/debuggui.cpp
-#TODO Tools/SimpleCommandLineApp.cpp
+   tools/KDbValidator.cpp
+   tools/KDbFieldValidator.cpp
+   tools/KDbLongLongValidator.cpp
+   tools/KDbObjectNameValidator.cpp
+   tools/KDbIdentifierValidator.cpp
+   tools/KDbUtils.cpp
+   tools/transliteration/transliteration_table.cpp
+#TODO tools/debuggui.cpp
+#TODO tools/SimpleCommandLineApp.cpp
 
-   EscapedString.cpp
-   Result.cpp
-   ConnectionData.cpp
-   VersionInfo.cpp
-   ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData_sdc.cpp
-   Field.cpp
-   QuerySchemaParameter.cpp
-   expression/Expression.cpp
-   expression/NArgExpression.cpp
-   expression/UnaryExpression.cpp
-   expression/BinaryExpression.cpp
-   expression/ConstExpression.cpp
-   expression/QueryParameterExpression.cpp
-   expression/VariableExpression.cpp
-   expression/FunctionExpression.cpp
-   FieldList.cpp
-   TableSchema.cpp
-   IndexSchema.cpp
-   QuerySchema.cpp
-   DriverManager.cpp
-   Driver.cpp
-   Driver_p.cpp
-   Connection.cpp
-   keywords.cpp
-   Object.cpp
-   Utils.cpp
-   RecordData.cpp
-   Cursor.cpp
-   Transaction.cpp
-   Global.cpp
-   Relationship.cpp
-   RecordEditBuffer.cpp
-   MessageHandler.cpp
-   PreparedStatement.cpp
-   DbProperties.cpp
-   Admin.cpp
-   LookupFieldSchema.cpp
-   Alter.cpp
+   KDbEscapedString.cpp
+   KDbResult.cpp
+   KDbConnectionData.cpp
+   KDbVersionInfo.cpp
+   ${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp
+   KDbField.cpp
+   KDbQuerySchemaParameter.cpp
+   expression/KDbExpression.cpp
+   expression/KDbNArgExpression.cpp
+   expression/KDbUnaryExpression.cpp
+   expression/KDbBinaryExpression.cpp
+   expression/KDbConstExpression.cpp
+   expression/KDbQueryParameterExpression.cpp
+   expression/KDbVariableExpression.cpp
+   expression/KDbFunctionExpression.cpp
+   KDbFieldList.cpp
+   KDbTableSchema.cpp
+   KDbIndexSchema.cpp
+   KDbQuerySchema.cpp
+   KDbQueryColumnInfo.cpp
+   KDbDriverManager.cpp
+   KDbDriver.cpp
+   KDbDriver_p.cpp
+   KDbConnection.cpp
+   generated/sqlkeywords.cpp
+   KDbObject.cpp
+   KDb.cpp
+   KDbRecordData.cpp
+   KDbCursor.cpp
+   KDbTransaction.cpp
+   KDbGlobal.cpp
+   KDbRelationship.cpp
+   KDbRecordEditBuffer.cpp
+   KDbMessageHandler.cpp
+   KDbPreparedStatement.cpp
+   KDbProperties.cpp
+   KDbAdmin.cpp
+   KDbLookupFieldSchema.cpp
+   KDbAlter.cpp
 
-   views/TableViewData.cpp
-   views/TableViewColumn.cpp
+   views/KDbTableViewData.cpp
+   views/KDbTableViewColumn.cpp
 )
 
-set(predicate_MOC_SRCS
-  DriverManager_p.h
-#  Cursor.h
-  Utils_p.h
-  Driver.h
-  Field.h
-#  Connection.h
-  views/TableViewData.h
+add_library(KDb SHARED ${kdb_LIB_SRCS})
+
+KDB_CREATE_SHARED_DATA_CLASSES(
+    kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
+    kdb # subdirectory in which the headers should be generated
+    KDbResult.shared.h
+    KDbVersionInfo.shared.h
+    KDbConnectionData.shared.h
+    KDbObject.shared.h
 )
 
-qt_wrap_cpp(predicate predicate_LIB_SRCS ${predicate_MOC_SRCS})
-
-add_library(predicate SHARED ${predicate_LIB_SRCS})
-target_link_libraries(predicate
-  Qt5::Core
-  Qt5::Gui
-  Qt5::Xml
+KDB_REMOVE_EXTENSIONS(
+    kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES
+    ${kdb_GENERATED_SHARED_DATA_CLASS_HEADERS}
 )
 
-ADD_DEPENDENCIES(predicate _shared_classes) # generate shared classes before they can be used in Predicate
+#message(STATUS "kdb_GENERATED_SHARED_DATA_CLASS_HEADERS: ${kdb_GENERATED_SHARED_DATA_CLASS_HEADERS}")
+
+#add_dependencies(KDb _shared_classes) # generate shared classes before they can be used in KDb
+
+generate_export_header(KDb)
+
+target_include_directories(KDb
+    INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KDb>"
+    PRIVATE expression generated interfaces parser parser/generated tools views
+            ${CMAKE_CURRENT_BINARY_DIR}/kdb
+)
+
+target_link_libraries(KDb
+    PUBLIC
+        Qt5::Core
+        Qt5::Gui
+        Qt5::Widgets
+    PRIVATE
+        Qt5::Xml
+)
 
 if (BUILD_TEST_COVERAGE)
-    target_link_libraries(predicate gcov)
+    target_link_libraries(KDb
+        PRIVATE
+            gcov
+    )
 endif (BUILD_TEST_COVERAGE)
 
-set_target_properties(predicate PROPERTIES
-  VERSION ${GENERIC_PREDICATE_LIB_VERSION}
-  SOVERSION ${GENERIC_PREDICATE_LIB_SOVERSION}
+set_target_properties(KDb
+    PROPERTIES VERSION ${GENERIC_KDB_LIB_VERSION}
+               SOVERSION ${GENERIC_KDB_LIB_SOVERSION}
+               EXPORT_NAME KDb
 )
 
-install(TARGETS predicate ${INSTALL_TARGETS_DEFAULT_ARGS})
+# Create a Config.cmake and a ConfigVersion.cmake file and install them
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KDb")
 
+ecm_setup_version(${KDB_VERSION}
+    VARIABLE_PREFIX KDB
+    VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
+    PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"
+)
+
+ecm_configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/KDbConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
+    INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+)
 
 ########### install files ###############
 
-install( FILES
-  Admin.h includes/Predicate/Admin
-#TODO  Alter.h includes/Predicate/Alter
-  Connection.h includes/Predicate/Connection
-  ${CMAKE_CURRENT_BINARY_DIR}/ConnectionData.h includes/Predicate/ConnectionData
-  Cursor.h includes/Predicate/Cursor
-  DbProperties.h includes/Predicate/DbProperties
-  Driver.h includes/Predicate/Driver
-  DriverManager.h includes/Predicate/DriverManager
-  ${CMAKE_CURRENT_BINARY_DIR}/Result.h includes/Predicate/Result
-  Error.h includes/Predicate/Error
-  EscapedString.h includes/Predicate/EscapedString
-  Field.h includes/Predicate/Field
-  FieldList.h includes/Predicate/FieldList
-  IndexSchema.h includes/Predicate/IndexSchema
-  LookupFieldSchema.h includes/Predicate/LookupFieldSchema
-  MessageHandler.h includes/Predicate/MessageHandler
-  ${CMAKE_CURRENT_BINARY_DIR}/Object.h includes/Predicate/Object
-  predicate_export.h
-  predicate_global.h
-  PreparedStatement.h includes/Predicate/PreparedStatement
-  QuerySchema.h includes/Predicate/QuerySchema
-  QuerySchemaParameter.h includes/Predicate/QuerySchemaParameter
-  RecordData.h includes/Predicate/RecordData
-  Relationship.h includes/Predicate/Relationship
-  RecordEditBuffer.h includes/Predicate/RecordEditBuffer
-  TableSchema.h includes/Predicate/TableSchema
-  Transaction.h includes/Predicate/Transaction
-  Utils.h includes/Predicate/Utils
-  ${CMAKE_CURRENT_BINARY_DIR}/Global.h  includes/Predicate/Global
-  ${CMAKE_CURRENT_BINARY_DIR}/VersionInfo.h includes/Predicate/VersionInfo
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        COMPONENT Devel)
 
-  parser/Parser.h includes/Predicate/Parser
+install(TARGETS KDb
+        EXPORT KDbTargets
+        ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-  expression/Expression.h includes/Predicate/Expression
-  expression/ExpressionData.h
+install(EXPORT KDbTargets
+        DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+        FILE KDbTargets.cmake)
 
-  views/TableViewData.h includes/Predicate/TableViewData
-  views/TableViewColumn.h includes/Predicate/TableViewColumn
-
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate COMPONENT Devel
+ecm_generate_pri_file(
+    BASE_NAME KDb
+    LIB_NAME KDb
+    DEPS "widgets xml"
+    FILENAME_VAR PRI_FILENAME
+    INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_DIR}/KDb
 )
 
-# Predicate/Private includes
-install( FILES
-  Connection_p.h includes/Predicate/Private/Connection
-  Driver_p.h includes/Predicate/Private/Driver
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Private COMPONENT Devel
+install(FILES ${PRI_FILENAME}
+        DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
+
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
+        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        COMPONENT Devel)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    HEADER_NAMES
+        KDbAdmin
+        KDbAlter
+        KDbConnection
+        KDbCursor
+        KDbProperties
+        KDbDriver
+        KDbDriverInfo
+        KDbDriverManager
+        KDbError
+        KDbEscapedString
+        KDbField
+        KDbFieldList
+        KDbIndexSchema
+        KDbLookupFieldSchema
+        KDbMessageHandler
+        KDbPreparedStatement
+        KDbQuerySchema
+        KDbQueryColumnInfo
+        KDbQuerySchemaParameter
+        KDbRecordData
+        KDbRecordEditBuffer
+        KDbRelationship
+        KDbTableSchema
+        KDbTransaction
+        KDb
+
+        expression/KDbExpression
+        expression/KDbExpressionData
+
+        interfaces/KDbPreparedStatementInterface
+
+        parser/KDbParser
+
+        views/KDbTableViewData
+        views/KDbTableViewColumn
+
+        tools/KDbValidator
+        #tools/Utils
+        tools/KDbTristate
+        #Qt5 tools/Static
+        #todo  tools/SimpleCommandLineApp
+        #  tools/SharedPtr.h
+        tools/KDbLongLongValidator
+        tools/KDbIdentifierValidator
+        tools/KDbFieldValidator
+        tools/KDbObjectNameValidator
+
+    REQUIRED_HEADERS kdb_HEADERS
 )
 
-# Predicate/Interfaces includes
-install( FILES
-  Interfaces/PreparedStatementInterface.h includes/Predicate/Interfaces/PreparedStatementInterface
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Interfaces COMPONENT Devel
+#message(STATUS "%% ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}")
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS_FROM_BUILDDIR
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}
+    HEADER_NAMES
+        ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}
+        KDbGlobal
+
+    REQUIRED_HEADERS kdb_HEADERS_FROM_BUILDDIR
 )
 
-install( FILES
-  Tools/Validator.h includes/Predicate/Tools/Validator
-  Tools/Utils.h includes/Predicate/Tools/Utils
-  Tools/Tristate.h includes/Predicate/Tools/Tristate
-  Tools/Static.h includes/Predicate/Tools/Static
-#todo  Tools/SimpleCommandLineApp.h includes/Predicate/Tools/SimpleCommandLineApp
-#  Tools/SharedPtr.h
-  Tools/LongLongValidator.h
-  Tools/Identifier.h
-  Tools/FieldValidator.h
-  Tools/DbObjectNameValidator.h
-
-  views/TableViewData.h
-  views/TableViewColumn.h
-
-  DESTINATION ${INCLUDE_INSTALL_DIR}/Predicate/Tools COMPONENT Devel
+install(
+    FILES
+        ${kdb_HEADERS}
+        ${kdb_HEADERS_FROM_BUILDDIR}
+        ${PROJECT_BINARY_DIR}/src/kdb_export.h
+    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kproperty
+    COMPONENT Devel
 )
+
+install(
+    FILES
+        ${kdb_FORWARDING_HEADERS}
+        ${kdb_FORWARDING_HEADERS_FROM_BUILDDIR}
+    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/KDb
+    COMPONENT Devel
+)
+
+# KDb/Private includes
+# install( FILES
+#   Connection_p.h
+#   Driver_p.h
+#   DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/Private COMPONENT Devel
+# )
+
+# KDb/Interfaces includes
+# install( FILES
+#   Interfaces/KDbPreparedStatementInterface.h includes/KDb/Interfaces/KDbPreparedStatementInterface
+#   DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/Interfaces COMPONENT Devel
+# )
 
 enable_testing()
 

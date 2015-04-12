@@ -24,7 +24,7 @@
 
 #include <QtGlobal>
 
-#include <Predicate/Error.h>
+#include "KDbError.h"
 #include <Predicate/Utils.h>
 
 #include <QtDebug>
@@ -33,10 +33,8 @@
 
 #include <sqldb.h>
 
-using namespace Predicate;
-
-SybaseCursor::SybaseCursor(Predicate::Connection* conn, const EscapedString& statement, uint cursor_options)
-        : Cursor(conn, statement, cursor_options)
+SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& statement, uint cursor_options)
+        : KDbCursor(conn, statement, cursor_options)
         , d(new SybaseCursorData(conn))
 {
 
@@ -46,8 +44,8 @@ SybaseCursor::SybaseCursor(Predicate::Connection* conn, const EscapedString& sta
 // PreDrvDbg << "SybaseCursor: constructor for query statement";
 }
 
-SybaseCursor::SybaseCursor(Connection* conn, QuerySchema* query, uint options)
-        : Cursor(conn, query, options)
+SybaseCursor::SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+        : KDbCursor(conn, query, options)
         , d(new SybaseCursorData(conn))
 {
     //  m_options |= Buffered;
@@ -61,7 +59,7 @@ SybaseCursor::~SybaseCursor()
     close();
 }
 
-bool SybaseCursor::drv_open(const EscapedString& sql)
+bool SybaseCursor::drv_open(const KDbEscapedString& sql)
 {
 
     /* Pseudo Code
@@ -146,7 +144,7 @@ QVariant SybaseCursor::value(uint pos)
     if (!d->dbProcess || pos >= m_fieldCount)
         return QVariant();
 
-    Predicate::Field *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
+    KDbField *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
     // db-library indexes its columns from 1
@@ -164,7 +162,7 @@ QVariant SybaseCursor::value(uint pos)
     // convert to string representation. All values are convertible to string
     dbconvert(d->dbProcess , dbcoltype(d->dbProcess , pos), dbdata(d->dbProcess , pos), columnDataLength , (SYBCHAR), columnValue, -2);
 
-    QVariant returnValue = Predicate::cstringToVariant((const char*)columnValue , f, strlen((const char*)columnValue));
+    QVariant returnValue = KDbcstringToVariant((const char*)columnValue , f, strlen((const char*)columnValue));
 
     delete[] columnValue;
 
@@ -175,7 +173,7 @@ QVariant SybaseCursor::value(uint pos)
 /* As with sqlite, the DB library returns all values (including numbers) as
    strings. So just put that string in a QVariant and let Predicate deal with it.
  */
-bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
+bool SybaseCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
 // PreDrvDbg << "Position is" << (long)m_at;
 // if (d->numRows<=0)
@@ -184,7 +182,7 @@ bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
     const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
     for (uint i = 0; i < realCount; i++) {
-        Field *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
+        KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
 
@@ -200,7 +198,7 @@ bool SybaseCursor::drv_storeCurrentRecord(RecordData* data) const
         // convert to string representation. All values are convertible to string
         dbconvert(d->dbProcess , dbcoltype(d->dbProcess , i + 1), dbdata(d->dbProcess , i + 1), columnDataLength , (SYBCHAR), columnValue, -2);
 
-        (*data)[i] =  Predicate::cstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
+        (*data)[i] =  KDbcstringToVariant((const char*)columnValue , f,  strlen((const char*)columnValue));
 
         delete[] columnValue;
     }
@@ -243,10 +241,3 @@ QString SybaseCursor::serverResultName() const
 {
     return QString();
 }
-
-/*void SybaseCursor::drv_clearServerResult()
-{
-    if (!d)
-        return;
-    d->res = 0;
-}*/

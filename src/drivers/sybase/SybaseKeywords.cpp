@@ -29,8 +29,6 @@
 
 #include <sybaseDriver.h>
 
-namespace Predicate
-{
 const char* SybaseDriver::keywords[] = {
     "ACTION",
     "ADD",
@@ -358,4 +356,3 @@ const char* SybaseDriver::keywords[] = {
     "ZEROFILL",
     0
 };
-}

@@ -5,7 +5,7 @@ endif(COMMAND cmake_policy)
 
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
-set(PREDICATE_PLUGINS_DIR ${QT_PLUGINS_DIR}/predicate)
+set(KDB_PLUGINS_DIR ${QT_PLUGINS_DIR}/kdb)
 
 # -----------------------
 
