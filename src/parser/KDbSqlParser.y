@@ -715,6 +715,7 @@ SQL_TYPE
     globalField->setType(KDbField::Text);
 }
 |
+%empty
 {
     // SQLITE compatibillity
     globalField = new KDbField();
