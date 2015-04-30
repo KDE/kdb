@@ -1,12 +1,20 @@
-#!/bin/sh
+#!/bin/bash
 # generates parser and lexer code using bison and flex
 
 builddir=$PWD
 srcdir=`dirname $0`
 cd $srcdir
+
+# check version of bison
+read a b c <<< $(bison --version | head -n 1 | sed "s/.* \([0-9]\.[0-9].*\)/\\1/;s/\./\n/g")
+v=$(expr $a \* 10000 + $b \* 100 + $c)
+if [ $v -lt 30000 ] ; then echo "Error: bison >= 3.0.0 is required, found $a.$b.$c" ; exit 1; fi
+
+# generate lexer and parser
 flex -ogenerated/sqlscanner.cpp KDbSqlScanner.l
 bison -d KDbSqlParser.y -Wall -fall -rall -t --report-file=$builddir/KDbSqlParser.output
 
+# postprocess
 echo '#ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
 #include "KDbField.h"
