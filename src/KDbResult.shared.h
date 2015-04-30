@@ -28,7 +28,7 @@ class KDbMessageHandler;
 
 /*! Stores result of the operation.
 */
-shared class export=KDB_EXPORT KDbResult
+shared class export=KDB_EXPORT virtual_dtor KDbResult
 {
 public:
     /*!
