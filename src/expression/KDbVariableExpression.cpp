@@ -171,7 +171,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
             parseInfo->setErrorMessage(
                 QObject::tr("Could not access the table directly using its name"));
             parseInfo->setErrorDescription(
-                QObject::tr("Table \"%1\" is covered by aliases. Instead of \"%2\", "
+                QObject::tr("Table name \"%1\" is covered by aliases. Instead of \"%2\", "
                             "you can write \"%3\".")
                          .arg(tableName,
                               tableName + QLatin1Char('.') + fieldName,

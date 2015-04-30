@@ -544,6 +544,7 @@ int yylex();
 //%nonassoc    ESCAPE
 //%nonassoc    OVERLAPS
 %nonassoc    BETWEEN
+%nonassoc NOT_BETWEEN
 //%nonassoc    IN_P
 //%left        POSTFIXOP        // dummy for postfix Op rules
 //%left        Op OPERATOR        // multi-character ops and user-defined operators
@@ -991,6 +992,26 @@ aExpr5 NOT_EQUAL aExpr4
     $$ = new KDbBinaryExpression(*$1, NOT_SIMILAR_TO, *$3);
     delete $1;
     delete $3;
+}
+| aExpr5 BETWEEN aExpr4 AND aExpr4
+{
+    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_BETWEEN_AND);
+    $$->toNArg().append( *$1 );
+    $$->toNArg().append( *$3 );
+    $$->toNArg().append( *$5 );
+    delete $1;
+    delete $3;
+    delete $5;
+}
+| aExpr5 NOT_BETWEEN aExpr4 AND aExpr4
+{
+    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_NOT_BETWEEN_AND);
+    $$->toNArg().append( *$1 );
+    $$->toNArg().append( *$3 );
+    $$->toNArg().append( *$5 );
+    delete $1;
+    delete $3;
+    delete $5;
 }
 |
 aExpr5

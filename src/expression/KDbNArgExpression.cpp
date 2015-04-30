@@ -69,23 +69,68 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
         if (!data->validate(parseInfo, callStack))
             return false;
     }
+
+    switch (token) {
+    case KDB_TOKEN_BETWEEN_AND:
+    case KDB_TOKEN_NOT_BETWEEN_AND: {
+        if (children.count() != 3) {
+            parseInfo->setErrorMessage(QObject::tr("Three arguments required"));
+            parseInfo->setErrorDecription(
+                QObject::tr("%1 operator requires exactly three arguments.", "BETWEEN..AND error")
+                            .arg(QLatin1String("BETWEEN...AND")));
+            return false;
+        }
+
+        if (!(   !KDbField::isNumericType(children[0]->type())
+              || !KDbField::isNumericType(children[1]->type())
+              || !KDbField::isNumericType(children[2]->type())))
+        {
+            return true;
+        } else if (!(   !KDbField::isTextType(children[0]->type())
+                     || !KDbField::isTextType(children[1]->type())
+                     || !KDbField::isTextType(children[2]->type())))
+        {
+            return true;
+        }
+
+        if ((   children[0]->type() == children[1]->type()
+             && children[1]->type() == children[2]->type()))
+        {
+            return true;
+        }
+
+        parseInfo->setErrorMessage(QObject::tr("Incompatible types of arguments"));
+        parseInfo->setErrorDecription(
+            QObject::tr("%1 operator requires compatible types of arguments.", "BETWEEN..AND type error")
+                        .arg(QLatin1String("BETWEEN..AND")));
+        return false;
+    }
+    default:;
+    }
     return true;
 }
 
 void KDbNArgExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
 {
-    dbg.nospace() << "NArgExp(class="
-        << expressionClassName(expressionClass);
+    dbg.nospace() << "NArgExp("
+        << KDbExpression::tokenToDebugString(token) << ", class=" << expressionClassName(expressionClass);
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         dbg.nospace() << ", ";
         data->debug(dbg, callStack);
     }
-    dbg.nospace() << ")";
+    dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
 }
 
 KDbEscapedString KDbNArgExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
                                                    KDb::ExpressionCallStack* callStack) const
 {
+    if (token == KDB_TOKEN_BETWEEN_AND && children.count() == 3) {
+        return children[0]->toString() + " BETWEEN " + children[1]->toString() + " AND " + children[2]->toString();
+    }
+    if (token == KDB_TOKEN_NOT_BETWEEN_AND && children.count() == 3) {
+        return children[0]->toString() + " NOT BETWEEN " + children[1]->toString() + " AND " + children[2]->toString();
+    }
+
     KDbEscapedString s;
     s.reserve(256);
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
@@ -101,6 +146,16 @@ void KDbNArgExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& p
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         data->getQueryParameters(params);
     }
+}
+
+QString KDbNArgExpressionData::tokenToString() const
+{
+    switch (token) {
+    case KDB_TOKEN_BETWEEN_AND: return QLatin1String("BETWEEN_AND");
+    case KDB_TOKEN_NOT_BETWEEN_AND: return QLatin1String("NOT_BETWEEN_AND");
+    default:;
+    }
+    return QString::fromLatin1("{INVALID_N_ARG_OPERATOR#%1} ").arg(token);
 }
 
 //=========================================

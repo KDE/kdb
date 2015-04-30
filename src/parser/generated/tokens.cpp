@@ -4,6 +4,7 @@ static const char* const _tokens[] = {
     "AND",
     "AS",
     "ASC",
+    "BETWEEN",
     "BY",
     "CREATE",
     "DESC",
