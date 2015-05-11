@@ -17,13 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QDir>
-
 #include "SqliteAdmin.h"
 #include "SqliteVacuum.h"
 
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
+
+#include <QDir>
 
 SQLiteAdminTools::SQLiteAdminTools()
         : KDbAdminTools()

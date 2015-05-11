@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include "SqliteDriver.h"
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-#include "SqliteDriver.h"
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 #include "SqliteAdmin.h"
