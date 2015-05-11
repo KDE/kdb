@@ -254,7 +254,6 @@
 //%token ONLY
 //%token OPEN
 //%token OPTION
-//%token OR
 //%token OUTER
 //%token OUTPUT
 //%token OVERLAPS
@@ -297,7 +296,6 @@
 //%token SET
 //%token SHOWOPT
 //%token SIGN
-//%token SIMILAR
 //%token SIN
 //%token SQL_SIZE
 //%token SMALLINT
@@ -334,7 +332,6 @@
 //%token GENERAL_TITLE
 //%token TWO_DIGITS
 //%token UCASE
-//%token UNION
 //%token UNIQUE
 //%token SQL_UNKNOWN
 //%token UNSIGNED_INTEGER
@@ -371,8 +368,6 @@
 %token ','
 %token '.'
 %token '$'
-//%token '<'
-//%token '>'
 %token '('
 %token ')'
 %token '?'
@@ -513,10 +508,6 @@ int yylex();
     OrderByColumnInternal::List *orderByColumns;
     QVariant *variantValue;
 }
-
-//%left '=' NOT_EQUAL '>' GREATER_OR_EQUAL '<' LESS_OR_EQUAL LIKE '%' NOT
-//%left '+' '-'
-//%left ASTERISK SLASH
 
 /* precedence: lowest to highest */
 %left     UNION
