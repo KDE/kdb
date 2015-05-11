@@ -1,9 +1,10 @@
 /**
-    \mainpage Predicate
+    \mainpage KDb
 
-    %Predicate is a database connectivity and creation library.
+    %KDb is a database connectivity and creation framework, consisted of a general-purpose
+    C++ Qt library and set of plugins delivering support for various database vendors.
 
-    - Development wiki: http://community.kde.org/Predicate
+    - Development wiki: http://community.kde.org/KDb
  */
-// DOXYGEN_SET_PROJECT_NAME = Predicate
-EXCLUDE=tests Predicate/parser/SqlScanner.cpp Predicate/parser/SqlParser.cpp Predicate/parser/SqlParser.h Drivers/sqlite/icu
+// DOXYGEN_SET_PROJECT_NAME = KDb
+EXCLUDE=examples tests tools src/generated src/parser/generated src/drivers/sqlite/icu
