@@ -275,7 +275,7 @@ QList<QByteArray> KDbDriver::propertyNames() const
     return names;
 }
 
-void KDbDriver::initDriverSpecificKeywords(const char** keywords)
+void KDbDriver::initDriverSpecificKeywords(const char* const* keywords)
 {
     d->driverSpecificSQLKeywords.setStrings(keywords);
 }

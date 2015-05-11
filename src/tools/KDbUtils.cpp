@@ -161,7 +161,7 @@ public:
     ~Private() {
         delete set;
     }
-    const char** array;
+    const char* const * array;
     QSet<QByteArray> *set;
 };
 
@@ -170,7 +170,7 @@ StaticSetOfStrings::StaticSetOfStrings()
 {
 }
 
-StaticSetOfStrings::StaticSetOfStrings(const char* array[])
+StaticSetOfStrings::StaticSetOfStrings(const char* const array[])
         : d(new Private)
 {
     setStrings(array);
@@ -181,7 +181,7 @@ StaticSetOfStrings::~StaticSetOfStrings()
     delete d;
 }
 
-void StaticSetOfStrings::setStrings(const char* array[])
+void StaticSetOfStrings::setStrings(const char* const array[])
 {
     delete d->set;
     d->set = 0;
@@ -197,7 +197,7 @@ bool StaticSetOfStrings::contains(const QByteArray& string) const
 {
     if (!d->set) {
         d->set = new QSet<QByteArray>();
-        for (const char ** p = d->array;*p;p++)
+        for (const char * const * p = d->array;*p;p++)
             d->set->insert(QByteArray::fromRawData(*p, qstrlen(*p)));
     }
     return d->set->contains(string);

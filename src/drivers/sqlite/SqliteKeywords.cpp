@@ -26,7 +26,7 @@
 
 #include "SqliteDriver.h"
 
-const char* SQLiteDriver::keywords[] = {
+const char* const SQLiteDriver::keywords[] = {
     "ABORT",
     "ATTACH",
     "CLUSTER",
