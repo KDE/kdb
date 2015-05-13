@@ -12,6 +12,7 @@ if [ $v -lt 30000 ] ; then echo "Error: bison >= 3.0.0 is required, found $a.$b.
 
 # generate lexer and parser
 flex -ogenerated/sqlscanner.cpp KDbSqlScanner.l
+perl -pi -e 's/i < _yybytes_len/i < (int)_yybytes_len/g' generated/sqlscanner.cpp
 bison -d KDbSqlParser.y -Wall -fall -rall -t --report-file=$builddir/KDbSqlParser.output
 
 # postprocess
