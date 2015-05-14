@@ -30,23 +30,24 @@ simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
 # Create target for the parser
 ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
 
+set(PARSER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/parser)
+
 # Create custom command for flex/lex (note the outputs)
 ADD_CUSTOM_COMMAND(
-COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/parser/generate_parser_code.sh
+COMMAND ${PARSER_SOURCE_DIR}/generate_parser_code.sh
 TARGET parser
 OUTPUTS
-  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.cpp)
+  ${PARSER_SOURCE_DIR}/generated/sqlparser.h
+  ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
+  ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp)
 
 # mark files as generated
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlParser.cpp GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.h GENERATED)
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_SOURCE_DIR}/parser/generated/KDbSqlScanner.cpp GENERATED)
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h GENERATED)
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp GENERATED)
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp GENERATED
+                            PROPERTIES COMPILE_FLAGS "-Wno-sign-compare -Wno-unused-function ")
 
-SET_SOURCE_FILES_PROPERTIES(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp GENERATED)
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp GENERATED)
 
 ########### next target ###############
 
