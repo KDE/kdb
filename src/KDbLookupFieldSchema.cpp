@@ -658,13 +658,13 @@ void KDbLookupFieldSchema::setVisibleColumns(const QList<uint>& list)
     d->visibleColumns = list;
 }
 
-int KDbLookupFieldSchema::visibleColumn(uint fieldsCount) const
+int KDbLookupFieldSchema::visibleColumn(uint fieldCount) const
 {
     if (d->visibleColumns.count() == 1)
-        return (d->visibleColumns.first() < fieldsCount) ? (int)d->visibleColumns.first() : -1;
+        return (d->visibleColumns.first() < fieldCount) ? (int)d->visibleColumns.first() : -1;
     if (d->visibleColumns.isEmpty())
         return -1;
-    return fieldsCount - 1;
+    return fieldCount - 1;
 }
 
 QList<int> KDbLookupFieldSchema::columnWidths() const

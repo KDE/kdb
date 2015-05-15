@@ -53,7 +53,7 @@ public:
             , columnsOrderWithoutAsterisks(0)
             , columnsOrderExpanded(0)
             , pkeyFieldsOrder(0)
-            , pkeyFieldsCount(0)
+            , pkeyFieldCount(0)
             , tablesBoundToColumns(64, -1) // will be resized if needed
             , ownedVisibleColumns(0)
             , regenerateExprAliases(false)
@@ -309,7 +309,7 @@ public:
     QVector<int> *pkeyFieldsOrder;
 
     /*! number of PKEY fields within the query */
-    uint pkeyFieldsCount;
+    uint pkeyFieldCount;
 
     /*! forced (predefined) statement */
     KDbEscapedString statement;
@@ -1281,9 +1281,9 @@ KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(FieldsExpandedOptions 
             for (uint i = 0; i < fieldsExpandedVectorSize; i++) {
                 (*tmpFieldsExpandedWithInternal)[i] = d->fieldsExpanded->at(i);
             }
-            const uint internalFieldsCount = d->internalFields ? d->internalFields->size() : 0;
-            if (internalFieldsCount > 0) {
-                for (uint i = 0; i < internalFieldsCount; i++) {
+            const uint internalFieldCount = d->internalFields ? d->internalFields->size() : 0;
+            if (internalFieldCount > 0) {
+                for (uint i = 0; i < internalFieldCount; i++) {
                     (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = d->internalFields->at(i);
                 }
             }
@@ -1292,7 +1292,7 @@ KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(FieldsExpandedOptions 
                     d->fakeRecordIdField = new KDbField(QLatin1String("rowID"), KDbField::BigInteger);
                     d->fakeRecordIdCol = new KDbQueryColumnInfo(d->fakeRecordIdField, QString(), true);
                 }
-                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldsCount] = d->fakeRecordIdCol;
+                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldCount] = d->fakeRecordIdCol;
             }
         }
         return *tmpFieldsExpandedWithInternal;
@@ -1706,7 +1706,7 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
     const uint fCount = fieldsExpanded().count();
-    d->pkeyFieldsCount = 0;
+    d->pkeyFieldCount = 0;
     for (uint i = 0; i < fCount; i++) {
         KDbQueryColumnInfo *fi = d->fieldsExpanded->at(i);
         const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(*fi->field) : -1;
@@ -1714,18 +1714,18 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
             KDbDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
-            d->pkeyFieldsCount++;
+            d->pkeyFieldCount++;
         }
     }
-    KDbDbg << d->pkeyFieldsCount
+    KDbDbg << d->pkeyFieldCount
     << " OUT OF " << pkey->fieldCount() << " PKEY'S FIELDS FOUND IN QUERY " << name();
     return *d->pkeyFieldsOrder;
 }
 
-uint KDbQuerySchema::pkeyFieldsCount()
+uint KDbQuerySchema::pkeyFieldCount()
 {
     (void)pkeyFieldsOrder(); /* rebuild information */
-    return d->pkeyFieldsCount;
+    return d->pkeyFieldCount;
 }
 
 KDbRelationship* KDbQuerySchema::addRelationship(KDbField *field1, KDbField *field2)

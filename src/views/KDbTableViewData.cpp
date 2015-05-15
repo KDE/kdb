@@ -327,8 +327,8 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
 
     // Allocate KDbTableViewColumn objects for each visible query column
     const KDbQueryColumnInfo::Vector fields = d->cursor->query()->fieldsExpanded();
-    const uint fieldsCount = fields.count();
-    for (uint i = 0;i < fieldsCount;i++) {
+    const uint fieldCount = fields.count();
+    for (uint i = 0;i < fieldCount;i++) {
         KDbQueryColumnInfo *ci = fields[i];
         if (ci->visible) {
             KDbQueryColumnInfo *visibleLookupColumnInfo = 0;

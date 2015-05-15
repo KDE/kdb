@@ -144,8 +144,8 @@ public:
     /*! A helper method.
      If visibleColumns() contains one item, this item is returned (a typical case).
      If visibleColumns() contains no item, -1 is returned.
-     If visibleColumns() multiple items, @a fieldsCount - 1 is returned. */
-    int visibleColumn(uint fieldsCount) const;
+     If visibleColumns() multiple items, @a fieldCount - 1 is returned. */
+    int visibleColumn(uint fieldCount) const;
 
     /*! @return a number of ordered integers specifying column widths;
      -1 means 'default width' for a given column. */

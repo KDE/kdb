@@ -635,7 +635,7 @@ public:
      only first-found column (oin the fieldsExpanded() list) for each pkey's field is included.
 
      Returns empty vector if there is no master table or no master table's pkey.
-     @see example for pkeyFieldsCount().
+     @see example for pkeyFieldCount().
     @todo js: UPDATE CACHE!
     */
     QVector<int> pkeyFieldsOrder() const;
@@ -650,15 +650,15 @@ public:
      Examples: let table T has (ID1 INTEGER, ID2 INTEGER, A INTEGER) fields,
      and let (ID1, ID2) is T's primary key.
      -# The query defined by "SELECT * FROM T" statement contains all T's
-        primary key's fields as T is the master table, and thus pkeyFieldsCount()
+        primary key's fields as T is the master table, and thus pkeyFieldCount()
         will return 2 (both primary key's fields are in the fieldsExpanded() list),
         and pkeyFieldsOrder() will return vector {0, 1}.
-     -# The query defined by "SELECT A, ID2 FROM T" statement, and thus pkeyFieldsCount()
+     -# The query defined by "SELECT A, ID2 FROM T" statement, and thus pkeyFieldCount()
         will return 1 (only one primary key's field is in the fieldsExpanded() list),
         and pkeyFieldsOrder() will return vector {-1, 1}, as second primary key's field
         is at position #1 and first field is not specified at all within the query.
     */
-    uint pkeyFieldsCount();
+    uint pkeyFieldCount();
 
     /*! @return a list of field infos for all auto-incremented fields
      from master table of this query. This result is cached for efficiency.

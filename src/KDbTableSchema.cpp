@@ -202,8 +202,8 @@ KDbFieldList& KDbTableSchema::insertField(uint index, KDbField *field)
     field->setTable(this);
     field->m_order = index;
     //update order for next next fields
-    uint fieldsCount = m_fields.count();
-    for (uint i = index + 1; i < fieldsCount; i++)
+    uint fieldCount = m_fields.count();
+    for (uint i = index + 1; i < fieldCount; i++)
         m_fields.at(i)->m_order = i;
 
     //Check for auto-generated indices:
