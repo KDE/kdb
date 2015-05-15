@@ -53,14 +53,10 @@ public:
     virtual ~KDbFieldList();
 
     /*! @return number of fields in the list. */
-    inline uint fieldCount() const {
-        return m_fields.count();
-    }
+    uint fieldCount() const;
 
     /*! @return true if the list is empty. */
-    inline bool isEmpty() const {
-        return m_fields.isEmpty();
-    }
+    bool isEmpty() const;
 
     /*! Adds @a field at the and of field list. */
     KDbFieldList& addField(KDbField *field);
@@ -84,50 +80,35 @@ public:
     virtual bool moveField(KDbField *field, uint newIndex);
 
     /*! @return field id or NULL if there is no such a field. */
-    inline KDbField* field(uint id) {
-        return m_fields.value(id);
-    }
+    KDbField* field(uint id);
 
     /*! @return field id or NULL if there is no such a field. */
-    inline const KDbField* field(uint id) const {
-        return m_fields.value(id);
-    }
+    const KDbField* field(uint id) const;
 
     /*! @return field with name @a name or NULL if there is no such a field. */
     virtual KDbField* field(const QString& name) const;
 
     /*! @return true if this list contains given @a field. */
-    inline bool hasField(const KDbField& field) const {
-        return m_fields.contains(const_cast<KDbField*>(&field));
-    }
+    bool hasField(const KDbField& field) const;
 
     /*! @return first occurrence of @a field in the list
      or -1 if this list does not contain this field. */
-    inline int indexOf(const KDbField& field) const {
-        return m_fields.indexOf(const_cast<KDbField*>(&field));
-    }
+    int indexOf(const KDbField& field) const;
 
     /*! @return list of field names for this list. */
     QStringList names() const;
 
-    inline KDbField::ListIterator fieldsIterator() const {
-        return m_fields.constBegin();
-    }
-    inline KDbField::ListIterator fieldsIteratorConstEnd() const {
-        return m_fields.constEnd();
-    }
+    KDbField::ListIterator fieldsIterator() const;
 
-    inline const KDbField::List* fields() const {
-        return &m_fields;
-    }
+    KDbField::ListIterator fieldsIteratorConstEnd() const;
+
+    const KDbField::List* fields() const;
 
     /*! @return list of autoincremented fields. The list is owned by this KDbFieldList object. */
     KDbField::List* autoIncrementFields() const;
 
     /*! @return true if fields in the list are owned by this list. */
-    inline bool isOwner() const {
-        return m_fields.autoDelete();
-    }
+    bool isOwner() const;
 
     /*! Removes all fields from the list. */
     virtual void clear();

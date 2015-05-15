@@ -52,6 +52,16 @@ KDbFieldList::~KDbFieldList()
     delete m_autoinc_fields;
 }
 
+uint KDbFieldList::fieldCount() const
+{
+    return m_fields.count();
+}
+
+bool KDbFieldList::isEmpty() const
+{
+    return m_fields.isEmpty();
+}
+
 void KDbFieldList::clear()
 {
     m_fields_by_name.clear();
@@ -141,9 +151,29 @@ bool KDbFieldList::moveField(KDbField *field, uint newIndex)
     return true;
 }
 
+KDbField* KDbFieldList::field(uint id)
+{
+    return m_fields.value(id);
+}
+
+const KDbField* KDbFieldList::field(uint id) const
+{
+    return m_fields.value(id);
+}
+
 KDbField* KDbFieldList::field(const QString& name) const
 {
     return m_fields_by_name.value(name.toLower());
+}
+
+bool KDbFieldList::hasField(const KDbField& field) const
+{
+    return m_fields.contains(const_cast<KDbField*>(&field));
+}
+
+int KDbFieldList::indexOf(const KDbField& field) const
+{
+    return m_fields.indexOf(const_cast<KDbField*>(&field));
 }
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
