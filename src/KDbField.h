@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#ifndef PREDICATE_FIELD_H
-#define PREDICATE_FIELD_H
+#ifndef KDB_FIELD_H
+#define KDB_FIELD_H
 
 #include <QPair>
 #include <QVector>
