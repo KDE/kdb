@@ -49,7 +49,7 @@ class DriverPrivate;
   - EXPORT_KDB_DRIVER macro should be placed in driver's .cpp file
   - KDbDriver inherits from QObject only because this enables Qt Plugin system
 
- @see EXPORT_KDB_DRIVER KDB_DRIVER
+ @see EXPORT_KDB_DRIVER
 */
 class KDB_EXPORT KDbDriver : public QObject, public KDbResultable
 {
@@ -165,10 +165,12 @@ public:
     /*! used when we do not have KDbDriver instance yet */
     static QString defaultSQLTypeName(int id_t);
 
+#if 0
     /*! Driver's static version information (major part), it is automatically defined
      in implementation by KDB_DRIVER macro (see Driver_p.h)
      It's usually compared to drivers' and KDb library version. */
     virtual KDbVersionInfo version() const = 0;
+#endif
 
     /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.
@@ -360,6 +362,7 @@ inline KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
     return KDb::dateTimeToSQL(v);
 }
 
+#if 0
 /*! KDbDriver's static version information, automatically implemented for KDb drivers.
  Put this into driver class declaration just like Q_OBJECT macro. */
 #define KDB_DRIVER \
@@ -372,5 +375,6 @@ const char *KDB_DRIVER_INTERFACE_ID =
 
 //! Declare Interface for KDb drivers, loadable as Qt plugins
 Q_DECLARE_INTERFACE(KDbDriver, KDB_DRIVER_INTERFACE_ID)
+#endif
 
 #endif
