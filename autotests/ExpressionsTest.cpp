@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "TestExpressions.h"
+#include "ExpressionsTest.h"
 
 #include <QtTest/QtTest>
 
@@ -29,7 +29,9 @@ Q_DECLARE_METATYPE(KDb::ExpressionClass)
 Q_DECLARE_METATYPE(KDbEscapedString)
 Q_DECLARE_METATYPE(KDbField::Type)
 
-void TestExpressions::initTestCase()
+QTEST_GUILESS_MAIN(ExpressionsTest)
+
+void ExpressionsTest::initTestCase()
 {
 }
 
@@ -61,7 +63,7 @@ static void testCloneExpression(const T &e1)
     compareStrings(e1, copied);
 }
 
-void TestExpressions::testNullExpression()
+void ExpressionsTest::testNullExpression()
 {
     QVERIFY(KDbExpression() != KDbExpression());
 
@@ -82,7 +84,7 @@ void TestExpressions::testNullExpression()
     QVERIFY(e1.toUnary().isNull());
     QVERIFY(!e1.isVariable());
     QVERIFY(e1.toVariable().isNull());
-    QCOMPARE(e1.expressionClass(), UnknownExpressionClass);
+    QCOMPARE(e1.expressionClass(), KDb::UnknownExpression);
     QCOMPARE(e1.token(), 0);
     QVERIFY(e1 != KDbExpression());
     QVERIFY(e1 == e1);
@@ -106,13 +108,13 @@ void TestExpressions::testNullExpression()
     testCloneExpression(e1);
 }
 
-void TestExpressions::testExpressionClassName_data()
+void ExpressionsTest::testExpressionClassName_data()
 {
     QTest::addColumn<KDb::ExpressionClass>("expClass");
     QTest::addColumn<QString>("name");
 
 #define T(n, c) QTest::newRow(n) << c << n
-    T("Unknown", UnknownExpressionClass);
+    T("Unknown", KDb::UnknownExpression);
     T("Unary", KDb::UnaryExpression);
     T("Arithm", KDb::ArithmeticExpression);
     T("Logical", KDb::LogicalExpression);
@@ -122,13 +124,13 @@ void TestExpressions::testExpressionClassName_data()
     T("Variable", KDb::VariableExpression);
     T("Function", KDb::FunctionExpression);
     T("Aggregation", KDb::AggregationExpression);
-    T("FieldList", FieldListExpressionClass);
-    T("TableList", TableListExpressionClass);
-    T("QueryParameter", QueryParameterExpressionClass);
+    T("FieldList", KDb::FieldListExpression);
+    T("TableList", KDb::TableListExpression);
+    T("QueryParameter", KDb::QueryParameterExpression);
 #undef T
 }
 
-void TestExpressions::testExpressionClassName()
+void ExpressionsTest::testExpressionClassName()
 {
     QFETCH(KDb::ExpressionClass, expClass);
     QTEST(expressionClassName(expClass), "name");
@@ -137,11 +139,11 @@ void TestExpressions::testExpressionClassName()
 class TestedExpression : public KDbExpression
 {
 public:
-    TestedExpression(int token) : KDbExpression(new KDbExpressionData, UnknownExpressionClass, token) {
+    TestedExpression(int token) : KDbExpression(new KDbExpressionData, KDb::UnknownExpression, token) {
     }
 };
 
-void TestExpressions::testExpressionToken()
+void ExpressionsTest::testExpressionToken()
 {
     KDbExpression e1;
     QCOMPARE(e1.token(), 0);
@@ -152,12 +154,12 @@ void TestExpressions::testExpressionToken()
         QCOMPARE(TestedExpression(i).tokenToString(),
                 isprint(i) ? QString(QLatin1Char(uchar(i))) : QString());
     }
-    for (int i = 255; i <= maxToken(); ++i) {
+    for (unsigned int i = 255; i <= maxToken(); ++i) {
         QCOMPARE(KDbExpression::tokenToDebugString(i), QLatin1String(tokenName(i)));
     }
 }
 
-void TestExpressions::testNArgExpression()
+void ExpressionsTest::testNArgExpression()
 {
     KDbNArgExpression n;
     KDbNArgExpression n2;
@@ -375,7 +377,7 @@ void TestExpressions::testNArgExpression()
     QCOMPARE(n.lastIndexOf(c2, 0), -1);
 }
 
-void TestExpressions::testUnaryExpression()
+void ExpressionsTest::testUnaryExpression()
 {
     KDbUnaryExpression u;
     KDbUnaryExpression u2;
@@ -461,7 +463,7 @@ void TestExpressions::testUnaryExpression()
     QCOMPARE(u2.toString(), KDbEscapedString("+-<CYCLE!>"));
 }
 
-void TestExpressions::testBinaryExpression()
+void ExpressionsTest::testBinaryExpression()
 {
     KDbBinaryExpression b;
     KDbBinaryExpression b2;
@@ -551,7 +553,7 @@ void TestExpressions::testBinaryExpression()
     QCOMPARE(b.toString(), KDbEscapedString("<NULL!> + 1"));
 }
 
-void TestExpressions::testBinaryExpressionCloning_data()
+void ExpressionsTest::testBinaryExpressionCloning_data()
 {
     QTest::addColumn<int>("type1");
     QTest::addColumn<QVariant>("const1");
@@ -561,7 +563,7 @@ void TestExpressions::testBinaryExpressionCloning_data()
     QTest::addColumn<QString>("string");
 
 #define T(type1, const1, token, type2, const2, string) \
-        QTest::newRow(KDbExpression::tokenToDebugString(token).toLatin1()) \
+        QTest::newRow(KDbExpression::tokenToDebugString(token).toLatin1().constData()) \
             << int(type1) << QVariant(const1) << int(token) \
             << int(type2) << QVariant(const2) << QString(string)
 
@@ -583,7 +585,7 @@ void TestExpressions::testBinaryExpressionCloning_data()
 #undef T
 }
 
-void TestExpressions::testBinaryExpressionCloning()
+void ExpressionsTest::testBinaryExpressionCloning()
 {
     QFETCH(int, type1);
     QFETCH(QVariant, const1);
@@ -603,13 +605,13 @@ void TestExpressions::testBinaryExpressionCloning()
     QCOMPARE(c1, b.right().toConst());
 }
 
-void TestExpressions::testConstExpressionValidate()
+void ExpressionsTest::testConstExpressionValidate()
 {
     KDbConstExpression c;
     KDbConstExpression c1;
 
     KDbQuerySchema *query = 0;
-    ParseInfoInternal parseInfo(query);
+    KDbParseInfoInternal parseInfo(query);
 
     c = KDbConstExpression(SQL_NULL, QVariant());
     QCOMPARE(c.type(), KDbField::Null);
@@ -847,14 +849,14 @@ void TestExpressions::testConstExpressionValidate()
     qDebug() << c;
 }
 
-void TestExpressions::testUnaryExpressionValidate()
+void ExpressionsTest::testUnaryExpressionValidate()
 {
     KDbConstExpression c;
     KDbConstExpression c1;
     KDbUnaryExpression u;
     KDbUnaryExpression u2;
     KDbQuerySchema *query = 0;
-    ParseInfoInternal parseInfo(query);
+    KDbParseInfoInternal parseInfo(query);
 
     // cycles detected by validate()
     c = KDbConstExpression(INTEGER_CONST, 17);
@@ -867,14 +869,14 @@ void TestExpressions::testUnaryExpressionValidate()
     qDebug() << c << u << c1 << u2;
 }
 
-void TestExpressions::testNArgExpressionValidate()
+void ExpressionsTest::testNArgExpressionValidate()
 {
     KDbNArgExpression n;
     KDbConstExpression c;
     KDbConstExpression c1;
 
     KDbQuerySchema *query = 0;
-    ParseInfoInternal parseInfo(query);
+    KDbParseInfoInternal parseInfo(query);
 
     c = KDbConstExpression(SQL_NULL, QVariant());
     QCOMPARE(c.type(), KDbField::Null);
@@ -891,7 +893,7 @@ void TestExpressions::testNArgExpressionValidate()
     qDebug() << c << c1 << n;
 }
 
-void TestExpressions::testBinaryExpressionValidate_data()
+void ExpressionsTest::testBinaryExpressionValidate_data()
 {
     QTest::addColumn<int>("type1");
     QTest::addColumn<QVariant>("const1");
@@ -901,7 +903,7 @@ void TestExpressions::testBinaryExpressionValidate_data()
     QTest::addColumn<KDbField::Type>("type3");
 
     KDbQuerySchema *query = 0;
-    ParseInfoInternal parseInfo(query);
+    KDbParseInfoInternal parseInfo(query);
 
     // invalid
     KDbConstExpression c(INTEGER_CONST, 7);
@@ -931,11 +933,11 @@ void TestExpressions::testBinaryExpressionValidate_data()
 
 #define T1(type1, const1, token, type2, const2, type3) \
         QTest::newRow( \
-            QByteArray::number(__LINE__) + ": " + KDbExpression::tokenToDebugString(type1).toLatin1() + " " \
+            (QByteArray::number(__LINE__) + ": " + KDbExpression::tokenToDebugString(type1).toLatin1() + " " \
              + QVariant(const1).toString().toLatin1() + " " \
              + KDbExpression::tokenToDebugString(token).toLatin1() + " " \
              + KDbExpression::tokenToDebugString(type2).toLatin1() + " " \
-             + QVariant(const2).toString().toLatin1()) \
+             + QVariant(const2).toString().toLatin1()).constData()) \
             << int(type1) << QVariant(const1) \
             << int(token) << int(type2) << QVariant(const2) \
             << type3
@@ -1044,7 +1046,7 @@ void TestExpressions::testBinaryExpressionValidate_data()
 #undef T1
 }
 
-void TestExpressions::testBinaryExpressionValidate()
+void ExpressionsTest::testBinaryExpressionValidate()
 {
     QFETCH(int, type1);
     QFETCH(QVariant, const1);
@@ -1054,7 +1056,7 @@ void TestExpressions::testBinaryExpressionValidate()
     QFETCH(KDbField::Type, type3);
 
     KDbQuerySchema *query = 0;
-    ParseInfoInternal parseInfo(query);
+    KDbParseInfoInternal parseInfo(query);
 
     KDbConstExpression c(type1, const1);
     KDbConstExpression c1(type2, const2);
@@ -1066,8 +1068,6 @@ void TestExpressions::testBinaryExpressionValidate()
     testCloneExpression(b);
 }
 
-void TestExpressions::cleanupTestCase()
+void ExpressionsTest::cleanupTestCase()
 {
 }
-
-QTEST_MAIN(TestExpressions)

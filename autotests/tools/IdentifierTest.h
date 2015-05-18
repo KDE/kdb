@@ -17,12 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef TESTIDENTIFIER_H
-#define TESTIDENTIFIER_H
+#ifndef KDB_IDENTIFIERTEST_H
+#define KDB_IDENTIFIERTEST_H
 
 #include <QObject>
 
-class TestIdentifier : public QObject
+class IdentifierTest : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:

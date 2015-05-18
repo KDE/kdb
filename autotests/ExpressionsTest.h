@@ -17,17 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef TESTEXPRESSIONS_H
-#define TESTEXPRESSIONS_H
-
-#undef QT_USE_QSTRINGBUILDER
-#undef QT_NO_CAST_TO_ASCII
-#undef QT_NO_CAST_FROM_ASCII
+#ifndef KDB_EXPRESSIONSTEST_H
+#define KDB_EXPRESSIONSTEST_H
 
 #include <QObject>
 #include <KDbUtils>
 
-class TestExpressions : public QObject
+class ExpressionsTest : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
@@ -49,8 +45,6 @@ private Q_SLOTS:
     void testBinaryExpressionValidate();
 
     void cleanupTestCase();
-
-private:
 };
 
 #endif

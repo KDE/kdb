@@ -17,27 +17,24 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef TESTSQLPARSER_H
-#define TESTSQLPARSER_H
-
-#undef QT_USE_QSTRINGBUILDER
-#undef QT_NO_CAST_TO_ASCII
-#undef QT_NO_CAST_FROM_ASCII
+#ifndef KDB_SQLPARSERTEST_H
+#define KDB_SQLPARSERTEST_H
 
 #include <QObject>
 #include <QScopedPointer>
+
 #include <KDbConnection>
 #include <KDbParser>
 #include <KDbEscapedString>
 
-class TestSqlParser : public QObject
+class SqlParserTest : public QObject
 {
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
     void testParse_data();
     void testParse();
-    //! Test a few tokens, they should have certain values, needed for maintaining BC
+    //! Tests a few tokens, they should have certain values, needed for maintaining BC
     void testTokens();
     void cleanupTestCase();
     
@@ -50,4 +47,4 @@ private:
     QScopedPointer<KDbParser> m_parser;
 };
 
-#endif // TESTSTATICSETOFSTRINGS_H
+#endif

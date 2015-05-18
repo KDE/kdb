@@ -17,15 +17,18 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "TestSqlParser.h"
+#include "SqlParserTest.h"
 #include <QtTest/QtTest>
 
 #include <KDbDriverManager>
 #include <KDbParser>
+#include "generated/sqlparser.h"
 
 Q_DECLARE_METATYPE(KDbEscapedString)
 
-bool TestSqlParser::openDatabase(const QString &path)
+QTEST_GUILESS_MAIN(SqlParserTest)
+
+bool SqlParserTest::openDatabase(const QString &path)
 {
     QString driverName("sqlite");
     KDbDriverManager manager;
@@ -36,7 +39,7 @@ bool TestSqlParser::openDatabase(const QString &path)
         return false;
     }
 
-    ConnectionData cdata;
+    KDbConnectionData cdata;
     cdata.setDatabaseName(path);
     m_conn.reset(driver->createConnection(cdata));
     if (!m_conn || driver->result().isError()) {
@@ -47,7 +50,7 @@ bool TestSqlParser::openDatabase(const QString &path)
         qDebug() << m_conn->result();
         return false;
     }
-    m_parser.reset(new Parser(m_conn.data()));
+    m_parser.reset(new KDbParser(m_conn.data()));
 #if 0
     if (m_conn->databaseExists(dbName)) {
         if (!m_conn->dropDatabase(dbName)) {
@@ -70,13 +73,13 @@ bool TestSqlParser::openDatabase(const QString &path)
     return true;
 }
 
-void TestSqlParser::initTestCase()
+void SqlParserTest::initTestCase()
 {
 }
 
-KDbEscapedString TestSqlParser::parse(const KDbEscapedString& statement, bool *ok)
+KDbEscapedString SqlParserTest::parse(const KDbEscapedString& statement, bool *ok)
 {
-    Parser *parser = m_parser.data();
+    KDbParser *parser = m_parser.data();
 
     *ok = parser->parse(statement);
     if (!*ok) {
@@ -122,7 +125,7 @@ static void eatEndComment(QString* string)
     *string = string->left(i+1).trimmed();
 }
 
-void TestSqlParser::testParse_data()
+void SqlParserTest::testParse_data()
 {
     QTest::addColumn<QString>("fname");
     QTest::addColumn<int>("lineNum");
@@ -133,7 +136,7 @@ void TestSqlParser::testParse_data()
     QString fname("statements.txt");
     QFile input(dir + QDir::separator() + fname);
     bool ok = input.open(QFile::ReadOnly | QFile::Text);
-    QVERIFY2(ok, ("Could not open data file " + input.fileName()).toLatin1());
+    QVERIFY2(ok, QString("Could not open data file %1").arg(input.fileName()).toLatin1().constData());
     QTextStream in(&input);
     QString category;
     QString testName;
@@ -170,12 +173,12 @@ void TestSqlParser::testParse_data()
                 }
                 ok = dbPath.isEmpty();
                 QVERIFY2(ok, QString("Error at line %1: SQLite was file already specified (%2)")
-                    .arg(lineNum).arg(dbPath).toLatin1());
+                    .arg(lineNum).arg(dbPath).toLatin1().constData());
                 dbPath = line.mid(QString("SQLITEFILE: ").length()).trimmed();
                 dbPath = dir + QDir::separator() + dbPath;
                 ok = openDatabase(dbPath);
                 QVERIFY2(ok, QString("Error at line %1: Could not open SQLite file %2")
-                    .arg(lineNum).arg(dbPath).toLatin1());
+                    .arg(lineNum).arg(dbPath).toLatin1().constData());
             }
             else if (line.startsWith("ERROR: ")) {
                 if (clearTestName) {
@@ -206,36 +209,36 @@ void TestSqlParser::testParse_data()
             }
             ok = !dbPath.isEmpty();
             QVERIFY2(ok, QString("Error at line %1: SQLite was file not specified, cannot execute statement")
-                .arg(lineNum).toLatin1());
+                .arg(lineNum).toLatin1().constData());
 
-            QTest::newRow(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"")
-                          .arg(fname).arg(lineNum).arg(category).arg(testName).toLatin1()
-                          + (expectError ? "; Error expected" :""))
+            QTest::newRow(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
+                          .arg(fname).arg(lineNum).arg(category).arg(testName)
+                          .arg(expectError ? "; Error expected" :"").toLatin1().constData())
                 << fname << lineNum << sql << expectError;
         }
     }
     input.close();
 }
 
-void TestSqlParser::testParse()
+void SqlParserTest::testParse()
 {
     QFETCH(QString, fname);
     QFETCH(int, lineNum);
     QFETCH(KDbEscapedString, sql);
     QFETCH(bool, expectError);
 
-    QVERIFY2(sql.endsWith(';'), QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum).toLatin1());
+    QVERIFY2(sql.endsWith(';'), QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum).toLatin1().constData());
     sql.chop(1);
     //qDebug() << "SQL:" << sql.toString() << expectError;
     bool ok;
     KDbEscapedString result = parse(sql, &ok);
-    Parser *parser = m_parser.data();
+    KDbParser *parser = m_parser.data();
 
     if (ok) {
         // sucess, so error cannot be expected
         QVERIFY2(!expectError,
                  (QString("Unexpected success in statement: \"%1\"; Result: %2")
-                  .arg(sql.toString()).arg(result.toString()).toLatin1()));
+                  .arg(sql.toString()).arg(result.toString()).toLatin1().constData()));
         if (!expectError) {
             qDebug() << "Result:" << result.toString();
         }
@@ -244,14 +247,14 @@ void TestSqlParser::testParse()
         // failure, so error should be expected
         QVERIFY2(expectError, QString("Statement: \"%1\"; %2")
                  .arg(sql.toString())
-                 .arg(KDbUtils::debugString(parser->error())).toLatin1());
+                 .arg(KDbUtils::debugString(parser->error())).toLatin1().constData());
         if (expectError) {
             qDebug() << parser->error();
         }
     }
 }
 
-void TestSqlParser::testTokens()
+void SqlParserTest::testTokens()
 {
     QCOMPARE(int(SQL_TYPE), 258);
     QCOMPARE(int(AS), 259);
@@ -317,7 +320,7 @@ void TestSqlParser::testTokens()
     QCOMPARE(int(NOT_LIKE), 319);
 }
 
-void TestSqlParser::cleanupTestCase()
+void SqlParserTest::cleanupTestCase()
 {
     if (m_conn && m_conn->isConnected()) {
 #if 0
@@ -330,5 +333,3 @@ void TestSqlParser::cleanupTestCase()
         m_conn.reset();
     }
 }
-
-QTEST_MAIN(TestSqlParser)

@@ -17,15 +17,19 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "TestIdentifier.h"
-#include <KDbIdentifierValidator>
-#include <QTest>
+#include "IdentifierTest.h"
 
-void TestIdentifier::initTestCase()
+#include <KDb>
+
+#include <QtTest/QTest>
+
+QTEST_GUILESS_MAIN(IdentifierTest)
+
+void IdentifierTest::initTestCase()
 {
 }
 
-void TestIdentifier::testStringToIdentifier_data()
+void IdentifierTest::testStringToIdentifier_data()
 {
     QTest::addColumn<QString>("string1");
     QTest::addColumn<QString>("string2");
@@ -39,14 +43,14 @@ void TestIdentifier::testStringToIdentifier_data()
     QTest::newRow("non-alpha") << "1" << "_1";
 }
 
-void TestIdentifier::testStringToIdentifier()
+void IdentifierTest::testStringToIdentifier()
 {
     QFETCH(QString, string1);
     QFETCH(QString, string2);
-    QCOMPARE(KDbUtils::stringToIdentifier(string1), string2);
+    QCOMPARE(KDb::stringToIdentifier(string1), string2);
 }
 
-void TestIdentifier::testIsIdentifier_data()
+void IdentifierTest::testIsIdentifier_data()
 {
     QTest::addColumn<QString>("string");
     QTest::addColumn<bool>("result");
@@ -61,15 +65,13 @@ void TestIdentifier::testIsIdentifier_data()
     QTest::newRow("empty") << "_7" << true;
 }
 
-void TestIdentifier::testIsIdentifier()
+void IdentifierTest::testIsIdentifier()
 {
     QFETCH(QString, string);
     QFETCH(bool, result);
-    QCOMPARE(KDbUtils::isIdentifier(string), result);
+    QCOMPARE(KDb::isIdentifier(string), result);
 }
 
-void TestIdentifier::cleanupTestCase()
+void IdentifierTest::cleanupTestCase()
 {
 }
-
-QTEST_MAIN(TestIdentifier)

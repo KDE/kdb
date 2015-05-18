@@ -17,25 +17,27 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "TestConnection.h"
+#include "ConnectionTest.h"
 
 #include <KDbDriverManager>
 #include <KDbConnection>
 
 #include <QtDebug>
 #include <QFile>
-#include <QTest>
+#include <QtTest/QTest>
 
 KDbConnection *conn = 0;
 
 #define TABLETEST_DO_NOT_CREATE_DB
-#include "../../tests/features/tables_test.h"
+#include "../tests/features/tables_test.h"
 
-void TestConnection::initTestCase()
+QTEST_GUILESS_MAIN(ConnectionTest)
+
+void ConnectionTest::initTestCase()
 {
 }
 
-void TestConnection::testCreateDb()
+void ConnectionTest::testCreateDb()
 {
     QString drv_name = "sqlite";
     QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "test.kexi"));
@@ -82,8 +84,6 @@ void TestConnection::testCreateDb()
     conn = 0;
 }
 
-void TestConnection::cleanupTestCase()
+void ConnectionTest::cleanupTestCase()
 {
 }
-
-QTEST_MAIN(TestConnection)

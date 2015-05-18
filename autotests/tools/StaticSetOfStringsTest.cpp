@@ -17,10 +17,12 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "TestStaticSetOfStrings.h"
+#include "StaticSetOfStringsTest.h"
 #include <QtTest/QtTest>
 
-const char* TestStaticSetOfStrings::keywords[] = {
+QTEST_GUILESS_MAIN(StaticSetOfStringsTest)
+
+const char* StaticSetOfStringsTest::keywords[] = {
     "ABORT",
     "ABSOLUTE",
     "ACCESS",
@@ -42,12 +44,12 @@ const char* TestStaticSetOfStrings::keywords[] = {
     0
 };
 
-void TestStaticSetOfStrings::initTestCase()
+void StaticSetOfStringsTest::initTestCase()
 {
     strings.setStrings(keywords);
 }
 
-void TestStaticSetOfStrings::testContains()
+void StaticSetOfStringsTest::testContains()
 {
     QVERIFY(strings.contains("ANY")); //test a random string
     QVERIFY(strings.contains(QString("backward").toUpper().toLocal8Bit()));
@@ -58,9 +60,6 @@ void TestStaticSetOfStrings::testContains()
     QVERIFY(strings.contains("BINARY")); //test end of list
 }
 
-void TestStaticSetOfStrings::cleanupTestCase()
+void StaticSetOfStringsTest::cleanupTestCase()
 {
-
 }
-
-QTEST_MAIN(TestStaticSetOfStrings)
