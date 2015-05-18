@@ -234,12 +234,6 @@ bool addColumn(KDbParseInfo *parseInfo, KDbExpression *columnExpr)
     return true;
 }
 
-//! clean up no longer needed temporary objects
-#define CLEANUP \
-    /*delete colViews;*/ \
-    /*delete tablesList;*/ \
-    delete options
-
 KDbQuerySchema* buildSelectQuery(
     KDbQuerySchema* querySchema, KDbNArgExpression* _colViews,
     KDbNArgExpression* _tablesList, SelectOptionsInternal* options)
@@ -257,6 +251,7 @@ KDbQuerySchema* buildSelectQuery(
         tablesList = *_tablesList;
         delete _tablesList;
     }
+    QScopedPointer<SelectOptionsInternal> optionsPtr(options);
 
     //-------tables list
     uint columnNum = 0;
@@ -285,7 +280,6 @@ KDbQuerySchema* buildSelectQuery(
             if (!s) {
                 setError(
                     QObject::tr("Table \"%1\" does not exist.").arg(tname));
-                CLEANUP;
                 return 0;
             }
             QString tableOrAliasName = KDb::iifNotEmpty(aliasString, tname);
@@ -338,7 +332,6 @@ KDbQuerySchema* buildSelectQuery(
                 if (columnExpr.toVariable().name() == QLatin1String("*")) {
                     if (containsAsteriskColumn) {
                         setError(QObject::tr("More than one asterisk (*) is not allowed"));
-                        CLEANUP;
                         return 0;
                     }
                     else {
@@ -376,8 +369,7 @@ KDbQuerySchema* buildSelectQuery(
             }
         } // for
         if (!globalParser->error().message().isEmpty()) { // we could not return earlier (inside the loop)
-            // because we want run CLEANUP what could crash QMutableListIterator.
-            CLEANUP;
+                                                          // because we want run CLEANUP what could crash QMutableListIterator.
             return 0;
         }
     }
@@ -387,7 +379,6 @@ KDbQuerySchema* buildSelectQuery(
         if (!options->whereExpr.isNull()) {
             if (!options->whereExpr.validate(&parseInfo)) {
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
-                CLEANUP;
                 return 0;
             }
             querySchema->setWhereExpression(options->whereExpr);
@@ -412,7 +403,6 @@ KDbQuerySchema* buildSelectQuery(
                                                             (*it).ascending, (*it).columnNumber - 1)) {
                             setError(QObject::tr("Could not define sorting - no column at position %1")
                                           .arg((*it).columnNumber));
-                            CLEANUP;
                             return 0;
                         }
                     } else {
@@ -420,7 +410,6 @@ KDbQuerySchema* buildSelectQuery(
                         if (!f) {
                             setError(QObject::tr("Could not define sorting - "
                                           "column name or alias \"%1\" does not exist").arg((*it).aliasOrName));
-                            CLEANUP;
                             return 0;
                         }
                         orderByColumnList->appendField(*f, (*it).ascending);
@@ -429,12 +418,7 @@ KDbQuerySchema* buildSelectQuery(
             }
         }
     }
-
 // KDbDbg << "Select ColViews=" << (colViews ? colViews->debugString() : QString())
 //  << " Tables=" << (tablesList ? tablesList->debugString() : QString()s);
-
-    CLEANUP;
     return querySchema;
 }
-
-#undef CLEANUP
