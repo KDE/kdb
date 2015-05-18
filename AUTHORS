@@ -7,6 +7,7 @@ Main Authors:
 
 Contributors:
 - Lucijan Busch <lucijan@kde.org> - early code
-- Sebastian Sauer <mail@dipe.org> - fixess
+- Sebastian Sauer <mail@dipe.org> - fixes
 - Joseph Wenninger <kde@jowenn.at> - fixes, early MySQL driver
 - Matt Rogers <mattr@kde.org> - ODBC driver
+- Laurent Montel <montel@kde.org> - cleanups
