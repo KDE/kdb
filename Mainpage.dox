@@ -7,4 +7,4 @@
     - Development wiki: http://community.kde.org/KDb
  */
 // DOXYGEN_SET_PROJECT_NAME = KDb
-EXCLUDE=examples tests tools src/generated src/parser/generated src/drivers/sqlite/icu
+EXCLUDE=examples autotests tests tools src/generated src/parser/generated src/drivers/sqlite/icu
