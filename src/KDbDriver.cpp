@@ -258,6 +258,11 @@ KDbEscapedString KDb::dateTimeToSQL(const QDateTime& v)
     return KDbEscapedString('\'') + v.toString(Qt::ISODate) + KDbEscapedString('\'');
 }
 
+KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
+{
+    return KDb::dateTimeToSQL(v);
+}
+
 QVariant KDbDriver::propertyValue(const QByteArray& propName) const
 {
     return d->properties.value(propName.toLower());
@@ -278,6 +283,11 @@ QList<QByteArray> KDbDriver::propertyNames() const
 void KDbDriver::initDriverSpecificKeywords(const char* const* keywords)
 {
     d->driverSpecificSQLKeywords.setStrings(keywords);
+}
+
+KDbEscapedString KDbDriver::addLimitTo1(const KDbEscapedString& sql, bool add)
+{
+    return add ? (sql + " LIMIT 1") : sql;
 }
 
 bool KDbDriver::isDriverSpecificKeyword(const QByteArray& word) const

@@ -35,7 +35,6 @@
 class KDbAdminTools;
 class KDbConnection;
 class KDbConnectionData;
-class ConnectionInternal;
 class KDbDriverManager;
 class KDbDriverBehaviour;
 class DriverPrivate;
@@ -191,7 +190,7 @@ public:
     }
 
     /*! @todo not compatible with all drivers - reimplement */
-    inline virtual KDbEscapedString dateTimeToSQL(const QDateTime& v) const;
+    virtual KDbEscapedString dateTimeToSQL(const QDateTime& v) const;
 
     /*! Driver-specific SQL string escaping.
      Implement escaping for any character like " or ' as your
@@ -304,9 +303,7 @@ protected:
     /*! @return SQL statement @a sql modified by adding limiting command,
      (if possible and if @add is true). Used for optimization for the server side.
      Can be reimplemented for other drivers. */
-    inline virtual KDbEscapedString addLimitTo1(const KDbEscapedString& sql, bool add) {
-        return add ? (sql + " LIMIT 1") : sql;
-    }
+    virtual KDbEscapedString addLimitTo1(const KDbEscapedString& sql, bool add);
 
 protected:
     /*! Used by the driver manager to set info for just loaded driver. */
@@ -355,11 +352,6 @@ KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
     Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
     @todo Add support for time zones */
 KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
-}
-
-inline KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
-{
-    return KDb::dateTimeToSQL(v);
 }
 
 #if 0

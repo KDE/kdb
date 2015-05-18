@@ -136,6 +136,20 @@ void KDbResultable::storePreviousError()
     qDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
+KDbResultable::~KDbResultable()
+{
+}
+
+KDbResult KDbResultable::result() const
+{
+    return m_result;
+}
+
+void KDbResultable::clearResult()
+{
+    m_result = KDbResult();
+}
+
 QString KDbResultable::serverResultName() const
 {
     return QString();

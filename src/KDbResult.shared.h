@@ -152,19 +152,15 @@ protected:
 #endif
 };
 
-//! Interface for classes providing result.
+//! Interface for classes providing a result.
 class KDB_EXPORT KDbResultable
 {
 public:
-    virtual ~KDbResultable() {}
+    virtual ~KDbResultable();
     
-    KDbResult result() const { return m_result; }
+    KDbResult result() const;
 
-    void clearResult() { m_result = KDbResult(); }
-
-    /*! Stores previous error.
-    */
-//    void storePreviousError();
+    void clearResult();
 
     /*!
     @return engine-specific last server-side operation result name, (name for serverResultCode()).
@@ -177,21 +173,6 @@ public:
     virtual QString serverResultName() const;
 
 protected:
-#if 0
-    /*!
-    Previous server result code, for displaying.
-    */
-    int m_previousServerResultCode;
-
-    int m_previousServerResultCode2;
-
-    /*!
-    Previous server result name, for displaying.
-    */
-    QString m_previousServerResultName;
-
-    QString m_previousServerResultName2;
-#endif
     KDbResult m_result;
 };
 
