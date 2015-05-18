@@ -1,4 +1,4 @@
-add_library(predicate_sqlite_icu SHARED icu.c)
+add_library(kdb_sqlite_icu MODULE icu.c)
 
 include_directories(${ICU_INCLUDE_DIRS})
 
