@@ -99,12 +99,9 @@ void yyerror(const char *str)
     globalParser->setOperation(KDbParser::OP_Error);
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
-
-    if ((   globalParser->error().type().isEmpty()
-         && (str == 0 || strlen(str) == 0 || qstrnicmp(str, "syntax error", 12) == 0 || qstrnicmp(str, "parse error", 11) == 0)
-        )
-        || otherError
-       )
+    const bool syntaxError = qstrnicmp(str, "syntax error", 12) == 0;
+    if ((   globalParser->error().type().isEmpty() && (str == 0 || strlen(str) == 0 || syntaxError))
+        || otherError)
     {
         KDbDbg << globalParser->statement();
         QString ptrline(globalCurrentPos, QLatin1Char(' '));
@@ -113,6 +110,7 @@ void yyerror(const char *str)
 
         KDbDbg << ptrline;
 
+#if 0
         //lexer may add error messages
         QString lexerErr = globalParser->error().message();
 
@@ -122,22 +120,26 @@ void yyerror(const char *str)
                 lexerErr = QObject::tr("identifier was expected");
             }
         }
+#endif
 
+        //! @todo exact invalid expression can be selected in the editor, based on KDbParseInfo data
         if (!otherError) {
-            if (!lexerErr.isEmpty()) {
-                lexerErr.prepend(QLatin1String(": "));
+            const bool isKDbSQLKeyword = KDb::isKDbSQLKeyword(globalToken);
+            if (isKDbSQLKeyword || syntaxError) {
+                if (isKDbSQLKeyword) {
+                    globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
+                                                          QObject::tr("\"%1\" is a reserved keyword.").arg(QLatin1String(globalToken)),
+                                                          globalToken, globalCurrentPos));
+                } else {
+                    globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
+                                                          QObject::tr("Syntax error."),
+                                                          globalToken, globalCurrentPos));
+                }
+            } else {
+                globalParser->setError(KDbParserError(QObject::tr("Error"),
+                                                      QObject::tr("Error near \"%1\".").arg(QLatin1String(globalToken)),
+                                                      globalToken, globalCurrentPos));
             }
-
-            if (KDb::isKDbSQLKeyword(globalToken))
-                globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("\"%1\" is a reserved keyword.")
-                                                .arg(QLatin1String(globalToken)) + lexerErr,
-                                             globalToken, globalCurrentPos));
-            else
-                globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
-                                             QObject::tr("Syntax Error near \"%1\".")
-                                                .arg(QLatin1String(globalToken)) + lexerErr,
-                                             globalToken, globalCurrentPos));
         }
     }
 }
