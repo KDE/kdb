@@ -20,6 +20,7 @@
 #ifndef KDB_PARSER_P_H
 #define KDB_PARSER_P_H
 
+#include "config-kdb.h"
 #include "KDbParser.h"
 #include "KDbQuerySchema.h"
 #include "KDbTableSchema.h"
@@ -68,7 +69,7 @@ public:
 };
 
 /*! Internal info used on parsing (writable). */
-class KDbParseInfoInternal : public KDbParseInfo
+class KDB_TESTING_EXPORT KDbParseInfoInternal : public KDbParseInfo
 {
 public:
     //! Constructs parse info structure for query @a query.

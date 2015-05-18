@@ -23,6 +23,7 @@
 #ifndef KDB_EXPRESSION_P_H
 #define KDB_EXPRESSION_P_H
 
+#include "config-kdb.h"
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 
@@ -60,7 +61,7 @@ typedef QExplicitlySharedDataPointer<KDbExpressionData> ExplicitlySharedExpressi
 
 //! Internal data class used to implement implicitly shared class KDbExpression.
 //! Provides thread-safe reference counting.
-class KDbExpressionData : public QSharedData
+class KDB_TESTING_EXPORT KDbExpressionData : public QSharedData
 {
 public:
     KDbExpressionData();

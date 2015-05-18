@@ -22,16 +22,16 @@ echo '#ifndef KDBSQLPARSER_H
 #include "KDbSqlTypes.h"
 
 bool parseData(KDbParser *p, const char *data);
-const char* tokenName(unsigned int offset);
-unsigned int maxToken();' > generated/sqlparser.h
+KDB_TESTING_EXPORT const char* tokenName(unsigned int offset);
+KDB_TESTING_EXPORT unsigned int maxToken();' > generated/sqlparser.h
 
 cat KDbSqlParser.tab.h >> generated/sqlparser.h
 echo '#endif' >> generated/sqlparser.h
 sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.h
 
 cat KDbSqlParser.tab.c | sed -e "s/KDbSqlParser\.tab\.c/KDbSqlParser.cpp/g" > generated/sqlparser.cpp
-echo 'const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
-unsigned int maxToken() { return YYMAXUTOK; }' >> generated/sqlparser.cpp
+echo 'KDB_TESTING_EXPORT const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
+KDB_TESTING_EXPORT unsigned int maxToken() { return YYMAXUTOK; }' >> generated/sqlparser.cpp
 sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.cpp
 
 ./extract_tokens.sh > generated/tokens.cpp

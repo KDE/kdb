@@ -2806,5 +2806,5 @@ yyreturn:
 #line 1483 "KDbSqlParser.y" /* yacc.c:1906  */
 
 
-const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
-unsigned int maxToken() { return YYMAXUTOK; }
+KDB_TESTING_EXPORT const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
+KDB_TESTING_EXPORT unsigned int maxToken() { return YYMAXUTOK; }
