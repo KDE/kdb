@@ -20,26 +20,17 @@
 #ifndef KDB_CONNECTION_P_H
 #define KDB_CONNECTION_P_H
 
-#include <KDbConnection>
+#include "kdb_export.h"
 
-//! Interface for connection's internals, implemented within drivers
-class KDB_EXPORT ConnectionInternal
+class KDbConnection;
+
+//! Interface for accessing connection's internal result, for use by drivers.
+class KDB_EXPORT KDbConnectionInternal
 {
 public:
-    explicit ConnectionInternal(KDbConnection *conn);
-    virtual ~ConnectionInternal();
-    virtual void storeResult() = 0;
+    explicit KDbConnectionInternal(KDbConnection *conn);
 
-    inline void setServerMessage(const QString& serverMessage) {
-        connection->setServerMessage(serverMessage);
-    }
-    inline void setServerResultCode(int code) {
-        connection->setServerResultCode(code);
-    }
-    inline void setResult(const KDbResult& result) {
-        connection->setResult(result);
-    }
-
+protected:
     KDbConnection* const connection;
 };
 

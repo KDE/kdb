@@ -20,12 +20,7 @@
 #ifndef KDB_CONNECTION_H
 #define KDB_CONNECTION_H
 
-#include <QObject>
 #include <QStringList>
-#include <QHash>
-#include <QVector>
-#include <QVariant>
-#include <QPointer>
 
 #include "KDbConnectionData.h"
 #include "KDbTableSchema.h"
@@ -43,35 +38,13 @@ class ConnectionPrivate;
 class KDbRecordEditBuffer;
 class KDbProperties;
 
-class KDB_EXPORT ConnectionSqlInterface : public KDbResultable
-{
-    protected:
-        inline void setSql(const KDbEscapedString& sql) {
-            m_result.setSql(sql);
-        }
-/*        inline QString sql() const {
-            return m_result.sql();
-        }*/
-        inline void setServerMessage(const QString& serverMessage) {
-            m_result.setServerMessage(serverMessage);
-        }
-        inline void setServerResultCode(int code) {
-            m_result.setServerResultCode(code);
-        }
-        inline void setResult(const KDbResult& result) {
-            m_result = result;
-        }
-    friend class KDbCursor;
-    friend class ConnectionInternal;
-};
-
 /*! @short Provides database connection, allowing queries and data modification.
 
  This class represents a database connection established within a data source.
  It supports data queries and modification by creating client-side database cursors.
  Database transactions are supported.
 */
-class KDB_EXPORT KDbConnection : public ConnectionSqlInterface
+class KDB_EXPORT KDbConnection : public KDbResultable
 {
 public:
 

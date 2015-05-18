@@ -65,12 +65,8 @@ KDbConnection::SelectStatementOptions::~SelectStatementOptions()
 
 //================================================
 
-ConnectionInternal::ConnectionInternal(KDbConnection *conn)
+KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
         : connection(conn)
-{
-}
-
-ConnectionInternal::~ConnectionInternal()
 {
 }
 

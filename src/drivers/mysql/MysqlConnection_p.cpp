@@ -37,7 +37,7 @@
 
 /* ************************************************************************** */
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
-        : ConnectionInternal(connection)
+        : KDbConnectionInternal(connection)
         , mysql(0)
         , mysql_owned(true)
         , res(0)
