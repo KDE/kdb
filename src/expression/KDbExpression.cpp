@@ -45,7 +45,7 @@ public:
             QLatin1String("Variable"),
             QLatin1String("Function"),
             QLatin1String("Aggregation"),
-            QLatin1String("KDbFieldList"),
+            QLatin1String("FieldList"),
             QLatin1String("TableList"),
             QLatin1String("QueryParameter")})
     {
