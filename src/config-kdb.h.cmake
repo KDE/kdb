@@ -2,7 +2,7 @@
 
 #ifdef BUILD_TESTING
 /* Export symbols for testing */
-#  define KDB_TESTING_EXPORT KDB_TESTING
+#  define KDB_TESTING_EXPORT KDB_EXPORT
 #else
 #  define KDB_TESTING_EXPORT
 #endif

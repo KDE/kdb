@@ -1,58 +1,57 @@
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Widgets Xml)
-
-ADD_DEFINITIONS(
-#TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
-  -D__KDB__=
-  -DMAKE_KDB_LIB=1
-  -DYYERROR_VERBOSE=1
-)
-if(CMAKE_BUILD_TYPE EQUAL Debug OR CMAKE_BUILD_TYPE EQUAL RelWithDebInfo)
-  ADD_DEFINITIONS(
-    -DYYDEBUG=1
-  )
-endif(CMAKE_BUILD_TYPE EQUAL Debug OR CMAKE_BUILD_TYPE EQUAL RelWithDebInfo)
-
-if (WIN32)
-  set(CMAKE_DEBUG_POSTFIX "d")
-  ADD_DEFINITIONS(
-    -DYY_NO_UNISTD_H=1
-  )
-endif (WIN32)
-
-########### options ###############
-
+# Options
 simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
+configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
+
+add_definitions(
+    #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
+    -D__KDB__=
+    #-DYYERROR_VERBOSE=1
+)
+if(CMAKE_BUILD_TYPE EQUAL Debug OR CMAKE_BUILD_TYPE EQUAL RelWithDebInfo)
+    add_definitions(
+        -DYYDEBUG=1
+    )
+endif()
+
+if(WIN32)
+    add_definitions(
+        -DYY_NO_UNISTD_H=1
+    )
+endif()
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
 # Create target for the parser
-ADD_CUSTOM_TARGET(parser echo "Creating parser/lexer files")
+add_custom_target(parser echo "Creating parser/lexer files")
 
 set(PARSER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/parser)
 
 # Create custom command for flex/lex (note the outputs)
-ADD_CUSTOM_COMMAND(
-COMMAND ${PARSER_SOURCE_DIR}/generate_parser_code.sh
-TARGET parser
-OUTPUTS
-  ${PARSER_SOURCE_DIR}/generated/sqlparser.h
-  ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
-  ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp)
+add_custom_command(
+    COMMAND ${PARSER_SOURCE_DIR}/generate_parser_code.sh
+    TARGET parser
+    OUTPUTS
+        ${PARSER_SOURCE_DIR}/generated/sqlparser.h
+        ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
+        ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
+)
 
-# mark files as generated
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h GENERATED)
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp GENERATED)
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp GENERATED
-                            PROPERTIES COMPILE_FLAGS "-Wno-sign-compare -Wno-unused-function ")
+# Mark files as generated
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp PROPERTIES GENERATED TRUE)
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp PROPERTIES GENERATED TRUE)
 
-set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp GENERATED)
-
-########### next target ###############
+set_source_files_properties(
+    ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
+    PROPERTIES
+        GENERATED TRUE
+        COMPILE_FLAGS "-Wno-sign-compare -Wno-unused-function "
+)
 
 # Generate KDbGlobal.h
-configure_file(KDbGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/KDbGlobal.h )
+configure_file(KDbGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/KDbGlobal.h)
 
 set(kdb_LIB_SRCS
    parser/generated/sqlscanner.cpp
@@ -136,11 +135,26 @@ KDB_REMOVE_EXTENSIONS(
 
 generate_export_header(KDb)
 
+set(kdb_INCLUDE_DIRS
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb/expression
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb/interfaces
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb/parser
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb/tools
+    ${CMAKE_CURRENT_BINARY_DIR}/kdb/views
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/expression
+    ${CMAKE_CURRENT_SOURCE_DIR}/generated
+    ${CMAKE_CURRENT_SOURCE_DIR}/interfaces
+    ${CMAKE_CURRENT_SOURCE_DIR}/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools
+    ${CMAKE_CURRENT_SOURCE_DIR}/views
+)
+
 target_include_directories(KDb
+    PUBLIC "$<BUILD_INTERFACE:${kdb_INCLUDE_DIRS}>"
     INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KDb>"
-    PRIVATE expression generated interfaces parser parser/generated tools views
-            ${CMAKE_CURRENT_BINARY_DIR}/kdb
-            ${ICU_INCLUDE_DIRS}
+    PRIVATE expression generated interfaces parser tools views ${ICU_INCLUDE_DIRS}
 )
 
 target_link_libraries(KDb
@@ -153,16 +167,16 @@ target_link_libraries(KDb
         ${ICU_I18N_LIBRARY}
 )
 
-if (BUILD_TEST_COVERAGE)
+if(BUILD_TEST_COVERAGE)
     target_link_libraries(KDb
         PRIVATE
             gcov
     )
-endif (BUILD_TEST_COVERAGE)
+endif()
 
 set_target_properties(KDb
-    PROPERTIES VERSION ${GENERIC_KDB_LIB_VERSION}
-               SOVERSION ${GENERIC_KDB_LIB_SOVERSION}
+    PROPERTIES VERSION 1.0
+               SOVERSION 1.0.0
                EXPORT_NAME KDb
 )
 
@@ -175,23 +189,24 @@ ecm_setup_version(${KDB_VERSION}
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"
 )
 
+install(TARGETS KDb
+        EXPORT KDbTargets
+        ${INSTALL_TARGETS_DEFAULT_ARGS})
+
+# Create a Config.cmake and a ConfigVersion.cmake file and install them
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KDb")
+
 ecm_configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KDbConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
     INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
 )
 
-########### install files ###############
-
 install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
         "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
         COMPONENT Devel)
-
-install(TARGETS KDb
-        EXPORT KDbTargets
-        ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 install(EXPORT KDbTargets
         DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
@@ -216,6 +231,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
     ORIGINAL CAMELCASE
     PREFIX kdb
     HEADER_NAMES
+        KDb
         KDbAdmin
         KDbAlter
         KDbConnection
@@ -240,7 +256,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbRelationship
         KDbTableSchema
         KDbTransaction
-        KDb
 
         expression/KDbExpression
         expression/KDbExpressionData
@@ -253,9 +268,8 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         views/KDbTableViewColumn
 
         tools/KDbValidator
-        #tools/Utils
+        tools/KDbUtils
         tools/KDbTristate
-        #Qt5 tools/Static
         #todo  tools/SimpleCommandLineApp
         #  tools/SharedPtr.h
         tools/KDbLongLongValidator
@@ -284,7 +298,8 @@ install(
         ${kdb_HEADERS}
         ${kdb_HEADERS_FROM_BUILDDIR}
         ${PROJECT_BINARY_DIR}/src/kdb_export.h
-    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kproperty
+        ${PROJECT_BINARY_DIR}/src/config-kdb.h
+    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kdb
     COMPONENT Devel
 )
 

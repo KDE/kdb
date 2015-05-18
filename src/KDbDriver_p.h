@@ -277,8 +277,8 @@ public:
     Q_EXPORT_PLUGIN2( kdb_ ## driverName, driverClass ) \
     Q_EXTERN_C Q_DECL_EXPORT const quint32 version_major = KDB_VERSION_MAJOR; \
     Q_EXTERN_C Q_DECL_EXPORT const quint32 version_minor = KDB_VERSION_MINOR; \
-    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_release = KDB_VERSION_RELEASE; \
+    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_release = KDB_VERSION_PATCH; \
     KDbVersionInfo driverClass::version() const { \
         return KDbVersionInfo( \
-            KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_RELEASE); }
+            KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_PATCH); }
 #endif

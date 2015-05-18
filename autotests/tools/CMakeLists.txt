@@ -1,3 +1,6 @@
-include(BuildTests)
-build_test(Identifier)
-build_test(StaticSetOfStrings)
+ecm_add_tests(
+    IdentifierTest.cpp
+    StaticSetOfStringsTest.cpp
+
+    LINK_LIBRARIES KDb Qt5::Test
+)

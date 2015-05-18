@@ -21,29 +21,13 @@
 #define KDBGLOBAL_H
 
 #include "kdb_export.h"
+#include "kdb_version.h"
+
 #include <QString>
 
 /*! @file KDbGlobal.h
     Global public definitions
 */
-
-/*! Implementation version of KDb.
- It is altered after every API change:
- - major number is increased after KDb storage format change,
- - minor is increased after adding binary-incompatible change.
- In external code: do not use this to get library version information.
- See KDb::version() if you need to know the runtime version of KDb.
-*/
-#define KDB_VERSION_MAJOR @KDB_VERSION_MAJOR@
-#define KDB_VERSION_MINOR @KDB_VERSION_MINOR@
-#define KDB_VERSION_RELEASE @KDB_VERSION_RELEASE@
-
-#define KDB_VERSION_MAJOR_STRING "@KDB_VERSION_MAJOR@"
-#define KDB_VERSION_MINOR_STRING "@KDB_VERSION_MINOR@"
-#define KDB_VERSION_RELEASE_STRING "@KDB_VERSION_RELEASE@"
-
-//! Version of KDb as string, at compile time.
-#cmakedefine KDB_VERSION_STRING "@KDB_VERSION_STRING@"
 
 //! Indicates the git sha1 commit which was used for compilation of KDb.
 #cmakedefine KDB_GIT_SHA1_STRING "@KDB_GIT_SHA1_STRING@"
@@ -58,16 +42,6 @@
  * appropriate.
  */
 #define KDB_MAKE_VERSION( a,b,c ) (((a) << 16) | ((b) << 8) | (c))
-
-/**
- * @brief Version of KDb as a number, at compile time
- *
- * This macro contains the KDb version in number form. As it is a macro,
- * it contains the version at compile time. See versionString() if you need
- * the runtime version of KDb.
- */
-#define KDB_VERSION \
-  KDB_MAKE_VERSION(KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_RELEASE)
 
 /**
  * @brief Check if the KDb version matches a certain version or is higher

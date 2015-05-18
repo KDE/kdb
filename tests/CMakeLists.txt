@@ -1,3 +1,9 @@
-remove_definitions(-DQT_USE_QSTRINGBUILDER -DQT_NO_CAST_TO_ASCII -DQT_NO_CAST_FROM_ASCII)
+remove_definitions(
+    -DQT_NO_KEYWORDS
+    -DQT_NO_SIGNALS_SLOTS_KEYWORDS
+    -DQT_NO_CAST_FROM_ASCII
+)
 
-add_subdirectory( features )
+add_definitions(-DKDBEXAMPLE_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_subdirectory(features)

@@ -249,7 +249,7 @@ void ConnectionTestDialog::reject()
 KDbVersionInfo KDb::version()
 {
     return KDbVersionInfo(
-        KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_RELEASE);
+        KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_PATCH);
 }
 
 bool KDb::deleteRecord(KDbConnection* conn, KDbTableSchema *table,
