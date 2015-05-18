@@ -43,7 +43,7 @@ KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& statement, uin
         , m_options(options)
 {
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String("Create cursor: ") + statement.toString());
+    KDb::debugGUI(QLatin1String("Create cursor for raw SQL: ") + statement.toString());
 #endif
     init();
 }
@@ -54,8 +54,9 @@ KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
         , m_options(options)
 {
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QString::fromLatin1("Create cursor for query \"%1\": ").arg(query->name())
-                        + KDbUtils::debugString(query));
+    KDb::debugGUI(QString::fromLatin1("Create cursor for query \"%1\":\n")
+                  .arg(KDb::iifNotEmpty(query->name(), QString::fromLatin1("<unnamed>")))
+                  + KDbUtils::debugString(query));
 #endif
     init();
 }
@@ -99,10 +100,12 @@ void KDbCursor::init()
 KDbCursor::~KDbCursor()
 {
 #ifdef KDB_DEBUG_GUI
+#if 0 // too many details
     if (m_query)
         KDb::debugGUI(QLatin1String("~ Delete cursor for query"));
     else
         KDb::debugGUI(QLatin1String("~ Delete cursor: ") + m_rawStatement.toString());
+#endif
 #endif
     /* if (!m_query)
         KDbDbg << "KDbCursor::~KDbCursor() '" << m_rawStatement.toLatin1() << "'";
