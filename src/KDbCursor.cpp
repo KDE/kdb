@@ -504,6 +504,9 @@ void KDbCursor::setQueryParameters(const QList<QVariant>& params)
         *m_queryParameters = params;
 }
 
+//! @todo extraMessages
+#if 0
 static const char *extraMessages[] = {
     QT_TR_NOOP("No connection for cursor open operation specified.")
 };
+#endif

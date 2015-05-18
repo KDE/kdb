@@ -3715,6 +3715,9 @@ KDbEscapedString KDbConnection::escapeString(const QString& str) const
     return m_driver->escapeString(str);
 }
 
+//! @todo extraMessages
+#if 0
 static const char *extraMessages[] = {
     QT_TR_NOOP("Unknown error.")
 };
+#endif
