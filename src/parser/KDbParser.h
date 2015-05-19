@@ -102,8 +102,14 @@ public:
     //! @return error message for the parsing process
     QString errorMessage() const;
 
+    //! Sets error message for the parsing process
+    void setErrorMessage(const QString &message);
+
     //! @return detailed error description for the parsing process
     QString errorDescription() const;
+
+    //! Sets detailed error description for the parsing process
+    void setErrorDecription(const QString &description);
 
 protected:
     //! Constructs parse info structure for query @a query.

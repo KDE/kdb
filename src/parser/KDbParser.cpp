@@ -213,3 +213,13 @@ QString KDbParseInfo::errorDescription() const
 {
     return d->errorDescription;
 }
+
+void KDbParseInfo::setErrorMessage(const QString &message)
+{
+    d->errorMessage = message;
+}
+
+void KDbParseInfo::setErrorDecription(const QString &description)
+{
+    d->errorDescription = description;
+}
