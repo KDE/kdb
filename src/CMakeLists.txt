@@ -23,19 +23,19 @@ endif()
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
-# Create target for the parser
-add_custom_target(parser echo "Creating parser/lexer files")
-
 set(PARSER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/parser)
 
 # Create custom command for flex/lex (note the outputs)
 add_custom_command(
     COMMAND ${PARSER_SOURCE_DIR}/generate_parser_code.sh
-    TARGET parser
-    OUTPUTS
+    DEPENDS ${PARSER_SOURCE_DIR}/KDbSqlParser.y
+            ${PARSER_SOURCE_DIR}/KDbSqlScanner.l
+            ${PARSER_SOURCE_DIR}/generate_parser_code.sh
+    OUTPUT
         ${PARSER_SOURCE_DIR}/generated/sqlparser.h
         ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
         ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
+    COMMENT "Creating parser/lexer files"
 )
 
 # Mark files as generated
