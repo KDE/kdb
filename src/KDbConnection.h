@@ -333,7 +333,7 @@ public:
     */
     virtual KDbEscapedString escapeString(const QString& str) const;
 
-    /*! Prepares SELECT query described by raw @a statement.
+    /*! Prepares SELECT query described by a raw statement @a sql.
      @return opened cursor created for results of this query
      or NULL if there was any error. KDbCursor can have optionally applied @a cursor_options
      (one of more selected from KDbCursor::Options).
@@ -342,9 +342,9 @@ public:
 
      Note for driver developers: you should initialize cursor engine-specific
      resources and return KDbCursor subclass' object
-     (passing @a statement and @a cursor_options to it's constructor).
+     (passing @a sql and @a cursor_options to its constructor).
     */
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0) = 0;
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0) = 0;
 
     /*! @overload prepareQuery(const KDbEscapedString&, uint)
      Prepares query described by @a query schema. @a params are values of parameters that
@@ -369,15 +369,15 @@ public:
      it is like "select * from table_name".*/
     KDbCursor* prepareQuery(KDbTableSchema* table, uint cursor_options = 0);
 
-    /*! Executes SELECT query described by @a statement.
+    /*! Executes SELECT query described by a raw SQL statement @a sql.
      @return opened cursor created for results of this query
-     or NULL if there was any error on the cursor creation or opening.
+     or 0 if there was any error on the cursor creation or opening.
      KDbCursor can have optionally applied @a cursor_options
      (one of more selected from KDbCursor::Options).
-     Identifiers in @a statement that are the same as keywords
-     in KDbSQL dialect or the backend's SQL need to have been escaped.
+     Identifiers in @a sql that are the same as keywords
+     in KDbSQL dialect or the backend's SQL have to be escaped.
      */
-    KDbCursor* executeQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    KDbCursor* executeQuery(const KDbEscapedString& sql, uint cursor_options = 0);
 
     /*! @overload executeQuery(const KDbEscapedString&, uint)
      @a params are values of parameters that
@@ -435,65 +435,60 @@ public:
      @return true if there is such query. Otherwise the method does nothing. */
     bool setQuerySchemaObsolete(const QString& queryName);
 
-    /*! Executes @a statement query and stores first record's data inside @a data.
-     This is convenient method when we need only first record from query result,
+    /*! Executes query for a raw statement @a sql and stores first record's data inside @a data.
+     This is a convenient method when we need only first record from query result,
      or when we know that query result has only one record.
      If @a addLimitTo1 is true (the default), adds a LIMIT clause to the query,
-     so @a statement should not include one already.
+     so @a sql should not include one already.
      @return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleRecord(const KDbEscapedString& statement, KDbRecordData* data, bool addLimitTo1 = true);
+    tristate querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1 = true);
 
     /*! Like tristate @ref querySingleRecord(const QString&, KDbRecordData*, bool)
      but uses KDbQuerySchema object.
      If @a addLimitTo1 is true (the default), adds a LIMIT clause to the query. */
     tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1 = true);
 
-    /*! Executes @a statement query and stores first record's field's (number @a column) string value
-     inside @a value. For efficiency it's recommended that a query defined by @a statement
+    /*! Executes query for a raw statement @a sql and stores first record's field's
+     (number @a column) string value inside @a value.
+     For efficiency it's recommended that a query defined by @a sql
      should have just one field (SELECT one_field FROM ....).
      If @a addLimitTo1 is true (the default), adds a LIMIT clause to the query,
-     so @a statement should not include one already.
+     so @a sql should not include one already.
      @return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available.
      @see queryStringList() */
-    tristate querySingleString(const KDbEscapedString& statement, QString* value, uint column = 0,
+    tristate querySingleString(const KDbEscapedString& sql, QString* value, uint column = 0,
                                bool addLimitTo1 = true);
 
-    /*! Convenience function: executes @a statement query and stores first
+    /*! Convenience function: executes query for a raw SQL statement @a sql and stores first
      record's field's (number @a column) value inside @a number. @see querySingleString().
      Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default).
      @return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
-    tristate querySingleNumber(const KDbEscapedString& statement, int* number, uint column = 0,
+    tristate querySingleNumber(const KDbEscapedString& sql, int* number, uint column = 0,
                                bool addLimitTo1 = true);
 
-    /*! Executes @a statement query and stores Nth field's string value of every record
-     inside @a list, where N is equal to @a column. The list is initially cleared.
-     For efficiency it's recommended that a query defined by @a statement
+    /*! Executes query for a raw SQL statement @a sql and stores Nth field's string value
+     of every record inside @a list, where N is equal to @a column. The list is initially cleared.
+     For efficiency it's recommended that a query defined by @a sql
      should have just one field (SELECT one_field FROM ....).
      @return true if all values were fetched successfuly,
      false on data retrieving failure. Returning empty list can be still a valid result.
      On errors, the list is not cleared, it may contain a few retrieved values. */
-    bool queryStringList(const KDbEscapedString& statement, QStringList* list, uint column = 0);
+    bool queryStringList(const KDbEscapedString& sql, QStringList* list, uint column = 0);
 
-    /*! @return true if there is at least one record returned in @a statement query.
+    /*! @return true if there is at least one record has been returned by executing query
+     for a raw SQL statement \a sql.
      Does not fetch any records. @a success will be set to false
      on query execution errors (true otherwise), so you can see a difference between
      "no results" and "query execution error" states.
-     Note: real executed query is: "SELECT 1 FROM (@a statement) LIMIT 1"
+     Note: real executed query is: "SELECT 1 FROM (@a sql) LIMIT 1"
      if @a addLimitTo1 is true (the default). */
-    bool resultExists(const KDbEscapedString& statement, bool* success, bool addLimitTo1 = true);
+    bool resultExists(const KDbEscapedString& sql, bool* success, bool addLimitTo1 = true);
 
     /*! @return true if there is at least one record in @a table. */
     bool isEmpty(KDbTableSchema* table, bool *success);
-
-//! @todo perhaps use quint64 here?
-    /*! @return number of records in @a statement query.
-     Does not fetch any records. -1 is returned on query execution errors (>0 otherwise).
-     Note: real executed query is: "SELECT COUNT() FROM (@a statement) LIMIT 1"
-     (using querySingleNumber()) */
-    int resultCount(const KDbEscapedString& statement);
 
     virtual KDbEscapedString recentSQLString() const;
 
@@ -690,10 +685,10 @@ public:
     quint64 lastInsertedAutoIncValue(const QString& aiFieldName,
                                      const KDbTableSchema& table, quint64* recordId = 0);
 
-    /*! Executes query @a statement, but without returning resulting
+    /*! Executes query for a raw SQL statement \a sql, but without returning resulting
      records (used mostly for functional queries).
      Only use this method if you really need. */
-    bool executeSQL(const KDbEscapedString& statement);
+    bool executeSQL(const KDbEscapedString& sql);
 
     //! @short options used in selectStatement()
     class KDB_EXPORT SelectStatementOptions
@@ -940,11 +935,11 @@ protected:
       @return true on success. */
     virtual bool drv_disconnect() = 0;
 
-    /*! Executes query @a statement, but without returning resulting
-     records (used mostly for functional queries).
-     It is already verified that @a statement is valid (properly escaped).
+    /*! Executes query for a raw SQL statement @a sql without returning resulting
+     records. It is useful mostly for functional queries.
+     It is already verified that @a sql is valid (properly escaped).
      Only use this method if you really need. */
-    virtual bool drv_executeSQL(const KDbEscapedString& statement) = 0;
+    virtual bool drv_executeSQL(const KDbEscapedString& sql) = 0;
 
     /*! For reimplementation: loads list of databases' names available for this connection
      and adds these names to @a list. If your server is not able to offer such a list,

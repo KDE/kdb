@@ -117,8 +117,8 @@ KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString& msg
 /*! This methods works like above, but works on @a result's  members instead. */
 KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info);
 
-/*! Function useful for building WHERE parts of sql statements.
-Constructs an sql string like "fielname = value" for specific @a drv driver,
+/*! Function useful for building WHERE parts of SQL statements.
+ Constructs an SQL string like "fielname = value" for specific @a drv driver,
  field type @a t, @a fieldName and @a value. If @a value is null, "fieldname is NULL"
  string is returned. */
 KDB_EXPORT KDbEscapedString sqlWhere(KDbDriver *drv, KDbField::Type t,

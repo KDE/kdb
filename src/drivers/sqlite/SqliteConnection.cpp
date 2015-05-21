@@ -356,10 +356,9 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     return true;
 }
 
-//CursorData* SQLiteConnection::drv_createCursor( const QString& statement )
-KDbCursor* SQLiteConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
+KDbCursor* SQLiteConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
 {
-    return new SQLiteCursor(this, statement, cursor_options);
+    return new SQLiteCursor(this, sql, cursor_options);
 }
 
 KDbCursor* SQLiteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
@@ -367,17 +366,17 @@ KDbCursor* SQLiteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_opt
     return new SQLiteCursor(this, query, cursor_options);
 }
 
-bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& statement)
+bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
-    KDbdebugGUI(QLatin1String("ExecuteSQL (SQLite): ") + statement.toString());
+    KDbdebugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
 #endif
 
     char *errmsg_p = 0;
     m_result.setServerResultCode(
         sqlite3_exec(
                  d->data,
-                 statement.constData(),
+                 sql.constData(),
                  0/*callback*/,
                  0,
                  &errmsg_p)

@@ -246,8 +246,8 @@ public:
     bool deleteAllRecords();
 
 protected:
-    /*! Cursor will operate on @a conn, raw @a statement will be used to execute query. */
-    KDbCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options = NoOptions);
+    /*! Cursor will operate on @a conn, raw @a sql will be used to execute query. */
+    KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
 
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     KDbCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
@@ -258,7 +258,7 @@ protected:
      and depending on wherher a cursor is buffered. */
     bool getNextRecord();
 
-    /* Note for driver developers: this method should initialize engine-specific cursor's
+    /*! Note for driver developers: this method should initialize engine-specific cursor's
      resources using m_sql statement. It is not required to store @a sql statement somewhere
      in your KDbCursor subclass (it is already stored in m_query or m_rawStatement,
      depending query type) - only pass it to proper engine's function. */

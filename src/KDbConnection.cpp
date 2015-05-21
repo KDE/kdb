@@ -1137,17 +1137,17 @@ bool KDbConnection::insertRecord(KDbFieldList* fields, const QList<QVariant>& va
     return res;
 }
 
-bool KDbConnection::executeSQL(const KDbEscapedString& statement)
+bool KDbConnection::executeSQL(const KDbEscapedString& sql)
 {
-    if (!statement.isValid()) {
+    if (!sql.isValid()) {
         m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
                           QObject::tr("SQL statement for execution is invalid (empty)."));
         return false;
     }
-    m_result.setSql(statement); //remember for Error.handling
-    if (!drv_executeSQL(statement)) {
+    m_result.setSql(sql); //remember for Error.handling
+    if (!drv_executeSQL(sql)) {
         m_result.setMessage(QString()); //clear as this could be most probably just "Unknown error" string.
-        m_result.setErrorSql(statement);
+        m_result.setErrorSql(sql);
         m_result.prependMessage(ERR_SQL_EXECUTION_ERROR, QObject::tr("Error while executing SQL statement."));
         return false;
     }
@@ -2277,11 +2277,11 @@ bool KDbConnection::drv_setAutoCommit(bool /*on*/)
     return true;
 }
 
-KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& statement, uint cursor_options)
+KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, uint cursor_options)
 {
-    if (statement.isEmpty())
+    if (sql.isEmpty())
         return 0;
-    KDbCursor *c = prepareQuery(statement, cursor_options);
+    KDbCursor *c = prepareQuery(sql, cursor_options);
     if (!c)
         return 0;
     if (!c->open()) {//err - kill that
