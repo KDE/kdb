@@ -28,7 +28,7 @@ class SybaseCursorData;
 class SybaseCursor: public KDbCursor
 {
 public:
-    SybaseCursor(KDbConnection* conn, const KDbEscapedString& statement,
+    SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql,
                  uint cursor_options = NoOptions);
     SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~SybaseCursor();

@@ -128,9 +128,9 @@ bool MysqlConnectionInternal::useDatabase(const QString &dbName)
     return true;
 }
 
-bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& statement)
+bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
-    if (mysql_real_query(mysql, statement.constData(), statement.length()) == 0)
+    if (mysql_real_query(mysql, sql.constData(), sql.length()) == 0)
         return true;
 
     storeResult();

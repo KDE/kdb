@@ -29,7 +29,7 @@ class MysqlCursorData;
 class MysqlCursor: public KDbCursor
 {
 public:
-    MysqlCursor(KDbConnection* conn, const KDbEscapedString& statement,
+    MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
                 uint cursor_options = NoOptions);
     MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~MysqlCursor();

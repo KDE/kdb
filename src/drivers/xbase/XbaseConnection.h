@@ -34,7 +34,7 @@ class xBaseConnection : public KDbConnection
 public:
     virtual ~xBaseConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
     //! @todo returns 0 for now
@@ -52,8 +52,8 @@ public:
     virtual bool drv_useDatabase( const QString &dbName = QString(), bool *cancelled = 0, 
       KDbMessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
-    virtual bool drv_dropDatabase( const QString &dbName = QString() );
-    virtual bool drv_executeSQL( const KDbEscapedString& statement );
+    virtual bool drv_dropDatabase(const QString &dbName = QString());
+    virtual bool drv_executeSQL(const KDbEscapedString& sql);
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for KDbResultable

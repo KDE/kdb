@@ -77,11 +77,11 @@ void SqlParserTest::initTestCase()
 {
 }
 
-KDbEscapedString SqlParserTest::parse(const KDbEscapedString& statement, bool *ok)
+KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
 {
     KDbParser *parser = m_parser.data();
 
-    *ok = parser->parse(statement);
+    *ok = parser->parse(sql);
     if (!*ok) {
         //qDebug() << parser->error();
         return KDbEscapedString();
@@ -96,10 +96,10 @@ KDbEscapedString SqlParserTest::parse(const KDbEscapedString& statement, bool *o
     //qDebug() << *q.data();
 
     QList<QVariant> params;
-    KDbEscapedString sql = m_conn->selectStatement(q.data(), params);
+    KDbEscapedString querySql = m_conn->selectStatement(q.data(), params);
     //qDebug() << sql;
     *ok = true;
-    return sql;
+    return querySql;
 }
 
 static void eatComment(QString* string)
@@ -237,7 +237,7 @@ void SqlParserTest::testParse()
     if (ok) {
         // sucess, so error cannot be expected
         QVERIFY2(!expectError,
-                 (QString("Unexpected success in statement: \"%1\"; Result: %2")
+                 (QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
                   .arg(sql.toString()).arg(result.toString()).toLatin1().constData()));
         if (!expectError) {
             qDebug() << "Result:" << result.toString();
@@ -245,7 +245,7 @@ void SqlParserTest::testParse()
     }
     else {
         // failure, so error should be expected
-        QVERIFY2(expectError, QString("Statement: \"%1\"; %2")
+        QVERIFY2(expectError, QString("SQL statement: \"%1\"; %2")
                  .arg(sql.toString())
                  .arg(KDbUtils::debugString(parser->error())).toLatin1().constData());
         if (expectError) {

@@ -47,8 +47,8 @@ public:
     virtual QString serverResultName() const;
 
 protected:
-    /*! KDbCursor will operate on @a conn, raw @a statement will be used to execute query. */
-    SQLiteCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options = NoOptions);
+    /*! KDbCursor will operate on @a conn, raw @a sql statement will be used to execute query. */
+    SQLiteCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
 
     /*! KDbCursor will operate on @a conn, @a query schema will be used to execute query. */
     SQLiteCursor(KDbConnection* conn, KDbQuerySchema* query,

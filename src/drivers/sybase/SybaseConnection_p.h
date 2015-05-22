@@ -64,8 +64,8 @@ public:
     //! Selects a database that is about to be used
     bool useDatabase(const QString &dbName = QString());
 
-    //! Execute SQL statement on the database
-    bool executeSQL(const KDbEscapedString& statement);
+    //! Executes query for a raw SQL statement @a sql on the database
+    bool executeSQL(const KDbEscapedString& sql);
 
     //! Stores last operation's result
     virtual void storeResult();

@@ -57,9 +57,10 @@ PostgresqlConnection::~PostgresqlConnection()
     delete d;
 }
 
+KDbCursor* PostgresqlConnection::prepareQuery(const KDbEscapedString& sql,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
-    return new PostgresqlCursor(this, statement, 1); //Always used buffered cursor
+    return new PostgresqlCursor(this, sql, 1); //Always used buffered cursor
 }
 
 KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
@@ -218,9 +219,9 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     return false;
 }
 
-bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& statement)
+bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    return d->executeSQL(statement, PGRES_COMMAND_OK);
+    return d->executeSQL(sql, PGRES_COMMAND_OK);
 }
 
 bool PostgresqlConnection::drv_isDatabaseUsed() const

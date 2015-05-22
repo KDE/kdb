@@ -47,7 +47,7 @@ class xBaseConnectionInternal : public KDbConnectionInternal
     bool useDatabase(const QString &dbName = QString());
 
     //! Execute SQL statement on the database
-    bool executeSQL(const KDbEscapedString& statement);
+    bool executeSQL(const KDbEscapedString& sql);
 
     //! Stores last operation's result
     virtual void storeResult();

@@ -31,7 +31,7 @@ public:
 
     virtual ~PostgresqlPreparedStatement();
 
-    virtual bool prepare(const KDbEscapedString& statement);
+    virtual bool prepare(const KDbEscapedString& sql);
 
     virtual bool execute(
         KDbPreparedStatement::Type type,

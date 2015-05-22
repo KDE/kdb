@@ -167,9 +167,9 @@ public:
     ~KDbParser();
 
     /**
-     * Clears the parser's status and runs the parsing.
+     * Clears the parser's status and runs the parsing for a raw SQL statement @a sql .
      */
-    bool parse(const KDbEscapedString &statement);
+    bool parse(const KDbEscapedString &sql);
 
     /**
      * Clear the parser's status.

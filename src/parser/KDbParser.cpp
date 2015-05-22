@@ -90,7 +90,7 @@ KDbParserError KDbParser::error() const
 
 KDbEscapedString KDbParser::statement() const
 {
-    return d->statement;
+    return d->sql;
 }
 
 void KDbParser::setOperation(OPCode op)
@@ -132,15 +132,15 @@ void KDbParser::init()
     d->initialized = true;
 }
 
-bool KDbParser::parse(const KDbEscapedString &statement)
+bool KDbParser::parse(const KDbEscapedString &sql)
 {
     init();
     clear();
-    d->statement = statement;
+    d->sql = sql;
 
     KDbParser *oldParser = globalParser;
     KDbField *oldField = globalField;
-    bool res = parseData(this, statement.toByteArray().constData());
+    bool res = parseData(this, sql.toByteArray().constData());
     globalParser = oldParser;
     globalField = oldField;
     return res;

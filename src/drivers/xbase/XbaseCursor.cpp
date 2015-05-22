@@ -37,8 +37,8 @@ class KDbxBaseCursorData {
 
 };
 
-xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const KDbEscapedString& statement, uint cursor_options)
-  : KDbCursor(conn,statement,cursor_options)
+xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const KDbEscapedString& sql, uint cursor_options)
+  : KDbCursor(conn,sql,cursor_options)
   , d( new xBaseCursorData(internalCursor) )
 {
   init();

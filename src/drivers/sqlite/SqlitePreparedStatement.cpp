@@ -37,15 +37,15 @@ SQLitePreparedStatement::~SQLitePreparedStatement()
     m_handle = 0;
 }
 
-bool SQLitePreparedStatement::prepare(const KDbEscapedString& statement)
+bool SQLitePreparedStatement::prepare(const KDbEscapedString& sql)
 {
     m_result.setServerResultCode(
         sqlite3_prepare(
             data,                    /* Database handle */
-            statement.toByteArray(), //const char *zSql,       /* SQL statement, UTF-8 encoded */
-            statement.length(),      //int nBytes,             /* Length of zSql in bytes. */
-            &m_handle,               //sqlite3_stmt **ppStmt,  /* OUT: Statement handle */
-            0                        //const char **pzTail     /* OUT: Pointer to unused portion of zSql */
+            sql.toByteArray(),       /* SQL statement, UTF-8 encoded */
+            sql.length(),            /* Length of zSql in bytes. */
+            &m_handle,               /* OUT: Statement handle */
+            0                        /* OUT: Pointer to unused portion of zSql */
         )
     );
     //! @todo copy error msg

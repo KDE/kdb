@@ -32,10 +32,10 @@ public:
 
     virtual ~PostgresqlConnectionInternal();
 
-    //! Execute SQL statement on the database
+    //! Executes query for a raw SQL statement @a sql on the database
     //! @a expectedStatus can be PGRES_COMMAND_OK for command
     //! not returning tuples, e.g. CREATE and PGRES_TUPLES_OK for command returning tuples, e.g. SELECT.
-    bool executeSQL(const KDbEscapedString& statement, ExecStatusType expectedStatus);
+    bool executeSQL(const KDbEscapedString& sql, ExecStatusType expectedStatus);
 
     //! stores last result's message
     virtual void storeResult();

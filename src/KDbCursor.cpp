@@ -36,14 +36,14 @@
 #pragma WARNING(replace QPointer<KDbConnection> m_conn;)
 #endif
 
-KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options)
+KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
         : m_conn(conn)
         , m_query(0)
-        , m_rawStatement(statement)
+        , m_rawSql(sql)
         , m_options(options)
 {
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String("Create cursor for raw SQL: ") + statement.toString());
+    KDb::debugGUI(QLatin1String("Create cursor for raw SQL: ") + sql.toString());
 #endif
     init();
 }
@@ -104,11 +104,11 @@ KDbCursor::~KDbCursor()
     if (m_query)
         KDb::debugGUI(QLatin1String("~ Delete cursor for query"));
     else
-        KDb::debugGUI(QLatin1String("~ Delete cursor: ") + m_rawStatement.toString());
+        KDb::debugGUI(QLatin1String("~ Delete cursor: ") + m_rawSql.toString());
 #endif
 #endif
     /* if (!m_query)
-        KDbDbg << "KDbCursor::~KDbCursor() '" << m_rawStatement.toLatin1() << "'";
+        KDbDbg << "KDbCursor::~KDbCursor() '" << m_rawSql.toLatin1() << "'";
       else
         KDbDbg << "KDbCursor::~KDbCursor() ";*/
 
@@ -130,8 +130,8 @@ bool KDbCursor::open()
         if (!close())
             return false;
     }
-    if (!m_rawStatement.isEmpty()) {
-        m_result.setSql(m_rawStatement);
+    if (!m_rawSql.isEmpty()) {
+        m_result.setSql(m_rawSql);
     }
     else {
         if (!m_query) {
@@ -442,7 +442,7 @@ QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
 {
     dbg.nospace() << "CURSOR(";
     if (!cursor.query()) {
-        dbg.nospace() << "RAW STATEMENT:" << cursor.rawStatement().toString()
+        dbg.nospace() << "RAW SQL STATEMENT:" << cursor.rawSql().toString()
                       << "\n";
     }
     else {

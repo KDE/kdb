@@ -84,9 +84,9 @@ void MysqlPreparedStatement::done()
 #endif
 }
 
-bool MysqlPreparedStatement::prepare(const KDbEscapedString& statement)
+bool MysqlPreparedStatement::prepare(const KDbEscapedString& sql)
 {
-    Q_UNUSED(statement);
+    Q_UNUSED(sql);
     return true;
 }
 

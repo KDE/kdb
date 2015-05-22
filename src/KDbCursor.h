@@ -78,7 +78,7 @@ public:
     }
 
     /*! Opens the cursor using data provided on creation.
-     The data might be either KDbQuerySchema or raw sql statement. */
+     The data might be either KDbQuerySchema or a raw SQL statement. */
     bool open();
 
     /*! Closes and then opens again the same cursor.
@@ -91,7 +91,7 @@ public:
     virtual bool close();
 
     /*! @return query schema used to define this cursor
-     or NULL if the cursor is not defined by a query schema but by a raw statement. */
+     or NULL if the cursor is not defined by a query schema but by a raw SQL statement. */
     inline KDbQuerySchema *query() const {
         return m_query;
     }
@@ -104,8 +104,8 @@ public:
 
     /*! @return raw query statement used to define this cursor
      or null string if raw statement instead (but KDbQuerySchema is defined instead). */
-    inline KDbEscapedString rawStatement() const {
-        return m_rawStatement;
+    inline KDbEscapedString rawSql() const {
+        return m_rawSql;
     }
 
     /*! @return logically or'd cursor's options,
@@ -246,7 +246,7 @@ public:
     bool deleteAllRecords();
 
 protected:
-    /*! Cursor will operate on @a conn, raw @a sql will be used to execute query. */
+    /*! Cursor will operate on @a conn, raw SQL statement @a sql will be used to execute query. */
     KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
 
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
@@ -259,7 +259,7 @@ protected:
     bool getNextRecord();
 
     /*! Note for driver developers: this method should initialize engine-specific cursor's
-     resources using m_sql statement. It is not required to store @a sql statement somewhere
+     resources using an SQL statement @a sql. It is not required to store @a sql statement somewhere
      in your KDbCursor subclass (it is already stored in m_query or m_rawStatement,
      depending query type) - only pass it to proper engine's function. */
     virtual bool drv_open(const KDbEscapedString& sql) = 0;
@@ -313,7 +313,7 @@ protected:
 
     KDbConnection *m_conn;
     KDbQuerySchema *m_query;
-    KDbEscapedString m_rawStatement;
+    KDbEscapedString m_rawSql;
     bool m_opened;
     bool m_atLast;
     bool m_afterLast;

@@ -35,12 +35,12 @@ protected:
     virtual ~KDbPreparedStatementInterface() {}
 
     /*! For implementation. Initializes the prepared statement in a backend-dependent way
-        using recently generated @a statement. 
-        It is guaranteed that @a statement valid and not empty.
+        using recently generated @a sql statement.
+        It should be guaranteed that @a sql is valid and not empty.
         For example sqlite3_prepare() is used for SQLite.
         This is called only when d->dirty == true is encountered on execute(),
         i.e. when attributes of the object (like WHERE field names) change. */
-    virtual bool prepare(const KDbEscapedString& statement) = 0;
+    virtual bool prepare(const KDbEscapedString& sql) = 0;
 
     //! For implementation. Executes the prepared statement using parameters @a parameters. 
     virtual bool execute(

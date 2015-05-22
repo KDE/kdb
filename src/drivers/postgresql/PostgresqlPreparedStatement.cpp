@@ -32,9 +32,9 @@ PostgresqlPreparedStatement::~PostgresqlPreparedStatement()
 {
 }
 
-bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& statement)
+bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& sql)
 {
-    Q_UNUSED(statement);
+    Q_UNUSED(sql);
     return true;
 }
 

@@ -72,7 +72,7 @@ class KDbConnection;
     be also removed (similar rules as in the Query Designer).
  * Especially, care about primary keys and uniquess (indices). Recreate them when needed.
    The problem could be if such analysis may require to fetch the entire table data
-   to the client side. Use "SELECT INTO" statments if possible to avoid such a treat.
+   to the client side. Use "SELECT INTO" statements if possible to avoid such a treat.
 
  The KDbAlterTableHandler is used in Kexi's Table Designer.
  Already opened KDbConnection object is needed.

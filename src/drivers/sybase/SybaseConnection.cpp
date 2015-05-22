@@ -77,9 +77,9 @@ bool SybaseConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-KDbCursor* SybaseConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
+KDbCursor* SybaseConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
 {
-    return new SybaseCursor(this, statement, cursor_options);
+    return new SybaseCursor(this, sql, cursor_options);
 }
 
 KDbCursor* SybaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
@@ -131,9 +131,9 @@ bool SybaseConnection::drv_dropDatabase(const QString &dbName)
     return drv_executeSQL(KDbEscapedString("DROP DATABASE ") + escapeString(dbName));
 }
 
-bool SybaseConnection::drv_executeSQL(const KDbEscapedString& statement)
+bool SybaseConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    return d->executeSQL(statement);
+    return d->executeSQL(sql);
 }
 
 quint64 SybaseConnection::drv_lastInsertRecordId()

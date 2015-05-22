@@ -52,13 +52,13 @@ void PostgresqlConnectionInternal::storeResult()
     }*/
 }
 
-bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& statement, ExecStatusType expectedStatus)
+bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql, ExecStatusType expectedStatus)
 {
     if (res) { // for sanity
         PQclear(res);
     }
 //! @todo consider using binary mode with PQexecParams()
-    res = PQexec(conn, statement.toByteArray().constData());
+    res = PQexec(conn, sql.toByteArray().constData());
     if (PQresultStatus(res) != expectedStatus) {
         setServerResultCode(PQresultStatus(res));
         storeResult();

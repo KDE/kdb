@@ -228,12 +228,12 @@ bool SybaseConnectionInternal::useDatabase(const QString &dbName)
     return false;
 }
 
-bool SybaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
+bool SybaseConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
     // remove queries in buffer if any. flush existing results if any
     dbcancel(dbProcess);
     // put query in command bufffer
-    dbcmd(dbProcess, statement.constData());
+    dbcmd(dbProcess, sql.constData());
     if (dbsqlexec(dbProcess) == SUCCEED) {
         while (dbresults(dbProcess) != NO_MORE_RESULTS) {
             /* nop */

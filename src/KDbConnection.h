@@ -853,7 +853,7 @@ public:
     */
     virtual bool drv_dropTable(const QString& tableName);
 
-    /*! Prepare a SQL statement and return a @a KDbPreparedStatement instance. */
+    /*! Prepare an SQL statement and return a @a KDbPreparedStatement instance. */
     KDbPreparedStatement prepareStatement(KDbPreparedStatement::Type type,
         KDbFieldList* fields, const QStringList& whereFieldNames = QStringList());
 
@@ -1136,7 +1136,7 @@ protected:
      */
     virtual bool drv_setAutoCommit(bool on);
 
-    /*! Prepare a SQL statement and return a @a KDbPreparedStatementInterface-derived object. */
+    /*! Prepare an SQL statement and return a @a KDbPreparedStatementInterface-derived object. */
     virtual KDbPreparedStatementInterface* prepareStatementInternal() = 0;
 
     /*! Internal, for handling autocommited transactions:

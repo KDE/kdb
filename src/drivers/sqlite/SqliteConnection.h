@@ -33,7 +33,7 @@ class SQLiteConnection : public KDbConnection
 public:
     virtual ~SQLiteConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
     virtual KDbPreparedStatementInterface* prepareStatementInternal();
@@ -75,7 +75,7 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString());
 
-    virtual bool drv_executeSQL(const KDbEscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& sql);
 
     virtual quint64 drv_lastInsertRecordId();
 

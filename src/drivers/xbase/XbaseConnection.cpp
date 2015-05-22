@@ -55,13 +55,13 @@ bool xBaseConnection::drv_disconnect() {
   return d->db_disconnect(*data());
 }
 
-KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& statement, uint cursor_options)
+KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
 {
   if ( !d->internalConn ) {
     return 0;
   }
-  KDbCursor* internalCursor = d->internalConn->prepareQuery(statement,cursor_options);
-  return new xBaseCursor( this, internalCursor, statement, cursor_options );
+  KDbCursor* internalCursor = d->internalConn->prepareQuery(sql,cursor_options);
+  return new xBaseCursor( this, internalCursor, sql, cursor_options );
 }
 
 KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options) {
@@ -104,15 +104,15 @@ bool xBaseConnection::drv_closeDatabase() {
   return true;
 }
 
-bool xBaseConnection::drv_dropDatabase( const QString &dbName) {
+bool xBaseConnection::drv_dropDatabase(const QString &dbName) {
     Q_UNUSED(dbName);
 //TODO is here escaping needed
   // Delete the directory ?
   return true;
 }
 
-bool xBaseConnection::drv_executeSQL( const KDbEscapedString& statement ) {
-  return d->executeSQL(statement);
+bool xBaseConnection::drv_executeSQL( const KDbEscapedString& sql ) {
+  return d->executeSQL(sql);
 }
 
 quint64 xBaseConnection::drv_lastInsertRecordId()

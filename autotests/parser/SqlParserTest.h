@@ -41,7 +41,7 @@ private Q_SLOTS:
 private:
     //! Opens database needed for tests.
     bool openDatabase(const QString &path);
-    KDbEscapedString parse(const KDbEscapedString& statement, bool *ok);
+    KDbEscapedString parse(const KDbEscapedString& sql, bool *ok);
 
     QScopedPointer<KDbConnection> m_conn;
     QScopedPointer<KDbParser> m_parser;

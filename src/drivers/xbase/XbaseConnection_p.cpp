@@ -169,11 +169,11 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
   return internalConn->useDatabase(dbMap[dbName]);
 }
 
-bool xBaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
+bool xBaseConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
 //PreDrvDbg << statement;
   if ( !internalConn ) {
     return false;
   }
-  return internalConn->executeSQL(statement);
+  return internalConn->executeSQL(sql);
 }

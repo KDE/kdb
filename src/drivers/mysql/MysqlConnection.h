@@ -36,7 +36,7 @@ class MysqlConnection : public KDbConnection
 public:
     virtual ~MysqlConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
     virtual KDbPreparedStatementInterface* prepareStatementInternal();
@@ -56,7 +56,7 @@ protected:
                                  KDbMessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const KDbEscapedString& statement);
+    virtual bool drv_executeSQL(const KDbEscapedString& sql);
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for KDbResultable

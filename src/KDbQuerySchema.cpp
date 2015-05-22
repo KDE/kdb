@@ -311,8 +311,8 @@ public:
     /*! number of PKEY fields within the query */
     uint pkeyFieldCount;
 
-    /*! forced (predefined) statement */
-    KDbEscapedString statement;
+    /*! Forced (predefined) raw SQL statement */
+    KDbEscapedString sql;
 
     /*! Relationships defined for this query. */
     QList<KDbRelationship*> relations;
@@ -1237,12 +1237,12 @@ KDbField::List* KDbQuerySchema::asterisks() const
 
 KDbEscapedString KDbQuerySchema::statement() const
 {
-    return d->statement;
+    return d->sql;
 }
 
-void KDbQuerySchema::setStatement(const KDbEscapedString& statement)
+void KDbQuerySchema::setStatement(const KDbEscapedString& sql)
 {
-    d->statement = statement;
+    d->sql = sql;
 }
 
 KDbField* KDbQuerySchema::field(const QString& name) const

@@ -47,7 +47,7 @@ public:
     KDbTableSchema *table;
     KDbQuerySchema *select;
     KDbConnection *db;
-    KDbEscapedString statement;
+    KDbEscapedString sql;
     KDbParserError error;
     bool initialized;
 };

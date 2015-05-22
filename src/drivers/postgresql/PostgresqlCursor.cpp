@@ -30,8 +30,8 @@
 #include <QtDebug>
 
 // Constructor based on query statement
-PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options)
-        : KDbCursor(conn, statement, options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
+        : KDbCursor(conn, sql, options)
         , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
 {

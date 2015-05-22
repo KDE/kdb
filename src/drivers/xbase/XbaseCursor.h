@@ -27,7 +27,7 @@ class xBaseCursorData;
 
 class xBaseCursor: public KDbCursor {
   public:
-    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const QString& statement = QString(),
+    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const QString& sql = QString(),
       uint cursor_options = NoOptions );
     xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~xBaseCursor();

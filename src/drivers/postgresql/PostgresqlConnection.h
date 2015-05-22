@@ -41,7 +41,7 @@ public:
     virtual ~PostgresqlConnection();
 
     //! @return a new query based on a query statement
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& statement, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
 
     //! @return a new query based on a query object
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
@@ -75,7 +75,8 @@ protected:
     virtual bool drv_closeDatabase();
     //! Drops the given database
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const KDbEscapedString& statement);
+    //! Executes an SQL statement
+    virtual bool drv_executeSQL(const KDbEscapedString& sql);
     //! @return the oid of the last insert - only works if sql was insert of 1 row
     virtual quint64 drv_lastInsertRecordId();
 

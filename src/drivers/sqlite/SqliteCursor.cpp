@@ -144,8 +144,8 @@ public:
     }
 };
 
-SQLiteCursor::SQLiteCursor(KDbConnection* conn, const KDbEscapedString& statement, uint options)
-        : KDbCursor(conn, statement, options)
+SQLiteCursor::SQLiteCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
+        : KDbCursor(conn, sql, options)
         , d(new SQLiteCursorData(conn))
 {
     d->data = static_cast<SQLiteConnection*>(conn)->d->data;

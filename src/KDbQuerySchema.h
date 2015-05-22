@@ -71,7 +71,7 @@ public:
     //! @return true if this column is thesame as @a col
     bool operator== (const KDbOrderByColumn& col) const;
 
-    /*! @return a string like "name ASC" usable for building a SQL statement.
+    /*! @return a string like "name ASC" usable for building an SQL statement.
      If @a includeTableNames is true (the default) field is output in a form
      of "tablename.fieldname" (but only if fieldname is not a name of alias).
 
@@ -178,7 +178,7 @@ public:
         return QList<KDbOrderByColumn*>::constEnd();
     }
 
-    /*! @return a string like "name ASC, 2 DESC" usable for building a SQL statement.
+    /*! @return a string like "name ASC, 2 DESC" usable for building an SQL statement.
      If @a includeTableNames is true (the default) fields are output in a form
      of "tablename.fieldname".
 
@@ -669,8 +669,9 @@ public:
     /*! @return a preset statement (if any). */
     KDbEscapedString statement() const;
 
-    /*! Forces a query statement (i.e. no statement is composed from KDbQuerySchema's content) */
-    void setStatement(const KDbEscapedString& statement);
+    /*! Forces a raw SQL statement @a sql for the query. This means that no statement is composed
+     * from KDbQuerySchema's content. */
+    void setStatement(const KDbEscapedString& sql);
 
     /*! @return a string that is a result of concatenating all column names
      for @a infolist, with "," between each one.

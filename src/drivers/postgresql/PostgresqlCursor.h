@@ -30,7 +30,7 @@ class PostgresqlCursorData;
 class PostgresqlCursor: public KDbCursor
 {
 public:
-    explicit PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& statement,
+    explicit PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
                               uint options = NoOptions);
     PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
     virtual ~PostgresqlCursor();

@@ -33,8 +33,8 @@
 
 #include <sqldb.h>
 
-SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& statement, uint cursor_options)
-        : KDbCursor(conn, statement, cursor_options)
+SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql, uint cursor_options)
+        : KDbCursor(conn, sql, cursor_options)
         , d(new SybaseCursorData(conn))
 {
 
