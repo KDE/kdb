@@ -479,7 +479,7 @@ public:
     bool queryStringList(const KDbEscapedString& sql, QStringList* list, uint column = 0);
 
     /*! @return true if there is at least one record has been returned by executing query
-     for a raw SQL statement \a sql.
+     for a raw SQL statement @a sql.
      Does not fetch any records. @a success will be set to false
      on query execution errors (true otherwise), so you can see a difference between
      "no results" and "query execution error" states.
@@ -685,7 +685,7 @@ public:
     quint64 lastInsertedAutoIncValue(const QString& aiFieldName,
                                      const KDbTableSchema& table, quint64* recordId = 0);
 
-    /*! Executes query for a raw SQL statement \a sql, but without returning resulting
+    /*! Executes query for a raw SQL statement @a sql, but without returning resulting
      records (used mostly for functional queries).
      Only use this method if you really need. */
     bool executeSQL(const KDbEscapedString& sql);
