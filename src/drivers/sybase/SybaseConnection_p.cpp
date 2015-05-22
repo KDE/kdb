@@ -40,8 +40,8 @@ using namespace NAMESPACE;
 QMap<DBPROCESS*, SybaseConnectionInternal*> SybaseConnectionInternal::dbProcessConnectionMap;
 
 
-int connectionMessageHandler(DBPROCESS* dbproc, DBINT msgno, int msgstate, int severity, char* msgtext
-                             , char* srvname, char* procname, int line)
+int connectionMessageHandler(DBPROCESS* dbproc, DBINT msgno, int msgstate, int severity,
+                             char* msgtext, char* srvname, char* procname, int line)
 {
     if (!dbproc) {
         return 0;
@@ -54,7 +54,6 @@ int connectionMessageHandler(DBPROCESS* dbproc, DBINT msgno, int msgstate, int s
     return (0);
 }
 
-/* ************************************************************************** */
 SybaseConnectionInternal::SybaseConnectionInternal(KDbConnection* connection)
         : ConnectionInternal(connection)
         , dbProcess(0)
@@ -92,15 +91,6 @@ void SybaseConnectionInternal::messageHandler(DBINT msgno, int msgstate, int sev
     PreDrvDbg << "Message Handler" << res << errmsg;
 }
 
-/* ************************************************************************** */
-/*! Connects to the Sybase server on host as the given user using the specified
-    password.  If host is "localhost", then a socket on the local file system
-    can be specified to connect to the server (several defaults will be tried if
-    none is specified).  If the server is on a remote machine, then a port is
-    the port that the remote server is listening on.
- */
-//bool SybaseConnectionInternal::db_connect(QCString host, QCString user,
-//  QCString password, unsigned short int port, QString socket)
 bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
 {
     if (dbinit() == FAIL)
@@ -220,8 +210,6 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
     return false;
 }
 
-/*! Disconnects from the database.
- */
 bool SybaseConnectionInternal::db_disconnect()
 {
 
@@ -231,9 +219,6 @@ bool SybaseConnectionInternal::db_disconnect()
     return true;
 }
 
-/* ************************************************************************** */
-/*! Selects dbName as the active database so it can be used.
- */
 bool SybaseConnectionInternal::useDatabase(const QString &dbName)
 {
     if (dbuse(dbProcess, dbName.toLatin1().data()) == SUCCEED) {
@@ -243,8 +228,6 @@ bool SybaseConnectionInternal::useDatabase(const QString &dbName)
     return false;
 }
 
-/*! Executes the given SQL statement on the server.
- */
 bool SybaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
     // remove queries in buffer if any. flush existing results if any
@@ -269,8 +252,6 @@ QString SybaseConnectionInternal::escapeIdentifier(const QString& str) const
     return QString(str).replace("'", "''");
 }
 
-
-
 //--------------------------------------
 
 SybaseCursorData::SybaseCursorData(KDbConnection* connection)
@@ -283,4 +264,3 @@ SybaseCursorData::SybaseCursorData(KDbConnection* connection)
 SybaseCursorData::~SybaseCursorData()
 {
 }
-

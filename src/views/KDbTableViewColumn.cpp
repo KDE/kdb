@@ -305,7 +305,6 @@ KDbQueryColumnInfo* KDbTableViewColumn::visibleLookupColumnInfo() const
     return d->visibleLookupColumnInfo;
 }
 
-//! @return true if data is stored in DB, not only in memeory.
 bool KDbTableViewColumn::isDBAware() const
 {
     return d->isDBAware;

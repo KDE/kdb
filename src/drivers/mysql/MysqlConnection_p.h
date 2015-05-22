@@ -52,6 +52,12 @@ public:
     virtual ~MysqlConnectionInternal();
 
     //! Connects to a MySQL database
+    /*! Connects to the MySQL server on host as the given user using the specified
+        password.  If host is "localhost", then a socket on the local file system
+        can be specified to connect to the server (several defaults will be tried if
+        none is specified).  If the server is on a remote machine, then a port is
+        the port that the remote server is listening on.
+     */
     bool db_connect(const ConnectionData& data);
 
     //! Disconnects from the database

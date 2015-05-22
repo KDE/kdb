@@ -54,8 +54,6 @@ void xBaseConnectionInternal::storeResult()
   }
 }
 
-//bool xBaseConnectionInternal::db_connect(QCString host, QCString user,
-//  QCString password, unsigned short int port, QString socket)
 bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
 {
   // we have to migrate the xbase source database into a .kexi file
@@ -144,8 +142,6 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   return true;
 }
 
-/*! Disconnects from the database.
-*/
 bool xBaseConnectionInternal::db_disconnect(const KDbConnectionData& data)
 {
   //! Export back to xBase
@@ -165,9 +161,6 @@ bool xBaseConnectionInternal::db_disconnect(const KDbConnectionData& data)
   return internalConn->disconnect();
 }
 
-/* ************************************************************************** */
-/*! Selects dbName as the active database so it can be used.
-*/
 bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 {
   if ( !internalConn ) {
@@ -176,11 +169,9 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
   return internalConn->useDatabase(dbMap[dbName]);
 }
 
-/*! Executes the given SQL statement
-*/
 bool xBaseConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
-//	PreDrvDbg << statement;
+//PreDrvDbg << statement;
   if ( !internalConn ) {
     return false;
   }

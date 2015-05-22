@@ -50,8 +50,6 @@ PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const ConnectionDa
 {
 }
 
-//==================================================================================
-//Do any tidying up before the object is deleted
 PostgresqlConnection::~PostgresqlConnection()
 {
     //delete m_trans;
@@ -59,25 +57,17 @@ PostgresqlConnection::~PostgresqlConnection()
     delete d;
 }
 
-//==================================================================================
-//Return a new query based on a query statment
-KDbCursor* PostgresqlConnection::prepareQuery(const KDbEscapedString& statement,  uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new PostgresqlCursor(this, statement, 1); //Always used buffered cursor
 }
 
-//==================================================================================
-//Return a new query based on a query object
 KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
     Q_UNUSED(cursor_options);
     return new PostgresqlCursor(this, query, 1);//Always used buffered cursor
 }
 
-//==================================================================================
-//Made this a noop
-//We tell we are connected, but we wont actually connect until we use a database!
 bool PostgresqlConnection::drv_connect()
 {
     PreDrvDbg;
@@ -108,24 +98,17 @@ bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     return true;
 }
 
-//==================================================================================
-//Made this a noop
-//We tell kexi wehave disconnected, but it is actually handled by closeDatabse
 bool PostgresqlConnection::drv_disconnect()
 {
     PreDrvDbg;
     return true;
 }
 
-//==================================================================================
-//Return a list of database names
 bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 {
     return queryStringList(KDbEscapedString("SELECT datname FROM pg_database WHERE datallowconn = TRUE"), list);
 }
 
-//==================================================================================
-//Create a new database
 bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
     return executeSQL(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
@@ -139,8 +122,6 @@ QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
     return key + "='" + value.toString().toUtf8() + "' ";
 }
 
-//==================================================================================
-//Use this as our connection instead of connect
 bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                                            KDbMessageHandler* msgHandler)
 {
@@ -216,8 +197,6 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     return true;
 }
 
-//==================================================================================
-//Here we close the database connection
 bool PostgresqlConnection::drv_closeDatabase()
 {
     PreDrvDbg;
@@ -228,8 +207,6 @@ bool PostgresqlConnection::drv_closeDatabase()
     return true;
 }
 
-//==================================================================================
-//Drops the given database
 bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 {
     PreDrvDbg << dbName;
@@ -241,22 +218,16 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     return false;
 }
 
-//==================================================================================
-//Execute an SQL statement
 bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& statement)
 {
     return d->executeSQL(statement, PGRES_COMMAND_OK);
 }
 
-//==================================================================================
-//Return true if currently connected to a database, ignoring the m_is_connected flag.
 bool PostgresqlConnection::drv_isDatabaseUsed() const
 {
     return d->conn;
 }
 
-//==================================================================================
-//Return the oid of the last insert - only works if sql was insert of 1 row
 quint64 PostgresqlConnection::drv_lastInsertRecordId()
 {
     // InvalidOid is 0, so the cast is OK

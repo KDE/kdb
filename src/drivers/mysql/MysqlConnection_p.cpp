@@ -35,7 +35,6 @@
 #define NAMESPACE Predicate
 #endif
 
-/* ************************************************************************** */
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : KDbConnectionInternal(connection)
         , mysql(0)
@@ -59,13 +58,6 @@ void MysqlConnectionInternal::storeResult()
     setServerMessage(QLatin1String(mysql_error(mysql)));
 }
 
-/* ************************************************************************** */
-/*! Connects to the MySQL server on host as the given user using the specified
-    password.  If host is "localhost", then a socket on the local file system
-    can be specified to connect to the server (several defaults will be tried if
-    none is specified).  If the server is on a remote machine, then a port is
-    the port that the remote server is listening on.
- */
 bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
@@ -115,8 +107,6 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
     return false;
 }
 
-/*! Disconnects from the database.
- */
 bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
@@ -125,9 +115,6 @@ bool MysqlConnectionInternal::db_disconnect()
     return true;
 }
 
-/* ************************************************************************** */
-/*! Selects dbName as the active database so it can be used.
- */
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
@@ -141,8 +128,6 @@ bool MysqlConnectionInternal::useDatabase(const QString &dbName)
     return true;
 }
 
-/*! Executes the given SQL statement on the server.
- */
 bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& statement)
 {
     if (mysql_real_query(mysql, statement.constData(), statement.length()) == 0)
