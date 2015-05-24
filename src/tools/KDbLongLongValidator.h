@@ -23,7 +23,6 @@
 #include "kdb_export.h"
 
 #include <QValidator>
-class QWidget;
 
 //! @short A validator for longlong data type.
 /*!

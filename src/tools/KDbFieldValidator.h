@@ -20,10 +20,7 @@
 #ifndef KDB_TOOLS_FIELDVALIDATOR_H
 #define KDB_TOOLS_FIELDVALIDATOR_H
 
-#include "kdb_export.h"
 #include "KDbValidator.h"
-
-class QWidget;
 
 class KDbField;
 
