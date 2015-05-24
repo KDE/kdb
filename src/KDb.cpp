@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
    Copyright (c) 2006, 2007 Thomas Braxton <kde.braxton@gmail.com>
    Copyright (c) 1999 Preston Brown <pbrown@kde.org>
    Copyright (c) 1997 Matthias Kalle Dalheimer <kalle@kde.org>
@@ -658,7 +658,7 @@ int KDb::recordCount(const KDbTableSchema& tableSchema)
     return count;
 }
 
-int KDb::recordCount(KDbQuerySchema* querySchema)
+int KDb::recordCount(KDbQuerySchema* querySchema, const QList<QVariant>& params)
 {
 //! @todo does not work with non-SQL data sources
     if (!querySchema->connection()) {
@@ -666,20 +666,20 @@ int KDb::recordCount(KDbQuerySchema* querySchema)
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
-    querySchema->connection()->querySingleNumber(
+    tristate result = querySchema->connection()->querySingleNumber(
         KDbEscapedString("SELECT COUNT(*) FROM (")
-            + querySchema->connection()->selectStatement(querySchema)
+            + querySchema->connection()->selectStatement(querySchema, params)
             + ") AS kdb__subquery", &count
     );
-    return count;
+    return true == result ? count : -1;
 }
 
-int KDb::recordCount(KDbTableOrQuerySchema* tableOrQuery)
+int KDb::recordCount(KDbTableOrQuerySchema* tableOrQuery, const QList<QVariant>& params)
 {
     if (tableOrQuery->table())
         return recordCount(*tableOrQuery->table());
     if (tableOrQuery->query())
-        return recordCount(tableOrQuery->query());
+        return recordCount(tableOrQuery->query(), params);
     return -1;
 }
 

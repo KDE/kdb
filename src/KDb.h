@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -145,13 +145,19 @@ int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
  -1 is returned if error occurred. */
 KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
 
+/*! @overload in rowCount(const KDbTableSchema& tableSchema)
+ Operates on a query schema. @a params are optional values of parameters that will
+ be inserted into places marked with [] before execution of the query. */
 //! @todo perhaps use quint64 here?
-/*! Like above but operates on a query schema. */
-KDB_EXPORT int recordCount(KDbQuerySchema* querySchema);
+KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
+                           const QList<QVariant>& params = QList<QVariant>());
 
+/*! @overload int rowCount(KDbQuerySchema& querySchema, const QList<QVariant>& params)
+ Operates on a table or query schema. @a params are optional values of parameters that
+ will be inserted into places marked with [] before execution of the query. */
 //! @todo perhaps use quint64 here?
-/*! Like above but operates on a table or query schema variant. */
-KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery);
+KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
+                           const QList<QVariant>& params = QList<QVariant>());
 
 /*! @return a number of columns that can be retrieved from table or query schema.
  In case of query, expanded fields are counted. Can return -1 if @a tableOrQuery

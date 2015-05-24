@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -2471,16 +2471,38 @@ bool KDbConnection::storeNewObjectData(KDbObject* object)
     return storeObjectDataInternal(object, true);
 }
 
-tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data, const KDbEscapedString* sql,
-                                               KDbQuerySchema* query, bool addLimitTo1)
+KDbCursor* KDbConnection::executeQueryInternal(const KDbEscapedString& sql,
+                                               KDbQuerySchema* query,
+                                               const QList<QVariant>* params)
+{
+    Q_ASSERT(!sql.isEmpty() || query);
+    clearResult();
+    if (!sql.isEmpty()) {
+        return executeQuery(sql);
+    }
+    if (!query) {
+        return 0;
+    }
+    if (params) {
+        return executeQuery(query, *params);
+    }
+    return executeQuery(query);
+}
+
+tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data,
+                                                  const KDbEscapedString* sql,
+                                                  KDbQuerySchema* query,
+                                                  const QList<QVariant>* params,
+                                                  bool addLimitTo1)
 {
     Q_ASSERT(sql || query);
-//! @todo does not work with non-SQL data sources
-    if (sql)
+    if (sql) {
+        //! @todo does not work with non-SQL data sources
         m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
-    KDbCursor *cursor;
-    if (!(cursor = sql ? executeQuery(m_result.sql()) : executeQuery(query))) {
-        KDbWarn << "!executeQuery()" << m_result.sql();
+    }
+    KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
+    if (!cursor) {
+        KDbWarn << "!querySingleRecordInternal() " << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst()
@@ -2499,12 +2521,18 @@ tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data, const KDb
 
 tristate KDbConnection::querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, &sql, 0, addLimitTo1);
+    return querySingleRecordInternal(data, &sql, 0, 0, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, 0, query, addLimitTo1);
+    return querySingleRecordInternal(data, 0, query, 0, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
+                                          const QList<QVariant>& params, bool addLimitTo1)
+{
+    return querySingleRecordInternal(data, 0, query, &params, addLimitTo1);
 }
 
 bool KDbConnection::checkIfColumnExists(KDbCursor *cursor, uint column)
@@ -2516,12 +2544,19 @@ bool KDbConnection::checkIfColumnExists(KDbCursor *cursor, uint column)
     return true;
 }
 
-tristate KDbConnection::querySingleString(const KDbEscapedString& sql, QString* value, uint column, bool addLimitTo1)
+tristate KDbConnection::querySingleStringInternal(const KDbEscapedString* sql,
+                                                  QString* value, KDbQuerySchema* query,
+                                                  const QList<QVariant>* params,
+                                                  uint column, bool addLimitTo1)
 {
-    KDbCursor *cursor;
-    m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
-    if (!(cursor = executeQuery(m_result.sql()))) {
-        KDbWarn << "!executeQuery() " << m_result.sql();
+    Q_ASSERT(sql || query);
+    if (sql) {
+        //! @todo does not work with non-SQL data sources
+        m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
+    }
+    KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
+    if (!cursor) {
+        KDbWarn << "!querySingleStringInternal()" << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
@@ -2538,10 +2573,33 @@ tristate KDbConnection::querySingleString(const KDbEscapedString& sql, QString* 
     return deleteCursor(cursor);
 }
 
-tristate KDbConnection::querySingleNumber(const KDbEscapedString& sql, int* number, uint column, bool addLimitTo1)
+tristate KDbConnection::querySingleString(const KDbEscapedString& sql, QString* value,
+                                          uint column, bool addLimitTo1)
+{
+    return querySingleStringInternal(&sql, value, 0, 0, column, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleString(KDbQuerySchema* query, QString* value, uint column,
+                                          bool addLimitTo1)
+{
+    return querySingleStringInternal(0, value, query, 0, column, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleString(KDbQuerySchema* query, QString* value,
+                                          const QList<QVariant>& params, uint column,
+                                          bool addLimitTo1)
+{
+    return querySingleStringInternal(0, value, query, &params, column, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleNumberInternal(const KDbEscapedString* sql,
+                                                  int* number, KDbQuerySchema* query,
+                                                  const QList<QVariant>* params,
+                                                  uint column, bool addLimitTo1)
 {
     QString str;
-    const tristate result = querySingleString(sql, &str, column, addLimitTo1);
+    const tristate result = querySingleStringInternal(sql, &str, query, params, column,
+                                                      addLimitTo1);
     if (result != true)
         return result;
     bool ok;
@@ -2552,13 +2610,36 @@ tristate KDbConnection::querySingleNumber(const KDbEscapedString& sql, int* numb
     return true;
 }
 
-bool KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* list, uint column)
+tristate KDbConnection::querySingleNumber(const KDbEscapedString& sql, int* number,
+                                          uint column, bool addLimitTo1)
 {
-    KDbCursor *cursor;
-    clearResult();
-    m_result.setSql(sql);
-    if (!(cursor = executeQuery(m_result.sql()))) {
-        KDbWarn << "!executeQuery() " << m_result.sql();
+    return querySingleNumberInternal(&sql, number, 0, 0, column, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleNumber(KDbQuerySchema* query, int* number, uint column,
+                                          bool addLimitTo1)
+{
+    return querySingleNumberInternal(0, number, query, 0, column, addLimitTo1);
+}
+
+tristate KDbConnection::querySingleNumber(KDbQuerySchema* query, int* number,
+                                          const QList<QVariant>& params, uint column,
+                                          bool addLimitTo1)
+{
+    return querySingleNumberInternal(0, number, query, &params, column, addLimitTo1);
+}
+
+tristate KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
+                                                QStringList* list, KDbQuerySchema* query,
+                                                const QList<QVariant>* params,
+                                                uint column)
+{
+    if (sql) {
+        m_result.setSql(*sql);
+    }
+    KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
+    if (!cursor) {
+        KDbWarn << "!queryStringListInternal() " << m_result.sql();
         return false;
     }
     cursor->moveFirst();
@@ -2576,16 +2657,33 @@ bool KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* li
         list->append(cursor->value(column).toString());
         if (!cursor->moveNext() && cursor->result().isError()) {
             m_result = cursor->result();
+            const tristate result = m_result.isError() ? tristate(false) : tristate(cancelled);
             deleteCursor(cursor);
-            return false;
+            return result;
         }
     }
     return deleteCursor(cursor);
 }
 
+tristate KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* list,
+                                        uint column)
+{
+    return queryStringListInternal(&sql, list, 0, 0, column);
+}
+
+tristate KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list, uint column)
+{
+    return queryStringListInternal(0, list, query, 0, column);
+}
+
+tristate KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
+                                    const QList<QVariant>& params, uint column)
+{
+    return queryStringListInternal(0, list, query, &params, column);
+}
+
 bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, bool addLimitTo1)
 {
-    KDbCursor *cursor;
     //optimization
     if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
         //this is at least for sqlite
@@ -2604,7 +2702,8 @@ bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, boo
             m_result.setSql(sql);
         }
     }
-    if (!(cursor = executeQuery(m_result.sql()))) {
+    KDbCursor *cursor = executeQuery(m_result.sql());
+    if (!cursor) {
         KDbWarn << "!executeQuery()" << m_result.sql();
         *success = false;
         return false;

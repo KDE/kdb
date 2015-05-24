@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -386,9 +386,9 @@ public:
      Statement is build from data provided by @a query schema.
      Kexi SQL and driver-specific escaping is performed on table names. */
     KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                         uint cursor_options = 0);
+                            uint cursor_options = 0);
 
-    /*! @overload executeQuery( KDbQuerySchema* query, const QList<QVariant>& params,
+    /*! @overload executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
       uint cursor_options = 0 ) */
     KDbCursor* executeQuery(KDbQuerySchema* query, uint cursor_options = 0);
 
@@ -444,10 +444,17 @@ public:
      false on data retrieving failure, and cancelled if there's no single record available. */
     tristate querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1 = true);
 
-    /*! Like tristate @ref querySingleRecord(const QString&, KDbRecordData*, bool)
-     but uses KDbQuerySchema object.
-     If @a addLimitTo1 is true (the default), adds a LIMIT clause to the query. */
+    /*! @overload tristate querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data,
+                                             bool addLimitTo1)
+     Uses a KDbQuerySchema object. */
     tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1 = true);
+
+    /*! @overload tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
+                                             bool addLimitTo1)
+     Accepts @a params as parameters that will be inserted into places marked with [] before
+     query execution. */
+    tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
+                               const QList<QVariant>& params, bool addLimitTo1 = true);
 
     /*! Executes query for a raw statement @a sql and stores first record's field's
      (number @a column) string value inside @a value.
@@ -461,12 +468,40 @@ public:
     tristate querySingleString(const KDbEscapedString& sql, QString* value, uint column = 0,
                                bool addLimitTo1 = true);
 
+    /*! @overload tristate querySingleString(const KDbEscapedString& sql, QString* value,
+                                             uint column, bool addLimitTo1)
+     Uses a KDbQuerySchema object. */
+    tristate querySingleString(KDbQuerySchema* query, QString* value, uint column = 0,
+                               bool addLimitTo1 = true);
+
+    /*! @overload tristate querySingleString(QuerySchema* query, QString* value, uint column,
+                                             bool addLimitTo1)
+     Accepts @a params as parameters that will be inserted into places marked with [] before
+     query execution. */
+    tristate querySingleString(KDbQuerySchema* query, QString* value,
+                               const QList<QVariant>& params, uint column = 0,
+                               bool addLimitTo1 = true);
+
     /*! Convenience function: executes query for a raw SQL statement @a sql and stores first
      record's field's (number @a column) value inside @a number. @see querySingleString().
      Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default).
      @return true if query was successfully executed and first record has been found,
      false on data retrieving failure, and cancelled if there's no single record available. */
     tristate querySingleNumber(const KDbEscapedString& sql, int* number, uint column = 0,
+                               bool addLimitTo1 = true);
+
+    /*! @overload tristate querySingleNumber(const KDbEscapedString& sql, int* number,
+                                             uint column, bool addLimitTo1)
+     Uses a KDbQuerySchema object. */
+     tristate querySingleNumber(KDbQuerySchema* query, int* number, uint column = 0,
+                                bool addLimitTo1 = true);
+
+    /*! @overload tristate querySingleNumber(KDbQuerySchema* query, int* number, uint column,
+                                             bool addLimitTo1)
+     Accepts @a params as parameters that will be inserted into places marked with [] before
+     query execution. */
+    tristate querySingleNumber(KDbQuerySchema* query, int* number,
+                               const QList<QVariant>& params, uint column = 0,
                                bool addLimitTo1 = true);
 
     /*! Executes query for a raw SQL statement @a sql and stores Nth field's string value
@@ -476,7 +511,19 @@ public:
      @return true if all values were fetched successfuly,
      false on data retrieving failure. Returning empty list can be still a valid result.
      On errors, the list is not cleared, it may contain a few retrieved values. */
-    bool queryStringList(const KDbEscapedString& sql, QStringList* list, uint column = 0);
+    tristate queryStringList(const KDbEscapedString& sql, QStringList* list, uint column = 0);
+
+    /*! @overload tristate queryStringList(const KDbEscapedString& sql, QStringList* list,
+                                           uint column)
+     Uses a QuerySchema object. */
+    tristate queryStringList(KDbQuerySchema* query, QStringList* list, uint column = 0);
+
+    /*! @overload tristate queryStringList(KDbQuerySchema* query, QStringList* list,
+                                           uint column)
+     Accepts @a params as parameters that will be inserted into places marked with [] before
+     query execution. */
+    tristate queryStringList(KDbQuerySchema* query, QStringList* list,
+                             const QList<QVariant>& params, uint column = 0);
 
     /*! @return true if there is at least one record has been returned by executing query
      for a raw SQL statement @a sql.
@@ -1229,7 +1276,30 @@ protected:
     /*! @internal used by querySingleRecord() methods.
      Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default). */
     tristate querySingleRecordInternal(KDbRecordData* data, const KDbEscapedString* sql,
-                                       KDbQuerySchema* query, bool addLimitTo1 = true);
+                                       KDbQuerySchema* query, const QList<QVariant>* params,
+                                       bool addLimitTo1 = true);
+
+    /*! @internal used by querySingleString() methods.
+     Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default). */
+    tristate querySingleStringInternal(const KDbEscapedString* sql, QString* value,
+                                       KDbQuerySchema* query, const QList<QVariant>* params,
+                                       uint column, bool addLimitTo1);
+
+    /*! @internal used by queryNumberString() methods.
+     Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default). */
+    tristate querySingleNumberInternal(const KDbEscapedString* sql, int* number,
+                                       KDbQuerySchema* query, const QList<QVariant>* params,
+                                       uint column, bool addLimitTo1);
+
+    /*! @internal used by queryStringList() methods. */
+    tristate queryStringListInternal(const KDbEscapedString *sql, QStringList* list,
+                                 KDbQuerySchema* query, const QList<QVariant>* params,
+                                 uint column);
+
+    /*! @internal used by *Internal() methods.
+     Executes query based on a raw SQL statement @a sql or @a query with optional @a params. */
+    KDbCursor* executeQueryInternal(const KDbEscapedString& sql, KDbQuerySchema* query,
+                                    const QList<QVariant>* params);
 
     /*! @internal used by KDbDriver::createConnection().
      Only works if connection is not yet established. */
