@@ -1077,8 +1077,9 @@ KDbTableSchema* KDbQuerySchema::table(const QString& tableName) const
 {
 //! @todo maybe use tables_byname?
     foreach(KDbTableSchema *table, d->tables) {
-        if (table->name().toLower() == tableName.toLower())
+        if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             return table;
+        }
     }
     return 0;
 }
@@ -1175,11 +1176,11 @@ int KDbQuerySchema::tablePositionForAlias(const QString& name) const
 int KDbQuerySchema::tablePosition(const QString& tableName) const
 {
     int num = -1;
-    QString tableNameLower(tableName.toLower());
     foreach(KDbTableSchema* table, d->tables) {
         num++;
-        if (table->name().toLower() == tableNameLower)
+        if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             return num;
+        }
     }
     return -1;
 }
@@ -1187,11 +1188,10 @@ int KDbQuerySchema::tablePosition(const QString& tableName) const
 QList<int> KDbQuerySchema::tablePositions(const QString& tableName) const
 {
     QList<int> result;
-    QString tableNameLower(tableName.toLower());
     int num = -1;
     foreach(KDbTableSchema* table, d->tables) {
         num++;
-        if (table->name().toLower() == tableNameLower) {
+        if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             result += num;
         }
     }

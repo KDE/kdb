@@ -103,12 +103,12 @@ SQLiteDriver::drv_createConnection(const ConnectionData& connData)
 bool SQLiteDriver::isSystemObjectName(const QString& n) const
 {
     return KDbDriver::isSystemObjectName(n)
-           || n.toLower().startsWith(QLatin1String("sqlite_"));
+           || n.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
 }
 
 bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
 {
-    QString lcName(n.toLower());
+    const QString lcName(n.toLower());
     return (lcName == QLatin1String("_rowid_"))
            || (lcName == QLatin1String("rowid"))
            || (lcName == QLatin1String("oid"));

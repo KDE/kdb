@@ -121,10 +121,8 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
         return false;
     }
 
-
-
     // umm, copied from pqxx driver.
-    if (hostName.isEmpty() || hostName.toLower() == "localhost") {
+    if (hostName.isEmpty() || 0 == hostName.compare(QLatin1String("localhost"), Qt::CaseInsensitive)) {
         if (data.useLocalSocketFile) {
             if (data.localSocketFileName.isEmpty()) {
                 QStringList sockets;

@@ -375,7 +375,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
 bool KDbAlterTableHandler::ChangeFieldPropertyAction::shouldBeRemoved(ActionDictDict &fieldActions)
 {
     Q_UNUSED(fieldActions);
-    return fieldName().toLower() == m_newValue.toString().toLower();
+    return 0 == fieldName().compare(m_newValue.toString(), Qt::CaseInsensitive);
 }
 
 tristate KDbAlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(KDbTableSchema* table, KDbField* field,
