@@ -404,11 +404,6 @@ KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField* f, int length =
  (typically something like "application/x-kexiproject-sqlite") */
 KDB_EXPORT QString defaultFileBasedDriverMimeType();
 
-/*! @return icon name for default file-based driver
- (typically icon for something like "application/x-kexiproject-sqlite").
- @see KDb::defaultFileBasedDriverMimeType() */
-KDB_EXPORT QString defaultFileBasedDriverIcon();
-
 /*! @return default file-based driver name (currently, "sqlite"). */
 KDB_EXPORT QString defaultFileBasedDriverName();
 

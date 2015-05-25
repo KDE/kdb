@@ -1571,22 +1571,6 @@ QString KDb::defaultFileBasedDriverName()
     return QLatin1String("sqlite");
 }
 
-QString KDb::defaultFileBasedDriverIcon()
-{
-//! @todo port to Qt4
-#if 1
-    return QString();
-#else
-    KMimeType::Ptr mimeType(KMimeType::mimeType(
-                                KDb::defaultFileBasedDriverMimeType()));
-    if (mimeType.isNull()) {
-        KDbWarn << KDb::defaultFileBasedDriverMimeType() << "mimetype not installed!";
-        return QString();
-    }
-    return mimeType->iconName();
-#endif
-}
-
 /*! @return QVariant value converted from null-terminated @a data string.
  In case of BLOB type, @a data is not null terminated, so passing length is needed. */
 QVariant KDb::cstringToVariant(const char* data, KDbField* f, int length)
