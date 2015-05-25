@@ -981,7 +981,7 @@ QDebug operator<<(QDebug dbg, const KDbQuerySchema& query)
         }
     }
 
-    dbg.nospace() << " - TABLE ALIASES:\n";
+    dbg.nospace() << "\n- TABLE ALIASES:\n";
     if (query.tableAliasesCount() == 0) {
         dbg.nospace() << "<NONE>\n";
     }
