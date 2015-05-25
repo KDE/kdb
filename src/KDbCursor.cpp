@@ -149,6 +149,11 @@ bool KDbCursor::open()
             m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("Query statement is empty."));
             return false;
         }
+#ifdef KDB_DEBUG_GUI
+        KDb::debugGUI(QString::fromLatin1("SQL for query \"%1\": ")
+                         .arg(KDb::iifNotEmpty(m_query->name(), QString::fromLatin1("<unnamed>")))
+                      + m_result.sql().toString());
+#endif
     }
     m_opened = drv_open(m_result.sql());
     m_afterLast = false; //we are not @ the end
