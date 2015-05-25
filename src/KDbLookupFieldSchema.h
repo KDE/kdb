@@ -222,13 +222,6 @@ private:
     Private * const d;
 };
 
-namespace KDb
-{
-/*! Gets property values for the lookup schema @a lookup.
- @a values is cleared before filling. This function is used e.g. for altering table design. */
-KDB_EXPORT void getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values);
-}
-
 //! Sends lookup field schema's record source information @a source to debug output @a dbg.
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema::RecordSource& source);
 

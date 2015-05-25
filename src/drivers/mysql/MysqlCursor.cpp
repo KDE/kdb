@@ -106,7 +106,7 @@ QVariant MysqlCursor::value(uint pos)
 
 //! @todo js: use MYSQL_FIELD::type here!
 
-    return KDbcstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
+    return KDb::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
 }
 
 /* As with sqlite, the DB library returns all values (including numbers) as
@@ -127,7 +127,7 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
         KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
-        (*data)[i] = KDbcstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
+        (*data)[i] = KDb::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
     }
     return true;
 }

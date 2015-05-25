@@ -22,7 +22,6 @@
 
 #include "KDbResult.h"
 
-class KDbConnection;
 class KDbConnectionData;
 
 //! @short An interface containing a set of tools for database administration

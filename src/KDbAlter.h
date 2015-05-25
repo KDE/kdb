@@ -20,8 +20,10 @@
 #ifndef KDB_ALTER_H
 #define KDB_ALTER_H
 
-#include "KDbConnection.h"
 #include "KDbUtils.h"
+#include "KDbResult.h"
+#include "KDbTristate.h"
+#include "KDbTableSchema.h"
 
 #include <QList>
 #include <QHash>

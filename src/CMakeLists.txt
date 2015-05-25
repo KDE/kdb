@@ -89,6 +89,7 @@ set(kdb_LIB_SRCS
    KDbIndexSchema.cpp
    KDbQuerySchema.cpp
    KDbQueryColumnInfo.cpp
+   KDbTableOrQuerySchema.cpp
    KDbDriverManager.cpp
    KDbDriver.cpp
    KDbDriver_p.cpp

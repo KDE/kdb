@@ -25,25 +25,25 @@
 #include <QByteArray>
 #include <QtDebug>
 
-#include "KDbField.h"
 #include "KDbGlobal.h"
-#include "KDbEscapedString.h"
-#include "KDbQueryColumnInfo.h"
+#include "KDbField.h"
 #include "KDbVersionInfo.h"
 
 class QDomNode;
 class QDomElement;
 class QDomDocument;
 
+class KDbEscapedString;
 class KDbConnection;
 class KDbConnectionData;
 class KDbMessageHandler;
 class KDbQuerySchema;
 class KDbResultable;
 class KDbResultInfo;
-class KDbTableOrQuerySchema;
 class KDbTableSchema;
 class KDbDriver;
+class KDbLookupFieldSchema;
+class KDbTableOrQuerySchema;
 
 namespace KDb
 {
@@ -226,6 +226,10 @@ KDB_EXPORT bool isLookupFieldSchemaProperty(const QByteArray& propertyName);
  This can be used when type information is deserialized from a string or QVariant. */
 KDB_EXPORT KDbField::Type intToFieldType(int type);
 
+/*! Gets property values for the lookup schema @a lookup.
+ @a values is cleared before filling. This function is used e.g. for altering table design. */
+KDB_EXPORT void getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values);
+
 /*! Gets property values for @a field.
  Properties from extended schema are included. @a values is cleared before filling.
  The same number of properties in the same order is returned.
@@ -394,30 +398,7 @@ KDB_EXPORT KDbField::Type maximumForIntegerTypes(KDbField::Type t1, KDbField::Ty
 
 /*! @return QVariant value converted from null-terminated @a data string.
  In case of BLOB type, @a data is not null terminated, so passing length is needed. */
-inline QVariant cstringToVariant(const char* data, KDbField* f, int length = -1)
-{
-    if (!data)
-        return QVariant();
-    // from most to least frequently used types:
-
-    if (!f || f->isTextType())
-        return QString::fromUtf8(data, length);
-    if (f->isIntegerType()) {
-        if (f->type() == KDbField::BigInteger)
-            return QVariant(QString::fromLatin1(data, length).toLongLong());
-        return QVariant(QString::fromLatin1(data, length).toInt());
-    }
-    if (f->isFPNumericType())
-        return QString::fromLatin1(data, length).toDouble();
-    if (f->type() == KDbField::BLOB)
-        return QByteArray(data, length);
-    // the default
-//! @todo date/time?
-    QVariant result(QString::fromUtf8(data, length));
-    if (!result.convert(KDbField::variantType(f->type())))
-        return QVariant();
-    return result;
-}
+KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField* f, int length = -1);
 
 /*! @return default file-based driver mime type
  (typically something like "application/x-kexiproject-sqlite") */
@@ -502,9 +483,6 @@ KDB_EXPORT QString sqlite3ProgramPath();
  @return true on success. */
 KDB_EXPORT bool importSqliteFile(const QString &inputFileName, const QString &outputFileName);
 
-//! Sends information about table or query schema @a schema to debug output @a dbg.
-KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbTableOrQuerySchema& schema);
-
 /*! @return true if @a s is a valid identifier, ie. starts with a letter or '_' character
  and contains only letters, numbers and '_' character. */
 KDB_EXPORT bool isIdentifier(const QString& s);
@@ -521,80 +499,5 @@ KDB_EXPORT QString identifierExpectedMessage(const QString &valueName,
         const QVariant& v);
 
 } // namespace KDb
-
-/*! Variant class providing a pointer to table or query. */
-class KDB_EXPORT KDbTableOrQuerySchema
-{
-public:
-    /*! Creates a new KDbTableOrQuerySchema variant object, retrieving table or query schema
-     using @a conn connection and @a name. If both table and query exists for @a name,
-     table has priority over query.
-     You should check whether a query or table has been found by testing
-     (query() || table()) expression. */
-    KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name);
-
-    /*! Creates a new KDbTableOrQuerySchema variant object, retrieving table or query schema
-     using @a conn connection and @a name. If @a table is true, @a name is assumed
-     to be a table name, otherwise @a name is assumed to be a query name.
-     You should check whether a query or table has been found by testing
-     (query() || table()) expression. */
-    KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name, bool table);
-
-    /*! Creates a new KDbTableOrQuerySchema variant object. @a tableOrQuery must be of
-     class KDbTableSchema or KDbQuerySchema.
-     You should check whether a query or table has been found by testing
-     (query() || table()) expression. */
-    explicit KDbTableOrQuerySchema(KDbFieldList *tableOrQuery);
-
-    /*! Creates a new KDbTableOrQuerySchema variant object, retrieving table or query schema
-     using @a conn connection and @a id.
-     You should check whether a query or table has been found by testing
-     (query() || table()) expression. */
-    KDbTableOrQuerySchema(KDbConnection *conn, int id);
-
-    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer so @a table
-     object. */
-    explicit KDbTableOrQuerySchema(KDbTableSchema* table);
-
-    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer so @a query
-     object. */
-    explicit KDbTableOrQuerySchema(KDbQuerySchema* query);
-
-    ~KDbTableOrQuerySchema();
-
-    //! @return a pointer to the query if it's provided
-    KDbQuerySchema* query() const;
-
-    //! @return a pointer to the table if it's provided
-    KDbTableSchema* table() const;
-
-    //! @return name of a query or table
-    QByteArray name() const;
-
-    //! @return caption (if present) or name of the table/query
-    QString captionOrName() const;
-
-    //! @return number of fields
-    uint fieldCount() const;
-
-    //! @return all columns for the table or the query
-    const KDbQueryColumnInfo::Vector columns(bool unique = false);
-
-    /*! @return a field of the table or the query schema for name @a name
-     or 0 if there is no such field. */
-    KDbField* field(const QString& name);
-
-    /*! Like KDbField* field(const QString& name);
-     but returns all information associated with field/column @a name. */
-    KDbQueryColumnInfo* columnInfo(const QString& name);
-
-    /*! @return connection object, for table or query or 0 if there's no table or query defined. */
-    KDbConnection* connection() const;
-
-protected:
-    Q_DISABLE_COPY(KDbTableOrQuerySchema)
-    class Private;
-    Private * const d;
-};
 
 #endif

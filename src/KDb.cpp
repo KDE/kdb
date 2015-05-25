@@ -25,7 +25,9 @@
 #include "KDbCursor.h"
 #include "KDbDriverManager.h"
 #include "KDbLookupFieldSchema.h"
-#include "KDbGlobal.h"
+#include "KDbTableOrQuerySchema.h"
+#include "KDbMessageHandler.h"
+#include "KDbConnectionData.h"
 #include "transliteration/transliteration_table.h"
 
 #include <QMap>
@@ -36,20 +38,12 @@
 #include <QPixmap>
 #include <QMutex>
 #include <QSet>
-#include <QProgressBar>
-
-#include <memory>
-
-
 #include <QTimer>
 #include <QThread>
+#include <QProgressBar>
 #include <QProgressDialog>
 
-#include "KDbMessageHandler.h"
-#include "KDbConnectionData.h"
-
-class KDbDriver;
-class KDbResultable;
+#include <memory>
 
 class ConnectionTestDialog;
 
@@ -454,178 +448,6 @@ int KDb::idForObjectName(KDbConnection* conn, const QString& objName, int objTyp
 }
 
 //-----------------------------------------
-
-class KDbTableOrQuerySchema::Private
-{
-public:
-    Private() {}
-    //! The name is kept here because m_table and m_table can be 0
-    //! and we still want name() and acptionOrName() work.
-    QByteArray name;
-
-    KDbTableSchema* table;
-
-    KDbQuerySchema* query;
-};
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name)
-        : d(new Private)
-{
-    d->name = name;
-    d->table = conn->tableSchema(QLatin1String(name));
-    d->query = d->table ? 0 : conn->querySchema(QLatin1String(name));
-    if (!d->table && !d->query) {
-        KDbWarn << "tableOrQuery is neither table nor query!";
-    }
-}
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name, bool table)
-        : d(new Private)
-{
-    d->name = name;
-    d->table = table ? conn->tableSchema(QLatin1String(name)) : 0;
-    d->query = table ? 0 : conn->querySchema(QLatin1String(name));
-    if (table && !d->table) {
-        KDbWarn << "no table specified!";
-    }
-    if (!table && !d->query) {
-        KDbWarn << "no query specified!";
-    }
-}
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbFieldList *tableOrQuery)
-    : d(new Private)
-{
-    d->table = dynamic_cast<KDbTableSchema*>(tableOrQuery);
-    d->query = dynamic_cast<KDbQuerySchema*>(tableOrQuery);
-    Q_ASSERT(tableOrQuery);
-    if (!d->table && !d->query) {
-        KDbWarn << "tableOrQuery is neither table nor query!";
-    }
-}
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, int id)
-    : d(new Private)
-{
-    d->table = conn->tableSchema(id);
-    d->query = d->table ? 0 : conn->querySchema(id);
-    if (!d->table && !d->query) {
-        KDbWarn << "no table or query found for id==" << id;
-    }
-}
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbTableSchema* table)
-    : d(new Private)
-{
-    d->table = table;
-    d->query = 0;
-    if (!d->table) {
-        KDbWarn << "no table specified!";
-    }
-}
-
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbQuerySchema* query)
-    : d(new Private)
-{
-    d->table = 0;
-    d->query = query;
-    if (!d->query) {
-        KDbWarn << "no query specified!";
-    }
-}
-
-KDbTableOrQuerySchema::~KDbTableOrQuerySchema()
-{
-    delete d;
-}
-
-uint KDbTableOrQuerySchema::fieldCount() const
-{
-    if (d->table)
-        return d->table->fieldCount();
-    if (d->query)
-        return d->query->fieldsExpanded().size();
-    return 0;
-}
-
-const KDbQueryColumnInfo::Vector KDbTableOrQuerySchema::columns(bool unique)
-{
-    if (d->table)
-        return d->table->query()->fieldsExpanded(unique ? KDbQuerySchema::Unique : KDbQuerySchema::Default);
-
-    if (d->query)
-        return d->query->fieldsExpanded(unique ? KDbQuerySchema::Unique : KDbQuerySchema::Default);
-
-    KDbWarn << "no query or table specified!";
-    return KDbQueryColumnInfo::Vector();
-}
-
-QByteArray KDbTableOrQuerySchema::name() const
-{
-    if (d->table)
-        return d->table->name().toLatin1();
-    if (d->query)
-        return d->query->name().toLatin1();
-    return d->name;
-}
-
-QString KDbTableOrQuerySchema::captionOrName() const
-{
-    KDbObject *object = d->table ? static_cast<KDbObject *>(d->table) : static_cast<KDbObject *>(d->query);
-    if (!object)
-        return QLatin1String(d->name);
-    return object->caption().isEmpty() ? object->name() : object->caption();
-}
-
-KDbField* KDbTableOrQuerySchema::field(const QString& name)
-{
-    if (d->table)
-        return d->table->field(name);
-    if (d->query)
-        return d->query->field(name);
-
-    return 0;
-}
-
-KDbQueryColumnInfo* KDbTableOrQuerySchema::columnInfo(const QString& name)
-{
-    if (d->table)
-        return d->table->query()->columnInfo(name);
-
-    if (d->query)
-        return d->query->columnInfo(name);
-
-    return 0;
-}
-
-//! Sends information about table or query schema @a schema to debug output @a dbg.
-QDebug operator<<(QDebug dbg, const KDbTableOrQuerySchema& schema)
-{
-    if (schema.table())
-        dbg.nospace() << *schema.table();
-    else if (schema.query())
-        dbg.nospace() << *schema.query();
-    return dbg.space();
-}
-
-KDbConnection* KDbTableOrQuerySchema::connection() const
-{
-    if (d->table)
-        return d->table->connection();
-    else if (d->query)
-        return d->query->connection();
-    return 0;
-}
-
-KDbQuerySchema* KDbTableOrQuerySchema::query() const
-{
-    return d->query;
-}
-
-KDbTableSchema* KDbTableOrQuerySchema::table() const
-{
-    return d->table;
-}
 
 void KDb::connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
                                      KDbMessageHandler& msgHandler)
@@ -1766,6 +1588,33 @@ QString KDb::defaultFileBasedDriverIcon()
 #endif
 }
 
+/*! @return QVariant value converted from null-terminated @a data string.
+ In case of BLOB type, @a data is not null terminated, so passing length is needed. */
+QVariant KDb::cstringToVariant(const char* data, KDbField* f, int length)
+{
+    if (!data)
+        return QVariant();
+    // from most to least frequently used types:
+
+    if (!f || f->isTextType())
+        return QString::fromUtf8(data, length);
+    if (f->isIntegerType()) {
+        if (f->type() == KDbField::BigInteger)
+            return QVariant(QString::fromLatin1(data, length).toLongLong());
+        return QVariant(QString::fromLatin1(data, length).toInt());
+    }
+    if (f->isFPNumericType())
+        return QString::fromLatin1(data, length).toDouble();
+    if (f->type() == KDbField::BLOB)
+        return QByteArray(data, length);
+    // the default
+//! @todo date/time?
+    QVariant result(QString::fromUtf8(data, length));
+    if (!result.convert(KDbField::variantType(f->type())))
+        return QVariant();
+    return result;
+}
+
 QStringList KDb::libraryPaths()
 {
     QStringList result;
@@ -1854,7 +1703,7 @@ bool KDb::isIdentifier(const QString& s)
     return i > 0 && i == sLength;
 }
 
-inline QString charToIdentifier(const QChar& c)
+static inline QString charToIdentifier(const QChar& c)
 {
     if (c.unicode() >= TRANSLITERATION_TABLE_SIZE)
         return QLatin1String("_");

@@ -19,7 +19,7 @@
 
 #include "KDbAlter.h"
 #include "KDb.h"
-#include "KDbUtils.h"
+#include "KDbConnection.h"
 
 #include <QMap>
 
