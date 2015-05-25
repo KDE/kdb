@@ -21,7 +21,7 @@
 
 #include <KDb>
 
-#include <QtTest/QTest>
+#include <QTest>
 
 QTEST_GUILESS_MAIN(IdentifierTest)
 

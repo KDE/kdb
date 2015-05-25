@@ -18,7 +18,7 @@
 */
 
 #include "SqlParserTest.h"
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include <KDbDriverManager>
 #include <KDbParser>

@@ -24,7 +24,7 @@
 
 #include <QtDebug>
 #include <QFile>
-#include <QtTest/QTest>
+#include <QTest>
 
 KDbConnection *conn = 0;
 

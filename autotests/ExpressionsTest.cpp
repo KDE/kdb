@@ -19,7 +19,7 @@
 
 #include "ExpressionsTest.h"
 
-#include <QtTest/QtTest>
+#include <QtTest>
 
 #include <KDbExpression>
 #include "parser/generated/sqlparser.h"
