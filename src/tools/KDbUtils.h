@@ -345,7 +345,8 @@ QString findExe(const QString& appname,
 #if defined(Q_OS_WIN)
 #define KDB_SHARED_LIB_EXTENSION ".dll"
 #elif defined(Q_OS_MAC)
-#define KDB_SHARED_LIB_EXTENSION ".dylib"
+// shared libraries indeed have a dylib extension on OS X, but most apps use .so for plugins
+#define KDB_SHARED_LIB_EXTENSION ".so"
 #else
 #define KDB_SHARED_LIB_EXTENSION ".so"
 #endif
