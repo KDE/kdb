@@ -737,9 +737,6 @@ protected:
 
     class Private;
     Private * const d;
-
-    friend class KDbConnection;
-    friend class KDbQuerySchemaPrivate;
 };
 
 //! @short KDbQueryAsterisk class encapsulates information about single asterisk in query definition
