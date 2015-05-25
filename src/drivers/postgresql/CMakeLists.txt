@@ -4,7 +4,7 @@ include_directories(
   ${PostgreSQL_INCLUDE_DIRS}
 )
 
-ADD_DEFINITIONS(
+add_definitions(
   -D__KDB__=
   -DPREDICATE_DRIVER_NAME="postgresql"
 )

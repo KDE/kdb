@@ -22,7 +22,7 @@ if (WIN32)
   set (DBUS_SERVICES_INSTALL_DIR   "share/dbus-1/services")   # The DBus services install dir (default ${SHARE_INSTALL_PREFIX}/dbus-1/services)")
   set (XDG_MIME_INSTALL_DIR        "share/mime/packages")     # The install dir for the xdg mimetypes
 
-else (WIN32)
+else ()
   # this macro implements some very special logic how to deal with the cache
   # by default the various install locations inherit their value from theit "parent" variable
   # so if you set CMAKE_INSTALL_PREFIX, then EXEC_INSTALL_PREFIX, PLUGIN_INSTALL_DIR will
@@ -38,13 +38,13 @@ else (WIN32)
   # But once you decide to set e.g. EXEC_INSTALL_PREFIX to some special location
   # this will go into the cache and it will no longer depend on CMAKE_INSTALL_PREFIX.
   macro(_SET_FANCY _var _value _comment)
-    SET (predefinedvalue "${_value}")
+    set (predefinedvalue "${_value}")
 
     if (NOT DEFINED ${_var})
-      SET (${_var} ${predefinedvalue})
-    else (NOT DEFINED ${_var})
-      SET (${_var} "${${_var}}" CACHE PATH "${_comment}")
-    endif (NOT DEFINED ${_var})
+      set (${_var} ${predefinedvalue})
+    else ()
+      set (${_var} "${${_var}}" CACHE PATH "${_comment}")
+    endif ()
   endmacro(_SET_FANCY)
 
 
@@ -63,7 +63,7 @@ else (WIN32)
   _set_fancy(DBUS_SERVICES_INSTALL_DIR   "${SHARE_INSTALL_PREFIX}/dbus-1/services"   "The DBus services install dir (default ${SHARE_INSTALL_PREFIX}/dbus-1/services)")
   _set_fancy(XDG_MIME_INSTALL_DIR        "${SHARE_INSTALL_PREFIX}/mime/packages"     "The install dir for the xdg mimetypes")
 
-endif (WIN32)
+endif ()
 
 # The INSTALL_TARGETS_DEFAULT_ARGS variable should be used when libraries are installed.
 # The arguments are also ok for regular executables, i.e. executables which don't go
@@ -85,6 +85,6 @@ endif (WIN32)
 # -everything except the development files: cmake -DCOMPONENT=Unspecified -P cmake_install.cmake
 # This can then also be used for packaging with cpack.
 
-SET (INSTALL_TARGETS_DEFAULT_ARGS RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
+set (INSTALL_TARGETS_DEFAULT_ARGS RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
 LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
 ARCHIVE DESTINATION "${LIB_INSTALL_DIR}" COMPONENT Devel)

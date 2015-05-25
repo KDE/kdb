@@ -7,11 +7,11 @@ simple_option(KDB_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
 
 if (KDB_SQLITE_VACUUM)
   set(KDB_SQLITE_DUMP_TOOL kdb_sqlite3_dump)
-  ADD_DEFINITIONS(-DKDB_SQLITE_DUMP_TOOL=\"${KDB_SQLITE_DUMP_TOOL}\")
-endif (KDB_SQLITE_VACUUM)
+  add_definitions(-DKDB_SQLITE_DUMP_TOOL=\"${KDB_SQLITE_DUMP_TOOL}\")
+endif ()
 
 # definitins used for the sqlite driver and the shell
-ADD_DEFINITIONS(
+add_definitions(
     # sqlite compile-time options, http://sqlite.org/compile.html
     -DSQLITE_SECURE_DELETE
     -DSQLITE_ENABLE_COLUMN_METADATA # Some additional APIs that provide convenient access to meta-data
@@ -38,18 +38,18 @@ include_directories(
   ${QT_INCLUDES}
 )
 
-ADD_DEFINITIONS(
+add_definitions(
   -D__KDB__=
   -DKDB_DRIVER_NAME="sqlite"
 )
 
 if(MSVC)
   # avoid deprecated warnings
-  ADD_DEFINITIONS(
+  add_definitions(
     -D_CRT_SECURE_NO_DEPRECATE
     -D_CRT_NONSTDC_NO_DEPRECATE
   )
-endif(MSVC)
+endif()
 
 ########### next target ###############
 
@@ -70,7 +70,7 @@ set(kdb_sqlite_MOC_SRCS
 if (KDB_SQLITE_VACUUM)
   list(APPEND kdb_sqlite_SRCS SqliteVacuum.cpp)
   list(APPEND kdb_sqlite_MOC_SRCS SqliteVacuum.h)
-endif (KDB_SQLITE_VACUUM)
+endif ()
 
 qt_wrap_cpp(kdb_sqlite kdb_sqlite_SRCS ${kdb_sqlite_MOC_SRCS})
 
@@ -79,10 +79,10 @@ add_library(kdb_sqlite SHARED ${kdb_sqlite_SRCS})
 target_link_libraries(kdb_sqlite ${SQLITE_LIBRARIES} kdb)
 if(DEFINED CMAKE_DL_LIBS)
   target_link_libraries(kdb_sqlite ${CMAKE_DL_LIBS})
-endif(DEFINED CMAKE_DL_LIBS)
+endif()
 if(DEFINED CMAKE_THREAD_LIBS)
   target_link_libraries(kdb_sqlite ${CMAKE_THREAD_LIBS})
-endif(DEFINED CMAKE_THREAD_LIBS)
+endif()
 set_target_properties(kdb_sqlite PROPERTIES PREFIX "")
 
 install(TARGETS kdb_sqlite DESTINATION ${KDB_PLUGINS_DIR})
@@ -92,4 +92,4 @@ add_subdirectory(icu)
 
 if (KDB_SQLITE_VACUUM)
   add_subdirectory(dump)
-endif (KDB_SQLITE_VACUUM)
+endif ()

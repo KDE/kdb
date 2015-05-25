@@ -1,7 +1,7 @@
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
   cmake_policy(SET CMP0005 NEW)
-endif(COMMAND cmake_policy)
+endif()
 
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
@@ -28,14 +28,14 @@ if(SQLITE_FOUND)
                       "http://icu-project.org" FALSE "" "Required by SQLite database driver")
     if(ICU_FOUND)
         ecm_optional_add_subdirectory(sqlite)
-    else(ICU_FOUND)
+    else()
         add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because ICU not found)")
         message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
-    endif(ICU_FOUND)
-else(SQLITE_FOUND)
+    endif()
+else()
     add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because SQLite3 not found)")
     message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
-endif(SQLITE_FOUND)
+endif()
 
 # -----------------------
 
@@ -47,7 +47,7 @@ if(MYSQL_FOUND)
    ecm_optional_add_subdirectory(mysql)
 else()
    add_feature_info(BUILD_MYSQL_DB_DRIVER FALSE "${BUILD_MYSQL_DB_DRIVER_DESC} (because MySQL Client Library not found)")
-endif(MYSQL_FOUND)
+endif()
 
 # -----------------------
 
@@ -59,7 +59,7 @@ if(POSTGRESQL_FOUND)
    ecm_optional_add_subdirectory(postgresql)
 else()
    add_feature_info(BUILD_POSTGRESQL_DB_DRIVER FALSE "${BUILD_POSTGRESQL_DB_DRIVER_DESC} (because C API to PostgreSQL not found)")
-endif(POSTGRESQL_FOUND)
+endif()
 
 #macro_optional_find_package(FreeTDS)
 #macro_log_feature(FREETDS_FOUND "FreeTDS" "Open source implementation of the TDS (Tabular Data Stream) protocol"

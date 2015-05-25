@@ -6,7 +6,7 @@ include_directories(
   ${QT_INCLUDES}
 )
 
-ADD_DEFINITIONS(
+add_definitions(
   -D__KDB__=
   -DPREDICATE_DRIVER_NAME="mysql"
 )
@@ -37,15 +37,15 @@ target_link_libraries(predicate_mysql
 
 if(MSVC)
   target_link_libraries(predicate_mysql ws2_32 msvcrtd)
-endif(MSVC)
+endif()
 
 set_target_properties(predicate_mysql PROPERTIES PREFIX "")
 
 if(MSVC)
   # avoid LNK2005 errors
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FORCE:MULTIPLE")
-  SET_TARGET_PROPERTIES(predicate_mysql PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")
-endif(MSVC)
+  set_target_properties(predicate_mysql PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")
+endif()
 
 install(TARGETS predicate_mysql DESTINATION ${PREDICATE_PLUGINS_DIR})
 install(FILES predicate_mysql.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})

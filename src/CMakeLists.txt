@@ -116,7 +116,7 @@ set(kdb_LIB_SRCS
 
 add_library(KDb SHARED ${kdb_LIB_SRCS})
 
-KDB_CREATE_SHARED_DATA_CLASSES(
+kdb_create_shared_data_classes(
     kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
     kdb # subdirectory in which the headers should be generated
     KDbResult.shared.h
@@ -125,7 +125,7 @@ KDB_CREATE_SHARED_DATA_CLASSES(
     KDbObject.shared.h
 )
 
-KDB_REMOVE_EXTENSIONS(
+kdb_remove_extensions(
     kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES
     ${kdb_GENERATED_SHARED_DATA_CLASS_HEADERS}
 )

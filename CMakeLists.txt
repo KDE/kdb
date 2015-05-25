@@ -78,7 +78,7 @@ endif ()
 simple_option(BUILD_EXAMPLES "Build example applications" OFF)
 if (BUILD_EXAMPLES)
     #add_subdirectory(examples)
-endif(BUILD_EXAMPLES)
+endif()
 
 add_subdirectory(src)
 
@@ -90,7 +90,7 @@ simple_option(BUILD_TESTING "Build tests" OFF) # override default from CTest.cma
 if (NOT WIN32)
   configure_file(${KDb_SOURCE_DIR}/kdb.pc.cmake ${KDb_BINARY_DIR}/kdb.pc @ONLY)
   install(FILES ${KDb_BINARY_DIR}/kdb.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-endif(NOT WIN32)
+endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 

@@ -4,7 +4,7 @@ include_directories(
   ${QT_INCLUDES}
 )
 
-ADD_DEFINITIONS(
+add_definitions(
   -D__KDB__=
   -DPREDICATE_DRIVER_NAME="xbase"
 )
