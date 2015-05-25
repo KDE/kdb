@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Michał Poteralski <michalpoteralskikde@gmail.com>
 
    This program is free software; you can redistribute it and/or
@@ -33,13 +33,13 @@
 class KDbRecordEditBuffer;
 class KDbCursor;
 
-typedef KDbUtils::AutodeletedList<KDbRecordData*> TableViewDataBase;
-typedef TableViewDataBase::ConstIterator TableViewDataConstIterator;
-typedef TableViewDataBase::Iterator TableViewDataIterator;
+typedef KDbUtils::AutodeletedList<KDbRecordData*> KDbTableViewDataBase;
+typedef KDbTableViewDataBase::ConstIterator KDbTableViewDataConstIterator;
+typedef KDbTableViewDataBase::Iterator KDbTableViewDataIterator;
 
 //! A list of records to allow configurable sorting and more.
 /*! @todo improve API */
-class KDB_EXPORT KDbTableViewData : public QObject, protected TableViewDataBase
+class KDB_EXPORT KDbTableViewData : public QObject, protected KDbTableViewDataBase
 {
     Q_OBJECT
 
@@ -74,17 +74,17 @@ public:
     bool preloadAllRecords();
 
     /*! Sets sorting for @a column. If @a column is -1, sorting is disabled. */
-    void setSorting(int column, bool ascending = true);
+    void setSorting(int column, Qt::SortOrder OrderByColumn = Qt::AscendingOrder);
 
     /*! @return the column number by which the data is sorted,
-     or -1 if sorting is disabled. In this case sortingOrder() will return 0.
+     or -1 if sorting is disabled.
      Initial sorted column number for data after instantiating object is -1. */
-    int sortedColumn() const;
+    int sortColumn() const;
 
-    /*! @return 1 if ascending sort order is set, -1 id descending sort order is set,
-     or 0 if no sorting is set. This is independent of whether data is sorted now.
-     Initial sorting for data after instantiating object is 0. */
-    int sortingOrder() const;
+    /*! @return sorting order. This is independent of whether the data is actually sorted.
+     sortColumn() should be checked first to see if sorting for any column is enabled
+     (by default it is not). */
+    Qt::SortOrder sortOrder() const;
 
     //! Sorts this data using previously set order.
     void sort();
@@ -93,8 +93,12 @@ public:
      Warning: @a col will be owned by this object, and deleted on its destruction. */
     void addColumn(KDbTableViewColumn* col);
 
-    int globalColumnID(int visibleID) const;
-    int visibleColumnID(int globalID) const;
+    //! @return Index of visible column @a visibleIndex on global list.
+    int globalIndexOfVisibleColumn(int visibleIndex) const;
+
+    //! @return Index on list of visible columns for column @a globalIndex
+    //!         or -1 if column at @a globalIndex is not visible.
+    int visibleColumnIndex(int globalIndex) const;
 
     /*! @return true if this db-aware data set. */
     /*! @todo virtual? */
@@ -106,18 +110,22 @@ public:
 
     KDbCursor* cursor() const;
 
-    inline uint columnCount() const {
-        return m_columns.count();
-    }
+    uint columnCount() const;
 
-    inline KDbTableViewColumn* column(uint c) {
-        return m_columns.value(c);
-    }
+    //! @return number of visible columns
+    uint visibleColumnCount() const;
 
-    /*! @return columns information */
-    inline TableViewColumnList* columns() {
-        return &m_columns;
-    }
+    //! @return column at index @a index (visible or not)
+    KDbTableViewColumn* column(uint c);
+
+    //! @return visible column at index @a index
+    KDbTableViewColumn* visibleColumn(uint index);
+
+    //! @return list of all columns
+    QList<KDbTableViewColumn*>* columns();
+
+    //! @return list of visible columns
+    QList<KDbTableViewColumn*>* visibleColumns();
 
     /*! @return true if data is not editable. Can be set using setReadOnly()
      but it's still true if database cursor returned by cursor()
@@ -155,24 +163,18 @@ public:
      Note that @a newval may be changed in aboutToChangeCell() signal handler.
      @see KDbRecordEditBuffer */
     bool updateRecordEditBufferRef(KDbRecordData *record,
-                                int colnum, KDbTableViewColumn* col, QVariant& newval,
-                                bool allowSignals = true,
-                                QVariant *visibleValueForLookupField = 0);
+                                   int colnum, KDbTableViewColumn* col, QVariant* newval,
+                                   bool allowSignals = true,
+                                   QVariant *visibleValueForLookupField = 0);
 
     /*! Added for convenience. Like above but @a newval is passed by value. */
-    inline bool updateRecordEditBuffer(KDbRecordData *record, int colnum, KDbTableViewColumn* col,
-                                    QVariant newval, bool allowSignals = true) {
-        QVariant newv(newval);
-        return updateRecordEditBufferRef(record, colnum, col, newv, allowSignals);
-    }
+    bool updateRecordEditBuffer(KDbRecordData *record, int colnum, KDbTableViewColumn* col,
+                                const QVariant &newval, bool allowSignals = true);
 
     /*! Added for convenience. Like above but it's assumed that @a record record's columns
      are ordered like in table view, not like in form view. Don't use this with form views. */
-    inline bool updateRecordEditBuffer(KDbRecordData *record, int colnum,
-                                    QVariant newval, bool allowSignals = true) {
-        KDbTableViewColumn* col = m_columns.value(colnum);
-        return col ? updateRecordEditBufferRef(record, colnum, col, newval, allowSignals) : false;
-    }
+    bool updateRecordEditBuffer(KDbRecordData *record, int colnum,
+                                const QVariant &newval, bool allowSignals = true);
 
     //! @return record edit buffer for currently edited record. Can be 0 or empty.
     KDbRecordEditBuffer* recordEditBuffer() const;
@@ -226,40 +228,40 @@ public:
     }
 
     inline KDbRecordData* at(uint index) {
-        return TableViewDataBase::at(index);
+        return KDbTableViewDataBase::at(index);
     }
     inline virtual uint count() const {
-        return TableViewDataBase::count();
+        return KDbTableViewDataBase::count();
     }
     inline bool isEmpty() const {
-        return TableViewDataBase::isEmpty();
+        return KDbTableViewDataBase::isEmpty();
     }
     inline KDbRecordData* first() {
-        return TableViewDataBase::first();
+        return KDbTableViewDataBase::first();
     }
     inline KDbRecordData* last() {
-        return TableViewDataBase::last();
+        return KDbTableViewDataBase::last();
     }
     inline int indexOf(const KDbRecordData* record, int from = 0) const {
-        return TableViewDataBase::indexOf(const_cast<KDbRecordData*>(record), from);
+        return KDbTableViewDataBase::indexOf(const_cast<KDbRecordData*>(record), from);
     }
     inline void removeFirst() {
-        TableViewDataBase::removeFirst();
+        KDbTableViewDataBase::removeFirst();
     }
     inline void removeLast() {
-        TableViewDataBase::removeLast();
+        KDbTableViewDataBase::removeLast();
     }
     inline void append(KDbRecordData* record) {
-        TableViewDataBase::append(record);
+        KDbTableViewDataBase::append(record);
     }
     inline void prepend(KDbRecordData* record) {
-        TableViewDataBase::prepend(record);
+        KDbTableViewDataBase::prepend(record);
     }
-    inline TableViewDataConstIterator constBegin() const {
-        return TableViewDataBase::constBegin();
+    inline KDbTableViewDataConstIterator constBegin() const {
+        return KDbTableViewDataBase::constBegin();
     }
-    inline TableViewDataConstIterator constEnd() const {
-        return TableViewDataBase::constEnd();
+    inline KDbTableViewDataConstIterator constEnd() const {
+        return KDbTableViewDataBase::constEnd();
     }
 
     /*! @return true if ROWID information is stored within every record.
@@ -270,9 +272,8 @@ public:
      so every KDbRecordData's length is expanded by one. */
     bool containsRecordIdInfo() const;
 
-    inline KDbRecordData* createItem() const {
-        return new KDbRecordData(m_itemSize);
-    }
+    //! Creates a single record data with proper number of columns.
+    KDbRecordData* createItem() const;
 
     //! @return reusable i18n'd message
     //!         "You can correct data in this record or use 'Cancel record changes' function."
@@ -289,7 +290,7 @@ Q_SIGNALS:
      Connect this signal to your slot and set @a result->success to false
      to disallow this change. You can also change @a newValue to other value,
      or change other columns in @a record. */
-    void aboutToChangeCell(KDbRecordData *record, int colnum, QVariant& newValue,
+    void aboutToChangeCell(KDbRecordData *record, int colnum, QVariant* newValue,
                            KDbResultInfo* result);
 
     /*! Emitted before inserting of a new, current record.
@@ -326,23 +327,19 @@ Q_SIGNALS:
 
     void recordRepaintRequested(KDbRecordData*);
 
+protected:
+    //! Used by KDbTableViewColumn::setVisible()
+    void columnVisibilityChanged(const KDbTableViewColumn &column);
+
 private:
     void init();
-    void init(
-        const QList<QVariant> &keys, const QList<QVariant> &values,
-        KDbField::Type keyType, KDbField::Type valueType);
+    void init(const QList<QVariant> &keys, const QList<QVariant> &values,
+              KDbField::Type keyType, KDbField::Type valueType);
 
     //! @internal for saveRecordChanges() and saveNewRecord()
     bool saveRecord(KDbRecordData *record, bool insert, bool repaint);
 
-    //! Number of physical columns
-    int m_itemSize;
-
-    /*! Columns information */
-    TableViewColumnList m_columns;
-
-    //! Temporary, used in compare functions like cmpInt(), cmpString()
-    //! to avoid memory allocations.
+    friend class KDbTableViewColumn;
 
     class Private;
     Private * const d;

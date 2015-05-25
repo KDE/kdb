@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Michał Poteralski <michalpoteralskikde@gmail.com>
 
    This program is free software; you can redistribute it and/or
@@ -84,7 +84,7 @@ class LessThanFunctor
 private:
     bool m_ascendingOrder;
     QVariant m_leftTmp, m_rightTmp;
-    int m_sortedColumn;
+    int m_sortColumn;
 
     bool (*m_lessThanFunction)(const QVariant&, const QVariant&);
 
@@ -172,7 +172,7 @@ private:
 public:
     LessThanFunctor()
             : m_ascendingOrder(true)
-            , m_sortedColumn(-1)
+            , m_sortColumn(-1)
             , m_lessThanFunction(0)
     {
     }
@@ -216,8 +216,8 @@ public:
         m_ascendingOrder = ascending;
     }
 
-    void setSortedColumn(int column) {
-        m_sortedColumn = column;
+    void setSortColumn(int column) {
+        m_sortColumn = column;
     }
 
 #define _IIF(a,b) ((a) ? (b) : !(b))
@@ -225,9 +225,9 @@ public:
     //! Main comparison operator that takes column number, type and order into account
     bool operator()(KDbRecordData* record1, KDbRecordData* record2) {
         // compare NULLs : NULL is smaller than everything
-        if ((m_leftTmp = record1->at(m_sortedColumn)).isNull())
-            return _IIF(m_ascendingOrder, !record2->at(m_sortedColumn).isNull());
-        if ((m_rightTmp = record2->at(m_sortedColumn)).isNull())
+        if ((m_leftTmp = record1->at(m_sortColumn)).isNull())
+            return _IIF(m_ascendingOrder, !record2->at(m_sortColumn).isNull());
+        if ((m_rightTmp = record2->at(m_sortColumn)).isNull())
             return !m_ascendingOrder;
 
         return _IIF(m_ascendingOrder, m_lessThanFunction(m_leftTmp, m_rightTmp));
@@ -241,18 +241,14 @@ class KDbTableViewData::Private
 {
 public:
     Private()
-            : sortedColumn(0)
-            , realSortedColumn(0)
+            : sortColumn(0)
+            , realSortColumn(0)
+            , sortOrder(Qt::AscendingOrder)
             , type(1)
             , pRecordEditBuffer(0)
-            , visibleColumnCount(0)
-            , visibleColumnIDs(100)
-            , globalColumnIDs(100)
             , readOnly(false)
             , insertingEnabled(true)
             , containsRecordIdInfo(false)
-            , ascendingOrder(false)
-            , descendingOrder(false)
             , autoIncrementedColumn(-2) {
     }
 
@@ -260,12 +256,24 @@ public:
         delete pRecordEditBuffer;
     }
 
-    //! (logical) sorted column number, set by setSorting()
-    //! can differ from realSortedColumn if there's lookup column used
-    int sortedColumn;
+    //! Number of physical columns
+    int realColumnCount;
 
-    //! real sorted column number, set by setSorting(), used by cmp*() methods
-    int realSortedColumn;
+    /*! Columns information */
+    QList<KDbTableViewColumn*> columns;
+
+    /*! Visible columns information */
+    QList<KDbTableViewColumn*> visibleColumns;
+
+    //! (Logical) sorted column number, set by setSorting().
+    //! Can differ from realSortColumn if there's lookup column used.
+    int sortColumn;
+
+    //! Real sorted column number, set by setSorting(), used by cmp*() methods
+    int realSortColumn;
+
+    //! Specifies sorting order
+    Qt::SortOrder sortOrder;
 
     LessThanFunctor lessThanFunctor;
 
@@ -277,9 +285,8 @@ public:
 
     KDbResultInfo result;
 
-    uint visibleColumnCount;
-
-    QVector<int> visibleColumnIDs, globalColumnIDs;
+    QList<int> visibleColumnIDs;
+    QList<int> globalColumnIDs;
 
     bool readOnly;
 
@@ -288,12 +295,6 @@ public:
     //! @see KDbTableViewData::containsRecordIdInfo()
     bool containsRecordIdInfo;
 
-    //! true if ascending sort order is set
-    bool ascendingOrder;
-
-    //! true if descending sort order is set
-    bool descendingOrder;
-
     int autoIncrementedColumn;
 };
 
@@ -301,7 +302,7 @@ public:
 
 KDbTableViewData::KDbTableViewData()
         : QObject()
-        , TableViewDataBase()
+        , KDbTableViewDataBase()
         , d(new Private)
 {
     init();
@@ -311,7 +312,7 @@ KDbTableViewData::KDbTableViewData()
 // db-aware ctor
 KDbTableViewData::KDbTableViewData(KDbCursor *c)
         : QObject()
-        , TableViewDataBase()
+        , KDbTableViewDataBase()
         , d(new Private)
 {
     init();
@@ -321,9 +322,10 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
         const KDbQuerySchema::FieldsExpandedOptions fieldsExpandedOptions
         = d->containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
           : KDbQuerySchema::WithInternalFields;
-        m_itemSize = d->cursor->query()->fieldsExpanded(fieldsExpandedOptions).count();
-    } else
-        m_itemSize = m_columns.count() + (d->containsRecordIdInfo ? 1 : 0);
+        d->realColumnCount = d->cursor->query()->fieldsExpanded(fieldsExpandedOptions).count();
+    } else {
+        d->realColumnCount = d->columns.count() + (d->containsRecordIdInfo ? 1 : 0);
+    }
 
     // Allocate KDbTableViewColumn objects for each visible query column
     const KDbQueryColumnInfo::Vector fields = d->cursor->query()->fieldsExpanded();
@@ -346,7 +348,7 @@ KDbTableViewData::KDbTableViewData(
     const QList<QVariant> &keys, const QList<QVariant> &values,
     KDbField::Type keyType, KDbField::Type valueType)
         : QObject()
-        , TableViewDataBase()
+        , KDbTableViewDataBase()
         , d(new Private)
 {
     init(keys, values, keyType, valueType);
@@ -355,7 +357,7 @@ KDbTableViewData::KDbTableViewData(
 KDbTableViewData::KDbTableViewData(
     KDbField::Type keyType, KDbField::Type valueType)
         : QObject()
-        , TableViewDataBase()
+        , KDbTableViewDataBase()
         , d(new Private)
 {
     const QList<QVariant> empty;
@@ -366,7 +368,7 @@ KDbTableViewData::~KDbTableViewData()
 {
     emit destroying();
     clearInternal(false /* !processEvents */);
-    qDeleteAll(m_columns);
+    qDeleteAll(d->columns);
     delete d;
 }
 
@@ -398,7 +400,7 @@ void KDbTableViewData::init(
 
 void KDbTableViewData::init()
 {
-    m_itemSize = 0;
+    d->realColumnCount = 0;
 }
 
 void KDbTableViewData::deleteLater()
@@ -409,34 +411,88 @@ void KDbTableViewData::deleteLater()
 
 void KDbTableViewData::addColumn(KDbTableViewColumn* col)
 {
-    m_columns.append(col);
+    d->columns.append(col);
     col->setData(this);
-    if (d->globalColumnIDs.size() < (int)m_columns.count()) {//sanity
-        d->globalColumnIDs.resize(d->globalColumnIDs.size()*2);
-    }
     if (col->isVisible()) {
-        d->visibleColumnCount++;
-        if ((uint)d->visibleColumnIDs.size() < d->visibleColumnCount) {//sanity
-            d->visibleColumnIDs.resize(d->visibleColumnIDs.size()*2);
-        }
-        d->visibleColumnIDs[ m_columns.count()-1 ] = d->visibleColumnCount - 1;
-        d->globalColumnIDs[ d->visibleColumnCount-1 ] = m_columns.count() - 1;
+        d->visibleColumns.append(col);
+        d->visibleColumnIDs.append(d->visibleColumns.count() - 1);
+        d->globalColumnIDs.append(d->columns.count() - 1);
     } else {
-        d->visibleColumnIDs[ m_columns.count()-1 ] = -1;
+        d->visibleColumnIDs.append(-1);
     }
     d->autoIncrementedColumn = -2; //clear cache;
-    if (!d->cursor || !d->cursor->query())
-        m_itemSize = m_columns.count() + (d->containsRecordIdInfo ? 1 : 0);
+    if (!d->cursor || !d->cursor->query()) {
+        d->realColumnCount = d->columns.count() + (d->containsRecordIdInfo ? 1 : 0);
+    }
 }
 
-int KDbTableViewData::globalColumnID(int visibleID) const
+void KDbTableViewData::columnVisibilityChanged(const KDbTableViewColumn &column)
 {
-    return d->globalColumnIDs.value(visibleID, -1);
+    if (column.isVisible()) { // column made visible
+        int indexInGlobal = d->columns.indexOf(const_cast<KDbTableViewColumn*>(&column));
+        // find previous column that is visible
+        int prevIndexInGlobal = indexInGlobal - 1;
+        while (prevIndexInGlobal >= 0 && d->visibleColumnIDs[prevIndexInGlobal] == -1) {
+            prevIndexInGlobal--;
+        }
+        int indexInVisible = prevIndexInGlobal + 1;
+        // update
+        d->visibleColumns.insert(indexInVisible, const_cast<KDbTableViewColumn*>(&column));
+        d->visibleColumnIDs[indexInGlobal] = indexInVisible;
+        d->globalColumnIDs.insert(indexInVisible, indexInGlobal);
+        for (int i = indexInGlobal + 1; i < d->columns.count(); i++) { // increment ids of the rest
+            if (d->visibleColumnIDs[i] >= 0) {
+                d->visibleColumnIDs[i]++;
+            }
+        }
+    }
+    else { // column made invisible
+        int indexInVisible = d->visibleColumns.indexOf(const_cast<KDbTableViewColumn*>(&column));
+        d->visibleColumns.removeAt(indexInVisible);
+        int indexInGlobal = globalIndexOfVisibleColumn(indexInVisible);
+        d->visibleColumnIDs[indexInGlobal] = -1;
+        d->globalColumnIDs.removeAt(indexInVisible);
+    }
 }
 
-int KDbTableViewData::visibleColumnID(int globalID) const
+int KDbTableViewData::globalIndexOfVisibleColumn(int visibleIndex) const
 {
-    return d->visibleColumnIDs.value(globalID, -1);
+    return d->globalColumnIDs.value(visibleIndex, -1);
+}
+
+int KDbTableViewData::visibleColumnIndex(int globalIndex) const
+{
+    return d->visibleColumnIDs.value(globalIndex, -1);
+}
+
+uint KDbTableViewData::columnCount() const
+{
+    return d->columns.count();
+}
+
+uint KDbTableViewData::visibleColumnCount() const
+{
+    return d->visibleColumns.count();
+}
+
+QList<KDbTableViewColumn*>* KDbTableViewData::columns()
+{
+    return &d->columns;
+}
+
+QList<KDbTableViewColumn*>* KDbTableViewData::visibleColumns()
+{
+    return &d->visibleColumns;
+}
+
+KDbTableViewColumn* KDbTableViewData::column(uint index)
+{
+    return d->columns.value(index);
+}
+
+KDbTableViewColumn* KDbTableViewData::visibleColumn(uint index)
+{
+    return d->visibleColumns.value(index);
 }
 
 bool KDbTableViewData::isDBAware() const
@@ -469,6 +525,11 @@ bool KDbTableViewData::containsRecordIdInfo() const
     return d->containsRecordIdInfo;
 }
 
+KDbRecordData* KDbTableViewData::createItem() const
+{
+    return new KDbRecordData(d->realColumnCount);
+}
+
 QString KDbTableViewData::dbTableName() const
 {
     if (d->cursor && d->cursor->query() && d->cursor->query()->masterTable())
@@ -476,46 +537,44 @@ QString KDbTableViewData::dbTableName() const
     return QString();
 }
 
-void KDbTableViewData::setSorting(int column, bool ascending)
+void KDbTableViewData::setSorting(int column, Qt::SortOrder order)
 {
-    if (column >= 0 && column < (int)m_columns.count()) {
-        d->ascendingOrder = ascending;
-        d->descendingOrder = !ascending;
-    } else {
-        d->ascendingOrder = false;
-        d->descendingOrder = false;
-        d->sortedColumn = -1;
-        d->realSortedColumn = -1;
+    d->sortOrder = order;
+    if (column < 0 || column >= d->columns.count()) {
+        d->sortColumn = -1;
+        d->realSortColumn = -1;
         return;
     }
     // find proper column information for sorting (lookup column points to alternate column with visible data)
-    const KDbTableViewColumn *tvcol = m_columns.at(column);
+    const KDbTableViewColumn *tvcol = d->columns.at(column);
     KDbQueryColumnInfo* visibleLookupColumnInfo = tvcol->visibleLookupColumnInfo();
     const KDbField *field = visibleLookupColumnInfo ? visibleLookupColumnInfo->field : tvcol->field();
-    d->sortedColumn = column;
-    d->realSortedColumn = tvcol->columnInfo()->indexForVisibleLookupValue() != -1
-                          ? tvcol->columnInfo()->indexForVisibleLookupValue() : d->sortedColumn;
+    d->sortColumn = column;
+    d->realSortColumn = tvcol->columnInfo()->indexForVisibleLookupValue() != -1
+                          ? tvcol->columnInfo()->indexForVisibleLookupValue() : d->sortColumn;
 
     // setup compare functor
     d->lessThanFunctor.setColumnType(*field);
-    d->lessThanFunctor.setAscendingOrder(ascending);
-    d->lessThanFunctor.setSortedColumn(column);
+    d->lessThanFunctor.setAscendingOrder(d->sortOrder == Qt::AscendingOrder);
+    d->lessThanFunctor.setSortColumn(column);
 }
 
-int KDbTableViewData::sortedColumn() const
+int KDbTableViewData::sortColumn() const
 {
-    return d->sortedColumn;
+    return d->sortColumn;
 }
 
-int KDbTableViewData::sortingOrder() const
+Qt::SortOrder KDbTableViewData::sortOrder() const
 {
-    return d->ascendingOrder ? 1 : (d->descendingOrder ? -1 : 0);
+    return d->sortOrder;
 }
 
 void KDbTableViewData::sort()
 {
-    if (0 != sortingOrder())
-        qSort(begin(), end(), d->lessThanFunctor);
+    if (d->sortColumn < 0 || d->sortColumn >= d->columns.count()) {
+        return;
+    }
+    qSort(begin(), end(), d->lessThanFunctor);
 }
 
 void KDbTableViewData::setReadOnly(bool set)
@@ -546,9 +605,10 @@ void KDbTableViewData::clearRecordEditBuffer()
 }
 
 bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
-        int colnum, KDbTableViewColumn* col, QVariant& newval, bool allowSignals,
+        int colnum, KDbTableViewColumn* col, QVariant* newval, bool allowSignals,
         QVariant *visibleValueForLookupField)
 {
+    Q_ASSERT(newval);
     d->result.clear();
     if (allowSignals)
         emit aboutToChangeCell(record, colnum, newval, &d->result);
@@ -567,7 +627,7 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
             KDbWarn << "column #" << colnum << " not found!";
             return false;
         }
-        d->pRecordEditBuffer->insert(*col->columnInfo(), newval);
+        d->pRecordEditBuffer->insert(*col->columnInfo(), *newval);
 
         if (col->visibleLookupColumnInfo() && visibleValueForLookupField) {
             //this is value for lookup table: update visible value as well
@@ -585,19 +645,41 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
         KDbWarn << "column #" << colnum << "not found!";
         return false;
     }
-    d->pRecordEditBuffer->insert(colname, newval);
+    d->pRecordEditBuffer->insert(colname, *newval);
     return true;
 }
 
-//get a new value (if present in the buffer), or the old one, otherwise
-//(taken here for optimization)
-#define GET_VALUE if (!pval) { \
-        pval = d->cursor \
-        ? d->pRecordEditBuffer->at( *(*it_f)->columnInfo(), record->at(col).isNull() /* useDefaultValueIfPossible */ ) \
-              : d->pRecordEditBuffer->at( *f ); \
-        val = pval ? *pval : record->at(col); /* get old value */ \
-        /*KDbDbg << col << (*it_f)->columnInfo()->debugString() << "val:" << val;*/ \
+bool KDbTableViewData::updateRecordEditBuffer(KDbRecordData *record, int colnum,
+                                              KDbTableViewColumn* col,
+                                              const QVariant &newval, bool allowSignals)
+{
+    QVariant newv(newval);
+    return updateRecordEditBufferRef(record, colnum, col, &newv, allowSignals);
+}
+
+bool KDbTableViewData::updateRecordEditBuffer(KDbRecordData *record, int colnum,
+                                              const QVariant &newval, bool allowSignals)
+{
+    KDbTableViewColumn* col = d->columns.value(colnum);
+    QVariant newv(newval);
+    return col ? updateRecordEditBufferRef(record, colnum, col, &newv, allowSignals) : false;
+}
+
+//! Get a new value (if present in the buffer), or the old one (taken here for optimization)
+static inline void saveRecordGetValue(const QVariant **pval, KDbCursor *cursor,
+                                      KDbRecordEditBuffer *pRecordEditBuffer,
+                                      QList<KDbTableViewColumn*>::ConstIterator* it_f,
+                                      KDbRecordData *record, KDbField *f, QVariant* val, int col)
+{
+    if (!*pval) {
+        *pval = cursor
+                ? pRecordEditBuffer->at( *(**it_f)->columnInfo(),
+                                         record->at(col).isNull() /* useDefaultValueIfPossible */ )
+                : pRecordEditBuffer->at( *f );
+        *val = *pval ? **pval : record->at(col); /* get old value */
+        //KDbDbg << col << *(**it_f)->columnInfo() << "val:" << *val;
     }
+}
 
 //! @todo if there're multiple views for this data, we need multiple buffers!
 bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repaint)
@@ -608,14 +690,14 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
 
     //check constraints:
     //-check if every NOT NULL and NOT EMPTY field is filled
-    TableViewColumnListIterator it_f(m_columns.constBegin());
+    QList<KDbTableViewColumn*>::ConstIterator it_f(d->columns.constBegin());
     int col = 0;
     const QVariant *pval = 0;
     QVariant val;
-    for (;it_f != m_columns.constEnd() && col < record->count(); ++it_f, col++) {
+    for (;it_f != d->columns.constEnd() && col < record->count();++it_f, ++col) {
         KDbField *f = (*it_f)->field();
         if (f->isNotNull()) {
-            GET_VALUE;
+            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
             //check it
             if (val.isNull() && !f->isAutoIncrement()) {
                 //NOT NULL violated
@@ -627,7 +709,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             }
         }
         if (f->isNotEmpty()) {
-            GET_VALUE;
+            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
             if (!f->isAutoIncrement() && (val.isNull() || KDb::isEmptyValue(f, val))) {
                 //NOT EMPTY violated
                 d->result.msg = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
@@ -672,7 +754,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
         KDbRecordEditBuffer::SimpleMap b = d->pRecordEditBuffer->simpleBuffer();
         for (KDbRecordEditBuffer::SimpleMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
             uint i = -1;
-            foreach(KDbTableViewColumn *col, m_columns) {
+            foreach(KDbTableViewColumn *col, d->columns) {
                 i++;
                 if (col->field()->name() == it.key()) {
                     KDbDbg << col->field()->name() << ": " << record->at(i).toString()
@@ -758,7 +840,7 @@ void KDbTableViewData::deleteRecords(const QList<int> &recordsToDelete, bool rep
     if (recordsToDelete.isEmpty())
         return;
     int last_r = 0;
-    TableViewDataIterator it(begin());
+    KDbTableViewDataIterator it(begin());
     for (QList<int>::ConstIterator r_it = recordsToDelete.constBegin(); r_it != recordsToDelete.constEnd(); ++r_it) {
         for (; last_r < (*r_it); last_r++)
             ++it;
@@ -814,7 +896,7 @@ int KDbTableViewData::autoIncrementedColumn()
     if (d->autoIncrementedColumn == -2) {
         //find such a column
         d->autoIncrementedColumn = -1;
-        foreach(KDbTableViewColumn *col, m_columns) {
+        foreach(KDbTableViewColumn *col, d->columns) {
             d->autoIncrementedColumn++;
             if (col->field()->isAutoIncrement())
                 break;

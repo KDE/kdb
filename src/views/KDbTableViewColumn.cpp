@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -210,7 +210,7 @@ void KDbTableViewColumn::setRelatedData(KDbTableViewData *data)
     if (!data)
         return;
     //find a primary key
-    const TableViewColumnList *columns = data->columns();
+    const QList<KDbTableViewColumn*> *columns = data->columns();
     int id = -1;
     foreach(KDbTableViewColumn* col, *columns) {
         id++;
@@ -240,9 +240,15 @@ bool KDbTableViewColumn::isVisible() const
 
 void KDbTableViewColumn::setVisible(bool v)
 {
-    if (d->columnInfo)
+    bool changed = d->visible != v;
+    if (d->columnInfo && d->columnInfo->visible != v) {
         d->columnInfo->visible = v;
+        changed = true;
+    }
     d->visible = v;
+    if (changed && d->data) {
+        d->data->columnVisibilityChanged(*this);
+    }
 }
 
 void KDbTableViewColumn::setIcon(const QIcon& icon)

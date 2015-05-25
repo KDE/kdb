@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -30,9 +30,6 @@
 class KDbTableViewColumn;
 class KDbTableViewData;
 class KDbValidator;
-
-typedef QList<KDbTableViewColumn*> TableViewColumnList;
-typedef QList<KDbTableViewColumn*>::ConstIterator TableViewColumnListIterator;
 
 //! Definition of a single column for table view.
 /*! @todo improve API */
@@ -80,6 +77,8 @@ public:
     bool isVisible() const;
 
     //! Changes column visibility.
+    //! KDbTableViewData is informed about this change.
+    //! @todo react on changes of KDbQueryColumnInfo::visible too
     void setVisible(bool v);
 
     /*! Sets icon for displaying in the caption area (header). */
