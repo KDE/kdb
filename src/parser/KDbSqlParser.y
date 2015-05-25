@@ -39,6 +39,7 @@
 %token KEY
 %token LEFT
 %token LESS_OR_EQUAL
+%token GREATER_OR_EQUAL
 %token SQL_NULL
 %token SQL_IS
 %token SQL_IS_NULL /*helper */
@@ -62,10 +63,10 @@
 %token SQL
 %token SQL_TRUE
 %token SQL_FALSE
+%token UNION
 
 %token SCAN_ERROR
 
-//%token UMINUS
 //%token SQL_ABS
 //%token ACOS
 //%token AMPERSAND
@@ -81,7 +82,7 @@
 //%token ALL
 //%token ALLOCATE
 //%token ALTER
-//%token AND
+%token AND
 //%token ANY
 //%token ARE
 //%token ASIN
@@ -92,6 +93,8 @@
 //%token AUTHORIZATION
 //%token AVG
 //%token BEFORE
+%token BETWEEN
+%token NOT_BETWEEN
 //%token SQL_BEGIN
 //%token BIGINT
 //%token BINARY
@@ -164,7 +167,7 @@
 //%token END
 //%token END_EXEC
 //%token ESCAPE
-//%token EXCEPT
+%token EXCEPT
 //%token SQL_EXCEPTION
 //%token EXEC
 //%token EXECUTE
@@ -203,10 +206,11 @@
 //%token INITIALLY
 //%token INNER
 //%token SQL_INPUT
+%token SQL_IN
 //%token INSENSITIVE
 //%token INSERT
 //%token INTEGER
-//%token INTERSECT
+%token INTERSECT
 //%token INTERVAL
 //%token INTO
 //%token IS
@@ -217,6 +221,9 @@
 //%token LCASE
 //%token LENGTH
 //%token LEVEL
+%token LIKE
+%token ILIKE
+%token NOT_LIKE
 //%token LINE_WIDTH
 //%token LOCAL
 //%token LOCATE
@@ -243,7 +250,9 @@
 //%token NEXT
 //%token NODUP
 //%token NONE
-//%token NOT
+%token NOT
+%token NOT_EQUAL
+%token NOT_EQUAL2
 //%token NOW
 //%token NULLIF
 //%token NUMERIC
@@ -262,6 +271,7 @@
 //%token SQL_PASCAL
 //%token PERSISTENT
 //%token CQL_PI
+%token OR
 //%token PLI
 //%token POSITION
 //%token PRECISION
@@ -296,6 +306,8 @@
 //%token SET
 //%token SHOWOPT
 //%token SIGN
+%token SIMILAR_TO
+%token NOT_SIMILAR_TO
 //%token SIN
 //%token SQL_SIZE
 //%token SMALLINT
@@ -355,24 +367,9 @@
 //%token WORD_WRAPPED
 //%token WORK
 //%token WRAPPED
-//%token XOR
+%token XOR
 //%token YEAR
 //%token YEARS_BETWEEN
-
-%token '-'
-%token '+'
-%token '*'
-%token '%'
-%token '@'
-%token ';'
-%token ','
-%token '.'
-%token '$'
-%token '('
-%token ')'
-%token '?'
-%token '\''
-%token '/'
 
 %type <stringValue> IDENTIFIER
 %type <stringValue> IDENTIFIER_DOT_ASTERISK
@@ -510,32 +507,9 @@ int yylex();
 }
 
 /* precedence: lowest to highest */
-%left     UNION
-%left     EXCEPT
-%left     INTERSECT
-%left     OR
-%left     AND
-%left     XOR
-%right    NOT
-%nonassoc '='
-%nonassoc '<'
-%nonassoc '>'
-%nonassoc LESS_OR_EQUAL
-%nonassoc GREATER_OR_EQUAL
-%nonassoc NOT_EQUAL
-%nonassoc NOT_EQUAL2
-%nonassoc SQL_IN
-%nonassoc LIKE
-%nonassoc ILIKE
-%nonassoc SIMILAR_TO
-%nonassoc NOT_SIMILAR_TO
-//%nonassoc    LIKE
-//%nonassoc    ILIKE
 //%nonassoc    SIMILAR
 //%nonassoc    ESCAPE
 //%nonassoc    OVERLAPS
-%nonassoc    BETWEEN
-%nonassoc NOT_BETWEEN
 //%nonassoc    IN_P
 //%left        POSTFIXOP        // dummy for postfix Op rules
 //%left        Op OPERATOR        // multi-character ops and user-defined operators
@@ -545,25 +519,7 @@ int yylex();
 //%nonassoc    NULL_P
 //%nonassoc    TRUE_P
 //%nonassoc    FALSE_P
-//%nonassoc    UNKNOWN
-%left        '+'
-%left        '-'
-%left        '*'
-%left        '/'
-%left        '%'
-%left        '^'
-%left        UMINUS
-// Unary Operators 
-//%left        AT ZONE            // sets precedence for AT TIME ZONE
-//%right        UMINUS
-%left        '['
-%left        ']'
-%left        '('
-%left        ')'
-//%left        TYPECAST
-%left        '.'
-
-%nonassoc NOT_LIKE
+%token UMINUS
 
 // <-- To keep binary compatibility insert new tokens here.
 

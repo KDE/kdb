@@ -62,7 +62,7 @@
 
 
 /* Copy the first part of user declarations.  */
-#line 424 "KDbSqlParser.y" /* yacc.c:339  */
+#line 421 "KDbSqlParser.y" /* yacc.c:339  */
 
 #include <stdio.h>
 #include <string.h>
@@ -90,8 +90,8 @@
 #endif
 
 #include <QObject>
-#include <QList>
 #include <QVariant>
+#include <QPoint>
 
 #include "KDbConnection.h"
 #include "KDbQuerySchema.h"
@@ -188,49 +188,49 @@ extern int yydebug;
     KEY = 275,
     LEFT = 276,
     LESS_OR_EQUAL = 277,
-    SQL_NULL = 278,
-    SQL_IS = 279,
-    SQL_IS_NULL = 280,
-    SQL_IS_NOT_NULL = 281,
-    ORDER = 282,
-    PRIMARY = 283,
-    SELECT = 284,
-    INTEGER_CONST = 285,
-    REAL_CONST = 286,
-    RIGHT = 287,
-    SQL_ON = 288,
-    DATE_CONST = 289,
-    DATETIME_CONST = 290,
-    TIME_CONST = 291,
-    TABLE = 292,
-    IDENTIFIER = 293,
-    IDENTIFIER_DOT_ASTERISK = 294,
-    QUERY_PARAMETER = 295,
-    VARCHAR = 296,
-    WHERE = 297,
-    SQL = 298,
-    SQL_TRUE = 299,
-    SQL_FALSE = 300,
-    SCAN_ERROR = 301,
+    GREATER_OR_EQUAL = 278,
+    SQL_NULL = 279,
+    SQL_IS = 280,
+    SQL_IS_NULL = 281,
+    SQL_IS_NOT_NULL = 282,
+    ORDER = 283,
+    PRIMARY = 284,
+    SELECT = 285,
+    INTEGER_CONST = 286,
+    REAL_CONST = 287,
+    RIGHT = 288,
+    SQL_ON = 289,
+    DATE_CONST = 290,
+    DATETIME_CONST = 291,
+    TIME_CONST = 292,
+    TABLE = 293,
+    IDENTIFIER = 294,
+    IDENTIFIER_DOT_ASTERISK = 295,
+    QUERY_PARAMETER = 296,
+    VARCHAR = 297,
+    WHERE = 298,
+    SQL = 299,
+    SQL_TRUE = 300,
+    SQL_FALSE = 301,
     UNION = 302,
-    EXCEPT = 303,
-    INTERSECT = 304,
-    OR = 305,
-    AND = 306,
-    XOR = 307,
-    NOT = 308,
-    GREATER_OR_EQUAL = 309,
-    NOT_EQUAL = 310,
-    NOT_EQUAL2 = 311,
-    SQL_IN = 312,
-    LIKE = 313,
-    ILIKE = 314,
-    SIMILAR_TO = 315,
-    NOT_SIMILAR_TO = 316,
-    BETWEEN = 317,
-    NOT_BETWEEN = 318,
-    UMINUS = 319,
-    NOT_LIKE = 320
+    SCAN_ERROR = 303,
+    AND = 304,
+    BETWEEN = 305,
+    NOT_BETWEEN = 306,
+    EXCEPT = 307,
+    SQL_IN = 308,
+    INTERSECT = 309,
+    LIKE = 310,
+    ILIKE = 311,
+    NOT_LIKE = 312,
+    NOT = 313,
+    NOT_EQUAL = 314,
+    NOT_EQUAL2 = 315,
+    OR = 316,
+    SIMILAR_TO = 317,
+    NOT_SIMILAR_TO = 318,
+    XOR = 319,
+    UMINUS = 320
   };
 #endif
 
@@ -239,7 +239,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 495 "KDbSqlParser.y" /* yacc.c:355  */
+#line 492 "KDbSqlParser.y" /* yacc.c:355  */
 
     QString* stringValue;
     qint64 integerValue;
@@ -512,18 +512,18 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  10
+#define YYFINAL  7
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   202
+#define YYLAST   220
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  89
+#define YYNTOKENS  82
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  37
+#define YYNNTS  30
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  115
+#define YYNRULES  100
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  190
+#define YYNSTATES  161
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -540,16 +540,16 @@ static const yytype_uint8 yytranslate[] =
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,    55,    50,    86,    59,
-      56,    57,    49,    48,    53,    47,    54,    60,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    52,
-      69,    68,    70,    58,    51,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,    78,    74,     2,
+      80,    81,    77,    72,    67,    73,    68,    76,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    66,
+      70,    71,    69,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    83,     2,    84,    81,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,    87,     2,    88,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    75,     2,    79,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -567,27 +567,26 @@ static const yytype_uint8 yytranslate[] =
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
       35,    36,    37,    38,    39,    40,    41,    42,    43,    44,
-      45,    46,    61,    62,    63,    64,    65,    66,    67,    71,
-      72,    73,    74,    75,    76,    77,    78,    79,    80,    82,
-      85
+      45,    46,    47,    48,    49,    50,    51,    52,    53,    54,
+      55,    56,    57,    58,    59,    60,    61,    62,    63,    64,
+      65
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   590,   590,   600,   604,   605,   615,   619,   627,   626,
-     636,   636,   642,   650,   666,   666,   672,   677,   682,   690,
-     695,   702,   709,   718,   724,   731,   736,   742,   748,   757,
-     767,   774,   780,   788,   799,   808,   817,   827,   835,   847,
-     853,   860,   867,   871,   878,   883,   890,   896,   903,   908,
-     914,   920,   926,   932,   939,   944,   950,   956,   962,   968,
-     974,   980,   986,   996,  1007,  1012,  1017,  1023,  1028,  1034,
-    1041,  1046,  1052,  1056,  1062,  1068,  1075,  1080,  1086,  1092,
-    1099,  1105,  1110,  1115,  1120,  1125,  1133,  1139,  1147,  1154,
-    1161,  1165,  1169,  1175,  1192,  1198,  1203,  1212,  1222,  1228,
-    1239,  1284,  1289,  1298,  1326,  1336,  1351,  1358,  1368,  1377,
-    1382,  1392,  1405,  1449,  1458,  1467
+       0,   546,   546,   556,   560,   561,   576,   675,   681,   688,
+     693,   699,   705,   714,   724,   731,   737,   745,   756,   765,
+     774,   784,   792,   804,   810,   817,   824,   828,   835,   840,
+     847,   853,   860,   865,   871,   877,   883,   889,   896,   901,
+     907,   913,   919,   925,   931,   937,   943,   953,   964,   969,
+     974,   980,   985,   991,   998,  1003,  1009,  1013,  1019,  1025,
+    1032,  1037,  1043,  1049,  1056,  1062,  1067,  1072,  1077,  1082,
+    1090,  1096,  1104,  1111,  1118,  1122,  1126,  1132,  1149,  1155,
+    1160,  1169,  1173,  1180,  1186,  1194,  1239,  1244,  1253,  1281,
+    1291,  1306,  1313,  1323,  1332,  1337,  1347,  1360,  1404,  1413,
+    1422
 };
 #endif
 
@@ -600,19 +599,17 @@ static const char *const yytname[] =
   "AUTO_INCREMENT", "BIT", "BITWISE_SHIFT_LEFT", "BITWISE_SHIFT_RIGHT",
   "BY", "CHARACTER_STRING_LITERAL", "CONCATENATION", "CREATE", "DESC",
   "DISTINCT", "DOUBLE_QUOTED_STRING", "FROM", "JOIN", "KEY", "LEFT",
-  "LESS_OR_EQUAL", "SQL_NULL", "SQL_IS", "SQL_IS_NULL", "SQL_IS_NOT_NULL",
-  "ORDER", "PRIMARY", "SELECT", "INTEGER_CONST", "REAL_CONST", "RIGHT",
-  "SQL_ON", "DATE_CONST", "DATETIME_CONST", "TIME_CONST", "TABLE",
-  "IDENTIFIER", "IDENTIFIER_DOT_ASTERISK", "QUERY_PARAMETER", "VARCHAR",
-  "WHERE", "SQL", "SQL_TRUE", "SQL_FALSE", "SCAN_ERROR", "'-'", "'+'",
-  "'*'", "'%'", "'@'", "';'", "','", "'.'", "'$'", "'('", "')'", "'?'",
-  "'\\''", "'/'", "UNION", "EXCEPT", "INTERSECT", "OR", "AND", "XOR",
-  "NOT", "'='", "'<'", "'>'", "GREATER_OR_EQUAL", "NOT_EQUAL",
-  "NOT_EQUAL2", "SQL_IN", "LIKE", "ILIKE", "SIMILAR_TO", "NOT_SIMILAR_TO",
-  "BETWEEN", "NOT_BETWEEN", "'^'", "UMINUS", "'['", "']'", "NOT_LIKE",
-  "'&'", "'|'", "'~'", "$accept", "TopLevelStatement", "StatementList",
-  "Statement", "CreateTableStatement", "$@1", "ColDefs", "ColDef",
-  "ColKeys", "ColKey", "ColType", "SelectStatement", "Select",
+  "LESS_OR_EQUAL", "GREATER_OR_EQUAL", "SQL_NULL", "SQL_IS", "SQL_IS_NULL",
+  "SQL_IS_NOT_NULL", "ORDER", "PRIMARY", "SELECT", "INTEGER_CONST",
+  "REAL_CONST", "RIGHT", "SQL_ON", "DATE_CONST", "DATETIME_CONST",
+  "TIME_CONST", "TABLE", "IDENTIFIER", "IDENTIFIER_DOT_ASTERISK",
+  "QUERY_PARAMETER", "VARCHAR", "WHERE", "SQL", "SQL_TRUE", "SQL_FALSE",
+  "UNION", "SCAN_ERROR", "AND", "BETWEEN", "NOT_BETWEEN", "EXCEPT",
+  "SQL_IN", "INTERSECT", "LIKE", "ILIKE", "NOT_LIKE", "NOT", "NOT_EQUAL",
+  "NOT_EQUAL2", "OR", "SIMILAR_TO", "NOT_SIMILAR_TO", "XOR", "UMINUS",
+  "';'", "','", "'.'", "'>'", "'<'", "'='", "'+'", "'-'", "'&'", "'|'",
+  "'/'", "'*'", "'%'", "'~'", "'('", "')'", "$accept", "TopLevelStatement",
+  "StatementList", "Statement", "SelectStatement", "Select",
   "SelectOptions", "WhereClause", "OrderByClause", "OrderByColumnId",
   "OrderByOption", "aExpr", "aExpr2", "aExpr3", "aExpr4", "aExpr5",
   "aExpr6", "aExpr7", "aExpr8", "aExpr9", "aExpr10", "aExprList",
@@ -630,18 +627,18 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298,   299,   300,   301,    45,    43,    42,
-      37,    64,    59,    44,    46,    36,    40,    41,    63,    39,
-      47,   302,   303,   304,   305,   306,   307,   308,    61,    60,
-      62,   309,   310,   311,   312,   313,   314,   315,   316,   317,
-     318,    94,   319,    91,    93,   320,    38,   124,   126
+     295,   296,   297,   298,   299,   300,   301,   302,   303,   304,
+     305,   306,   307,   308,   309,   310,   311,   312,   313,   314,
+     315,   316,   317,   318,   319,   320,    59,    44,    46,    62,
+      60,    61,    43,    45,    38,   124,    47,    42,    37,   126,
+      40,    41
 };
 # endif
 
-#define YYPACT_NINF -133
+#define YYPACT_NINF -127
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-133)))
+  (!!((Yystate) == (-127)))
 
 #define YYTABLE_NINF -1
 
@@ -652,25 +649,23 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-       6,   -20,  -133,    48,  -133,   -22,  -133,  -133,    -2,    17,
-    -133,     6,  -133,    29,    52,  -133,  -133,  -133,     8,  -133,
-    -133,  -133,    89,    89,  -133,    89,    89,    89,  -133,  -133,
-      57,    71,    85,  -133,    24,     5,   -23,  -133,  -133,    82,
-    -133,    11,  -133,  -133,  -133,    58,    19,    41,  -133,    18,
-      89,  -133,    26,  -133,  -133,    40,  -133,  -133,    89,    89,
-      89,    89,    89,    89,    89,    89,  -133,  -133,    89,    89,
-      89,    89,    89,    89,    89,    89,    89,    89,    89,    89,
-      89,    89,    89,    89,    89,    89,    89,    93,    89,    28,
-    -133,    80,    -3,    61,  -133,    59,    51,    75,  -133,    52,
-    -133,  -133,    64,    69,    90,  -133,  -133,  -133,  -133,  -133,
-    -133,  -133,  -133,  -133,  -133,  -133,  -133,  -133,  -133,  -133,
-      73,    96,  -133,  -133,  -133,  -133,  -133,  -133,  -133,  -133,
-    -133,  -133,  -133,    31,  -133,  -133,   155,  -133,  -133,   138,
-    -133,  -133,  -133,    89,  -133,    89,    89,  -133,   124,   137,
-       7,    31,     9,    30,  -133,    64,  -133,  -133,  -133,   142,
-    -133,  -133,  -133,    31,   128,  -133,   126,   127,     4,   138,
-    -133,  -133,  -133,    31,   154,   156,  -133,   165,   164,     4,
-    -133,  -133,  -133,   131,   132,  -133,  -133,  -133,  -133,  -133
+      25,  -127,    21,  -127,   -32,  -127,    11,  -127,    25,  -127,
+     -43,     5,  -127,  -127,  -127,   -21,  -127,  -127,  -127,   124,
+     124,   124,  -127,   124,   124,  -127,  -127,    43,    -8,   157,
+    -127,     7,    57,    22,  -127,  -127,     8,  -127,     9,  -127,
+    -127,    81,    14,     1,  -127,   -28,     0,  -127,   -14,  -127,
+    -127,  -127,  -127,    -7,   124,   124,   124,   124,   124,   124,
+     124,   124,  -127,  -127,   124,   124,   124,   124,   124,   124,
+     124,   124,   124,   124,   124,   124,   124,   124,   124,   124,
+     124,   124,   124,    56,   124,    70,  -127,    48,    -3,    46,
+    -127,     6,    50,  -127,     5,  -127,  -127,  -127,    28,    15,
+      64,  -127,  -127,  -127,  -127,  -127,  -127,  -127,  -127,  -127,
+      59,    61,  -127,  -127,  -127,  -127,  -127,  -127,  -127,  -127,
+    -127,  -127,  -127,  -127,  -127,  -127,  -127,  -127,  -127,    -1,
+    -127,  -127,    95,  -127,  -127,  -127,  -127,  -127,   124,  -127,
+     124,   124,  -127,    72,    94,     4,    -1,  -127,  -127,  -127,
+      99,  -127,  -127,  -127,    -1,    74,  -127,  -127,  -127,    -1,
+    -127
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -678,43 +673,39 @@ static const yytype_int16 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,    29,     0,     2,     4,     6,     7,    23,     0,
-       1,     5,    92,     0,     0,    89,    93,    94,    85,    86,
-      90,    91,     0,     0,   114,     0,     0,     0,   112,    44,
-      48,    54,    64,    67,    70,    76,    80,    95,    26,    24,
-     107,   108,   109,     8,     3,     0,   103,   100,   102,     0,
-       0,    87,    85,    81,    82,     0,    84,    83,     0,     0,
-       0,     0,     0,     0,     0,     0,    65,    66,     0,     0,
+       0,    13,     0,     2,     4,     6,     7,     1,     5,    76,
+       0,     0,    73,    77,    78,    69,    70,    74,    75,     0,
+       0,     0,    99,     0,     0,    97,    28,    32,    38,    48,
+      51,    54,    60,    64,    79,    10,     8,    92,    93,    94,
+       3,     0,    88,    85,    87,     0,     0,    71,    69,    68,
+      66,    65,    67,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,    49,    50,     0,     0,     0,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-      27,    30,    25,     0,   111,     0,     0,     0,   104,     0,
-      88,   115,     0,     0,     0,    96,    46,    45,    47,    52,
-      53,    51,    49,    50,    55,    56,    59,    57,    60,    61,
-       0,     0,    58,    68,    69,    72,    73,    71,    74,    75,
-      78,    79,    77,     0,    34,   106,     0,    28,   110,     0,
-     113,   105,   101,     0,    97,     0,     0,    41,    39,    31,
-      35,     0,    22,     0,    11,    99,    98,    62,    63,     0,
-      33,    42,    43,     0,    36,    32,    19,     0,    12,     0,
-       9,    40,    37,     0,     0,     0,    18,     0,     0,    13,
-      15,    10,    38,     0,     0,    16,    17,    14,    20,    21
+       0,     0,     0,     0,     0,     0,    11,    14,     9,     0,
+      96,     0,     0,    89,     0,    72,   100,    82,    84,     0,
+       0,    80,    29,    30,    31,    36,    34,    33,    35,    37,
+       0,     0,    43,    41,    42,    39,    40,    44,    45,    52,
+      53,    56,    55,    57,    58,    59,    61,    62,    63,     0,
+      18,    91,     0,    12,    95,    98,    90,    86,     0,    81,
+       0,     0,    25,    23,    15,    19,     0,    83,    46,    47,
+       0,    17,    26,    27,     0,    20,    16,    24,    21,     0,
+      22
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -133,  -133,   179,  -133,  -133,  -133,  -133,    22,  -133,    13,
-    -133,  -133,  -133,   101,    45,  -132,  -133,  -133,   -25,    72,
-      88,   -67,  -133,    77,    92,    83,   121,  -133,  -133,    53,
-     158,  -133,    99,  -133,   106,   157,  -133
+    -127,  -127,   136,  -127,  -127,  -127,    58,    13,  -126,  -127,
+    -127,   -24,    69,   114,   -63,  -127,    -9,   101,    53,    98,
+    -127,  -127,    20,   109,  -127,    65,  -127,    66,   111,  -127
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     3,     4,     5,     6,    95,   153,   154,   179,   180,
-     168,     7,     8,    90,    91,   149,   150,   164,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    51,   103,
-      38,    47,    48,    39,    40,    41,    42
+      -1,     2,     3,     4,     5,     6,    86,    87,   144,   145,
+     155,    25,    26,    27,    28,    29,    30,    31,    32,    33,
+      34,    47,    99,    35,    43,    44,    36,    37,    38,    39
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -722,111 +713,111 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      55,   114,   115,   116,   117,   118,   119,   120,   121,   122,
-      12,   176,   166,   161,    13,    93,    14,     9,    79,   165,
-       1,    15,   162,    97,    87,   102,    84,    85,    16,    17,
-      11,   172,   177,    77,    78,     2,    18,    86,    19,    88,
-      12,   182,    20,    21,    13,    22,    23,    24,    10,    94,
-     167,    15,    80,    81,    25,    43,   100,    98,    16,    17,
-     163,   147,    49,   134,    50,    26,    18,   101,    19,   148,
-      12,   178,    20,    21,    13,    22,    23,    24,   157,   158,
-     104,    15,    50,   169,    25,    45,    27,   170,    16,    17,
-      46,    82,    83,    61,    99,    26,    52,   105,    19,   138,
-      14,    12,    20,    21,   133,    22,    23,   136,   140,    87,
-      66,    67,    15,   141,    25,   139,    27,   143,   155,    16,
-      17,    58,    59,    60,    88,    26,   144,    52,   100,    19,
-     106,   107,   108,    20,    21,    89,    22,    23,   145,    62,
-      63,    64,    65,    53,    54,    25,    27,    56,    57,   109,
-     110,   111,   112,   113,   123,   124,    26,    68,    69,    70,
-      71,   146,    72,    73,    74,    75,   151,   130,   131,   132,
-      76,   125,   126,   127,   128,   129,   152,    27,   159,    88,
-     171,   173,   174,   175,   183,   185,   184,   186,   188,   189,
-      44,   181,   187,   137,   160,   135,   156,    92,   142,     0,
-       0,     0,    96
+      53,   110,   111,   112,   113,   114,   115,   116,   117,   118,
+     152,    95,     9,    89,    57,    58,    73,    74,    92,   153,
+     156,     7,    98,     9,    12,    83,    11,    10,   158,    11,
+     142,    13,    14,   160,     8,    12,    83,    41,   143,    48,
+      84,    16,    13,    14,    42,    17,    18,    45,    90,    96,
+      15,    84,    16,    93,   100,     1,    17,    18,    19,    46,
+     130,    59,    60,    61,   119,   120,    46,   129,    94,    19,
+      75,   154,    20,    21,   101,    85,   132,   148,   149,    23,
+      24,    97,     9,    20,    21,   134,    10,   135,    22,   136,
+      23,    24,    54,     9,    12,   138,   139,    10,    80,    81,
+      82,    13,    14,    95,    55,    12,   146,    56,   140,    15,
+     141,    16,    13,    14,    98,    17,    18,    49,    50,    51,
+      48,    52,    16,   102,   103,   104,    17,    18,    19,    76,
+      77,    78,    79,   126,   127,   128,     9,    84,   157,    19,
+     150,   159,    20,    21,    40,    88,   133,    22,    12,    23,
+      24,   131,    91,    20,    21,    13,    14,   151,   147,   137,
+      23,    24,     0,    48,     0,    16,     0,     0,     0,    17,
+      18,   105,   106,   107,   108,   109,   121,   122,   123,   124,
+     125,     0,    19,    62,    63,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,    20,    21,     0,     0,
+       0,     0,     0,    23,    24,     0,     0,    64,    65,     0,
+      66,     0,    67,     0,    68,     0,    69,    70,     0,    71,
+      72
 };
 
 static const yytype_int16 yycheck[] =
 {
-      25,    68,    69,    70,    71,    72,    73,    74,    75,    76,
-      12,     7,     3,     6,    16,     4,    18,    37,    13,   151,
-      14,    23,    15,     4,    27,    50,    49,    50,    30,    31,
-      52,   163,    28,     9,    10,    29,    38,    60,    40,    42,
-      12,   173,    44,    45,    16,    47,    48,    49,     0,    38,
-      41,    23,    47,    48,    56,    38,    38,    38,    30,    31,
-      53,    30,    54,    88,    56,    67,    38,    49,    40,    38,
-      12,    67,    44,    45,    16,    47,    48,    49,   145,   146,
-      54,    23,    56,    53,    56,    56,    88,    57,    30,    31,
-      38,    86,    87,    22,    53,    67,    38,    57,    40,    38,
-      18,    12,    44,    45,    11,    47,    48,    27,    57,    27,
-      25,    26,    23,    38,    56,    56,    88,    53,   143,    30,
-      31,    64,    65,    66,    42,    67,    57,    38,    38,    40,
-      58,    59,    60,    44,    45,    53,    47,    48,    65,    68,
-      69,    70,    71,    22,    23,    56,    88,    26,    27,    61,
-      62,    63,    64,    65,    77,    78,    67,    72,    73,    74,
-      75,    65,    77,    78,    79,    80,    11,    84,    85,    86,
-      85,    79,    80,    81,    82,    83,    38,    88,    54,    42,
-      38,    53,    56,    56,    30,    20,    30,    23,    57,    57,
-      11,   169,   179,    92,   149,    89,   143,    39,    99,    -1,
-      -1,    -1,    45
+      24,    64,    65,    66,    67,    68,    69,    70,    71,    72,
+       6,    39,    12,     4,    22,    23,     9,    10,     4,    15,
+     146,     0,    46,    12,    24,    28,    18,    16,   154,    18,
+      31,    31,    32,   159,    66,    24,    28,    80,    39,    39,
+      43,    41,    31,    32,    39,    45,    46,    68,    39,    77,
+      39,    43,    41,    39,    68,    30,    45,    46,    58,    80,
+      84,    69,    70,    71,    73,    74,    80,    11,    67,    58,
+      13,    67,    72,    73,    81,    67,    28,   140,   141,    79,
+      80,    81,    12,    72,    73,    39,    16,    81,    77,    39,
+      79,    80,    49,    12,    24,    67,    81,    16,    76,    77,
+      78,    31,    32,    39,    61,    24,    11,    64,    49,    39,
+      49,    41,    31,    32,   138,    45,    46,    19,    20,    21,
+      39,    23,    41,    54,    55,    56,    45,    46,    58,    72,
+      73,    74,    75,    80,    81,    82,    12,    43,    39,    58,
+      68,    67,    72,    73,     8,    36,    88,    77,    24,    79,
+      80,    85,    41,    72,    73,    31,    32,   144,   138,    94,
+      79,    80,    -1,    39,    -1,    41,    -1,    -1,    -1,    45,
+      46,    57,    58,    59,    60,    61,    75,    76,    77,    78,
+      79,    -1,    58,    26,    27,    -1,    -1,    -1,    -1,    -1,
+      -1,    -1,    -1,    -1,    -1,    -1,    72,    73,    -1,    -1,
+      -1,    -1,    -1,    79,    80,    -1,    -1,    50,    51,    -1,
+      53,    -1,    55,    -1,    57,    -1,    59,    60,    -1,    62,
+      63
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,    14,    29,    90,    91,    92,    93,   100,   101,    37,
-       0,    52,    12,    16,    18,    23,    30,    31,    38,    40,
-      44,    45,    47,    48,    49,    56,    67,    88,   107,   108,
-     109,   110,   111,   112,   113,   114,   115,   116,   119,   122,
-     123,   124,   125,    38,    91,    56,    38,   120,   121,    54,
-      56,   117,    38,   115,   115,   107,   115,   115,    64,    65,
-      66,    22,    68,    69,    70,    71,    25,    26,    72,    73,
-      74,    75,    77,    78,    79,    80,    85,     9,    10,    13,
-      47,    48,    86,    87,    49,    50,    60,    27,    42,    53,
-     102,   103,   119,     4,    38,    94,   124,     4,    38,    53,
-      38,    49,   107,   118,    54,    57,   108,   108,   108,   109,
-     109,   109,   109,   109,   110,   110,   110,   110,   110,   110,
-     110,   110,   110,   112,   112,   113,   113,   113,   113,   113,
-     114,   114,   114,    11,   107,   123,    27,   102,    38,    56,
-      57,    38,   121,    53,    57,    65,    65,    30,    38,   104,
-     105,    11,    38,    95,    96,   107,   118,   110,   110,    54,
-     103,     6,    15,    53,   106,   104,     3,    41,    99,    53,
-      57,    38,   104,    53,    56,    56,     7,    28,    67,    97,
-      98,    96,   104,    30,    30,    20,    23,    98,    57,    57
+       0,    30,    83,    84,    85,    86,    87,     0,    66,    12,
+      16,    18,    24,    31,    32,    39,    41,    45,    46,    58,
+      72,    73,    77,    79,    80,    93,    94,    95,    96,    97,
+      98,    99,   100,   101,   102,   105,   108,   109,   110,   111,
+      84,    80,    39,   106,   107,    68,    80,   103,    39,   101,
+     101,   101,   101,    93,    49,    61,    64,    22,    23,    69,
+      70,    71,    26,    27,    50,    51,    53,    55,    57,    59,
+      60,    62,    63,     9,    10,    13,    72,    73,    74,    75,
+      76,    77,    78,    28,    43,    67,    88,    89,   105,     4,
+      39,   110,     4,    39,    67,    39,    77,    81,    93,   104,
+      68,    81,    94,    94,    94,    95,    95,    95,    95,    95,
+      96,    96,    96,    96,    96,    96,    96,    96,    96,    98,
+      98,    99,    99,    99,    99,    99,   100,   100,   100,    11,
+      93,   109,    28,    88,    39,    81,    39,   107,    67,    81,
+      49,    49,    31,    39,    90,    91,    11,   104,    96,    96,
+      68,    89,     6,    15,    67,    92,    90,    39,    90,    67,
+      90
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    89,    90,    91,    91,    91,    92,    92,    94,    93,
-      95,    95,    96,    96,    97,    97,    98,    98,    98,    99,
-      99,    99,    99,   100,   100,   100,   100,   100,   100,   101,
-     102,   102,   102,   102,   103,   104,   104,   104,   104,   105,
-     105,   105,   106,   106,   107,   108,   108,   108,   108,   109,
-     109,   109,   109,   109,   109,   110,   110,   110,   110,   110,
-     110,   110,   110,   110,   110,   111,   111,   111,   112,   112,
-     112,   113,   113,   113,   113,   113,   113,   114,   114,   114,
-     114,   115,   115,   115,   115,   115,   115,   115,   115,   115,
-     115,   115,   115,   115,   115,   115,   116,   117,   118,   118,
-     119,   120,   120,   121,   121,   121,   122,   122,   123,   123,
-     123,   123,   124,   124,   125,   125
+       0,    82,    83,    84,    84,    84,    85,    86,    86,    86,
+      86,    86,    86,    87,    88,    88,    88,    88,    89,    90,
+      90,    90,    90,    91,    91,    91,    92,    92,    93,    94,
+      94,    94,    94,    95,    95,    95,    95,    95,    95,    96,
+      96,    96,    96,    96,    96,    96,    96,    96,    96,    97,
+      97,    97,    98,    98,    98,    99,    99,    99,    99,    99,
+      99,   100,   100,   100,   100,   101,   101,   101,   101,   101,
+     101,   101,   101,   101,   101,   101,   101,   101,   101,   101,
+     102,   103,   103,   104,   104,   105,   106,   106,   107,   107,
+     107,   108,   108,   109,   109,   109,   109,   110,   110,   111,
+     111
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     3,     1,     2,     1,     1,     0,     7,
-       3,     1,     2,     3,     2,     1,     2,     2,     1,     1,
-       4,     4,     0,     1,     2,     3,     2,     3,     4,     1,
-       1,     3,     4,     4,     2,     1,     2,     3,     4,     1,
-       3,     1,     1,     1,     1,     3,     3,     3,     1,     3,
-       3,     3,     3,     3,     1,     3,     3,     3,     3,     3,
-       3,     3,     5,     5,     1,     2,     2,     1,     3,     3,
-       1,     3,     3,     3,     3,     3,     1,     3,     3,     3,
-       1,     2,     2,     2,     2,     1,     1,     2,     3,     1,
-       1,     1,     1,     1,     1,     1,     3,     3,     3,     3,
-       2,     3,     1,     1,     2,     3,     3,     1,     1,     1,
-       3,     2,     1,     4,     1,     3
+       0,     2,     1,     3,     1,     2,     1,     1,     2,     3,
+       2,     3,     4,     1,     1,     3,     4,     4,     2,     1,
+       2,     3,     4,     1,     3,     1,     1,     1,     1,     3,
+       3,     3,     1,     3,     3,     3,     3,     3,     1,     3,
+       3,     3,     3,     3,     3,     3,     5,     5,     1,     2,
+       2,     1,     3,     3,     1,     3,     3,     3,     3,     3,
+       1,     3,     3,     3,     1,     2,     2,     2,     2,     1,
+       1,     2,     3,     1,     1,     1,     1,     1,     1,     1,
+       3,     3,     2,     3,     1,     2,     3,     1,     1,     2,
+       3,     3,     1,     1,     1,     3,     2,     1,     4,     1,
+       3
 };
 
 
@@ -1503,262 +1494,134 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 591 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 547 "KDbSqlParser.y" /* yacc.c:1646  */
     {
 //todo: multiple statements
 //todo: not only "select" statements
-    parser->setOperation(Parser::OP_Select);
-    parser->setQuerySchema((yyvsp[0].querySchema));
+    globalParser->setOperation(KDbParser::OP_Select);
+    globalParser->setQuerySchema((yyvsp[0].querySchema));
 }
-#line 1514 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1505 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 601 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 557 "KDbSqlParser.y" /* yacc.c:1646  */
     {
 //todo: multiple statements
 }
-#line 1522 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1513 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 606 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 562 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.querySchema) = (yyvsp[-1].querySchema);
 }
-#line 1530 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1521 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 616 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-YYACCEPT;
-}
-#line 1538 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 620 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 577 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.querySchema) = (yyvsp[0].querySchema);
 }
-#line 1546 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1529 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 8:
-#line 627 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    parser->setOperation(Parser::OP_CreateTable);
-    parser->createTable((yyvsp[0].stringValue)->toLatin1());
-    delete (yyvsp[0].stringValue);
-}
-#line 1556 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 11:
-#line 637 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-}
-#line 1563 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 12:
-#line 643 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    KDbDbg << "adding field " << *(yyvsp[-1].stringValue);
-    field->setName(*(yyvsp[-1].stringValue));
-    parser->table()->addField(field);
-    field = 0;
-    delete (yyvsp[-1].stringValue);
-}
-#line 1575 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 13:
-#line 651 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    KDbDbg << "adding field " << *(yyvsp[-2].stringValue);
-    field->setName(*(yyvsp[-2].stringValue));
-    delete (yyvsp[-2].stringValue);
-    parser->table()->addField(field);
-
-//    if(field->isPrimaryKey())
-//        parser->table()->addPrimaryKey(field->name());
-
-//    delete field;
-//    field = 0;
-}
-#line 1592 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 15:
-#line 667 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-}
-#line 1599 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 16:
-#line 673 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    field->setPrimaryKey(true);
-    KDbDbg << "primary";
-}
-#line 1608 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 678 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    field->setNotNull(true);
-    KDbDbg << "not_null";
-}
-#line 1617 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 18:
-#line 683 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    field->setAutoIncrement(true);
-    KDbDbg << "ainc";
-}
-#line 1626 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 19:
-#line 691 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    field = new KDbField();
-    field->setType((yyvsp[0].colType));
-}
-#line 1635 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 20:
-#line 696 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    KDbDbg << "sql + length";
-    field = new KDbField();
-    field->setPrecision((yyvsp[-1].integerValue));
-    field->setType((yyvsp[-3].colType));
-}
-#line 1646 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 703 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    field = new KDbField();
-    field->setPrecision((yyvsp[-1].integerValue));
-    field->setType(KDbField::Text);
-}
-#line 1656 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 22:
-#line 710 "KDbSqlParser.y" /* yacc.c:1646  */
-    {
-    // SQLITE compatibillity
-    field = new KDbField();
-    field->setType(KDbField::InvalidType);
-}
-#line 1666 "KDbSqlParser.cpp" /* yacc.c:1646  */
-    break;
-
-  case 23:
-#line 719 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 7:
+#line 676 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "Select";
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[0].querySchema), 0 )))
         return 0;
 }
-#line 1676 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1539 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 725 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 8:
+#line 682 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "Select ColViews=" << *(yyvsp[0].exprList);
 
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-1].querySchema), (yyvsp[0].exprList) )))
         return 0;
 }
-#line 1687 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1550 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 732 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 9:
+#line 689 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), (yyvsp[-1].exprList), (yyvsp[0].exprList) )))
         return 0;
 }
-#line 1696 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1559 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 737 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 10:
+#line 694 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "Select ColViews Tables";
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-1].querySchema), 0, (yyvsp[0].exprList) )))
         return 0;
 }
-#line 1706 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1569 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 743 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 11:
+#line 700 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "Select ColViews Conditions";
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), (yyvsp[-1].exprList), 0, (yyvsp[0].selectOptions) )))
         return 0;
 }
-#line 1716 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1579 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 28:
-#line 749 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 12:
+#line 706 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "Select ColViews Tables SelectOptions";
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-3].querySchema), (yyvsp[-2].exprList), (yyvsp[-1].exprList), (yyvsp[0].selectOptions) )))
         return 0;
 }
-#line 1726 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1589 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 29:
-#line 758 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 13:
+#line 715 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "SELECT";
-//    parser->createSelect();
-//    parser->setOperation(Parser::OP_Select);
+//    globalParser->createSelect();
+//    globalParser->setOperation(KDbParser::OP_Select);
     (yyval.querySchema) = new KDbQuerySchema();
 }
-#line 1737 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1600 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 30:
-#line 768 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 14:
+#line 725 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "WhereClause";
     (yyval.selectOptions) = new SelectOptionsInternal;
     (yyval.selectOptions)->whereExpr = *(yyvsp[0].expr);
     delete (yyvsp[0].expr);
 }
-#line 1748 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1611 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 31:
-#line 775 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 15:
+#line 732 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "OrderByClause";
     (yyval.selectOptions) = new SelectOptionsInternal;
     (yyval.selectOptions)->orderByColumns = (yyvsp[0].orderByColumns);
 }
-#line 1758 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1621 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 32:
-#line 781 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 16:
+#line 738 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "WhereClause ORDER BY OrderByClause";
     (yyval.selectOptions) = new SelectOptionsInternal;
@@ -1766,11 +1629,11 @@ YYACCEPT;
     delete (yyvsp[-3].expr);
     (yyval.selectOptions)->orderByColumns = (yyvsp[0].orderByColumns);
 }
-#line 1770 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1633 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 789 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 17:
+#line 746 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "OrderByClause WhereClause";
     (yyval.selectOptions) = new SelectOptionsInternal;
@@ -1778,19 +1641,19 @@ YYACCEPT;
     delete (yyvsp[0].expr);
     (yyval.selectOptions)->orderByColumns = (yyvsp[-1].orderByColumns);
 }
-#line 1782 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1645 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 34:
-#line 800 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 18:
+#line 757 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[0].expr);
 }
-#line 1790 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1653 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 35:
-#line 809 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 19:
+#line 766 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "ORDER BY IDENTIFIER";
     (yyval.orderByColumns) = new OrderByColumnInternal::List;
@@ -1799,11 +1662,11 @@ YYACCEPT;
     (yyval.orderByColumns)->append( orderByColumn );
     delete (yyvsp[0].variantValue);
 }
-#line 1803 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1666 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 36:
-#line 818 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 20:
+#line 775 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "ORDER BY IDENTIFIER OrderByOption";
     (yyval.orderByColumns) = new OrderByColumnInternal::List;
@@ -1813,11 +1676,11 @@ YYACCEPT;
     (yyval.orderByColumns)->append( orderByColumn );
     delete (yyvsp[-1].variantValue);
 }
-#line 1817 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1680 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 37:
-#line 828 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 21:
+#line 785 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.orderByColumns) = (yyvsp[0].orderByColumns);
     OrderByColumnInternal orderByColumn;
@@ -1825,11 +1688,11 @@ YYACCEPT;
     (yyval.orderByColumns)->append( orderByColumn );
     delete (yyvsp[-2].variantValue);
 }
-#line 1829 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1692 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 38:
-#line 836 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 22:
+#line 793 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.orderByColumns) = (yyvsp[0].orderByColumns);
     OrderByColumnInternal orderByColumn;
@@ -1838,210 +1701,210 @@ YYACCEPT;
     (yyval.orderByColumns)->append( orderByColumn );
     delete (yyvsp[-3].variantValue);
 }
-#line 1842 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1705 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 39:
-#line 848 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 23:
+#line 805 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.variantValue) = new QVariant( *(yyvsp[0].stringValue) );
     KDbDbg << "OrderByColumnId: " << *(yyval.variantValue);
     delete (yyvsp[0].stringValue);
 }
-#line 1852 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1715 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 40:
-#line 854 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 24:
+#line 811 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.variantValue) = new QVariant( *(yyvsp[-2].stringValue) + QLatin1Char('.') + *(yyvsp[0].stringValue) );
     KDbDbg << "OrderByColumnId: " << *(yyval.variantValue);
     delete (yyvsp[-2].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 1863 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1726 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 41:
-#line 861 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 25:
+#line 818 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.variantValue) = new QVariant((yyvsp[0].integerValue));
     KDbDbg << "OrderByColumnId: " << *(yyval.variantValue);
 }
-#line 1872 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1735 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 42:
-#line 868 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 26:
+#line 825 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.booleanValue) = true;
 }
-#line 1880 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1743 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 43:
-#line 872 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 27:
+#line 829 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.booleanValue) = false;
 }
-#line 1888 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1751 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 45:
-#line 884 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 29:
+#line 841 "KDbSqlParser.y" /* yacc.c:1646  */
     {
 //    KDbDbg << "AND " << $3.debugString();
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), AND, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1899 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1762 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 46:
-#line 891 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 30:
+#line 848 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), OR, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1909 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1772 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 47:
-#line 897 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 31:
+#line 854 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), XOR, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1919 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1782 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 909 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 33:
+#line 866 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '>', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1929 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1792 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 915 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 34:
+#line 872 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), GREATER_OR_EQUAL, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1939 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1802 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 51:
-#line 921 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 35:
+#line 878 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '<', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1949 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1812 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 52:
-#line 927 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 36:
+#line 884 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), LESS_OR_EQUAL, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1959 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1822 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 53:
-#line 933 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 37:
+#line 890 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '=', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1969 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1832 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 55:
-#line 945 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 39:
+#line 902 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), NOT_EQUAL, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1979 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1842 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 56:
-#line 951 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 40:
+#line 908 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), NOT_EQUAL2, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1989 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1852 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 957 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 41:
+#line 914 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), LIKE, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 1999 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1862 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 58:
-#line 963 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 42:
+#line 920 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), NOT_LIKE, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2009 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1872 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 59:
-#line 969 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 43:
+#line 926 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), SQL_IN, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2019 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1882 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 60:
-#line 975 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 44:
+#line 932 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), SIMILAR_TO, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2029 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1892 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 61:
-#line 981 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 45:
+#line 938 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), NOT_SIMILAR_TO, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2039 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1902 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 987 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 46:
+#line 944 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.expr) = new KDbNArgExpression(RelationalExpressionClass, KDB_TOKEN_BETWEEN_AND);
+    (yyval.expr) = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_BETWEEN_AND);
     (yyval.expr)->toNArg().append( *(yyvsp[-4].expr) );
     (yyval.expr)->toNArg().append( *(yyvsp[-2].expr) );
     (yyval.expr)->toNArg().append( *(yyvsp[0].expr) );
@@ -2049,13 +1912,13 @@ YYACCEPT;
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2053 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1916 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 997 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 47:
+#line 954 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.expr) = new KDbNArgExpression(RelationalExpressionClass, KDB_TOKEN_NOT_BETWEEN_AND);
+    (yyval.expr) = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_NOT_BETWEEN_AND);
     (yyval.expr)->toNArg().append( *(yyvsp[-4].expr) );
     (yyval.expr)->toNArg().append( *(yyvsp[-2].expr) );
     (yyval.expr)->toNArg().append( *(yyvsp[0].expr) );
@@ -2063,163 +1926,163 @@ YYACCEPT;
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2067 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1930 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 1013 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 49:
+#line 970 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( SQL_IS_NULL, *(yyvsp[-1].expr) );
     delete (yyvsp[-1].expr);
 }
-#line 2076 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1939 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 66:
-#line 1018 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 50:
+#line 975 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( SQL_IS_NOT_NULL, *(yyvsp[-1].expr) );
     delete (yyvsp[-1].expr);
 }
-#line 2085 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1948 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 1029 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 52:
+#line 986 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), BITWISE_SHIFT_LEFT, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2095 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1958 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 69:
-#line 1035 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 53:
+#line 992 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), BITWISE_SHIFT_RIGHT, *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2105 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1968 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 71:
-#line 1047 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 55:
+#line 1004 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '+', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2115 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1978 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 72:
-#line 1053 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 56:
+#line 1010 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), CONCATENATION, *(yyvsp[0].expr));
 }
-#line 2123 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1986 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 73:
-#line 1057 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 57:
+#line 1014 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '-', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2133 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 1996 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 74:
-#line 1063 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 58:
+#line 1020 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '&', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2143 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2006 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 75:
-#line 1069 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 59:
+#line 1026 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '|', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2153 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2016 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 77:
-#line 1081 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 61:
+#line 1038 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '/', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2163 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2026 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 78:
-#line 1087 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 62:
+#line 1044 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '*', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2173 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2036 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 79:
-#line 1093 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 63:
+#line 1050 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(*(yyvsp[-2].expr), '%', *(yyvsp[0].expr));
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].expr);
 }
-#line 2183 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2046 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 81:
-#line 1106 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 65:
+#line 1063 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( '-', *(yyvsp[0].expr) );
     delete (yyvsp[0].expr);
 }
-#line 2192 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2055 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 82:
-#line 1111 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 66:
+#line 1068 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( '+', *(yyvsp[0].expr) );
     delete (yyvsp[0].expr);
 }
-#line 2201 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2064 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 83:
-#line 1116 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 67:
+#line 1073 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( '~', *(yyvsp[0].expr) );
     delete (yyvsp[0].expr);
 }
-#line 2210 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2073 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 84:
-#line 1121 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 68:
+#line 1078 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbUnaryExpression( NOT, *(yyvsp[0].expr) );
     delete (yyvsp[0].expr);
 }
-#line 2219 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2082 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 85:
-#line 1126 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 69:
+#line 1083 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbVariableExpression( *(yyvsp[0].stringValue) );
 
@@ -2227,80 +2090,80 @@ YYACCEPT;
     KDbDbg << "  + identifier: " << *(yyvsp[0].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2231 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2094 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 86:
-#line 1134 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 70:
+#line 1091 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbQueryParameterExpression( *(yyvsp[0].stringValue) );
     KDbDbg << "  + query parameter:" << *(yyval.expr);
     delete (yyvsp[0].stringValue);
 }
-#line 2241 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2104 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 87:
-#line 1140 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 71:
+#line 1097 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "  + function:" << *(yyvsp[-1].stringValue) << "(" << *(yyvsp[0].exprList) << ")";
     (yyval.expr) = new KDbFunctionExpression(*(yyvsp[-1].stringValue), *(yyvsp[0].exprList));
     delete (yyvsp[-1].stringValue);
     delete (yyvsp[0].exprList);
 }
-#line 2252 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2115 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 88:
-#line 1148 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 72:
+#line 1105 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbVariableExpression( *(yyvsp[-2].stringValue) + QLatin1Char('.') + *(yyvsp[0].stringValue) );
     KDbDbg << "  + identifier.identifier:" << *(yyvsp[-2].stringValue) << "." << *(yyvsp[0].stringValue);
     delete (yyvsp[-2].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2263 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2126 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 89:
-#line 1155 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 73:
+#line 1112 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbConstExpression( SQL_NULL, QVariant() );
     KDbDbg << "  + NULL";
 //    $$ = new KDbField();
     //$$->setName(QString::null);
 }
-#line 2274 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2137 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 90:
-#line 1162 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 74:
+#line 1119 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbConstExpression( SQL_TRUE, true );
 }
-#line 2282 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2145 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 91:
-#line 1166 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 75:
+#line 1123 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbConstExpression( SQL_FALSE, false );
 }
-#line 2290 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2153 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 92:
-#line 1170 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 76:
+#line 1127 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbConstExpression( CHARACTER_STRING_LITERAL, *(yyvsp[0].stringValue) );
     KDbDbg << "  + constant " << (yyvsp[0].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2300 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2163 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 93:
-#line 1176 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 77:
+#line 1133 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     QVariant val;
     if ((yyvsp[0].integerValue) <= INT_MAX && (yyvsp[0].integerValue) >= INT_MIN)
@@ -2317,97 +2180,99 @@ YYACCEPT;
     (yyval.expr) = new KDbConstExpression( INTEGER_CONST, val );
     KDbDbg << "  + int constant: " << val.toString();
 }
-#line 2321 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2184 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 94:
-#line 1193 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 78:
+#line 1150 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbConstExpression( REAL_CONST, QPoint( (yyvsp[0].realValue).integer, (yyvsp[0].realValue).fractional ) );
     KDbDbg << "  + real constant: " << (yyvsp[0].realValue).integer << "." << (yyvsp[0].realValue).fractional;
 }
-#line 2330 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2193 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 96:
-#line 1204 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 80:
+#line 1161 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "(expr)";
     (yyval.expr) = new KDbUnaryExpression('(', *(yyvsp[-1].expr));
     delete (yyvsp[-1].expr);
 }
-#line 2340 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2203 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 97:
-#line 1213 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 81:
+#line 1170 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-//    $$ = new KDbNArgExpression(UnknownExpressionClass, 0);
-//    $$->add( $1 );
-//    $$->add( $3 );
     (yyval.exprList) = (yyvsp[-1].exprList);
 }
-#line 2351 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2211 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 98:
-#line 1223 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 82:
+#line 1174 "KDbSqlParser.y" /* yacc.c:1646  */
+    {
+    (yyval.exprList) = new KDbNArgExpression(KDb::ArgumentListExpression, ',');
+}
+#line 2219 "KDbSqlParser.cpp" /* yacc.c:1646  */
+    break;
+
+  case 83:
+#line 1181 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[0].exprList);
     (yyval.exprList)->prepend( *(yyvsp[-2].expr) );
     delete (yyvsp[-2].expr);
 }
-#line 2361 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2229 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 99:
-#line 1229 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 84:
+#line 1187 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.exprList) = new KDbNArgExpression(UnknownExpressionClass, 0);
-    (yyval.exprList)->append( *(yyvsp[-2].expr) );
+    (yyval.exprList) = new KDbNArgExpression(KDb::ArgumentListExpression, ',');
     (yyval.exprList)->append( *(yyvsp[0].expr) );
-    delete (yyvsp[-2].expr);
-    delete (yyvsp[0].expr);
 }
-#line 2373 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2238 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 100:
-#line 1240 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 85:
+#line 1195 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[0].exprList);
 }
-#line 2381 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2246 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 101:
-#line 1285 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 86:
+#line 1240 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[-2].exprList);
     (yyval.exprList)->append(*(yyvsp[0].expr));
 }
-#line 2390 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2255 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 102:
-#line 1290 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 87:
+#line 1245 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.exprList) = new KDbNArgExpression(TableListExpressionClass, IDENTIFIER); //ok?
+    (yyval.exprList) = new KDbNArgExpression(KDb::TableListExpression, IDENTIFIER); //ok?
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
 }
-#line 2400 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2265 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 103:
-#line 1299 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 88:
+#line 1254 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     KDbDbg << "FROM: '" << *(yyvsp[0].stringValue) << "'";
     (yyval.expr) = new KDbVariableExpression(*(yyvsp[0].stringValue));
 
     /*
 //TODO: this isn't ok for more tables:
-    KDbField::ListIterator it = parser->select()->fieldsIterator();
+    KDbField::ListIterator it = globalParser->select()->fieldsIterator();
     for(KDbField *item; (item = it.current()); ++it)
     {
         if(item->table() == dummy)
@@ -2421,18 +2286,18 @@ YYACCEPT;
             if(!f)
             {
                 KDbParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
-                parser->setError(err);
+                globalParser->setError(err);
                 yyerror("fieldlisterror");
             }
         }
     }*/
     delete (yyvsp[0].stringValue);
 }
-#line 2432 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2297 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 104:
-#line 1327 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 89:
+#line 1282 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     //table + alias
     (yyval.expr) = new KDbBinaryExpression(
@@ -2442,11 +2307,11 @@ YYACCEPT;
     delete (yyvsp[-1].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2446 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2311 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 105:
-#line 1337 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 90:
+#line 1292 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     //table + alias
     (yyval.expr) = new KDbBinaryExpression(
@@ -2456,55 +2321,55 @@ YYACCEPT;
     delete (yyvsp[-2].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2460 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2325 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 106:
-#line 1352 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 91:
+#line 1307 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[-2].exprList);
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
     KDbDbg << "ColViews: ColViews , ColItem";
 }
-#line 2471 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2336 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 107:
-#line 1359 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 92:
+#line 1314 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.exprList) = new KDbNArgExpression(FieldListExpressionClass, 0);
+    (yyval.exprList) = new KDbNArgExpression(KDb::FieldListExpression, 0);
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
     KDbDbg << "ColViews: ColItem";
 }
-#line 2482 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2347 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 108:
-#line 1369 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 93:
+#line 1324 "KDbSqlParser.y" /* yacc.c:1646  */
     {
 //    $$ = new KDbField();
 //    dummy->addField($$);
 //    $$->setExpression( $1 );
-//    parser->select()->addField($$);
+//    globalParser->select()->addField($$);
     (yyval.expr) = (yyvsp[0].expr);
     KDbDbg << " added column expr:" << *(yyvsp[0].expr);
 }
-#line 2495 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2360 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 109:
-#line 1378 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 94:
+#line 1333 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[0].expr);
     KDbDbg << " added column wildcard:" << *(yyvsp[0].expr);
 }
-#line 2504 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2369 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 110:
-#line 1383 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 95:
+#line 1338 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(
         *(yyvsp[-2].expr), AS,
@@ -2514,11 +2379,11 @@ YYACCEPT;
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].stringValue);
 }
-#line 2518 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2383 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 111:
-#line 1393 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 96:
+#line 1348 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(
         *(yyvsp[-1].expr), AS_EMPTY,
@@ -2528,42 +2393,42 @@ YYACCEPT;
     delete (yyvsp[-1].expr);
     delete (yyvsp[0].stringValue);
 }
-#line 2532 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2397 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 112:
-#line 1406 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 97:
+#line 1361 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[0].expr);
 }
-#line 2540 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2405 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 113:
-#line 1450 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 98:
+#line 1405 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[-1].expr);
 //! @todo DISTINCT '(' ColExpression ')'
 //    $$->setName("DISTINCT(" + $3->name() + ")");
 }
-#line 2550 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2415 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 114:
-#line 1459 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 99:
+#line 1414 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbVariableExpression(QLatin1String("*"));
     KDbDbg << "all columns";
 
-//    KDbQueryAsterisk *ast = new KDbQueryAsterisk(parser->select(), dummy);
-//    parser->select()->addAsterisk(ast);
+//    KDbQueryAsterisk *ast = new KDbQueryAsterisk(globalParser->select(), dummy);
+//    globalParser->select()->addAsterisk(ast);
 //    requiresTable = true;
 }
-#line 2563 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2428 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
-  case 115:
-#line 1468 "KDbSqlParser.y" /* yacc.c:1646  */
+  case 100:
+#line 1423 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     QString s( *(yyvsp[-2].stringValue) );
     s += QLatin1String(".*");
@@ -2571,11 +2436,11 @@ YYACCEPT;
     KDbDbg << "  + all columns from " << s;
     delete (yyvsp[-2].stringValue);
 }
-#line 2575 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2440 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2579 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2444 "KDbSqlParser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2803,7 +2668,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1483 "KDbSqlParser.y" /* yacc.c:1906  */
+#line 1438 "KDbSqlParser.y" /* yacc.c:1906  */
 
 
 KDB_TESTING_EXPORT const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }
