@@ -102,7 +102,7 @@ public:
     /*!
     Creates new object of type @a type.
     */
-    KDbObject(int type = KDb::UnknownObjectType);
+    explicit KDbObject(int type = KDb::UnknownObjectType);
 
 protected:
     //! Clears all properties except 'type'.

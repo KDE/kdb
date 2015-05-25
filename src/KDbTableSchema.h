@@ -45,9 +45,9 @@ public:
     KDbTableSchema();
 
     /*! Copy constructor.
-     if @a copyId is true, it's copied as well, otherwise the table id becomes -1,
+     If @a copyId is true, it's copied as well, otherwise the table id becomes -1,
      what is usable when we want to store the copy as an independent table. */
-    KDbTableSchema(const KDbTableSchema& ts, bool copyId = true);
+    explicit KDbTableSchema(const KDbTableSchema& ts, bool copyId = true);
 
     /*! Copy constructor like @ref KDbTableSchema(const KDbTableSchema&, bool).
      @a id is set as the table identifier. This is rarely usable, e.g.
