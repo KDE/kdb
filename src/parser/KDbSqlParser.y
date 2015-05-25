@@ -569,17 +569,18 @@ Statement ';' StatementList
     | Statement SelectStatement         {  }
 */
 Statement :
-CreateTableStatement
+/*CreateTableStatement
 {
 YYACCEPT;
 }
-| SelectStatement
+| */
+SelectStatement
 {
     $$ = $1;
 }
 ;
 
-CreateTableStatement :
+/*CreateTableStatement :
 CREATE TABLE IDENTIFIER
 {
     globalParser->setOperation(KDbParser::OP_CreateTable);
@@ -669,7 +670,7 @@ SQL_TYPE
     globalField = new KDbField();
     globalField->setType(KDbField::InvalidType);
 }
-;
+;*/
 
 SelectStatement:
 Select
