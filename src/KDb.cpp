@@ -32,7 +32,6 @@
 
 #include <QMap>
 #include <QHash>
-#include <QThread>
 #include <QtXml>
 #include <QBuffer>
 #include <QPixmap>
