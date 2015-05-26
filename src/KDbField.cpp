@@ -768,6 +768,7 @@ void KDbField::FieldTypeNames::init()
     ADDTYPE(Text, QObject::tr("Text"), "Text");
     ADDTYPE(LongText, QObject::tr("Long Text"), "LongText");
     ADDTYPE(BLOB, QObject::tr("Object"), "BLOB");
+    ADDTYPE(Null, QLatin1String("NULL")/*don't translate*/, "NULL");
 }
 
 //-------------------------------------------------------
