@@ -27,7 +27,6 @@
 
 #include <QList>
 #include <QHash>
-#include <QtDebug>
 
 class KDbConnection;
 

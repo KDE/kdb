@@ -30,7 +30,6 @@
 #include <QVector>
 #include <QByteArray>
 #include <QSet>
-#include <QtPlugin>
 
 #include "KDbConnection.h"
 #include "KDbAdmin.h"

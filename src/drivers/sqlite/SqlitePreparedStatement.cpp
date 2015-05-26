@@ -20,7 +20,6 @@
 #include "SqlitePreparedStatement.h"
 #include "KDbPreparedStatement.h"
 
-#include <QtDebug>
 
 SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal* conn)
         : KDbPreparedStatementInterface()

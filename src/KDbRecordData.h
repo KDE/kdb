@@ -25,9 +25,7 @@
 #ifndef KDB_RECORDDATA_H
 #define KDB_RECORDDATA_H
 
-#include <QVector>
 #include <QVariant>
-#include <QtDebug>
 #include "kdb_export.h"
 
 //! @short Structure for storing single record with type information.

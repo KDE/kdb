@@ -24,7 +24,6 @@
 #ifndef KDB_EXPRESSION_H
 #define KDB_EXPRESSION_H
 
-#include <QtDebug>
 
 #include "KDbGlobal.h"
 #include "KDbField.h"

@@ -22,7 +22,6 @@
 #include <QStringList>
 #include <QFile>
 
-#include <QtDebug>
 
 #include "MysqlConnection_p.h"
 #include "MysqlConnection.h"

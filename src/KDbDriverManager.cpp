@@ -33,7 +33,6 @@
 #include <QPluginLoader>
 #include <QSettings>
 #include <QWidget>
-#include <QtDebug>
 
 //remove debug
 #undef KDbDbg

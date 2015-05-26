@@ -20,6 +20,8 @@
 #ifndef PARSER_TEST_H
 #define PARSER_TEST_H
 
+#include <KDbParser>
+
 int parserTest(const KDbEscapedString &st, const QStringList &params)
 {
     int r = 0;

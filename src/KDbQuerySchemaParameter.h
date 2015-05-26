@@ -20,7 +20,6 @@
 #ifndef KDB_QUERYSCHEMAPARAMETER_H
 #define KDB_QUERYSCHEMAPARAMETER_H
 
-#include <QtDebug>
 #include "KDbField.h"
 
 class KDbDriver;

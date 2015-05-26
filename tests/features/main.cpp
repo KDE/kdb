@@ -20,19 +20,15 @@
 #include <QApplication>
 #include <QFileInfo>
 #include <QPointer>
-#include <QtDebug>
 #include <QTextStream>
 
 #include <KDbDriverManager>
 #include <KDbDriver>
 #include <KDbConnection>
 #include <KDbCursor>
-#include <KDbField>
 #include <KDbTableSchema>
 #include <KDbQuerySchema>
 #include <KDbIndexSchema>
-#include <KDbParser>
-#include <KDbUtils>
 
 #include <iostream>
 

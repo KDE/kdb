@@ -20,7 +20,6 @@
 #ifndef KDB_CURSOR_P_H
 #define KDB_CURSOR_P_H
 
-#include <KDbConnection>
 
 #if 0
 /*PRIVATE*/ class /*KDB_EXPORT*/ CursorData

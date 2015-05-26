@@ -30,7 +30,6 @@
 #define KDB_TOOLS_SHAREDPTR_H
 
 #include <QExplicitlySharedDataPointer>
-#include <QAtomicPointer>
 
 typedef QSharedData Shared;
 

@@ -24,7 +24,6 @@
 
 #include <assert.h>
 
-#include <QtDebug>
 
 KDbIndexSchema::KDbIndexSchema(KDbTableSchema *tableSchema)
         : KDbFieldList(false)//fields are not owned by KDbIndexSchema object

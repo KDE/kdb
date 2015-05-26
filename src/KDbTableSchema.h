@@ -21,11 +21,8 @@
 #ifndef KDB_TABLESCHEMA_H
 #define KDB_TABLESCHEMA_H
 
-#include <QList>
 #include <QString>
-#include <QPointer>
 #include <QVector>
-#include <QtDebug>
 
 #include "KDbFieldList.h"
 #include "KDbIndexSchema.h"

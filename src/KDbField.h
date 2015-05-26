@@ -26,7 +26,6 @@
 #include <QVector>
 #include <QStringList>
 #include <QHash>
-#include <QtDebug>
 
 #include "KDbUtils.h"
 

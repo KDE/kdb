@@ -19,10 +19,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QVariant>
-#include <QFile>
 #include <QRegExp>
-#include <QtDebug>
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"

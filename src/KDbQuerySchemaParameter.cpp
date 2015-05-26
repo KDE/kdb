@@ -22,6 +22,7 @@
 #include "KDbDriverManager_p.h"
 
 #include <QWeakPointer>
+#include <QtDebug>
 
 KDbQuerySchemaParameter::KDbQuerySchemaParameter()
         : type(KDbField::InvalidType)

@@ -21,9 +21,7 @@
 
 #include "KDb.h"
 
-#include <QtDebug>
 #include <QMessageBox>
-#include <QProgressBar>
 #include <QProgressDialog>
 #include <QFileInfo>
 #include <QFile>

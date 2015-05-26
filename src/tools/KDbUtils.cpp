@@ -32,18 +32,9 @@
 #include "KDbUtils.h"
 
 #include <QRegExp>
-#include <QPainter>
-#include <QImage>
-#include <QIcon>
-#include <QMetaProperty>
-#include <QBitmap>
-#include <QFocusEvent>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
-#include <QStyle>
-#include <QtDebug>
-#include <QCoreApplication>
 
 #ifdef Q_WS_WIN
 #include <windows.h>

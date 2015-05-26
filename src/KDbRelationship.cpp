@@ -23,7 +23,6 @@
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
 
-#include <QtDebug>
 
 KDbRelationship::KDbRelationship()
         : m_masterIndex(0)

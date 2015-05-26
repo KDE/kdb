@@ -21,7 +21,6 @@
 #define KDB_DRIVER_MANAGER_P_H
 
 #include <QObject>
-#include <QWeakPointer>
 #include <KDbDriver>
 
 //! Internal class of the driver manager.

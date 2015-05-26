@@ -18,7 +18,6 @@
 */
 
 #include "SybasePreparedStatement.h"
-#include <QtDebug>
 
 SybasePreparedStatement::SybasePreparedStatement(StatementType type, ConnectionInternal& conn,
         KDbFieldList& fields)

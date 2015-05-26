@@ -21,7 +21,6 @@
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-#include <QtDebug>
 
 KDbDriverBehaviour::KDbDriverBehaviour()
         : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))

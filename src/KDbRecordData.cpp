@@ -25,6 +25,8 @@
 #include "KDbRecordData.h"
 #include "KDbGlobal.h"
 
+#include <QtDebug>
+
 QVariant KDbRecordData::s_null;
 
 QDebug operator<<(QDebug dbg, const KDbRecordData& data)

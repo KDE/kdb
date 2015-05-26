@@ -25,9 +25,6 @@
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-#include <QVariant>
-#include <QFile>
-#include <QtDebug>
 
 #include <mysql_version.h>
 #include <mysql.h>

@@ -22,7 +22,6 @@
 #include <KDbDriverManager>
 #include <KDbConnection>
 
-#include <QtDebug>
 #include <QFile>
 #include <QTest>
 

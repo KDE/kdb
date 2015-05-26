@@ -21,9 +21,7 @@
 #define KDB_INDEXSCHEMA_H
 
 #include <QList>
-#include <QString>
 #include <QSet>
-#include <QtDebug>
 
 #include "KDbObject.h"
 #include "KDbFieldList.h"

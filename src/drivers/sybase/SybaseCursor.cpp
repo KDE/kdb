@@ -22,12 +22,10 @@
 #include "SybaseConnection.h"
 #include "SybaseConnection_p.h"
 
-#include <QtGlobal>
 
 #include "KDbError.h"
 #include <Predicate/Utils.h>
 
-#include <QtDebug>
 #include <limits.h>
 #include <cstring>
 

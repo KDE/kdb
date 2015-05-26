@@ -20,7 +20,6 @@
 #include "KDbTransaction.h"
 #include "KDbConnection.h"
 
-#include <QtDebug>
 
 #include <assert.h>
 

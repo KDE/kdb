@@ -28,7 +28,6 @@
 
 #include <QFileInfo>
 #include <QHostAddress>
-#include <QtDebug>
 
 #define MIN_SERVER_VERSION_MAJOR 7
 #define MIN_SERVER_VERSION_MINOR 1

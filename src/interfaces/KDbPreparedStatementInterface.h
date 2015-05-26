@@ -20,8 +20,6 @@
 #ifndef KDB_PREPAREDSTATEMENT_IFACE_H
 #define KDB_PREPAREDSTATEMENT_IFACE_H
 
-#include <QVariant>
-#include <QStringList>
 #include <QSharedData>
 
 #include "KDbResult.h"

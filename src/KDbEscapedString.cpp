@@ -19,8 +19,8 @@
 
 #include "KDbEscapedString.h"
 
-#include <QDataStream>
 #include <QtDebug>
+#include <QDataStream>
 
 KDbEscapedString &KDbEscapedString::prepend(const KDbEscapedString &s)
 {

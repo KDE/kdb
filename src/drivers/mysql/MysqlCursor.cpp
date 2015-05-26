@@ -24,7 +24,6 @@
 #include "KDbError.h"
 #include "KDb.h"
 
-#include <QtDebug>
 #include <limits.h>
 
 #define BOOL bool

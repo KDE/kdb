@@ -22,9 +22,7 @@
 
 #include "kdb_export.h"
 
-#include <QObject>
 #include <QString>
-#include <QMap>
 #include <QSharedData>
 
 /*! @brief Database specific connection data, e.g. host, port.

@@ -31,7 +31,6 @@
 #include <postgres.h>
 #include <catalog/pg_type.h>
 
-#include <QtDebug>
 
 EXPORT_PREDICATE_DRIVER(PostgresqlDriver, postgresql)
 

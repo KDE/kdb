@@ -23,8 +23,6 @@
 #include <QTextStream>
 
 #include <KCmdLineArgs>
-#include <QtDebug>
-#include <KLocale>
 #include <KComponentData>
 
 #include "KDbConnectionData.h"

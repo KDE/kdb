@@ -17,11 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QByteArray>
-#include <QStringList>
-#include <QFile>
 
-#include <QtDebug>
 #include <KTemporaryFile>
 
 #include "XbaseConnection_p.h"

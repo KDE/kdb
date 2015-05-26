@@ -24,7 +24,6 @@
 #include <QVariant>
 #include <QStringList>
 #include <QHash>
-
 #include <QtDebug>
 
 //! @internal

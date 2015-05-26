@@ -23,7 +23,6 @@
 #include <QList>
 #include <QByteArray>
 #include <QDateTime>
-#include <QtPlugin>
 
 #include "KDb.h"
 #include "KDbVersionInfo.h"

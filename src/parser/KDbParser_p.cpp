@@ -20,7 +20,6 @@
 #include "KDbParser_p.h"
 #include "generated/sqlparser.h"
 
-#include <QRegExp>
 #include <QMutableListIterator>
 
 #include <assert.h>

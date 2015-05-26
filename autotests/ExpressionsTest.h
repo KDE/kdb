@@ -21,7 +21,6 @@
 #define KDB_EXPRESSIONSTEST_H
 
 #include <QObject>
-#include <KDbUtils>
 
 class ExpressionsTest : public QObject
 {

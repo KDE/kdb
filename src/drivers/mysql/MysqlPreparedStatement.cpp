@@ -18,7 +18,6 @@
 */
 
 #include "MysqlPreparedStatement.h"
-#include <QtDebug>
 #include <errmsg.h>
 
 // For example prepared MySQL statement code see:

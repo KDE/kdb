@@ -22,7 +22,6 @@
 
 #include <QList>
 #include <QHash>
-#include <QtDebug>
 
 #include "KDb.h"
 #include "KDbGlobal.h"

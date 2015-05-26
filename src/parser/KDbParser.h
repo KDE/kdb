@@ -21,9 +21,9 @@
 #ifndef KDB_PARSER_H
 #define KDB_PARSER_H
 
-#include <QObject>
-
 #include "kdb_export.h"
+
+#include <QString>
 
 class KDbConnection;
 class KDbQuerySchema;

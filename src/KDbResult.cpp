@@ -18,8 +18,8 @@
 */
 
 #include "KDbResult.h"
-//#include "KDbMessageHandler.h"
 
+#include <QObject>
 #include <QtDebug>
 
 #define ERRMSG(a) \

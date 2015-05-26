@@ -26,7 +26,6 @@
 #include "KDbDriver.h"
 #include "generated/sqlparser.h"
 
-#include <QPoint>
 
 #include <ctype.h>
 

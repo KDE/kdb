@@ -27,7 +27,6 @@
 #include "KDbGlobal.h"
 
 
-#include <QtDebug>
 
 // Constructor based on query statement
 PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)

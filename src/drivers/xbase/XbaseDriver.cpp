@@ -24,7 +24,6 @@
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-#include <QtDebug>
 
 #include "XbaseConnection.h"
 

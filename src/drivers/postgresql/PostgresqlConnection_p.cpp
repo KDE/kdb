@@ -20,7 +20,6 @@
 
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlConnection.h"
-#include <QtDebug>
 
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *conn)
         : ConnectionInternal(conn)

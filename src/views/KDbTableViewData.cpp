@@ -31,9 +31,7 @@
 #include "KDb.h"
 #include "KDbError.h"
 
-#include <QtDebug>
 #include <QApplication>
-#include <QVector>
 
 #include <unicode/coll.h>
 

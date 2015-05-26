@@ -20,8 +20,6 @@
 #include "KDbConnectionData.h"
 #include "KDbDriverManager.h"
 
-#include <QFileInfo>
-#include <QDir>
 
 KDbConnectionData::~KDbConnectionData()
 {

@@ -30,7 +30,6 @@
 
 #include <QBitArray>
 #include <QWeakPointer>
-#include <QtDebug>
 
 //! @internal
 class KDbQuerySchema::Private

@@ -30,7 +30,6 @@
 
 #include <QList>
 #include <QHash>
-#include <QByteArray>
 #include <QCache>
 #include <QString>
 

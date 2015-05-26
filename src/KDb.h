@@ -23,7 +23,6 @@
 #include <QList>
 #include <QVariant>
 #include <QByteArray>
-#include <QtDebug>
 
 #include "KDbGlobal.h"
 #include "KDbField.h"

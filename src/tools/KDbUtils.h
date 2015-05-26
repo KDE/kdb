@@ -28,11 +28,9 @@
 
 #include "kdb_export.h"
 
-#include <QPointer>
 #include <QObject>
 #include <QDateTime>
 #include <QMetaMethod>
-#include <QFont>
 
 
 namespace KDbUtils

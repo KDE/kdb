@@ -20,7 +20,6 @@
 #include "KDbObject.h"
 #include "KDbConnection.h"
 
-#include <QtDebug>
 
 KDbObject::KDbObject(int type)
     : d(new Data)

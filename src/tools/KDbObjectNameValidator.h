@@ -21,7 +21,6 @@
 #define KEXIDBOBJECTNAMEVALIDATOR_H
 
 #include <QString>
-#include <QPointer>
 #include "KDbGlobal.h"
 #include "KDbValidator.h"
 

@@ -19,7 +19,6 @@
 */
 
 #include "PostgresqlPreparedStatement.h"
-#include <QtDebug>
 
 PostgresqlPreparedStatement::PostgresqlPreparedStatement(ConnectionInternal* conn)
         : KDbPreparedStatementInterface()

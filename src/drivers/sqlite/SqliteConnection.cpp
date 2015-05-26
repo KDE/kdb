@@ -32,7 +32,6 @@
 #include <QFile>
 #include <QDir>
 #include <QRegExp>
-#include <QtDebug>
 
 //remove debug
 #undef PreDrvDbg

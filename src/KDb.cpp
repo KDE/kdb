@@ -32,15 +32,16 @@
 
 #include <QMap>
 #include <QHash>
-#include <QtXml>
 #include <QBuffer>
 #include <QPixmap>
-#include <QMutex>
 #include <QSet>
 #include <QTimer>
 #include <QThread>
-#include <QProgressBar>
 #include <QProgressDialog>
+#include <QDomNode>
+#include <QApplication>
+#include <QDir>
+#include <QProcess>
 
 #include <memory>
 

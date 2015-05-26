@@ -27,7 +27,6 @@
 #include "SqliteConnection_p.h"
 #include "SqliteAdmin.h"
 
-#include <QtDebug>
 
 #include <sqlite3.h>
 

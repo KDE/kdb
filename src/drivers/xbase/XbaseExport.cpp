@@ -22,7 +22,6 @@
 #include <QHash>
 #include <QDir>
 
-#include <QtDebug>
 
 #include "KDbField.h"
 #include "KDbRecordData.h"

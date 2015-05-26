@@ -21,7 +21,6 @@
 #define KDB_SIMPLECMDLINEAPP_H
 
 #include <KDbConnection>
-#include <KDbDriver>
 
 #include <KAboutData>
 

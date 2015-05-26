@@ -24,7 +24,6 @@
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
 
-#include <QtDebug>
 
 
 #include <assert.h>

@@ -24,7 +24,6 @@
 #include "KDbLookupFieldSchema.h"
 
 #include <assert.h>
-#include <QtDebug>
 
 //! @internal
 class KDbTableSchema::Private

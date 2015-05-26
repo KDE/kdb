@@ -21,7 +21,6 @@
 #include "KDbPreparedStatementInterface.h"
 #include "KDbTableSchema.h"
 
-#include <QtDebug>
 
 KDbPreparedStatement::Data::~Data()
 {

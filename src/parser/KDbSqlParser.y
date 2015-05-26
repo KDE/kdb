@@ -445,7 +445,6 @@
 #endif
 
 #include <QObject>
-#include <QList>
 #include <QVariant>
 #include <QPoint>
 

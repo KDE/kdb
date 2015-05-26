@@ -22,7 +22,6 @@
 
 #include "KDbGlobal.h"
 #include "KDbField.h"
-#include <QtDebug>
 
 /*! Provides common attributes for KDb objects: id, name, caption,
  help text. A KDb object is typically storable in database, for example:

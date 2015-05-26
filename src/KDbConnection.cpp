@@ -41,9 +41,7 @@
 
 #include <QDir>
 #include <QFileInfo>
-#include <QPointer>
-#include <QtXml>
-#include <QtDebug>
+#include <QDomDocument>
 
 /*! Version number of extended table schema.
 
