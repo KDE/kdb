@@ -26,7 +26,8 @@
 #include "KDbDriver.h"
 #include "KDbParser.h"
 
-#include <ctype.h>
+#include <QtDebug>
+#include <QSet>
 
 class BuiltInAggregates : public QSet<QString>
 {

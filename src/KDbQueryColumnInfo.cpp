@@ -21,6 +21,8 @@
 #include "KDbTableSchema.h"
 #include "KDbField.h"
 
+#include <QtDebug>
+
 KDbQueryColumnInfo::KDbQueryColumnInfo(KDbField *f, const QString& _alias, bool _visible,
                                  KDbQueryColumnInfo *foreignColumn)
         : field(f), alias(_alias), visible(_visible), m_indexForVisibleLookupValue(-1)

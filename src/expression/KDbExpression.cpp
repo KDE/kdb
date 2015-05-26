@@ -27,8 +27,6 @@
 #include "KDbParser_p.h"
 #include "generated/sqlparser.h"
 
-#include <ctype.h>
-
 //! @internal A cache
 class KDbExpressionClassNames
 {

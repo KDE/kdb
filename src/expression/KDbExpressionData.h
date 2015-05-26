@@ -27,8 +27,6 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 
-#include <ctype.h>
-
 class KDbExpressionData;
 class KDbUnaryExpressionData;
 class KDbConstExpressionData;

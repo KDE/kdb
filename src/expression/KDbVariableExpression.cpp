@@ -25,8 +25,6 @@
 #include "KDbQuerySchema.h"
 #include "KDbParser_p.h"
 
-#include <ctype.h>
-
 KDbVariableExpressionData::KDbVariableExpressionData()
  : KDbExpressionData()
  , field(0)

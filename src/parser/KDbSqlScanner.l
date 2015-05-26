@@ -19,13 +19,10 @@
 */
 
 %{
-#include <iostream>
-
-#include "KDbField.h"
-#include "KDbExpression.h"
-
 #include "sqlparser.h"
 #include "KDbSqlTypes.h"
+
+#include <QtDebug>
 
 extern int globalCurrentPos;
 extern QByteArray globalToken;

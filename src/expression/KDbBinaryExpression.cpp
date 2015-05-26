@@ -26,7 +26,7 @@
 #include "KDbDriver.h"
 #include "generated/sqlparser.h"
 
-#include <ctype.h>
+#include <QtDebug>
 
 KDbBinaryExpressionData::KDbBinaryExpressionData()
  : KDbExpressionData()

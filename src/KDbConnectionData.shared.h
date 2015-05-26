@@ -22,6 +22,7 @@
 
 #include "kdb_export.h"
 
+#include <QMap>
 #include <QString>
 #include <QSharedData>
 
