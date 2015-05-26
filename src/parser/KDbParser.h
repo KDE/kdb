@@ -85,7 +85,6 @@ private:
     int m_position;
 };
 
-class KDbParseInfoInternal;
 
 /*! Info used on parsing. */
 class KDB_EXPORT KDbParseInfo

@@ -34,7 +34,6 @@
 #include <QMetaMethod>
 #include <QFont>
 
-class QMetaProperty;
 
 namespace KDbUtils
 {

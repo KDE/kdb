@@ -37,7 +37,6 @@
 #include "KDbUtils.h"
 #include "KDbVersionInfo.h"
 
-class KService;
 
 /*! Detailed definition of driver's default behaviour.
  Note for driver developers:

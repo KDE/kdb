@@ -24,6 +24,7 @@
 
 #include "KDbQueryColumnInfo.h"
 
+class KDbConnection;
 class KDbFieldList;
 class KDbTableSchema;
 class KDbQuerySchema;

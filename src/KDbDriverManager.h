@@ -25,8 +25,6 @@
 
 #include "KDbDriver.h"
 
-class DriverManagerInternal;
-class KDbConnection;
 
 //! Database driver manager, provided for finding and loading drivers.
 class KDB_EXPORT KDbDriverManager

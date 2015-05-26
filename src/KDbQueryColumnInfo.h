@@ -26,7 +26,6 @@
 #include <QHash>
 
 class KDbField;
-class KDbConnection;
 
 //! @short Helper class that assigns additional information for the column in a query
 /*! The following information is assigned:
