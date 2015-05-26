@@ -162,8 +162,27 @@ QString KDbNArgExpressionData::tokenToString() const
     }
     return QString::fromLatin1("{INVALID_N_ARG_OPERATOR#%1}").arg(token);
 }
+
+bool KDbNArgExpressionData::containsInvalidArgument() const
+{
+    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+        const KDbField::Type type = data->type();
+        if (type == KDbField::InvalidType) {
+            return true;
+        }
     }
-    return QString::fromLatin1("{INVALID_N_ARG_OPERATOR#%1} ").arg(token);
+    return false;
+}
+
+bool KDbNArgExpressionData::containsNullArgument() const
+{
+    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+        const KDbField::Type type = data->type();
+        if (type == KDbField::Null) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //=========================================
@@ -264,4 +283,14 @@ int KDbNArgExpression::argCount() const
 bool KDbNArgExpression::isEmpty() const
 {
     return d->children.isEmpty();
+}
+
+bool KDbNArgExpression::containsInvalidArgument() const
+{
+    return d->convert<KDbNArgExpressionData>()->containsInvalidArgument();
+}
+
+bool KDbNArgExpression::containsNullArgument() const
+{
+    return d->convert<KDbNArgExpressionData>()->containsNullArgument();
 }

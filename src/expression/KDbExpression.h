@@ -287,6 +287,12 @@ public:
     //! @return true if the expression contains no arguments; otherwise returns false.
     bool isEmpty() const;
 
+    //! @return true if any argument is invalid (!KDbExpression::isValid()).
+    bool containsInvalidArgument() const;
+
+    //! @return true if any argument is NULL (type KDbField::Null).
+    bool containsNullArgument() const;
+
 protected:
     explicit KDbNArgExpression(KDbExpressionData* data);
 
@@ -503,8 +509,8 @@ public:
     /*! Constructs function expression with name @a name, without arguments. */
     explicit KDbFunctionExpression(const QString& name);
 
-    /*! Constructs function expression with name @a name and arguments @a args. */
-    KDbFunctionExpression(const QString& name, KDbNArgExpression& args);
+    /*! Constructs function expression with name @a name and arguments @a arguments. */
+    KDbFunctionExpression(const QString& name, const KDbNArgExpression &arguments);
 
     /*! Constructs a copy of other function expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
@@ -515,8 +521,16 @@ public:
     //! @return name of the function.
     QString name() const;
 
-    KDbNArgExpression arguments() const;
+    //! Sets name of the function to @a name.
+    void setName(const QString &name);
 
+    //! @return list of arguments of the function.
+    KDbNArgExpression arguments();
+
+    //! Sets the list of arguments to @a arguments.
+    void setArguments(const KDbNArgExpression &arguments);
+
+    /*! Constructs function expression with name @a name and arguments @a arguments. */
     static QStringList builtInAggregates();
 
     static bool isBuiltInAggregate(const QString& function);

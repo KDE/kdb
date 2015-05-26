@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -24,6 +24,7 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
+#include "KDbParser.h"
 
 #include <ctype.h>
 
@@ -51,17 +52,16 @@ KDbFunctionExpressionData::KDbFunctionExpressionData()
  : KDbExpressionData()
 {
     ExpressionDebug << "FunctionExpressionData" << ref;
+    setArguments(ExplicitlySharedExpressionDataPointer());
 }
 
-KDbFunctionExpressionData::KDbFunctionExpressionData(const QString& aName)
+KDbFunctionExpressionData::KDbFunctionExpressionData(const QString& aName,
+                                                     ExplicitlySharedExpressionDataPointer arguments)
         : KDbExpressionData()
         , name(aName)
 {
-    ExpressionDebug << "FunctionExpressionData" << ref;
-/*    if (aArgs) {
-        args = *aArgs;
-        args->setParent(this);
-    }*/
+    setArguments(arguments);
+    ExpressionDebug << "FunctionExpressionData" << ref << *args;
 }
 
 KDbFunctionExpressionData::~KDbFunctionExpressionData()
@@ -72,7 +72,10 @@ KDbFunctionExpressionData::~KDbFunctionExpressionData()
 KDbFunctionExpressionData* KDbFunctionExpressionData::clone()
 {
     ExpressionDebug << "FunctionExpressionData::clone" << *this;
-    return new KDbFunctionExpressionData(*this);
+    KDbFunctionExpressionData *cloned = new KDbFunctionExpressionData(*this);
+    ExpressionDebug << "FunctionExpressionData::clone" << *cloned;
+    cloned->args = args->clone();
+    return cloned;
 }
 
 void KDbFunctionExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
@@ -100,14 +103,100 @@ void KDbFunctionExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter
 
 KDbField::Type KDbFunctionExpressionData::typeInternal(KDb::ExpressionCallStack* callStack) const
 {
-//! @todo
     Q_UNUSED(callStack);
+    if (name == QLatin1String("SUBSTR")) {
+        if (args->convert<KDbNArgExpressionData>()->containsNullArgument()) {
+            return KDbField::Null;
+        }
+        return KDbField::Text;
+    }
+    //! @todo
     return KDbField::InvalidType;
 }
 
 bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack)
 {
-    return args.data() ? args.data()->validate(parseInfo, callStack) : true;
+    if (!args->validate(parseInfo, callStack)) {
+        return false;
+    }
+    if (args->token != ',') { // arguments required: NArgExpr with token ','
+        return false;
+    }
+    if (!args->validate(parseInfo)) {
+        return false;
+    }
+    if (name.isEmpty()) {
+        return false;
+    }
+    if (name == QLatin1String("SUBSTR")) {
+        /* From https://www.sqlite.org/lang_corefunc.html:
+        [1] substr(X,Y,Z)
+        The substr(X,Y,Z) function returns a substring of input string X that begins
+        with the Y-th character and which is Z characters long. If Z is omitted then
+
+        [2] substr(X,Y)
+        substr(X,Y) returns all characters through the end of the string X beginning with
+        the Y-th. The left-most character of X is number 1. If Y is negative then the
+        first character of the substring is found by counting from the right rather than
+        the left. If Z is negative then the abs(Z) characters preceding the Y-th
+        character are returned. If X is a string then characters indices refer to actual
+        UTF-8 characters. If X is a BLOB then the indices refer to bytes. */
+        if (args->convert<KDbNArgExpressionData>()->containsInvalidArgument()) {
+            return false;
+        }
+        const int count = args->children.count();
+        if (count != 2 && count != 3) {
+            parseInfo->setErrorMessage(QObject::tr("Incorrect number of arguments"));
+            parseInfo->setErrorDescription(QObject::tr("%1() function requires 2 or 3 arguments.").arg(name));
+            return false;
+        }
+        ExplicitlySharedExpressionDataPointer textExpr = args->children[0];
+        if (!textExpr->isTextType() && textExpr->type() != KDbField::Null) {
+            parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
+            parseInfo->setErrorDescription(QObject::tr("%1() function's first argument should be of type \"%2\". "
+                                                       "Specified argument is of type \"%3\".")
+                                           .arg(name)
+                                           .arg(KDbField::typeName(KDbField::Text))
+                                           .arg(KDbField::typeName(textExpr->type())));
+            return false;
+        }
+        ExplicitlySharedExpressionDataPointer startExpr = args->children[1];
+        if (!startExpr->isIntegerType() && startExpr->type() != KDbField::Null) {
+            parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
+            parseInfo->setErrorDescription(QObject::tr("%1() function's second argument should be of type \"%2\". "
+                                                       "Specified argument is of type \"%3\".")
+                                           .arg(name)
+                                           .arg(KDbField::typeName(KDbField::Integer))
+                                           .arg(KDbField::typeName(startExpr->type())));
+            return false;
+        }
+        if (count == 3) {
+            ExplicitlySharedExpressionDataPointer lengthExpr = args->children[2];
+            if (!lengthExpr->isIntegerType() && lengthExpr->type() != KDbField::Null) {
+                parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
+                parseInfo->setErrorDescription(QObject::tr("%1() function's third argument should be of type \"%2\". "
+                                                           "Specified argument is of type \"%3\".")
+                                               .arg(name)
+                                               .arg(KDbField::typeName(KDbField::Integer))
+                                               .arg(KDbField::typeName(lengthExpr->type())));
+                return false;
+            }
+        }
+    }
+    else {
+        return false;
+    }
+    return true;
+}
+
+void KDbFunctionExpressionData::setArguments(ExplicitlySharedExpressionDataPointer arguments)
+{
+    args = (arguments && arguments->convert<KDbNArgExpressionData>())
+            ? arguments : ExplicitlySharedExpressionDataPointer(new KDbNArgExpressionData);
+    children.append(args);
+    args->parent = this;
+    args->token = ',';
+    args->expressionClass = KDb::ArgumentListExpression;
 }
 
 //=========================================
@@ -132,14 +221,11 @@ KDbFunctionExpression::KDbFunctionExpression(const QString& name)
 {
 }
 
-KDbFunctionExpression::KDbFunctionExpression(const QString& name, KDbNArgExpression& args)
-        : KDbExpression(new KDbFunctionExpressionData(name),//, args.data()),
+KDbFunctionExpression::KDbFunctionExpression(const QString& name,
+                                             const KDbNArgExpression& arguments)
+        : KDbExpression(new KDbFunctionExpressionData(name.toUpper(), arguments.d),
               classForFunctionName(name), 0/*undefined*/)
 {
-    if (!args.isNull()) {
-        d->convert<KDbFunctionExpressionData>()->args = args.d;
-        appendChild(args);
-    }
 }
 
 KDbFunctionExpression::KDbFunctionExpression(const KDbFunctionExpression& expr)
@@ -179,7 +265,17 @@ QString KDbFunctionExpression::name() const
     return d->convert<KDbFunctionExpressionData>()->name;
 }
 
-KDbNArgExpression KDbFunctionExpression::arguments() const
+void KDbFunctionExpression::setName(const QString &name)
 {
-    return KDbNArgExpression(d->convert<KDbFunctionExpressionData>()->args.data());
+    d->convert<KDbFunctionExpressionData>()->name = name;
+}
+
+KDbNArgExpression KDbFunctionExpression::arguments()
+{
+    return KDbNArgExpression(d->convert<KDbFunctionExpressionData>()->args);
+}
+
+void KDbFunctionExpression::setArguments(const KDbNArgExpression &arguments)
+{
+    d->convert<KDbFunctionExpressionData>()->setArguments(arguments.d);
 }

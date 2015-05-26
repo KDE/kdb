@@ -47,10 +47,11 @@ public:
             QLatin1String("Aggregation"),
             QLatin1String("FieldList"),
             QLatin1String("TableList"),
+            QLatin1String("ArgumentList"),
             QLatin1String("QueryParameter")})
     {
     }
-    const QLatin1String names[13];
+    const QLatin1String names[14];
 };
 
 Q_GLOBAL_STATIC(KDbExpressionClassNames, KDb_expressionClassNames)
@@ -201,7 +202,7 @@ KDbEscapedString KDbExpressionData::toStringInternal(KDbQuerySchemaParameterValu
 {
     Q_UNUSED(params);
     Q_UNUSED(callStack);
-    return KDbEscapedString("<NULL!>");
+    return KDbEscapedString("<UNKNOWN!>");
 }
 
 void KDbExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
@@ -451,8 +452,6 @@ int KDbExpression::lastIndexOfChild(const KDbExpression& child, int from) const
 
 bool KDbExpression::checkBeforeInsert(const ExplicitlySharedExpressionDataPointer& child)
 {
-    if (isNull())
-        return false;
     if (!child)
         return false;
     if (d == child) // expression cannot be own child
@@ -475,7 +474,7 @@ void KDbExpression::appendChild(const ExplicitlySharedExpressionDataPointer& chi
 KDbEscapedString KDbExpression::toString(KDbQuerySchemaParameterValueListIterator* params) const
 {
     if (isNull())
-        return KDbEscapedString("<NULL!>");
+        return KDbEscapedString("<UNKNOWN!>");
     return d->toString(params);
 }
 

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -53,6 +53,7 @@ enum ExpressionClass {
     AggregationExpression,
     FieldListExpression,
     TableListExpression,
+    ArgumentListExpression,
     QueryParameterExpression
 };
 }
@@ -138,6 +139,8 @@ public:
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
     virtual QString tokenToString() const; //!< @return string for token
     virtual KDbNArgExpressionData* clone();
+    bool containsInvalidArgument() const;
+    bool containsNullArgument() const;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
@@ -309,7 +312,8 @@ class KDbFunctionExpressionData : public KDbExpressionData
 {
 public:
     KDbFunctionExpressionData();
-    explicit KDbFunctionExpressionData(const QString& aName);
+    explicit KDbFunctionExpressionData(const QString& aName,
+                                       ExplicitlySharedExpressionDataPointer arguments = ExplicitlySharedExpressionDataPointer());
     virtual ~KDbFunctionExpressionData();
 
     QString name;
@@ -317,6 +321,8 @@ public:
 
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
     virtual KDbFunctionExpressionData* clone();
+
+    void setArguments(ExplicitlySharedExpressionDataPointer arguments);
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
