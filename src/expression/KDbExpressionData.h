@@ -85,6 +85,12 @@ public:
     ExplicitlySharedExpressionDataPointer parent;
     QList<ExplicitlySharedExpressionDataPointer> children;
     KDbField::Type type() const; //!< @return type of this expression;
+    bool isValid() const;
+    bool isTextType() const;
+    bool isIntegerType() const;
+    bool isNumericType() const;
+    bool isFPNumericType() const;
+    bool isDateTimeType() const;
     KDbEscapedString toString(KDbQuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
     bool validate(KDbParseInfo *parseInfo);

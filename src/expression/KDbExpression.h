@@ -84,6 +84,30 @@ public:
      Default type is KDbField::InvalidType. */
     KDbField::Type type() const;
 
+    //! @return true if type of this object is not KDbField::InvalidType.
+    /*! A covenience method. @see type() */
+    bool isValid() const;
+
+    //! @return true if type of this object belong to a group of text types.
+    /*! A covenience method. @see type() */
+    bool isTextType() const;
+
+    //! \return true if type of this object belong to a group of integer types.
+    /*! A covenience method. @see type() */
+    bool isIntegerType() const;
+
+    //! @return true if type of this object belong to a group of numeric types.
+    /*! A covenience method. @see type() */
+    bool isNumericType() const;
+
+    //! @return true if type of this object belong to a group of floating-point numeric types.
+    /*! A covenience method. @see type() */
+    bool isFPNumericType() const;
+
+    //! @return true if type of this object belong to a group of time, date and date/time types.
+    /*! A covenience method. @see type() */
+    bool isDateTimeType() const;
+
     /*! @return true if evaluation of this expression succeeded. */
     bool validate(KDbParseInfo *parseInfo);
 

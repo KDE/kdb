@@ -119,6 +119,36 @@ KDbField::Type KDbExpressionData::type() const
     return type(&callStack);
 }
 
+bool KDbExpressionData::isValid() const
+{
+    return type() != KDbField::InvalidType;
+}
+
+bool KDbExpressionData::isTextType() const
+{
+    return KDbField::isTextType(type());
+}
+
+bool KDbExpressionData::isIntegerType() const
+{
+    return KDbField::isIntegerType(type());
+}
+
+bool KDbExpressionData::isNumericType() const
+{
+    return KDbField::isNumericType(type());
+}
+
+bool KDbExpressionData::isFPNumericType() const
+{
+    return KDbField::isFPNumericType(type());
+}
+
+bool KDbExpressionData::isDateTimeType() const
+{
+    return KDbField::isDateTimeType(type());
+}
+
 bool KDbExpressionData::validate(KDbParseInfo *parseInfo)
 {
     KDb::ExpressionCallStack callStack;
@@ -289,6 +319,36 @@ QString KDbExpression::tokenToDebugString(int token)
 KDbField::Type KDbExpression::type() const
 {
     return d->type();
+}
+
+bool KDbExpression::isValid() const
+{
+    return d->isValid();
+}
+
+bool KDbExpression::isTextType() const
+{
+    return d->isTextType();
+}
+
+bool KDbExpression::isIntegerType() const
+{
+    return d->isIntegerType();
+}
+
+bool KDbExpression::isNumericType() const
+{
+    return d->isNumericType();
+}
+
+bool KDbExpression::isFPNumericType() const
+{
+    return d->isFPNumericType();
+}
+
+bool KDbExpression::isDateTimeType() const
+{
+    return d->isDateTimeType();
 }
 
 QString KDbExpression::tokenToString() const
