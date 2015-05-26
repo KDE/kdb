@@ -708,6 +708,10 @@ void ExpressionsTest::testFunctionExpression()
     QCOMPARE(e.toFunction(), f_substr);
     QCOMPARE(e.toFunction(), f_substr.toFunction());
     QVERIFY(e.isFunction());
+
+    // nested functions
+    f_substr2.arguments().replace(0, f_substr);
+    QCOMPARE(f_substr2.type(), KDbField::Text);
 }
 
 void ExpressionsTest::testConstExpressionValidate()
@@ -1276,6 +1280,11 @@ void ExpressionsTest::testFunctionExpressionValidate()
     second.setToken(REAL_CONST);
     second.setValue(3.14);
     QVERIFY(!validate(&f_substr2));
+
+    // nested functions
+    KDbFunctionExpression f_substr3 = f_substr.clone().toFunction();
+    f_substr3.arguments().replace(0, f_substr.clone());
+    QVERIFY(validate(&f_substr3));
 
     // fixed type
     args.replace(1, KDbConstExpression(INTEGER_CONST, 1));

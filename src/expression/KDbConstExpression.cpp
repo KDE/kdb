@@ -115,9 +115,12 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(KDbQuerySchemaParamete
         return KDbEscapedString("TRUE");
     case SQL_FALSE:
         return KDbEscapedString("FALSE");
-    case REAL_CONST:
-        return KDbEscapedString::number(value.toPoint().x()) + '.'
-                + KDbEscapedString::number(value.toPoint().y());
+    case REAL_CONST: {
+        if (!value.canConvert<qreal>()) {
+            return KDbEscapedString("0.0");
+        }
+        break;
+    }
     case DATE_CONST:
         return KDbEscapedString('\'') + value.toDate().toString(Qt::ISODate) + '\'';
     case DATETIME_CONST:
