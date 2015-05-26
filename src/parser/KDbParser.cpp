@@ -219,7 +219,7 @@ void KDbParseInfo::setErrorMessage(const QString &message)
     d->errorMessage = message;
 }
 
-void KDbParseInfo::setErrorDecription(const QString &description)
+void KDbParseInfo::setErrorDescription(const QString &description)
 {
     d->errorDescription = description;
 }

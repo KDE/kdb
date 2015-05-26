@@ -54,7 +54,7 @@ KDbField::Type KDbNArgExpressionData::typeInternal(KDb::ExpressionCallStack *cal
     default:;
     }
 
-    return KDbField::InvalidType;
+    return KDbField::Tuple;
 }
 
 KDbNArgExpressionData* KDbNArgExpressionData::clone()
@@ -75,7 +75,7 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
     case KDB_TOKEN_NOT_BETWEEN_AND: {
         if (children.count() != 3) {
             parseInfo->setErrorMessage(QObject::tr("Three arguments required"));
-            parseInfo->setErrorDecription(
+            parseInfo->setErrorDescription(
                 QObject::tr("%1 operator requires exactly three arguments.", "BETWEEN..AND error")
                             .arg(QLatin1String("BETWEEN...AND")));
             return false;
@@ -100,7 +100,7 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
         }
 
         parseInfo->setErrorMessage(QObject::tr("Incompatible types of arguments"));
-        parseInfo->setErrorDecription(
+        parseInfo->setErrorDescription(
             QObject::tr("%1 operator requires compatible types of arguments.", "BETWEEN..AND type error")
                         .arg(QLatin1String("BETWEEN..AND")));
         return false;

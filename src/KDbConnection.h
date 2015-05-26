@@ -676,7 +676,7 @@ public:
      - else (2nd priority): value of KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME
      if it is not empty.
 
-     See decription of KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME member.
+     See description of KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME member.
      You may want to reimplement this method only when you need to depend on
      this connection specifics
      (e.g. you need to check something remotely).
