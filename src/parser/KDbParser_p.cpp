@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -75,16 +75,6 @@ void KDbParseInfoInternal::appendPositionForTableOrAliasName(const QString &tabl
         d->repeatedTablesAndAliases.insert(tableOrAliasName, list);
     }
     list->append(pos);
-}
-
-void KDbParseInfoInternal::setErrorMessage(const QString &message)
-{
-    d->errorMessage = message;
-}
-
-void KDbParseInfoInternal::setErrorDescription(const QString &description)
-{
-    d->errorDescription = description;
 }
 
 //-------------------------------------

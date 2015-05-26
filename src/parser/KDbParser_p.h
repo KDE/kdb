@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -79,12 +79,6 @@ public:
 
     //! Appends position @a pos for table or alias @a tableOrAliasName.
     void appendPositionForTableOrAliasName(const QString &tableOrAliasName, int pos);
-
-    //! Sets error message to @a message.
-    void setErrorMessage(const QString &message);
-
-    //! Sets error description to @a description.
-    void setErrorDescription(const QString &description);
 
 private:
     Q_DISABLE_COPY(KDbParseInfoInternal)
