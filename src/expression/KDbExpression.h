@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Radoslaw Wicik <radoslaw@wicik.pl>
 
    Design based on nexp.h : Parser module of Python-like language
@@ -62,6 +62,7 @@ public:
 
     //! @return true if this expression is null. 
     //! Equivalent of expressionClass() == KDb::UnknownExpression.
+    //! @note Returns false for expressions of type KDbField::Null (SQL's NULL).
     bool isNull() const;
 
     //! Creates a deep (not shallow) copy of the KDbExpression.
@@ -74,14 +75,20 @@ public:
     */
     int token() const;
 
+    /*! Sets token @a token for this expression. */
+    void setToken(int token);
+
     /*!
     @return class identifier of this expression.
     Default expressionClass is KDb::UnknownExpression.
     */
     KDb::ExpressionClass expressionClass() const;
 
+    /*! Sets expression class @a aClass for this expression. */
+    void setExpressionClass(KDb::ExpressionClass aClass);
+
     /*! @return type of this expression, based on effect of its evaluation.
-     Default type is KDbField::InvalidType. */
+     Default type is KDbField::InvalidType. @see isValid() */
     KDbField::Type type() const;
 
     //! @return true if type of this object is not KDbField::InvalidType.
@@ -240,6 +247,10 @@ public:
      @a i must be a valid index position in the list (i.e., 0 <= i < argCount()). */
     void insert(int i, const KDbExpression& expr);
 
+    //! Replaces expression argument at index @a i with expression @a expr.
+    //! @a i must be a valid index position in the list (i.e., 0 <= i < argCount()). */
+    void replace(int i, const KDbExpression& expr);
+
     /*! Removes the expression argument @a expr and returns true on success;
         otherwise returns false. */
     bool remove(const KDbExpression& expr);
@@ -266,9 +277,9 @@ public:
       @see indexOf() */
     int lastIndexOf(const KDbExpression& expr, int from = -1) const;
 
-    //! @return expression index @n in the list of arguments.
-    //! If the index @a is out of bounds, the function returns null expression.
-    KDbExpression arg(int n) const;
+    //! @return expression index @a i in the list of arguments.
+    //! If the index @a i is out of bounds, the function returns null expression.
+    KDbExpression arg(int i) const;
 
     //! @return the number of expression arguments in this expression.
     int argCount() const;
@@ -501,6 +512,7 @@ public:
 
     virtual ~KDbFunctionExpression();
 
+    //! @return name of the function.
     QString name() const;
 
     KDbNArgExpression arguments() const;

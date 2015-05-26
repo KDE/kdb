@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -153,7 +153,15 @@ QString KDbNArgExpressionData::tokenToString() const
     switch (token) {
     case KDB_TOKEN_BETWEEN_AND: return QLatin1String("BETWEEN_AND");
     case KDB_TOKEN_NOT_BETWEEN_AND: return QLatin1String("NOT_BETWEEN_AND");
-    default:;
+    default: {
+        const QString s = KDbExpressionData::tokenToString();
+        if (!s.isEmpty()) {
+            return QString::fromLatin1("'%1'").arg(s);
+        }
+    }
+    }
+    return QString::fromLatin1("{INVALID_N_ARG_OPERATOR#%1}").arg(token);
+}
     }
     return QString::fromLatin1("{INVALID_N_ARG_OPERATOR#%1} ").arg(token);
 }
@@ -202,14 +210,25 @@ void KDbNArgExpression::prepend(const KDbExpression& expr)
     prependChild(expr);
 }
 
-KDbExpression KDbNArgExpression::arg(int n) const
+KDbExpression KDbNArgExpression::arg(int i) const
 {
-    return KDbExpression(d->children.value(n));
+    return KDbExpression(d->children.value(i));
 }
 
 void KDbNArgExpression::insert(int i, const KDbExpression& expr)
 {
     insertChild(i, expr);
+}
+
+void KDbNArgExpression::replace(int i, const KDbExpression& expr)
+{
+    if (!checkBeforeInsert(expr.d))
+        return;
+    if (i < 0 || i > d->children.count())
+        return;
+    d->children.at(i)->parent.reset();
+    d->children.replace(i, expr.d);
+    expr.d->parent = d;
 }
 
 bool KDbNArgExpression::remove(const KDbExpression& expr)

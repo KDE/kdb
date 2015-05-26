@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Radoslaw Wicik <radoslaw@wicik.pl>
 
    Based on nexp.cpp : Parser module of Python-like language
@@ -294,9 +294,19 @@ int KDbExpression::token() const
     return d->token;
 }
 
+void KDbExpression::setToken(int token)
+{
+    d->token = token;
+}
+
 KDb::ExpressionClass KDbExpression::expressionClass() const
 {
     return d->expressionClass;
+}
+
+void KDbExpression::setExpressionClass(KDb::ExpressionClass aClass)
+{
+    d->expressionClass = aClass;
 }
 
 bool KDbExpression::validate(KDbParseInfo *parseInfo)
