@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2011-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2011-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -37,14 +37,15 @@ void ExpressionsTest::initTestCase()
 
 //! compares two expression @a e1 and @a e2 based on strings/debug strings
 //! and token strings
-template <typename T>
-static void compareStrings(const T &e1, const T &e2)
+template <typename T1, typename T2>
+static void compareStrings(const T1 &e1, const T2 &e2)
 {
+    //qDebug() << "compareStrings():"
+    //         << "\ne1:" << e1.toString() << e1.tokenToDebugString() << e1.tokenToString()
+    //         << "\ne2:" << e2.toString() << e2.tokenToDebugString() << e2.tokenToString();
     QCOMPARE(e1.toString(), e2.toString());
     QCOMPARE(e1.tokenToDebugString(), e2.tokenToDebugString());
     QCOMPARE(e1.tokenToString(), e2.tokenToString());
-    qDebug() << "compareStrings():"
-             << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
 }
 
 //! tests clone and copy ctor for @a e1
@@ -55,7 +56,7 @@ static void testCloneExpression(const T &e1)
     QVERIFY(e1 != e1.clone());
     QVERIFY(e1 != e1clone);
     QVERIFY(e1.clone() != e1clone);
-    compareStrings(KDbExpression(e1), e1clone);
+    compareStrings(e1, e1clone);
 
     const T copied(e1);
     QVERIFY(e1 == copied);
