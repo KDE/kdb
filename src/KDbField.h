@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -107,7 +107,8 @@ public:
                              not used in table definitions,
                              but only in query definitions */
         Enum = 129,      /*!< An integer internal with a string list of hints */
-        Map = 130        /*!< Mapping from string to string list (more generic than Enum */
+        Map = 130,       /*!< Mapping from string to string list (more generic than Enum) */
+        Tuple = 131      /*!< A list of values (e.g. arguments of a function) */
     };
 
     /*! Type groups for fields. */

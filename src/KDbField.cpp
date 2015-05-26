@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -732,7 +732,7 @@ void KDbField::setCustomProperty(const QByteArray& propertyName, const QVariant&
 //-------------------------------------------------------
 #define ADDTYPE(type, i18, str) \
     (*this)[KDbField::type] = i18; \
-    (*this)[KDbField::type+KDbField::LastType+1] = QLatin1String(str); \
+    (*this)[KDbField::type+KDbField::Null+1] = QLatin1String(str); \
     str2num[ QString::fromLatin1(str).toLower() ] = type; \
     names.append(i18)
 #define ADDGROUP(type, i18, str) \
@@ -752,7 +752,7 @@ void KDbField::FieldTypeNames::init()
     if (m_initialized)
         return;
     m_initialized = true;
-    resize((KDbField::LastType + 1)*2);
+    resize((KDbField::Null + 1)*2);
 
     ADDTYPE(InvalidType, QObject::tr("Invalid Type"), "InvalidType");
     ADDTYPE(Byte, QObject::tr("Byte"), "Byte");
