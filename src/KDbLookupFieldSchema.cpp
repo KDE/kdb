@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -658,13 +658,12 @@ void KDbLookupFieldSchema::setVisibleColumns(const QList<uint>& list)
     d->visibleColumns = list;
 }
 
-int KDbLookupFieldSchema::visibleColumn(uint fieldCount) const
+int KDbLookupFieldSchema::visibleColumn(uint index) const
 {
-    if (d->visibleColumns.count() == 1)
-        return (d->visibleColumns.first() < fieldCount) ? (int)d->visibleColumns.first() : -1;
-    if (d->visibleColumns.isEmpty())
+    if (index >= uint(d->visibleColumns.count())) {
         return -1;
-    return fieldCount - 1;
+    }
+    return index;
 }
 
 QList<int> KDbLookupFieldSchema::columnWidths() const
