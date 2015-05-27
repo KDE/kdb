@@ -35,7 +35,7 @@ srcdir=`dirname $0`
 cd $srcdir
 
 flex -ogenerated/sqlscanner.cpp KDbSqlScanner.l
-bison -d KDbSqlParser.y -Wall -fall -rall -t --report-file=$builddir/KDbSqlParser.output
+bison -d KDbSqlParser.y -Wall -fall -rall --report-file=$builddir/KDbSqlParser.output
 
 # postprocess
 echo '#ifndef KDBSQLPARSER_H

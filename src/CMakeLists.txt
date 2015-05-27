@@ -6,19 +6,7 @@ configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
 add_definitions(
     #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
     -D__KDB__=
-    #-DYYERROR_VERBOSE=1
 )
-if(CMAKE_BUILD_TYPE EQUAL Debug OR CMAKE_BUILD_TYPE EQUAL RelWithDebInfo)
-    add_definitions(
-        -DYYDEBUG=1
-    )
-endif()
-
-if(WIN32)
-    add_definitions(
-        -DYY_NO_UNISTD_H=1
-    )
-endif()
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
@@ -38,8 +26,22 @@ add_custom_command(
     COMMENT "Creating parser/lexer files"
 )
 
-# Mark files as generated
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp PROPERTIES GENERATED TRUE)
+string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
+if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
+   add_definitions(-DYYDEBUG=1) # needed where sqlparser.h is used
+endif()
+
+if(WIN32)
+    set(EXTRA_PARSER_COMPILE_FLAGS "-DYY_NO_UNISTD_H=1")
+endif()
+
+# Mark files as generated, set compile flags
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
+    PROPERTIES
+        GENERATED TRUE
+        # YYERROR_VERBOSE=1 needed to get a token table for tokenName() even for release builds
+        COMPILE_FLAGS "-DYYERROR_VERBOSE=1 ${EXTRA_PARSER_COMPILE_FLAGS} "
+)
 set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp PROPERTIES GENERATED TRUE)
 
