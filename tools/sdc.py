@@ -613,20 +613,23 @@ def process():
             data_class_copy_ctor += '        , %s(other.%s)\n' % (member['name'], member['name'])
             if member.has_key('docs'):
                 data_class_members += member['docs']
-            if not member['no_getter'] or not member['no_setter']:
+
+            isInternalMember = member['no_getter'] and member['no_setter']
+            if isInternalMember:
+                data_class_members += "        //! @internal"
+            else:
                 data_class_members += "        //! @see "
+            if not member['no_getter']:
+                getter = member['getter']
+                if not getter:
+                    getter = member['name']
+                data_class_members += "%s::%s()" % (shared_class_name, getter)
+            if not member['no_setter']:
                 if not member['no_getter']:
-                    getter = member['getter']
-                    if not getter:
-                        getter = member['name']
-                    data_class_members += "%s::%s()" % (shared_class_name, getter)
-                if member['no_setter']:
-                    data_class_members += "\n"
-                else:
-                    if not member['no_getter']:
-                        data_class_members += ", "
-                    setter = makeSetter(member['name'], member['setter'])
-                    data_class_members += "%s::%s()\n" % (shared_class_name, setter)
+                    data_class_members += ", "
+                setter = makeSetter(member['name'], member['setter'])
+                data_class_members += "%s::%s()" % (shared_class_name, setter)
+            data_class_members += "\n"
             data_class_members += "        %s%s %s;\n" % (('mutable ' if member['mutable'] else ''), member['type'], member['name'])
             if shared_class_options['with_from_to_map']:
                 toMap_impl += '    map[QLatin1String(\"%s\")] = %s;\n' % (member['name'], generate_toString_conversion(member['name'], member['type']))
