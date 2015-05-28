@@ -30,6 +30,7 @@
 
 #include <QBitArray>
 #include <QWeakPointer>
+#include <QDebug>
 
 //! @internal
 class KDbQuerySchema::Private
@@ -837,7 +838,7 @@ bool KDbQuerySchema::removeField(KDbField *field)
     }
     d->clearCachedData();
     if (indexOfAsterisk >= 0) {
-        //kDebug() << "d->asterisks.removeAt:" << field;
+        //KDbDbg << "d->asterisks.removeAt:" << field;
         //field->debug();
         d->asterisks.removeAt(indexOfAsterisk); //this will destroy this asterisk
     }

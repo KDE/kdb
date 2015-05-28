@@ -44,6 +44,7 @@
 #include <QProcess>
 
 #include <memory>
+#include <QDebug>
 
 class ConnectionTestDialog;
 
@@ -167,7 +168,7 @@ ConnectionTestDialog::~ConnectionTestDialog()
 
 int ConnectionTestDialog::exec()
 {
-    //kDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    //KDbDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
     m_timer.start(20);
     m_thread->start();
     const int res = QProgressDialog::exec(); // krazy:exclude=qclasses
@@ -219,7 +220,7 @@ void ConnectionTestDialog::slotTimeout()
 
 void ConnectionTestDialog::error(const QString& msg, const QString& details)
 {
-    //kDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    //KDbDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
     KDbDbg << msg << details;
     m_stopWaiting = true;
     if (!msg.isEmpty() || !details.isEmpty()) {

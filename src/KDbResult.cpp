@@ -150,7 +150,7 @@ void KDbResultable::storePreviousError()
     m_previousServerResultName = m_previousServerResultName2;
     m_previousServerResultCode2 = m_serverResultCode;
     m_previousServerResultName2 = m_serverResultName;
-    qDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
+    KDbDbg << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
 KDbResultable::~KDbResultable()

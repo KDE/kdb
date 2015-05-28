@@ -133,12 +133,12 @@ bool DriverManagerInternal::lookupDrivers()
     m_lookupDriversNeeded = false;
     clearResult();
 
-    //qDebug() << "Load all plugins";
+    //KDbDbg << "Load all plugins";
     const QList<QPluginLoader*> offers
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
     foreach(QPluginLoader *loader, offers) {
         //QJsonObject json = loader->metaData();
-        //qDebug() << json;
+        //KDbDbg << json;
         //! @todo check version
         KDbDriverMetaData *metaData = new KDbDriverMetaData(*loader);
         if (m_driversMetaData.contains(metaData->id())) {
@@ -157,7 +157,7 @@ bool DriverManagerInternal::lookupDrivers()
      Plugin path "Plugins" entry can be added to qt.conf to override; see http://qt-project.org/doc/qt-4.8/qt-conf.html.
     */
     const QStringList libraryPaths(KDb::libraryPaths());
-    qDebug() << "libraryPaths:" << libraryPaths;
+    KDbDbg << "libraryPaths:" << libraryPaths;
     foreach (const QString& path, libraryPaths) {
         lookupDriversForDirectory(path);
     }
@@ -350,11 +350,11 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
 #endif
     QLibrary lib(libFileName);
     LibUnloader unloader(&lib);
-    qDebug() << libFileName;
+    KDbDbg << libFileName;
     if (!lib.load()) {
         m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(id));
         m_result.setServerMessage(lib.errorString());
-        qDebug() << lib.errorString();
+        KDbDbg << lib.errorString();
         return 0;
     }
     
@@ -387,7 +387,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     if (!drv) {
         m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(id));
         m_result.setServerMessage(loader.errorString());
-        qDebug() << loader.instance() << loader.errorString();
+        KDbDbg << loader.instance() << loader.errorString();
 //! @todo
 /*        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
             m_componentLoadingErrors[KLibLoader::ErrNoServiceFound] = "ErrNoServiceFound";

@@ -2965,7 +2965,7 @@ bool KDbConnection::loadExtendedTableSchemaData(KDbTableSchema* tableSchema)
                     } else if (propEl.tagName() == QLatin1String("lookup-column")) {
                         KDbLookupFieldSchema *lookupFieldSchema = KDbLookupFieldSchema::loadFromDom(propEl);
                         if (lookupFieldSchema) {
-                            qDebug() << f->name() << *lookupFieldSchema;
+                            KDbDbg << f->name() << *lookupFieldSchema;
                             tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
                         }
                     }
@@ -3307,7 +3307,7 @@ bool KDbConnection::setupKDbSystemSchema()
     .addField(new KDbField(QLatin1String("o_caption"), KDbField::Text))
     .addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
 
-    qDebug() << *t_objects;
+    KDbDbg << *t_objects;
 
     KDbTableSchema *t_objectdata = newKDbSystemTableSchema(QLatin1String("kexi__objectdata"));
     t_objectdata->addField(new KDbField(QLatin1String("o_id"),
@@ -3376,7 +3376,7 @@ inline void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* 
 bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-// qDebug() << *query;
+// KDbDbg << *query;
 
     clearResult();
     //--get PKEY

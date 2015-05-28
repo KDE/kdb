@@ -71,7 +71,7 @@ SqliteVacuum::~SqliteVacuum()
 tristate SqliteVacuum::run()
 {
     const QString dump_app = QString::fromLatin1(KDB_SQLITE_DUMP_TOOL);
-    //qDebug() << "KDb-drv(" KDB_DRIVER_NAME "):" << dump_app;
+    //KDbDrvDbg << KDB_DRIVER_NAME << dump_app;
     KDbDrvDbg << dump_app;
     if (dump_app.isEmpty()) {
         KDbDrvWarn << "Could not find tool" << KDB_SQLITE_DUMP_TOOL;

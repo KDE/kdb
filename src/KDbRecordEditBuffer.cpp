@@ -20,6 +20,7 @@
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
 
+#include <QtDebug>
 
 KDbRecordEditBuffer::KDbRecordEditBuffer(bool dbAwareBuffer)
         : m_simpleBuffer(dbAwareBuffer ? 0 : new SimpleMap())

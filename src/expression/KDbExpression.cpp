@@ -272,7 +272,7 @@ KDbExpression::KDbExpression(const ExplicitlySharedExpressionDataPointer &ptr)
 
 KDbExpression::~KDbExpression()
 {
-    //qDebug() << *this << d->ref;
+    //KDbDbg << *this << d->ref;
     if (d->parent && d->ref == 1) {
          d->parent->children.removeOne(d);
     }
@@ -421,7 +421,7 @@ void KDbExpression::removeChild(int i)
         return;
     if (i < 0 || i >= d->children.count())
         return;
-    //qDebug() << d->children.count() << d->children.at(i);
+    //KDbDbg << d->children.count() << d->children.at(i);
     d->children.removeAt(i);
 }
 

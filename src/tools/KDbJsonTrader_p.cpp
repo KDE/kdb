@@ -20,6 +20,7 @@
 */
 
 #include "KDbJsonTrader_p.h"
+#include "KDbGlobal.h"
 
 #include <QDebug>
 #include <QList>
@@ -71,7 +72,7 @@ static QList<QPluginLoader *> findPlugins(const QString &path, const QString &se
             QPluginLoader *loader = new QPluginLoader(dirIter.filePath());
             QJsonObject json = loader->metaData().value(QLatin1String("MetaData")).toObject();
             if (json.isEmpty()) {
-                //qDebug() << dirIter.filePath() << "has no json!";
+                //KDbDbg << dirIter.filePath() << "has no json!";
                 continue;
             }
             QJsonObject pluginData = json.value(QLatin1String("KPlugin")).toObject();
@@ -103,7 +104,7 @@ QList<QPluginLoader *> KDbJsonTrader::query(const QString &servicetype,
         QStringList searchDirs;
         searchDirs += QCoreApplication::libraryPaths();
         foreach(const QString &dir, searchDirs) {
-            qDebug() << dir;
+            KDbDbg << dir;
             QString possiblePath = dir + QLatin1String("/kdb");
             if (QDir(possiblePath).exists()) {
                 d->pluginPaths += possiblePath;
