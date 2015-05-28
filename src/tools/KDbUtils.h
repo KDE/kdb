@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -335,6 +335,54 @@ Q_DECLARE_FLAGS(FindExeOptions, FindExeOption)
 QString findExe(const QString& appname,
                 const QString& path = QString(),
                 FindExeOptions options = NoFindExeOptions);
+
+//! A single property
+//! @note This property is general-purpose and not related to Qt Properties.
+//! @see KDbUtils::PropertySet
+class KDB_EXPORT Property {
+public:
+    Property() : isNull(true) {}
+    Property(const QVariant &aValue, const QString &aCaption)
+        : value(aValue), caption(aCaption), isNull(false)
+    {}
+    Property(const Property &other)
+    : value(other.value), caption(other.caption), isNull(other.isNull)
+    {}
+    QVariant const value;  //!< Property value
+    QString const caption; //!< User visible property caption
+    bool const isNull;     //!< true if this is a null property
+};
+
+//! A set of properties.
+//! @note These properties are general-purpose and not related to Qt Properties.
+//! @see KDbUtils::Property
+class KDB_EXPORT PropertySet
+{
+public:
+    PropertySet();
+
+    PropertySet(const PropertySet &other);
+
+    ~PropertySet();
+
+    //! Inserts property with a given @a name, @a value and @a caption.
+    //! If @a caption is empty, caption from existing property is reused.
+    void insert(const QByteArray &name, const QVariant &value, const QString &caption = QString());
+
+    //! Removes property with a given @a name.
+    void remove(const QByteArray &name);
+
+    //! @return property with a given @a name.
+    //! If not found, a null Property is returned (Property::isNull).
+    Property property(const QByteArray &name) const;
+
+    //! @return a list of property names.
+    QList<QByteArray> names() const;
+
+private:
+    class Private;
+    Private * const d;
+};
 
 } // KDbUtils
 

@@ -222,16 +222,12 @@ public:
 
     inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
-    //! @return property value for @a propeName available for this driver.
-    //! If there's no such property defined for driver, Null QVariant value is returned.
-    QVariant propertyValue(const QByteArray& propName) const;
+    //! @return internal property with a name @a name for this driver.
+    //! If there's no such property defined for driver, a null property is returned.
+    KDbUtils::Property internalProperty(const QByteArray& name) const;
 
-    //! @return translated property caption for @a propeName.
-    //! If there's no such property defined for driver, empty string value is returned.
-    QString propertyCaption(const QByteArray& propName) const;
-
-    //! @return a list of property names available for this driver.
-    QList<QByteArray> propertyNames() const;
+    //! @return a list of internal property names for this driver.
+    QList<QByteArray> internalPropertyNames() const;
 
     const KDbDriverBehaviour* behaviour() const { return beh; }
 
@@ -315,6 +311,7 @@ protected:
     friend class KDbConnection;
     friend class KDbCursor;
     friend class DriverManagerInternal;
+    friend class DriverPrivate;
 
     KDbDriverBehaviour *beh;
     DriverPrivate * const d;

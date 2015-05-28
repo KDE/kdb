@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -416,4 +416,54 @@ QString KDbUtils::findExe(const QString& appname,
     // If we reach here, the executable wasn't found.
     // So return empty string.
     return QString();
+}
+
+// ---
+
+class PropertySet::Private
+{
+public:
+    AutodeletedHash<QByteArray, Property*> data;
+};
+
+PropertySet::PropertySet()
+ : d(new Private)
+{
+}
+
+PropertySet::PropertySet(const PropertySet &other)
+    : d(new Private)
+{
+    d->data = other.d->data;
+}
+
+PropertySet::~PropertySet()
+{
+    delete d;
+}
+
+void PropertySet::insert(const QByteArray &name, const QVariant &value, const QString &caption)
+{
+    QString realCaption = caption;
+    Property *existing = d->data.value(name);
+    if (caption.isEmpty() && existing) {
+        realCaption = existing->caption; // reuse
+    }
+    d->data.insert(name, new Property(value, realCaption));
+}
+
+void PropertySet::remove(const QByteArray &name)
+{
+    d->data.remove(name);
+}
+
+Property PropertySet::property(const QByteArray &name) const
+{
+    Property *result = d->data.value(name);
+    return result ? *result : Property();
+}
+
+QList<QByteArray> PropertySet::names() const
+{
+    return d->data.keys();
 }

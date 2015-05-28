@@ -49,28 +49,26 @@ KDbDriverBehaviour::~KDbDriverBehaviour()
 
 //---------------------------------------------
 
-DriverPrivate::DriverPrivate()
-        : isDBOpenedAfterCreate(false)
+DriverPrivate::DriverPrivate(KDbDriver *aDriver)
+        : driver(aDriver)
+        , isDBOpenedAfterCreate(false)
         , features(KDbDriver::NoFeatures)
 {
     adminTools = 0;
 
-    properties["client_library_version"] = QString();
-    propertyCaptions["client_library_version"] =
-        QObject::tr("Client library version");
-
-    properties["default_server_encoding"] = QString();
-    propertyCaptions["default_server_encoding"] =
-        QObject::tr("Default character encoding on server");
+    properties.insert("client_library_version", QVariant(),
+                      QObject::tr("Client library version"));
+    properties.insert("default_server_encoding", QVariant(),
+                      QObject::tr("Default character encoding on server"));
 }
 
 void DriverPrivate::initInternalProperties()
 {
-    properties["is_file_database"] = QVariant(metaData->isFileBased());
-    propertyCaptions["is_file_database"] = QObject::tr("File-based database driver");
+    properties.insert("is_file_database", metaData->isFileBased(),
+                      QObject::tr("File-based database driver"));
     if (metaData->isFileBased()) {
-        properties["file_database_mimetypes"] = metaData->mimeTypes();
-        propertyCaptions["file_database_mimetypes"] = QObject::tr("File-based database's MIME types");
+        properties.insert("file_database_mimetypes", metaData->mimeTypes(),
+                          QObject::tr("File-based database's MIME types"));
     }
 
 #if 0
@@ -88,18 +86,19 @@ void DriverPrivate::initInternalProperties()
 #endif
 // properties["transaction_support"] = features & KDbDriver::TransactionsMask;
 // propertyCaptions["transaction_support"] = QObject::tr("Transaction support");
-    properties["transaction_single"] = QVariant(features & KDbDriver::SingleTransactions);
-    propertyCaptions["transaction_single"] = QObject::tr("Single transactions support");
-    properties["transaction_multiple"] = QVariant(features & KDbDriver::MultipleTransactions);
-    propertyCaptions["transaction_multiple"] = QObject::tr("Multiple transactions support");
-    properties["transaction_nested"] = QVariant(features & KDbDriver::NestedTransactions);
-    propertyCaptions["transaction_nested"] = QObject::tr("Nested transactions support");
+    properties.insert("transactions_single", bool(features & KDbDriver::SingleTransactions),
+                      QObject::tr("Single transactions support"));
+    properties.insert("transactions_multiple", bool(features & KDbDriver::MultipleTransactions),
+                      QObject::tr("Multiple transactions support"));
+    properties.insert("transactions_nested", bool(features & KDbDriver::NestedTransactions),
+                      QObject::tr("Nested transactions support"));
+    properties.insert("transactions_ignored", bool(features & KDbDriver::IgnoreTransactions),
+                      QObject::tr("Ignored transactions support"));
+    //! @todo more KDbDriver::Features
 
     const KDbVersionInfo v(KDb::version());
-    properties["kdb_driver_version"] =
-        QString::fromLatin1("%1.%2").arg(v.major()).arg(v.minor());
-    propertyCaptions["kdb_driver_version"] =
-        QObject::tr("KDb driver version");
+    properties.insert("kdb_driver_version", QString::fromLatin1("%1.%2.%3").arg(v.major()).arg(v.minor()).arg(v.release()),
+                      QObject::tr("KDb driver version"));
 }
 
 DriverPrivate::~DriverPrivate()

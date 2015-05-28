@@ -199,8 +199,10 @@ public:
 class DriverPrivate
 {
 public:
-    DriverPrivate();
+    explicit DriverPrivate(KDbDriver *aDriver);
     virtual ~DriverPrivate();
+
+    KDbDriver *driver;
 
     QSet<KDbConnection*> connections;
 
@@ -221,15 +223,15 @@ public:
     //! real type names for this engine
     QVector<QString> typeNames;
 
-    /*! Driver properties dictionary (indexed by name),
-     useful for presenting properties to the user.
-     Set available properties here in driver implementation. */
-    QHash<QByteArray, QVariant> properties;
-
-    /*! i18n-ed captions for properties. You do not need
-     to set predefined properties' caption in driver implementation
-     -it's done automatically. */
-    QHash<QByteArray, QString> propertyCaptions;
+    /*! Driver properties (indexed by name), useful for presenting properties to the user.
+     Contains i18n-ed captions.
+     In driver implementations available properties can be initialized, for example:
+     @code
+        d->properties.insert("maximum_performance", 1000, QObject::tr("Maximum performance"));
+     @endcode
+     You do not need to set captions of properties predefined by the KDbDriver superclass,
+     they will be reused. Predefined properties are set in KDbDriver. */
+    KDbUtils::PropertySet properties;
 
     /*! Provides a number of database administration tools for the driver. */
     KDbAdminTools *adminTools;

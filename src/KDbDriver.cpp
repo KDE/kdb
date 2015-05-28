@@ -53,7 +53,7 @@ static const char* const KDb_defaultSQLTypeNames[] = {
 KDbDriver::KDbDriver(QObject *parent, const QVariantList &args)
  : QObject(parent)
  , beh(new KDbDriverBehaviour())
- , d(new DriverPrivate())
+ , d(new DriverPrivate(this))
 {
     Q_UNUSED(args);
     d->typeNames.resize(KDbField::LastType + 1);
@@ -253,19 +253,14 @@ KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
     return KDb::dateTimeToSQL(v);
 }
 
-QVariant KDbDriver::propertyValue(const QByteArray& propName) const
+KDbUtils::Property KDbDriver::internalProperty(const QByteArray& name) const
 {
-    return d->properties.value(propName.toLower());
+    return d->properties.property(name);
 }
 
-QString KDbDriver::propertyCaption(const QByteArray& propName) const
+QList<QByteArray> KDbDriver::internalPropertyNames() const
 {
-    return d->propertyCaptions.value(propName.toLower());
-}
-
-QList<QByteArray> KDbDriver::propertyNames() const
-{
-    QList<QByteArray> names(d->properties.keys());
+    QList<QByteArray> names(d->properties.names());
     qSort(names);
     return names;
 }
