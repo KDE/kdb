@@ -64,22 +64,33 @@ void ConnectionTest::testCreateDb()
     conn = driver->createConnection(cdata);
     qDebug() << driver->result().message();
     QVERIFY2(!driver->result().isError() && conn, "Failed to create connection");
+    QVERIFY2(driver->connections().contains(conn), "Driver does not list created connection");
+    QCOMPARE(driver->connections().count(), 1);
+    //! @todo KDbDriver::metaData
 
     {
         QScopedPointer<KDbConnection> connGuard(conn);
 
         QVERIFY2(conn->connect(), "Failed to connect");
+        QVERIFY(conn->isConnected());
         if (conn->databaseExists(db_name)) {
             QVERIFY2(conn->dropDatabase(db_name), "Failed to drop database");
         }
+        QVERIFY2(!conn->databaseExists(db_name), "Database still exists after drop");
         QVERIFY2(conn->createDatabase(db_name), "Failed to create db");
+        QVERIFY2(conn->databaseExists(db_name), "Database does not exists after creation");
         QVERIFY2(conn->useDatabase(db_name), "Failed to use db");
+        QVERIFY(conn->isDatabaseUsed());
 
         QVERIFY2(tablesTest() == 0, "Failed to create test data");
 
+        QVERIFY2(conn->closeDatabase(), "Failed to close database");
+        QVERIFY2(!conn->isDatabaseUsed(), "Database still used after closing");
         QVERIFY2(conn->disconnect(), "Failed to disconnect database");
+        QVERIFY2(!conn->isConnected(), "Database still connected after disconnecting");
     }
     conn = 0;
+    QVERIFY(driver->connections().isEmpty());
 }
 
 void ConnectionTest::cleanupTestCase()
