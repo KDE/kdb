@@ -70,29 +70,27 @@ static QList<QPluginLoader *> findPlugins(const QString &path, const QString &se
         if (dirIter.fileInfo().isFile()) {
             QPluginLoader *loader = new QPluginLoader(dirIter.filePath());
             QJsonObject json = loader->metaData().value(QLatin1String("MetaData")).toObject();
-
             if (json.isEmpty()) {
-                qDebug() << dirIter.filePath() << "has no json!";
+                //qDebug() << dirIter.filePath() << "has no json!";
+                continue;
             }
-            if (!json.isEmpty()) {
-                QJsonObject pluginData = json.value(QLatin1String("KPlugin")).toObject();
-                if (!pluginData.value(QLatin1String("ServiceTypes")).toArray()
-                        .contains(QJsonValue(servicetype)))
-                {
+            QJsonObject pluginData = json.value(QLatin1String("KPlugin")).toObject();
+            if (!pluginData.value(QLatin1String("ServiceTypes")).toArray()
+                    .contains(QJsonValue(servicetype)))
+            {
+                continue;
+            }
+
+            if (!mimetype.isEmpty()) {
+                QStringList mimeTypes = json.value(QLatin1String("X-KDE-ExtraNativeMimeTypes"))
+                        .toString().split(QLatin1Char(','));
+                mimeTypes += json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
+                mimeTypes += json.value(QLatin1String("X-KDE-NativeMimeType")).toString();
+                if (! mimeTypes.contains(mimetype)) {
                     continue;
                 }
-
-                if (!mimetype.isEmpty()) {
-                    QStringList mimeTypes = json.value(QLatin1String("X-KDE-ExtraNativeMimeTypes"))
-                            .toString().split(QLatin1Char(','));
-                    mimeTypes += json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
-                    mimeTypes += json.value(QLatin1String("X-KDE-NativeMimeType")).toString();
-                    if (! mimeTypes.contains(mimetype)) {
-                        continue;
-                    }
-                }
-                list.append(loader);
             }
+            list.append(loader);
         }
     }
     return list;
