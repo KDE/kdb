@@ -29,9 +29,9 @@ int main(int argc, char * argv[])
 {
     KComponentData componentData("newapi");
     KDbDriverManager manager;
-    QStringList names = manager.driverNames();
+    QStringList driverIds = manager.driverIds();
     qDebug() << "DRIVERS: ";
-    for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it)
+    for (QStringList::ConstIterator it = driverIds.constBegin(); it != driverIds.constEnd() ; ++it)
         qDebug() << *it;
     if (manager.error()) {
         qDebug() << manager.errorMsg();

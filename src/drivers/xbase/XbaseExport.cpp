@@ -261,8 +261,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
     return false;
   }
 
-  KDbDriver *sourceDriver = drvManager.driver(
-    m_migrateData->source->driverName);
+  KDbDriver *sourceDriver = drvManager.driver(m_migrateData->source->driverId);
   if (!sourceDriver) {
     result->setStatus(&drvManager,
       tr("Could not export back to destination database"));

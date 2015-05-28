@@ -74,7 +74,7 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   kexiConnectionData = new KDbConnectionData();
 
   // set destination file name here.
-  kexiConnectionData->driverName = KDb::defaultFileBasedDriverName();
+  kexiConnectionData->driverId = KDb::defaultFileBasedDriverId();
   kexiConnectionData->setFileName( tempDatabase );
   KDbDrvDbg << "Current file name: " << tempDatabase;
 
@@ -82,7 +82,7 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   QString sourceDriverId = "xbase";
   // get the source migration driver
   KexiMigration::KexiMigrate* sourceDriver = 0;
-  sourceDriver = xBase2KexiMigrateManager.driver( sourceDriverName );
+  sourceDriver = xBase2KexiMigrateManager.driver( sourceDriverId );
   if(!sourceDriver || xBase2KexiMigrateManager.error()) {
     KDbDrvDbg << "Import migrate driver error...";
     return false;

@@ -46,7 +46,7 @@ xBaseDriver::xBaseDriver()
   ,dp( new xBaseDriverPrivate() )
 {
   KDbDriverManager manager;
-  dp->internalDriver = manager.driver(KDb::defaultFileBasedDriverName());
+  dp->internalDriver = manager.driver(KDb::defaultFileBasedDriverId());
 
 //  d->isFileDriver = true ;
   d->isDBOpenedAfterCreate = true;
