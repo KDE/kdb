@@ -101,7 +101,7 @@ char xBaseExportPrivate::type(KDbField::Type fieldType)
 
 bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecordData* recordData ) {
 
-// 	PreDrvDbg<<recordData->debugString();
+// 	KDbDrvDbg<<recordData->debugString();
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toLatin1();
   xbDbf* table = xbase.GetDbfPtr( pathNameBa.constData() );
@@ -117,19 +117,19 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecor
     // we use size()+1 as size to accommodate `\0`
     table->UpdateMemoData(i, stringData.size()+1, stringData.constData(), F_SETLKW );
   #else
-    PreDrvDbg<<"XB_MEMO_FIELDS support disabled during compilation of XBase libraries";
+    KDbDrvDbg<<"XB_MEMO_FIELDS support disabled during compilation of XBase libraries";
   #endif
   } else {
     if ((returnCode = table->PutField( i, stringData.constData())) != XB_NO_ERROR ) {
       switch(returnCode) {
       case XB_INVALID_FIELDNO:
-        PreDrvDbg<<"Invalid field number "<<i;
+        KDbDrvDbg<<"Invalid field number "<<i;
         return false;
       case XB_INVALID_DATA:
-        PreDrvDbg<<"Invalid data "<<stringData;
+        KDbDrvDbg<<"Invalid data "<<stringData;
         return false;
       default:
-        PreDrvDbg<<"Error number "<<returnCode<<" has occurred";
+        KDbDrvDbg<<"Error number "<<returnCode<<" has occurred";
         return false;
     }
     }
@@ -137,13 +137,13 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecor
   }
 
   if((returnCode = table->AppendRecord()) != XB_NO_ERROR) {
-    PreDrvDbg << "\nxBase Error " << returnCode << " appending data record.";
+    KDbDrvDbg << "\nxBase Error " << returnCode << " appending data record.";
     return false;
   }
 
 // 	// for debugging purposes only
 // 	for ( uint i=0; i< (uint)recordData->size(); ++i ) {
-// 		PreDrvDbg<<table->GetField(i);
+// 		KDbDrvDbg<<table->GetField(i);
 // 	}
 
   return true;
@@ -218,7 +218,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KDbTableS
     if (f->isUniqueKey() || f->isPrimaryKey()) {
 
       if ((returnCode = index.CreateIndex(indexNameBa.constData(), fieldNameBa.constData(), XB_UNIQUE, XB_OVERLAY)) != XB_NO_ERROR ) {
-        PreDrvDbg<<"Couldn't create unique index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
+        KDbDrvDbg<<"Couldn't create unique index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
         return false;
       }
       index.CloseIndex();
@@ -226,7 +226,7 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KDbTableS
     } else if ( f->isIndexed() ) {
 
       if ((returnCode = index.CreateIndex(indexNameBa.constData(), fieldNameBa.constData(), XB_NOT_UNIQUE, XB_OVERLAY)) != XB_NO_ERROR ) {
-        PreDrvDbg<<"Couldn't create index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
+        KDbDrvDbg<<"Couldn't create index for fieldName "<<fieldName<<" on table "<<sourceTableName<<" Error Code "<<returnCode;
         return false;
       }
       index.CloseIndex();
@@ -256,7 +256,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   KDbDriverManager drvManager;
 
   if (!m_migrateData) {
-    PreDrvDbg<<"Migration Data not set yet !!";
+    KDbDrvDbg<<"Migration Data not set yet !!";
     result->setStatus(&drvManager, tr("Data not set for migration"));
     return false;
   }
@@ -271,7 +271,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   // connect to destination database
   if (!dest_connect()) {
-    PreDrvDbg<<"Couldn't connect to destination database";
+    KDbDrvDbg<<"Couldn't connect to destination database";
     if (result)
       result->setStatus(tr("Could not connect to data source \"%1\".",
         m_migrateData->destination->connectionData()->serverInfoString()), "");
@@ -281,16 +281,16 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   KDbConnection* sourceConn = sourceDriver->createConnection(*(m_migrateData->source));
 
   if (!sourceConn || sourceDriver->error()) {
-    PreDrvDbg<<"Export failed";
+    KDbDrvDbg<<"Export failed";
     return false;
   }
   if (!sourceConn->connect()) {
-    PreDrvDbg<<"Export failed.Could not connect";
+    KDbDrvDbg<<"Export failed.Could not connect";
     return false;
   }
 
   if (!sourceConn->useDatabase(m_migrateData->sourceName)) {
-    PreDrvDbg<<"Couldn't use database "<<m_migrateData->sourceName;
+    KDbDrvDbg<<"Couldn't use database "<<m_migrateData->sourceName;
     return false;
   }
 
@@ -298,7 +298,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   // Check if there are any tables
   if (tables.isEmpty()) {
-    PreDrvDbg << "There were no tables to export";
+    KDbDrvDbg << "There were no tables to export";
     if (result)
       result->setStatus(
         tr("No tables to export found in data source \"%1\".",
@@ -324,7 +324,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
     if (m_migrateData->keepData) {
       if (!dest_copyTable(tableCaption, sourceConn, tableSchema)) {
-        PreDrvDbg << "Failed to copy table " << tableCaption;
+        KDbDrvDbg << "Failed to copy table " << tableCaption;
         if (result)
           result->setStatus(sourceConn,
               tr("Could not copy table \"%1\" to destination database.", tableCaption));
@@ -409,7 +409,7 @@ bool xBaseExport::dest_createTable(const QString& originalName, KDbTableSchema* 
   xBaseTable->SetVersion( 4 ); // create dbase IV style files
   xbShort returnCode;
   if (( returnCode = xBaseTable->CreateDatabase( pathNameBa.constData() , xBaseTableSchema, XB_OVERLAY ))  != XB_NO_ERROR ) {
-    PreDrvDbg<<"Error creating table "<<originalName<<" Error Code "<<returnCode;
+    KDbDrvDbg<<"Error creating table "<<originalName<<" Error Code "<<returnCode;
     return false;
   }
 
@@ -442,7 +442,7 @@ bool xBaseExport::dest_copyTable(const QString& srcTableName, KDbConnection *src
       return false;
     }
     if (!d->appendRecord(srcTableName, record)) {
-      PreDrvDbg<<"Couldn't append record";
+      KDbDrvDbg<<"Couldn't append record";
       return false;
     }
 

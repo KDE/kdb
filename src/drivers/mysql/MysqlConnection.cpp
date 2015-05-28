@@ -99,7 +99,7 @@ KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_opti
 
 bool MysqlConnection::drv_getDatabasesList(QStringList* list)
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     list->clear();
     MYSQL_RES *res = mysql_list_dbs(d->mysql, 0);
     if (res != 0) {
@@ -134,7 +134,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
 bool MysqlConnection::drv_createDatabase(const QString &dbName)
 {
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    PreDrvDbg << storedDbName;
+    KDbDrvDbg << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
     if (drv_executeSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))

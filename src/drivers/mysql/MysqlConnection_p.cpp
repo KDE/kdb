@@ -62,7 +62,7 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
     if (!(mysql = mysql_init(mysql)))
         return false;
 
-    PreDrvDbg;
+    KDbDrvDbg;
     QByteArray localSocket;
     QString hostName = data.hostName();
     if (   hostName.isEmpty()
@@ -110,7 +110,7 @@ bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
     mysql = 0;
-    PreDrvDbg;
+    KDbDrvDbg;
     return true;
 }
 

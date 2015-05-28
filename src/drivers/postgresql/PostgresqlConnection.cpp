@@ -70,7 +70,7 @@ KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor
 
 bool PostgresqlConnection::drv_connect()
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     return true;
 }
 
@@ -100,7 +100,7 @@ bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 
 bool PostgresqlConnection::drv_disconnect()
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     return true;
 }
 
@@ -199,7 +199,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 
 bool PostgresqlConnection::drv_closeDatabase()
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     PQclear(d->res);
     d->res = 0;
     PQfinish(d->conn);
@@ -209,7 +209,7 @@ bool PostgresqlConnection::drv_closeDatabase()
 
 bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 {
-    PreDrvDbg << dbName;
+    KDbDrvDbg << dbName;
 
     //FIXME Maybe should check that dbname is no the currentdb
     if (executeSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))

@@ -113,7 +113,7 @@ QVariant MysqlCursor::value(uint pos)
  */
 bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
-// PreDrvDbg << "position is " << (long)m_at;
+// KDbDrvDbg << "position is " << (long)m_at;
     if (d->numRows == 0)
         return false;
 

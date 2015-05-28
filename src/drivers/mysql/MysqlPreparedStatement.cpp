@@ -32,7 +32,7 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
 #endif
         , m_resetRequired(false)
 {
-// PreDrvDbg;
+// KDbDrvDbg;
     mysql_owned = false;
     mysql = dynamic_cast<KDbMysqlConnectionInternal&>(*conn).mysql; //copy
     if (!init())

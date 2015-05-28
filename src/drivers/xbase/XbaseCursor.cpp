@@ -66,7 +66,7 @@ void xBaseCursor::init() {
 
 bool xBaseCursor::drv_open(const KDbEscapedString& sql)
 {
-//	PreDrvDbg << m_sql;
+//	KDbDrvDbg << m_sql;
   if (!d->internalCursor) {
     return false;
   }

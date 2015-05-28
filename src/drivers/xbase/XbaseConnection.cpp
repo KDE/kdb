@@ -70,7 +70,7 @@ KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_opti
 
 bool xBaseConnection::drv_getDatabasesList(QStringList* list)
 {
-  PreDrvDbg;
+  KDbDrvDbg;
 
   //! TODO Check whether this is the right thing to do
   *list += QStringList( d->dbMap.keys() );
@@ -80,7 +80,7 @@ bool xBaseConnection::drv_getDatabasesList(QStringList* list)
 
 bool xBaseConnection::drv_createDatabase( const QString &dbName) {
   //! TODO Check whether this function has any use.
-  PreDrvDbg << dbName;
+  KDbDrvDbg << dbName;
 //	return d->internalConn->createDatabase(d->dbMap[dbName]);
   return true;
 }
