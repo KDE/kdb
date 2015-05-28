@@ -536,7 +536,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
 
     //low-level create
     if (!drv_createDatabase(dbName)) {
-        m_result = KDbResult(QObject::tr("Error creating database \"%1\" on the server.").arg(dbName));
+        m_result.prependMessage(QObject::tr("Error creating database \"%1\" on the server.").arg(dbName));
         closeDatabase();//sanity
         return false;
     }
@@ -644,11 +644,15 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
         //-get global database information
         bool ok;
         const int major = d->dbProperties.value(QLatin1String("kdb_major_ver")).toInt(&ok);
-        if (!ok)
+        if (!ok) {
+            m_result = d->dbProperties.result();
             return false;
+        }
         const int minor = d->dbProperties.value(QLatin1String("kdb_minor_ver")).toInt(&ok);
-        if (!ok)
+        if (!ok) {
+            m_result = d->dbProperties.result();
             return false;
+        }
         d->databaseVersion.setMajor(major);
         d->databaseVersion.setMinor(minor);
     }

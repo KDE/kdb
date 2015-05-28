@@ -388,24 +388,21 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString& msg, QStr
     if (!result.recentSQLString().isEmpty())
         details += QLatin1String("<p><b>") + QObject::tr("SQL statement:")
                    + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
-    int serverResultCode;
+    int serverErrorCode;
     QString serverResultName;
-    if (result.serverResultCode() != 0) {
-        serverResultCode = result.serverResultCode();
+    if (result.isError()) {
+        serverErrorCode = result.serverErrorCode();
         serverResultName = resultable.serverResultName();
-    } /*else {
-        serverResultCode = result.previousServerResultCode();
-        serverResultName = result.previousServerResultName();
-    }*/
+    }
     if (   !details.isEmpty()
         && (   !result.serverMessage().isEmpty()
             || !result.recentSQLString().isEmpty()
             || !serverResultName.isEmpty()
-            || serverResultCode != 0)
+            || serverErrorCode != 0)
            )
     {
         details += (QLatin1String("<p><b>") + QObject::tr("Server result code:")
-                    + QLatin1String("</b> ") + QString::number(serverResultCode));
+                    + QLatin1String("</b> ") + QString::number(serverErrorCode));
         if (!serverResultName.isEmpty()) {
             details += QString::fromLatin1(" (%1)").arg(serverResultName);
         }

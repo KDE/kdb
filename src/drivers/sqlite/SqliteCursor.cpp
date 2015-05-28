@@ -173,16 +173,15 @@ bool SQLiteCursor::drv_open(const KDbEscapedString& sql)
         return false;
     }
 
-    m_result.setServerResultCode(
-        sqlite3_prepare(
+    int res = sqlite3_prepare(
                  d->data,            /* Database handle */
                  sql.constData(),       /* SQL statement, UTF-8 encoded */
                  sql.length(),             /* Length of zSql in bytes. */
                  &d->prepared_st_handle,  /* OUT: Statement handle */
                  0/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
-             )
-    );
-    if (m_result.serverResultCode() != SQLITE_OK) {
+             );
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
         storeResult();
         return false;
     }
@@ -196,10 +195,9 @@ bool SQLiteCursor::drv_open(const KDbEscapedString& sql)
 
 bool SQLiteCursor::drv_close()
 {
-    m_result.setServerResultCode(
-        sqlite3_finalize(d->prepared_st_handle)
-    );
-    if (m_result.serverResultCode() != SQLITE_OK) {
+    int res = sqlite3_finalize(d->prepared_st_handle);
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
         storeResult();
         return false;
     }
@@ -208,10 +206,8 @@ bool SQLiteCursor::drv_close()
 
 void SQLiteCursor::drv_getNextRecord()
 {
-    m_result.setServerResultCode(
-        sqlite3_step(d->prepared_st_handle)
-    );
-    if (m_result.serverResultCode() == SQLITE_ROW) {
+    int res = sqlite3_step(d->prepared_st_handle);
+    if (res == SQLITE_ROW) {
         m_fetchResult = FetchOK;
         m_fieldCount = sqlite3_data_count(d->prepared_st_handle);
 //#else //for SQLITE3 data fetching is delayed. Now we even do not take field count information
@@ -219,10 +215,12 @@ void SQLiteCursor::drv_getNextRecord()
         m_fieldsToStoreInRecord = m_fieldCount;
     }
     else {
-        if (m_result.serverResultCode() == SQLITE_DONE)
+        if (res == SQLITE_DONE) {
             m_fetchResult = FetchEnd;
-        else
+        } else {
+            m_result.setServerErrorCode(res);
             m_fetchResult = FetchError;
+        }
     }
 
     //debug
@@ -340,11 +338,11 @@ QVariant SQLiteCursor::value(uint i)
 
 QString SQLiteCursor::serverResultName() const
 {
-    return SQLiteConnectionInternal::serverResultName(m_result.serverResultCode());
+    return SQLiteConnectionInternal::serverResultName(m_result.serverErrorCode());
 }
 
 void SQLiteCursor::storeResult()
 {
     m_result.setServerMessage(
-        QLatin1String( (d->data && m_result.serverResultCode() != SQLITE_OK) ? sqlite3_errmsg(d->data) : 0 ));
+        QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));
 }

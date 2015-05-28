@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -51,20 +51,34 @@ void KDbResult::init(int code, const QString& message)
         d->message = QObject::tr("Unspecified error encountered");
     else
         d->message = message;
-    d->hasError = d->code != ERR_NONE;
 //! @todo
 /*    if (m_hasError)
         ERRMSG(this);*/
 }
 
+bool KDbResult::isError() const
+{
+    return d->code != ERR_NONE
+            || d->serverErrorCodeSet
+            || !d->message.isEmpty()
+            || !d->messageTitle.isEmpty()
+            || !d->errorSql.isEmpty()
+            || !d->serverMessage.isEmpty();
+}
+
+void KDbResult::setServerErrorCode(int errorCode)
+{
+    d->serverErrorCode = errorCode;
+    d->serverErrorCodeSet = true;
+}
+
 void KDbResult::prependMessage(int code, const QString& message)
 {
-    if (d->code == 0) {
-        if (code == 0)
+    if (d->code == ERR_NONE) {
+        if (code == ERR_NONE)
             d->code = ERR_OTHER;
         else
             d->code = code;
-        d->hasError = d->code != ERR_NONE;
     }
     if (!message.isEmpty()) {
         if (d->message.isEmpty())
@@ -80,6 +94,11 @@ void KDbResult::prependMessage(int code, const QString& message)
 #endif
 }
 
+void KDbResult::prependMessage(const QString& message)
+{
+    prependMessage(ERR_NONE, message);
+}
+
 QDebug operator<<(QDebug dbg, const KDbResult& result)
 {
     if (result.isError()) {
@@ -93,11 +112,9 @@ QDebug operator<<(QDebug dbg, const KDbResult& result)
             dbg.space() << "SQL=" << result.sql();
         if (!result.errorSql().isEmpty())
             dbg.space() << "ERR_SQL=" << result.errorSql();
-        dbg.space() << "SERVER_RESULT=(CODE:" << result.serverResultCode() /*<< "NAME:" << result.serverResultName()*/ << ")";
+        dbg.space() << "SERVER_ERROR=" << result.serverErrorCode() /*<< "NAME:" << result.serverResultName()*/;
         if (!result.serverMessage().isEmpty())
             dbg.nospace() << "MESSAGE:" << result.serverMessage();
-        /*dbg.space() << "PREV_SERVER_RESULT=(CODE:" << result.previousServerResultCode() << "NAME:" <<
-             result.previousServerResultName() << ")";*/
     } else {
         dbg.nospace() << "KDbResult: OK";
     }

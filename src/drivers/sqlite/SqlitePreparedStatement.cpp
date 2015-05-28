@@ -39,26 +39,29 @@ SQLitePreparedStatement::~SQLitePreparedStatement()
 
 bool SQLitePreparedStatement::prepare(const KDbEscapedString& sql)
 {
-    m_result.setServerResultCode(
-        sqlite3_prepare(
+    int res = sqlite3_prepare(
             data,                    /* Database handle */
             sql.toByteArray().constData(), /* SQL statement, UTF-8 encoded */
             sql.length(),            /* Length of zSql in bytes. */
             &m_handle,               /* OUT: Statement handle */
             0                        /* OUT: Pointer to unused portion of zSql */
-        )
-    );
-    //! @todo copy error msg
-    return m_result.serverResultCode() == SQLITE_OK;
+        );
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
+        m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+        return false;
+    }
+    return true;
 }
 
 bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, int par)
 {
     if (value.isNull()) {
         //no value to bind or the value is null: bind NULL
-        m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
+        int res = sqlite3_bind_null(m_handle, par);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
             return false;
         }
         return true;
@@ -66,11 +69,11 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     if (field->isTextType()) {
         //! @todo optimize: make a static copy so SQLITE_STATIC can be used
         const QByteArray utf8String(value.toString().toUtf8());
-        m_result.setServerResultCode(
-            sqlite3_bind_text(m_handle, par,
-                              utf8String.constData(), utf8String.length(), SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
+        int res = sqlite3_bind_text(m_handle, par,
+                                    utf8String.constData(), utf8String.length(), SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
             return false;
         }
         return true;
@@ -84,105 +87,117 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
         bool ok;
         const int intValue = value.toInt(&ok);
         if (ok) {
-            m_result.setServerResultCode(sqlite3_bind_int(m_handle, par, intValue));
-            if (SQLITE_OK != m_result.serverResultCode()) {
-                //! @todo msg?
+            int res = sqlite3_bind_int(m_handle, par, intValue);
+            if (res != SQLITE_OK) {
+                m_result.setServerErrorCode(res);
+                m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
                 return false;
             }
         } else {
-            m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
-            if (SQLITE_OK != m_result.serverResultCode()) {
-                //! @todo msg?
+            int res = sqlite3_bind_null(m_handle, par);
+            if (res != SQLITE_OK) {
+                m_result.setServerErrorCode(res);
+                m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
                 return false;
             }
         }
         break;
     }
     case KDbField::Float:
-    case KDbField::Double:
-        m_result.setServerResultCode(sqlite3_bind_double(m_handle, par, value.toDouble()));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
+    case KDbField::Double: {
+        int res = sqlite3_bind_double(m_handle, par, value.toDouble());
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
             return false;
         }
         break;
+    }
     case KDbField::BigInteger: {
         //! @todo what about unsigned > LLONG_MAX ?
         bool ok;
         const qint64 int64Value = value.toLongLong(&ok);
         if (ok) {
-            m_result.setServerResultCode(sqlite3_bind_int64(m_handle, par, int64Value));
-            if (SQLITE_OK != m_result.serverResultCode()) {
-                //! @todo msg?
+            int res = sqlite3_bind_int64(m_handle, par, int64Value);
+            if (res != SQLITE_OK) {
+                m_result.setServerErrorCode(res);
+                m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
                 return false;
             }
         } else {
-            m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
-            if (SQLITE_OK != m_result.serverResultCode()) {
-                //! @todo msg?
+            int res = sqlite3_bind_null(m_handle, par);
+            if (res != SQLITE_OK) {
+                m_result.setServerErrorCode(res);
+                m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
                 return false;
             }
         }
         break;
     }
-    case KDbField::Boolean:
-        m_result.setServerResultCode(
-            sqlite3_bind_text(m_handle, par, value.toBool() ? "1" : "0",
-                              1, SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
-            return false;
-        }
-        break;
-    case KDbField::Time:
-        m_result.setServerResultCode(
-            sqlite3_bind_text(m_handle, par,
-                              value.toTime().toString(Qt::ISODate).toLatin1().constData(),
-                              QLatin1String("HH:MM:SS").size(), SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
-            return false;
-        }
-        break;
-    case KDbField::Date:
-        m_result.setServerResultCode(
-            sqlite3_bind_text(m_handle, par,
-                              value.toDate().toString(Qt::ISODate).toLatin1().constData(),
-                              QLatin1String("YYYY-MM-DD").size(), SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
-            return false;
-        }
-        break;
-    case KDbField::DateTime:
-        m_result.setServerResultCode(
-            sqlite3_bind_text(m_handle, par,
-                              value.toDateTime().toString(Qt::ISODate).toLatin1().constData(),
-                              QLatin1String("YYYY-MM-DDTHH:MM:SS").size(), SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
-            return false;
-        }
-        break;
-    case KDbField::BLOB: {
-        const QByteArray byteArray(value.toByteArray());
-        m_result.setServerResultCode(
-            sqlite3_bind_blob(m_handle, par,
-                              byteArray.constData(), byteArray.size(), SQLITE_TRANSIENT /*??*/));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
+    case KDbField::Boolean: {
+        int res = sqlite3_bind_text(m_handle, par, value.toBool() ? "1" : "0",
+                                    1, SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
             return false;
         }
         break;
     }
-    default:
-        KDbWarn << "unsupported field type:"
-                << field->type() << "- NULL value bound to column #" << par;
-        m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
-        if (SQLITE_OK != m_result.serverResultCode()) {
-            //! @todo msg?
+    case KDbField::Time: {
+        int res = sqlite3_bind_text(m_handle, par,
+                                    value.toTime().toString(Qt::ISODate).toLatin1().constData(),
+                                    QLatin1String("HH:MM:SS").size(), SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
             return false;
         }
+        break;
+    }
+    case KDbField::Date: {
+        int res = sqlite3_bind_text(m_handle, par,
+                                    value.toDate().toString(Qt::ISODate).toLatin1().constData(),
+                                    QLatin1String("YYYY-MM-DD").size(), SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+            return false;
+        }
+        break;
+    }
+    case KDbField::DateTime: {
+        int res = sqlite3_bind_text(m_handle, par,
+                                value.toDateTime().toString(Qt::ISODate).toLatin1().constData(),
+                                QLatin1String("YYYY-MM-DDTHH:MM:SS").size(), SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+            return false;
+        }
+        break;
+    }
+    case KDbField::BLOB: {
+        const QByteArray byteArray(value.toByteArray());
+        int res = sqlite3_bind_blob(m_handle, par,
+                                    byteArray.constData(), byteArray.size(), SQLITE_TRANSIENT /*??*/);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+            return false;
+        }
+        break;
+    }
+    default: {
+        KDbWarn << "unsupported field type:"
+                << field->type() << "- NULL value bound to column #" << par;
+        int res = sqlite3_bind_null(m_handle, par);
+        if (res != SQLITE_OK) {
+            m_result.setServerErrorCode(res);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+            return false;
+        }
+    }
     } //switch
     return true;
 }
@@ -209,13 +224,15 @@ bool SQLitePreparedStatement::execute(
 
     //real execution
     sqlite3_step(m_handle);
-    m_result.setServerResultCode(sqlite3_reset(m_handle));
-    if (type == KDbPreparedStatement::InsertStatement && SQLITE_OK == m_result.serverResultCode()) {
+    int res = sqlite3_reset(m_handle);
+    if (type == KDbPreparedStatement::InsertStatement && res == SQLITE_OK) {
         return true;
     }
     if (type == KDbPreparedStatement::SelectStatement) {
         //fetch result
         //! @todo
     }
+    m_result.setServerErrorCode(res);
+    m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
     return false;
 }

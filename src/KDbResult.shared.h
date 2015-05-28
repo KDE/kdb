@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -26,36 +26,29 @@
 
 class KDbMessageHandler;
 
-/*! Stores result of the operation.
+/*! Stores detailed information about result of recent operation.
 */
 shared class export=KDB_EXPORT virtual_dtor KDbResult
 {
 public:
     /*!
     @getter
-    @return result code, defaults to 0.
+    @return result code, default is ERR_NONE (0).
     @setter
     Sets the result code if there was error.
     */
-    data_member int code default=0 default_setter=ERR_OTHER;
+    data_member int code default=ERR_NONE default_setter=ERR_OTHER;
 
     /*!
     @getter
-    @return true if there is error.
-    */
-    data_member bool hasError default=false getter=isError no_setter;
-
-    /*!
-    @getter
-    @return engine-specific last server-side operation result number.
+    @return an implementation-specific last server-side operation result number.
     Use this to give users more precise information about the result.
 
     For example, use this for your driver - default implementation just returns 0.
-    Note that this result value is not the same as the one returned
-    by code() (KDbObject::m_errno member)
+    Note that this value is not the same as the one returned by code().
     @sa serverMessage()
     */
-    data_member int serverResultCode default=0;
+    data_member int serverErrorCode default=0 no_setter;
 
     /*!
     @getter
@@ -79,25 +72,35 @@ public:
     /*!
     @getter
     @return message from server.
-    KDb library offers detailed result numbers using resultCode()
-    and detailed result i18n-ed messages using message().
-    This information is not engine-dependent (almost).
-    Use this in your code to give users more information on the result of operatoim.
-    This method returns (non-i18n-ed !) engine-specific message,
-    if there was any error during last server-side operation,
-    otherwise empty string.
+    KDb framework offers detailed result numbers using resultCode() and detailed
+    result i18n-ed messages using message(). These both are (almost) not engine-dependent.
+    Use setServerMessage() to users more information on the result of operation that is
+    non-i18n-ed and engine-specific, usually coming from the server server side.
     @setter
-    Sets message from server.
+    Sets message from the server.
     */
     data_member QString serverMessage;
+
+    data_member bool serverErrorCodeSet default=false no_getter no_setter;
 
     KDbResult(int code, const QString& message);
 
     explicit KDbResult(const QString& message);
 
+    //! @return true if there is an error i.e. a nonempty message, error code other
+    //!         than ERR_NONE or server result has been set.
+    bool isError() const;
+
+    //! Sets an implementation-specific error code of server-side operation.
+    //! Use this to give users more precise information. Implies isError() == true.
+    //! The only way to clear already set server result code is to create a new KDbResult object.
+    void setServerErrorCode(int errorCode);
+
+    //! Sets result code and prepends message to an existing message.
     void prependMessage(int code, const QString& message);
 
-    void prependMessage(const QString& message) { prependMessage(0, message); }
+    //! Prepends message to an existing message.
+    void prependMessage(const QString& message);
 
     //! Efficient clearing of the sql attribute, equivalent of setSql(QString()).
     void clearSql() {
@@ -163,7 +166,7 @@ public:
     void clearResult();
 
     /*!
-    @return engine-specific last server-side operation result name, (name for serverResultCode()).
+    @return engine-specific last server-side operation result name, a name for KDbResult::serverErrorCode().
     Use this in your application to give users more information on what's up.
 
     Use this for your driver - default implementation just returns empty string.

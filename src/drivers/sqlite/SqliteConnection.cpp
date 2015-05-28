@@ -132,7 +132,7 @@ SQLiteConnection::~SQLiteConnection()
 void SQLiteConnection::storeResult()
 {
     m_result.setServerMessage(
-        QLatin1String( (d->data && m_result.serverResultCode() != SQLITE_OK) ? sqlite3_errmsg(d->data) : 0 ));
+        QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));
 }
 
 bool SQLiteConnection::drv_connect()
@@ -226,18 +226,19 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 //    int allowReadonly = 1;
 //    const bool wasReadOnly = KDbConnection::isReadOnly();
 
-    m_result.setServerResultCode(
-        sqlite3_open_v2(
+    int res = sqlite3_open_v2(
                  data().databaseName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
                  0
-             )
-    );
+             );
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
+    }
     storeResult();
 
-    if (m_result.serverResultCode() == SQLITE_OK) {
+    if (!m_result.isError()) {
         // Set the secure-delete on, so SQLite overwrites deleted content with zeros.
         // The default setting is determined by the SQLITE_SECURE_DELETE compile-time option but we overwrite it here.
         // Works with 3.6.23. Earlier version just ignore this pragma.
@@ -248,15 +249,16 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
             return false;
         }
         // Load ICU extension for unicode collations
+        bool icuExtensionLoaded = false;
         const QStringList libraryPaths(KDb::libraryPaths());
-        QString icuExtensionFilename;
         foreach (const QString& path, libraryPaths) {
-            icuExtensionFilename = path + QLatin1String("/kdb_sqlite3_icu" KDB_SHARED_LIB_EXTENSION);
-            if (QFileInfo(icuExtensionFilename).exists() && loadExtension(icuExtensionFilename)) {
+            QString icuExtensionFilename = path + QLatin1String("/sqlite3/kdb_sqlite_icu" KDB_SHARED_LIB_EXTENSION);
+            if (loadExtension(icuExtensionFilename)) {
+                icuExtensionLoaded = true;
                 break;
             }
         }
-        if (icuExtensionFilename.isEmpty()) {
+        if (!icuExtensionLoaded) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -310,7 +312,7 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
                           "Could not gain exclusive access for writing the file. "
                           "Check the file's permissions and whether it is already opened and locked by another application."));
     }*/
-    return m_result.serverResultCode() == SQLITE_OK;
+    return res == SQLITE_OK;
 }
 
 void SQLiteConnection::drv_closeDatabaseSilently()
@@ -372,14 +374,15 @@ bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
 #endif
 
     char *errmsg_p = 0;
-    m_result.setServerResultCode(
-        sqlite3_exec(
+    int res = sqlite3_exec(
                  d->data,
                  sql.constData(),
                  0/*callback*/,
                  0,
-                 &errmsg_p)
-    );
+                 &errmsg_p);
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
+    }
     if (errmsg_p) {
         clearResult();
         m_result.setServerMessage(QLatin1String(errmsg_p));
@@ -388,9 +391,9 @@ bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
 
     storeResult();
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
+    KDb::debugGUI(QLatin1String( res == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
-    return m_result.serverResultCode() == SQLITE_OK;
+    return res == SQLITE_OK;
 }
 
 quint64 SQLiteConnection::drv_lastInsertRecordId()
@@ -400,7 +403,7 @@ quint64 SQLiteConnection::drv_lastInsertRecordId()
 
 QString SQLiteConnection::serverResultName() const
 {
-    return SQLiteConnectionInternal::serverResultName(m_result.serverResultCode());
+    return SQLiteConnectionInternal::serverResultName(m_result.serverErrorCode());
 }
 
 KDbPreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
@@ -419,20 +422,31 @@ bool SQLiteConnection::isReadOnly() const
 bool SQLiteConnection::loadExtension(const QString& path)
 {
     bool tempEnable = false;
+    clearResult();
+    QFileInfo fileInfo(path);
+    if (!fileInfo.exists()) {
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             QObject::tr("Could not find SQLite extension file \"%1\".").arg(path));
+        KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension";
+        return false;
+    }
     if (!d->extensionsLoadingEnabled()) {
         tempEnable = true;
         d->setExtensionsLoadingEnabled(true);
     }
     char *errmsg_p = 0;
-    m_result.setServerResultCode(
-        sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p));
-    bool ok = SQLITE_OK == m_result.serverResultCode();
-    KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
-            << path << ":" << errmsg_p;
-    if (errmsg_p) {
-        clearResult();
-        m_result.setServerMessage(QLatin1String(errmsg_p));
-        sqlite3_free(errmsg_p);
+    int res = sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p);
+    bool ok = res == SQLITE_OK;
+    if (!ok) {
+        m_result.setServerErrorCode(res);
+        m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
+                             QObject::tr("Could not load SQLite extension \"%1\".").arg(path));
+        KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
+                << path << ":" << errmsg_p;
+        if (errmsg_p) {
+            m_result.setServerMessage(QLatin1String(errmsg_p));
+            sqlite3_free(errmsg_p);
+        }
     }
     if (tempEnable) {
         d->setExtensionsLoadingEnabled(false);
