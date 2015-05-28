@@ -68,56 +68,67 @@
 
 
 /*! @namespace KDb
-@brief High-level database connectivity library with database backend drivers
+@brief A database connectivity and creation framework
+
+KDb is consisted of a general-purpose C++ Qt library and set of plugins delivering support
+for various database vendors.
 
 @section Framework
 KDbDriverManager
+KDbDriverMetaData
+KDbDriver
 
 Database access
  - KDbConnection
  - KDbConnectionData
+ - KDbTransaction
+ - KDbRecordEditBuffer
+ - KDbPreparedStatement
 
 Database structure
  - Schema
   - KDbTableSchema
   - KDbQuerySchema
+  - KDbQuerySchemaParameter
+  - KDbQueryColumnInfo
+  - KDbTableOrQuerySchema
   - KDbIndexSchema
-
-Stored in the database.
+  - KDbFieldList
+  - KDbLookupFieldSchema
+  - KDbRelationship
+  - KDbParser
+  - KDbExpression
 
 Data representation
- - KDbRecord
  - KDbField
+ - KDbRecordData
+ - KDbTableViewData
+ - KDbTableViewColumn
+
+Tools
+ - KDbObject
+ - KDbEscapedString
+ - KDbMessageHandler
+ - KDbProperties
+ - KDbAdmin
+ - KDbAlter
+ - KDbValidator
+ - KDbUtils
 
 @section Drivers
 
-Drivers are loaded using KDbDriverManager::driver(const QString& name).  The names
-of drivers are given in their drivers .desktop file in the DriverName field.
+Drivers are loaded as plugins on demand by KDbDriverManager. The IDs, descriptions
+and other details about drivers are given in their metadata by KDbDriverManager::driverMetaData().
+The metadata is accessible without actually loading any driver.
 
-KDb supports two kinds of databases: file-based and network-based databases.
-The type of a driver is available from several places. The DriverType
-field in the driver's .desktop file, is read by the KDbDriverManager and
-available by calling KDbDriverManager::KDbDriverInfo(const QString &name) and using
-the KDbDriverInfo#fileBased member from the result. Given a reference to a
-driver, its type can also be found directly using KDbDriver::isFileBased().
+KDb supports two families of databases, file and network-based while providing a single
+uniform API.
 
-Each database backend driver consists of three main classes: a driver,
-a connection and a cursor class, e.g SQLiteDriver, SQLiteConnection,
-SQLiteCursor.
-
-The driver classes subclass the KDbDriver class.  They set KDbDriver#m_typeNames,
-which maps KDb KDbField::Type on to the types supported by the database.  They also
-provide functions for escaping strings and checking table names.  These may be
-used, for example, on a database backend that uses the database name as a
-filename.  In this case, it should be ensured that all the characters in the
-database name are valid characters in a filename.
-
-The connection classes subclass the KDbConnection class, and include most of the
-calls to the native database API.
-
-The cursor classes subclass KDbCursor, and implement cursor functionality specific
-to the database backend.
-
+Each database driver implements of three main classes KDbDriver, KDbConnection, KDbCursor.
+The driver classes handle database-related specifics such as data types, naming and hide
+them behind a general purpose API. The connection classes act as a proxy between the KDb API
+and the native database. The cursor classes implement cursor functionality specific to
+the native database at record level.
 */
 namespace KDb
 {
