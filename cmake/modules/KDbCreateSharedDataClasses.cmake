@@ -16,6 +16,7 @@
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 macro(KDB_CREATE_SHARED_DATA_CLASSES)
+    # message(STATUS "KDB_CREATE_SHARED_DATA_CLASSES ARGV: ${ARGV}")
     set(_args "")
     list(APPEND _args ${ARGV})
     list(GET _args 0 OUTPUT_VAR)
@@ -29,10 +30,12 @@ macro(KDB_CREATE_SHARED_DATA_CLASSES)
         #MESSAGE(DEBUG "--------- ${_input} ${OUTPUT} ${INPUT}")
         #MESSAGE(DEBUG "COMMAND python ${CMAKE_SOURCE_DIR}/tools/sdc.py ${INPUT} ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT}")
         message(STATUS "Creating shared data class in ${OUTPUT} from ${_input}")
+        set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PREFIX})
+        file(MAKE_DIRECTORY ${OUTPUT_DIR})
         execute_process(
             COMMAND python ${CMAKE_SOURCE_DIR}/tools/sdc.py
                            ${INPUT}
-                           ${CMAKE_CURRENT_BINARY_DIR}/${PREFIX}/${OUTPUT}
+                           ${OUTPUT_DIR}/${OUTPUT}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             RESULT_VARIABLE KDB_CREATE_SHARED_DATA_CLASSES_RESULT
         )
@@ -45,7 +48,7 @@ macro(KDB_CREATE_SHARED_DATA_CLASSES)
 endmacro(KDB_CREATE_SHARED_DATA_CLASSES)
 
 macro(KDB_REMOVE_EXTENSIONS)
-    # message(STATUS "ARGV: ${ARGV}")
+    # message(STATUS "KDB_REMOVE_EXTENSIONS ARGV: ${ARGV}")
     set(_args "")
     list(APPEND _args ${ARGV})
     list(GET _args 0 OUTPUT_VAR)
@@ -53,7 +56,7 @@ macro(KDB_REMOVE_EXTENSIONS)
     # message(STATUS "OUTPUT_VAR: ${OUTPUT_VAR} ${_args}")
     foreach(_input ${_args})
         string(REGEX REPLACE "\\.h" "" OUTPUT ${_input})
-        message(STATUS "...result: ${OUTPUT}")
+        # message(STATUS "...result: ${OUTPUT}")
         list(APPEND ${OUTPUT_VAR} "${OUTPUT}")
     endforeach(_input)
 endmacro(KDB_REMOVE_EXTENSIONS)
