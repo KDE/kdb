@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,21 +17,26 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KDB_CONNECTIONTEST_H
-#define KDB_CONNECTIONTEST_H
+#include "DriverTest.h"
 
-#include "KDbTestUtils.h"
+#include <QTest>
 
-class ConnectionTest : public QObject
+QTEST_GUILESS_MAIN(DriverTest)
+
+void DriverTest::initTestCase()
 {
-    Q_OBJECT
-private Q_SLOTS:
-    void initTestCase();
-    void testCreateDb();
-    void cleanupTestCase();
+}
 
-private:
-    KDbTestUtils utils;
-};
+void DriverTest::testDriverManager()
+{
+    utils.testDriverManager();
+}
 
-#endif
+void DriverTest::testSqliteDriver()
+{
+    utils.testSqliteDriver();
+}
+
+void DriverTest::cleanupTestCase()
+{
+}

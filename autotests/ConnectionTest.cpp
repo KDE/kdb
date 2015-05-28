@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -33,64 +33,62 @@ KDbConnection *conn = 0;
 
 QTEST_GUILESS_MAIN(ConnectionTest)
 
+//! Calls @a call and verifies status of @a resultable
+//! On error displays the status on debug and does the same as QVERIFY with @a errorMessage
+#define KDB_VERIFY(resultable, call, errorMessage) \
+    do { \
+        bool KDB_VERIFY_ok = (call); \
+        if (resultable->result().isError()) { \
+            qDebug() << resultable->result(); \
+        } \
+        if (!QTest::qVerify(KDB_VERIFY_ok && !resultable->result().isError(), # call, (errorMessage), __FILE__, __LINE__)) {\
+            return; \
+        } \
+    } \
+    while (false)
+
 void ConnectionTest::initTestCase()
 {
+    utils.testDriverManager();
+    utils.testSqliteDriver();
 }
 
 void ConnectionTest::testCreateDb()
 {
-    QString drv_id = "org.kde.kdb.sqlite";
+    QVERIFY(utils.driver);
+
     QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi"));
-
-    KDbDriverManager manager;
-    QStringList names = manager.driverIds();
-    qDebug() << "DRIVERS:" << names;
-    QVERIFY2(!manager.result().isError(), "Error in driver manager");
-    qDebug() << manager.result().message();
-    QVERIFY2(!names.isEmpty(), "No db drivers found");
-
-    //get driver
-    const KDbDriverMetaData* driverMetaData = manager.driverMetaData(drv_id);
-    QVERIFY2(driverMetaData, "Driver metadata not found");
-    KDbDriver *driver = manager.driver(drv_id);
-    QVERIFY2(!manager.result().isError() && driver,
-             "Error in driver manager after KDbDriverManager::driver() call");
-    QCOMPARE(driverMetaData->id(), drv_id);
-    QVERIFY(driverMetaData->isFileBased());
 
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(db_name);
-    conn = driver->createConnection(cdata);
-    qDebug() << driver->result().message();
-    QVERIFY2(!driver->result().isError() && conn, "Failed to create connection");
-    QVERIFY2(driver->connections().contains(conn), "Driver does not list created connection");
-    QCOMPARE(driver->connections().count(), 1);
+    KDB_VERIFY(utils.driver, conn = utils.driver->createConnection(cdata), "Failed to create connection");
+    QVERIFY2(utils.driver->connections().contains(conn), "Driver does not list created connection");
+    QCOMPARE(utils.driver->connections().count(), 1);
     //! @todo KDbDriver::metaData
-
     {
         QScopedPointer<KDbConnection> connGuard(conn);
 
-        QVERIFY2(conn->connect(), "Failed to connect");
+        KDB_VERIFY(conn, conn->connect(), "Failed to connect");
         QVERIFY(conn->isConnected());
         if (conn->databaseExists(db_name)) {
-            QVERIFY2(conn->dropDatabase(db_name), "Failed to drop database");
+            KDB_VERIFY(conn, conn->dropDatabase(db_name), "Failed to drop database");
         }
-        QVERIFY2(!conn->databaseExists(db_name), "Database still exists after drop");
-        QVERIFY2(conn->createDatabase(db_name), "Failed to create db");
-        QVERIFY2(conn->databaseExists(db_name), "Database does not exists after creation");
-        QVERIFY2(conn->useDatabase(db_name), "Failed to use db");
-        QVERIFY(conn->isDatabaseUsed());
+        KDB_VERIFY(conn, !conn->databaseExists(db_name), "Database still exists after drop");
+        KDB_VERIFY(conn, conn->createDatabase(db_name), "Failed to create db");
+        KDB_VERIFY(conn, conn->databaseExists(db_name), "Database does not exists after creation");
+        KDB_VERIFY(conn, conn->useDatabase(db_name), "Failed to use db");
+        KDB_VERIFY(conn, conn->isDatabaseUsed(), "Db isn't marked as used after USE");
 
         QVERIFY2(tablesTest() == 0, "Failed to create test data");
 
-        QVERIFY2(conn->closeDatabase(), "Failed to close database");
-        QVERIFY2(!conn->isDatabaseUsed(), "Database still used after closing");
-        QVERIFY2(conn->disconnect(), "Failed to disconnect database");
-        QVERIFY2(!conn->isConnected(), "Database still connected after disconnecting");
+        KDB_VERIFY(conn, conn->closeDatabase(), "Failed to close database");
+        KDB_VERIFY(conn, !conn->isDatabaseUsed(), "Database still used after closing");
+        KDB_VERIFY(conn, conn->disconnect(), "Failed to disconnect database");
+        KDB_VERIFY(conn, !conn->isConnected(), "Database still connected after disconnecting");
     }
     conn = 0;
-    QVERIFY(driver->connections().isEmpty());
+    QVERIFY(utils.driver->connections().isEmpty());
 }
 
 void ConnectionTest::cleanupTestCase()

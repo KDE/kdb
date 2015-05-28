@@ -12,11 +12,28 @@ include(ECMAddTests)
 
 find_package(Qt5Test REQUIRED)
 
+# A helper library for db-related tests
+add_library(kdbtestutils SHARED
+    KDbTestUtils.cpp
+)
+target_link_libraries(kdbtestutils
+    PUBLIC
+        KDb
+    PRIVATE
+        Qt5::Test
+)
+generate_export_header(kdbtestutils)
+
+# Tests
 ecm_add_tests(
     ConnectionTest.cpp
+    DriverTest.cpp
     ExpressionsTest.cpp
 
-    LINK_LIBRARIES KDb Qt5::Test
+    LINK_LIBRARIES
+        Qt5::Test
+        KDb
+        kdbtestutils
 )
 
 add_subdirectory(tools)
