@@ -165,6 +165,7 @@ target_link_libraries(KDb
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
+        KF5::CoreAddons
     PRIVATE
         Qt5::Xml
         ${ICU_I18N_LIBRARY}
