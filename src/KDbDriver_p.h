@@ -204,8 +204,8 @@ public:
 
     QSet<KDbConnection*> connections;
 
-    /*! Info about the driver. */
-    KDbDriverInfo info;
+    /*! Driver's metadata. */
+    const KDbDriverMetaData *metaData;
 
     /*! Internal constant flag: Set this in subclass if after successful
      drv_createDatabase() the database is in opened state (as after useDatabase()).

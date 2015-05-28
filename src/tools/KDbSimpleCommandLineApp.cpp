@@ -44,7 +44,7 @@ public:
 
     KDbDriverManager manager;
     KComponentData componentData;
-    ConnectionData connData;
+    KDbConnectionData connData;
     QPointer<KDbConnection> conn;
 };
 
@@ -71,8 +71,8 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     KCmdLineOptions allOptions;
 
     // add predefined options
-    allOptions.add("drv", KLocalizedString(), KDb::defaultFileBasedDriverName().toUtf8());
-    allOptions.add("driver <name>", ktr("Database driver name"));
+    allOptions.add("drv", KLocalizedString(), KDb::defaultFileBasedDriverId().toUtf8());
+    allOptions.add("driver <id>", ktr("Database driver ID"));
     allOptions.add("u");
     allOptions.add("user <name>", ktr("Database user name"));
     allOptions.add("p");
@@ -89,7 +89,7 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     KCmdLineArgs::addCmdLineOptions(allOptions);
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
 
-    d->connData.driverName = args->getOption("driver");
+    d->connData.driverId = args->getOption("driver");
     d->connData.userName = args->getOption("user");
     d->connData.hostName = args->getOption("host");
     d->connData.localSocketFileName = args->getOption("local-socket");
@@ -125,13 +125,13 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
         }
 
         //get the driver
-        KDbDriver *driver = d->manager.driver(d->connData.driverName);
+        KDbDriver *driver = d->manager.driver(d->connData.driverId);
         if (!driver || d->manager.error()) {
             setError(&d->manager);
             return false;
         }
 
-        if (driver->isFileBased())
+        if (driver->metaData()->isFileBased())
             d->connData.setFileName(databaseName);
 
         d->conn = driver->createConnection(&d->connData);

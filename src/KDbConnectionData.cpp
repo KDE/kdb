@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,7 +19,9 @@
 
 #include "KDbConnectionData.h"
 #include "KDbDriverManager.h"
+#include "KDbDriverMetaData.h"
 
+#include <QObject>
 
 KDbConnectionData::~KDbConnectionData()
 {
@@ -27,10 +29,10 @@ KDbConnectionData::~KDbConnectionData()
 
 QString KDbConnectionData::serverInfoString(ServerInfoStringOptions options) const
 {
-    if (!d->driverName.isEmpty()) {
+    if (!d->driverId.isEmpty()) {
         KDbDriverManager mananager;
-        const KDbDriverInfo info = mananager.driverInfo(d->driverName);
-        if (info.isValid() && info.isFileBased()) {
+        const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
+        if (metaData->isValid() && metaData->isFileBased()) {
             if (d->databaseName.isEmpty()) {
                 return QObject::tr("<file>");
             }
@@ -47,8 +49,8 @@ QString KDbConnectionData::serverInfoString(ServerInfoStringOptions options) con
 bool KDbConnectionData::passwordNeeded() const
 {
     KDbDriverManager mananager;
-    KDbDriverInfo info = mananager.driverInfo(d->driverName);
-    const bool fileBased = info.isValid() && info.isFileBased();
+    const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
+    const bool fileBased = metaData->isValid() && metaData->isFileBased();
 
     return !d->savePassword && !fileBased; //!< @todo temp.: change this if there are
                                            //!< file-based drivers requiring a password

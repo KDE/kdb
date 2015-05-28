@@ -19,8 +19,8 @@
 */
 
 #include "KDbDriver_p.h"
+#include "KDbDriverMetaData.h"
 #include "KDb.h"
-
 
 KDbDriverBehaviour::KDbDriverBehaviour()
         : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))
@@ -66,10 +66,10 @@ DriverPrivate::DriverPrivate()
 
 void DriverPrivate::initInternalProperties()
 {
-    properties["is_file_database"] = QVariant(info.isFileBased());
+    properties["is_file_database"] = QVariant(metaData->isFileBased());
     propertyCaptions["is_file_database"] = QObject::tr("File-based database driver");
-    if (info.isFileBased()) {
-        properties["file_database_mimetypes"] = info.mimeTypes();
+    if (metaData->isFileBased()) {
+        properties["file_database_mimetypes"] = metaData->mimeTypes();
         propertyCaptions["file_database_mimetypes"] = QObject::tr("File-based database's MIME types");
     }
 

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,10 +24,11 @@
 #include <QByteArray>
 #include <QDateTime>
 
+#include <KPluginFactory>
+
 #include "KDb.h"
 #include "KDbVersionInfo.h"
 #include "KDbField.h"
-#include "KDbDriverInfo.h"
 #include "KDbResult.h"
 #include "KDbEscapedString.h"
 
@@ -36,7 +37,11 @@ class KDbConnection;
 class KDbConnectionData;
 class KDbDriverManager;
 class KDbDriverBehaviour;
+class KDbDriverMetaData;
 class DriverPrivate;
+
+#define KDB_DRIVER_PLUGIN_FACTORY(class_name, name) \
+    K_PLUGIN_FACTORY_WITH_JSON(class_name ## Factory, name, registerPlugin<class_name>();)
 
 //! Database driver's abstraction.
 /*! This class is a prototype of the database driver.
@@ -87,9 +92,9 @@ public:
         ReadOnlyConnection = 1 //!< set to perform read only connection
     };
 
-    /*! Creates connection using @a conn_data as parameters.
+    /*! Creates connection using @a connData as parameters.
      @return 0 and sets error message on error.
-     driverName member of @a conn_data will be updated with this driver name.
+     driverId member of @a connData will be updated with the driver's ID.
      @a options can be a combination of CreateConnectionOptions enum values.
      */
     KDbConnection *createConnection(const KDbConnectionData& connData, int options = 0);
@@ -97,16 +102,8 @@ public:
     /*! @return Set of created connections. */
     const QSet<KDbConnection*> connections() const;
 
-    //! @return a name of the driver (DriverName field of the .desktop info file).
-    //! Provided for convenience and optimization. This is the same as info().name().
-    QString name() const;
-
-    //! @return true if the driver is file-based.
-    //! Provided for convenience and optimization. This is the same as info().isFileBased().
-    bool isFileBased() const;
-
     /*! Info about the driver. */
-    KDbDriverInfo info() const;
+    const KDbDriverMetaData* metaData() const;
 
     /*! @return true if @a n is a system object's name,
      eg. name of build-in system table that cannot be used or created by a user,
@@ -251,7 +248,7 @@ protected:
      You may also want to change options in KDbDriverBehaviour *beh member.
      See drivers/mySQL/mysqldriver.cpp for usage example.
      */
-    KDbDriver();
+    KDbDriver(QObject *parent, const QVariantList &args);
 
     /*! For reimplementation: creates and returns connection object
      with additional structures specific for a given driver.
@@ -305,8 +302,8 @@ protected:
     virtual KDbEscapedString addLimitTo1(const KDbEscapedString& sql, bool add);
 
 protected:
-    /*! Used by the driver manager to set info for just loaded driver. */
-    void setInfo( const KDbDriverInfo& info );
+    /*! Used by the driver manager to set metaData for just loaded driver. */
+    void setMetaData(const KDbDriverMetaData *metaData);
 
     /*! @return true if this driver's implementation is valid.
      Just a few constraints are checked to ensure that driver developer didn't forget something.

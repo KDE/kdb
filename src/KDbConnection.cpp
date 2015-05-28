@@ -25,6 +25,7 @@
 #include "KDbConnectionData.h"
 #include "KDbDriver.h"
 #include "KDbDriver_p.h"
+#include "KDbDriverMetaData.h"
 #include "KDbObject.h"
 #include "KDbTableSchema.h"
 #include "KDbRelationship.h"
@@ -319,7 +320,7 @@ bool KDbConnection::connect()
 
     d->serverVersion.clear();
     if (!(d->isConnected = drv_connect())) {
-        m_result = KDbResult(m_driver->isFileBased() ?
+        m_result = KDbResult(m_driver->metaData()->isFileBased() ?
                     QObject::tr("Could not open \"%1\" project file.")
                     .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName()))
                  :  QObject::tr("Could not connect to \"%1\" database server.")
@@ -448,7 +449,7 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
         return false;
     clearResult();
 
-    if (m_driver->isFileBased()) {
+    if (m_driver->metaData()->isFileBased()) {
         //for file-based db: file must exists and be accessible
         QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
@@ -516,7 +517,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
                  QObject::tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
         return false;
     }
-    if (m_driver->isFileBased()) {
+    if (m_driver->metaData()->isFileBased()) {
         //update connection data if filename differs
         if (QFileInfo(dbName).isAbsolute()) {
             d->connData.setDatabaseName(dbName);
@@ -733,8 +734,8 @@ bool KDbConnection::dropDatabase(const QString &dbName)
 
     QString dbToDrop;
     if (dbName.isEmpty() && d->usedDatabase.isEmpty()) {
-        if (!m_driver->isFileBased()
-                || (m_driver->isFileBased() && d->connData.databaseName().isEmpty()))
+        if (!m_driver->metaData()->isFileBased()
+                || (m_driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
                               QObject::tr("Cannot delete database - name not specified."));
@@ -746,7 +747,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
         if (dbName.isEmpty()) {
             dbToDrop = d->usedDatabase;
         } else {
-            if (m_driver->isFileBased()) //lets get full path
+            if (m_driver->metaData()->isFileBased()) //lets get full path
                 dbToDrop = QFileInfo(dbName).absoluteFilePath();
             else
                 dbToDrop = dbName;
@@ -2099,7 +2100,7 @@ bool KDbConnection::rollbackAutoCommitTransaction(const KDbTransaction& trans)
 
 #define SET_ERR_TRANS_NOT_SUPP \
     { m_result = KDbResult(ERR_UNSUPPORTED_DRV_FEATURE, \
-                        QObject::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->name() )); }
+                        QObject::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->metaData()->name() )); }
 
 #define SET_BEGIN_TR_ERROR \
     { if (!m_result.isError()) \

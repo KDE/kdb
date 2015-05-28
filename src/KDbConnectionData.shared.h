@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2013 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -52,18 +52,18 @@ public:
 
     /*!
     @getter
-    @return name that identifies the driver.
-    Name (unique, not i18n-ed) of driver that is used (or should be used) to
+    @return identifier of the driver.
+    ID (unique, not i18n-ed) of driver that is used (or should be used) to
     create a connection. If you pass this KDbConnectionData object to
-    KDbDriver::createConnection() to create connection, the @a driverName member
-    will be updated with a valid KDb driver name.
-    In other situations the @a driverName member may be used to store information what
+    KDbDriver::createConnection() to create connection, the @a driverId member
+    will be updated with a valid KDb driver ID.
+    In other situations the @a driverId member may be used to store information what
     driver should be used to perform connection, before we get an appropriate
     driver object from KDbDriverManager.
     @setter
-    Sets name of the driver to use
+    Sets identifier of the driver to use
     */
-    data_member QString driverName;
+    data_member QString driverId;
 
     /*!
     @getter

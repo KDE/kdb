@@ -30,7 +30,7 @@ class KComponentData;
 //! @short A skeleton for creating a simple command line database application.
 /*! This class creates a KComponentData object and automatically handles the following
  command line options:
- - --driver \<name\> (Database driver name) or -drv
+ - --driver \<id\> (Database driver ID) or -drv
  - --user \<name\> (Database user name) or -u
  - --password (Prompt for password) or -p
  - --host \<name\> (Server (host) name) or -h

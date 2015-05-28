@@ -30,10 +30,10 @@ QTEST_GUILESS_MAIN(SqlParserTest)
 
 bool SqlParserTest::openDatabase(const QString &path)
 {
-    QString driverName("sqlite");
+    QString driverId("org.kde.kdb.sqlite");
     KDbDriverManager manager;
-    qDebug() << manager.driverNames();
-    KDbDriver *driver = manager.driver(driverName);
+    qDebug() << manager.driverIds();
+    KDbDriver *driver = manager.driver(driverId);
     if (!driver || manager.result().isError()) {
         qDebug() << manager.result();
         return false;

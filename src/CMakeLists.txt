@@ -61,6 +61,7 @@ set(kdb_LIB_SRCS
    parser/KDbParser.cpp
    parser/KDbParser_p.cpp
 
+   tools/KDbJsonTrader_p.cpp # mostly copied from KReport's KReportJsonTrader_p.cpp
    tools/KDbValidator.cpp
    tools/KDbFieldValidator.cpp
    tools/KDbLongLongValidator.cpp
@@ -95,6 +96,7 @@ set(kdb_LIB_SRCS
    KDbDriverManager.cpp
    KDbDriver.cpp
    KDbDriver_p.cpp
+   KDbDriverMetaData.cpp
    KDbConnection.cpp
    generated/sqlkeywords.cpp
    KDbObject.cpp
@@ -242,7 +244,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbCursor
         KDbProperties
         KDbDriver
-        KDbDriverInfo
+        KDbDriverMetaData
         KDbDriverManager
         KDbError
         KDbEscapedString

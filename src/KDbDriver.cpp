@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,7 +27,6 @@
 #include "KDbAdmin.h"
 #include "KDb.h"
 
-
 #include <assert.h>
 
 /*! @internal Used in KDbDriver::defaultSQLTypeName(int)
@@ -51,10 +50,12 @@ static const char* const KDb_defaultSQLTypeNames[] = {
 
 //---------------------------------------------
 
-KDbDriver::KDbDriver()
- : beh(new KDbDriverBehaviour())
+KDbDriver::KDbDriver(QObject *parent, const QVariantList &args)
+ : QObject(parent)
+ , beh(new KDbDriverBehaviour())
  , d(new DriverPrivate())
 {
+    Q_UNUSED(args);
     d->typeNames.resize(KDbField::LastType + 1);
 }
 
@@ -72,7 +73,7 @@ KDbDriver::~KDbDriver()
 bool KDbDriver::isValid()
 {
     clearResult();
-    QString inv_impl(tr("Invalid database driver's \"%1\" implementation.").arg(name()));
+    QString inv_impl(tr("Invalid database driver's \"%1\" implementation.").arg(metaData()->name()));
     QString not_init(tr("Value of \"%1\" is not initialized for the driver."));
     if (beh->ROW_ID_FIELD_NAME.isEmpty()) {
         m_result = KDbResult(ERR_INVALID_DRIVER_IMPL,
@@ -88,19 +89,9 @@ const QSet<KDbConnection*> KDbDriver::connections() const
     return d->connections;
 }
 
-KDbDriverInfo KDbDriver::info() const
+const KDbDriverMetaData* KDbDriver::metaData() const
 {
-    return d->info;
-}
-
-QString KDbDriver::name() const
-{
-    return d->info.name();
-}
-
-bool KDbDriver::isFileBased() const
-{
-    return d->info.isFileBased();
+    return d->metaData;
 }
 
 int KDbDriver::features() const
@@ -142,7 +133,7 @@ KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData, in
 
     conn->setReadOnly(options & ReadOnlyConnection);
 
-//! @todo needed? connData->setDriverName(name());
+//! @todo needed? connData->setDriverId(id());
     d->connections.insert(conn);
     return conn;
 }
@@ -294,9 +285,9 @@ bool KDbDriver::isDriverSpecificKeyword(const QByteArray& word) const
     return d->driverSpecificSQLKeywords.contains(word);
 }
 
-void KDbDriver::setInfo( const KDbDriverInfo& info )
+void KDbDriver::setMetaData(const KDbDriverMetaData *metaData)
 {
-    d->info = info;
+    d->metaData = metaData;
     d->initInternalProperties();
 }
 

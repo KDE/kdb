@@ -24,6 +24,7 @@
 
 #include <KDbDriverManager>
 #include <KDbDriver>
+#include <KDbDriverMetaData>
 #include <KDbConnection>
 #include <KDbCursor>
 #include <KDbTableSchema>
@@ -157,7 +158,7 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n     e.g. using the \"tables\" test"
 "\n"
 "\nArguments:"
-"\n  driver_name               Driver name"
+"\n  driver_id                 Driver ID"
 "\n  db_name                   Database name"
 "\n  sql_statement             Optional SQL statement (for parser test)"
 "\n"
@@ -250,9 +251,9 @@ int main(int argc, char** argv)
     drv_name = args.first();
 
     KDbDriverManager manager;
-    const QStringList driverNames = manager.driverNames();
-    qDebug() << "DRIVERS: " << driverNames;
-    if (driverNames.isEmpty()) {
+    const QStringList driverIds = manager.driverIds();
+    qDebug() << "DRIVERS: " << driverIds;
+    if (driverIds.isEmpty()) {
         qWarning() << "No drivers found";
         return finish(1);
     }
@@ -267,7 +268,8 @@ int main(int argc, char** argv)
         qDebug() << manager.result();
         return finish(1);
     }
-    qDebug() << "main: MIME types for" << driver->name() << ":" << driver->info().mimeTypes();
+    qDebug() << "main: MIME types for" << driver->metaData()->id() << ":"
+             << driver->metaData()->mimeTypes();
 
     const bool bufCursors = takeOption(args, "buffered-cursors");
     QString queryParams = takeOptionWithArg(args, "query-params");

@@ -99,7 +99,7 @@ ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const KDbC
 
     // try to load driver now because it's not supported in different thread
     KDbDriverManager manager;
-    m_driver = manager.driver(m_connData.driverName());
+    m_driver = manager.driver(m_connData.driverId());
     if (manager.result().isError()) {
         emitError(manager.resultable());
         m_driver = 0;
@@ -1567,9 +1567,9 @@ QString KDb::defaultFileBasedDriverMimeType()
     return QLatin1String("application/x-kexiproject-sqlite3");
 }
 
-QString KDb::defaultFileBasedDriverName()
+QString KDb::defaultFileBasedDriverId()
 {
-    return QLatin1String("sqlite");
+    return QLatin1String("org.kde.kdb.sqlite");
 }
 
 /*! @return QVariant value converted from null-terminated @a data string.

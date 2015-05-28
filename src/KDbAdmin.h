@@ -40,7 +40,7 @@ public:
      Currently it is implemented for SQLite drivers.
 
      @return true on success, false on failure
-     (then you can get error status from the AdminTools object). */
+     (then you can get error status from the KDbAdminTools object). */
     virtual bool vacuum(const KDbConnectionData& data, const QString& databaseName);
 
 protected:

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,7 +21,9 @@
 #define KDB_DRIVER_MANAGER_P_H
 
 #include <QObject>
-#include <KDbDriver>
+
+#include "KDbDriver.h"
+#include "KDbDriverMetaData.h"
 
 //! Internal class of the driver manager.
 class DriverManagerInternal : public QObject, public KDbResultable
@@ -33,11 +35,17 @@ public:
 
     ~DriverManagerInternal();
 
+    QStringList driverIds();
+
     /*! Tries to load db driver @a name.
       @return db driver, or 0 if error (then error message is also set) */
-    KDbDriver* driver(const QString& name);
+    KDbDriver* driver(const QString& id);
 
-    KDbDriverInfo driverInfo(const QString &name);
+    const KDbDriverMetaData* driverMetaData(const QString &id);
+
+    QStringList driverIdsForMimeType(const QString& mimeType);
+
+    QStringList possibleProblems() const;
 
     static DriverManagerInternal *self();
 
@@ -50,16 +58,13 @@ protected Q_SLOTS:
 
 private:
     bool lookupDrivers();
-    void lookupDriversForDirectory(const QString& pluginsDir);
 
-    QMap<QString, KDbDriverInfo> m_infos_by_mimetype;
-    QMap<QString, KDbDriverInfo> m_driversInfo; //!< used to store drivers information
-    QMap<QString, KDbDriver* > m_drivers; //!< for owning drivers
+    QMap<QString, KDbDriverMetaData*> m_metadata_by_mimetype;
+    QMap<QString, KDbDriverMetaData*> m_driversMetaData; //!< used to store driver metadata
+    QMap<QString, KDbDriver*> m_drivers; //!< for owning drivers
     QString m_pluginsDir;
     QStringList m_possibleProblems;
     bool m_lookupDriversNeeded;
-
-    friend class KDbDriverManager;
 };
 
 #endif

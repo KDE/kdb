@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2012 Dimitrios T. Tanis <dimitrios.tanis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -22,10 +22,11 @@
 
 #include "KDbDriverManager.h"
 #include "KDbDriverManager_p.h"
-
 #include "KDbDriver_p.h"
+#include "KDbJsonTrader_p.h"
+#include "KDbDriverMetaData.h"
 
-#include <assert.h>
+#include <KPluginFactory>
 
 #include <QObject>
 #include <QApplication>
@@ -71,6 +72,7 @@ DriverManagerInternal *DriverManagerInternal::self()
     return s_self;
 }
 
+#if 0
 void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
 {
     QDir dir(pluginsDir, QLatin1String("kdb_*.desktop"));
@@ -117,6 +119,7 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
         }
     }
 }
+#endif
 
 bool DriverManagerInternal::lookupDrivers()
 {
@@ -126,13 +129,29 @@ bool DriverManagerInternal::lookupDrivers()
     if (qApp) {
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
-//! @todo for Qt-only version check for KComponentData wrapper
-//  KDbWarn << "cannot work without KComponentData (KGlobal::mainComponent()==0)!";
-//  setError("Driver Manager cannot work without KComponentData (KGlobal::mainComponent()==0)!");
 
     m_lookupDriversNeeded = false;
     clearResult();
 
+    //qDebug() << "Load all plugins";
+    const QList<QPluginLoader*> offers
+            = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
+    foreach(QPluginLoader *loader, offers) {
+        //QJsonObject json = loader->metaData();
+        //qDebug() << json;
+        //! @todo check version
+        KDbDriverMetaData *metaData = new KDbDriverMetaData(*loader);
+        if (m_driversMetaData.contains(metaData->id())) {
+            qWarning() << "More than one driver with ID" << metaData->id() << "-- skipping this one";
+            continue;
+        }
+        foreach (const QString& mimeType, metaData->mimeTypes()) {
+            m_metadata_by_mimetype.insertMulti(mimeType, metaData);
+        }
+        m_driversMetaData.insert(metaData->id(), metaData);
+    }
+
+#if 0
     /*! Try in all possible driver directories.
      Looks for "kdb" directory in $INSTALL/plugins, $QT_PLUGIN_PATH, and directory of the application executable.
      Plugin path "Plugins" entry can be added to qt.conf to override; see http://qt-project.org/doc/qt-4.8/qt-conf.html.
@@ -146,6 +165,7 @@ bool DriverManagerInternal::lookupDrivers()
         m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not find directory for database drivers."));
         return false;
     }
+#endif
 
 #if 0 // todo?
     KService::List tlist = KServiceTypeTrader::self()->query("Kexi/DBDriver");
@@ -219,21 +239,57 @@ bool DriverManagerInternal::lookupDrivers()
         KDbDbg << "registered driver: " << ptr->name() << "(" << ptr->library() << ")";
     }
 #endif
-    if (m_driversInfo.isEmpty()) {
-        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not find any database drivers."));
+    if (m_driversMetaData.isEmpty()) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             QObject::tr("Could not find any database drivers."));
         return false;
     }
     return true;
 }
 
-KDbDriverInfo DriverManagerInternal::driverInfo(const QString &name)
+QStringList DriverManagerInternal::driverIds()
 {
-    KDbDriverInfo i = m_driversInfo.value(name.toLower());
-    if (!m_result.isError() && i.isValid())
-        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
-    return i;
+    if (!lookupDrivers()) {
+        return QStringList();
+    }
+    if (m_driversMetaData.isEmpty() && result().isError()) {
+        return QStringList();
+    }
+    return m_driversMetaData.keys();
 }
 
+const KDbDriverMetaData* DriverManagerInternal::driverMetaData(const QString &id)
+{
+    if (!lookupDrivers()) {
+        return 0;
+    }
+    const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
+    if (!metaData || m_result.isError()) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             QObject::tr("Could not find database driver \"%1\".").arg(id));
+    }
+    return metaData;
+}
+
+QStringList DriverManagerInternal::driverIdsForMimeType(const QString &mimeType)
+{
+    if (!lookupDrivers()) {
+        return QStringList();
+    }
+    const QList<KDbDriverMetaData*> metaDatas(m_metadata_by_mimetype.values(mimeType.toLower()));
+    QStringList result;
+    foreach (const KDbDriverMetaData* metaData, metaDatas) {
+        result.append(metaData->id());
+    }
+    return result;
+}
+
+QStringList DriverManagerInternal::possibleProblems() const
+{
+    return m_possibleProblems;
+}
+
+#if 0
 struct LibUnloader {
     LibUnloader(QLibrary *lib) : m_lib(lib) {}
     ~LibUnloader() {
@@ -243,29 +299,51 @@ struct LibUnloader {
 private:
     QLibrary *m_lib;
 };
+#endif
 
-KDbDriver* DriverManagerInternal::driver(const QString& name)
+KDbDriver* DriverManagerInternal::driver(const QString& id)
 {
     if (!lookupDrivers())
         return 0;
 
     clearResult();
-    KDbDbg << "loading" << name;
+    KDbDbg << "loading" << id;
 
     KDbDriver *drv = 0;
-    if (!name.isEmpty()) {
-        drv = m_drivers.value(name.toLower());
+    if (!id.isEmpty()) {
+        drv = m_drivers.value(id.toLower());
     }
     if (drv)
         return drv; //cached
 
-    if (!m_driversInfo.contains(name.toLower())) {
-        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not find database driver \"%1\".").arg(name));
+    if (!m_driversMetaData.contains(id.toLower())) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             QObject::tr("Could not find database driver \"%1\".").arg(id));
         return 0;
     }
 
-    const KDbDriverInfo info(m_driversInfo.value(name.toLower()));
+    const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
+    KPluginFactory *factory = qobject_cast<KPluginFactory*>(metaData->instantiate());
+    if (!factory) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             QObject::tr("Could not load database driver's plugin file \"%1\".")
+                             .arg(metaData->fileName()));
+        qWarning() << m_result.message();
+        return 0;
+    }
+    KDbDriver *driver = factory->create<KDbDriver>();
+    if (!driver) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             QObject::tr("Could not open database driver from plugin \"%1\".")
+                             .arg(metaData->fileName()));
+        qWarning() << m_result.message();
+        return 0;
+    }
+    driver->setMetaData(metaData);
+    return driver;
+}
 
+#if 0
     QString libFileName(info.absoluteFilePath());
 #if defined Q_OS_WIN && (defined(_DEBUG) || defined(DEBUG))
     libFileName += "_d";
@@ -274,7 +352,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& name)
     LibUnloader unloader(&lib);
     qDebug() << libFileName;
     if (!lib.load()) {
-        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(name));
+        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(id));
         m_result.setServerMessage(lib.errorString());
         qDebug() << lib.errorString();
         return 0;
@@ -284,19 +362,19 @@ KDbDriver* DriverManagerInternal::driver(const QString& name)
     if (!foundMajor) {
        m_result = KDbResult(ERR_DRIVERMANAGER,
                          QObject::tr("Could not find \"%1\" entry point of library \"%2\".")
-                         .arg(QLatin1String("version_major")).arg(name));
+                         .arg(QLatin1String("version_major")).arg(id));
        return 0;
     }
     const uint* foundMinor = (const uint*)lib.resolve("version_minor");
     if (!foundMinor) {
        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not find \"%1\" entry point of library \"%2\".")
-                         .arg(QLatin1String("version_minor")).arg(name));
+                         .arg(QLatin1String("version_minor")).arg(id));
        return 0;
     }
     if (!KDb::version().matches(*foundMajor, *foundMinor)) {
         m_result = KDbResult(ERR_INCOMPAT_DRIVER_VERSION,
             QObject::tr("Incompatible database driver's \"%1\" version: found version %2, expected version %3.")
-                 .arg(name)
+                 .arg(id)
                  .arg(QString::fromLatin1("%1.%2").arg(*foundMajor).arg(*foundMinor))
                  .arg(QString::fromLatin1("%1.%2").arg(KDb::version().major()).arg(KDb::version().minor()))
             );
@@ -307,7 +385,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& name)
     QPluginLoader loader(libFileName);
     drv = dynamic_cast<KDbDriver*>(loader.instance());
     if (!drv) {
-        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(name));
+        m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(id));
         m_result.setServerMessage(loader.errorString());
         qDebug() << loader.instance() << loader.errorString();
 //! @todo
@@ -326,6 +404,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& name)
     m_drivers.insert(info.name().toLower(), drv); //cache it
     return drv;
 }
+#endif
 
 // ---------------------------
 // --- KDbDriverManager impl. ---
@@ -339,7 +418,8 @@ KDbDriverManager::~KDbDriverManager()
 {
 }
 
-KDbResult KDbDriverManager::result() const {
+KDbResult KDbDriverManager::result() const
+{
     return s_self->result();
 }
 
@@ -348,51 +428,35 @@ KDbResultable KDbDriverManager::resultable() const
     return KDbResultable(static_cast<const KDbResultable&>(*s_self));
 }
 
-QStringList KDbDriverManager::driverNames()
+QStringList KDbDriverManager::driverIds()
 {
-    if (!s_self->lookupDrivers())
-        return QStringList();
-
-    if (s_self->m_driversInfo.isEmpty() && result().isError())
-        return QStringList();
-    return s_self->m_driversInfo.keys();
+    return s_self->driverIds();
 }
 
-KDbDriverInfo KDbDriverManager::driverInfo(const QString &name)
+const KDbDriverMetaData* KDbDriverManager::driverMetaData(const QString &id)
 {
-    s_self->lookupDrivers();
-    KDbDriverInfo i = s_self->driverInfo(name);
-    return i;
+    return s_self->driverMetaData(id);
 }
 
-QStringList KDbDriverManager::driversForMimeType(const QString &mimeType)
+QStringList KDbDriverManager::driverIdsForMimeType(const QString &mimeType)
 {
-    if (!s_self->lookupDrivers()) {
-        return QStringList();
-    }
-
-    const QList<KDbDriverInfo> infos(s_self->m_infos_by_mimetype.values(mimeType.toLower()));
-    QStringList result;
-    foreach (const KDbDriverInfo& info, infos) {
-        result.append(info.name());
-    }
-    return result;
+    return s_self->driverIdsForMimeType(mimeType);
 }
 
-KDbDriver* KDbDriverManager::driver(const QString& name)
+KDbDriver* KDbDriverManager::driver(const QString& id)
 {
-    KDbDriver *drv = s_self->driver(name);
-    return drv;
+    return s_self->driver(id);
 }
 
-QString KDbDriverManager::possibleProblemsInfoMsg() const
+QString KDbDriverManager::possibleProblemsMessage() const
 {
-    if (s_self->m_possibleProblems.isEmpty())
+    if (s_self->possibleProblems().isEmpty()) {
         return QString();
+    }
     QString str;
     str.reserve(1024);
     str = QLatin1String("<ul>");
-    foreach (const QString& problem, s_self->m_possibleProblems)
+    foreach (const QString& problem, s_self->possibleProblems())
         str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
     str += QLatin1String("</ul>");
     return str;
@@ -400,9 +464,9 @@ QString KDbDriverManager::possibleProblemsInfoMsg() const
 
 bool KDbDriverManager::hasDatabaseServerDrivers()
 {
-    foreach(const QString& name, driverNames()) {
-        const KDbDriverInfo info(driverInfo(name));
-        if (!info.isFileBased()) {
+    foreach(const QString& id, driverIds()) {
+        const KDbDriverMetaData *metaData = s_self->driverMetaData(id);
+        if (!metaData->isFileBased()) {
             return true;
         }
     }

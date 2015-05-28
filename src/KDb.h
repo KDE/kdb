@@ -403,8 +403,8 @@ KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField* f, int length =
  (typically something like "application/x-kexiproject-sqlite") */
 KDB_EXPORT QString defaultFileBasedDriverMimeType();
 
-/*! @return default file-based driver name (currently, "sqlite"). */
-KDB_EXPORT QString defaultFileBasedDriverName();
+/*! @return default file-based driver ID (currently, "org.kde.kdb.sqlite"). */
+KDB_EXPORT QString defaultFileBasedDriverId();
 
 #ifdef KDB_DEBUG_GUI
 //! A prototype of handler for GUI debugger

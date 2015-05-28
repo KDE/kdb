@@ -20,6 +20,7 @@
 #include "ConnectionTest.h"
 
 #include <KDbDriverManager>
+#include <KDbDriverMetaData>
 #include <KDbConnection>
 
 #include <QFile>
@@ -38,26 +39,24 @@ void ConnectionTest::initTestCase()
 
 void ConnectionTest::testCreateDb()
 {
-    QString drv_name = "sqlite";
-    QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "test.kexi"));
+    QString drv_id = "org.kde.kdb.sqlite";
+    QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi"));
 
     KDbDriverManager manager;
-    QStringList names = manager.driverNames();
-    qDebug() << "DRIVERS: ";
-    for (QStringList::ConstIterator it = names.constBegin(); it != names.constEnd() ; ++it) {
-        qDebug() << *it;
-    }
+    QStringList names = manager.driverIds();
+    qDebug() << "DRIVERS:" << names;
     QVERIFY2(!manager.result().isError(), "Error in driver manager");
     qDebug() << manager.result().message();
     QVERIFY2(!names.isEmpty(), "No db drivers found");
 
     //get driver
-    const KDbDriverInfo drv_info = manager.driverInfo(drv_name);
-    QVERIFY2(drv_info.isValid(), "Driver info empty");
-    KDbDriver *driver = manager.driver(drv_name);
-    QVERIFY2(!manager.result().isError() && driver, "Error in driver manager after KDbDriverManager::driver() call");
-    QCOMPARE(drv_info.name(), drv_name);
-    QVERIFY(drv_info.isFileBased());
+    const KDbDriverMetaData* driverMetaData = manager.driverMetaData(drv_id);
+    QVERIFY2(driverMetaData, "Driver metadata not found");
+    KDbDriver *driver = manager.driver(drv_id);
+    QVERIFY2(!manager.result().isError() && driver,
+             "Error in driver manager after KDbDriverManager::driver() call");
+    QCOMPARE(driverMetaData->id(), drv_id);
+    QVERIFY(driverMetaData->isFileBased());
 
     //open connection
     KDbConnectionData cdata;

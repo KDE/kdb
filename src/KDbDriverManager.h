@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2012 Dimitrios T. Tanis <dimitrios.tanis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -23,10 +23,16 @@
 #ifndef KDB_DRIVER_MANAGER_H
 #define KDB_DRIVER_MANAGER_H
 
-#include "KDbDriver.h"
+#include <QString>
 
+#include "kdb_export.h"
 
-//! Database driver manager, provided for finding and loading drivers.
+class KDbResult;
+class KDbResultable;
+class KDbDriver;
+class KDbDriverMetaData;
+
+//! A driver manager for finding and loading driver plugins.
 class KDB_EXPORT KDbDriverManager
 {
 public:
@@ -40,33 +46,34 @@ public:
     //! It adds serverResultName() in addition to the result().
     KDbResultable resultable() const;
 
-    /*! Tries to load db driver with named name @a name.
-      The name is case insensitive.
-      @return driver object, or 0 if error (then result is also set, see result()). */
-    KDbDriver* driver(const QString& name);
+    /*! @return information (metadata) about driver with ID @a id.
+      The lookup is case insensitive.
+      0 is returned if the metadata has not been found.
+      On error status can be obtained using result(). */
+    const KDbDriverMetaData* driverMetaData(const QString &id);
 
-    /*! returns list of available drivers names.
+    /*! Tries to load db driver with ID @a id.
+      The lookup is case insensitive.
+      @return driver object or 0 on error.
+      On error status can be obtained using result(). */
+    KDbDriver* driver(const QString& id);
+
+    /*! returns list of available drivers IDs.
       That drivers can be loaded by first use of driver() method. */
-    QStringList driverNames();
+    QStringList driverIds();
 
-    /*! @return information about driver's named with @a name.
-      The name is case insensitive.
-      You can check if driver information is not found calling
-      Info::name.isEmpty() (then error message is also set). */
-    KDbDriverInfo driverInfo(const QString &name);
-
-    /*! @return list of driver names for @a mimeType mime type
-     or empty list if no driver has been found.
-     Works only with drivers for file-based databases like SQLite.
+    /*! @return list of driver IDs for @a mimeType mime type.
+     Empty list is returned if no driver has been found.
+     Works only with drivers of file-based databases such as SQLite.
      The lookup is case insensitive. */
-    QStringList driversForMimeType(const QString& mimeType);
+    QStringList driverIdsForMimeType(const QString& mimeType);
 
-    /*! HTML information about possible problems encountered.
-     It's displayed in 'details' section, if an error encountered.
-     Currently it contains a list of incompatible db drivers.
+    /*! @return HTML-formatted message about possible problems encountered.
+     It can be displayed in a 'details' section of a GUI message if an error encountered.
+     Currently the message contains a list of incompatible db drivers.
      Can be used in code that finds driver depending on file format. */
-//! @todo make just QStringList
-    QString possibleProblemsInfoMsg() const;
+//! @todo make it just QStringList
+    QString possibleProblemsMessage() const;
 
     /*! @return true if there is at least one server-based database driver installed. */
     bool hasDatabaseServerDrivers();
