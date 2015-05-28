@@ -30,23 +30,23 @@
 
 #include <sqlite3.h>
 
-KDB_DRIVER_PLUGIN_FACTORY(SQLiteDriver, "kdb_sqlitedriver.json")
+KDB_DRIVER_PLUGIN_FACTORY(SqliteDriver, "kdb_sqlitedriver.json")
 
 //! driver specific private data
 //! @internal
-class SQLiteDriverPrivate
+class SqliteDriverPrivate
 {
 public:
-    SQLiteDriverPrivate() 
+    SqliteDriverPrivate()
      : collate(QLatin1String(" COLLATE ''"))
     {
     }
     KDbEscapedString collate;
 };
 
-SQLiteDriver::SQLiteDriver(QObject *parent, const QVariantList &args)
+SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
-        , dp(new SQLiteDriverPrivate)
+        , dp(new SqliteDriverPrivate)
 {
     d->isDBOpenedAfterCreate = true;
     d->features = SingleTransactions | CursorForward
@@ -87,25 +87,25 @@ SQLiteDriver::SQLiteDriver(QObject *parent, const QVariantList &args)
     d->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
 }
 
-SQLiteDriver::~SQLiteDriver()
+SqliteDriver::~SqliteDriver()
 {
     delete dp;
 }
 
 
 KDbConnection*
-SQLiteDriver::drv_createConnection(const KDbConnectionData& connData)
+SqliteDriver::drv_createConnection(const KDbConnectionData& connData)
 {
-    return new SQLiteConnection(this, connData);
+    return new SqliteConnection(this, connData);
 }
 
-bool SQLiteDriver::isSystemObjectName(const QString& n) const
+bool SqliteDriver::isSystemObjectName(const QString& n) const
 {
     return KDbDriver::isSystemObjectName(n)
            || n.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
 }
 
-bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
+bool SqliteDriver::drv_isSystemFieldName(const QString& n) const
 {
     const QString lcName(n.toLower());
     return (lcName == QLatin1String("_rowid_"))
@@ -113,37 +113,37 @@ bool SQLiteDriver::drv_isSystemFieldName(const QString& n) const
            || (lcName == QLatin1String("oid"));
 }
 
-KDbEscapedString SQLiteDriver::escapeString(const QString& str) const
+KDbEscapedString SqliteDriver::escapeString(const QString& str) const
 {
     return KDbEscapedString("'") + KDbEscapedString(str).replace('\'', "''") + '\'';
 }
 
-KDbEscapedString SQLiteDriver::escapeString(const QByteArray& str) const
+KDbEscapedString SqliteDriver::escapeString(const QByteArray& str) const
 {
     return KDbEscapedString("'") + KDbEscapedString(str).replace('\'', "''") + '\'';
 }
 
-KDbEscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
+KDbEscapedString SqliteDriver::escapeBLOB(const QByteArray& array) const
 {
     return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapeXHex));
 }
 
-QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const
+QString SqliteDriver::drv_escapeIdentifier(const QString& str) const
 {
     return QString(str).replace(QLatin1Char('"'), QLatin1String("\"\""));
 }
 
-QByteArray SQLiteDriver::drv_escapeIdentifier(const QByteArray& str) const
+QByteArray SqliteDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('"', "\"\"");
 }
 
-KDbAdminTools* SQLiteDriver::drv_createAdminTools() const
+KDbAdminTools* SqliteDriver::drv_createAdminTools() const
 {
-    return new SQLiteAdminTools();
+    return new SqliteAdminTools();
 }
 
-KDbEscapedString SQLiteDriver::collationSQL() const
+KDbEscapedString SqliteDriver::collationSQL() const
 {
     return dp->collate;
 }

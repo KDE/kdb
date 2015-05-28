@@ -42,7 +42,7 @@ void usleep(unsigned int usec)
 #include <unistd.h>
 #endif
 
-SQLiteVacuum::SQLiteVacuum(const QString& filePath)
+SqliteVacuum::SqliteVacuum(const QString& filePath)
         : m_filePath(filePath)
 {
     m_dumpProcess = 0;
@@ -52,7 +52,7 @@ SQLiteVacuum::SQLiteVacuum(const QString& filePath)
     m_result = true;
 }
 
-SQLiteVacuum::~SQLiteVacuum()
+SqliteVacuum::~SqliteVacuum()
 {
     if (m_dumpProcess) {
         m_dumpProcess->waitForFinished();
@@ -68,7 +68,7 @@ SQLiteVacuum::~SQLiteVacuum()
     QFile::remove(m_tmpFilePath);
 }
 
-tristate SQLiteVacuum::run()
+tristate SqliteVacuum::run()
 {
     const QString dump_app = QString::fromLatin1(KDB_SQLITE_DUMP_TOOL);
     //qDebug() << "KDb-drv(" KDB_DRIVER_NAME "):" << dump_app;
@@ -158,7 +158,7 @@ tristate SQLiteVacuum::run()
     return m_result;
 }
 
-void SQLiteVacuum::readFromStdErr()
+void SqliteVacuum::readFromStdErr()
 {
     while (true) {
         QByteArray s(m_dumpProcess->readLine(1000));
@@ -187,7 +187,7 @@ void SQLiteVacuum::readFromStdErr()
     }
 }
 
-void SQLiteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     KDbDrvDbg << exitCode << exitStatus;
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
@@ -221,7 +221,7 @@ void SQLiteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
     }
 }
 
-void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     KDbDrvDbg << exitCode << exitStatus;
 
@@ -231,7 +231,7 @@ void SQLiteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     }
 }
 
-void SQLiteVacuum::cancelClicked()
+void SqliteVacuum::cancelClicked()
 {
     m_sqliteProcess->terminate();
     m_result = cancelled;

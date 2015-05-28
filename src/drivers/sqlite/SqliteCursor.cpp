@@ -45,11 +45,11 @@ static bool sqliteStringToBool(const QString& s)
 
 //----------------------------------------------------
 
-class SQLiteCursorData : public SQLiteConnectionInternal
+class SqliteCursorData : public SqliteConnectionInternal
 {
 public:
-    explicit SQLiteCursorData(SQLiteConnection* conn)
-            : SQLiteConnectionInternal(conn)
+    explicit SqliteCursorData(SqliteConnection* conn)
+            : SqliteConnectionInternal(conn)
             , prepared_st_handle(0)
             , utail(0)
             , curr_coldata(0)
@@ -142,34 +142,34 @@ public:
     }
 };
 
-SQLiteCursor::SQLiteCursor(SQLiteConnection* conn, const KDbEscapedString& sql, uint options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, uint options)
         : KDbCursor(conn, sql, options)
-        , d(new SQLiteCursorData(conn))
+        , d(new SqliteCursorData(conn))
 {
-    d->data = static_cast<SQLiteConnection*>(conn)->d->data;
+    d->data = static_cast<SqliteConnection*>(conn)->d->data;
 }
 
-SQLiteCursor::SQLiteCursor(SQLiteConnection* conn, KDbQuerySchema* query, uint options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query, uint options)
         : KDbCursor(conn, query, options)
-        , d(new SQLiteCursorData(conn))
+        , d(new SqliteCursorData(conn))
 {
-    d->data = static_cast<SQLiteConnection*>(conn)->d->data;
+    d->data = static_cast<SqliteConnection*>(conn)->d->data;
 }
 
-SQLiteCursor::~SQLiteCursor()
+SqliteCursor::~SqliteCursor()
 {
     close();
     delete d;
 }
 
-bool SQLiteCursor::drv_open(const KDbEscapedString& sql)
+bool SqliteCursor::drv_open(const KDbEscapedString& sql)
 {
     //! @todo decode
     if (! d->data) {
-        // this may as example be the case if SQLiteConnection::drv_useDatabase()
+        // this may as example be the case if SqliteConnection::drv_useDatabase()
         // wasn't called before. Normaly sqlite_compile/sqlite3_prepare
         // should handle it, but it crashes in in sqlite3SafetyOn at util.c:786
-        qWarning() << "SQLiteCursor::drv_open(): Database handle undefined.";
+        qWarning() << "SqliteCursor::drv_open(): Database handle undefined.";
         return false;
     }
 
@@ -193,7 +193,7 @@ bool SQLiteCursor::drv_open(const KDbEscapedString& sql)
     return true;
 }
 
-bool SQLiteCursor::drv_close()
+bool SqliteCursor::drv_close()
 {
     int res = sqlite3_finalize(d->prepared_st_handle);
     if (res != SQLITE_OK) {
@@ -204,7 +204,7 @@ bool SQLiteCursor::drv_close()
     return true;
 }
 
-void SQLiteCursor::drv_getNextRecord()
+void SqliteCursor::drv_getNextRecord()
 {
     int res = sqlite3_step(d->prepared_st_handle);
     if (res == SQLITE_ROW) {
@@ -234,7 +234,7 @@ void SQLiteCursor::drv_getNextRecord()
       }*/
 }
 
-void SQLiteCursor::drv_appendCurrentRecordToBuffer()
+void SqliteCursor::drv_appendCurrentRecordToBuffer()
 {
 // KDbDrvDbg;
     if (!d->curr_coldata)
@@ -253,24 +253,24 @@ void SQLiteCursor::drv_appendCurrentRecordToBuffer()
 // KDbDrvDbg << "ok.";
 }
 
-void SQLiteCursor::drv_bufferMovePointerNext()
+void SqliteCursor::drv_bufferMovePointerNext()
 {
     d->curr_coldata++; //move to next record in the buffer
 }
 
-void SQLiteCursor::drv_bufferMovePointerPrev()
+void SqliteCursor::drv_bufferMovePointerPrev()
 {
     d->curr_coldata--; //move to prev record in the buffer
 }
 
 //compute a place in the buffer that contain next record's data
 //and move internal buffer pointer to that place
-void SQLiteCursor::drv_bufferMovePointerTo(qint64 at)
+void SqliteCursor::drv_bufferMovePointerTo(qint64 at)
 {
     d->curr_coldata = d->records.at(at);
 }
 
-void SQLiteCursor::drv_clearBuffer()
+void SqliteCursor::drv_clearBuffer()
 {
     if (d->cols_pointers_mem_size > 0) {
         const uint records_in_buf = m_records_in_buf;
@@ -290,19 +290,19 @@ void SQLiteCursor::drv_clearBuffer()
 
 //! @todo
 /*
-const char *** SQLiteCursor::bufferData()
+const char *** SqliteCursor::bufferData()
 {
   if (!isBuffered())
     return 0;
   return m_records.data();
 }*/
 
-const char ** SQLiteCursor::recordData() const
+const char ** SqliteCursor::recordData() const
 {
     return d->curr_coldata;
 }
 
-bool SQLiteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
+bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
     if (!m_fieldsExpanded) {//simple version: without types
         for (uint i = 0; i < m_fieldCount; i++) {
@@ -326,7 +326,7 @@ bool SQLiteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
     return true;
 }
 
-QVariant SQLiteCursor::value(uint i)
+QVariant SqliteCursor::value(uint i)
 {
     if (i > (m_fieldCount - 1)) //range checking
         return QVariant();
@@ -336,12 +336,12 @@ QVariant SQLiteCursor::value(uint i)
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }
 
-QString SQLiteCursor::serverResultName() const
+QString SqliteCursor::serverResultName() const
 {
-    return SQLiteConnectionInternal::serverResultName(m_result.serverErrorCode());
+    return SqliteConnectionInternal::serverResultName(m_result.serverErrorCode());
 }
 
-void SQLiteCursor::storeResult()
+void SqliteCursor::storeResult()
 {
     m_result.setServerMessage(
         QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));

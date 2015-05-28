@@ -23,17 +23,17 @@
 #include "KDbDriver.h"
 
 class KDbConnection;
-class SQLiteDriverPrivate;
+class SqliteDriverPrivate;
 
 //! SQLite database driver.
-class SQLiteDriver : public KDbDriver
+class SqliteDriver : public KDbDriver
 {
     Q_OBJECT
 
 public:
-    SQLiteDriver(QObject *parent, const QVariantList &args);
+    SqliteDriver(QObject *parent, const QVariantList &args);
 
-    virtual ~SQLiteDriver();
+    virtual ~SqliteDriver();
 
     /*! @return true if @a n is a system object name;
       for this driver any object with name prefixed with "sqlite_"
@@ -74,7 +74,7 @@ protected:
     */
     virtual bool drv_isSystemFieldName(const QString& n) const;
 
-    SQLiteDriverPrivate * const dp;
+    SqliteDriverPrivate * const dp;
 
 private:
     static const char * const keywords[];

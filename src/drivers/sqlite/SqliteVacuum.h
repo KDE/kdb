@@ -41,12 +41,12 @@ class QProgressDialog;
  creates a copy of the original database file, and replaces the orginal with the new only
  on success.
 */
-class SQLiteVacuum : public QObject
+class SqliteVacuum : public QObject
 {
     Q_OBJECT
 public:
-    explicit SQLiteVacuum(const QString& filePath);
-    ~SQLiteVacuum();
+    explicit SqliteVacuum(const QString& filePath);
+    ~SqliteVacuum();
 
     /*! Performs compacting procedure.
      @return true on success, false on failure and cancelled if user

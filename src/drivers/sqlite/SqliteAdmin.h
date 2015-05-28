@@ -24,11 +24,11 @@
 #include "KDbAdmin.h"
 
 //! @short An interface containing a set of tools for SQLite database administration.
-class SQLiteAdminTools : public KDbAdminTools
+class SqliteAdminTools : public KDbAdminTools
 {
 public:
-    SQLiteAdminTools();
-    virtual ~SQLiteAdminTools();
+    SqliteAdminTools();
+    virtual ~SqliteAdminTools();
 
 #ifdef KDB_SQLITE_VACUUM
     /*! Performs vacuum (compacting) for connection @a conn. */

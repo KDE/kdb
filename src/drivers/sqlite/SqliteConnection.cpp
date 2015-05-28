@@ -37,7 +37,7 @@
 #undef KDbDrvDbg
 #define KDbDrvDbg if (true); else qDebug()
 
-SQLiteConnectionInternal::SQLiteConnectionInternal(KDbConnection *connection)
+SqliteConnectionInternal::SqliteConnectionInternal(KDbConnection *connection)
         : KDbConnectionInternal(connection)
         , data(0)
         , data_owned(true)
@@ -45,7 +45,7 @@ SQLiteConnectionInternal::SQLiteConnectionInternal(KDbConnection *connection)
 {
 }
 
-SQLiteConnectionInternal::~SQLiteConnectionInternal()
+SqliteConnectionInternal::~SqliteConnectionInternal()
 {
     if (data_owned && data) {
         sqlite3_close(data);
@@ -83,12 +83,12 @@ static const char* const serverResultNames[] = {
     "SQLITE_NOTADB", // 26
 };
 
-void SQLiteConnectionInternal::storeResult()
+void SqliteConnectionInternal::storeResult()
 {
 }
 
 // static
-QString SQLiteConnectionInternal::serverResultName(int serverResultCode)
+QString SqliteConnectionInternal::serverResultName(int serverResultCode)
 {
     if (serverResultCode >= 0 && serverResultCode <= SQLITE_NOTADB)
         return QString::fromLatin1(serverResultNames[serverResultCode]);
@@ -99,12 +99,12 @@ QString SQLiteConnectionInternal::serverResultName(int serverResultCode)
     return QString();
 }
 
-bool SQLiteConnectionInternal::extensionsLoadingEnabled() const
+bool SqliteConnectionInternal::extensionsLoadingEnabled() const
 {
     return m_extensionsLoadingEnabled;
 }
 
-void SQLiteConnectionInternal::setExtensionsLoadingEnabled(bool set)
+void SqliteConnectionInternal::setExtensionsLoadingEnabled(bool set)
 {
     if (set == m_extensionsLoadingEnabled)
         return;
@@ -113,13 +113,13 @@ void SQLiteConnectionInternal::setExtensionsLoadingEnabled(bool set)
 }
 
 /*! Used by driver */
-SQLiteConnection::SQLiteConnection(KDbDriver *driver, const KDbConnectionData& connData)
+SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData)
         : KDbConnection(driver, connData)
-        , d(new SQLiteConnectionInternal(this))
+        , d(new SqliteConnectionInternal(this))
 {
 }
 
-SQLiteConnection::~SQLiteConnection()
+SqliteConnection::~SqliteConnection()
 {
     KDbDrvDbg;
     //disconnect if was connected
@@ -129,18 +129,18 @@ SQLiteConnection::~SQLiteConnection()
     KDbDrvDbg << "ok";
 }
 
-void SQLiteConnection::storeResult()
+void SqliteConnection::storeResult()
 {
     m_result.setServerMessage(
         QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));
 }
 
-bool SQLiteConnection::drv_connect()
+bool SqliteConnection::drv_connect()
 {
     return true;
 }
 
-bool SQLiteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
+bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     KDbDrvDbg;
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
@@ -153,27 +153,27 @@ bool SQLiteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     return true;
 }
 
-bool SQLiteConnection::drv_disconnect()
+bool SqliteConnection::drv_disconnect()
 {
     KDbDrvDbg;
     return true;
 }
 
-bool SQLiteConnection::drv_getDatabasesList(QStringList* list)
+bool SqliteConnection::drv_getDatabasesList(QStringList* list)
 {
     //this is one-db-per-file database
     list->append(data().databaseName());
     return true;
 }
 
-bool SQLiteConnection::drv_containsTable(const QString &tableName)
+bool SqliteConnection::drv_containsTable(const QString &tableName)
 {
     bool success = false;
     return resultExists(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
                         .arg(escapeString(tableName)), &success) && success;
 }
 
-bool SQLiteConnection::drv_getTablesList(QStringList* list)
+bool SqliteConnection::drv_getTablesList(QStringList* list)
 {
     KDbCursor *cursor;
     if (!(cursor = executeQuery(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table'")))) {
@@ -193,20 +193,20 @@ bool SQLiteConnection::drv_getTablesList(QStringList* list)
     return deleteCursor(cursor);
 }
 
-bool SQLiteConnection::drv_createDatabase(const QString &dbName)
+bool SqliteConnection::drv_createDatabase(const QString &dbName)
 {
     Q_UNUSED(dbName);
     return drv_useDatabaseInternal(0, 0, true/*create if missing*/);
 }
 
-bool SQLiteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
+bool SqliteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
                                        KDbMessageHandler* msgHandler)
 {
     Q_UNUSED(dbName);
     return drv_useDatabaseInternal(cancelled, msgHandler, false/*do not create if missing*/);
 }
 
-bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
+bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
                                                KDbMessageHandler* msgHandler, bool createIfMissing)
 {
 //! @todo add option (command line or in kdbrc?)
@@ -315,14 +315,14 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
     return res == SQLITE_OK;
 }
 
-void SQLiteConnection::drv_closeDatabaseSilently()
+void SqliteConnection::drv_closeDatabaseSilently()
 {
     KDbResult result = this->result(); // save
     drv_closeDatabase();
     m_result = result;
 }
 
-bool SQLiteConnection::drv_closeDatabase()
+bool SqliteConnection::drv_closeDatabase()
 {
     if (!d->data)
         return false;
@@ -342,7 +342,7 @@ bool SQLiteConnection::drv_closeDatabase()
     return false;
 }
 
-bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
+bool SqliteConnection::drv_dropDatabase(const QString &dbName)
 {
     Q_UNUSED(dbName); // Each database is one single SQLite file.
     const QString filename = data().databaseName();
@@ -357,17 +357,17 @@ bool SQLiteConnection::drv_dropDatabase(const QString &dbName)
     return true;
 }
 
-KDbCursor* SQLiteConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
 {
-    return new SQLiteCursor(this, sql, cursor_options);
+    return new SqliteCursor(this, sql, cursor_options);
 }
 
-KDbCursor* SQLiteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
 {
-    return new SQLiteCursor(this, query, cursor_options);
+    return new SqliteCursor(this, query, cursor_options);
 }
 
-bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
+bool SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
@@ -396,22 +396,22 @@ bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
     return res == SQLITE_OK;
 }
 
-quint64 SQLiteConnection::drv_lastInsertRecordId()
+quint64 SqliteConnection::drv_lastInsertRecordId()
 {
     return (quint64)sqlite3_last_insert_rowid(d->data);
 }
 
-QString SQLiteConnection::serverResultName() const
+QString SqliteConnection::serverResultName() const
 {
-    return SQLiteConnectionInternal::serverResultName(m_result.serverErrorCode());
+    return SqliteConnectionInternal::serverResultName(m_result.serverErrorCode());
 }
 
-KDbPreparedStatementInterface* SQLiteConnection::prepareStatementInternal()
+KDbPreparedStatementInterface* SqliteConnection::prepareStatementInternal()
 {
-    return new SQLitePreparedStatement(d);
+    return new SqlitePreparedStatement(d);
 }
 
-bool SQLiteConnection::isReadOnly() const
+bool SqliteConnection::isReadOnly() const
 {
     return KDbConnection::isReadOnly();
 //! @todo port
@@ -419,7 +419,7 @@ bool SQLiteConnection::isReadOnly() const
     //       || KDbConnection::isReadOnly();
 }
 
-bool SQLiteConnection::loadExtension(const QString& path)
+bool SqliteConnection::loadExtension(const QString& path)
 {
     bool tempEnable = false;
     clearResult();
@@ -427,7 +427,7 @@ bool SQLiteConnection::loadExtension(const QString& path)
     if (!fileInfo.exists()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              QObject::tr("Could not find SQLite extension file \"%1\".").arg(path));
-        KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension";
+        KDbWarn << "SqliteConnection::loadExtension(): Could not load SQLite extension";
         return false;
     }
     if (!d->extensionsLoadingEnabled()) {
@@ -441,7 +441,7 @@ bool SQLiteConnection::loadExtension(const QString& path)
         m_result.setServerErrorCode(res);
         m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
                              QObject::tr("Could not load SQLite extension \"%1\".").arg(path));
-        KDbWarn << "SQLiteConnection::loadExtension(): Could not load SQLite extension"
+        KDbWarn << "SqliteConnection::loadExtension(): Could not load SQLite extension"
                 << path << ":" << errmsg_p;
         if (errmsg_p) {
             m_result.setServerMessage(QLatin1String(errmsg_p));

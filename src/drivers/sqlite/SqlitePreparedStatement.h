@@ -26,12 +26,12 @@
 class KDbField;
 
 /*! Implementation of prepared statements for the SQLite driver. */
-class SQLitePreparedStatement : public KDbPreparedStatementInterface, public SQLiteConnectionInternal
+class SqlitePreparedStatement : public KDbPreparedStatementInterface, public SqliteConnectionInternal
 {
 public:
-    explicit SQLitePreparedStatement(SQLiteConnectionInternal* conn);
+    explicit SqlitePreparedStatement(SqliteConnectionInternal* conn);
 
-    virtual ~SQLitePreparedStatement();
+    virtual ~SqlitePreparedStatement();
 
 protected:
     virtual bool prepare(const KDbEscapedString& sql);

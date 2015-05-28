@@ -25,17 +25,17 @@
 
 #include <QDir>
 
-SQLiteAdminTools::SQLiteAdminTools()
+SqliteAdminTools::SqliteAdminTools()
         : KDbAdminTools()
 {
 }
 
-SQLiteAdminTools::~SQLiteAdminTools()
+SqliteAdminTools::~SqliteAdminTools()
 {
 }
 
 #ifdef KDB_SQLITE_VACUUM
-bool SQLiteAdminTools::vacuum(const KDbConnectionData& data, const QString& databaseName)
+bool SqliteAdminTools::vacuum(const KDbConnectionData& data, const QString& databaseName)
 {
     clearResult();
     KDbDriverManager manager;
@@ -46,7 +46,7 @@ bool SQLiteAdminTools::vacuum(const KDbConnectionData& data, const QString& data
         return false;
     }
     QFileInfo file(databaseName);
-    SQLiteVacuum vacuum(QDir::fromNativeSeparators(file.absoluteFilePath()));
+    SqliteVacuum vacuum(QDir::fromNativeSeparators(file.absoluteFilePath()));
     tristate result = vacuum.run();
     if (false == result) {
         m_result = KDbResult(title);

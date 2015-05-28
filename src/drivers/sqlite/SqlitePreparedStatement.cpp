@@ -22,22 +22,22 @@
 
 #include <QtDebug>
 
-SQLitePreparedStatement::SQLitePreparedStatement(SQLiteConnectionInternal* conn)
+SqlitePreparedStatement::SqlitePreparedStatement(SqliteConnectionInternal* conn)
         : KDbPreparedStatementInterface()
-        , SQLiteConnectionInternal(conn->connection)
+        , SqliteConnectionInternal(conn->connection)
         , m_handle(0)
 {
     data_owned = false;
     data = conn->data; //copy
 }
 
-SQLitePreparedStatement::~SQLitePreparedStatement()
+SqlitePreparedStatement::~SqlitePreparedStatement()
 {
     sqlite3_finalize(m_handle);
     m_handle = 0;
 }
 
-bool SQLitePreparedStatement::prepare(const KDbEscapedString& sql)
+bool SqlitePreparedStatement::prepare(const KDbEscapedString& sql)
 {
     int res = sqlite3_prepare(
             data,                    /* Database handle */
@@ -54,7 +54,7 @@ bool SQLitePreparedStatement::prepare(const KDbEscapedString& sql)
     return true;
 }
 
-bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, int par)
+bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, int par)
 {
     if (value.isNull()) {
         //no value to bind or the value is null: bind NULL
@@ -202,7 +202,7 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     return true;
 }
 
-bool SQLitePreparedStatement::execute(
+bool SqlitePreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList& insertFieldList,

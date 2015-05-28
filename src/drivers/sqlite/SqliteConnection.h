@@ -24,14 +24,14 @@
 
 #include "KDbConnection.h"
 
-class SQLiteConnectionInternal;
+class SqliteConnectionInternal;
 class KDbDriver;
 
 //! SQLite-specific connection
-class SQLiteConnection : public KDbConnection
+class SqliteConnection : public KDbConnection
 {
 public:
-    virtual ~SQLiteConnection();
+    virtual ~SqliteConnection();
 
     virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
@@ -43,7 +43,7 @@ public:
 
 protected:
     /*! Used by driver */
-    SQLiteConnection(KDbDriver *driver, const KDbConnectionData& connData);
+    SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData);
 
     virtual bool drv_connect();
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
@@ -90,7 +90,7 @@ protected:
     //! for drv_changeFieldProperty()
     tristate changeFieldType(KDbTableSchema *table, KDbField *field, KDbField::Type type);
 
-    SQLiteConnectionInternal* d;
+    SqliteConnectionInternal* d;
 
 private:
     bool drv_useDatabaseInternal(bool *cancelled, KDbMessageHandler* msgHandler, bool createIfMissing);
@@ -101,8 +101,8 @@ private:
     //! Loads extension from library at @a path (absolute path is recommended)
     bool loadExtension(const QString& path);
 
-    friend class SQLiteDriver;
-    friend class SQLiteCursor;
+    friend class SqliteDriver;
+    friend class SqliteCursor;
 };
 
 #endif

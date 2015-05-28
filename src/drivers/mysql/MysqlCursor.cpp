@@ -118,7 +118,7 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
         return false;
 
 //! @todo js: use MYSQL_FIELD::type here!
-//!           see SQLiteCursor::storeCurrentRecord()
+//!           see SqliteCursor::storeCurrentRecord()
 
     const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
     const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);

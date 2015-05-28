@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-// ** bits of SQLiteConnection related to table altering **
+// ** bits of SqliteConnection related to table altering **
 
 #include "SqliteConnection.h"
 #include "KDb.h"
@@ -25,13 +25,13 @@
 #include <QHash>
 #include <QGlobalStatic>
 
-enum SQLiteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
+enum SqliteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
     NoAffinity = 0, IntAffinity = 1, TextAffinity = 2, BLOBAffinity = 3
 };
 
 //! @internal
-struct SQLiteTypeAffinityInternal {
-    SQLiteTypeAffinityInternal() {
+struct SqliteTypeAffinityInternal {
+    SqliteTypeAffinityInternal() {
         affinity.insert(KDbField::Byte, IntAffinity);
         affinity.insert(KDbField::ShortInteger, IntAffinity);
         affinity.insert(KDbField::Integer, IntAffinity);
@@ -46,19 +46,19 @@ struct SQLiteTypeAffinityInternal {
         affinity.insert(KDbField::LongText, TextAffinity);
         affinity.insert(KDbField::BLOB, BLOBAffinity);
     }
-    QHash<KDbField::Type, SQLiteTypeAffinity> affinity;
+    QHash<KDbField::Type, SqliteTypeAffinity> affinity;
 };
 
-Q_GLOBAL_STATIC(SQLiteTypeAffinityInternal, KDb_SQLite_affinityForType)
+Q_GLOBAL_STATIC(SqliteTypeAffinityInternal, KDb_SQLite_affinityForType)
 
 //! @return SQLite type affinity for @a type
 //! See doc/dev/alter_table_type_conversions.ods, page 2 for more info
-static SQLiteTypeAffinity affinityForType(KDbField::Type type)
+static SqliteTypeAffinity affinityForType(KDbField::Type type)
 {
     return KDb_SQLite_affinityForType->affinity[type];
 }
 
-tristate SQLiteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbField *field,
+tristate SqliteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbField *field,
         const QString& propertyName, const QVariant& value)
 {
     if (propertyName == QLatin1String("type")) {
@@ -95,13 +95,13 @@ tristate SQLiteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbFie
 
  See alter_table_type_conversions.ods for details.
 */
-tristate SQLiteConnection::changeFieldType(KDbTableSchema *table, KDbField *field,
+tristate SqliteConnection::changeFieldType(KDbTableSchema *table, KDbField *field,
         KDbField::Type type)
 {
     Q_UNUSED(table);
     const KDbField::Type oldType = field->type();
-    const SQLiteTypeAffinity oldAffinity = affinityForType(oldType);
-    const SQLiteTypeAffinity newAffinity = affinityForType(type);
+    const SqliteTypeAffinity oldAffinity = affinityForType(oldType);
+    const SqliteTypeAffinity newAffinity = affinityForType(type);
     if (oldAffinity != newAffinity) {
         //type affinity will be changed
     }

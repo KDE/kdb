@@ -24,14 +24,14 @@
 
 #include <sqlite3.h>
 
-class SQLiteConnection;
+class SqliteConnection;
 
 /*! Internal SQLite connection data. Also used by SqliteCursor. */
-class SQLiteConnectionInternal : public KDbConnectionInternal
+class SqliteConnectionInternal : public KDbConnectionInternal
 {
 public:
-    explicit SQLiteConnectionInternal(KDbConnection *connection);
-    virtual ~SQLiteConnectionInternal();
+    explicit SqliteConnectionInternal(KDbConnection *connection);
+    virtual ~SqliteConnectionInternal();
 
     virtual void storeResult();
 
