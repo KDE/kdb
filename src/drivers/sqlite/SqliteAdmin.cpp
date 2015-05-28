@@ -39,7 +39,7 @@ bool SQLiteAdminTools::vacuum(const KDbConnectionData& data, const QString& data
 {
     clearResult();
     KDbDriverManager manager;
-    KDbDriver *drv = manager.driver(data.driverName());
+    KDbDriver *drv = manager.driver(data.driverId());
     QString title(QObject::tr("Could not compact database \"%1\".").arg(QDir::fromNativeSeparators(databaseName)));
     if (!drv) {
         m_result = KDbResult(title);

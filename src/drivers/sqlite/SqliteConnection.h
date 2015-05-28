@@ -43,7 +43,7 @@ public:
 
 protected:
     /*! Used by driver */
-    SQLiteConnection(KDbDriver *driver, const ConnectionData& connData);
+    SQLiteConnection(KDbDriver *driver, const KDbConnectionData& connData);
 
     virtual bool drv_connect();
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version);

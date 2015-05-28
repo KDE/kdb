@@ -29,8 +29,6 @@ class KDB_EXPORT KDbConnectionInternal
 {
 public:
     explicit KDbConnectionInternal(KDbConnection *conn);
-
-protected:
     KDbConnection* const connection;
 };
 

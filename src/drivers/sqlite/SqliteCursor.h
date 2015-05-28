@@ -26,6 +26,7 @@
 #include "KDbConnection.h"
 
 class SQLiteCursorData;
+class SQLiteConnection;
 
 /*!
 
@@ -48,10 +49,10 @@ public:
 
 protected:
     /*! KDbCursor will operate on @a conn, raw @a sql statement will be used to execute query. */
-    SQLiteCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
+    SQLiteCursor(SQLiteConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
 
     /*! KDbCursor will operate on @a conn, @a query schema will be used to execute query. */
-    SQLiteCursor(KDbConnection* conn, KDbQuerySchema* query,
+    SQLiteCursor(SQLiteConnection* conn, KDbQuerySchema* query,
                  uint options = NoOptions);
 
     virtual bool drv_open(const KDbEscapedString& sql);

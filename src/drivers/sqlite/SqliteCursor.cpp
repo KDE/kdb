@@ -45,12 +45,11 @@ static bool sqliteStringToBool(const QString& s)
 
 //----------------------------------------------------
 
-class KDbSQLiteCursorData : public SQLiteConnectionInternal
+class SQLiteCursorData : public SQLiteConnectionInternal
 {
 public:
-    explicit SQLiteCursorData(KDbConnection* conn)
-            :
-            SQLiteConnectionInternal(conn)
+    explicit SQLiteCursorData(SQLiteConnection* conn)
+            : SQLiteConnectionInternal(conn)
             , prepared_st_handle(0)
             , utail(0)
             , curr_coldata(0)
@@ -143,14 +142,14 @@ public:
     }
 };
 
-SQLiteCursor::SQLiteCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
+SQLiteCursor::SQLiteCursor(SQLiteConnection* conn, const KDbEscapedString& sql, uint options)
         : KDbCursor(conn, sql, options)
         , d(new SQLiteCursorData(conn))
 {
     d->data = static_cast<SQLiteConnection*>(conn)->d->data;
 }
 
-SQLiteCursor::SQLiteCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+SQLiteCursor::SQLiteCursor(SQLiteConnection* conn, KDbQuerySchema* query, uint options)
         : KDbCursor(conn, query, options)
         , d(new SQLiteCursorData(conn))
 {
@@ -230,16 +229,16 @@ void SQLiteCursor::drv_getNextRecord()
     /*
       if ((int)m_result == (int)FetchOK && d->curr_coldata) {
         for (uint i=0;i<m_fieldCount;i++) {
-          PreDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
+          KDbDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)");
         }
-    //  PreDrvDbg << m_fieldCount << "col(s) fetched";
+    //  KDbDrvDbg << m_fieldCount << "col(s) fetched";
       }*/
 }
 
 void SQLiteCursor::drv_appendCurrentRecordToBuffer()
 {
-// PreDrvDbg;
+// KDbDrvDbg;
     if (!d->curr_coldata)
         return;
     if (!d->cols_pointers_mem_size)
@@ -248,12 +247,12 @@ void SQLiteCursor::drv_appendCurrentRecordToBuffer()
     const char **src_col = d->curr_coldata;
     const char **dest_col = record;
     for (uint i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
-//  PreDrvDbg << i <<": '" << *src_col << "'";
-//  PreDrvDbg << "src_col: " << src_col;
+//  KDbDrvDbg << i <<": '" << *src_col << "'";
+//  KDbDrvDbg << "src_col: " << src_col;
         *dest_col = *src_col ? strdup(*src_col) : 0;
     }
     d->records[m_records_in_buf] = record;
-// PreDrvDbg << "ok.";
+// KDbDrvDbg << "ok.";
 }
 
 void SQLiteCursor::drv_bufferMovePointerNext()
@@ -323,7 +322,7 @@ bool SQLiteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
             break;
         }
         KDbField *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
-//  PreDrvDbg << "col=" << (col ? *col : 0);
+//  KDbDrvDbg << "col=" << (col ? *col : 0);
         (*data)[i] = d->getValue(f, i);
     }
     return true;

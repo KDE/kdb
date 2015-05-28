@@ -22,7 +22,7 @@
 
 #include <sqlite3.h>
 
-#include "KDbGlobal.h"
+#include "kdb_version.h"
 
 using namespace std;
 
@@ -30,9 +30,9 @@ extern "C" int shell_main(const char *inFilename);
     
 void usage()
 {
-    cout << PREDICATE_SQLITE_DUMP_TOOL " version " KDB_VERSION_STRING << endl
+    cout << KDB_SQLITE_DUMP_TOOL " version " KDB_VERSION_STRING << endl
          << "A tool for executing DUMP command on SQLite 3 databases." << endl
-         << "Usage: " PREDICATE_SQLITE_DUMP_TOOL " <database>" << endl;
+         << "Usage: " KDB_SQLITE_DUMP_TOOL " <database>" << endl;
 }
 
 int main(int argc, char **argv)

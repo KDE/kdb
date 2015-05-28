@@ -1,0 +1,22 @@
+[Desktop Entry]
+Name=SQLite
+Comment=KDb driver for handling SQLite databases
+Type=Service
+Icon=
+Encoding=UTF-8
+
+X-KDE-Library=kdb_sqlitedriver
+X-KDE-ServiceTypes=KDb/Driver
+X-KDE-PluginInfo-Author=Kexi Team
+X-KDE-PluginInfo-Email=kexi@kde.org
+X-KDE-PluginInfo-Name=org.kde.kdb.sqlite
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=http://kexi-project.org
+X-KDE-PluginInfo-Category=
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=LGPL
+X-KDE-PluginInfo-EnabledByDefault=true
+
+X-KDb-FileBased=true
+X-KDb-ImportingEnabled=false
+MimeType=application/x-kexiproject-sqlite3,application/x-sqlite3

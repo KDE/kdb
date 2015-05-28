@@ -1,7 +1,7 @@
 add_feature_info(BUILD_SQLITE_DB_DRIVER TRUE ${BUILD_SQLITE_DB_DRIVER_DESC})
 
 # Generate SqliteGlobal.h
-configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h )
+configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h)
 
 simple_option(KDB_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
 
@@ -40,7 +40,7 @@ include_directories(
 
 add_definitions(
   -D__KDB__=
-  -DKDB_DRIVER_NAME="sqlite"
+  -DKDB_DRIVER_NAME=\"sqlite\"
 )
 
 if(MSVC)
@@ -63,30 +63,30 @@ set(kdb_sqlite_SRCS
    SqliteAlter.cpp
 )
 
-set(kdb_sqlite_MOC_SRCS
-   SqliteDriver.h
-)
-
 if (KDB_SQLITE_VACUUM)
   list(APPEND kdb_sqlite_SRCS SqliteVacuum.cpp)
   list(APPEND kdb_sqlite_MOC_SRCS SqliteVacuum.h)
 endif ()
 
-qt_wrap_cpp(kdb_sqlite kdb_sqlite_SRCS ${kdb_sqlite_MOC_SRCS})
+add_library(kdb_sqlitedriver MODULE ${kdb_sqlite_SRCS})
+kcoreaddons_desktop_to_json(kdb_sqlitedriver kdb_sqlitedriver.desktop)
 
-add_library(kdb_sqlite SHARED ${kdb_sqlite_SRCS})
+target_link_libraries(kdb_sqlitedriver
+    PUBLIC
+        KDb
+    PRIVATE
+        ${SQLITE_LIBRARIES}
+)
 
-target_link_libraries(kdb_sqlite ${SQLITE_LIBRARIES} kdb)
-if(DEFINED CMAKE_DL_LIBS)
-  target_link_libraries(kdb_sqlite ${CMAKE_DL_LIBS})
-endif()
-if(DEFINED CMAKE_THREAD_LIBS)
-  target_link_libraries(kdb_sqlite ${CMAKE_THREAD_LIBS})
-endif()
-set_target_properties(kdb_sqlite PROPERTIES PREFIX "")
+#if(DEFINED CMAKE_DL_LIBS)
+#  target_link_libraries(kdb_sqlitedriver ${CMAKE_DL_LIBS})
+#endif()
+#if(DEFINED CMAKE_THREAD_LIBS)
+#  target_link_libraries(kdb_sqlitedriver ${CMAKE_THREAD_LIBS})
+#endif()
+#set_target_properties(kdb_sqlitedriver PROPERTIES PREFIX "")
 
-install(TARGETS kdb_sqlite DESTINATION ${KDB_PLUGINS_DIR})
-install(FILES kdb_sqlite.desktop DESTINATION ${KDB_PLUGINS_DIR})
+install(TARGETS kdb_sqlitedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
 
 add_subdirectory(icu)
 

@@ -34,11 +34,11 @@
 #include <QRegExp>
 
 //remove debug
-#undef PreDrvDbg
-#define PreDrvDbg if (true); else qDebug()
+#undef KDbDrvDbg
+#define KDbDrvDbg if (true); else qDebug()
 
 SQLiteConnectionInternal::SQLiteConnectionInternal(KDbConnection *connection)
-        : ConnectionInternal(connection)
+        : KDbConnectionInternal(connection)
         , data(0)
         , data_owned(true)
         , m_extensionsLoadingEnabled(false)
@@ -113,7 +113,7 @@ void SQLiteConnectionInternal::setExtensionsLoadingEnabled(bool set)
 }
 
 /*! Used by driver */
-SQLiteConnection::SQLiteConnection(KDbDriver *driver, const ConnectionData& connData)
+SQLiteConnection::SQLiteConnection(KDbDriver *driver, const KDbConnectionData& connData)
         : KDbConnection(driver, connData)
         , d(new SQLiteConnectionInternal(this))
 {
@@ -121,12 +121,12 @@ SQLiteConnection::SQLiteConnection(KDbDriver *driver, const ConnectionData& conn
 
 SQLiteConnection::~SQLiteConnection()
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     //disconnect if was connected
 // disconnect();
     destroy();
     delete d;
-    PreDrvDbg << "ok";
+    KDbDrvDbg << "ok";
 }
 
 void SQLiteConnection::storeResult()
@@ -142,7 +142,7 @@ bool SQLiteConnection::drv_connect()
 
 bool SQLiteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
     QRegExp re(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (re.exactMatch(version->string())) {
@@ -155,7 +155,7 @@ bool SQLiteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 
 bool SQLiteConnection::drv_disconnect()
 {
-    PreDrvDbg;
+    KDbDrvDbg;
     return true;
 }
 
@@ -315,9 +315,9 @@ bool SQLiteConnection::drv_useDatabaseInternal(bool *cancelled,
 
 void SQLiteConnection::drv_closeDatabaseSilently()
 {
-    KDbResult result = d->connection->result(); // save
+    KDbResult result = this->result(); // save
     drv_closeDatabase();
-    d->setResult(result);
+    m_result = result;
 }
 
 bool SQLiteConnection::drv_closeDatabase()
@@ -368,7 +368,7 @@ KDbCursor* SQLiteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_opt
 bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
-    KDbdebugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
+    KDb::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
 #endif
 
     char *errmsg_p = 0;
@@ -382,13 +382,13 @@ bool SQLiteConnection::drv_executeSQL(const KDbEscapedString& sql)
     );
     if (errmsg_p) {
         clearResult();
-        d->setServerMessage(QLatin1String(errmsg_p));
+        m_result.setServerMessage(QLatin1String(errmsg_p));
         sqlite3_free(errmsg_p);
     }
 
     storeResult();
 #ifdef KDB_DEBUG_GUI
-    KDbdebugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
+    KDb::debugGUI(QLatin1String( m_result.serverResultCode() == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
     return m_result.serverResultCode() == SQLITE_OK;
 }
@@ -431,7 +431,7 @@ bool SQLiteConnection::loadExtension(const QString& path)
             << path << ":" << errmsg_p;
     if (errmsg_p) {
         clearResult();
-        d->setServerMessage(QLatin1String(errmsg_p));
+        m_result.setServerMessage(QLatin1String(errmsg_p));
         sqlite3_free(errmsg_p);
     }
     if (tempEnable) {

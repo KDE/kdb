@@ -20,7 +20,7 @@
 #ifndef KDB_SQLITEPREPAREDSTATEMENT_H
 #define KDB_SQLITEPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/KDbPreparedStatementInterface>
+#include "KDbPreparedStatementInterface.h"
 #include "SqliteConnection_p.h"
 
 class KDbField;
@@ -29,7 +29,7 @@ class KDbField;
 class SQLitePreparedStatement : public KDbPreparedStatementInterface, public SQLiteConnectionInternal
 {
 public:
-    explicit SQLitePreparedStatement(ConnectionInternal* conn);
+    explicit SQLitePreparedStatement(SQLiteConnectionInternal* conn);
 
     virtual ~SQLitePreparedStatement();
 

@@ -20,14 +20,15 @@
 #include "SqlitePreparedStatement.h"
 #include "KDbPreparedStatement.h"
 
+#include <QtDebug>
 
-SQLitePreparedStatement::SQLitePreparedStatement(ConnectionInternal* conn)
+SQLitePreparedStatement::SQLitePreparedStatement(SQLiteConnectionInternal* conn)
         : KDbPreparedStatementInterface()
         , SQLiteConnectionInternal(conn->connection)
         , m_handle(0)
 {
     data_owned = false;
-    data = dynamic_cast<SQLiteConnectionInternal&>(*conn).data; //copy
+    data = conn->data; //copy
 }
 
 SQLitePreparedStatement::~SQLitePreparedStatement()
@@ -41,7 +42,7 @@ bool SQLitePreparedStatement::prepare(const KDbEscapedString& sql)
     m_result.setServerResultCode(
         sqlite3_prepare(
             data,                    /* Database handle */
-            sql.toByteArray(),       /* SQL statement, UTF-8 encoded */
+            sql.toByteArray().constData(), /* SQL statement, UTF-8 encoded */
             sql.length(),            /* Length of zSql in bytes. */
             &m_handle,               /* OUT: Statement handle */
             0                        /* OUT: Pointer to unused portion of zSql */
@@ -67,7 +68,7 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
         const QByteArray utf8String(value.toString().toUtf8());
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
-                              (const char*)utf8String, utf8String.length(), SQLITE_TRANSIENT /*??*/));
+                              utf8String.constData(), utf8String.length(), SQLITE_TRANSIENT /*??*/));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
@@ -136,8 +137,8 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     case KDbField::Time:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
-                              value.toTime().toString(Qt::ISODate).toLatin1(),
-                              sizeof("HH:MM:SS"), SQLITE_TRANSIENT /*??*/));
+                              value.toTime().toString(Qt::ISODate).toLatin1().constData(),
+                              QLatin1String("HH:MM:SS").size(), SQLITE_TRANSIENT /*??*/));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
@@ -146,8 +147,8 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     case KDbField::Date:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
-                              value.toDate().toString(Qt::ISODate).toLatin1(),
-                              sizeof("YYYY-MM-DD"), SQLITE_TRANSIENT /*??*/));
+                              value.toDate().toString(Qt::ISODate).toLatin1().constData(),
+                              QLatin1String("YYYY-MM-DD").size(), SQLITE_TRANSIENT /*??*/));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
@@ -156,8 +157,8 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     case KDbField::DateTime:
         m_result.setServerResultCode(
             sqlite3_bind_text(m_handle, par,
-                              value.toDateTime().toString(Qt::ISODate).toLatin1(),
-                              sizeof("YYYY-MM-DDTHH:MM:SS"), SQLITE_TRANSIENT /*??*/));
+                              value.toDateTime().toString(Qt::ISODate).toLatin1().constData(),
+                              QLatin1String("YYYY-MM-DDTHH:MM:SS").size(), SQLITE_TRANSIENT /*??*/));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?
             return false;
@@ -176,7 +177,7 @@ bool SQLitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     }
     default:
         KDbWarn << "unsupported field type:"
-            << field->type() << "- NULL value bound to column #" << par;
+                << field->type() << "- NULL value bound to column #" << par;
         m_result.setServerResultCode(sqlite3_bind_null(m_handle, par));
         if (SQLITE_OK != m_result.serverResultCode()) {
             //! @todo msg?

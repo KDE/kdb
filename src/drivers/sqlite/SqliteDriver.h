@@ -29,10 +29,9 @@ class SQLiteDriverPrivate;
 class SQLiteDriver : public KDbDriver
 {
     Q_OBJECT
-    PREDICATE_DRIVER
 
 public:
-    SQLiteDriver();
+    SQLiteDriver(QObject *parent, const QVariantList &args);
 
     virtual ~SQLiteDriver();
 
@@ -66,8 +65,8 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
-    virtual AdminTools* drv_createAdminTools() const;
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData);
+    virtual KDbAdminTools* drv_createAdminTools() const;
 
     /*! @return true if @a n is a system field name;
       for this driver fields with name equal "_ROWID_"
@@ -79,7 +78,6 @@ protected:
 
 private:
     static const char * const keywords[];
-
 };
 
 #endif

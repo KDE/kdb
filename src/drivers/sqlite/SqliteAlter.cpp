@@ -21,8 +21,9 @@
 
 #include "SqliteConnection.h"
 #include "KDb.h"
-#include <Predicate/Tools/Static>
+
 #include <QHash>
+#include <QGlobalStatic>
 
 enum SQLiteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
     NoAffinity = 0, IntAffinity = 1, TextAffinity = 2, BLOBAffinity = 3

@@ -30,11 +30,11 @@
 
 #include <sqlite3.h>
 
-EXPORT_PREDICATE_DRIVER(SQLiteDriver, sqlite)
+KDB_DRIVER_PLUGIN_FACTORY(SQLiteDriver, "kdb_sqlitedriver.json")
 
 //! driver specific private data
 //! @internal
-class KDbSQLiteDriverPrivate
+class SQLiteDriverPrivate
 {
 public:
     SQLiteDriverPrivate() 
@@ -44,8 +44,8 @@ public:
     KDbEscapedString collate;
 };
 
-SQLiteDriver::SQLiteDriver()
-        : KDbDriver()
+SQLiteDriver::SQLiteDriver(QObject *parent, const QVariantList &args)
+        : KDbDriver(parent, args)
         , dp(new SQLiteDriverPrivate)
 {
     d->isDBOpenedAfterCreate = true;
@@ -94,7 +94,7 @@ SQLiteDriver::~SQLiteDriver()
 
 
 KDbConnection*
-SQLiteDriver::drv_createConnection(const ConnectionData& connData)
+SQLiteDriver::drv_createConnection(const KDbConnectionData& connData)
 {
     return new SQLiteConnection(this, connData);
 }
@@ -125,7 +125,7 @@ KDbEscapedString SQLiteDriver::escapeString(const QByteArray& str) const
 
 KDbEscapedString SQLiteDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KDbEscapedString(KDb::escapeBLOB(array, KDbBLOBEscapeXHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapeXHex));
 }
 
 QString SQLiteDriver::drv_escapeIdentifier(const QString& str) const
@@ -138,7 +138,7 @@ QByteArray SQLiteDriver::drv_escapeIdentifier(const QByteArray& str) const
     return QByteArray(str).replace('"', "\"\"");
 }
 
-AdminTools* SQLiteDriver::drv_createAdminTools() const
+KDbAdminTools* SQLiteDriver::drv_createAdminTools() const
 {
     return new SQLiteAdminTools();
 }
@@ -147,3 +147,5 @@ KDbEscapedString SQLiteDriver::collationSQL() const
 {
     return dp->collate;
 }
+
+#include "SqliteDriver.moc"

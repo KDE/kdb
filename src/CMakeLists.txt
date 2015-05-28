@@ -3,6 +3,8 @@ simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
 configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
 
+add_subdirectory(drivers)
+
 add_definitions(
     #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
     -D__KDB__=
