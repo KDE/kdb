@@ -21,8 +21,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <QStringList>
 #include <QApplication>
 #include <QFile>
-
-#include <KTemporaryFile>
+#include <QTemporaryFile>
 
 #include "SybaseConnection_p.h"
 
@@ -143,9 +142,7 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
         }
     }
 
-
-    KTemporaryFile confFile;
-    confFile.setSuffix(".conf");
+    QTemporaryFile confFile(QDir::tempPath() + QLatin1String("/kdb_sybase_XXXXXX.conf"));
     confFile.open();
 
     QTextStream out(&confFile);

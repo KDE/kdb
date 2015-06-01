@@ -18,7 +18,7 @@
 */
 
 
-#include <KTemporaryFile>
+#include <QTemporaryFile>
 
 #include "XbaseConnection_p.h"
 #include "XbaseExport.h"
@@ -54,13 +54,12 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
 {
   // we have to migrate the xbase source database into a .kexi file
   // xbase source database directory will be in connectiondata
-  // we can choose a KTemporaryFile for the destination .kexi file
+  // we can choose a QTemporaryFile for the destination .kexi file
 
   KexiMigration::MigrateManager xBase2KexiMigrateManager;
 
   // create a temporary .kexi file
-  KTemporaryFile temporaryKexiFile;
-  temporaryKexiFile.setSuffix( ".kexi" );
+  QTemporaryFile temporaryKexiFile(QDir::tempPath() + QLatin1String("/kdb_xbase_XXXXXX.kexi"));
   temporaryKexiFile.setAutoRemove( false );
 
   if ( !temporaryKexiFile.open() ) {
