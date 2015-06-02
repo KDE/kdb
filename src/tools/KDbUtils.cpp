@@ -37,12 +37,12 @@
 #include <QFile>
 #include <QFileInfo>
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #include <windows.h>
 #ifdef _WIN32_WCE
 #include <basetyps.h>
 #endif
-#ifdef Q_WS_WIN64
+#ifdef Q_OS_WIN64
 //! @todo did not find a reliable way to fix with kdewin mingw header
 #define interface struct
 #endif
@@ -197,7 +197,7 @@ bool StaticSetOfStrings::contains(const QByteArray& string) const
 
 //---------
 
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
 //! Internal, from kdelibs' kstandarddirs.cpp
 static QString getBundle(const QString& path, bool ignore)
 {
@@ -225,7 +225,7 @@ static QString getBundle(const QString& path, bool ignore)
 //! Internal, from kdelibs' kstandarddirs.cpp
 static QString checkExecutable(const QString& path, bool ignoreExecBit)
 {
-#ifdef Q_WS_MAC
+#ifdef Q_OS_MAC
     QString bundle = getBundle(path, ignoreExecBit);
     if (!bundle.isEmpty()) {
         return bundle;
@@ -275,7 +275,7 @@ static QString checkExecutable(const QString& path, bool ignoreExecBit)
 //! Internal, from kdelibs' kstandarddirs.cpp
 static inline QString equalizePath(QString &str)
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     // filter pathes through QFileInfo to have always
     // the same case for drive letters
     QFileInfo f(str);

@@ -22,7 +22,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <Predicate/Private/KDbConnection>
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #include <my_Global.h>
 #endif
 #include <mysql_version.h>

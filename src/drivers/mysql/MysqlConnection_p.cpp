@@ -72,7 +72,7 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
             if (data.localSocketFileName().isEmpty()) {
                 //! @todo move the list of default sockets to a generic method
                 QStringList sockets;
-#ifndef Q_WS_WIN
+#ifndef Q_OS_WIN
                 sockets
                     << QLatin1String("/var/lib/mysql/mysql.sock")
                     << QLatin1String("/var/run/mysqld/mysqld.sock")

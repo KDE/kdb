@@ -33,7 +33,7 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 #include <windows.h>
 void usleep(unsigned int usec)
 {
