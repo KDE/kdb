@@ -244,7 +244,7 @@ QVariant PostgresqlCursor::pValue(uint pos) const
             return QVariant(result);
         }
     default:
-        qWarning() << "PostgresqlCursor::pValue() data type?";
+        qCWarning(KDB_LOG) << "PostgresqlCursor::pValue() data type?";
     }
     return QVariant();
 

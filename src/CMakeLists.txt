@@ -1,5 +1,7 @@
 # Options
 simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
+simple_option(KDB_DRIVERMANAGER_DEBUG "Debugging of the Driver Manager class" OFF)
+simple_option(KDB_TRANSACTIONS_DEBUG "Debugging of the Transaction class" OFF)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
 configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
 
@@ -115,6 +117,7 @@ set(kdb_LIB_SRCS
    KDbAdmin.cpp
    KDbLookupFieldSchema.cpp
    KDbAlter.cpp
+   kdb_debug.cpp
 
    views/KDbTableViewData.cpp
    views/KDbTableViewColumn.cpp

@@ -18,6 +18,7 @@
 */
 
 #include "KDbParser_p.h"
+#include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
 #include <QMutableListIterator>
@@ -83,8 +84,8 @@ extern void tokenize(const char *data);
 
 void yyerror(const char *str)
 {
-    KDbDbg << "error: " << str;
-    KDbDbg << "at character " << globalCurrentPos << " near tooken " << globalToken;
+    kdbDebug() << "error: " << str;
+    kdbDebug() << "at character " << globalCurrentPos << " near tooken " << globalToken;
     globalParser->setOperation(KDbParser::OP_Error);
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
@@ -92,12 +93,12 @@ void yyerror(const char *str)
     if ((   globalParser->error().type().isEmpty() && (str == 0 || strlen(str) == 0 || syntaxError))
         || otherError)
     {
-        KDbDbg << globalParser->statement();
+        kdbDebug() << globalParser->statement();
         QString ptrline(globalCurrentPos, QLatin1Char(' '));
 
         ptrline += QLatin1String("^");
 
-        KDbDbg << ptrline;
+        kdbDebug() << ptrline;
 
 #if 0
         //lexer may add error messages
@@ -173,12 +174,12 @@ bool parseData(KDbParser *p, const char *data)
 
     bool ok = true;
     if (globalParser->operation() == KDbParser::OP_Select) {
-        KDbDbg << "parseData(): ok";
-//   KDbDbg << "parseData(): " << tableDict.count() << " loaded tables";
+        kdbDebug() << "parseData(): ok";
+//   kdbDebug() << "parseData(): " << tableDict.count() << " loaded tables";
         /*   KDbTableSchema *ts;
               for(QDictIterator<KDbTableSchema> it(tableDict); KDbTableSchema *s = tableList.first(); s; s = tableList.next())
               {
-                KDbDbg << " " << s->name();
+                kdbDebug() << " " << s->name();
               }*/
     } else {
         ok = false;
@@ -275,12 +276,12 @@ KDbQuerySchema* buildSelectQuery(
             }
             QString tableOrAliasName = KDb::iifNotEmpty(aliasString, tname);
             if (!aliasString.isEmpty()) {
-//    KDbDbg << "- add alias for table: " << aliasString;
+//    kdbDebug() << "- add alias for table: " << aliasString;
             }
             // 1. collect information about first repeated table name or alias
             //    (potential ambiguity)
             parseInfo.appendPositionForTableOrAliasName(tableOrAliasName, i);
-//   KDbDbg << "addTable: " << tname;
+//   kdbDebug() << "addTable: " << tname;
             querySchema->addTable(s, aliasString);
         }
     }
@@ -333,7 +334,7 @@ KDbQuerySchema* buildSelectQuery(
             }
             else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
-//  KDbDbg << colViews->list.count() << " " << it.current()->debugString();
+//  kdbDebug() << colViews->list.count() << " " << it.current()->debugString();
 #ifdef __GNUC__
 #warning ok? //KDb: it.remove();
 #else
@@ -354,7 +355,7 @@ KDbQuerySchema* buildSelectQuery(
             }
 
             if (!aliasVariable.isNull()) {
-//    KDbDbg << "ALIAS \"" << aliasVariable->name << "\" set for column "
+//    kdbDebug() << "ALIAS \"" << aliasVariable->name << "\" set for column "
 //     << columnNum;
                 querySchema->setColumnAlias(columnNum, aliasVariable.name());
             }
@@ -409,7 +410,7 @@ KDbQuerySchema* buildSelectQuery(
             }
         }
     }
-// KDbDbg << "Select ColViews=" << (colViews ? colViews->debugString() : QString())
+// kdbDebug() << "Select ColViews=" << (colViews ? colViews->debugString() : QString())
 //  << " Tables=" << (tablesList ? tablesList->debugString() : QString()s);
     return querySchema;
 }

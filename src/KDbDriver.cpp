@@ -19,13 +19,13 @@
 
 #include "KDbDriver.h"
 #include "KDbDriver_p.h"
-
 #include "KDbDriverManager_p.h"
 #include "KDbError.h"
 #include "KDbConnection.h"
 #include "KDbConnectionData.h"
 #include "KDbAdmin.h"
 #include "KDb.h"
+#include "kdb_debug.h"
 
 #include <assert.h>
 
@@ -67,7 +67,7 @@ KDbDriver::~KDbDriver()
     d->connections.clear();
     delete beh;
     delete d;
-// KDbDbg << "ok";
+// kdbDebug() << "ok";
 }
 
 bool KDbDriver::isValid()
@@ -225,7 +225,7 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, uint ftype, 
     case KDbField::InvalidType:
         return KDbEscapedString("!INVALIDTYPE!");
     default:
-        KDbDbg << KDbEscapedString("UNKNOWN!");
+        kdbDebug() << KDbEscapedString("UNKNOWN!");
         return KDbEscapedString();
     }
     return KDbEscapedString();

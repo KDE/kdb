@@ -24,6 +24,7 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbParser_p.h"
+#include "kdb_debug.h"
 
 KDbVariableExpressionData::KDbVariableExpressionData()
  : KDbExpressionData()
@@ -104,7 +105,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
     tableForQueryAsterisk = 0;
 
     /* taken from parser's addColumn(): */
-    KDbDbg << "checking variable name: " << name;
+    kdbDebug() << "checking variable name: " << name;
     QString tableName, fieldName;
     if (!KDb::splitToTableAndFieldParts(name, &tableName, &fieldName,
                                         KDb::SetFieldNameIfNoTableName))
@@ -163,7 +164,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
                 covered = false; //uncovered
                 break;
             }
-            KDbDbg << " --" << "covered by " << tableAlias << " alias";
+            kdbDebug() << " --" << "covered by " << tableAlias << " alias";
         }
         if (covered) {
             parseInfo->setErrorMessage(
@@ -185,7 +186,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         if (tablePosition >= 0) {
             ts = parseInfo->querySchema()->tables()->at(tablePosition);
             if (ts) {
-//    KDbDbg << " --it's a tableAlias.name";
+//    kdbDebug() << " --it's a tableAlias.name";
             }
         }
     }
@@ -218,7 +219,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         return true;
     }
 
-// KDbDbg << " --it's a table.name";
+// kdbDebug() << " --it's a table.name";
     KDbField *realField = ts->field(fieldName);
     if (!realField) {
         parseInfo->setErrorMessage(QObject::tr("Field not found"));

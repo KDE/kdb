@@ -25,6 +25,7 @@
 #include "KDbDriver_p.h"
 #include "KDbJsonTrader_p.h"
 #include "KDbDriverMetaData.h"
+#include "kdb_debug.h"
 
 #include <KPluginFactory>
 
@@ -34,10 +35,6 @@
 #include <QPluginLoader>
 #include <QSettings>
 #include <QWidget>
-
-//remove debug
-#undef KDbDbg
-#define KDbDbg if (0) qDebug()
 
 Q_GLOBAL_STATIC(DriverManagerInternal, s_self);
 
@@ -49,10 +46,10 @@ DriverManagerInternal::DriverManagerInternal() /* protected */
 
 DriverManagerInternal::~DriverManagerInternal()
 {
-    KDbDbg;
+    drivermanagerDebug();
     qDeleteAll(m_drivers);
     m_drivers.clear();
-    KDbDbg << "ok";
+    drivermanagerDebug() << "ok";
 }
 
 void DriverManagerInternal::slotAppQuits()
@@ -61,7 +58,7 @@ void DriverManagerInternal::slotAppQuits()
             && qApp->topLevelWidgets().first()->isVisible()) {
         return; //what a hack! - we give up when app is still there
     }
-    KDbDbg << "let's clear drivers...";
+    drivermanagerDebug() << "let's clear drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
 }
@@ -83,13 +80,13 @@ void DriverManagerInternal::lookupDriversForDirectory(const QString& pluginsDir)
         KDbDriverInfo info;
         info.setName( config.value(QLatin1String("Name")).toString().toLower() );
         if (m_driversInfo.contains(info.name())) {
-            qWarning() << "More than one driver named" << info.name() << "-- skipping this one";
+            kdbWarning() << "More than one driver named" << info.name() << "-- skipping this one";
             continue;
         }
         info.setVersion(config.value(QLatin1String("Version")).toString());
         const QString expectedVersion(QString::fromLatin1("%1.%2").arg(KDb::version().major()).arg(KDb::version().minor()));
         if (expectedVersion != info.version()) {
-            qWarning() << "Incompatible database driver's" << info.name()
+            kdbWarning() << "Incompatible database driver's" << info.name()
                 << "version: found version" << info.version() << "expected version" << expectedVersion
                 << "-- skipping this one";
         }
@@ -133,16 +130,16 @@ bool DriverManagerInternal::lookupDrivers()
     m_lookupDriversNeeded = false;
     clearResult();
 
-    //KDbDbg << "Load all plugins";
+    //drivermanagerDebug() << "Load all plugins";
     const QList<QPluginLoader*> offers
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
     foreach(QPluginLoader *loader, offers) {
         //QJsonObject json = loader->metaData();
-        //KDbDbg << json;
+        //drivermanagerDebug() << json;
         //! @todo check version
         KDbDriverMetaData *metaData = new KDbDriverMetaData(*loader);
         if (m_driversMetaData.contains(metaData->id())) {
-            qWarning() << "More than one driver with ID" << metaData->id() << "-- skipping this one";
+            kdbWarning() << "More than one driver with ID" << metaData->id() << "-- skipping this one";
             continue;
         }
         foreach (const QString& mimeType, metaData->mimeTypes()) {
@@ -157,7 +154,7 @@ bool DriverManagerInternal::lookupDrivers()
      Plugin path "Plugins" entry can be added to qt.conf to override; see http://qt-project.org/doc/qt-4.8/qt-conf.html.
     */
     const QStringList libraryPaths(KDb::libraryPaths());
-    KDbDbg << "libraryPaths:" << libraryPaths;
+    drivermanagerDebug() << "libraryPaths:" << libraryPaths;
     foreach (const QString& path, libraryPaths) {
         lookupDriversForDirectory(path);
     }
@@ -173,18 +170,18 @@ bool DriverManagerInternal::lookupDrivers()
     for (; it != tlist.constEnd(); ++it) {
         KService::Ptr ptr = (*it);
         if (!ptr->property("Library").toString().startsWith("kdb_")) {
-            KDbWarn << "X-KDE-Library == " << ptr->property("Library").toString()
+            kdbWarning() << "X-KDE-Library == " << ptr->property("Library").toString()
                 << ": no \"kdb_\" prefix -- skipped to avoid potential conflicts!";
             continue;
         }
         QString srv_name = ptr->property("X-Kexi-DriverName").toString().toLower();
         if (srv_name.isEmpty()) {
-            KDbWarn << "X-Kexi-DriverName must be set for KDb driver \""
+            kdbWarning() << "X-Kexi-DriverName must be set for KDb driver \""
                 << ptr->property("Name").toString() << "\" service!\n -- skipped!";
             continue;
         }
         if (m_services_lcase.contains(srv_name)) {
-            KDbWarn << "more than one driver named" << srv_name << "\n -- skipping this one!";
+            kdbWarning() << "more than one driver named" << srv_name << "\n -- skipping this one!";
             continue;
         }
 
@@ -197,12 +194,12 @@ bool DriverManagerInternal::lookupDrivers()
         if (ok)
             minor_ver = lst[1].toUInt(&ok);
         if (!ok) {
-            KDbWarn << "problem with detecting" << srv_name << "driver's version -- skipping it!";
+            kdbWarning() << "problem with detecting" << srv_name << "driver's version -- skipping it!";
             continue;
         }
 
         if (!KDb::version().matches(major_ver, minor_ver)) {
-            KDbWarn << QString("'%1' driver"
+            kdbWarning() << QString("'%1' driver"
                                " has version '%2' but required KDb driver version is '%3.%4'\n"
                                " -- skipping this driver!").arg(srv_name).arg(srv_ver_str)
                               .arg(KDb::version().major).arg(KDb::version().minor);
@@ -230,13 +227,13 @@ bool DriverManagerInternal::lookupDrivers()
                 if (!m_services_by_mimetype.contains(mime)) {
                     m_services_by_mimetype.insert(mime, ptr);
                 } else {
-                    KDbWarn << "more than one driver for" << mime << "m ime type!";
+                    kdbWarning() << "more than one driver for" << mime << "m ime type!";
                 }
             }
         }
         m_services.insert(srv_name, ptr);
         m_services_lcase.insert(srv_name,  ptr);
-        KDbDbg << "registered driver: " << ptr->name() << "(" << ptr->library() << ")";
+        drivermanagerDebug() << "registered driver: " << ptr->name() << "(" << ptr->library() << ")";
     }
 #endif
     if (m_driversMetaData.isEmpty()) {
@@ -307,7 +304,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         return 0;
 
     clearResult();
-    KDbDbg << "loading" << id;
+    drivermanagerDebug() << "loading" << id;
 
     KDbDriver *drv = 0;
     if (!id.isEmpty()) {
@@ -328,7 +325,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              QObject::tr("Could not load database driver's plugin file \"%1\".")
                              .arg(metaData->fileName()));
-        qWarning() << m_result.message();
+        kdbWarning() << m_result.message();
         return 0;
     }
     KDbDriver *driver = factory->create<KDbDriver>();
@@ -336,7 +333,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              QObject::tr("Could not open database driver from plugin \"%1\".")
                              .arg(metaData->fileName()));
-        qWarning() << m_result.message();
+        kdbWarning() << m_result.message();
         return 0;
     }
     driver->setMetaData(metaData);
@@ -350,11 +347,11 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
 #endif
     QLibrary lib(libFileName);
     LibUnloader unloader(&lib);
-    KDbDbg << libFileName;
+    drivermanagerDebug() << libFileName;
     if (!lib.load()) {
         m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load library \"%1\".").arg(id));
         m_result.setServerMessage(lib.errorString());
-        KDbDbg << lib.errorString();
+        drivermanagerDebug() << lib.errorString();
         return 0;
     }
     
@@ -387,7 +384,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     if (!drv) {
         m_result = KDbResult(ERR_DRIVERMANAGER, QObject::tr("Could not load database driver \"%1\".").arg(id));
         m_result.setServerMessage(loader.errorString());
-        KDbDbg << loader.instance() << loader.errorString();
+        drivermanagerDebug() << loader.instance() << loader.errorString();
 //! @todo
 /*        if (m_componentLoadingErrors.isEmpty()) {//fill errtable on demand
             m_componentLoadingErrors[KLibLoader::ErrNoServiceFound] = "ErrNoServiceFound";

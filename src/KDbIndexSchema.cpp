@@ -21,9 +21,9 @@
 #include "KDbDriver.h"
 #include "KDbConnection.h"
 #include "KDbTableSchema.h"
+#include "kdb_debug.h"
 
 #include <assert.h>
-
 
 KDbIndexSchema::KDbIndexSchema(KDbTableSchema *tableSchema)
         : KDbFieldList(false)//fields are not owned by KDbIndexSchema object
@@ -49,7 +49,7 @@ KDbIndexSchema::KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema& parent
     foreach(KDbField *f, idx.m_fields) {
         KDbField *parentTableField = parentTable.field(f->name());
         if (!parentTableField) {
-            KDbWarn << "cannot find field" << f->name() << "in parentTable. Empty index will be created!";
+            kdbWarning() << "cannot find field" << f->name() << "in parentTable. Empty index will be created!";
             KDbFieldList::clear();
             break;
         }
@@ -80,7 +80,7 @@ KDbIndexSchema::~KDbIndexSchema()
 KDbFieldList& KDbIndexSchema::addField(KDbField *field)
 {
     if (field->table() != m_tableSchema) {
-        KDbWarn << (field ? field->name() : QString())
+        kdbWarning() << (field ? field->name() : QString())
         << "WARNING: field does not belong to the same table"
         << (field && field->table() ? field->table()->name() : QString())
         << "as index!";

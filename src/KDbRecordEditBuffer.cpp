@@ -19,8 +19,7 @@
 
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
-
-#include <QtDebug>
+#include "kdb_debug.h"
 
 KDbRecordEditBuffer::KDbRecordEditBuffer(bool dbAwareBuffer)
         : m_simpleBuffer(dbAwareBuffer ? 0 : new SimpleMap())
@@ -45,7 +44,7 @@ KDbRecordEditBuffer::~KDbRecordEditBuffer()
 const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo& ci, bool useDefaultValueIfPossible) const
 {
     if (!m_dbBuffer) {
-        KDbWarn << "not db-aware buffer!";
+        kdbWarning() << "not db-aware buffer!";
         return 0;
     }
     *m_dbBufferIt = m_dbBuffer->find(&ci);
@@ -68,7 +67,7 @@ const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo& ci, bool useDefaultV
 const QVariant* KDbRecordEditBuffer::at(KDbField& f) const
 {
     if (!m_simpleBuffer) {
-        KDbWarn << "this is db-aware buffer!";
+        kdbWarning() << "this is db-aware buffer!";
         return 0;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(f.name());
@@ -80,7 +79,7 @@ const QVariant* KDbRecordEditBuffer::at(KDbField& f) const
 const QVariant* KDbRecordEditBuffer::at(const QString& fname) const
 {
     if (!m_simpleBuffer) {
-        KDbWarn << "this is db-aware buffer!";
+        kdbWarning() << "this is db-aware buffer!";
         return 0;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(fname);
@@ -92,7 +91,7 @@ const QVariant* KDbRecordEditBuffer::at(const QString& fname) const
 void KDbRecordEditBuffer::removeAt(const KDbQueryColumnInfo& ci)
 {
     if (!m_dbBuffer) {
-        KDbWarn << "not db-aware buffer!";
+        kdbWarning() << "not db-aware buffer!";
         return;
     }
     m_dbBuffer->remove(const_cast<KDbQueryColumnInfo*>(&ci)); // const_cast ok here, we won't modify ci
@@ -101,7 +100,7 @@ void KDbRecordEditBuffer::removeAt(const KDbQueryColumnInfo& ci)
 void KDbRecordEditBuffer::removeAt(const KDbField& f)
 {
     if (!m_simpleBuffer) {
-        KDbWarn << "this is db-aware buffer!";
+        kdbWarning() << "this is db-aware buffer!";
         return;
     }
     m_simpleBuffer->remove(f.name());
@@ -110,7 +109,7 @@ void KDbRecordEditBuffer::removeAt(const KDbField& f)
 void KDbRecordEditBuffer::removeAt(const QString& fname)
 {
     if (!m_simpleBuffer) {
-        KDbWarn << "this is db-aware buffer!";
+        kdbWarning() << "this is db-aware buffer!";
         return;
     }
     m_simpleBuffer->remove(fname);

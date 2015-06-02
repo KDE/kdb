@@ -191,10 +191,7 @@ public:
         }
 
 //! @todo add QDebug operator <<
-        void debug(const DebugOptions& debugOptions = DebugOptions()) {
-            KDbDbg << debugString(debugOptions)
-            << " (req = " << alteringRequirements() << ")";
-        }
+        void debug(const DebugOptions& debugOptions = DebugOptions());
 
     protected:
         //! Sets requirements for altering; used internally by KDbAlterTableHandler object

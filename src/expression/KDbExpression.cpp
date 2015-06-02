@@ -25,6 +25,7 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbParser_p.h"
+#include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
 //! @internal A cache
@@ -213,7 +214,7 @@ bool KDbExpressionData::addToCallStack(QDebug *dbg, QList<const KDbExpressionDat
     if (callStack->contains(this)) {
         if (dbg)
             dbg->nospace() << "<CYCLE!>";
-        qWarning() << "Cycle detected in"
+        qCWarning(KDB_LOG) << "Cycle detected in"
             << expressionClassName(expressionClass) << KDbExpression::tokenToDebugString(token);
         return false;
     }
@@ -272,7 +273,7 @@ KDbExpression::KDbExpression(const ExplicitlySharedExpressionDataPointer &ptr)
 
 KDbExpression::~KDbExpression()
 {
-    //KDbDbg << *this << d->ref;
+    //kdbDebug() << *this << d->ref;
     if (d->parent && d->ref == 1) {
          d->parent->children.removeOne(d);
     }
@@ -421,7 +422,7 @@ void KDbExpression::removeChild(int i)
         return;
     if (i < 0 || i >= d->children.count())
         return;
-    //KDbDbg << d->children.count() << d->children.at(i);
+    //kdbDebug() << d->children.count() << d->children.at(i);
     d->children.removeAt(i);
 }
 
@@ -574,7 +575,7 @@ KDbFunctionExpression KDbExpression::toFunction() const
 void KDbExpression::setLeftOrRight(const KDbExpression& e, int index)
 {
     if (this == &e) {
-        qWarning() << "KDbExpression::setLeftOrRight(): Expression cannot be own child";
+        qCWarning(KDB_LOG) << "KDbExpression::setLeftOrRight(): Expression cannot be own child";
         return;
     }
     if (d->children.indexOf(e.d) == index) { // cannot set twice

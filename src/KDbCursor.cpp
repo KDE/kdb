@@ -23,8 +23,7 @@
 #include "KDbError.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
-
-
+#include "kdb_debug.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -107,16 +106,16 @@ KDbCursor::~KDbCursor()
 #endif
 #endif
     /* if (!m_query)
-        KDbDbg << "KDbCursor::~KDbCursor() '" << m_rawSql.toLatin1() << "'";
+        kdbDebug() << "KDbCursor::~KDbCursor() '" << m_rawSql.toLatin1() << "'";
       else
-        KDbDbg << "KDbCursor::~KDbCursor() ";*/
+        kdbDebug() << "KDbCursor::~KDbCursor() ";*/
 
     //take me if delete was
     if (!m_conn->m_insideCloseDatabase) {
         if (!m_conn->m_destructor_started) {
             m_conn->takeCursor(this);
         } else {
-            KDbFatal << "can be destroyed with Conenction::deleteCursor(), not with delete operator!";
+            kdbCritical() << "can be destroyed with Conenction::deleteCursor(), not with delete operator!";
         }
     }
     delete m_fieldsExpanded;
@@ -134,7 +133,7 @@ bool KDbCursor::open()
     }
     else {
         if (!m_query) {
-            KDbDbg << "no query statement (or schema) defined!";
+            kdbDebug() << "no query statement (or schema) defined!";
             m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("No query statement or schema defined."));
             return false;
         }
@@ -144,7 +143,7 @@ bool KDbCursor::open()
                         ? m_conn->selectStatement(m_query, *m_queryParameters, options)
                         : m_conn->selectStatement(m_query, options));
         if (m_result.sql().isEmpty()) {
-            KDbDbg << "empty statement!";
+            kdbDebug() << "empty statement!";
             m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("Query statement is empty."));
             return false;
         }
@@ -165,9 +164,9 @@ bool KDbCursor::open()
     m_validRecord = false;
 
     if (m_conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
-//  KDbDbg << "READ AHEAD:";
+//  kdbDebug() << "READ AHEAD:";
         m_readAhead = getNextRecord(); //true if any record in this query
-//  KDbDbg << "READ AHEAD = " << m_readAhead;
+//  kdbDebug() << "READ AHEAD = " << m_readAhead;
     }
     m_at = 0; //we are still before 1st rec
     return !m_result.isError();
@@ -189,7 +188,7 @@ bool KDbCursor::close()
     m_logicalFieldCount = 0;
     m_at = -1;
 
-// KDbDbg << ret;
+// kdbDebug() << ret;
     return ret;
 }
 
@@ -340,7 +339,7 @@ bool KDbCursor::getNextRecord()
     m_fetchResult = FetchInvalid; //by default: invalid result of record fetching
 
     if (m_options & Buffered) {//this cursor is buffered:
-//  KDbDbg << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
+//  kdbDebug() << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
             if (m_at_buffer) {//we already have got a pointer to buffer
                 drv_bufferMovePointerNext(); //just move to next record in the buffer
@@ -354,12 +353,12 @@ bool KDbCursor::getNextRecord()
                 if (!m_buffering_completed) {
                     //retrieve record only if we are not after
                     //the last buffer's item (i.e. when buffer is not fully filled):
-//     KDbDbg<<"==== buffering: drv_getNextRecord() ====";
+//     kdbDebug()<<"==== buffering: drv_getNextRecord() ====";
                     drv_getNextRecord();
                 }
                 if (m_fetchResult != FetchOK) {//there is no record
                     m_buffering_completed = true; //no more records for buffer
-//     KDbDbg<<"m_fetchResult != FetchOK ********";
+//     kdbDebug()<<"m_fetchResult != FetchOK ********";
                     m_validRecord = false;
                     m_afterLast = true;
                     m_at = -1; //position is invalid now and will not be used
@@ -377,10 +376,10 @@ bool KDbCursor::getNextRecord()
         }
     } else {//we are after last retrieved record: we need to physically fetch next record:
         if (!m_readAhead) {//we have no record that was read ahead
-//   KDbDbg<<"==== no prefetched record ====";
+//   kdbDebug()<<"==== no prefetched record ====";
             drv_getNextRecord();
             if (m_fetchResult != FetchOK) {//there is no record
-//    KDbDbg<<"m_fetchResult != FetchOK ********";
+//    kdbDebug()<<"m_fetchResult != FetchOK ********";
                 m_validRecord = false;
                 m_afterLast = true;
                 m_at = -1;
@@ -398,9 +397,9 @@ bool KDbCursor::getNextRecord()
 
 // if (m_data->curr_colname && m_data->curr_coldata)
 //  for (int i=0;i<m_data->curr_cols;i++) {
-//   KDbDbg<<i<<": "<< m_data->curr_colname[i]<<" == "<< m_data->curr_coldata[i];
+//   kdbDebug()<<i<<": "<< m_data->curr_colname[i]<<" == "<< m_data->curr_coldata[i];
 //  }
-// KDbDbg<<"m_at == "<<(long)m_at;
+// kdbDebug()<<"m_at == "<<(long)m_at;
 
     m_validRecord = true;
     return true;

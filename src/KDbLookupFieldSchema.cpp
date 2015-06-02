@@ -19,12 +19,12 @@
 
 #include "KDbLookupFieldSchema.h"
 #include "KDb.h"
+#include "kdb_debug.h"
 
 #include <QDomElement>
 #include <QVariant>
 #include <QStringList>
 #include <QHash>
-#include <QtDebug>
 
 //! @internal
 class KDbLookupFieldSchema::RecordSource::Private

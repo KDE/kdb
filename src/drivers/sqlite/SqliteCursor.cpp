@@ -21,6 +21,7 @@
 
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
+#include "sqlite_debug.h"
 
 #include "KDbError.h"
 #include "KDbDriver.h"
@@ -169,7 +170,7 @@ bool SqliteCursor::drv_open(const KDbEscapedString& sql)
         // this may as example be the case if SqliteConnection::drv_useDatabase()
         // wasn't called before. Normaly sqlite_compile/sqlite3_prepare
         // should handle it, but it crashes in in sqlite3SafetyOn at util.c:786
-        qWarning() << "SqliteCursor::drv_open(): Database handle undefined.";
+        sqliteWarning() << "SqliteCursor::drv_open(): Database handle undefined.";
         return false;
     }
 
@@ -227,16 +228,16 @@ void SqliteCursor::drv_getNextRecord()
     /*
       if ((int)m_result == (int)FetchOK && d->curr_coldata) {
         for (uint i=0;i<m_fieldCount;i++) {
-          KDbDrvDbg<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
+          sqliteDebug()<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)");
         }
-    //  KDbDrvDbg << m_fieldCount << "col(s) fetched";
+    //  sqliteDebug() << m_fieldCount << "col(s) fetched";
       }*/
 }
 
 void SqliteCursor::drv_appendCurrentRecordToBuffer()
 {
-// KDbDrvDbg;
+// sqliteDebug();
     if (!d->curr_coldata)
         return;
     if (!d->cols_pointers_mem_size)
@@ -245,12 +246,12 @@ void SqliteCursor::drv_appendCurrentRecordToBuffer()
     const char **src_col = d->curr_coldata;
     const char **dest_col = record;
     for (uint i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
-//  KDbDrvDbg << i <<": '" << *src_col << "'";
-//  KDbDrvDbg << "src_col: " << src_col;
+//  sqliteDebug() << i <<": '" << *src_col << "'";
+//  sqliteDebug() << "src_col: " << src_col;
         *dest_col = *src_col ? strdup(*src_col) : 0;
     }
     d->records[m_records_in_buf] = record;
-// KDbDrvDbg << "ok.";
+// sqliteDebug() << "ok.";
 }
 
 void SqliteCursor::drv_bufferMovePointerNext()
@@ -320,7 +321,7 @@ bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
             break;
         }
         KDbField *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
-//  KDbDrvDbg << "col=" << (col ? *col : 0);
+//  sqliteDebug() << "col=" << (col ? *col : 0);
         (*data)[i] = d->getValue(f, i);
     }
     return true;

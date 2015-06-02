@@ -30,6 +30,7 @@
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
 #include "KDbUtils.h"
+#include "kdb_debug.h"
 
 #include <QRegExp>
 #include <QDir>
@@ -62,7 +63,7 @@ void KDbUtils::serializeMap(const QMap<QString, QString>& map, QString& string)
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
-    KDbDbg << array[3] << array[4] << array[5];
+    kdbDebug() << array[3] << array[4] << array[5];
     const uint size = array.size();
     string.clear();
     string.reserve(size);

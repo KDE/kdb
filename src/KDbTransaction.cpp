@@ -19,13 +19,9 @@
 
 #include "KDbTransaction.h"
 #include "KDbConnection.h"
-
+#include "kdb_debug.h"
 
 #include <assert.h>
-
-//remove debug
-#undef KDbDbg
-#define KDbDbg if (true); else qDebug()
 
 //helper for debugging
 KDB_EXPORT int KDbTransaction::globalcount = 0;
@@ -47,13 +43,13 @@ KDbTransactionData::KDbTransactionData(KDbConnection *conn)
     assert(conn);
     KDbTransaction::globalcount++; //because refcount(1) init.
     KDbTransactionData::globalcount++;
-    KDbDbg << "-- globalcount ==" << KDbTransactionData::globalcount;
+    transactionsDebug() << "-- globalcount ==" << KDbTransactionData::globalcount;
 }
 
 KDbTransactionData::~KDbTransactionData()
 {
     KDbTransactionData::globalcount--;
-    KDbDbg << "-- globalcount ==" << KDbTransactionData::globalcount;
+    transactionsDebug() << "-- globalcount ==" << KDbTransactionData::globalcount;
 }
 
 //---------------------------------------------------
@@ -79,13 +75,13 @@ KDbTransaction::~KDbTransaction()
     if (m_data) {
         m_data->refcount--;
         KDbTransaction::globalcount--;
-        KDbDbg << "m_data->refcount==" << m_data->refcount;
+        transactionsDebug() << "m_data->refcount==" << m_data->refcount;
         if (m_data->refcount == 0)
             delete m_data;
     } else {
-        KDbDbg << "null";
+        transactionsDebug() << "null";
     }
-    KDbDbg << "-- globalcount == " << KDbTransaction::globalcount;
+    transactionsDebug() << "-- globalcount == " << KDbTransaction::globalcount;
 }
 
 KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
@@ -94,7 +90,7 @@ KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
         if (m_data) {
             m_data->refcount--;
             KDbTransaction::globalcount--;
-            KDbDbg << "m_data->refcount==" << m_data->refcount;
+            transactionsDebug() << "m_data->refcount==" << m_data->refcount;
             if (m_data->refcount == 0)
                 delete m_data;
         }

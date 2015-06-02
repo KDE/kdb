@@ -64,7 +64,7 @@ inline QDateTime stringToHackedQTime(const QString& s)
 {
     if (s.isEmpty())
         return QDateTime();
-    //  KDbDbg << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate ) ).toString(Qt::ISODate);
+    //  kdbDebug() << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate ) ).toString(Qt::ISODate);
     return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
 }
 

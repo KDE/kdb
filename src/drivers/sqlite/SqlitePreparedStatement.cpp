@@ -19,8 +19,7 @@
 
 #include "SqlitePreparedStatement.h"
 #include "KDbPreparedStatement.h"
-
-#include <QtDebug>
+#include "sqlite_debug.h"
 
 SqlitePreparedStatement::SqlitePreparedStatement(SqliteConnectionInternal* conn)
         : KDbPreparedStatementInterface()
@@ -189,7 +188,7 @@ bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
         break;
     }
     default: {
-        KDbWarn << "unsupported field type:"
+        sqliteWarning() << "unsupported field type:"
                 << field->type() << "- NULL value bound to column #" << par;
         int res = sqlite3_bind_null(m_handle, par);
         if (res != SQLITE_OK) {

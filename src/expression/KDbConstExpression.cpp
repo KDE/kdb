@@ -24,9 +24,8 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
+#include "kdb_debug.h"
 #include "generated/sqlparser.h"
-
-#include <QtDebug>
 
 KDbConstExpressionData::KDbConstExpressionData(const QVariant& aValue)
  : KDbExpressionData()

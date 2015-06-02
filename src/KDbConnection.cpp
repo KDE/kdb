@@ -19,7 +19,6 @@
 
 #include "KDbConnection.h"
 #include "KDbConnection_p.h"
-
 #include "KDbError.h"
 #include "KDbExpression.h"
 #include "KDbConnectionData.h"
@@ -31,14 +30,13 @@
 #include "KDbRelationship.h"
 #include "KDbTransaction.h"
 #include "KDbCursor.h"
-#include "KDbGlobal.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
 #include "KDbProperties.h"
 #include "KDbLookupFieldSchema.h"
-#include "KDbParser.h"
-
 #include "KDbPreparedStatementInterface.h"
+#include "KDbParser.h"
+#include "kdb_debug.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -385,7 +383,7 @@ bool KDbConnection::checkIsDatabaseUsed()
 
 QStringList KDbConnection::databaseNames(bool also_system_db)
 {
-    //KDbDbg << also_system_db;
+    //kdbDebug() << also_system_db;
     if (!checkConnected())
         return QStringList();
 
@@ -411,9 +409,9 @@ QStringList KDbConnection::databaseNames(bool also_system_db)
         return list;
     //filter system databases:
     for (QStringList::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
-        //KDbDbg << *it;
+        //kdbDebug() << *it;
         if (!m_driver->isSystemDatabaseName(*it)) {
-            //KDbDbg << "add " << *it;
+            //kdbDebug() << "add " << *it;
             non_system_list << (*it);
         }
     }
@@ -444,7 +442,7 @@ bool KDbConnection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 
 bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 {
-// KDbDbg << dbName << ignoreErrors;
+// kdbDebug() << dbName << ignoreErrors;
     if (m_driver->beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE && !checkConnected())
         return false;
     clearResult();
@@ -598,7 +596,7 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
 {
     if (cancelled)
         *cancelled = false;
-    //KDbDbg << dbName << kexiCompatible;
+    //kdbDebug() << dbName << kexiCompatible;
     if (!checkConnected())
         return false;
 
@@ -677,8 +675,8 @@ bool KDbConnection::closeDatabase()
             if (!rollbackTransaction(tr)) {//rollback as much as you can, don't stop on prev. errors
                 ret = false;
             } else {
-                KDbDbg << "transaction rolled back!";
-                KDbDbg << "trans.refcount==" << (tr.m_data ? QString::number(tr.m_data->refcount) : QLatin1String("(null)"));
+                kdbDebug() << "transaction rolled back!";
+                kdbDebug() << "trans.refcount==" << (tr.m_data ? QString::number(tr.m_data->refcount) : QLatin1String("(null)"));
             }
         }
         d->dont_remove_transactions = false; //unlock!
@@ -993,7 +991,7 @@ KDbEscapedString KDbConnection::createTableStatement(const KDbTableSchema& table
 #define V_A(a) + ',' + m_driver->valueToSQL( \
         tableSchema->field(a) ? tableSchema->field(a)->type() : KDbField::Text, c ## a )
 
-//  KDbDbg << "******** " << QString("INSERT INTO ") +
+//  kdbDebug() << "******** " << QString("INSERT INTO ") +
 //   escapeIdentifier(tableSchema->name()) +
 //   " VALUES (" + vals + ")";
 
@@ -1084,7 +1082,7 @@ bool KDbConnection::insertRecord(KDbTableSchema* tableSchema, const QList<QVaria
             sql += ',';
         }
         sql += m_driver->valueToSQL(f, *it);
-//  KDbDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
+//  kdbDebug() << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
     }
@@ -1122,7 +1120,7 @@ bool KDbConnection::insertRecord(KDbFieldList* fields, const QList<QVariant>& va
             sql += ',';
         }
         sql += m_driver->valueToSQL(f, *it);
-//  KDbDbg << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
+//  kdbDebug() << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
         if (fieldsIt == flist->constEnd())
@@ -1283,22 +1281,22 @@ static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
                 } else if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Query) {
                     KDbQuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
                     if (!lookupQuery) {
-                        KDbWarn << "!lookupQuery";
+                        kdbWarning() << "!lookupQuery";
                         return KDbEscapedString();
                     }
                     const KDbQueryColumnInfo::Vector fieldsExpanded(lookupQuery->fieldsExpanded());
                     if (lookupFieldSchema->boundColumn() >= fieldsExpanded.count()) {
-                        KDbWarn << "(uint)lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
+                        kdbWarning() << "(uint)lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
                         return KDbEscapedString();
                     }
                     KDbQueryColumnInfo *boundColumnInfo = fieldsExpanded.at(lookupFieldSchema->boundColumn());
                     if (!boundColumnInfo) {
-                        KDbWarn << "!boundColumnInfo";
+                        kdbWarning() << "!boundColumnInfo";
                         return KDbEscapedString();
                     }
                     KDbField *boundField = boundColumnInfo->field;
                     if (!boundField) {
-                        KDbWarn << "!boundField";
+                        kdbWarning() << "!boundField";
                         return KDbEscapedString();
                     }
                     //add LEFT OUTER JOIN
@@ -1323,7 +1321,7 @@ static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         if ((uint)fieldsExpanded.count() <= visibleColumnIndex) {
-                            KDbWarn << "fieldsExpanded.count() <= (*visibleColumnsIt) : "
+                            kdbWarning() << "fieldsExpanded.count() <= (*visibleColumnsIt) : "
                             << fieldsExpanded.count() << " <= " << visibleColumnIndex;
                             return KDbEscapedString();
                         }
@@ -1337,7 +1335,7 @@ static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
                     s_additional_fields += expression;
                 }
                 else {
-                    KDbWarn << "unsupported record source type" << recordSource.typeName();
+                    kdbWarning() << "unsupported record source type" << recordSource.typeName();
                     return KDbEscapedString();
                 }
             }
@@ -1452,7 +1450,7 @@ static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
             if (pkeyFieldsIndex < 0) // no field mentioned in this query
                 continue;
             if (pkeyFieldsIndex >= (int)fieldsExpanded.count()) {
-                KDbWarn << "ORDER BY: (*it) >= fieldsExpanded.count() - "
+                kdbWarning() << "ORDER BY: (*it) >= fieldsExpanded.count() - "
                         << pkeyFieldsIndex << " >= " << fieldsExpanded.count();
                 continue;
             }
@@ -1465,7 +1463,7 @@ static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
     if (!orderByString.isEmpty())
         sql += (" ORDER BY " + orderByString);
 
-    //KDbDbg << sql;
+    //kdbDebug() << sql;
     return sql;
 }
 
@@ -1522,7 +1520,7 @@ quint64 KDbConnection::lastInsertedAutoIncValue(const QString& aiFieldName, cons
                 + " WHERE " + m_driver->beh->ROW_ID_FIELD_NAME
                 + '=' + KDbEscapedString::number(foundRecordId), &rdata))
     {
-//  KDbDbg << "foundRecordId<=0 || true!=querySingleRecord()";
+//  kdbDebug() << "foundRecordId<=0 || true!=querySingleRecord()";
         return (quint64) - 1; //ULL;
     }
     return rdata[0].toULongLong();
@@ -1613,7 +1611,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
 }
 
 #define createTable_ERR \
-    { KDbDbg << "ERROR!"; \
+    { kdbDebug() << "ERROR!"; \
         m_result.prependMessage(QObject::tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
@@ -2039,7 +2037,7 @@ bool KDbConnection::dropQuery(const QString& queryName)
 bool KDbConnection::drv_createTable(const KDbTableSchema& tableSchema)
 {
     const KDbEscapedString sql( createTableStatement(tableSchema) );
-    //KDbDbg << "******** " << sql;
+    //kdbDebug() << "******** " << sql;
     return executeSQL(sql);
 }
 
@@ -2338,7 +2336,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
     if (!cursor)
         return false;
     if (cursor->connection() != this) {//illegal call
-        KDbWarn << "Cannot delete the cursor not owned by the same connection!";
+        kdbWarning() << "Cannot delete the cursor not owned by the same connection!";
         return false;
     }
     const bool ret = cursor->close();
@@ -2354,7 +2352,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
 bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object)
 {
     if (data.count() < 5) {
-        KDbWarn << "Aborting, schema data should have 5 elements, found" << data.count();
+        kdbWarning() << "Aborting, schema data should have 5 elements, found" << data.count();
         return false;
     }
     bool ok;
@@ -2371,7 +2369,7 @@ bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object
     object->setCaption(data[3].toString());
     object->setDescription(data[4].toString());
 
-// KDbDbg<<"@@@ KDbConnection::setupObjectData() == " << sdata.schemaDataDebugString();
+// kdbDebug()<<"@@@ KDbConnection::setupObjectData() == " << sdata.schemaDataDebugString();
     return true;
 }
 
@@ -2438,7 +2436,7 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
             //fetch newly assigned ID
 //! @todo safe to cast it?
             int obj_id = (int)lastInsertedAutoIncValue(QLatin1String("o_id"), *ts);
-            //KDbDbg << "NEW obj_id == " << obj_id;
+            //kdbDebug() << "NEW obj_id == " << obj_id;
             if (obj_id <= 0)
                 return false;
             object->setId(obj_id);
@@ -2505,7 +2503,7 @@ tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data,
     }
     KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
     if (!cursor) {
-        KDbWarn << "!querySingleRecordInternal() " << m_result.sql();
+        kdbWarning() << "!querySingleRecordInternal() " << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst()
@@ -2513,7 +2511,7 @@ tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data,
             || !cursor->storeCurrentRecord(data))
     {
         const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
-        //KDbDbg << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
+        //kdbDebug() << "!cursor->moveFirst() || cursor->eof() || cursor->storeCurrentRecord(data) "
         //          "m_result.sql()=" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
@@ -2559,12 +2557,12 @@ tristate KDbConnection::querySingleStringInternal(const KDbEscapedString* sql,
     }
     KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
     if (!cursor) {
-        KDbWarn << "!querySingleStringInternal()" << m_result.sql();
+        kdbWarning() << "!querySingleStringInternal()" << m_result.sql();
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
         const tristate result = cursor->result().isError() ? tristate(false) : tristate(cancelled);
-        //KDbDbg << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
+        //kdbDebug() << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         deleteCursor(cursor);
         return result;
     }
@@ -2642,7 +2640,7 @@ tristate KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
     }
     KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
     if (!cursor) {
-        KDbWarn << "!queryStringListInternal() " << m_result.sql();
+        kdbWarning() << "!queryStringListInternal() " << m_result.sql();
         return false;
     }
     cursor->moveFirst();
@@ -2707,13 +2705,13 @@ bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, boo
     }
     KDbCursor *cursor = executeQuery(m_result.sql());
     if (!cursor) {
-        KDbWarn << "!executeQuery()" << m_result.sql();
+        kdbWarning() << "!executeQuery()" << m_result.sql();
         *success = false;
         return false;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
         *success = !cursor->result().isError();
-        KDbWarn << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
+        kdbWarning() << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
         return false;
@@ -2799,7 +2797,7 @@ static void addFieldPropertyToExtendedTableSchemaData(
         break;
     default:
 //! @todo add more QVariant types
-        KDbFatal << "addFieldPropertyToExtendedTableSchemaData(): impl. error";
+        kdbCritical() << "addFieldPropertyToExtendedTableSchemaData(): impl. error";
     }
     extendedTableSchemaFieldPropertyEl.appendChild(extendedTableSchemaFieldPropertyValueEl);
     extendedTableSchemaFieldPropertyValueEl.appendChild(
@@ -2965,13 +2963,13 @@ bool KDbConnection::loadExtendedTableSchemaData(KDbTableSchema* tableSchema)
                     } else if (propEl.tagName() == QLatin1String("lookup-column")) {
                         KDbLookupFieldSchema *lookupFieldSchema = KDbLookupFieldSchema::loadFromDom(propEl);
                         if (lookupFieldSchema) {
-                            KDbDbg << f->name() << *lookupFieldSchema;
+                            kdbDebug() << f->name() << *lookupFieldSchema;
                             tableSchema->setLookupFieldSchema(f->name(), lookupFieldSchema);
                         }
                     }
                 }
             } else {
-                KDbWarn << "no such field:" << fieldEl.attribute(QLatin1String("name"))
+                kdbWarning() << "no such field:" << fieldEl.attribute(QLatin1String("name"))
                         << "in table:" << tableSchema->name();
             }
         }
@@ -3021,7 +3019,7 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
 
     f->setDefaultValue(KDb::stringToVariant(data.at(7).toString(), KDbField::variantType(f_type), &ok));
     if (!ok) {
-        KDbWarn << "problem with KDb::stringToVariant(" << data.at(7).toString() << ')';
+        kdbWarning() << "problem with KDb::stringToVariant(" << data.at(7).toString() << ')';
     }
     ok = true; //problem with defaultValue is not critical
 
@@ -3060,7 +3058,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
     KDbRecordData fieldData;
     bool ok = true;
     while (!cursor->eof()) {
-//  KDbDbg<<"@@@ f_name=="<<cursor->value(2).asCString();
+//  kdbDebug()<<"@@@ f_name=="<<cursor->value(2).asCString();
         if (!cursor->storeCurrentRecord(&fieldData)) {
             ok = false;
             break;
@@ -3307,7 +3305,7 @@ bool KDbConnection::setupKDbSystemSchema()
     .addField(new KDbField(QLatin1String("o_caption"), KDbField::Text))
     .addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
 
-    KDbDbg << *t_objects;
+    kdbDebug() << *t_objects;
 
     KDbTableSchema *t_objectdata = newKDbSystemTableSchema(QLatin1String("kexi__objectdata"));
     t_objectdata->addField(new KDbField(QLatin1String("o_id"),
@@ -3365,7 +3363,7 @@ inline void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* 
     for (KDbRecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
         if (columnsOrderExpandedIt == columnsOrderExpanded->constEnd()) {
-            KDbWarn << "(KDbConnection) \"now also assign new value in memory\" step"
+            kdbWarning() << "(KDbConnection) \"now also assign new value in memory\" step"
                        "- could not find item" << it.key()->aliasOrName();
             continue;
         }
@@ -3376,24 +3374,24 @@ inline void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* 
 bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId)
 {
 // Each SQL identifier needs to be escaped in the generated query.
-// KDbDbg << *query;
+// kdbDebug() << *query;
 
     clearResult();
     //--get PKEY
     if (buf->dbBuffer().isEmpty()) {
-        KDbDbg << " -- NO CHANGES DATA!";
+        kdbDebug() << " -- NO CHANGES DATA!";
         return true;
     }
     KDbTableSchema *mt = query->masterTable();
     if (!mt) {
-        KDbWarn << " -- NO MASTER TABLE!";
+        kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLE,
                           QObject::tr("Could not update record because there is no master table defined."));
         return false;
     }
     KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
     if (!useRecordId && !pkey) {
-        KDbWarn << " -- NO MASTER TABLE's PKEY!";
+        kdbWarning() << " -- NO MASTER TABLE's PKEY!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
                           QObject::tr("Could not update record because master table has no primary key defined."));
 //! @todo perhaps we can try to update without using PKEY?
@@ -3422,9 +3420,9 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     }
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-        //KDbDbg << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
+        //kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
         if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
-            KDbWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
+            kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
                               QObject::tr("Could not update record because it does not contain entire primary key of master table."));
             return false;
@@ -3451,7 +3449,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                    + m_driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += (sqlset + " WHERE " + sqlwhere);
-    //KDbDbg << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
+    //kdbDebug() << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
 
     // preprocessing before update
     if (!drv_beforeUpdate(mt->name(), &affectedFields))
@@ -3480,18 +3478,18 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     //--get PKEY
     /*disabled: there may be empty records (with autoinc)
     if (buf.dbBuffer().isEmpty()) {
-      KDbDbg << " -- NO CHANGES DATA!";
+      kdbDebug() << " -- NO CHANGES DATA!";
       return true; }*/
     KDbTableSchema *mt = query->masterTable();
     if (!mt) {
-        KDbWarn << " -- NO MASTER TABLE!";
+        kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_INSERT_NO_MASTER_TABLE,
                           QObject::tr("Could not insert record because there is no master table specified."));
         return false;
     }
     KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
     if (!getRecordId && !pkey) {
-        KDbWarn << " -- WARNING: NO MASTER TABLE's PKEY";
+        kdbWarning() << " -- WARNING: NO MASTER TABLE's PKEY";
     }
 
     KDbEscapedString sqlcols, sqlvals;
@@ -3513,7 +3511,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                 && !ci->field->defaultValue().isNull()
                 && !b.contains(ci))
         {
-            //KDbDbg << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
+            //kdbDebug() << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
             b.insert(ci, ci->field->defaultValue());
         }
     }
@@ -3524,16 +3522,16 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (b.isEmpty()) {
         // empty record inserting requested:
         if (!getRecordId && !pkey) {
-            KDbWarn << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY RECORDS: INSERT CANCELLED";
+            kdbWarning() << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY RECORDS: INSERT CANCELLED";
             m_result = KDbResult(ERR_INSERT_NO_MASTER_TABLES_PKEY,
                               QObject::tr("Could not insert record because master table has no primary key specified."));
             return false;
         }
         if (pkey) {
             const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-//   KDbDbg << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
+//   kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
             if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
-                KDbWarn << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
+                kdbWarning() << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
                 m_result = KDbResult(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
                                   QObject::tr("Could not insert record because it does not contain entire master table's primary key."));
                 return false;
@@ -3543,7 +3541,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         KDbField *anyField = mt->anyNonPKField();
         if (!anyField) {
             if (!pkey) {
-                KDbWarn << "WARNING: NO FIELD AVAILABLE TO SET IT TO NULL";
+                kdbWarning() << "WARNING: NO FIELD AVAILABLE TO SET IT TO NULL";
                 return false;
             } else {
                 //try to set NULL in pkey field (could not work for every SQL engine!)
@@ -3569,7 +3567,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         }
     }
     sql += (sqlcols + ") VALUES (" + sqlvals + ')');
-// KDbDbg << " -- SQL == " << sql;
+// kdbDebug() << " -- SQL == " << sql;
 
     // do driver specific pre-processing
     if (!drv_beforeInsert(mt->name(), &affectedFields))
@@ -3617,20 +3615,20 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         }
         uint i = 0;
         foreach(KDbQueryColumnInfo *ci, *aif_list) {
-//   KDbDbg << "AUTOINCREMENTED FIELD" << fi->field->name() << "==" << aif_data[i].toInt();
+//   kdbDebug() << "AUTOINCREMENTED FIELD" << fi->field->name() << "==" << aif_data[i].toInt();
             ((*data)[ columnsOrderExpanded.value(ci)] = aif_data.value(i)).convert(ci->field->variantType());        //cast to get proper type
             i++;
         }
     } else {
         recordId = drv_lastInsertRecordId();
-//  KDbDbg << "new recordId ==" << (uint)recordId;
+//  kdbDebug() << "new recordId ==" << (uint)recordId;
         if (m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
-            KDbWarn << "m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
+            kdbWarning() << "m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
             return false;
         }
     }
     if (getRecordId && /*sanity check*/data->size() > (int)fieldsExpanded.size()) {
-//  KDbDbg << "new ROWID ==" << (uint)ROWID;
+//  kdbDebug() << "new ROWID ==" << (uint)ROWID;
         (*data)[data->size() - 1] = recordId;
     }
     return true;
@@ -3642,7 +3640,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     clearResult();
     KDbTableSchema *mt = query->masterTable();
     if (!mt) {
-        KDbWarn << " -- NO MASTER TABLE!";
+        kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_DELETE_NO_MASTER_TABLE,
                           QObject::tr("Could not delete record because there is no master table specified."));
         return false;
@@ -3651,7 +3649,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
 
 //! @todo allow to delete from a table without pkey
     if (!useRecordId && !pkey) {
-        KDbWarn << " -- WARNING: NO MASTER TABLE's PKEY";
+        kdbWarning() << " -- WARNING: NO MASTER TABLE's PKEY";
         m_result = KDbResult(ERR_DELETE_NO_MASTER_TABLES_PKEY,
                           QObject::tr("Could not delete record because there is no primary key for master table specified."));
         return false;
@@ -3666,9 +3664,9 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
 
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-        //KDbDbg << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
+        //kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
         if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
-            KDbWarn << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
+            kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
                               QObject::tr("Could not delete record because it does not contain entire master table's primary key."));
             return false;
@@ -3693,7 +3691,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
                     + m_driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += sqlwhere;
-    //KDbDbg << " -- SQL == " << sql;
+    //kdbDebug() << " -- SQL == " << sql;
 
     if (!executeSQL(sql)) {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
@@ -3707,15 +3705,15 @@ bool KDbConnection::deleteAllRecords(KDbQuerySchema* query)
     clearResult();
     KDbTableSchema *mt = query->masterTable();
     if (!mt) {
-        KDbWarn << " -- NO MASTER TABLE!";
+        kdbWarning() << " -- NO MASTER TABLE!";
         return false;
     }
     KDbIndexSchema *pkey = mt->primaryKey();
     if (!pkey || pkey->fields()->isEmpty()) {
-        KDbWarn << "-- WARNING: NO MASTER TABLE's PKEY";
+        kdbWarning() << "-- WARNING: NO MASTER TABLE's PKEY";
     }
     KDbEscapedString sql = KDbEscapedString("DELETE FROM ") + escapeIdentifier(mt->name());
-    //KDbDbg << "-- SQL == " << sql;
+    //kdbDebug() << "-- SQL == " << sql;
 
     if (!executeSQL(sql)) {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
@@ -3753,7 +3751,7 @@ void KDbConnection::unregisterForTablesSchemaChanges(TableSchemaChangeListenerIn
 
 QSet<KDbConnection::TableSchemaChangeListenerInterface*>* KDbConnection::tableSchemaChangeListeners(KDbTableSchema* schema) const
 {
-    //KDbDbg << d->tableSchemaChangeListeners.count();
+    //kdbDebug() << d->tableSchemaChangeListeners.count();
     return d->tableSchemaChangeListeners.value(schema);
 }
 

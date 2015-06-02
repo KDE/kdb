@@ -54,6 +54,7 @@ endif()
 ########### next target ###############
 
 set(kdb_sqlite_SRCS
+   sqlite_debug.cpp
    SqliteConnection.cpp 
    SqliteDriver.cpp 
    SqliteCursor.cpp 

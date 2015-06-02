@@ -22,6 +22,7 @@
 
 #include "KDbTableOrQuerySchema.h"
 #include "KDbConnection.h"
+#include "kdb_debug.h"
 
 class KDbTableOrQuerySchema::Private
 {
@@ -43,7 +44,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArr
     d->table = conn->tableSchema(QLatin1String(name));
     d->query = d->table ? 0 : conn->querySchema(QLatin1String(name));
     if (!d->table && !d->query) {
-        KDbWarn << "tableOrQuery is neither table nor query!";
+        kdbWarning() << "tableOrQuery is neither table nor query!";
     }
 }
 
@@ -54,10 +55,10 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArr
     d->table = table ? conn->tableSchema(QLatin1String(name)) : 0;
     d->query = table ? 0 : conn->querySchema(QLatin1String(name));
     if (table && !d->table) {
-        KDbWarn << "no table specified!";
+        kdbWarning() << "no table specified!";
     }
     if (!table && !d->query) {
-        KDbWarn << "no query specified!";
+        kdbWarning() << "no query specified!";
     }
 }
 
@@ -68,7 +69,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbFieldList *tableOrQuery)
     d->query = dynamic_cast<KDbQuerySchema*>(tableOrQuery);
     Q_ASSERT(tableOrQuery);
     if (!d->table && !d->query) {
-        KDbWarn << "tableOrQuery is neither table nor query!";
+        kdbWarning() << "tableOrQuery is neither table nor query!";
     }
 }
 
@@ -78,7 +79,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, int id)
     d->table = conn->tableSchema(id);
     d->query = d->table ? 0 : conn->querySchema(id);
     if (!d->table && !d->query) {
-        KDbWarn << "no table or query found for id==" << id;
+        kdbWarning() << "no table or query found for id==" << id;
     }
 }
 
@@ -88,7 +89,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbTableSchema* table)
     d->table = table;
     d->query = 0;
     if (!d->table) {
-        KDbWarn << "no table specified!";
+        kdbWarning() << "no table specified!";
     }
 }
 
@@ -98,7 +99,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbQuerySchema* query)
     d->table = 0;
     d->query = query;
     if (!d->query) {
-        KDbWarn << "no query specified!";
+        kdbWarning() << "no query specified!";
     }
 }
 
@@ -124,7 +125,7 @@ const KDbQueryColumnInfo::Vector KDbTableOrQuerySchema::columns(bool unique)
     if (d->query)
         return d->query->fieldsExpanded(unique ? KDbQuerySchema::Unique : KDbQuerySchema::Default);
 
-    KDbWarn << "no query or table specified!";
+    kdbWarning() << "no query or table specified!";
     return KDbQueryColumnInfo::Vector();
 }
 

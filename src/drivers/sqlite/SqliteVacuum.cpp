@@ -18,6 +18,7 @@
 */
 
 #include "SqliteVacuum.h"
+#include "sqlite_debug.h"
 
 #include "KDb.h"
 
@@ -71,15 +72,15 @@ SqliteVacuum::~SqliteVacuum()
 tristate SqliteVacuum::run()
 {
     const QString dump_app = QString::fromLatin1(KDB_SQLITE_DUMP_TOOL);
-    //KDbDrvDbg << KDB_DRIVER_NAME << dump_app;
-    KDbDrvDbg << dump_app;
+    //sqliteDebug() << KDB_DRIVER_NAME << dump_app;
+    sqliteDebug() << dump_app;
     if (dump_app.isEmpty()) {
-        KDbDrvWarn << "Could not find tool" << KDB_SQLITE_DUMP_TOOL;
+        sqliteWarning() << "Could not find tool" << KDB_SQLITE_DUMP_TOOL;
         m_result = false;
         return m_result;
     }
     const QString sqlite_app(KDb::sqlite3ProgramPath());
-    KDbDrvDbg << sqlite_app;
+    sqliteDebug() << sqlite_app;
     if (sqlite_app.isEmpty()) {
         m_result = false;
         return m_result;
@@ -87,11 +88,11 @@ tristate SqliteVacuum::run()
     
     QFileInfo fi(m_filePath);
     if (!fi.isReadable()) {
-        KDbDrvWarn << "No readable file" << m_filePath;
+        sqliteWarning() << "No readable file" << m_filePath;
         return false;
     }
 
-    KDbDrvDbg << fi.absoluteFilePath() << fi.absoluteDir().path();
+    sqliteDebug() << fi.absoluteFilePath() << fi.absoluteDir().path();
 
     delete m_dumpProcess;
     m_dumpProcess = new QProcess(this);
@@ -120,7 +121,7 @@ tristate SqliteVacuum::run()
     tempFile->open();
     m_tmpFilePath = tempFile->fileName();
     delete tempFile;
-    KDbDrvDbg << m_tmpFilePath;
+    sqliteDebug() << m_tmpFilePath;
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
     if (!m_sqliteProcess->waitForStarted()) {
         delete m_dumpProcess;
@@ -164,7 +165,7 @@ void SqliteVacuum::readFromStdErr()
         QByteArray s(m_dumpProcess->readLine(1000));
         if (s.isEmpty())
             break;
-    KDbDrvDbg << s;
+    sqliteDebug() << s;
         if (s.startsWith("DUMP: ")) {
             //set previously known progress
             m_dlg->setValue(m_percent);
@@ -189,7 +190,7 @@ void SqliteVacuum::readFromStdErr()
 
 void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    KDbDrvDbg << exitCode << exitStatus;
+    sqliteDebug() << exitCode << exitStatus;
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         cancelClicked();
         m_result = false;
@@ -208,7 +209,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
     const uint origSize = fi.size();
 
     if (!QFile::rename(m_tmpFilePath, fi.absoluteFilePath())) {
-        KDbDrvWarn << "Rename" << m_tmpFilePath << "to" << fi.absoluteFilePath() << "failed.";
+        sqliteWarning() << "Rename" << m_tmpFilePath << "to" << fi.absoluteFilePath() << "failed.";
         m_result = false;
     }
 
@@ -223,7 +224,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    KDbDrvDbg << exitCode << exitStatus;
+    sqliteDebug() << exitCode << exitStatus;
 
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         m_result = false;

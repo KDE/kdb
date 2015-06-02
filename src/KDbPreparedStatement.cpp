@@ -20,8 +20,7 @@
 #include "KDbPreparedStatement.h"
 #include "KDbPreparedStatementInterface.h"
 #include "KDbTableSchema.h"
-
-#include <QtDebug>
+#include "kdb_debug.h"
 
 KDbPreparedStatement::Data::~Data()
 {
@@ -59,7 +58,7 @@ bool KDbPreparedStatement::generateStatementString(KDbEscapedString * s)
         return generateInsertStatementString(s);
     default:;
     }
-    KDbFatal << "Unsupported type" << d->type;
+    kdbCritical() << "Unsupported type" << d->type;
     return false;
 }
 
@@ -88,7 +87,7 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
             s->append(" AND ");
         KDbField *f = d->fields.field(whereItem);
         if (!f) {
-            KDbWarn << "field" << whereItem << "not found, aborting";
+            kdbWarning() << "field" << whereItem << "not found, aborting";
             s->clear();
             return false;
         }

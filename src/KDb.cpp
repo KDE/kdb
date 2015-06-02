@@ -21,13 +21,13 @@
 */
 
 #include "KDb.h"
-
 #include "KDbCursor.h"
 #include "KDbDriverManager.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbTableOrQuerySchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbConnectionData.h"
+#include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
 
 #include <QMap>
@@ -44,7 +44,6 @@
 #include <QProcess>
 
 #include <memory>
-#include <QDebug>
 
 class ConnectionTestDialog;
 
@@ -168,7 +167,7 @@ ConnectionTestDialog::~ConnectionTestDialog()
 
 int ConnectionTestDialog::exec()
 {
-    //KDbDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
     m_timer.start(20);
     m_thread->start();
     const int res = QProgressDialog::exec(); // krazy:exclude=qclasses
@@ -179,23 +178,23 @@ int ConnectionTestDialog::exec()
 
 void ConnectionTestDialog::slotTimeout()
 {
-    //KDbDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
-    KDbDbg << m_error;
+    //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    kdbDebug() << m_error;
     bool notResponding = false;
     if (m_elapsedTime >= 1000*5) {//5 seconds
         m_stopWaiting = true;
         notResponding = true;
     }
-    KDbDbg << m_elapsedTime << m_stopWaiting << notResponding;
+    kdbDebug() << m_elapsedTime << m_stopWaiting << notResponding;
     if (m_stopWaiting) {
         m_timer.disconnect(this);
         m_timer.stop();
         reject();
-        KDbDbg << "after reject";
+        kdbDebug() << "after reject";
         if (m_error) {
-            KDbDbg << "show?";
+            kdbDebug() << "show?";
             m_msgHandler->showErrorMessage(KDbMessageHandler::Sorry, m_msg, m_details);
-            KDbDbg << "shown";
+            kdbDebug() << "shown";
             m_error = false;
         } else if (notResponding) {
             m_msgHandler->showErrorMessage(
@@ -220,14 +219,14 @@ void ConnectionTestDialog::slotTimeout()
 
 void ConnectionTestDialog::error(const QString& msg, const QString& details)
 {
-    //KDbDbg << "tid:" << QThread::currentThread() << "this_thread:" << thread();
-    KDbDbg << msg << details;
+    //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
+    kdbDebug() << msg << details;
     m_stopWaiting = true;
     if (!msg.isEmpty() || !details.isEmpty()) {
         m_error = true;
         m_msg = msg;
         m_details = details;
-        KDbDbg << "ERR!";
+        kdbDebug() << "ERR!";
     }
 }
 
@@ -466,7 +465,7 @@ int KDb::recordCount(const KDbTableSchema& tableSchema)
 {
 //! @todo does not work with non-SQL data sources
     if (!tableSchema.connection()) {
-        KDbWarn << "no tableSchema.connection()";
+        kdbWarning() << "no tableSchema.connection()";
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -482,7 +481,7 @@ int KDb::recordCount(KDbQuerySchema* querySchema, const QList<QVariant>& params)
 {
 //! @todo does not work with non-SQL data sources
     if (!querySchema->connection()) {
-        KDbWarn << "no querySchema->connection()";
+        kdbWarning() << "no querySchema->connection()";
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
@@ -558,7 +557,7 @@ QString KDb::formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces
 KDbField::Type KDb::intToFieldType(int type)
 {
     if (type < (int)KDbField::InvalidType || type > (int)KDbField::LastType) {
-        KDbWarn << "invalid type" << type;
+        kdbWarning() << "invalid type" << type;
         return KDbField::InvalidType;
     }
     return (KDbField::Type)type;
@@ -570,7 +569,7 @@ static bool setIntToFieldType(KDbField *field, const QVariant& value)
     bool ok;
     const int intType = value.toInt(&ok);
     if (!ok || KDbField::InvalidType == KDb::intToFieldType(intType)) {//for sanity
-        KDbWarn << "invalid type";
+        kdbWarning() << "invalid type";
         return false;
     }
     field->setType((KDbField::Type)intType);
@@ -878,7 +877,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
         }
         else if (KDb::isLookupFieldSchemaProperty(propertyName)) {
             if (!field->table()) {
-                KDbWarn << "Cannot set" << propertyName << "property - no table assigned for field";
+                kdbWarning() << "Cannot set" << propertyName << "property - no table assigned for field";
             } else {
                 KDbLookupFieldSchema *lookup = field->table()->lookupFieldSchema(*field);
                 const bool createLookup = !lookup;
@@ -960,7 +959,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
         field->setCustomProperty(propertyName, value);
     }
 
-    KDbWarn << "property" << propertyName << "not found!";
+    kdbWarning() << "property" << propertyName << "not found!";
     return false;
 #undef SET_BOOLEAN_FLAG
 #undef GET_INT
@@ -1031,7 +1030,7 @@ QVariant KDb::loadPropertyValueFromDom(const QDomNode& node, bool* ok)
     }
     else {
 //! @todo add more QVariant types
-        KDbWarn << "KDb::loadPropertyValueFromDom(): unknown type '" << valueType << "'";
+        kdbWarning() << "KDb::loadPropertyValueFromDom(): unknown type '" << valueType << "'";
     }
     if (ok)
         *ok = false;
@@ -1103,7 +1102,7 @@ QVariant KDb::emptyValueForType(KDbField::Type type)
         if (type == KDbField::Time)
             return QTime::currentTime();
     }
-    KDbWarn << "no value for type" << KDbField::typeName(type);
+    kdbWarning() << "no value for type" << KDbField::typeName(type);
     return QVariant();
 }
 
@@ -1156,7 +1155,7 @@ QVariant KDb::notEmptyValueForType(KDbField::Type type)
         if (type == KDbField::Time)
             return QTime::currentTime();
     }
-    KDbWarn << "no value for type" << KDbField::typeName(type);
+    kdbWarning() << "no value for type" << KDbField::typeName(type);
     return QVariant();
 }
 
@@ -1285,7 +1284,7 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     QString str;
     str.reserve(escaped_length);
     if (str.capacity() < escaped_length) {
-        KDbWarn << "no enough memory (cannot allocate" << escaped_length << "chars)";
+        kdbWarning() << "no enough memory (cannot allocate" << escaped_length << "chars)";
         return QString();
     }
     if (type == BLOBEscapeXHex)
@@ -1333,12 +1332,12 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
         const char* s = data;
         const char* end = s + length;
         if (pass == 1) {
-            KDbDbg << "processBinaryData(): real size == " << output;
+            kdbDebug() << "processBinaryData(): real size == " << output;
             array.resize(output);
             output = 0;
         }
         for (int input = 0; s < end; output++) {
-            //  KDbDbg<<(int)s[0]<<" "<<(int)s[1]<<" "<<(int)s[2]<<" "<<(int)s[3]<<" "<<(int)s[4];
+            //  kdbDebug()<<(int)s[0]<<" "<<(int)s[1]<<" "<<(int)s[2]<<" "<<(int)s[3]<<" "<<(int)s[4];
             if (s[0] == '\\' && (s + 1) < end) {
                 //special cases as in http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
                 if (s[1] == '\'') {// \'
@@ -1354,7 +1353,7 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
                         array[output] = char((int(s[1] - '0') * 8 + int(s[2] - '0')) * 8 + int(s[3] - '0'));
                     s += 4;
                 } else {
-                    KDbWarn << "no octal value after backslash";
+                    kdbWarning() << "no octal value after backslash";
                     s++;
                 }
             } else {
@@ -1362,7 +1361,7 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
                     array[output] = s[0];
                 s++;
             }
-            //  KDbDbg<<output<<": "<<(int)array[output];
+            //  kdbDebug()<<output<<": "<<(int)array[output];
         }
     }
     return array;
@@ -1483,7 +1482,7 @@ QVariant KDb::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
             if (!_ok) {
                 if (ok)
                     *ok = _ok;
-                KDbWarn << "Error in digit" << i;
+                kdbWarning() << "Error in digit" << i;
                 return QVariant();
             }
             ba[i/2] = (char)c;
@@ -1626,7 +1625,7 @@ QString KDb::sqlite3ProgramPath()
 {
     QString path = KDbUtils::findExe(QLatin1String("sqlite3"));
     if (path.isEmpty()) {
-        KDbWarn << "Could not find program \"sqlite3\"";
+        kdbWarning() << "Could not find program \"sqlite3\"";
     }
     return path;
 }
@@ -1640,32 +1639,32 @@ bool KDb::importSqliteFile(const QString &inputFileName, const QString &outputFi
 
     QFileInfo fi(inputFileName);
     if (!fi.isReadable()) {
-        KDbWarn << "No readable input file" << fi.absoluteFilePath();
+        kdbWarning() << "No readable input file" << fi.absoluteFilePath();
         return false;
     }
     QFileInfo fo(outputFileName);
     if (QFile(fo.absoluteFilePath()).exists()) {
         if (!QFile::remove(fo.absoluteFilePath())) {
-            KDbWarn << "Cannot remove output file" << fo.absoluteFilePath();
+            kdbWarning() << "Cannot remove output file" << fo.absoluteFilePath();
             return false;
         }
     }
-    KDbDbg << inputFileName << fi.absoluteDir().path() << fo.absoluteFilePath();
+    kdbDebug() << inputFileName << fi.absoluteDir().path() << fo.absoluteFilePath();
 
     QProcess p;
     p.start(sqlite_app, QStringList() << fo.absoluteFilePath());
     if (!p.waitForStarted()) {
-        KDbWarn << "Failed to start program" << sqlite_app;
+        kdbWarning() << "Failed to start program" << sqlite_app;
         return false;
     }
     QByteArray line(".read " + QFile::encodeName(fi.absoluteFilePath()));
     if (p.write(line) != line.length() || !p.waitForBytesWritten()) {
-        KDbWarn << "Failed to send \".read\" command to program" << sqlite_app;
+        kdbWarning() << "Failed to send \".read\" command to program" << sqlite_app;
         return false;
     }
     p.closeWriteChannel();
     if (!p.waitForFinished()) {
-        KDbWarn << "Failed to finish program" << sqlite_app;
+        kdbWarning() << "Failed to finish program" << sqlite_app;
         return false;
     }
     return true;

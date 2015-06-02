@@ -24,13 +24,12 @@
 #include "KDbDriver.h"
 #include "KDbExpression.h"
 #include "KDb.h"
+#include "kdb_debug.h"
 
 // we use here tr() but this depends on kde libs: TODO: add #ifdefs
 #include <QDateTime>
 
 #include <assert.h>
-
-#include "KDbGlobal.h"
 
 KDbField::FieldTypeNames KDbField::m_typeNames;
 KDbField::FieldTypeGroupNames KDbField::m_typeGroupNames;
@@ -337,7 +336,7 @@ void
 KDbField::setType(Type t)
 {
     if (!m_expr->isNull()) {
-        KDbWarn << "could not set type" << KDbField::typeName(t)
+        kdbWarning() << "could not set type" << KDbField::typeName(t)
                 << "because the field has expression assigned!";
         return;
     }

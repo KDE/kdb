@@ -20,6 +20,7 @@
 #include "KDbAlter.h"
 #include "KDb.h"
 #include "KDbConnection.h"
+#include "kdb_debug.h"
 
 #include <QMap>
 
@@ -86,6 +87,12 @@ KDbAlterTableHandler::MoveFieldPositionAction& KDbAlterTableHandler::ActionBase:
     if (dynamic_cast<MoveFieldPositionAction*>(this))
         return *dynamic_cast<MoveFieldPositionAction*>(this);
     return nullMoveFieldPositionAction;
+}
+
+void KDbAlterTableHandler::ActionBase::debug(const DebugOptions& debugOptions)
+{
+    kdbDebug() << debugString(debugOptions)
+    << " (req = " << alteringRequirements() << ")";
 }
 
 //--------------------------------------------------------
@@ -170,7 +177,7 @@ int KDbAlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName
     if (res == 0) {
         if (KDb::isExtendedTableFieldProperty(propertyName))
             return (int)ExtendedSchemaAlteringRequired;
-        KDbWarn << "property" << propertyName << "not found!";
+        kdbWarning() << "property" << propertyName << "not found!";
     }
     return res;
 }
@@ -241,7 +248,7 @@ static void debugAction(KDbAlterTableHandler::ActionBase *action, int nestingLev
             *debugTarget += debugString + QLatin1Char('\n');
         }
     } else {
-        KDbDbg << debugString;
+        kdbDebug() << debugString;
 #ifdef KDB_DEBUG_GUI
         if (simulate)
             KDb::alterTableActionDebugGUI(debugString, nestingLevel);
@@ -262,7 +269,7 @@ static void debugActionDict(KDbAlterTableHandler::ActionDict *dict, int fieldUID
     }
     QString dbg(QString::fromLatin1("Action dict for field \"%1\" (%2, UID=%3):")
                         .arg(fieldName).arg(dict->count()).arg(fieldUID));
-    KDbDbg << dbg;
+    kdbDebug() << dbg;
 #ifdef KDB_DEBUG_GUI
     if (simulate)
         KDb::alterTableActionDebugGUI(dbg, 1);
@@ -336,7 +343,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
                     actionsLikeThis = createActionDict(fieldActions, uid());
                 KDbAlterTableHandler::ChangeFieldPropertyAction* newRenameAction
                     = new KDbAlterTableHandler::ChangeFieldPropertyAction(*this);
-                KDbDbg << "insert into" << fieldName() << "dict:" << newRenameAction->debugString();
+                kdbDebug() << "insert into" << fieldName() << "dict:" << newRenameAction->debugString();
                 actionsLikeThis->insert(m_propertyName.toLatin1(), newRenameAction);
                 return;
             }
@@ -639,7 +646,7 @@ void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &fi
             KDbField *f = new KDbField(*field());
             if (KDb::setFieldProperties(f, values)) {
                 setField(f);
-                KDbDbg << field();
+                kdbDebug() << field();
 #ifdef KDB_DEBUG_GUI
                 KDb::alterTableActionDebugGUI(
                     QLatin1String("** Property-set actions moved to field definition itself:\n")
@@ -650,7 +657,7 @@ void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &fi
                 KDb::alterTableActionDebugGUI(
                     QLatin1String("** Failed to set properties for field ") + KDbUtils::debugString<KDbField>(*field()), 0);
 #endif
-                KDbWarn << "setFieldProperties() failed!";
+                kdbWarning() << "setFieldProperties() failed!";
                 delete f;
             }
         }
@@ -778,7 +785,7 @@ void KDbAlterTableHandler::setActions(const ActionList& actions)
 
 void KDbAlterTableHandler::debug()
 {
-    KDbDbg << "KDbAlterTableHandler's actions:";
+    kdbDebug() << "KDbAlterTableHandler's actions:";
     foreach(ActionBase* action, d->actions) {
         action->debug();
     }
@@ -882,7 +889,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     }
     // - Debug
     QString dbg = QString::fromLatin1("** Overall altering requirements: %1").arg(args->requirements);
-    KDbDbg << dbg;
+    kdbDebug() << dbg;
 
     if (args->onlyComputeRequirements) {
         args->result = true;
@@ -897,7 +904,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 #endif
     dbg = QString::fromLatin1("** Ordered, simplified actions (%1, was %2):")
             .arg(currentActionsCount).arg(allActionsCount);
-    KDbDbg << dbg;
+    kdbDebug() << dbg;
 #ifdef KDB_DEBUG_GUI
     if (args->simulate)
         KDb::alterTableActionDebugGUI(dbg, 0);
@@ -930,9 +937,9 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         }
         newTable->setName(tempDestTableName);
     }
-    KDbDbg << *oldTable;
+    kdbDebug() << *oldTable;
     if (recreateTable && !args->debugString) {
-        KDbDbg << *newTable;
+        kdbDebug() << *newTable;
     }
 
     // Update table schema in memory ----
@@ -1052,7 +1059,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             }
         }
         sql += (") SELECT " + sourceFields + " FROM " + oldTable->name());
-        KDbDbg << " ** " << sql;
+        kdbDebug() << " ** " << sql;
         if (!d->conn->executeSQL(sql)) {
             m_result = d->conn->result();
 //! @todo delete newTable...

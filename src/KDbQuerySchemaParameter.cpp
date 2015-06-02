@@ -20,9 +20,9 @@
 #include "KDbQuerySchemaParameter.h"
 #include "KDbDriver.h"
 #include "KDbDriverManager_p.h"
+#include "kdb_debug.h"
 
 #include <QWeakPointer>
-#include <QtDebug>
 
 KDbQuerySchemaParameter::KDbQuerySchemaParameter()
         : type(KDbField::InvalidType)
@@ -83,7 +83,7 @@ KDbQuerySchemaParameterValueListIterator::~KDbQuerySchemaParameterValueListItera
 QVariant KDbQuerySchemaParameterValueListIterator::getPreviousValue()
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
-        KDbWarn << "no prev value";
+        kdbWarning() << "no prev value";
         return QVariant();
     }
     QVariant res(*d->paramsIt);
@@ -95,7 +95,7 @@ QVariant KDbQuerySchemaParameterValueListIterator::getPreviousValue()
 KDbEscapedString KDbQuerySchemaParameterValueListIterator::getPreviousValueAsString(KDbField::Type type)
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
-        KDbWarn << "no prev value";
+        kdbWarning() << "no prev value";
         return d->driverWeakPointer.toStrongRef()->valueToSQL(type, QVariant()); //"NULL"
     }
     KDbEscapedString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));

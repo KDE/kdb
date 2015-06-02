@@ -21,6 +21,7 @@
 #include "SqliteConnection_p.h"
 #include "SqliteCursor.h"
 #include "SqlitePreparedStatement.h"
+#include "sqlite_debug.h"
 
 #include <sqlite3.h>
 
@@ -32,10 +33,6 @@
 #include <QFile>
 #include <QDir>
 #include <QRegExp>
-
-//remove debug
-#undef KDbDrvDbg
-#define KDbDrvDbg if (true); else qDebug()
 
 SqliteConnectionInternal::SqliteConnectionInternal(KDbConnection *connection)
         : KDbConnectionInternal(connection)
@@ -121,12 +118,12 @@ SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& c
 
 SqliteConnection::~SqliteConnection()
 {
-    KDbDrvDbg;
+    sqliteDebug();
     //disconnect if was connected
 // disconnect();
     destroy();
     delete d;
-    KDbDrvDbg << "ok";
+    sqliteDebug() << "ok";
 }
 
 void SqliteConnection::storeResult()
@@ -142,7 +139,7 @@ bool SqliteConnection::drv_connect()
 
 bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
-    KDbDrvDbg;
+    sqliteDebug();
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
     QRegExp re(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (re.exactMatch(version->string())) {
@@ -155,7 +152,7 @@ bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 
 bool SqliteConnection::drv_disconnect()
 {
-    KDbDrvDbg;
+    sqliteDebug();
     return true;
 }
 
@@ -177,7 +174,7 @@ bool SqliteConnection::drv_getTablesList(QStringList* list)
 {
     KDbCursor *cursor;
     if (!(cursor = executeQuery(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table'")))) {
-        KDbWarn << "!executeQuery()";
+        sqliteWarning() << "!executeQuery()";
         return false;
     }
     list->clear();
@@ -427,7 +424,7 @@ bool SqliteConnection::loadExtension(const QString& path)
     if (!fileInfo.exists()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              QObject::tr("Could not find SQLite extension file \"%1\".").arg(path));
-        KDbWarn << "SqliteConnection::loadExtension(): Could not load SQLite extension";
+        sqliteWarning() << "SqliteConnection::loadExtension(): Could not load SQLite extension";
         return false;
     }
     if (!d->extensionsLoadingEnabled()) {
@@ -441,7 +438,7 @@ bool SqliteConnection::loadExtension(const QString& path)
         m_result.setServerErrorCode(res);
         m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
                              QObject::tr("Could not load SQLite extension \"%1\".").arg(path));
-        KDbWarn << "SqliteConnection::loadExtension(): Could not load SQLite extension"
+        sqliteWarning() << "SqliteConnection::loadExtension(): Could not load SQLite extension"
                 << path << ":" << errmsg_p;
         if (errmsg_p) {
             m_result.setServerMessage(QLatin1String(errmsg_p));

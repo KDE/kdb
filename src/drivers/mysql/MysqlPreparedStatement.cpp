@@ -218,7 +218,7 @@ bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, i
         break;
     }
     default:
-        KDbWarn << "unsupported field type:"
+        kdbWarning() << "unsupported field type:"
             << field->type() << "- NULL value bound to column #" << arg;
         res = sqlite3_bind_null(prepared_st_handle, arg);
         if (SQLITE_OK != res) {

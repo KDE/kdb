@@ -24,9 +24,8 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
+#include "kdb_debug.h"
 #include "generated/sqlparser.h"
-
-#include <QtDebug>
 
 KDbBinaryExpressionData::KDbBinaryExpressionData()
  : KDbExpressionData()
@@ -273,11 +272,11 @@ static KDb::ExpressionClass classForArgs(const KDbExpression& leftExpr,
                                     const KDbExpression& rightExpr)
 {
     if (leftExpr.isNull()) {
-        qWarning() << "KDbBinaryExpression set to null because left argument is not specified";
+        qCWarning(KDB_LOG) << "KDbBinaryExpression set to null because left argument is not specified";
         return KDb::UnknownExpression;
     }
     if (rightExpr.isNull()) {
-        qWarning() << "KDbBinaryExpression set to null because right argument is not specified";
+        qCWarning(KDB_LOG) << "KDbBinaryExpression set to null because right argument is not specified";
         return KDb::UnknownExpression;
     }
     return KDbExpression::classForToken(token);

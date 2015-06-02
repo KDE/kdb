@@ -133,25 +133,6 @@ the native database at record level.
 namespace KDb
 {
 
-#if !defined(_DEBUG) && !defined(DEBUG)
-# define KDB_DEBUG if (true); else
-#else
-# define KDB_DEBUG
-#endif
-
-//! Debug command for the core KDb code
-# define KDbDbg KDB_DEBUG qDebug() << "KDb:"
-//! Debug command for KDb driver's code
-# define KDbDrvDbg KDB_DEBUG qDebug() << "KDb-drv(" KDB_DRIVER_NAME "):"
-//! Warning command for the core KDb code
-# define KDbWarn KDB_DEBUG qWarning() << "KDb:"
-//! Warning command for KDb driver's code
-# define KDbDrvWarn KDB_DEBUG qWarning() << "KDb-drv(" KDB_DRIVER_NAME "):"
-//! Fatal command for the core KDb code
-# define KDbFatal KDB_DEBUG qCritical() << "KDb:"
-//! Fatal command for KDb driver's code
-# define KDbDrvFatal KDB_DEBUG qCritical() << "KDb-drv(" KDB_DRIVER_NAME "):"
-
 /*! Object types set like table or query. */
 enum ObjectType {
     UnknownObjectType = -1, //!< helper
@@ -188,13 +169,11 @@ enum IdentifierEscapingType {
 //! Macro to use in drivers to avoid redundant translations.
 #define KDbTr QObject::tr
 
-//! Debugging options for expressions
+//! Debugging for expressions
 #cmakedefine KDB_EXPRESSION_DEBUG
-#ifdef KDB_EXPRESSION_DEBUG
-# define ExpressionDebug qDebug()
-#else
-# define ExpressionDebug if (1) {} else qDebug()
-#endif
+
+//! Debugging for the driver manager
+#cmakedefine KDB_DRIVERMANAGER_DEBUG
 
 //! GUI for debugging
 #cmakedefine KDB_DEBUG_GUI

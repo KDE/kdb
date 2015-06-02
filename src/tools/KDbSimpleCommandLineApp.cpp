@@ -106,7 +106,7 @@ SimpleCommandLineApp::SimpleCommandLineApp(
 //! @todo make use of pty/tty here! (and care about portability)
         QTextStream cin(stdin, QIODevice::ReadOnly);
         cin >> d->connData.password;
-        KDbDbg << d->connData.password;
+        kdbDebug() << d->connData.password;
     }
 }
 

@@ -22,6 +22,7 @@
 #include "KDbDriver.h"
 #include "KDbConnection.h"
 #include "KDbLookupFieldSchema.h"
+#include "kdb_debug.h"
 
 #include <assert.h>
 
@@ -319,7 +320,7 @@ bool KDbTableSchema::setLookupFieldSchema(const QString& fieldName, KDbLookupFie
 {
     KDbField *f = field(fieldName);
     if (!f) {
-        KDbWarn << "no such field" << fieldName << "in table" << name();
+        kdbWarning() << "no such field" << fieldName << "in table" << name();
         return false;
     }
     delete d->lookupFields.take(f);

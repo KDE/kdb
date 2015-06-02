@@ -24,8 +24,7 @@
 
 #include "KDbRecordData.h"
 #include "KDbGlobal.h"
-
-#include <QtDebug>
+#include "kdb_debug.h"
 
 QVariant KDbRecordData::s_null;
 

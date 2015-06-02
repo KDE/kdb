@@ -18,9 +18,9 @@
 */
 
 #include "KDbResult.h"
+#include "kdb_debug.h"
 
 #include <QObject>
-#include <QtDebug>
 
 #define ERRMSG(a) \
     { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
@@ -150,7 +150,7 @@ void KDbResultable::storePreviousError()
     m_previousServerResultName = m_previousServerResultName2;
     m_previousServerResultCode2 = m_serverResultCode;
     m_previousServerResultName2 = m_serverResultName;
-    KDbDbg << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
+    kdbDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
 KDbResultable::~KDbResultable()

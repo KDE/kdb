@@ -20,8 +20,7 @@
 #include "KDbQueryColumnInfo.h"
 #include "KDbTableSchema.h"
 #include "KDbField.h"
-
-#include <QtDebug>
+#include "kdb_debug.h"
 
 KDbQueryColumnInfo::KDbQueryColumnInfo(KDbField *f, const QString& _alias, bool _visible,
                                  KDbQueryColumnInfo *foreignColumn)

@@ -22,8 +22,7 @@
 #include "KDbTableSchema.h"
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
-
-#include <QtDebug>
+#include "kdb_debug.h"
 
 KDbRelationship::KDbRelationship()
         : m_masterIndex(0)
@@ -62,19 +61,19 @@ KDbRelationship::~KDbRelationship()
 void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDbField *field2)
 {
     if (!field1 || !field2 || !query) {
-        KDbWarn << "!masterField || !detailsField || !query";
+        kdbWarning() << "!masterField || !detailsField || !query";
         return;
     }
     if (field1->isQueryAsterisk() || field2->isQueryAsterisk()) {
-        KDbWarn << "relationship's fields cannot be asterisks";
+        kdbWarning() << "relationship's fields cannot be asterisks";
         return;
     }
     if (field1->table() == field2->table()) {
-        KDbWarn << "fields cannot belong to the same table";
+        kdbWarning() << "fields cannot belong to the same table";
         return;
     }
     if (!query->contains(field1->table()) || !query->contains(field2->table())) {
-        KDbWarn << "fields do not belong to this query";
+        kdbWarning() << "fields do not belong to this query";
         return;
     }
 //! @todo: check more things: -types
@@ -162,7 +161,7 @@ void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
         if (masterField->type() != detailsField->type()
                 && masterField->isIntegerType() != detailsField->isIntegerType()
                 && masterField->isTextType() != detailsField->isTextType()) {
-            KDbWarn << "INDEX on" << masterIndex->table()->name()
+            kdbWarning() << "INDEX on" << masterIndex->table()->name()
                 << ", INDEX on" << detailsIndex->table()->name() << ": !equal field types:"
                 << KDbDriver::defaultSQLTypeName(masterField->type()) << masterField->name() << ","
                 << KDbDriver::defaultSQLTypeName(detailsField->type()) << detailsField->name();
@@ -172,7 +171,7 @@ void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
 #if 0 //too STRICT!
         if ((masterField->isUnsigned() && !detailsField->isUnsigned())
                 || (!masterField->isUnsigned() && detailsField->isUnsigned())) {
-            KDbWarn << "KDbRelationship::setIndices(INDEX on '" << masterIndex->table()->name()
+            kdbWarning() << "KDbRelationship::setIndices(INDEX on '" << masterIndex->table()->name()
             << "',INDEX on " << detailsIndex->table()->name() << "): !equal signedness of field types: "
             << KDbDriver::defaultSQLTypeName(masterField->type()) << " " << masterField->name() << ", "
             << KDbDriver::defaultSQLTypeName(detailsField->type()) << " " << detailsField->name();

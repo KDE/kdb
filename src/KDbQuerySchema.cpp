@@ -30,7 +30,7 @@
 
 #include <QBitArray>
 #include <QWeakPointer>
-#include <QDebug>
+#include "kdb_debug.h"
 
 //! @internal
 class KDbQuerySchema::Private
@@ -385,12 +385,12 @@ KDbOrderByColumn* KDbOrderByColumn::copy(KDbQuerySchema* fromQuery, KDbQuerySche
         if (fromQuery && toQuery) {
             int columnIndex = fromQuery->columnsOrder().value(m_column);
             if (columnIndex < 0) {
-                KDbDbg << "KDbOrderByColumn::copy(): Index not found for column" << *m_column;
+                kdbDebug() << "KDbOrderByColumn::copy(): Index not found for column" << *m_column;
                 return 0;
             }
             columnInfo = toQuery->expandedOrInternalField(columnIndex);
             if (!columnInfo) {
-                KDbDbg << "KDbOrderByColumn::copy(): Column info not found at index"
+                kdbDebug() << "KDbOrderByColumn::copy(): Column info not found at index"
                        << columnIndex << "in toQuery";
                 return 0;
             }
@@ -593,7 +593,7 @@ bool KDbOrderByColumnList::appendField(KDbQuerySchema& querySchema,
         append(new KDbOrderByColumn(*field, ascending));
         return true;
     }
-    KDbWarn << "no such field" << fieldName;
+    kdbWarning() << "no such field" << fieldName;
     return false;
 }
 
@@ -651,7 +651,7 @@ KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
     d->masterTable = tableSchema;
     init();
     /*if (!d->masterTable) {
-      KDbWarn << "!d->masterTable";
+      kdbWarning() << "!d->masterTable";
       m_name.clear();
       return;
     }*/
@@ -734,16 +734,16 @@ KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field,
                                     int bindToTable, bool visible)
 {
     if (!field) {
-        KDbWarn << "!field";
+        kdbWarning() << "!field";
         return *this;
     }
 
     if (position > (uint)m_fields.count()) {
-        KDbWarn << "position" << position << "out of range";
+        kdbWarning() << "position" << position << "out of range";
         return *this;
     }
     if (!field->isQueryAsterisk() && !field->isExpression() && !field->table()) {
-        KDbWarn << "field" << field->name() << "must contain table information!";
+        kdbWarning() << "field" << field->name() << "must contain table information!";
         return *this;
     }
     if ((int)fieldCount() >= d->visibility.size()) {
@@ -771,7 +771,7 @@ KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field,
 
     //bind to table
     if (bindToTable < -1 || bindToTable > int(d->tables.count())) {
-        KDbWarn << "bindToTable" << bindToTable << "out of range";
+        kdbWarning() << "bindToTable" << bindToTable << "out of range";
         bindToTable = -1;
     }
     //--move items to make a place for a new one
@@ -779,16 +779,16 @@ KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field,
         d->tablesBoundToColumns[i] = d->tablesBoundToColumns[i-1];
     d->tablesBoundToColumns[position] = bindToTable;
 
-    KDbDbg << "bound to table" << bindToTable;
+    kdbDebug() << "bound to table" << bindToTable;
     if (bindToTable == -1)
-        KDbDbg << " <NOT SPECIFIED>";
+        kdbDebug() << " <NOT SPECIFIED>";
     else
-        KDbDbg << " name=" << d->tables.at(bindToTable)->name()
+        kdbDebug() << " name=" << d->tables.at(bindToTable)->name()
         << " alias=" << tableAlias(bindToTable);
     QString s;
     for (uint i = 0; i < fieldCount();i++)
         s += (QString::number(d->tablesBoundToColumns[i]) + QLatin1Char(' '));
-    KDbDbg << "tablesBoundToColumns == [" << s << "]";
+    kdbDebug() << "tablesBoundToColumns == [" << s << "]";
 
     if (field->isExpression())
         d->regenerateExprAliases = true;
@@ -800,7 +800,7 @@ int KDbQuerySchema::tableBoundToColumn(uint columnPosition) const
 {
     int res = d->tablesBoundToColumns.value(columnPosition, -99);
     if (res == -99) {
-        KDbWarn << "columnPosition" << columnPosition << "out of range";
+        kdbWarning() << "columnPosition" << columnPosition << "out of range";
         return -1;
     }
     return res;
@@ -838,7 +838,7 @@ bool KDbQuerySchema::removeField(KDbField *field)
     }
     d->clearCachedData();
     if (indexOfAsterisk >= 0) {
-        //KDbDbg << "d->asterisks.removeAt:" << field;
+        //kdbDebug() << "d->asterisks.removeAt:" << field;
         //field->debug();
         d->asterisks.removeAt(indexOfAsterisk); //this will destroy this asterisk
     }
@@ -1041,7 +1041,7 @@ QList<KDbTableSchema*>* KDbQuerySchema::tables() const
 
 void KDbQuerySchema::addTable(KDbTableSchema *table, const QString& alias)
 {
-    KDbDbg << (void *)table << "alias=" << alias;
+    kdbDebug() << (void *)table << "alias=" << alias;
     if (!table)
         return;
 
@@ -1052,7 +1052,7 @@ void KDbQuerySchema::addTable(KDbTableSchema *table, const QString& alias)
             num++;
             if (0 == t->name().compare(table->name(), Qt::CaseInsensitive)) {
                 if (tableAlias(num).isEmpty()) {
-                    KDbDbg << "table" << table->name() << "without alias already added";
+                    kdbDebug() << "table" << table->name() << "without alias already added";
                     return;
                 }
             }
@@ -1128,13 +1128,13 @@ bool KDbQuerySchema::hasColumnAlias(uint position) const
 void KDbQuerySchema::setColumnAlias(uint position, const QString& alias)
 {
     if (position >= (uint)m_fields.count()) {
-        KDbWarn << "position"  << position << "out of range!";
+        kdbWarning() << "position"  << position << "out of range!";
         return;
     }
     const QString fixedAlias(alias.trimmed());
     KDbField *f = KDbFieldList::field(position);
     if (f->captionOrName().isEmpty() && fixedAlias.isEmpty()) {
-        KDbWarn << "position" << position << "could not remove alias when no name is specified for expression column!";
+        kdbWarning() << "position" << position << "could not remove alias when no name is specified for expression column!";
         return;
     }
     d->setColumnAlias(position, fixedAlias);
@@ -1211,7 +1211,7 @@ int KDbQuerySchema::columnPositionForAlias(const QString& name) const
 void KDbQuerySchema::setTableAlias(uint position, const QString& alias)
 {
     if (position >= (uint)d->tables.count()) {
-        KDbWarn << "position"  << position << "out of range!";
+        kdbWarning() << "position"  << position << "out of range!";
         return;
     }
     const QString fixedAlias(alias.trimmed());
@@ -1369,7 +1369,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                     KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(ast_f, QString()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     list.append(ci);
-                    KDbDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
+                    kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
                     d->columnsOrder->insert(ci, fieldPosition);
                 }
             } else {//all-tables asterisk: iterate through table list
@@ -1383,7 +1383,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                         KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(tab_f, QString()/*no field for asterisk!*/,
                                 isColumnVisible(fieldPosition));
                         list.append(ci);
-                        KDbDbg << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
+                        kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
                         d->columnsOrder->insert(ci, fieldPosition);
                     }
                 }
@@ -1393,7 +1393,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(f, columnAlias(fieldPosition), isColumnVisible(fieldPosition));
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
-            KDbDbg << "caching (unexpanded) column's order:" << *ci << "at position" << fieldPosition;
+            kdbDebug() << "caching (unexpanded) column's order:" << *ci << "at position" << fieldPosition;
             d->columnsOrder->insert(ci, fieldPosition);
             d->columnsOrderWithoutAsterisks->insert(ci, fieldPosition);
 
@@ -1675,7 +1675,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                     ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
             }
         } else {
-            KDbWarn << "unsupported record source type" << recordSource.typeName();
+            kdbWarning() << "unsupported record source type" << recordSource.typeName();
         }
     }
 }
@@ -1702,7 +1702,7 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
 
     //get order of PKEY fields (e.g. for records updating or inserting )
     KDbIndexSchema *pkey = tbl->primaryKey();
-    KDbDbg << *pkey;
+    kdbDebug() << *pkey;
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
     const uint fCount = fieldsExpanded().count();
@@ -1712,12 +1712,12 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
         const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(*fi->field) : -1;
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
-            KDbDbg << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
+            kdbDebug() << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldCount++;
         }
     }
-    KDbDbg << d->pkeyFieldCount
+    kdbDebug() << d->pkeyFieldCount
     << " OUT OF " << pkey->fieldCount() << " PKEY'S FIELDS FOUND IN QUERY " << name();
     return *d->pkeyFieldsOrder;
 }
@@ -1748,7 +1748,7 @@ KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields() const
     }
     KDbTableSchema *mt = masterTable();
     if (!mt) {
-        KDbWarn << "no master table!";
+        kdbWarning() << "no master table!";
         return d->autoincFields;
     }
     if (d->autoincFields->isEmpty()) {//no cache

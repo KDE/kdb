@@ -72,7 +72,7 @@ public:
     , parent(other.parent)
     , children(other.children)
     {
-        KDbDbg << "KDbExpressionData" << ref;
+        kdbDebug() << "KDbExpressionData" << ref;
     }*/
 
     virtual ~KDbExpressionData();

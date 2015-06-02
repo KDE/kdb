@@ -24,12 +24,12 @@
 */
 
 #include "KDbTableViewData.h"
-
 #include "KDbField.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDbCursor.h"
 #include "KDb.h"
 #include "KDbError.h"
+#include "kdb_debug.h"
 
 #include <QApplication>
 
@@ -51,14 +51,14 @@ public:
         UErrorCode status = U_ZERO_ERROR;
         m_collator = Collator::createInstance(status);
         if (U_FAILURE(status)) {
-            qWarning() << "Could not create instance of collator:" << status;
+            kdbWarning() << "Could not create instance of collator:" << status;
             m_collator = 0;
         }
 
         // enable normalization by default
         m_collator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
         if (U_FAILURE(status)) {
-            qWarning() << "Could not set collator attribute:" << status;
+            kdbWarning() << "Could not set collator attribute:" << status;
         }
     }
 
@@ -613,16 +613,16 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
     if (!d->result.success)
         return false;
 
-    //KDbDbg << "column #" << colnum << " = " << newval.toString();
+    //kdbDebug() << "column #" << colnum << " = " << newval.toString();
     if (!col) {
-        KDbWarn << "column #" << colnum << "not found! col==0";
+        kdbWarning() << "column #" << colnum << "not found! col==0";
         return false;
     }
     if (!d->pRecordEditBuffer)
         d->pRecordEditBuffer = new KDbRecordEditBuffer(isDBAware());
     if (d->pRecordEditBuffer->isDBAware()) {
         if (!(col->columnInfo())) {
-            KDbWarn << "column #" << colnum << " not found!";
+            kdbWarning() << "column #" << colnum << " not found!";
             return false;
         }
         d->pRecordEditBuffer->insert(*col->columnInfo(), *newval);
@@ -634,13 +634,13 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
         return true;
     }
     if (!(col->field())) {
-        KDbWarn << "column #" << colnum << "not found!";
+        kdbWarning() << "column #" << colnum << "not found!";
         return false;
     }
     //not db-aware:
     const QString colname = col->field()->name();
     if (colname.isEmpty()) {
-        KDbWarn << "column #" << colnum << "not found!";
+        kdbWarning() << "column #" << colnum << "not found!";
         return false;
     }
     d->pRecordEditBuffer->insert(colname, *newval);
@@ -675,7 +675,7 @@ static inline void saveRecordGetValue(const QVariant **pval, KDbCursor *cursor,
                                          record->at(col).isNull() /* useDefaultValueIfPossible */ )
                 : pRecordEditBuffer->at( *f );
         *val = *pval ? **pval : record->at(col); /* get old value */
-        //KDbDbg << col << *(**it_f)->columnInfo() << "val:" << *val;
+        //kdbDebug() << col << *(**it_f)->columnInfo() << "val:" << *val;
     }
 }
 
@@ -755,7 +755,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             foreach(KDbTableViewColumn *col, d->columns) {
                 i++;
                 if (col->field()->name() == it.key()) {
-                    KDbDbg << col->field()->name() << ": " << record->at(i).toString()
+                    kdbDebug() << col->field()->name() << ": " << record->at(i).toString()
                            << " -> " << it.value().toString();
                     (*record)[i] = it.value();
                 }
@@ -822,7 +822,7 @@ bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
     int index = indexOf(record);
     if (index == -1) {
         //aah - this shouldn't be!
-        KDbWarn << "!removeRef() - IMPL. ERROR?";
+        kdbWarning() << "!removeRef() - IMPL. ERROR?";
         d->result.success = false;
         return false;
     }
