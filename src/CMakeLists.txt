@@ -239,6 +239,7 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
         COMPONENT Devel)
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
     PREFIX kdb
     HEADER_NAMES
@@ -267,41 +268,73 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbRelationship
         KDbTableSchema
         KDbTransaction
+)
 
-        expression/KDbExpression
-        expression/KDbExpressionData
-
-        interfaces/KDbPreparedStatementInterface
-
-        parser/KDbParser
-
-        views/KDbTableViewData
-        views/KDbTableViewColumn
-
-        tools/KDbValidator
-        tools/KDbUtils
-        tools/KDbTristate
-        #todo  tools/SimpleCommandLineApp
-        #  tools/SharedPtr.h
-        tools/KDbLongLongValidator
-        tools/KDbIdentifierValidator
-        tools/KDbFieldValidator
-        tools/KDbObjectNameValidator
-
+ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE expression
+    HEADER_NAMES
+        KDbExpression
+        KDbExpressionData
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE interfaces
+    HEADER_NAMES
+        KDbPreparedStatementInterface
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE parser
+    HEADER_NAMES
+        KDbParser
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE views
+    HEADER_NAMES
+        KDbTableViewData
+        KDbTableViewColumn
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE tools
+    HEADER_NAMES
+        KDbValidator
+        KDbUtils
+        KDbTristate
+        #todo SimpleCommandLineApp
+        #  SharedPtr.h
+        KDbLongLongValidator
+        KDbIdentifierValidator
+        KDbFieldValidator
+        KDbObjectNameValidator
 )
 
 #message(STATUS "%% ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}")
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS_FROM_BUILDDIR
+    REQUIRED_HEADERS kdb_HEADERS_FROM_BUILDDIR
     ORIGINAL CAMELCASE
     PREFIX kdb
     SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}
     HEADER_NAMES
         ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}
         KDbGlobal
-
-    REQUIRED_HEADERS kdb_HEADERS_FROM_BUILDDIR
 )
 
 install(
@@ -318,7 +351,7 @@ install(
     FILES
         ${kdb_FORWARDING_HEADERS}
         ${kdb_FORWARDING_HEADERS_FROM_BUILDDIR}
-    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/KDb
+    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
     COMPONENT Devel
 )
 
