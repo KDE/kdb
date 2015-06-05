@@ -29,6 +29,7 @@
 #include "KDbConnectionData.h"
 #include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
+#include "config-kdb.h"
 
 #include <QMap>
 #include <QHash>

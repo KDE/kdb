@@ -24,6 +24,7 @@
 #include <QVariant>
 #include <QByteArray>
 
+#include "config-kdb.h"
 #include "KDbGlobal.h"
 #include "KDbField.h"
 #include "KDbVersionInfo.h"

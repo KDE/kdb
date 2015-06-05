@@ -56,9 +56,6 @@ set_source_files_properties(
         COMPILE_FLAGS "-Wno-sign-compare -Wno-unused-function "
 )
 
-# Generate KDbGlobal.h
-configure_file(KDbGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/KDbGlobal.h)
-
 set(kdb_LIB_SRCS
    parser/generated/sqlscanner.cpp
    parser/generated/sqlparser.cpp
@@ -334,7 +331,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS_FROM_BUILDDIR
     SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}
     HEADER_NAMES
         ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}
-        KDbGlobal
 )
 
 install(
@@ -342,7 +338,6 @@ install(
         ${kdb_HEADERS}
         ${kdb_HEADERS_FROM_BUILDDIR}
         ${PROJECT_BINARY_DIR}/src/kdb_export.h
-        ${PROJECT_BINARY_DIR}/src/config-kdb.h
     DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kdb
     COMPONENT Devel
 )
@@ -351,6 +346,7 @@ install(
     FILES
         ${kdb_FORWARDING_HEADERS}
         ${kdb_FORWARDING_HEADERS_FROM_BUILDDIR}
+        ${PROJECT_BINARY_DIR}/src/config-kdb.h
     DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
     COMPONENT Devel
 )

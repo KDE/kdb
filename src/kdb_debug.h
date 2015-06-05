@@ -20,7 +20,7 @@
 #ifndef KDB_DEBUG_H
 #define KDB_DEBUG_H
 
-#include "KDbGlobal.h"
+#include "config-kdb.h"
 
 #include <QLoggingCategory>
 Q_DECLARE_LOGGING_CATEGORY(KDB_LOG)

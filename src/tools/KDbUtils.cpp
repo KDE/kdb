@@ -31,6 +31,7 @@
 #include "KDbDriverManager.h"
 #include "KDbUtils.h"
 #include "kdb_debug.h"
+#include "config-kdb.h"
 
 #include <QRegExp>
 #include <QDataStream>

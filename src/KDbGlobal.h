@@ -29,12 +29,6 @@
     Global public definitions
 */
 
-//! Indicates the git sha1 commit which was used for compilation of KDb.
-#cmakedefine KDB_GIT_SHA1_STRING "@KDB_GIT_SHA1_STRING@"
-
-//! The subdirectory relative to the install prefix for executables.
-#define BIN_INSTALL_DIR "${BIN_INSTALL_DIR}"
-
 /**
  * @brief Make a number from the major, minor and release number of a KDb version
  *
@@ -168,18 +162,6 @@ enum IdentifierEscapingType {
 
 //! Macro to use in drivers to avoid redundant translations.
 #define KDbTr QObject::tr
-
-//! Debugging for expressions
-#cmakedefine KDB_EXPRESSION_DEBUG
-
-//! Debugging for the driver manager
-#cmakedefine KDB_DRIVERMANAGER_DEBUG
-
-//! GUI for debugging
-#cmakedefine KDB_DEBUG_GUI
-
-//! Include unfinished features
-#cmakedefine KDB_UNFINISHED
 
 #ifndef WARNING
 #ifdef _MSC_VER
