@@ -33,6 +33,7 @@
 #include "kdb_debug.h"
 
 #include <QRegExp>
+#include <QDataStream>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>

@@ -37,6 +37,10 @@
 #include <unicode/uregex.h>
 #include <unicode/ustring.h>
 #include <unicode/ucol.h>
+#include <unicode/uvernum.h>
+#if U_ICU_VERSION_MAJOR_NUM>=51
+#include <unicode/utf_old.h>
+#endif
 
 #include <assert.h>
 

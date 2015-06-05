@@ -49,7 +49,7 @@ class CollatorInstance
 public:
     CollatorInstance() {
         UErrorCode status = U_ZERO_ERROR;
-        m_collator = Collator::createInstance(status);
+        m_collator = icu::Collator::createInstance(status);
         if (U_FAILURE(status)) {
             kdbWarning() << "Could not create instance of collator:" << status;
             m_collator = 0;
@@ -62,7 +62,7 @@ public:
         }
     }
 
-    Collator* getCollator() {
+    icu::Collator* getCollator() {
         return m_collator;
     }
 
@@ -71,7 +71,7 @@ public:
     }
 
 private:
-    Collator *m_collator;
+    icu::Collator *m_collator;
 };
 
 Q_GLOBAL_STATIC(CollatorInstance, KDb_collator)
@@ -157,7 +157,7 @@ private:
     static bool cmpStringWithCollator(const QVariant& left, const QVariant& right) {
         const QString &as = left.toString();
         const QString &bs = right.toString();
-        return Collator::LESS == KDb_collator->getCollator()->compare(
+        return icu::Collator::LESS == KDb_collator->getCollator()->compare(
                                         (const UChar *)as.constData(), as.size(),
                                         (const UChar *)bs.constData(), bs.size());
     }
