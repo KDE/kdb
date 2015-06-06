@@ -1,6 +1,18 @@
 [Desktop Entry]
 Name=SQLite
+Name[nl]=SQLite
+Name[pt]=SQLite
+Name[pt_BR]=SQLite
+Name[sv]=SQLite
+Name[uk]=SQLite
+Name[x-test]=xxSQLitexx
 Comment=KDb driver for handling SQLite databases
+Comment[nl]=KDb-stuurprogramma for behandeling van SQLite databases
+Comment[pt]=Controlador do KDb para lidar com bases de dados SQLite
+Comment[pt_BR]=Driver do KDb para lidar com bancos de dados SQLite
+Comment[sv]=Predikatdrivrutin för att hantera SQLite-databaser
+Comment[uk]=Драйвер KDb для роботи з базами даних SQLite
+Comment[x-test]=xxKDb driver for handling SQLite databasesxx
 Type=Service
 Icon=
 Encoding=UTF-8
