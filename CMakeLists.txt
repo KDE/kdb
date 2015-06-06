@@ -36,8 +36,6 @@ find_package(KF5 5.7.0 REQUIRED CoreAddons)
 
 find_package(ICU REQUIRED)
 
-set(KDB_PLUGIN_INSTALL_DIR ${LIB_INSTALL_DIR}/plugins/kdb)
-
 macro(add_simple_feature_info _NAME _DESCRIPTION _DEFAULT)
   if ("${_DEFAULT}" STREQUAL "${${_NAME}}")
     set(_STATUS " (default value)")

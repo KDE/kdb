@@ -5,7 +5,7 @@ endif()
 
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
-set(KDB_PLUGIN_INSTALL_DIR ${LIB_INSTALL_DIR}/plugins/kdb)
+set(KDB_PLUGIN_INSTALL_DIR ${PLUGIN_INSTALL_DIR}/kdb)
 
 # -----------------------
 
