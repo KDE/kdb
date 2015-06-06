@@ -425,7 +425,7 @@
 #include <iostream>
 #include <assert.h>
 #include <limits.h>
-//TODO OK?
+//! @todo OK?
 #ifdef Q_OS_WIN
 //workaround for bug on msvc
 # undef LLONG_MIN
@@ -1084,7 +1084,7 @@ aExpr9:
 {
     $$ = new KDbVariableExpression( *$1 );
 
-//TODO: simplify this later if that's 'only one field name' expression
+    //! @todo simplify this later if that's 'only one field name' expression
     kdbDebug() << "  + identifier: " << *$1;
     delete $1;
 }
@@ -1101,7 +1101,7 @@ aExpr9:
     delete $1;
     delete $2;
 }
-/*TODO: shall we also support db name? */
+/*! @todo shall we also support db name? */
 | IDENTIFIER '.' IDENTIFIER
 {
     $$ = new KDbVariableExpression( *$1 + QLatin1Char('.') + *$3 );
@@ -1142,7 +1142,7 @@ aExpr9:
 
 //    if ($1 < ULLONG_MAX)
 //        val = (quint64)$1;
-//TODO ok?
+//! @todo ok?
 
     $$ = new KDbConstExpression( INTEGER_CONST, val );
     kdbDebug() << "  + int constant: " << val.toString();
@@ -1256,8 +1256,8 @@ IDENTIFIER
     kdbDebug() << "FROM: '" << *$1 << "'";
     $$ = new KDbVariableExpression(*$1);
 
+    //! @todo this isn't ok for more tables:
     /*
-//TODO: this isn't ok for more tables:
     KDbField::ListIterator it = globalParser->select()->fieldsIterator();
     for(KDbField *item; (item = it.current()); ++it)
     {
@@ -1367,41 +1367,43 @@ aExpr
 {
     $$ = new KDbFunctionExpression( $1, $3 );
 }*/
+//! @todo
 /*
 | SUM '(' ColExpression ')'
 {
     KDbFunctionExpression(
 //    $$ = new AggregationExpression( SUM,  );
-//TODO
 //    $$->setName("SUM(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
 //wait    globalParser->select()->grouped(true);
-}
+}*/
+//! @todo
+/*
 | SQL_MIN '(' ColExpression ')'
 {
     $$ = $3;
-//TODO
 //    $$->setName("MIN(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
 //wait    globalParser->select()->grouped(true);
-}
+}*/
+//! @todo
+/*
 | SQL_MAX '(' ColExpression ')'
 {
     $$ = $3;
-//TODO
 //    $$->setName("MAX(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
 //wait    globalParser->select()->grouped(true);
-}
+}*/
+//! @todo
+/*
 | AVG '(' ColExpression ')'
 {
     $$ = $3;
-//TODO
 //    $$->setName("AVG(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
 //wait    globalParser->select()->grouped(true);
 }*/
-//?
 | DISTINCT '(' ColExpression ')' 
 {
     $$ = $3;

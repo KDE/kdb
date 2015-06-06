@@ -43,17 +43,11 @@ int cursor_options = 0;
 bool db_name_required = true;
 
 KDbConnectionData conn_data;
-#ifdef __GNUC__
-#warning replace QPointer<KDbConnection> conn;
-#else
-#pragma WARNING(replace QPointer<KDbConnection> conn;)
-#endif
+
+//! @todo IMPORTANT: replace QPointer<KDbConnection> conn;
 KDbConnection* conn = 0;
-#ifdef __GNUC__
-#warning replace QPointer<KDbDriver> driver;
-#else
-#pragma WARNING(replace QPointer<KDbDriver> driver;)
-#endif
+
+//! @todo IMPORTANT: replace QPointer<KDbDriver> driver;
 KDbDriver* driver;
 QApplication *app = 0;
 

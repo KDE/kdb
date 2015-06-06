@@ -674,12 +674,7 @@ void KDb::getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *
     values->insert("maxLengthIsDefault", field.maxLengthStrategy() & KDbField::DefaultMaxLength);
     values->insert("precision", field.precision());
     values->insert("defaultValue", field.defaultValue());
-#ifdef __GNUC__
-#warning TODO    values->insert("defaultWidth", field.defaultWidth());
-#else
-#pragma WARNING(TODO    values->insert("defaultWidth", field.defaultWidth());)
-#endif
-
+//! @todo IMPORTANT: values->insert("defaultWidth", field.defaultWidth());
     if (KDb::supportsVisibleDecimalPlacesProperty(field.type())) {
         values->insert("visibleDecimalPlaces", field.defaultValue());
     }
@@ -761,11 +756,7 @@ bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& 
         return false;
     if ((it = values.find("defaultValue")) != values.constEnd())
         field->setDefaultValue(*it);
-#ifdef __GNUC__
-#warning TODO defaultWidth
-#else
-#pragma WARNING(TODO defaultWidth)
-#endif
+//! @todo IMPORTANT: defaultWidth
 #if 0
     if ((it = values.find("defaultWidth")) != values.constEnd())
         field.setDefaultWidth((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
@@ -947,11 +938,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
             return true;
         }
 
-#ifdef __GNUC__
-#warning TODO defaultWidth
-#else
-#pragma WARNING(TODO defaultWidth)
-#endif
+//! @todo IMPORTANT: defaultWidth
 #if 0
         if ("defaultWidth" == propertyName)
             GET_INT(setDefaultWidth);

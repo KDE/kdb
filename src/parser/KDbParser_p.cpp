@@ -335,11 +335,7 @@ KDbQuerySchema* buildSelectQuery(
             else if (isExpressionField) {
                 //expression object will be reused, take, will be owned, do not destroy
 //  kdbDebug() << colViews->list.count() << " " << it.current()->debugString();
-#ifdef __GNUC__
-#warning ok? //KDb: it.remove();
-#else
-#pragma WARNING(ok?)
-#endif
+//! @todo IMPORTANT: it.remove();
             } else if (aliasVariable.isNull()) {
                 setError(QObject::tr("Invalid \"%1\" column definition")
                          .arg(e.toString().toString())); //ok?

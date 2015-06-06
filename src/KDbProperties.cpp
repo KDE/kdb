@@ -19,12 +19,7 @@
 
 #include "KDbProperties.h"
 
-#ifdef __GNUC__
-#warning replace QPointer<KDbConnection> m_conn;
-#else
-#pragma WARNING(replace QPointer<KDbConnection> m_conn;)
-#endif
-
+//! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn;
 KDbProperties::KDbProperties(KDbConnection *conn)
         : m_conn(conn)
 {

@@ -967,7 +967,7 @@ case 7:
 YY_RULE_SETUP
 #line 89 "KDbSqlScanner.l"
 {
-//TODO: what about hex or octal values?
+//! @todo what about hex or octal values?
     //we're using QString:toLongLong() here because atoll() is not so portable:
     ECOUNT;
     bool ok;

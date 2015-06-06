@@ -27,12 +27,7 @@ KDbFieldList::KDbFieldList(bool owner)
 {
 }
 
-#ifdef __GNUC__
-#warning (API) improve deepCopyFields
-#else
-#pragma WARNING((API) improve deepCopyFields)
-#endif
-
+//! @todo IMPORTANT: (API) improve deepCopyFields
 KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
         : m_fields(fl.m_fields.autoDelete())
         , m_autoinc_fields(0)

@@ -838,7 +838,7 @@ public:
          e.g. conflicting listeners. */
         QString listenerInfoString;
     };
-//TMP// TODO: will be more generic
+    //! @todo will be more generic
     /** Register @a listener for receiving (listening) information about changes
      in KDbTableSchema object. Changes could be: altering and removing. */
     void registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,

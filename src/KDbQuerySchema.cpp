@@ -709,11 +709,7 @@ void KDbQuerySchema::clear()
     d->clear();
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field, bool visible)
 {
     return insertField(position, field, -1/*don't bind*/, visible);
@@ -725,11 +721,7 @@ KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field)
     return insertField(position, field, -1/*don't bind*/, true);
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::insertField(uint position, KDbField *field,
                                     int bindToTable, bool visible)
 {
@@ -806,21 +798,13 @@ int KDbQuerySchema::tableBoundToColumn(uint columnPosition) const
     return res;
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::addField(KDbField* field, bool visible)
 {
     return insertField(m_fields.count(), field, visible);
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::addField(KDbField* field, int bindToTable,
         bool visible)
 {
@@ -846,11 +830,7 @@ bool KDbQuerySchema::removeField(KDbField *field)
     return true;
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::addExpression(const KDbExpression& expr, bool visible)
 {
     return addField(new KDbField(this, expr), visible);
@@ -867,11 +847,7 @@ void KDbQuerySchema::setColumnVisible(uint position, bool v)
         d->visibility.setBit(position, v);
 }
 
-#ifdef __GNUC__
-#warning TODO move visible to overload
-#else
-#pragma WARNING(TODO move visible to overload)
-#endif
+//! @todo IMPORTANT: move visible to overload
 KDbFieldList& KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visible)
 {
     if (!asterisk)

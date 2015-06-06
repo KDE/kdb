@@ -87,11 +87,7 @@ void KDbResult::prependMessage(int code, const QString& message)
             d->message = message + QLatin1Char(' ') + d->message;
     }
 //    if (m_hasError)
-#ifdef __GNUC__
-#warning TODO ERRMSG(this);
-#else
-#pragma WARNING(TODO ERRMSG(this);)
-#endif
+//! @todo IMPORTANT: ERRMSG(this);
 }
 
 void KDbResult::prependMessage(const QString& message)

@@ -92,7 +92,7 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   md->destination = new KexiProjectData(*kexiConnectionData, tempDatabase);
 
   // Setup XBase connection data from input connection data passed
-  //! TODO Check sanity of this
+  //! @todo Check sanity of this
   md->source = new KDbConnectionData(data);
   md->sourceName = "";
 

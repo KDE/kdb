@@ -54,8 +54,8 @@ SybaseDriver::SybaseDriver()
 
 
     //predefined properties
-    d->properties["client_library_version"] = "";//TODO
-    d->properties["default_server_encoding"] = ""; //TODO
+    d->properties["client_library_version"] = ""; //!< @todo
+    d->properties["default_server_encoding"] = ""; //!< @todo
 
     // datatypes
     // integers

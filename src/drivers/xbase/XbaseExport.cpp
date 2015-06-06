@@ -382,10 +382,10 @@ bool xBaseExport::dest_createTable(const QString& originalName, KDbTableSchema* 
     KDbField* f = tableSchema->field(i);
 
     QByteArray ba = f->name().toLatin1();
-    //! TODO Fieldname can only be 11 characters
+    //! @todo Fieldname can only be 11 characters
     strcpy(xBaseTableSchema[i].FieldName, ba.data());
     xBaseTableSchema[i].Type = d->type(f->type());
-    xBaseTableSchema[i].FieldLen = d->fieldLength( f ); //! TODO Check semantics
+    xBaseTableSchema[i].FieldLen = d->fieldLength( f ); //!< @todo Check semantics
     xBaseTableSchema[i].NoOfDecs = ( xBaseTableSchema[i].Type != XB_CHAR_FLD )? f->scale() : 0 ;
 
   }

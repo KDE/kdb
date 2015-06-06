@@ -729,12 +729,11 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
                 KDb::getHTMLErrorMesage(*d->cursor, &d->result);
 
                 /*   if (desc)
-                      *desc =
-                js: TODO: use KexiMainWindow::showErrorMessage(const QString &title, KDbObject *obj)
+                      *desc = */
+                /*! @todo use KexiMainWindow::showErrorMessage(const QString &title, KDbObject *obj)
                   after it will be moved somewhere to kexidb (this will require moving other
                     showErrorMessage() methods from KexiMainWindow to libkexiutils....)
-                  then: just call: *desc = KexiDB::errorMessage(d->cursor);
-                */
+                  then: just call: *desc = KexiDB::errorMessage(d->cursor); */
                 return false;
             }
         } else { // record updating
@@ -812,7 +811,7 @@ bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
         d->result.success = false;
         if (!d->cursor->deleteRecord(static_cast<KDbRecordData*>(record), d->containsRecordIdInfo /*use ROWID*/)) {
             d->result.msg = tr("Record deleting failed.");
-            /*js: TODO: use KDberrorMessage() for description (desc) as in KDbTableViewData::saveRecord() */
+            //! @todo use KDberrorMessage() for description (desc) as in KDbTableViewData::saveRecord() */
             KDb::getHTMLErrorMesage(*d->cursor, &d->result);
             d->result.success = false;
             return false;

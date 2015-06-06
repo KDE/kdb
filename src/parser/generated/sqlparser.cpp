@@ -70,7 +70,7 @@
 #include <iostream>
 #include <assert.h>
 #include <limits.h>
-//TODO OK?
+//! @todo OK?
 #ifdef Q_OS_WIN
 //workaround for bug on msvc
 # undef LLONG_MIN
@@ -586,8 +586,8 @@ static const yytype_uint16 yyrline[] =
     1033,  1038,  1044,  1050,  1057,  1063,  1068,  1073,  1078,  1083,
     1091,  1097,  1105,  1112,  1119,  1123,  1127,  1133,  1150,  1156,
     1161,  1170,  1174,  1181,  1187,  1195,  1240,  1245,  1254,  1282,
-    1292,  1307,  1314,  1324,  1333,  1338,  1348,  1361,  1405,  1414,
-    1423
+    1292,  1307,  1314,  1324,  1333,  1338,  1348,  1361,  1407,  1416,
+    1425
 };
 #endif
 
@@ -2087,7 +2087,7 @@ yyreduce:
     {
     (yyval.expr) = new KDbVariableExpression( *(yyvsp[0].stringValue) );
 
-//TODO: simplify this later if that's 'only one field name' expression
+    //! @todo simplify this later if that's 'only one field name' expression
     kdbDebug() << "  + identifier: " << *(yyvsp[0].stringValue);
     delete (yyvsp[0].stringValue);
 }
@@ -2176,7 +2176,7 @@ yyreduce:
 
 //    if ($1 < ULLONG_MAX)
 //        val = (quint64)$1;
-//TODO ok?
+//! @todo ok?
 
     (yyval.expr) = new KDbConstExpression( INTEGER_CONST, val );
     kdbDebug() << "  + int constant: " << val.toString();
@@ -2271,8 +2271,8 @@ yyreduce:
     kdbDebug() << "FROM: '" << *(yyvsp[0].stringValue) << "'";
     (yyval.expr) = new KDbVariableExpression(*(yyvsp[0].stringValue));
 
+    //! @todo this isn't ok for more tables:
     /*
-//TODO: this isn't ok for more tables:
     KDbField::ListIterator it = globalParser->select()->fieldsIterator();
     for(KDbField *item; (item = it.current()); ++it)
     {
@@ -2406,7 +2406,7 @@ yyreduce:
     break;
 
   case 98:
-#line 1406 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1408 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[-1].expr);
 //! @todo DISTINCT '(' ColExpression ')'
@@ -2416,7 +2416,7 @@ yyreduce:
     break;
 
   case 99:
-#line 1415 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1417 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbVariableExpression(QLatin1String("*"));
     kdbDebug() << "all columns";
@@ -2429,7 +2429,7 @@ yyreduce:
     break;
 
   case 100:
-#line 1424 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1426 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     QString s( *(yyvsp[-2].stringValue) );
     s += QLatin1String(".*");
@@ -2669,7 +2669,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1439 "KDbSqlParser.y" /* yacc.c:1906  */
+#line 1441 "KDbSqlParser.y" /* yacc.c:1906  */
 
 
 KDB_TESTING_EXPORT const char* tokenName(unsigned int offset) { return yytname[YYTRANSLATE(offset)]; }

@@ -34,11 +34,7 @@ public:
         qDeleteAll(actions);
     }
     ActionList actions;
-#ifdef __GNUC__
-#warning replace QPointer<KDbConnection> conn;
-#else
-#pragma WARNING(replace QPointer<KDbConnection> conn;)
-#endif
+//! @todo IMPORTANT: replace QPointer<KDbConnection> conn;
     KDbConnection* conn;
 };
 
@@ -443,9 +439,8 @@ tristate KDbAlterTableHandler::ChangeFieldPropertyAction::execute(KDbConnection*
          C. Like B. for "name" property above
          (mysql then truncate the values for changes like varchar -> integer,
          and properly convert the values for changes like integer -> varchar)
-
-         TODO: more cases to check
         */
+        //! @todo more cases to check
     }
     if (m_propertyName == QLatin1String("maxLength")) {
         //! @todo use "select max( length(o_name) ) from kexi__objects"

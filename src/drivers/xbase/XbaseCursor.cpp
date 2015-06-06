@@ -163,9 +163,9 @@ QString xBaseCursor::serverResultName() const
   return d->internalCursor->serverResultName();
 }
 
+//! @todo xBaseCursor::drv_clearServerResult()
 /*void xBaseCursor::drv_clearServerResult()
 {
-  //! TODO
 }*/
 
 QString xBaseCursor::serverErrorMsg()

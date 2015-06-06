@@ -48,11 +48,7 @@ bool KDbBinaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Exp
         return false;
 
     //update type for query parameters
-#ifdef __GNUC__
-#warning TODO
-#else
-#pragma WARNING(TODO)
-#endif
+//! @todo IMPORTANT: update type for query parameters
 #if 0
     if (left()->isQueryParameter()) {
         KDbQueryParameterExpression queryParameter = left()->toQueryParameter();

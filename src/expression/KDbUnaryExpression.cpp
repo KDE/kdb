@@ -133,12 +133,8 @@ bool KDbUnaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expr
 //! @todo compare types... e.g. NOT applied to Text makes no sense...
 
     // update type
-#ifdef __GNUC__
-#warning TODO
-#else
-#pragma WARNING(TODO)
-#endif
-#if 0 // TODO
+//! @todo IMPORTANT: update type
+#if 0
     if (a->toQueryParameter()) {
         a->toQueryParameter()->setType(type());
     }

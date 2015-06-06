@@ -26,7 +26,6 @@
 #include "KDb.h"
 #include "kdb_debug.h"
 
-// we use here tr() but this depends on kde libs: TODO: add #ifdefs
 #include <QDateTime>
 
 #include <assert.h>

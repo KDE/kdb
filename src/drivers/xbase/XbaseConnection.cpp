@@ -41,7 +41,7 @@ bool xBaseConnection::drv_connect(KDbServerVersionInfo* version)
   if (!ok)
     return false;
 
-  //! TODO xBase version here
+  //! @todo xBase version here
   //version.string = mysql_get_host_info(d->mysql);
 
   return true;
@@ -72,16 +72,16 @@ bool xBaseConnection::drv_getDatabasesList(QStringList* list)
 {
   KDbDrvDbg;
 
-  //! TODO Check whether this is the right thing to do
+  //! @todo Check whether this is the right thing to do
   *list += QStringList( d->dbMap.keys() );
 //        list<<d->internalConn->databaseNames();
   return true;
 }
 
 bool xBaseConnection::drv_createDatabase( const QString &dbName) {
-  //! TODO Check whether this function has any use.
+  //! @todo Check whether this function has any use.
   KDbDrvDbg << dbName;
-//	return d->internalConn->createDatabase(d->dbMap[dbName]);
+// return d->internalConn->createDatabase(d->dbMap[dbName]);
   return true;
 }
 
@@ -89,7 +89,7 @@ bool xBaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KD
 {
   Q_UNUSED(cancelled);
   Q_UNUSED(msgHandler);
-//TODO is here escaping needed?
+//! @todo is here escaping needed?
   return d->useDatabase(dbName);
 }
 
@@ -102,7 +102,7 @@ bool xBaseConnection::drv_closeDatabase() {
 
 bool xBaseConnection::drv_dropDatabase(const QString &dbName) {
     Q_UNUSED(dbName);
-//TODO is here escaping needed
+//! @todo is here escaping needed
   // Delete the directory ?
   return true;
 }
@@ -113,7 +113,7 @@ bool xBaseConnection::drv_executeSQL( const KDbEscapedString& sql ) {
 
 quint64 xBaseConnection::drv_lastInsertRecordId()
 {
-  //! TODO
+  //! @todo
   quint64 rowID = -1;
   if (d->internalConn)
     d->internalConn->lastInsertedAutoIncValue(QString(), QString(), &rowID );

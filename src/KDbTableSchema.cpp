@@ -274,12 +274,7 @@ QDebug operator<<(QDebug dbg, const KDbTableSchema& table)
     return dbg.space();
 }
 
-#ifdef __GNUC__
-#warning replace QPointer<KDbConnection> m_conn;
-#else
-#pragma WARNING(replace QPointer<KDbConnection> m_conn;)
-#endif
-
+//! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn
 KDbConnection* KDbTableSchema::connection() const
 {
     return static_cast<KDbConnection*>(m_conn);

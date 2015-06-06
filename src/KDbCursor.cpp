@@ -28,12 +28,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#ifdef __GNUC__
-#warning replace QPointer<KDbConnection> m_conn;
-#else
-#pragma WARNING(replace QPointer<KDbConnection> m_conn;)
-#endif
-
+//! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn;
 KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
         : m_conn(conn)
         , m_query(0)

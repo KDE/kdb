@@ -2344,11 +2344,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
     return ret;
 }
 
-#ifdef __GNUC__
-#warning fix KDbConnection::setupObjectData() after refactoring
-#else
-#pragma WARNING(fix KDbConnection::setupObjectData() after refactoring)
-#endif
+//! @todo IMPORTANT: fix KDbConnection::setupObjectData() after refactoring
 bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object)
 {
     if (data.count() < 5) {

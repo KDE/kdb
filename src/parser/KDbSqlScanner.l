@@ -87,7 +87,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 }
 
 {integer} {
-//TODO: what about hex or octal values?
+//! @todo what about hex or octal values?
     //we're using QString:toLongLong() here because atoll() is not so portable:
     ECOUNT;
     bool ok;

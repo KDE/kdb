@@ -211,7 +211,7 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 {
     KDbDrvDbg << dbName;
 
-    //FIXME Maybe should check that dbname is no the currentdb
+    //! @todo Maybe should check that dbname is no the currentdb
     if (executeSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
         return true;
 

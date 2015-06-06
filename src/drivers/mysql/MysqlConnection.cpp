@@ -178,11 +178,7 @@ quint64 MysqlConnection::drv_lastInsertRecordId()
 
 QString MysqlConnection::serverResultName() const
 {
-#ifdef __GNUC__
-#warning TODO: MysqlConnection::serverResultName()
-#else
-#pragma WARNING(TODO: MysqlConnection::serverResultName())
-#endif
+//! @todo IMPORTANT: MysqlConnection::serverResultName()
     return QString();
 }
 

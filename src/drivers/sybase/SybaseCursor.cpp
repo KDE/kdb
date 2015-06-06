@@ -118,8 +118,9 @@ bool SybaseCursor::drv_close()
     return true;
 }
 
+//! @todo SybaseCursor::drv_moveFirst()
 /*bool SybaseCursor::drv_moveFirst() {
-  return true; //TODO
+  return true;
 }*/
 
 void SybaseCursor::drv_getNextRecord()

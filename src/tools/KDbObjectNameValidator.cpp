@@ -21,12 +21,7 @@
 
 #include "KDbDriver.h"
 
-#ifdef __GNUC__
-#warning replace QPointer<KDbDriver> m_drv;
-#else
-#pragma WARNING(replace QPointer<KDbDriver> m_drv;)
-#endif
-
+//! @todo IMPORTANT: replace QPointer<KDbDriver> m_drv;
 KDbObjectNameValidator::KDbObjectNameValidator(KDbDriver *drv, QObject * parent)
         : KDbValidator(parent)
         , m_drv(drv)
