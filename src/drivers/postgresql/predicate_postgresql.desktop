@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=postgresql
 Name[nl]=postgresql
+Name[pl]=postgresql
 Name[pt]=postgresql
 Name[pt_BR]=postgresql
 Name[sv]=PostgreSQL
@@ -9,6 +10,7 @@ Name[x-test]=xxpostgresqlxx
 Caption=PostgreSQL
 Comment=Predicate driver for handling PostgreSQL databases
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van PostgreSQL databases
+Comment[pl]=Sterownik do obsługi baz danych PostgreSQL w Predicate
 Comment[pt]=Controlador do Predicate para lidar com bases de dados PostgreSQL
 Comment[pt_BR]=Driver do Predicate para lidar com bancos de dados PostgreSQL
 Comment[sv]=Predikatdrivrutin för att hantera PostgreSQL-databaser

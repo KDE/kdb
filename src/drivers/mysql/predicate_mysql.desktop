@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=mysql
 Name[nl]=mysql
+Name[pl]=mysql
 Name[pt]=mysql
 Name[pt_BR]=mysql
 Name[sv]=mysql
@@ -9,6 +10,7 @@ Name[x-test]=xxmysqlxx
 Caption=MySQL
 Comment=Predicate driver for handling MySQL databases
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van MySQL databases
+Comment[pl]=Sterownik do obsługi baz danych MySQL w Predicate
 Comment[pt]=Controlador do Predicate para lidar com bases de dados MySQL
 Comment[pt_BR]=Driver do Predicate para lidar com bancos de dados MySQL
 Comment[sv]=Predikatdrivrutin för att hantera MySQL-databaser

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=xbase
 Name[nl]=xbase
+Name[pl]=xbase
 Name[pt]=xbase
 Name[pt_BR]=xbase
 Name[sv]=xBase
@@ -9,6 +10,7 @@ Name[x-test]=xxxbasexx
 Caption=xBase
 Comment=Predicate driver for handling xBase databases
 Comment[nl]=Onderbouwingsstuurprogramma voor het behandelen van xBase databases
+Comment[pl]=Ogłoś sterownik do obsługi baz danych xBase
 Comment[pt]=Controlador do Predicate para lidar com bases de dados do xBase
 Comment[pt_BR]=Driver do Predicate para lidar com bancos de dados xBase
 Comment[sv]=Predikatdrivrutin för att hantera xBase-databaser

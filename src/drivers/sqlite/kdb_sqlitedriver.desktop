@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=SQLite
 Name[nl]=SQLite
+Name[pl]=SQLite
 Name[pt]=SQLite
 Name[pt_BR]=SQLite
 Name[sv]=SQLite
@@ -8,6 +9,7 @@ Name[uk]=SQLite
 Name[x-test]=xxSQLitexx
 Comment=KDb driver for handling SQLite databases
 Comment[nl]=KDb-stuurprogramma for behandeling van SQLite databases
+Comment[pl]=Sterownik KDb do obsługi baz danych SQLite
 Comment[pt]=Controlador do KDb para lidar com bases de dados SQLite
 Comment[pt_BR]=Driver do KDb para lidar com bancos de dados SQLite
 Comment[sv]=Predikatdrivrutin för att hantera SQLite-databaser
