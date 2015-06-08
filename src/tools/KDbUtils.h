@@ -68,10 +68,10 @@ inline QDateTime stringToHackedQTime(const QString& s)
     return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
 }
 
-/*! Serializes @a map to @a array.
- KexiUtils::deserializeMap() can be used to deserialize this array back to map. */
-KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray& array);
-KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QString& string);
+/*! Serializes @a map to the array pointed by @a array.
+ KDbUtils::deserializeMap() can be used to deserialize this array back to map. */
+KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray *array);
+KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QString *string);
 
 /*! @return a map deserialized from a byte array @a array.
  @a array need to contain data previously serialized using KexiUtils::serializeMap(). */
@@ -91,11 +91,11 @@ KDB_EXPORT QString stringToFileName(const QString& string);
  Each character's unicode value is increased by 47 + i (where i is index of the character).
  The resulting string still contains redable characters.
  Do not use this for data that can be accessed by attackers! */
-KDB_EXPORT void simpleCrypt(QString& string);
+KDB_EXPORT void simpleCrypt(QString *string);
 
 /*! Performs a simple @a string decryption using rot47-like algorithm,
  using opposite operations to KexiUtils::simpleCrypt(). */
-KDB_EXPORT void simpleDecrypt(QString& string);
+KDB_EXPORT void simpleDecrypt(QString *string);
 
 //! @internal
 KDB_EXPORT QString ptrToStringInternal(void* ptr, uint size);

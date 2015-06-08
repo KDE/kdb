@@ -103,16 +103,17 @@ KDB_EXPORT QString simplifiedTypeName(const KDbField& field);
  Values of some types (as for strings) can be both empty and not null. */
 KDB_EXPORT bool isEmptyValue(KDbField *f, const QVariant &v);
 
-/*! Sets @a msg to an error message retrieved from @a resultable, and @a details
- to details of this error (server message and result number).
+/*! Sets string pointed by @a msg to an error message retrieved from @a resultable,
+ and string pointed by @a details to details of this error (server message and result number).
  Does nothing if @a result is empty. In this case @a msg and @a details strings are not overwritten.
- If @a msg is not empty, @a result message is appended to @a details.
+ If the string pointed by @a msg is not empty, @a result message is appended to the string
+ pointed by @a details.
  */
-KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString& msg, QString &details);
+KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QString *details);
 
 /*! This methods works like above, but appends both a message and a description
- to @a msg. */
-KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString& msg);
+ to string pointed by @a msg. */
+KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString *msg);
 
 /*! This methods works like above, but works on @a result's  members instead. */
 KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info);
@@ -169,7 +170,7 @@ KDB_EXPORT int fieldCount(KDbTableOrQuerySchema* tableOrQuery);
  @a data is used to perform a (temporary) test connection. @a msgHandler is used to display errors.
  On successful connecting, a message is displayed. After testing, temporary connection is closed. */
 KDB_EXPORT void connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
-        KDbMessageHandler& msgHandler);
+        KDbMessageHandler* msgHandler);
 
 //! Used in splitToTableAndFieldParts().
 enum SplitToTableAndFieldPartsOptions {
@@ -378,16 +379,15 @@ KDB_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool*
 
 /*! @return true if setting default value for @a field field is allowed. Fields with unique
  (and thus primary key) flags set do not accept  default values.
- False is returned aslo if @a field is 0. */
+ False is returned also if @a field is 0. */
 KDB_EXPORT bool isDefaultValueAllowed(KDbField* field);
 
-/*! Gets limits for values of type @a type. The result is put into @a minValue and @a maxValue.
- Supported types are Byte, ShortInteger, Integer and BigInteger
- Results for BigInteger or non-integer types are the same as for Integer due
- to limitation of int type.
- Signed integers are assumed. */
+/*! Gets limits for values of type @a type. The result is put into integers pointed
+ by @a minValue and @a maxValue. Supported types are Byte, ShortInteger, Integer and BigInteger.
+ Results for BigInteger or non-integer types are the same as for Integer due to limitation
+ of int type. Signed integers are assumed. @a minValue and @a maxValue must not be 0. */
 //! @todo add support for unsigned flag
-KDB_EXPORT void getLimitsForType(KDbField::Type type, int &minValue, int &maxValue);
+KDB_EXPORT void getLimitsForType(KDbField::Type type, int *minValue, int *maxValue);
 
 /*! @return type that's maximum of two integer types @a t1 and @a t2, e.g. Integer for (Byte, Integer).
  If one of the types is not of the integer group, KDbField::InvalidType is returned.
