@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -110,10 +110,12 @@ void SqliteConnectionInternal::setExtensionsLoadingEnabled(bool set)
 }
 
 /*! Used by driver */
-SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData)
-        : KDbConnection(driver, connData)
+SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                                   const KDbConnectionOptions &options)
+        : KDbConnection(driver, connData, options)
         , d(new SqliteConnectionInternal(this))
 {
+    this->options()->setCaption("extraSqliteExtensionPaths", QObject::tr("Extra SQLite extension paths"));
 }
 
 SqliteConnection::~SqliteConnection()
@@ -209,7 +211,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
 //! @todo add option (command line or in kdbrc?)
 //! @todo   int exclusiveFlag = KDbConnection::isReadOnly() ? SQLITE_OPEN_READONLY : SQLITE_OPEN_WRITE_LOCKED; // <-- shared read + (if !r/o): exclusive write
     int openFlags = 0;
-    if (isReadOnly()) {
+    if (options()->isReadOnly()) {
         openFlags |= SQLITE_OPEN_READONLY;
     }
     else {
@@ -223,6 +225,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
 //    int allowReadonly = 1;
 //    const bool wasReadOnly = KDbConnection::isReadOnly();
 
+    sqliteDebug() << data().databaseName();
     int res = sqlite3_open_v2(
                  data().databaseName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
                  &d->data,
@@ -246,16 +249,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
             return false;
         }
         // Load ICU extension for unicode collations
-        bool icuExtensionLoaded = false;
-        const QStringList libraryPaths(KDb::libraryPaths());
-        foreach (const QString& path, libraryPaths) {
-            QString icuExtensionFilename = path + QLatin1String("/sqlite3/kdb_sqlite_icu" KDB_SHARED_LIB_EXTENSION);
-            if (loadExtension(icuExtensionFilename)) {
-                icuExtensionLoaded = true;
-                break;
-            }
-        }
-        if (!icuExtensionLoaded) {
+        if (!findAndLoadExtension(QLatin1String("kdb_sqlite_icu"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -408,12 +402,22 @@ KDbPreparedStatementInterface* SqliteConnection::prepareStatementInternal()
     return new SqlitePreparedStatement(d);
 }
 
-bool SqliteConnection::isReadOnly() const
+bool SqliteConnection::findAndLoadExtension(const QString & name)
 {
-    return KDbConnection::isReadOnly();
-//! @todo port
-    //return (d->data ? sqlite3_is_readonly(d->data) : false)
-    //       || KDbConnection::isReadOnly();
+    QStringList pluginPaths;
+    foreach (const QString& path, KDb::libraryPaths()) {
+        pluginPaths += path + QLatin1String("/sqlite3");
+    }
+    pluginPaths += options()->property("extraSqliteExtensionPaths").value.toStringList();
+    foreach (const QString& path, pluginPaths) {
+        if (loadExtension(path + QLatin1Char('/') + name + QLatin1String(KDB_SHARED_LIB_EXTENSION))) {
+            return true;
+        }
+    }
+    clearResult();
+    m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
+                         QObject::tr("Could not load SQLite extension \"%1\".").arg(name));
+    return false;
 }
 
 bool SqliteConnection::loadExtension(const QString& path)

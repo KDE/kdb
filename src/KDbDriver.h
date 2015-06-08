@@ -35,6 +35,7 @@
 class KDbAdminTools;
 class KDbConnection;
 class KDbConnectionData;
+class KDbConnectionOptions;
 class KDbDriverManager;
 class KDbDriverBehaviour;
 class KDbDriverMetaData;
@@ -87,17 +88,15 @@ public:
         IgnoreTransactions = 1024
     };
 
-    //! Options used for createConnection()
-    enum CreateConnectionOptions {
-        ReadOnlyConnection = 1 //!< set to perform read only connection
-    };
-
     /*! Creates connection using @a connData as parameters.
      @return 0 and sets error message on error.
      driverId member of @a connData will be updated with the driver's ID.
-     @a options can be a combination of CreateConnectionOptions enum values.
-     */
-    KDbConnection *createConnection(const KDbConnectionData& connData, int options = 0);
+     @a options can be set for the new connection. */
+    KDbConnection *createConnection(const KDbConnectionData& connData,
+                                    const KDbConnectionOptions &options);
+
+    //! @overload createConnection(const KDbConnectionData&, const KDbConnectionOptions&)
+    KDbConnection *createConnection(const KDbConnectionData& connData);
 
     /*! @return Set of created connections. */
     const QSet<KDbConnection*> connections() const;
@@ -250,7 +249,8 @@ protected:
      with additional structures specific for a given driver.
      KDbConnection object should inherit KDbConnection and have a destructor
      that descructs all allocated driver-dependent connection structures. */
-    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData) = 0;
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options) = 0;
 
     /*! Driver-specific SQL string escaping.
      This method is used by escapeIdentifier().

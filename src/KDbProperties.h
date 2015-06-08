@@ -25,7 +25,7 @@
 //! @todo implement KConfigBase interface here?
 
 //! A set of storable database properties.
-/*! This is a convenience class that allows to store global dabatase properties without a need
+/*! This is a convenience class that allows to store global database properties without a need
  for creating and maintain custom table.
  KDbProperties object is accessible only using KDbConnection::databaseProperties() method.
  */

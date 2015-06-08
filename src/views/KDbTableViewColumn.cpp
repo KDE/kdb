@@ -152,7 +152,7 @@ KDbTableViewColumn::KDbTableViewColumn(
     // - if the query itself is stored (i.e. has connection) and lookup column is defined
     const bool columnFromMasterTable = query.masterTable() == d->columnInfo->field->table();
     d->readOnly = !columnFromMasterTable
-                 || (query.connection() && query.connection()->isReadOnly());
+                 || (query.connection() && query.connection()->options()->isReadOnly());
 //! @todo remove this when queries become editable            ^^^^^^^^^^^^^^
 // kdbDebug() << "KDbTableViewColumn: query.masterTable()=="
 //  << (query.masterTable() ? query.masterTable()->name() : "notable") << ", columnInfo->field->table()=="

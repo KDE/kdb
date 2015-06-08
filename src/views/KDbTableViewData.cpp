@@ -935,7 +935,7 @@ bool KDbTableViewData::preloadAllRecords()
 
 bool KDbTableViewData::isReadOnly() const
 {
-    return d->readOnly || (d->cursor && d->cursor->connection()->isReadOnly());
+    return d->readOnly || (d->cursor && d->cursor->connection()->options()->isReadOnly());
 }
 
 // static

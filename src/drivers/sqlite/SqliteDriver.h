@@ -65,7 +65,8 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options);
     virtual KDbAdminTools* drv_createAdminTools() const;
 
     /*! @return true if @a n is a system field name;

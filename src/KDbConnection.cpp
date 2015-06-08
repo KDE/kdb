@@ -68,13 +68,63 @@ KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
 }
 
 //================================================
+
+KDbConnectionOptions::KDbConnectionOptions()
+ : m_connection(0)
+{
+    KDbUtils::PropertySet::insert("readOnly", false, QObject::tr("Read only", "Read only connection"));
+}
+
+bool KDbConnectionOptions::isReadOnly() const
+{
+    return property("readOnly").value.toBool();
+}
+
+void KDbConnectionOptions::insert(const QByteArray &name, const QVariant &value,
+                                  const QString &caption)
+{
+    if (name == "readOnly") {
+        setReadOnly(value.toBool());
+        return;
+    }
+    QString realCaption;
+    if (property(name).caption.isEmpty()) { // don't allow to change the caption
+        realCaption = caption;
+    }
+    KDbUtils::PropertySet::insert(name, value, realCaption);
+}
+
+void KDbConnectionOptions::setCaption(const QByteArray &name, const QString &caption)
+{
+    KDbUtils::PropertySet::insert(name, property(name).value, caption);
+}
+
+void KDbConnectionOptions::remove(const QByteArray &name)
+{
+    if (name == "readOnly") {
+        return;
+    }
+    KDbUtils::PropertySet::remove(name);
+}
+
+void KDbConnectionOptions::setReadOnly(bool set)
+{
+    if (m_connection && m_connection->isConnected()) {
+        return; //sanity
+    }
+    KDbUtils::PropertySet::insert("readOnly", set);
+}
+
+//================================================
 //! @internal
 class ConnectionPrivate
 {
 public:
-    ConnectionPrivate(KDbConnection* const conn, const KDbConnectionData& _connData)
+    ConnectionPrivate(KDbConnection* const conn, const KDbConnectionData& _connData,
+                      const KDbConnectionOptions &_options)
             : conn(conn)
             , connData(_connData)
+            , options(_options)
             , m_parser(0)
             , dbProperties(conn)
             , dont_remove_transactions(false)
@@ -84,9 +134,11 @@ public:
             , autoCommit(true)
             , takeTableEnabled(true)
     {
+        options.m_connection = conn;
     }
 
     ~ConnectionPrivate() {
+        options.m_connection = 0;
         qDeleteAll(cursors);
         delete m_parser;
         qDeleteAll(tableSchemaChangeListeners);
@@ -204,6 +256,9 @@ public:
     KDbConnection* const conn; //!< The @a KDbConnection instance this @a ConnectionPrivate belongs to.
     KDbConnectionData connData; //!< the @a KDbConnectionData used within that connection.
 
+    //! True for read only connection. Used especially for file-based drivers.
+    KDbConnectionOptions options;
+
     /*! Default transaction handle.
     If transactions are supported: Any operation on database (e.g. inserts)
     that is started without specifying transaction context, will be performed
@@ -256,8 +311,6 @@ public:
 
     bool autoCommit;
 
-    /*! True for read only connection. Used especially for file-based drivers. */
-    bool readOnly;
 private:
     //! Table schemas retrieved on demand with tableSchema()
     QHash<int, KDbTableSchema*> tables;
@@ -276,8 +329,9 @@ private:
 //! static: list of internal KDb system table names
 QStringList KDb_kdbSystemTableNames;
 
-KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData)
-        : d(new ConnectionPrivate(this, connData))
+KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                             const KDbConnectionOptions &options)
+        : d(new ConnectionPrivate(this, connData, options))
         , m_driver(driver)
         , m_destructor_started(false)
         , m_insideCloseDatabase(false)
@@ -462,7 +516,7 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
                                                      .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
-        if (!d->readOnly && !file.isWritable()) {
+        if (!d->options.isReadOnly() && !file.isWritable()) {
             if (!ignoreErrors)
                 m_result = KDbResult(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not writable.")
                                                      .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
@@ -3766,16 +3820,9 @@ tristate KDbConnection::closeAllTableSchemaChangeListeners(KDbTableSchema* schem
     return res;
 }
 
-void KDbConnection::setReadOnly(bool set)
+KDbConnectionOptions* KDbConnection::options()
 {
-    if (d->isConnected)
-        return; //sanity
-    d->readOnly = set;
-}
-
-bool KDbConnection::isReadOnly() const
-{
-    return d->readOnly;
+    return &d->options;
 }
 
 void KDbConnection::addCursor(KDbCursor* cursor)
