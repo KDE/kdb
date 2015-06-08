@@ -1,4 +1,6 @@
-add_library(kdb_sqlite_icu MODULE icu.c)
+add_library(kdb_sqlite_icu MODULE icu.cpp)
+
+generate_export_header(kdb_sqlite_icu)
 
 include_directories(${ICU_INCLUDE_DIRS})
 

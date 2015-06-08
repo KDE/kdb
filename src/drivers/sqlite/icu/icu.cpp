@@ -251,7 +251,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   UErrorCode status = U_ZERO_ERROR;
   URegularExpression *pExpr;
   UBool res;
-  const UChar *zString = sqlite3_value_text16(apArg[1]);
+  const UChar *zString = static_cast<const UChar *>(sqlite3_value_text16(apArg[1]));
 
   (void)nArg;  /* Unused parameter */
 
@@ -262,9 +262,9 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
     return;
   }
 
-  pExpr = sqlite3_get_auxdata(p, 0);
+  pExpr = static_cast<URegularExpression*>(sqlite3_get_auxdata(p, 0));
   if( !pExpr ){
-    const UChar *zPattern = sqlite3_value_text16(apArg[0]);
+    const UChar *zPattern = static_cast<const UChar *>(sqlite3_value_text16(apArg[0]));
     if( !zPattern ){
       return;
     }
@@ -337,29 +337,29 @@ static void icuCaseFunc16(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   int nOutput;
 
   UErrorCode status = U_ZERO_ERROR;
-  const char *zLocale = 0;
+  const unsigned char *zLocale = 0;
 
   assert(nArg==1 || nArg==2);
   if( nArg==2 ){
-    zLocale = (const char *)sqlite3_value_text(apArg[1]);
+    zLocale = static_cast<const unsigned char *>(sqlite3_value_text(apArg[1]));
   }
 
-  zInput = sqlite3_value_text16(apArg[0]);
+  zInput = static_cast<const UChar *>(sqlite3_value_text16(apArg[0]));
   if( !zInput ){
     return;
   }
   nInput = sqlite3_value_bytes16(apArg[0]);
 
   nOutput = nInput * 2 + 2;
-  zOutput = sqlite3_malloc(nOutput);
+  zOutput = static_cast<UChar *>(sqlite3_malloc(nOutput));
   if( !zOutput ){
     return;
   }
 
   if( sqlite3_user_data(p) ){
-    u_strToUpper(zOutput, nOutput/2, zInput, nInput/2, zLocale, &status);
+    u_strToUpper(zOutput, nOutput/2, zInput, nInput/2, reinterpret_cast<const char*>(zLocale), &status);
   }else{
-    u_strToLower(zOutput, nOutput/2, zInput, nInput/2, zLocale, &status);
+    u_strToLower(zOutput, nOutput/2, zInput, nInput/2, reinterpret_cast<const char*>(zLocale), &status);
   }
 
   if( !U_SUCCESS(status) ){
