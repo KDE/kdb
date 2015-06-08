@@ -31,12 +31,49 @@
 #include "KDbPreparedStatement.h"
 #include "KDbRecordData.h"
 #include "KDb.h"
+#include "KDbUtils.h"
 #include "KDbTristate.h"
 
 class KDbCursor;
 class ConnectionPrivate;
 class KDbRecordEditBuffer;
 class KDbProperties;
+
+/*! @brief Generic options for a single connection.
+    The options are accessible using key/value pairs. This enables extensibility
+    depending on driver's type and version.
+    @see KDbDriver::createConnection(const KDbConnectionData&) KDbConnection::options()
+*/
+class KDB_EXPORT KDbConnectionOptions : public KDbUtils::PropertySet
+{
+public:
+    KDbConnectionOptions();
+
+    /*! @return true for read-only connection. Used especially for file-based drivers.
+     Can be implemented in a driver to provide real read-only flag of the connection
+     (sqlite driver does this). */
+    bool isReadOnly() const;
+
+    /*! @internal used by KDbDriver::createConnection().
+     Only works if connection is not yet established. */
+    void setReadOnly(bool set);
+
+    //! Inserts option with a given @a name, @a value and @a caption.
+    //! If @a caption is empty, caption from existing option is reused.
+    void insert(const QByteArray &name, const QVariant &value, const QString &caption = QString());
+
+    //! Sets caption for property @a name to @a caption.
+    //! If @a caption is not empty, does nothing.
+    void setCaption(const QByteArray &name, const QString &caption);
+
+    //! Removes option with a given @a name.
+    void remove(const QByteArray &name);
+
+private:
+    friend class ConnectionPrivate;
+
+    KDbConnection *m_connection;
+};
 
 /*! @short Provides database connection, allowing queries and data modification.
 
@@ -80,10 +117,10 @@ public:
      with useDatabase(). */
     bool isDatabaseUsed() const;
 
-    /*! @return true for read only connection. Used especially for file-based drivers.
-     Can be reimplemented in a driver to provide real read-only flag of the connection
-     (sqlite driver does this). */
-    virtual bool isReadOnly() const;
+    /*! @return generic options for a single connection.
+        The options are accessible using key/value pairs. This enables extensibility
+        depending on driver's type and version. */
+    KDbConnectionOptions *options();
 
     /*! Reimplemented, also clears sql string.
      @sa recentSQLString() */
@@ -951,7 +988,8 @@ public:
 
 protected:
     /*! Used by KDbDriver */
-    KDbConnection(KDbDriver *driver, const KDbConnectionData& connData);
+    KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                  const KDbConnectionOptions &options);
 
     /*! Method to be called form KDbConnection's subclass destructor.
      @see ~KDbConnection() */
@@ -1300,10 +1338,6 @@ protected:
      Executes query based on a raw SQL statement @a sql or @a query with optional @a params. */
     KDbCursor* executeQueryInternal(const KDbEscapedString& sql, KDbQuerySchema* query,
                                     const QList<QVariant>* params);
-
-    /*! @internal used by KDbDriver::createConnection().
-     Only works if connection is not yet established. */
-    void setReadOnly(bool set);
 
     /*! Loads extended schema information for table @a tableSchema,
      if present (see ExtendedTableSchemaInformation in Kexi Wiki).

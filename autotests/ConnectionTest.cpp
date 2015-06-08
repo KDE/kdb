@@ -62,9 +62,24 @@ void ConnectionTest::testCreateDb()
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(db_name);
-    KDB_VERIFY(utils.driver, conn = utils.driver->createConnection(cdata), "Failed to create connection");
+    KDbConnectionOptions connOptions;
+    QStringList extraSqliteExtensionPaths;
+    extraSqliteExtensionPaths << SQLITE_ICU_EXTENSION_PATH;
+    connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
+
+    KDB_VERIFY(utils.driver, conn = utils.driver->createConnection(cdata, connOptions), "Failed to create connection");
     QVERIFY2(utils.driver->connections().contains(conn), "Driver does not list created connection");
     QCOMPARE(utils.driver->connections().count(), 1);
+
+    const KDbUtils::Property extraSqliteExtensionPathsProperty = conn->options()->property("extraSqliteExtensionPaths");
+    QVERIFY2(!extraSqliteExtensionPathsProperty.isNull, "extraSqliteExtensionPaths property not found");
+    QCOMPARE(extraSqliteExtensionPathsProperty.value.toStringList(), extraSqliteExtensionPaths);
+
+    const KDbUtils::Property readOnlyProperty = conn->options()->property("readOnly");
+    QVERIFY2(!readOnlyProperty.isNull, "readOnly property not found");
+    QCOMPARE(readOnlyProperty.value.toBool(), conn->options()->isReadOnly());
+    //! @todo Add extensive test for a read-only connection
+
     //! @todo KDbDriver::metaData
     {
         QScopedPointer<KDbConnection> connGuard(conn);

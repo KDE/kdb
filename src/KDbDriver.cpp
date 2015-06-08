@@ -124,18 +124,23 @@ QString KDbDriver::sqlTypeName(int id_t, int /*p*/) const
     return d->typeNames[KDbField::InvalidType];
 }
 
-KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData, int options)
+KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData,
+                                           const KDbConnectionOptions &options)
 {
     clearResult();
     if (!isValid())
         return 0;
-    KDbConnection *conn = drv_createConnection(connData);
 
-    conn->setReadOnly(options & ReadOnlyConnection);
+    KDbConnection *conn = drv_createConnection(connData, options);
 
 //! @todo needed? connData->setDriverId(id());
     d->connections.insert(conn);
     return conn;
+}
+
+KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData)
+{
+    return createConnection(connData, KDbConnectionOptions());
 }
 
 KDbConnection* KDbDriver::removeConnection(KDbConnection *conn)

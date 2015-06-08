@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,7 +27,12 @@
 class SqliteConnectionInternal;
 class KDbDriver;
 
-//! SQLite-specific connection
+/*! @brief SQLite-specific connection
+    Following connection options are supported (see KDbConnectionOptions):
+    - extraSqliteExtensionPaths (read/write, QStringList): adds extra seach paths for SQLite
+                                extensions. Set them before KDbConnection::useDatabase()
+                                is called. Absolute paths are recommended.
+*/
 class SqliteConnection : public KDbConnection
 {
 public:
@@ -38,12 +43,10 @@ public:
 
     virtual KDbPreparedStatementInterface* prepareStatementInternal();
 
-    /*! Reimplemented to provide real read-only flag of the connection */
-    virtual bool isReadOnly() const;
-
 protected:
     /*! Used by driver */
-    SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData);
+    SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                     const KDbConnectionOptions &options);
 
     virtual bool drv_connect();
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
@@ -98,7 +101,13 @@ private:
     //! Closes database without altering stored result number and message
     void drv_closeDatabaseSilently();
 
-    //! Loads extension from library at @a path (absolute path is recommended)
+    //! Finds a native SQLite extension @a name in the search path and loads it.
+    //! Path and filename extension should not be provided.
+    //! @return true on success
+    bool findAndLoadExtension(const QString & name);
+
+    //! Loads extension from plugin at @a path (absolute path is recommended)
+    //! @return true on success
     bool loadExtension(const QString& path);
 
     friend class SqliteDriver;

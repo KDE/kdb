@@ -793,7 +793,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 //! @todo err msg?
         return 0;
     }
-    if (d->conn->isReadOnly()) {
+    if (d->conn->options()->isReadOnly()) {
 //! @todo err msg?
         return 0;
     }

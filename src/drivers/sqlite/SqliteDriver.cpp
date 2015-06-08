@@ -94,9 +94,10 @@ SqliteDriver::~SqliteDriver()
 
 
 KDbConnection*
-SqliteDriver::drv_createConnection(const KDbConnectionData& connData)
+SqliteDriver::drv_createConnection(const KDbConnectionData& connData,
+                                   const KDbConnectionOptions &options)
 {
-    return new SqliteConnection(this, connData);
+    return new SqliteConnection(this, connData, options);
 }
 
 bool SqliteDriver::isSystemObjectName(const QString& n) const

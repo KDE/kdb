@@ -437,7 +437,11 @@ PropertySet::PropertySet()
 PropertySet::PropertySet(const PropertySet &other)
     : d(new Private)
 {
-    d->data = other.d->data;
+    for (AutodeletedHash<QByteArray, Property*>::ConstIterator it(other.d->data.constBegin());
+         it != other.d->data.constEnd(); ++it)
+    {
+        d->data.insert(it.key(), new Property(*it.value()));
+    }
 }
 
 PropertySet::~PropertySet()
