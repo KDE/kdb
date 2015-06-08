@@ -101,7 +101,7 @@ char xBaseExportPrivate::type(KDbField::Type fieldType)
 
 bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecordData* recordData ) {
 
-// 	KDbDrvDbg<<recordData->debugString();
+//     KDbDrvDbg<<recordData->debugString();
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toLatin1();
   xbDbf* table = xbase.GetDbfPtr( pathNameBa.constData() );
@@ -141,10 +141,10 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecor
     return false;
   }
 
-// 	// for debugging purposes only
-// 	for ( uint i=0; i< (uint)recordData->size(); ++i ) {
-// 		KDbDrvDbg<<table->GetField(i);
-// 	}
+//     // for debugging purposes only
+//     for ( uint i=0; i< (uint)recordData->size(); ++i ) {
+//         KDbDrvDbg<<table->GetField(i);
+//     }
 
   return true;
 }
@@ -317,7 +317,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
     if (!dest_createTable(tableCaption, tableSchema)) {
       if (result)
-        result->setStatus(tr("Could not create table in destination \"%1\". Error reading table \"%2\".",	m_migrateData->destination->connectionData()->serverInfoString(), tableCaption), "");
+        result->setStatus(tr("Could not create table in destination \"%1\". Error reading table \"%2\".",    m_migrateData->destination->connectionData()->serverInfoString(), tableCaption), "");
       return false;
     }
 

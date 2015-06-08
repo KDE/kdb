@@ -34,7 +34,7 @@ class xBaseDriver : public KDbDriver
 
     virtual ~xBaseDriver();
 
-    /*! \return true if \a n is a system object name; 
+    /*! \return true if \a n is a system object name;
     */
     virtual bool isSystemObjectName( const QString& n ) const;
 
@@ -53,7 +53,7 @@ class xBaseDriver : public KDbDriver
     virtual QByteArray drv_escapeIdentifier( const QByteArray& str) const;
     virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
     virtual bool drv_isSystemFieldName( const QString& n ) const;
-  
+
   private:
     xBaseDriverPrivate* dp;
     static const char *keywords[];

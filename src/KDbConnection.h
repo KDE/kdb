@@ -1407,7 +1407,7 @@ private:
 namespace KDb
 {
 /*! @return "SELECT ..." statement's string needed for executing query
-    defined by @a querySchema, @a params and @a options. 
+    defined by @a querySchema, @a params and @a options.
     @a driver is used to generate driver-dependent statement. */
 KDB_EXPORT KDbEscapedString selectStatement(const KDbDriver &driver,
                                                KDbQuerySchema *querySchema,

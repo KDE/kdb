@@ -55,7 +55,7 @@ xBaseCursor::~xBaseCursor() {
 }
 
 void xBaseCursor::init() {
-  
+
   if (d->internalCursor) {
     m_options |= d->internalCursor->options();
   }

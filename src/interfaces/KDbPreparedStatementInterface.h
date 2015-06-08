@@ -40,7 +40,7 @@ protected:
         i.e. when attributes of the object (like WHERE field names) change. */
     virtual bool prepare(const KDbEscapedString& sql) = 0;
 
-    //! For implementation. Executes the prepared statement using parameters @a parameters. 
+    //! For implementation. Executes the prepared statement using parameters @a parameters.
     virtual bool execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,

@@ -160,7 +160,7 @@ class KDB_EXPORT KDbResultable
 {
 public:
     virtual ~KDbResultable();
-    
+
     KDbResult result() const;
 
     void clearResult();

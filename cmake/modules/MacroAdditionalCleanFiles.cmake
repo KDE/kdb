@@ -9,7 +9,7 @@
 
 macro (MACRO_ADDITIONAL_CLEAN_FILES)
    get_directory_property(_tmp_DIR_PROPS ADDITIONAL_MAKE_CLEAN_FILES )
-   
+
    if (_tmp_DIR_PROPS)
       set(_tmp_DIR_PROPS ${_tmp_DIR_PROPS} ${ARGN})
    else ()

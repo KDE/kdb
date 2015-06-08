@@ -1,4 +1,4 @@
-# - Try to find the FreeTDS library 
+# - Try to find the FreeTDS library
 # Once done this will define
 #
 #  FreeTDS_FOUND - system has FreeTDS
@@ -19,7 +19,7 @@ else ()
        find_library(FreeTDS_TDS_LIBRARIES NAMES tds )
 
        find_library(FreeTDS_SYBDB_LIBRARIES NAMES sybdb )
-  
+
        set(FreeTDS_LIBRARIES ${FreeTDS_SYBDB_LIBRARIES} ${FreeTDS_TDS_LIBRARIES} CACHE STRING "Libraries needed for sybase/mssql driver")
 
        include(FindPackageHandleStandardArgs)

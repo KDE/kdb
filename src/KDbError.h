@@ -55,15 +55,15 @@ namespace KDb {
 #define ERR_CURSOR_RECORD_FETCHING 130 //!< eg. for KDbCursor::drv_getNextRecord()
 #define ERR_UNSUPPORTED_DRV_FEATURE 140 //!< given driver's feature is unsupported (eg. transactins)
 #define ERR_ROLLBACK_OR_COMMIT_TRANSACTION 150 //!< error during transaction rollback or commit
-#define ERR_SYSTEM_NAME_RESERVED 160 //!< system name is reserved and cannot be used 
+#define ERR_SYSTEM_NAME_RESERVED 160 //!< system name is reserved and cannot be used
 //!< (e.g. for table, db, or field name)
 #define ERR_CANNOT_CREATE_EMPTY_OBJECT 170 //!< empty object cannot be created
 //!< (e.g. table without fields)
 #define ERR_INVALID_DRIVER_IMPL 180 //! driver's implementation is invalid
 #define ERR_INCOMPAT_DRIVER_VERSION 181 //!< driver's version is incompatible
-#define ERR_INCOMPAT_DATABASE_VERSION 182 //!< db's version is incompatible with currently 
+#define ERR_INCOMPAT_DATABASE_VERSION 182 //!< db's version is incompatible with currently
 //!< used Kexi version
-#define ERR_INVALID_DATABASE_CONTENTS 183 //!< db's contents are invalid 
+#define ERR_INVALID_DATABASE_CONTENTS 183 //!< db's contents are invalid
 //!< (e.g. no enough information to open db)
 
 //! errors related to data updating on the server
@@ -71,10 +71,10 @@ namespace KDb {
 #define ERR_UPDATE_SERVER_ERROR 191    //!< error @ the server side during data updating
 #define ERR_UPDATE_NO_MASTER_TABLE 192 //!< data could not be edited because there
 //!< is no master table defined
-#define ERR_UPDATE_NO_MASTER_TABLES_PKEY 193 //!< data could not be edited 
+#define ERR_UPDATE_NO_MASTER_TABLES_PKEY 193 //!< data could not be edited
 //!< because it's master table has
 //!< no primary key defined
-#define ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY 194 //!< data could not be edited 
+#define ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY 194 //!< data could not be edited
 //!< because it does not contain entire
 //!< master table's primary key
 
@@ -83,7 +83,7 @@ namespace KDb {
 #define ERR_INSERT_SERVER_ERROR 221    //!< error @ the server side during data inserting
 #define ERR_INSERT_NO_MASTER_TABLE 222 //!< data could not be inserted because there
 //!< is no master table defined
-#define ERR_INSERT_NO_MASTER_TABLES_PKEY 223 //!< data could not be inserted because master 
+#define ERR_INSERT_NO_MASTER_TABLES_PKEY 223 //!< data could not be inserted because master
 //!< table has no primary key defined
 #define ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY 224 //!< data could not be inserted
 //!< because it does not contain entire
@@ -105,7 +105,7 @@ namespace KDb {
 //!< usually returned by KDbConnection::executeSQL()
 #define ERR_SQL_PARSE_ERROR 270 //!< Parse error coming from arser::parse()
 
-#define ERR_OTHER 0xffff //!< use this if you have not (yet?) the name for given error 
+#define ERR_OTHER 0xffff //!< use this if you have not (yet?) the name for given error
 
 } // namespace KDb
 

@@ -53,7 +53,7 @@
  * when choosing the version number that you are checking against.
  * Otherwise you might risk to break the next KDb release.
  * Therefore be careful that development version have a
- * version number lower than the released version, so do not check 
+ * version number lower than the released version, so do not check
  * e.g. for KDb 3.1 with KDB_IS_VERSION(3, 1, 0)
  * but with the actual version number at a time a needed feature was introduced,
  * e.g. KDB_IS_VERSION(3, 0, 90) for beta 3.1

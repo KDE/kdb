@@ -203,7 +203,7 @@ int main(int argc, char** argv)
 #ifndef NO_GUI
     if (test_name == "tableview") {
         gui = true;
-    } else 
+    } else
 #endif
     if (test_name == "parser") {
 //        minargs = 3;

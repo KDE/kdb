@@ -85,7 +85,7 @@ tristate SqliteVacuum::run()
         m_result = false;
         return m_result;
     }
-    
+
     QFileInfo fi(m_filePath);
     if (!fi.isReadable()) {
         sqliteWarning() << "No readable file" << m_filePath;
@@ -101,7 +101,7 @@ tristate SqliteVacuum::run()
     connect(m_dumpProcess, SIGNAL(readyReadStandardError()), this, SLOT(readFromStdErr()));
     connect(m_dumpProcess, SIGNAL(finished(int,QProcess::ExitStatus)),
             this, SLOT(dumpProcessFinished(int,QProcess::ExitStatus)));
-            
+
     delete m_sqliteProcess;
     m_sqliteProcess = new QProcess(this);
     m_sqliteProcess->setWorkingDirectory(fi.absoluteDir().path());
@@ -116,7 +116,7 @@ tristate SqliteVacuum::run()
         m_result = false;
         return m_result;
     }
-    
+
     QTemporaryFile *tempFile = new QTemporaryFile(fi.absoluteFilePath());
     tempFile->open();
     m_tmpFilePath = tempFile->fileName();
@@ -131,7 +131,7 @@ tristate SqliteVacuum::run()
         m_result = false;
         return m_result;
     }
-    
+
     m_dlg = new QProgressDialog(0); // krazy:exclude=qclasses
     m_dlg->setWindowTitle(tr("Compacting database"));
     m_dlg->setLabelText(

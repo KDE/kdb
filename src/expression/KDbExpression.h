@@ -59,7 +59,7 @@ public:
 
     virtual ~KDbExpression();
 
-    //! @return true if this expression is null. 
+    //! @return true if this expression is null.
     //! Equivalent of expressionClass() == KDb::UnknownExpression.
     //! @note Returns false for expressions of type KDbField::Null (SQL's NULL).
     bool isNull() const;
@@ -164,7 +164,7 @@ public:
     bool operator==(const KDbExpression& e) const;
 
     bool operator!=(const KDbExpression& e) const;
-    
+
     /*! @return the parent expression. */
     KDbExpression parent() const;
 

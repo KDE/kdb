@@ -11,9 +11,9 @@
 *************************************************************************
 ** $Id: icu.c,v 1.7 2007/12/13 21:54:11 drh Exp $
 **
-** This file implements an integration between the ICU library 
-** ("International Components for Unicode", an open-source library 
-** for handling unicode data) and SQLite. The integration uses 
+** This file implements an integration between the ICU library
+** ("International Components for Unicode", an open-source library
+** for handling unicode data) and SQLite. The integration uses
 ** ICU to provide the following to SQLite:
 **
 **   * An implementation of the SQL regexp() function (and hence REGEXP
@@ -24,7 +24,7 @@
 **
 **   * Integration of ICU and SQLite collation seqences.
 **
-**   * An implementation of the LIKE operator that uses ICU to 
+**   * An implementation of the LIKE operator that uses ICU to
 **     provide case-independent matching.
 */
 
@@ -68,7 +68,7 @@ static void xFree(void *p){
 
 /*
 ** Compare two UTF-8 strings for equality where the first string is
-** a "LIKE" expression. Return true (1) if they are the same and 
+** a "LIKE" expression. Return true (1) if they are the same and
 ** false (0) if they are different.
 */
 static int icuLikeCompare(
@@ -103,7 +103,7 @@ static int icuLikeCompare(
       uint8_t c;
 
       /* Skip any MATCH_ALL or MATCH_ONE characters that follow a
-      ** MATCH_ALL. For each MATCH_ONE, skip one character in the 
+      ** MATCH_ALL. For each MATCH_ONE, skip one character in the
       ** test string.
       */
       while( (c=zPattern[iPattern]) == MATCH_ALL || c == MATCH_ONE ){
@@ -156,15 +156,15 @@ static int icuLikeCompare(
 **
 **       A LIKE B
 **
-** is implemented as like(B, A). If there is an escape character E, 
+** is implemented as like(B, A). If there is an escape character E,
 **
 **       A LIKE B ESCAPE E
 **
 ** is mapped to like(B, A, E).
 */
 static void icuLikeFunc(
-  sqlite3_context *context, 
-  int argc, 
+  sqlite3_context *context,
+  int argc,
   sqlite3_value **argv
 ){
   const unsigned char *zA = sqlite3_value_text(argv[0]);
@@ -190,7 +190,7 @@ static void icuLikeFunc(
     if( zE==0 ) return;
     U8_NEXT(zE, i, nE, uEsc);
     if( i!=nE){
-      sqlite3_result_error(context, 
+      sqlite3_result_error(context,
           "ESCAPE expression must be a single character", -1);
       return;
     }
@@ -205,7 +205,7 @@ static void icuLikeFunc(
 ** This function is called when an ICU function called from within
 ** the implementation of an SQL scalar function returns an error.
 **
-** The scalar function context passed as the first argument is 
+** The scalar function context passed as the first argument is
 ** loaded with an error message based on the following two args.
 */
 static void icuFunctionError(
@@ -231,7 +231,7 @@ static void icuRegexpDelete(void *p){
 /*
 ** Implementation of SQLite REGEXP operator. This scalar function takes
 ** two arguments. The first is a regular expression pattern to compile
-** the second is a string to match against that pattern. If either 
+** the second is a string to match against that pattern. If either
 ** argument is an SQL NULL, then NULL Is returned. Otherwise, the result
 ** is 1 if the string matches the pattern, or 0 otherwise.
 **
@@ -255,8 +255,8 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
 
   (void)nArg;  /* Unused parameter */
 
-  /* If the left hand side of the regexp operator is NULL, 
-  ** then the result is also NULL. 
+  /* If the left hand side of the regexp operator is NULL,
+  ** then the result is also NULL.
   */
   if( !zString ){
     return;
@@ -294,7 +294,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   }
 
   /* Set the text that the regular expression operates on to a NULL
-  ** pointer. This is not really necessary, but it is tidier than 
+  ** pointer. This is not really necessary, but it is tidier than
   ** leaving the regular expression object configured with an invalid
   ** pointer after this function returns.
   */
@@ -305,7 +305,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
 }
 
 /*
-** Implementations of scalar functions for case mapping - upper() and 
+** Implementations of scalar functions for case mapping - upper() and
 ** lower(). Function upper() converts its input to upper-case (ABC).
 ** Function lower() converts to lower-case (abc).
 **
@@ -313,7 +313,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
 ** "language specific". Refer to ICU documentation for the differences
 ** between the two.
 **
-** To utilise "general" case mapping, the upper() or lower() scalar 
+** To utilise "general" case mapping, the upper() or lower() scalar
 ** functions are invoked with one argument:
 **
 **     upper('ABC') -> 'abc'
@@ -405,7 +405,7 @@ static int icuCollationColl(
 /*
 ** Implementation of the scalar function icu_load_collation().
 **
-** This scalar function is used to add ICU collation based collation 
+** This scalar function is used to add ICU collation based collation
 ** types to an SQLite database connection. It is intended to be called
 ** as follows:
 **
@@ -416,8 +416,8 @@ static int icuCollationColl(
 ** collation sequence to create.
 */
 static void icuLoadCollation(
-  sqlite3_context *p, 
-  int nArg, 
+  sqlite3_context *p,
+  int nArg,
   sqlite3_value **apArg
 ){
   sqlite3 *db = (sqlite3 *)sqlite3_user_data(p);
@@ -442,7 +442,7 @@ static void icuLoadCollation(
   }
   assert(p);
 
-  rc = sqlite3_create_collation_v2(db, zName, SQLITE_UTF16, (void *)pUCollator, 
+  rc = sqlite3_create_collation_v2(db, zName, SQLITE_UTF16, (void *)pUCollator,
       icuCollationColl, icuCollationDel
   );
   if( rc!=SQLITE_OK ){
@@ -495,7 +495,7 @@ int sqlite3IcuInit(sqlite3 *db){
 
 #if !defined SQLITE_CORE || !SQLITE_CORE
 int sqlite3_extension_init(
-  sqlite3 *db, 
+  sqlite3 *db,
   char **pzErrMsg,
   const struct sqlite3_api_routines *pApi
 ){

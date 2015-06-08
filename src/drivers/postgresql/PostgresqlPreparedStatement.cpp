@@ -56,5 +56,5 @@ bool PostgresqlPreparedStatement::execute(
         return connection->insertRecord(&insertFieldList, myParameters);
     }
 //! @todo support select
-    return false;  
+    return false;
 }

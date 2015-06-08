@@ -70,7 +70,7 @@ bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
 
     // get real types for all fields
     PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(m_conn->driver());
-    
+
     m_realTypes.resize(m_fieldsToStoreInRecord);
     for (int i = 0; i < int(m_fieldsToStoreInRecord); i++) {
         const int pqtype = PQftype(d->res, i);
@@ -106,7 +106,7 @@ void PostgresqlCursor::drv_getNextRecord()
 
 //==================================================================================
 //Check the current position is within boundaries
-#if 0 
+#if 0
 void PostgresqlCursor::drv_getPrevRecord()
 {
 // KDbDrvDbg;

@@ -945,7 +945,7 @@ QList<int> KDbConnection::objectIds(int objectType)
     else
         sql = "SELECT o_id, o_name FROM kexi__objects WHERE o_type=" + QByteArray::number(objectType)
               + " ORDER BY o_id";
-    
+
     KDbCursor *c = executeQuery(sql);
     if (!c)
         return list;

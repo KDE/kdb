@@ -49,7 +49,7 @@ public:
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
     virtual bool drv_createDatabase( const QString &dbName = QString() );
-    virtual bool drv_useDatabase( const QString &dbName = QString(), bool *cancelled = 0, 
+    virtual bool drv_useDatabase( const QString &dbName = QString(), bool *cancelled = 0,
       KDbMessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
