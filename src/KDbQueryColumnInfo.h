@@ -24,6 +24,7 @@
 
 #include <QVector>
 #include <QHash>
+#include <QString>
 
 class KDbField;
 
