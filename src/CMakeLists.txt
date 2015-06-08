@@ -47,7 +47,7 @@ set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
         COMPILE_FLAGS "-DYYERROR_VERBOSE=1 ${EXTRA_PARSER_COMPILE_FLAGS} "
 )
 set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
-set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cpp PROPERTIES GENERATED TRUE)
 
 set_source_files_properties(
     ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
@@ -77,7 +77,7 @@ set(kdb_LIB_SRCS
    KDbResult.cpp
    KDbConnectionData.cpp
    KDbVersionInfo.cpp
-   ${CMAKE_CURRENT_BINARY_DIR}/kdb/KDbConnectionData_sdc.cpp
+   ${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cpp
    KDbField.cpp
    KDbQuerySchemaParameter.cpp
    expression/KDbExpression.cpp
@@ -124,7 +124,7 @@ add_library(KDb SHARED ${kdb_LIB_SRCS})
 
 kdb_create_shared_data_classes(
     kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
-    kdb # subdirectory in which the headers should be generated
+    NO_PREFIX # subdirectory in which the headers should be generated
     KDbResult.shared.h
     KDbVersionInfo.shared.h
     KDbConnectionData.shared.h
@@ -328,10 +328,12 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS_FROM_BUILDDIR
     REQUIRED_HEADERS kdb_HEADERS_FROM_BUILDDIR
     ORIGINAL CAMELCASE
     PREFIX kdb
-    SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCE_DIR ${PROJECT_BINARY_DIR}/src
     HEADER_NAMES
         ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}
 )
+
+#message(STATUS "%%kdb_HEADERS_FROM_BUILDDIR ${kdb_HEADERS_FROM_BUILDDIR}")
 
 install(
     FILES
