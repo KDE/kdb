@@ -70,7 +70,7 @@ else()
       $ENV{MYSQL_DIR}/lib/mysql
       /usr/local/mysql/lib
       /opt/mysql/mysql/lib
-      PATH_SUFFIXES 
+      PATH_SUFFIXES
       mysql
    )
 endif()

@@ -35,7 +35,7 @@ typedef QSharedData Shared;
 
 /**
  * @class SharedPtr SharedPtr.h <KDbUtils::SharedPtr>
- * 
+ *
  * Can be used to control the lifetime of an object that has derived
  * QSharedData. As long a someone holds
  * a SharedPtr on some QSharedData object it won't become deleted but

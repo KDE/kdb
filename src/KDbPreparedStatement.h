@@ -98,7 +98,7 @@ public:
         QStringList whereFieldNames;
         const KDbField::List* fieldsForParameters; //!< fields where we'll put the inserted parameters
         KDbField::List* whereFields; //!< temporary, used for select statements, based on whereFieldNames
-        bool dirty; //!< true if the statement has to be internally 
+        bool dirty; //!< true if the statement has to be internally
                     //!< prepared (possible again) before calling executeInternal()
         KDbPreparedStatementInterface *iface;
     };

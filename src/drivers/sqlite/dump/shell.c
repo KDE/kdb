@@ -68,8 +68,8 @@ static sqlite3 *db = 0;
 static volatile int seenInterrupt = 0;
 
 /*
-** A global char* and an SQL function to access its current value 
-** from within an SQL statement. This program used to use the 
+** A global char* and an SQL function to access its current value
+** from within an SQL statement. This program used to use the
 ** sqlite_exec_printf() API to substitue a string into an SQL statement.
 ** The correct way to do this with sqlite3 is to use the bind API, but
 ** since the shell is built around the callback paradigm it would be a lot
@@ -159,7 +159,7 @@ static void shellLog(void *pArg, int iErrCode, const char *zMsg){
 ** added to zIn, and the result returned in memory obtained from malloc().
 ** zIn, if it was not NULL, is freed.
 **
-** If the third argument, quote, is not '\0', then it is used as a 
+** If the third argument, quote, is not '\0', then it is used as a
 ** quote character for zAppend.
 */
 static char *appendText(char *zIn, char const *zAppend, char quote){
@@ -255,7 +255,7 @@ static int dump_callback(void *pArg, int nArg, char **azArg, char **azCol){
   zTable = azArg[0];
   zType = azArg[1];
   zSql = azArg[2];
-  
+
   if( strcmp(zTable, "sqlite_sequence")==0 ){
     zPrepStmt = "DELETE FROM sqlite_sequence;\n";
   }else if( strcmp(zTable, "sqlite_stat1")==0 ){
@@ -285,7 +285,7 @@ static int dump_callback(void *pArg, int nArg, char **azArg, char **azCol){
     char *zTableInfo = 0;
     char *zTmp = 0;
     int nRow = 0;
-   
+
     zTableInfo = appendText(zTableInfo, "PRAGMA table_info(", 0);
     zTableInfo = appendText(zTableInfo, zTable, '"');
     zTableInfo = appendText(zTableInfo, ");", 0);
@@ -341,7 +341,7 @@ static int dump_callback(void *pArg, int nArg, char **azArg, char **azCol){
 ** "ORDER BY rowid DESC" to the end.
 */
 static int run_schema_dump_query(
-  struct callback_data *p, 
+  struct callback_data *p,
   const char *zQuery
 ){
   int rc;
@@ -384,7 +384,7 @@ static void open_db(struct callback_data *p){
           shellstaticFunc, 0, 0);
     }
     if( db==0 || SQLITE_OK!=sqlite3_errcode(db) ){
-      fprintf(stderr,"Error: unable to open database \"%s\": %s\n", 
+      fprintf(stderr,"Error: unable to open database \"%s\": %s\n",
           p->zDbFilename, sqlite3_errmsg(db));
       exit(1);
     }
@@ -454,7 +454,7 @@ static int do_meta_command(char *zLine, struct callback_data *p){
     p->nErr = 0;
 
   /* get table sizes */
-  rc = sqlite3_prepare(p->db, 
+  rc = sqlite3_prepare(p->db,
         "SELECT name FROM sqlite_master "
         "WHERE sql NOT NULL AND type=='table' AND name!='sqlite_sequence'", -1, &pSelect, 0);
   if( rc!=SQLITE_OK || !pSelect ){
@@ -480,7 +480,7 @@ static int do_meta_command(char *zLine, struct callback_data *p){
   }
 
   /* dump tables */
-  rc = sqlite3_prepare(p->db, 
+  rc = sqlite3_prepare(p->db,
         "SELECT name FROM sqlite_master "
         "WHERE sql NOT NULL AND type=='table' AND name!='sqlite_sequence'", -1, &pSelect, 0);
   if( rc!=SQLITE_OK || !pSelect ){
@@ -522,7 +522,7 @@ static int do_meta_command(char *zLine, struct callback_data *p){
     return 1;
   }
 
-  run_schema_dump_query(p, 
+  run_schema_dump_query(p,
     "SELECT name, type, sql FROM sqlite_master "
     "WHERE name=='sqlite_sequence'"
   );

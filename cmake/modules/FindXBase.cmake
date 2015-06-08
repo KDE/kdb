@@ -1,4 +1,4 @@
-# - Try to find the XBase library 
+# - Try to find the XBase library
 # Once done this will define
 #
 #  XBase_FOUND - system has XBase

@@ -354,7 +354,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         drivermanagerDebug() << lib.errorString();
         return 0;
     }
-    
+
     const uint* foundMajor = (const uint*)lib.resolve("version_major");
     if (!foundMajor) {
        m_result = KDbResult(ERR_DRIVERMANAGER,

@@ -11,12 +11,12 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_sybase_SRCS 
-   SybaseDriver.cpp 
-   SybaseConnection.cpp 
-   SybaseConnection_p.cpp 
-   SybaseCursor.cpp 
-   SybaseKeywords.cpp 
+set(predicate_sybase_SRCS
+   SybaseDriver.cpp
+   SybaseConnection.cpp
+   SybaseConnection_p.cpp
+   SybaseCursor.cpp
+   SybaseKeywords.cpp
    SybasePreparedStatement.cpp )
 
 

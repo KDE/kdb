@@ -82,7 +82,7 @@ public:
         Sorry = 4,
         Fatal = 5
     };
-    
+
     //! Question types
     enum QuestionType
     {

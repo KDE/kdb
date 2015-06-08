@@ -27,7 +27,7 @@
 using namespace std;
 
 extern "C" int shell_main(const char *inFilename);
-    
+
 void usage()
 {
     cout << KDB_SQLITE_DUMP_TOOL " version " KDB_VERSION_STRING << endl

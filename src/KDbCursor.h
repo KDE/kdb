@@ -47,7 +47,7 @@ class KDbRecordEditBuffer;
   moveNext(), moveNext(), movePrev() you are going through records: 1, 2, 3, 2.
 
   Cursor can be buffered or unbuferred.
-  
+
   @warning Buffered cursors are not implemented!
 
   Buffering in this class is not related to any SQL engine capatibilities for server-side cursors

@@ -55,10 +55,10 @@ endif()
 
 set(kdb_sqlite_SRCS
    sqlite_debug.cpp
-   SqliteConnection.cpp 
-   SqliteDriver.cpp 
-   SqliteCursor.cpp 
-   SqliteKeywords.cpp 
+   SqliteConnection.cpp
+   SqliteDriver.cpp
+   SqliteCursor.cpp
+   SqliteKeywords.cpp
    SqlitePreparedStatement.cpp
    SqliteAdmin.cpp
    SqliteAlter.cpp

@@ -742,7 +742,7 @@ WhereClause
     $$->whereExpr = *$1;
     delete $1;
     $$->orderByColumns = $4;
-} 
+}
 | ORDER BY OrderByClause WhereClause
 {
     kdbDebug() << "OrderByClause WhereClause";
@@ -1404,7 +1404,7 @@ aExpr
 //wait    $$->containsGroupingAggregate(true);
 //wait    globalParser->select()->grouped(true);
 }*/
-| DISTINCT '(' ColExpression ')' 
+| DISTINCT '(' ColExpression ')'
 {
     $$ = $3;
 //! @todo DISTINCT '(' ColExpression ')'

@@ -50,7 +50,7 @@ class xBaseCursor: public KDbCursor {
 
   protected:
     xBaseCursorData *d;
-  
+
   private:
     void init();
 

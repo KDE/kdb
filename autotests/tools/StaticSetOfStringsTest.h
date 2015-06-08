@@ -30,7 +30,7 @@ private Q_SLOTS:
     void initTestCase();
     void testContains();
     void cleanupTestCase();
-    
+
 private:
     static const char *keywords[];
     KDbUtils::StaticSetOfStrings strings;

@@ -36,14 +36,14 @@ class xBaseExportPrivate;
 class xBaseExport : public KDbObject
 {
   public:
-    
+
     void setData(KexiMigration::Data* migrateData);
 
-    //! Exports data 
+    //! Exports data
     bool performExport(Kexi::ObjectStatus* result = 0);
 
   protected:
-    
+
     xBaseExport();
 
     //! Connect to destination database
@@ -70,4 +70,4 @@ class xBaseExport : public KDbObject
   friend class KDbxBaseConnectionInternal;
 };
 
-#endif // 
+#endif //

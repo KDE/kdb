@@ -13,12 +13,12 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_mysql_SRCS 
-   MysqlDriver.cpp 
-   MysqlConnection.cpp 
-   MysqlConnection_p.cpp 
-   MysqlCursor.cpp 
-   MysqlKeywords.cpp 
+set(predicate_mysql_SRCS
+   MysqlDriver.cpp
+   MysqlConnection.cpp
+   MysqlConnection_p.cpp
+   MysqlCursor.cpp
+   MysqlKeywords.cpp
    MysqlPreparedStatement.cpp
 )
 

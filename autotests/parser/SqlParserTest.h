@@ -37,7 +37,7 @@ private Q_SLOTS:
     //! Tests a few tokens, they should have certain values, needed for maintaining BC
     void testTokens();
     void cleanupTestCase();
-    
+
 private:
     //! Opens database needed for tests.
     bool openDatabase(const QString &path);
