@@ -36,5 +36,6 @@ ecm_add_tests(
         kdbtestutils
 )
 
+add_subdirectory(headers)
 add_subdirectory(tools)
 add_subdirectory(parser)
