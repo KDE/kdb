@@ -743,7 +743,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
                 d->result.msg = tr("Record changing failed.") + QLatin1String("\n\n")
                                 + KDbTableViewData::messageYouCanImproveData();
 //! @todo set d->result.column if possible
-                KDb::getHTMLErrorMesage(*d->cursor, d->result.desc);
+                KDb::getHTMLErrorMesage(*d->cursor, &d->result.desc);
                 return false;
             }
         }

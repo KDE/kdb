@@ -117,12 +117,15 @@ def open_sdc():
 """
 def insert_fromMap_toMap_methods():
     global outfile, shared_class_name, toMap_impl, fromMap_impl
-    outfile.write("""    /*! @return map with saved attributes of the %s object. @see fromMap(). */
+    outfile.write("""    /*! @return map with saved attributes of the %s object.
+
+     @see %s(const QMap<QString, QString>&, bool *).
+    */
     QMap<QString, QString> toMap() const {
         return d->toMap();
     }
 
-""" % shared_class_name)
+""" % (shared_class_name, shared_class_name))
     open_sdc()
     outfile_sdc.write("""%s::Data::Data(const QMap<QString, QString>& map, bool *ok)
 {
@@ -190,7 +193,7 @@ def insert_generated_code():
 """)
     if shared_class_options['with_from_to_map']:
         outfile.write("""        /*! Constructor for Data object, takes attributes saved to map @a map.
-        If @a ok is not null, sets *ok to true on success and to false on failure. @see toMap(). */
+        If @a ok is not 0, *ok is set to true on success and to false on failure. @see toMap(). */
         Data(const QMap<QString, QString>& map, bool *ok);
 
         QMap<QString, QString> toMap() const;
@@ -506,7 +509,7 @@ def process():
 """ % (shared_class_name, shared_class_name, shared_class_name)
             if shared_class_options['with_from_to_map']:
                 main_ctor += """    /*! Constructor for %s object, takes attributes saved to map @a map.
-         If @a ok is not null, sets *ok to true on success and to false on failure. @see toMap(). */
+         If @a ok is not 0, sets *ok to true on success and to false on failure. @see toMap(). */
     %s(const QMap<QString, QString>& map, bool *ok)
      : d(new Data(map, ok))
     {

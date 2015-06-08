@@ -52,25 +52,27 @@
 
 using namespace KDbUtils;
 
-void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray& array)
+void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)
 {
-    QDataStream ds(&array, QIODevice::WriteOnly);
+    Q_ASSERT(array);
+    QDataStream ds(array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
 }
 
-void KDbUtils::serializeMap(const QMap<QString, QString>& map, QString& string)
+void KDbUtils::serializeMap(const QMap<QString, QString>& map, QString *string)
 {
+    Q_ASSERT(string);
     QByteArray array;
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
     kdbDebug() << array[3] << array[4] << array[5];
     const uint size = array.size();
-    string.clear();
-    string.reserve(size);
+    string->clear();
+    string->reserve(size);
     for (uint i = 0; i < size; i++) {
-        string[i] = QChar(ushort(array[i]) + 1);
+        (*string)[i] = QChar(ushort(array[i]) + 1);
     }
 }
 
@@ -106,16 +108,18 @@ QString KDbUtils::stringToFileName(const QString& string)
     return _string.simplified();
 }
 
-void KDbUtils::simpleCrypt(QString& string)
+void KDbUtils::simpleCrypt(QString *string)
 {
-    for (int i = 0; i < string.length(); i++)
-        string[i] = QChar(string[i].unicode() + 47 + i);
+    Q_ASSERT(string);
+    for (int i = 0; i < string->length(); i++)
+        (*string)[i] = QChar((*string)[i].unicode() + 47 + i);
 }
 
-void KDbUtils::simpleDecrypt(QString& string)
+void KDbUtils::simpleDecrypt(QString *string)
 {
-    for (int i = 0; i < string.length(); i++)
-        string[i] = QChar(string[i].unicode() - 47 - i);
+    Q_ASSERT(string);
+    for (int i = 0; i < string->length(); i++)
+        (*string)[i] = QChar((*string)[i].unicode() - 47 - i);
 }
 
 QString KDbUtils::ptrToStringInternal(void* ptr, uint size)

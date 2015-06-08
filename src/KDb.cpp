@@ -68,7 +68,7 @@ class ConnectionTestDialog : public QProgressDialog // krazy:exclude=qclasses
 {
     Q_OBJECT
 public:
-    ConnectionTestDialog(QWidget* parent, const KDbConnectionData& data, KDbMessageHandler& msgHandler);
+    ConnectionTestDialog(QWidget* parent, const KDbConnectionData& data, KDbMessageHandler* msgHandler);
     virtual ~ConnectionTestDialog();
 
     int exec();
@@ -111,7 +111,7 @@ void ConnectionTestThread::emitError(const KDbResultable& KDbResultable)
 {
     QString msg;
     QString details;
-    KDb::getHTMLErrorMesage(KDbResultable, msg, details);
+    KDb::getHTMLErrorMesage(KDbResultable, &msg, &details);
     emit error(msg, details);
 }
 
@@ -141,11 +141,11 @@ void ConnectionTestThread::run()
 
 ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         const KDbConnectionData& data,
-        KDbMessageHandler& msgHandler)
+        KDbMessageHandler* msgHandler)
         : QProgressDialog(parent)
         , m_thread(new ConnectionTestThread(this, data))
         , m_connData(data)
-        , m_msgHandler(&msgHandler)
+        , m_msgHandler(msgHandler)
         , m_elapsedTime(0)
         , m_error(false)
         , m_stopWaiting(false)
@@ -194,23 +194,29 @@ void ConnectionTestDialog::slotTimeout()
         kdbDebug() << "after reject";
         if (m_error) {
             kdbDebug() << "show?";
-            m_msgHandler->showErrorMessage(KDbMessageHandler::Sorry, m_msg, m_details);
+            if (m_msgHandler) {
+                m_msgHandler->showErrorMessage(KDbMessageHandler::Sorry, m_msg, m_details);
+            }
             kdbDebug() << "shown";
             m_error = false;
         } else if (notResponding) {
-            m_msgHandler->showErrorMessage(
-                KDbMessageHandler::Sorry,
-                QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
-                    .arg(m_connData.serverInfoString()),
-                QString(),
-                QObject::tr("Test Connection"));
+            if (m_msgHandler) {
+                m_msgHandler->showErrorMessage(
+                    KDbMessageHandler::Sorry,
+                    QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
+                        .arg(m_connData.serverInfoString()),
+                    QString(),
+                    QObject::tr("Test Connection"));
+            }
         } else {
-            m_msgHandler->showErrorMessage(
-                KDbMessageHandler::Information,
-                QObject::tr("Test connection to \"%1\" database server established successfully.")
-                    .arg(m_connData.serverInfoString()),
-                QString(),
-                tr("Test Connection"));
+            if (m_msgHandler) {
+                m_msgHandler->showErrorMessage(
+                    KDbMessageHandler::Information,
+                    QObject::tr("Test connection to \"%1\" database server established successfully.")
+                        .arg(m_connData.serverInfoString()),
+                    QString(),
+                    tr("Test Connection"));
+            }
         }
         return;
     }
@@ -369,25 +375,27 @@ KDbField::Type KDb::defaultTypeForGroup(KDbField::TypeGroup typeGroup)
     return (typeGroup <= KDbField::LastTypeGroup) ? KDb_typeCache->def_tlist.value(typeGroup) : KDbField::InvalidType;
 }
 
-void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString& msg, QString &details)
+void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QString *details)
 {
+    Q_ASSERT(msg);
+    Q_ASSERT(details);
     const KDbResult result(resultable.result());
     if (!result.isError())
         return;
     //lower level message is added to the details, if there is alread message specified
     if (!result.messageTitle().isEmpty())
-        msg += QLatin1String("<p>") + result.messageTitle();
+        *msg += QLatin1String("<p>") + result.messageTitle();
 
-    if (msg.isEmpty())
-        msg = QLatin1String("<p>") + result.message();
+    if (msg->isEmpty())
+        *msg = QLatin1String("<p>") + result.message();
     else
-        details += QLatin1String("<p>") + result.message();
+        *details += QLatin1String("<p>") + result.message();
 
     if (!result.serverMessage().isEmpty())
-        details += QLatin1String("<p><b>") + QObject::tr("Message from server:")
+        *details += QLatin1String("<p><b>") + QObject::tr("Message from server:")
                    + QLatin1String("</b> ") + result.serverMessage();
     if (!result.recentSQLString().isEmpty())
-        details += QLatin1String("<p><b>") + QObject::tr("SQL statement:")
+        *details += QLatin1String("<p><b>") + QObject::tr("SQL statement:")
                    + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
     int serverErrorCode;
     QString serverResultName;
@@ -395,40 +403,42 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString& msg, QStr
         serverErrorCode = result.serverErrorCode();
         serverResultName = resultable.serverResultName();
     }
-    if (   !details.isEmpty()
+    if (   !details->isEmpty()
         && (   !result.serverMessage().isEmpty()
             || !result.recentSQLString().isEmpty()
             || !serverResultName.isEmpty()
             || serverErrorCode != 0)
            )
     {
-        details += (QLatin1String("<p><b>") + QObject::tr("Server result code:")
+        *details += (QLatin1String("<p><b>") + QObject::tr("Server result code:")
                     + QLatin1String("</b> ") + QString::number(serverErrorCode));
         if (!serverResultName.isEmpty()) {
-            details += QString::fromLatin1(" (%1)").arg(serverResultName);
+            *details += QString::fromLatin1(" (%1)").arg(serverResultName);
         }
     }
     else {
         if (!serverResultName.isEmpty()) {
-            details += (QLatin1String("<p><b>") + QObject::tr("Server result:")
+            *details += (QLatin1String("<p><b>") + QObject::tr("Server result:")
                         + QLatin1String("</b> ") + serverResultName);
         }
     }
 
-    if (!details.isEmpty() && !details.startsWith(QLatin1String("<qt>"))) {
-        if (!details.startsWith(QLatin1String("<p>")))
-            details.prepend(QLatin1String("<p>"));
+    if (!details->isEmpty() && !details->startsWith(QLatin1String("<qt>"))) {
+        if (!details->startsWith(QLatin1String("<p>")))
+            details->prepend(QLatin1String("<p>"));
     }
 }
 
-void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString& msg)
+void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg)
 {
+    Q_ASSERT(msg);
     getHTMLErrorMesage(resultable, msg, msg);
 }
 
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info)
 {
-    getHTMLErrorMesage(resultable, info->msg, info->desc);
+    Q_ASSERT(info);
+    getHTMLErrorMesage(resultable, &info->msg, &info->desc);
 }
 
 int KDb::idForObjectName(KDbConnection* conn, const QString& objName, int objType)
@@ -448,7 +458,7 @@ int KDb::idForObjectName(KDbConnection* conn, const QString& objName, int objTyp
 //-----------------------------------------
 
 void KDb::connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
-                                     KDbMessageHandler& msgHandler)
+                               KDbMessageHandler* msgHandler)
 {
     ConnectionTestDialog dlg(parent, data, msgHandler);
     dlg.exec();
@@ -1501,23 +1511,25 @@ bool KDb::isDefaultValueAllowed(KDbField* field)
     return field && !field->isUniqueKey();
 }
 
-void KDb::getLimitsForType(KDbField::Type type, int &minValue, int &maxValue)
+void KDb::getLimitsForType(KDbField::Type type, int *minValue, int *maxValue)
 {
+    Q_ASSERT(minValue);
+    Q_ASSERT(maxValue);
     switch (type) {
     case KDbField::Byte:
 //! @todo always ok?
-        minValue = 0;
-        maxValue = 255;
+        *minValue = 0;
+        *maxValue = 255;
         break;
     case KDbField::ShortInteger:
-        minValue = -32768;
-        maxValue = 32767;
+        *minValue = -32768;
+        *maxValue = 32767;
         break;
     case KDbField::Integer:
     case KDbField::BigInteger: //cannot return anything larger
     default:
-        minValue = (int) - 0x07FFFFFFF;
-        maxValue = (int)(0x080000000 - 1);
+        *minValue = (int) - 0x07FFFFFFF;
+        *maxValue = (int)(0x080000000 - 1);
     }
 }
 

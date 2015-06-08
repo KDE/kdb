@@ -35,8 +35,8 @@
 
  It also offers error and warning messages for check() method.
  You may need to reimplement:
- -  QValidator::State validate( QString& input, int& pos ) const;
- -  Result check(const QString &valueName, QVariant v, QString &message, QString &details);
+ -  QValidator::State validate(QString& input, int& pos) const
+ -  Result check(const QString &valueName, const QVariant &v, QString *message, QString *details)
  */
 class KDB_EXPORT KDbValidator : public QValidator
 {
