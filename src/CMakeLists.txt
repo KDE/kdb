@@ -241,6 +241,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
     PREFIX kdb
     HEADER_NAMES
         KDb
+        KDbGlobal
         KDbAdmin
         KDbAlter
         KDbConnection
