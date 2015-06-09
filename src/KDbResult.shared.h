@@ -25,6 +25,7 @@
 #include "KDbEscapedString.h"
 
 class KDbMessageHandler;
+class KDbMessageTitleSetter;
 
 /*! Stores detailed information about result of recent operation.
 */
@@ -176,6 +177,7 @@ public:
     virtual QString serverResultName() const;
 
 protected:
+    friend class KDbMessageTitleSetter;
     KDbResult m_result;
 };
 

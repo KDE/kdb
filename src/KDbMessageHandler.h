@@ -31,6 +31,7 @@
 #include "kdb_export.h"
 
 class KDbResult;
+class KDbResultable;
 
 /*! Helper for setting temporary message title for an KDbResult object.
  Message title is a text prepended to error or warning messages.
@@ -44,6 +45,7 @@ class KDB_EXPORT KDbMessageTitleSetter
 {
 public:
     explicit KDbMessageTitleSetter(KDbResult* result, const QString& message = QString());
+    explicit KDbMessageTitleSetter(KDbResultable* resultable, const QString& message = QString());
     ~KDbMessageTitleSetter();
 
 protected:

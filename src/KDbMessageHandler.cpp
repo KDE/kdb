@@ -28,6 +28,13 @@ KDbMessageTitleSetter::KDbMessageTitleSetter(KDbResult* result, const QString& m
     m_result->setMessageTitle(message);
 }
 
+KDbMessageTitleSetter::KDbMessageTitleSetter(KDbResultable* resultable, const QString& message)
+        : m_result(&resultable->m_result)
+        , m_prevMsgTitle(resultable->result().messageTitle())
+{
+    m_result->setMessageTitle(message);
+}
+
 KDbMessageTitleSetter::~KDbMessageTitleSetter()
 {
     m_result->setMessageTitle(m_prevMsgTitle);
