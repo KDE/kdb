@@ -50,6 +50,9 @@ bool KDbConnectionData::passwordNeeded() const
 {
     KDbDriverManager mananager;
     const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
+    if (!metaData) {
+        return false;
+    }
     const bool fileBased = metaData->isValid() && metaData->isFileBased();
 
     return !d->savePassword && !fileBased; //!< @todo temp.: change this if there are

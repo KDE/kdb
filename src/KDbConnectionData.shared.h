@@ -202,7 +202,10 @@ public:
 
     /*!
     @return true if password is needed for performing connection.
-    The password has to be provided by the user. */
+    The password has to be provided by the user.
+    @note This method needs information about driver ID; it returns false if driverId()
+          does not return a valid ID.
+    */
     bool passwordNeeded() const;
 };
 
