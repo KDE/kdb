@@ -28,7 +28,7 @@
  table schema or query schema.
  Default type of object is KDb::UnknownObjectType.
 */
-shared class export=KDB_EXPORT KDbObject
+shared class export=KDB_EXPORT operator== KDbObject
 {
 public:
     /*!

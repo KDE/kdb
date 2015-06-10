@@ -31,7 +31,7 @@
 
  KDbConnection data, once configured, can be later stored for reuse.
 */
-shared class export=KDB_EXPORT KDbConnectionData with_from_to_map
+shared class export=KDB_EXPORT with_from_to_map operator== KDbConnectionData
 {
 public:
     /*!

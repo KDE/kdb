@@ -29,7 +29,7 @@ class KDbMessageTitleSetter;
 
 /*! Stores detailed information about result of recent operation.
 */
-shared class export=KDB_EXPORT virtual_dtor KDbResult
+shared class export=KDB_EXPORT virtual_dtor operator== KDbResult
 {
 public:
     /*!
