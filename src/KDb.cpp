@@ -152,7 +152,7 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
 {
     setWindowTitle(tr("Test Connection"));
     setLabelText(tr("Testing connection to \"%1\" database server...")
-                 .arg(data.serverInfoString()));
+                 .arg(data.toUserVisibleString()));
     setModal(true);
     setRange(0, 0); //to show busy indicator
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(slotTimeout()));
@@ -204,7 +204,7 @@ void ConnectionTestDialog::slotTimeout()
                 m_msgHandler->showErrorMessage(
                     KDbMessageHandler::Sorry,
                     QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
-                        .arg(m_connData.serverInfoString()),
+                        .arg(m_connData.toUserVisibleString()),
                     QString(),
                     QObject::tr("Test Connection"));
             }
@@ -213,7 +213,7 @@ void ConnectionTestDialog::slotTimeout()
                 m_msgHandler->showErrorMessage(
                     KDbMessageHandler::Information,
                     QObject::tr("Test connection to \"%1\" database server established successfully.")
-                        .arg(m_connData.serverInfoString()),
+                        .arg(m_connData.toUserVisibleString()),
                     QString(),
                     tr("Test Connection"));
             }

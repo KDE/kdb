@@ -27,21 +27,17 @@ KDbConnectionData::~KDbConnectionData()
 {
 }
 
-QString KDbConnectionData::serverInfoString(ServerInfoStringOptions options) const
+QString KDbConnectionData::toUserVisibleString(UserVisibleStringOptions options) const
 {
-    if (!d->driverId.isEmpty()) {
-        KDbDriverManager mananager;
-        const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
-        if (metaData->isValid() && metaData->isFileBased()) {
-            if (d->databaseName.isEmpty()) {
-                return QObject::tr("<file>");
-            }
-            else {
-                return QObject::tr("file: %1").arg(d->databaseName);
-            }
+    KDbDriverManager mananager;
+    const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
+    if (!metaData /* default is file */ || (metaData->isValid() && metaData->isFileBased())) {
+        if (d->databaseName.isEmpty()) {
+            return QObject::tr("<file>");
         }
+        return QObject::tr("file: %1").arg(d->databaseName);
     }
-    return ((d->userName.isEmpty() || !(options & AddUserToServerInfoString)) ? QString() : (d->userName + QLatin1Char('@')))
+    return ((d->userName.isEmpty() || !(options & AddUserToUserVisibleString)) ? QString() : (d->userName + QLatin1Char('@')))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
            + (d->port != 0 ? (QLatin1Char(':') + QString::number(d->port)) : QString());
 }

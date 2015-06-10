@@ -178,27 +178,31 @@ public:
     QString serverName;
 #endif
 
-    enum ServerInfoStringOption {
-        NoServerInfoStringOptions = 0x0,
-        AddUserToServerInfoString = 0x1
+    //! Used in toUserVisibleString()
+    enum UserVisibleStringOption {
+        NoUserVisibleStringOption = 0x0,
+        AddUserToUserVisibleString = 0x1
     };
-    Q_DECLARE_FLAGS(ServerInfoStringOptions, ServerInfoStringOption)
+    Q_DECLARE_FLAGS(UserVisibleStringOptions, UserVisibleStringOption)
 
     /*!
-    @brief  A user-friendly string for the server
+    @return A user-visible string for the connection data
 
-    @return a user-friendly string like:
+    driverId() is used to know if driver handles server connections. If it's not possible
+    to check the driver, defaults to "file" connection.
+
+    Example strings:
      - "myhost.org:12345" if a host and port is specified;
-     - "localhost:12345" of only port is specified;
-     - "user@myhost.org:12345" if also user is specified
-     - "<file>" if file-based driver is assigned but no filename is assigned
-       to the databaseName attribute
-     - "file: pathto/mydb.kexi" if file-based driver is assigned and filename
-       is assigned to the databaseName attribute
+     - "localhost:12345" if only a port and server-based driver is specified;
+     - "user@myhost.org:12345" if user is specified too
+     - "<file>" if a file-based driver is specified but no filename in the databaseName attribute
+     - "file: pathto/mydb.kexi" if a file-based driver is specified and filename
+       is specified in the databaseName attribute
+     - "<file>" if the driver is unknown or not specified and no databaseName is specified
 
-     User's name is added if @a options & AddUserToServerInfoString is true (the default).
+     User name is added if (@a options & AddUserToUserVisibleString) is true (the default).
     */
-    QString serverInfoString(ServerInfoStringOptions options = AddUserToServerInfoString) const;
+    QString toUserVisibleString(UserVisibleStringOptions options = AddUserToUserVisibleString) const;
 
     /*!
     @return true if password is needed for performing connection.
@@ -209,8 +213,7 @@ public:
     bool passwordNeeded() const;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnectionData::ServerInfoStringOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnectionData::UserVisibleStringOptions)
 
-typedef QList<KDbConnectionData> KDbConnectionDataList;
 
 #endif
