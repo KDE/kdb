@@ -65,6 +65,7 @@ public:
     bool isEmpty() const { return QHash<QByteArray, QVariant>::isEmpty(); }
     QVariant property(const QByteArray& name, const QVariant& defaultValue = QVariant()) const
         { return value(name, defaultValue); }
+    bool hasProperty(const QByteArray& name) const { return contains(name); }
     QList<QByteArray> propertyNames() const { return keys(); }
     void clear() { QHash<QByteArray, QVariant>::clear(); }
 };
