@@ -26,6 +26,7 @@
 /*! Provides common attributes for KDb objects: id, name, caption,
  help text. A KDb object is typically storable in database, for example:
  table schema or query schema.
+ Default type of object is KDb::UnknownObjectType.
 */
 shared class export=KDB_EXPORT KDbObject
 {
@@ -98,10 +99,8 @@ public:
         return d->caption.isEmpty() ? d->name : d->caption;
     }
 
-    /*!
-    Creates new object of type @a type.
-    */
-    explicit KDbObject(int type = KDb::UnknownObjectType);
+    //! Creates new object of type @a type. */
+    explicit KDbObject(int type);
 
 protected:
     //! Clears all properties except 'type'.
