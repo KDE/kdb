@@ -21,16 +21,20 @@
 
 #include <QStringList>
 
+static bool isTrue(KPluginMetaData *metaData, const char* fieldName)
+{
+    return 0 == metaData->value(QLatin1String(fieldName))
+                .compare(QLatin1String("true"), Qt::CaseInsensitive);
+}
+
 class KDbDriverMetaData::Private
 {
 public:
     Private(KDbDriverMetaData *metaData)
     {
         mimeTypes = metaData->value(QLatin1String("MimeType")).split(QLatin1Char(';'));
-        fileBased = 0 == metaData->value(QLatin1String("X-KDb-FileBased"))
-                        .compare(QLatin1String("true"), Qt::CaseInsensitive);
-        importingEnabled = 0 == metaData->value(QLatin1String("X-KDb-ImportingEnabled"))
-                        .compare(QLatin1String("true"), Qt::CaseInsensitive);
+        fileBased = isTrue(metaData, "X-KDb-FileBased");
+        importingEnabled = isTrue(metaData, "X-KDb-ImportingEnabled");
     }
 
     QStringList mimeTypes;
