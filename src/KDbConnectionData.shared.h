@@ -35,6 +35,25 @@ shared class export=KDB_EXPORT KDbConnectionData with_from_to_map
 public:
     /*!
     @getter
+    @return database name
+
+    Optional attribute explicitly providing database name.
+    If not empty, the database driver will attempt to use the database
+    (e.g. with "USE DATABASE" SQL statement).
+
+    For file-based database engines like SQLite, the database name is equal to filename
+    (absolute or relative) that should be open. In this case hostName and port is unused.
+
+    Can be empty, in which case if database name is required by the connection,
+    after connecting KDbConnection::useDatabase() should be called.
+
+    @setter
+    Explicitly sets database name.
+    */
+    data_member QString databaseName;
+
+    /*!
+    @getter
     @return caption of the connection
     Captions are optional for identyfying given connection by name eg. for users.
     @setter
@@ -64,6 +83,15 @@ public:
     Sets identifier of the driver to use
     */
     data_member QString driverId;
+
+    /*!
+    @getter
+    @return username used for creating connections
+    Can be empty.
+    @setter
+    Sets username used for creating connections
+    */
+    data_member QString userName;
 
     /*!
     @getter
@@ -132,34 +160,6 @@ public:
     in a configuration file for later use
     */
     data_member bool savePassword default=false;
-
-    /*!
-    @getter
-    @return username used for creating connections
-    Can be empty.
-    @setter
-    Sets username used for creating connections
-    */
-    data_member QString userName;
-
-    /*!
-    @getter
-    @return database name
-
-    Optional attribute explicitly providing database name.
-    If not empty, the database driver will attempt to use the database
-    (e.g. with "USE DATABASE" SQL statement).
-
-    For file-based database engines like SQLite, the database name is equal to filename
-    (absolute or relative) that should be open. In this case hostName and port is unused.
-
-    Can be empty, in which case if database name is required by the connection,
-    after connecting KDbConnection::useDatabase() should be called.
-
-    @setter
-    Explicitly sets database name.
-    */
-    data_member QString databaseName;
 
 #if 0
     /*!
