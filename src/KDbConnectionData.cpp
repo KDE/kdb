@@ -54,3 +54,27 @@ bool KDbConnectionData::passwordNeeded() const
     return !d->savePassword && !fileBased; //!< @todo temp.: change this if there are
                                            //!< file-based drivers requiring a password
 }
+
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbConnectionData& data)
+{
+    dbg.nospace() << "CONNDATA";
+    KDbDriverManager mananager;
+    const KDbDriverMetaData *metaData = mananager.driverMetaData(data.driverId());
+    dbg.nospace()
+        << " databaseName=" << data.databaseName()
+        << " caption=" << data.caption()
+        << " description=" << data.description()
+        << " driverId=" << data.driverId()
+        << " userName=" << data.userName()
+        << " hostName=" << data.hostName()
+        << " port=" << data.port()
+        << " useLocalSocketFile=" << data.useLocalSocketFile()
+        << " localSocketFileName=" << data.localSocketFileName()
+        << " password=" << QString::fromLatin1("*").repeated(data.password().length()) /* security */
+        << " savePassword=" << data.savePassword()
+        << " passwordNeeded=" <<
+           (metaData ? QString::number(data.passwordNeeded())
+                     : QString::fromLatin1("[don't know, no valid driverId]")).toLatin1().constData()
+        << " userVisibleString=" << data.toUserVisibleString();
+    return dbg.nospace();
+}

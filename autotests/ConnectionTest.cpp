@@ -62,6 +62,8 @@ void ConnectionTest::testCreateDb()
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(db_name);
+    qDebug() << cdata;
+
     KDbConnectionOptions connOptions;
     QStringList extraSqliteExtensionPaths;
     extraSqliteExtensionPaths << SQLITE_ICU_EXTENSION_PATH;

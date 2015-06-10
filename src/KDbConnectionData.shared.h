@@ -25,6 +25,7 @@
 #include <QMap>
 #include <QString>
 #include <QSharedData>
+#include <QDebug>
 
 /*! @brief Database specific connection data, e.g. host, port.
 
@@ -215,5 +216,7 @@ public:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnectionData::UserVisibleStringOptions)
 
+//! Sends information about connection data @a data to debug output @a dbg.
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbConnectionData& data);
 
 #endif
