@@ -263,6 +263,12 @@ public:
     inline KDbTableViewDataConstIterator constEnd() const {
         return KDbTableViewDataBase::constEnd();
     }
+    inline KDbTableViewDataIterator begin() {
+        return KDbTableViewDataBase::begin();
+    }
+    inline KDbTableViewDataIterator end() {
+        return KDbTableViewDataBase::end();
+    }
 
     /*! @return true if ROWID information is stored within every record.
      Only reasonable for db-aware version. ROWID information is available
