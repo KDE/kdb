@@ -265,6 +265,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbRecordEditBuffer
         KDbRelationship
         KDbTableSchema
+        KDbTableOrQuerySchema
         KDbTransaction
 )
 

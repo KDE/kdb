@@ -42,6 +42,7 @@ KDbRecordDataHeaderTest.cpp
 KDbRecordEditBufferHeaderTest.cpp
 KDbRelationshipHeaderTest.cpp
 KDbResultHeaderTest.cpp
+KDbTableOrQuerySchemaHeaderTest.cpp
 KDbTableSchemaHeaderTest.cpp
 KDbTableViewColumnHeaderTest.cpp
 KDbTableViewDataHeaderTest.cpp
