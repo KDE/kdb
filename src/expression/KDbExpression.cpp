@@ -70,8 +70,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbExpression& expr)
 //=========================================
 
 KDbExpressionData::KDbExpressionData()
-: token(0)
-, expressionClass(KDb::UnknownExpression)
+    : expressionClass(KDb::UnknownExpression)
 {
     //ExpressionDebug << "KDbExpressionData" << ref;
 }
@@ -172,13 +171,6 @@ bool KDbExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expressio
     return true;
 }
 
-QString KDbExpressionData::tokenToString() const
-{
-    if (token < 255 && isprint(token))
-        return KDbExpression::tokenToDebugString(token);
-    return QString();
-}
-
 KDbEscapedString KDbExpressionData::toString(KDbQuerySchemaParameterValueListIterator* params) const
 {
     KDb::ExpressionCallStack callStack;
@@ -215,7 +207,7 @@ bool KDbExpressionData::addToCallStack(QDebug *dbg, QList<const KDbExpressionDat
         if (dbg)
             dbg->nospace() << "<CYCLE!>";
         qCWarning(KDB_LOG) << "Cycle detected in"
-            << expressionClassName(expressionClass) << KDbExpression::tokenToDebugString(token);
+            << expressionClassName(expressionClass) << token.value();
         return false;
     }
     callStack->append(this);
@@ -242,7 +234,7 @@ void KDbExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* call
 {
     Q_UNUSED(callStack);
     dbg.nospace() << QString::fromLatin1("Exp(%1,type=%2)")
-                   .arg(token).arg(KDbDriver::defaultSQLTypeName(type()));
+                   .arg(token.value()).arg(KDbDriver::defaultSQLTypeName(type()));
 }
 
 //=========================================
@@ -253,7 +245,7 @@ KDbExpression::KDbExpression()
     ExpressionDebug << "KDbExpression ctor ()" << *this << d->ref;
 }
 
-KDbExpression::KDbExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, int token)
+KDbExpression::KDbExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, KDbToken token)
     : d(data)
 {
     d->expressionClass = aClass;
@@ -289,12 +281,12 @@ KDbExpression KDbExpression::clone() const
     return KDbExpression(d->clone());
 }
 
-int KDbExpression::token() const
+KDbToken KDbExpression::token() const
 {
     return d->token;
 }
 
-void KDbExpression::setToken(int token)
+void KDbExpression::setToken(KDbToken token)
 {
     d->token = token;
 }
@@ -312,18 +304,6 @@ void KDbExpression::setExpressionClass(KDb::ExpressionClass aClass)
 bool KDbExpression::validate(KDbParseInfo *parseInfo)
 {
     return d->validate(parseInfo);
-}
-
-// static
-QString KDbExpression::tokenToDebugString(int token)
-{
-    if (token < 254) {
-        if (isprint(token))
-            return QString(QLatin1Char(uchar(token)));
-        else
-            return QString::number(token);
-    }
-    return QLatin1String(tokenName(token));
 }
 
 KDbField::Type KDbExpression::type() const
@@ -359,11 +339,6 @@ bool KDbExpression::isFPNumericType() const
 bool KDbExpression::isDateTimeType() const
 {
     return d->isDateTimeType();
-}
-
-QString KDbExpression::tokenToString() const
-{
-    return d->tokenToString();
 }
 
 KDbExpression KDbExpression::parent() const
@@ -594,9 +569,9 @@ void KDbExpression::setLeftOrRight(const KDbExpression& e, int index)
 }
 
 // static
-KDb::ExpressionClass KDbExpression::classForToken(int token)
+KDb::ExpressionClass KDbExpression::classForToken(KDbToken token)
 {
-    switch (token) {
+    switch (token.value()) {
     case '+':
     case '-':
     case '*':

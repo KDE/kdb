@@ -47,7 +47,7 @@ KDbUnaryExpressionData* KDbUnaryExpressionData::clone()
 void KDbUnaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
 {
     dbg.nospace() << "UnaryExp("
-           << KDbExpression::tokenToDebugString(token) << ",";
+           << token << ",";
     if (children.isEmpty()) {
         dbg.nospace() << "<NONE>";
     }
@@ -69,23 +69,22 @@ KDbEscapedString KDbUnaryExpressionData::toStringInternal(KDbQuerySchemaParamete
 {
     Q_UNUSED(callStack);
     ExplicitlySharedExpressionDataPointer a = arg();
+    KDbEscapedString aString = a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>");
     if (token == '(') { //parentheses (special case)
-        return "(" + (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>")) + ")";
+        return "(" + aString + ")";
     }
-    if (token < 255 && isprint(token)) {
-        return KDbExpression::tokenToDebugString(token)
-                + (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>"));
+    if (token.toChar() > 0) {
+        return token.toString() + aString;
     }
-    switch (token) {
+    switch (token.value()) {
     case NOT:
-        return "NOT " + (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>"));
+        return "NOT " + aString;
     case SQL_IS_NULL:
-        return (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>")) + " IS NULL";
+        return aString + " IS NULL";
     case SQL_IS_NOT_NULL:
-        return (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>")) + " IS NOT NULL";
+        return aString + " IS NOT NULL";
     }
-    return KDbEscapedString("{INVALID_OPERATOR#%1} ")
-        .arg(token) + (a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>"));
+    return KDbEscapedString("%1 %2").arg(token.toString()).arg(aString);
 }
 
 void KDbUnaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
@@ -106,7 +105,7 @@ KDbField::Type KDbUnaryExpressionData::typeInternal(KDb::ExpressionCallStack* ca
 
     //NULL IS NOT NULL : BOOLEAN
     //NULL IS NULL : BOOLEAN
-    switch (token) {
+    switch (token.value()) {
     case SQL_IS_NULL:
     case SQL_IS_NOT_NULL:
         return KDbField::Boolean;
@@ -115,9 +114,9 @@ KDbField::Type KDbUnaryExpressionData::typeInternal(KDb::ExpressionCallStack* ca
     const KDbField::Type t = a->type(callStack);
     if (t == KDbField::Null)
         return KDbField::Null;
-    if (token == NOT)
-        return KDbField::Boolean;
-
+    if (token == KDbToken::NOT) {
+        return t == KDbField::Boolean ? KDbField::Boolean : KDbField::InvalidType;
+    }
     return t;
 }
 
@@ -171,7 +170,7 @@ KDbUnaryExpression::KDbUnaryExpression()
     ExpressionDebug << "KDbUnaryExpression() ctor" << *this;
 }
 
-KDbUnaryExpression::KDbUnaryExpression(int token, const KDbExpression& arg)
+KDbUnaryExpression::KDbUnaryExpression(KDbToken token, const KDbExpression& arg)
         : KDbExpression(new KDbUnaryExpressionData, KDb::UnaryExpression, token)
 {
     appendChild(arg.d);

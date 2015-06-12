@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -85,23 +85,59 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
     const KDbField::TypeGroup rtGroup = KDbField::typeGroup(rt);
 
     if (ltNull || rtNull) {
-        switch (token) {
-        case OR: // NULL OR something == something
-            if (ltNull) {
-                return rtBool ? KDbField::Boolean : KDbField::InvalidType;
+        switch (token.value()) {
+        //! @todo add general support, e.g. for "NULL AND (1 == 1)"; for now we only support
+        //! constants because there's no evaluation and operations with NULL depend on whether we have TRUE or FALSE
+        //! See http://www.postgresql.org/docs/9.4/static/functions-logical.html
+        //!     https://dev.mysql.com/doc/refman/5.0/en/logical-operators.html
+        case OR: {
+            const KDbConstExpressionData *leftConst = left()->convertConst<KDbConstExpressionData>();
+            const KDbConstExpressionData *rightConst = right()->convertConst<KDbConstExpressionData>();
+            if ((ltBool && leftConst && leftConst->value.toBool())       // true OR NULL is true
+                || (rtBool && rightConst && rightConst->value.toBool())) // NULL OR true is true
+            {
+                return KDbField::Boolean;
             }
-            else if (rtNull) {
-                return ltBool ? KDbField::Boolean : KDbField::InvalidType;
+            else if ((ltBool && leftConst && !leftConst->value.toBool())  // false OR NULL is NULL
+                     || (rtBool && rightConst && !rightConst->value.toBool())) // NULL OR false is true
+            {
+                return KDbField::Null;
             }
+            break;
+        }
+        case AND: {
+            const KDbConstExpressionData *leftConst = left()->convertConst<KDbConstExpressionData>();
+            const KDbConstExpressionData *rightConst = right()->convertConst<KDbConstExpressionData>();
+            if ((ltBool && leftConst && !leftConst->value.toBool())       // false AND NULL is false
+                || (rtBool && rightConst && !rightConst->value.toBool())) // NULL AND false is false
+            {
+                return KDbField::Boolean;
+            }
+            else if ((ltBool && leftConst && leftConst->value.toBool())       // true AND NULL is NULL
+                     || (rtBool && rightConst && rightConst->value.toBool())) // NULL AND true is NULL
+            {
+                return KDbField::Null;
+            }
+            break;
+        }
+        case XOR: {// Logical XOR. Returns NULL if either operand is NULL. For non-NULL operands,
+                   // evaluates to 1 if an odd number of operands is nonzero, otherwise 0 is returned.
+                   // a XOR b is mathematically equal to (a AND (NOT b)) OR ((NOT a) and b).
+                   // https://dev.mysql.com/doc/refman/5.0/en/logical-operators.html#operator_xor
+            return KDbField::Null;
+        }
         default:
             return KDbField::Null;
         }
     }
 
-    switch (token) {
+    switch (token.value()) {
     case OR:
     case AND:
     case XOR:
+        if (ltNull && rtNull) {
+            return KDbField::Null;
+        }
         return (ltBool && rtBool) ? KDbField::Boolean : KDbField::InvalidType;
     case CONCATENATION:
         if (lt == KDbField::Text && rt == KDbField::Text) {
@@ -150,7 +186,7 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
             return t;
         }
 
-        switch (token) {
+        switch (token.value()) {
         case '&':
         case BITWISE_SHIFT_RIGHT:
         case BITWISE_SHIFT_LEFT:
@@ -193,7 +229,7 @@ void KDbBinaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack
     else {
         dbg.nospace() << "<NONE>";
     }
-    dbg.nospace() << "," << KDbExpression::tokenToDebugString(token) << ",";
+    dbg.nospace() << "," << token << ",";
     if (children.count() == 2 && right().constData()) {
         right()->debug(dbg, callStack);
     }
@@ -203,44 +239,13 @@ void KDbBinaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack
     dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
 }
 
-QString KDbBinaryExpressionData::tokenToString() const
-{
-    if (token < 255 && isprint(token))
-        return KDbExpression::tokenToDebugString(token);
-    // other arithmetic operations: << >>
-    switch (token) {
-    case BITWISE_SHIFT_RIGHT: return QLatin1String(">>");
-    case BITWISE_SHIFT_LEFT: return QLatin1String("<<");
-        // other relational operations: <= >= <> (or !=) LIKE IN
-    case NOT_EQUAL: return QLatin1String("<>");
-    case NOT_EQUAL2: return QLatin1String("!=");
-    case LESS_OR_EQUAL: return QLatin1String("<=");
-    case GREATER_OR_EQUAL: return QLatin1String(">=");
-    case LIKE: return QLatin1String("LIKE");
-    case NOT_LIKE: return QLatin1String("NOT LIKE");
-    case SQL_IN: return QLatin1String("IN");
-        // other logical operations: OR (or ||) AND (or &&) XOR
-    case SIMILAR_TO: return QLatin1String("SIMILAR TO");
-    case NOT_SIMILAR_TO: return QLatin1String("NOT SIMILAR TO");
-    case OR: return QLatin1String("OR");
-    case AND: return QLatin1String("AND");
-    case XOR: return QLatin1String("XOR");
-        // other string operations: || (as CONCATENATION)
-    case CONCATENATION: return QLatin1String("||");
-        // SpecialBinary "pseudo operators":
-        /* not handled here */
-    default:;
-    }
-    return QString::fromLatin1("{INVALID_BINARY_OPERATOR#%1} ").arg(token);
-}
-
 KDbEscapedString KDbBinaryExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                     KDb::ExpressionCallStack* callStack) const
+                                                           KDb::ExpressionCallStack* callStack) const
 {
 #define INFIX(a) \
     (left().constData() ? left()->toString(params, callStack) : KDbEscapedString("<NULL>")) \
     + " " + a + " " + (right().constData() ? right()->toString(params, callStack) : KDbEscapedString("<NULL>"))
-    return INFIX(tokenToString());
+    return INFIX(token.toString());
 #undef INFIX
 }
 
@@ -264,8 +269,8 @@ ExplicitlySharedExpressionDataPointer KDbBinaryExpressionData::right() const
 //=========================================
 
 static KDb::ExpressionClass classForArgs(const KDbExpression& leftExpr,
-                                    int token,
-                                    const KDbExpression& rightExpr)
+                                         KDbToken token,
+                                         const KDbExpression& rightExpr)
 {
     if (leftExpr.isNull()) {
         qCWarning(KDB_LOG) << "KDbBinaryExpression set to null because left argument is not specified";
@@ -285,8 +290,8 @@ KDbBinaryExpression::KDbBinaryExpression()
 }
 
 KDbBinaryExpression::KDbBinaryExpression(const KDbExpression& leftExpr,
-                                   int token,
-                                   const KDbExpression& rightExpr)
+                                         KDbToken token,
+                                         const KDbExpression& rightExpr)
     : KDbExpression(new KDbBinaryExpressionData, classForArgs(leftExpr, token, rightExpr), token)
 {
     if (!isNull()) {

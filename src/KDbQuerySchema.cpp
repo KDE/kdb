@@ -1403,7 +1403,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                             QString::fromLatin1("[multiple_visible_fields_%1]")
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
-                            KDbConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                            KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                         if (!d->ownedVisibleColumns) {
                             d->ownedVisibleColumns = new KDbField::List();
                         }
@@ -1460,7 +1460,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                         QString::fromLatin1("[multiple_visible_fields_%1]")
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
-                        KDbConstExpression(CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
+                        KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
                     if (!d->ownedVisibleColumns) {
                         d->ownedVisibleColumns = new KDbField::List();
                     }
@@ -1776,17 +1776,17 @@ void KDbQuerySchema::setWhereExpression(const KDbExpression& expr)
 }
 
 void KDbQuerySchema::addToWhereExpression(KDbField *field,
-                                       const QVariant& value, int relation)
+                                          const QVariant& value, KDbToken relation)
 {
-    int token;
+    KDbToken token;
     if (value.isNull())
-        token = SQL_NULL;
+        token = KDbToken::SQL_NULL;
     else if (field->isIntegerType()) {
-        token = INTEGER_CONST;
+        token = KDbToken::INTEGER_CONST;
     } else if (field->isFPNumericType()) {
-        token = REAL_CONST;
+        token = KDbToken::REAL_CONST;
     } else {
-        token = CHARACTER_STRING_LITERAL;
+        token = KDbToken::CHARACTER_STRING_LITERAL;
 //! @todo date, time
     }
 
@@ -1801,7 +1801,7 @@ void KDbQuerySchema::addToWhereExpression(KDbField *field,
     else {
         d->whereExpr = KDbBinaryExpression(
             d->whereExpr,
-            AND,
+            KDbToken::AND,
             newExpr
         );
     }

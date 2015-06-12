@@ -27,6 +27,8 @@ add_custom_command(
         ${PARSER_SOURCE_DIR}/generated/sqlparser.h
         ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
         ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
+        ${PARSER_SOURCE_DIR}/generated/KDbToken.h
+        ${PARSER_SOURCE_DIR}/generated/KDbToken.cpp
     COMMENT "Creating parser/lexer files"
 )
 
@@ -59,6 +61,7 @@ set_source_files_properties(
 set(kdb_LIB_SRCS
    parser/generated/sqlscanner.cpp
    parser/generated/sqlparser.cpp
+   parser/generated/KDbToken.cpp
    parser/KDbParser.cpp
    parser/KDbParser_p.cpp
 
@@ -295,6 +298,15 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
     RELATIVE parser
     HEADER_NAMES
         KDbParser
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    PREFIX kdb
+    RELATIVE parser/generated
+    HEADER_NAMES
+        KDbToken
 )
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS

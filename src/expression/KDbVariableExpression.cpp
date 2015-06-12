@@ -253,7 +253,7 @@ KDbVariableExpression::KDbVariableExpression()
 
 KDbVariableExpression::KDbVariableExpression(const QString& name)
         : KDbExpression(new KDbVariableExpressionData(name),
-              KDb::VariableExpression, 0/*undefined*/)
+              KDb::VariableExpression, KDbToken()/*undefined*/)
 {
 }
 

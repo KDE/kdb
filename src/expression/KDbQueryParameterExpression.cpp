@@ -98,7 +98,7 @@ KDbQueryParameterExpression::KDbQueryParameterExpression()
 
 KDbQueryParameterExpression::KDbQueryParameterExpression(const QString& message)
         : KDbConstExpression(new KDbQueryParameterExpressionData(KDbField::Text, message),
-              KDb::QueryParameterExpression, QUERY_PARAMETER)
+              KDb::QueryParameterExpression, KDbToken::QUERY_PARAMETER)
 {
 }
 

@@ -304,7 +304,7 @@ KDbQuerySchema* buildSelectQuery(
                 assert(e.isBinary());
                 assert(t_with_alias.left().expressionClass() == KDb::VariableExpression);
                 assert(t_with_alias.right().expressionClass() == KDb::VariableExpression
-                       && (t_with_alias.token() == AS || t_with_alias.token() == AS_EMPTY));
+                       && (t_with_alias.token() == KDbToken::AS || t_with_alias.token() == KDbToken::AS_EMPTY));
                 t_e = t_with_alias.left().toVariable();
                 aliasString = t_with_alias.right().toVariable().name();
             } else {
@@ -343,7 +343,7 @@ KDbQuerySchema* buildSelectQuery(
             KDbExpression columnExpr(e);
             KDbVariableExpression aliasVariable;
             if (e.expressionClass() == KDb::SpecialBinaryExpression && e.isBinary()
-                    && (e.token() == AS || e.token() == AS_EMPTY)) {
+                    && (e.token() == KDbToken::AS || e.token() == KDbToken::AS_EMPTY)) {
                 //KDb::SpecialBinaryExpression: with alias
                 columnExpr = e.toBinary().left();
                 aliasVariable = e.toBinary().right().toVariable();

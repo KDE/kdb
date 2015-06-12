@@ -78,7 +78,7 @@ public:
     virtual ~KDbExpressionData();
 
     //! @see KDbExpression::token()
-    int token;
+    KDbToken token;
     //! @see KDbExpression::expressionClass()
     KDb::ExpressionClass expressionClass;
     ExplicitlySharedExpressionDataPointer parent;
@@ -93,7 +93,6 @@ public:
     KDbEscapedString toString(KDbQuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
     bool validate(KDbParseInfo *parseInfo);
-    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual KDbExpressionData* clone();
 
     template <typename T>
@@ -135,7 +134,6 @@ public:
     virtual ~KDbNArgExpressionData();
 
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
-    virtual QString tokenToString() const; //!< @return string for token
     virtual KDbNArgExpressionData* clone();
     bool containsInvalidArgument() const;
     bool containsNullArgument() const;
@@ -187,7 +185,6 @@ public:
     virtual ~KDbBinaryExpressionData();
 
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
-    virtual QString tokenToString() const; //!< @return string for token, like "<=" or ">";
     virtual KDbBinaryExpressionData* clone();
     ExplicitlySharedExpressionDataPointer left() const;
     ExplicitlySharedExpressionDataPointer right() const;

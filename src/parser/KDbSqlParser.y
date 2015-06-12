@@ -841,19 +841,19 @@ aExpr2:
 aExpr3 AND aExpr2
 {
 //    kdbDebug() << "AND " << $3.debugString();
-    $$ = new KDbBinaryExpression(*$1, AND, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::AND, *$3);
     delete $1;
     delete $3;
 }
 | aExpr3 OR aExpr2
 {
-    $$ = new KDbBinaryExpression(*$1, OR, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::OR, *$3);
     delete $1;
     delete $3;
 }
 | aExpr3 XOR aExpr2
 {
-    $$ = new KDbBinaryExpression(*$1, XOR, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::XOR, *$3);
     delete $1;
     delete $3;
 }
@@ -871,7 +871,7 @@ aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 }
 | aExpr4 GREATER_OR_EQUAL aExpr3
 {
-    $$ = new KDbBinaryExpression(*$1, GREATER_OR_EQUAL, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::GREATER_OR_EQUAL, *$3);
     delete $1;
     delete $3;
 }
@@ -883,7 +883,7 @@ aExpr4 '>' %prec GREATER_OR_EQUAL aExpr3
 }
 | aExpr4 LESS_OR_EQUAL aExpr3
 {
-    $$ = new KDbBinaryExpression(*$1, LESS_OR_EQUAL, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::LESS_OR_EQUAL, *$3);
     delete $1;
     delete $3;
 }
@@ -901,49 +901,49 @@ aExpr4
 aExpr4:
 aExpr5 NOT_EQUAL aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, NOT_EQUAL, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::NOT_EQUAL, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 NOT_EQUAL2 aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, NOT_EQUAL2, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::NOT_EQUAL2, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 LIKE aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, LIKE, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::LIKE, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 NOT_LIKE aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, NOT_LIKE, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::NOT_LIKE, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 SQL_IN aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, SQL_IN, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::SQL_IN, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 SIMILAR_TO aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, SIMILAR_TO, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::SIMILAR_TO, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 NOT_SIMILAR_TO aExpr4
 {
-    $$ = new KDbBinaryExpression(*$1, NOT_SIMILAR_TO, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::NOT_SIMILAR_TO, *$3);
     delete $1;
     delete $3;
 }
 | aExpr5 BETWEEN aExpr4 AND aExpr4
 {
-    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_BETWEEN_AND);
+    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDbToken::BETWEEN_AND);
     $$->toNArg().append( *$1 );
     $$->toNArg().append( *$3 );
     $$->toNArg().append( *$5 );
@@ -953,7 +953,7 @@ aExpr5 NOT_EQUAL aExpr4
 }
 | aExpr5 NOT_BETWEEN aExpr4 AND aExpr4
 {
-    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDB_TOKEN_NOT_BETWEEN_AND);
+    $$ = new KDbNArgExpression(KDb::RelationalExpression, KDbToken::NOT_BETWEEN_AND);
     $$->toNArg().append( *$1 );
     $$->toNArg().append( *$3 );
     $$->toNArg().append( *$5 );
@@ -969,12 +969,12 @@ aExpr5
 aExpr5:
 aExpr5 SQL_IS_NULL
 {
-    $$ = new KDbUnaryExpression( SQL_IS_NULL, *$1 );
+    $$ = new KDbUnaryExpression( KDbToken::SQL_IS_NULL, *$1 );
     delete $1;
 }
 | aExpr5 SQL_IS_NOT_NULL
 {
-    $$ = new KDbUnaryExpression( SQL_IS_NOT_NULL, *$1 );
+    $$ = new KDbUnaryExpression( KDbToken::SQL_IS_NOT_NULL, *$1 );
     delete $1;
 }
 |
@@ -985,13 +985,13 @@ aExpr6
 aExpr6:
 aExpr7 BITWISE_SHIFT_LEFT aExpr6
 {
-    $$ = new KDbBinaryExpression(*$1, BITWISE_SHIFT_LEFT, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::BITWISE_SHIFT_LEFT, *$3);
     delete $1;
     delete $3;
 }
 | aExpr7 BITWISE_SHIFT_RIGHT aExpr6
 {
-    $$ = new KDbBinaryExpression(*$1, BITWISE_SHIFT_RIGHT, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::BITWISE_SHIFT_RIGHT, *$3);
     delete $1;
     delete $3;
 }
@@ -1009,7 +1009,7 @@ aExpr8 '+' aExpr7
 }
 | aExpr8 CONCATENATION aExpr7
 {
-    $$ = new KDbBinaryExpression(*$1, CONCATENATION, *$3);
+    $$ = new KDbBinaryExpression(*$1, KDbToken::CONCATENATION, *$3);
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
@@ -1077,7 +1077,7 @@ aExpr9:
 }
 | NOT aExpr9
 {
-    $$ = new KDbUnaryExpression( NOT, *$2 );
+    $$ = new KDbUnaryExpression( KDbToken::NOT, *$2 );
     delete $2;
 }
 | IDENTIFIER
@@ -1111,22 +1111,22 @@ aExpr9:
 }
 | SQL_NULL
 {
-    $$ = new KDbConstExpression( SQL_NULL, QVariant() );
+    $$ = new KDbConstExpression( KDbToken::SQL_NULL, QVariant() );
     kdbDebug() << "  + NULL";
 //    $$ = new KDbField();
     //$$->setName(QString::null);
 }
 | SQL_TRUE
 {
-    $$ = new KDbConstExpression( SQL_TRUE, true );
+    $$ = new KDbConstExpression( KDbToken::SQL_TRUE, true );
 }
 | SQL_FALSE
 {
-    $$ = new KDbConstExpression( SQL_FALSE, false );
+    $$ = new KDbConstExpression( KDbToken::SQL_FALSE, false );
 }
 | CHARACTER_STRING_LITERAL
 {
-    $$ = new KDbConstExpression( CHARACTER_STRING_LITERAL, *$1 );
+    $$ = new KDbConstExpression( KDbToken::CHARACTER_STRING_LITERAL, *$1 );
     kdbDebug() << "  + constant " << $1;
     delete $1;
 }
@@ -1144,12 +1144,12 @@ aExpr9:
 //        val = (quint64)$1;
 //! @todo ok?
 
-    $$ = new KDbConstExpression( INTEGER_CONST, val );
+    $$ = new KDbConstExpression( KDbToken::INTEGER_CONST, val );
     kdbDebug() << "  + int constant: " << val.toString();
 }
 | REAL_CONST
 {
-    $$ = new KDbConstExpression( REAL_CONST, QPoint( $1.integer, $1.fractional ) );
+    $$ = new KDbConstExpression( KDbToken::REAL_CONST, QPoint( $1.integer, $1.fractional ) );
     kdbDebug() << "  + real constant: " << $1.integer << "." << $1.fractional;
 }
 |
@@ -1244,7 +1244,7 @@ FlatTableList ',' FlatTable
 }
 |FlatTable
 {
-    $$ = new KDbNArgExpression(KDb::TableListExpression, IDENTIFIER); //ok?
+    $$ = new KDbNArgExpression(KDb::TableListExpression, KDbToken::IDENTIFIER); //ok?
     $$->append(*$1);
     delete $1;
 }
@@ -1283,7 +1283,7 @@ IDENTIFIER
 {
     //table + alias
     $$ = new KDbBinaryExpression(
-        KDbVariableExpression(*$1), AS_EMPTY,
+        KDbVariableExpression(*$1), KDbToken::AS_EMPTY,
         KDbVariableExpression(*$2)
     );
     delete $1;
@@ -1293,7 +1293,7 @@ IDENTIFIER
 {
     //table + alias
     $$ = new KDbBinaryExpression(
-        KDbVariableExpression(*$1), AS,
+        KDbVariableExpression(*$1), KDbToken::AS,
         KDbVariableExpression(*$3)
     );
     delete $1;
@@ -1313,7 +1313,7 @@ ColViews ',' ColItem
 }
 |ColItem
 {
-    $$ = new KDbNArgExpression(KDb::FieldListExpression, 0);
+    $$ = new KDbNArgExpression(KDb::FieldListExpression, KDbToken());
     $$->append(*$1);
     delete $1;
     kdbDebug() << "ColViews: ColItem";
@@ -1338,7 +1338,7 @@ ColExpression
 | ColExpression AS IDENTIFIER
 {
     $$ = new KDbBinaryExpression(
-        *$1, AS,
+        *$1, KDbToken::AS,
         KDbVariableExpression(*$3)
     );
     kdbDebug() << " added column expr:" << *$$;
@@ -1348,7 +1348,7 @@ ColExpression
 | ColExpression IDENTIFIER
 {
     $$ = new KDbBinaryExpression(
-        *$1, AS_EMPTY,
+        *$1, KDbToken::AS_EMPTY,
         KDbVariableExpression(*$2)
     );
     kdbDebug() << " added column expr:" << *$$;

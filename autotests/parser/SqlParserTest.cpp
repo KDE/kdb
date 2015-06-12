@@ -22,7 +22,7 @@
 
 #include <KDbDriverManager>
 #include <KDbParser>
-#include "generated/sqlparser.h"
+#include <KDbToken>
 
 Q_DECLARE_METATYPE(KDbEscapedString)
 
@@ -256,69 +256,78 @@ void SqlParserTest::testParse()
 
 void SqlParserTest::testTokens()
 {
-    QCOMPARE(int(SQL_TYPE), 258);
-    QCOMPARE(int(AS), 259);
-    QCOMPARE(int(AS_EMPTY), 260);
-    QCOMPARE(int(ASC), 261);
-    QCOMPARE(int(AUTO_INCREMENT), 262);
-    QCOMPARE(int(BIT), 263);
-    QCOMPARE(int(BITWISE_SHIFT_LEFT), 264);
-    QCOMPARE(int(BITWISE_SHIFT_RIGHT), 265);
-    QCOMPARE(int(BY), 266);
-    QCOMPARE(int(CHARACTER_STRING_LITERAL), 267);
-    QCOMPARE(int(CONCATENATION), 268);
-    QCOMPARE(int(CREATE), 269);
-    QCOMPARE(int(DESC), 270);
-    QCOMPARE(int(DISTINCT), 271);
-    QCOMPARE(int(DOUBLE_QUOTED_STRING), 272);
-    QCOMPARE(int(FROM), 273);
-    QCOMPARE(int(JOIN), 274);
-    QCOMPARE(int(KEY), 275);
-    QCOMPARE(int(LEFT), 276);
-    QCOMPARE(int(LESS_OR_EQUAL), 277);
-    QCOMPARE(int(GREATER_OR_EQUAL), 278);
-    QCOMPARE(int(SQL_NULL), 279);
-    QCOMPARE(int(SQL_IS), 280);
-    QCOMPARE(int(SQL_IS_NULL), 281);
-    QCOMPARE(int(SQL_IS_NOT_NULL), 282);
-    QCOMPARE(int(ORDER), 283);
-    QCOMPARE(int(PRIMARY), 284);
-    QCOMPARE(int(SELECT), 285);
-    QCOMPARE(int(INTEGER_CONST), 286);
-    QCOMPARE(int(REAL_CONST), 287);
-    QCOMPARE(int(RIGHT), 288);
-    QCOMPARE(int(SQL_ON), 289);
-    QCOMPARE(int(DATE_CONST), 290);
-    QCOMPARE(int(DATETIME_CONST), 291);
-    QCOMPARE(int(TIME_CONST), 292);
-    QCOMPARE(int(TABLE), 293);
-    QCOMPARE(int(IDENTIFIER), 294);
-    QCOMPARE(int(IDENTIFIER_DOT_ASTERISK), 295);
-    QCOMPARE(int(QUERY_PARAMETER), 296);
-    QCOMPARE(int(VARCHAR), 297);
-    QCOMPARE(int(WHERE), 298);
-    QCOMPARE(int(SQL), 299);
-    QCOMPARE(int(SQL_TRUE), 300);
-    QCOMPARE(int(SQL_FALSE), 301);
-    QCOMPARE(int(UNION), 302);
-    QCOMPARE(int(SCAN_ERROR), 303);
-    QCOMPARE(int(AND), 304);
-    QCOMPARE(int(BETWEEN), 305);
-    QCOMPARE(int(NOT_BETWEEN), 306);
-    QCOMPARE(int(EXCEPT), 307);
-    QCOMPARE(int(SQL_IN), 308);
-    QCOMPARE(int(INTERSECT), 309);
-    QCOMPARE(int(LIKE), 310);
-    QCOMPARE(int(ILIKE), 311);
-    QCOMPARE(int(NOT_LIKE), 312);
-    QCOMPARE(int(NOT), 313);
-    QCOMPARE(int(NOT_EQUAL), 314);
-    QCOMPARE(int(NOT_EQUAL2), 315);
-    QCOMPARE(int(OR), 316);
-    QCOMPARE(int(SIMILAR_TO), 317);
-    QCOMPARE(int(NOT_SIMILAR_TO), 318);
-    QCOMPARE(int(XOR), 319);
-    QCOMPARE(int(UMINUS), 320);
+    KDbToken t = KDbToken::LEFT;
+    qDebug() << t << t.toChar() << t.value() << t.isValid();
+    t = '+';
+    qDebug() << t << t.toChar() << t.value() << t.isValid();
+    t = KDbToken();
+    qDebug() << t << t.toChar() << t.value() << t.isValid();
+
+    QCOMPARE(KDbToken::SQL_TYPE.value(), 258);
+    QCOMPARE(KDbToken::AS.value(), 259);
+    QCOMPARE(KDbToken::AS_EMPTY.value(), 260);
+    QCOMPARE(KDbToken::ASC.value(), 261);
+    QCOMPARE(KDbToken::AUTO_INCREMENT.value(), 262);
+    QCOMPARE(KDbToken::BIT.value(), 263);
+    QCOMPARE(KDbToken::BITWISE_SHIFT_LEFT.value(), 264);
+    QCOMPARE(KDbToken::BITWISE_SHIFT_RIGHT.value(), 265);
+    QCOMPARE(KDbToken::BY.value(), 266);
+    QCOMPARE(KDbToken::CHARACTER_STRING_LITERAL.value(), 267);
+    QCOMPARE(KDbToken::CONCATENATION.value(), 268);
+    QCOMPARE(KDbToken::CREATE.value(), 269);
+    QCOMPARE(KDbToken::DESC.value(), 270);
+    QCOMPARE(KDbToken::DISTINCT.value(), 271);
+    QCOMPARE(KDbToken::DOUBLE_QUOTED_STRING.value(), 272);
+    QCOMPARE(KDbToken::FROM.value(), 273);
+    QCOMPARE(KDbToken::JOIN.value(), 274);
+    QCOMPARE(KDbToken::KEY.value(), 275);
+    QCOMPARE(KDbToken::LEFT.value(), 276);
+    QCOMPARE(KDbToken::LESS_OR_EQUAL.value(), 277);
+    QCOMPARE(KDbToken::GREATER_OR_EQUAL.value(), 278);
+    QCOMPARE(KDbToken::SQL_NULL.value(), 279);
+    QCOMPARE(KDbToken::SQL_IS.value(), 280);
+    QCOMPARE(KDbToken::SQL_IS_NULL.value(), 281);
+    QCOMPARE(KDbToken::SQL_IS_NOT_NULL.value(), 282);
+    QCOMPARE(KDbToken::ORDER.value(), 283);
+    QCOMPARE(KDbToken::PRIMARY.value(), 284);
+    QCOMPARE(KDbToken::SELECT.value(), 285);
+    QCOMPARE(KDbToken::INTEGER_CONST.value(), 286);
+    QCOMPARE(KDbToken::REAL_CONST.value(), 287);
+    QCOMPARE(KDbToken::RIGHT.value(), 288);
+    QCOMPARE(KDbToken::SQL_ON.value(), 289);
+    QCOMPARE(KDbToken::DATE_CONST.value(), 290);
+    QCOMPARE(KDbToken::DATETIME_CONST.value(), 291);
+    QCOMPARE(KDbToken::TIME_CONST.value(), 292);
+    QCOMPARE(KDbToken::TABLE.value(), 293);
+    QCOMPARE(KDbToken::IDENTIFIER.value(), 294);
+    QCOMPARE(KDbToken::IDENTIFIER_DOT_ASTERISK.value(), 295);
+    QCOMPARE(KDbToken::QUERY_PARAMETER.value(), 296);
+    QCOMPARE(KDbToken::VARCHAR.value(), 297);
+    QCOMPARE(KDbToken::WHERE.value(), 298);
+    QCOMPARE(KDbToken::SQL.value(), 299);
+    QCOMPARE(KDbToken::SQL_TRUE.value(), 300);
+    QCOMPARE(KDbToken::SQL_FALSE.value(), 301);
+    QCOMPARE(KDbToken::UNION.value(), 302);
+    QCOMPARE(KDbToken::SCAN_ERROR.value(), 303);
+    QCOMPARE(KDbToken::AND.value(), 304);
+    QCOMPARE(KDbToken::BETWEEN.value(), 305);
+    QCOMPARE(KDbToken::NOT_BETWEEN.value(), 306);
+    QCOMPARE(KDbToken::EXCEPT.value(), 307);
+    QCOMPARE(KDbToken::SQL_IN.value(), 308);
+    QCOMPARE(KDbToken::INTERSECT.value(), 309);
+    QCOMPARE(KDbToken::LIKE.value(), 310);
+    QCOMPARE(KDbToken::ILIKE.value(), 311);
+    QCOMPARE(KDbToken::NOT_LIKE.value(), 312);
+    QCOMPARE(KDbToken::NOT.value(), 313);
+    QCOMPARE(KDbToken::NOT_EQUAL.value(), 314);
+    QCOMPARE(KDbToken::NOT_EQUAL2.value(), 315);
+    QCOMPARE(KDbToken::OR.value(), 316);
+    QCOMPARE(KDbToken::SIMILAR_TO.value(), 317);
+    QCOMPARE(KDbToken::NOT_SIMILAR_TO.value(), 318);
+    QCOMPARE(KDbToken::XOR.value(), 319);
+    QCOMPARE(KDbToken::UMINUS.value(), 320);
+
+    //! @todo add extra tokens: BETWEEN_AND, NOT_BETWEEN_AND
 }
 
 void SqlParserTest::cleanupTestCase()

@@ -24,17 +24,12 @@
 #ifndef KDB_EXPRESSION_H
 #define KDB_EXPRESSION_H
 
-
 #include "KDbGlobal.h"
 #include "KDbField.h"
 #include "KDbQuerySchemaParameter.h"
 #include "KDbEscapedString.h"
 #include "KDbExpressionData.h"
-
-//! Custom tokens are not used in parser but used as extension in expression classes.
-//#define KDB_CUSTOM_TOKEN 0x1000
-#define KDB_TOKEN_BETWEEN_AND 0x1001
-#define KDB_TOKEN_NOT_BETWEEN_AND 0x1002
+#include "KDbToken.h"
 
 //! @return class name of class @a c
 KDB_EXPORT QString expressionClassName(KDb::ExpressionClass c);
@@ -72,10 +67,10 @@ public:
     or identifiers (e.g. SQL_NULL) of elements used by the KDbSQL parser.
     By default token is 0.
     */
-    int token() const;
+    KDbToken token() const;
 
     /*! Sets token @a token for this expression. */
-    void setToken(int token);
+    void setToken(KDbToken token);
 
     /*!
     @return class identifier of this expression.
@@ -127,20 +122,9 @@ public:
      The leaf nodes are objects of QueryParameterExpr class. */
     void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
 
-    static QString tokenToDebugString(int token);
-
     //! @return expression class for token @a token.
     //! @todo support more tokens
-    static KDb::ExpressionClass classForToken(int token);
-
-    /*! @return single character if the token is < 256
-     or token name, e.g. LESS_OR_EQUAL (for debugging). */
-    inline QString tokenToDebugString() const {
-        return tokenToDebugString(token());
-    }
-
-    //! @return string for token, like "<=" or ">"
-    QString tokenToString() const;
+    static KDb::ExpressionClass classForToken(KDbToken token);
 
     //! Convenience type casts.
     KDbNArgExpression toNArg() const;
@@ -200,7 +184,7 @@ protected:
 
     explicit KDbExpression(KDbExpressionData* data);
 
-    KDbExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, int token);
+    KDbExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, KDbToken token);
 
     explicit KDbExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
@@ -225,7 +209,7 @@ public:
     KDbNArgExpression();
 
     //! Constructs an N-argument expression of class @a aClass and token @a token.
-    KDbNArgExpression(KDb::ExpressionClass aClass, int token);
+    KDbNArgExpression(KDb::ExpressionClass aClass, KDbToken token);
 
     /*! Constructs a copy of other N-argument expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
@@ -312,7 +296,7 @@ public:
     KDbUnaryExpression();
 
     //! Constructs unary expression with token @a token and argument @a arg.
-    KDbUnaryExpression(int token, const KDbExpression& arg);
+    KDbUnaryExpression(KDbToken token, const KDbExpression& arg);
 
     /*! Constructs a copy of other unary expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
@@ -353,7 +337,7 @@ public:
 
     /*! Constructs binary expression with left expression @a leftExpr,
      token @a token, and right expression @a rightExpr. */
-    KDbBinaryExpression(const KDbExpression& leftExpr, int token, const KDbExpression& rightExpr);
+    KDbBinaryExpression(const KDbExpression& leftExpr, KDbToken token, const KDbExpression& rightExpr);
 
     /*! Constructs a copy of other unary expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
@@ -390,7 +374,7 @@ public:
     KDbConstExpression();
 
     /*! Constructs const expression token @a token and value @a value. */
-    KDbConstExpression(int token, const QVariant& value);
+    KDbConstExpression(KDbToken token, const QVariant& value);
 
     /*! Constructs a copy of other const expression @a expr.
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
@@ -404,7 +388,7 @@ public:
 
 protected:
     //! Internal, used by KDbQueryParameterExpression(const QString& message).
-    KDbConstExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, int token);
+    KDbConstExpression(KDbExpressionData* data, KDb::ExpressionClass aClass, KDbToken token);
     explicit KDbConstExpression(KDbExpressionData* data);
     explicit KDbConstExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 

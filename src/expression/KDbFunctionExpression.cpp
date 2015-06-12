@@ -25,6 +25,7 @@
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
 #include "KDbParser.h"
+#include "KDbParser_p.h"
 #include "kdb_debug.h"
 
 #include <QSet>
@@ -218,14 +219,14 @@ KDbFunctionExpression::KDbFunctionExpression()
 
 KDbFunctionExpression::KDbFunctionExpression(const QString& name)
         : KDbExpression(new KDbFunctionExpressionData(name),
-              classForFunctionName(name), 0/*undefined*/)
+              classForFunctionName(name), KDbToken()/*undefined*/)
 {
 }
 
 KDbFunctionExpression::KDbFunctionExpression(const QString& name,
                                              const KDbNArgExpression& arguments)
         : KDbExpression(new KDbFunctionExpressionData(name.toUpper(), arguments.d),
-              classForFunctionName(name), 0/*undefined*/)
+              classForFunctionName(name), KDbToken()/*undefined*/)
 {
 }
 

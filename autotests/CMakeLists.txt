@@ -6,8 +6,10 @@ remove_definitions(
 )
 
 set(FILES_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
-add_definitions(-DFILES_OUTPUT_DIR=\"${FILES_OUTPUT_DIR}\"
-                -DSQLITE_ICU_EXTENSION_PATH=\"${PROJECT_BINARY_DIR}/src/drivers/sqlite/icu\"
+add_definitions(
+    -DFILES_OUTPUT_DIR=\"${FILES_OUTPUT_DIR}\"
+    -DSQLITE_ICU_EXTENSION_PATH=\"${PROJECT_BINARY_DIR}/src/drivers/sqlite/icu\"
+    -DYYTOKENTYPE # this removes access to yytokentype enum as we should access KDb::Token instead
 )
 
 include(ECMAddTests)

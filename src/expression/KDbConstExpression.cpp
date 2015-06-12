@@ -48,7 +48,7 @@ KDbConstExpressionData* KDbConstExpressionData::clone()
 KDbField::Type KDbConstExpressionData::typeInternal(KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
-    switch (token) {
+    switch (token.value()) {
     case SQL_NULL:
         return KDbField::Null;
     case INTEGER_CONST:
@@ -91,7 +91,7 @@ void KDbConstExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
 {
     Q_UNUSED(callStack);
     const QString res = QLatin1String("ConstExp(")
-        + KDbExpression::tokenToDebugString(token)
+        + token.name()
         + QLatin1String(",") + toString().toString()
         + QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSQLTypeName(type()));
     dbg.nospace() << res.toLocal8Bit().constData();
@@ -102,7 +102,7 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(KDbQuerySchemaParamete
 {
     Q_UNUSED(params);
     Q_UNUSED(callStack);
-    switch (token) {
+    switch (token.value()) {
     case SQL_NULL:
         return KDbEscapedString("NULL");
     case CHARACTER_STRING_LITERAL:
@@ -152,13 +152,13 @@ KDbConstExpression::KDbConstExpression()
     ExpressionDebug << "KDbConstExpression() ctor" << *this;
 }
 
-KDbConstExpression::KDbConstExpression(int token, const QVariant& value)
+KDbConstExpression::KDbConstExpression(KDbToken token, const QVariant& value)
         : KDbExpression(new KDbConstExpressionData(value), KDb::ConstExpression, token)
 {
 }
 
 KDbConstExpression::KDbConstExpression(KDbExpressionData* data, KDb::ExpressionClass aClass,
-                                 int token)
+                                       KDbToken token)
         : KDbExpression(data, aClass, token)
 {
 }

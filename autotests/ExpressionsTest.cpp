@@ -28,8 +28,22 @@
 Q_DECLARE_METATYPE(KDb::ExpressionClass)
 Q_DECLARE_METATYPE(KDbEscapedString)
 Q_DECLARE_METATYPE(KDbField::Type)
+Q_DECLARE_METATYPE(KDbToken)
+
 
 QTEST_GUILESS_MAIN(ExpressionsTest)
+
+//! Used in macros so characters and KDbTokens can be used interchangeably
+static inline KDbToken TO_TOKEN(char charValue)
+{
+    return KDbToken(charValue);
+}
+
+//! Used in macros so characters and KDbTokens can be used interchangeably
+static inline KDbToken TO_TOKEN(KDbToken token)
+{
+    return token;
+}
 
 void ExpressionsTest::initTestCase()
 {
@@ -41,11 +55,12 @@ template <typename T1, typename T2>
 static void compareStrings(const T1 &e1, const T2 &e2)
 {
     //qDebug() << "compareStrings():"
-    //         << "\ne1:" << e1.toString() << e1.tokenToDebugString() << e1.tokenToString()
-    //         << "\ne2:" << e2.toString() << e2.tokenToDebugString() << e2.tokenToString();
+    //         << "\ne1:" << e1.toString() << e1.token() << e1.token().ToString()
+    //         << "\ne2:" << e2.toString() << e2.token() << e2.token().toString();
     QCOMPARE(e1.toString(), e2.toString());
-    QCOMPARE(e1.tokenToDebugString(), e2.tokenToDebugString());
-    QCOMPARE(e1.tokenToString(), e2.tokenToString());
+    QCOMPARE(e1.token(), e2.token());
+    QCOMPARE(e1.token().value(), e2.token().value());
+    QCOMPARE(e1.token().toString(), e2.token().toString());
 }
 
 //! tests clone and copy ctor for @a e1
@@ -110,7 +125,7 @@ void ExpressionsTest::testNullExpression()
     QVERIFY(!e1.isVariable());
     QVERIFY(e1.toVariable().isNull());
     QCOMPARE(e1.expressionClass(), KDb::UnknownExpression);
-    QCOMPARE(e1.token(), 0);
+    QCOMPARE(e1.token(), KDbToken());
     QVERIFY(e1 != KDbExpression());
     QVERIFY(e1 == e1);
     QVERIFY(e1 != e2);
@@ -119,15 +134,15 @@ void ExpressionsTest::testNullExpression()
     QVERIFY(e1.isNull());
     QCOMPARE(e1, e2);
     QCOMPARE(e1.toString(), KDbEscapedString("<UNKNOWN!>"));
-    QCOMPARE(e1.tokenToDebugString(), QLatin1String("0"));
-    QCOMPARE(e1.tokenToString(), QString());
+    QCOMPARE(e1.token().name(), QLatin1String("<INVALID_TOKEN>"));
+    QCOMPARE(e1.token().toString(), QString("<INVALID_TOKEN>"));
     compareStrings(e1, e2);
 
     KDbExpression e3(e2);
     QVERIFY(e3.isNull());
     QCOMPARE(e2, e3);
     compareStrings(e2, e3);
-    //ExpressionDebug << "$$$" << e1.toString() << e1.tokenToDebugString() << e1.tokenToString();
+    //ExpressionDebug << "$$$" << e1.toString() << e1.token() << e1.token().toString();
 
     e1 = KDbExpression();
     testCloneExpression(e1);
@@ -163,26 +178,46 @@ void ExpressionsTest::testExpressionClassName()
     QTEST(expressionClassName(expClass), "name");
 }
 
-class TestedExpression : public KDbExpression
+//! Adds quote if this is the single-character token, to match the format of bison
+static QString toString(KDbToken token)
 {
-public:
-    TestedExpression(int token) : KDbExpression(new KDbExpressionData, KDb::UnknownExpression, token) {
+    if (token.toChar()) {
+        return QString::fromLatin1("'%1'").arg(token.toString());
     }
-};
+    return token.toString();
+}
 
 void ExpressionsTest::testExpressionToken()
 {
     KDbExpression e1;
-    QCOMPARE(e1.token(), 0);
+    QVERIFY(!e1.isValid());
+    QVERIFY(!KDbToken().isValid());
+    QCOMPARE(e1.token(), KDbToken());
+    QVERIFY(KDbToken('+').toChar() > 0);
+    QCOMPARE(KDbToken('*'), KDbToken('*'));
+    QCOMPARE(KDbToken('*').toChar(), '*');
+    QCOMPARE(KDbToken('*').value(), int('*'));
+    QCOMPARE(KDbToken('*').name(), QString::fromLatin1("*"));
+    QCOMPARE(KDbToken('*').toString(), QString::fromLatin1("*"));
+    QCOMPARE(KDbToken::LEFT.toChar(), char(0));
+    QCOMPARE(KDbToken().toChar(), char(0));
+    QVERIFY(KDbToken::LEFT.isValid());
+    QVERIFY(KDbToken::maxCharTokenValue > 0);
+    QVERIFY(KDbToken::LEFT.value() > KDbToken::maxCharTokenValue);
+    QVERIFY(!KDbToken::allTokens().isEmpty());
 
-    for (int i = 0; i < 254; ++i) {
-        QCOMPARE(KDbExpression::tokenToDebugString(i),
-                isprint(i) ? QString(QLatin1Char(uchar(i))) : QString::number(i));
-        QCOMPARE(TestedExpression(i).tokenToString(),
-                isprint(i) ? QString(QLatin1Char(uchar(i))) : QString());
-    }
-    for (unsigned int i = 255; i <= maxToken(); ++i) {
-        QCOMPARE(KDbExpression::tokenToDebugString(i), QLatin1String(tokenName(i)));
+    foreach(KDbToken t, KDbToken::allTokens()) {
+        //qDebug() << t << t.value();
+        if (t.toChar() > 0) {
+            QVERIFY(t.value() <= KDbToken::maxCharTokenValue);
+            QCOMPARE(t, KDbToken(char(t.value())));
+            QCOMPARE(t.name(), isprint(t.value()) ? QString(QLatin1Char(uchar(t.value())))
+                                                  : QString::number(t.value()));
+            QCOMPARE(toString(t), QString::fromLatin1(g_tokenName(t.value())));
+        }
+        else {
+            QCOMPARE(t.name(), QString::fromLatin1(g_tokenName(t.value())));
+        }
     }
 }
 
@@ -208,8 +243,8 @@ void ExpressionsTest::testNArgExpression()
 
     // -- copy ctor & cloning
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 7);
-    c2 = KDbConstExpression(INTEGER_CONST, 8);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 7);
+    c2 = KDbConstExpression(KDbToken::INTEGER_CONST, 8);
     n.append(c1);
     n.append(c2);
     testCloneExpression(n);
@@ -217,8 +252,8 @@ void ExpressionsTest::testNArgExpression()
     // copy on stack
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
     {
-        KDbConstExpression s1(INTEGER_CONST, 7);
-        KDbConstExpression s2(INTEGER_CONST, 8);
+        KDbConstExpression s1(KDbToken::INTEGER_CONST, 7);
+        KDbConstExpression s2(KDbToken::INTEGER_CONST, 8);
         n.append(s1);
         n.append(s2);
         c1 = s1;
@@ -228,10 +263,10 @@ void ExpressionsTest::testNArgExpression()
     QCOMPARE(n.arg(0).toConst(), c1);
     QCOMPARE(n.arg(1).toConst(), c2);
 
-    QCOMPARE(n.tokenToDebugString(), QString("+"));
+    QCOMPARE(n.token().name(), QString("+"));
     QCOMPARE(n.toString(), KDbEscapedString("7, 8"));
     n.setToken('*');
-    QCOMPARE(n.tokenToDebugString(), QString("*"));
+    QCOMPARE(n.token().name(), QString("*"));
 
     // -- append(KDbExpression), prepend(KDbExpression)
     KDbExpression e;
@@ -243,7 +278,7 @@ void ExpressionsTest::testNArgExpression()
     QCOMPARE(nNull.argCount(), 0); // cleared
 
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 1);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 1);
     n.append(c1);
     QVERIFY(!n.isEmpty());
     QCOMPARE(n.argCount(), 1);
@@ -259,14 +294,14 @@ void ExpressionsTest::testNArgExpression()
                                // to itself is not allowed
 
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 2);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 2);
     n.append(c1);
     n.append(c1); // cannot append the same expression twice
     QCOMPARE(n.argCount(), 1);
     QCOMPARE(n.arg(0).toConst(), c1);
 
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     n.prepend(c1);
     n.prepend(c1); // cannot prepend the same expression twice
     QCOMPARE(n.argCount(), 1);
@@ -277,7 +312,7 @@ void ExpressionsTest::testNArgExpression()
 
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
     n2 = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 4);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 4);
     n.append(c1);
     n2.append(c1); // c moves from n to n2
     QVERIFY(n.isEmpty());
@@ -290,8 +325,8 @@ void ExpressionsTest::testNArgExpression()
 
     // -- insert(int, KDbExpression)
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c1 = KDbConstExpression(INTEGER_CONST, 3);
-    c2 = KDbConstExpression(INTEGER_CONST, 4);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
+    c2 = KDbConstExpression(KDbToken::INTEGER_CONST, 4);
     // it must be a valid index position in the list (i.e., 0 <= i < argCount()).
     n.insert(-10, c1);
     QVERIFY(n.isEmpty());
@@ -338,7 +373,7 @@ void ExpressionsTest::testNArgExpression()
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
     n.prepend(c1);
     n.append(c2);
-    c3 = KDbConstExpression(INTEGER_CONST, 5);
+    c3 = KDbConstExpression(KDbToken::INTEGER_CONST, 5);
     QVERIFY(!n.remove(c3)); // not found
     QCOMPARE(n.argCount(), 2);
     n.append(c3);
@@ -369,9 +404,9 @@ void ExpressionsTest::testNArgExpression()
     // -- takeAt(int)
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
     n2 = n;
-    c1 = KDbConstExpression(INTEGER_CONST, 1);
-    c2 = KDbConstExpression(INTEGER_CONST, 2);
-    c3 = KDbConstExpression(INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 1);
+    c2 = KDbConstExpression(KDbToken::INTEGER_CONST, 2);
+    c3 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     n.append(c1);
     n.append(c2);
     n.append(c3);
@@ -386,10 +421,10 @@ void ExpressionsTest::testNArgExpression()
 
     // -- indexOf(KDbExpression, int)
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c = KDbConstExpression(INTEGER_CONST, 0);
-    c1 = KDbConstExpression(INTEGER_CONST, 1);
-    c2 = KDbConstExpression(INTEGER_CONST, 2);
-    c3 = KDbConstExpression(INTEGER_CONST, 3);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 0);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 1);
+    c2 = KDbConstExpression(KDbToken::INTEGER_CONST, 2);
+    c3 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     n.append(c1);
     n.append(c2);
     n.append(c3);
@@ -411,9 +446,9 @@ void ExpressionsTest::testNArgExpression()
 
     // -- a list of arguments
     n = KDbNArgExpression(KDb::ArgumentListExpression, ',');
-    n.append(KDbConstExpression(INTEGER_CONST, 1));
-    n.append(KDbConstExpression(INTEGER_CONST, 2));
-    n.append(KDbConstExpression(INTEGER_CONST, 3));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 2));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 3));
     QCOMPARE(n.toString(), KDbEscapedString("1, 2, 3"));
     QCOMPARE(n.argCount(), 3);
     QVERIFY(!n.containsInvalidArgument());
@@ -421,9 +456,9 @@ void ExpressionsTest::testNArgExpression()
 
     // -- a list of arguments contains invalid argument
     n = KDbNArgExpression(KDb::ArgumentListExpression, ',');
-    n.append(KDbConstExpression(INTEGER_CONST, 1));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
     n.append(KDbExpression());
-    n.append(KDbConstExpression(INTEGER_CONST, 3));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 3));
     QVERIFY(n.containsInvalidArgument());
     QVERIFY(!n.containsNullArgument());
     QVERIFY(!n.isNull());
@@ -431,9 +466,9 @@ void ExpressionsTest::testNArgExpression()
 
     // -- a list of arguments contains null argument
     n = KDbNArgExpression(KDb::ArgumentListExpression, ',');
-    n.append(KDbConstExpression(INTEGER_CONST, 1));
-    n.append(KDbConstExpression(SQL_NULL, QVariant()));
-    n.prepend(KDbConstExpression(INTEGER_CONST, 0));
+    n.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
+    n.append(KDbConstExpression(KDbToken::SQL_NULL, QVariant()));
+    n.prepend(KDbConstExpression(KDbToken::INTEGER_CONST, 0));
     QVERIFY(!n.containsInvalidArgument());
     QVERIFY(n.containsNullArgument());
     QCOMPARE(n.toString(), KDbEscapedString("0, 1, NULL"));
@@ -456,16 +491,16 @@ void ExpressionsTest::testUnaryExpression()
     QVERIFY(u.arg().isNull());
 
     // -- copy ctor & cloning
-    c1 = KDbConstExpression(INTEGER_CONST, 7);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 7);
     u = KDbUnaryExpression('-', c1);
     testCloneExpression(u);
-    QCOMPARE(u.tokenToDebugString(), QString("-"));
+    QCOMPARE(u.token().name(), QString("-"));
     QCOMPARE(u.toString(), KDbEscapedString("-7"));
     QCOMPARE(c1, u.arg().toConst());
 
     u2 = KDbUnaryExpression('-', u);
     testCloneExpression(u);
-    QCOMPARE(u2.tokenToDebugString(), QString("-"));
+    QCOMPARE(u2.token().name(), QString("-"));
     QCOMPARE(u2.toString(), KDbEscapedString("--7"));
     QCOMPARE(u, u2.arg().toUnary());
 
@@ -474,40 +509,46 @@ void ExpressionsTest::testUnaryExpression()
     QCOMPARE(u.toString(), KDbEscapedString("(7)"));
     QCOMPARE(c1, u.arg().toConst());
 
-    c1 = KDbConstExpression(SQL_TRUE, true);
-    u = KDbUnaryExpression(NOT, c1);
+    c1 = KDbConstExpression(KDbToken::SQL_TRUE, true);
+    u = KDbUnaryExpression(KDbToken::NOT, c1);
     testCloneExpression(u);
     QCOMPARE(u.toString(), KDbEscapedString("NOT TRUE"));
     QCOMPARE(c1, u.arg().toConst());
 
-    c1 = KDbConstExpression(SQL_NULL, QVariant());
-    u = KDbUnaryExpression(SQL_IS_NULL, c1);
+    c1 = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
+    u = KDbUnaryExpression(KDbToken::NOT, c1);
+    testCloneExpression(u);
+    QCOMPARE(u.toString(), KDbEscapedString("NOT NULL"));
+    QCOMPARE(c1, u.arg().toConst());
+
+    c1 = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
+    u = KDbUnaryExpression(KDbToken::SQL_IS_NULL, c1);
     testCloneExpression(u);
     QCOMPARE(u.toString(), KDbEscapedString("NULL IS NULL"));
     QCOMPARE(c1, u.arg().toConst());
 
-    c1 = KDbConstExpression(SQL_NULL, QVariant());
-    u = KDbUnaryExpression(SQL_IS_NOT_NULL, c1);
+    c1 = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
+    u = KDbUnaryExpression(KDbToken::SQL_IS_NOT_NULL, c1);
     testCloneExpression(u);
     QCOMPARE(u.toString(), KDbEscapedString("NULL IS NOT NULL"));
     QCOMPARE(c1, u.arg().toConst());
 
-    c1 = KDbConstExpression(INTEGER_CONST, 17);
-    u = KDbUnaryExpression(SQL, c1);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 17);
+    u = KDbUnaryExpression(KDbToken::SQL, c1);
     testCloneExpression(u);
-    QCOMPARE(u.toString(), KDbEscapedString("{INVALID_OPERATOR#%1} 17").arg(SQL));
+    QCOMPARE(u.toString(), KDbEscapedString("SQL 17"));
     QCOMPARE(c1, u.arg().toConst());
 
     // -- exchanging arg between two unary expressions
-    c = KDbConstExpression(INTEGER_CONST, 17);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 17);
     u = KDbUnaryExpression('-', c);
-    c1 = KDbConstExpression(INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     u2 = KDbUnaryExpression('+', c1);
     u2.setArg(c); // this should take c arg from u to u2
     QCOMPARE(c, u2.arg().toConst()); // c is now in u2
     QVERIFY(u.arg().isNull()); // u has null arg now
 
-    c = KDbConstExpression(INTEGER_CONST, 17);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 17);
     u = KDbUnaryExpression('-', c);
     u2 = KDbUnaryExpression('+', c);
     // u2 takes c arg from u
@@ -515,9 +556,9 @@ void ExpressionsTest::testUnaryExpression()
     QVERIFY(u.arg().isNull()); // u has null arg now
 
     // -- cycles
-    c = KDbConstExpression(INTEGER_CONST, 17);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 17);
     u = KDbUnaryExpression('-', c);
-    c1 = KDbConstExpression(INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     u2 = KDbUnaryExpression('+', c1);
     u2.setArg(u);
     u.setArg(u2);
@@ -546,7 +587,7 @@ void ExpressionsTest::testBinaryExpression()
     QVERIFY(b.isNull()); // it's null because args are null
     qDebug() << b.toString();
     QCOMPARE(b.toString(), KDbEscapedString("<UNKNOWN!>"));
-    c = KDbConstExpression(INTEGER_CONST, 10);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 10);
     b = KDbBinaryExpression(c, '-', KDbExpression());
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
@@ -561,24 +602,24 @@ void ExpressionsTest::testBinaryExpression()
     QCOMPARE(b.toString(), KDbEscapedString("<UNKNOWN!>"));
 
     // -- copy ctor & cloning
-    c = KDbConstExpression(INTEGER_CONST, 3);
-    c1 = KDbConstExpression(INTEGER_CONST, 4);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 4);
     b = KDbBinaryExpression(c, '/', c1);
     testCloneExpression(b);
-    QCOMPARE(b.tokenToDebugString(), QString("/"));
+    QCOMPARE(b.token().name(), QString("/"));
     QCOMPARE(b.toString(), KDbEscapedString("3 / 4"));
     QCOMPARE(c1, b.right().toConst());
 
     b2 = KDbBinaryExpression(b, '*', b.clone());
     testCloneExpression(b2);
-    QCOMPARE(b2.tokenToDebugString(), QString("*"));
+    QCOMPARE(b2.token().name(), QString("*"));
     QCOMPARE(b2.toString(), KDbEscapedString("3 / 4 * 3 / 4"));
     QCOMPARE(b, b2.left().toBinary());
 
     // -- cycles
     // --- ref to parent
     b = KDbBinaryExpression(
-            KDbConstExpression(INTEGER_CONST, 1), '+', KDbConstExpression(INTEGER_CONST, 2));
+            KDbConstExpression(KDbToken::INTEGER_CONST, 1), '+', KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     KDbEscapedString s = b.toString();
     b.setLeft(b); // should not work
     qDebug() << b.toString();
@@ -589,8 +630,8 @@ void ExpressionsTest::testBinaryExpression()
     QCOMPARE(s, b.toString());
     // --- ref to grandparent
     b = KDbBinaryExpression(
-            KDbConstExpression(INTEGER_CONST, 1), '+', KDbConstExpression(INTEGER_CONST, 2));
-    c = KDbConstExpression(INTEGER_CONST, 10);
+            KDbConstExpression(KDbToken::INTEGER_CONST, 1), '+', KDbConstExpression(KDbToken::INTEGER_CONST, 2));
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 10);
     b2 = KDbBinaryExpression(b, '-', c);
     qDebug() << b2.toString();
     QCOMPARE(b2.toString(), KDbEscapedString("1 + 2 - 10"));
@@ -600,7 +641,7 @@ void ExpressionsTest::testBinaryExpression()
 
     // -- moving right argument to left should remove right arg
     b = KDbBinaryExpression(
-            KDbConstExpression(INTEGER_CONST, 1), '+', KDbConstExpression(INTEGER_CONST, 2));
+            KDbConstExpression(KDbToken::INTEGER_CONST, 1), '+', KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     c = b.right().toConst();
     b.setLeft(c);
     qDebug() << b.toString();
@@ -608,7 +649,7 @@ void ExpressionsTest::testBinaryExpression()
 
     // -- moving left argument to right should remove left arg
     b = KDbBinaryExpression(
-            KDbConstExpression(INTEGER_CONST, 1), '+', KDbConstExpression(INTEGER_CONST, 2));
+            KDbConstExpression(KDbToken::INTEGER_CONST, 1), '+', KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     c = b.left().toConst();
     b.setRight(c);
     qDebug() << b.toString();
@@ -617,42 +658,42 @@ void ExpressionsTest::testBinaryExpression()
 
 void ExpressionsTest::testBinaryExpressionCloning_data()
 {
-    QTest::addColumn<int>("type1");
+    QTest::addColumn<KDbToken>("type1");
     QTest::addColumn<QVariant>("const1");
-    QTest::addColumn<int>("token");
-    QTest::addColumn<int>("type2");
+    QTest::addColumn<KDbToken>("token");
+    QTest::addColumn<KDbToken>("type2");
     QTest::addColumn<QVariant>("const2");
     QTest::addColumn<QString>("string");
 
 #define T(type1, const1, token, type2, const2, string) \
-        QTest::newRow(KDbExpression::tokenToDebugString(token).toLatin1().constData()) \
-            << int(type1) << QVariant(const1) << int(token) \
-            << int(type2) << QVariant(const2) << QString(string)
+        QTest::newRow(TO_TOKEN(token).name().toLatin1().constData()) \
+            << type1 << QVariant(const1) << TO_TOKEN(token) \
+            << type2 << QVariant(const2) << QString(string)
 
-    T(INTEGER_CONST, 3, '/', INTEGER_CONST, 4, "3 / 4");
-    T(INTEGER_CONST, 3, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 4, "3 >> 4");
-    T(INTEGER_CONST, 3, BITWISE_SHIFT_LEFT, INTEGER_CONST, 4, "3 << 4");
-    T(INTEGER_CONST, 3, NOT_EQUAL, INTEGER_CONST, 4, "3 <> 4");
-    T(INTEGER_CONST, 3, NOT_EQUAL2, INTEGER_CONST, 4, "3 != 4");
-    T(INTEGER_CONST, 3, LESS_OR_EQUAL, INTEGER_CONST, 4, "3 <= 4");
-    T(INTEGER_CONST, 3, GREATER_OR_EQUAL, INTEGER_CONST, 4, "3 >= 4");
-    T(CHARACTER_STRING_LITERAL, "ABC", LIKE, CHARACTER_STRING_LITERAL, "A%", "'ABC' LIKE 'A%'");
-    T(INTEGER_CONST, 3, SQL_IN, INTEGER_CONST, 4, "3 IN 4");
-    T(INTEGER_CONST, 3, SIMILAR_TO, INTEGER_CONST, 4, "3 SIMILAR TO 4");
-    T(INTEGER_CONST, 3, NOT_SIMILAR_TO, INTEGER_CONST, 4, "3 NOT SIMILAR TO 4");
-    T(SQL_TRUE, true, OR, SQL_FALSE, false, "TRUE OR FALSE");
-    T(INTEGER_CONST, 3, AND, INTEGER_CONST, 4, "3 AND 4");
-    T(INTEGER_CONST, 3, XOR, INTEGER_CONST, 4, "3 XOR 4");
-    T(CHARACTER_STRING_LITERAL, "AB", CONCATENATION, CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
+    T(KDbToken::INTEGER_CONST, 3, '/', KDbToken::INTEGER_CONST, 4, "3 / 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::BITWISE_SHIFT_RIGHT, KDbToken::INTEGER_CONST, 4, "3 >> 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::BITWISE_SHIFT_LEFT, KDbToken::INTEGER_CONST, 4, "3 << 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::NOT_EQUAL, KDbToken::INTEGER_CONST, 4, "3 <> 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::NOT_EQUAL2, KDbToken::INTEGER_CONST, 4, "3 != 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::LESS_OR_EQUAL, KDbToken::INTEGER_CONST, 4, "3 <= 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::GREATER_OR_EQUAL, KDbToken::INTEGER_CONST, 4, "3 >= 4");
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ABC", KDbToken::LIKE, KDbToken::CHARACTER_STRING_LITERAL, "A%", "'ABC' LIKE 'A%'");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::SQL_IN, KDbToken::INTEGER_CONST, 4, "3 IN 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::SIMILAR_TO, KDbToken::INTEGER_CONST, 4, "3 SIMILAR TO 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::NOT_SIMILAR_TO, KDbToken::INTEGER_CONST, 4, "3 NOT SIMILAR TO 4");
+    T(KDbToken::SQL_TRUE, true, KDbToken::OR, KDbToken::SQL_FALSE, false, "TRUE OR FALSE");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::AND, KDbToken::INTEGER_CONST, 4, "3 AND 4");
+    T(KDbToken::INTEGER_CONST, 3, KDbToken::XOR, KDbToken::INTEGER_CONST, 4, "3 XOR 4");
+    T(KDbToken::CHARACTER_STRING_LITERAL, "AB", KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
 #undef T
 }
 
 void ExpressionsTest::testBinaryExpressionCloning()
 {
-    QFETCH(int, type1);
+    QFETCH(KDbToken, type1);
     QFETCH(QVariant, const1);
-    QFETCH(int, token);
-    QFETCH(int, type2);
+    QFETCH(KDbToken, token);
+    QFETCH(KDbToken, type2);
     QFETCH(QVariant, const2);
     QFETCH(QString, string);
 
@@ -660,8 +701,9 @@ void ExpressionsTest::testBinaryExpressionCloning()
     KDbConstExpression c1(type2, const2);
     KDbBinaryExpression b(c, token, c1);
     testCloneExpression(b);
-    QCOMPARE(b.tokenToDebugString(), KDbExpression::tokenToDebugString(token));
-    qDebug() << KDbExpression::tokenToDebugString(token) << b.toString();
+    QCOMPARE(b.token(), token);
+    QCOMPARE(b.token().name(), token.name());
+    //qDebug() << token << b;
     QCOMPARE(b.toString(), KDbEscapedString(string));
     QCOMPARE(c, b.left().toConst());
     QCOMPARE(c1, b.right().toConst());
@@ -676,17 +718,17 @@ void ExpressionsTest::testFunctionExpression()
     QVERIFY(emptyFunction.isNull());
 
     KDbNArgExpression args;
-    args.append(KDbConstExpression(CHARACTER_STRING_LITERAL, "abc"));
-    args.append(KDbConstExpression(INTEGER_CONST, 2));
+    args.append(KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, "abc"));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     KDbFunctionExpression f_substr("SUBSTR", args);
     //qDebug() << f_substr.toString();
-    //qDebug() << f_substr.tokenToDebugString();
-    //qDebug() << f_substr.tokenToString();
+    //qDebug() << f_substr.token().name();
+    //qDebug() << f_substr.token().toString();
 
     testCloneExpression(f_substr);
     QCOMPARE(f_substr.type(), KDbField::Text);
 
-    args.append(KDbConstExpression(INTEGER_CONST, 1));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
     KDbFunctionExpression f_substr2("SUBSTR", args);
     testCloneExpression(f_substr2);
     QCOMPARE(f_substr2.type(), KDbField::Text);
@@ -718,21 +760,21 @@ void ExpressionsTest::testConstExpressionValidate()
 {
     KDbConstExpression c;
 
-    c = KDbConstExpression(SQL_NULL, QVariant());
+    c = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
     QCOMPARE(c.type(), KDbField::Null);
     QVERIFY(c.isValid());
     QVERIFY(!c.isNull());
     QVERIFY(validate(&c));
 
     // null
-    c = KDbConstExpression(SQL_NULL, QVariant());
+    c = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
     QCOMPARE(c.type(), KDbField::Null);
     QVERIFY(validate(&c));
     testCloneExpression(c);
     qDebug() << c;
 
     // integer
-    c = KDbConstExpression(INTEGER_CONST, -0x7f);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, -0x7f);
     QCOMPARE(c.type(), KDbField::Byte);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -747,7 +789,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, -10);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, -10);
     QCOMPARE(c.type(), KDbField::Byte);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -756,7 +798,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, 0);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 0);
     QCOMPARE(c.type(), KDbField::Byte);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -765,7 +807,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, 20);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 20);
     QCOMPARE(c.type(), KDbField::Byte);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -774,7 +816,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, 255);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 255);
     QCOMPARE(c.type(), KDbField::Byte);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -783,7 +825,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, -0x80);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, -0x80);
     QCOMPARE(c.type(), KDbField::ShortInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -792,7 +834,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, -0x7fff);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, -0x7fff);
     QCOMPARE(c.type(), KDbField::ShortInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -801,7 +843,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, 256);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 256);
     QCOMPARE(c.type(), KDbField::ShortInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -810,7 +852,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, 0xffff);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 0xffff);
     QCOMPARE(c.type(), KDbField::ShortInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -819,7 +861,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, -0x8000);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, -0x8000);
     QCOMPARE(c.type(), KDbField::Integer);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -828,7 +870,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, uint(0x10000));
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, uint(0x10000));
     QCOMPARE(c.type(), KDbField::Integer);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -837,7 +879,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, qlonglong(-0x100000));
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, qlonglong(-0x100000));
     QCOMPARE(c.type(), KDbField::BigInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -846,7 +888,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(INTEGER_CONST, qulonglong(0x1000000));
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, qulonglong(0x1000000));
     QCOMPARE(c.type(), KDbField::BigInteger);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -858,7 +900,7 @@ void ExpressionsTest::testConstExpressionValidate()
     // string
     int oldMaxLen = KDbField::defaultMaxLength(); // save
     KDbField::setDefaultMaxLength(0);
-    c = KDbConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
+    c = KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, "01234567890");
     QVERIFY(c.isValid());
     QVERIFY(c.isTextType());
     QCOMPARE(c.type(), KDbField::Text);
@@ -868,7 +910,7 @@ void ExpressionsTest::testConstExpressionValidate()
     qDebug() << c;
 
     KDbField::setDefaultMaxLength(10);
-    c = KDbConstExpression(CHARACTER_STRING_LITERAL, QString());
+    c = KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QString());
     QCOMPARE(c.type(), KDbField::Text);
     QVERIFY(c.isValid());
     QVERIFY(c.isTextType());
@@ -877,7 +919,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(CHARACTER_STRING_LITERAL, QVariant());
+    c = KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant());
     QCOMPARE(c.type(), KDbField::Text);
     QVERIFY(c.isValid());
     QVERIFY(c.isTextType());
@@ -886,7 +928,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(CHARACTER_STRING_LITERAL, "01234567890");
+    c = KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, "01234567890");
     QCOMPARE(c.type(), KDbField::LongText);
     QVERIFY(c.isValid());
     QVERIFY(c.isTextType());
@@ -903,7 +945,7 @@ void ExpressionsTest::testConstExpressionValidate()
     KDbField::setDefaultMaxLength(oldMaxLen); // restore
 
     // bool
-    c = KDbConstExpression(SQL_TRUE, true);
+    c = KDbConstExpression(KDbToken::SQL_TRUE, true);
     QCOMPARE(c.type(), KDbField::Boolean);
     QVERIFY(c.isValid());
     QVERIFY(!c.isTextType());
@@ -917,7 +959,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(SQL_FALSE, false);
+    c = KDbConstExpression(KDbToken::SQL_FALSE, false);
     QCOMPARE(c.type(), KDbField::Boolean);
     QVERIFY(c.isValid());
     QVERIFY(!c.isTextType());
@@ -928,7 +970,7 @@ void ExpressionsTest::testConstExpressionValidate()
     qDebug() << c;
 
     // real
-    c = KDbConstExpression(REAL_CONST, QVariant());
+    c = KDbConstExpression(KDbToken::REAL_CONST, QVariant());
     QCOMPARE(c.type(), KDbField::Double);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -939,7 +981,7 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    c = KDbConstExpression(REAL_CONST, 3.14159);
+    c = KDbConstExpression(KDbToken::REAL_CONST, 3.14159);
     QCOMPARE(c.type(), KDbField::Double);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
@@ -957,7 +999,7 @@ void ExpressionsTest::testConstExpressionValidate()
 
     // date
     QDate date(QDate::currentDate());
-    c = KDbConstExpression(DATE_CONST, date);
+    c = KDbConstExpression(KDbToken::DATE_CONST, date);
     QVERIFY(c.isValid());
     QVERIFY(c.isDateTimeType());
     QCOMPARE(c.type(), KDbField::Date);
@@ -975,7 +1017,7 @@ void ExpressionsTest::testConstExpressionValidate()
 
     // date/time
     QDateTime dateTime(QDateTime::currentDateTime());
-    c = KDbConstExpression(DATETIME_CONST, dateTime);
+    c = KDbConstExpression(KDbToken::DATETIME_CONST, dateTime);
     QCOMPARE(c.type(), KDbField::DateTime);
     QVERIFY(c.isValid());
     QVERIFY(c.isDateTimeType());
@@ -993,7 +1035,7 @@ void ExpressionsTest::testConstExpressionValidate()
 
     // time
     QTime time(QTime::currentTime());
-    c = KDbConstExpression(TIME_CONST, time);
+    c = KDbConstExpression(KDbToken::TIME_CONST, time);
     QCOMPARE(c.type(), KDbField::Time);
     QVERIFY(c.isValid());
     QVERIFY(c.isDateTimeType());
@@ -1010,7 +1052,7 @@ void ExpressionsTest::testConstExpressionValidate()
     qDebug() << c;
 
     // setValue()
-    c = KDbConstExpression(INTEGER_CONST, 124);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 124);
     QCOMPARE(c.value(), QVariant(124));
     c.setValue(299);
     QCOMPARE(c.value(), QVariant(299));
@@ -1029,14 +1071,28 @@ void ExpressionsTest::testUnaryExpressionValidate()
     KDbUnaryExpression u2;
 
     // cycles detected by validate()
-    c = KDbConstExpression(INTEGER_CONST, 17);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 17);
     u = KDbUnaryExpression('-', c);
-    c1 = KDbConstExpression(INTEGER_CONST, 3);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     u2 = KDbUnaryExpression('+', c1);
     u2.setArg(u);
     u.setArg(u2);
     QVERIFY(!validate(&u));
     //qDebug() << c << u << c1 << u2;
+
+    // NOT NULL is NULL
+    c = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
+    u = KDbUnaryExpression(KDbToken::NOT, c);
+    QCOMPARE(u.type(), KDbField::Null);
+    QVERIFY(validate(&u));
+    testCloneExpression(u);
+
+    // NOT "abc" is INVALID
+    c = KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, "abc");
+    u = KDbUnaryExpression(KDbToken::NOT, c);
+    QCOMPARE(u.type(), KDbField::InvalidType);
+    QVERIFY(!validate(&u));
+    testCloneExpression(u);
 }
 
 void ExpressionsTest::testNArgExpressionValidate()
@@ -1046,13 +1102,13 @@ void ExpressionsTest::testNArgExpressionValidate()
     KDbConstExpression c1;
     KDbConstExpression c2;
 
-    c = KDbConstExpression(SQL_NULL, QVariant());
+    c = KDbConstExpression(KDbToken::SQL_NULL, QVariant());
     QCOMPARE(c.type(), KDbField::Null);
     QVERIFY(validate(&c));
 
     n = KDbNArgExpression(KDb::ArithmeticExpression, '+');
-    c = KDbConstExpression(INTEGER_CONST, 0);
-    c1 = KDbConstExpression(INTEGER_CONST, 1);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 0);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 1);
     n.append(c);
     n.append(c1);
     QCOMPARE(n.type(), KDbField::Tuple);
@@ -1062,9 +1118,9 @@ void ExpressionsTest::testNArgExpressionValidate()
 
     // -- a list of arguments
     n = KDbNArgExpression(KDb::ArgumentListExpression, ',');
-    c = KDbConstExpression(INTEGER_CONST, 1);
-    c1 = KDbConstExpression(INTEGER_CONST, 2);
-    c2 = KDbConstExpression(INTEGER_CONST, 3);
+    c = KDbConstExpression(KDbToken::INTEGER_CONST, 1);
+    c1 = KDbConstExpression(KDbToken::INTEGER_CONST, 2);
+    c2 = KDbConstExpression(KDbToken::INTEGER_CONST, 3);
     n.append(c);
     n.append(c1);
     n.append(c2);
@@ -1075,15 +1131,15 @@ void ExpressionsTest::testNArgExpressionValidate()
 
 void ExpressionsTest::testBinaryExpressionValidate_data()
 {
-    QTest::addColumn<int>("type1");
+    QTest::addColumn<KDbToken>("type1");
     QTest::addColumn<QVariant>("const1");
-    QTest::addColumn<int>("token");
-    QTest::addColumn<int>("type2");
+    QTest::addColumn<KDbToken>("token");
+    QTest::addColumn<KDbToken>("type2");
     QTest::addColumn<QVariant>("const2");
     QTest::addColumn<KDbField::Type>("type3");
 
     // invalid
-    KDbConstExpression c(INTEGER_CONST, 7);
+    KDbConstExpression c(KDbToken::INTEGER_CONST, 7);
     KDbBinaryExpression b(c, '+', KDbExpression());
     QCOMPARE(b.type(), KDbField::InvalidType);
     QVERIFY(!validate(&b));
@@ -1108,15 +1164,17 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
     testCloneExpression(b3);
     qDebug() << b3;
 
-#define T1(type1, const1, token, type2, const2, type3) \
+#define TNAME(type) type.name().toLatin1()
+
+#define T1(type1, const1, tokenOrChar, type2, const2, type3) \
         QTest::newRow( \
-            (QByteArray::number(__LINE__) + ": " + KDbExpression::tokenToDebugString(type1).toLatin1() + " " \
+            (QByteArray::number(__LINE__) + ": " + TNAME(type1) + " " \
              + QVariant(const1).toString().toLatin1() + " " \
-             + KDbExpression::tokenToDebugString(token).toLatin1() + " " \
-             + KDbExpression::tokenToDebugString(type2).toLatin1() + " " \
+             + TNAME(TO_TOKEN(tokenOrChar)) + " " \
+             + TNAME(type2) + " " \
              + QVariant(const2).toString().toLatin1()).constData()) \
-            << int(type1) << QVariant(const1) \
-            << int(token) << int(type2) << QVariant(const2) \
+            << type1 << QVariant(const1) \
+            << TO_TOKEN(tokenOrChar) << type2 << QVariant(const2) \
             << type3
 // tests both f(x, y) and f(y, x)
 #define T(type1, const1, token, type2, const2, type3) \
@@ -1124,111 +1182,127 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
         T1(type2, const2, token, type1, const1, type3)
 
     // null
-    T(SQL_NULL, QVariant(), '+', INTEGER_CONST, 7, KDbField::Null);
-    // NULL OR bool == bool
-    T(SQL_NULL, QVariant(), OR, SQL_TRUE, true, KDbField::Boolean);
-    T(SQL_NULL, QVariant(), OR, CHARACTER_STRING_LITERAL, "xyz", KDbField::InvalidType);
+    T(KDbToken::SQL_NULL, QVariant(), '+', KDbToken::INTEGER_CONST, 7, KDbField::Null);
+    // NULL OR true is true
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::OR, KDbToken::SQL_TRUE, true, KDbField::Boolean);
+    // NULL AND true is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::AND, KDbToken::SQL_TRUE, true, KDbField::Null);
+    // NULL OR false is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::OR, KDbToken::SQL_FALSE, false, KDbField::Null);
+    // NULL AND false is false
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::AND, KDbToken::SQL_FALSE, false, KDbField::Boolean);
+    // NULL AND NULL is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::AND, KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    // NULL OR NULL is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::OR, KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    // NULL XOR TRUE is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::XOR, KDbToken::SQL_TRUE, true, KDbField::Null);
+    // NULL XOR NULL is NULL
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::XOR, KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    // NULL AND "xyz" is invalid
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::OR, KDbToken::CHARACTER_STRING_LITERAL, "xyz", KDbField::InvalidType);
     // integer
     // -- KDb::ArithmeticExpression only: resulting type is Integer or more
     //    see explanation for KDb::maximumForIntegerTypes()
-    T(INTEGER_CONST, 50, '+', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '-', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '*', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '/', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '&', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '|', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, '%', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, BITWISE_SHIFT_RIGHT, INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 50, BITWISE_SHIFT_LEFT, INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 20, KDbField::Integer);
-    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 300, KDbField::Integer);
-    T(INTEGER_CONST, 300, '+', INTEGER_CONST, 300, KDbField::Integer);
-    T(INTEGER_CONST, 50, '+', INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
-    T(INTEGER_CONST, INT_MAX, '+', INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
+    T(KDbToken::INTEGER_CONST, 50, '+', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '-', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '*', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '/', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '&', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '|', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '%', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, KDbToken::BITWISE_SHIFT_RIGHT, KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, KDbToken::BITWISE_SHIFT_LEFT, KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 300, '+', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 300, '+', KDbToken::INTEGER_CONST, 300, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 300, '+', KDbToken::INTEGER_CONST, 300, KDbField::Integer);
+    T(KDbToken::INTEGER_CONST, 50, '+', KDbToken::INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
+    T(KDbToken::INTEGER_CONST, INT_MAX, '+', KDbToken::INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
 
-    T(INTEGER_CONST, 50, '<', INTEGER_CONST, 20, KDbField::Boolean);
-    T(INTEGER_CONST, 50, '=', INTEGER_CONST, 20, KDbField::Boolean);
-    T(INTEGER_CONST, 50, '>', INTEGER_CONST, 20, KDbField::Boolean);
-    T(INTEGER_CONST, 50, '<', INTEGER_CONST, INT_MAX, KDbField::Boolean);
-    T(INTEGER_CONST, 50, '<', INTEGER_CONST, qulonglong(INT_MAX), KDbField::Boolean);
-    T(INTEGER_CONST, qulonglong(INT_MAX), '<', INTEGER_CONST, INT_MAX, KDbField::Boolean);
-    T(INTEGER_CONST, 300, LESS_OR_EQUAL, INTEGER_CONST, 20, KDbField::Boolean);
-    T(INTEGER_CONST, 300, GREATER_OR_EQUAL, INTEGER_CONST, 300, KDbField::Boolean);
-    T(INTEGER_CONST, 300, '>', INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 50, '<', KDbToken::INTEGER_CONST, 20, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 50, '=', KDbToken::INTEGER_CONST, 20, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 50, '>', KDbToken::INTEGER_CONST, 20, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 50, '<', KDbToken::INTEGER_CONST, INT_MAX, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 50, '<', KDbToken::INTEGER_CONST, qulonglong(INT_MAX), KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, qulonglong(INT_MAX), '<', KDbToken::INTEGER_CONST, INT_MAX, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::LESS_OR_EQUAL, KDbToken::INTEGER_CONST, 20, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::GREATER_OR_EQUAL, KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::INTEGER_CONST, 300, '>', KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
 
-    T(INTEGER_CONST, 300, OR, INTEGER_CONST, 20, KDbField::InvalidType);
-    T(INTEGER_CONST, 300, AND, INTEGER_CONST, 20, KDbField::InvalidType);
-    T(INTEGER_CONST, 300, XOR, INTEGER_CONST, 20, KDbField::InvalidType);
-    T(INTEGER_CONST, 300, OR, SQL_NULL, QVariant(), KDbField::InvalidType);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::OR, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::AND, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::XOR, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::INTEGER_CONST, 300, KDbToken::OR, KDbToken::SQL_NULL, QVariant(), KDbField::InvalidType);
     // real
-    T(REAL_CONST, 0.5, '+', REAL_CONST, -9.4, KDbField::Double);
-    T(REAL_CONST, 0.5, '-', REAL_CONST, -9.4, KDbField::Double);
-    T(REAL_CONST, 0.5, '*', REAL_CONST, -9.4, KDbField::Double);
-    T(REAL_CONST, 0.5, '/', REAL_CONST, -9.4, KDbField::Double);
-    T(REAL_CONST, 0.5, '&', REAL_CONST, -9.4, KDbField::Integer);
-    T(REAL_CONST, 0.5, '&', INTEGER_CONST, 9, KDbField::Byte);
-    T(REAL_CONST, 0.5, '&', INTEGER_CONST, 1000, KDbField::ShortInteger);
-    T(REAL_CONST, 0.5, '&', INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
-    T(REAL_CONST, 0.5, '%', REAL_CONST, -9.4, KDbField::Double);
-    T(REAL_CONST, 0.5, BITWISE_SHIFT_RIGHT, REAL_CONST, 9.4, KDbField::Integer);
-    T(REAL_CONST, 0.5, BITWISE_SHIFT_LEFT, REAL_CONST, 9.4, KDbField::Integer);
-    T(REAL_CONST, 0.5, '+', INTEGER_CONST, 300, KDbField::Double);
-    T(REAL_CONST, 0.5, '-', INTEGER_CONST, 300, KDbField::Double);
-    T(REAL_CONST, 0.5, '/', INTEGER_CONST, 300, KDbField::Double);
-    T(REAL_CONST, 0.5, '-', SQL_NULL, QVariant(), KDbField::Null);
+    T(KDbToken::REAL_CONST, 0.5, '+', KDbToken::REAL_CONST, -9.4, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '-', KDbToken::REAL_CONST, -9.4, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '*', KDbToken::REAL_CONST, -9.4, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '/', KDbToken::REAL_CONST, -9.4, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '&', KDbToken::REAL_CONST, -9.4, KDbField::Integer);
+    T(KDbToken::REAL_CONST, 0.5, '&', KDbToken::INTEGER_CONST, 9, KDbField::Byte);
+    T(KDbToken::REAL_CONST, 0.5, '&', KDbToken::INTEGER_CONST, 1000, KDbField::ShortInteger);
+    T(KDbToken::REAL_CONST, 0.5, '&', KDbToken::INTEGER_CONST, qulonglong(INT_MAX), KDbField::BigInteger);
+    T(KDbToken::REAL_CONST, 0.5, '%', KDbToken::REAL_CONST, -9.4, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, KDbToken::BITWISE_SHIFT_RIGHT, KDbToken::REAL_CONST, 9.4, KDbField::Integer);
+    T(KDbToken::REAL_CONST, 0.5, KDbToken::BITWISE_SHIFT_LEFT, KDbToken::REAL_CONST, 9.4, KDbField::Integer);
+    T(KDbToken::REAL_CONST, 0.5, '+', KDbToken::INTEGER_CONST, 300, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '-', KDbToken::INTEGER_CONST, 300, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '/', KDbToken::INTEGER_CONST, 300, KDbField::Double);
+    T(KDbToken::REAL_CONST, 0.5, '-', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
 
-    T(REAL_CONST, 0.5, '>', REAL_CONST, -9.4, KDbField::Boolean);
-    T(REAL_CONST, 0.5, '>', INTEGER_CONST, 300, KDbField::Boolean);
-    T(REAL_CONST, 0.5, '=', INTEGER_CONST, 300, KDbField::Boolean);
-    T(REAL_CONST, 0.5, '<', INTEGER_CONST, qulonglong(INT_MAX), KDbField::Boolean);
-    T(REAL_CONST, 0.5, LESS_OR_EQUAL, INTEGER_CONST, 300, KDbField::Boolean);
-    T(REAL_CONST, 0.5, GREATER_OR_EQUAL, INTEGER_CONST, 300, KDbField::Boolean);
-    T(REAL_CONST, 0.5, '>', SQL_NULL, QVariant(), KDbField::Null);
+    T(KDbToken::REAL_CONST, 0.5, '>', KDbToken::REAL_CONST, -9.4, KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, '>', KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, '=', KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, '<', KDbToken::INTEGER_CONST, qulonglong(INT_MAX), KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, KDbToken::LESS_OR_EQUAL, KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, KDbToken::GREATER_OR_EQUAL, KDbToken::INTEGER_CONST, 300, KDbField::Boolean);
+    T(KDbToken::REAL_CONST, 0.5, '>', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
 
-    T(REAL_CONST, 30.2, OR, REAL_CONST, 20, KDbField::InvalidType);
-    T(REAL_CONST, 30.2, AND, REAL_CONST, 20, KDbField::InvalidType);
-    T(REAL_CONST, 30.2, XOR, REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::REAL_CONST, 30.2, KDbToken::OR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::REAL_CONST, 30.2, KDbToken::AND, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::REAL_CONST, 30.2, KDbToken::XOR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
     // string
-    T(CHARACTER_STRING_LITERAL, "ab", CONCATENATION, CHARACTER_STRING_LITERAL, "cd", KDbField::Text);
-    T(SQL_NULL, QVariant(), CONCATENATION, CHARACTER_STRING_LITERAL, "cd", KDbField::Null);
-    T(INTEGER_CONST, 50, CONCATENATION, INTEGER_CONST, 20, KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "ab", CONCATENATION, INTEGER_CONST, 20, KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "ab", GREATER_OR_EQUAL, CHARACTER_STRING_LITERAL, "cd", KDbField::Boolean);
-    T(CHARACTER_STRING_LITERAL, "ab", '<', INTEGER_CONST, 3, KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "ab", '+', CHARACTER_STRING_LITERAL, "cd", KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "A", OR, REAL_CONST, 20, KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "A", AND, REAL_CONST, 20, KDbField::InvalidType);
-    T(CHARACTER_STRING_LITERAL, "A", XOR, REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Text);
+    T(KDbToken::SQL_NULL, QVariant(), KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Null);
+    T(KDbToken::INTEGER_CONST, 50, KDbToken::CONCATENATION, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::CONCATENATION, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::GREATER_OR_EQUAL, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Boolean);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '<', KDbToken::INTEGER_CONST, 3, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '+', KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::OR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::AND, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::XOR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
     // bool
-    T(SQL_TRUE, true, '<', SQL_FALSE, false, KDbField::Boolean);
-    T(SQL_TRUE, true, '=', SQL_FALSE, false, KDbField::Boolean);
-    T(SQL_TRUE, true, '+', SQL_FALSE, false, KDbField::InvalidType);
-    T(SQL_TRUE, true, '<', INTEGER_CONST, 20, KDbField::Boolean);
-    T(SQL_TRUE, true, '<', REAL_CONST, -10.1, KDbField::Boolean);
-    T(SQL_TRUE, true, '-', SQL_NULL, QVariant(), KDbField::Null);
-    T(SQL_TRUE, true, '<', SQL_NULL, QVariant(), KDbField::Null);
-    T(SQL_TRUE, true, OR, SQL_FALSE, false, KDbField::Boolean);
-    T(SQL_TRUE, true, AND, SQL_FALSE, false, KDbField::Boolean);
-    T(SQL_TRUE, true, XOR, SQL_FALSE, false, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, '<', KDbToken::SQL_FALSE, false, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, '=', KDbToken::SQL_FALSE, false, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, '+', KDbToken::SQL_FALSE, false, KDbField::InvalidType);
+    T(KDbToken::SQL_TRUE, true, '<', KDbToken::INTEGER_CONST, 20, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, '<', KDbToken::REAL_CONST, -10.1, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, '-', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    T(KDbToken::SQL_TRUE, true, '<', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    T(KDbToken::SQL_TRUE, true, KDbToken::OR, KDbToken::SQL_FALSE, false, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, KDbToken::AND, KDbToken::SQL_FALSE, false, KDbField::Boolean);
+    T(KDbToken::SQL_TRUE, true, KDbToken::XOR, KDbToken::SQL_FALSE, false, KDbField::Boolean);
     // date/time
-    T(DATE_CONST, QDate(2001, 1, 2), '=', DATE_CONST, QDate(2002, 1, 2), KDbField::Boolean);
-    T(DATETIME_CONST, QDateTime(QDate(2001, 1, 2), QTime(1, 2, 3)), LESS_OR_EQUAL, DATE_CONST, QDateTime::currentDateTime(), KDbField::Boolean);
-    T(TIME_CONST, QTime(1, 2, 3), '<', DATE_CONST, QTime::currentTime(), KDbField::Boolean);
-    T(DATE_CONST, QDate(2001, 1, 2), '=', INTEGER_CONST, 17, KDbField::InvalidType);
-    T(DATE_CONST, QDate(2001, 1, 2), '=', SQL_NULL, QVariant(), KDbField::Null);
-    T(DATE_CONST, QDate(2001, 1, 2), OR, SQL_FALSE, false, KDbField::InvalidType);
-    T(DATE_CONST, QDate(2001, 1, 2), AND, SQL_FALSE, false, KDbField::InvalidType);
-    T(DATE_CONST, QDate(2001, 1, 2), XOR, SQL_FALSE, false, KDbField::InvalidType);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::DATE_CONST, QDate(2002, 1, 2), KDbField::Boolean);
+    T(KDbToken::DATETIME_CONST, QDateTime(QDate(2001, 1, 2), QTime(1, 2, 3)), KDbToken::LESS_OR_EQUAL, KDbToken::DATE_CONST, QDateTime::currentDateTime(), KDbField::Boolean);
+    T(KDbToken::TIME_CONST, QTime(1, 2, 3), '<', KDbToken::DATE_CONST, QTime::currentTime(), KDbField::Boolean);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::INTEGER_CONST, 17, KDbField::InvalidType);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), KDbToken::OR, KDbToken::SQL_FALSE, false, KDbField::InvalidType);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), KDbToken::AND, KDbToken::SQL_FALSE, false, KDbField::InvalidType);
+    T(KDbToken::DATE_CONST, QDate(2001, 1, 2), KDbToken::XOR, KDbToken::SQL_FALSE, false, KDbField::InvalidType);
 #undef T
 #undef T1
+#undef TNAME
 }
 
 void ExpressionsTest::testBinaryExpressionValidate()
 {
-    QFETCH(int, type1);
+    QFETCH(KDbToken, type1);
     QFETCH(QVariant, const1);
-    QFETCH(int, token);
-    QFETCH(int, type2);
+    QFETCH(KDbToken, token);
+    QFETCH(KDbToken, type2);
     QFETCH(QVariant, const2);
     QFETCH(KDbField::Type, type3);
 
@@ -1248,12 +1322,12 @@ void ExpressionsTest::testFunctionExpressionValidate()
     QVERIFY(!validate(&emptyFunction));
 
     KDbNArgExpression args;
-    args.append(KDbConstExpression(CHARACTER_STRING_LITERAL, "abc"));
-    args.append(KDbConstExpression(INTEGER_CONST, 2));
+    args.append(KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, "abc"));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     KDbFunctionExpression f_substr("SUBSTR", args);
     QVERIFY(validate(&f_substr));
 
-    args.append(KDbConstExpression(INTEGER_CONST, 1));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
     KDbFunctionExpression f_substr2("SUBSTR", args);
     QVERIFY(validate(&f_substr2));
 
@@ -1264,20 +1338,20 @@ void ExpressionsTest::testFunctionExpressionValidate()
 
     // wrong type (1st arg)
     args = KDbNArgExpression();
-    args.append(KDbConstExpression(DATETIME_CONST, QDateTime::currentDateTime()));
-    args.append(KDbConstExpression(INTEGER_CONST, 1));
+    args.append(KDbConstExpression(KDbToken::DATETIME_CONST, QDateTime::currentDateTime()));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 1));
     f_substr2.setArguments(args);
     QVERIFY(!validate(&f_substr2));
 
     // fixed type
     KDbConstExpression first = args.arg(0).toConst();
-    first.setToken(CHARACTER_STRING_LITERAL);
+    first.setToken(KDbToken::CHARACTER_STRING_LITERAL);
     first.setValue("xyz");
     QVERIFY(validate(&f_substr2));
 
     // wrong type (2nd arg)
     KDbConstExpression second = args.arg(1).toConst();
-    second.setToken(REAL_CONST);
+    second.setToken(KDbToken::REAL_CONST);
     second.setValue(3.14);
     QVERIFY(!validate(&f_substr2));
 
@@ -1287,18 +1361,18 @@ void ExpressionsTest::testFunctionExpressionValidate()
     QVERIFY(validate(&f_substr3));
 
     // fixed type
-    args.replace(1, KDbConstExpression(INTEGER_CONST, 1));
+    args.replace(1, KDbConstExpression(KDbToken::INTEGER_CONST, 1));
     QVERIFY(validate(&f_substr2));
 
     // wrong type (3rd arg)
-    args.append(KDbConstExpression(REAL_CONST, 1.111));
+    args.append(KDbConstExpression(KDbToken::REAL_CONST, 1.111));
     //qDebug() << args;
     //qDebug() << f_substr2;
     QVERIFY(!validate(&f_substr2));
 
     // wrong number of args
     f_substr2.setArguments(KDbNArgExpression());
-    args.append(KDbConstExpression(INTEGER_CONST, 77));
+    args.append(KDbConstExpression(KDbToken::INTEGER_CONST, 77));
     QVERIFY(!validate(&f_substr2));
 
     KDbFunctionExpression f_noname("", args);

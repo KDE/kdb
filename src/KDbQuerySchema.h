@@ -27,6 +27,7 @@
 #include "KDbObject.h"
 #include "KDbQueryColumnInfo.h"
 #include "KDbQuerySchemaParameter.h"
+#include "KDbToken.h"
 
 class KDbConnection;
 class KDbTableSchema;
@@ -703,7 +704,7 @@ public:
     /*! Adds a part to WHERE expression.
      Simplifies creating of WHERE expression, if used instead
      of setWhereExpression(KDbExpression *expr). */
-    void addToWhereExpression(KDbField *field, const QVariant& value, int relation = '=');
+    void addToWhereExpression(KDbField *field, const QVariant& value, KDbToken relation = '=');
 
     /*! Sets a list of columns for ORDER BY section of the query.
      Each name on the list must be a field or alias present within the query
