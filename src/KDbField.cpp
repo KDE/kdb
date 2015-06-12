@@ -182,7 +182,7 @@ QStringList KDbField::typeNames()
 QString KDbField::typeString(Type type)
 {
     m_typeNames.init();
-    return (type <= LastType) ? m_typeNames.at((int)LastType + 1 + type)
+    return (type <= Null) ? m_typeNames.at((int)Null + 1 + type)
                               : (QLatin1String("Type") + QString::number(type));
 }
 
