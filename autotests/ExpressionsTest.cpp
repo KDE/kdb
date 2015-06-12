@@ -30,6 +30,21 @@ Q_DECLARE_METATYPE(KDbEscapedString)
 Q_DECLARE_METATYPE(KDbField::Type)
 Q_DECLARE_METATYPE(KDbToken)
 
+namespace QTest {
+    template<>
+    char *toString(const KDbEscapedString &string)
+    {
+        return qstrdup(string.toString().toLatin1().constData());
+    }
+}
+
+namespace QTest {
+    template<>
+    char *toString(const KDbField::Type &type)
+    {
+        return qstrdup(KDbField::typeString(type).toLatin1().constData());
+    }
+}
 
 QTEST_GUILESS_MAIN(ExpressionsTest)
 
