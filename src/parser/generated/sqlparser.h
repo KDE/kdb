@@ -1,12 +1,16 @@
+/****************************************************************************
+ * Created by generate_parser_code.sh
+ * WARNING! All changes made in this file will be lost!
+ ****************************************************************************/
 #ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
 #include "KDbField.h"
 #include "KDbParser.h"
 #include "KDbSqlTypes.h"
+#include "KDbToken.h"
 
 bool parseData(KDbParser *p, const char *data);
-KDB_TESTING_EXPORT const char* tokenName(unsigned int offset);
-KDB_TESTING_EXPORT unsigned int maxToken();
+KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset);
 /* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C
