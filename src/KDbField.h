@@ -629,6 +629,7 @@ public:
     */
     KDbExpression expression();
 
+    //! @overload KDbExpression expression()
     const KDbExpression expression() const;
 
     /*! Sets expression data @a expr. If there was
