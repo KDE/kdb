@@ -58,6 +58,50 @@ void KDbParser::Private::clear()
 
 //-------------------------------------
 
+KDbParseInfo::KDbParseInfo(KDbQuerySchema *query)
+ : d(new Private)
+{
+    d->querySchema = query;
+}
+
+KDbParseInfo::~KDbParseInfo()
+{
+    delete d;
+}
+
+QList<int> KDbParseInfo::tablesAndAliasesForName(const QString &tableOrAliasName) const
+{
+    const QList<int> *list = d->repeatedTablesAndAliases.value(tableOrAliasName);
+    return list ? *list : QList<int>();
+}
+
+KDbQuerySchema* KDbParseInfo::querySchema() const
+{
+    return d->querySchema;
+}
+
+QString KDbParseInfo::errorMessage() const
+{
+    return d->errorMessage;
+}
+
+QString KDbParseInfo::errorDescription() const
+{
+    return d->errorDescription;
+}
+
+void KDbParseInfo::setErrorMessage(const QString &message)
+{
+    d->errorMessage = message;
+}
+
+void KDbParseInfo::setErrorDescription(const QString &description)
+{
+    d->errorDescription = description;
+}
+
+//-------------------------------------
+
 KDbParseInfoInternal::KDbParseInfoInternal(KDbQuerySchema *query)
 : KDbParseInfo(query)
 {

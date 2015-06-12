@@ -730,6 +730,20 @@ public:
      (a tree of expression items). */
     QList<KDbQuerySchemaParameter> parameters() const;
 
+    //! @return true if this query is valid
+    /*! Detailed validation is performed in the same way as parsing of query statements
+     * by the KDbParser.
+     * Example :Let the query be "SELECT <fields> FROM <tables> WHERE <whereExpression>".
+     * First each field from <fields> (@see fields()) is validated using
+     * KDbField::expression().validate(). Then the <whereExpression> (@see whereExpression())
+     * is validated using KDbExpression::validate().
+     *
+     * On error, a string pointed by @a errorMessage is set to a general error message
+     * and a string pointed by @a errorDescription is set to a detailed description
+     * of the error. */
+    //! @todo add tests
+    bool validate(QString *errorMessage, QString *errorDescription);
+
 protected:
     void init();
 

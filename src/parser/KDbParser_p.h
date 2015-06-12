@@ -51,6 +51,39 @@ public:
     bool initialized;
 };
 
+/*! Info used on parsing. */
+class KDB_TESTING_EXPORT KDbParseInfo
+{
+public:
+    ~KDbParseInfo();
+
+    //! @return positions of tables/aliases having the same name @a tableOrAliasName.
+    QList<int> tablesAndAliasesForName(const QString &tableOrAliasName) const;
+
+    //! @return query schema for this parsing
+    KDbQuerySchema* querySchema() const;
+
+    //! @return error message for the parsing process
+    QString errorMessage() const;
+
+    //! Sets error message for the parsing process to @a message
+    void setErrorMessage(const QString &message);
+
+    //! @return detailed error description for the parsing process
+    QString errorDescription() const;
+
+    //! Sets detailed error description for the parsing process to @a description
+    void setErrorDescription(const QString &description);
+
+protected:
+    //! Constructs parse info structure for query @a query.
+    explicit KDbParseInfo(KDbQuerySchema *query);
+
+    Q_DISABLE_COPY(KDbParseInfo)
+    class Private;
+    Private * const d;
+};
+
 class KDbParseInfo::Private
 {
 public:

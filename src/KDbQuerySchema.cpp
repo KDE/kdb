@@ -25,6 +25,7 @@
 #include "generated/sqlparser.h"
 #include "KDb.h"
 #include "KDbLookupFieldSchema.h"
+#include "KDbParser_p.h"
 
 #include <assert.h>
 
@@ -1851,6 +1852,35 @@ QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
     QList<KDbQuerySchemaParameter> params;
     whereExpression().getQueryParameters(params);
     return params;
+}
+
+static void setResult(const KDbParseInfoInternal &parseInfo,
+                      QString *errorMessage, QString *errorDescription)
+{
+    if (errorMessage) {
+        *errorMessage = parseInfo.errorMessage();
+    }
+    if (errorDescription) {
+        *errorDescription = parseInfo.errorDescription();
+    }
+}
+
+bool KDbQuerySchema::validate(QString *errorMessage, QString *errorDescription)
+{
+    KDbParseInfoInternal parseInfo(this);
+    foreach(KDbField* f, *fields()) {
+        if (f->isExpression()) {
+            if (!f->expression().validate(&parseInfo)) {
+                setResult(parseInfo, errorMessage, errorDescription);
+                return false;
+            }
+        }
+    }
+    if (!whereExpression().validate(&parseInfo)) {
+        setResult(parseInfo, errorMessage, errorDescription);
+        return false;
+    }
+    return true;
 }
 
 //---------------------------------------------------
