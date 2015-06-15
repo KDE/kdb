@@ -186,8 +186,7 @@ public:
     };
     Q_DECLARE_FLAGS(UserVisibleStringOptions, UserVisibleStringOption)
 
-    /*!
-    @return A user-visible string for the connection data
+    /*! @return A user-visible string for the connection data
 
     driverId() is used to know if driver handles server connections. If it's not possible
     to check the driver, defaults to "file" connection.
@@ -205,8 +204,7 @@ public:
     */
     QString toUserVisibleString(UserVisibleStringOptions options = AddUserToUserVisibleString) const;
 
-    /*!
-    @return true if password is needed for performing connection.
+    /*! @return true if password is needed for performing connection.
     The password has to be provided by the user.
     @note This method needs information about driver ID; it returns false if driverId()
           does not return a valid ID.
