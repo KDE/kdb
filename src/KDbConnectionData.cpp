@@ -55,6 +55,11 @@ bool KDbConnectionData::passwordNeeded() const
                                            //!< file-based drivers requiring a password
 }
 
+bool KDbConnectionData::isValid() const
+{
+    return !d->databaseName.isEmpty();
+}
+
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbConnectionData& data)
 {
     dbg.nospace() << "CONNDATA";
