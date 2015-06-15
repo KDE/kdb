@@ -353,7 +353,6 @@ install(
     FILES
         ${kdb_HEADERS}
         ${kdb_HEADERS_FROM_BUILDDIR}
-        ${PROJECT_BINARY_DIR}/src/kdb_export.h
     DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kdb
     COMPONENT Devel
 )
@@ -362,6 +361,7 @@ install(
     FILES
         ${kdb_FORWARDING_HEADERS}
         ${kdb_FORWARDING_HEADERS_FROM_BUILDDIR}
+        ${PROJECT_BINARY_DIR}/src/kdb_export.h
         ${PROJECT_BINARY_DIR}/src/config-kdb.h
     DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
     COMPONENT Devel
