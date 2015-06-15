@@ -508,7 +508,8 @@ def process():
     }
 """ % (shared_class_name, shared_class_name, shared_class_name)
             if shared_class_options['with_from_to_map']:
-                main_ctor += """    /*! Constructor for %s object, takes attributes saved to map @a map.
+                main_ctor += """
+    /*! Constructor for %s object, takes attributes saved to map @a map.
          If @a ok is not 0, sets *ok to true on success and to false on failure. @see toMap(). */
     %s(const QMap<QString, QString>& map, bool *ok)
      : d(new Data(map, ok))
