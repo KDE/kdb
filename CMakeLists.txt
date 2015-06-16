@@ -50,8 +50,7 @@ macro(simple_option _NAME _DESCRIPTION _DEFAULT)
   add_simple_feature_info(${_NAME} ${_DESCRIPTION} ${_DEFAULT})
 endmacro(simple_option)
 
-# If Git is installed and a '.git' directory is found,
-# we append the Git revision to AKONADI_VERSION_STRING
+# If Git is installed and a '.git' directory is found set KDB_GIT_SHA1_STRING
 set(KDB_GIT_SHA1_STRING "")
 if(EXISTS "${KDb_SOURCE_DIR}/.git")
   find_package(Git)
