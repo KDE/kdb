@@ -227,6 +227,11 @@ KDB_EXPORT bool isLookupFieldSchemaProperty(const QByteArray& propertyName);
  This can be used when type information is deserialized from a string or QVariant. */
 KDB_EXPORT KDbField::Type intToFieldType(int type);
 
+/*! @return type group of field for integer value @a typeGroup.
+ If @a typeGroup cannot be casted to KDbField::TypeGroup, KDbField::InvalidGroup is returned.
+ This can be used when type information is deserialized from a string or QVariant. */
+KDB_EXPORT KDbField::TypeGroup intToFieldTypeGroup(int typeGroup);
+
 /*! Gets property values for the lookup schema @a lookup.
  @a values is cleared before filling. This function is used e.g. for altering table design. */
 KDB_EXPORT void getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values);

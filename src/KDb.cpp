@@ -567,11 +567,20 @@ QString KDb::formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces
 
 KDbField::Type KDb::intToFieldType(int type)
 {
-    if (type < (int)KDbField::InvalidType || type > (int)KDbField::LastType) {
+    if (type < int(KDbField::InvalidType) || type > int(KDbField::LastType)) {
         kdbWarning() << "invalid type" << type;
         return KDbField::InvalidType;
     }
-    return (KDbField::Type)type;
+    return static_cast<KDbField::Type>(type);
+}
+
+KDbField::TypeGroup KDb::intToFieldTypeGroup(int typeGroup)
+{
+    if (typeGroup < int(KDbField::InvalidGroup) || typeGroup > int(KDbField::LastTypeGroup)) {
+        kdbWarning() << "invalid type group" << typeGroup;
+        return KDbField::InvalidGroup;
+    }
+    return static_cast<KDbField::TypeGroup>(typeGroup);
 }
 
 static bool setIntToFieldType(KDbField *field, const QVariant& value)
