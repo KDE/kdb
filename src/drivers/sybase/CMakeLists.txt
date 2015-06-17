@@ -6,7 +6,6 @@ include_directories(
 
 add_definitions(
   -D__KDB__=
-  -DPREDICATE_DRIVER_NAME="sybase"
 )
 
 ########### next target ###############

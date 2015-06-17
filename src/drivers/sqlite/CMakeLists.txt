@@ -40,7 +40,6 @@ include_directories(
 
 add_definitions(
   -D__KDB__=
-  -DKDB_DRIVER_NAME=\"sqlite\"
 )
 
 if(MSVC)

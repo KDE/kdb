@@ -48,12 +48,6 @@ class DriverPrivate;
 /*! This class is a prototype of the database driver.
  KDbDriver allows new connections to be created, and groups as their parent.
  Before destruction, all owned connections are destructed.
-
-@todo driver must be provided within KDE module file named with "kdb_" prefix
-  - EXPORT_KDB_DRIVER macro should be placed in driver's .cpp file
-  - KDbDriver inherits from QObject only because this enables Qt Plugin system
-
- @see EXPORT_KDB_DRIVER
 */
 class KDB_EXPORT KDbDriver : public QObject, public KDbResultable
 {
@@ -346,20 +340,5 @@ KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
     @todo Add support for time zones */
 KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
 }
-
-#if 0
-/*! KDbDriver's static version information, automatically implemented for KDb drivers.
- Put this into driver class declaration just like Q_OBJECT macro. */
-#define KDB_DRIVER \
-    Q_INTERFACES(KDbDriver) \
-    public: \
-        virtual KDbVersionInfo version() const;
-
-const char *KDB_DRIVER_INTERFACE_ID =
-    "org.kde.KDb.DriverInterface" KDB_VERSION_MAJOR_STRING "." KDB_VERSION_MINOR_STRING;
-
-//! Declare Interface for KDb drivers, loadable as Qt plugins
-Q_DECLARE_INTERFACE(KDbDriver, KDB_DRIVER_INTERFACE_ID)
-#endif
 
 #endif

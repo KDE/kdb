@@ -21,7 +21,7 @@
 #define KDB_DRIVER_P_H
 
 #ifndef __KDB__
-# error "Do not include: this is KDb internal file"
+# error "Do not include: this is KDb's' internal file"
 #endif
 
 #include <QString>
@@ -37,10 +37,9 @@
 #include "KDbVersionInfo.h"
 
 
-/*! Detailed definition of driver's default behaviour.
- Note for driver developers:
- Change these defaults in you KDbDriver subclass
- constructor, if needed.
+//! @internal Detailed definition of driver's default behaviour
+/*! @note For driver developers:
+ Change these defaults in you KDbDriver subclass constructor if needed.
 */
 class KDB_EXPORT KDbDriverBehaviour
 {
@@ -269,16 +268,4 @@ public:
     Private();
     ~Private();
 };
-
-//! Export the driver class @a driverName for the plugin specified by driverName.
-//! The resulting library file should be named "kdb_{driverName}".
-//! Also exports driver's static version information.
-#define EXPORT_KDB_DRIVER( driverClass, driverName ) \
-    Q_EXPORT_PLUGIN2( kdb_ ## driverName, driverClass ) \
-    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_major = KDB_VERSION_MAJOR; \
-    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_minor = KDB_VERSION_MINOR; \
-    Q_EXTERN_C Q_DECL_EXPORT const quint32 version_release = KDB_VERSION_PATCH; \
-    KDbVersionInfo driverClass::version() const { \
-        return KDbVersionInfo( \
-            KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_PATCH); }
 #endif
