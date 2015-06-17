@@ -37,7 +37,7 @@ using namespace std;
 
 QByteArray prgname;
 QString db_name;
-QString drv_name;
+QString drv_id;
 QString test_name;
 int cursor_options = 0;
 bool db_name_required = true;
@@ -109,7 +109,7 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n (c) 2003-2006, OpenOffice Software LLC."
 "\n"
 "\nUsage: " APPNAME " --test <test_name> [options]"
-"\n         driver_name [db_name] [sql_statement]"
+"\n         driver_id [db_name] [sql_statement]"
 "\n"
 "\nOptions:"
 "\n  --help                    Displays this help and exits"
@@ -142,17 +142,17 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n                            backends"
 "\n"
 "\nNotes:"
-"\n1. 'dr_prop' requires <driver_name> argument"
-"\n2. 'parser' test requires <db_name>, <driver_name> and <sql_statement>"
+"\n1. 'dr_prop' requires <driver_id> argument"
+"\n2. 'parser' test requires <db_name>, <driverid> and <sql_statement>"
 "\n     arguments"
-"\n3. All other tests require <db_name> and <driver_name> arguments"
+"\n3. All other tests require <db_name> and <driver_id> arguments"
 "\n4. 'tables' test automatically runs 'dbcreation' test"
 "\n     <new_db_name> is removed if already exists"
 "\n5. <db_name> must be a valid database created using KDb,"
 "\n     e.g. using the \"tables\" test"
 "\n"
 "\nArguments:"
-"\n  driver_id                 Driver ID"
+"\n  driver_id                 Driver ID, e.g. org.kde.kdb.sqlite"
 "\n  db_name                   Database name"
 "\n  sql_statement             Optional SQL statement (for parser test)"
 "\n"
@@ -242,7 +242,7 @@ int main(int argc, char** argv)
         }
     }
 
-    drv_name = args.first();
+    drv_id = args.first();
 
     KDbDriverManager manager;
     const QStringList driverIds = manager.driverIds();
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
     }
 
     //get driver
-    driver = manager.driver(drv_name);
+    driver = manager.driver(drv_id);
     if (!driver || manager.result().isError()) {
         qDebug() << manager.result();
         return finish(1);

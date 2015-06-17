@@ -28,11 +28,11 @@
 
 void KDbTestUtils::testDriverManager()
 {
-    QStringList names = manager.driverIds();
-    qDebug() << "DRIVERS:" << names;
+    QStringList ids = manager.driverIds();
+    qDebug() << "DRIVERS:" << ids;
     QVERIFY2(!manager.result().isError(), "Error in driver manager");
     qDebug() << manager.result().message();
-    QVERIFY2(!names.isEmpty(), "No db drivers found");
+    QVERIFY2(!ids.isEmpty(), "No db drivers found");
 }
 
 void KDbTestUtils::testSqliteDriver()
