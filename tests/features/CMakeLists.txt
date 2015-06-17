@@ -1,9 +1,3 @@
-include_directories(
-  ${KDb_SOURCE_DIR}
-  ${KDb_BINARY_DIR}
-  ${QT_INCLUDES}
-)
-
 # temp
 add_definitions(
   -DNO_GUI=1

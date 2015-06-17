@@ -107,20 +107,6 @@ public:
     void clearSql() {
         d->sql.clear();
     }
-/*
-    Used to store actually executed SQL statement.
-    data_member QString sql no_getter no_setter;
-*/
-/*    data_member KDbMessageHandler::MessageType errorType;
-*/
-
-#if 0
-    /*! Clears error flag.
-     Also calls drv_clearServerResultCode().
-     You can reimplement this method in subclasses to clear even more members,
-     but remember to also call KDbObject::clearError(). */
-    virtual void clearError();
-#endif
 
     /*! @return sql string of actually executed SQL statement,
      usually using drv_executeSQL(). If there was error during executing SQL statement,

@@ -2,8 +2,6 @@ add_feature_info(BUILD_MYSQL_DB_DRIVER TRUE ${BUILD_MYSQL_DB_DRIVER_DESC})
 
 include_directories(
   ${MYSQL_INCLUDE_DIR}
-  ${Predicate_SOURCE_DIR}
-  ${QT_INCLUDES}
 )
 
 add_definitions(

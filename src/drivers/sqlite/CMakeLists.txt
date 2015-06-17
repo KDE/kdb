@@ -33,9 +33,7 @@ add_definitions(
 )
 
 include_directories(
-  ${KDb_SOURCE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${QT_INCLUDES}
+  ${SQLITE_INCLUDE_DIR}
 )
 
 add_definitions(

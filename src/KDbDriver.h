@@ -153,13 +153,6 @@ public:
     /*! used when we do not have KDbDriver instance yet */
     static QString defaultSQLTypeName(int id_t);
 
-#if 0
-    /*! Driver's static version information (major part), it is automatically defined
-     in implementation by KDB_DRIVER macro (see Driver_p.h)
-     It's usually compared to drivers' and KDb library version. */
-    virtual KDbVersionInfo version() const = 0;
-#endif
-
     /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.
      Reimplement this if you need other behaviour (eg. for 'date' type handling)

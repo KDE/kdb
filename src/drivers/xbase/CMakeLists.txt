@@ -1,7 +1,5 @@
 include_directories(
   ${XBase_INCLUDE_DIR}
-  ${Predicate_SOURCE_DIR}
-  ${QT_INCLUDES}
 )
 
 add_definitions(
