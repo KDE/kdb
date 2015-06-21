@@ -25,6 +25,7 @@
 
 #include <QFile>
 #include <QTest>
+#include <QMimeDatabase>
 
 void KDbTestUtils::testDriverManager()
 {
@@ -38,11 +39,24 @@ void KDbTestUtils::testDriverManager()
 void KDbTestUtils::testSqliteDriver()
 {
     QString drv_id = "org.kde.kdb.sqlite";
+    // find the metadata
     const KDbDriverMetaData* driverMetaData = manager.driverMetaData(drv_id);
-    QVERIFY2(driverMetaData, "Driver metadata not found");
+    KDB_VERIFY(manager.resultable(), driverMetaData = manager.driverMetaData(drv_id), "Driver metadata not found");
     QCOMPARE(driverMetaData->id(), drv_id);
     QVERIFY(driverMetaData->isFileBased());
-    driver = manager.driver(drv_id);
-    QVERIFY2(driver, "Error in driver manager after KDbDriverManager::driver() call");
-    QVERIFY2(!manager.result().isError(), "Error in driver manager after KDbDriverManager::driver() call");
+    // test the mimetypes
+    QStringList mimeTypes(driverMetaData->mimeTypes());
+    qDebug() << "mimeTypes:" << mimeTypes;
+    QVERIFY2(mimeTypes.count() > 1, "Less than two MIME types found");
+    QVERIFY(mimeTypes.contains("application/x-kexiproject-sqlite3"));
+    QVERIFY(mimeTypes.contains("application/x-sqlite3"));
+    QVERIFY(!KDb::defaultFileBasedDriverMimeType().isEmpty());
+    QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()), "SQLite's MIME types should include the default file based one");
+    QMimeDatabase mimeDb;
+    foreach(const QString &mimeName, mimeTypes) {
+        QVERIFY2(mimeDb.mimeTypeForName(mimeName).isValid(),
+                 QString("%1 MIME type not found in the MIME database").arg(mimeName).toLatin1().constData());
+    }
+    // find driver for the metadata
+    KDB_VERIFY(manager.resultable(), driver = manager.driver(drv_id), "Driver not found");
 }
