@@ -33,20 +33,6 @@ KDbConnection *conn = 0;
 
 QTEST_GUILESS_MAIN(ConnectionTest)
 
-//! Calls @a call and verifies status of @a resultable
-//! On error displays the status on debug and does the same as QVERIFY with @a errorMessage
-#define KDB_VERIFY(resultable, call, errorMessage) \
-    do { \
-        bool KDB_VERIFY_ok = (call); \
-        if (resultable->result().isError()) { \
-            qDebug() << resultable->result(); \
-        } \
-        if (!QTest::qVerify(KDB_VERIFY_ok && !resultable->result().isError(), # call, (errorMessage), __FILE__, __LINE__)) {\
-            return; \
-        } \
-    } \
-    while (false)
-
 void ConnectionTest::initTestCase()
 {
     utils.testDriverManager();
