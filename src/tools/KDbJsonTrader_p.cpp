@@ -83,9 +83,8 @@ static QList<QPluginLoader *> findPlugins(const QString &path, const QString &se
             }
 
             if (!mimetype.isEmpty()) {
-                QStringList mimeTypes = json.value(QLatin1String("X-KDE-ExtraNativeMimeTypes"))
-                        .toString().split(QLatin1Char(','));
-                mimeTypes += json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
+                QStringList mimeTypes
+                        = json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
                 mimeTypes += json.value(QLatin1String("X-KDE-NativeMimeType")).toString();
                 if (! mimeTypes.contains(mimetype)) {
                     continue;
