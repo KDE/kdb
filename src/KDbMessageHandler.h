@@ -118,32 +118,36 @@ public:
     /*! Constructs message handler, @a parent is a widget that will be a parent
      for displaying gui elements (e.g. message boxes). Can be 0 for non-gui usage. */
     explicit KDbMessageHandler(QWidget *parent = 0);
+
     virtual ~KDbMessageHandler();
 
-    /*! This method can be used to block/unblock messages.
-     Sometimes you are receiving both lower- and higher-level messages,
-     but you do not need to display two message boxes but only one (higher level with details).
-     All you need is to call enableMessages(false) before action that can fail
-     and restore messages by enableMessages(true) after the action.
-     See KexiMainWindow::renameObject() implementation for example. */
-    inline void enableMessages(bool enable) {
-        m_enableMessages = enable;
-    }
+    /*! @return true if the handler is enables so messages are not blocked.
+     @see setEnabled(bool) */
+    bool messagesEnabled() const;
+
+    /*! Enables or disabled the handler to block/unblock its messages.
+     Sometimes both lower- and higher-level messages are received,
+     what is not optimal as only one of them should be displayed (e.g. a higher level
+     with details). This can be solved by calling setEnabled(false) shortly before
+     an action that can send the unwanted message. Afterwards messages can be enabled again
+     by calling setEnabled(true).
+     By default messages are enabled. */
+    void setMessagesEnabled(bool enable);
 
     /*! Shows error message with @a title (it is not caption) and details. */
     virtual void showErrorMessage(
         KDbMessageHandler::MessageType messageType,
-        const QString &msg,
+        const QString &message,
         const QString &details = QString(),
         const QString &caption = QString()
     ) = 0;
 
-    /*! Shows error message with @a msg text. Existing error message from @a obj object
+    /*! Shows error message with @a message text. Existing error message from @a obj object
      is also copied, if present. */
     virtual void showErrorMessage(
         const KDbResult& result,
         KDbMessageHandler::MessageType messageType = Error,
-        const QString& msg = QString(),
+        const QString& message = QString(),
         const QString& caption = QString()
     ) = 0;
 
@@ -163,9 +167,24 @@ public:
             KDbMessageHandler::Options options = 0,
             KDbMessageHandler* msgHandler = 0);
 
+    //! @return message redirection for this handler or 0 if there is no redirection.
+    KDbMessageHandler* redirection();
+
+    //! @overload KDbMessageHandler* redirection()
+    const KDbMessageHandler* redirection() const;
+
+    /*! Sets redirection of all messages for this handler to @a otherHandler.
+     Passing 0 removes redirection. Setting new redirection replaces previous. */
+    void setRedirection(KDbMessageHandler *otherHandler);
+
 protected:
-    QPointer<QWidget> m_messageHandlerParentWidget;
-    bool m_enableMessages;
+    /*! @return a widget that will be parent for displaying gui elements (e.g. message boxes).
+     Can be 0 for non-gui cases. */
+    QWidget *parentWidget();
+
+    Q_DISABLE_COPY(KDbMessageHandler)
+    class Private;
+    Private * const d;
 };
 
 #endif

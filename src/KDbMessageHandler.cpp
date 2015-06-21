@@ -42,14 +42,41 @@ KDbMessageTitleSetter::~KDbMessageTitleSetter()
 
 //------------------------------------------------
 
-KDbMessageHandler::KDbMessageHandler(QWidget *parent)
-        : m_messageHandlerParentWidget(parent)
-        , m_enableMessages(true)
+class KDbMessageHandler::Private
 {
+public:
+    Private()
+     : messageRedirection(0)
+     , enableMessages(true)
+    {
+    }
+
+    QPointer<QWidget> messageHandlerParentWidget;
+    KDbMessageHandler *messageRedirection;
+    bool enableMessages;
+};
+
+//------------------------------------------------
+
+KDbMessageHandler::KDbMessageHandler(QWidget *parent)
+ : d(new Private)
+{
+    d->messageHandlerParentWidget = parent;
 }
 
 KDbMessageHandler::~KDbMessageHandler()
 {
+    delete d;
+}
+
+bool KDbMessageHandler::messagesEnabled() const
+{
+    return d->enableMessages;
+}
+
+void KDbMessageHandler::setMessagesEnabled(bool enable)
+{
+    d->enableMessages = enable;
 }
 
 KDbMessageHandler::ButtonCode KDbMessageHandler::askQuestion(
@@ -63,13 +90,30 @@ KDbMessageHandler::ButtonCode KDbMessageHandler::askQuestion(
     KDbMessageHandler::Options options,
     KDbMessageHandler* msgHandler)
 {
-    Q_UNUSED(messageType);
-    Q_UNUSED(message);
-    Q_UNUSED(caption);
-    Q_UNUSED(buttonYes);
-    Q_UNUSED(buttonNo);
-    Q_UNUSED(dontShowAskAgainName);
-    Q_UNUSED(options);
-    Q_UNUSED(msgHandler);
+    if (d->enableMessages && d->messageRedirection) {
+        return d->messageRedirection->askQuestion(messageType, message, caption, defaultResult,
+                                                  buttonYes, buttonNo, dontShowAskAgainName,
+                                                  options, msgHandler);
+    }
     return defaultResult;
+}
+
+KDbMessageHandler* KDbMessageHandler::redirection()
+{
+    return d->messageRedirection;
+}
+
+const KDbMessageHandler* KDbMessageHandler::redirection() const
+{
+    return d->messageRedirection;
+}
+
+void KDbMessageHandler::setRedirection(KDbMessageHandler *otherHandler)
+{
+    d->messageRedirection = otherHandler;
+}
+
+QWidget* KDbMessageHandler::parentWidget()
+{
+    return d->messageHandlerParentWidget;
 }
