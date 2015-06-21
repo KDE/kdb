@@ -136,7 +136,7 @@ enum ObjectType {
     LastObjectType = 2, //ALWAYS UPDATE THIS
 
     KDbSystemTableObjectType = 128, //!< helper, not used in storage
-                                    //!< (allows to select kexidb system tables
+                                    //!< (allows to select KDb system tables
                                     //!< may be or'd with TableObjectType)
     IndexObjectType = 256 //!< special
 };

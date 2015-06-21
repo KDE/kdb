@@ -8,7 +8,7 @@ CMAKE_SOURCE_DIR=`grep ^CMAKE_SOURCE_DIR Makefile | sed 's/.*\= //'`
 echo CMAKE_BINARY_DIR = $CMAKE_BINARY_DIR
 echo CMAKE_SOURCE_DIR = $CMAKE_SOURCE_DIR
 
-cd $CMAKE_BINARY_DIR/Predicate
+cd $CMAKE_BINARY_DIR/src
 
 rm -f app.info app.info2
 
@@ -16,7 +16,7 @@ lcov --directory . --zerocounters
 
 ctest || exit 1
 
-lcov --directory . -b $CMAKE_SOURCE_DIR/Predicate/parser --capture --output-file app.info || exit 1
-lcov --remove app.info 'Predicate/tests*' '*ThirdParty*' '/usr/*' --output-file  app.info2 || exit 1
+lcov --directory . -b $CMAKE_SOURCE_DIR/src/parser --capture --output-file app.info || exit 1
+lcov --remove app.info '/usr/*' --output-file  app.info2 || exit 1
 
 genhtml --legend -f --demangle-cpp -o gcov_report app.info2

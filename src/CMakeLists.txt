@@ -381,5 +381,3 @@ install(
 # )
 
 enable_testing()
-
-#TODO install( FILES kexidb_driver.desktop  DESTINATION ${SERVICETYPES_INSTALL_DIR})

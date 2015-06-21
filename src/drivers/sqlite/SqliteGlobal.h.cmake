@@ -23,6 +23,6 @@
 //global SQLite driver's public definitions
 
 //! Support for SQLite vacuum (compacting) feature
-#cmakedefine PREDICATE_SQLITE_VACUUM
+#cmakedefine KDB_SQLITE_VACUUM
 
 #endif

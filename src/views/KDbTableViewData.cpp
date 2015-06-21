@@ -731,9 +731,9 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
                 /*   if (desc)
                       *desc = */
                 /*! @todo use KexiMainWindow::showErrorMessage(const QString &title, KDbObject *obj)
-                  after it will be moved somewhere to kexidb (this will require moving other
+                  after it will be moved somewhere to KDb (this will require moving other
                     showErrorMessage() methods from KexiMainWindow to libkexiutils....)
-                  then: just call: *desc = KexiDB::errorMessage(d->cursor); */
+                  then: just call: *desc = KDb::errorMessage(d->cursor); */
                 return false;
             }
         } else { // record updating
