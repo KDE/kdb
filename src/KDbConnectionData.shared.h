@@ -209,12 +209,7 @@ public:
     @note This method needs information about driver ID; it returns false if driverId()
           does not return a valid ID.
     */
-    bool passwordNeeded() const;
-
-    /*! @return true if the data is valud. Valid data has at least non-empty KDbConnectionData::databaseName().
-    Initially after constructing using the default constructor, the connection is invalid.
-    */
-    bool isValid() const;
+    bool isPasswordNeeded() const;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnectionData::UserVisibleStringOptions)
