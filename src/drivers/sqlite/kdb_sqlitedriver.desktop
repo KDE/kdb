@@ -38,4 +38,4 @@ X-KDE-PluginInfo-EnabledByDefault=true
 
 X-KDb-FileBased=true
 X-KDb-ImportingEnabled=false
-MimeType=application/x-kexiproject-sqlite3,application/x-sqlite3
+MimeType=application/x-kexiproject-sqlite3;application/x-sqlite3
