@@ -405,7 +405,7 @@ KDB_EXPORT KDbField::Type maximumForIntegerTypes(KDbField::Type t1, KDbField::Ty
  In case of BLOB type, @a data is not null terminated, so passing length is needed. */
 KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField* f, int length = -1);
 
-/*! @return default file-based driver mime type
+/*! @return default file-based driver MIME type
  (typically something like "application/x-kexiproject-sqlite") */
 KDB_EXPORT QString defaultFileBasedDriverMimeType();
 

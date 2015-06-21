@@ -1127,7 +1127,7 @@ struct KDb_NotEmptyValueForTypeCache {
                 continue;
             }
             if (i == KDbField::BLOB) {
-//! @todo blobs will contain other mime types too
+//! @todo blobs will contain other MIME types too
                 QByteArray ba;
 //! @todo port to Qt4
 #if 0
