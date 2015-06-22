@@ -629,11 +629,12 @@ bool KDbConnection::createDatabase(const QString &dbName)
     }
 
     //-insert KDb version info:
+    // (for compatibility with Kexi expect the legacy kexidb_major_ver/kexidb_minor_ver values)
     KDbTableSchema *table = d->table(QLatin1String("kexi__db"));
     if (!table)
         createDatabase_ERROR;
-    if (!insertRecord(table, QLatin1String("kdb_major_ver"), KDb::version().major())
-            || !insertRecord(table, QLatin1String("kdb_minor_ver"), KDb::version().minor()))
+    if (!insertRecord(table, QLatin1String("kexidb_major_ver"), KDb::version().major())
+            || !insertRecord(table, QLatin1String("kexidb_minor_ver"), KDb::version().minor()))
         createDatabase_ERROR;
 
     if (trans.active() && !commitTransaction(trans))
@@ -695,12 +696,12 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
     if (kexiCompatible && my_dbName.compare(anyAvailableDatabaseName(), Qt::CaseInsensitive) != 0) {
         //-get global database information
         bool ok;
-        const int major = d->dbProperties.value(QLatin1String("kdb_major_ver")).toInt(&ok);
+        const int major = d->dbProperties.value(QLatin1String("kexidb_major_ver")).toInt(&ok);
         if (!ok) {
             m_result = d->dbProperties.result();
             return false;
         }
-        const int minor = d->dbProperties.value(QLatin1String("kdb_minor_ver")).toInt(&ok);
+        const int minor = d->dbProperties.value(QLatin1String("kexidb_minor_ver")).toInt(&ok);
         if (!ok) {
             m_result = d->dbProperties.result();
             return false;
