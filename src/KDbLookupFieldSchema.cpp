@@ -44,7 +44,7 @@ class KDbLookupFieldSchema::Private
 public:
     Private()
             : boundColumn(-1)
-            , maximumListRows(KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
+            , maxVisibleRecords(KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORDS)
             , displayWidget(KDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET)
             , columnHeadersVisible(KDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
             , limitToList(KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
@@ -54,7 +54,7 @@ public:
     int boundColumn;
     QList<uint> visibleColumns;
     QList<int> columnWidths;
-    uint maximumListRows;
+    uint maxVisibleRecords;
     DisplayWidget displayWidget;
     bool columnHeadersVisible;
     bool limitToList;
@@ -256,14 +256,14 @@ void KDbLookupFieldSchema::setRecordSource(const KDbLookupFieldSchema::RecordSou
     d->recordSource = recordSource;
 }
 
-void KDbLookupFieldSchema::setMaximumListRows(uint rows)
+void KDbLookupFieldSchema::setMaxVisibleRecords(uint count)
 {
-    if (rows == 0)
-        d->maximumListRows = KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS;
-    else if (rows > KDB_LOOKUP_FIELD_MAX_LIST_ROWS)
-        d->maximumListRows = KDB_LOOKUP_FIELD_MAX_LIST_ROWS;
+    if (count == 0)
+        d->maxVisibleRecords = KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORDS;
+    else if (count > KDB_LOOKUP_FIELD_LIMIT_MAX_VISIBLE_RECORDS)
+        d->maxVisibleRecords = KDB_LOOKUP_FIELD_LIMIT_MAX_VISIBLE_RECORDS;
     else
-        d->maximumListRows = rows;
+        d->maxVisibleRecords = count;
 }
 
 QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
@@ -284,8 +284,8 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
             dbg.nospace() << ';';
         dbg.nospace() << visibleColumn;
     }
-    dbg.space() << "maximumListRows:";
-    dbg.space() << lookup.maximumListRows();
+    dbg.space() << "maxVisibleRecords:";
+    dbg.space() << lookup.maxVisibleRecords();
     dbg.space() << "displayWidget:";
     dbg.space() << (lookup.displayWidget() == KDbLookupFieldSchema::ComboBox ? "ComboBox" : "ListBox");
     dbg.space() << "columnHeadersVisible:";
@@ -415,7 +415,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 return 0;
             }
             if (val.type() == QVariant::Int)
-                lookupFieldSchema->setMaximumListRows(val.toUInt());
+                lookupFieldSchema->setMaxVisibleRecords(val.toUInt());
         } else if (name == "limit-to-list") {
             /* <limit-to-list>
                 <bool>true/false</bool>
@@ -506,10 +506,10 @@ void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
         KDb::saveBooleanElementToDom(doc, &lookupColumnEl,
                                            QLatin1String("show-column-headers"),
                                            columnHeadersVisible());
-    if (maximumListRows() != KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS)
+    if (maxVisibleRecords() != KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORDS)
         KDb::saveNumberElementToDom(doc, &lookupColumnEl,
                                           QLatin1String("list-rows"),
-                                          maximumListRows());
+                                          maxVisibleRecords());
     if (limitToList() != KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST)
         KDb::saveBooleanElementToDom(doc, &lookupColumnEl,
                                            QLatin1String("limit-to-list"),
@@ -567,7 +567,7 @@ bool KDbLookupFieldSchema::setProperty(const QByteArray& propertyName, const QVa
         const uint ival = value.toUInt(&ok);
         if (!ok)
             return false;
-        setMaximumListRows(ival);
+        setMaxVisibleRecords(ival);
     } else if ("limitToList" == propertyName) {
         setLimitToList(value.toBool());
     } else if ("displayWidget" == propertyName) {
@@ -623,7 +623,7 @@ bool KDbLookupFieldSchema::setProperties(const QMap<QByteArray, QVariant>& value
         int ival = it.value().toInt(&ok);
         if (!ok)
             return false;
-        setMaximumListRows(ival);
+        setMaxVisibleRecords(ival);
     }
     if ((it = values.find("limitToList")) != values.constEnd()) {
         setLimitToList(it.value().toBool());
@@ -685,9 +685,9 @@ void KDbLookupFieldSchema::setColumnHeadersVisible(bool set)
     d->columnHeadersVisible = set;
 }
 
-uint KDbLookupFieldSchema::maximumListRows() const
+uint KDbLookupFieldSchema::maxVisibleRecords() const
 {
-    return d->maximumListRows;
+    return d->maxVisibleRecords;
 }
 
 bool KDbLookupFieldSchema::limitToList() const

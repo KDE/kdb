@@ -31,11 +31,11 @@ class QVariant;
 //! default value for KDbLookupFieldSchema::columnHeadersVisible()
 #define KDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE false
 
-//! default value for KDbLookupFieldSchema::maximumListRows()
-#define KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS 8
+//! default value for KDbLookupFieldSchema::maxVisibleRecords()
+#define KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORDS 8
 
-//! maximum value for KDbLookupFieldSchema::maximumListRows()
-#define KDB_LOOKUP_FIELD_MAX_LIST_ROWS 100
+//! upper limit for KDbLookupFieldSchema::maxVisibleRecords()
+#define KDB_LOOKUP_FIELD_LIMIT_MAX_VISIBLE_RECORDS 100
 
 //! default value for KDbLookupFieldSchema::limitToList()
 #define KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST true
@@ -159,16 +159,16 @@ public:
     /*! Sets "column headers visibility" flag. @see columnHeadersVisible() */
     void setColumnHeadersVisible(bool set);
 
-    /*! @return integer property specifying a maximum number of rows
+    /*! @return integer property specifying a maximum number of records
      that can be displayed in a combo box popup or a list box. The default is
-     equal to KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS constant. */
-    uint maximumListRows() const;
+     equal to KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORD_COUNT constant. */
+    uint maxVisibleRecords() const;
 
-    /*! Sets maximum number of rows that can be displayed in a combo box popup
-     or a list box. If @a rows is 0, KDB_LOOKUP_FIELD_DEFAULT_LIST_ROWS is set.
-     If @a rows is greater than KDB_LOOKUP_FIELD_MAX_LIST_ROWS,
+    /*! Sets maximum number of records that can be displayed in a combo box popup
+     or a list box. If @a count is 0, KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORD_COUNT is set.
+     If @a count is greater than KDB_LOOKUP_FIELD_MAX_LIST_ROWS,
      KDB_LOOKUP_FIELD_MAX_LIST_ROWS is set. */
-    void setMaximumListRows(uint rows);
+    void setMaxVisibleRecords(uint count);
 
     /*! @return true if , only values present on the list can be selected using
      the combo box. The default is true. */

@@ -38,7 +38,7 @@ typedef QList<QVariant> KDbPreparedStatementParameters;
   Currently INSERT and SELECT statements are supported.
   For example, wher using KDbPreparedStatement for INSERTs,
   you can gain about 30% speedup compared to using multiple
-  connection.insertRecord(*tabelSchema, dbRowBuffer).
+  connection.insertRecord(*tabelSchema, dbRecordBuffer).
 
   To use KDbPreparedStatement, create is using KDbConnection:prepareStatement(),
   providing table schema; set up parameters using operator << ( const QVariant& value );

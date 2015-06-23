@@ -665,7 +665,7 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
     }
     values->insert("columnWidths", lookup ? variantList : QVariant());
     values->insert("showColumnHeaders", lookup ? lookup->columnHeadersVisible() : QVariant());
-    values->insert("listRows", lookup ? lookup->maximumListRows() : QVariant());
+    values->insert("listRows", lookup ? lookup->maxVisibleRecords() : QVariant());
     values->insert("limitToList", lookup ? lookup->limitToList() : QVariant());
     values->insert("displayWidget", lookup ? uint(lookup->displayWidget()) : QVariant());
 }
