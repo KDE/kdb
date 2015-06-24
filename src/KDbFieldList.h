@@ -81,11 +81,14 @@ public:
     /*! @return field id or NULL if there is no such a field. */
     KDbField* field(uint id);
 
-    /*! @return field id or NULL if there is no such a field. */
+    /*! @overload KDbField* field(uint id) */
     const KDbField* field(uint id) const;
 
     /*! @return field with name @a name or NULL if there is no such a field. */
-    virtual KDbField* field(const QString& name) const;
+    virtual KDbField* field(const QString& name);
+
+    /*! @overload . DbField* field(const QString& name) const */
+    const KDbField* field(const QString& name) const;
 
     /*! @return true if this list contains given @a field. */
     bool hasField(const KDbField& field) const;

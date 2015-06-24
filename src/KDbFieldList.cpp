@@ -157,7 +157,12 @@ const KDbField* KDbFieldList::field(uint id) const
     return m_fields.value(id);
 }
 
-KDbField* KDbFieldList::field(const QString& name) const
+KDbField* KDbFieldList::field(const QString& name)
+{
+    return m_fields_by_name.value(name.toLower());
+}
+
+const KDbField* KDbFieldList::field(const QString& name) const
 {
     return m_fields_by_name.value(name.toLower());
 }
