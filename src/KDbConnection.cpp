@@ -1739,7 +1739,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     if (!drv_createTable(*tableSchema))
         createTable_ERR;
 
-    //add schema data to kexi__* tables
+    //add the object data to kexi__* tables
     if (!internalTable) {
         //update kexi__objects
         if (!storeNewObjectData(tableSchema))
@@ -2403,7 +2403,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
 bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object)
 {
     if (data.count() < 5) {
-        kdbWarning() << "Aborting, schema data should have 5 elements, found" << data.count();
+        kdbWarning() << "Aborting, object data should have 5 elements, found" << data.count();
         return false;
     }
     bool ok;
@@ -2463,7 +2463,7 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
                               .arg(KDbEscapedString::number(object->type()),
                                    m_driver->valueToSQL(KDbField::Text, object->name())), &existingID))
         {
-            //we already have stored a schema data with the same name and type:
+            //we already have stored an object data with the same name and type:
             //just update it's properties as it would be existing object
             object->setId(existingID);
             newObject = false;

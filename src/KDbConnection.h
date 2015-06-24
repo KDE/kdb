@@ -824,7 +824,7 @@ public:
      @return true on success, false on failure and cancelled when such object couldn't be found. */
     tristate loadObjectData(int id, KDbObject* object);
 
-    /*! Finds object schema data for object of type @a type and name @a name.
+    /*! Finds object data for object of type @a type and name @a name.
      If the object is found, resulted schema is stored in @a object and true is returned,
      otherwise false is returned. */
     tristate loadObjectData(int type, const QString& name, KDbObject* object);
