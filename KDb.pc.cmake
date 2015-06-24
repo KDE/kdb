@@ -6,7 +6,7 @@ includedir=${prefix}/include
 Name: KDb
 Description: A database connectivity and creation library
 Version: @KDB_VERSION@
-URL: https://projects.kde.org/kdb
-Requires: QtCore QtGui QtXml ICU
+URL: http://community.kde.org/KDb
+Requires: QtCore QtGui QtXml ICU KF5CoreAddons
 Libs: -L${libdir}
 Cflags: -I${includedir}

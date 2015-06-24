@@ -85,8 +85,8 @@ simple_option(KDB_UNFINISHED
 simple_option(BUILD_TESTING "Build tests" OFF) # override default from CTest.cmake
 
 if (NOT WIN32)
-  configure_file(${KDb_SOURCE_DIR}/kdb.pc.cmake ${KDb_BINARY_DIR}/kdb.pc @ONLY)
-  install(FILES ${KDb_BINARY_DIR}/kdb.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+  configure_file(${KDb_SOURCE_DIR}/KDb.pc.cmake ${KDb_BINARY_DIR}/KDb.pc @ONLY)
+  install(FILES ${KDb_BINARY_DIR}/KDb.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
