@@ -450,6 +450,7 @@
 
 #include "KDbConnection.h"
 #include "KDbQuerySchema.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbField.h"
 #include "KDbTableSchema.h"
 #include "KDbParser.h"
@@ -717,7 +718,7 @@ SELECT
     kdbDebug() << "SELECT";
 //    globalParser->createSelect();
 //    globalParser->setOperation(KDbParser::OP_Select);
-    $$ = new KDbQuerySchema();
+    $$ = KDbQuerySchema::Private::createQuery(globalParser->connection());
 }
 ;
 

@@ -751,6 +751,8 @@ public:
     //! @todo add tests
     bool validate(QString *errorMessage, QString *errorDescription);
 
+    class Private;
+
 protected:
     //! @internal associates @a conn with this query so it's possible to find tables
     explicit KDbQuerySchema(KDbConnection *conn);
@@ -759,7 +761,6 @@ protected:
 
     void computeFieldsExpanded() const;
 
-    class Private;
     Private * const d;
 };
 

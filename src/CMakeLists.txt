@@ -95,6 +95,7 @@ set(kdb_LIB_SRCS
    KDbTableSchema.cpp
    KDbIndexSchema.cpp
    KDbQuerySchema.cpp
+   KDbQuerySchema_p.cpp
    KDbQueryColumnInfo.cpp
    KDbTableOrQuerySchema.cpp
    KDbDriverManager.cpp
