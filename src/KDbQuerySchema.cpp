@@ -42,6 +42,7 @@ public:
             , masterTable(0)
             , fakeRecordIdField(0)
             , fakeRecordIdCol(0)
+            , conn(0)
             , maxIndexWithAlias(-1)
             , visibility(64)
             , fieldsExpanded(0)
@@ -80,6 +81,7 @@ public:
             pkeyFieldsOrder = 0;
             fakeRecordIdCol = 0;
             fakeRecordIdField = 0;
+            conn = 0;
             ownedVisibleColumns = 0;
             // </clear, so computeFieldsExpanded() will re-create it>
             if (!copy->whereExpr.isNull()) {
@@ -215,6 +217,10 @@ public:
 
     KDbField *fakeRecordIdField; //! used to mark a place for record Id
     KDbQueryColumnInfo *fakeRecordIdCol; //! used to mark a place for record Id
+
+    //! Connection on which this query operates
+    //! @todo use equivalent of QPointer<KDbConnection>
+    KDbConnection* conn;
 
 protected:
     void tryRegenerateExprAliases() {
@@ -644,12 +650,13 @@ KDbQuerySchema::KDbQuerySchema()
 }
 
 KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
-        : KDbFieldList(false)
+        : KDbFieldList(false)//fields are not owned by KDbQuerySchema object
         , KDbObject(KDb::QueryObjectType)
         , d(new Private(this))
 {
     Q_ASSERT(tableSchema);
     d->masterTable = tableSchema;
+    d->conn = tableSchema->connection();
     init();
     /*if (!d->masterTable) {
       kdbWarning() << "!d->masterTable";
@@ -691,6 +698,16 @@ KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema)
     // this deep copy must be after the 'd' initialization because fieldsExpanded() is used there
     d->orderByColumnList = new KDbOrderByColumnList(*querySchema.d->orderByColumnList,
                                                  const_cast<KDbQuerySchema*>(&querySchema), this);
+}
+
+KDbQuerySchema::KDbQuerySchema(KDbConnection *conn)
+        : KDbFieldList(false)//fields are not owned by KDbQuerySchema object
+        , KDbObject(KDb::QueryObjectType)
+        , d(new Private(this))
+{
+    Q_ASSERT(conn);
+    init();
+    d->conn = conn;
 }
 
 KDbQuerySchema::~KDbQuerySchema()
@@ -862,8 +879,13 @@ KDbFieldList& KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visib
 
 KDbConnection* KDbQuerySchema::connection() const
 {
-    KDbTableSchema *mt = masterTable();
-    return mt ? mt->connection() : 0;
+    if (d->conn) {
+        return d->conn;
+    }
+    if (!d->tables.isEmpty()) {
+        return d->tables.first()->connection();
+    }
+    return 0;
 }
 
 QDebug operator<<(QDebug dbg, const KDbQuerySchema& query)
