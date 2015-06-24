@@ -304,7 +304,6 @@ KDbTableViewData::KDbTableViewData()
         , d(new Private)
 {
     init();
-    d->cursor = 0;
 }
 
 // db-aware ctor
@@ -399,6 +398,7 @@ void KDbTableViewData::init(
 void KDbTableViewData::init()
 {
     d->realColumnCount = 0;
+    d->cursor = 0;
 }
 
 void KDbTableViewData::deleteLater()
