@@ -365,7 +365,14 @@ protected:
 //! The KDbConstExpression class represents const expression.
 /*! Types are string, integer, float constants. Also includes NULL value.
  Token can be: IDENTIFIER, SQL_NULL, SQL_TRUE, SQL_FALSE, CHARACTER_STRING_LITERAL,
- INTEGER_CONST, REAL_CONST, DATE_CONST, DATETIME_CONST, TIME_CONST. */
+ INTEGER_CONST, REAL_CONST, DATE_CONST, DATETIME_CONST, TIME_CONST.
+
+ @note For REAL_CONST accepted values can be of type qreal, double and QPoint.
+       In the case of QPoint, integer value (with a sign) is stored in QPoint::x
+       and the fraction part (that should be always positive) is stored in QPoint::y.
+       This gives 31 bits for the integer part (10 decimal digits) and 31 bits for the part
+       (10 decimal digits).
+*/
 class KDB_EXPORT KDbConstExpression : public KDbExpression
 {
 public:

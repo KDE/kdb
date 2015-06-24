@@ -27,6 +27,8 @@
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
+#include <QPoint>
+
 KDbConstExpressionData::KDbConstExpressionData(const QVariant& aValue)
  : KDbExpressionData()
  , value(aValue)
@@ -90,10 +92,14 @@ KDbField::Type KDbConstExpressionData::typeInternal(KDb::ExpressionCallStack* ca
 void KDbConstExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
-    const QString res = QLatin1String("ConstExp(")
+    QString res = QLatin1String("ConstExp(")
         + token.name()
         + QLatin1String(",") + toString().toString()
-        + QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSQLTypeName(type()));
+        + QString::fromLatin1(",type=%1").arg(KDbDriver::defaultSQLTypeName(type()));
+    if (value.type() == QVariant::Point && token.value() == REAL_CONST) {
+        res += QLatin1String(",DECIMAL");
+    }
+    res += QLatin1String(")");
     dbg.nospace() << res.toLocal8Bit().constData();
 }
 
@@ -113,6 +119,9 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(KDbQuerySchemaParamete
     case SQL_FALSE:
         return KDbEscapedString("FALSE");
     case REAL_CONST: {
+        if (value.type() == QVariant::Point) {
+            return KDbEscapedString("%1.%2").arg(value.toPoint().x()).arg(qAbs(value.toPoint().y()));
+        }
         if (!value.canConvert<qreal>()) {
             return KDbEscapedString("0.0");
         }

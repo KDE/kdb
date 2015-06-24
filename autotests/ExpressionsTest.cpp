@@ -1012,6 +1012,25 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
+    QPoint largeDecimal(INT_MAX, INT_MAX);
+    c = KDbConstExpression(KDbToken::REAL_CONST, largeDecimal);
+    QCOMPARE(c.type(), KDbField::Double);
+    QVERIFY(c.isValid());
+    QVERIFY(c.isNumericType());
+    QVERIFY(c.isFPNumericType());
+    QCOMPARE(c.value(), QVariant(largeDecimal));
+    QCOMPARE(c.toString(), KDbEscapedString(QString("%1.%2").arg(largeDecimal.x()).arg(largeDecimal.y())));
+    largeDecimal.setY(-10);
+    QVERIFY(validate(&c));
+    testCloneExpression(c);
+    qDebug() << c;
+    c = KDbConstExpression(KDbToken::REAL_CONST, largeDecimal);
+    QCOMPARE(c.value(), QVariant(largeDecimal));
+    QCOMPARE(c.toString(), KDbEscapedString(QString("%1.%2").arg(largeDecimal.x()).arg(-largeDecimal.y())));
+    QVERIFY(validate(&c));
+    testCloneExpression(c);
+    qDebug() << c;
+
     // date
     QDate date(QDate::currentDate());
     c = KDbConstExpression(KDbToken::DATE_CONST, date);
