@@ -28,7 +28,7 @@
  table schema or query schema.
  Default type of object is KDb::UnknownObjectType.
 */
-shared class export=KDB_EXPORT operator== KDbObject
+shared class export=KDB_EXPORT operator== virtual_dtor KDbObject
 {
 public:
     /*!
@@ -104,8 +104,7 @@ public:
 
 protected:
     //! Clears all properties except 'type'.
-    void clear();
-/*    friend class KDbConnection; */
+    virtual void clear();
 };
 
 //! Sends information about object @a object to debug output @a dbg.
