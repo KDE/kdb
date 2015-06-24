@@ -223,15 +223,12 @@ private:
 };
 
 //! @short Case insensitive hash container supporting QString or QByteArray keys.
-//! Keys are turned to lowercase before inserting. Also supports option for autodeletion.
+//! Keys are turned to lowercase before inserting.
 template <typename Key, typename T>
 class KDB_EXPORT CaseInsensitiveHash : public QHash<Key, T>
 {
 public:
-    CaseInsensitiveHash() : QHash<Key, T>(), m_autoDelete(false) {}
-    ~CaseInsensitiveHash() {
-        if (m_autoDelete) qDeleteAll(*this);
-    }
+    CaseInsensitiveHash() : QHash<Key, T>() {}
     typename QHash<Key, T>::iterator find(const Key& key) const {
         return QHash<Key, T>::find(key.toLower());
     }
@@ -274,12 +271,6 @@ public:
     const T operator[](const Key& key) const {
         return QHash<Key, T>::operator[](key.toLower());
     }
-    //! Controls autodeletion flag.
-    void setAutoDelete(bool set) {
-        m_autoDelete = set;
-    }
-private:
-    bool m_autoDelete;
 };
 
 //! A set created from static (0-terminated) array of raw null-terminated strings.
