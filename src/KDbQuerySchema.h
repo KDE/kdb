@@ -502,7 +502,13 @@ public:
 
     /*! This is overloaded method KDbField* field(const QString& name, bool expanded)
      with expanded = true. This method is also a product of inheritance from KDbFieldList.  */
-    virtual KDbField* field(const QString& name) const;
+    virtual KDbField* field(const QString& name);
+
+    /*! @return field id or NULL if there is no such a field. */
+    KDbField* field(uint id);
+
+    /*! @overload KDbField* field(uint id) */
+    const KDbField* field(uint id) const;
 
     /*! Like KDbQuerySchema::field(const QString& name) but returns not only KDbField
      object for @a identifier but entire KDbQueryColumnInfo object.

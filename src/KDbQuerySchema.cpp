@@ -1222,7 +1222,7 @@ void KDbQuerySchema::setStatement(const KDbEscapedString& sql)
     d->sql = sql;
 }
 
-KDbField* KDbQuerySchema::field(const QString& name) const
+KDbField* KDbQuerySchema::field(const QString& name)
 {
     return field(name, true);
 }
@@ -1231,6 +1231,16 @@ KDbField* KDbQuerySchema::field(const QString& identifier, bool expanded) const
 {
     KDbQueryColumnInfo *ci = columnInfo(identifier, expanded);
     return ci ? ci->field : 0;
+}
+
+KDbField* KDbQuerySchema::field(uint id)
+{
+    return KDbFieldList::field(id);
+}
+
+const KDbField* KDbQuerySchema::field(uint id) const
+{
+    return KDbFieldList::field(id);
 }
 
 KDbQueryColumnInfo* KDbQuerySchema::columnInfo(const QString& identifier, bool expanded) const
