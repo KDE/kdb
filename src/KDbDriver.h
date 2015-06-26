@@ -201,11 +201,12 @@ public:
         return KDbEscapedString();
     }
 
-    //! Driver-specific identifier escaping (e.g. for a table name, db name, etc.)
-    /*! Escape database identifier (@a str) in order that keywords
-       can be used as table names, column names, etc. */
+    //! @return @a str string with applied driver-specific identifier escaping
+    /*! This escaping can be used for field, table, database names, etc.
+        @see KDb::escapeIdentifier */
     inline QString escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
 
+    //! @overload QString escapeIdentifier(const QString&) const
     inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
 
     //! @return internal property with a name @a name for this driver.
@@ -306,32 +307,17 @@ protected:
 
 namespace KDb {
 
-/*! @return true if the @a word is an reserved KDbSQL keyword
- (see keywords.cpp for a list of reserved keywords). */
-KDB_EXPORT bool isKDbSQLKeyword(const QByteArray& word);
-
-KDB_EXPORT QString escapeIdentifier(const QString& string);
-
+//! @return string @a string with applied driver-specific identifier escaping if @a driver
+//!         is not KDbSQL general identifier escaping when @a driver is 0.
+/*! This escaping can be used for field, table, database names, etc.
+    @see KDb::escapeIdentifier */
 KDB_EXPORT QString escapeIdentifier(const KDbDriver* driver,
-                                    const QString& str);
+                                    const QString& string);
 
-KDB_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
-
+//! @overload QString escapeIdentifier(const KDbDriver*, const QString&)
 KDB_EXPORT QByteArray escapeIdentifier(const KDbDriver* driver,
                                        const QByteArray& str);
 
-/*! Escapes and converts value @a v (for type @a ftype)
-    to string representation required by KDbSQL commands.
-    For Date/Time type KDb::dateTimeToSQL() is used.
-    For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
-KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
-
-/*! Converts value @a v to string representation required by KDbSQL commands:
-    ISO 8601 DateTime format - with "T" delimiter/
-    For specification see http://www.w3.org/TR/NOTE-datetime.
-    Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
-    @todo Add support for time zones */
-KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
 }
 
 #endif

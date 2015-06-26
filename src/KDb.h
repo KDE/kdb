@@ -308,17 +308,37 @@ KDB_EXPORT QVariant emptyValueForType(KDbField::Type type);
  for filling new columns. */
 KDB_EXPORT QVariant notEmptyValueForType(KDbField::Type type);
 
+/*! @return true if the @a word is an reserved KDbSQL keyword
+ See generated/sqlkeywords.cpp.
+ @todo add function returning list of keywords. */
+KDB_EXPORT bool isKDbSQLKeyword(const QByteArray& word);
+
+//! @return @a string string with applied KDbSQL identifier escaping
+/*! This escaping can be used for field, table, database names, etc.
+    Use it for user-visible backend-independent statements.
+    @see KDb::escapeIdentifierAndAddQuotes() */
+KDB_EXPORT QString escapeIdentifier(const QString& string);
+
+//! @overload QString escapeIdentifier(const QString&)
+KDB_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
+
+//! @return @a string string with applied KDbSQL identifier escaping and enclosed in " quotes
+/*! This escaping can be used for field, table, database names, etc.
+    Use it for user-visible backend-independent statements.
+    @see KDb::escapeIdentifier */
+KDB_EXPORT QString escapeIdentifierAndAddQuotes(const QString& string);
+
+//! @overload QString escapeIdentifierAndAddQuotes(const QString&)
+KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
+
 /*! @return escaped identifier string @a string using KDbSQL dialect,
             i.e. doubles double quotes and inserts the string into double quotes.
     If the identifier does not contain double quote, @a string is returned.
     Use it for user-visible backend-independent statements. */
-KDB_EXPORT QString escapeIdentifier(const QString& string);
 
-KDB_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
-
-/*! @return escaped string @a string using KDbSQL dialect,
-            i.e. doubles single quotes and inserts the string into single quotes.
-    Quotes are always added.
+/*! @return escaped string @a string w using KDbSQL dialect,
+            i.e. doubles single quotes ("'") and inserts the string into single quotes.
+    Quotes "'" are prepended and appended.
     Also escapes \\n, \\r, \\t, \\\\, \\0.
     Use it for user-visible backend-independent statements. */
 KDB_EXPORT QString escapeString(const QString& string);
@@ -411,6 +431,19 @@ KDB_EXPORT QString defaultFileBasedDriverMimeType();
 
 /*! @return default file-based driver ID (currently, "org.kde.kdb.sqlite"). */
 KDB_EXPORT QString defaultFileBasedDriverId();
+
+/*! Escapes and converts value @a v (for type @a ftype)
+    to string representation required by KDbSQL commands.
+    For Date/Time type KDb::dateTimeToSQL() is used.
+    For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
+KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
+
+/*! Converts value @a v to string representation required by KDbSQL commands:
+    ISO 8601 DateTime format - with "T" delimiter/
+    For specification see http://www.w3.org/TR/NOTE-datetime.
+    Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
+    @todo Add support for time zones */
+KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
 
 #ifdef KDB_DEBUG_GUI
 //! A prototype of handler for GUI debugger

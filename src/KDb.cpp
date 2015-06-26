@@ -1166,97 +1166,70 @@ QVariant KDb::notEmptyValueForType(KDbField::Type type)
     return QVariant();
 }
 
-QString KDb::escapeIdentifier(const QString& string)
+//! @internal @return nestimated new length after escaping of string @a string
+template<typename T>
+inline static int estimatedNewLength(const T &string, bool addQuotes)
 {
-    const QLatin1Char quote('"');
-    // find out the length ot the destination string
-    const int origStringLength = string.length();
-    int newStringLength = 1 + 1;
-    for (int i = 0; i < origStringLength; i++) {
-        if (string.at(i) == quote)
-            newStringLength += 2;
-        else
-            newStringLength++;
-    }
-    if (newStringLength == origStringLength)
-        return string;
-    newStringLength += 2; // for quotes
+    if (string.length() < 10)
+        return string.length() * 2 + (addQuotes ? 2 : 0);
+    return string.length() * 3 / 2;
+}
+
+//! @internal @return @a string string with applied KDbSQL identifier escaping.
+//! If @a addQuotes is true, '"' characer is prepended and appended.
+template<typename T, typename Latin1StringType, typename Latin1CharType, typename CharType>
+inline static T escapeIdentifier(const T& string, bool addQuotes)
+{
+    const Latin1CharType quote('"');
     // create
-    QString escapedQuote(quote);
-    escapedQuote.append(QLatin1Char(quote));
-    QString newString;
-    newString.reserve(newStringLength);
-    newString.append(quote);
-    for (int i = 0; i < origStringLength; i++) {
-        const QChar c = string.at(i);
+    Latin1StringType escapedQuote("\"\"");
+    T newString;
+    newString.reserve(estimatedNewLength(string, addQuotes));
+    if (addQuotes) {
+        newString.append(quote);
+    }
+    for (int i = 0; i < string.length(); i++) {
+        const CharType c = string.at(i);
         if (c == quote)
             newString.append(escapedQuote);
         else
             newString.append(c);
     }
-    newString.append(quote);
+    if (addQuotes) {
+        newString.append(quote);
+    }
+    newString.squeeze();
     return newString;
+}
+
+QString KDb::escapeIdentifier(const QString& string)
+{
+    return ::escapeIdentifier<QString, QLatin1String, QLatin1Char, QChar>(string, false);
 }
 
 QByteArray KDb::escapeIdentifier(const QByteArray& string)
 {
-    const char quote = '"';
-    // find out the length ot the destination string
-    const int origStringLength = string.length();
-    int newStringLength = 1 + 1;
-    for (int i = 0; i < origStringLength; i++) {
-        if (string.at(i) == quote)
-            newStringLength += 2;
-        else
-            newStringLength++;
-    }
-    if (newStringLength == origStringLength)
-        return string;
-    newStringLength += 2; // for quotes
-    // create
-    QByteArray escapedQuote;
-    escapedQuote.append(quote);
-    escapedQuote.append(quote);
-    QByteArray newString;
-    newString.reserve(newStringLength);
-    newString.append(quote);
-    for (int i = 0; i < origStringLength; i++) {
-        const char c = string.at(i);
-        if (c == quote)
-            newString.append(escapedQuote);
-        else
-            newString.append(c);
-    }
-    newString.append(quote);
-    return newString;
+    return ::escapeIdentifier<QByteArray, QByteArray, char, char>(string, false);
+}
+
+QString KDb::escapeIdentifierAndAddQuotes(const QString& string)
+{
+    return ::escapeIdentifier<QString, QLatin1String, QLatin1Char, QChar>(string, true);
+}
+
+QByteArray KDb::escapeIdentifierAndAddQuotes(const QByteArray& string)
+{
+    return ::escapeIdentifier<QByteArray, QByteArray, char, char>(string, true);
 }
 
 QString KDb::escapeString(const QString& string)
 {
-    const char quote = '\'';
+    const QLatin1Char quote('\'');
     // find out the length ot the destination string
-    const int origStringLength = string.length();
-    int newStringLength = 1 + 1;
-    for (int i = 0; i < origStringLength; i++) {
-        const ushort unicode = string.at(i).unicode();
-        if (   unicode == quote
-            || unicode == '\t'
-            || unicode == '\\'
-            || unicode == '\n'
-            || unicode == '\r'
-            || unicode == '\0')
-        {
-            newStringLength += 2;
-        }
-        else
-            newStringLength++;
-    }
-    newStringLength += 2; // for quotes
     // create
-    QString newString;
-    newString.reserve(newStringLength);
-    newString.append(QLatin1Char(quote));
-    for (int i = 0; i < origStringLength; i++) {
+    QString newString(quote);
+    newString.reserve(estimatedNewLength(string, true));
+    for (int i = 0; i < string.length(); i++) {
         const QChar c = string.at(i);
         const ushort unicode = c.unicode();
         if (unicode == quote)
