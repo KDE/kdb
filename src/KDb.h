@@ -331,11 +331,6 @@ KDB_EXPORT QString escapeIdentifierAndAddQuotes(const QString& string);
 //! @overload QString escapeIdentifierAndAddQuotes(const QString&)
 KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
 
-/*! @return escaped identifier string @a string using KDbSQL dialect,
-            i.e. doubles double quotes and inserts the string into double quotes.
-    If the identifier does not contain double quote, @a string is returned.
-    Use it for user-visible backend-independent statements. */
-
 /*! @return escaped string @a string w using KDbSQL dialect,
             i.e. doubles single quotes ("'") and inserts the string into single quotes.
     Quotes "'" are prepended and appended.
