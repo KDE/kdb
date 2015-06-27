@@ -56,13 +56,13 @@ void IdentifierTest::testIsIdentifier_data()
     QTest::addColumn<bool>("result");
     QTest::newRow("empty") << "" << false;
     QTest::newRow("empty") << QString() << false;
-    QTest::newRow("empty") << "\0" << false;
-    QTest::newRow("empty") << " " << false;
-    QTest::newRow("empty") << "7" << false;
-    QTest::newRow("empty") << "_" << true;
-    QTest::newRow("empty") << "abc_2" << true;
-    QTest::newRow("empty") << "Abc_2" << true;
-    QTest::newRow("empty") << "_7" << true;
+    QTest::newRow("zero") << "\0" << false;
+    QTest::newRow("space") << " " << false;
+    QTest::newRow("number") << "7" << false;
+    QTest::newRow("underscore") << "_" << true;
+    QTest::newRow("alpha") << "abc_2" << true;
+    QTest::newRow("upper") << "Abc_2" << true;
+    QTest::newRow("upper2") << "_7" << true;
 }
 
 void IdentifierTest::testIsIdentifier()
@@ -70,6 +70,28 @@ void IdentifierTest::testIsIdentifier()
     QFETCH(QString, string);
     QFETCH(bool, result);
     QCOMPARE(KDb::isIdentifier(string), result);
+}
+
+void IdentifierTest::escapeIdentifier_data()
+{
+    QTest::addColumn<QString>("string");
+    QTest::addColumn<QString>("result");
+    QTest::newRow("empty") << "" << QString();
+    QTest::newRow("empty") << QString() << QString();
+    QTest::newRow("\"") << "\"" << "\"\"";
+    QTest::newRow("\"-\"") << "\"-\"" << "\"\"-\"\"";
+    QTest::newRow("\t") << "\t" << "\t";
+    QTest::newRow("alpha") << "a b" << "a b";
+}
+
+void IdentifierTest::escapeIdentifier()
+{
+    QFETCH(QString, string);
+    QFETCH(QString, result);
+    QCOMPARE(KDb::escapeIdentifier(string), result);
+    QCOMPARE(KDb::escapeIdentifier(string.toLatin1()), result.toLatin1());
+    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string), QString::fromLatin1("\"%1\"").arg(result));
+    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string.toLatin1()), '"' + result.toLatin1() + '"');
 }
 
 void IdentifierTest::cleanupTestCase()

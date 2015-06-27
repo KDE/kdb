@@ -31,6 +31,8 @@ private Q_SLOTS:
     void testStringToIdentifier();
     void testIsIdentifier_data();
     void testIsIdentifier();
+    void escapeIdentifier_data();
+    void escapeIdentifier();
     void cleanupTestCase();
 };
 
