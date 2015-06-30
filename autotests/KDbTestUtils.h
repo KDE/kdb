@@ -57,6 +57,7 @@ T* KDB_POINTER_WRAPPER(const QPointer<T> &t) { return t.data(); }
     } \
     while (false)
 
+//! Test utilities that provide basic database features
 class KDBTESTUTILS_EXPORT KDbTestUtils : public QObject
 {
     Q_OBJECT
