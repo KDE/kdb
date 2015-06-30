@@ -33,6 +33,7 @@ ecm_add_tests(
     ConnectionTest.cpp
     DriverTest.cpp
     ExpressionsTest.cpp
+    KDbTest.cpp
 
     LINK_LIBRARIES
         Qt5::Test
