@@ -170,37 +170,51 @@ public:
     //! Converts type @a type to QVariant equivalent as accurate as possible
     static QVariant::Type variantType(Type type);
 
-    /*! @return a i18n-ed type name for @a type (@a type has to be an element from KDbField::Type,
-     not greater than KDbField::LastType) */
+    //! @return a translated type name for @a type
+    /*! @a type has to be an element from KDbField::Type, not greater than KDbField::LastType;
+        KDbField::Null is also supported.
+        For unsupported types empty string is returned. */
     static QString typeName(Type type);
 
-    /*! @return list of all available i18n-ed type names. */
+    //! @return list of all available translated type names
+    /*! The first element of the list is the name of KDbField::InvalidType, the last one
+        is a name of KDbField::LastType. */
     static QStringList typeNames();
 
-    /*! @return type string for @a type, e.g. "Integer" for Integer type
-     (not-i18n-ed, @a type has to be an element from KDbField::Type,
-     not greater than KDbField::LastType) */
+    //! @return a nontranslated type string for @a type
+    /*! For example returns "Integer" for KDbType::Integer.
+        @a type has to be an element from KDbField::Type, not greater than KDbField::LastType;
+        KDbField::Null is also supported.
+        For unsupported types empty string is returned. */
     static QString typeString(Type type);
 
-    /*! @return type for a given @a typeString */
+    //! @return type for a given nontranslated type string @a typeString
+    /*! For example returns KDbType::Integer for "Integer".
+        @a typeString has to be name of type not greater than KDbField::LastType;
+        KDbField::Null is also supported.
+        For unsupported value KDbField::InvalidType is returned. */
     static Type typeForString(const QString& typeString);
 
-    /*! @return type group for a given @a typeGroupString */
+    //! @return type group for a given nontranslated type group @a typeGroupString
+    /*! For example returns KDbField::TextGroup for "TextGroup" string.
+        For unsupported value KDbField::InvalidGroup is returned. */
     static TypeGroup typeGroupForString(const QString& typeGroupString);
 
-    /*! @return group for @a type */
+    //! @return group for @a type
+    /*! For example returns KDbField::TextGroup for KDbField::Text type.
+        @a type has to be an element from KDbField::Type, not greater than KDbField::LastType.
+        For unsupported type KDbField::InvalidGroup is returned. */
     static TypeGroup typeGroup(Type type);
 
-    /*! @return a i18n-ed group name for @a typeGroup
-     (@a typeGroup has to be an element from KDbField::TypeGroup) */
+    //! @return a translated group name for @a typeGroup
     static QString typeGroupName(TypeGroup typeGroup);
 
-    /*! @return list of all available i18n-ed type group names. */
+    //! @return list of all available translated type group names
+    /*! The first element of the list is the name of KDbField::InvalidGroup, the last one
+        is a name of KDbField::LastTypeGroup. */
     static QStringList typeGroupNames();
 
-    /*! @return type group string for @a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
-     (not-i18n-ed, @a type has to be an element from KDbField::Type,
-     not greater than KDbField::LastType) */
+    //! @return a nontranslated type group string for @a typeGroup, e.g. "IntegerGroup" for IntegerGroup type
     static QString typeGroupString(TypeGroup typeGroup);
 
     /*! @return the name of this field */
@@ -331,7 +345,7 @@ public:
      type of the expression (after evaluation) is returned instead. */
     Type type() const;
 
-    //! @return a i18n-ed type name for this field
+    //! @return a translated type name for this field
     inline QString typeName() const {
         return KDbField::typeName(type());
     }
@@ -341,7 +355,7 @@ public:
         return KDbField::typeGroup(type());
     }
 
-    //! @return a i18n-ed type group name for this field
+    //! @return a translated type group name for this field
     inline QString typeGroupName() const {
         return KDbField::typeGroupName(typeGroup());
     }
@@ -714,7 +728,7 @@ protected:
     KDbExpression* m_expr;
     CustomPropertiesMap* m_customProperties;
 
-    //! @internal Used in m_typeNames member to handle i18n-ed type names
+    //! @internal Used in m_typeNames member to handle translated type names
     class KDB_EXPORT FieldTypeNames : public QVector<QString>
     {
     public:
@@ -726,7 +740,7 @@ protected:
         bool m_initialized;
     };
 
-    //! @internal Used in m_typeGroupNames member to handle i18n-ed type group names
+    //! @internal Used in m_typeGroupNames member to handle translated type group names
     class KDB_EXPORT FieldTypeGroupNames : public QVector<QString>
     {
     public:
@@ -738,10 +752,10 @@ protected:
         bool m_initialized;
     };
 
-    //! real i18n-ed type names (and not-i18n-ed type name strings)
+    //! real translated type names (and nontranslated type name strings)
     static FieldTypeNames m_typeNames;
 
-    //! real i18n-ed type group names (and not-i18n-ed group name strings)
+    //! real translated type group names (and nontranslated group name strings)
     static FieldTypeGroupNames m_typeGroupNames;
 
 private:
