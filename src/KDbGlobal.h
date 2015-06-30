@@ -147,6 +147,13 @@ enum IdentifierEscapingType {
     KDbEscaping     //!< Identifiers are escaped using KDb's generic convention
 };
 
+//! A property of numeric values
+enum Signedness
+{
+    Signed = 0,  //!< Values can be both positive and negative
+    Unsigned = 1 //!< Values can be both non-negative
+};
+
 }
 
 //! Macros for marking future QObject::tr() translations.
