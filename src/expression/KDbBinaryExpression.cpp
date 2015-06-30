@@ -170,16 +170,16 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
 
     if (expressionClass == KDb::ArithmeticExpression) {
         if (ltInt && rtInt) {
-            /* From documentation of KDb::maximumForIntegerTypes():
+            /* From documentation of KDb::maximumForIntegerFieldTypes():
              In case of KDb::ArithmeticExpression:
              returned type may not fit to the result of evaluated expression that involves the arguments.
-             For example, 100 is within Byte type, maximumForIntegerTypes(Byte, Byte) is Byte but result
+             For example, 100 is within Byte type, maximumForIntegerFieldTypes(Byte, Byte) is Byte but result
              of 100 * 100 exceeds the range of Byte.
 
              Solution: for types smaller than Integer (e.g. Byte and ShortInteger) we are returning
              Integer type.
             */
-            KDbField::Type t = KDb::maximumForIntegerTypes(lt, rt);
+            KDbField::Type t = KDb::maximumForIntegerFieldTypes(lt, rt);
             if (t == KDbField::Byte || t == KDbField::ShortInteger) {
                 return KDbField::Integer;
             }

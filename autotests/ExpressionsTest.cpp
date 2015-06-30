@@ -1237,7 +1237,7 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
     T(KDbToken::SQL_NULL, QVariant(), KDbToken::OR, KDbToken::CHARACTER_STRING_LITERAL, "xyz", KDbField::InvalidType);
     // integer
     // -- KDb::ArithmeticExpression only: resulting type is Integer or more
-    //    see explanation for KDb::maximumForIntegerTypes()
+    //    see explanation for KDb::maximumForIntegerFieldTypes()
     T(KDbToken::INTEGER_CONST, 50, '+', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
     T(KDbToken::INTEGER_CONST, 50, '-', KDbToken::INTEGER_CONST, 20, KDbField::Integer);
     T(KDbToken::INTEGER_CONST, 50, '*', KDbToken::INTEGER_CONST, 20, KDbField::Integer);

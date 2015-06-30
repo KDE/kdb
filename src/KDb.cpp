@@ -303,9 +303,9 @@ bool KDb::deleteRecord(KDbConnection* conn, const QString &tableName,
                            + " AND " + keyname3 + "=" + conn->driver()->valueToSQL(keytype3, keyval3));
 }
 
-bool KDb::isEmptyValue(KDbField *f, const QVariant &v)
+bool KDb::isEmptyValue(KDbField::Type type, const QVariant &v)
 {
-    if (f->hasEmptyProperty() && v.toString().isEmpty() && !v.toString().isNull())
+    if (KDbField::hasEmptyProperty(type) && v.toString().isEmpty() && !v.toString().isNull())
         return true;
     return v.isNull();
 }
@@ -321,9 +321,9 @@ KDbEscapedString KDb::sqlWhere(KDbDriver *drv, KDbField::Type t,
 //! Cache
 struct TypeCache {
     TypeCache() {
-        for (KDbField::Type t = KDbField::FirstType; t <= KDbField::LastType; t = KDbField::Type(int(t) + 1)) {
+        for (KDbField::Type t = KDbField::InvalidType; t <= KDbField::LastType; t = KDbField::Type(int(t) + 1)) {
             const KDbField::TypeGroup tg = KDbField::typeGroup(t);
-            KDb::TypeGroupList list;
+            QList<KDbField::Type> list;
             QStringList name_list, str_list;
             if (tlist.contains(tg)) {
                 list = tlist.value(tg);
@@ -347,7 +347,7 @@ struct TypeCache {
         def_tlist[ KDbField::BLOBGroup ] = KDbField::BLOB;
     }
 
-    QHash< KDbField::TypeGroup, KDb::TypeGroupList > tlist;
+    QHash< KDbField::TypeGroup, QList<KDbField::Type> > tlist;
     QHash< KDbField::TypeGroup, QStringList > nlist;
     QHash< KDbField::TypeGroup, QStringList > slist;
     QHash< KDbField::TypeGroup, KDbField::Type > def_tlist;
@@ -355,22 +355,22 @@ struct TypeCache {
 
 Q_GLOBAL_STATIC(TypeCache, KDb_typeCache)
 
-const KDb::TypeGroupList KDb::typesForGroup(KDbField::TypeGroup typeGroup)
+const QList<KDbField::Type> KDb::fieldTypesForGroup(KDbField::TypeGroup typeGroup)
 {
     return KDb_typeCache->tlist.value(typeGroup);
 }
 
-QStringList KDb::typeNamesForGroup(KDbField::TypeGroup typeGroup)
+QStringList KDb::fieldTypeNamesForGroup(KDbField::TypeGroup typeGroup)
 {
     return KDb_typeCache->nlist.value(typeGroup);
 }
 
-QStringList KDb::typeStringsForGroup(KDbField::TypeGroup typeGroup)
+QStringList KDb::fieldTypeStringsForGroup(KDbField::TypeGroup typeGroup)
 {
     return KDb_typeCache->slist.value(typeGroup);
 }
 
-KDbField::Type KDb::defaultTypeForGroup(KDbField::TypeGroup typeGroup)
+KDbField::Type KDb::defaultFieldTypeForGroup(KDbField::TypeGroup typeGroup)
 {
     return (typeGroup <= KDbField::LastTypeGroup) ? KDb_typeCache->def_tlist.value(typeGroup) : KDbField::InvalidType;
 }
@@ -1071,9 +1071,9 @@ QDomElement KDb::saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentE
     return el;
 }
 
-//! @internal Used in KDb::emptyValueForType()
-struct KDb_EmptyValueForTypeCache {
-    KDb_EmptyValueForTypeCache()
+//! @internal Used in KDb::emptyValueForFieldType()
+struct KDb_EmptyValueForFieldTypeCache {
+    KDb_EmptyValueForFieldTypeCache()
             : values(int(KDbField::LastType) + 1) {
 #define ADD(t, value) values.insert(t, value);
         ADD(KDbField::Byte, 0);
@@ -1092,12 +1092,12 @@ struct KDb_EmptyValueForTypeCache {
     QVector<QVariant> values;
 };
 
-//! Used in KDb::emptyValueForType()
-Q_GLOBAL_STATIC(KDb_EmptyValueForTypeCache, KDb_emptyValueForTypeCache)
+//! Used in KDb::emptyValueForFieldType()
+Q_GLOBAL_STATIC(KDb_EmptyValueForFieldTypeCache, KDb_emptyValueForFieldTypeCache)
 
-QVariant KDb::emptyValueForType(KDbField::Type type)
+QVariant KDb::emptyValueForFieldType(KDbField::Type type)
 {
-    const QVariant val(KDb_emptyValueForTypeCache->values.at(
+    const QVariant val(KDb_emptyValueForFieldTypeCache->values.at(
                            (type <= KDbField::LastType) ? type : KDbField::InvalidType));
     if (!val.isNull())
         return val;
@@ -1113,9 +1113,9 @@ QVariant KDb::emptyValueForType(KDbField::Type type)
     return QVariant();
 }
 
-//! @internal Used in KDb::notEmptyValueForType()
-struct KDb_NotEmptyValueForTypeCache {
-    KDb_NotEmptyValueForTypeCache()
+//! @internal Used in KDb::notEmptyValueForFieldType()
+struct KDb_NotEmptyValueForFieldTypeCache {
+    KDb_NotEmptyValueForFieldTypeCache()
             : values(int(KDbField::LastType) + 1) {
 #define ADD(t, value) values.insert(t, value);
         // copy most of the values
@@ -1139,18 +1139,18 @@ struct KDb_NotEmptyValueForTypeCache {
                 ADD(i, ba);
                 continue;
             }
-            ADD(i, KDb::emptyValueForType((KDbField::Type)i));
+            ADD(i, KDb::emptyValueForFieldType((KDbField::Type)i));
         }
 #undef ADD
     }
     QVector<QVariant> values;
 };
-//! Used in KDb::notEmptyValueForType()
-Q_GLOBAL_STATIC(KDb_NotEmptyValueForTypeCache, KDb_notEmptyValueForTypeCache)
+//! Used in KDb::notEmptyValueForFieldType()
+Q_GLOBAL_STATIC(KDb_NotEmptyValueForFieldTypeCache, KDb_notEmptyValueForFieldTypeCache)
 
-QVariant KDb::notEmptyValueForType(KDbField::Type type)
+QVariant KDb::notEmptyValueForFieldType(KDbField::Type type)
 {
-    const QVariant val(KDb_notEmptyValueForTypeCache->values.at(
+    const QVariant val(KDb_notEmptyValueForFieldTypeCache->values.at(
                            (type <= KDbField::LastType) ? type : KDbField::InvalidType));
     if (!val.isNull())
         return val;
@@ -1493,29 +1493,30 @@ bool KDb::isDefaultValueAllowed(KDbField* field)
     return field && !field->isUniqueKey();
 }
 
-void KDb::getLimitsForType(KDbField::Type type, int *minValue, int *maxValue)
+void KDb::getLimitsForFieldType(KDbField::Type type, qlonglong *minValue, qlonglong *maxValue,
+                                Signedness signedness)
 {
     Q_ASSERT(minValue);
     Q_ASSERT(maxValue);
     switch (type) {
     case KDbField::Byte:
 //! @todo always ok?
-        *minValue = 0;
-        *maxValue = 255;
+        *minValue = signedness == KDb::Signed ? -0x80 : 0;
+        *maxValue = signedness == KDb::Signed ? 0x7F : 0xFF;
         break;
     case KDbField::ShortInteger:
-        *minValue = -32768;
-        *maxValue = 32767;
+        *minValue = signedness == KDb::Signed ? -0x8000 : 0;
+        *maxValue = signedness == KDb::Signed ? 0x7FFF : 0xFFFF;
         break;
     case KDbField::Integer:
-    case KDbField::BigInteger: //cannot return anything larger
+    case KDbField::BigInteger: //!< @todo cannot return anything larger?
     default:
-        *minValue = (int) - 0x07FFFFFFF;
-        *maxValue = (int)(0x080000000 - 1);
+        *minValue = signedness == KDb::Signed ? qlonglong(-0x07FFFFFFF) : qlonglong(0);
+        *maxValue = signedness == KDb::Signed ? qlonglong(0x07FFFFFFF) : qlonglong(0x0FFFFFFFF);
     }
 }
 
-KDbField::Type KDb::maximumForIntegerTypes(KDbField::Type t1, KDbField::Type t2)
+KDbField::Type KDb::maximumForIntegerFieldTypes(KDbField::Type t1, KDbField::Type t2)
 {
     if (!KDbField::isIntegerType(t1) || !KDbField::isIntegerType(t2))
         return KDbField::InvalidType;
@@ -1527,18 +1528,18 @@ KDbField::Type KDb::maximumForIntegerTypes(KDbField::Type t1, KDbField::Type t2)
         return t1;
     if (t1 == KDbField::BigInteger)
         return t1;
-    return KDb::maximumForIntegerTypes(t2, t1); //swap
+    return KDb::maximumForIntegerFieldTypes(t2, t1); //swap
 }
 
-QString KDb::simplifiedTypeName(const KDbField& field)
+QString KDb::simplifiedFieldTypeName(KDbField::Type type)
 {
-    if (field.isNumericType())
+    if (KDbField::isNumericType(type))
         return QObject::tr("Number"); //simplify
-    else if (field.type() == KDbField::BLOB)
+    else if (type == KDbField::BLOB)
 //! @todo support names of other BLOB subtypes
         return QObject::tr("Image"); //simplify
 
-    return field.typeGroupName();
+    return KDbField::typeGroupName(KDbField::typeGroup(type));
 }
 
 QString KDb::defaultFileBasedDriverMimeType()

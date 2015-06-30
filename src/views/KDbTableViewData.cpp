@@ -708,7 +708,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
         }
         if (f->isNotEmpty()) {
             saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
-            if (!f->isAutoIncrement() && (val.isNull() || KDb::isEmptyValue(f, val))) {
+            if (!f->isAutoIncrement() && (val.isNull() || KDb::isEmptyValue(f->type(), val))) {
                 //NOT EMPTY violated
                 d->result.msg = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
                                 + QLatin1String("\n\n") + KDbTableViewData::messageYouCanImproveData();

@@ -75,33 +75,32 @@ KDB_EXPORT bool deleteRecord(KDbConnection* conn, const QString &tableName,
                                     const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
                                     const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3);
 
-typedef QList<KDbField::Type> TypeGroupList;
+/*! @return list of field types for field type group @a typeGroup. */
+KDB_EXPORT const QList<KDbField::Type> fieldTypesForGroup(KDbField::TypeGroup typeGroup);
 
-/*! @return list of types for type group @a typeGroup. */
-KDB_EXPORT const KDb::TypeGroupList typesForGroup(KDbField::TypeGroup typeGroup);
+/*! @return list of translated field type names for field type group @a typeGroup. */
+KDB_EXPORT QStringList fieldTypeNamesForGroup(KDbField::TypeGroup typeGroup);
 
-/*! @return list of i18n-ed type names for type group @a typeGroup. */
-KDB_EXPORT QStringList typeNamesForGroup(KDbField::TypeGroup typeGroup);
+/*! @return list of (nontranslated) field type names for field type group @a typeGroup. */
+KDB_EXPORT QStringList fieldTypeStringsForGroup(KDbField::TypeGroup typeGroup);
 
-/*! @return list of (not-i18n-ed) type names for type group @a typeGroup. */
-KDB_EXPORT QStringList typeStringsForGroup(KDbField::TypeGroup typeGroup);
-
-/*! @return default field type for type group @a typeGroup,
+/*! @return default field type for field type group @a typeGroup,
  for example, KDbField::Integer for KDbField::IntegerGroup.
  It is used e.g. in KexiAlterTableDialog, to properly fill
  'type' property when user selects type group for a field. */
-KDB_EXPORT KDbField::Type defaultTypeForGroup(KDbField::TypeGroup typeGroup);
+KDB_EXPORT KDbField::Type defaultFieldTypeForGroup(KDbField::TypeGroup typeGroup);
 
-/*! @return a slightly simplified type name for @a field.
- For BLOB type it returns i18n-ed "Image" string or other, depending on the mime type.
- For numbers (either floating-point or integer) it returns i18n-ed "Number: string.
- For other types it the same string as KDbField::typeGroupName() is returned. */
+/*! @return a slightly simplified field type name type @a type.
+ For KDbField::BLOB type it returns a translated "Image" string or other, depending on the mime type.
+ For numbers (either floating-point or integer) it returns a translated "Number" string.
+ For other types KDbField::typeGroupName() is returned. */
 //! @todo support names of other BLOB subtypes
-KDB_EXPORT QString simplifiedTypeName(const KDbField& field);
+KDB_EXPORT QString simplifiedFieldTypeName(KDbField::Type type);
 
-/*! @return true if @a v represents an empty (but not null) value.
- Values of some types (as for strings) can be both empty and not null. */
-KDB_EXPORT bool isEmptyValue(KDbField *f, const QVariant &v);
+/*! @return true if value @a v represents an empty (but not null) value.
+ This depends on field type @a type. Values of some types (such as strings)
+ can be both empty and not null. */
+KDB_EXPORT bool isEmptyValue(KDbField::Type type, const QVariant &v);
 
 /*! Sets string pointed by @a msg to an error message retrieved from @a resultable,
  and string pointed by @a details to details of this error (server message and result number).
@@ -289,24 +288,24 @@ KDB_EXPORT QDomElement saveNumberElementToDom(QDomDocument *doc, QDomElement *pa
 KDB_EXPORT QDomElement saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value);
 
-/*! @return an empty value that can be set for a database field of type @a type having
- "null" property set. Empty string is returned for text type, 0 for integer
- or floating-point types, false for boolean type, empty null byte array for BLOB type.
- For date, time and date/time types current date, time, date+time is returned, respectively.
- Returns null QVariant for unsupported values like KDbField::InvalidType.
- This function is efficient (uses a cache) and is heavily used by the KDbAlterTableHandler
- for filling new columns. */
-KDB_EXPORT QVariant emptyValueForType(KDbField::Type type);
+//! @return equivalent of empty (default) value that can be set for a database field of type @a type
+/*! In particular returns:
+ - empty string for text types,
+ - 0 for integer and floating-point types,
+ - false for boolean types,
+ - a null byte array for BLOB type,
+ - current date, time, date+time is returned (measured at client side) for date, time and
+   date/time types respectively,
+ - a null QVariant for unsupported values such as KDbField::InvalidType. */
+KDB_EXPORT QVariant emptyValueForFieldType(KDbField::Type type);
 
-/*! @return a value that can be set for a database field of type @a type having
- "notEmpty" property set. It works in a similar way as
- @ref QVariant emptyValueForType( KDbField::Type type ) with the following differences:
+//! @return a value that can be set for a database field of type @a type having "notEmpty" property set.
+/*! It works in a similar way as @ref QVariant KDb::emptyValueForFieldType(KDbField::Type type)
+ with the following differences:
  - " " string (a single space) is returned for Text and LongText types
  - a byte array with saved "filenew" PNG image (icon) for BLOB type
- Returns null QVariant for unsupported values like KDbField::InvalidType.
- This function is efficient (uses a cache) and is heavily used by the KDbAlterTableHandler
- for filling new columns. */
-KDB_EXPORT QVariant notEmptyValueForType(KDbField::Type type);
+ Returns null QVariant for unsupported values like KDbField::InvalidType. */
+KDB_EXPORT QVariant notEmptyValueForFieldType(KDbField::Type type);
 
 /*! @return true if the @a word is an reserved KDbSQL keyword
  See generated/sqlkeywords.cpp.
@@ -402,19 +401,22 @@ KDB_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool*
  False is returned also if @a field is 0. */
 KDB_EXPORT bool isDefaultValueAllowed(KDbField* field);
 
-/*! Gets limits for values of type @a type. The result is put into integers pointed
- by @a minValue and @a maxValue. Supported types are Byte, ShortInteger, Integer and BigInteger.
+//! Provides limits for values of type @a type
+/*! The result is put into integers pointed by @a minValue and @a maxValue.
+ The limits are machine-independent,. what is useful for format and protocol compatibility.
+ Supported types are Byte, ShortInteger, Integer and BigInteger.
+ The value of @a signedness controls the values; they can be limited to unsigned or not.
  Results for BigInteger or non-integer types are the same as for Integer due to limitation
  of int type. Signed integers are assumed. @a minValue and @a maxValue must not be 0. */
-//! @todo add support for unsigned flag
-KDB_EXPORT void getLimitsForType(KDbField::Type type, int *minValue, int *maxValue);
+KDB_EXPORT void getLimitsForFieldType(KDbField::Type type, qlonglong *minValue, qlonglong *maxValue,
+                                      KDb::Signedness signedness = KDb::Signed);
 
 /*! @return type that's maximum of two integer types @a t1 and @a t2, e.g. Integer for (Byte, Integer).
  If one of the types is not of the integer group, KDbField::InvalidType is returned.
  Returned type may not fit to the result of evaluated expression that involves the arguments.
- For example, 100 is within Byte type, maximumForIntegerTypes(Byte, Byte) is Byte but result
+ For example, 100 is within Byte type, maximumForIntegerFieldTypes(Byte, Byte) is Byte but result
  of 100 * 100 exceeds the range of Byte. */
-KDB_EXPORT KDbField::Type maximumForIntegerTypes(KDbField::Type t1, KDbField::Type t2);
+KDB_EXPORT KDbField::Type maximumForIntegerFieldTypes(KDbField::Type t1, KDbField::Type t2);
 
 /*! @return QVariant value converted from null-terminated @a data string.
  In case of BLOB type, @a data is not null terminated, so passing length is needed. */

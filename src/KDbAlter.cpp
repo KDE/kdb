@@ -1033,11 +1033,11 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             } else if (f->isNotNull()) {
                 //this field cannot be null
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KDb::emptyValueForType(f->type()));
+                                      f->type(), KDb::emptyValueForFieldType(f->type()));
             } else if (f->isNotEmpty()) {
                 //this field cannot be empty - use any nonempty value..., e.g. " " for text or 0 for number
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KDb::notEmptyValueForType(f->type()));
+                                      f->type(), KDb::notEmptyValueForFieldType(f->type()));
             }
 //! @todo support unique, validatationRule, unsigned flags...
 //! @todo check for foreignKey values...
