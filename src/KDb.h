@@ -418,9 +418,21 @@ KDB_EXPORT void getLimitsForFieldType(KDbField::Type type, qlonglong *minValue, 
  of 100 * 100 exceeds the range of Byte. */
 KDB_EXPORT KDbField::Type maximumForIntegerFieldTypes(KDbField::Type t1, KDbField::Type t2);
 
-/*! @return QVariant value converted from null-terminated @a data string.
- In case of BLOB type, @a data is not null terminated, so passing length is needed. */
-KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField* f, int length = -1);
+//! @return QVariant value converted from a @a data string
+/*! Conversion is based on the information about type @a type.
+ @a type has to be an element from KDbField::Type, not greater than KDbField::LastType.
+ For unsupported type this function fails. @a length value controls number of characters
+ used in the conversion. It is optional value for all cases but for the BLOB type because
+ for it @a data is not null-terminated so the length cannot be measured.
+ The value of @a signedness controls the conversion in case of integer types; numbers can be
+ limited to unsigned or not.
+ If @a ok is not 0 *ok is set to false on failure and to true on success. On failure a null
+ QVariant is returned. The function fails if @a data is 0.
+ For rules of conversion to the boolean type see the documentation of @ref QVariant::toBool(),
+ QVariant::toDate() for date type, QVariant::toDateTime() for date+time type,
+ QVariant::toTime() for time type. */
+KDB_EXPORT QVariant cstringToVariant(const char* data, KDbField::Type type, bool *ok, int length = -1,
+                                     KDb::Signedness signedness = KDb::Signed);
 
 /*! @return default file-based driver MIME type
  (typically something like "application/x-kexiproject-sqlite") */
@@ -487,6 +499,16 @@ template<typename T>
 T iifNotEmpty(const T &string, const QByteArray &stringIfEmpty)
 {
     return iifNotEmpty(string, QString(stringIfEmpty));
+}
+
+//! @return @a value if @a ok is true, else returns default value T().
+template<typename T>
+T iif(bool ok, const T &value)
+{
+    if (ok) {
+        return value;
+    }
+    return T();
 }
 
 /*! @return a list of paths that KDb will search when dynamically loading libraries (plugins)

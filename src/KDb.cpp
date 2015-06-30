@@ -43,6 +43,7 @@
 #include <QApplication>
 #include <QDir>
 #include <QProcess>
+#include <QtDebug>
 
 #include <memory>
 
@@ -1552,30 +1553,71 @@ QString KDb::defaultFileBasedDriverId()
     return QLatin1String("org.kde.kdb.sqlite");
 }
 
-/*! @return QVariant value converted from null-terminated @a data string.
- In case of BLOB type, @a data is not null terminated, so passing length is needed. */
-QVariant KDb::cstringToVariant(const char* data, KDbField* f, int length)
+// Try to convert from string to type T
+template <typename T>
+QVariant convert(T (QString::*ConvertToT)(bool*,int) const, const char *data, int size,
+                 qlonglong minValue, qlonglong maxValue, bool *ok)
 {
-    if (!data)
+    T v = (QString::fromLatin1(data, size).*ConvertToT)(ok, 10);
+    if (*ok) {
+        *ok = minValue <= v && v <= maxValue;
+    }
+    return KDb::iif(*ok, QVariant(v));
+}
+
+QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, int length,
+                               KDb::Signedness signedness)
+{
+    bool tempOk;
+    bool *thisOk = ok ? ok : &tempOk;
+    if (!data || type > KDbField::LastType) {
+        *thisOk = false;
         return QVariant();
+    }
     // from most to least frequently used types:
 
-    if (!f || f->isTextType())
+    if (KDbField::isTextType(type)) {
+        *thisOk = true;
+        //! @todo use KDbDriverBehaviour::TEXT_TYPE_MAX_LENGTH for Text type?
         return QString::fromUtf8(data, length);
-    if (f->isIntegerType()) {
-        if (f->type() == KDbField::BigInteger)
-            return QVariant(QString::fromLatin1(data, length).toLongLong());
-        return QVariant(QString::fromLatin1(data, length).toInt());
     }
-    if (f->isFPNumericType())
-        return QString::fromLatin1(data, length).toDouble();
-    if (f->type() == KDbField::BLOB)
-        return QByteArray(data, length);
+    if (KDbField::isIntegerType(type)) {
+        qlonglong minValue, maxValue;
+        const bool isUnsigned = signedness == KDb::Unsigned;
+        KDb::getLimitsForFieldType(type, &minValue, &maxValue, signedness);
+        switch (type) {
+        case KDbField::Byte: // Byte here too, minValue/maxValue will take care of limits
+        case KDbField::ShortInteger:
+            return isUnsigned ?
+                convert(&QString::toUShort, data, length, minValue, maxValue, thisOk)
+                : convert(&QString::toShort, data, length, minValue, maxValue, thisOk);
+        case KDbField::Integer:
+            return isUnsigned ?
+                convert(&QString::toUInt, data, length, minValue, maxValue, thisOk)
+                : convert(&QString::toInt, data, length, minValue, maxValue, thisOk);
+        case KDbField::BigInteger:
+            return isUnsigned ?
+                convert(&QString::toULongLong, data, length, minValue, maxValue, thisOk)
+                : convert(&QString::toLongLong, data, length, minValue, maxValue, thisOk);
+        default:
+            qFatal("Unsupported integer type %d", type);
+        }
+    }
+    if (KDbField::isFPNumericType(type)) {
+        return KDb::iif(*thisOk, QVariant(QString::fromLatin1(data, length).toDouble(thisOk)));
+    }
+    if (type == KDbField::BLOB) {
+        *thisOk = length >= 0;
+        return *thisOk ? QVariant(QByteArray(data, length)) : QVariant();
+    }
     // the default
 //! @todo date/time?
     QVariant result(QString::fromUtf8(data, length));
-    if (!result.convert(KDbField::variantType(f->type())))
+    if (!result.convert(KDbField::variantType(type))) {
+        *thisOk = false;
         return QVariant();
+    }
+    *thisOk = true;
     return result;
 }
 
