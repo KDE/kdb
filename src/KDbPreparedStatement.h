@@ -56,10 +56,10 @@ typedef QList<QVariant> KDbPreparedStatementParameters;
     KDbPreparedStatement statement = conn->prepareStatement(
       KDbPreparedStatement::Insert, tableSchema);
     for (i=0; i<10000; i++) {
-      prepared << rand() << getText(i);
-      if (!prepared.execute())
+      KDbPreparedStatementParameters parameters;
+      parameters << rand() << getText(i);
+      if (!statement.execute(parameters))
         return false;
-      prepared.clearParameters();
     }
     return true;
   }
