@@ -349,7 +349,7 @@ KDbQuerySchema* buildSelectQuery(
                 aliasVariable = e.toBinary().right().toVariable();
                 if (aliasVariable.isNull()) {
                     setError(QObject::tr("Invalid alias definition for column \"%1\"")
-                                  .arg(columnExpr.toString().toString())); //ok?
+                                  .arg(columnExpr.toString(0).toString())); //ok?
                     break;
                 }
             }
@@ -382,7 +382,7 @@ KDbQuerySchema* buildSelectQuery(
 //! @todo IMPORTANT: it.remove();
             } else if (aliasVariable.isNull()) {
                 setError(QObject::tr("Invalid \"%1\" column definition")
-                         .arg(e.toString().toString())); //ok?
+                         .arg(e.toString(0).toString())); //ok?
                 break;
             }
             else {

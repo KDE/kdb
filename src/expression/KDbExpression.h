@@ -115,8 +115,10 @@ public:
     /*! @return string as a representation of this expression element
                 by running recursive calls.
      @a param, if not 0, points to a list item containing value
-     of a query parameter (used in QueryParameterExpr). */
-    KDbEscapedString toString(KDbQuerySchemaParameterValueListIterator* params = 0) const;
+     of a query parameter (used in QueryParameterExpr).
+     The result may depend on the optional @a driver parameter.
+     If @a driver is 0, representation for portable KDbSQL dialect is returned. */
+    KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = 0) const;
 
     /*! Collects query parameters (messages and types) reculsively and saves them to params.
      The leaf nodes are objects of QueryParameterExpr class. */

@@ -115,6 +115,8 @@ cat << EOF > generated/KDbToken.h
 
 #include <QDebug>
 
+class KDbDriver;
+
 /*! @brief A type-safe KDBSQL token
  It can be used in KDb expressions
  @see KDbExpression */
@@ -152,10 +154,12 @@ cat << EOF >> generated/KDbToken.h
     //! @return string interpretation of this token (as visibe to the user)
     //! For example "<>" is returned for the NOT_EQUAL token.
     //! Empty string is returned for an invalid string
-    QString toString() const;
+    //! The result may depend on the optional @a driver parameter.
+    //! If @a driver is 0, representation for portable KDbSQL dialect is returned.
+    QString toString(const KDbDriver *driver = 0) const;
 
-    //! Like see toString()
-    static QString toString(KDbToken token);
+    //! Like toString(const KDbDriver *driver)
+    static QString toString(KDbToken token, const KDbDriver *driver = 0);
 
     //! Maximum character token value (253)
     static const int maxCharTokenValue;
@@ -251,6 +255,8 @@ cat << EOF > generated/KDbToken.cpp
 */
 
 #include "KDbToken.h"
+#include "KDbDriver.h"
+#include "KDbDriver_p.h"
 #include "sqlparser.h"
 
 KDbToken::KDbToken(char charToken)
@@ -274,13 +280,13 @@ QString KDbToken::name() const
     }
 }
 
-QString KDbToken::toString() const
+QString KDbToken::toString(const KDbDriver *driver) const
 {
     if (toChar() > 0) {
         return name();
     }
     // other arithmetic operations: << >>
-    // NOTE: include cases that have toString() != name()
+    // NOTE: only include cases that have toString() != name() or are dependent on driver
     switch (v) {
     case ::BITWISE_SHIFT_RIGHT: return QLatin1String(">>");
     case ::BITWISE_SHIFT_LEFT: return QLatin1String("<<");
@@ -289,7 +295,11 @@ QString KDbToken::toString() const
     case ::NOT_EQUAL2: return QLatin1String("!=");
     case ::LESS_OR_EQUAL: return QLatin1String("<=");
     case ::GREATER_OR_EQUAL: return QLatin1String(">=");
-    case ::NOT_LIKE: return QLatin1String("NOT LIKE");
+    case ::LIKE: return driver ? driver->behaviour()->LIKE_OPERATOR : QLatin1String("LIKE");
+    case ::NOT_LIKE:
+        return driver
+            ? (QString::fromLatin1("NOT ") + driver->behaviour()->LIKE_OPERATOR)
+            : QString::fromLatin1("NOT LIKE");
     case ::SQL_IN: return QLatin1String("IN");
         // other logical operations: OR (or ||) AND (or &&) XOR
     case ::SIMILAR_TO: return QLatin1String("SIMILAR TO");
@@ -308,9 +318,9 @@ QString KDbToken::toString() const
 }
 
 //static
-QString KDbToken::toString(KDbToken token)
+QString KDbToken::toString(KDbToken token, const KDbDriver *driver)
 {
-    return token.toString();
+    return token.toString(driver);
 }
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, KDbToken token)

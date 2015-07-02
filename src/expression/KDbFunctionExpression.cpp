@@ -90,11 +90,13 @@ void KDbFunctionExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallSta
     dbg.nospace() << QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSQLTypeName(type()));
 }
 
-KDbEscapedString KDbFunctionExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                       KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbFunctionExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
     return KDbEscapedString(name + QLatin1Char('('))
-           + (args.data() ? args.data()->toString(params, callStack) : KDbEscapedString())
+           + (args.data() ? args.data()->toString(driver, params, callStack) : KDbEscapedString())
            + KDbEscapedString(')');
 }
 

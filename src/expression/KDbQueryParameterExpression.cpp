@@ -60,9 +60,12 @@ void KDbQueryParameterExpressionData::debugInternal(QDebug dbg, KDb::ExpressionC
         .arg(value.toString()).arg(KDbDriver::defaultSQLTypeName(type()));
 }
 
-KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                             KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
+    Q_UNUSED(driver);
     Q_UNUSED(callStack);
     return params ? params->getPreviousValueAsString(type())
            : KDbEscapedString("[%1]").arg(KDbEscapedString(value.toString()));

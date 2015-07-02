@@ -111,14 +111,20 @@ void KDbNArgExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* 
     dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
 }
 
-KDbEscapedString KDbNArgExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                   KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbNArgExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
     if (token == KDbToken::BETWEEN_AND && children.count() == 3) {
-        return children[0]->toString() + " BETWEEN " + children[1]->toString() + " AND " + children[2]->toString();
+        return children[0]->toString(driver, params, callStack) + " BETWEEN "
+                + children[1]->toString(driver, params, callStack) + " AND "
+                + children[2]->toString(driver, params, callStack);
     }
     if (token == KDbToken::NOT_BETWEEN_AND && children.count() == 3) {
-        return children[0]->toString() + " NOT BETWEEN " + children[1]->toString() + " AND " + children[2]->toString();
+        return children[0]->toString(driver, params, callStack) + " NOT BETWEEN "
+                + children[1]->toString(driver, params, callStack) + " AND "
+                + children[2]->toString(driver, params, callStack);
     }
 
     KDbEscapedString s;
@@ -126,7 +132,7 @@ KDbEscapedString KDbNArgExpressionData::toStringInternal(KDbQuerySchemaParameter
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         if (!s.isEmpty())
             s += ", ";
-        s += data->toString(params, callStack);
+        s += data->toString(driver, params, callStack);
     }
     return s;
 }

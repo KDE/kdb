@@ -40,6 +40,7 @@ KDbDriverBehaviour::KDbDriverBehaviour()
         , BOOLEAN_TRUE_LITERAL(QLatin1Char('1'))
         , BOOLEAN_FALSE_LITERAL(QLatin1Char('0'))
         , TEXT_TYPE_MAX_LENGTH(0)
+        , LIKE_OPERATOR(QLatin1String("LIKE"))
 {
 }
 

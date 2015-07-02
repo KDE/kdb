@@ -28,6 +28,8 @@
 
 #include <QDebug>
 
+class KDbDriver;
+
 /*! @brief A type-safe KDBSQL token
  It can be used in KDb expressions
  @see KDbExpression */
@@ -61,10 +63,12 @@ public:
     //! @return string interpretation of this token (as visibe to the user)
     //! For example "<>" is returned for the NOT_EQUAL token.
     //! Empty string is returned for an invalid string
-    QString toString() const;
+    //! The result may depend on the optional @a driver parameter.
+    //! If @a driver is 0, representation for portable KDbSQL dialect is returned.
+    QString toString(const KDbDriver *driver = 0) const;
 
-    //! Like see toString()
-    static QString toString(KDbToken token);
+    //! Like toString(const KDbDriver *driver)
+    static QString toString(KDbToken token, const KDbDriver *driver = 0);
 
     //! Maximum character token value (253)
     static const int maxCharTokenValue;

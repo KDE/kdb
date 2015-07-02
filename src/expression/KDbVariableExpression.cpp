@@ -65,9 +65,12 @@ void KDbVariableExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallSta
                      : QLatin1String("FIELD NOT DEFINED YET"));
 }
 
-KDbEscapedString KDbVariableExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                       KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbVariableExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
+    Q_UNUSED(driver);
     Q_UNUSED(params);
     Q_UNUSED(callStack);
     return KDbEscapedString(name);

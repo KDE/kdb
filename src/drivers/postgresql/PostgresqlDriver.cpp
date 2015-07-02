@@ -50,6 +50,7 @@ PostgresqlDriver::PostgresqlDriver()
     beh->AUTO_INCREMENT_PK_FIELD_OPTION = QLatin1String("PRIMARY KEY");
     beh->ALWAYS_AVAILABLE_DATABASE_NAME = QLatin1String("template1");
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
+    beh->LIKE_OPERATOR = QLatin1String("ILIKE");
     // Use SQL compliant TRUE or FALSE as described
     // at http://www.postgresql.org/docs/8.0/interactive/datatype-boolean.html
     // 1 or 0 does not work.

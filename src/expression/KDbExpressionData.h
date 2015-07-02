@@ -90,7 +90,8 @@ public:
     bool isNumericType() const;
     bool isFPNumericType() const;
     bool isDateTimeType() const;
-    KDbEscapedString toString(KDbQuerySchemaParameterValueListIterator* params = 0) const;
+    KDbEscapedString toString(const KDbDriver *driver,
+                              KDbQuerySchemaParameterValueListIterator* params = 0) const;
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
     bool validate(KDbParseInfo *parseInfo);
     virtual KDbExpressionData* clone();
@@ -106,8 +107,9 @@ public:
 
     KDbField::Type type(KDb::ExpressionCallStack* callStack) const;
 
-    KDbEscapedString toString(KDbQuerySchemaParameterValueListIterator* params,
-                           KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toString(const KDbDriver *driver,
+                              KDbQuerySchemaParameterValueListIterator* params,
+                              KDb::ExpressionCallStack* callStack) const;
 
     bool validate(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
 
@@ -117,8 +119,9 @@ protected:
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
 
@@ -144,8 +147,9 @@ protected:
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
 };
@@ -168,8 +172,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
@@ -195,8 +200,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
@@ -219,8 +225,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
@@ -244,8 +251,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
@@ -290,8 +298,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 
@@ -323,8 +332,9 @@ protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
     virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
-    virtual KDbEscapedString toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                           KDb::ExpressionCallStack* callStack) const;
+    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                              KDbQuerySchemaParameterValueListIterator* params,
+                                              KDb::ExpressionCallStack* callStack) const;
 
     virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
 

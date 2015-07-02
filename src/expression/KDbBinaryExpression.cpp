@@ -239,13 +239,15 @@ void KDbBinaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack
     dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
 }
 
-KDbEscapedString KDbBinaryExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                           KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbBinaryExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
 #define INFIX(a) \
-    (left().constData() ? left()->toString(params, callStack) : KDbEscapedString("<NULL>")) \
-    + " " + a + " " + (right().constData() ? right()->toString(params, callStack) : KDbEscapedString("<NULL>"))
-    return INFIX(token.toString());
+    (left().constData() ? left()->toString(driver, params, callStack) : KDbEscapedString("<NULL>")) \
+    + " " + a + " " + (right().constData() ? right()->toString(driver, params, callStack) : KDbEscapedString("<NULL>"))
+    return INFIX(token.toString(driver));
 #undef INFIX
 }
 

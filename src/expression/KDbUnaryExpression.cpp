@@ -64,17 +64,20 @@ void KDbUnaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
         .arg(KDbDriver::defaultSQLTypeName(type())).toLatin1().constData();
 }
 
-KDbEscapedString KDbUnaryExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbUnaryExpressionData::toStringInternal(
+                                        const KDbDriver *driver,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
     ExplicitlySharedExpressionDataPointer a = arg();
-    KDbEscapedString aString = a.constData() ? a->toString(params, callStack) : KDbEscapedString("<NULL>");
+    KDbEscapedString aString = a.constData()
+            ? a->toString(driver, params, callStack) : KDbEscapedString("<NULL>");
     if (token == '(') { //parentheses (special case)
         return "(" + aString + ")";
     }
     if (token.toChar() > 0) {
-        return token.toString() + aString;
+        return token.toString(driver) + aString;
     }
     switch (token.value()) {
     case NOT:
@@ -84,7 +87,7 @@ KDbEscapedString KDbUnaryExpressionData::toStringInternal(KDbQuerySchemaParamete
     case SQL_IS_NOT_NULL:
         return aString + " IS NOT NULL";
     }
-    return KDbEscapedString("%1 %2").arg(token.toString()).arg(aString);
+    return KDbEscapedString("%1 %2").arg(token.toString(driver)).arg(aString);
 }
 
 void KDbUnaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)

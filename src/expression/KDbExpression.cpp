@@ -171,26 +171,32 @@ bool KDbExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expressio
     return true;
 }
 
-KDbEscapedString KDbExpressionData::toString(KDbQuerySchemaParameterValueListIterator* params) const
+KDbEscapedString KDbExpressionData::toString(const KDbDriver *driver,
+                                             KDbQuerySchemaParameterValueListIterator* params) const
 {
     KDb::ExpressionCallStack callStack;
-    return toString(params, &callStack);
+    return toString(driver, params, &callStack);
 }
 
-KDbEscapedString KDbExpressionData::toString(KDbQuerySchemaParameterValueListIterator* params,
+KDbEscapedString KDbExpressionData::toString(
+                                       const KDbDriver *driver,
+                                       KDbQuerySchemaParameterValueListIterator* params,
                                        KDb::ExpressionCallStack* callStack) const
 {
     if (!addToCallStack(0, callStack)) {
         return KDbEscapedString("<CYCLE!>");
     }
-    KDbEscapedString s = toStringInternal(params, callStack);
+    KDbEscapedString s = toStringInternal(driver, params, callStack);
     callStack->removeLast();
     return s;
 }
 
-KDbEscapedString KDbExpressionData::toStringInternal(KDbQuerySchemaParameterValueListIterator* params,
-                                               KDb::ExpressionCallStack* callStack) const
+KDbEscapedString KDbExpressionData::toStringInternal(
+                                          const KDbDriver *driver,
+                                          KDbQuerySchemaParameterValueListIterator* params,
+                                          KDb::ExpressionCallStack* callStack) const
 {
+    Q_UNUSED(driver);
     Q_UNUSED(params);
     Q_UNUSED(callStack);
     return KDbEscapedString("<UNKNOWN!>");
@@ -445,11 +451,12 @@ void KDbExpression::appendChild(const ExplicitlySharedExpressionDataPointer& chi
     child->parent = d;
 }
 
-KDbEscapedString KDbExpression::toString(KDbQuerySchemaParameterValueListIterator* params) const
+KDbEscapedString KDbExpression::toString(const KDbDriver *driver,
+                                         KDbQuerySchemaParameterValueListIterator* params) const
 {
     if (isNull())
         return KDbEscapedString("<UNKNOWN!>");
-    return d->toString(params);
+    return d->toString(driver, params);
 }
 
 void KDbExpression::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
