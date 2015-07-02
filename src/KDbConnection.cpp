@@ -36,6 +36,7 @@
 #include "KDbLookupFieldSchema.h"
 #include "KDbPreparedStatementInterface.h"
 #include "KDbParser.h"
+#include "KDbNativeStatementBuilder.h"
 #include "kdb_debug.h"
 
 #include <QDir>
@@ -49,18 +50,6 @@
   * 1: (Kexi 1.x) Initial version
 */
 #define KDB_EXTENDED_TABLE_SCHEMA_VERSION 2
-
-KDbConnection::SelectStatementOptions::SelectStatementOptions()
-        : alsoRetrieveRecordId(false)
-        , addVisibleLookupColumns(true)
-{
-}
-
-KDbConnection::SelectStatementOptions::~SelectStatementOptions()
-{
-}
-
-//================================================
 
 KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
         : connection(conn)
@@ -960,85 +949,6 @@ QList<int> KDbConnection::objectIds(int objectType)
     return list;
 }
 
-KDbEscapedString KDbConnection::createTableStatement(const KDbTableSchema& tableSchema) const
-{
-// Each SQL identifier needs to be escaped in the generated query.
-    KDbEscapedString sql;
-    sql.reserve(4096);
-    sql = KDbEscapedString("CREATE TABLE ") + escapeIdentifier(tableSchema.name()) + " (";
-    bool first = true;
-    foreach(KDbField *field, tableSchema.m_fields) {
-        if (first)
-            first = false;
-        else
-            sql += ", ";
-        KDbEscapedString v = KDbEscapedString(escapeIdentifier(field->name())) + ' ';
-        const bool autoinc = field->isAutoIncrement();
-        const bool pk = field->isPrimaryKey() || (autoinc && m_driver->beh->AUTO_INCREMENT_REQUIRES_PK);
-//! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
-        if (autoinc && m_driver->beh->SPECIAL_AUTO_INCREMENT_DEF) {
-            if (pk)
-                v.append(m_driver->beh->AUTO_INCREMENT_TYPE).append(' ').append(m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION);
-            else
-                v.append(m_driver->beh->AUTO_INCREMENT_TYPE).append(' ').append(m_driver->beh->AUTO_INCREMENT_FIELD_OPTION);
-        } else {
-            if (autoinc && !m_driver->beh->AUTO_INCREMENT_TYPE.isEmpty())
-                v += m_driver->beh->AUTO_INCREMENT_TYPE;
-            else
-                v += m_driver->sqlTypeName(field->type(), field->precision());
-
-            if (field->isUnsigned())
-                v.append(' ').append(m_driver->beh->UNSIGNED_TYPE_KEYWORD);
-
-            if (field->isFPNumericType() && field->precision() > 0) {
-                if (field->scale() > 0)
-                    v += QString::fromLatin1("(%1,%2)").arg(field->precision()).arg(field->scale());
-                else
-                    v += QString::fromLatin1("(%1)").arg(field->precision());
-            }
-            else if (field->type() == KDbField::Text) {
-                uint realMaxLen;
-                if (m_driver->beh->TEXT_TYPE_MAX_LENGTH == 0) {
-                    realMaxLen = field->maxLength(); // allow to skip (N)
-                }
-                else { // max length specified by driver
-                    if (field->maxLength() == 0) { // as long as possible
-                        realMaxLen = m_driver->beh->TEXT_TYPE_MAX_LENGTH;
-                    }
-                    else { // not longer than specified by driver
-                        realMaxLen = qMin(m_driver->beh->TEXT_TYPE_MAX_LENGTH, field->maxLength());
-                    }
-                }
-                if (realMaxLen > 0) {
-                    v += QString::fromLatin1("(%1)").arg(realMaxLen);
-                }
-            }
-
-            if (autoinc) {
-                v.append(' ').append(pk ? m_driver->beh->AUTO_INCREMENT_PK_FIELD_OPTION : m_driver->beh->AUTO_INCREMENT_FIELD_OPTION);
-            }
-            else {
-                //! @todo here is automatically a single-field key created
-                if (pk)
-                    v += " PRIMARY KEY";
-            }
-            if (!pk && field->isUniqueKey())
-                v += " UNIQUE";
-///@todo IS this ok for all engines?: if (!autoinc && !field->isPrimaryKey() && field->isNotNull())
-            if (!autoinc && !pk && field->isNotNull())
-                v += " NOT NULL"; //only add not null option if no autocommit is set
-            if (field->defaultValue().isValid()) {
-                KDbEscapedString valToSQL(m_driver->valueToSQL(field, field->defaultValue()));
-                if (!valToSQL.isEmpty()) //for sanity
-                    v += " DEFAULT " + valToSQL;
-            }
-        }
-        sql += v;
-    }
-    sql += ')';
-    return sql;
-}
-
 //yeah, it is very efficient:
 #define C_A(a) , const QVariant& c ## a
 
@@ -1208,346 +1118,6 @@ bool KDbConnection::executeSQL(const KDbEscapedString& sql)
         return false;
     }
     return true;
-}
-
-static KDbEscapedString selectStatementInternal(const KDbDriver *driver,
-                                             KDbConnection *connection,
-                                             KDbQuerySchema* querySchema,
-                                             const QList<QVariant>& params,
-                                             const KDbConnection::SelectStatementOptions& options)
-{
-//"SELECT FROM ..." is theoretically allowed "
-//if (querySchema.fieldCount()<1)
-//  return QString();
-// Each SQL identifier needs to be escaped in the generated query.
-
-    if (!querySchema->statement().isEmpty())
-        return querySchema->statement();
-
-//! @todo looking at singleTable is visually nice but a field name can conflict
-//!   with function or variable name...
-    uint number = 0;
-    bool singleTable = querySchema->tables()->count() <= 1;
-    if (singleTable) {
-        //make sure we will have single table:
-        foreach(KDbField *f, *querySchema->fields()) {
-            if (querySchema->isColumnVisible(number) && f->table() && f->table()->lookupFieldSchema(*f)) {
-                //uups, no, there's at least one left join
-                singleTable = false;
-                break;
-            }
-            number++;
-        }
-    }
-
-    KDbEscapedString sql; //final sql string
-    sql.reserve(4096);
-    KDbEscapedString s_additional_joins; //additional joins needed for lookup fields
-    KDbEscapedString s_additional_fields; //additional fields to append to the fields list
-    uint internalUniqueTableAliasNumber = 0; //used to build internalUniqueTableAliases
-    uint internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
-    number = 0;
-    QList<KDbQuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
-    KDbEscapedString kdb_subquery_prefix("__kdb_subquery_");
-    foreach(KDbField *f, *querySchema->fields()) {
-        if (querySchema->isColumnVisible(number)) {
-            if (!sql.isEmpty())
-                sql += ", ";
-
-            if (f->isQueryAsterisk()) {
-                if (!singleTable && static_cast<KDbQueryAsterisk*>(f)->isSingleTableAsterisk()) { //single-table *
-                    sql.append(KDb::escapeIdentifier(driver, f->table()->name())).append(".*");
-                }
-                else { //all-tables * (or simplified table.* when there's only one table)
-                    sql += '*';
-                }
-            } else {
-                if (f->isExpression()) {
-                    sql += f->expression().toString();
-                } else {
-                    if (!f->table()) //sanity check
-                        return KDbEscapedString();
-
-                    QString tableName;
-                    int tablePosition = querySchema->tableBoundToColumn(number);
-                    if (tablePosition >= 0) {
-                        tableName = KDb::iifNotEmpty(querySchema->tableAlias(tablePosition),
-                                                           f->table()->name());
-                    }
-                    if (options.addVisibleLookupColumns) { // try to find table/alias name harder
-                        if (tableName.isEmpty()) {
-                            tableName = querySchema->tableAlias(f->table()->name());
-                        }
-                        if (tableName.isEmpty()) {
-                            tableName = f->table()->name();
-                        }
-                    }
-                    if (!singleTable && !tableName.isEmpty()) {
-                        sql.append(KDb::escapeIdentifier(driver, tableName)).append('.');
-                    }
-                    sql += KDb::escapeIdentifier(driver, f->name());
-                }
-                const QString aliasString(querySchema->columnAlias(number));
-                if (!aliasString.isEmpty()) {
-                    sql.append(" AS ").append(aliasString);
-                }
-//! @todo add option that allows to omit "AS" keyword
-            }
-            KDbLookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns && f->table())
-                                                   ? f->table()->lookupFieldSchema(*f) : 0;
-            if (lookupFieldSchema && lookupFieldSchema->boundColumn() >= 0) {
-                // Lookup field schema found
-                // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
-                // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
-                // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
-                KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
-                if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Table) {
-                    KDbTableSchema *lookupTable = querySchema->connection()->tableSchema(recordSource.name());
-                    KDbFieldList* visibleColumns = 0;
-                    KDbField *boundField = 0;
-                    if (lookupTable
-                            && (uint)lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
-                            && (visibleColumns = lookupTable->subList(lookupFieldSchema->visibleColumns()))
-                            && (boundField = lookupTable->field(lookupFieldSchema->boundColumn()))) {
-                        //add LEFT OUTER JOIN
-                        if (!s_additional_joins.isEmpty())
-                            s_additional_joins += ' ';
-                        const QString internalUniqueTableAlias(
-                            QLatin1String("__kdb_") + lookupTable->name() + QLatin1Char('_')
-                            + QString::number(internalUniqueTableAliasNumber++));
-                        s_additional_joins += KDbEscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
-                            .arg(KDb::escapeIdentifier(driver, lookupTable->name()))
-                            .arg(internalUniqueTableAlias)
-                            .arg(KDb::escapeIdentifier(driver, querySchema->tableAliasOrName(f->table()->name())))
-                            .arg(KDb::escapeIdentifier(driver, f->name()))
-                            .arg(internalUniqueTableAlias)
-                            .arg(KDb::escapeIdentifier(driver, boundField->name()));
-
-                        //add visibleField to the list of SELECTed fields //if it is not yet present there
-                        if (!s_additional_fields.isEmpty())
-                            s_additional_fields += ", ";
-//! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
-//! @todo Add possibility for joining the values at client side.
-                        s_additional_fields += visibleColumns->sqlFieldsList(
-                                                   connection, QLatin1String(" || ' ' || "), internalUniqueTableAlias,
-                                                   driver ? KDb::DriverEscaping : KDb::KDbEscaping);
-                    }
-                    delete visibleColumns;
-                } else if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Query) {
-                    KDbQuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
-                    if (!lookupQuery) {
-                        kdbWarning() << "!lookupQuery";
-                        return KDbEscapedString();
-                    }
-                    const KDbQueryColumnInfo::Vector fieldsExpanded(lookupQuery->fieldsExpanded());
-                    if (lookupFieldSchema->boundColumn() >= fieldsExpanded.count()) {
-                        kdbWarning() << "(uint)lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
-                        return KDbEscapedString();
-                    }
-                    KDbQueryColumnInfo *boundColumnInfo = fieldsExpanded.at(lookupFieldSchema->boundColumn());
-                    if (!boundColumnInfo) {
-                        kdbWarning() << "!boundColumnInfo";
-                        return KDbEscapedString();
-                    }
-                    KDbField *boundField = boundColumnInfo->field;
-                    if (!boundField) {
-                        kdbWarning() << "!boundField";
-                        return KDbEscapedString();
-                    }
-                    //add LEFT OUTER JOIN
-                    if (!s_additional_joins.isEmpty())
-                        s_additional_joins += ' ';
-                    KDbEscapedString internalUniqueQueryAlias
-                        = kdb_subquery_prefix + connection->escapeString(lookupQuery->name()) + '_'
-                        + QString::number(internalUniqueQueryAliasNumber++);
-                    s_additional_joins += KDbEscapedString("LEFT OUTER JOIN (%1) AS %2 ON %3.%4=%5.%6")
-                        .arg(KDb::selectStatement(lookupQuery, params, options))
-                        .arg((internalUniqueQueryAlias))
-                        .arg(KDb::escapeIdentifier(driver, f->table()->name()))
-                        .arg(KDb::escapeIdentifier(driver, f->name()))
-                        .arg(internalUniqueQueryAlias)
-                        .arg(KDb::escapeIdentifier(driver, boundColumnInfo->aliasOrName()));
-
-                    if (!s_additional_fields.isEmpty())
-                        s_additional_fields += ", ";
-                    const QList<uint> visibleColumns(lookupFieldSchema->visibleColumns());
-                    KDbEscapedString expression;
-                    foreach(uint visibleColumnIndex, visibleColumns) {
-//! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
-//! @todo Add possibility for joining the values at client side.
-                        if ((uint)fieldsExpanded.count() <= visibleColumnIndex) {
-                            kdbWarning() << "fieldsExpanded.count() <= (*visibleColumnsIt) : "
-                            << fieldsExpanded.count() << " <= " << visibleColumnIndex;
-                            return KDbEscapedString();
-                        }
-                        if (!expression.isEmpty())
-                            expression += " || ' ' || ";
-                        expression += (
-                            internalUniqueQueryAlias + '.'
-                            + KDb::escapeIdentifier(driver, fieldsExpanded.value(visibleColumnIndex)->aliasOrName())
-                        );
-                    }
-                    s_additional_fields += expression;
-                }
-                else {
-                    kdbWarning() << "unsupported record source type" << recordSource.typeName();
-                    return KDbEscapedString();
-                }
-            }
-        }
-        number++;
-    }
-
-    //add lookup fields
-    if (!s_additional_fields.isEmpty())
-        sql += (", " + s_additional_fields);
-
-    if (driver && options.alsoRetrieveRecordId) { //append rowid column
-        KDbEscapedString s;
-        if (!sql.isEmpty())
-            s = ", ";
-        if (querySchema->masterTable())
-            s += KDbEscapedString(querySchema->tableAliasOrName(querySchema->masterTable()->name())) + '.';
-        s += driver->behaviour()->ROW_ID_FIELD_NAME;
-        sql += s;
-    }
-
-    sql.prepend("SELECT ");
-    QList<KDbTableSchema*>* tables = querySchema->tables();
-    if ((tables && !tables->isEmpty()) || !subqueries_for_lookup_data.isEmpty()) {
-        sql += " FROM ";
-        KDbEscapedString s_from;
-        if (tables) {
-            number = 0;
-            foreach(KDbTableSchema *table, *tables) {
-                if (!s_from.isEmpty())
-                    s_from += ", ";
-                s_from += KDb::escapeIdentifier(driver, table->name());
-                const QString aliasString(querySchema->tableAlias(number));
-                if (!aliasString.isEmpty())
-                    s_from.append(" AS ").append(aliasString);
-                number++;
-            }
-        }
-        // add subqueries for lookup data
-        uint subqueries_for_lookup_data_counter = 0;
-        foreach(KDbQuerySchema* subQuery, subqueries_for_lookup_data) {
-            if (!s_from.isEmpty())
-                s_from += ", ";
-            s_from += '('
-                      + selectStatementInternal(driver, connection, subQuery, params, options);
-                      + ") AS " + kdb_subquery_prefix
-                      + KDbEscapedString::number(subqueries_for_lookup_data_counter++);
-        }
-        sql += s_from;
-    }
-    KDbEscapedString s_where;
-    s_where.reserve(4096);
-
-    //JOINS
-    if (!s_additional_joins.isEmpty()) {
-        sql += ' ' + s_additional_joins + ' ';
-    }
-
-//! @todo: we're using WHERE for joins now; use INNER/LEFT/RIGHT JOIN later
-
-    //WHERE
-    bool wasWhere = false; //for later use
-    foreach(KDbRelationship *rel, *querySchema->relationships()) {
-        if (s_where.isEmpty()) {
-            wasWhere = true;
-        } else
-            s_where += " AND ";
-        KDbEscapedString s_where_sub;
-        foreach(const KDbField::Pair &pair, *rel->fieldPairs()) {
-            if (!s_where_sub.isEmpty())
-                s_where_sub += " AND ";
-            s_where_sub +=
-               KDbEscapedString(KDb::escapeIdentifier(driver, pair.first->table()->name())) + '.' +
-               KDb::escapeIdentifier(driver, pair.first->name()) + " = " +
-               KDb::escapeIdentifier(driver, pair.second->table()->name()) + '.' +
-               KDb::escapeIdentifier(driver, pair.second->name());
-        }
-        if (rel->fieldPairs()->count() > 1) {
-            s_where_sub.prepend('(');
-            s_where_sub += ')';
-        }
-        s_where += s_where_sub;
-    }
-    //EXPLICITLY SPECIFIED WHERE EXPRESSION
-    if (driver && !querySchema->whereExpression().isNull()) {
-        KDbQuerySchemaParameterValueListIterator paramValuesIt(*driver, params);
-        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr = params.isEmpty() ? 0 : &paramValuesIt;
-        if (wasWhere) {
-//! @todo () are not always needed
-            s_where = '(' + s_where + ") AND ("
-                + querySchema->whereExpression().toString(paramValuesItPtr) + ')';
-        } else {
-            s_where = querySchema->whereExpression().toString(paramValuesItPtr);
-        }
-    }
-    if (!s_where.isEmpty())
-        sql += " WHERE " + s_where;
-//! @todo (js) add other sql parts
-    //(use wasWhere here)
-
-    // ORDER BY
-    KDbEscapedString orderByString(
-        querySchema->orderByColumnList()->toSQLString(
-            !singleTable/*includeTableName*/, connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping)
-    );
-    const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());
-    if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
-        //add automatic ORDER BY if there is no explicitly defined (especially helps when there are complex JOINs)
-        KDbOrderByColumnList automaticPKOrderBy;
-        const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded());
-        foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
-            if (pkeyFieldsIndex < 0) // no field mentioned in this query
-                continue;
-            if (pkeyFieldsIndex >= (int)fieldsExpanded.count()) {
-                kdbWarning() << "ORDER BY: (*it) >= fieldsExpanded.count() - "
-                        << pkeyFieldsIndex << " >= " << fieldsExpanded.count();
-                continue;
-            }
-            KDbQueryColumnInfo *ci = fieldsExpanded[ pkeyFieldsIndex ];
-            automaticPKOrderBy.appendColumn(*ci);
-        }
-        orderByString = automaticPKOrderBy.toSQLString(!singleTable/*includeTableName*/,
-                        connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping);
-    }
-    if (!orderByString.isEmpty())
-        sql += (" ORDER BY " + orderByString);
-
-    //kdbDebug() << sql;
-    return sql;
-}
-
-KDbEscapedString KDb::selectStatement(const KDbDriver &driver,
-                                         KDbQuerySchema* querySchema,
-                                         const QList<QVariant>& params,
-                                         const KDbConnection::SelectStatementOptions& options)
-{
-    return selectStatementInternal(&driver, 0, querySchema, params, options);
-}
-
-KDbEscapedString KDb::selectStatement(KDbQuerySchema* querySchema,
-                                         const QList<QVariant>& params,
-                                         const KDbConnection::SelectStatementOptions& options)
-{
-    return selectStatementInternal(0, 0, querySchema, params, options);
-}
-
-KDbEscapedString KDbConnection::selectStatement(KDbQuerySchema* querySchema,
-                                    const QList<QVariant>& params,
-                                    const SelectStatementOptions& options)
-{
-    return selectStatementInternal(driver(), this, querySchema, params, options);
-}
-
-KDbEscapedString KDbConnection::selectStatement(KDbTableSchema* tableSchema,
-                                          const SelectStatementOptions& options)
-{
-    return selectStatement(tableSchema->query(), options);
 }
 
 KDbField* KDbConnection::findSystemFieldName(const KDbFieldList& fieldlist)
@@ -2091,7 +1661,11 @@ bool KDbConnection::dropQuery(const QString& queryName)
 
 bool KDbConnection::drv_createTable(const KDbTableSchema& tableSchema)
 {
-    const KDbEscapedString sql( createTableStatement(tableSchema) );
+    const KDbNativeStatementBuilder builder(this);
+    KDbEscapedString sql;
+    if (!builder.generateCreateTableStatement(&sql,tableSchema)) {
+        return false;
+    }
     //kdbDebug() << "******** " << sql;
     return executeSQL(sql);
 }
@@ -2773,7 +2347,15 @@ bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, boo
 
 bool KDbConnection::isEmpty(KDbTableSchema* table, bool* success)
 {
-    return !resultExists(selectStatement(table->query()), success);
+    const KDbNativeStatementBuilder builder(this);
+    KDbEscapedString sql;
+    if (!builder.generateSelectStatement(&sql, table)) {
+        if (success) {
+            *success =false;
+        }
+        return false;
+    }
+    return !resultExists(sql, success);
 }
 
 //! Used by addFieldPropertyToExtendedTableSchemaData()

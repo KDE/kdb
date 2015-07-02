@@ -22,6 +22,7 @@
 #include "KDbDriver_p.h"
 #include "KDbError.h"
 #include "KDbRecordEditBuffer.h"
+#include "KDbNativeStatementBuilder.h"
 #include "KDb.h"
 #include "kdb_debug.h"
 
@@ -132,16 +133,19 @@ bool KDbCursor::open()
             m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("No query statement or schema defined."));
             return false;
         }
-        KDbConnection::SelectStatementOptions options;
+        KDbSelectStatementOptions options;
         options.alsoRetrieveRecordId = m_containsRecordIdInfo; /*get record Id if needed*/
-        m_result.setSql(m_queryParameters
-                        ? m_conn->selectStatement(m_query, *m_queryParameters, options)
-                        : m_conn->selectStatement(m_query, options));
-        if (m_result.sql().isEmpty()) {
-            kdbDebug() << "empty statement!";
-            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("Query statement is empty."));
+        KDbNativeStatementBuilder builder(m_conn);
+        KDbEscapedString sql;
+        if (!builder.generateSelectStatement(&sql, m_query, options,
+                                             m_queryParameters ? *m_queryParameters : QList<QVariant>())
+            || sql.isEmpty())
+        {
+            kdbDebug() << "no statement generated!";
+            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("Could not generate query statement."));
             return false;
         }
+        m_result.setSql(sql);
 #ifdef KDB_DEBUG_GUI
         KDb::debugGUI(QString::fromLatin1("SQL for query \"%1\": ")
                          .arg(KDb::iifNotEmpty(m_query->name(), QString::fromLatin1("<unnamed>")))
@@ -444,9 +448,16 @@ QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
                       << "\n";
     }
     else {
-        dbg.nospace() << "KDbQuerySchema:"
-                      << cursor.connection()->selectStatement(cursor.query()).toString()
-                      << "\n";
+        KDbNativeStatementBuilder builder(cursor.connection());
+        KDbEscapedString sql;
+        QString sqlString;
+        if (builder.generateSelectStatement(&sql, cursor.query())) {
+            sqlString = sql.toString();
+        }
+        else {
+            sqlString = QLatin1String("<CANNOT GENERATE!>");
+        }
+        dbg.nospace() << "KDbQuerySchema:" << sqlString << "\n";
     }
     if (cursor.isOpened()) {
         dbg.space() << "OPENED";

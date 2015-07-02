@@ -774,39 +774,6 @@ public:
      Only use this method if you really need. */
     bool executeSQL(const KDbEscapedString& sql);
 
-    //! @short options used in selectStatement()
-    class KDB_EXPORT SelectStatementOptions
-    {
-    public:
-        SelectStatementOptions();
-        ~SelectStatementOptions();
-
-        //! True if record ID should be also retrieved. False by default.
-        bool alsoRetrieveRecordId;
-
-        /*! True if relations (LEFT OUTER JOIN) for visible lookup columns should be added.
-         True by default. This is set to false when user-visible statement is generated
-         e.g. for the Query Designer. */
-        bool addVisibleLookupColumns;
-    };
-
-    /*! @return "SELECT ..." statement's string needed for executing query
-     defined by @a querySchema, @a params and @a options. */
-    KDbEscapedString selectStatement(KDbQuerySchema* querySchema,
-                                  const QList<QVariant>& params,
-                                  const SelectStatementOptions& options = SelectStatementOptions());
-
-    /*! @overload QString selectStatement( KDbQuerySchema* querySchema,
-      QList<QVariant> params = QList<QVariant>(),
-      const SelectStatementOptions& options = SelectStatementOptions() ) const;
-     @return "SELECT ..." statement's string needed for executing query
-     defined by @a querySchema. */
-    inline KDbEscapedString selectStatement(KDbQuerySchema* querySchema,
-                                         const SelectStatementOptions& options = SelectStatementOptions())
-    {
-        return selectStatement(querySchema, QList<QVariant>(), options);
-    }
-
     /*! Stores object (id, name, caption, description)
     described by @a object on the backend. It is expected that entry on the
     backend already exists, so it's updated. Changes to identifier attribute are not allowed.
@@ -1088,24 +1055,6 @@ protected:
       using connection. After drop, database shouldn't be accessible
       anymore. */
     virtual bool drv_dropDatabase(const QString &dbName = QString()) = 0;
-
-    /*! @return "CREATE TABLE ..." statement string needed for @a tableSchema
-     creation in the database.
-
-     Note: The statement string can be specific for this connection's driver database,
-     and thus not reusable in general.
-    */
-    KDbEscapedString createTableStatement(const KDbTableSchema& tableSchema) const;
-
-    /*! @return "SELECT ..." statement's string needed for executing query
-     defined by "select * from table_name" where <i>table_name</i> is @a tableSchema's name.
-     This method's variant can be useful when there is no appropriate KDbQuerySchema defined.
-
-     Note: The statement string can be specific for this connection's driver database,
-     and thus not reusable in general.
-    */
-    KDbEscapedString selectStatement(KDbTableSchema* tableSchema,
-                                  const SelectStatementOptions& options = SelectStatementOptions());
 
     /*!
      Creates table named by @a tableName. Schema object must be on
@@ -1403,45 +1352,5 @@ private:
     friend class ConnectionPrivate;
     friend class KDbAlterTableHandler;
 };
-
-namespace KDb
-{
-/*! @return "SELECT ..." statement's string needed for executing query
-    defined by @a querySchema, @a params and @a options.
-    @a driver is used to generate driver-dependent statement. */
-KDB_EXPORT KDbEscapedString selectStatement(const KDbDriver &driver,
-                                               KDbQuerySchema *querySchema,
-                                               const QList<QVariant>& params,
-                                               const KDbConnection::SelectStatementOptions& options
-                                                = KDbConnection::SelectStatementOptions());
-
-/*! @overload QString selectStatement(const KDbDriver&,
-    KDbQuerySchema*, const QList<QVariant>&, const KDbConnection::SelectStatementOptions&); */
-KDB_EXPORT inline KDbEscapedString selectStatement(const KDbDriver &driver,
-                                                      KDbQuerySchema *querySchema,
-                                                      const KDbConnection::SelectStatementOptions& options
-                                                        = KDbConnection::SelectStatementOptions())
-{
-    return selectStatement(driver, querySchema, QList<QVariant>(), options);
-}
-
-/*! @return "SELECT ..." KDbSQL statement's string needed for executing query
-    defined by @a querySchema, @a params and @a options. */
-KDB_EXPORT KDbEscapedString selectStatement(KDbQuerySchema *querySchema,
-                                               const QList<QVariant>& params,
-                                               const KDbConnection::SelectStatementOptions& options
-                                                 = KDbConnection::SelectStatementOptions());
-
-
-/*! @overload QString selectStatement(KDbQuerySchema*, const QList<QVariant>&,
-    const KDbConnection::SelectStatementOptions&); */
-KDB_EXPORT inline KDbEscapedString selectStatement(KDbQuerySchema *querySchema,
-                                                      const KDbConnection::SelectStatementOptions& options
-                                                       = KDbConnection::SelectStatementOptions())
-{
-    return selectStatement(querySchema, QList<QVariant>(), options);
-}
-
-} // namespace KDb
 
 #endif

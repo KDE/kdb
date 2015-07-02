@@ -118,6 +118,7 @@ set(kdb_LIB_SRCS
    KDbAdmin.cpp
    KDbLookupFieldSchema.cpp
    KDbAlter.cpp
+   KDbNativeStatementBuilder.cpp
    kdb_debug.cpp
 
    views/KDbTableViewData.cpp
@@ -261,6 +262,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbIndexSchema
         KDbLookupFieldSchema
         KDbMessageHandler
+        KDbNativeStatementBuilder
         KDbPreparedStatement
         KDbQuerySchema
         KDbQueryColumnInfo

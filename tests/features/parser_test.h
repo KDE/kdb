@@ -21,6 +21,8 @@
 #define PARSER_TEST_H
 
 #include <KDbParser>
+#include <KDbConnection>
+#include <KDbNativeStatementBuilder>
 
 int parserTest(const KDbEscapedString &st, const QStringList &params)
 {
@@ -35,11 +37,19 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
     const bool ok = parser.parse(st);
     KDbQuerySchema *q = parser.query();
     QList<QVariant> variantParams;
-    foreach(const QString param, params)
-    variantParams.append(param.toLocal8Bit());
+    foreach(const QString param, params) {
+        variantParams.append(param.toLocal8Bit());
+    }
     if (ok && q) {
         cout << KDbUtils::debugString<KDbQuerySchema>(*q).toLatin1().constData() << '\n';
-        cout << "-STATEMENT:\n" << conn->selectStatement(q, variantParams).toByteArray().constData() << '\n';
+        KDbNativeStatementBuilder builder(conn);
+        KDbEscapedString sql;
+        if (builder.generateSelectStatement(&sql, q, variantParams)) {
+            cout << "-STATEMENT:\n" << sql.toByteArray().constData() << '\n';
+        }
+        else {
+            cout << "-CANNOT GENERATE STATEMENT\n";
+        }
     } else {
         qDebug() << parser.error();
         r = 1;

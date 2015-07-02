@@ -40,6 +40,7 @@ add_executable(
     KDbLongLongValidator_HeaderTest.cpp
     KDbLookupFieldSchema_HeaderTest.cpp
     KDbMessageHandler_HeaderTest.cpp
+    KDbNativeStatementBuilder_HeaderTest.cpp
     KDbObject_HeaderTest.cpp
     KDbObjectNameValidator_HeaderTest.cpp
     KDbParser_HeaderTest.cpp
@@ -88,6 +89,7 @@ add_executable(
     KDbLongLongValidator.h_HeaderTest.cpp
     KDbLookupFieldSchema.h_HeaderTest.cpp
     KDbMessageHandler.h_HeaderTest.cpp
+    KDbNativeStatementBuilder.h_HeaderTest.cpp
     KDbObject.h_HeaderTest.cpp
     KDbObjectNameValidator.h_HeaderTest.cpp
     KDbParser.h_HeaderTest.cpp

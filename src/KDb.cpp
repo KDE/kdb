@@ -27,6 +27,7 @@
 #include "KDbTableOrQuerySchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbConnectionData.h"
+#include "KDbNativeStatementBuilder.h"
 #include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
 #include "config-kdb.h"
@@ -497,10 +498,13 @@ int KDb::recordCount(KDbQuerySchema* querySchema, const QList<QVariant>& params)
         return -1;
     }
     int count = -1; //will be changed only on success of querySingleNumber()
+    KDbNativeStatementBuilder builder(querySchema->connection());
+    KDbEscapedString subSql;
+    if (!builder.generateSelectStatement(&subSql, querySchema, params)) {
+        return -1;
+    }
     tristate result = querySchema->connection()->querySingleNumber(
-        KDbEscapedString("SELECT COUNT(*) FROM (")
-            + querySchema->connection()->selectStatement(querySchema, params)
-            + ") AS kdb__subquery", &count
+        KDbEscapedString("SELECT COUNT(*) FROM (") + subSql + ") AS kdb__subquery", &count
     );
     return true == result ? count : -1;
 }

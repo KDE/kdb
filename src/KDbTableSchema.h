@@ -170,6 +170,7 @@ private:
     bool m_isKDbSystem;
 
     friend class KDbConnection;
+    friend class KDbNativeStatementBuilder;
 };
 
 /*! Internal table with a name @a name. Rarely used.

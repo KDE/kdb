@@ -21,6 +21,7 @@
 #include <QtTest>
 
 #include <KDbDriverManager>
+#include <KDbNativeStatementBuilder>
 #include <KDbParser>
 #include <KDbToken>
 
@@ -96,9 +97,10 @@ KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
     //qDebug() << *q.data();
 
     QList<QVariant> params;
-    KDbEscapedString querySql = m_conn->selectStatement(q.data(), params);
-    //qDebug() << sql;
-    *ok = true;
+    KDbNativeStatementBuilder builder(m_conn.data());
+    KDbEscapedString querySql;
+    *ok = builder.generateSelectStatement(&querySql, q.data(), params);
+    //qDebug() << querySql;
     return querySql;
 }
 
