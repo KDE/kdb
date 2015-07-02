@@ -53,9 +53,8 @@ DriverPrivate::DriverPrivate(KDbDriver *aDriver)
         : driver(aDriver)
         , isDBOpenedAfterCreate(false)
         , features(KDbDriver::NoFeatures)
+        , adminTools(0)
 {
-    adminTools = 0;
-
     properties.insert("client_library_version", QVariant(),
                       QObject::tr("Client library version"));
     properties.insert("default_server_encoding", QVariant(),
