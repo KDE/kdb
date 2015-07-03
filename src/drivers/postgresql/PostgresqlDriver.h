@@ -67,4 +67,4 @@ private:
     QMap<int, QVariant::Type> m_pgsqlToVariantTypes;
 };
 
-#endif // PREDICATE_DRIVER_POSTGRESQLDRIVER_H
+#endif // KDB_DRIVER_POSTGRESQLDRIVER_H

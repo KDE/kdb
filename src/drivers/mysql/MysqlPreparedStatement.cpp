@@ -26,7 +26,7 @@
 MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
         : KDbPreparedStatementInterface()
         , MysqlConnectionInternal(conn->connection)
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
         , m_statement(0)
         , m_mysqlBind(0)
 #endif
@@ -41,7 +41,7 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
 
 bool MysqlPreparedStatement::init()
 {
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
     m_statement = mysql_stmt_init(mysql);
     if (!m_statement) {
 //! @todo err 'out of memory'
@@ -72,7 +72,7 @@ MysqlPreparedStatement::~MysqlPreparedStatement()
 
 void MysqlPreparedStatement::done()
 {
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
     if (m_statement) {
 //! @todo handle errors of mysql_stmt_close()?
         mysql_stmt_close(m_statement);
@@ -89,7 +89,7 @@ bool MysqlPreparedStatement::prepare(const KDbEscapedString& sql)
     return true;
 }
 
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
 #define BIND_NULL { \
         m_mysqlBind[arg].buffer_type = MYSQL_TYPE_NULL; \
         m_mysqlBind[arg].buffer = 0; \
@@ -237,7 +237,7 @@ bool MysqlPreparedStatement::execute(
     const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(selectFieldList);
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
     if (!m_statement || m_realParamCount <= 0)
         return false;
     if (mysql_stmt_errno(m_statement) == CR_SERVER_LOST) {
@@ -309,6 +309,6 @@ bool MysqlPreparedStatement::execute(
     }
 //! @todo support select
 
-#endif // !PREDICATE_USE_MYSQL_STMT
+#endif // !KDB_USE_MYSQL_STMT
     return false;
 }

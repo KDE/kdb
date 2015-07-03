@@ -21,7 +21,7 @@
 #define SYBASEPREPAREDSTATEMENT_H
 
 #include "KDbPreparedStatement.h"
-#include <Predicate/Private/KDbConnection>
+#include "KDbConnection_p.h"
 
 class SybasePreparedStatement : public KDbPreparedStatement
 {

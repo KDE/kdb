@@ -60,4 +60,4 @@ class xBaseDriver : public KDbDriver
 
 };
 
-#endif // PREDICATE_DRIVER_XBASEDRIVER_H
+#endif // KDB_DRIVER_XBASEDRIVER_H

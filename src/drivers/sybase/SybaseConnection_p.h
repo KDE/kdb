@@ -22,7 +22,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <QMap>
 
-#include <Predicate/Private/KDbConnection>
+#include "KDbConnection_p.h"
 
 //#include <config.h>
 #include <sqlfront.h>
@@ -40,7 +40,7 @@ class ConnectionData;
 //! Internal Sybase connection data.
 /*! Provides a low-level API for accessing Sybase databases, that can
     be shared by any module that needs direct access to the underlying
-    database.  Used by the Predicate and KexiMigration drivers.
+    database.  Used by the KDb and KexiMigration drivers.
  */
 class SybaseConnectionInternal : public KDbConnectionInternal
 {

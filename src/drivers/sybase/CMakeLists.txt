@@ -8,7 +8,7 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_sybase_SRCS
+set(kdb_sybasedriver_SRCS
    SybaseDriver.cpp
    SybaseConnection.cpp
    SybaseConnection_p.cpp
@@ -17,13 +17,13 @@ set(predicate_sybase_SRCS
    SybasePreparedStatement.cpp )
 
 
-add_library(predicate_sybase SHARED ${predicate_sybase_SRCS})
+add_library(kdb_sybasedriver SHARED ${kdb_sybasedriver_SRCS})
+kcoreaddons_desktop_to_json(kdb_sybasedriver kdb_sybasedriver.desktop)
 
-target_link_libraries(predicate_sybase
+target_link_libraries(kdb_sybasedriver
   ${FreeTDS_LIBRARIES}
-  predicate
+  kdb
 )
-set_target_properties(predicate_sybase PROPERTIES PREFIX "")
+set_target_properties(kdb_sybasedriver PROPERTIES PREFIX "")
 
-install(TARGETS predicate_sybase DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_sybase.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS kdb_sybasedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})

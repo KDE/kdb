@@ -24,7 +24,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-EXPORT_PREDICATE_DRIVER(SybaseDriver, sybase)
+KDB_DRIVER_PLUGIN_FACTORY(SybaseDriver, "kdb_sybasedriver.json")
 
 SybaseDriver::SybaseDriver()
     : KDbDriver()

@@ -22,14 +22,14 @@
 
 #include <QPointer>
 
-#include <Predicate/Private/KDbConnection>
+#include "KDbConnection_p.h"
 
 class ConnectionData;
 
 //! Internal xBase connection data.
 /*! Provides a low-level API for accessing xBase databases, that can
 be shared by any module that needs direct access to the underlying
-database.  Used by the Predicate drivers.
+database.  Used by the KDb drivers.
 */
 class xBaseConnectionInternal : public KDbConnectionInternal
 {

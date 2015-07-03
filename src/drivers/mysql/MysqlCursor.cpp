@@ -109,7 +109,7 @@ QVariant MysqlCursor::value(uint pos)
 }
 
 /* As with sqlite, the DB library returns all values (including numbers) as
-   strings. So just put that string in a QVariant and let Predicate deal with it.
+   strings. So just put that string in a QVariant and let KDb deal with it.
  */
 bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {

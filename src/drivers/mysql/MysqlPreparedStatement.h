@@ -20,7 +20,7 @@
 #ifndef MYSQLPREPAREDSTATEMENT_H
 #define MYSQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/KDbPreparedStatementInterface>
+#include "KDbPreparedStatementInterface.h"
 #include "MysqlConnection_p.h"
 
 //! @todo 1.1 - unfinished: #define KDB_USE_MYSQL_STMT; for 1.0 we're using unoptimized version
@@ -45,7 +45,7 @@ protected:
     bool init();
     void done();
 
-#ifdef PREDICATE_USE_MYSQL_STMT
+#ifdef KDB_USE_MYSQL_STMT
     bool bindValue(KDbField *field, const QVariant& value, int arg);
     int m_realParamCount;
     MYSQL_STMT *m_statement;

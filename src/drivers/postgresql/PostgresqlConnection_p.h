@@ -21,7 +21,7 @@
 #ifndef KDB_DRIVER_POSTGRESQLCONNECTION_P_H
 #define KDB_DRIVER_POSTGRESQLCONNECTION_P_H
 
-#include <Predicate/Private/KDbConnection>
+#include "KDbConnection_p.h"
 
 #include <libpq-fe.h>
 
@@ -63,4 +63,4 @@ public:
     virtual ~PostgresqlCursorData();
 };
 
-#endif // PREDICATE_DRIVER_POSTGRESQLCONNECTION_P_H
+#endif // KDB_DRIVER_POSTGRESQLCONNECTION_P_H

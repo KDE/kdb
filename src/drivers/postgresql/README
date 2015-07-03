@@ -1,4 +1,4 @@
-Predicate libpq-based PostgreSQL Driver
+KDb libpq-based PostgreSQL Driver
 
 This driver requires the libpq library. It is rewrite of the libpqxx-based 'pqxx' driver by Adam Pigg.
 

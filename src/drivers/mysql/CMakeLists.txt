@@ -10,7 +10,7 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_mysql_SRCS
+set(kdb_mysqldriver_SRCS
    MysqlDriver.cpp
    MysqlConnection.cpp
    MysqlConnection_p.cpp
@@ -19,30 +19,30 @@ set(predicate_mysql_SRCS
    MysqlPreparedStatement.cpp
 )
 
-set(predicate_mysql_MOC_SRCS
+set(kdb_mysqldriver_MOC_SRCS
    MysqlDriver.h
 )
 
-qt_wrap_cpp(predicate_mysql predicate_mysql_SRCS ${predicate_mysql_MOC_SRCS})
+qt_wrap_cpp(kdb_mysqldriver kdb_mysqldriver_SRCS ${kdb_mysqldriver_MOC_SRCS})
 
-add_library(predicate_mysql SHARED ${predicate_mysql_SRCS})
+add_library(kdb_mysqldriver SHARED ${kdb_mysqldriver_SRCS})
+kcoreaddons_desktop_to_json(kdb_mysqldriver kdb_mysqldriver.desktop)
 
-target_link_libraries(predicate_mysql
+target_link_libraries(kdb_mysqldriver
   ${MYSQL_LIBRARIES}
-  predicate
+  kdb
 )
 
 if(MSVC)
-  target_link_libraries(predicate_mysql ws2_32 msvcrtd)
+  target_link_libraries(kdb_mysqldriver ws2_32 msvcrtd)
 endif()
 
-set_target_properties(predicate_mysql PROPERTIES PREFIX "")
+set_target_properties(kdb_mysqldriver PROPERTIES PREFIX "")
 
 if(MSVC)
   # avoid LNK2005 errors
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FORCE:MULTIPLE")
-  set_target_properties(predicate_mysql PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")
+  set_target_properties(kdb_mysqldriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")
 endif()
 
-install(TARGETS predicate_mysql DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_mysql.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS kdb_mysqldriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})

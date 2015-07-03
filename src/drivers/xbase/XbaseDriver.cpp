@@ -27,7 +27,7 @@
 
 #include "XbaseConnection.h"
 
-EXPORT_PREDICATE_DRIVER(xBaseDriver, xbase)
+KDB_DRIVER_PLUGIN_FACTORY(xBaseDriver, "kdb_xbasedriver.json")
 
 class KDbxBaseDriverPrivate {
 

@@ -229,7 +229,7 @@ drivers:
 *  drivers/mysql/MysqlKeywords.cpp
 *  drivers/mysql/MysqlPreparedStatement.h
 *  drivers/mysql/MysqlPreparedStatement.cpp
-** for now it's nonfunctional; port and improve code within PREDICATE_USE_MYSQL_STMT
+** for now it's nonfunctional; port and improve code within KDB_USE_MYSQL_STMT
 
   drivers/odbc/odbcconnection.h
   drivers/odbc/odbcconnection.cpp

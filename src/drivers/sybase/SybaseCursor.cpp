@@ -24,7 +24,7 @@
 
 
 #include "KDbError.h"
-#include <Predicate/Utils.h>
+#include "KDbUtils.h"
 
 #include <limits.h>
 #include <cstring>
@@ -170,7 +170,7 @@ QVariant SybaseCursor::value(uint pos)
 
 
 /* As with sqlite, the DB library returns all values (including numbers) as
-   strings. So just put that string in a QVariant and let Predicate deal with it.
+   strings. So just put that string in a QVariant and let KDb deal with it.
  */
 bool SybaseCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {

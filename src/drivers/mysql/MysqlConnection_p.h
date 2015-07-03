@@ -20,7 +20,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #ifndef KDB_MYSQLCLIENT_P_H
 #define KDB_MYSQLCLIENT_P_H
 
-#include <Predicate/Private/KDbConnection>
+#include "KDbConnection_p.h"
 
 #ifdef Q_OS_WIN
 #include <my_Global.h>
@@ -42,7 +42,7 @@ class ConnectionData;
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
     be shared by any module that needs direct access to the underlying
-    database.  Used by the Predicate and migration drivers.
+    database.  Used by the KDb and migration drivers.
     @todo fix the above note about migration...
  */
 class MysqlConnectionInternal : public ConnectionInternal

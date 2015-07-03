@@ -10,7 +10,7 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_postgresql_SRCS
+set(kdb_postgresqldriver_SRCS
    PostgresqlDriver.cpp
    PostgresqlConnection.cpp
    PostgresqlCursor.cpp
@@ -19,20 +19,20 @@ set(predicate_postgresql_SRCS
    PostgresqlPreparedStatement.cpp
 )
 
-set(predicate_postgresql_MOC_SRCS
+set(kdb_postgresqldriver_MOC_SRCS
    PostgresqlDriver.h
 )
 
-qt_wrap_cpp(predicate_postgresql predicate_postgresql_SRCS ${predicate_postgresql_MOC_SRCS})
+qt_wrap_cpp(kdb_postgresqldriver kdb_postgresqldriver_SRCS ${kdb_postgresqldriver_MOC_SRCS})
 
-add_library(predicate_postgresql SHARED ${predicate_postgresql_SRCS})
+add_library(kdb_postgresqldriver SHARED ${kdb_postgresqldriver_SRCS})
+kcoreaddons_desktop_to_json(kdb_postgresqldriver kdb_postgresqldriver.desktop)
 
-target_link_libraries(predicate_postgresql
+target_link_libraries(kdb_postgresqldriver
   ${PostgreSQL_LIBRARIES}
-  predicate
+  kdb
   Qt5::Network
 )
-set_target_properties(predicate_postgresql PROPERTIES PREFIX "")
+set_target_properties(kdb_postgresqldriver PROPERTIES PREFIX "")
 
-install(TARGETS predicate_postgresql DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_postgresql.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS kdb_postgresqldriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})

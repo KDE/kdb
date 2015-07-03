@@ -55,4 +55,4 @@ private:
     PostgresqlCursorData *d;
 };
 
-#endif // PREDICATE_DRIVER_POSTGRESQLCURSOR_H
+#endif // KDB_DRIVER_POSTGRESQLCURSOR_H

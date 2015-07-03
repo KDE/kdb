@@ -8,7 +8,7 @@ add_definitions(
 
 ########### next target ###############
 
-set(predicate_xbase_SRCS
+set(kdb_xbasedriver_SRCS
    XbaseDriver.cpp
    XbaseConnection.cpp
    XbaseConnection_p.cpp
@@ -18,14 +18,14 @@ set(predicate_xbase_SRCS
    )
 
 
-add_library(predicate_xbase SHARED ${predicate_xbase_SRCS})
+add_library(kdb_xbasedriver SHARED ${kdb_xbasedriver_SRCS})
+kcoreaddons_desktop_to_json(kdb_xbasedriver kdb_xbasedriver.desktop)
 
-target_link_libraries(predicate_xbase
+target_link_libraries(kdb_xbasedriver
   ${XBase_LIBRARIES}
-  predicate
+  kdb
 #TODO  keximigrate
 )
-set_target_properties(predicate_xbase PROPERTIES PREFIX "")
+set_target_properties(kdb_xbasedriver PROPERTIES PREFIX "")
 
-install(TARGETS predicate_xbase DESTINATION ${PREDICATE_PLUGINS_DIR})
-install(FILES predicate_xbase.desktop DESTINATION ${PREDICATE_PLUGINS_DIR})
+install(TARGETS kdb_xbasedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})

@@ -21,7 +21,7 @@
 #ifndef POSTGRESQLPREPAREDSTATEMENT_H
 #define POSTGRESQLPREPAREDSTATEMENT_H
 
-#include <Predicate/Interfaces/KDbPreparedStatementInterface>
+#include "KDbPreparedStatementInterface.h"
 #include "PostgresqlConnection_p.h"
 
 class PostgresqlPreparedStatement : public KDbPreparedStatementInterface, public PostgresqlConnectionInternal
