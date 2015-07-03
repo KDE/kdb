@@ -23,11 +23,13 @@
 #include "kdb_debug.h"
 
 KDbPreparedStatement::Data::Data()
-    : type(InvalidStatement), whereFields(0), dirty(true)
+    : type(InvalidStatement), fields(0), fieldsForParameters(0), whereFields(0),
+      dirty(true), iface(0)
 {
 }
 
-KDbPreparedStatement::Data::Data(Type _type, KDbPreparedStatementInterface* _iface, KDbFieldList* _fields,
+KDbPreparedStatement::Data::Data(Type _type, KDbPreparedStatementInterface* _iface,
+                                 KDbFieldList* _fields,
      const QStringList& _whereFieldNames)
     : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
     , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
@@ -157,7 +159,7 @@ bool KDbPreparedStatement::generateInsertStatementString(KDbEscapedString * s)
 
 bool KDbPreparedStatement::isValid() const
 {
-    return d->type == InvalidStatement;
+    return d->type != InvalidStatement;
 }
 
 KDbPreparedStatement::Type KDbPreparedStatement::type() const
