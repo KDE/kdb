@@ -22,10 +22,34 @@
 #include "KDbTableSchema.h"
 #include "kdb_debug.h"
 
+KDbPreparedStatement::Data::Data()
+    : type(InvalidStatement), whereFields(0), dirty(true)
+{
+}
+
+KDbPreparedStatement::Data::Data(Type _type, KDbPreparedStatementInterface* _iface, KDbFieldList* _fields,
+     const QStringList& _whereFieldNames)
+    : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
+    , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
+{
+}
+
 KDbPreparedStatement::Data::~Data()
 {
     delete iface;
     delete whereFields;
+}
+
+KDbPreparedStatement::KDbPreparedStatement()
+    : d( new Data() )
+{
+}
+
+KDbPreparedStatement::KDbPreparedStatement(KDbPreparedStatementInterface* iface,
+                                           Type type, KDbFieldList* fields,
+                                           const QStringList& whereFieldNames)
+    : d( new Data(type, iface, fields, whereFieldNames) )
+{
 }
 
 KDbPreparedStatement::~KDbPreparedStatement()
@@ -67,7 +91,7 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
 //! @todo only tables and trivial queries supported for select...
     *s = "SELECT ";
     bool first = true;
-    foreach(KDbField *f, *d->fields.fields()) {
+    foreach(KDbField *f, *d->fields->fields()) {
         if (first)
             first = false;
         else
@@ -85,7 +109,7 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
         }
         else
             s->append(" AND ");
-        KDbField *f = d->fields.field(whereItem);
+        KDbField *f = d->fields->field(whereItem);
         if (!f) {
             kdbWarning() << "field" << whereItem << "not found, aborting";
             s->clear();
@@ -101,15 +125,15 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
 bool KDbPreparedStatement::generateInsertStatementString(KDbEscapedString * s)
 {
     //! @todo only tables supported for insert; what about views?
-    KDbTableSchema *table = d->fields.isEmpty() ? 0 : d->fields.field(0)->table();
+    KDbTableSchema *table = d->fields->isEmpty() ? 0 : d->fields->field(0)->table();
     if (!table)
         return false; //err
 
     KDbEscapedString namesList;
     bool first = true;
     //we are using a selection of fields only
-    const bool allTableFieldsUsed = dynamic_cast<KDbTableSchema*>(&d->fields);
-    foreach(KDbField* f, *d->fields.fields()) {
+    const bool allTableFieldsUsed = dynamic_cast<KDbTableSchema*>(d->fields);
+    foreach(const KDbField* f, *d->fields->fields()) {
         if (first) {
             s->append("?");
             if (!allTableFieldsUsed)
@@ -127,8 +151,47 @@ bool KDbPreparedStatement::generateInsertStatementString(KDbEscapedString * s)
     s->prepend(KDbEscapedString("INSERT INTO ") + table->name()
                + (allTableFieldsUsed ? KDbEscapedString() : (KDbEscapedString(" (") + namesList + ')'))
                + " VALUES (");
-    d->fieldsForParameters = d->fields.fields();
+    d->fieldsForParameters = d->fields->fields();
     return true;
+}
+
+bool KDbPreparedStatement::isValid() const
+{
+    return d->type == InvalidStatement;
+}
+
+KDbPreparedStatement::Type KDbPreparedStatement::type() const
+{
+    return d->type;
+}
+
+void KDbPreparedStatement::setType(KDbPreparedStatement::Type type)
+{
+    d->type = type;
+    d->dirty = true;
+}
+
+const KDbFieldList* KDbPreparedStatement::fields() const
+{
+    return d->fields;
+}
+
+void KDbPreparedStatement::setFields(KDbFieldList* fields)
+{
+    Q_ASSERT(fields);
+    d->fields = fields;
+    d->dirty = true;
+}
+
+QStringList KDbPreparedStatement::whereFieldNames() const
+{
+    return d->whereFieldNames;
+}
+
+void KDbPreparedStatement::setWhereFieldNames(const QStringList& whereFieldNames)
+{
+    d->whereFieldNames = whereFieldNames;
+    d->dirty = true;
 }
 
 /*bool KDbPreparedStatement::insert()

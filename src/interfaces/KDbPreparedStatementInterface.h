@@ -44,7 +44,7 @@ protected:
     virtual bool execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
-        KDbFieldList& insertFieldList,
+        KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters) = 0;
 
     friend class KDbConnection;

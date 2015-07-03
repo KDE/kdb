@@ -204,7 +204,7 @@ bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
 bool SqlitePreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
-    KDbFieldList& insertFieldList,
+    KDbFieldList* insertFieldList,
     const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(insertFieldList);

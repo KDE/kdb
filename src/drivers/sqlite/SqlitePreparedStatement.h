@@ -39,7 +39,7 @@ protected:
     virtual bool execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
-        KDbFieldList& insertFieldList,
+        KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters);
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);

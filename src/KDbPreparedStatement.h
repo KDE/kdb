@@ -86,15 +86,12 @@ public:
     //! @internal
     class KDB_EXPORT Data : public QSharedData {
     public:
-        Data() : type(InvalidStatement), whereFields(0), dirty(true) {}
+        Data();
         Data(Type _type, KDbPreparedStatementInterface* _iface, KDbFieldList* _fields,
-             const QStringList& _whereFieldNames)
-            : type(_type), fields(*_fields), whereFieldNames(_whereFieldNames)
-            , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
-        {}
+             const QStringList& _whereFieldNames);
         ~Data();
         Type type;
-        KDbFieldList fields;
+        KDbFieldList *fields;
         QStringList whereFieldNames;
         const KDbField::List* fieldsForParameters; //!< fields where we'll put the inserted parameters
         KDbField::List* whereFields; //!< temporary, used for select statements, based on whereFieldNames
@@ -104,24 +101,23 @@ public:
     };
 
     //! Creates an invalid prepared statement.
-    KDbPreparedStatement()
-        : d( new Data() )
-    {
-    }
+    KDbPreparedStatement();
 
     virtual ~KDbPreparedStatement();
 
-    bool isValid() const { return d->type == InvalidStatement; }
+    bool isValid() const;
 
-    Type type() const { return d->type; }
-    void setType(Type type) { d->type = type; d->dirty = true; }
+    KDbPreparedStatement::Type type() const;
 
-    const KDbFieldList& fields() const { return d->fields; }
-    void setFields(KDbFieldList& fields) { d->fields = fields; d->dirty = true; }
+    void setType(KDbPreparedStatement::Type type);
 
-    QStringList whereFieldNames() const { return d->whereFieldNames; }
-    void setWhereFieldNames(const QStringList& whereFieldNames)
-        { d->whereFieldNames = whereFieldNames; d->dirty = true; }
+    const KDbFieldList* fields() const;
+
+    void setFields(KDbFieldList* fields);
+
+    QStringList whereFieldNames() const;
+
+    void setWhereFieldNames(const QStringList& whereFieldNames);
 
     /*! Executes the prepared statement using @a parameters parameters.
      A number parameters set up for the statement must be the same as a number of fields
@@ -133,11 +129,9 @@ public:
 protected:
     //! Creates a new prepared statement. In your code use
     //! Users call KDbConnection:prepareStatement() instead.
-    KDbPreparedStatement(KDbPreparedStatementInterface* iface, Type type, KDbFieldList* fields,
-                      const QStringList& whereFieldNames = QStringList())
-        : d( new Data(type, iface, fields, whereFieldNames) )
-    {
-    }
+    KDbPreparedStatement(KDbPreparedStatementInterface* iface, Type type,
+                         KDbFieldList* fields,
+                         const QStringList& whereFieldNames = QStringList());
 
     friend class KDbConnection;
 
