@@ -103,7 +103,7 @@ QList<QPluginLoader *> KDbJsonTrader::query(const QString &servicetype,
         QStringList searchDirs;
         searchDirs += QCoreApplication::libraryPaths();
         foreach(const QString &dir, searchDirs) {
-            kdbDebug() << dir;
+            //kdbDebug() << dir;
             QString possiblePath = dir + QLatin1String("/kdb");
             if (QDir(possiblePath).exists()) {
                 d->pluginPaths += possiblePath;
