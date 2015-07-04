@@ -167,9 +167,6 @@ enum Signedness
 # define FUTURE_TR_NOOP(x) (x)
 #endif
 
-//! Macro to use in drivers to avoid redundant translations.
-#define KDbTr QObject::tr
-
 #ifndef WARNING
 #ifdef _MSC_VER
 /* WARNING preprocessor directive
