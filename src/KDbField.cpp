@@ -680,12 +680,12 @@ QDebug operator<<(QDebug dbg, const KDbField& field)
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, KDbField::Type type)
 {
-    return dbg.space() << KDbField::typeString(type).toLatin1().constData();
+    return dbg.space() << qPrintable(KDbField::typeString(type));
 }
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, KDbField::TypeGroup typeGroup)
 {
-    return dbg.space() << KDbField::typeGroupString(typeGroup).toLatin1().constData();
+    return dbg.space() << qPrintable(KDbField::typeGroupString(typeGroup));
 }
 
 bool KDbField::isExpression() const

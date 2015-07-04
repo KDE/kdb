@@ -181,7 +181,7 @@ void yyerror(const char *str)
 void setError(const QString& errName, const QString& errDesc)
 {
     globalParser->setError(KDbParserError(errName, errDesc, globalToken, globalCurrentPos));
-    yyerror(errName.toLatin1().constData());
+    yyerror(qPrintable(errName));
 }
 
 void setError(const QString& errDesc)

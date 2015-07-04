@@ -55,7 +55,7 @@ void KDbTestUtils::testSqliteDriver()
     QMimeDatabase mimeDb;
     foreach(const QString &mimeName, mimeTypes) {
         QVERIFY2(mimeDb.mimeTypeForName(mimeName).isValid(),
-                 QString("%1 MIME type not found in the MIME database").arg(mimeName).toLatin1().constData());
+                 qPrintable(QString("%1 MIME type not found in the MIME database").arg(mimeName)));
     }
     // find driver for the metadata
     KDB_VERIFY(manager.resultable(), driver = manager.driver(drv_id), "Driver not found");

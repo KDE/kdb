@@ -34,7 +34,7 @@ namespace QTest {
     template<>
     char *toString(const KDbEscapedString &string)
     {
-        return qstrdup(string.toString().toLatin1().constData());
+        return qstrdup(qPrintable(string.toString()));
     }
 }
 
@@ -42,7 +42,7 @@ namespace QTest {
     template<>
     char *toString(const KDbField::Type &type)
     {
-        return qstrdup(KDbField::typeString(type).toLatin1().constData());
+        return qstrdup(qPrintable(KDbField::typeString(type)));
     }
 }
 
@@ -681,7 +681,7 @@ void ExpressionsTest::testBinaryExpressionCloning_data()
     QTest::addColumn<QString>("string");
 
 #define T(type1, const1, token, type2, const2, string) \
-        QTest::newRow(TO_TOKEN(token).name().toLatin1().constData()) \
+        QTest::newRow(qPrintable(TO_TOKEN(token).name())) \
             << type1 << QVariant(const1) << TO_TOKEN(token) \
             << type2 << QVariant(const2) << QString(string)
 
@@ -1202,11 +1202,11 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
 
 #define T1(type1, const1, tokenOrChar, type2, const2, type3) \
         QTest::newRow( \
-            (QByteArray::number(__LINE__) + ": " + TNAME(type1) + " " \
-             + QVariant(const1).toString().toLatin1() + " " \
+            qPrintable(QString::number(__LINE__) + ": " + TNAME(type1) + " " \
+             + QVariant(const1).toString() + " " \
              + TNAME(TO_TOKEN(tokenOrChar)) + " " \
              + TNAME(type2) + " " \
-             + QVariant(const2).toString().toLatin1()).constData()) \
+             + QVariant(const2).toString().toLatin1())) \
             << type1 << QVariant(const1) \
             << TO_TOKEN(tokenOrChar) << type2 << QVariant(const2) \
             << type3

@@ -145,7 +145,7 @@ bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     }
     case KDbField::Time: {
         int res = sqlite3_bind_text(m_handle, par,
-                                    value.toTime().toString(Qt::ISODate).toLatin1().constData(),
+                                    qPrintable(value.toTime().toString(Qt::ISODate)),
                                     QLatin1String("HH:MM:SS").size(), SQLITE_TRANSIENT /*??*/);
         if (res != SQLITE_OK) {
             m_result.setServerErrorCode(res);
@@ -156,7 +156,7 @@ bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     }
     case KDbField::Date: {
         int res = sqlite3_bind_text(m_handle, par,
-                                    value.toDate().toString(Qt::ISODate).toLatin1().constData(),
+                                    qPrintable(value.toDate().toString(Qt::ISODate)),
                                     QLatin1String("YYYY-MM-DD").size(), SQLITE_TRANSIENT /*??*/);
         if (res != SQLITE_OK) {
             m_result.setServerErrorCode(res);
@@ -167,7 +167,7 @@ bool SqlitePreparedStatement::bindValue(KDbField *field, const QVariant& value, 
     }
     case KDbField::DateTime: {
         int res = sqlite3_bind_text(m_handle, par,
-                                value.toDateTime().toString(Qt::ISODate).toLatin1().constData(),
+                                qPrintable(value.toDateTime().toString(Qt::ISODate)),
                                 QLatin1String("YYYY-MM-DDTHH:MM:SS").size(), SQLITE_TRANSIENT /*??*/);
         if (res != SQLITE_OK) {
             m_result.setServerErrorCode(res);

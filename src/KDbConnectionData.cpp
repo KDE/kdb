@@ -73,8 +73,8 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbConnectionData& data)
         << " password=" << QString::fromLatin1("*").repeated(data.password().length()) /* security */
         << " savePassword=" << data.savePassword()
         << " isPasswordNeeded=" <<
-           (metaData ? QString::number(data.isPasswordNeeded())
-                     : QString::fromLatin1("[don't know, no valid driverId]")).toLatin1().constData()
+           qPrintable(metaData ? QString::number(data.isPasswordNeeded())
+                     : QString::fromLatin1("[don't know, no valid driverId]"))
         << " userVisibleString=" << data.toUserVisibleString();
     return dbg.nospace();
 }

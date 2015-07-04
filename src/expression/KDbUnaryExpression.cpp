@@ -60,8 +60,8 @@ void KDbUnaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
             dbg.nospace() << "<NONE>";
         }
     }
-    dbg.nospace() << QString::fromLatin1(",type=%1)")
-        .arg(KDbDriver::defaultSQLTypeName(type())).toLatin1().constData();
+    dbg.nospace() << qPrintable(QString::fromLatin1(",type=%1)")
+        .arg(KDbDriver::defaultSQLTypeName(type())));
 }
 
 KDbEscapedString KDbUnaryExpressionData::toStringInternal(

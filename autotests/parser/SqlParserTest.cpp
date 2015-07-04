@@ -138,7 +138,7 @@ void SqlParserTest::testParse_data()
     QString fname("statements.txt");
     QFile input(dir + QDir::separator() + fname);
     bool ok = input.open(QFile::ReadOnly | QFile::Text);
-    QVERIFY2(ok, QString("Could not open data file %1").arg(input.fileName()).toLatin1().constData());
+    QVERIFY2(ok, qPrintable(QString("Could not open data file %1").arg(input.fileName())));
     QTextStream in(&input);
     QString category;
     QString testName;
@@ -174,13 +174,13 @@ void SqlParserTest::testParse_data()
                     testName.clear();
                 }
                 ok = dbPath.isEmpty();
-                QVERIFY2(ok, QString("Error at line %1: SQLite was file already specified (%2)")
-                    .arg(lineNum).arg(dbPath).toLatin1().constData());
+                QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file already specified (%2)")
+                    .arg(lineNum).arg(dbPath)));
                 dbPath = line.mid(QString("SQLITEFILE: ").length()).trimmed();
                 dbPath = dir + QDir::separator() + dbPath;
                 ok = openDatabase(dbPath);
-                QVERIFY2(ok, QString("Error at line %1: Could not open SQLite file %2")
-                    .arg(lineNum).arg(dbPath).toLatin1().constData());
+                QVERIFY2(ok, qPrintable(QString("Error at line %1: Could not open SQLite file %2")
+                    .arg(lineNum).arg(dbPath)));
             }
             else if (line.startsWith("ERROR: ")) {
                 if (clearTestName) {
@@ -210,12 +210,12 @@ void SqlParserTest::testParse_data()
                 continue;
             }
             ok = !dbPath.isEmpty();
-            QVERIFY2(ok, QString("Error at line %1: SQLite was file not specified, cannot execute statement")
-                .arg(lineNum).toLatin1().constData());
+            QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file not specified, "
+                                            "cannot execute statement").arg(lineNum)));
 
-            QTest::newRow(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
+            QTest::newRow(qPrintable(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
                           .arg(fname).arg(lineNum).arg(category).arg(testName)
-                          .arg(expectError ? "; Error expected" :"").toLatin1().constData())
+                          .arg(expectError ? "; Error expected" :"")))
                 << fname << lineNum << sql << expectError;
         }
     }
@@ -229,7 +229,8 @@ void SqlParserTest::testParse()
     QFETCH(KDbEscapedString, sql);
     QFETCH(bool, expectError);
 
-    QVERIFY2(sql.endsWith(';'), QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum).toLatin1().constData());
+    QVERIFY2(sql.endsWith(';'), qPrintable(QString("%1:%2: Missing ';' at the end of line")
+                                           .arg(fname).arg(lineNum)));
     sql.chop(1);
     //qDebug() << "SQL:" << sql.toString() << expectError;
     bool ok;
@@ -239,17 +240,17 @@ void SqlParserTest::testParse()
     if (ok) {
         // sucess, so error cannot be expected
         QVERIFY2(!expectError,
-                 (QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
-                  .arg(sql.toString()).arg(result.toString()).toLatin1().constData()));
+                 (qPrintable(QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
+                  .arg(sql.toString()).arg(result.toString()))));
         if (!expectError) {
             qDebug() << "Result:" << result.toString();
         }
     }
     else {
         // failure, so error should be expected
-        QVERIFY2(expectError, QString("SQL statement: \"%1\"; %2")
+        QVERIFY2(expectError, qPrintable(QString("SQL statement: \"%1\"; %2")
                  .arg(sql.toString())
-                 .arg(KDbUtils::debugString(parser->error())).toLatin1().constData());
+                 .arg(KDbUtils::debugString(parser->error()))));
         if (expectError) {
             qDebug() << parser->error();
         }

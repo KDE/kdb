@@ -41,7 +41,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
         variantParams.append(param.toLocal8Bit());
     }
     if (ok && q) {
-        cout << KDbUtils::debugString<KDbQuerySchema>(*q).toLatin1().constData() << '\n';
+        cout << qPrintable(KDbUtils::debugString<KDbQuerySchema>(*q)) << '\n';
         KDbNativeStatementBuilder builder(conn);
         KDbEscapedString sql;
         if (builder.generateSelectStatement(&sql, q, variantParams)) {

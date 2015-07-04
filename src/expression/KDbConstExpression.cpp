@@ -100,7 +100,7 @@ void KDbConstExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
         res += QLatin1String(",DECIMAL");
     }
     res += QLatin1String(")");
-    dbg.nospace() << res.toLocal8Bit().constData();
+    dbg.nospace() << qPrintable(res);
 }
 
 KDbEscapedString KDbConstExpressionData::toStringInternal(
