@@ -14,6 +14,7 @@ Name[uk]=PostgreSQL
 Name[x-test]=xxpostgresqlxx
 Caption=PostgreSQL
 Comment=KDb driver for handling PostgreSQL databases
+Comment[de]=KDb-Treiber für die Handhabung von PostgreSQL-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos PostgreSQL.
 Comment[nl]=KDb-stuurprogramma for behandeling van PostgreSQL databases
 Comment[pl]=Sterownik KDb do obsługi baz danych PostgreSQL

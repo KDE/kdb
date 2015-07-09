@@ -14,6 +14,7 @@ Name[uk]=MySQL
 Name[x-test]=xxmysqlxx
 Caption=MySQL
 Comment=KDb driver for handling MySQL databases
+Comment[de]=KDb-Treiber für die Handhabung von MySQL-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos MySQL.
 Comment[nl]=KDb-stuurprogramma for behandeling van MySQL databases
 Comment[pl]=Sterownik KDb do obsługi baz danych MySQL

@@ -14,6 +14,7 @@ Name[uk]=Sybase
 Name[x-test]=xxsybasexx
 Caption=Sybase
 Comment=KDb driver for handling Sybase databases
+Comment[de]=KDb-Treiber für die Handhabung von Sybase-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos Sybase.
 Comment[nl]=KDb-stuurprogramma for behandeling van Sybase databases
 Comment[pl]=Sterownik KDb do obsługi baz danych Sybase
