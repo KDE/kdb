@@ -83,15 +83,16 @@ bool DriverManagerInternal::lookupDrivers()
         //QJsonObject json = loader->metaData();
         //drivermanagerDebug() << json;
         //! @todo check version
-        KDbDriverMetaData *metaData = new KDbDriverMetaData(*loader);
+        QScopedPointer<KDbDriverMetaData> metaData(new KDbDriverMetaData(*loader));
         if (m_driversMetaData.contains(metaData->id())) {
             kdbWarning() << "More than one driver with ID" << metaData->id() << "-- skipping this one";
             continue;
         }
         foreach (const QString& mimeType, metaData->mimeTypes()) {
-            m_metadata_by_mimetype.insertMulti(mimeType, metaData);
+            m_metadata_by_mimetype.insertMulti(mimeType, metaData.data());
         }
-        m_driversMetaData.insert(metaData->id(), metaData);
+        m_driversMetaData.insert(metaData->id(), metaData.data());
+        metaData.take();
     }
     if (m_driversMetaData.isEmpty()) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
