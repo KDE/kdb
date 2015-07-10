@@ -268,7 +268,7 @@ QDebug KDbTableSchema::debugFields(QDebug dbg) const
 
 QDebug operator<<(QDebug dbg, const KDbTableSchema& table)
 {
-    dbg.nospace() << QLatin1String("TABLE");
+    dbg.nospace() << "TABLE";
     dbg.space() << static_cast<const KDbObject&>(table) << '\n';
     table.debugFields(dbg);
     return dbg.space();

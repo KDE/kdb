@@ -46,6 +46,7 @@ QDebug operator<<(QDebug dbg, const KDbObject& object)
         desc.truncate(120);
         desc += QLatin1String("...");
     }
-    dbg.space() << "ID=" << object.id() << "NAME=" << object.name() << "CAPTION=" << object.caption() << "DESC=" << desc;
-    return dbg.space();
+    dbg.nospace() << " ID=" << object.id() << " NAME=" << object.name() << " CAPTION="
+                  << object.caption() << " DESC=" << desc;
+    return dbg.nospace();
 }

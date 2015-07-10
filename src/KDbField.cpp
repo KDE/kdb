@@ -624,10 +624,14 @@ void KDbField::setIndexed(bool s)
 QDebug operator<<(QDebug dbg, const KDbField& field)
 {
     KDbConnection *conn = field.table() ? field.table()->connection() : 0;
-    dbg.nospace() << (field.name().isEmpty() ? QLatin1String("<NONAME> ") : field.name());
+    if (field.name().isEmpty()) {
+        dbg.nospace() << "<NONAME>";
+    } else {
+        dbg.nospace() << field.name();
+    }
     if (field.options() & KDbField::Unsigned)
-        dbg.space() << "UNSIGNED";
-    dbg.space() << ((conn && conn->driver())
+        dbg.nospace() << " UNSIGNED";
+    dbg.nospace() << ' ' << qPrintable((conn && conn->driver())
         ? conn->driver()->sqlTypeName(field.type()) : KDbDriver::defaultSQLTypeName(field.type()));
     if (field.isFPNumericType() && field.precision() > 0) {
         if (field.scale() > 0)
@@ -639,24 +643,24 @@ QDebug operator<<(QDebug dbg, const KDbField& field)
         dbg.space() << QString::fromLatin1("(%1)").arg(field.maxLength());
 
     if (field.constraints() & KDbField::AutoInc)
-        dbg.space() << "AUTOINC";
+        dbg.nospace() << " AUTOINC";
     if (field.constraints() & KDbField::Unique)
-        dbg.space() << "UNIQUE";
+        dbg.nospace() << " UNIQUE";
     if (field.constraints() & KDbField::PrimaryKey)
-        dbg.space() << "PKEY";
+        dbg.nospace() << " PKEY";
     if (field.constraints() & KDbField::ForeignKey)
-        dbg.space() << "FKEY";
+        dbg.nospace() << " FKEY";
     if (field.constraints() & KDbField::NotNull)
-        dbg.space() << "NOTNULL";
+        dbg.nospace() << " NOTNULL";
     if (field.constraints() & KDbField::NotEmpty)
-        dbg.space() << "NOTEMPTY";
+        dbg.nospace() << " NOTEMPTY";
     if (!field.defaultValue().isNull()) {
-        dbg.space() << QString::fromLatin1("DEFAULT=[%1]")
-                           .arg(QLatin1String(field.defaultValue().typeName()));
-        dbg.nospace() << KDb::variantToString(field.defaultValue());
+        dbg.nospace() << qPrintable(QString::fromLatin1(" DEFAULT=[%1]")
+                           .arg(QLatin1String(field.defaultValue().typeName())));
+        dbg.nospace() << qPrintable(KDb::variantToString(field.defaultValue()));
     }
     if (field.isExpression()) {
-        dbg.space() << "EXPRESSION=";
+        dbg.nospace() << " EXPRESSION=";
         dbg.nospace() << field.expression();
     }
     const KDbField::CustomPropertiesMap customProperties(field.customProperties());
