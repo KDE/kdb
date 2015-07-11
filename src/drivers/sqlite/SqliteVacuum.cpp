@@ -141,11 +141,13 @@ tristate SqliteVacuum::run()
     );
     m_dlg->adjustSize();
     m_dlg->resize(300, m_dlg->height());
-    connect(m_dlg, SIGNAL(cancelClicked()), this, SLOT(cancelClicked()));
     m_dlg->setMinimumDuration(1000);
     m_dlg->setAutoClose(true);
     m_dlg->setRange(0, 100);
     m_dlg->exec();
+    if (m_dlg->wasCanceled()) {
+        cancelClicked();
+    }
     while (m_dumpProcess->state() == QProcess::Running
            && m_sqliteProcess->state()  == QProcess::Running)
     {
