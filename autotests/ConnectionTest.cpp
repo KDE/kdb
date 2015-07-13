@@ -39,6 +39,72 @@ void ConnectionTest::initTestCase()
     utils.testSqliteDriver();
 }
 
+void ConnectionTest::testConnectionData()
+{
+    KDbConnectionData cdata;
+    QVERIFY(cdata.databaseName().isEmpty());
+    QVERIFY(cdata.driverId().isEmpty());
+    QVERIFY(cdata.caption().isEmpty());
+    QVERIFY(cdata.description().isEmpty());
+    QVERIFY(cdata.userName().isEmpty());
+    QVERIFY(cdata.hostName().isEmpty());
+    QCOMPARE(cdata.port(), 0);
+    QVERIFY(cdata.useLocalSocketFile());
+    QVERIFY(cdata.localSocketFileName().isEmpty());
+    QVERIFY(cdata.password().isEmpty());
+    QVERIFY(!cdata.savePassword());
+    QCOMPARE(cdata, cdata);
+    QVERIFY2(!cdata.isPasswordNeeded(), "Password-needed is not false for empty data");
+    QVERIFY(cdata.toUserVisibleString().isEmpty());
+    QCOMPARE(cdata, KDbConnectionData());
+
+    QString db = "mydb";
+    cdata.setDatabaseName(db);
+    QCOMPARE(cdata.databaseName(), db);
+    QCOMPARE(db, cdata.toUserVisibleString());
+    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption));
+
+    cdata.setDriverId("INVALID.ID");
+    QCOMPARE(db, cdata.toUserVisibleString()); // driver ID invalid: still just returns the db name
+    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption)); // like above
+
+    KDbDriverManager manager;
+    //! @todo more drivers
+    if (manager.driver("org.kde.kdb.sqlite")) { // only if mysql is present
+        qDebug() << "org.kde.kdb.sqlite driver found, testing...";
+        cdata = KDbConnectionData();
+        cdata.setDriverId("org.kde.kdb.sqlite");
+        QCOMPARE(cdata.toUserVisibleString(), QObject::tr("<file>"));
+        cdata.setDatabaseName("my.db");
+        QCOMPARE(cdata.toUserVisibleString(), QObject::tr("file: %1").arg("my.db"));
+        KDbConnectionData copy(cdata);
+        QCOMPARE(cdata, copy);
+    }
+    if (manager.driver("org.kde.kdb.mysql")) { // only if mysql is present
+        qDebug() << "org.kde.kdb.mysql driver found, testing...";
+        cdata = KDbConnectionData();
+        cdata.setDriverId("org.kde.kdb.mysql");
+        QCOMPARE(cdata.toUserVisibleString(), QLatin1String("localhost"));
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+                 QLatin1String("localhost")); // like above
+        cdata.setUserName("joe");
+        QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@localhost"));
+        cdata.setUserName(QString());
+        cdata.setHostName("example.com");
+        QCOMPARE(cdata.toUserVisibleString(), QLatin1String("example.com"));
+        cdata.setUserName("joe");
+        QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@example.com"));
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+                 QLatin1String("example.com"));
+        cdata.setPort(12345);
+        QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@example.com:12345"));
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+                 QLatin1String("example.com:12345"));
+        KDbConnectionData copy(cdata);
+        QCOMPARE(cdata, copy);
+    }
+}
+
 void ConnectionTest::testCreateDb()
 {
     QVERIFY(utils.driver);

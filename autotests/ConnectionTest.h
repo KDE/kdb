@@ -27,6 +27,7 @@ class ConnectionTest : public QObject
     Q_OBJECT
 private Q_SLOTS:
     void initTestCase();
+    void testConnectionData();
     void testCreateDb();
     void cleanupTestCase();
 
