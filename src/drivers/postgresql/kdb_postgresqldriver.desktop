@@ -1,18 +1,5 @@
 [Desktop Entry]
-Name=postgresql
-Name[cs]=postgresql
-Name[de]=PostgreSQL
-Name[es]=postgresql
-Name[gl]=PostgreSQL
-Name[nl]=postgresql
-Name[pl]=postgresql
-Name[pt]=postgresql
-Name[pt_BR]=postgresql
-Name[sk]=postgresql
-Name[sv]=PostgreSQL
-Name[uk]=PostgreSQL
-Name[x-test]=xxpostgresqlxx
-Caption=PostgreSQL
+Name=PostgreSQL
 Comment=KDb driver for handling PostgreSQL databases
 Comment[de]=KDb-Treiber für die Handhabung von PostgreSQL-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos PostgreSQL.
@@ -23,6 +10,22 @@ Comment[pt_BR]=Driver do KDb para lidar com bancos de dados PostgreSQL
 Comment[sv]=Kdb-drivrutin för att hantera PostgreSQL-databaser
 Comment[uk]=Драйвер KDb для роботи з базами даних PostgreSQL
 Comment[x-test]=xxKDb driver for handling PostgreSQL databasesxx
-FileName=postgresql
-Type=Network
-Version=0.0
+Type=Service
+Icon=
+Encoding=UTF-8
+
+X-KDE-Library=kdb_postgresqldriver
+X-KDE-ServiceTypes=KDb/Driver
+X-KDE-PluginInfo-Author=Kexi Team
+X-KDE-PluginInfo-Email=kexi@kde.org
+X-KDE-PluginInfo-Name=org.kde.kdb.postgresql
+X-KDE-PluginInfo-Version=1.0
+X-KDE-PluginInfo-Website=http://kexi-project.org
+X-KDE-PluginInfo-Category=
+X-KDE-PluginInfo-Depends=
+X-KDE-PluginInfo-License=LGPL
+X-KDE-PluginInfo-EnabledByDefault=true
+
+X-KDb-FileBased=false
+X-KDb-ImportingEnabled=true
+MimeType=
