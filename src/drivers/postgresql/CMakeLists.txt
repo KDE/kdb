@@ -23,8 +23,6 @@ set(kdb_postgresqldriver_MOC_SRCS
    PostgresqlDriver.h
 )
 
-qt_wrap_cpp(kdb_postgresqldriver kdb_postgresqldriver_SRCS ${kdb_postgresqldriver_MOC_SRCS})
-
 add_library(kdb_postgresqldriver SHARED ${kdb_postgresqldriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_postgresqldriver kdb_postgresqldriver.desktop)
 

@@ -8,8 +8,6 @@ add_definitions(
   -D__KDB__=
 )
 
-########### next target ###############
-
 set(kdb_mysqldriver_SRCS
    MysqlDriver.cpp
    MysqlConnection.cpp
@@ -23,8 +21,6 @@ set(kdb_mysqldriver_MOC_SRCS
    MysqlDriver.h
 )
 
-qt_wrap_cpp(kdb_mysqldriver kdb_mysqldriver_SRCS ${kdb_mysqldriver_MOC_SRCS})
-
 add_library(kdb_mysqldriver SHARED ${kdb_mysqldriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_mysqldriver kdb_mysqldriver.desktop)
 
@@ -35,11 +31,6 @@ target_link_libraries(kdb_mysqldriver
 
 if(MSVC)
   target_link_libraries(kdb_mysqldriver ws2_32 msvcrtd)
-endif()
-
-set_target_properties(kdb_mysqldriver PROPERTIES PREFIX "")
-
-if(MSVC)
   # avoid LNK2005 errors
 #  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /FORCE:MULTIPLE")
   set_target_properties(kdb_mysqldriver PROPERTIES LINK_FLAGS "/NODEFAULTLIB:\"libcmtd.lib\"")

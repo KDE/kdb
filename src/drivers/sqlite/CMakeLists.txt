@@ -48,8 +48,6 @@ if(MSVC)
   )
 endif()
 
-########### next target ###############
-
 set(kdb_sqlite_SRCS
    sqlite_debug.cpp
    SqliteConnection.cpp
@@ -75,14 +73,6 @@ target_link_libraries(kdb_sqlitedriver
     PRIVATE
         ${SQLITE_LIBRARIES}
 )
-
-#if(DEFINED CMAKE_DL_LIBS)
-#  target_link_libraries(kdb_sqlitedriver ${CMAKE_DL_LIBS})
-#endif()
-#if(DEFINED CMAKE_THREAD_LIBS)
-#  target_link_libraries(kdb_sqlitedriver ${CMAKE_THREAD_LIBS})
-#endif()
-#set_target_properties(kdb_sqlitedriver PROPERTIES PREFIX "")
 
 install(TARGETS kdb_sqlitedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
 
