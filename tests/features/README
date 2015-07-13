@@ -1,16 +1,16 @@
-1. predicatefeaturestest
+1. kdbfeaturestest
 -------------
 
-This is a set of tests for the Predicate library API.
+This is a set of tests for the KDb features.
 Every test is driver-independent.
 
-Usage: run 'predicatefeaturestest --help' for usage details.
+Usage: run 'kdbfeaturestest --help' for usage details.
 
 
 2. sqltest
 ----------
 
-A script for easier executing 'parser' subtest within te predicatefeaturestest.
+A script for easier executing 'parser' subtest within the kdbfeaturestest.
 Usage: run './sqltest' without arguments for usage details.
 
 There is also sqltest_int script accepting interactive mode.
@@ -19,37 +19,31 @@ Usage: run './sqltest_int' without arguments for usage details.
 
 3. Important documents
 ----------------------
-Predicate Drivers section of the Development wiki pages:
-http://community.kde.org/Predicate/Drivers
+KDb Drivers section of the Development wiki pages:
+http://community.kde.org/KDb/Drivers
 
 
-4. Information for Predicate drivers developers
---------------------------------------------
+4. Information for KDb drivers developers
+-----------------------------------------
 FIXME: update
 
-While you're developing a new driver or plan to improve existing one,
-you may want to test a number of aspects of the Predicate library to see
-if the behaviour is like expected.
+While you're developing a new driver or plan to improve existing one, you may want to test
+a number of aspects of the KDb framework to see if the behaviour is like expected.
 
-Following tests should be passed (the order is from most simple 
-test to more complicated):
+Following tests should be passed (the order is from most simple test to more complicated):
 
 -dbcreation
 -schema
 -tables
 -cursors
--tableview (note: it is disabled as Predicate is largely non-gui for now)
+-tableview (note: it is disabled as KDb is largely non-gui for now)
 -parser
 -dr_prop
 
 If a given driver does not pass one of these tests, and you have found that:
-- the problem is apparently on the Predicate library side (e.g. crash, or improper
-behaviour),
-- the problem can be solved by extending the Predicate API,
+- the problem is apparently on the KDb side (e.g. crash, or improper behaviour),
+- the problem can be solved by extending the KDb API,
 - the documentation is not correct or not clear enough, or
 - whatever like that...
 
-..please contact:
-
-Predicate library maintainer
-Jaroslaw Staniek, staniek @ kde . org, irc://irc.freenode.net #kexi
+..please contact KDb maintainer Jaroslaw Staniek, staniek @ kde . org, irc://irc.freenode.net #kexi
