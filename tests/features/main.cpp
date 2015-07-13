@@ -262,8 +262,10 @@ int main(int argc, char** argv)
         qDebug() << manager.result();
         return finish(1);
     }
-    qDebug() << "main: MIME types for" << driver->metaData()->id() << ":"
-             << driver->metaData()->mimeTypes();
+    if (manager.driverMetaData(drv_id)->isFileBased()) {
+        qDebug() << "main: MIME types for" << driver->metaData()->id() << ":"
+                 << driver->metaData()->mimeTypes();
+    }
 
     const bool bufCursors = takeOption(args, "buffered-cursors");
     QString queryParams = takeOptionWithArg(args, "query-params");
