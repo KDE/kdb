@@ -99,18 +99,18 @@ QDebug operator<<(QDebug dbg, const KDbResult& result)
 {
     if (result.isError()) {
         dbg.nospace() << "KDbResult:";
-        dbg.space() << "CODE=" << result.code();
+        dbg.nospace() << " CODE=" << result.code();
         if (!result.message().isEmpty())
-            dbg.space() << "MESSAGE=" << result.message();
+            dbg.nospace() << " MESSAGE=" << result.message();
         if (!result.messageTitle().isEmpty())
-            dbg.space() << "TITLE=" << result.messageTitle();
+            dbg.nospace() << " TITLE=" << result.messageTitle();
         if (!result.sql().isEmpty())
-            dbg.space() << "SQL=" << result.sql();
+            dbg.nospace() << " SQL=" << result.sql();
         if (!result.errorSql().isEmpty())
-            dbg.space() << "ERR_SQL=" << result.errorSql();
-        dbg.space() << "SERVER_ERROR=" << result.serverErrorCode() /*<< "NAME:" << result.serverResultName()*/;
+            dbg.nospace() << " ERR_SQL=" << result.errorSql();
+        dbg.nospace() << " SERVER_ERROR_CODE=" << result.serverErrorCode() /*<< "NAME:" << result.serverResultName()*/;
         if (!result.serverMessage().isEmpty())
-            dbg.nospace() << "MESSAGE:" << result.serverMessage();
+            dbg.nospace() << " SERVER_MESSAGE=" << result.serverMessage();
     } else {
         dbg.nospace() << "KDbResult: OK";
     }
