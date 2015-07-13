@@ -364,7 +364,10 @@ bool KDbConnection::connect()
 
     d->serverVersion.clear();
     if (!(d->isConnected = drv_connect())) {
-        m_result = KDbResult(m_driver->metaData()->isFileBased() ?
+        if (m_result.code() == ERR_NONE) {
+            m_result.setCode(ERR_OTHER);
+        }
+        m_result.setMessage(m_driver->metaData()->isFileBased() ?
                     QObject::tr("Could not open \"%1\" project file.")
                     .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName()))
                  :  QObject::tr("Could not connect to \"%1\" database server.")
