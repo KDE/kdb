@@ -31,7 +31,9 @@ QString KDbConnectionData::toUserVisibleString(UserVisibleStringOptions options)
 {
     KDbDriverManager mananager;
     const KDbDriverMetaData *metaData = mananager.driverMetaData(d->driverId);
-    if (!metaData /* default is file */ || (metaData->isValid() && metaData->isFileBased())) {
+    if (!metaData) {
+        return d->databaseName;
+    } else if (metaData->isValid() && metaData->isFileBased()) {
         if (d->databaseName.isEmpty()) {
             return QObject::tr("<file>");
         }
