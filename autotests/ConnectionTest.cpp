@@ -56,6 +56,8 @@ void ConnectionTest::testCreateDb()
     connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
 
     KDB_VERIFY(utils.driver, conn = utils.driver->createConnection(cdata, connOptions), "Failed to create connection");
+    QVERIFY2(cdata.driverId().isEmpty(), "Connection data has filled driver ID");
+    QCOMPARE(conn->data().driverId(), utils.driver->metaData()->id());
     QVERIFY2(utils.driver->connections().contains(conn), "Driver does not list created connection");
     QCOMPARE(utils.driver->connections().count(), 1);
 

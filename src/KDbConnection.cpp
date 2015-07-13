@@ -325,6 +325,9 @@ KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connDat
         , m_destructor_started(false)
         , m_insideCloseDatabase(false)
 {
+    if (d->connData.driverId().isEmpty()) {
+        d->connData.setDriverId(m_driver->metaData()->id());
+    }
 }
 
 void KDbConnection::destroy()
