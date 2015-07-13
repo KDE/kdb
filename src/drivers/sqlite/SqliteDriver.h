@@ -42,9 +42,7 @@ public:
     virtual bool isSystemObjectName(const QString& n) const;
 
     /*! @return false for this driver. */
-    virtual bool isSystemDatabaseName(const QString&) const {
-        return false;
-    }
+    virtual bool isSystemDatabaseName(const QString&) const;
 
     //! Escape a string for use as a value
     virtual KDbEscapedString escapeString(const QString& str) const;
