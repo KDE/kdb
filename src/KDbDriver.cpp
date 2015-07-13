@@ -116,8 +116,9 @@ KDbAdminTools* KDbDriver::drv_createAdminTools() const
     return new KDbAdminTools(); //empty impl.
 }
 
-QString KDbDriver::sqlTypeName(int id_t, int /*p*/) const
+QString KDbDriver::sqlTypeName(int id_t, int p) const
 {
+    Q_UNUSED(p);
     if (id_t > KDbField::InvalidType && id_t <= KDbField::LastType)
         return d->typeNames[(id_t>0 && id_t<=KDbField::LastType) ? id_t : KDbField::InvalidType /*sanity*/];
 
@@ -156,11 +157,6 @@ QString KDbDriver::defaultSQLTypeName(int id_t)
     if (id_t < 0 || id_t > (KDbField::LastType + 1))
         return QLatin1String("Null");
     return QLatin1String(KDb_defaultSQLTypeNames[id_t]);
-}
-
-bool KDbDriver::isSystemObjectName(const QString& n) const
-{
-    return KDbDriver::isKDbSystemObjectName(n);
 }
 
 bool KDbDriver::isKDbSystemObjectName(const QString& n)

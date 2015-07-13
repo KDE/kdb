@@ -102,8 +102,7 @@ SqliteDriver::drv_createConnection(const KDbConnectionData& connData,
 
 bool SqliteDriver::isSystemObjectName(const QString& n) const
 {
-    return KDbDriver::isSystemObjectName(n)
-           || n.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
+    return n.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
 }
 
 bool SqliteDriver::drv_isSystemFieldName(const QString& n) const

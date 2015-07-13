@@ -98,27 +98,23 @@ public:
     /*! Info about the driver. */
     const KDbDriverMetaData* metaData() const;
 
-    /*! @return true if @a n is a system object's name,
-     eg. name of build-in system table that cannot be used or created by a user,
-     and in most cases user even shouldn't see this. The list is specific for
-     a given driver implementation.
-     By default calls KDbDriver::isKDbSystemObjectName() static method.
-     Note for driver developers: Also call KDbDriver::isSystemObjectName()
-     from your reimplementation.
-     @see isSystemFieldName().
+    /*! @return true if @a n is a database type-specific system object's name,
+     e.g. name of a built-in system table that cannot be created by the user,
+     and in most cases a name that user shouldn't even see.
+     @see isSystemDatabaseName() isKDbSystemObjectName() isSystemFieldName()
     */
-    virtual bool isSystemObjectName(const QString& n) const;
+    virtual bool isSystemObjectName(const QString& n) const = 0;
 
     /*! @return true if @a n is a related to KDb's 'system' object's
      name, i.e. when @a n starts with "kexi__" prefix.
+     @see isSystemDatabaseName() isSystemObjectName() isSystemFieldName()
     */
     static bool isKDbSystemObjectName(const QString& n);
 
-    /*! @return true if @a n is a system database's name,
-     eg. name of build-in, system database that cannot be used or created by a user,
-     and in most cases user even shouldn't see this. The list is specific for
-     a given driver implementation. For implementation.
-     @see isSystemObjectName().
+    /*! @return true if @a n is a database type-specific system database's name,
+     e.g. name of a built-in system database that cannot be created by a user,
+     and in most cases user a name that user shouldn't even see.
+     @see isKDbSystemObjectName() isSystemObjectName() isSystemFieldName()
     */
     virtual bool isSystemDatabaseName(const QString& n) const = 0;
 
@@ -126,7 +122,7 @@ public:
      field that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation.
-     @see isSystemObjectName().
+     @see isSystemDatabaseName() isKDbSystemObjectName() isSystemObjectName()
     */
     bool isSystemFieldName(const QString& n) const;
 
@@ -134,12 +130,11 @@ public:
      @see KDb::isKDbSQLKeyword(const QByteArray&) */
     bool isDriverSpecificKeyword(const QByteArray& word) const;
 
-    /*! @return KDbDriver's features that are combination of KDbDriver::Features
-    enum. */
+    /*! @return driver's features that are combination of KDbDriver::Features enum.
+    @todo change int to Features */
     int features() const;
 
-    /*! @return true if transaction are supported (single or
-     multiple). */
+    /*! @return true if transaction are supported (single or multiple). */
     bool transactionsSupported() const;
 
     /*! @return admin tools object providing a number of database administration
@@ -264,8 +259,8 @@ protected:
      tools for the driver. This is called once per driver.
 
      Note for driver developers: Reimplement this method by returning
-     KDbAdminTools-derived object. Default implementation creates
-     empty admin tools.
+     a KDbAdminTools-derived object. Default implementation creates
+     anmd returns an empty admin tools KDbAdminTools object.
      @see adminTools() */
     virtual KDbAdminTools* drv_createAdminTools() const;
 
