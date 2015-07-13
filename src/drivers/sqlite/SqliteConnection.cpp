@@ -80,10 +80,6 @@ static const char* const serverResultNames[] = {
     "SQLITE_NOTADB", // 26
 };
 
-void SqliteConnectionInternal::storeResult()
-{
-}
-
 // static
 QString SqliteConnectionInternal::serverResultName(int serverResultCode)
 {

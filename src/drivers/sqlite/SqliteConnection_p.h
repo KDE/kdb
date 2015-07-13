@@ -33,8 +33,6 @@ public:
     explicit SqliteConnectionInternal(KDbConnection *connection);
     virtual ~SqliteConnectionInternal();
 
-    virtual void storeResult();
-
     //! @return true is loading extensions is enabled
     bool extensionsLoadingEnabled() const;
 
