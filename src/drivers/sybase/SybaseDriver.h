@@ -26,7 +26,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 class SybaseDriver : public KDbDriver
 {
     Q_OBJECT
-    PREDICATE_DRIVER
 
 public:
     /*!

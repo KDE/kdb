@@ -28,7 +28,6 @@
 class MysqlDriver : public KDbDriver
 {
     Q_OBJECT
-    PREDICATE_DRIVER
 
 public:
     /*!

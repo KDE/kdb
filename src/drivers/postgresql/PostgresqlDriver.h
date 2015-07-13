@@ -29,7 +29,6 @@ class KDbConnection;
 class PostgresqlDriver : public KDbDriver
 {
     Q_OBJECT
-    PREDICATE_DRIVER
 
 public:
     PostgresqlDriver();

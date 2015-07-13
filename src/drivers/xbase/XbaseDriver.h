@@ -26,8 +26,7 @@ class xBaseDriverPrivate;
 
 class xBaseDriver : public KDbDriver
 {
-  Q_OBJECT
-  PREDICATE_DRIVER
+    Q_OBJECT
 
   public:
     xBaseDriver();
