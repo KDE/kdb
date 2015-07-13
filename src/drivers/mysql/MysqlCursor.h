@@ -45,7 +45,11 @@ public:
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
 
+    //! Implemented for KDbResultable
+    virtual QString serverResultName() const;
+
 private:
+    void storeResult();
     QVariant pValue(uint pos) const;
     MysqlCursorData *d;
 };

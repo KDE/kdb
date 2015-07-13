@@ -18,12 +18,14 @@
 */
 
 #include "MysqlPreparedStatement.h"
+#include "KDbConnection.h"
+
 #include <errmsg.h>
 
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
-MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
+MysqlPreparedStatement::MysqlPreparedStatement(MysqlConnectionInternal* conn)
         : KDbPreparedStatementInterface()
         , MysqlConnectionInternal(conn->connection)
 #ifdef KDB_USE_MYSQL_STMT
@@ -32,11 +34,12 @@ MysqlPreparedStatement::MysqlPreparedStatement(ConnectionInternal* conn)
 #endif
         , m_resetRequired(false)
 {
-// KDbDrvDbg;
+// mysqlDebug();
     mysql_owned = false;
-    mysql = dynamic_cast<KDbMysqlConnectionInternal&>(*conn).mysql; //copy
-    if (!init())
+    mysql = conn->mysql;
+    if (!init()) {
         done();
+    }
 }
 
 bool MysqlPreparedStatement::init()
@@ -218,7 +221,7 @@ bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, i
         break;
     }
     default:
-        kdbWarning() << "unsupported field type:"
+        mysqlWarning() << "unsupported field type:"
             << field->type() << "- NULL value bound to column #" << arg;
         res = sqlite3_bind_null(prepared_st_handle, arg);
         if (SQLITE_OK != res) {
@@ -233,7 +236,7 @@ bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, i
 bool MysqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
-    KDbFieldList& insertFieldList,
+    KDbFieldList* insertFieldList,
     const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(selectFieldList);
@@ -297,7 +300,7 @@ bool MysqlPreparedStatement::execute(
 #else
     m_resetRequired = true;
     if (type == KDbPreparedStatement::InsertStatement) {
-        const int missingValues = insertFieldList.fieldCount() - parameters.count();
+        const int missingValues = insertFieldList->fieldCount() - parameters.count();
         KDbPreparedStatementParameters myParameters(parameters);
         if (missingValues > 0) {
     //! @todo can be more efficient
@@ -305,7 +308,7 @@ bool MysqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        return connection->insertRecord(&insertFieldList, myParameters);
+        return connection->insertRecord(insertFieldList, myParameters);
     }
 //! @todo support select
 

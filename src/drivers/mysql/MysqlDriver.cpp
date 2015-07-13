@@ -25,7 +25,6 @@
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-
 #include <mysql_version.h>
 #include <mysql.h>
 #define BOOL bool
@@ -192,3 +191,5 @@ QByteArray MysqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('`', '\'');
 }
+
+#include "MysqlDriver.moc"

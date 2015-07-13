@@ -63,7 +63,7 @@ bool MysqlCursor::drv_open(const KDbEscapedString& sql)
         }
     }
 
-    d->storeResult();
+    storeResult();
     return false;
 }
 
@@ -105,7 +105,9 @@ QVariant MysqlCursor::value(uint pos)
 
 //! @todo js: use MYSQL_FIELD::type here!
 
-    return KDb::cstringToVariant(d->mysqlrow[pos], f, d->lengths[pos]);
+    bool ok;
+    return KDb::cstringToVariant(d->mysqlrow[pos], f ? f->type() : KDbField::Text,
+                                            &ok, d->lengths[pos]);
 }
 
 /* As with sqlite, the DB library returns all values (including numbers) as
@@ -113,7 +115,7 @@ QVariant MysqlCursor::value(uint pos)
  */
 bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
-// KDbDrvDbg << "position is " << (long)m_at;
+// mysqlDebug() << "position is " << (long)m_at;
     if (d->numRows == 0)
         return false;
 
@@ -126,7 +128,12 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
         KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;
-        (*data)[i] = KDb::cstringToVariant(d->mysqlrow[i], f, d->lengths[i]);
+        bool ok;
+        (*data)[i] = KDb::cstringToVariant(d->mysqlrow[i], f ? f->type() : KDbField::Text,
+                                           &ok, d->lengths[i]);
+        if (!ok) {
+            return false;
+        }
     }
     return true;
 }
@@ -161,4 +168,14 @@ const char** MysqlCursor::recordData() const
 {
     //! @todo
     return 0;
+}
+
+QString MysqlCursor::serverResultName() const
+{
+    return MysqlConnectionInternal::serverResultName(d->mysql);
+}
+
+void MysqlCursor::storeResult()
+{
+    m_result.setServerMessage(QString::fromLatin1(mysql_error(d->mysql)));
 }

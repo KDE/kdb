@@ -9,24 +9,23 @@ add_definitions(
 )
 
 set(kdb_mysqldriver_SRCS
-   MysqlDriver.cpp
-   MysqlConnection.cpp
-   MysqlConnection_p.cpp
-   MysqlCursor.cpp
-   MysqlKeywords.cpp
-   MysqlPreparedStatement.cpp
-)
-
-set(kdb_mysqldriver_MOC_SRCS
-   MysqlDriver.h
+    mysql_debug.cpp
+    MysqlDriver.cpp
+    MysqlConnection.cpp
+    MysqlConnection_p.cpp
+    MysqlCursor.cpp
+    MysqlKeywords.cpp
+    MysqlPreparedStatement.cpp
 )
 
 add_library(kdb_mysqldriver SHARED ${kdb_mysqldriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_mysqldriver kdb_mysqldriver.desktop)
 
 target_link_libraries(kdb_mysqldriver
-  ${MYSQL_LIBRARIES}
-  kdb
+    PUBLIC
+        KDb
+    PRIVATE
+        ${MYSQL_LIBRARIES}
 )
 
 if(MSVC)

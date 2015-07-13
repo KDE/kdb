@@ -22,6 +22,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "KDbConnection_p.h"
 
+#include <QString>
+
 #ifdef Q_OS_WIN
 #include <my_Global.h>
 #endif
@@ -31,13 +33,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 typedef struct st_mysql MYSQL;
 #undef bool
 
-#ifdef MYSQLMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE Predicate
-#endif
-
-class ConnectionData;
+class KDbConnectionData;
+class KDbEscapedString;
 
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
@@ -45,7 +42,7 @@ class ConnectionData;
     database.  Used by the KDb and migration drivers.
     @todo fix the above note about migration...
  */
-class MysqlConnectionInternal : public ConnectionInternal
+class MysqlConnectionInternal : public KDbConnectionInternal
 {
 public:
     explicit MysqlConnectionInternal(KDbConnection* connection);
@@ -58,7 +55,7 @@ public:
         none is specified).  If the server is on a remote machine, then a port is
         the port that the remote server is listening on.
      */
-    bool db_connect(const ConnectionData& data);
+    bool db_connect(const KDbConnectionData& data);
 
     //! Disconnects from the database
     bool db_disconnect();
@@ -69,11 +66,10 @@ public:
     //! Executes query for a raw SQL statement @a sql
     bool executeSQL(const KDbEscapedString& sql);
 
-    //! Stores last operation's result
-    virtual void storeResult();
-
     //! Escapes a table, database or column name
     QString escapeIdentifier(const QString& str) const;
+
+    static QString serverResultName(MYSQL *mysql);
 
     MYSQL *mysql;
     bool mysql_owned; //!< true if mysql pointer should be freed on destruction

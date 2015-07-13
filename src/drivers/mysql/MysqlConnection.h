@@ -43,7 +43,8 @@ public:
 
 protected:
     /*! Used by driver */
-    MysqlConnection(KDbDriver *driver, const ConnectionData& connData);
+    MysqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                    const KDbConnectionOptions &options);
 
     virtual bool drv_connect();
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
@@ -66,6 +67,8 @@ protected:
     virtual bool drv_getTablesList(QStringList* list);
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_containsTable(const QString &tableName);
+
+    void storeResult();
 
     MysqlConnectionInternal* d;
 

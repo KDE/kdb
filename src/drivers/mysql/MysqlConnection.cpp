@@ -19,18 +19,17 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QRegExp>
-
-#include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include "MysqlConnection_p.h"
+#include "MysqlDriver.h"
 #include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
-#include "KDbGlobal.h"
-#include "KDbError.h"
+#include "mysql_debug.h"
 
-MysqlConnection::MysqlConnection(KDbDriver *driver, const ConnectionData& connData)
-        : KDbConnection(driver, connData)
+#include <QRegExp>
+
+MysqlConnection::MysqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                                 const KDbConnectionOptions &options)
+        : KDbConnection(driver, connData, options)
         , d(new MysqlConnectionInternal(this))
 {
 }
@@ -44,8 +43,11 @@ MysqlConnection::~MysqlConnection()
 bool MysqlConnection::drv_connect()
 {
     const bool ok = d->db_connect(data());
-    if (!ok)
+    if (!ok) {
+        storeResult(); //store error msg, if any - can be destroyed after disconnect()
+        d->db_disconnect();
         return false;
+    }
 
     // Get lower_case_table_name value so we know if there's case sensitivity supported
     // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
@@ -99,7 +101,7 @@ KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_opti
 
 bool MysqlConnection::drv_getDatabasesList(QStringList* list)
 {
-    KDbDrvDbg;
+    mysqlDebug();
     list->clear();
     MYSQL_RES *res = mysql_list_dbs(d->mysql, 0);
     if (res != 0) {
@@ -110,7 +112,7 @@ bool MysqlConnection::drv_getDatabasesList(QStringList* list)
         mysql_free_result(res);
         return true;
     }
-    d->storeResult();
+    storeResult();
     return false;
 }
 
@@ -124,7 +126,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
     if (!exists || !success) {
         if (!ignoreErrors) {
             m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                              predicateTr("The database \"%1\" does not exist.").arg(storedDbName));
+                                 QObject::tr("The database \"%1\" does not exist.").arg(storedDbName));
         }
         return false;
     }
@@ -134,12 +136,12 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
 bool MysqlConnection::drv_createDatabase(const QString &dbName)
 {
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    KDbDrvDbg << storedDbName;
+    mysqlDebug() << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
     if (drv_executeSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
         return true;
-    d->storeResult();
+    storeResult();
     return false;
 }
 
@@ -149,7 +151,11 @@ bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KD
     Q_UNUSED(msgHandler);
 //! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    return d->useDatabase(storedDbName);
+    if (!d->useDatabase(storedDbName)) {
+        storeResult();
+        return false;
+    }
+    return true;
 }
 
 bool MysqlConnection::drv_closeDatabase()
@@ -167,7 +173,11 @@ bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 
 bool MysqlConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    return d->executeSQL(sql);
+    if (!d->executeSQL(sql)) {
+        storeResult();
+        return false;
+    }
+    return true;
 }
 
 quint64 MysqlConnection::drv_lastInsertRecordId()
@@ -178,16 +188,8 @@ quint64 MysqlConnection::drv_lastInsertRecordId()
 
 QString MysqlConnection::serverResultName() const
 {
-//! @todo IMPORTANT: MysqlConnection::serverResultName()
-    return QString();
+    return MysqlConnectionInternal::serverResultName(d->mysql);
 }
-
-/*void MysqlConnection::drv_clearServerResult()
-{
-    if (!d)
-        return;
-    d->res = 0;
-}*/
 
 bool MysqlConnection::drv_containsTable(const QString& tableName)
 {
@@ -198,10 +200,16 @@ bool MysqlConnection::drv_containsTable(const QString& tableName)
 
 bool MysqlConnection::drv_getTablesList(QStringList* list)
 {
-    return queryStringList(KDbEscapedString("SHOW TABLES"), list);
+    return true == queryStringList(KDbEscapedString("SHOW TABLES"), list);
 }
 
 KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 {
     return new MysqlPreparedStatement(d);
+}
+
+void MysqlConnection::storeResult()
+{
+    m_result.setServerMessage(QString::fromLatin1(mysql_error(d->mysql)));
+    m_result.setServerErrorCode(mysql_errno(d->mysql));
 }

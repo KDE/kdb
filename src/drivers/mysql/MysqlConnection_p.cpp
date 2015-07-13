@@ -18,16 +18,15 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QByteArray>
-#include <QStringList>
-#include <QFile>
-
-
 #include "MysqlConnection_p.h"
 #include "MysqlConnection.h"
+#include "mysql_debug.h"
 
 #include "KDbConnectionData.h"
 
+#include <QByteArray>
+#include <QStringList>
+#include <QFile>
 
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : KDbConnectionInternal(connection)
@@ -46,23 +45,15 @@ MysqlConnectionInternal::~MysqlConnectionInternal()
     }
 }
 
-void MysqlConnectionInternal::storeResult()
-{
-    setServerResultCode(mysql_errno(mysql));
-    setServerMessage(QLatin1String(mysql_error(mysql)));
-}
-
-bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
+bool MysqlConnectionInternal::db_connect(const KDbConnectionData& data)
 {
     if (!(mysql = mysql_init(mysql)))
         return false;
 
-    KDbDrvDbg;
+    mysqlDebug();
     QByteArray localSocket;
-    QString hostName = data.hostName();
-    if (   hostName.isEmpty()
-        || 0 == QString::compare(hostName, QLatin1String("localhost"), Qt::CaseInsensitive))
-    {
+    QByteArray hostName = QFile::encodeName(data.hostName());
+    if (hostName.isEmpty() || 0 == qstricmp(hostName.constData(), "localhost")) {
         if (data.useLocalSocketFile()) {
             if (data.localSocketFileName().isEmpty()) {
                 //! @todo move the list of default sockets to a generic method
@@ -85,19 +76,23 @@ bool MysqlConnectionInternal::db_connect(const ConnectionData& data)
                 localSocket = QFile::encodeName(data.localSocketFileName());
         } else {
             //we're not using local socket
-            hostName = QLatin1String("127.0.0.1"); //this will force mysql to connect to localhost
+            hostName = "127.0.0.1"; //this will force mysql to connect to localhost
         }
     }
 
     /*! @todo is latin1() encoding here valid? what about using UTF for passwords? */
-    QByteArray pwd(data.password().isNull() ? QByteArray() : data.password().toLatin1());
-    mysql_real_connect(mysql, hostName.toLatin1(), data.userName().toLatin1(),
-                       pwd.constData(), 0, data.port(), localSocket, 0);
-    if (mysql_errno(mysql) == 0)
+    const QByteArray userName(data.userName().toLatin1());
+    const QByteArray password(data.password().toLatin1());
+    int client_flag = 0; //!< @todo support client_flag?
+    if (mysql_real_connect(mysql, hostName.isEmpty() ? 0 : hostName.constData(),
+                           data.userName().isEmpty() ? 0 : userName.constData(),
+                           data.password().isNull() ? 0 : password.constData(),
+                           0,
+                           data.port(), localSocket.isEmpty() ? 0 : localSocket.constData(),
+                           client_flag))
+    {
         return true;
-
-    storeResult(); //store error msg, if any - can be destroyed after disconnect()
-    db_disconnect();
+    }
     return false;
 }
 
@@ -105,7 +100,7 @@ bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
     mysql = 0;
-    KDbDrvDbg;
+    mysqlDebug();
     return true;
 }
 
@@ -124,16 +119,19 @@ bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 
 bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
-    if (mysql_real_query(mysql, sql.constData(), sql.length()) == 0)
-        return true;
-
-    storeResult();
-    return false;
+    return 0 == mysql_real_query(mysql, sql.constData(), sql.length());
 }
 
 QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
 {
     return QString(str).replace(QLatin1Char('`'), QLatin1Char('\''));
+}
+
+//static
+QString MysqlConnectionInternal::serverResultName(MYSQL *mysql)
+{
+    //! @todo use mysql_stmt_sqlstate() for prepared statements
+    return QString::fromLatin1(mysql_sqlstate(mysql));
 }
 
 //--------------------------------------

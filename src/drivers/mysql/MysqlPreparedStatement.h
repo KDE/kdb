@@ -29,7 +29,7 @@
 class MysqlPreparedStatement : public KDbPreparedStatementInterface, public MysqlConnectionInternal
 {
 public:
-    explicit MysqlPreparedStatement(ConnectionInternal* conn);
+    explicit MysqlPreparedStatement(MysqlConnectionInternal* conn);
 
     virtual ~MysqlPreparedStatement();
 
@@ -39,8 +39,10 @@ protected:
     virtual bool execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
-        KDbFieldList& insertFieldList,
+        KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters);
+
+    bool bindValue(KDbField *field, const QVariant& value, int arg);
 
     bool init();
     void done();
