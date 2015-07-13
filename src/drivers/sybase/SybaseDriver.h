@@ -54,7 +54,8 @@ protected:
     virtual KDbEscapedString addLimitTo1(const QString& sql, bool add);
 
 private:
-    static const char *keywords[];
+    static const char *m_keywords[];
+    QSet<QByteArray> m_systemDatabases;
 };
 
 #endif

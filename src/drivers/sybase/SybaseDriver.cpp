@@ -50,8 +50,7 @@ SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
 
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
 
-    initDriverSpecificKeywords(keywords);
-
+    initDriverSpecificKeywords(m_keywords);
 
     //predefined properties
     d->properties["client_library_version"] = ""; //!< @todo
@@ -97,22 +96,12 @@ KDbConnection* SybaseDriver::drv_createConnection(const KDbConnectionData& connD
 
 bool SybaseDriver::isSystemDatabaseName(const QString &n) const
 {
-    QStringList systemDatabases;
-    systemDatabases << QString::fromLatin1("master")
-    << QString::fromLatin1("model")
-    << QString::fromLatin1("sybsystemprocs")
-    << QString::fromLatin1("tempdb")
-    << QString::fromLatin1("sybsecurity")
-    << QString::fromLatin1("sybsystemdb")
-    << QString::fromLatin1("pubs2")
-    << QString::fromLatin1("pubs3")
-    << QString::fromLatin1("dbccdb");
-
-    QStringList::iterator i = qFind(systemDatabases.begin(), systemDatabases.end(), n.toLower());
-    if (i != systemDatabases.end())
-        return true;
-
-    return KDbDriver::isSystemObjectName(n);
+    if (m_systemDatabases.isEmpty()) {
+        m_systemDatabases << "master" << "model" << "sybsystemprocs" << "tempdb"
+                          << "sybsecurity" << "sybsystemdb" << "pubs2" << "pubs3"
+                          << "dbccdb";
+    }
+    return m_systemDatabases.contains(n.toLatin1().toLower());
 }
 
 bool SybaseDriver::drv_isSystemFieldName(const QString&) const

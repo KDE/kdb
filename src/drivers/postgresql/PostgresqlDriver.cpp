@@ -190,7 +190,8 @@ KDbConnection* PostgresqlDriver::drv_createConnection(const KDbConnectionData& c
 
 bool PostgresqlDriver::isSystemObjectName(const QString& n) const
 {
-    return KDbDriver::isSystemObjectName(n);
+    Q_UNUSED(n);
+    return false;
 }
 
 bool PostgresqlDriver::drv_isSystemFieldName(const QString&) const

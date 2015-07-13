@@ -105,7 +105,13 @@ bool xBaseDriver::isSystemObjectName( const QString& n ) const
   if ( !dp->internalDriver ) {
     return false;
   }
-  return KDbDriver::isSystemObjectName(n) || dp->internalDriver->isSystemObjectName(n);
+  return dp->internalDriver->isSystemObjectName(n);
+}
+
+bool xBaseDriver::isSystemDatabaseName(const QString& n) const
+{
+    Q_UNUSED(n);
+    return false;
 }
 
 bool xBaseDriver::drv_isSystemFieldName( const QString& n ) const

@@ -40,6 +40,10 @@ public:
 
     virtual ~MysqlDriver();
 
+    /*! @return false for this driver. */
+    virtual bool isSystemObjectName(const QString& n) const;
+
+    /*! @return true if @a is "mysql", "information_schema" or "performance_schema". */
     virtual bool isSystemDatabaseName(const QString &n) const;
 
     //! Escape a string for use as a value

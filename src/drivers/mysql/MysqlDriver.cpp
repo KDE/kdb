@@ -84,8 +84,11 @@ KDbConnection* MysqlDriver::drv_createConnection(const KDbConnectionData& connDa
 {
     return new MysqlConnection(this, connData, options);
 }
+
+bool MysqlDriver::isSystemObjectName(const QString& n) const
 {
-    return new MysqlConnection(this, connData);
+    Q_UNUSED(n);
+    return false;
 }
 
 bool MysqlDriver::isSystemDatabaseName(const QString &n) const
@@ -95,8 +98,9 @@ bool MysqlDriver::isSystemDatabaseName(const QString &n) const
            || 0 == n.compare(QLatin1String("performance_schema"), Qt::CaseInsensitive);
 }
 
-bool MysqlDriver::drv_isSystemFieldName(const QString&) const
+bool MysqlDriver::drv_isSystemFieldName(const QString& n) const
 {
+    Q_UNUSED(n);
     return false;
 }
 
