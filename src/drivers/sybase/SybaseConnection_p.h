@@ -28,14 +28,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <sqlfront.h>
 #include <sqldb.h>
 
-
-#ifdef SYBASEMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE KexiDB
-#endif
-
-class ConnectionData;
+class KDbConnectionData;
 
 //! Internal Sybase connection data.
 /*! Provides a low-level API for accessing Sybase databases, that can

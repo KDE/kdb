@@ -28,11 +28,6 @@
 
 #include "KDbConnectionData.h"
 
-#ifdef MYSQLMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE Predicate
-#endif
 
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : KDbConnectionInternal(connection)

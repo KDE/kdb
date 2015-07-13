@@ -27,14 +27,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "KDbConnectionData.h"
 
-#ifdef SYBASEMIGRATE_H
-#define NAMESPACE KexiMigration
-#else
-#define NAMESPACE KexiDB
-#endif
-
-using namespace NAMESPACE;
-
 QMap<DBPROCESS*, SybaseConnectionInternal*> SybaseConnectionInternal::dbProcessConnectionMap;
 
 
