@@ -28,7 +28,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "SybasePreparedStatement.h"
 #include "KDbError.h"
 
-SybaseConnection::SybaseConnection(KDbDriver *driver, const ConnectionData& connData)
+SybaseConnection::SybaseConnection(KDbDriver *driver, const KDbConnectionData& connData)
         : KDbConnection(driver, connData)
         , d(new SybaseConnectionInternal(this))
 {

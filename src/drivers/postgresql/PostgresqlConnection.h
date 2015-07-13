@@ -54,7 +54,7 @@ public:
 
 protected:
     /*! Used by driver */
-    PostgresqlConnection(KDbDriver *driver, const ConnectionData& connData);
+    PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData);
 
     //! @return true if currently connected to a database, ignoring the m_is_connected flag.
     virtual bool drv_isDatabaseUsed() const;

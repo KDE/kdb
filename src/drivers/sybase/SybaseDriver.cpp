@@ -26,8 +26,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 KDB_DRIVER_PLUGIN_FACTORY(SybaseDriver, "kdb_sybasedriver.json")
 
-SybaseDriver::SybaseDriver()
-    : KDbDriver()
+SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
+    : KDbDriver(parent, args)
 {
     // Sybase supports Nested Transactions. Ignore for now
     d->features = IgnoreTransactions | CursorForward;
@@ -89,10 +89,10 @@ SybaseDriver::~SybaseDriver()
 {
 }
 
-KDbConnection*
-SybaseDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* SybaseDriver::drv_createConnection(const KDbConnectionData& connData,
+                                   const KDbConnectionOptions &options)
 {
-    return new SybaseConnection(this, connData);
+    return new SybaseConnection(this, connData, options);
 }
 
 bool SybaseDriver::isSystemDatabaseName(const QString &n) const

@@ -36,7 +36,7 @@ public:
      *
      * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
      */
-    MysqlDriver();
+    MysqlDriver(QObject *parent, const QVariantList &args);
 
     virtual ~MysqlDriver();
 
@@ -52,7 +52,8 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName(const QString& n) const;
 
 private:

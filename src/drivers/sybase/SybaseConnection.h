@@ -43,7 +43,7 @@ public:
 protected:
 
     /*! Used by driver */
-    SybaseConnection(KDbDriver *driver, const ConnectionData& connData);
+    SybaseConnection(KDbDriver *driver, const KDbConnectionData& connData);
 
     virtual bool drv_connect(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();

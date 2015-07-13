@@ -31,10 +31,11 @@ class PostgresqlDriver : public KDbDriver
     Q_OBJECT
 
 public:
-    PostgresqlDriver();
+    PostgresqlDriver(QObject *parent, const QVariantList &args);
 
     virtual ~PostgresqlDriver();
 
+    //! @todo implement
     virtual bool isSystemObjectName(const QString& n) const;
 
     virtual bool isSystemDatabaseName(const QString& n) const;
@@ -56,7 +57,8 @@ public:
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName(const QString& n)const;
 
 private:

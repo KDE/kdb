@@ -24,7 +24,7 @@
 #include "XbaseConnection_p.h"
 #include "KDbError.h"
 
-xBaseConnection::xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const ConnectionData& connData)
+xBaseConnection::xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const KDbConnectionData& connData)
   : KDbConnection(driver, connData)
   , d(new xBaseConnectionInternal(this, internalDriver))
 {

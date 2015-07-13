@@ -32,7 +32,7 @@ public:
      * Constructor sets database features and
      * maps the types in KexiDB::KDbField::Type to the Sybase types.
      */
-    SybaseDriver();
+    SybaseDriver(QObject *parent, const QVariantList &args);
 
     virtual ~SybaseDriver();
 
@@ -48,7 +48,8 @@ public:
 protected:
     virtual QByteArray drv_escapeIdentifier(const QString& str) const;
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName(const QString& n) const;
     virtual KDbEscapedString addLimitTo1(const QString& sql, bool add);
 

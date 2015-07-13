@@ -43,7 +43,7 @@ PostgresqlTransactionData::~PostgresqlTransactionData()
 
 //==================================================================================
 
-PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const ConnectionData& connData)
+PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData)
         : KDbConnection(driver, connData)
         , d(new PostgresqlConnectionInternal(this))
 {

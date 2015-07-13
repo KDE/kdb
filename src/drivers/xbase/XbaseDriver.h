@@ -28,8 +28,8 @@ class xBaseDriver : public KDbDriver
 {
     Q_OBJECT
 
-  public:
-    xBaseDriver();
+public:
+    xBaseDriver(QObject *parent, const QVariantList &args);
 
     virtual ~xBaseDriver();
 
@@ -47,16 +47,16 @@ class xBaseDriver : public KDbDriver
     //! Escape BLOB value \a array
     virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
 
-  protected:
+protected:
     virtual QByteArray drv_escapeIdentifier( const QString& str) const;
     virtual QByteArray drv_escapeIdentifier( const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const ConnectionData& connData);
+    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName( const QString& n ) const;
 
-  private:
+private:
     xBaseDriverPrivate* dp;
     static const char *keywords[];
-
 };
 
 #endif // KDB_DRIVER_XBASEDRIVER_H

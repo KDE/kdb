@@ -37,8 +37,8 @@ KDB_DRIVER_PLUGIN_FACTORY(MysqlDriver, "kdb_mysqldriver.json")
    so MysqlConnection should keep count?
  */
 
-MysqlDriver::MysqlDriver()
-    : KDbDriver()
+MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
+    : KDbDriver(parent, args)
 {
     d->features = IgnoreTransactions | CursorForward;
 
@@ -79,8 +79,11 @@ MysqlDriver::~MysqlDriver()
 {
 }
 
-KDbConnection*
-MysqlDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* MysqlDriver::drv_createConnection(const KDbConnectionData& connData,
+                                                 const KDbConnectionOptions &options)
+{
+    return new MysqlConnection(this, connData, options);
+}
 {
     return new MysqlConnection(this, connData);
 }

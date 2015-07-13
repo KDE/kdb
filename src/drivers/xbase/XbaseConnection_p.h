@@ -24,7 +24,7 @@
 
 #include "KDbConnection_p.h"
 
-class ConnectionData;
+class KDbConnectionData;
 
 //! Internal xBase connection data.
 /*! Provides a low-level API for accessing xBase databases, that can

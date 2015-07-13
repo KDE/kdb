@@ -34,10 +34,8 @@
 
 EXPORT_PREDICATE_DRIVER(PostgresqlDriver, postgresql)
 
-//==================================================================================
-//
-PostgresqlDriver::PostgresqlDriver()
-        : KDbDriver()
+PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
+        : KDbDriver(parent, args)
 {
     d->features = SingleTransactions | CursorForward | CursorBackward;
 //! @todo enable this when kexidb supports multiple: d->features = MultipleTransactions | CursorForward | CursorBackward;
@@ -184,9 +182,10 @@ QString PostgresqlDriver::sqlTypeName(int id_t, int p) const
     }
 }
 
-KDbConnection* PostgresqlDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* PostgresqlDriver::drv_createConnection(const KDbConnectionData& connData,
+                                                      const KDbConnectionOptions &options)
 {
-    return new PostgresqlConnection(this, connData);
+    return new PostgresqlConnection(this, connData, options);
 }
 
 bool PostgresqlDriver::isSystemObjectName(const QString& n) const

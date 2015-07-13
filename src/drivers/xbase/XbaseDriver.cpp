@@ -41,8 +41,8 @@ public:
 
 };
 
-xBaseDriver::xBaseDriver()
-  : KDbDriver()
+xBaseDriver::xBaseDriver(QObject *parent, const QVariantList &args)
+  : KDbDriver(parent, args)
   ,dp( new xBaseDriverPrivate() )
 {
   KDbDriverManager manager;
@@ -91,12 +91,13 @@ xBaseDriver::~xBaseDriver()
   delete dp;
 }
 
-KDbConnection* xBaseDriver::drv_createConnection(const ConnectionData& connData)
+KDbConnection* xBaseDriver::drv_createConnection(const KDbConnectionData& connData,
+                                                 const KDbConnectionOptions &options)
 {
     if ( !dp->internalDriver ) {
         return 0;
     }
-    return new xBaseConnection( this, dp->internalDriver, connData );
+    return new xBaseConnection(this, dp->internalDriver, connData, options);
 }
 
 bool xBaseDriver::isSystemObjectName( const QString& n ) const

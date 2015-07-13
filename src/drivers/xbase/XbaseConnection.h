@@ -43,7 +43,7 @@ public:
   protected:
 
     /*! Used by driver */
-    xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const ConnectionData& connData);
+    xBaseConnection(KDbDriver *driver, KDbDriver* internalDriver, const KDbConnectionData& connData);
 
     virtual bool drv_connect(KDbServerVersionInfo* version);
     virtual bool drv_disconnect();
