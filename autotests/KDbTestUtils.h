@@ -68,6 +68,8 @@ public:
 public Q_SLOTS:
     void testDriverManager();
     void testSqliteDriver();
+protected:
+    void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
 };
 
 #endif
