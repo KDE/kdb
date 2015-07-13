@@ -31,8 +31,7 @@
 #include <postgres.h>
 #include <catalog/pg_type.h>
 
-
-EXPORT_PREDICATE_DRIVER(PostgresqlDriver, postgresql)
+KDB_DRIVER_PLUGIN_FACTORY(PostgresqlDriver, "kdb_postgresqldriver.json")
 
 PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
@@ -240,3 +239,5 @@ KDbEscapedString PostgresqlDriver::escapeBLOB(const QByteArray& array) const
 {
     return KDbEscapedString(KDb::escapeBLOB(array, KDbBLOBEscapeOctal));
 }
+
+#include "PostgresqlDriver.moc"
