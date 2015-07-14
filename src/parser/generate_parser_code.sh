@@ -56,6 +56,8 @@ srcdir=`dirname $0`
 cd $srcdir
 
 flex -ogenerated/sqlscanner.cpp KDbSqlScanner.l
+# Correct a few yy_size_t vs size_t vs int differences that some bisons cause
+sed --in-place 's/int yyleng/yy_size_t yyleng/g;s/int yyget_leng/yy_size_t yyget_leng/g;s/yyleng = (int)/yyleng = (size_t)/g;' generated/sqlscanner.cpp
 bison -d KDbSqlParser.y -Wall -fall -rall --report-file=$builddir/KDbSqlParser.output
 
 # postprocess
