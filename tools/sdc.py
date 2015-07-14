@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 #   This file is part of the KDE project
-#   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+#   Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
 #
 #   This program is free software; you can redistribute it and/or
 #   modify it under the terms of the GNU General Public
@@ -524,10 +524,11 @@ def process():
             if inherits:
                 inherits = ' : ' + inherits
             outfile.write("class %s%s\n" % (name, inherits))
-            line = infile.readline() # {
-            outfile.write(line)
-            line = infile.readline() # public:
-            outfile.write(line)
+            while True:
+                line = infile.readline() # output everything until 'public:'
+                outfile.write(line)
+                if line.strip().startswith('public:'):
+                    break
             shared_class_inserted = True
         elif len(lst) >= 2 and lst[0] == '#if' and lst[1] == '0':
             insert_generated_code()
