@@ -332,7 +332,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbUtils
         KDbTristate
         #todo SimpleCommandLineApp
-        #  SharedPtr.h
         KDbLongLongValidator
         KDbIdentifierValidator
         KDbFieldValidator
