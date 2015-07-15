@@ -35,6 +35,7 @@ class KDbDriver;
 */
 class SqliteConnection : public KDbConnection
 {
+    Q_DECLARE_TR_FUNCTIONS(SqliteConnection)
 public:
     virtual ~SqliteConnection();
 

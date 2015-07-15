@@ -47,6 +47,7 @@ class KDbQuerySchemaParameterValueListIterator;
 //! The KDbExpression class represents a base class for all expressions.
 class KDB_EXPORT KDbExpression
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbExpression)
 public:
     /*! Constructs a null expression.
       @see KDbExpression::isNull() */

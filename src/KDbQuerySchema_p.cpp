@@ -180,7 +180,7 @@ void KDbQuerySchema::Private::tryRegenerateExprAliases()
             //missing
             do { //find 1st unused
                 colNum++;
-                columnAlias = QObject::tr("expr", "short for 'expression' word, e.g. 'expr' (only latin letters, please, no '.')")
+                columnAlias = tr("expr", "short for 'expression' word, e.g. 'expr' (only latin letters, please, no '.')")
                               + QString::number(colNum);
             } while (-1 != tablePositionForAlias(columnAlias));
 

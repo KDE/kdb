@@ -20,8 +20,6 @@
 #include "KDbResult.h"
 #include "kdb_debug.h"
 
-#include <QObject>
-
 #define ERRMSG(a) \
     { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }
 
@@ -48,7 +46,7 @@ void KDbResult::init(int code, const QString& message)
     d->code = code;
     d->errorSql = d->sql;
     if (d->code == ERR_OTHER && message.isEmpty())
-        d->message = QObject::tr("Unspecified error encountered");
+        d->message = tr("Unspecified error encountered");
     else
         d->message = message;
 //! @todo

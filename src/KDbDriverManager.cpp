@@ -96,7 +96,7 @@ bool DriverManagerInternal::lookupDrivers()
     }
     if (m_driversMetaData.isEmpty()) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             QObject::tr("Could not find any database drivers."));
+                             tr("Could not find any database drivers."));
         return false;
     }
     return true;
@@ -121,7 +121,7 @@ const KDbDriverMetaData* DriverManagerInternal::driverMetaData(const QString &id
     const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
     if (!metaData || m_result.isError()) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             QObject::tr("Could not find database driver \"%1\".").arg(id));
+                             tr("Could not find database driver \"%1\".").arg(id));
     }
     return metaData;
 }
@@ -161,7 +161,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
 
     if (!m_driversMetaData.contains(id.toLower())) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             QObject::tr("Could not find database driver \"%1\".").arg(id));
+                             tr("Could not find database driver \"%1\".").arg(id));
         return 0;
     }
 
@@ -169,16 +169,16 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     KPluginFactory *factory = qobject_cast<KPluginFactory*>(metaData->instantiate());
     if (!factory) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             QObject::tr("Could not load database driver's plugin file \"%1\".")
-                             .arg(metaData->fileName()));
+                             tr("Could not load database driver's plugin file \"%1\".")
+                                .arg(metaData->fileName()));
         kdbWarning() << m_result.message();
         return 0;
     }
     KDbDriver *driver = factory->create<KDbDriver>();
     if (!driver) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             QObject::tr("Could not open database driver from plugin \"%1\".")
-                             .arg(metaData->fileName()));
+                             tr("Could not open database driver from plugin \"%1\".")
+                                .arg(metaData->fileName()));
         kdbWarning() << m_result.message();
         return 0;
     }

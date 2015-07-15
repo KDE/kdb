@@ -215,8 +215,8 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
         const uint newSize = QFileInfo(m_filePath).size();
         const uint decrease = 100 - 100 * newSize / origSize;
         QMessageBox::information(0, QString(), // krazy:exclude=qclasses
-            QObject::tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
-                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
+            tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
+               .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
     }
 }
 

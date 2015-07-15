@@ -63,6 +63,7 @@ class KDbRecordEditBuffer;
 */
 class KDB_EXPORT KDbCursor: public KDbResultable
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbCursor)
 public:
     //! KDbCursor options that describes its behaviour
     enum Options {

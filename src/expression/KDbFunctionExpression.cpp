@@ -150,39 +150,39 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::E
         }
         const int count = args->children.count();
         if (count != 2 && count != 3) {
-            parseInfo->setErrorMessage(QObject::tr("Incorrect number of arguments"));
-            parseInfo->setErrorDescription(QObject::tr("%1() function requires 2 or 3 arguments.").arg(name));
+            parseInfo->setErrorMessage(KDbExpression::tr("Incorrect number of arguments"));
+            parseInfo->setErrorDescription(KDbExpression::tr("%1() function requires 2 or 3 arguments.").arg(name));
             return false;
         }
         ExplicitlySharedExpressionDataPointer textExpr = args->children[0];
         if (!textExpr->isTextType() && textExpr->type() != KDbField::Null) {
-            parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
-            parseInfo->setErrorDescription(QObject::tr("%1() function's first argument should be of type \"%2\". "
-                                                       "Specified argument is of type \"%3\".")
-                                           .arg(name)
-                                           .arg(KDbField::typeName(KDbField::Text))
-                                           .arg(KDbField::typeName(textExpr->type())));
+            parseInfo->setErrorMessage(KDbExpression::tr("Incorrect type of argument"));
+            parseInfo->setErrorDescription(KDbExpression::tr("%1() function's first argument should be of type \"%2\". "
+                                                             "Specified argument is of type \"%3\".")
+                                                             .arg(name,
+                                                                  KDbField::typeName(KDbField::Text),
+                                                                  KDbField::typeName(textExpr->type())));
             return false;
         }
         ExplicitlySharedExpressionDataPointer startExpr = args->children[1];
         if (!startExpr->isIntegerType() && startExpr->type() != KDbField::Null) {
-            parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
-            parseInfo->setErrorDescription(QObject::tr("%1() function's second argument should be of type \"%2\". "
-                                                       "Specified argument is of type \"%3\".")
-                                           .arg(name)
-                                           .arg(KDbField::typeName(KDbField::Integer))
-                                           .arg(KDbField::typeName(startExpr->type())));
+            parseInfo->setErrorMessage(KDbExpression::tr("Incorrect type of argument"));
+            parseInfo->setErrorDescription(KDbExpression::tr("%1() function's second argument should be of type \"%2\". "
+                                                             "Specified argument is of type \"%3\".")
+                                                             .arg(name,
+                                                                  KDbField::typeName(KDbField::Integer),
+                                                                  KDbField::typeName(startExpr->type())));
             return false;
         }
         if (count == 3) {
             ExplicitlySharedExpressionDataPointer lengthExpr = args->children[2];
             if (!lengthExpr->isIntegerType() && lengthExpr->type() != KDbField::Null) {
-                parseInfo->setErrorMessage(QObject::tr("Incorrect type of argument"));
-                parseInfo->setErrorDescription(QObject::tr("%1() function's third argument should be of type \"%2\". "
-                                                           "Specified argument is of type \"%3\".")
-                                               .arg(name)
-                                               .arg(KDbField::typeName(KDbField::Integer))
-                                               .arg(KDbField::typeName(lengthExpr->type())));
+                parseInfo->setErrorMessage(KDbExpression::tr("Incorrect type of argument"));
+                parseInfo->setErrorDescription(KDbExpression::tr("%1() function's third argument should be of type \"%2\". "
+                                                                 "Specified argument is of type \"%3\".")
+                                                                 .arg(name,
+                                                                      KDbField::typeName(KDbField::Integer),
+                                                                      KDbField::typeName(lengthExpr->type())));
                 return false;
             }
         }

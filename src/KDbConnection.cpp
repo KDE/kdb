@@ -61,7 +61,7 @@ KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
 KDbConnectionOptions::KDbConnectionOptions()
  : m_connection(0)
 {
-    KDbUtils::PropertySet::insert("readOnly", false, QObject::tr("Read only", "Read only connection"));
+    KDbUtils::PropertySet::insert("readOnly", false, KDbConnection::tr("Read only", "Read only connection"));
 }
 
 bool KDbConnectionOptions::isReadOnly() const
@@ -135,11 +135,12 @@ public:
     }
 
     void errorInvalidDBContents(const QString& details) {
-        conn->m_result = KDbResult(ERR_INVALID_DATABASE_CONTENTS, QObject::tr("Invalid database contents. %1").arg(details));
+        conn->m_result = KDbResult(ERR_INVALID_DATABASE_CONTENTS,
+                                   KDbConnection::tr("Invalid database contents. %1").arg(details));
     }
 
     QString strItIsASystemObject() const {
-        return QObject::tr("It is a system object.");
+        return KDbConnection::tr("It is a system object.");
     }
 
     inline KDbParser *parser() {
@@ -353,12 +354,13 @@ bool KDbConnection::connect()
 {
     clearResult();
     if (d->isConnected) {
-        m_result = KDbResult(ERR_ALREADY_CONNECTED, QObject::tr("Connection already established."));
+        m_result = KDbResult(ERR_ALREADY_CONNECTED,
+                             tr("Connection already established."));
         return false;
     }
     if (m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT && d->connData.databaseName().isEmpty()) {
         m_result = KDbResult(ERR_MISSING_DB_LOCATION,
-                          QObject::tr("Database name required to create connection."));
+                             tr("Database name required to create connection."));
         return 0;
     }
 
@@ -368,10 +370,10 @@ bool KDbConnection::connect()
             m_result.setCode(ERR_OTHER);
         }
         m_result.setMessage(m_driver->metaData()->isFileBased() ?
-                    QObject::tr("Could not open \"%1\" project file.")
-                    .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName()))
-                 :  QObject::tr("Could not connect to \"%1\" database server.")
-                    .arg(d->connData.toUserVisibleString()));
+                    tr("Could not open \"%1\" project file.")
+                       .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName()))
+                 :  tr("Could not connect to \"%1\" database server.")
+                       .arg(d->connData.toUserVisibleString()));
     }
     if (d->isConnected && !m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
         if (!drv_getServerVersion(&d->serverVersion))
@@ -416,7 +418,8 @@ bool KDbConnection::checkConnected()
         clearResult();
         return true;
     }
-    m_result = KDbResult(ERR_NO_CONNECTION, QObject::tr("Not connected to the database server."));
+    m_result = KDbResult(ERR_NO_CONNECTION,
+                         tr("Not connected to the database server."));
     return false;
 }
 
@@ -426,7 +429,8 @@ bool KDbConnection::checkIsDatabaseUsed()
         clearResult();
         return true;
     }
-    m_result = KDbResult(ERR_NO_DB_USED, QObject::tr("Currently no database is used."));
+    m_result = KDbResult(ERR_NO_DB_USED,
+                         tr("Currently no database is used."));
     return false;
 }
 
@@ -482,7 +486,8 @@ bool KDbConnection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 
     if (list.indexOf(dbName) == -1) {
         if (!ignoreErrors)
-            m_result = KDbResult(ERR_OBJECT_NOT_FOUND, QObject::tr("The database \"%1\" does not exist.").arg(dbName));
+            m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                                 tr("The database \"%1\" does not exist.").arg(dbName));
         return false;
     }
 
@@ -501,20 +506,23 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
         QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
             if (!ignoreErrors)
-                m_result = KDbResult(ERR_OBJECT_NOT_FOUND, QObject::tr("The database file \"%1\" does not exist.")
-                                                        .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
+                m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                                     tr("The database file \"%1\" does not exist.")
+                                        .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         if (!file.isReadable()) {
             if (!ignoreErrors)
-                m_result = KDbResult(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not readable.")
-                                                     .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
+                m_result = KDbResult(ERR_ACCESS_RIGHTS,
+                                     tr("Database file \"%1\" is not readable.")
+                                        .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         if (!d->options.isReadOnly() && !file.isWritable()) {
             if (!ignoreErrors)
-                m_result = KDbResult(ERR_ACCESS_RIGHTS, QObject::tr("Database file \"%1\" is not writable.")
-                                                     .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
+                m_result = KDbResult(ERR_ACCESS_RIGHTS,
+                                     tr("Database file \"%1\" is not writable.")
+                                        .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName())));
             return false;
         }
         return true;
@@ -542,7 +550,7 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 
 #define createDatabase_CLOSE \
     { if (!closeDatabase()) { \
-            m_result = KDbResult(QObject::tr("Database \"%1\" created but could not be closed after creation.").arg(dbName)); \
+            m_result = KDbResult(KDbConnection::tr("Database \"%1\" created but could not be closed after creation.").arg(dbName)); \
             return false; \
         } }
 
@@ -556,12 +564,13 @@ bool KDbConnection::createDatabase(const QString &dbName)
         return false;
 
     if (databaseExists(dbName)) {
-        m_result = KDbResult(ERR_OBJECT_EXISTS, QObject::tr("Database \"%1\" already exists.").arg(dbName));
+        m_result = KDbResult(ERR_OBJECT_EXISTS,
+                             tr("Database \"%1\" already exists.").arg(dbName));
         return false;
     }
     if (m_driver->isSystemDatabaseName(dbName)) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
-                 QObject::tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
+                             tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
         return false;
     }
     if (m_driver->metaData()->isFileBased()) {
@@ -583,7 +592,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
 
     //low-level create
     if (!drv_createDatabase(dbName)) {
-        m_result.prependMessage(QObject::tr("Error creating database \"%1\" on the server.").arg(dbName));
+        m_result.prependMessage(tr("Error creating database \"%1\" on the server.").arg(dbName));
         closeDatabase();//sanity
         return false;
     }
@@ -597,7 +606,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
     if (!tmpdbName.isEmpty() || !m_driver->d->isDBOpenedAfterCreate) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
-            m_result = KDbResult(QObject::tr("Database \"%1\" created but could not be opened.").arg(dbName));
+            m_result = KDbResult(tr("Database \"%1\" created but could not be opened.").arg(dbName));
             return false;
         }
     } else {
@@ -674,7 +683,7 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
     if (!drv_useDatabase(my_dbName, cancelled, msgHandler)) {
         if (cancelled && *cancelled)
             return false;
-        QString msg(QObject::tr("Opening database \"%1\" failed.").arg(my_dbName));
+        QString msg(tr("Opening database \"%1\" failed.").arg(my_dbName));
         m_result.prependMessage(msg);
         return false;
     }
@@ -762,7 +771,8 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
         //we have no db used, but it is required by engine to have used any!
         *name = anyAvailableDatabaseName();
         if (name->isEmpty()) {
-            m_result = KDbResult(ERR_NO_DB_USED, QObject::tr("Cannot find any database for temporary connection."));
+            m_result = KDbResult(ERR_NO_DB_USED,
+                                 tr("Cannot find any database for temporary connection."));
             return false;
         }
         const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
@@ -771,8 +781,7 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
         d->skip_databaseExists_check_in_useDatabase = orig_skip_databaseExists_check_in_useDatabase;
         if (!ret) {
             m_result = KDbResult(m_result.code(),
-                              QObject::tr("Error during starting temporary connection using \"%1\" database name.")
-                              .arg(*name));
+                                 tr("Error during starting temporary connection using \"%1\" database name.").arg(*name));
             return false;
         }
     }
@@ -790,7 +799,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
                 || (m_driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
-                              QObject::tr("Cannot delete database - name not specified."));
+                                 tr("Cannot delete database - name not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
@@ -807,12 +816,14 @@ bool KDbConnection::dropDatabase(const QString &dbName)
     }
 
     if (dbToDrop.isEmpty()) {
-        m_result = KDbResult(ERR_NO_NAME_SPECIFIED, QObject::tr("Cannot delete database - name not specified."));
+        m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
+                             tr("Cannot delete database - name not specified."));
         return false;
     }
 
     if (m_driver->isSystemDatabaseName(dbToDrop)) {
-        m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED, QObject::tr("Cannot delete system database \"%1\".").arg(dbToDrop));
+        m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
+                             tr("Cannot delete system database \"%1\".").arg(dbToDrop));
         return false;
     }
 
@@ -1113,14 +1124,15 @@ bool KDbConnection::executeSQL(const KDbEscapedString& sql)
 {
     if (!sql.isValid()) {
         m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
-                          QObject::tr("SQL statement for execution is invalid (empty)."));
+                             tr("SQL statement for execution is invalid (empty)."));
         return false;
     }
     m_result.setSql(sql); //remember for Error.handling
     if (!drv_executeSQL(sql)) {
         m_result.setMessage(QString()); //clear as this could be most probably just "Unknown error" string.
         m_result.setErrorSql(sql);
-        m_result.prependMessage(ERR_SQL_EXECUTION_ERROR, QObject::tr("Error while executing SQL statement."));
+        m_result.prependMessage(ERR_SQL_EXECUTION_ERROR,
+                                tr("Error while executing SQL statement."));
         return false;
     }
     return true;
@@ -1243,7 +1255,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
 
 #define createTable_ERR \
     { kdbDebug() << "ERROR!"; \
-        m_result.prependMessage(QObject::tr("Creating table failed.")); \
+        m_result.prependMessage(KDbConnection::tr("Creating table failed.")); \
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
 
@@ -1255,7 +1267,8 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     //check if there are any fields
     if (tableSchema->fieldCount() < 1) {
         clearResult();
-        m_result = KDbResult(ERR_CANNOT_CREATE_EMPTY_OBJECT, QObject::tr("Cannot create table without fields."));
+        m_result = KDbResult(ERR_CANNOT_CREATE_EMPTY_OBJECT,
+                             tr("Cannot create table without fields."));
         return false;
     }
     const bool internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
@@ -1266,8 +1279,8 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
         if (m_driver->isSystemObjectName(tableName)) {
             clearResult();
             m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
-                              QObject::tr("System name \"%1\" cannot be used as table name.")
-                              .arg(tableSchema->name()));
+                                 tr("System name \"%1\" cannot be used as table name.")
+                                    .arg(tableSchema->name()));
             return false;
         }
 
@@ -1275,8 +1288,8 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
         if (sys_field) {
             clearResult();
             m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
-                              QObject::tr("System name \"%1\" cannot be used as one of fields in \"%2\" table.")
-                              .arg(sys_field->name(), tableName));
+                                 tr("System name \"%1\" cannot be used as one of fields in \"%2\" table.")
+                                    .arg(sys_field->name(), tableName));
             return false;
         }
     }
@@ -1291,7 +1304,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
             if (existingTable == tableSchema) {
                 clearResult();
                 m_result = KDbResult(ERR_OBJECT_EXISTS,
-                                  QObject::tr("Could not create the same table \"%1\" twice.").arg(tableSchema->name()));
+                                     tr("Could not create the same table \"%1\" twice.").arg(tableSchema->name()));
                 return false;
             }
 //! @todo (js) update any structure (e.g. queries) that depend on this table!
@@ -1304,7 +1317,8 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     } else {
         if (this->tableSchema(tableSchema->name()) != 0) {
             clearResult();
-            m_result = KDbResult(ERR_OBJECT_EXISTS, QObject::tr("Table \"%1\" already exists.").arg(tableSchema->name()));
+            m_result = KDbResult(ERR_OBJECT_EXISTS,
+                                 tr("Table \"%1\" already exists.").arg(tableSchema->name()));
             return false;
         }
     }
@@ -1367,7 +1381,7 @@ KDbTableSchema *KDbConnection::copyTable(const KDbTableSchema &tableSchema, cons
     clearResult();
     if (this->tableSchema(tableSchema.name()) != &tableSchema) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                          QObject::tr("Table \"%1\" does not exist.").arg(tableSchema.name()));
+                             tr("Table \"%1\" does not exist.").arg(tableSchema.name()));
         return 0;
     }
     KDbTableSchema *copiedTable = new KDbTableSchema(tableSchema, false /* !copyId*/);
@@ -1394,7 +1408,7 @@ KDbTableSchema *KDbConnection::copyTable(const QString &tableName, const KDbObje
     KDbTableSchema* ts = tableSchema(tableName);
     if (!ts) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                          QObject::tr("Table \"%1\" does not exist.").arg(tableName));
+                             tr("Table \"%1\" does not exist.").arg(tableName));
         return 0;
     }
     return copyTable(*ts, newData);
@@ -1416,7 +1430,8 @@ bool KDbConnection::removeObject(uint objId)
     if (   !KDb::deleteRecord(this, d->table(QLatin1String("kexi__objects")), QLatin1String("o_id"), objId) //schema entry
         || !KDb::deleteRecord(this, d->table(QLatin1String("kexi__objectdata")), QLatin1String("o_id"), objId)) //data blocks
     {
-        m_result = KDbResult(ERR_DELETE_SERVER_ERROR, QObject::tr("Could not remove object's data."));
+        m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
+                             tr("Could not remove object's data."));
         return false;
     }
     return true;
@@ -1439,13 +1454,13 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
     if (!tableSchema)
         return false;
 
-    QString errmsg = QObject::tr("Table \"%1\" cannot be removed.\n");
+    QString errmsg = tr("Table \"%1\" cannot be removed.\n");
     //be sure that we handle the correct KDbTableSchema object:
     if (tableSchema->id() < 0
             || this->tableSchema(tableSchema->name()) != tableSchema
             || this->tableSchema(tableSchema->id()) != tableSchema) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND, errmsg.arg(tableSchema->name())
-                          + QObject::tr("Unexpected name or identifier."));
+                          + tr("Unexpected name or identifier."));
         return false;
     }
 
@@ -1494,8 +1509,8 @@ tristate KDbConnection::dropTable(const QString& tableName)
     clearResult();
     KDbTableSchema* ts = tableSchema(tableName);
     if (!ts) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, QObject::tr("Table \"%1\" does not exist.")
-                                                .arg(tableName));
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             tr("Table \"%1\" does not exist.").arg(tableName));
         return false;
     }
     return dropTable(ts);
@@ -1509,8 +1524,9 @@ tristate KDbConnection::alterTable(KDbTableSchema* tableSchema, KDbTableSchema* 
         return res;
 
     if (tableSchema == newTableSchema) {
-        m_result = KDbResult(ERR_OBJECT_THE_SAME, QObject::tr("Could not alter table \"%1\" using the same table as destination.")
-                                               .arg(tableSchema->name()));
+        m_result = KDbResult(ERR_OBJECT_THE_SAME,
+                             tr("Could not alter table \"%1\" using the same table as destination.")
+                                .arg(tableSchema->name()));
         return false;
     }
 //! @todo (js) implement real altering
@@ -1531,18 +1547,21 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
 {
     clearResult();
     if (tableSchema != this->tableSchema(tableSchema->id())) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, QObject::tr("Unknown table \"%1\".").arg(tableSchema->name()));
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             tr("Unknown table \"%1\".").arg(tableSchema->name()));
         return false;
     }
     if (newName.isEmpty() || !KDb::isIdentifier(newName)) {
-        m_result = KDbResult(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid table name \"%1\".").arg(newName));
+        m_result = KDbResult(ERR_INVALID_IDENTIFIER,
+                             tr("Invalid table name \"%1\".").arg(newName));
         return false;
     }
     const QString oldTableName = tableSchema->name();
     const QString newTableName = newName.trimmed();
     if (oldTableName.trimmed() == newTableName) {
-        m_result = KDbResult(ERR_OBJECT_THE_SAME, QObject::tr("Could not rename table \"%1\" using the same name.")
-                                               .arg(newTableName));
+        m_result = KDbResult(ERR_OBJECT_THE_SAME,
+                             tr("Could not rename table \"%1\" using the same name.")
+                                .arg(newTableName));
         return false;
     }
 //! @todo alter table name for server DB backends!
@@ -1552,8 +1571,8 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
     const int origID = destTableExists ? tableToReplace->id() : -1; //will be reused in the new table
     if (!replace && destTableExists) {
         m_result = KDbResult(ERR_OBJECT_EXISTS,
-                          QObject::tr("Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists.")
-                          .arg(tableSchema->name(), newName, newName));
+                             tr("Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists.")
+                                .arg(tableSchema->name(), newName, newName));
         return false;
     }
 
@@ -1658,8 +1677,8 @@ bool KDbConnection::dropQuery(const QString& queryName)
     clearResult();
     KDbQuerySchema* qs = querySchema(queryName);
     if (!qs) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, QObject::tr("Query \"%1\" does not exist.")
-                                                .arg(queryName));
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             tr("Query \"%1\" does not exist.").arg(queryName));
         return false;
     }
     return dropQuery(qs);
@@ -1737,11 +1756,12 @@ bool KDbConnection::rollbackAutoCommitTransaction(const KDbTransaction& trans)
 
 #define SET_ERR_TRANS_NOT_SUPP \
     { m_result = KDbResult(ERR_UNSUPPORTED_DRV_FEATURE, \
-                        QObject::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->metaData()->name() )); }
+                           KDbConnection::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->metaData()->name() )); }
 
 #define SET_BEGIN_TR_ERROR \
     { if (!m_result.isError()) \
-            m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Begin transaction failed.")); }
+            m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, \
+                                 KDbConnection::tr("Begin transaction failed.")); }
 
 KDbTransaction KDbConnection::beginTransaction()
 {
@@ -1757,7 +1777,8 @@ KDbTransaction KDbConnection::beginTransaction()
     }
     if (m_driver->d->features & KDbDriver::SingleTransactions) {
         if (d->default_trans.active()) {
-            m_result = KDbResult(ERR_TRANSACTION_ACTIVE, QObject::tr("Transaction already started."));
+            m_result = KDbResult(ERR_TRANSACTION_ACTIVE,
+                                 tr("Transaction already started."));
             return KDbTransaction();
         }
         if (!(trans.m_data = drv_beginTransaction())) {
@@ -1796,7 +1817,8 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
             if (ignore_inactive)
                 return true;
             clearResult();
-            m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE, QObject::tr("Transaction not started."));
+            m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE,
+                                 tr("Transaction not started."));
             return false;
         }
         t = d->default_trans;
@@ -1810,7 +1832,8 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
-        m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on commit transaction."));
+        m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION,
+                             tr("Error on commit transaction."));
     return ret;
 }
 
@@ -1829,7 +1852,8 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
             if (ignore_inactive)
                 return true;
             clearResult();
-            m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE, QObject::tr("Transaction not started."));
+            m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE,
+                                 tr("Transaction not started."));
             return false;
         }
         t = d->default_trans;
@@ -1843,7 +1867,8 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
     if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
-        m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION, QObject::tr("Error on rollback transaction."));
+        m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION,
+                             tr("Error on rollback transaction."));
     return ret;
 }
 
@@ -1993,7 +2018,8 @@ bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object
     object->setId(id);
     const QString name(data[2].toString());
     if (!KDb::isIdentifier(name)) {
-        m_result = KDbResult(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\".").arg(name));
+        m_result = KDbResult(ERR_INVALID_IDENTIFIER,
+                             tr("Invalid object name \"%1\".").arg(name));
         return false;
     }
     object->setName(name);
@@ -2170,7 +2196,8 @@ tristate KDbConnection::querySingleRecord(KDbQuerySchema* query, KDbRecordData* 
 bool KDbConnection::checkIfColumnExists(KDbCursor *cursor, uint column)
 {
     if (column >= cursor->fieldCount()) {
-        m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Column \"%1\" does not exist in the query.").arg(column));
+        m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
+                             tr("Column \"%1\" does not exist in the query.").arg(column));
         return false;
     }
     return true;
@@ -2516,18 +2543,18 @@ bool KDbConnection::storeExtendedTableSchemaData(KDbTableSchema* tableSchema)
 bool KDbConnection::loadExtendedTableSchemaData(KDbTableSchema* tableSchema)
 {
 #define loadExtendedTableSchemaData_ERR \
-    { m_result = KDbResult(QObject::tr("Error while loading extended table schema.", \
-                                    "Extended schema for a table: loading error")); \
+    { m_result = KDbResult(tr("Error while loading extended table schema.", \
+                              "Extended schema for a table: loading error")); \
       return false; }
 #define loadExtendedTableSchemaData_ERR2(details) \
     { m_result = KDbResult(details); \
-      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema.", \
-                                           "Extended schema for a table: loading error")); \
+      m_result.setMessageTitle(tr("Error while loading extended table schema.", \
+                                  "Extended schema for a table: loading error")); \
       return false; }
 #define loadExtendedTableSchemaData_ERR3(data) \
-    { m_result = KDbResult(QObject::tr("Invalid XML data: %1").arg(data.left(1024))); \
-      m_result.setMessageTitle(QObject::tr("Error while loading extended table schema.", \
-                                           "Extended schema for a table: loading error")); \
+    { m_result = KDbResult(tr("Invalid XML data: %1").arg(data.left(1024))); \
+      m_result.setMessageTitle(tr("Error while loading extended table schema.", \
+                                  "Extended schema for a table: loading error")); \
       return false; }
 
     // Load extended schema information, if present (see ExtendedTableSchemaInformation in Kexi Wiki)
@@ -2546,8 +2573,8 @@ bool KDbConnection::loadExtendedTableSchemaData(KDbTableSchema* tableSchema)
     int errorLine, errorColumn;
     if (!doc.setContent(extendedTableSchemaString, &errorMsg, &errorLine, &errorColumn)) {
         loadExtendedTableSchemaData_ERR2(
-            QObject::tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: %4")
-            .arg(errorMsg).arg(errorLine).arg(errorColumn).arg(extendedTableSchemaString.left(1024)));
+            tr("Error in XML data: \"%1\" in line %2, column %3.\nXML data: %4")
+               .arg(errorMsg).arg(errorLine).arg(errorColumn).arg(extendedTableSchemaString.left(1024)));
     }
 
 //! @todo look at the current format version (KDB_EXTENDED_TABLE_SCHEMA_VERSION)
@@ -2647,8 +2674,8 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
 
     QString name(data.at(2).toString().toLower());
     if (!KDb::isIdentifier(name)) {
-        m_result = KDbResult(ERR_INVALID_IDENTIFIER, QObject::tr("Invalid object name \"%1\".")
-                                                  .arg(data.at(2).toString()));
+        m_result = KDbResult(ERR_INVALID_IDENTIFIER,
+                             tr("Invalid object name \"%1\".").arg(data.at(2).toString()));
         ok = false;
         return 0;
     }
@@ -2686,7 +2713,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
     }
     if (!cursor->moveFirst()) {
         if (!cursor->result().isError() && cursor->eof()) {
-            m_result = KDbResult(QObject::tr("Table has no fields defined."));
+            m_result = KDbResult(tr("Table has no fields defined."));
         }
         deleteCursor(cursor);
         delete t;
@@ -2842,8 +2869,7 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
     QString sql;
     if (!loadDataBlock(objID, &sql, QLatin1String("sql"))) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                          QObject::tr("Could not find definition for query \"%1\". Removing this query is recommended.")
-                          .arg(data[2].toString()));
+                             tr("Could not find definition for query \"%1\". Removing this query is recommended.").arg(data[2].toString()));
         return 0;
     }
     d->parser()->parse(KDbEscapedString(sql));
@@ -2851,10 +2877,10 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
     //error?
     if (!query) {
         m_result = KDbResult(ERR_SQL_PARSE_ERROR,
-                          QObject::tr("<p>Could not load definition for query \"%1\". "
-                             "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
-                             "<p>You can open this query in Text View and correct it.</p>")
-                             .arg(data[2].toString(), sql));
+                             tr("<p>Could not load definition for query \"%1\". "
+                                "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
+                                "<p>You can open this query in Text View and correct it.</p>")
+                                .arg(data[2].toString(), sql));
         return 0;
     }
     if (!setupObjectData(data, query)) {
@@ -3025,14 +3051,14 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (!mt) {
         kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLE,
-                          QObject::tr("Could not update record because there is no master table defined."));
+                             tr("Could not update record because there is no master table defined."));
         return false;
     }
     KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
     if (!useRecordId && !pkey) {
         kdbWarning() << " -- NO MASTER TABLE's PKEY!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
-                          QObject::tr("Could not update record because master table has no primary key defined."));
+                             tr("Could not update record because master table has no primary key defined."));
 //! @todo perhaps we can try to update without using PKEY?
         return false;
     }
@@ -3063,7 +3089,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
             kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
-                              QObject::tr("Could not update record because it does not contain entire primary key of master table."));
+                                 tr("Could not update record because it does not contain entire primary key of master table."));
             return false;
         }
         if (!pkey->fields()->isEmpty()) {
@@ -3074,7 +3100,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                 QVariant val(data->at(pkeyFieldsOrder.at(i)));
                 if (val.isNull() || !val.isValid()) {
                     m_result = KDbResult(ERR_UPDATE_NULL_PKEY_FIELD,
-                                      QObject::tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
+                                         tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
                     //js todo: pass the field's name somewhere!
                     return false;
                 }
@@ -3101,7 +3127,8 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         return false;
 
     if (!res) {
-        m_result = KDbResult(ERR_UPDATE_SERVER_ERROR, QObject::tr("Record updating on the server failed."));
+        m_result = KDbResult(ERR_UPDATE_SERVER_ERROR,
+                             tr("Record updating on the server failed."));
         return false;
     }
     //success: now also assign new values in memory:
@@ -3123,7 +3150,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (!mt) {
         kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_INSERT_NO_MASTER_TABLE,
-                          QObject::tr("Could not insert record because there is no master table specified."));
+                             tr("Could not insert record because there is no master table specified."));
         return false;
     }
     KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
@@ -3163,7 +3190,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         if (!getRecordId && !pkey) {
             kdbWarning() << "MASTER TABLE's PKEY REQUIRED FOR INSERTING EMPTY RECORDS: INSERT CANCELLED";
             m_result = KDbResult(ERR_INSERT_NO_MASTER_TABLES_PKEY,
-                              QObject::tr("Could not insert record because master table has no primary key specified."));
+                                 tr("Could not insert record because master table has no primary key specified."));
             return false;
         }
         if (pkey) {
@@ -3172,7 +3199,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
                 kdbWarning() << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
                 m_result = KDbResult(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
-                                  QObject::tr("Could not insert record because it does not contain entire master table's primary key."));
+                                     tr("Could not insert record because it does not contain entire master table's primary key."));
                 return false;
             }
         }
@@ -3219,7 +3246,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         return false;
 
     if (!res) {
-        m_result = KDbResult(ERR_INSERT_SERVER_ERROR, QObject::tr("Record inserting on the server failed."));
+        m_result = KDbResult(ERR_INSERT_SERVER_ERROR,
+                             tr("Record inserting on the server failed."));
         return false;
     }
     //success: now also assign a new value in memory:
@@ -3281,7 +3309,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     if (!mt) {
         kdbWarning() << " -- NO MASTER TABLE!";
         m_result = KDbResult(ERR_DELETE_NO_MASTER_TABLE,
-                          QObject::tr("Could not delete record because there is no master table specified."));
+                             tr("Could not delete record because there is no master table specified."));
         return false;
     }
     KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
@@ -3290,7 +3318,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     if (!useRecordId && !pkey) {
         kdbWarning() << " -- WARNING: NO MASTER TABLE's PKEY";
         m_result = KDbResult(ERR_DELETE_NO_MASTER_TABLES_PKEY,
-                          QObject::tr("Could not delete record because there is no primary key for master table specified."));
+                             tr("Could not delete record because there is no primary key for master table specified."));
         return false;
     }
 
@@ -3307,7 +3335,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
         if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
             kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
-                              QObject::tr("Could not delete record because it does not contain entire master table's primary key."));
+                                 tr("Could not delete record because it does not contain entire master table's primary key."));
             return false;
         }
         uint i = 0;
@@ -3317,7 +3345,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
             QVariant val(data->at(pkeyFieldsOrder.at(i)));
             if (val.isNull() || !val.isValid()) {
                 m_result = KDbResult(ERR_DELETE_NULL_PKEY_FIELD,
-                                  QObject::tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
+                                     tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
 //js todo: pass the field's name somewhere!
                 return false;
             }
@@ -3333,7 +3361,8 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     //kdbDebug() << " -- SQL == " << sql;
 
     if (!executeSQL(sql)) {
-        m_result = KDbResult(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
+        m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
+                             tr("Record deletion on the server failed."));
         return false;
     }
     return true;
@@ -3355,7 +3384,8 @@ bool KDbConnection::deleteAllRecords(KDbQuerySchema* query)
     //kdbDebug() << "-- SQL == " << sql;
 
     if (!executeSQL(sql)) {
-        m_result = KDbResult(ERR_DELETE_SERVER_ERROR, QObject::tr("Record deletion on the server failed."));
+        m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
+                             tr("Record deletion on the server failed."));
         return false;
     }
     return true;

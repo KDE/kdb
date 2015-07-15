@@ -74,9 +74,9 @@ void ConnectionTest::testConnectionData()
         qDebug() << "org.kde.kdb.sqlite driver found, testing...";
         cdata = KDbConnectionData();
         cdata.setDriverId("org.kde.kdb.sqlite");
-        QCOMPARE(cdata.toUserVisibleString(), QObject::tr("<file>"));
+        QCOMPARE(cdata.toUserVisibleString(), KDbConnection::tr("<file>"));
         cdata.setDatabaseName("my.db");
-        QCOMPARE(cdata.toUserVisibleString(), QObject::tr("file: %1").arg("my.db"));
+        QCOMPARE(cdata.toUserVisibleString(), KDbConnection::tr("file: %1").arg("my.db"));
         KDbConnectionData copy(cdata);
         QCOMPARE(cdata, copy);
     }

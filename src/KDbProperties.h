@@ -31,6 +31,7 @@
  */
 class KDB_EXPORT KDbProperties : public KDbResultable
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbProperties)
 public:
     ~KDbProperties();
 

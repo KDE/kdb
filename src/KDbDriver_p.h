@@ -231,7 +231,7 @@ public:
      Contains i18n-ed captions.
      In driver implementations available properties can be initialized, for example:
      @code
-        d->properties.insert("maximum_performance", 1000, QObject::tr("Maximum performance"));
+        d->properties.insert("maximum_performance", 1000, SomeClass::tr("Maximum performance"));
      @endcode
      You do not need to set captions of properties predefined by the KDbDriver superclass,
      they will be reused. Predefined properties are set in KDbDriver. */

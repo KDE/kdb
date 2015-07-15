@@ -24,6 +24,7 @@
 #define KDB_DRIVER_MANAGER_H
 
 #include <QString>
+#include <QCoreApplication>
 
 #include "kdb_export.h"
 
@@ -35,6 +36,7 @@ class KDbDriverMetaData;
 //! A driver manager for finding and loading driver plugins.
 class KDB_EXPORT KDbDriverManager
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbDriverManager)
 public:
     KDbDriverManager();
     virtual ~KDbDriverManager();

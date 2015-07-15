@@ -24,6 +24,7 @@
 #include "kdb_export.h"
 
 #include <QString>
+#include <QCoreApplication>
 
 class KDbConnection;
 class KDbQuerySchema;
@@ -108,6 +109,7 @@ private:
  */
 class KDB_EXPORT KDbParser
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbParser)
 public:
 
     /**

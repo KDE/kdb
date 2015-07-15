@@ -41,12 +41,12 @@ KDbValidator::Result KDbObjectNameValidator::internalCheck(
             : !m_drv->isSystemObjectName(value.toString()))
         return KDbValidator::Ok;
     if (message) {
-        *message = QObject::tr("You cannot use name \"%1\" for your object. "
-                               "It is reserved for internal objects. Please choose another name.")
-                               .arg(value.toString());
+        *message = KDbDriver::tr("You cannot use name \"%1\" for your object. "
+                                 "It is reserved for internal objects. Please choose another name.")
+                                 .arg(value.toString());
     }
     if (details) {
-        *details = QObject::tr("Names of internal database objects are starting with \"kexi__\".");
+        *details = KDbDriver::tr("Names of internal database objects are starting with \"kexi__\".");
     }
     return KDbValidator::Error;
 }

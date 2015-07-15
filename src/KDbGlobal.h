@@ -156,7 +156,7 @@ enum Signedness
 
 }
 
-//! Macros for marking future QObject::tr() translations.
+//! Macros for marking future Qt tr() translations.
 #ifndef futureTr
 # define futureTr QString
 # define futureTr2(a,b) QString(b)

@@ -130,22 +130,20 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
                     firstField = f;
                 } else if (f->table() != firstField->table()) {
                     //ambiguous field name
-                    parseInfo->setErrorMessage(
-                        QObject::tr("Ambiguous field name"));
+                    parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous field name"));
                     parseInfo->setErrorDescription(
-                        QObject::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
-                                    "Use \"<tableName>.%4\" notation to specify table name.")
-                                   .arg(firstField->table()->name(), f->table()->name(),
-                                        fieldName, fieldName));
+                        KDbExpression::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
+                                          "Use \"<tableName>.%4\" notation to specify table name.")
+                                          .arg(firstField->table()->name(), f->table()->name(),
+                                               fieldName, fieldName));
                     return false;
                 }
             }
         }
         if (!firstField) {
-            parseInfo->setErrorMessage(
-                QObject::tr("Field not found"));
+            parseInfo->setErrorMessage(KDbExpression::tr("Field not found"));
             parseInfo->setErrorDescription(
-                QObject::tr("Table containing \"%1\" field not found.").arg(fieldName));
+                KDbExpression::tr("Table containing \"%1\" field not found.").arg(fieldName));
             return false;
         }
         //ok
@@ -170,14 +168,13 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
             kdbDebug() << " --" << "covered by " << tableAlias << " alias";
         }
         if (covered) {
-            parseInfo->setErrorMessage(
-                QObject::tr("Could not access the table directly using its name"));
+            parseInfo->setErrorMessage(KDbExpression::tr("Could not access the table directly using its name"));
             parseInfo->setErrorDescription(
-                QObject::tr("Table name \"%1\" is covered by aliases. Instead of \"%2\", "
-                            "you can write \"%3\".")
-                         .arg(tableName,
-                              tableName + QLatin1Char('.') + fieldName,
-                              tableAlias + QLatin1Char('.') + fieldName));
+                KDbExpression::tr("Table name \"%1\" is covered by aliases. Instead of \"%2\", "
+                                  "you can write \"%3\".")
+                                  .arg(tableName,
+                                       tableName + QLatin1Char('.') + fieldName,
+                                       tableAlias + QLatin1Char('.') + fieldName));
             return false;
         }
         if (!tPositions.isEmpty()) {
@@ -195,10 +192,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
     }
 
     if (!ts) {
-        parseInfo->setErrorMessage(
-            QObject::tr("Table not found"));
-        parseInfo->setErrorDescription(
-            QObject::tr("Unknown table \"%1\".").arg(tableName));
+        parseInfo->setErrorMessage(KDbExpression::tr("Table not found"));
+        parseInfo->setErrorDescription(KDbExpression::tr("Unknown table \"%1\".").arg(tableName));
         return false;
     }
 
@@ -212,10 +207,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
     //it's a table.*
     if (fieldName == QLatin1String("*")) {
         if (positionsList.count() > 1) {
-            parseInfo->setErrorMessage(
-                QObject::tr("Ambiguous \"%1.*\" expression").arg(tableName));
-            parseInfo->setErrorDescription(
-                QObject::tr("More than one \"%1\" table or alias defined.").arg(tableName));
+            parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous \"%1.*\" expression").arg(tableName));
+            parseInfo->setErrorDescription(KDbExpression::tr("More than one \"%1\" table or alias defined.").arg(tableName));
             return false;
         }
         tableForQueryAsterisk = ts;
@@ -225,20 +218,19 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
 // kdbDebug() << " --it's a table.name";
     KDbField *realField = ts->field(fieldName);
     if (!realField) {
-        parseInfo->setErrorMessage(QObject::tr("Field not found"));
+        parseInfo->setErrorMessage(KDbExpression::tr("Field not found"));
         parseInfo->setErrorDescription(
-            QObject::tr("Table \"%1\" has no \"%2\" field.").arg(tableName, fieldName));
+            KDbExpression::tr("Table \"%1\" has no \"%2\" field.").arg(tableName, fieldName));
         return false;
     }
 
     // check if table or alias is used twice and both have the same column
     // (so the column is ambiguous)
     if (positionsList.count() > 1) {
-        parseInfo->setErrorMessage(
-            QObject::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName));
+        parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName));
         parseInfo->setErrorDescription(
-            QObject::tr("More than one \"%1\" table or alias defined containing \"%2\" field.")
-                        .arg(tableName, fieldName));
+            KDbExpression::tr("More than one \"%1\" table or alias defined containing \"%2\" field.")
+                              .arg(tableName, fieldName));
         return false;
     }
     field = realField; //store

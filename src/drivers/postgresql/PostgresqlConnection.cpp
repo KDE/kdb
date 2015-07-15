@@ -271,7 +271,7 @@ KDbEscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
     if (error != 0) {
         d->storeResult();
         const_cast<KDbResult&>(m_result) = KDbResult(ERR_INVALID_ENCODING,
-                          QObject::tr("Escaping string failed. Invalid multibyte encoding."));
+                          PostgresqlConnection::tr("Escaping string failed. Invalid multibyte encoding."));
         return KDbEscapedString();
     }
     return KDbEscapedString("\'") + d->escapingBuffer + '\'';

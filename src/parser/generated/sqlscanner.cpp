@@ -973,7 +973,7 @@ YY_RULE_SETUP
     bool ok;
     yylval.integerValue = QByteArray(yytext).toLongLong( &ok );
     if (!ok) {
-        setError(QObject::tr("Invalid integer number"),QObject::tr("This integer number may be too large."));
+        setError(KDbParser::tr("Invalid integer number"), KDbParser::tr("This integer number may be too large."));
         return SCAN_ERROR;
     }
 //    yylval.integerValue = atol(yytext);
@@ -1304,8 +1304,8 @@ YY_RULE_SETUP
     ECOUNT;
     yylval.stringValue = new QString(QString::fromUtf8(yytext, yyleng));
     if (yytext[0]>='0' && yytext[0]<='9') {
-        setError(QObject::tr("Invalid identifier"),
-          QObject::tr("Identifiers should start with a letter or '_' character"));
+        setError(KDbParser::tr("Invalid identifier"),
+                 KDbParser::tr("Identifiers should start with a letter or '_' character"));
         return SCAN_ERROR;
     }
     return IDENTIFIER;

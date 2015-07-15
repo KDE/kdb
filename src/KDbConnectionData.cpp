@@ -20,8 +20,7 @@
 #include "KDbConnectionData.h"
 #include "KDbDriverManager.h"
 #include "KDbDriverMetaData.h"
-
-#include <QObject>
+#include "KDbConnection.h"
 
 KDbConnectionData::~KDbConnectionData()
 {
@@ -35,9 +34,9 @@ QString KDbConnectionData::toUserVisibleString(UserVisibleStringOptions options)
         return d->databaseName;
     } else if (metaData->isValid() && metaData->isFileBased()) {
         if (d->databaseName.isEmpty()) {
-            return QObject::tr("<file>");
+            return KDbConnection::tr("<file>");
         }
-        return QObject::tr("file: %1").arg(d->databaseName);
+        return KDbConnection::tr("file: %1").arg(d->databaseName);
     }
     return ((d->userName.isEmpty() || !(options & AddUserToUserVisibleString)) ? QString() : (d->userName + QLatin1Char('@')))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)

@@ -756,20 +756,20 @@ void KDbField::FieldTypeNames::init()
     m_initialized = true;
     resize((KDbField::Null + 1)*2);
 
-    ADDTYPE(InvalidType, QObject::tr("Invalid Type"), "InvalidType");
-    ADDTYPE(Byte, QObject::tr("Byte"), "Byte");
-    ADDTYPE(ShortInteger, QObject::tr("Short Integer Number"), "ShortInteger");
-    ADDTYPE(Integer, QObject::tr("Integer Number"), "Integer");
-    ADDTYPE(BigInteger, QObject::tr("Big Integer Number"), "BigInteger");
-    ADDTYPE(Boolean, QObject::tr("Yes/No Value"), "Boolean");
-    ADDTYPE(Date, QObject::tr("Date"), "Date");
-    ADDTYPE(DateTime, QObject::tr("Date and Time"), "DateTime");
-    ADDTYPE(Time, QObject::tr("Time"), "Time");
-    ADDTYPE(Float, QObject::tr("Single Precision Number"), "Float");
-    ADDTYPE(Double, QObject::tr("Double Precision Number"), "Double");
-    ADDTYPE(Text, QObject::tr("Text"), "Text");
-    ADDTYPE(LongText, QObject::tr("Long Text"), "LongText");
-    ADDTYPE(BLOB, QObject::tr("Object"), "BLOB");
+    ADDTYPE(InvalidType, tr("Invalid Type"), "InvalidType");
+    ADDTYPE(Byte, tr("Byte"), "Byte");
+    ADDTYPE(ShortInteger, tr("Short Integer Number"), "ShortInteger");
+    ADDTYPE(Integer, tr("Integer Number"), "Integer");
+    ADDTYPE(BigInteger, tr("Big Integer Number"), "BigInteger");
+    ADDTYPE(Boolean, tr("Yes/No Value"), "Boolean");
+    ADDTYPE(Date, tr("Date"), "Date");
+    ADDTYPE(DateTime, tr("Date and Time"), "DateTime");
+    ADDTYPE(Time, tr("Time"), "Time");
+    ADDTYPE(Float, tr("Single Precision Number"), "Float");
+    ADDTYPE(Double, tr("Double Precision Number"), "Double");
+    ADDTYPE(Text, tr("Text"), "Text");
+    ADDTYPE(LongText, tr("Long Text"), "LongText");
+    ADDTYPE(BLOB, tr("Object"), "BLOB");
     ADDTYPE(Null, QLatin1String("NULL")/*don't translate*/, "NULL");
 }
 
@@ -788,11 +788,11 @@ void KDbField::FieldTypeGroupNames::init()
     m_initialized = true;
     resize((KDbField::LastTypeGroup + 1)*2);
 
-    ADDGROUP(InvalidGroup, QObject::tr("Invalid Group"), "InvalidGroup");
-    ADDGROUP(TextGroup, QObject::tr("Text"), "TextGroup");
-    ADDGROUP(IntegerGroup, QObject::tr("Integer Number"), "IntegerGroup");
-    ADDGROUP(FloatGroup, QObject::tr("Floating Point Number"), "FloatGroup");
-    ADDGROUP(BooleanGroup, QObject::tr("Yes/No"), "BooleanGroup");
-    ADDGROUP(DateTimeGroup, QObject::tr("Date/Time"), "DateTimeGroup");
-    ADDGROUP(BLOBGroup, QObject::tr("Object"), "BLOBGroup");
+    ADDGROUP(InvalidGroup, KDbField::tr("Invalid Group"), "InvalidGroup");
+    ADDGROUP(TextGroup, KDbField::tr("Text"), "TextGroup");
+    ADDGROUP(IntegerGroup, KDbField::tr("Integer Number"), "IntegerGroup");
+    ADDGROUP(FloatGroup, KDbField::tr("Floating Point Number"), "FloatGroup");
+    ADDGROUP(BooleanGroup, KDbField::tr("Yes/No"), "BooleanGroup");
+    ADDGROUP(DateTimeGroup, KDbField::tr("Date/Time"), "DateTimeGroup");
+    ADDGROUP(BLOBGroup, KDbField::tr("Object"), "BLOBGroup");
 }

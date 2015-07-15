@@ -126,7 +126,7 @@ bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreError
     if (!exists || !success) {
         if (!ignoreErrors) {
             m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                                 QObject::tr("The database \"%1\" does not exist.").arg(storedDbName));
+                                 tr("The database \"%1\" does not exist.").arg(storedDbName));
         }
         return false;
     }

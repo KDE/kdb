@@ -130,7 +130,8 @@ bool KDbCursor::open()
     else {
         if (!m_query) {
             kdbDebug() << "no query statement (or schema) defined!";
-            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("No query statement or schema defined."));
+            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
+                                 tr("No query statement or schema defined."));
             return false;
         }
         KDbSelectStatementOptions options;
@@ -142,7 +143,8 @@ bool KDbCursor::open()
             || sql.isEmpty())
         {
             kdbDebug() << "no statement generated!";
-            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR, QObject::tr("Could not generate query statement."));
+            m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
+                                 tr("Could not generate query statement."));
             return false;
         }
         m_result.setSql(sql);
@@ -157,7 +159,7 @@ bool KDbCursor::open()
     m_at = 0; //we are before 1st rec
     if (!m_opened) {
         m_result.setCode(ERR_SQL_EXECUTION_ERROR);
-        m_result.setMessage(QObject::tr("Error opening database cursor."));
+        m_result.setMessage(tr("Error opening database cursor."));
         return false;
     }
     m_validRecord = false;
@@ -362,7 +364,8 @@ bool KDbCursor::getNextRecord()
                     m_afterLast = true;
                     m_at = -1; //position is invalid now and will not be used
                     if (m_fetchResult == FetchError) {
-                        m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Cannot fetch next record."));
+                        m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
+                                             tr("Cannot fetch next record."));
                         return false;
                     }
                     return false; // in case of m_fetchResult = FetchEnd or m_fetchResult = FetchInvalid
@@ -385,7 +388,8 @@ bool KDbCursor::getNextRecord()
                 if (m_fetchResult == FetchEnd) {
                     return false;
                 }
-                m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING, QObject::tr("Cannot fetch next record."));
+                m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
+                                     tr("Cannot fetch next record."));
                 return false;
             }
         } else //we have a record that was read ahead: eat this

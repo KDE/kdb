@@ -34,6 +34,7 @@
 //! @internal
 class KDbQuerySchema::Private
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbQuerySchema)
 public:
     explicit Private(KDbQuerySchema* q, Private* copy = 0);
 

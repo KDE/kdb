@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QStringList>
 #include <QHash>
+#include <QCoreApplication>
 
 #include "KDbUtils.h"
 
@@ -72,6 +73,7 @@ class KDB_EXPORT KDbField
     Q_GADGET
     Q_ENUMS(Type TypeGroup)
     Q_FLAGS(Constraints Constraint Options Option)
+    Q_DECLARE_TR_FUNCTIONS(KDbField)
 public:
     typedef KDbUtils::AutodeletedList<KDbField*> List; //!< list of fields
     typedef QVector<KDbField*> Vector; //!< vector of fields

@@ -151,7 +151,7 @@ void yyerror(const char *str)
         QString errtypestr = QLatin1String(str);
         if (lexerErr.isEmpty()) {
             if (errtypestr.startsWith(QString::fromLatin1("parse error, expecting `IDENTIFIER'"))) {
-                lexerErr = QObject::tr("identifier was expected");
+                lexerErr = KDbParser::tr("identifier was expected");
             }
         }
 #endif
@@ -161,17 +161,17 @@ void yyerror(const char *str)
             const bool isKDbSQLKeyword = KDb::isKDbSQLKeyword(globalToken);
             if (isKDbSQLKeyword || syntaxError) {
                 if (isKDbSQLKeyword) {
-                    globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
-                                                          QObject::tr("\"%1\" is a reserved keyword.").arg(QLatin1String(globalToken)),
+                    globalParser->setError(KDbParserError(KDbParser::tr("Syntax Error"),
+                                                          KDbParser::tr("\"%1\" is a reserved keyword.").arg(QLatin1String(globalToken)),
                                                           globalToken, globalCurrentPos));
                 } else {
-                    globalParser->setError(KDbParserError(QObject::tr("Syntax Error"),
-                                                          QObject::tr("Syntax error."),
+                    globalParser->setError(KDbParserError(KDbParser::tr("Syntax Error"),
+                                                          KDbParser::tr("Syntax error."),
                                                           globalToken, globalCurrentPos));
                 }
             } else {
-                globalParser->setError(KDbParserError(QObject::tr("Error"),
-                                                      QObject::tr("Error near \"%1\".").arg(QLatin1String(globalToken)),
+                globalParser->setError(KDbParserError(KDbParser::tr("Error"),
+                                                      KDbParser::tr("Error near \"%1\".").arg(QLatin1String(globalToken)),
                                                       globalToken, globalCurrentPos));
             }
         }
@@ -186,11 +186,11 @@ void setError(const QString& errName, const QString& errDesc)
 
 void setError(const QString& errDesc)
 {
-    setError(QObject::tr("Other error"), errDesc);
+    setError(KDbParser::tr("Other error"), errDesc);
 }
 
 /* this is better than assert() */
-#define IMPL_ERROR(errmsg) setError(QObject::tr("Implementation error"), QLatin1String(errmsg))
+#define IMPL_ERROR(errmsg) setError(KDbParser::tr("Implementation error"), QLatin1String(errmsg))
 
 bool parseData(KDbParser *p, const char *data)
 {
@@ -201,7 +201,8 @@ bool parseData(KDbParser *p, const char *data)
     fieldList.clear();
 
     if (!data) {
-        KDbParserError err(QObject::tr("Error"), QObject::tr("No query statement specified."),
+        KDbParserError err(KDbParser::tr("Error"),
+                           KDbParser::tr("No query statement specified."),
                            globalToken, globalCurrentPos);
         globalParser->setError(err);
         yyerror("");
@@ -249,7 +250,7 @@ bool addColumn(KDbParseInfo *parseInfo, KDbExpression *columnExpr)
         //it's a variable:
         if (v_e.name() == QLatin1String("*")) {//all tables asterisk
             if (parseInfo->querySchema()->tables()->isEmpty()) {
-                setError(QObject::tr("\"*\" could not be used if no tables are specified."));
+                setError(KDbParser::tr("\"*\" could not be used if no tables are specified."));
                 return false;
             }
             parseInfo->querySchema()->addAsterisk(new KDbQueryAsterisk(parseInfo->querySchema()));
@@ -314,8 +315,7 @@ KDbQuerySchema* buildSelectQuery(
             QString tname = t_e.name();
             KDbTableSchema *s = globalParser->connection()->tableSchema(tname);
             if (!s) {
-                setError(
-                    QObject::tr("Table \"%1\" does not exist.").arg(tname));
+                setError(KDbParser::tr("Table \"%1\" does not exist.").arg(tname));
                 return 0;
             }
             QString tableOrAliasName = KDb::iifNotEmpty(aliasString, tname);
@@ -348,8 +348,8 @@ KDbQuerySchema* buildSelectQuery(
                 columnExpr = e.toBinary().left();
                 aliasVariable = e.toBinary().right().toVariable();
                 if (aliasVariable.isNull()) {
-                    setError(QObject::tr("Invalid alias definition for column \"%1\"")
-                                  .arg(columnExpr.toString(0).toString())); //ok?
+                    setError(KDbParser::tr("Invalid alias definition for column \"%1\"")
+                                           .arg(columnExpr.toString(0).toString())); //ok?
                     break;
                 }
             }
@@ -367,7 +367,7 @@ KDbQuerySchema* buildSelectQuery(
             if (c == KDb::VariableExpression) {
                 if (columnExpr.toVariable().name() == QLatin1String("*")) {
                     if (containsAsteriskColumn) {
-                        setError(QObject::tr("More than one asterisk (*) is not allowed"));
+                        setError(KDbParser::tr("More than one asterisk (*) is not allowed"));
                         return 0;
                     }
                     else {
@@ -381,8 +381,8 @@ KDbQuerySchema* buildSelectQuery(
 //  kdbDebug() << colViews->list.count() << " " << it.current()->debugString();
 //! @todo IMPORTANT: it.remove();
             } else if (aliasVariable.isNull()) {
-                setError(QObject::tr("Invalid \"%1\" column definition")
-                         .arg(e.toString(0).toString())); //ok?
+                setError(KDbParser::tr("Invalid \"%1\" column definition")
+                                       .arg(e.toString(0).toString())); //ok?
                 break;
             }
             else {
@@ -433,15 +433,16 @@ KDbQuerySchema* buildSelectQuery(
                     if ((*it).columnNumber != -1) {
                         if (!orderByColumnList->appendColumn(*querySchema,
                                                             (*it).ascending, (*it).columnNumber - 1)) {
-                            setError(QObject::tr("Could not define sorting - no column at position %1")
-                                          .arg((*it).columnNumber));
+                            setError(KDbParser::tr("Could not define sorting - no column at position %1")
+                                                   .arg((*it).columnNumber));
                             return 0;
                         }
                     } else {
                         KDbField * f = querySchema->findTableField((*it).aliasOrName);
                         if (!f) {
-                            setError(QObject::tr("Could not define sorting - "
-                                          "column name or alias \"%1\" does not exist").arg((*it).aliasOrName));
+                            setError(KDbParser::tr("Could not define sorting - "
+                                                   "column name or alias \"%1\" does not exist")
+                                                   .arg((*it).aliasOrName));
                             return 0;
                         }
                         orderByColumnList->appendField(*f, (*it).ascending);

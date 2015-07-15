@@ -37,6 +37,7 @@ public:
 
 class PostgresqlConnection : public KDbConnection
 {
+    Q_DECLARE_TR_FUNCTIONS(PostgresqlConnection)
 public:
     virtual ~PostgresqlConnection();
 

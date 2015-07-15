@@ -205,16 +205,16 @@ void ConnectionTestDialog::slotTimeout()
             if (m_msgHandler) {
                 m_msgHandler->showErrorMessage(
                     KDbMessageHandler::Sorry,
-                    QObject::tr("Test connection to \"%1\" database server failed. The server is not responding.")
+                    tr("Test connection to \"%1\" database server failed. The server is not responding.")
                         .arg(m_connData.toUserVisibleString()),
                     QString(),
-                    QObject::tr("Test Connection"));
+                    tr("Test Connection"));
             }
         } else {
             if (m_msgHandler) {
                 m_msgHandler->showErrorMessage(
                     KDbMessageHandler::Information,
-                    QObject::tr("Test connection to \"%1\" database server established successfully.")
+                    tr("Test connection to \"%1\" database server established successfully.")
                         .arg(m_connData.toUserVisibleString()),
                     QString(),
                     tr("Test Connection"));
@@ -248,6 +248,16 @@ void ConnectionTestDialog::reject()
 }
 
 // ----
+
+//! @internal Dummy class to get simply translation markup expressions
+//! of the form kdb::tr("foo") instead of the complicated and harder to read
+//! QCoreApplication::translate("KDb", "foo") which also runs the chance of
+//! typos in the class context argument
+class kdb
+{
+Q_DECLARE_TR_FUNCTIONS(KDb)
+};
+
 
 KDbVersionInfo KDb::version()
 {
@@ -394,10 +404,10 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
         *details += QLatin1String("<p>") + result.message();
 
     if (!result.serverMessage().isEmpty())
-        *details += QLatin1String("<p><b>") + QObject::tr("Message from server:")
+        *details += QLatin1String("<p><b>") + kdb::tr("Message from server:")
                    + QLatin1String("</b> ") + result.serverMessage();
     if (!result.recentSQLString().isEmpty())
-        *details += QLatin1String("<p><b>") + QObject::tr("SQL statement:")
+        *details += QLatin1String("<p><b>") + kdb::tr("SQL statement:")
                    + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
     int serverErrorCode;
     QString serverResultName;
@@ -412,7 +422,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
             || serverErrorCode != 0)
            )
     {
-        *details += (QLatin1String("<p><b>") + QObject::tr("Server result code:")
+        *details += (QLatin1String("<p><b>") + kdb::tr("Server result code:")
                     + QLatin1String("</b> ") + QString::number(serverErrorCode));
         if (!serverResultName.isEmpty()) {
             *details += QString::fromLatin1(" (%1)").arg(serverResultName);
@@ -420,7 +430,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
     }
     else {
         if (!serverResultName.isEmpty()) {
-            *details += (QLatin1String("<p><b>") + QObject::tr("Server result:")
+            *details += (QLatin1String("<p><b>") + kdb::tr("Server result:")
                         + QLatin1String("</b> ") + serverResultName);
         }
     }
@@ -1539,10 +1549,10 @@ KDbField::Type KDb::maximumForIntegerFieldTypes(KDbField::Type t1, KDbField::Typ
 QString KDb::simplifiedFieldTypeName(KDbField::Type type)
 {
     if (KDbField::isNumericType(type))
-        return QObject::tr("Number"); //simplify
+        return KDbField::tr("Number"); //simplify
     else if (type == KDbField::BLOB)
 //! @todo support names of other BLOB subtypes
-        return QObject::tr("Image"); //simplify
+        return KDbField::tr("Image"); //simplify
 
     return KDbField::typeGroupName(KDbField::typeGroup(type));
 }
@@ -1756,10 +1766,10 @@ QString KDb::stringToIdentifier(const QString &s)
 
 QString KDb::identifierExpectedMessage(const QString &valueName, const QVariant& v)
 {
-    return QLatin1String("<p>") + QObject::tr("Value of \"%1\" column must be an identifier.")
+    return QLatin1String("<p>") + kdb::tr("Value of \"%1\" column must be an identifier.")
             .arg(valueName)
            + QLatin1String("</p><p>")
-           + QObject::tr("\"%1\" is not a valid identifier.").arg(v.toString()) + QLatin1String("</p>");
+           + kdb::tr("\"%1\" is not a valid identifier.").arg(v.toString()) + QLatin1String("</p>");
 }
 
 //--------------------------------------------------------------------------------

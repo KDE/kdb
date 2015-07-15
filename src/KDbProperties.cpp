@@ -39,7 +39,7 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
                       .arg(m_conn->escapeString(name)), &ok);
     if (!ok) {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not set value of database property \"%1\".").arg(name));
+        m_result.prependMessage(tr("Could not set value of database property \"%1\".").arg(name));
         return false;
     }
 
@@ -50,7 +50,7 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
                     .arg(m_conn->escapeString(name)))))
         {
             m_result = m_conn->result();
-            m_result.prependMessage(QObject::tr("Could not set value of database property \"%1\".").arg(name));
+            m_result.prependMessage(tr("Could not set value of database property \"%1\".").arg(name));
             return false;
         }
         return true;
@@ -62,7 +62,7 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
                     .arg(m_conn->escapeString(value.toString()))))
     {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not set value of database property \"%1\".").arg(name));
+        m_result.prependMessage(tr("Could not set value of database property \"%1\".").arg(name));
         return false;
     }
     return true;
@@ -80,7 +80,7 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
                         .arg(m_conn->escapeString(name)), &ok);
     if (!ok) {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not set caption for database property \"%1\".").arg(name));
+        m_result.prependMessage(tr("Could not set caption for database property \"%1\".").arg(name));
         return false;
     }
 
@@ -90,7 +90,7 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
                         .arg(m_conn->escapeString(caption))
                         .arg(m_conn->escapeString(name)))) {
             m_result = m_conn->result();
-            m_result.prependMessage(QObject::tr("Could not set caption for database property \"%1\".").arg(name));
+            m_result.prependMessage(tr("Could not set caption for database property \"%1\".").arg(name));
             return false;
         }
         return true;
@@ -101,7 +101,7 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
                     .arg(m_conn->escapeString(name))
                     .arg(m_conn->escapeString(caption)))) {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not set caption for database property \"%1\".").arg(name));
+        m_result.prependMessage(tr("Could not set caption for database property \"%1\".").arg(name));
         return false;
     }
     return true;
@@ -116,7 +116,7 @@ QVariant KDbProperties::value(const QString& _name)
                     + m_conn->escapeString(name), &result))
     {
         m_result = m_conn->result();
-        m_result.prependMessage(ERR_NO_DB_PROPERTY, QObject::tr("Could not read database property \"%1\".").arg(name));
+        m_result.prependMessage(ERR_NO_DB_PROPERTY, tr("Could not read database property \"%1\".").arg(name));
         return QVariant();
     }
     return result;
@@ -133,7 +133,7 @@ QString KDbProperties::caption(const QString& _name)
                     + m_conn->escapeString(name), &result))
     {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not read database property \"%1\".").arg(name));
+        m_result.prependMessage(tr("Could not read database property \"%1\".").arg(name));
         return QString();
     }
     return result;
@@ -148,7 +148,7 @@ QStringList KDbProperties::names()
         //                                                        ^^ exclude captions
     {
         m_result = m_conn->result();
-        m_result.prependMessage(QObject::tr("Could not read database properties."));
+        m_result.prependMessage(tr("Could not read database properties."));
         return QStringList();
     }
     return result;

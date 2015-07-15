@@ -121,7 +121,7 @@ void KDbTest::testFieldTypeNamesAndStringsForGroup()
     QFETCH(QStringList, typeStrings);
     QStringList translatedNames;
     foreach(const QByteArray &name, typeNames) {
-        translatedNames.append(QObject::tr(name.constData()));
+        translatedNames.append(KDbField::tr(name.constData()));
     }
     QCOMPARE(KDb::fieldTypeNamesForGroup(typeGroup), translatedNames);
     QCOMPARE(KDb::fieldTypeStringsForGroup(typeGroup), typeStrings);
@@ -140,25 +140,25 @@ void KDbTest::testDefaultFieldTypeForGroup()
 
 void KDbTest::testSimplifiedFieldTypeName()
 {
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::InvalidType), QObject::tr("Invalid Group"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Byte), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::ShortInteger), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Integer), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::BigInteger), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Boolean), QObject::tr("Yes/No"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Date), QObject::tr("Date/Time"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::DateTime), QObject::tr("Date/Time"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Time), QObject::tr("Date/Time"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Float), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Double), QObject::tr("Number"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Text), QObject::tr("Text"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::LongText), QObject::tr("Text"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::BLOB), QObject::tr("Image"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Null), QObject::tr("Invalid Group"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Asterisk), QObject::tr("Invalid Group"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Enum), QObject::tr("Invalid Group"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Map), QObject::tr("Invalid Group"));
-    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Tuple), QObject::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::InvalidType), KDbField::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Byte), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::ShortInteger), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Integer), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::BigInteger), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Boolean), KDbField::tr("Yes/No"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Date), KDbField::tr("Date/Time"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::DateTime), KDbField::tr("Date/Time"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Time), KDbField::tr("Date/Time"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Float), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Double), KDbField::tr("Number"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Text), KDbField::tr("Text"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::LongText), KDbField::tr("Text"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::BLOB), KDbField::tr("Image"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Null), KDbField::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Asterisk), KDbField::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Enum), KDbField::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Map), KDbField::tr("Invalid Group"));
+    QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Tuple), KDbField::tr("Invalid Group"));
 }
 
 void KDbTest::testCstringToVariant_data()

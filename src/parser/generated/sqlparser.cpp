@@ -2287,7 +2287,7 @@ yyreduce:
             KDbField *f = item->table()->field(item->name());
             if(!f)
             {
-                KDbParserError err(QObject::tr("Field List Error"), QObject::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
+                KDbParserError err(KDbParser::tr("Field List Error"), KDbParser::tr("Unknown column '%1' in table '%2'",item->name(),schema->name()), ctoken, current);
                 globalParser->setError(err);
                 yyerror("fieldlisterror");
             }

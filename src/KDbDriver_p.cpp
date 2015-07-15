@@ -57,18 +57,18 @@ DriverPrivate::DriverPrivate(KDbDriver *aDriver)
         , adminTools(0)
 {
     properties.insert("client_library_version", QVariant(),
-                      QObject::tr("Client library version"));
+                      KDbDriver::tr("Client library version"));
     properties.insert("default_server_encoding", QVariant(),
-                      QObject::tr("Default character encoding on server"));
+                      KDbDriver::tr("Default character encoding on server"));
 }
 
 void DriverPrivate::initInternalProperties()
 {
     properties.insert("is_file_database", metaData->isFileBased(),
-                      QObject::tr("File-based database driver"));
+                      KDbDriver::tr("File-based database driver"));
     if (metaData->isFileBased()) {
         properties.insert("file_database_mimetypes", metaData->mimeTypes(),
-                          QObject::tr("File-based database's MIME types"));
+                          KDbDriver::tr("File-based database's MIME types"));
     }
 
 #if 0
@@ -85,20 +85,20 @@ void DriverPrivate::initInternalProperties()
         str = futureTr2("None", "No transactions");
 #endif
 // properties["transaction_support"] = features & KDbDriver::TransactionsMask;
-// propertyCaptions["transaction_support"] = QObject::tr("Transaction support");
+// propertyCaptions["transaction_support"] = KDbDriver::tr("Transaction support");
     properties.insert("transactions_single", bool(features & KDbDriver::SingleTransactions),
-                      QObject::tr("Single transactions support"));
+                      KDbDriver::tr("Single transactions support"));
     properties.insert("transactions_multiple", bool(features & KDbDriver::MultipleTransactions),
-                      QObject::tr("Multiple transactions support"));
+                      KDbDriver::tr("Multiple transactions support"));
     properties.insert("transactions_nested", bool(features & KDbDriver::NestedTransactions),
-                      QObject::tr("Nested transactions support"));
+                      KDbDriver::tr("Nested transactions support"));
     properties.insert("transactions_ignored", bool(features & KDbDriver::IgnoreTransactions),
-                      QObject::tr("Ignored transactions support"));
+                      KDbDriver::tr("Ignored transactions support"));
     //! @todo more KDbDriver::Features
 
     const KDbVersionInfo v(KDb::version());
     properties.insert("kdb_driver_version", QString::fromLatin1("%1.%2.%3").arg(v.major()).arg(v.minor()).arg(v.release()),
-                      QObject::tr("KDb driver version"));
+                      KDbDriver::tr("KDb driver version"));
 }
 
 DriverPrivate::~DriverPrivate()

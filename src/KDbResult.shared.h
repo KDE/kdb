@@ -24,6 +24,8 @@
 #include "KDbError.h"
 #include "KDbEscapedString.h"
 
+#include <QCoreApplication>
+
 class KDbMessageHandler;
 class KDbMessageTitleSetter;
 
@@ -31,6 +33,7 @@ class KDbMessageTitleSetter;
 */
 shared class export=KDB_EXPORT virtual_dtor operator== KDbResult
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbResult)
 public:
     /*!
     @getter

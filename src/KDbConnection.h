@@ -83,6 +83,7 @@ private:
 */
 class KDB_EXPORT KDbConnection : public KDbResultable
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbConnection)
 public:
 
     /*! Opened connection is automatically disconnected and removed

@@ -111,7 +111,7 @@ SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& c
         : KDbConnection(driver, connData, options)
         , d(new SqliteConnectionInternal(this))
 {
-    this->options()->setCaption("extraSqliteExtensionPaths", QObject::tr("Extra SQLite extension paths"));
+    this->options()->setCaption("extraSqliteExtensionPaths", SqliteConnection::tr("Extra SQLite extension paths"));
 }
 
 SqliteConnection::~SqliteConnection()
@@ -335,7 +335,7 @@ bool SqliteConnection::drv_dropDatabase(const QString &dbName)
     const QString filename = data().databaseName();
     if (QFile::exists(filename) && !QFile::remove(filename)) {
         m_result = KDbResult(ERR_ACCESS_RIGHTS,
-                          QObject::tr("Could not remove file \"%1\". "
+                             SqliteConnection::tr("Could not remove file \"%1\". "
                              "Check the file's permissions and whether it is already "
                              "opened and locked by another application.")
                    .arg(QDir::fromNativeSeparators(filename)));
@@ -412,7 +412,7 @@ bool SqliteConnection::findAndLoadExtension(const QString & name)
     }
     clearResult();
     m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
-                         QObject::tr("Could not load SQLite extension \"%1\".").arg(name));
+                         SqliteConnection::tr("Could not load SQLite extension \"%1\".").arg(name));
     return false;
 }
 
@@ -423,7 +423,7 @@ bool SqliteConnection::loadExtension(const QString& path)
     QFileInfo fileInfo(path);
     if (!fileInfo.exists()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                             QObject::tr("Could not find SQLite extension file \"%1\".").arg(path));
+                             SqliteConnection::tr("Could not find SQLite extension file \"%1\".").arg(path));
         sqliteWarning() << "SqliteConnection::loadExtension(): Could not load SQLite extension";
         return false;
     }
@@ -437,7 +437,7 @@ bool SqliteConnection::loadExtension(const QString& path)
     if (!ok) {
         m_result.setServerErrorCode(res);
         m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
-                             QObject::tr("Could not load SQLite extension \"%1\".").arg(path));
+                             SqliteConnection::tr("Could not load SQLite extension \"%1\".").arg(path));
         sqliteWarning() << "SqliteConnection::loadExtension(): Could not load SQLite extension"
                 << path << ":" << errmsg_p;
         if (errmsg_p) {
