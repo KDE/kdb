@@ -1,5 +1,11 @@
 [Desktop Entry]
 Name=PostgreSQL
+Name[gl]=PostgreSQL
+Name[nl]=PostgreSQL
+Name[pt]=PostgreSQL
+Name[pt_BR]=PostgreSQL
+Name[sv]=PostgreSQL
+Name[x-test]=xxPostgreSQLxx
 Comment=KDb driver for handling PostgreSQL databases
 Comment[de]=KDb-Treiber für die Handhabung von PostgreSQL-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos PostgreSQL.

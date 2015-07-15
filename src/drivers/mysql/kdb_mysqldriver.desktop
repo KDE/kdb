@@ -1,5 +1,11 @@
 [Desktop Entry]
 Name=MySQL
+Name[gl]=MySQL
+Name[nl]=MySQL
+Name[pt]=MySQL
+Name[pt_BR]=MySQL
+Name[sv]=MySQL
+Name[x-test]=xxMySQLxx
 Comment=KDb driver for handling MySQL databases
 Comment[de]=KDb-Treiber für die Handhabung von MySQL-Datenbanken
 Comment[gl]=Controlador de KDb para manexar bases de datos MySQL.
