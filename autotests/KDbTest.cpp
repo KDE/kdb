@@ -250,8 +250,8 @@ void KDbTest::testCstringToVariant()
         QCOMPARE(KDb::cstringToVariant(realData, type, &ok, data.length(), signedness), variant); // a case where length is set
         QCOMPARE(ok, okResult);
     }
-    QCOMPARE(KDb::cstringToVariant(0, type, &ok, length, signedness), QVariant()); // a case where data == 0
-    QVERIFY(!ok);
+    QCOMPARE(KDb::cstringToVariant(0, type, &ok, length, signedness), QVariant()); // a case where data == 0 (NULL)
+    QVERIFY(ok || type < KDbField::Byte || type > KDbField::LastType); // fails for NULL if this type isn't allowed
     if (type != KDbField::Boolean) {
         QCOMPARE(KDb::cstringToVariant(realData, type, &ok, 0, signedness), QVariant()); // a case where length == 0
         QVERIFY(!ok);

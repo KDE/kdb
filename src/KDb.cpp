@@ -1584,8 +1584,12 @@ QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, 
 {
     bool tempOk;
     bool *thisOk = ok ? ok : &tempOk;
-    if (!data || type > KDbField::LastType) {
+    if (type < KDbField::Byte || type > KDbField::LastType) {
         *thisOk = false;
+        return QVariant();
+    }
+    if (!data) { // NULL value
+        *thisOk = true;
         return QVariant();
     }
     // from most to least frequently used types:
