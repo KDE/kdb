@@ -17,6 +17,8 @@ set(kdb_sybasedriver_SRCS
    SybasePreparedStatement.cpp )
 
 
+ecm_create_qm_loader(kdb_sybasedriver_SRCS kdb_sybasedriver_qt)
+
 add_library(kdb_sybasedriver SHARED ${kdb_sybasedriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_sybasedriver kdb_sybasedriver.desktop)
 

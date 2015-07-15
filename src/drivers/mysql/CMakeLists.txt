@@ -18,6 +18,9 @@ set(kdb_mysqldriver_SRCS
     MysqlPreparedStatement.cpp
 )
 
+
+ecm_create_qm_loader(kdb_mysqldriver_SRCS kdb_mysqldriver_qt)
+
 add_library(kdb_mysqldriver SHARED ${kdb_mysqldriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_mysqldriver kdb_mysqldriver.desktop)
 

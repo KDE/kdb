@@ -64,6 +64,8 @@ if (KDB_SQLITE_VACUUM)
   list(APPEND kdb_sqlite_MOC_SRCS SqliteVacuum.h)
 endif ()
 
+ecm_create_qm_loader(kdb_sqlite_SRCS kdb_sqlitedriver_qt)
+
 add_library(kdb_sqlitedriver MODULE ${kdb_sqlite_SRCS})
 kcoreaddons_desktop_to_json(kdb_sqlitedriver kdb_sqlitedriver.desktop)
 

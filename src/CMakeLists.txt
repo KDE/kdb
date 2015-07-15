@@ -125,6 +125,8 @@ set(kdb_LIB_SRCS
    views/KDbTableViewColumn.cpp
 )
 
+ecm_create_qm_loader(kdb_LIB_SRCS kdb_qt)
+
 add_library(KDb SHARED ${kdb_LIB_SRCS})
 
 kdb_create_shared_data_classes(

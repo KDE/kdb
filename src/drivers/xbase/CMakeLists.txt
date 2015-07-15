@@ -17,6 +17,7 @@ set(kdb_xbasedriver_SRCS
    XbaseExport.cpp
    )
 
+ecm_create_qm_loader(kdb_xbasedriver_SRCS kdb_xbasedriver_qt)
 
 add_library(kdb_xbasedriver SHARED ${kdb_xbasedriver_SRCS})
 kcoreaddons_desktop_to_json(kdb_xbasedriver kdb_xbasedriver.desktop)
