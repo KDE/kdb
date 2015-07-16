@@ -1,18 +1,24 @@
 [Desktop Entry]
 Name=MySQL
+Name[ca]=MySQL
+Name[es]=MySQL
 Name[gl]=MySQL
 Name[nl]=MySQL
 Name[pt]=MySQL
 Name[pt_BR]=MySQL
+Name[sk]=MySQL
 Name[sv]=MySQL
 Name[x-test]=xxMySQLxx
 Comment=KDb driver for handling MySQL databases
+Comment[ca]=Controlador del KDb per a gestionar bases de dades MySQL
 Comment[de]=KDb-Treiber für die Handhabung von MySQL-Datenbanken
+Comment[es]=Controlador de KDb para el manejo de bases de datos MySQL
 Comment[gl]=Controlador de KDb para manexar bases de datos MySQL.
 Comment[nl]=KDb-stuurprogramma for behandeling van MySQL databases
 Comment[pl]=Sterownik KDb do obsługi baz danych MySQL
 Comment[pt]=Controlador do KDb para lidar com bases de dados MySQL
 Comment[pt_BR]=Driver do KDb para lidar com bancos de dados MySQL
+Comment[sk]=KDb ovládač na spracovanie databáz MySQL
 Comment[sv]=Kdb-drivrutin för att hantera MySQL-databaser
 Comment[uk]=Драйвер KDb для роботи з базами даних MySQL
 Comment[x-test]=xxKDb driver for handling MySQL databasesxx
