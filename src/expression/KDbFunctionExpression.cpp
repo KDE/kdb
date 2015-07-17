@@ -100,7 +100,7 @@ KDbEscapedString KDbFunctionExpressionData::toStringInternal(
            + KDbEscapedString(')');
 }
 
-void KDbFunctionExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbFunctionExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     args->getQueryParameters(params);
 }

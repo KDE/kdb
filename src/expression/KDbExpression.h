@@ -121,9 +121,10 @@ public:
      If @a driver is 0, representation for portable KDbSQL dialect is returned. */
     KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = 0) const;
 
-    /*! Collects query parameters (messages and types) reculsively and saves them to params.
-     The leaf nodes are objects of QueryParameterExpr class. */
-    void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    /*! Collects query parameters (messages and types) recursively and saves them to @a params.
+     The leaf nodes are objects of QueryParameterExpr class.
+     @note @a params must not be 0. */
+    void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
 
     //! @return expression class for token @a token.
     //! @todo support more tokens

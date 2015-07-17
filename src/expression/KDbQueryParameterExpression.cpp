@@ -71,12 +71,12 @@ KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
            : KDbEscapedString("[%1]").arg(KDbEscapedString(value.toString()));
 }
 
-void KDbQueryParameterExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbQueryParameterExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     KDbQuerySchemaParameter param;
     param.message = value.toString();
     param.type = type();
-    params.append(param);
+    params->append(param);
 }
 
 bool KDbQueryParameterExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack)

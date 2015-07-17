@@ -40,12 +40,12 @@ bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& sql)
 bool PostgresqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
-    KDbFieldList& insertFieldList,
+    KDbFieldList* insertFieldList,
     const KDbPreparedStatementParameters& parameters)
 {
     Q_UNUSED(selectFieldList);
     if (type == KDbPreparedStatement::InsertStatement) {
-        const int missingValues = insertFieldList.fieldCount() - parameters.count();
+        const int missingValues = insertFieldList->fieldCount() - parameters.count();
         KDbPreparedStatementParameters myParameters(parameters);
         if (missingValues > 0) {
     //! @todo can be more efficient
@@ -53,7 +53,7 @@ bool PostgresqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        return connection->insertRecord(&insertFieldList, myParameters);
+        return connection->insertRecord(insertFieldList, myParameters);
     }
 //! @todo support select
     return false;

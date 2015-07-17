@@ -90,7 +90,7 @@ KDbEscapedString KDbUnaryExpressionData::toStringInternal(
     return KDbEscapedString("%1 %2").arg(token.toString(driver)).arg(aString);
 }
 
-void KDbUnaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbUnaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     ExplicitlySharedExpressionDataPointer a = arg();
     if (a.constData())

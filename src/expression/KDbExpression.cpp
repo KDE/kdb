@@ -202,7 +202,7 @@ KDbEscapedString KDbExpressionData::toStringInternal(
     return KDbEscapedString("<UNKNOWN!>");
 }
 
-void KDbExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     Q_UNUSED(params);
 }
@@ -459,7 +459,7 @@ KDbEscapedString KDbExpression::toString(const KDbDriver *driver,
     return d->toString(driver, params);
 }
 
-void KDbExpression::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbExpression::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     d->getQueryParameters(params);
 }

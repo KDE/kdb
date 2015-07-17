@@ -1581,7 +1581,7 @@ QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
     if (whereExpression().isNull())
         return QList<KDbQuerySchemaParameter>();
     QList<KDbQuerySchemaParameter> params;
-    whereExpression().getQueryParameters(params);
+    whereExpression().getQueryParameters(&params);
     return params;
 }
 

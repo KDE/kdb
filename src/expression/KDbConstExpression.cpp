@@ -145,7 +145,7 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
     return KDbEscapedString(value.toString());
 }
 
-void KDbConstExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbConstExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     Q_UNUSED(params);
 }

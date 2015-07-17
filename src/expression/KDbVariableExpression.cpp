@@ -76,7 +76,7 @@ KDbEscapedString KDbVariableExpressionData::toStringInternal(
     return KDbEscapedString(name);
 }
 
-void KDbVariableExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>& params)
+void KDbVariableExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     Q_UNUSED(params);
 }

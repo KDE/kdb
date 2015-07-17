@@ -92,7 +92,7 @@ public:
     bool isDateTimeType() const;
     KDbEscapedString toString(const KDbDriver *driver,
                               KDbQuerySchemaParameterValueListIterator* params = 0) const;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     bool validate(KDbParseInfo *parseInfo);
     virtual KDbExpressionData* clone();
 
@@ -136,7 +136,7 @@ public:
     KDbNArgExpressionData();
     virtual ~KDbNArgExpressionData();
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbNArgExpressionData* clone();
     bool containsInvalidArgument() const;
     bool containsNullArgument() const;
@@ -162,7 +162,7 @@ public:
     KDbUnaryExpressionData();
     virtual ~KDbUnaryExpressionData();
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbUnaryExpressionData* clone();
     inline ExplicitlySharedExpressionDataPointer arg() const {
         return children.isEmpty() ? ExplicitlySharedExpressionDataPointer() : children.first();
@@ -189,7 +189,7 @@ public:
     KDbBinaryExpressionData();
     virtual ~KDbBinaryExpressionData();
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbBinaryExpressionData* clone();
     ExplicitlySharedExpressionDataPointer left() const;
     ExplicitlySharedExpressionDataPointer right() const;
@@ -218,7 +218,7 @@ public:
     virtual ~KDbConstExpressionData();
 
     QVariant value;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbConstExpressionData* clone();
 
 protected:
@@ -244,7 +244,7 @@ public:
     virtual ~KDbQueryParameterExpressionData();
 
     KDbField::Type m_type;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbQueryParameterExpressionData* clone();
 
 protected:
@@ -291,7 +291,7 @@ public:
      This is set to NULL if this variable is not an asterisk of that form. */
     KDbTableSchema *tableForQueryAsterisk;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbVariableExpressionData* clone();
 
 protected:
@@ -323,7 +323,7 @@ public:
     QString name;
     ExplicitlySharedExpressionDataPointer args;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>& params);
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     virtual KDbFunctionExpressionData* clone();
 
     void setArguments(ExplicitlySharedExpressionDataPointer arguments);
