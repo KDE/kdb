@@ -65,9 +65,8 @@ KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
                                         KDbQuerySchemaParameterValueListIterator* params,
                                         KDb::ExpressionCallStack* callStack) const
 {
-    Q_UNUSED(driver);
     Q_UNUSED(callStack);
-    return params ? params->getPreviousValueAsString(type())
+    return params ? driver->valueToSQL(type(), params->getPreviousValue())
            : KDbEscapedString("[%1]").arg(KDbEscapedString(value.toString()));
 }
 

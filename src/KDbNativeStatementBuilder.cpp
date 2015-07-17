@@ -339,7 +339,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
     }
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
     if (driver && !querySchema->whereExpression().isNull()) {
-        KDbQuerySchemaParameterValueListIterator paramValuesIt(*driver, parameters);
+        KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
         KDbQuerySchemaParameterValueListIterator *paramValuesItPtr = parameters.isEmpty() ? 0 : &paramValuesIt;
         if (wasWhere) {
 //! @todo () are not always needed

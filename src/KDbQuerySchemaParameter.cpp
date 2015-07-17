@@ -53,25 +53,24 @@ QDebug operator<<(QDebug dbg, const QList<KDbQuerySchemaParameter>& list)
 class KDbQuerySchemaParameterValueListIterator::Private
 {
 public:
-    Private(const KDbDriver &driver, const QList<QVariant>& aParams)
+    Private(/*const KDbDriver &driver, */const QList<QVariant>& aParams)
             : //driverWeakPointer(DriverManagerInternal::self()->driverWeakPointer(driver))
             params(aParams)
     {
-        Q_UNUSED(driver);
         //move to last item, as the order is reversed due to parser's internals
         paramsIt = params.constEnd();
         --paramsIt;
         paramsItPosition = params.count();
     }
-    QWeakPointer<const KDbDriver> driverWeakPointer;
+    //! @todo ?? QWeakPointer<const KDbDriver> driverWeakPointer;
     const QList<QVariant> params;
     QList<QVariant>::ConstIterator paramsIt;
     int paramsItPosition;
 };
 
 KDbQuerySchemaParameterValueListIterator::KDbQuerySchemaParameterValueListIterator(
-    const KDbDriver &driver, const QList<QVariant>& params)
-        : d(new Private(driver, params))
+    const QList<QVariant>& params)
+        : d(new Private(params))
 {
 }
 
@@ -87,18 +86,6 @@ QVariant KDbQuerySchemaParameterValueListIterator::getPreviousValue()
         return QVariant();
     }
     QVariant res(*d->paramsIt);
-    --d->paramsItPosition;
-    --d->paramsIt;
-    return res;
-}
-
-KDbEscapedString KDbQuerySchemaParameterValueListIterator::getPreviousValueAsString(KDbField::Type type)
-{
-    if (d->paramsItPosition == 0) { //d->params.constEnd()) {
-        kdbWarning() << "no prev value";
-        return d->driverWeakPointer.toStrongRef()->valueToSQL(type, QVariant()); //"NULL"
-    }
-    KDbEscapedString res(d->driverWeakPointer.toStrongRef()->valueToSQL(type, *d->paramsIt));
     --d->paramsItPosition;
     --d->paramsIt;
     return res;

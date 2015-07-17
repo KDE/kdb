@@ -42,14 +42,12 @@ public:
 class KDB_EXPORT KDbQuerySchemaParameterValueListIterator
 {
 public:
-    KDbQuerySchemaParameterValueListIterator(const KDbDriver &driver, const QList<QVariant>& params);
+    KDbQuerySchemaParameterValueListIterator(const QList<QVariant>& params);
     ~KDbQuerySchemaParameterValueListIterator();
 
     //! @return previous value
     QVariant getPreviousValue();
 
-    //! @return previous value as string formatted using driver's escaping
-    KDbEscapedString getPreviousValueAsString(KDbField::Type type);
 protected:
     class Private;
     Private * const d;
