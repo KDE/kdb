@@ -47,7 +47,7 @@ public:
     KDbTableViewColumn(const QString &name, KDbField::Type ctype,
                     KDbField::Constraints cconst = KDbField::NoConstraints,
                     KDbField::Options options = KDbField::NoOptions,
-                    uint maxLength = 0, uint precision = 0,
+                    int maxLength = 0, int precision = 0,
                     QVariant defaultValue = QVariant(),
                     const QString &caption = QString(),
                     const QString &description = QString());
@@ -153,11 +153,12 @@ public:
 
     /*! Sets visible width for this column to @a w (usually in pixels or points).
         0 means there is no hint for the width. */
-    void setWidth(uint w);
+    void setWidth(int w);
 
     /*! @return width of this field (usually in pixels or points).
          0 (the default) means there is no hint for the width. */
-    uint width() const;
+
+    int width() const;
 
 protected:
     //! special ctor that does not allocate d member;

@@ -191,7 +191,7 @@ public:
      If greater than 0, this value should be used to express maximum value, e.g. VARCHAR(...).
      This is the case for MySQL.
      The default is 0. */
-    uint TEXT_TYPE_MAX_LENGTH;
+    int TEXT_TYPE_MAX_LENGTH;
 
     /*! "LIKE" by default, used to construct native expressions "x LIKE y" and "x NOT LIKE y".
      LIKE is case-insensitive for MySQL, SQLite, and often on Sybase/MSSQL

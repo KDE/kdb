@@ -35,7 +35,7 @@ class SqliteCursor : public KDbCursor
 {
 public:
     virtual ~SqliteCursor();
-    virtual QVariant value(uint i);
+    virtual QVariant value(int i);
 
     /*! [PROTOTYPE] @return internal buffer data. */
 //! @todo virtual const char *** bufferData()
@@ -49,11 +49,11 @@ public:
 
 protected:
     /*! KDbCursor will operate on @a conn, raw @a sql statement will be used to execute query. */
-    SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
+    SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, int options = NoOptions);
 
     /*! KDbCursor will operate on @a conn, @a query schema will be used to execute query. */
     SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query,
-                 uint options = NoOptions);
+                 int options = NoOptions);
 
     virtual bool drv_open(const KDbEscapedString& sql);
 

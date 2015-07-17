@@ -66,7 +66,7 @@ public:
     QWeakPointer<const KDbDriver> driverWeakPointer;
     const QList<QVariant> params;
     QList<QVariant>::ConstIterator paramsIt;
-    uint paramsItPosition;
+    int paramsItPosition;
 };
 
 KDbQuerySchemaParameterValueListIterator::KDbQuerySchemaParameterValueListIterator(

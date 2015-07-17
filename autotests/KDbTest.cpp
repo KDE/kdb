@@ -350,7 +350,7 @@ KDB_EXPORT void getLimitsForFieldType(KDbField::Type type, int *minValue, int *m
 KDB_EXPORT KDbField::Type maximumForIntegerFieldTypes(KDbField::Type t1, KDbField::Type t2);
 KDB_EXPORT QString defaultFileBasedDriverMimeType();
 KDB_EXPORT QString defaultFileBasedDriverId();
-KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
+KDB_EXPORT KDbEscapedString valueToSQL(KDbField::Type ftype, const QVariant& v);
 KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
 template<typename T>
 T iifNotEmpty(const T &string, const T &stringIfEmpty)

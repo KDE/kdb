@@ -55,7 +55,7 @@ public:
     KDbValidator* validator;
 
     KDbTableViewData* relatedData;
-    uint relatedDataPKeyID;
+    int relatedDataPKeyID;
 
     KDbField* field;
 
@@ -65,7 +65,7 @@ public:
     //! @see visibleLookupColumnInfo()
     KDbQueryColumnInfo* visibleLookupColumnInfo;
 
-    uint width;
+    int width;
     bool isDBAware; //!< true if data is stored in DB, not only in memeory
     bool readOnly;
     bool fieldOwned;
@@ -89,7 +89,7 @@ KDbTableViewColumn::KDbTableViewColumn(KDbField *f, bool owner)
 KDbTableViewColumn::KDbTableViewColumn(const QString &name, KDbField::Type ctype,
         KDbField::Constraints cconst,
         KDbField::Options options,
-        uint maxLength, uint precision,
+        int maxLength, int precision,
         QVariant defaultValue,
         const QString &caption, const QString &description)
         : d(new Private)
@@ -345,12 +345,12 @@ bool KDbTableViewColumn::acceptsFirstChar(const QChar &ch) const
     return true;
 }
 
-void KDbTableViewColumn::setWidth(uint w)
+void KDbTableViewColumn::setWidth(int w)
 {
     d->width = w;
 }
 
-uint KDbTableViewColumn::width() const
+int KDbTableViewColumn::width() const
 {
     return d->width;
 }

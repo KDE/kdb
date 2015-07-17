@@ -176,7 +176,7 @@ bool KDbDriver::isSystemFieldName(const QString& n) const
     return drv_isSystemFieldName(n);
 }
 
-static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, uint ftype, const QVariant& v)
+static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
 {
     if (v.isNull())
         return KDbEscapedString("NULL");
@@ -232,7 +232,7 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, uint ftype, 
     return KDbEscapedString();
 }
 
-KDbEscapedString KDbDriver::valueToSQL(uint ftype, const QVariant& v) const
+KDbEscapedString KDbDriver::valueToSQL(KDbField::Type ftype, const QVariant& v) const
 {
     //! note, it was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions.
     return valueToSQLInternal(this, ftype, v);

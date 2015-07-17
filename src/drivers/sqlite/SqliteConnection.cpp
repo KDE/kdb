@@ -141,9 +141,9 @@ bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
     QRegExp re(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
     if (re.exactMatch(version->string())) {
-        version->setMajor(re.cap(1).toUInt());
-        version->setMinor(re.cap(2).toUInt());
-        version->setRelease(re.cap(3).toUInt());
+        version->setMajor(re.cap(1).toInt());
+        version->setMinor(re.cap(2).toInt());
+        version->setRelease(re.cap(3).toInt());
     }
     return true;
 }
@@ -344,12 +344,12 @@ bool SqliteConnection::drv_dropDatabase(const QString &dbName)
     return true;
 }
 
-KDbCursor* SqliteConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
 {
     return new SqliteCursor(this, sql, cursor_options);
 }
 
-KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, int cursor_options)
 {
     return new SqliteCursor(this, query, cursor_options);
 }

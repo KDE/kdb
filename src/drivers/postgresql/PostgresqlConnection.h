@@ -42,10 +42,10 @@ public:
     virtual ~PostgresqlConnection();
 
     //! @return a new query based on a query statement
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
 
     //! @return a new query based on a query object
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
 
     virtual KDbPreparedStatementInterface* prepareStatementInternal();
 

@@ -40,11 +40,11 @@ KDbIdentifierValidator::~KDbIdentifierValidator()
 
 QValidator::State KDbIdentifierValidator::validate(QString& input, int& pos) const
 {
-    uint i;
-    for (i = 0; (int)i < input.length() && input.at(i) == QLatin1Char(' '); i++)
+    int i;
+    for (i = 0; i < input.length() && input.at(i) == QLatin1Char(' '); i++)
         ;
     pos -= i; //i chars will be removed from beginning
-    if ((int)i < input.length() && input.at(i) >= QLatin1Char('0') && input.at(i) <= QLatin1Char('9'))
+    if (i < input.length() && input.at(i) >= QLatin1Char('0') && input.at(i) <= QLatin1Char('9'))
         pos++; //_ will be added at the beginning
     bool addspace = (input.right(1) == QLatin1String(" "));
     input = d->isLowerCaseForced ? KDb::stringToIdentifier(input).toLower() : KDb::stringToIdentifier(input);

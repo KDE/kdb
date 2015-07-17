@@ -42,7 +42,7 @@ public:
 
     KDbConnection *m_conn;
     bool m_active;
-    uint refcount;
+    int refcount;
 };
 
 //! This class encapsulates KDbTransaction handle.

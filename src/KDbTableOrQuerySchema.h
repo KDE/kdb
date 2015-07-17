@@ -82,7 +82,7 @@ public:
     QString captionOrName() const;
 
     //! @return number of fields
-    uint fieldCount() const;
+    int fieldCount() const;
 
     //! @return all columns for the table or the query
     const KDbQueryColumnInfo::Vector columns(bool unique = false);

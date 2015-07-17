@@ -36,8 +36,8 @@ class MysqlConnection : public KDbConnection
 public:
     virtual ~MysqlConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
 
     virtual KDbPreparedStatementInterface* prepareStatementInternal();
 

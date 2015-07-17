@@ -108,7 +108,7 @@ KDbTableOrQuerySchema::~KDbTableOrQuerySchema()
     delete d;
 }
 
-uint KDbTableOrQuerySchema::fieldCount() const
+int KDbTableOrQuerySchema::fieldCount() const
 {
     if (d->table)
         return d->table->fieldCount();

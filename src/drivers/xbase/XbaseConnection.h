@@ -34,8 +34,8 @@ class xBaseConnection : public KDbConnection
 public:
     virtual ~xBaseConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
 
     //! @todo returns 0 for now
     virtual KDbPreparedStatementInterface* prepareStatementInternal();

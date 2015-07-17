@@ -326,8 +326,8 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
 
     // Allocate KDbTableViewColumn objects for each visible query column
     const KDbQueryColumnInfo::Vector fields = d->cursor->query()->fieldsExpanded();
-    const uint fieldCount = fields.count();
-    for (uint i = 0;i < fieldCount;i++) {
+    const int fieldCount = fields.count();
+    for (int i = 0;i < fieldCount;i++) {
         KDbQueryColumnInfo *ci = fields[i];
         if (ci->visible) {
             KDbQueryColumnInfo *visibleLookupColumnInfo = 0;
@@ -384,7 +384,7 @@ void KDbTableViewData::init(
     KDbTableViewColumn *valueColumn = new KDbTableViewColumn(valueField, true);
     addColumn(valueColumn);
 
-    uint cnt = qMin(keys.count(), values.count());
+    int cnt = qMin(keys.count(), values.count());
     QList<QVariant>::ConstIterator it_keys = keys.constBegin();
     QList<QVariant>::ConstIterator it_values = values.constBegin();
     for (;cnt > 0;++it_keys, ++it_values, cnt--) {
@@ -463,12 +463,12 @@ int KDbTableViewData::visibleColumnIndex(int globalIndex) const
     return d->visibleColumnIDs.value(globalIndex, -1);
 }
 
-uint KDbTableViewData::columnCount() const
+int KDbTableViewData::columnCount() const
 {
     return d->columns.count();
 }
 
-uint KDbTableViewData::visibleColumnCount() const
+int KDbTableViewData::visibleColumnCount() const
 {
     return d->visibleColumns.count();
 }
@@ -483,12 +483,12 @@ QList<KDbTableViewColumn*>* KDbTableViewData::visibleColumns()
     return &d->visibleColumns;
 }
 
-KDbTableViewColumn* KDbTableViewData::column(uint index)
+KDbTableViewColumn* KDbTableViewData::column(int index)
 {
     return d->columns.value(index);
 }
 
-KDbTableViewColumn* KDbTableViewData::visibleColumn(uint index)
+KDbTableViewColumn* KDbTableViewData::visibleColumn(int index)
 {
     return d->visibleColumns.value(index);
 }
@@ -625,11 +625,11 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
             kdbWarning() << "column #" << colnum << " not found!";
             return false;
         }
-        d->pRecordEditBuffer->insert(*col->columnInfo(), *newval);
+        d->pRecordEditBuffer->insert(col->columnInfo(), *newval);
 
         if (col->visibleLookupColumnInfo() && visibleValueForLookupField) {
             //this is value for lookup table: update visible value as well
-            d->pRecordEditBuffer->insert(*col->visibleLookupColumnInfo(), *visibleValueForLookupField);
+            d->pRecordEditBuffer->insert(col->visibleLookupColumnInfo(), *visibleValueForLookupField);
         }
         return true;
     }
@@ -671,7 +671,7 @@ static inline void saveRecordGetValue(const QVariant **pval, KDbCursor *cursor,
 {
     if (!*pval) {
         *pval = cursor
-                ? pRecordEditBuffer->at( *(**it_f)->columnInfo(),
+                ? pRecordEditBuffer->at( (**it_f)->columnInfo(),
                                          record->at(col).isNull() /* useDefaultValueIfPossible */ )
                 : pRecordEditBuffer->at( *f );
         *val = *pval ? **pval : record->at(col); /* get old value */
@@ -750,7 +750,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
     } else {//not db-aware version
         KDbRecordEditBuffer::SimpleMap b = d->pRecordEditBuffer->simpleBuffer();
         for (KDbRecordEditBuffer::SimpleMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
-            uint i = -1;
+            int i = -1;
             foreach(KDbTableViewColumn *col, d->columns) {
                 i++;
                 if (col->field()->name() == it.key()) {
@@ -849,7 +849,7 @@ void KDbTableViewData::deleteRecords(const QList<int> &recordsToDelete, bool rep
     emit recordsDeleted(recordsToDelete);
 }
 
-void KDbTableViewData::insertRecord(KDbRecordData *record, uint index, bool repaint)
+void KDbTableViewData::insertRecord(KDbRecordData *record, int index, bool repaint)
 {
     Q_UNUSED(record);
     insert(index = qMin(index, count()), record);
@@ -860,11 +860,11 @@ void KDbTableViewData::clearInternal(bool processEvents)
 {
     clearRecordEditBuffer();
 //! @todo this is time consuming: find better data model
-    const uint c = count();
+    const int c = count();
 #ifndef TABLEVIEW_NO_PROCESS_EVENTS
     const bool _processEvents = processEvents && !qApp->closingDown();
 #endif
-    for (uint i = 0; i < c; i++) {
+    for (int i = 0; i < c; i++) {
         removeLast();
 #ifndef TABLEVIEW_NO_PROCESS_EVENTS
         if (_processEvents && i % 1000 == 0)

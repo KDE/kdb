@@ -89,12 +89,12 @@ bool MysqlConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-KDbCursor* MysqlConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
 {
     return new MysqlCursor(this, sql, cursor_options);
 }
 
-KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, int cursor_options)
 {
     return new MysqlCursor(this, query, cursor_options);
 }

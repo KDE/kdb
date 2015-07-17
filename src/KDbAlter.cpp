@@ -116,9 +116,9 @@ KDbAlterTableHandler::FieldActionBase::~FieldActionBase()
 struct KDb_AlterTableHandlerStatic {
     KDb_AlterTableHandlerStatic() {
 #define I(name, type) \
-    types.insert(QByteArray(name).toLower(), (int)KDbAlterTableHandler::type)
+    types.insert(QByteArray(name).toLower(), int(KDbAlterTableHandler::type))
 #define I2(name, type1, type2) \
-    flag = (int)KDbAlterTableHandler::type1|(int)KDbAlterTableHandler::type2; \
+    flag = int(KDbAlterTableHandler::type1)|int(KDbAlterTableHandler::type2); \
     if (flag & KDbAlterTableHandler::PhysicalAlteringRequired) \
         flag |= KDbAlterTableHandler::MainSchemaAlteringRequired; \
     types.insert(QByteArray(name).toLower(), flag)
@@ -172,7 +172,7 @@ int KDbAlterTableHandler::alteringTypeForProperty(const QByteArray& propertyName
     const int res = KDb_alteringTypeForProperty->types[propertyName.toLower()];
     if (res == 0) {
         if (KDb::isExtendedTableFieldProperty(propertyName))
-            return (int)ExtendedSchemaAlteringRequired;
+            return int(ExtendedSchemaAlteringRequired);
         kdbWarning() << "property" << propertyName << "not found!";
     }
     return res;
@@ -958,7 +958,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
                 lastUID = currentField ? fieldAction->uid() : -1;
             }
             InsertFieldAction *insertFieldAction = dynamic_cast<InsertFieldAction*>(action);
-            if (insertFieldAction && insertFieldAction->index() > (int)newTable->fieldCount()) {
+            if (insertFieldAction && insertFieldAction->index() > newTable->fieldCount()) {
                 //update index: there can be empty rows
                 insertFieldAction->setIndex(newTable->fieldCount());
             }

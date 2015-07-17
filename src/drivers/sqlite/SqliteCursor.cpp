@@ -78,7 +78,7 @@ public:
     char *utail;
     const char **curr_coldata;
     const char **curr_colname;
-    uint cols_pointers_mem_size; //!< size of record's array of pointers to values
+    int cols_pointers_mem_size; //!< size of record's array of pointers to values
     QVector<const char**> records; //!< buffer data
 
     inline QVariant getValue(KDbField *f, int i) {
@@ -143,14 +143,14 @@ public:
     }
 };
 
-SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, uint options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, int options)
         : KDbCursor(conn, sql, options)
         , d(new SqliteCursorData(conn))
 {
     d->data = static_cast<SqliteConnection*>(conn)->d->data;
 }
 
-SqliteCursor::SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query, uint options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query, int options)
         : KDbCursor(conn, query, options)
         , d(new SqliteCursorData(conn))
 {
@@ -227,7 +227,7 @@ void SqliteCursor::drv_getNextRecord()
     //debug
     /*
       if ((int)m_result == (int)FetchOK && d->curr_coldata) {
-        for (uint i=0;i<m_fieldCount;i++) {
+        for (int i=0;i<m_fieldCount;i++) {
           sqliteDebug()<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)");
         }
@@ -245,7 +245,7 @@ void SqliteCursor::drv_appendCurrentRecordToBuffer()
     const char **record = (const char**)malloc(d->cols_pointers_mem_size);
     const char **src_col = d->curr_coldata;
     const char **dest_col = record;
-    for (uint i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
+    for (int i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
 //  sqliteDebug() << i <<": '" << *src_col << "'";
 //  sqliteDebug() << "src_col: " << src_col;
         *dest_col = *src_col ? strdup(*src_col) : 0;
@@ -274,11 +274,11 @@ void SqliteCursor::drv_bufferMovePointerTo(qint64 at)
 void SqliteCursor::drv_clearBuffer()
 {
     if (d->cols_pointers_mem_size > 0) {
-        const uint records_in_buf = m_records_in_buf;
+        const int records_in_buf = m_records_in_buf;
         const char ***r_ptr = d->records.data();
-        for (uint i = 0; i < records_in_buf; i++, r_ptr++) {
+        for (int i = 0; i < records_in_buf; i++, r_ptr++) {
             const char **field_data = *r_ptr;
-            for (uint col = 0; col < m_fieldCount; col++, field_data++) {
+            for (int col = 0; col < m_fieldCount; col++, field_data++) {
                 free((void*)*field_data); //free field memory
             }
             free(*r_ptr); //free pointers to fields array
@@ -306,14 +306,14 @@ const char ** SqliteCursor::recordData() const
 bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
     if (!m_fieldsExpanded) {//simple version: without types
-        for (uint i = 0; i < m_fieldCount; i++) {
+        for (int i = 0; i < m_fieldCount; i++) {
             (*data)[i] = QString::fromUtf8((const char*)sqlite3_column_text(d->prepared_st_handle, i));
         }
         return true;
     }
-    const uint maxCount = qMin(m_fieldCount, (uint)m_fieldsExpanded->count());
+    const int maxCount = qMin(m_fieldCount, m_fieldsExpanded->count());
     // i - visible field's index, j - physical index
-    for (uint i = 0, j = 0; i < m_fieldCount; i++, j++) {
+    for (int i = 0, j = 0; i < m_fieldCount; i++, j++) {
         while (j < maxCount && !m_fieldsExpanded->at(j)->visible)
             j++;
         if (j >= (maxCount /*+(m_containsROWIDInfo ? 1 : 0)*/)) {
@@ -327,12 +327,12 @@ bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
     return true;
 }
 
-QVariant SqliteCursor::value(uint i)
+QVariant SqliteCursor::value(int i)
 {
     if (i > (m_fieldCount - 1)) //range checking
         return QVariant();
 //! @todo allow disable range checking! - performance reasons
-    KDbField *f = (m_fieldsExpanded && i < (uint)m_fieldsExpanded->count())
+    KDbField *f = (m_fieldsExpanded && i < m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(i)->field : 0;
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }

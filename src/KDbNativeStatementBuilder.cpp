@@ -79,7 +79,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 
 //! @todo looking at singleTable is visually nice but a field name can conflict
 //!   with function or variable name...
-    uint number = 0;
+    int number = 0;
     bool singleTable = querySchema->tables()->count() <= 1;
     if (singleTable) {
         //make sure we will have single table:
@@ -97,8 +97,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
     sql.reserve(4096);
     KDbEscapedString s_additional_joins; //additional joins needed for lookup fields
     KDbEscapedString s_additional_fields; //additional fields to append to the fields list
-    uint internalUniqueTableAliasNumber = 0; //used to build internalUniqueTableAliases
-    uint internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
+    int internalUniqueTableAliasNumber = 0; //used to build internalUniqueTableAliases
+    int internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
     number = 0;
     QList<KDbQuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
     KDbEscapedString kdb_subquery_prefix("__kdb_subquery_");
@@ -160,7 +160,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     KDbFieldList* visibleColumns = 0;
                     KDbField *boundField = 0;
                     if (lookupTable
-                            && (uint)lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
+                            && lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
                             && (visibleColumns = lookupTable->subList(lookupFieldSchema->visibleColumns()))
                             && (boundField = lookupTable->field(lookupFieldSchema->boundColumn()))) {
                         //add LEFT OUTER JOIN
@@ -195,7 +195,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     }
                     const KDbQueryColumnInfo::Vector fieldsExpanded(lookupQuery->fieldsExpanded());
                     if (lookupFieldSchema->boundColumn() >= fieldsExpanded.count()) {
-                        kdbWarning() << "(uint)lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
+                        kdbWarning() << "lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
                         return false;
                     }
                     KDbQueryColumnInfo *boundColumnInfo = fieldsExpanded.at(lookupFieldSchema->boundColumn());
@@ -231,12 +231,12 @@ static bool selectStatementInternal(KDbEscapedString *target,
 
                     if (!s_additional_fields.isEmpty())
                         s_additional_fields += ", ";
-                    const QList<uint> visibleColumns(lookupFieldSchema->visibleColumns());
+                    const QList<int> visibleColumns(lookupFieldSchema->visibleColumns());
                     KDbEscapedString expression;
-                    foreach(uint visibleColumnIndex, visibleColumns) {
+                    foreach(int visibleColumnIndex, visibleColumns) {
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
-                        if ((uint)fieldsExpanded.count() <= visibleColumnIndex) {
+                        if (fieldsExpanded.count() <= visibleColumnIndex) {
                             kdbWarning() << "fieldsExpanded.count() <= (*visibleColumnsIt) : "
                             << fieldsExpanded.count() << " <= " << visibleColumnIndex;
                             return false;
@@ -291,7 +291,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             }
         }
         // add subqueries for lookup data
-        uint subqueries_for_lookup_data_counter = 0;
+        int subqueries_for_lookup_data_counter = 0;
         foreach(KDbQuerySchema* subQuery, subqueries_for_lookup_data) {
             if (!s_from.isEmpty())
                 s_from += ", ";
@@ -367,13 +367,13 @@ static bool selectStatementInternal(KDbEscapedString *target,
         foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
             if (pkeyFieldsIndex < 0) // no field mentioned in this query
                 continue;
-            if (pkeyFieldsIndex >= (int)fieldsExpanded.count()) {
+            if (pkeyFieldsIndex >= fieldsExpanded.count()) {
                 kdbWarning() << "ORDER BY: (*it) >= fieldsExpanded.count() - "
                         << pkeyFieldsIndex << " >= " << fieldsExpanded.count();
                 continue;
             }
             KDbQueryColumnInfo *ci = fieldsExpanded[ pkeyFieldsIndex ];
-            automaticPKOrderBy.appendColumn(*ci);
+            automaticPKOrderBy.appendColumn(ci);
         }
         orderByString = automaticPKOrderBy.toSQLString(!singleTable/*includeTableName*/,
                         connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping);
@@ -451,7 +451,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
                     v += QString::fromLatin1("(%1)").arg(field->precision());
             }
             else if (field->type() == KDbField::Text) {
-                uint realMaxLen;
+                int realMaxLen;
                 if (d->driver()->beh->TEXT_TYPE_MAX_LENGTH == 0) {
                     realMaxLen = field->maxLength(); // allow to skip (N)
                 }

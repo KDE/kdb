@@ -42,7 +42,7 @@ public:
     @setter
     Sets the major version number.
     */
-    data_member uint major default=0;
+    data_member int major default=0;
 
     /*!
     @getter
@@ -50,7 +50,7 @@ public:
     @setter
     Sets the minor version number.
     */
-    data_member uint minor default=0;
+    data_member int minor default=0;
 
     /*!
     @getter
@@ -58,9 +58,9 @@ public:
     @setter
     Sets the release version number.
     */
-    data_member uint release default=0;
+    data_member int release default=0;
 
-    KDbVersionInfo(uint majorVersion, uint minorVersion, uint releaseVersion)
+    KDbVersionInfo(int majorVersion, int minorVersion, int releaseVersion)
      : d(new Data)
     {
         d->major = majorVersion;
@@ -69,7 +69,7 @@ public:
     }
 
     //! @return true if @a major and @a minor exatcly matches major and minor version of this info, respectively.
-    bool matches(uint major, uint minor) const { return major == d->major && minor == d->minor; }
+    bool matches(int major, int minor) const { return major == d->major && minor == d->minor; }
 
     //! @return true if this version info is null, i.e. all the version numbers are zero.
     bool isNull() const;
@@ -86,7 +86,7 @@ public:
     @setter
     Sets the major version number.
     */
-    data_member uint major default=0;
+    data_member int major default=0;
 
     /*!
     @getter
@@ -94,7 +94,7 @@ public:
     @setter
     Sets the minor version number.
     */
-    data_member uint minor default=0;
+    data_member int minor default=0;
 
     /*!
     @getter
@@ -102,7 +102,7 @@ public:
     @setter
     Sets the release version number.
     */
-    data_member uint release default=0;
+    data_member int release default=0;
 
     /*!
     @getter

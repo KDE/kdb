@@ -445,7 +445,7 @@ KDB_EXPORT QString defaultFileBasedDriverId();
     to string representation required by KDbSQL commands.
     For Date/Time type KDb::dateTimeToSQL() is used.
     For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
-KDB_EXPORT KDbEscapedString valueToSQL(uint ftype, const QVariant& v);
+KDB_EXPORT KDbEscapedString valueToSQL(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:
     ISO 8601 DateTime format - with "T" delimiter/

@@ -28,14 +28,14 @@ class xBaseCursorData;
 class xBaseCursor: public KDbCursor {
   public:
     xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const QString& sql = QString(),
-      uint cursor_options = NoOptions );
-    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, uint options = NoOptions);
+      int cursor_options = NoOptions );
+    xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, int options = NoOptions);
     virtual ~xBaseCursor();
 
     virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
     virtual void drv_getNextRecord();
-    virtual QVariant value(uint);
+    virtual QVariant value(int);
 
 //    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();

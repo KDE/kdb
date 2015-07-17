@@ -36,14 +36,14 @@ class KDbxBaseCursorData {
 
 };
 
-xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const KDbEscapedString& sql, uint cursor_options)
+xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, const KDbEscapedString& sql, int cursor_options)
   : KDbCursor(conn,sql,cursor_options)
   , d( new xBaseCursorData(internalCursor) )
 {
   init();
 }
 
-xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, uint options)
+xBaseCursor::xBaseCursor(KDbConnection* conn, KDbCursor* internalCursor, KDbQuerySchema* query, int options)
   : KDbCursor( conn, query, options )
   , d( new xBaseCursorData(internalCursor) )
 {
@@ -101,7 +101,7 @@ void xBaseCursor::drv_getNextRecord() {
   }
 }
 
-QVariant xBaseCursor::value(uint pos) {
+QVariant xBaseCursor::value(int pos) {
   if (!d->internalCursor) {
     // Construct an invalid QVariant
     return QVariant();

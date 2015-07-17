@@ -34,8 +34,8 @@ class SybaseConnection : public KDbConnection
 public:
     virtual ~SybaseConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, uint cursor_options = 0);
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, uint cursor_options = 0);
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
 
     virtual KDbPreparedStatement prepareStatement(KDbPreparedStatement::StatementType type,
             KDbFieldList* fields);

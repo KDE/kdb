@@ -154,7 +154,7 @@ public:
      This implementation return date, datetime and time values in ISO format,
      what seems to be accepted by SQL servers.
      @see Qt::DateFormat */
-    virtual KDbEscapedString valueToSQL(uint ftype, const QVariant& v) const;
+    virtual KDbEscapedString valueToSQL(KDbField::Type ftype, const QVariant& v) const;
 
     //! Like above but with the fildtype as string.
     inline KDbEscapedString valueToSQL(const QString& ftype, const QVariant& v) const {

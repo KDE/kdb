@@ -28,14 +28,14 @@
 
 #define BOOL bool
 
-MysqlCursor::MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql, uint cursor_options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql, int cursor_options)
         : KDbCursor(conn, sql, cursor_options)
         , d(new MysqlCursorData(conn))
 {
     m_options |= Buffered;
 }
 
-MysqlCursor::MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
         : KDbCursor(conn, query, options)
         , d(new MysqlCursorData(conn))
 {
@@ -95,12 +95,12 @@ void MysqlCursor::drv_getNextRecord()
 }
 
 // This isn't going to work right now as it uses d->mysqlrow
-QVariant MysqlCursor::value(uint pos)
+QVariant MysqlCursor::value(int pos)
 {
     if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
         return QVariant();
 
-    KDbField *f = (m_fieldsExpanded && pos < (uint)m_fieldsExpanded->count())
+    KDbField *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
                        ? m_fieldsExpanded->at(pos)->field : 0;
 
 //! @todo js: use MYSQL_FIELD::type here!
@@ -122,9 +122,9 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 //! @todo js: use MYSQL_FIELD::type here!
 //!           see SqliteCursor::storeCurrentRecord()
 
-    const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
-    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
-    for (uint i = 0; i < realCount; i++) {
+    const int fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : INT_MAX;
+    const int realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
+    for (int i = 0; i < realCount; i++) {
         KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;

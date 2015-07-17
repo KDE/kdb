@@ -31,11 +31,11 @@ class PostgresqlCursor: public KDbCursor
 {
 public:
     explicit PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
-                              uint options = NoOptions);
-    PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
+                              int options = NoOptions);
+    PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
     virtual ~PostgresqlCursor();
 
-    virtual QVariant value(uint pos);
+    virtual QVariant value(int pos);
     virtual const char** recordData() const;
     virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
     virtual bool drv_open(const KDbEscapedString& sql);
@@ -47,7 +47,7 @@ public:
     virtual void drv_bufferMovePointerTo(qint64 to);
 
 private:
-    QVariant pValue(uint pos)const;
+    QVariant pValue(int pos)const;
 
     unsigned long m_numRows;
     QVector<QVariant::Type> m_realTypes;

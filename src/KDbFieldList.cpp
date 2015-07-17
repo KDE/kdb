@@ -48,7 +48,7 @@ KDbFieldList::~KDbFieldList()
     delete m_autoinc_fields;
 }
 
-uint KDbFieldList::fieldCount() const
+int KDbFieldList::fieldCount() const
 {
     return m_fields.count();
 }
@@ -67,12 +67,12 @@ void KDbFieldList::clear()
     m_sqlFields.clear();
 }
 
-KDbFieldList& KDbFieldList::insertField(uint index, KDbField *field)
+KDbFieldList& KDbFieldList::insertField(int index, KDbField *field)
 {
     Q_ASSERT(field);
     if (!field)
         return *this;
-    if (index > (uint)m_fields.count()) {
+    if (index > m_fields.count()) {
         kdbCritical() << "index (" << index << ") out of range";
         return *this;
     }
@@ -131,13 +131,13 @@ bool KDbFieldList::removeField(KDbField *field)
     return true;
 }
 
-bool KDbFieldList::moveField(KDbField *field, uint newIndex)
+bool KDbFieldList::moveField(KDbField *field, int newIndex)
 {
     Q_ASSERT(field);
     if (!field || !m_fields.removeOne(field)) {
         return false;
     }
-    if (int(newIndex) > m_fields.count()) {
+    if (newIndex > m_fields.count()) {
         newIndex = m_fields.count();
     }
     m_fields.insert(newIndex, field);
@@ -147,12 +147,12 @@ bool KDbFieldList::moveField(KDbField *field, uint newIndex)
     return true;
 }
 
-KDbField* KDbFieldList::field(uint id)
+KDbField* KDbFieldList::field(int id)
 {
     return m_fields.value(id);
 }
 
-const KDbField* KDbFieldList::field(uint id) const
+const KDbField* KDbFieldList::field(int id) const
 {
     return m_fields.value(id);
 }
@@ -269,10 +269,10 @@ KDbFieldList* KDbFieldList::subList(const QList<QByteArray>& list)
 
 #undef _ADD_FIELD
 
-KDbFieldList* KDbFieldList::subList(const QList<uint>& list)
+KDbFieldList* KDbFieldList::subList(const QList<int>& list)
 {
     KDbFieldList *fl = new KDbFieldList(false);
-    foreach(uint index, list) {
+    foreach(int index, list) {
         KDbField *f = field(index);
         if (!f) {
             kdbWarning() << QString::fromLatin1("could not find field at position %1").arg(index);

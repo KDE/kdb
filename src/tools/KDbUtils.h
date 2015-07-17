@@ -98,9 +98,9 @@ KDB_EXPORT void simpleCrypt(QString *string);
 KDB_EXPORT void simpleDecrypt(QString *string);
 
 //! @internal
-KDB_EXPORT QString ptrToStringInternal(void* ptr, uint size);
+KDB_EXPORT QString ptrToStringInternal(void* ptr, int size);
 //! @internal
-KDB_EXPORT void* stringToPtrInternal(const QString& str, uint size);
+KDB_EXPORT void* stringToPtrInternal(const QString& str, int size);
 
 //! @return a pointer @a ptr safely serialized to string
 template<class type>

@@ -30,7 +30,7 @@
 #include <stdlib.h>
 
 //! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn;
-KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
+KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)
         : m_conn(conn)
         , m_query(0)
         , m_rawSql(sql)
@@ -42,7 +42,7 @@ KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint opti
     init();
 }
 
-KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
         : m_conn(conn)
         , m_query(query)
         , m_options(options)
@@ -116,6 +116,53 @@ KDbCursor::~KDbCursor()
     }
     delete m_fieldsExpanded;
     delete m_queryParameters;
+}
+
+KDbConnection* KDbCursor::connection() const
+{
+    return m_conn;
+}
+
+KDbQuerySchema *KDbCursor::query() const
+{
+    return m_query;
+}
+
+KDbEscapedString KDbCursor::rawSql() const
+{
+    return m_rawSql;
+}
+
+int KDbCursor::options() const
+{
+    return m_options;
+}
+
+bool KDbCursor::isOpened() const
+{
+    return m_opened;
+}
+
+bool KDbCursor::containsRecordIdInfo() const
+{
+    return m_containsRecordIdInfo;
+}
+
+KDbRecordData* KDbCursor::storeCurrentRecord() const
+{
+    KDbRecordData* data = new KDbRecordData(m_fieldsToStoreInRecord);
+    if (!drv_storeCurrentRecord(data)) {
+        delete data;
+        return 0;
+    }
+    return data;
+}
+
+bool KDbCursor::storeCurrentRecord(KDbRecordData* data) const
+{
+    Q_ASSERT(data);
+    data->resize(m_fieldsToStoreInRecord);
+    return drv_storeCurrentRecord(data);
 }
 
 bool KDbCursor::open()

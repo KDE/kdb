@@ -156,7 +156,7 @@ void KDbQuerySchema::Private::clearCachedData()
     }
 }
 
-void KDbQuerySchema::Private::setColumnAlias(uint position, const QString& alias)
+void KDbQuerySchema::Private::setColumnAlias(int position, const QString& alias)
 {
     if (alias.isEmpty()) {
         columnAliases.remove(position);
@@ -171,9 +171,9 @@ void KDbQuerySchema::Private::tryRegenerateExprAliases()
     if (!regenerateExprAliases)
         return;
     //regenerate missing aliases for experessions
-    uint colNum = 0; //used to generate a name
+    int colNum = 0; //used to generate a name
     QString columnAlias;
-    uint p = -1;
+    int p = -1;
     foreach(KDbField* f, *query->fields()) {
         p++;
         if (f->isExpression() && columnAliases.value(p).isEmpty()) {
@@ -190,9 +190,9 @@ void KDbQuerySchema::Private::tryRegenerateExprAliases()
     regenerateExprAliases = false;
 }
 
-void KDbQuerySchema::Private::setColumnAliasInternal(uint position, const QString& alias)
+void KDbQuerySchema::Private::setColumnAliasInternal(int position, const QString& alias)
 {
     columnAliases.insert(position, alias.toLower());
     columnPositionsForAliases.insert(alias.toLower(), position);
-    maxIndexWithAlias = qMax(maxIndexWithAlias, (int)position);
+    maxIndexWithAlias = qMax(maxIndexWithAlias, position);
 }

@@ -52,9 +52,9 @@ public:
 
     RecordSource recordSource;
     int boundColumn;
-    QList<uint> visibleColumns;
+    QList<int> visibleColumns;
     QList<int> columnWidths;
-    uint maxVisibleRecords;
+    int maxVisibleRecords;
     DisplayWidget displayWidget;
     bool columnHeadersVisible;
     bool limitToList;
@@ -209,10 +209,10 @@ static bool setVisibleColumns(KDbLookupFieldSchema *lookup, const QVariant &val)
     else {
         variantList = val.toList();
     }
-    QList<uint> visibleColumns;
+    QList<int> visibleColumns;
     foreach(const QVariant& variant, variantList) {
         bool ok;
-        const uint ival = variant.toUInt(&ok);
+        const int ival = variant.toInt(&ok);
         if (!ok) {
             return false;
         }
@@ -227,7 +227,7 @@ static bool setColumnWidths(KDbLookupFieldSchema *lookup, const QVariant &val)
     QList<int> widths;
     foreach(const QVariant& variant, val.toList()) {
         bool ok;
-        const uint ival = variant.toInt(&ok);
+        const int ival = variant.toInt(&ok);
         if (!ok)
             return false;
         widths.append(ival);
@@ -239,7 +239,7 @@ static bool setColumnWidths(KDbLookupFieldSchema *lookup, const QVariant &val)
 static bool setDisplayWidget(KDbLookupFieldSchema *lookup, const QVariant &val)
 {
     bool ok;
-    const uint ival = val.toUInt(&ok);
+    const int ival = val.toInt(&ok);
     if (!ok || ival > KDbLookupFieldSchema::ListBox)
         return false;
     lookup->setDisplayWidget(static_cast<KDbLookupFieldSchema::DisplayWidget>(ival));
@@ -256,7 +256,7 @@ void KDbLookupFieldSchema::setRecordSource(const KDbLookupFieldSchema::RecordSou
     d->recordSource = recordSource;
 }
 
-void KDbLookupFieldSchema::setMaxVisibleRecords(uint count)
+void KDbLookupFieldSchema::setMaxVisibleRecords(int count)
 {
     if (count == 0)
         d->maxVisibleRecords = KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORDS;
@@ -275,7 +275,7 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
     dbg.space() << "visibleColumns:";
 
     bool first = true;
-    foreach(uint visibleColumn, lookup.visibleColumns()) {
+    foreach(int visibleColumn, lookup.visibleColumns()) {
         if (first) {
             first = false;
             dbg.nospace();
@@ -415,7 +415,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 return 0;
             }
             if (val.type() == QVariant::Int)
-                lookupFieldSchema->setMaxVisibleRecords(val.toUInt());
+                lookupFieldSchema->setMaxVisibleRecords(val.toInt());
         } else if (name == "limit-to-list") {
             /* <limit-to-list>
                 <bool>true/false</bool>
@@ -480,11 +480,11 @@ void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
                                           QLatin1String("bound-column"), boundColumn());
     }
 
-    QList<uint> visibleColumns(this->visibleColumns());
+    QList<int> visibleColumns(this->visibleColumns());
     if (!visibleColumns.isEmpty()) {
         QDomElement visibleColumnEl(doc->createElement(QLatin1String("visible-column")));
         lookupColumnEl.appendChild(visibleColumnEl);
-        foreach(uint visibleColumn, visibleColumns) {
+        foreach(int visibleColumn, visibleColumns) {
             QDomElement numberEl(doc->createElement(QLatin1String("number")));
             visibleColumnEl.appendChild(numberEl);
             numberEl.appendChild(doc->createTextNode(QString::number(visibleColumn)));
@@ -564,7 +564,7 @@ bool KDbLookupFieldSchema::setProperty(const QByteArray& propertyName, const QVa
     } else if ("showColumnHeaders" == propertyName) {
         setColumnHeadersVisible(value.toBool());
     } else if ("listRows" == propertyName) {
-        const uint ival = value.toUInt(&ok);
+        const int ival = value.toInt(&ok);
         if (!ok)
             return false;
         setMaxVisibleRecords(ival);
@@ -647,19 +647,19 @@ void KDbLookupFieldSchema::setBoundColumn(int column)
     d->boundColumn = column >= 0 ? column : -1;
 }
 
-QList<uint> KDbLookupFieldSchema::visibleColumns() const
+QList<int> KDbLookupFieldSchema::visibleColumns() const
 {
     return d->visibleColumns;
 }
 
-void KDbLookupFieldSchema::setVisibleColumns(const QList<uint>& list)
+void KDbLookupFieldSchema::setVisibleColumns(const QList<int>& list)
 {
     d->visibleColumns = list;
 }
 
-int KDbLookupFieldSchema::visibleColumn(uint index) const
+int KDbLookupFieldSchema::visibleColumn(int index) const
 {
-    if (index >= uint(d->visibleColumns.count())) {
+    if (index >= d->visibleColumns.count()) {
         return -1;
     }
     return index;
@@ -685,7 +685,7 @@ void KDbLookupFieldSchema::setColumnHeadersVisible(bool set)
     d->columnHeadersVisible = set;
 }
 
-uint KDbLookupFieldSchema::maxVisibleRecords() const
+int KDbLookupFieldSchema::maxVisibleRecords() const
 {
     return d->maxVisibleRecords;
 }

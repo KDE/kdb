@@ -193,17 +193,17 @@ void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
     d->anyNonPKField = 0; //for safety
 }
 
-KDbFieldList& KDbTableSchema::insertField(uint index, KDbField *field)
+KDbFieldList& KDbTableSchema::insertField(int index, KDbField *field)
 {
     assert(field);
     KDbFieldList::insertField(index, field);
-    if (!field || index > (uint)m_fields.count())
+    if (!field || index > m_fields.count())
         return *this;
     field->setTable(this);
     field->m_order = index;
     //update order for next next fields
-    uint fieldCount = m_fields.count();
-    for (uint i = index + 1; i < fieldCount; i++)
+    const int fieldCount = m_fields.count();
+    for (int i = index + 1; i < fieldCount; i++)
         m_fields.at(i)->m_order = i;
 
     //Check for auto-generated indices:
@@ -348,7 +348,7 @@ QVector<KDbLookupFieldSchema*> KDbTableSchema::lookupFields() const
     //update
     d->lookupFieldsList.clear();
     d->lookupFieldsList.resize(d->lookupFields.count());
-    uint i = 0;
+    int i = 0;
     foreach(KDbField* f, m_fields) {
         QHash<const KDbField*, KDbLookupFieldSchema*>::ConstIterator itMap = d->lookupFields.constFind(f);
         if (itMap != d->lookupFields.constEnd()) {

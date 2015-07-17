@@ -31,7 +31,7 @@
 
 #include <sqldb.h>
 
-SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql, uint cursor_options)
+SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql, int cursor_options)
         : KDbCursor(conn, sql, cursor_options)
         , d(new SybaseCursorData(conn))
 {
@@ -42,7 +42,7 @@ SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql, uin
 // KDbDrvDbg << "SybaseCursor: constructor for query statement";
 }
 
-SybaseCursor::SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+SybaseCursor::SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
         : KDbCursor(conn, query, options)
         , d(new SybaseCursorData(conn))
 {
@@ -138,7 +138,7 @@ void SybaseCursor::drv_getNextRecord()
 }
 
 
-QVariant SybaseCursor::value(uint pos)
+QVariant SybaseCursor::value(int pos)
 {
     if (!d->dbProcess || pos >= m_fieldCount)
         return QVariant();
@@ -178,9 +178,9 @@ bool SybaseCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 // if (d->numRows<=0)
 //  return false;
 
-    const uint fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : UINT_MAX;
-    const uint realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
-    for (uint i = 0; i < realCount; i++) {
+    const int fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : INT_MAX;
+    const int realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
+    for (int i = 0; i < realCount; i++) {
         KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
         if (m_fieldsExpanded && !f)
             continue;

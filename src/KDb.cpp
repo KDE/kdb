@@ -48,6 +48,8 @@
 
 #include <memory>
 
+Q_DECLARE_METATYPE(KDbField::Type)
+
 class ConnectionTestDialog;
 
 class ConnectionTestThread : public QThread
@@ -87,7 +89,7 @@ protected:
     KDbConnectionData m_connData;
     QTimer m_timer;
     KDbMessageHandler* m_msgHandler;
-    uint m_elapsedTime;
+    int m_elapsedTime;
     bool m_error;
     QString m_msg;
     QString m_details;
@@ -567,7 +569,7 @@ QString KDb::formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces
 //! @todo round?
     if (decimalPlaces < 0) {
         QString s(QString::number(value, 'f', 10 /*reasonable precision*/));
-        uint i = s.length() - 1;
+        int i = s.length() - 1;
         while (i > 0 && s[i] == QLatin1Char('0'))
             i--;
         if (s[i] == QLatin1Char('.')) //remove '.'
@@ -576,7 +578,7 @@ QString KDb::formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces
         return s;
     }
     if (decimalPlaces == 0)
-        return QString::number((int)value);
+        return QString::number(int(value));
     return QLocale().toString(value, 'g', decimalPlaces);
 }
 
@@ -664,7 +666,7 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
         values->insert("visibleColumn", lookup ? lookup->visibleColumns().first() : QVariant());
     }
     else {
-        QList<uint> visibleColumns = lookup->visibleColumns();
+        QList<int> visibleColumns = lookup->visibleColumns();
         foreach(const QVariant& variant, visibleColumns) {
             variantList.append(variant);
         }
@@ -682,7 +684,7 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
     values->insert("showColumnHeaders", lookup ? lookup->columnHeadersVisible() : QVariant());
     values->insert("listRows", lookup ? lookup->maxVisibleRecords() : QVariant());
     values->insert("limitToList", lookup ? lookup->limitToList() : QVariant());
-    values->insert("displayWidget", lookup ? uint(lookup->displayWidget()) : QVariant());
+    values->insert("displayWidget", lookup ? int(lookup->displayWidget()) : QVariant());
 }
 
 void KDb::getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *values)
@@ -691,16 +693,16 @@ void KDb::getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *
     values->clear();
     // normal values
     values->insert("type", field.type());
-    const uint constraints = field.constraints();
-    values->insert("primaryKey", constraints & KDbField::PrimaryKey);
-    values->insert("indexed", constraints & KDbField::Indexed);
+    const KDbField::Constraints constraints = field.constraints();
+    values->insert("primaryKey", constraints.testFlag(KDbField::PrimaryKey));
+    values->insert("indexed", constraints.testFlag(KDbField::Indexed));
     values->insert("autoIncrement", KDbField::isAutoIncrementAllowed(field.type())
-                                    && (constraints & KDbField::AutoInc));
-    values->insert("unique", constraints & KDbField::Unique);
-    values->insert("notNull", constraints & KDbField::NotNull);
-    values->insert("allowEmpty", !(constraints & KDbField::NotEmpty));
-    const uint options = field.options();
-    values->insert("unsigned", options & KDbField::Unsigned);
+                                    && constraints.testFlag(KDbField::AutoInc));
+    values->insert("unique", constraints.testFlag(KDbField::Unique));
+    values->insert("notNull", constraints.testFlag(KDbField::NotNull));
+    values->insert("allowEmpty", !constraints.testFlag(KDbField::NotEmpty));
+    const KDbField::Options options = field.options();
+    values->insert("unsigned", options.testFlag(KDbField::Unsigned));
     values->insert("name", field.name());
     values->insert("caption", field.caption());
     values->insert("description", field.description());
@@ -776,7 +778,7 @@ bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& 
     if ((it = values.find("description")) != values.constEnd())
         field->setDescription((*it).toString());
     if ((it = values.find("maxLength")) != values.constEnd())
-        field->setMaxLength((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+        field->setMaxLength((*it).isNull() ? 0/*default*/ : (*it).toInt(&ok));
     if (!ok)
         return false;
     if ((it = values.find("maxLengthIsDefault")) != values.constEnd()
@@ -785,7 +787,7 @@ bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& 
         field->setMaxLengthStrategy(KDbField::DefaultMaxLength);
     }
     if ((it = values.find("precision")) != values.constEnd())
-        field->setPrecision((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+        field->setPrecision((*it).isNull() ? 0/*default*/ : (*it).toInt(&ok));
     if (!ok)
         return false;
     if ((it = values.find("defaultValue")) != values.constEnd())
@@ -793,7 +795,7 @@ bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& 
 //! @todo IMPORTANT: defaultWidth
 #if 0
     if ((it = values.find("defaultWidth")) != values.constEnd())
-        field.setDefaultWidth((*it).isNull() ? 0/*default*/ : (*it).toUInt(&ok));
+        field.setDefaultWidth((*it).isNull() ? 0/*default*/ : (*it).toInt(&ok));
     if (!ok)
         return false;
 #endif
@@ -884,7 +886,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
         return true; \
     }
 #define GET_INT(method) { \
-        const uint ival = value.toUInt(&ok); \
+        const int ival = value.toInt(&ok); \
         if (!ok) \
             return false; \
         field->method( ival ); \
@@ -1468,10 +1470,10 @@ QVariant KDb::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
             *ok = false;
         return QVariant();
     case QVariant::ByteArray: {//special case: hex string
-        const uint len = s.length();
+        const int len = s.length();
         QByteArray ba;
         ba.resize(len / 2 + len % 2);
-        for (uint i = 0; i < (len - 1); i += 2) {
+        for (int i = 0; i < (len - 1); i += 2) {
             bool _ok;
             int c = s.mid(i, 2).toInt(&_ok, 16);
             if (!_ok) {
@@ -1717,8 +1719,8 @@ bool KDb::importSqliteFile(const QString &inputFileName, const QString &outputFi
 
 bool KDb::isIdentifier(const QString& s)
 {
-    uint i;
-    const uint sLength = s.length();
+    int i;
+    const int sLength = s.length();
     for (i = 0; i < sLength; i++) {
         const char c = s.at(i).toLower().toLatin1();
         if (c == 0 || !(c == '_' || (c >= 'a' && c <= 'z') || (i > 0 && c >= '0' && c <= '9')))
@@ -1757,8 +1759,8 @@ QString KDb::stringToIdentifier(const QString &s)
         wasUnderscore = add == QLatin1String("_");
     }
 
-    const uint idLength = id.length();
-    for (uint i = 1; i < idLength; i++) {
+    const int idLength = id.length();
+    for (int i = 1; i < idLength; i++) {
         add = charToIdentifier(id.at(i));
         if (wasUnderscore && add == QLatin1String("_"))
             continue;

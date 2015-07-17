@@ -74,9 +74,7 @@ public:
     virtual ~KDbCursor();
 
     /*! @return connection used for the cursor */
-    inline KDbConnection* connection() const {
-        return m_conn;
-    }
+    KDbConnection* connection() const;
 
     /*! Opens the cursor using data provided on creation.
      The data might be either KDbQuerySchema or a raw SQL statement. */
@@ -92,10 +90,8 @@ public:
     virtual bool close();
 
     /*! @return query schema used to define this cursor
-     or NULL if the cursor is not defined by a query schema but by a raw SQL statement. */
-    inline KDbQuerySchema *query() const {
-        return m_query;
-    }
+     or 0 if the cursor is not defined by a query schema but by a raw SQL statement. */
+    KDbQuerySchema *query() const;
 
     //! @return query parameters assigned to this cursor
     QList<QVariant> queryParameters() const;
@@ -105,20 +101,14 @@ public:
 
     /*! @return raw query statement used to define this cursor
      or null string if raw statement instead (but KDbQuerySchema is defined instead). */
-    inline KDbEscapedString rawSql() const {
-        return m_rawSql;
-    }
+    KDbEscapedString rawSql() const;
 
     /*! @return logically or'd cursor's options,
       selected from KDbCursor::Options enum. */
-    inline uint options() const {
-        return m_options;
-    }
+    int options() const;
 
     /*! @return true if the cursor is opened. */
-    inline bool isOpened() const {
-        return m_opened;
-    }
+    bool isOpened() const;
 
     /*! @return true if the cursor is buffered. */
     bool isBuffered() const;
@@ -168,7 +158,7 @@ public:
 
     /*! @return number of fields available for this cursor.
      This never includes ROWID column or other internal columns (e.g. lookup). */
-    inline uint fieldCount() const {
+    inline int fieldCount() const {
         return m_query ? m_logicalFieldCount : m_fieldCount;
     }
 
@@ -178,9 +168,7 @@ public:
      for a KDb database driver and the master table has no primary key defined.
      Phisically, ROWID value is returned after last returned field,
      so data vector's length is expanded by one. */
-    inline bool containsRecordIdInfo() const {
-        return m_containsRecordIdInfo;
-    }
+    bool containsRecordIdInfo() const;
 
     /*! @return a value stored in column number @a i (counting from 0).
      Is has unspecified behaviour if the cursor is not at valid record.
@@ -188,7 +176,7 @@ public:
      If @a i is >= than m_fieldCount, null QVariant value should be returned.
      To return a value typically you can use a pointer to internal structure
      that contain current record data (buffered or unbuffered). */
-    virtual QVariant value(uint i) = 0;
+    virtual QVariant value(int i) = 0;
 
     /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
     virtual const char ** recordData() const = 0;
@@ -221,22 +209,12 @@ public:
     /*! Allocates a new KDbRecordData and stores data in it (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
      @return newly created record data object or 0 on error. */
-    inline KDbRecordData* storeCurrentRecord() const {
-        KDbRecordData* data = new KDbRecordData(m_fieldsToStoreInRecord);
-        if (!drv_storeCurrentRecord(data)) {
-            delete data;
-            return 0;
-        }
-        return data;
-    }
+    KDbRecordData* storeCurrentRecord() const;
 
     /*! Puts current record's data into @a data (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
      @return true on success. */
-    inline bool storeCurrentRecord(KDbRecordData* data) const {
-        data->resize(m_fieldsToStoreInRecord);
-        return drv_storeCurrentRecord(data);
-    }
+    bool storeCurrentRecord(KDbRecordData* data) const;
 
     bool updateRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId = false);
 
@@ -248,10 +226,10 @@ public:
 
 protected:
     /*! Cursor will operate on @a conn, raw SQL statement @a sql will be used to execute query. */
-    KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options = NoOptions);
+    KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int options = NoOptions);
 
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
-    KDbCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
+    KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
 
     void init();
 
@@ -322,12 +300,12 @@ protected:
     bool m_containsRecordIdInfo; //!< true if result contains extra column for record id;
                                  //!< used only for PostgreSQL now
     qint64 m_at;
-    uint m_fieldCount; //!< cached field count information
-    uint m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
+    int m_fieldCount; //!< cached field count information
+    int m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
                                   //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
                                   //!< sets m_fieldCount+1 here)
-    uint m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
-    uint m_options; //!< cursor options that describes its behaviour
+    int m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
+    int m_options; //!< cursor options that describes its behaviour
 
     //! possible results of record fetching, used for m_fetchResult
     enum FetchResult {

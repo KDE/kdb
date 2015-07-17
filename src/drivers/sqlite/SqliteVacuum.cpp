@@ -203,7 +203,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
         return;
     }
     QFileInfo fi(m_filePath);
-    const uint origSize = fi.size();
+    const qint64 origSize = fi.size();
 
     const QByteArray oldName(QFile::encodeName(m_tmpFilePath)), newName(QFile::encodeName(fi.absoluteFilePath()));
     if (0 != ::rename(oldName.constData(), newName.constData())) {
@@ -212,8 +212,8 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
     }
 
     if (m_result == true) {
-        const uint newSize = QFileInfo(m_filePath).size();
-        const uint decrease = 100 - 100 * newSize / origSize;
+        const qint64 newSize = QFileInfo(m_filePath).size();
+        const qint64 decrease = 100 - 100 * newSize / origSize;
         QMessageBox::information(0, QString(), // krazy:exclude=qclasses
             tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));

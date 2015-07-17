@@ -291,7 +291,7 @@ KDbQuerySchema* buildSelectQuery(
     QScopedPointer<SelectOptionsInternal> optionsPtr(options);
 
     //-------tables list
-    uint columnNum = 0;
+    int columnNum = 0;
     /*! @todo use this later if there are columns that use database fields,
               e.g. "SELECT 1 from table1 t, table2 t") is ok however. */
     //used to collect information about first repeated table name or alias:
@@ -418,7 +418,7 @@ KDbQuerySchema* buildSelectQuery(
         //----- ORDER BY
         if (options->orderByColumns) {
             KDbOrderByColumnList *orderByColumnList = querySchema->orderByColumnList();
-            uint count = options->orderByColumns->count();
+            int count = options->orderByColumns->count();
             OrderByColumnInternal::ListConstIterator it(options->orderByColumns->constEnd());
             --it;
             for (;count > 0; --it, --count)
@@ -427,11 +427,11 @@ KDbQuerySchema* buildSelectQuery(
                 //first, try to find a column name or alias (outside of asterisks)
                 KDbQueryColumnInfo *columnInfo = querySchema->columnInfo((*it).aliasOrName, false/*outside of asterisks*/);
                 if (columnInfo) {
-                    orderByColumnList->appendColumn(*columnInfo, (*it).ascending);
+                    orderByColumnList->appendColumn(columnInfo, (*it).ascending);
                 } else {
                     //failed, try to find a field name within all the tables
                     if ((*it).columnNumber != -1) {
-                        if (!orderByColumnList->appendColumn(*querySchema,
+                        if (!orderByColumnList->appendColumn(querySchema,
                                                             (*it).ascending, (*it).columnNumber - 1)) {
                             setError(KDbParser::tr("Could not define sorting - no column at position %1")
                                                    .arg((*it).columnNumber));
@@ -445,7 +445,7 @@ KDbQuerySchema* buildSelectQuery(
                                                    .arg((*it).aliasOrName));
                             return 0;
                         }
-                        orderByColumnList->appendField(*f, (*it).ascending);
+                        orderByColumnList->appendField(f, (*it).ascending);
                     }
                 }
             }

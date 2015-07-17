@@ -34,7 +34,7 @@ KDbField::FieldTypeNames KDbField::m_typeNames;
 KDbField::FieldTypeGroupNames KDbField::m_typeGroupNames;
 
 //! @todo make this configurable
-static uint m_defaultMaxLength = 0; // unlimited
+static int m_defaultMaxLength = 0; // unlimited
 
 KDbField::KDbField()
 {
@@ -69,7 +69,7 @@ KDbField::KDbField(KDbQuerySchema *querySchema)
 }
 
 KDbField::KDbField(const QString& name, Type type,
-             Constraints constr, Options options, uint maxLength, uint precision,
+             Constraints constr, Options options, int maxLength, int precision,
              QVariant defaultValue, const QString& caption, const QString& description)
         : m_parent(0)
         , m_name(name.toLower())
@@ -182,7 +182,7 @@ QStringList KDbField::typeNames()
 QString KDbField::typeString(Type type)
 {
     m_typeNames.init();
-    return (type <= Null) ? m_typeNames.at((int)Null + 1 + type)
+    return (type <= Null) ? m_typeNames.at(int(Null) + 1 + type)
                               : (QLatin1String("Type") + QString::number(type));
 }
 
@@ -201,7 +201,7 @@ QStringList KDbField::typeGroupNames()
 QString KDbField::typeGroupString(TypeGroup typeGroup)
 {
     m_typeGroupNames.init();
-    return m_typeGroupNames.value((int)LastTypeGroup + 1 + typeGroup,
+    return m_typeGroupNames.value(int(LastTypeGroup) + 1 + typeGroup,
                                   QLatin1String("TypeGroup") + QString::number(typeGroup));
 }
 
@@ -357,12 +357,12 @@ void KDbField::setConstraints(Constraints c)
     }
 }
 
-uint KDbField::defaultMaxLength()
+int KDbField::defaultMaxLength()
 {
     return m_defaultMaxLength;
 }
 
-void KDbField::setDefaultMaxLength(uint maxLength)
+void KDbField::setDefaultMaxLength(int maxLength)
 {
     m_defaultMaxLength = maxLength;
 }
@@ -377,20 +377,20 @@ void KDbField::setMaxLengthStrategy(MaxLengthStrategy strategy)
     m_maxLengthStrategy = strategy;
 }
 
-uint KDbField::maxLength() const
+int KDbField::maxLength() const
 {
     return m_maxLength;
 }
 
 void
-KDbField::setMaxLength(uint maxLength)
+KDbField::setMaxLength(int maxLength)
 {
     m_maxLength = maxLength;
     m_maxLengthStrategy = DefinedMaxLength;
 }
 
 void
-KDbField::setPrecision(uint p)
+KDbField::setPrecision(int p)
 {
     if (!isFPNumericType())
         return;
@@ -398,7 +398,7 @@ KDbField::setPrecision(uint p)
 }
 
 void
-KDbField::setScale(uint s)
+KDbField::setScale(int s)
 {
     if (!isFPNumericType())
         return;
@@ -525,7 +525,7 @@ KDbField::setDefaultValue(const QByteArray& def)
         break;
     }
     case Text: {
-        if (def.isNull() || (uint(def.length()) > maxLength()))
+        if (def.isNull() || def.length() > maxLength())
             m_defaultValue = QVariant();
         else
             m_defaultValue = QVariant(QLatin1String(def));

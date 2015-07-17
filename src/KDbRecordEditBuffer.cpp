@@ -41,36 +41,42 @@ KDbRecordEditBuffer::~KDbRecordEditBuffer()
     delete m_defaultValuesDbBufferIt;
 }
 
-const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo& ci, bool useDefaultValueIfPossible) const
+bool KDbRecordEditBuffer::isDBAware() const
 {
+    return m_dbBuffer != 0;
+}
+
+const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultValueIfPossible) const
+{
+    Q_ASSERT(ci);
     if (!m_dbBuffer) {
         kdbWarning() << "not db-aware buffer!";
         return 0;
     }
-    *m_dbBufferIt = m_dbBuffer->find(&ci);
+    *m_dbBufferIt = m_dbBuffer->find(ci);
     QVariant* result = 0;
     if (*m_dbBufferIt != m_dbBuffer->end())
         result = &(*m_dbBufferIt).value();
     if (useDefaultValueIfPossible
             && (!result || result->isNull())
-            && ci.field && !ci.field->defaultValue().isNull() && KDb::isDefaultValueAllowed(ci.field)
+            && ci->field && !ci->field->defaultValue().isNull() && KDb::isDefaultValueAllowed(ci->field)
             && !hasDefaultValueAt(ci)) {
         //no buffered or stored value: try to get a default value declared in a field, so user can modify it
         if (!result)
-            m_dbBuffer->insert(&ci, ci.field->defaultValue());
-        result = &(*m_dbBuffer)[ &ci ];
-        m_defaultValuesDbBuffer->insert(&ci, true);
+            m_dbBuffer->insert(ci, ci->field->defaultValue());
+        result = &(*m_dbBuffer)[ ci ];
+        m_defaultValuesDbBuffer->insert(ci, true);
     }
     return (const QVariant*)result;
 }
 
-const QVariant* KDbRecordEditBuffer::at(KDbField& f) const
+const QVariant* KDbRecordEditBuffer::at(const KDbField &field) const
 {
     if (!m_simpleBuffer) {
         kdbWarning() << "this is db-aware buffer!";
         return 0;
     }
-    *m_simpleBufferIt = m_simpleBuffer->constFind(f.name());
+    *m_simpleBufferIt = m_simpleBuffer->constFind(field.name());
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
         return 0;
     return &(*m_simpleBufferIt).value();
@@ -97,13 +103,13 @@ void KDbRecordEditBuffer::removeAt(const KDbQueryColumnInfo& ci)
     m_dbBuffer->remove(const_cast<KDbQueryColumnInfo*>(&ci)); // const_cast ok here, we won't modify ci
 }
 
-void KDbRecordEditBuffer::removeAt(const KDbField& f)
+void KDbRecordEditBuffer::removeAt(const KDbField& field)
 {
     if (!m_simpleBuffer) {
         kdbWarning() << "this is db-aware buffer!";
         return;
     }
-    m_simpleBuffer->remove(f.name());
+    m_simpleBuffer->remove(field.name());
 }
 
 void KDbRecordEditBuffer::removeAt(const QString& fname)
@@ -134,6 +140,36 @@ bool KDbRecordEditBuffer::isEmpty() const
     return true;
 }
 
+void KDbRecordEditBuffer::insert(KDbQueryColumnInfo *ci, const QVariant &val)
+{
+    if (m_dbBuffer) {
+        m_dbBuffer->insert(ci, val);
+        m_defaultValuesDbBuffer->remove(ci);
+    }
+}
+
+void KDbRecordEditBuffer::insert(const QString &fname, const QVariant &val)
+{
+    if (m_simpleBuffer) {
+        m_simpleBuffer->insert(fname, val);
+    }
+}
+
+bool KDbRecordEditBuffer::hasDefaultValueAt(KDbQueryColumnInfo *ci) const
+{
+    return m_defaultValuesDbBuffer->value(ci, false);
+}
+
+const KDbRecordEditBuffer::SimpleMap KDbRecordEditBuffer::simpleBuffer() const
+{
+    return *m_simpleBuffer;
+}
+
+const KDbRecordEditBuffer::DBMap KDbRecordEditBuffer::dbBuffer() const
+{
+    return *m_dbBuffer;
+}
+
 QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
 {
     if (buffer.isDBAware()) {
@@ -142,7 +178,7 @@ QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
         for (KDbRecordEditBuffer::DBMap::ConstIterator it = buffer.dbBuffer().constBegin(); it != buffer.dbBuffer().constEnd(); ++it) {
             dbg.nospace() << "* field name=" << it.key()->field->name() << "val="
             << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString())
-            << (buffer.hasDefaultValueAt(*it.key()) ? " DEFAULT\n" : "\n");
+            << (buffer.hasDefaultValueAt(it.key()) ? " DEFAULT\n" : "\n");
         }
         return dbg.space();
     }

@@ -40,12 +40,18 @@ class KDB_EXPORT KDbOrderByColumn
 {
 public:
     typedef QList<KDbOrderByColumn*>::ConstIterator ListConstIterator;
+
+    //! Creates an empty information about a single query column.
     KDbOrderByColumn();
-    explicit KDbOrderByColumn(KDbQueryColumnInfo& column, bool ascending = true, int pos = -1);
+
+    //! Creates information about a single query column @a column used for sorting.
+    //! @a column must not be 0.
+    explicit KDbOrderByColumn(KDbQueryColumnInfo* column, bool ascending = true, int pos = -1);
 
     //! Like above but used when the field @a field is not present on the list of columns.
     //! (e.g. SELECT a FROM t ORDER BY b; where T is a table with fields (a,b)).
-    explicit KDbOrderByColumn(KDbField& field, bool ascending = true);
+    //! @a field must not be 0.
+    explicit KDbOrderByColumn(KDbField* field, bool ascending = true);
 
     ~KDbOrderByColumn();
 
@@ -128,7 +134,8 @@ public:
      is used to find appropriate field or alias name.
      @return false if there is at least one name for which a field or alias name does not exist
      (all the newly appended fields are removed in this case) */
-    bool appendFields(KDbQuerySchema& querySchema,
+    //! @note @a querySchema must not be 0.
+    bool appendFields(KDbQuerySchema* querySchema,
                       const QString& field1, bool ascending1 = true,
                       const QString& field2 = QString(), bool ascending2 = true,
                       const QString& field3 = QString(), bool ascending3 = true,
@@ -136,48 +143,43 @@ public:
                       const QString& field5 = QString(), bool ascending5 = true);
 
     /*! Appends column @a columnInfo. Ascending sorting is set is @a ascending is true. */
-    void appendColumn(KDbQueryColumnInfo& columnInfo, bool ascending = true);
+    //! @note @a columnInfo must not be 0.
+    void appendColumn(KDbQueryColumnInfo* columnInfo, bool ascending = true);
 
     /*! Appends a field @a field. Ascending sorting is set is @a ascending is true.
      Read documentation of @ref KDbOrderByColumn(const KDbField& field, bool ascending = true)
      for more info. */
-    void appendField(KDbField& field, bool ascending = true);
+    //! @note @a field must not be 0.
+    void appendField(KDbField* field, bool ascending = true);
 
     /*! Appends field with a name @a field. Ascending sorting is set is @a ascending is true.
      @return true on successful appending, and false if there is no such field or alias
      name in the @a querySchema. */
-    bool appendField(KDbQuerySchema& querySchema, const QString& fieldName,
+    //! @note @a querySchema must not be 0.
+    bool appendField(KDbQuerySchema* querySchema, const QString& fieldName,
                      bool ascending = true);
 
     /*! Appends a column that is at position @a pos (counted from 0).
      @return true on successful adding and false if there is no such position @a pos. */
-    bool appendColumn(KDbQuerySchema& querySchema, bool ascending = true, int pos = -1);
+    //! @note @a querySchema must not be 0.
+    bool appendColumn(KDbQuerySchema* querySchema, bool ascending = true, int pos = -1);
 
     /*! @return true if the list is empty. */
-    bool isEmpty() const {
-        return QList<KDbOrderByColumn*>::isEmpty();
-    }
+    bool isEmpty() const;
 
     /*! @return number of elements of the list. */
-    uint count() const {
-        return QList<KDbOrderByColumn*>::count();
-    }
+    int count() const;
 
     /*! Removes all elements from the list (deletes them). */
     void clear();
 
-    iterator begin() {
-        return QList<KDbOrderByColumn*>::begin();
-    }
-    iterator end() {
-        return QList<KDbOrderByColumn*>::end();
-    }
-    const_iterator constBegin() const {
-        return QList<KDbOrderByColumn*>::constBegin();
-    }
-    const_iterator constEnd() const {
-        return QList<KDbOrderByColumn*>::constEnd();
-    }
+    iterator begin();
+
+    iterator end();
+
+    const_iterator constBegin() const;
+
+    const_iterator constEnd() const;
 
     /*! @return a string like "name ASC, 2 DESC" usable for building an SQL statement.
      If @a includeTableNames is true (the default) fields are output in a form
@@ -186,8 +188,8 @@ public:
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
     KDbEscapedString toSQLString(bool includeTableNames = true,
-                              KDbConnection *conn = 0,
-                              KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
+                                 KDbConnection *conn = 0,
+                                 KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 };
 
 //! @short KDbQuerySchema provides information about database query
@@ -236,19 +238,19 @@ public:
      Added field will be visible. Use insertField(position, field, false)
      to add invisible field.
     */
-    virtual KDbFieldList& insertField(uint position, KDbField *field);
+    virtual KDbFieldList& insertField(int position, KDbField *field);
 
     /* Like above method, but you can also set column's visibility.
      New column is not bound explicitly to any table.
     */
-    KDbFieldList& insertField(uint position, KDbField *field, bool visible);
+    KDbFieldList& insertField(int position, KDbField *field, bool visible);
 
     /* Like above method, but you can also explicitly bound the new column
      to specific position on tables list.
      If @a visible is true (the default), the field will be visible.
      If bindToTable==-1, no particular table should be bound.
-     @see tableBoundToColumn(uint columnPosition) */
-    KDbFieldList& insertField(uint position, KDbField *field,
+     @see tableBoundToColumn(int columnPosition) */
+    KDbFieldList& insertField(int position, KDbField *field,
                            int bindToTable, bool visible = true);
 
     /*! Adds @a field to the columns list.
@@ -260,7 +262,7 @@ public:
      at @a bindToTable position. Use bindToTable==-1 if no table should be bound.
      If @a visible is true (the default), the field will be visible.
      @see insertField()
-     @see tableBoundToColumn(uint columnPosition)
+     @see tableBoundToColumn(int columnPosition)
     */
     KDbFieldList& addField(KDbField* field, int bindToTable,
                         bool visible = true);
@@ -275,10 +277,10 @@ public:
 
     /*! @return visibility flag for column at @a position.
      By default column is visible. */
-    bool isColumnVisible(uint position) const;
+    bool isColumnVisible(int position) const;
 
     //! Sets visibility flag for column at @a position to @a v.
-    void setColumnVisible(uint position, bool v);
+    void setColumnVisible(int position, bool v);
 
     /*! Adds @a asterisk at the and of columns list. */
     KDbFieldList& addAsterisk(KDbQueryAsterisk *asterisk, bool visible = true);
@@ -360,7 +362,7 @@ public:
      If the column is an expression and has no alias defined,
      a new unique alias will be generated automatically on this call.
     */
-    QString columnAlias(uint position) const;
+    QString columnAlias(int position) const;
 
     /*! @return number of column aliases */
     int columnAliasesCount() const;
@@ -370,11 +372,11 @@ public:
      within the query.
      If there is no alias for this column,
      or if there is no such column in the query defined, false is returned. */
-    bool hasColumnAlias(uint position) const;
+    bool hasColumnAlias(int position) const;
 
     /*! Sets @a alias for a column at @a position, within the query.
      Passing empty string to @a alias clears alias for a given column. */
-    void setColumnAlias(uint position, const QString& alias);
+    void setColumnAlias(int position, const QString& alias);
 
     /*! @return a table position (within FROM section),
      that is bound to column at @a columnPosition (within SELECT section).
@@ -397,7 +399,7 @@ public:
         no database field is used for this column,
         e.g. "1" constant for "SELECT 1 from table" query statement)
     */
-    int tableBoundToColumn(uint columnPosition) const;
+    int tableBoundToColumn(int columnPosition) const;
 
     /*! @return number of table aliases */
     int tableAliasesCount() const;
@@ -405,7 +407,7 @@ public:
     /*! @return alias of a table at @a position (within FROM section)
      or null string if there is no alias for this table
      or if there is no such table within the query defined. */
-    QString tableAlias(uint position) const;
+    QString tableAlias(int position) const;
 
     /*! @return alias of a table @a tableName (within FROM section)
      or empty value if there is no alias for this table
@@ -447,7 +449,7 @@ public:
      has non empty alias defined.
      If there is no alias for this table,
      or if there is no such table in the query defined, false is returned. */
-    bool hasTableAlias(uint position) const;
+    bool hasTableAlias(int position) const;
 
     /*! @return column position that has defined alias @a name.
      If there is no such alias, -1 is returned. */
@@ -457,7 +459,7 @@ public:
      of the query).
      Passing empty sting to @a alias clears alias for a given table
      (only for specified @a position). */
-    void setTableAlias(uint position, const QString& alias);
+    void setTableAlias(int position, const QString& alias);
 
     /*! @return a list of relationships defined for this query */
     QList<KDbRelationship*>* relationships() const;
@@ -505,10 +507,10 @@ public:
     virtual KDbField* field(const QString& name);
 
     /*! @return field id or NULL if there is no such a field. */
-    KDbField* field(uint id);
+    KDbField* field(int id);
 
-    /*! @overload KDbField* field(uint id) */
-    const KDbField* field(uint id) const;
+    /*! @overload KDbField* field(int id) */
+    const KDbField* field(int id) const;
 
     /*! Like KDbQuerySchema::field(const QString& name) but returns not only KDbField
      object for @a identifier but entire KDbQueryColumnInfo object.
@@ -583,7 +585,7 @@ public:
      The returned field can be either logical or internal (for lookup),
      the latter case is true if @a index &gt;= fieldsExpanded().count().
      Equivalent of KDbQuerySchema::fieldsExpanded(WithInternalFields).at(index). */
-    KDbQueryColumnInfo* expandedOrInternalField(uint index) const;
+    KDbQueryColumnInfo* expandedOrInternalField(int index) const;
 
     /*! Options used in columnsOrder(). */
     enum ColumnsOrderOptions {
@@ -617,7 +619,7 @@ public:
      - columnsOrder(UnexpandedList) will return the following map: KDbQueryColumnInfo(id)->0,
        KDbQueryColumnInfo(name)->0, KDbQueryColumnInfo(surname)->0 because the column
        list is not expanded. This way you can use the returned index to get KDbField*
-       pointer using field(uint) method of KDbFieldList superclass.
+       pointer using field(int) method of KDbFieldList superclass.
      - columnsOrder(UnexpandedListWithoutAsterisks) will return the following map:
        KDbQueryColumnInfo(id)->0,
     */
@@ -665,7 +667,7 @@ public:
         and pkeyFieldsOrder() will return vector {-1, 1}, as second primary key's field
         is at position #1 and first field is not specified at all within the query.
     */
-    uint pkeyFieldCount();
+    int pkeyFieldCount();
 
     /*! @return a list of field infos for all auto-incremented fields
      from master table of this query. This result is cached for efficiency.

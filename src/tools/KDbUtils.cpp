@@ -68,10 +68,10 @@ void KDbUtils::serializeMap(const QMap<QString, QString>& map, QString *string)
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
     kdbDebug() << array[3] << array[4] << array[5];
-    const uint size = array.size();
+    const int size = array.size();
     string->clear();
     string->reserve(size);
-    for (uint i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         (*string)[i] = QChar(ushort(array[i]) + 1);
     }
 }
@@ -89,9 +89,9 @@ QMap<QString, QString> KDbUtils::deserializeMap(const QByteArray& array)
 QMap<QString, QString> KDbUtils::deserializeMap(const QString& string)
 {
     QByteArray array;
-    const uint size = string.length();
+    const int size = string.length();
     array.resize(size);
-    for (uint i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         array[i] = char(string[i].unicode() - 1);
     }
     QMap<QString, QString> map;
@@ -122,11 +122,11 @@ void KDbUtils::simpleDecrypt(QString *string)
         (*string)[i] = QChar((*string)[i].unicode() - 47 - i);
 }
 
-QString KDbUtils::ptrToStringInternal(void* ptr, uint size)
+QString KDbUtils::ptrToStringInternal(void* ptr, int size)
 {
     QString str;
     unsigned char* cstr_ptr = (unsigned char*) & ptr;
-    for (uint i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         QString s;
         s.sprintf("%2.2x", cstr_ptr[i]);
         str.append(s);
@@ -134,14 +134,14 @@ QString KDbUtils::ptrToStringInternal(void* ptr, uint size)
     return str;
 }
 
-void* KDbUtils::stringToPtrInternal(const QString& str, uint size)
+void* KDbUtils::stringToPtrInternal(const QString& str, int size)
 {
-    if ((str.length() / 2) < (int)size)
+    if ((str.length() / 2) < size)
         return 0;
     QByteArray array;
     array.resize(size);
     bool ok;
-    for (uint i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         array[i] = (unsigned char)(str.mid(i * 2, 2).toUInt(&ok, 16));
         if (!ok)
             return 0;

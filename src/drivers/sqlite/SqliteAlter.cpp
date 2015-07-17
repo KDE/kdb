@@ -63,7 +63,7 @@ tristate SqliteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbFie
 {
     if (propertyName == QLatin1String("type")) {
         bool ok;
-        KDbField::Type type = KDb::intToFieldType(value.toUInt(&ok));
+        KDbField::Type type = KDb::intToFieldType(value.toInt(&ok));
         if (!ok || KDbField::InvalidType == type) {
             //! @todo msg
             return false;

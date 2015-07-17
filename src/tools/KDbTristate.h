@@ -85,10 +85,10 @@ enum tristate_cancelled_t {
  * a callback function or a Qt slot. Example:
  * @code
  * public Q_SLOTS:
- *   void validateData(tristate& result);
+ *   void validateData(tristate *result);
  * @endcode
  * Having the single parameter, signals and slots have still simple look.
- * Developers can alter their code (by replacing 'bool& result' with 'tristate& result')
+ * Developers can alter their code (by replacing 'bool *result' with 'tristate *result')
  * in case when a possibility of canceling of, say, data provessing needs to be implemented.
  * Let's say @e validateData() function uses a QDialog to get some validation from a user.
  * While QDialog::Rejected is returned after cancellation of the validation process,

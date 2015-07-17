@@ -52,7 +52,7 @@ public:
     virtual ~KDbFieldList();
 
     /*! @return number of fields in the list. */
-    uint fieldCount() const;
+    int fieldCount() const;
 
     /*! @return true if the list is empty. */
     bool isEmpty() const;
@@ -64,7 +64,7 @@ public:
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
-    virtual KDbFieldList& insertField(uint index, KDbField *field);
+    virtual KDbFieldList& insertField(int index, KDbField *field);
 
     /*! Removes field from the field list. Use with care.
 
@@ -76,13 +76,13 @@ public:
     /*! Moves fiels @a field from its current position to new position @a newIndex.
      If @a newIndex value is greater than fieldCount()-1, it is appended.
      @return false if this field does not belong to this list. */
-    virtual bool moveField(KDbField *field, uint newIndex);
+    virtual bool moveField(KDbField *field, int newIndex);
 
     /*! @return field id or NULL if there is no such a field. */
-    KDbField* field(uint id);
+    KDbField* field(int id);
 
-    /*! @overload KDbField* field(uint id) */
-    const KDbField* field(uint id) const;
+    /*! @overload KDbField* field(int id) */
+    const KDbField* field(int id) const;
 
     /*! @return field with name @a name or NULL if there is no such a field. */
     virtual KDbField* field(const QString& name);
@@ -141,7 +141,7 @@ public:
     KDbFieldList* subList(const QList<QByteArray>& list);
 
     /*! Like above, but with a list of field indices */
-    KDbFieldList* subList(const QList<uint>& list);
+    KDbFieldList* subList(const QList<int>& list);
 
     /*! @return a string that is a result of all field names concatenated
      and with @a separator. This is usable e.g. as argument like "field1,field2"

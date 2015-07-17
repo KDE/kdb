@@ -67,7 +67,7 @@ KDbField::Type KDbConstExpressionData::typeInternal(KDb::ExpressionCallStack* ca
         return KDbField::BigInteger;
     case CHARACTER_STRING_LITERAL:
         if (KDbField::defaultMaxLength() > 0
-            && uint(value.toString().length()) > KDbField::defaultMaxLength())
+            && value.toString().length() > KDbField::defaultMaxLength())
         {
             return KDbField::LongText;
         }

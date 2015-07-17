@@ -30,11 +30,11 @@ class MysqlCursor: public KDbCursor
 {
 public:
     MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
-                uint cursor_options = NoOptions);
-    MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
+                int cursor_options = NoOptions);
+    MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
     virtual ~MysqlCursor();
 
-    virtual QVariant value(uint pos);
+    virtual QVariant value(int pos);
     virtual const char** recordData() const;
     virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
     virtual bool drv_open(const KDbEscapedString& sql);
@@ -50,7 +50,6 @@ public:
 
 private:
     void storeResult();
-    QVariant pValue(uint pos) const;
     MysqlCursorData *d;
 };
 

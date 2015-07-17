@@ -77,34 +77,26 @@ public:
     typedef QMap<KDbQueryColumnInfo*, QVariant> DBMap;
 
     explicit KDbRecordEditBuffer(bool dbAwareBuffer);
+
     ~KDbRecordEditBuffer();
 
-    inline bool isDBAware() const {
-        return m_dbBuffer != 0;
-    }
+    bool isDBAware() const;
 
     void clear();
 
     bool isEmpty() const;
 
     //! Inserts value @a val for db-aware buffer's column @a ci
-    inline void insert(KDbQueryColumnInfo& ci, QVariant &val) {
-        if (m_dbBuffer) {
-            m_dbBuffer->insert(&ci, val);
-            m_defaultValuesDbBuffer->remove(&ci);
-        }
-    }
+    void insert(KDbQueryColumnInfo* ci, const QVariant &val);
 
     //! Inserts value @a val for not-db-aware buffer's column @a fname
-    inline void insert(const QString& fname, QVariant &val) {
-        if (m_simpleBuffer) m_simpleBuffer->insert(fname, val);
-    }
+    void insert(const QString &fname, const QVariant &val);
 
     //! Removes value from db-aware buffer's column @a ci
     void removeAt(const KDbQueryColumnInfo& ci);
 
     //! Removes value from not-db-aware buffer's column @a fname
-    void removeAt(const KDbField& f);
+    void removeAt(const KDbField& field);
 
     //! Removes value from not-db-aware buffer's column @a fname
     void removeAt(const QString& fname);
@@ -114,26 +106,21 @@ public:
      default value obtained from @a ci if @a useDefaultValueIfPossible is true.
      Note that if the column is declared as unique (especially: primary key),
      default value will not be used. */
-    const QVariant* at(KDbQueryColumnInfo& ci, bool useDefaultValueIfPossible = true) const;
+    const QVariant* at(KDbQueryColumnInfo *ci, bool useDefaultValueIfPossible = true) const;
 
-    //! Useful only for not-db-aware buffer. @return value for field @a f
-    const QVariant* at(KDbField& f) const;
+    //! Useful only for not-db-aware buffer. @return value for field @a field
+    const QVariant* at(const KDbField &field) const;
 
     //! Useful only for not-db-aware buffer. @return value for field @a fname
     const QVariant* at(const QString& fname) const;
 
     //! Useful only for db-aware buffer: @return true if the value available as
     //! at( ci ) is obtained from column's default value
-    inline bool hasDefaultValueAt(KDbQueryColumnInfo& ci) const {
-        return m_defaultValuesDbBuffer->contains(&ci) && (*m_defaultValuesDbBuffer)[ &ci ];
-    }
+    bool hasDefaultValueAt(KDbQueryColumnInfo *ci) const;
 
-    inline const SimpleMap simpleBuffer() const {
-        return *m_simpleBuffer;
-    }
-    inline const DBMap dbBuffer() const {
-        return *m_dbBuffer;
-    }
+    const KDbRecordEditBuffer::SimpleMap simpleBuffer() const;
+
+    const KDbRecordEditBuffer::DBMap dbBuffer() const;
 
 protected:
     SimpleMap *m_simpleBuffer;

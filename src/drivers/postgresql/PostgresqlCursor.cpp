@@ -29,7 +29,7 @@
 
 
 // Constructor based on query statement
-PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, uint options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)
         : KDbCursor(conn, sql, options)
         , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
@@ -39,7 +39,7 @@ PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& 
 
 //==================================================================================
 //Constructor base on query object
-PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, uint options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
         : KDbCursor(conn, query, options)
         , d(new PostgresqlCursorData(conn))
 {
@@ -123,7 +123,7 @@ void PostgresqlCursor::drv_getPrevRecord()
 
 //==================================================================================
 //Return the value for a given column for the current record
-QVariant PostgresqlCursor::value(uint pos)
+QVariant PostgresqlCursor::value(int pos)
 {
     if (pos < m_fieldCount)
         return pValue(pos);
@@ -170,13 +170,13 @@ inline bool hasTimeZone(const QString& s)
 
 //==================================================================================
 //Return the value for a given column for the current record - Private const version
-QVariant PostgresqlCursor::pValue(uint pos) const
+QVariant PostgresqlCursor::pValue(int pos) const
 {
 //  KDbDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
     const qint64 row = at();
 
 #if 0
-    KDbField *f = (m_fieldsExpanded && pos < qMin((uint)m_fieldsExpanded->count(), m_fieldCount))
+    KDbField *f = (m_fieldsExpanded && pos < qMin(m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
 #endif
 // KDbDrvDbg << "pos:" << pos;
@@ -284,7 +284,7 @@ const char** PostgresqlCursor::recordData() const
 bool PostgresqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
 // KDbDrvDbg << "POSITION IS" << (long)m_at;
-    for (uint i = 0; i < m_fieldsToStoreInRecord; i++)
+    for (int i = 0; i < m_fieldsToStoreInRecord; i++)
         (*data)[i] = pValue(i);
     return true;
 }

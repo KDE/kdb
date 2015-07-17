@@ -51,7 +51,7 @@ bool xBaseConnection::drv_disconnect() {
   return d->db_disconnect(*data());
 }
 
-KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, uint cursor_options)
+KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
 {
   if ( !d->internalConn ) {
     return 0;
@@ -60,7 +60,7 @@ KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, uint curso
   return new xBaseCursor( this, internalCursor, sql, cursor_options );
 }
 
-KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, uint cursor_options) {
+KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, int cursor_options) {
   if ( !d->internalConn ) {
     return 0;
   }

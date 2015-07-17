@@ -29,15 +29,15 @@ class SybaseCursor: public KDbCursor
 {
 public:
     SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql,
-                 uint cursor_options = NoOptions);
-    SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, uint options = NoOptions);
+                 int cursor_options = NoOptions);
+    SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
     virtual ~SybaseCursor();
     virtual bool drv_open(const KDbEscapedString& sql);
     virtual bool drv_close();
 //   virtual bool drv_moveFirst();
     virtual void drv_getNextRecord();
     //virtual bool drv_getPrevRecord();
-    virtual QVariant value(uint);
+    virtual QVariant value(int);
 
 //    virtual void drv_clearServerResult();
     virtual void drv_appendCurrentRecordToBuffer();
@@ -52,7 +52,7 @@ public:
     virtual QString serverResultName() const;
 
 protected:
-    QVariant pValue(uint pos) const;
+    QVariant pValue(int pos) const;
 
     SybaseCursorData *d;
 };

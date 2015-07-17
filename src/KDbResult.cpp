@@ -18,6 +18,7 @@
 */
 
 #include "KDbResult.h"
+#include "KDbMessageHandler.h"
 #include "kdb_debug.h"
 
 #define ERRMSG(a) \
@@ -147,6 +148,16 @@ void KDbResultable::storePreviousError()
     kdbDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
+KDbResultable::KDbResultable()
+ : m_messageHandler(0)
+{
+}
+
+KDbResultable::KDbResultable(const KDbResultable &other)
+ : m_result(other.m_result), m_messageHandler(other.m_messageHandler)
+{
+}
+
 KDbResultable::~KDbResultable()
 {
 }
@@ -164,4 +175,21 @@ void KDbResultable::clearResult()
 QString KDbResultable::serverResultName() const
 {
     return QString();
+}
+
+void KDbResultable::setMessageHandler(KDbMessageHandler *handler)
+{
+    m_messageHandler = handler;
+}
+
+KDbMessageHandler* KDbResultable::messageHandler() const
+{
+    return m_messageHandler;
+}
+
+void KDbResultable::showMessage()
+{
+    if (m_messageHandler && m_result.isError()) {
+        m_messageHandler->showErrorMessage(m_result);
+    }
 }

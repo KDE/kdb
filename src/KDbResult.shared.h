@@ -149,25 +149,36 @@ protected:
 class KDB_EXPORT KDbResultable
 {
 public:
+    KDbResultable();
+
+    KDbResultable(const KDbResultable &other);
+
     virtual ~KDbResultable();
 
     KDbResult result() const;
 
     void clearResult();
 
-    /*!
-    @return engine-specific last server-side operation result name, a name for KDbResult::serverErrorCode().
+    /*! @return engine-specific last server-side operation result name, a name for KDbResult::serverErrorCode().
     Use this in your application to give users more information on what's up.
 
     Use this for your driver - default implementation just returns empty string.
     Note that this result name is not the same as the error message returned by KDbResult::serverMessage() or KDbResult::message().
-    @sa KDbResult::serverMessage()
-    */
+    @sa KDbResult::serverMessage() */
     virtual QString serverResultName() const;
+
+    //! Sets message handler to @a handler.
+    void setMessageHandler(KDbMessageHandler *handler);
+
+    //! @return associated message handler. 0 by default.
+    KDbMessageHandler* messageHandler() const;
+
+    void showMessage();
 
 protected:
     friend class KDbMessageTitleSetter;
     KDbResult m_result;
+    KDbMessageHandler *m_messageHandler;
 };
 
 //! Sends result @a result to debug output @a dbg.

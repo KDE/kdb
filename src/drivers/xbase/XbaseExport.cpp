@@ -142,7 +142,7 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecor
   }
 
 //     // for debugging purposes only
-//     for ( uint i=0; i< (uint)recordData->size(); ++i ) {
+//     for ( int i=0; i< recordData->size(); ++i ) {
 //         KDbDrvDbg<<table->GetField(i);
 //     }
 
@@ -201,11 +201,11 @@ bool xBaseExportPrivate::createIndexes(const QString& sourceTableName, KDbTableS
   QString pathName = tableNamePathMap.value( sourceTableName );
   QByteArray pathNameBa = pathName.toLatin1();
   xbDbf* table = xbase.GetDbfPtr( pathNameBa.constData() );
-  uint fieldCount = tableSchema->fieldCount();
+  int fieldCount = tableSchema->fieldCount();
 
   QString dirName = QFileInfo( pathName ).path();
 
-  for (uint i=0; i< (uint)fieldCount ; ++i) {
+  for (int i=0; i< fieldCount ; ++i) {
     KDbField* f = tableSchema->field(i);
 
     int returnCode;
@@ -373,11 +373,11 @@ bool xBaseExport::dest_createTable(const QString& originalName, KDbTableSchema* 
   // 3. End for
   // 4. Create table in overlay mode ( overwrite )
 
-  uint fieldCount = tableSchema->fieldCount();
+  int fieldCount = tableSchema->fieldCount();
   const int arrayLength = fieldCount + 1; // and extra space for the `null`
   xbSchema xBaseTableSchema[arrayLength];// = new xbSchema[fieldCount+1][4];
 
-  uint i = 0;
+  int i = 0;
   for (i = 0; i < fieldCount ; ++i) {
     KDbField* f = tableSchema->field(i);
 

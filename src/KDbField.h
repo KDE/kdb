@@ -159,7 +159,7 @@ public:
     KDbField(const QString& name, Type type,
           Constraints constr = NoConstraints,
           Options options = NoOptions,
-          uint maxLength = 0, uint precision = 0,
+          int maxLength = 0, int precision = 0,
           QVariant defaultValue = QVariant(),
           const QString& caption = QString(),
           const QString& description = QString());
@@ -396,11 +396,11 @@ public:
 
     /*! @return default maximum length of text.
         Default is 0, i.e unlimited length (if the engine supports it). */
-    static uint defaultMaxLength();
+    static int defaultMaxLength();
 
     /*! Sets default maximum length of text. 0 means unlimited length,
         greater than 0 means specific maximum length. */
-    static void setDefaultMaxLength(uint maxLength);
+    static void setDefaultMaxLength(int maxLength);
 
     /*! Strategy for defining maximum length of text for this field.
       Only makes sense if the field type is of Text type.
@@ -433,7 +433,7 @@ public:
 
     /*! @return maximum length of text allowed for this field. Only meaningful if the type is Text.
       @see setMaxLength() */
-    uint maxLength() const;
+    int maxLength() const;
 
     /*! Sets maximum length for this field. Only works for Text type.
      It can be specific maximum value or 0 for unlimited length (which will work if engine supports).
@@ -441,11 +441,11 @@ public:
      To reset to default maximum length, call setMaxLength(defaultMaxLength()) and then
      to indicate this is based on default setting, call setMaxLengthStrategy(DefaultMaxLength).
      @see maxLength(), maxLengthStrategy() */
-    void setMaxLength(uint maxLength);
+    void setMaxLength(int maxLength);
 
     /*! @return precision for numeric and other fields that have both length (scale)
      and precision (floating point types). */
-    inline uint precision() const {
+    inline int precision() const {
         return m_precision;
     }
 
@@ -456,7 +456,7 @@ public:
      of significant digits in the whole number, that is, the number of digits
      to both sides of the decimal point. So the number 23.5141 has a precision
      of 6 and a scale of 4. Integers can be considered to have a scale of zero. */
-    inline uint scale() const {
+    inline int scale() const {
         return m_maxLength;
     }
 
@@ -547,14 +547,14 @@ public:
 
     /*! Sets scale for this field. Only works for floating-point types.
      @see scale() */
-    void setScale(uint s);
+    void setScale(int s);
 
     /*! Sets number of decimal places that should be visible to the user.
      @see visibleDecimalPlaces() */
     void setVisibleDecimalPlaces(int p);
 
     /*! Sets scale for this field. Only works for floating-point types. */
-    void setPrecision(uint p);
+    void setPrecision(int p);
 
     /*! Sets unsigned flag for this field. Only works for integer types. */
     void setUnsigned(bool u);
@@ -669,8 +669,8 @@ public:
     QVector<QString> enumHints() const {
         return m_hints;
     }
-    QString enumHint(uint num) {
-        return (num < (uint)m_hints.size()) ? m_hints.at(num) : QString();
+    QString enumHint(int num) {
+        return (num < m_hints.size()) ? m_hints.at(num) : QString();
     }
     /*! sets the hint for enum fields */
     void setEnumHints(const QVector<QString> &l) {
@@ -717,8 +717,8 @@ protected:
     QString m_subType;
     Constraints m_constraints;
     MaxLengthStrategy m_maxLengthStrategy;
-    uint m_maxLength; //!< also used for storing scale for floating point types
-    uint m_precision;
+    int m_maxLength; //!< also used for storing scale for floating point types
+    int m_precision;
     int m_visibleDecimalPlaces; //!< used in visibleDecimalPlaces()
     Options m_options;
     QVariant m_defaultValue;

@@ -48,9 +48,9 @@ public:
 
     void clearCachedData();
 
-    void setColumnAlias(uint position, const QString& alias);
+    void setColumnAlias(int position, const QString& alias);
 
-    inline void setTableAlias(uint position, const QString& alias) {
+    inline void setTableAlias(int position, const QString& alias) {
         tableAliases.insert(position, alias.toLower());
         tablePositionsForAliases.insert(alias.toLower(), position);
     }
@@ -60,12 +60,12 @@ public:
         return columnAliases.count();
     }
 
-    inline QString columnAlias(uint position) {
+    inline QString columnAlias(int position) {
         tryRegenerateExprAliases();
         return columnAliases.value(position);
     }
 
-    inline bool hasColumnAlias(uint position) {
+    inline bool hasColumnAlias(int position) {
         tryRegenerateExprAliases();
         return columnAliases.contains(position);
     }
@@ -102,7 +102,7 @@ public:
 protected:
     void tryRegenerateExprAliases();
 
-    void setColumnAliasInternal(uint position, const QString& alias);
+    void setColumnAliasInternal(int position, const QString& alias);
 
     /*! Used to mapping columns to its aliases for this query */
     QHash<int, QString> columnAliases;
@@ -168,7 +168,7 @@ public:
     QVector<int> *pkeyFieldsOrder;
 
     /*! number of PKEY fields within the query */
-    uint pkeyFieldCount;
+    int pkeyFieldCount;
 
     /*! Forced (predefined) raw SQL statement */
     KDbEscapedString sql;
@@ -180,7 +180,7 @@ public:
      Used if table is used in FROM section more than once
      (using table aliases).
 
-     This list is updated by insertField(uint position, KDbField *field,
+     This list is updated by insertField(int position, KDbField *field,
      int bindToTable, bool visible), using bindToTable parameter.
 
      Example: for this statement:

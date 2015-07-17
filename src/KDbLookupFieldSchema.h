@@ -135,15 +135,15 @@ public:
     /*! @return a list of visible columns: a list of integers specifying indices (counted from 0)
      of columns within the row source that are visible in the combo box.
      Empty list means unspecified value. */
-    QList<uint> visibleColumns() const;
+    QList<int> visibleColumns() const;
 
     /*! Sets a list of visible columns to \a list. @see visibleColumns() */
-    void setVisibleColumns(const QList<uint>& list);
+    void setVisibleColumns(const QList<int>& list);
 
     /*! A helper method.
      If index >= visibleColumns().count(), -1 is returned,
      else \a index is returned. */
-    int visibleColumn(uint index) const;
+    int visibleColumn(int index) const;
 
     /*! @return a number of ordered integers specifying column widths;
      -1 means 'default width' for a given column. */
@@ -162,13 +162,13 @@ public:
     /*! @return integer property specifying a maximum number of records
      that can be displayed in a combo box popup or a list box. The default is
      equal to KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORD_COUNT constant. */
-    uint maxVisibleRecords() const;
+    int maxVisibleRecords() const;
 
     /*! Sets maximum number of records that can be displayed in a combo box popup
      or a list box. If @a count is 0, KDB_LOOKUP_FIELD_DEFAULT_MAX_VISIBLE_RECORD_COUNT is set.
      If @a count is greater than KDB_LOOKUP_FIELD_MAX_LIST_ROWS,
      KDB_LOOKUP_FIELD_MAX_LIST_ROWS is set. */
-    void setMaxVisibleRecords(uint count);
+    void setMaxVisibleRecords(int count);
 
     /*! @return true if , only values present on the list can be selected using
      the combo box. The default is true. */

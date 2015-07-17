@@ -110,16 +110,16 @@ public:
 
     KDbCursor* cursor() const;
 
-    uint columnCount() const;
+    int columnCount() const;
 
     //! @return number of visible columns
-    uint visibleColumnCount() const;
+    int visibleColumnCount() const;
 
     //! @return column at index @a index (visible or not)
-    KDbTableViewColumn* column(uint c);
+    KDbTableViewColumn* column(int c);
 
     //! @return visible column at index @a index
-    KDbTableViewColumn* visibleColumn(uint index);
+    KDbTableViewColumn* visibleColumn(int index);
 
     //! @return list of all columns
     QList<KDbTableViewColumn*>* columns();
@@ -213,7 +213,7 @@ public:
     /*! Inserts new @a record at index @a index.
      @a record will be owned by this data object.
      Note: Reasonable only for not not-db-aware version. */
-    void insertRecord(KDbRecordData *record, uint index, bool repaint = false);
+    void insertRecord(KDbRecordData *record, int index, bool repaint = false);
 
     //! @todo add this as well? void insertRecord(KDbRecordData *record, KDbRecordData *aboveRecord)
 
@@ -227,10 +227,10 @@ public:
         emit reloadRequested();
     }
 
-    inline KDbRecordData* at(uint index) {
+    inline KDbRecordData* at(int index) {
         return KDbTableViewDataBase::at(index);
     }
-    inline virtual uint count() const {
+    inline virtual int count() const {
         return KDbTableViewDataBase::count();
     }
     inline bool isEmpty() const {
@@ -315,7 +315,7 @@ Q_SIGNALS:
     void recordInserted(KDbRecordData*, bool repaint); //!< A record has been inserted
 
     //! A record has been inserted at @a index position (not db-aware data only)
-    void recordInserted(KDbRecordData*, uint index, bool repaint);
+    void recordInserted(KDbRecordData*, int index, bool repaint);
 
     /*! Emitted before deleting of a current record.
      Connect this signal to your slot and set @a result->success to false
