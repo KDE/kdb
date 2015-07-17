@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,6 +20,46 @@
 #include "KDbMessageHandler.h"
 
 #include "KDbResult.h"
+
+class KDbMessageGuard::Private
+{
+public:
+    Private() {}
+    const KDbResult *result;
+    KDbResultable *resultable;
+    KDbMessageHandler *handler;
+};
+
+KDbMessageGuard::KDbMessageGuard(KDbResultable *resultable)
+    : d(new Private)
+{
+    Q_ASSERT(resultable);
+    d->result = 0;
+    d->resultable = resultable;
+    d->handler = 0;
+}
+
+KDbMessageGuard::KDbMessageGuard(const KDbResult &result, KDbMessageHandler *handler)
+ : d(new Private)
+{
+    Q_ASSERT(handler);
+    d->result = &result;
+    d->resultable = 0;
+    d->handler = handler;
+}
+
+KDbMessageGuard::~KDbMessageGuard()
+{
+    if (d->handler && d->result->isError()) { // variant 1
+        d->handler->showErrorMessage(*d->result);
+    }
+    else if (d->resultable->messageHandler() && d->resultable->result().isError()){ // variant 2
+        d->resultable->messageHandler()->showErrorMessage(d->resultable->result());
+    }
+    delete d;
+}
+
+//------------------------------------------------
 
 KDbMessageTitleSetter::KDbMessageTitleSetter(KDbResult* result, const QString& message)
         : m_result(result)

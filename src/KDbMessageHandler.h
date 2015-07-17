@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
 
    Contains parts of kmessagebox.h
    Copyright (C) 1999 Waldo Bastian (bastian@kde.org)
@@ -32,6 +32,58 @@
 
 class KDbResult;
 class KDbResultable;
+class KDbMessageHandler;
+
+//! A guard class for transmitting messages based on KDbResult
+/*! It's intended use is for top-level public methods in applications that have to display
+ messages. Create it's instance on stack; at the end of the block, on KDbMessageGuard's
+ destruction result will be checked. If it's not empty, error is passed to the associated
+ message handler.
+ The example below emits error message if result is not empty before .
+ @code
+ class MyClass : ... public KDbResultable {
+ [..]
+     MyClass(KDbMessageHandler *handler) {
+         setMessageHandler(handler); // need ...
+     }
+     bool connectToProject() {
+         KDbMessageGuard mg(this); // MyClass is KDbResultable so this easy notation is possible
+         if (... something failed ...) {
+              m_result = KDbResult(tr("Operation failed."));
+              return false; // ~KDbMessageGuard called here, m_result is passed to messageHandler()
+         }
+         // ...
+         return true; // ~KDbMessageGuard called here is a no-op because there's no error in m_result
+     }
+ };
+ @endcode
+ There are two equivalent variants of usage:
+ - using the KDbResultable object as in the example above (recommended)
+ - using a reference to a KDbResult and a KDbMessageHandler
+ @note instantiating KDbMessageGuard objects on the heap makes not much sense.
+*/
+class KDB_EXPORT KDbMessageGuard
+{
+public:
+    //! Builds a guard in the current code block using @a resultable
+    //! Infromation from @a resultable will be used in ~KDbMessageGuard() to pass message
+    //! to the resultable->messageHandler() handler if the handler is present
+    //! and resultable->result().isError() == true.
+    //! @note @a resultable is required
+    explicit KDbMessageGuard(KDbResultable *resultable);
+
+    //! Builds a guard in the current code block using a reference to @a result and @a handler
+    //! These will be used in ~KDbMessageGuard() is result.isError() == true.
+    //! @note @a handler is required
+    KDbMessageGuard(const KDbResult &result, KDbMessageHandler *handler);
+
+    ~KDbMessageGuard();
+
+protected:
+    Q_DISABLE_COPY(KDbMessageGuard)
+    class Private;
+    Private * const d;
+};
 
 /*! Helper for setting temporary message title for an KDbResult object.
  Message title is a text prepended to error or warning messages.
