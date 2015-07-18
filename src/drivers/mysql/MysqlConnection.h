@@ -33,7 +33,7 @@ class MysqlConnectionInternal;
 */
 class MysqlConnection : public KDbConnection
 {
-Q_OBJECT
+    Q_DECLARE_TR_FUNCTIONS(MysqlConnection)
 public:
     virtual ~MysqlConnection();
 
