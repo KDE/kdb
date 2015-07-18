@@ -412,7 +412,7 @@ bool KDbCursor::getNextRecord()
                     m_at = -1; //position is invalid now and will not be used
                     if (m_fetchResult == FetchError) {
                         m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
-                                             tr("Cannot fetch next record."));
+                                             tr("Could not fetch next record."));
                         return false;
                     }
                     return false; // in case of m_fetchResult = FetchEnd or m_fetchResult = FetchInvalid
@@ -436,7 +436,7 @@ bool KDbCursor::getNextRecord()
                     return false;
                 }
                 m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
-                                     tr("Cannot fetch next record."));
+                                     tr("Could not fetch next record."));
                 return false;
             }
         } else //we have a record that was read ahead: eat this

@@ -905,7 +905,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
         }
         else if (KDb::isLookupFieldSchemaProperty(propertyName)) {
             if (!field->table()) {
-                kdbWarning() << "Cannot set" << propertyName << "property - no table assigned for field";
+                kdbWarning() << "Could not set" << propertyName << "property - no table assigned for field";
             } else {
                 KDbLookupFieldSchema *lookup = field->table()->lookupFieldSchema(*field);
                 const bool createLookup = !lookup;
@@ -1690,7 +1690,7 @@ bool KDb::importSqliteFile(const QString &inputFileName, const QString &outputFi
     QFileInfo fo(outputFileName);
     if (QFile(fo.absoluteFilePath()).exists()) {
         if (!QFile::remove(fo.absoluteFilePath())) {
-            kdbWarning() << "Cannot remove output file" << fo.absoluteFilePath();
+            kdbWarning() << "Could not remove output file" << fo.absoluteFilePath();
             return false;
         }
     }

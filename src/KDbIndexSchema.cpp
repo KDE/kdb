@@ -49,7 +49,7 @@ KDbIndexSchema::KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema& parent
     foreach(KDbField *f, idx.m_fields) {
         KDbField *parentTableField = parentTable.field(f->name());
         if (!parentTableField) {
-            kdbWarning() << "cannot find field" << f->name() << "in parentTable. Empty index will be created!";
+            kdbWarning() << "Could not find field" << f->name() << "in parentTable. Empty index will be created!";
             KDbFieldList::clear();
             break;
         }

@@ -575,7 +575,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
     }
     if (m_driver->isSystemDatabaseName(dbName)) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
-                             tr("Cannot create database \"%1\". This name is reserved for system database.").arg(dbName));
+                             tr("Could not create database \"%1\". This name is reserved for system database.").arg(dbName));
         return false;
     }
     if (m_driver->metaData()->isFileBased()) {
@@ -777,7 +777,7 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
         *name = anyAvailableDatabaseName();
         if (name->isEmpty()) {
             m_result = KDbResult(ERR_NO_DB_USED,
-                                 tr("Cannot find any database for temporary connection."));
+                                 tr("Could not find any database for temporary connection."));
             return false;
         }
         const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
@@ -804,7 +804,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
                 || (m_driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
-                                 tr("Cannot delete database - name not specified."));
+                                 tr("Could not delete database - name not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
@@ -822,13 +822,13 @@ bool KDbConnection::dropDatabase(const QString &dbName)
 
     if (dbToDrop.isEmpty()) {
         m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
-                             tr("Cannot delete database - name not specified."));
+                             tr("Could not delete database - name not specified."));
         return false;
     }
 
     if (m_driver->isSystemDatabaseName(dbToDrop)) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
-                             tr("Cannot delete system database \"%1\".").arg(dbToDrop));
+                             tr("Could not delete system database \"%1\".").arg(dbToDrop));
         return false;
     }
 
@@ -1273,7 +1273,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     if (tableSchema->fieldCount() < 1) {
         clearResult();
         m_result = KDbResult(ERR_CANNOT_CREATE_EMPTY_OBJECT,
-                             tr("Cannot create table without fields."));
+                             tr("Could not create table without fields."));
         return false;
     }
     const bool internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
@@ -2001,7 +2001,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
     if (!cursor)
         return false;
     if (cursor->connection() != this) {//illegal call
-        kdbWarning() << "Cannot delete the cursor not owned by the same connection!";
+        kdbWarning() << "Could not delete the cursor not owned by the same connection!";
         return false;
     }
     const bool ret = cursor->close();

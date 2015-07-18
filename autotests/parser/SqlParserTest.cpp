@@ -211,7 +211,7 @@ void SqlParserTest::testParse_data()
             }
             ok = !dbPath.isEmpty();
             QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file not specified, "
-                                            "cannot execute statement").arg(lineNum)));
+                                            "could not execute statement").arg(lineNum)));
 
             QTest::newRow(qPrintable(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
                           .arg(fname).arg(lineNum).arg(category).arg(testName)
