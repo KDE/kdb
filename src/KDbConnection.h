@@ -191,15 +191,22 @@ public:
     /*! @return names of all the @a objectType (see @a ObjectType in KDbGlobal.h)
     schemas stored in currently used database. KDb::AnyObjectType can be passed
     as @a objectType to get names of objects of any type.
-    If @a ok is not null then variable pointed by it will be set to the result.
-    On error, the functions can return incomplete list. */
+    The list ordered is based on object identifiers.
+    Only names that are identifiers (checked using KDb::isIdentifier()) are returned.
+    If @a ok is not 0 then variable pointed by it will be set to the result.
+    On error, the function returns empty list.
+    @see kdbSystemTableNames() tableNames(int,bool*) */
     QStringList objectNames(int objectType = KDb::AnyObjectType, bool* ok = 0);
 
     /*! @return names of all table schemas stored in currently
-     used database. If @a also_system_tables is true,
+     used database. If @a alsoSystemTables is true,
      internal KDb system table names (kexi__*) are also returned.
-     @see kdbSystemTableNames() */
-    QStringList tableNames(bool also_system_tables = false);
+     The list ordered is based on object identifiers.
+     Only names that are identifiers (checked using KDb::isIdentifier()) are returned.
+     If @a ok is not 0 then variable pointed by it will be set to the result.
+     On error, the function returns empty list.
+     @see kdbSystemTableNames() objectNames(int,bool*) */
+    QStringList tableNames(bool alsoSystemTables = false, bool* ok = 0);
 
     /*! @return list of internal KDb system table names
      (kexi__*). This does not mean that these tables can be found
@@ -232,33 +239,45 @@ public:
      This is a shortcut for objectIds(KDb::TableObjectType).
      Internal KDb system tables (kexi__*) are not available here
      because these have no identifiers assigned (more formally: id=-1).
+     If @a ok is not 0 then variable pointed by it will be set to the result.
 
-     Note: the fact that given id is on the returned list does not mean
+     @note The fact that given id is on the returned list does not mean
      that tableSchema( id ) returns anything. The table definition can be broken,
-     so you have to double check this. */
-    QList<int> tableIds();
+     so you have to double check this.
+
+     Only IDs of objects with names that are identifiers (checked using KDb::isIdentifier())
+     are returned.
+     @see queryIds()
+     */
+    QList<int> tableIds(bool* ok = 0);
 
     /*! @return ids of all database query schemas stored in currently
      used database. These ids can be later used as argument for querySchema().
      This is a shortcut for objectIds(KDb::QueryObjectType).
+     If @a ok is not 0 then variable pointed by it will be set to the result.
 
-     Note: the fact that given id is on the returned list does not mean
+     @note The fact that given id is on the returned list does not mean
      that querySchema( id ) returns anything. The query definition can be broken,
      so you have to double check this.
 
+     Only IDs of objects with names that are identifiers (checked using KDb::isIdentifier())
+     are returned.
      @see tableIds()
      */
-    QList<int> queryIds();
+    QList<int> queryIds(bool* ok = 0);
 
     /*! @return names of all schemas of object with @a objectType type
      that are stored in currently used database.
+     If @a ok is not 0 then variable pointed by it will be set to the result.
 
-     Note: the fact that given id is on the returned list does not mean
+     @note The fact that given id is on the returned list does not mean
      that the definition of the object is valid,
      so you have to double check this.
 
-     @see queryIds() */
-    QList<int> objectIds(int objectType);
+     Only IDs of objects with names that are identifiers (checked using KDb::isIdentifier())
+     are returned.
+     @see tableIds() queryIds() */
+    QList<int> objectIds(int objectType, bool* ok = 0);
 
     /*! @brief Creates new KDbTransaction handle and starts a new transaction.
      @return KDbTransaction object if transaction has been started
@@ -547,19 +566,19 @@ public:
      @return true if all values were fetched successfuly,
      false on data retrieving failure. Returning empty list can be still a valid result.
      On errors, the list is not cleared, it may contain a few retrieved values. */
-    tristate queryStringList(const KDbEscapedString& sql, QStringList* list, int column = 0);
+    bool queryStringList(const KDbEscapedString& sql, QStringList* list, int column = 0);
 
     /*! @overload tristate queryStringList(const KDbEscapedString& sql, QStringList* list,
                                            int column)
      Uses a QuerySchema object. */
-    tristate queryStringList(KDbQuerySchema* query, QStringList* list, int column = 0);
+    bool queryStringList(KDbQuerySchema* query, QStringList* list, int column = 0);
 
     /*! @overload tristate queryStringList(KDbQuerySchema* query, QStringList* list,
                                            int column)
      Accepts @a params as parameters that will be inserted into places marked with [] before
      query execution. */
-    tristate queryStringList(KDbQuerySchema* query, QStringList* list,
-                             const QList<QVariant>& params, int column = 0);
+    bool queryStringList(KDbQuerySchema* query, QStringList* list,
+                         const QList<QVariant>& params, int column = 0);
 
     /*! @return true if there is at least one record has been returned by executing query
      for a raw SQL statement @a sql.
@@ -1278,9 +1297,9 @@ protected:
                                        int column, bool addLimitTo1);
 
     /*! @internal used by queryStringList() methods. */
-    tristate queryStringListInternal(const KDbEscapedString *sql, QStringList* list,
+    bool queryStringListInternal(const KDbEscapedString *sql, QStringList* list,
                                  KDbQuerySchema* query, const QList<QVariant>* params,
-                                 int column);
+                                 int column, bool (*filterFunction)(const QString&));
 
     /*! @internal used by *Internal() methods.
      Executes query based on a raw SQL statement @a sql or @a query with optional @a params. */

@@ -856,51 +856,41 @@ bool KDbConnection::dropDatabase(const QString &dbName)
 
 QStringList KDbConnection::objectNames(int objectType, bool* ok)
 {
-    QStringList list;
-
     if (!checkIsDatabaseUsed()) {
-        if (ok)
+        if (ok) {
             *ok = false;
-        return list;
-    }
-
-    KDbEscapedString sql;
-    if (objectType == KDb::AnyObjectType)
-        sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
-    else
-        sql = "SELECT o_name FROM kexi__objects WHERE o_type=" + QByteArray::number(objectType)
-              + " ORDER BY o_id";
-
-    KDbCursor *c = executeQuery(sql);
-    if (!c) {
-        if (ok)
-            *ok = false;
-        return list;
-    }
-
-    for (c->moveFirst(); !c->eof(); c->moveNext()) {
-        QString name = c->value(0).toString();
-        if (KDb::isIdentifier(name)) {
-            list.append(name);
         }
+        return QStringList();
     }
-
-    if (!deleteCursor(c)) {
-        if (ok)
-            *ok = false;
-        return list;
+    KDbEscapedString sql;
+    if (objectType == KDb::AnyObjectType) {
+        sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
+    } else {
+        sql = KDbEscapedString("SELECT o_name FROM kexi__objects WHERE o_type=%1"
+                               " ORDER BY o_id").arg(objectType);
     }
-
-    if (ok)
-        *ok = true;
+    QStringList list;
+    const bool success = queryStringListInternal(&sql, &list, 0, 0, 0, KDb::isIdentifier);
+    if (ok) {
+        *ok = success;
+    }
+    if (!success) {
+        m_result.prependMessage(tr("Could not retrieve list of object names."));
+    }
     return list;
 }
 
-QStringList KDbConnection::tableNames(bool also_system_tables)
+QStringList KDbConnection::tableNames(bool alsoSystemTables, bool* ok)
 {
-    bool ok = true;
-    QStringList list = objectNames(KDb::TableObjectType, &ok);
-    if (also_system_tables && ok) {
+    bool success;
+    QStringList list = objectNames(KDb::TableObjectType, &success);
+    if (ok) {
+        *ok = success;
+    }
+    if (!success) {
+        m_result.prependMessage(tr("Could not retrieve list of table names."));
+    }
+    if (alsoSystemTables && success) {
         list += kdbSystemTableNames();
     }
     return list;
@@ -934,22 +924,20 @@ KDbProperties KDbConnection::databaseProperties() const
     return d->dbProperties;
 }
 
-QList<int> KDbConnection::tableIds()
+QList<int> KDbConnection::tableIds(bool* ok)
 {
-    return objectIds(KDb::TableObjectType);
+    return objectIds(KDb::TableObjectType, ok);
 }
 
-QList<int> KDbConnection::queryIds()
+QList<int> KDbConnection::queryIds(bool* ok)
 {
-    return objectIds(KDb::QueryObjectType);
+    return objectIds(KDb::QueryObjectType, ok);
 }
 
-QList<int> KDbConnection::objectIds(int objectType)
+QList<int> KDbConnection::objectIds(int objectType, bool* ok)
 {
-    QList<int> list;
-
     if (!checkIsDatabaseUsed())
-        return list;
+        return QList<int>();
 
     KDbEscapedString sql;
     if (objectType == KDb::AnyObjectType)
@@ -959,8 +947,14 @@ QList<int> KDbConnection::objectIds(int objectType)
               + " ORDER BY o_id";
 
     KDbCursor *c = executeQuery(sql);
-    if (!c)
-        return list;
+    if (!c) {
+        if (ok) {
+            *ok = false;
+        }
+        m_result.prependMessage(tr("Could not retrieve list of object identifiers."));
+        return QList<int>();
+    }
+    QList<int> list;
     for (c->moveFirst(); !c->eof(); c->moveNext()) {
         QString tname = c->value(1).toString(); //kexi__objects.o_name
         if (KDb::isIdentifier(tname)) {
@@ -968,6 +962,7 @@ QList<int> KDbConnection::objectIds(int objectType)
         }
     }
     deleteCursor(c);
+    *ok = true;
     return list;
 }
 
@@ -2299,10 +2294,11 @@ tristate KDbConnection::querySingleNumber(KDbQuerySchema* query, int* number,
     return querySingleNumberInternal(0, number, query, &params, column, addLimitTo1);
 }
 
-tristate KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
-                                                QStringList* list, KDbQuerySchema* query,
-                                                const QList<QVariant>* params,
-                                                int column)
+bool KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
+                                            QStringList* list, KDbQuerySchema* query,
+                                            const QList<QVariant>* params,
+                                            int column,
+                                            bool (*filterFunction)(const QString&))
 {
     if (sql) {
         m_result.setSql(*sql);
@@ -2324,32 +2320,34 @@ tristate KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
     }
     list->clear();
     while (!cursor->eof()) {
-        list->append(cursor->value(column).toString());
+        const QString str(cursor->value(column).toString());
+        if (!filterFunction || filterFunction(str)) {
+            list->append(str);
+        }
         if (!cursor->moveNext() && cursor->result().isError()) {
             m_result = cursor->result();
-            const tristate result = m_result.isError() ? tristate(false) : tristate(cancelled);
             deleteCursor(cursor);
-            return result;
+            return false;
         }
     }
     return deleteCursor(cursor);
 }
 
-tristate KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* list,
-                                        int column)
+bool KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* list,
+                                    int column)
 {
-    return queryStringListInternal(&sql, list, 0, 0, column);
+    return queryStringListInternal(&sql, list, 0, 0, column, 0);
 }
 
-tristate KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list, int column)
+bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list, int column)
 {
-    return queryStringListInternal(0, list, query, 0, column);
+    return queryStringListInternal(0, list, query, 0, column, 0);
 }
 
-tristate KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
+bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
                                     const QList<QVariant>& params, int column)
 {
-    return queryStringListInternal(0, list, query, &params, column);
+    return queryStringListInternal(0, list, query, &params, column, 0);
 }
 
 bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, bool addLimitTo1)
