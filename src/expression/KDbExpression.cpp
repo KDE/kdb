@@ -461,6 +461,7 @@ KDbEscapedString KDbExpression::toString(const KDbDriver *driver,
 
 void KDbExpression::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
+    Q_ASSERT(params);
     d->getQueryParameters(params);
 }
 

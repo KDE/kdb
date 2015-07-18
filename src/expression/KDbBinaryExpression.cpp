@@ -253,6 +253,7 @@ KDbEscapedString KDbBinaryExpressionData::toStringInternal(
 
 void KDbBinaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
+    Q_ASSERT(params);
     if (left().constData())
         left()->getQueryParameters(params);
     if (right().constData())

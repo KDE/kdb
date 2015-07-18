@@ -204,6 +204,7 @@ bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
                                      const QString& field4, bool ascending4,
                                      const QString& field5, bool ascending5)
 {
+    Q_ASSERT(querySchema);
     int numAdded = 0;
 #define ADD_COL(fieldName, ascending) \
     if (ok && !fieldName.isEmpty()) { \

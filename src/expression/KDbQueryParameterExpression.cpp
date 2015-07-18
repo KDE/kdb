@@ -72,6 +72,7 @@ KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
 
 void KDbQueryParameterExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
+    Q_ASSERT(params);
     KDbQuerySchemaParameter param;
     param.message = value.toString();
     param.type = type();

@@ -142,6 +142,7 @@ bool KDbRecordEditBuffer::isEmpty() const
 
 void KDbRecordEditBuffer::insert(KDbQueryColumnInfo *ci, const QVariant &val)
 {
+    Q_ASSERT(ci);
     if (m_dbBuffer) {
         m_dbBuffer->insert(ci, val);
         m_defaultValuesDbBuffer->remove(ci);
@@ -157,6 +158,7 @@ void KDbRecordEditBuffer::insert(const QString &fname, const QVariant &val)
 
 bool KDbRecordEditBuffer::hasDefaultValueAt(KDbQueryColumnInfo *ci) const
 {
+    Q_ASSERT(ci);
     return m_defaultValuesDbBuffer->value(ci, false);
 }
 

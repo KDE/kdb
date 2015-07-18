@@ -139,6 +139,7 @@ KDbEscapedString KDbNArgExpressionData::toStringInternal(
 
 void KDbNArgExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
+    Q_ASSERT(params);
     foreach(ExplicitlySharedExpressionDataPointer data, children) {
         data->getQueryParameters(params);
     }

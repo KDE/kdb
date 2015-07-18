@@ -92,6 +92,7 @@ KDbEscapedString KDbUnaryExpressionData::toStringInternal(
 
 void KDbUnaryExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
+    Q_ASSERT(params);
     ExplicitlySharedExpressionDataPointer a = arg();
     if (a.constData())
         a->getQueryParameters(params);
