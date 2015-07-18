@@ -35,6 +35,7 @@ class xBaseExportPrivate;
 
 class xBaseExport : public KDbObject
 {
+Q_OBJECT
   public:
 
     void setData(KexiMigration::Data* migrateData);

@@ -40,6 +40,7 @@
  */
 class KDB_EXPORT KDbValidator : public QValidator
 {
+Q_OBJECT
 public:
     enum Result { Error = 0, Ok = 1, Warning = 2 };
 
