@@ -2899,15 +2899,17 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
                              tr("Could not find definition for query \"%1\". Removing this query is recommended.").arg(data[2].toString()));
         return 0;
     }
-    d->parser()->parse(KDbEscapedString(sql));
-    KDbQuerySchema *query = d->parser()->query();
+    KDbQuerySchema *query = 0;
+    if (d->parser()->parse(KDbEscapedString(sql))) {
+        query = d->parser()->query();
+    }
     //error?
     if (!query) {
         m_result = KDbResult(ERR_SQL_PARSE_ERROR,
                              tr("<p>Could not load definition for query \"%1\". "
                                 "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
                                 "<p>You can open this query in Text View and correct it.</p>")
-                                .arg(data[2].toString(), sql));
+                                .arg(data[2].toString()).arg(sql));
         return 0;
     }
     if (!setupObjectData(data, query)) {
