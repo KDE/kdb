@@ -27,7 +27,9 @@
 #include "config-kdb.h"
 #include "KDbGlobal.h"
 #include "KDbField.h"
+#include "KDbTableSchema.h"
 #include "KDbVersionInfo.h"
+#include "KDbTristate.h"
 
 class QDomNode;
 class QDomElement;
@@ -40,7 +42,6 @@ class KDbMessageHandler;
 class KDbQuerySchema;
 class KDbResultable;
 class KDbResultInfo;
-class KDbTableSchema;
 class KDbDriver;
 class KDbLookupFieldSchema;
 class KDbTableOrQuerySchema;

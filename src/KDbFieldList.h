@@ -23,7 +23,6 @@
 #include <QList>
 #include <QHash>
 
-#include "KDb.h"
 #include "KDbGlobal.h"
 #include "KDbField.h"
 #include "KDbEscapedString.h"

@@ -31,6 +31,7 @@
 #include "KDbTableViewColumn.h"
 
 class KDbRecordEditBuffer;
+class KDbResultInfo;
 class KDbCursor;
 
 typedef KDbUtils::AutodeletedList<KDbRecordData*> KDbTableViewDataBase;
