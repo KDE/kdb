@@ -62,13 +62,19 @@ bool KDbPreparedStatement::execute(const KDbPreparedStatementParameters& paramet
 {
     if (d->dirty) {
         KDbEscapedString s;
-        if (!generateStatementString(&s)) // sets d->fieldsForParameters too
+        if (!generateStatementString(&s)) { // sets d->fieldsForParameters too
+            m_result.setCode(ERR_OTHER);
             return false;
+        }
 //! @todo error message?
-        if (s.isEmpty())
+        if (s.isEmpty()) {
+            m_result.setCode(ERR_OTHER);
             return false;
-        if (!d->iface->prepare(s))
+        }
+        if (!d->iface->prepare(s)) {
+            m_result.setCode(ERR_OTHER);
             return false;
+        }
         d->dirty = false;
     }
     return d->iface->execute(d->type, *d->fieldsForParameters, d->fields, parameters);
