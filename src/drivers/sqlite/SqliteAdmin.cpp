@@ -42,7 +42,8 @@ bool SqliteAdminTools::vacuum(const KDbConnectionData& data, const QString& data
     KDbDriver *drv = manager.driver(data.driverId());
     QString title(SqliteVacuum::tr("Could not compact database \"%1\".").arg(QDir::fromNativeSeparators(databaseName)));
     if (!drv) {
-        m_result = KDbResult(title);
+        m_result = manager.result();
+        m_result.prependMessage(title);
         return false;
     }
     QFileInfo file(databaseName);

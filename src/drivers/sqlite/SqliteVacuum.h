@@ -25,6 +25,7 @@
 #include <QProcess>
 
 #include "KDbTristate.h"
+#include "KDbResult.h"
 
 class QProgressDialog;
 
@@ -41,7 +42,7 @@ class QProgressDialog;
  creates a copy of the original database file, and replaces the orginal with the new only
  on success.
 */
-class SqliteVacuum : public QObject
+class SqliteVacuum : public QObject, public KDbResultable
 {
     Q_OBJECT
 public:
@@ -66,7 +67,7 @@ protected:
     QProcess *m_sqliteProcess;
     QProgressDialog* m_dlg; // krazy:exclude=qclasses
     int m_percent;
-    tristate m_result;
+    bool m_canceled;
 };
 
 #endif
