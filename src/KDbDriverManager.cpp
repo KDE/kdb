@@ -201,9 +201,9 @@ KDbResult KDbDriverManager::result() const
     return s_self->result();
 }
 
-KDbResultable KDbDriverManager::resultable() const
+KDbResultable* KDbDriverManager::resultable() const
 {
-    return KDbResultable(static_cast<const KDbResultable&>(*s_self));
+    return s_self;
 }
 
 QStringList KDbDriverManager::driverIds()

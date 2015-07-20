@@ -46,7 +46,7 @@ public:
 
     //! @return KDbResultable object for the recent operation.
     //! It adds serverResultName() in addition to the result().
-    KDbResultable resultable() const;
+    KDbResultable* resultable() const;
 
     /*! @return information (metadata) about driver with ID @a id.
       The lookup is case insensitive.

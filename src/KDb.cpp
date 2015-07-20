@@ -106,7 +106,7 @@ ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const KDbC
     KDbDriverManager manager;
     m_driver = manager.driver(m_connData.driverId());
     if (manager.result().isError()) {
-        emitError(manager.resultable());
+        emitError(*manager.resultable());
         m_driver = 0;
     }
 }
