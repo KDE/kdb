@@ -267,54 +267,50 @@ KDbVersionInfo KDb::version()
         KDB_VERSION_MAJOR, KDB_VERSION_MINOR, KDB_VERSION_PATCH);
 }
 
-bool KDb::deleteRecord(KDbConnection* conn, KDbTableSchema *table,
-                             const QString &keyname, const QString &keyval)
+bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
+                        const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
 {
-    return table != 0 && conn->executeSQL(KDbEscapedString("DELETE FROM ")
-        + table->name() + " WHERE "
-        + keyname + '=' + conn->driver()->valueToSQL(KDbField::Text, QVariant(keyval)));
+    Q_ASSERT(conn);
+    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
+                            .arg(conn->escapeIdentifier(tableName))
+                            .arg(conn->escapeIdentifier(keyname))
+                            .arg(conn->driver()->valueToSQL(keytype, keyval)));
 }
 
-bool KDb::deleteRecord(KDbConnection* conn, const QString &tableName,
-                             const QString &keyname, const QString &keyval)
+bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
+                        const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
+                        const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2)
 {
-    return conn->executeSQL(KDbEscapedString("DELETE FROM ") + tableName + " WHERE "
-                           + keyname + '=' + conn->driver()->valueToSQL(KDbField::Text, QVariant(keyval)));
+    Q_ASSERT(conn);
+    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
+                            .arg(conn->escapeIdentifier(tableName))
+                            .arg(conn->escapeIdentifier(keyname1))
+                            .arg(conn->driver()->valueToSQL(keytype1, keyval1))
+                            .arg(conn->escapeIdentifier(keyname2))
+                            .arg(conn->driver()->valueToSQL(keytype2, keyval2)));
 }
 
-bool KDb::deleteRecord(KDbConnection* conn, KDbTableSchema *table,
-                             const QString& keyname, int keyval)
+bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
+                        const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
+                        const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
+                        const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3)
 {
-    return table != 0 && conn->executeSQL(KDbEscapedString("DELETE FROM ")
-        + table->name() + " WHERE "
-        + keyname + '=' + conn->driver()->valueToSQL(KDbField::Integer, QVariant(keyval)));
+    Q_ASSERT(conn);
+    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
+                            .arg(conn->escapeIdentifier(tableName))
+                            .arg(conn->escapeIdentifier(keyname1))
+                            .arg(conn->driver()->valueToSQL(keytype1, keyval1))
+                            .arg(conn->escapeIdentifier(keyname2))
+                            .arg(conn->driver()->valueToSQL(keytype2, keyval2))
+                            .arg(conn->escapeIdentifier(keyname3))
+                            .arg(conn->driver()->valueToSQL(keytype3, keyval3)));
 }
 
-bool KDb::deleteRecord(KDbConnection* conn, const QString &tableName,
-                             const QString &keyname, int keyval)
+bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
 {
-    return conn->executeSQL(KDbEscapedString("DELETE FROM ") + tableName + " WHERE "
-                           + keyname + '=' + conn->driver()->valueToSQL(KDbField::Integer, QVariant(keyval)));
-}
-
-bool KDb::deleteRecord(KDbConnection* conn, const QString &tableName,
-                             const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
-                             const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2)
-{
-    return conn->executeSQL(KDbEscapedString("DELETE FROM ") + tableName + " WHERE "
-        + keyname1 + '=' + conn->driver()->valueToSQL(keytype1, keyval1)
-        + " AND " + keyname2 + '=' + conn->driver()->valueToSQL(keytype2, keyval2));
-}
-
-bool KDb::deleteRecord(KDbConnection* conn, const QString &tableName,
-                             const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
-                             const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
-                             const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3)
-{
-    return conn->executeSQL(KDbEscapedString("DELETE FROM ") + tableName + " WHERE "
-                           + keyname1 + "=" + conn->driver()->valueToSQL(keytype1, keyval1)
-                           + " AND " + keyname2 + "=" + conn->driver()->valueToSQL(keytype2, keyval2)
-                           + " AND " + keyname3 + "=" + conn->driver()->valueToSQL(keytype3, keyval3));
+    Q_ASSERT(conn);
+    return conn->executeSQL(KDbEscapedString("DELETE FROM %1")
+                            .arg(conn->escapeIdentifier(tableName)));
 }
 
 bool KDb::isEmptyValue(KDbField::Type type, const QVariant &v)
@@ -455,18 +451,13 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *inf
     getHTMLErrorMesage(resultable, &info->msg, &info->desc);
 }
 
-int KDb::idForObjectName(KDbConnection* conn, const QString& objName, int objType)
+tristate KDb::idForObjectName(KDbConnection* conn, int *id, const QString& objName, int objType)
 {
-    KDbRecordData data;
-    if (true != conn->querySingleRecord(
-                KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_name='%1' AND o_type=%2")
-                .arg(KDbEscapedString(objName), KDbEscapedString::number(objType)), &data))
-    {
-        return 0;
-    }
-    bool ok;
-    int id = data[0].toInt(&ok);
-    return ok ? id : 0;
+    Q_ASSERT(conn);
+    Q_ASSERT(id);
+    return conn->querySingleNumber(
+        KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_name=%1 AND o_type=%2")
+        .arg(conn->escapeString(objName)).arg(objType), id);
 }
 
 //-----------------------------------------
@@ -1505,9 +1496,9 @@ QVariant KDb::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
     return result;
 }
 
-bool KDb::isDefaultValueAllowed(KDbField* field)
+bool KDb::isDefaultValueAllowed(const KDbField &field)
 {
-    return field && !field->isUniqueKey();
+    return !field.isUniqueKey();
 }
 
 void KDb::getLimitsForFieldType(KDbField::Type type, qlonglong *minValue, qlonglong *maxValue,
@@ -1655,6 +1646,7 @@ QStringList KDb::libraryPaths()
 
 QString KDb::temporaryTableName(KDbConnection *conn, const QString &baseName)
 {
+    Q_ASSERT(conn);
     while (true) {
         QString name = QLatin1String("tmp__") + baseName;
         for (int i = 0; i < 10; ++i) {

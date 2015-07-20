@@ -32,18 +32,17 @@ KDbProperties::~KDbProperties()
 bool KDbProperties::setValue(const QString& _name, const QVariant& value)
 {
     QString name(_name.trimmed());
-    bool ok;
     //we need to know whether update or insert
-    bool exists = m_conn->resultExists(
+    const tristate result = m_conn->resultExists(
                       KDbEscapedString("SELECT 1 FROM kexi__db WHERE db_property=%1")
-                      .arg(m_conn->escapeString(name)), &ok);
-    if (!ok) {
+                      .arg(m_conn->escapeString(name)));
+    if (~result) {
         m_result = m_conn->result();
         m_result.prependMessage(tr("Could not set value of database property \"%1\".").arg(name));
         return false;
     }
 
-    if (exists) {
+    if (result == true) {
         if (!m_conn->executeSQL(
                     KDbEscapedString("UPDATE kexi__db SET db_value=%1 WHERE db_property=%2")
                     .arg(m_conn->escapeString(value.toString())
@@ -73,18 +72,17 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
     QString name(_name.trimmed());
     //captions have ' ' prefix
     name.prepend(QLatin1String(" "));
-    bool ok;
     //we need to know whether update or insert
-    bool exists = m_conn->resultExists(
+    const tristate result = m_conn->resultExists(
                       KDbEscapedString("SELECT 1 FROM kexi__db WHERE db_property=%1")
-                        .arg(m_conn->escapeString(name)), &ok);
-    if (!ok) {
+                        .arg(m_conn->escapeString(name)));
+    if (~result) {
         m_result = m_conn->result();
         m_result.prependMessage(tr("Could not set caption for database property \"%1\".").arg(name));
         return false;
     }
 
-    if (exists) {
+    if (result == true) {
         if (!m_conn->executeSQL(
                     KDbEscapedString("UPDATE kexi__db SET db_value=%1 WHERE db_property=%2")
                         .arg(m_conn->escapeString(caption))

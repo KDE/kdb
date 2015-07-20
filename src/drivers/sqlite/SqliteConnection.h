@@ -58,7 +58,7 @@ protected:
     virtual bool drv_getTablesList(QStringList* list);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_containsTable(const QString &tableName);
+    virtual tristate drv_containsTable(const QString &tableName);
 
     /*! Creates new database using connection. Note: Do not pass @a dbName
       arg because for file-based engine (that has one database per connection)

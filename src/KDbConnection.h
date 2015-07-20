@@ -580,17 +580,15 @@ public:
     bool queryStringList(KDbQuerySchema* query, QStringList* list,
                          const QList<QVariant>& params, int column = 0);
 
-    /*! @return true if there is at least one record has been returned by executing query
-     for a raw SQL statement @a sql.
-     Does not fetch any records. @a success will be set to false
-     on query execution errors (true otherwise), so you can see a difference between
-     "no results" and "query execution error" states.
+    /*! @return @c true if there is at least one record has been returned by executing query
+     for a raw SQL statement @a sql or @c false if no such record exists.
+     Does not fetch any records. On error returns @c cancelled.
      Note: real executed query is: "SELECT 1 FROM (@a sql) LIMIT 1"
      if @a addLimitTo1 is true (the default). */
-    bool resultExists(const KDbEscapedString& sql, bool* success, bool addLimitTo1 = true);
+    tristate resultExists(const KDbEscapedString& sql, bool addLimitTo1 = true);
 
     /*! @return true if there is at least one record in @a table. */
-    bool isEmpty(KDbTableSchema* table, bool *success);
+    tristate isEmpty(KDbTableSchema* table);
 
     virtual KDbEscapedString recentSQLString() const;
 
@@ -879,9 +877,9 @@ public:
 //! @todo move this somewhere to low level class (MIGRATION?)
     /*! LOW LEVEL METHOD. For implementation: returns true if table
      with name @a tableName exists in the database.
-     @return false if it does not exist or error occurred.
+     @return @c false if it does not exist or @c cancelled if error occurred.
      The lookup is case insensitive. */
-    virtual bool drv_containsTable(const QString &tableName) = 0;
+    virtual tristate drv_containsTable(const QString &tableName) = 0;
 
     /*! Creates table using @a tableSchema information.
      @return true on success. Default implementation

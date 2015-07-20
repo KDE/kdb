@@ -315,7 +315,7 @@ KDB_EXPORT QDomElement saveNumberElementToDom(QDomDocument *doc, QDomElement *pa
         const QString& elementName, int value);
 KDB_EXPORT QDomElement saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value);
-KDB_EXPORT bool isDefaultValueAllowed(KDbField* field);
+KDB_EXPORT bool isDefaultValueAllowed(const KDbField &field);
 KDB_EXPORT QString temporaryTableName(KDbConnection *conn, const QString &baseName);
 #ifdef KDB_DEBUG_GUI
 typedef void(*DebugGUIHandler)(const QString&);

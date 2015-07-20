@@ -52,29 +52,64 @@ namespace KDb
 //! @return KDb-specific information about version of the database.
 KDB_EXPORT KDbVersionInfo version();
 
-//! for convenience
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, KDbTableSchema *table,
-                                          const QString &keyname, const QString& keyval);
+//! @overload bool deleteRecord(KDbConnection*, const KDbTableSchema&, const QString &, KDbField::Type, const QVariant &)
+KDB_EXPORT bool deleteRecords(KDbConnection* conn, const QString &tableName,
+                              const QString &keyname, KDbField::Type keytype, const QVariant &keyval);
 
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, const QString &tableName,
-                                          const QString &keyname, const QString &keyval);
+//! Deletes records using one generic criteria.
+inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
+                              const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
+{
+    return deleteRecords(conn, table.name(), keyname, keytype, keyval);
+}
 
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, KDbTableSchema *table,
-                                          const QString& keyname, int keyval);
+//! @overload bool deleteRecords(KDbConnection*, const QString&, const QString&, KDbField::Type, const QVariant&);
+inline bool deleteRecords(KDbConnection* conn, const QString &tableName,
+                              const QString &keyname, const QString &keyval)
+{
+    return deleteRecords(conn, tableName, keyname, KDbField::Text, keyval);
+}
 
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, const QString &tableName,
-                                          const QString &keyname, int keyval);
+//! @overload bool deleteRecords(KDbConnection*, const QString&, const QString&, const QString&);
+inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
+                              const QString &keyname, const QString &keyval)
+{
+    return deleteRecords(conn, table.name(), keyname, keyval);
+}
 
-/*! Deletes record with two generic criterias. */
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, const QString &tableName,
-                                   const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
-                                   const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2);
+//! @overload bool deleteRecords(KDbConnection*, const KDbTableSchema&, const QString&, const QString&);
+inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
+                              const QString& keyname, int keyval)
+{
+    return deleteRecords(conn, table, keyname, KDbField::Integer, keyval);
+}
 
-/*! Deletes record with three generic criterias. */
-KDB_EXPORT bool deleteRecord(KDbConnection* conn, const QString &tableName,
-                                    const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
-                                    const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
-                                    const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3);
+//! @overload bool deleteRecords(KDbConnection*, const KDbTableSchema&, const QString&, int);
+inline bool deleteRecords(KDbConnection* conn, const QString &tableName,
+                              const QString& keyname, int keyval)
+{
+    return deleteRecords(conn, tableName, keyname, KDbField::Integer, keyval);
+}
+
+//! Deletes records with two generic criterias.
+KDB_EXPORT bool deleteRecords(KDbConnection* conn, const QString &tableName,
+                             const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
+                             const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2);
+
+//! Deletes records with three generic criterias.
+KDB_EXPORT bool deleteRecords(KDbConnection* conn, const QString &tableName,
+                             const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
+                             const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
+                             const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3);
+
+//! Deletes all records from table @a tableName.
+KDB_EXPORT bool deleteAllRecords(KDbConnection* conn, const QString &tableName);
+
+//! @overload bool deleteAllRecords(KDbConnection*, const QString&);
+inline bool deleteAllRecords(KDbConnection* conn, const KDbTableSchema &table)
+{
+    return KDb::deleteAllRecords(conn, table.name());
+}
 
 /*! @return list of field types for field type group @a typeGroup. */
 KDB_EXPORT const QList<KDbField::Type> fieldTypesForGroup(KDbField::TypeGroup typeGroup);
@@ -125,9 +160,11 @@ KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInf
 KDB_EXPORT KDbEscapedString sqlWhere(KDbDriver *drv, KDbField::Type t,
                                         const QString& fieldName, const QVariant& value);
 
-/*! @return identifier for object @a objName of type @a objType
- or 0 if such object does not exist. */
-KDB_EXPORT int idForObjectName(KDbConnection* conn, const QString& objName, int objType);
+/*! Find an identifier for object @a objName of type @a objType.
+ On success true is returned and *id is set to the value of the identifier.
+ On failure false is returned. If there is no such object, @c cancelled value is returned. */
+KDB_EXPORT tristate idForObjectName(KDbConnection* conn, int *id, const QString& objName,
+                                    int objType);
 
 //! @todo perhaps use quint64 here?
 /*! @return number of records that can be retrieved after executing @a sql statement
@@ -135,7 +172,7 @@ KDB_EXPORT int idForObjectName(KDbConnection* conn, const QString& objName, int 
  For SQL data sources it does not fetch any records, only "COUNT(*)"
  SQL aggregation is used at the backed.
  -1 is returned if error occurred. */
-int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
+KDB_EXPORT int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
 
 //! @todo perhaps use quint64 here?
 /*! @return number of records that can be retrieved from @a tableSchema.
@@ -398,9 +435,8 @@ KDB_EXPORT QString variantToString(const QVariant& v);
 KDB_EXPORT QVariant stringToVariant(const QString& s, QVariant::Type type, bool* ok);
 
 /*! @return true if setting default value for @a field field is allowed. Fields with unique
- (and thus primary key) flags set do not accept  default values.
- False is returned also if @a field is 0. */
-KDB_EXPORT bool isDefaultValueAllowed(KDbField* field);
+ (and thus primary key) flags set do not accept  default values. */
+KDB_EXPORT bool isDefaultValueAllowed(const KDbField &field);
 
 //! Provides limits for values of type @a type
 /*! The result is put into integers pointed by @a minValue and @a maxValue.

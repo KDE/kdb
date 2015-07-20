@@ -161,11 +161,10 @@ bool SqliteConnection::drv_getDatabasesList(QStringList* list)
     return true;
 }
 
-bool SqliteConnection::drv_containsTable(const QString &tableName)
+tristate SqliteConnection::drv_containsTable(const QString &tableName)
 {
-    bool success = false;
     return resultExists(KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE %1")
-                        .arg(escapeString(tableName)), &success) && success;
+                            .arg(escapeString(tableName)));
 }
 
 bool SqliteConnection::drv_getTablesList(QStringList* list)

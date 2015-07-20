@@ -87,7 +87,7 @@ protected:
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_containsTable(const QString &tableName);
+    virtual tristate drv_containsTable(const QString &tableName);
 
     PostgresqlConnectionInternal *d;
 

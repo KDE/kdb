@@ -59,7 +59,7 @@ const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultV
         result = &(*m_dbBufferIt).value();
     if (useDefaultValueIfPossible
             && (!result || result->isNull())
-            && ci->field && !ci->field->defaultValue().isNull() && KDb::isDefaultValueAllowed(ci->field)
+            && ci->field && !ci->field->defaultValue().isNull() && KDb::isDefaultValueAllowed(*ci->field)
             && !hasDefaultValueAt(ci)) {
         //no buffered or stored value: try to get a default value declared in a field, so user can modify it
         if (!result)

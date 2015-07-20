@@ -867,7 +867,7 @@ QStringList KDbConnection::objectNames(int objectType, bool* ok)
         sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
     } else {
         sql = KDbEscapedString("SELECT o_name FROM kexi__objects WHERE o_type=%1"
-                               " ORDER BY o_id").arg(objectType);
+                               " ORDER BY o_id").arg(m_driver->valueToSQL(KDbField::Integer, objectType));
     }
     QStringList list;
     const bool success = queryStringListInternal(&sql, &list, 0, 0, 0, KDb::isIdentifier);
@@ -1248,8 +1248,8 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
     delete fl;
 
     sql.append(KDbEscapedString(" WHERE t_id=%1 AND f_name=%2")
-                .arg(KDbEscapedString::number(field->table()->id()),
-                     m_driver->valueToSQL(KDbField::Text, field->name())));
+                .arg(m_driver->valueToSQL(KDbField::Integer, field->table()->id()))
+                .arg(escapeString(field->name())));
     return executeSQL(sql);
 }
 
@@ -1339,7 +1339,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
         if (!ts)
             return false;
         //for sanity: remove field info (if any) for this table id
-        if (!KDb::deleteRecord(this, ts, QLatin1String("t_id"), tableSchema->id()))
+        if (!KDb::deleteRecords(this, *ts, QLatin1String("t_id"), tableSchema->id()))
             return false;
 
         KDbFieldList *fl = createFieldListForKexi__Fields(ts);
@@ -1427,8 +1427,11 @@ bool KDbConnection::removeObject(int objId)
 {
     clearResult();
     //remove table schema from kexi__* tables
-    if (   !KDb::deleteRecord(this, d->table(QLatin1String("kexi__objects")), QLatin1String("o_id"), objId) //schema entry
-        || !KDb::deleteRecord(this, d->table(QLatin1String("kexi__objectdata")), QLatin1String("o_id"), objId)) //data blocks
+    KDbTableSchema *kexi__objects = d->table(QLatin1String("kexi__objects"));
+    KDbTableSchema *kexi__objectdata = d->table(QLatin1String("kexi__objectdata"));
+    if (!kexi__objects || !kexi__objectdata
+        || !KDb::deleteRecords(this, *kexi__objects, QLatin1String("o_id"), objId) //schema entry
+        || !KDb::deleteRecords(this, *kexi__objectdata, QLatin1String("o_id"), objId)) //data blocks
     {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
                              tr("Could not remove object's data."));
@@ -1439,7 +1442,7 @@ bool KDbConnection::removeObject(int objId)
 
 bool KDbConnection::drv_dropTable(const QString& tableName)
 {
-    return executeSQL(KDbEscapedString("DROP TABLE ") + escapeIdentifier(tableName));
+    return executeSQL(KDbEscapedString("DROP TABLE %1").arg(escapeIdentifier(tableName)));
 }
 
 tristate KDbConnection::dropTable(KDbTableSchema* tableSchema)
@@ -1480,13 +1483,17 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
         return false;
 
     //for sanity we're checking if this table exists physically
-    if (drv_containsTable(tableSchema->name())) {
+    const tristate result = drv_containsTable(tableSchema->name());
+    if (~result) {
+        return cancelled;
+    }
+    if (result == true) {
         if (!drv_dropTable(tableSchema->name()))
             return false;
     }
 
     KDbTableSchema *ts = d->table(QLatin1String("kexi__fields"));
-    if (!KDb::deleteRecord(this, ts, QLatin1String("t_id"), tableSchema->id())) //field entries
+    if (!ts || !KDb::deleteRecords(this, *ts, QLatin1String("t_id"), tableSchema->id())) //field entries
         return false;
 
     //remove table schema from kexi__objects table
@@ -1596,12 +1603,16 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
         // the new table owns the previous table's id:
         if (!executeSQL(
                     KDbEscapedString("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
-                    .arg(origID).arg(tableSchema->id()).arg(int(KDb::TableObjectType))))
+                    .arg(m_driver->valueToSQL(KDbField::Integer, origID))
+                    .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))
+                    .arg(m_driver->valueToSQL(KDbField::Integer, int(KDb::TableObjectType)))))
         {
             return false;
         }
         if (!executeSQL(KDbEscapedString("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
-                        .arg(origID, tableSchema->id()))) {
+                        .arg(m_driver->valueToSQL(KDbField::Integer, origID))
+                        .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
+        {
             return false;
         }
 
@@ -1618,7 +1629,9 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
     // Update kexi__objects
     //! @todo
     if (!executeSQL(KDbEscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
-                    .arg(escapeString(tableSchema->name()), tableSchema->id()))) {
+                    .arg(escapeString(tableSchema->name()))
+                    .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
+    {
         alterTableName_ERR;
         return false;
     }
@@ -2035,7 +2048,7 @@ tristate KDbConnection::loadObjectData(int id, KDbObject* object)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                          .arg(id),
+                             .arg(m_driver->valueToSQL(KDbField::Integer, id)),
             &data))
     {
         return cancelled;
@@ -2049,7 +2062,8 @@ tristate KDbConnection::loadObjectData(int type, const QString& name, KDbObject*
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
                           "FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
-                          .arg(KDbEscapedString::number(type), m_driver->valueToSQL(KDbField::Text, name)),
+                          .arg(m_driver->valueToSQL(KDbField::Integer, type))
+                          .arg(escapeString(name)),
             &data))
     {
         return cancelled;
@@ -2066,8 +2080,8 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
         int existingID;
         if (true == querySingleNumber(
                 KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
-                              .arg(KDbEscapedString::number(object->type()),
-                                   m_driver->valueToSQL(KDbField::Text, object->name())), &existingID))
+                                 .arg(m_driver->valueToSQL(KDbField::Integer, object->type()))
+                                 .arg(escapeString(object->name())), &existingID))
         {
             //we already have stored an object data with the same name and type:
             //just update it's properties as it would be existing object
@@ -2114,9 +2128,10 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
     //existing object:
     return executeSQL(
                KDbEscapedString("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
-               .arg(KDbEscapedString::number(object->id()), KDbEscapedString::number(object->type()),
-                    m_driver->valueToSQL(KDbField::Text, object->caption()),
-                    m_driver->valueToSQL(KDbField::Text, object->description())));
+               .arg(m_driver->valueToSQL(KDbField::Integer, object->id()))
+               .arg(m_driver->valueToSQL(KDbField::Integer, object->type()))
+               .arg(escapeString(object->caption()))
+               .arg(escapeString(object->description())));
 }
 
 bool KDbConnection::storeObjectData(KDbObject* object)
@@ -2350,7 +2365,7 @@ bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
     return queryStringListInternal(0, list, query, &params, column, 0);
 }
 
-bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, bool addLimitTo1)
+tristate KDbConnection::resultExists(const KDbEscapedString& sql, bool addLimitTo1)
 {
     //optimization
     if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
@@ -2373,31 +2388,29 @@ bool KDbConnection::resultExists(const KDbEscapedString& sql, bool* success, boo
     KDbCursor *cursor = executeQuery(m_result.sql());
     if (!cursor) {
         kdbWarning() << "!executeQuery()" << m_result.sql();
-        *success = false;
-        return false;
+        return cancelled;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
-        *success = !cursor->result().isError();
         kdbWarning() << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
-        return false;
+        return m_result.isError() ? cancelled : tristate(false);
     }
-    *success = deleteCursor(cursor);
-    return true;
+    return deleteCursor(cursor) ? tristate(true) : cancelled;
 }
 
-bool KDbConnection::isEmpty(KDbTableSchema* table, bool* success)
+tristate KDbConnection::isEmpty(KDbTableSchema* table)
 {
     const KDbNativeStatementBuilder builder(this);
     KDbEscapedString sql;
     if (!builder.generateSelectStatement(&sql, table)) {
-        if (success) {
-            *success =false;
-        }
-        return false;
+        return cancelled;
     }
-    return !resultExists(sql, success);
+    const tristate result = resultExists(sql);
+    if (~result) {
+        return cancelled;
+    }
+    return result == false;
 }
 
 //! Used by addFieldPropertyToExtendedTableSchemaData()
@@ -2714,8 +2727,9 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
     KDbCursor *cursor;
     if (!(cursor = executeQuery(
             KDbEscapedString("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
-                          "f_options, f_default, f_order, f_caption, f_help "
-                          "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order").arg(t->id()))))
+                             "f_options, f_default, f_order, f_caption, f_help "
+                             "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order")
+                            .arg(m_driver->valueToSQL(KDbField::Integer, t->id())))))
     {
         delete t;
         return 0;
@@ -2776,8 +2790,9 @@ KDbTableSchema* KDbConnection::tableSchema(const QString& tableName)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                          "WHERE o_name='%1' AND o_type=%2")
-                          .arg(KDbEscapedString(tableName), KDbEscapedString::number(KDb::TableObjectType)), &data))
+                             "WHERE o_name=%1 AND o_type=%2")
+                             .arg(escapeString(tableName))
+                             .arg(m_driver->valueToSQL(KDbField::Integer, KDb::TableObjectType)), &data))
     {
         return 0;
     }
@@ -2793,7 +2808,7 @@ KDbTableSchema* KDbConnection::tableSchema(int tableId)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                          .arg(tableId), &data))
+                             .arg(m_driver->valueToSQL(KDbField::Integer, tableId)), &data))
     {
         return 0;
     }
@@ -2805,11 +2820,11 @@ tristate KDbConnection::loadDataBlock(int objectID, QString* dataString, const Q
     if (objectID <= 0)
         return false;
     return querySingleString(
-               KDbEscapedString("SELECT o_data FROM kexi__objectdata WHERE o_id=%1 AND %2")
-                             .arg(KDbEscapedString::number(objectID),
-                                  KDbEscapedString(KDb::sqlWhere(m_driver, KDbField::Text,
+               KDbEscapedString("SELECT o_data FROM kexi__objectdata WHERE o_id=%1 AND ")
+                                .arg(m_driver->valueToSQL(KDbField::Integer, objectID))
+                                + KDbEscapedString(KDb::sqlWhere(m_driver, KDbField::Text,
                                                 QLatin1String("o_sub_id"),
-                                                dataID.isEmpty() ? QVariant() : QVariant(dataID)))),
+                                                dataID.isEmpty() ? QVariant() : QVariant(dataID))),
                dataString);
 }
 
@@ -2818,18 +2833,20 @@ bool KDbConnection::storeDataBlock(int objectID, const QString &dataString, cons
     if (objectID <= 0)
         return false;
     KDbEscapedString sql(
-        KDbEscapedString("SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1").arg(objectID));
+        KDbEscapedString("SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1")
+                        .arg(m_driver->valueToSQL(KDbField::Integer, objectID)));
     KDbEscapedString sql_sub(KDb::sqlWhere(m_driver, KDbField::Text, QLatin1String("o_sub_id"),
                                               dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
-    bool ok, exists;
-    exists = resultExists(sql + " AND " + sql_sub, &ok);
-    if (!ok)
+    const tristate result = resultExists(sql + " AND " + sql_sub);
+    if (~result) {
         return false;
-    if (exists) {
-        return executeSQL("UPDATE kexi__objectdata SET o_data="
-                          + m_driver->valueToSQL(KDbField::LongText, dataString)
-                          + " WHERE o_id=" + QString::number(objectID) + " AND " + sql_sub);
+    }
+    if (result == true) {
+        return executeSQL(KDbEscapedString("UPDATE kexi__objectdata SET o_data=%1 WHERE o_id=%2 AND ")
+                          .arg(m_driver->valueToSQL(KDbField::LongText, dataString))
+                          .arg(m_driver->valueToSQL(KDbField::Integer, objectID))
+                          + sql_sub);
     }
     return executeSQL(
                KDbEscapedString("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
@@ -2848,7 +2865,8 @@ bool KDbConnection::copyDataBlock(int sourceObjectID, int destObjectID, const QS
     KDbEscapedString sql = KDbEscapedString(
          "INSERT INTO kexi__objectdata SELECT %1, t.o_data, t.o_sub_id "
          "FROM kexi__objectdata AS t WHERE o_id=%2")
-         .arg(destObjectID).arg(sourceObjectID);
+         .arg(m_driver->valueToSQL(KDbField::Integer, destObjectID))
+         .arg(m_driver->valueToSQL(KDbField::Integer, sourceObjectID));
     if (!dataID.isEmpty()) {
         sql += KDbEscapedString(" AND ") + KDb::sqlWhere(m_driver, KDbField::Text,
                                                             QLatin1String("o_sub_id"), dataID);
@@ -2861,10 +2879,10 @@ bool KDbConnection::removeDataBlock(int objectID, const QString& dataID)
     if (objectID <= 0)
         return false;
     if (dataID.isEmpty())
-        return KDb::deleteRecord(this, QLatin1String("kexi__objectdata"),
+        return KDb::deleteRecords(this, QLatin1String("kexi__objectdata"),
                                        QLatin1String("o_id"), QString::number(objectID));
     else
-        return KDb::deleteRecord(this, QLatin1String("kexi__objectdata"),
+        return KDb::deleteRecords(this, QLatin1String("kexi__objectdata"),
                                        QLatin1String("o_id"), KDbField::Integer, objectID,
                                        QLatin1String("o_sub_id"), KDbField::Text, dataID);
 }
@@ -2910,8 +2928,9 @@ KDbQuerySchema* KDbConnection::querySchema(const QString& queryName)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                          "WHERE o_name='%1' AND o_type=%2")
-                          .arg(KDbEscapedString(m_queryName), KDbEscapedString::number(KDb::QueryObjectType)),
+                             "WHERE o_name=%1 AND o_type=%2")
+                             .arg(escapeString(m_queryName))
+                             .arg(m_driver->valueToSQL(KDbField::Integer, int(KDb::QueryObjectType))),
             &data))
     {
         return 0;
@@ -2929,7 +2948,7 @@ KDbQuerySchema* KDbConnection::querySchema(int queryId)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                          .arg(queryId),
+                             .arg(m_driver->valueToSQL(KDbField::Integer, queryId)),
             &data))
     {
         return 0;
@@ -3182,7 +3201,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     int fieldsExpandedCount = fieldsExpanded.count();
     for (int i = 0; i < fieldsExpandedCount; i++) {
         KDbQueryColumnInfo *ci = fieldsExpanded.at(i);
-        if (ci->field && KDb::isDefaultValueAllowed(ci->field)
+        if (ci->field && KDb::isDefaultValueAllowed(*ci->field)
                 && !ci->field->defaultValue().isNull()
                 && !b.contains(ci))
         {

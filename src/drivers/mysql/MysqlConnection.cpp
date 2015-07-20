@@ -118,19 +118,18 @@ bool MysqlConnection::drv_getDatabasesList(QStringList* list)
 
 bool MysqlConnection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 {
-    bool success;
     /* db names can be lower case in mysql */
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    bool exists = resultExists(
-      KDbEscapedString("SHOW DATABASES LIKE %1").arg(escapeString(storedDbName)), &success);
-    if (!exists || !success) {
-        if (!ignoreErrors) {
-            m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                                 tr("The database \"%1\" does not exist.").arg(storedDbName));
-        }
-        return false;
+    const tristate result = resultExists(
+        KDbEscapedString("SHOW DATABASES LIKE %1").arg(escapeString(storedDbName)));
+    if (result == true) {
+        return true;
     }
-    return true;
+    if (!ignoreErrors) {
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             tr("The database \"%1\" does not exist.").arg(storedDbName));
+    }
+    return false;
 }
 
 bool MysqlConnection::drv_createDatabase(const QString &dbName)
@@ -191,11 +190,10 @@ QString MysqlConnection::serverResultName() const
     return MysqlConnectionInternal::serverResultName(d->mysql);
 }
 
-bool MysqlConnection::drv_containsTable(const QString& tableName)
+tristate MysqlConnection::drv_containsTable(const QString& tableName)
 {
-    bool success = false;
     return resultExists(KDbEscapedString("SHOW TABLES LIKE %1")
-                        .arg(escapeString(tableName)), &success) && success;
+                        .arg(escapeString(tableName)));
 }
 
 bool MysqlConnection::drv_getTablesList(QStringList* list)

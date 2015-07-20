@@ -234,11 +234,10 @@ quint64 PostgresqlConnection::drv_lastInsertRecordId()
     return static_cast<quint64>(PQoidValue(d->res));
 }
 
-bool PostgresqlConnection::drv_containsTable(const QString &tableName)
+tristate PostgresqlConnection::drv_containsTable(const QString &tableName)
 {
-    bool success = false;
     return resultExists(KDbEscapedString("SELECT 1 FROM pg_class WHERE relkind='r' AND relname LIKE %1")
-                        .arg(escapeString(tableName)), &success) && success;
+                        .arg(escapeString(tableName)));
 }
 
 bool PostgresqlConnection::drv_getTablesList(QStringList* list)
