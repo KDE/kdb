@@ -2,6 +2,7 @@
 Name=PostgreSQL
 Name[ca]=PostgreSQL
 Name[cs]=PostgreSQL
+Name[de]=PostgreSQL
 Name[es]=PostgreSQL
 Name[gl]=PostgreSQL
 Name[nl]=PostgreSQL
@@ -10,6 +11,7 @@ Name[pt]=PostgreSQL
 Name[pt_BR]=PostgreSQL
 Name[sk]=PostgreSQL
 Name[sv]=PostgreSQL
+Name[uk]=PostgreSQL
 Name[x-test]=xxPostgreSQLxx
 Comment=KDb driver for handling PostgreSQL databases
 Comment[ca]=Controlador del KDb per a gestionar bases de dades PostgreSQL
