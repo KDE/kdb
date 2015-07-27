@@ -28,12 +28,14 @@
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
+#include <vector>
+
 //! @internal A cache
 class KDbExpressionClassNames
 {
 public:
     KDbExpressionClassNames()
-     : names((QLatin1String[]){
+     : names({
             QLatin1String("Unknown"),
             QLatin1String("Unary"),
             QLatin1String("Arithm"),
@@ -50,7 +52,7 @@ public:
             QLatin1String("QueryParameter")})
     {
     }
-    const QLatin1String names[14];
+    const std::vector<QString> names;
 };
 
 Q_GLOBAL_STATIC(KDbExpressionClassNames, KDb_expressionClassNames)

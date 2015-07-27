@@ -25,12 +25,14 @@
 #include "KDbConnection.h"
 #include "KDbTableSchema.h"
 
+#include <vector>
+
 //! Cache
 class ParserStatic
 {
 public:
     ParserStatic()
-     : operationStrings((QLatin1String[]){
+     : operationStrings({
             QLatin1String("None"),
             QLatin1String("Error"),
             QLatin1String("CreateTable"),
@@ -41,7 +43,7 @@ public:
             QLatin1String("Delete")})
     {
     }
-    const QLatin1String operationStrings[8];
+    const std::vector<QString> operationStrings;
 };
 
 Q_GLOBAL_STATIC(ParserStatic, KDb_parserStatic)

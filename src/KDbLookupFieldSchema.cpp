@@ -26,6 +26,8 @@
 #include <QStringList>
 #include <QHash>
 
+#include <vector>
+
 //! @internal
 class KDbLookupFieldSchema::RecordSource::Private
 {
@@ -65,7 +67,7 @@ class LookupFieldSchemaStatic
 {
 public:
     LookupFieldSchemaStatic()
-     : typeNames((QString[]){
+     : typeNames({
             QString(), // no type
             QLatin1String("table"),
             QLatin1String("query"),
@@ -79,7 +81,7 @@ public:
         typesForNames.insert(QLatin1String("valuelist"), KDbLookupFieldSchema::RecordSource::ValueList);
         typesForNames.insert(QLatin1String("fieldlist"), KDbLookupFieldSchema::RecordSource::KDbFieldList);
     }
-    const QString typeNames[6];
+    const std::vector<QString> typeNames;
     QHash<QString, KDbLookupFieldSchema::RecordSource::Type> typesForNames;
 };
 
