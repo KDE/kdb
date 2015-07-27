@@ -1,1 +1,1 @@
-#include <kdb/KDbQueryColumnInfo.h>
+#include <KDbQueryColumnInfo.h>

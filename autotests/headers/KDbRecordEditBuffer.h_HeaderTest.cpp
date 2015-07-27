@@ -1,1 +1,1 @@
-#include <kdb/KDbRecordEditBuffer.h>
+#include <KDbRecordEditBuffer.h>

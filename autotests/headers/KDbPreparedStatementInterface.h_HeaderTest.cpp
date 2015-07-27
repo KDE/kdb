@@ -1,1 +1,1 @@
-#include <kdb/KDbPreparedStatementInterface.h>
+#include <KDbPreparedStatementInterface.h>

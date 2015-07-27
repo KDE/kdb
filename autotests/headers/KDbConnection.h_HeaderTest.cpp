@@ -1,1 +1,1 @@
-#include <kdb/KDbConnection.h>
+#include <KDbConnection.h>

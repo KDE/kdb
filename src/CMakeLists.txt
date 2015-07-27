@@ -158,9 +158,9 @@ set(kdb_INCLUDE_DIRS
     ${CMAKE_CURRENT_BINARY_DIR}/kdb/views
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/expression
-    ${CMAKE_CURRENT_SOURCE_DIR}/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/interfaces
     ${CMAKE_CURRENT_SOURCE_DIR}/parser
+    ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated
     ${CMAKE_CURRENT_SOURCE_DIR}/tools
     ${CMAKE_CURRENT_SOURCE_DIR}/views
 )
@@ -245,7 +245,6 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     HEADER_NAMES
         KDb
         KDbGlobal
@@ -280,7 +279,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE expression
     HEADER_NAMES
         KDbExpression
@@ -290,7 +288,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE interfaces
     HEADER_NAMES
         KDbPreparedStatementInterface
@@ -299,7 +296,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE parser
     HEADER_NAMES
         KDbParser
@@ -308,7 +304,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE parser/generated
     HEADER_NAMES
         KDbToken
@@ -317,7 +312,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE views
     HEADER_NAMES
         KDbTableViewData
@@ -327,7 +321,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS
     REQUIRED_HEADERS kdb_HEADERS
     ORIGINAL CAMELCASE
-    PREFIX kdb
     RELATIVE tools
     HEADER_NAMES
         KDbValidator
@@ -345,7 +338,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
 ecm_generate_headers(kdb_FORWARDING_HEADERS_FROM_BUILDDIR
     REQUIRED_HEADERS kdb_HEADERS_FROM_BUILDDIR
     ORIGINAL CAMELCASE
-    PREFIX kdb
     SOURCE_DIR ${PROJECT_BINARY_DIR}/src
     HEADER_NAMES
         ${kdb_GENERATED_SHARED_DATA_CLASS_BASENAMES}
@@ -357,7 +349,7 @@ install(
     FILES
         ${kdb_HEADERS}
         ${kdb_HEADERS_FROM_BUILDDIR}
-    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/kdb
+    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
     COMPONENT Devel
 )
 

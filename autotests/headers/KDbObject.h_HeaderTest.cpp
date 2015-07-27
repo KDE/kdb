@@ -1,1 +1,1 @@
-#include <kdb/KDbObject.h>
+#include <KDbObject.h>

@@ -1,1 +1,1 @@
-#include <kdb/KDbTableViewColumn.h>
+#include <KDbTableViewColumn.h>

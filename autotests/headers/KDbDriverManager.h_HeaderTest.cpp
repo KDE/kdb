@@ -1,1 +1,1 @@
-#include <kdb/KDbDriverManager.h>
+#include <KDbDriverManager.h>

@@ -1,1 +1,1 @@
-#include <kdb/KDbProperties.h>
+#include <KDbProperties.h>

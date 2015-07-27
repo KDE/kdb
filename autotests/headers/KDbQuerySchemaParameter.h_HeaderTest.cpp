@@ -1,1 +1,1 @@
-#include <kdb/KDbQuerySchemaParameter.h>
+#include <KDbQuerySchemaParameter.h>

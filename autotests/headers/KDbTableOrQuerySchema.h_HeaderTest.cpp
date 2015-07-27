@@ -1,1 +1,1 @@
-#include <kdb/KDbTableOrQuerySchema.h>
+#include <KDbTableOrQuerySchema.h>

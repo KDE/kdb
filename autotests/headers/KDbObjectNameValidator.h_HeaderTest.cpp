@@ -1,1 +1,1 @@
-#include <kdb/KDbObjectNameValidator.h>
+#include <KDbObjectNameValidator.h>

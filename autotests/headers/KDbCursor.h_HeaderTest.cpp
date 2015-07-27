@@ -1,1 +1,1 @@
-#include <kdb/KDbCursor.h>
+#include <KDbCursor.h>
