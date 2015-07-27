@@ -45,7 +45,7 @@ in_fname = sys.argv[1]
 out_fname = sys.argv[2]
 
 try:
-    infile = open(in_fname, "r")
+    infile = open(in_fname, "rb") # binary mode needed for Windows
     outfile = open(out_fname, "w")
 except Exception, inst:
     print inst
@@ -87,9 +87,9 @@ toMap_impl = ''
 fromMap_impl = ''
 
 def get_file(fname):
-    if fname.rfind('/') == -1:
+    if fname.rfind(os.sep) == -1:
         return fname
-    return fname[fname.rfind('/')+1:]
+    return fname[fname.rfind(os.sep)+1:]
 
 def open_sdc():
     global outfile_sdc, shared_class_options
