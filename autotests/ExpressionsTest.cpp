@@ -36,13 +36,21 @@ namespace QTest {
     {
         return qstrdup(qPrintable(string.toString()));
     }
-}
 
-namespace QTest {
     template<>
     char *toString(const KDbField::Type &type)
     {
         return qstrdup(qPrintable(KDbField::typeString(type)));
+    }
+
+    //! Adds a quote if this is the single-character token to match the format of Bison
+    template<>
+    char* toString(const KDbToken &token)
+    {
+        return qstrdup(qPrintable(
+                           token.toChar() ? QString::fromLatin1("'%1'").arg(token.toString())
+                                          : token.toString()
+                      ));
     }
 }
 
@@ -193,15 +201,6 @@ void ExpressionsTest::testExpressionClassName()
     QTEST(expressionClassName(expClass), "name");
 }
 
-//! Adds quote if this is the single-character token, to match the format of bison
-static QString toString(KDbToken token)
-{
-    if (token.toChar()) {
-        return QString::fromLatin1("'%1'").arg(token.toString());
-    }
-    return token.toString();
-}
-
 void ExpressionsTest::testExpressionToken()
 {
     KDbExpression e1;
@@ -228,7 +227,7 @@ void ExpressionsTest::testExpressionToken()
             QCOMPARE(t, KDbToken(char(t.value())));
             QCOMPARE(t.name(), isprint(t.value()) ? QString(QLatin1Char(uchar(t.value())))
                                                   : QString::number(t.value()));
-            QCOMPARE(toString(t), QString::fromLatin1(g_tokenName(t.value())));
+            QCOMPARE(QTest::toString(t), QString::fromLatin1(g_tokenName(t.value())).toLatin1().data());
         }
         else {
             QCOMPARE(t.name(), QString::fromLatin1(g_tokenName(t.value())));
@@ -1002,7 +1001,9 @@ void ExpressionsTest::testConstExpressionValidate()
     QVERIFY(c.isNumericType());
     QVERIFY(c.isFPNumericType());
     QCOMPARE(c.value(), QVariant(3.14159));
-    QCOMPARE(c.toString(0), KDbEscapedString("3.14159"));
+    QString piString("3.14159");
+    // limit precision because it depends on the OS
+    QCOMPARE(c.toString(0).toString().left(piString.length() - 1), piString.left(piString.length() - 1));
     QVERIFY(validate(&c));
     qDebug() << c;
     c.setValue(-18.012);
