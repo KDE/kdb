@@ -16,10 +16,16 @@ find_path(
   DOC "Include directory for the ICU library")
 mark_as_advanced(ICU_INCLUDE_DIR)
 
+if(CYGWIN)
+  set(LIB_NAMES icuuc cygicuuc cygicuuc32)
+else()
+  set(LIB_NAMES icuuc)
+endif()
+
 # Look for the library.
 find_library(
   ICU_LIBRARY
-  NAMES icuuc cygicuuc cygicuuc32
+  NAMES ${LIB_NAMES}
   DOC "Libraries to link against for the common parts of ICU")
 mark_as_advanced(ICU_LIBRARY)
 
