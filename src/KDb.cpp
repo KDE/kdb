@@ -1607,9 +1607,7 @@ QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, 
                 convert(&QString::toUInt, data, length, minValue, maxValue, thisOk)
                 : convert(&QString::toInt, data, length, minValue, maxValue, thisOk);
         case KDbField::BigInteger:
-            return isUnsigned ?
-                convert(&QString::toULongLong, data, length, minValue, maxValue, thisOk)
-                : convert(&QString::toLongLong, data, length, minValue, maxValue, thisOk);
+            return convert(&QString::toLongLong, data, length, minValue, maxValue, thisOk);
         default:
             qFatal("Unsupported integer type %d", type);
         }
