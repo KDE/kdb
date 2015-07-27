@@ -192,7 +192,7 @@ void KDbTest::testCstringToVariant_data()
     QTest::newRow("uint1") << QString::number(0x07FFFFFFF) << KDbField::Integer << -1 << QVariant(0x07FFFFFFF) << KDb::Unsigned << true;
     QTest::newRow("int2") << QString::number(-0x07FFFFFFF) << KDbField::Integer << -1 << QVariant(-0x07FFFFFFF) << KDb::Signed << true;
     QTest::newRow("uint2") << QString::number(-0x07FFFFFFF) << KDbField::Integer << -1 << QVariant() << KDb::Unsigned << false;
-    QTest::newRow("int3") << QString::number(-0x080000000) << KDbField::Integer << -1 << QVariant() << KDb::Signed << false;
+    QTest::newRow("int3") << QString::number(std::numeric_limits<qlonglong>::min()) << KDbField::Integer << -1 << QVariant() << KDb::Signed << false;
     QTest::newRow("uint4") << "-1" << KDbField::Integer << -1 << QVariant() << KDb::Unsigned << false;
     QTest::newRow("int4") << "-1" << KDbField::Integer << -1 << QVariant(-1) << KDb::Signed << true;
     //!< @todo cannot be larger?
@@ -200,7 +200,7 @@ void KDbTest::testCstringToVariant_data()
     QTest::newRow("ubigint1") << QString::number(0x07FFFFFFF) << KDbField::BigInteger << -1 << QVariant(0x07FFFFFFF) << KDb::Unsigned << true;
     QTest::newRow("bigint2") << QString::number(-0x07FFFFFFF) << KDbField::BigInteger << -1 << QVariant(-0x07FFFFFFF) << KDb::Signed << true;
     QTest::newRow("ubigint2") << QString::number(-0x07FFFFFFF) << KDbField::BigInteger << -1 << QVariant() << KDb::Unsigned << false;
-    QTest::newRow("bigint3") << QString::number(-0x080000000) << KDbField::BigInteger << -1 << QVariant() << KDb::Signed << false;
+    QTest::newRow("bigint3") << QString::number(std::numeric_limits<qlonglong>::min()) << KDbField::BigInteger << -1 << QVariant() << KDb::Signed << false;
     QTest::newRow("ubigint4") << "-1" << KDbField::BigInteger << -1 << QVariant() << KDb::Unsigned << false;
     QTest::newRow("bigint4") << "-1" << KDbField::BigInteger << -1 << QVariant(-1) << KDb::Signed << true;
     QTest::newRow("bool0") << "0" << KDbField::Boolean << -1 << QVariant(false) << KDb::Signed << true;
