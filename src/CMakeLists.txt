@@ -3,6 +3,9 @@ simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DRIVERMANAGER_DEBUG "Debugging of the Driver Manager class" OFF)
 simple_option(KDB_TRANSACTIONS_DEBUG "Debugging of the Transaction class" OFF)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
+
+include(CheckIncludeFile)
+check_include_file(unistd.h HAVE_UNISTD_H)
 configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
 
 add_subdirectory(drivers)
@@ -37,8 +40,14 @@ if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
    add_definitions(-DYYDEBUG=1) # needed where sqlparser.h is used
 endif()
 
-if(WIN32)
-    set(EXTRA_PARSER_COMPILE_FLAGS "-DYY_NO_UNISTD_H=1")
+if(NOT HAVE_UNISTD_H)
+    set(EXTRA_SCANNER_COMPILE_FLAGS "-DYY_NO_UNISTD_H=1")
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCC)
+    set(EXTRA_SCANNER_COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} -Wno-sign-compare -Wno-unused-function")
+elseif(MSVC)
+    set(EXTRA_SCANNER_COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} /wd4018") # disable warning C4018: '<' : signed/unsigned mismatch
 endif()
 
 # Mark files as generated, set compile flags
@@ -55,7 +64,7 @@ set_source_files_properties(
     ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
     PROPERTIES
         GENERATED TRUE
-        COMPILE_FLAGS "-Wno-sign-compare -Wno-unused-function "
+        COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} "
 )
 
 set(kdb_LIB_SRCS
