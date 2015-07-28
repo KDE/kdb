@@ -10,7 +10,7 @@ if (KDB_SQLITE_VACUUM)
   add_definitions(-DKDB_SQLITE_DUMP_TOOL=\"${KDB_SQLITE_DUMP_TOOL}\")
 endif ()
 
-# definitins used for the sqlite driver and the shell
+# Definitions used for the sqlite driver and the shell
 add_definitions(
     # sqlite compile-time options, http://sqlite.org/compile.html
     -DSQLITE_SECURE_DELETE
