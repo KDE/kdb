@@ -7,5 +7,9 @@ target_link_libraries(${KDB_SQLITE_DUMP_TOOL}
         KDb
         ${SQLITE_LIBRARIES}
 )
+if(WIN32)
+    set_target_properties(${KDB_SQLITE_DUMP_TOOL}
+                          PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE")
+endif()
 
 install(TARGETS ${KDB_SQLITE_DUMP_TOOL} ${INSTALL_TARGETS_DEFAULT_ARGS})
