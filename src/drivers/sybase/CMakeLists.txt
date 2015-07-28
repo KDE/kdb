@@ -2,12 +2,6 @@ include_directories(
   ${FreeTDS_INCLUDE_DIR}
 )
 
-add_definitions(
-  -D__KDB__=
-)
-
-########### next target ###############
-
 set(kdb_sybasedriver_SRCS
    SybaseDriver.cpp
    SybaseConnection.cpp

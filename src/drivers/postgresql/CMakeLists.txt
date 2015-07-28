@@ -4,12 +4,6 @@ include_directories(
   ${PostgreSQL_INCLUDE_DIRS}
 )
 
-add_definitions(
-  -D__KDB__=
-)
-
-########### next target ###############
-
 set(kdb_postgresqldriver_SRCS
    PostgresqlDriver.cpp
    PostgresqlConnection.cpp

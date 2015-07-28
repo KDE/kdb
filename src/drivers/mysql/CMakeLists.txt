@@ -4,10 +4,6 @@ include_directories(
   ${MYSQL_INCLUDE_DIR}
 )
 
-add_definitions(
-  -D__KDB__=
-)
-
 set(kdb_mysqldriver_SRCS
     mysql_debug.cpp
     MysqlDriver.cpp

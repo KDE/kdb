@@ -20,10 +20,6 @@
 #ifndef KDB_DRIVER_P_H
 #define KDB_DRIVER_P_H
 
-#ifndef __KDB__
-# error "Do not include: this is KDb's' internal file"
-#endif
-
 #include <QString>
 #include <QVariant>
 #include <QHash>

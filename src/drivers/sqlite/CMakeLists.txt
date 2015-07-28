@@ -36,10 +36,6 @@ include_directories(
   ${SQLITE_INCLUDE_DIR}
 )
 
-add_definitions(
-  -D__KDB__=
-)
-
 if(MSVC)
   # avoid deprecated warnings
   add_definitions(

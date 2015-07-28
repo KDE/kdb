@@ -10,10 +10,9 @@ configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
 
 add_subdirectory(drivers)
 
-add_definitions(
-    #TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
-    -D__KDB__=
-)
+#add_definitions(
+#    TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
+#)
 
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html

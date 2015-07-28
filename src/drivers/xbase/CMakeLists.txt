@@ -2,12 +2,6 @@ include_directories(
   ${XBase_INCLUDE_DIR}
 )
 
-add_definitions(
-  -D__KDB__=
-)
-
-########### next target ###############
-
 set(kdb_xbasedriver_SRCS
    XbaseDriver.cpp
    XbaseConnection.cpp
