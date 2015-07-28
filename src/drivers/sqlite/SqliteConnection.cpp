@@ -222,7 +222,8 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
 
     sqliteDebug() << data().databaseName();
     int res = sqlite3_open_v2(
-                 data().databaseName().toUtf8().constData(), /* unicode expected since SQLite 3.1 */
+                 /* unicode expected since SQLite 3.1 */
+                 QDir::toNativeSeparators(data().databaseName()).toUtf8().constData(),
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
@@ -431,7 +432,7 @@ bool SqliteConnection::loadExtension(const QString& path)
         d->setExtensionsLoadingEnabled(true);
     }
     char *errmsg_p = 0;
-    int res = sqlite3_load_extension(d->data, path.toUtf8().constData(), 0, &errmsg_p);
+    int res = sqlite3_load_extension(d->data, QDir::toNativeSeparators(path).toUtf8().constData(), 0, &errmsg_p);
     bool ok = res == SQLITE_OK;
     if (!ok) {
         m_result.setServerErrorCode(res);
