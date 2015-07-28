@@ -30,9 +30,11 @@ extern "C" int shell_main(const char *inFilename);
 
 void usage()
 {
-    cout << KDB_SQLITE_DUMP_TOOL " version " KDB_VERSION_STRING << endl
-         << "A tool for executing DUMP command on SQLite 3 databases." << endl
-         << "Usage: " KDB_SQLITE_DUMP_TOOL " <database>" << endl;
+    cerr << "Usage: " KDB_SQLITE_DUMP_TOOL " [file]\n\n"
+         << KDB_SQLITE_DUMP_TOOL " version " KDB_VERSION_STRING << "\n"
+         << "A stripped-down variant of the `sqlite3' tool for compacting\n"
+            "SQLite 3 databases. Executes DUMP command on a database file and prints\n"
+         << "percent progress. This tool is a part of the KDb framework.\n";
 }
 
 int main(int argc, char **argv)
