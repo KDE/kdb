@@ -22,7 +22,7 @@
 #
 # Variables that FindSqlite.cmake sets:
 #  SQLITE_FOUND             TRUE if required version of Sqlite has been found
-#  SQLITE_INCLUDE_DIR       the SQLite's include directory
+#  SQLITE_INCLUDE_DIR       include directories to use SQLite
 #  SQLITE_LIBRARIES         link these to use SQLite
 #  SQLITE_MIN_VERSION       minimum version, if as the second argument of find_package()
 #  SQLITE_VERSION_STRING    found version of SQLite, e.g. "3.6.16"
@@ -40,12 +40,14 @@
 #      TEMP_STORE THREADSAFE OMIT_LOAD_EXTENSION.
 #      For complete list of options read http://www.sqlite.org/compile.html
 #      SQLITE_COMPILE_OPTIONS list is used for the check.
+#  SQLITE_INCLUDE_PATH      include directory for sqlite3.h
+#  SQLITE_EXT_INCLUDE_PATH      include directory for sqlite3ext.h
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 #
 # Copyright (C) 2008 Gilles Caulier <caulier.gilles@gmail.com>
-# Copyright (C) 2010-2011 Jarosław Staniek <staniek@kde.org>
+# Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -67,17 +69,40 @@ if(NOT WIN32)
   set(SQLITE_DEFINITIONS ${PC_SQLITE_CFLAGS_OTHER})
 endif()
 
-find_path(SQLITE_INCLUDE_DIR NAMES sqlite3.h
+set(SQLITE_INCLUDE_DIR) # start with empty list
+
+find_path(SQLITE_INCLUDE_PATH NAMES sqlite3.h
   PATHS
   ${PC_SQLITE_INCLUDEDIR}
   ${PC_SQLITE_INCLUDE_DIRS}
 )
+if(SQLITE_INCLUDE_PATH)
+  set(SQLITE_INCLUDE_DIR ${SQLITE_INCLUDE_DIR} ${SQLITE_INCLUDE_PATH})
+endif()
+
+find_path(SQLITE_EXT_INCLUDE_PATH NAMES sqlite3ext.h
+  PATHS
+  ${PC_SQLITE_INCLUDEDIR}
+  ${PC_SQLITE_INCLUDE_DIRS}
+)
+if(SQLITE_EXT_INCLUDE_PATH)
+  set(SQLITE_INCLUDE_DIR ${SQLITE_INCLUDE_DIR} ${SQLITE_EXT_INCLUDE_PATH})
+endif()
+
+# most of the headers will be in the same directories, avoid creating a list of duplicates
+if (SQLITE_INCLUDE_DIR)
+  list(REMOVE_DUPLICATES SQLITE_INCLUDE_DIR)
+endif ()
 
 find_library(SQLITE_LIBRARIES NAMES sqlite3
   PATHS
   ${PC_SQLITE_LIBDIR}
   ${PC_SQLITE_LIBRARY_DIRS}
 )
+#message(DEBUG " SQLITE_INCLUDE_DIR: ${SQLITE_INCLUDE_DIR}")
+#message(DEBUG " SQLITE_INCLUDE_PATH: ${SQLITE_INCLUDE_PATH}")
+#message(DEBUG " SQLITE_EXT_INCLUDE_PATH: ${SQLITE_EXT_INCLUDE_PATH}")
+#message(DEBUG " SQLITE_LIBRARIES: ${SQLITE_LIBRARIES}")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Sqlite DEFAULT_MSG SQLITE_INCLUDE_DIR SQLITE_LIBRARIES)
