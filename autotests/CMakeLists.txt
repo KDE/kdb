@@ -6,9 +6,15 @@ remove_definitions(
 )
 
 set(FILES_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(KDB_LOCAL_PLUGINS_DIR ${PROJECT_BINARY_DIR}/plugins)
 add_definitions(
     -DFILES_OUTPUT_DIR=\"${FILES_OUTPUT_DIR}\"
-    -DSQLITE_ICU_EXTENSION_PATH=\"${PROJECT_BINARY_DIR}/src/drivers/sqlite/icu\"
+     # make plugins work without installing them:
+    -DKDB_LOCAL_PLUGINS_DIR=\"${KDB_LOCAL_PLUGINS_DIR}\"
+     # nonstandard path for sqlite3 extensions, they would work too if we placed them
+     # in ${KDB_LOCAL_PLUGINS_DIR}/sqlite3 but we want to test the "extraSqliteExtensionPaths"
+     # connection option in ConnectionTest::testCreateDb():
+    -DSQLITE_LOCAL_ICU_EXTENSION_PATH=\"${KDB_LOCAL_PLUGINS_DIR}/sqlite3\"
     -DYYTOKENTYPE # this removes access to yytokentype enum as we should access KDb::Token instead
 )
 

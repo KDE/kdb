@@ -29,6 +29,7 @@
 
 void KDbTestUtils::testDriverManager()
 {
+    QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
     QStringList ids = manager.driverIds();
     qDebug() << "DRIVERS:" << ids;
     QVERIFY2(!manager.result().isError(), "Error in driver manager");
