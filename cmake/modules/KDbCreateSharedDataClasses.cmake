@@ -36,7 +36,7 @@ macro(KDB_CREATE_SHARED_DATA_CLASSES)
             set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/${PREFIX})
             set(OUTPUT "${PREFIX}/${OUTPUT}")
         endif()
-        message(STATUS "OUTPUT_DIR: ${OUTPUT_DIR} ${PREFIX}")
+        # message(STATUS "OUTPUT_DIR: ${OUTPUT_DIR} ${PREFIX}")
         file(MAKE_DIRECTORY ${OUTPUT_DIR})
         execute_process(
             COMMAND python ${CMAKE_SOURCE_DIR}/tools/sdc.py
