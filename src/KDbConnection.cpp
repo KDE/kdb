@@ -962,7 +962,9 @@ QList<int> KDbConnection::objectIds(int objectType, bool* ok)
         }
     }
     deleteCursor(c);
-    *ok = true;
+    if (ok) {
+        *ok = true;
+    }
     return list;
 }
 
