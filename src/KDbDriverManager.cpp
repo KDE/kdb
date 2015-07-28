@@ -173,7 +173,10 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not load database driver's plugin file \"%1\".")
                                 .arg(metaData->fileName()));
-        kdbWarning() << m_result.message();
+        QPluginLoader loader(metaData->fileName()); // use this to get the message
+        (void)loader.load();
+        m_result.setServerMessage(loader.errorString());
+        kdbWarning() << m_result.message() << m_result.serverMessage();
         return 0;
     }
     KDbDriver *driver = factory->create<KDbDriver>();
