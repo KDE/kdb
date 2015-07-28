@@ -85,7 +85,9 @@ bool DriverManagerInternal::lookupDrivers()
         //! @todo check version
         QScopedPointer<KDbDriverMetaData> metaData(new KDbDriverMetaData(*loader));
         if (m_driversMetaData.contains(metaData->id())) {
-            kdbWarning() << "More than one driver with ID" << metaData->id() << "-- skipping this one";
+            kdbWarning() << "Driver with ID" << metaData->id() << "already found at"
+                         << m_driversMetaData.value(metaData->id())->fileName()
+                         << "-- skipping another at" << metaData->fileName();
             continue;
         }
         foreach (const QString& mimeType, metaData->mimeTypes()) {
