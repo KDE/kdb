@@ -23,9 +23,9 @@
 #include <QObject>
 #include <QScopedPointer>
 
-#include <KDbConnection>
 #include <KDbParser>
-#include <KDbEscapedString>
+
+#include "KDbTestUtils.h"
 
 class SqlParserTest : public QObject
 {
@@ -43,7 +43,7 @@ private:
     bool openDatabase(const QString &path);
     KDbEscapedString parse(const KDbEscapedString& sql, bool *ok);
 
-    QScopedPointer<KDbConnection> m_conn;
+    KDbTestUtils m_utils;
     QScopedPointer<KDbParser> m_parser;
 };
 

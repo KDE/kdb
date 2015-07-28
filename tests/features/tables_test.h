@@ -20,7 +20,7 @@
 #ifndef TABLETEST_H
 #define TABLETEST_H
 
-int tablesTest()
+int tablesTest(KDbConnection *conn)
 {
 #ifndef TABLETEST_DO_NOT_CREATE_DB
     if (dbCreationTest() != 0)

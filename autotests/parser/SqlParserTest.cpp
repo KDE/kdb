@@ -22,36 +22,32 @@
 
 #include <KDbDriverManager>
 #include <KDbNativeStatementBuilder>
-#include <KDbParser>
 #include <KDbToken>
 
 Q_DECLARE_METATYPE(KDbEscapedString)
 
 QTEST_GUILESS_MAIN(SqlParserTest)
 
+void SqlParserTest::initTestCase()
+{
+    m_utils.testDriverManager();
+    m_utils.testSqliteDriver();
+}
+
 bool SqlParserTest::openDatabase(const QString &path)
 {
-    QString driverId("org.kde.kdb.sqlite");
-    KDbDriverManager manager;
-    qDebug() << manager.driverIds();
-    KDbDriver *driver = manager.driver(driverId);
-    if (!driver || manager.result().isError()) {
-        qDebug() << manager.result();
+    if (!m_utils.driver) {
         return false;
     }
 
     KDbConnectionData cdata;
     cdata.setDatabaseName(path);
-    m_conn.reset(driver->createConnection(cdata));
-    if (!m_conn || driver->result().isError()) {
-        qDebug() << driver->result();
+    m_utils.testConnect(cdata);
+    if (!m_utils.connection) {
+        qDebug() << m_utils.driver->result();
         return false;
     }
-    if (!m_conn->connect()) {
-        qDebug() << m_conn->result();
-        return false;
-    }
-    m_parser.reset(new KDbParser(m_conn.data()));
+    m_parser.reset(new KDbParser(m_utils.connection.data()));
 #if 0
     if (m_conn->databaseExists(dbName)) {
         if (!m_conn->dropDatabase(dbName)) {
@@ -66,16 +62,13 @@ bool SqlParserTest::openDatabase(const QString &path)
         return false;
     }
 #endif
-    if (!m_conn->useDatabase()) {
-        qDebug() << m_conn->result();
-        m_conn->disconnect();
+    m_utils.testUse();
+    if (!m_utils.connection->isDatabaseUsed()) {
+        qDebug() << m_utils.connection->result();
+        m_utils.testDisconnect();
         return false;
     }
     return true;
-}
-
-void SqlParserTest::initTestCase()
-{
 }
 
 KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
@@ -97,7 +90,7 @@ KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
     //qDebug() << *q.data();
 
     QList<QVariant> params;
-    KDbNativeStatementBuilder builder(m_conn.data());
+    KDbNativeStatementBuilder builder(m_utils.connection.data());
     KDbEscapedString querySql;
     *ok = builder.generateSelectStatement(&querySql, q.data(), params);
     //qDebug() << querySql;
@@ -335,14 +328,11 @@ void SqlParserTest::testTokens()
 
 void SqlParserTest::cleanupTestCase()
 {
-    if (m_conn && m_conn->isConnected()) {
+    m_utils.testDisconnect();
 #if 0
         if (!m_conn->dropDatabase()) {
             qDebug() << m_conn->result();
         }
         qDebug() << "Database" << m_conn->data().databaseName() << "dropped.";
 #endif
-        m_conn->disconnect();
-        m_conn.reset();
-    }
 }

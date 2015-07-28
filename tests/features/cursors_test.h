@@ -20,12 +20,12 @@
 #ifndef CURSORS_TEST_H
 #define CURSORS_TEST_H
 
-int tablesTest();
+int tablesTest(KDbConnection *conn);
 
 int cursorsTest()
 {
     if (!conn->databaseExists(db_name)) {
-        if (tablesTest() != 0)
+        if (tablesTest(conn) != 0)
             return 1;
         qDebug() << "DB created & filled";
     }

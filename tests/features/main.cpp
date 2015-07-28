@@ -307,7 +307,7 @@ int main(int argc, char** argv)
     else if (test_name == "dbcreation")
         r = dbCreationTest();
     else if (test_name == "tables")
-        r = tablesTest();
+        r = tablesTest(conn);
 #ifndef NO_GUI
     else if (test_name == "tableview")
         r = tableViewTest();
