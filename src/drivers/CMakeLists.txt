@@ -8,6 +8,24 @@ endif()
 set(KDB_PLUGIN_INSTALL_DIR ${PLUGIN_INSTALL_DIR}/kdb)
 
 # -----------------------
+macro(build_and_install_kdb_driver _name _srcs _extra_libs)
+    set(_target kdb_${_name}driver)
+    ecm_create_qm_loader(${_srcs} ${_target}_qt)
+    add_library(${_target} MODULE ${_srcs})
+    kcoreaddons_desktop_to_json(${_target} ${_target}.desktop)
+
+    target_link_libraries(${_target}
+        PUBLIC
+            KDb
+        PRIVATE
+            ${_extra_libs}
+    )
+    # Needed for examples and autotests:
+    set_target_properties(${_target}
+                          PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/plugins/kdb")
+    install(TARGETS ${_target} DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
+endmacro()
+# -----------------------
 
 # find SQLite:
 set(SQLITE_MIN_VERSION 3.6.16)

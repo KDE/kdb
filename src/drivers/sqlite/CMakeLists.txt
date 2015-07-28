@@ -64,19 +64,7 @@ if (KDB_SQLITE_VACUUM)
   list(APPEND kdb_sqlite_MOC_SRCS SqliteVacuum.h)
 endif ()
 
-ecm_create_qm_loader(kdb_sqlite_SRCS kdb_sqlitedriver_qt)
-
-add_library(kdb_sqlitedriver MODULE ${kdb_sqlite_SRCS})
-kcoreaddons_desktop_to_json(kdb_sqlitedriver kdb_sqlitedriver.desktop)
-
-target_link_libraries(kdb_sqlitedriver
-    PUBLIC
-        KDb
-    PRIVATE
-        ${SQLITE_LIBRARIES}
-)
-
-install(TARGETS kdb_sqlitedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
+build_and_install_kdb_driver(sqlite "${kdb_sqlite_SRCS}" "${SQLITE_LIBRARIES}")
 
 add_subdirectory(icu)
 
