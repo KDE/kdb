@@ -42,6 +42,10 @@ T* KDB_POINTER_WRAPPER(T *t) { return t; }
 template<typename T>
 T* KDB_POINTER_WRAPPER(const QPointer<T> &t) { return t.data(); }
 
+//! @internal for KDB_VERIFY
+template<typename T>
+T* KDB_POINTER_WRAPPER(const QScopedPointer<T> &t) { return t.data(); }
+
 //! Calls @a call and verifies status of @a resultable
 //! On error displays the status on debug and does the same as QVERIFY with @a errorMessage
 #define KDB_VERIFY(resultable, call, errorMessage) \
