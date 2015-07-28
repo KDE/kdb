@@ -21,12 +21,10 @@
 
 #include <KDbDriverManager>
 #include <KDbDriverMetaData>
-#include <KDbConnection>
 
+#include <QDir>
 #include <QFile>
 #include <QTest>
-
-KDbConnection *conn = 0;
 
 #define TABLETEST_DO_NOT_CREATE_DB
 #include "../tests/features/tables_test.h"
@@ -109,57 +107,31 @@ void ConnectionTest::testCreateDb()
 {
     QVERIFY(utils.driver);
 
-    QString db_name(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi"));
+    QString db_name(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi")));
 
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(db_name);
-    qDebug() << cdata;
 
-    KDbConnectionOptions connOptions;
-    QStringList extraSqliteExtensionPaths;
-    extraSqliteExtensionPaths << SQLITE_ICU_EXTENSION_PATH;
-    connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
-
-    KDB_VERIFY(utils.driver, conn = utils.driver->createConnection(cdata, connOptions), "Failed to create connection");
-    QVERIFY2(cdata.driverId().isEmpty(), "Connection data has filled driver ID");
-    QCOMPARE(conn->data().driverId(), utils.driver->metaData()->id());
-    QVERIFY2(utils.driver->connections().contains(conn), "Driver does not list created connection");
-    QCOMPARE(utils.driver->connections().count(), 1);
-
-    const KDbUtils::Property extraSqliteExtensionPathsProperty = conn->options()->property("extraSqliteExtensionPaths");
-    QVERIFY2(!extraSqliteExtensionPathsProperty.isNull, "extraSqliteExtensionPaths property not found");
-    QCOMPARE(extraSqliteExtensionPathsProperty.value.toStringList(), extraSqliteExtensionPaths);
-
-    const KDbUtils::Property readOnlyProperty = conn->options()->property("readOnly");
-    QVERIFY2(!readOnlyProperty.isNull, "readOnly property not found");
-    QCOMPARE(readOnlyProperty.value.toBool(), conn->options()->isReadOnly());
-    //! @todo Add extensive test for a read-only connection
+    utils.testConnect(cdata);
+    QVERIFY(utils.connection);
 
     //! @todo KDbDriver::metaData
     {
-        QScopedPointer<KDbConnection> connGuard(conn);
-
-        KDB_VERIFY(conn, conn->connect(), "Failed to connect");
-        QVERIFY(conn->isConnected());
-        if (conn->databaseExists(db_name)) {
-            KDB_VERIFY(conn, conn->dropDatabase(db_name), "Failed to drop database");
+        QScopedPointer<KDbConnection> connGuard(utils.connection.data());
+        //! @todo move to KDbTestUtils::testCreate()
+        if (utils.connection->databaseExists(db_name)) {
+            KDB_VERIFY(utils.connection, utils.connection->dropDatabase(db_name), "Failed to drop database");
         }
-        KDB_VERIFY(conn, !conn->databaseExists(db_name), "Database still exists after drop");
-        KDB_VERIFY(conn, conn->createDatabase(db_name), "Failed to create db");
-        KDB_VERIFY(conn, conn->databaseExists(db_name), "Database does not exists after creation");
-        KDB_VERIFY(conn, conn->useDatabase(db_name), "Failed to use db");
-        KDB_VERIFY(conn, conn->isDatabaseUsed(), "Db isn't marked as used after USE");
-
-        QVERIFY2(tablesTest() == 0, "Failed to create test data");
-
-        KDB_VERIFY(conn, conn->closeDatabase(), "Failed to close database");
-        KDB_VERIFY(conn, !conn->isDatabaseUsed(), "Database still used after closing");
-        KDB_VERIFY(conn, conn->disconnect(), "Failed to disconnect database");
-        KDB_VERIFY(conn, !conn->isConnected(), "Database still connected after disconnecting");
+        KDB_VERIFY(utils.connection, !utils.connection->databaseExists(db_name), "Database exists");
+        KDB_VERIFY(utils.connection, utils.connection->createDatabase(db_name), "Failed to create db");
+        KDB_VERIFY(utils.connection, utils.connection->databaseExists(db_name), "Database does not exists after creation");
+        utils.testUse();
+        QVERIFY2(tablesTest(utils.connection.data()) == 0, "Failed to create test data");
+        connGuard.take();
     }
-    conn = 0;
-    QVERIFY(utils.driver->connections().isEmpty());
+
+    utils.testDisconnect();
 }
 
 void ConnectionTest::cleanupTestCase()

@@ -25,6 +25,7 @@
 #include <QPointer>
 #include <KDbDriver>
 #include <KDbDriverManager>
+#include <KDbConnection>
 
 //! @internal for KDB_VERIFY
 template<typename T>
@@ -66,12 +67,19 @@ class KDBTESTUTILS_EXPORT KDbTestUtils : public QObject
 {
     Q_OBJECT
 public:
+    KDbTestUtils();
+
     KDbDriverManager manager;
     QPointer<KDbDriver> driver;
+    QScopedPointer<KDbConnection> connection;
 
 public Q_SLOTS:
     void testDriverManager();
     void testSqliteDriver();
+    void testConnect(const KDbConnectionData &cdata);
+    void testUse();
+    void testDisconnect();
+
 protected:
     void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
 };

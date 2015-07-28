@@ -27,6 +27,11 @@
 #include <QTest>
 #include <QMimeDatabase>
 
+KDbTestUtils::KDbTestUtils()
+    : connection(0)
+{
+}
+
 void KDbTestUtils::testDriverManager()
 {
     QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
@@ -69,4 +74,58 @@ void KDbTestUtils::testSqliteDriver()
                true, // file-based
                mimeTypes);
     QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()), "SQLite's MIME types should include the default file based one");
+}
+
+void KDbTestUtils::testConnect(const KDbConnectionData &cdata)
+{
+    qDebug() << cdata;
+
+    KDbConnectionOptions connOptions;
+    QStringList extraSqliteExtensionPaths;
+    extraSqliteExtensionPaths << SQLITE_LOCAL_ICU_EXTENSION_PATH;
+    connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
+
+    const int connCount = driver->connections().count();
+    connection.reset(driver->createConnection(cdata, connOptions));
+    KDB_VERIFY(driver, !connection.isNull(), "Failed to create connection");
+    QVERIFY2(cdata.driverId().isEmpty(), "Connection data has filled driver ID");
+    QCOMPARE(connection->data().driverId(), driver->metaData()->id());
+    QVERIFY2(driver->connections().contains(connection.data()), "Driver does not list created connection");
+    QCOMPARE(driver->connections().count(), connCount + 1); // one more
+
+    const KDbUtils::Property extraSqliteExtensionPathsProperty = connection->options()->property("extraSqliteExtensionPaths");
+    QVERIFY2(!extraSqliteExtensionPathsProperty.isNull, "extraSqliteExtensionPaths property not found");
+    QCOMPARE(extraSqliteExtensionPathsProperty.value.toStringList(), extraSqliteExtensionPaths);
+
+    const KDbUtils::Property readOnlyProperty = connection->options()->property("readOnly");
+    QVERIFY2(!readOnlyProperty.isNull, "readOnly property not found");
+    QCOMPARE(readOnlyProperty.value.toBool(), connection->options()->isReadOnly());
+
+    //! @todo Add extensive test for a read-only connection
+
+    KDB_VERIFY(connection, connection->connect(), "Failed to connect");
+    KDB_VERIFY(connection, connection->isConnected(), "Database not connected after call to connect()");
+}
+
+void KDbTestUtils::testUse()
+{
+    KDB_VERIFY(connection, connection->databaseExists(connection->data().databaseName()), "Database does not exists");
+    KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
+    KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
+}
+
+void KDbTestUtils::testDisconnect()
+{
+    if (!connection) {
+        return;
+    }
+    const int connCount = driver->connections().count();
+    KDB_VERIFY(connection, connection->closeDatabase(), "Failed to close database");
+    KDB_VERIFY(connection, !connection->isDatabaseUsed(), "Database still used after closing");
+    KDB_VERIFY(connection, connection->closeDatabase(), "Second closeDatabase() call  should not fail");
+    KDB_VERIFY(connection, connection->disconnect(), "Failed to disconnect database");
+    KDB_VERIFY(connection, !connection->isConnected(), "Database still connected after disconnecting");
+    KDB_VERIFY(connection, connection->disconnect(), "Second disconnect() call should not fail");
+    connection.reset();
+    QCOMPARE(driver->connections().count(), connCount - 1); // one less
 }
