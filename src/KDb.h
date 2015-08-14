@@ -528,14 +528,14 @@ T iifNotEmpty(const T &string, const T &stringIfEmpty)
 template<typename T>
 T iifNotEmpty(const QByteArray &string, const T &stringIfEmpty)
 {
-    return iifNotEmpty(QString(string), stringIfEmpty);
+    return iifNotEmpty(QLatin1String(string), stringIfEmpty);
 }
 
 //! @overload iifNotEmpty(const T &string, const T &stringIfEmpty)
 template<typename T>
 T iifNotEmpty(const T &string, const QByteArray &stringIfEmpty)
 {
-    return iifNotEmpty(string, QString(stringIfEmpty));
+    return iifNotEmpty(string, QLatin1String(stringIfEmpty));
 }
 
 //! @return @a value if @a ok is true, else returns default value T().
