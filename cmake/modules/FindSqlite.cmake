@@ -43,9 +43,6 @@
 #  SQLITE_INCLUDE_PATH      include directory for sqlite3.h
 #  SQLITE_EXT_INCLUDE_PATH      include directory for sqlite3ext.h
 #
-# Redistribution and use is allowed according to the terms of the BSD license.
-# For details see the accompanying COPYING-CMAKE-SCRIPTS file.
-#
 # Copyright (C) 2008 Gilles Caulier <caulier.gilles@gmail.com>
 # Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
 #
