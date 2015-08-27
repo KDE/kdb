@@ -59,7 +59,7 @@ Q_GLOBAL_STATIC(KDbExpressionClassNames, KDb_expressionClassNames)
 
 KDB_EXPORT QString expressionClassName(KDb::ExpressionClass c)
 {
-    Q_ASSERT(c < sizeof(KDb_expressionClassNames->names));
+    Q_ASSERT(c < KDb_expressionClassNames->names.size());
     return KDb_expressionClassNames->names[c];
 }
 

@@ -128,7 +128,7 @@ void KDbLookupFieldSchema::RecordSource::setName(const QString& name)
 
 QString KDbLookupFieldSchema::RecordSource::typeName() const
 {
-    Q_ASSERT(d->type < sizeof(KDb_lookupFieldSchemaStatic->typeNames));
+    Q_ASSERT(d->type < KDb_lookupFieldSchemaStatic->typeNames.size());
     return KDb_lookupFieldSchemaStatic->typeNames[d->type];
 }
 
