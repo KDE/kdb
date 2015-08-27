@@ -31,7 +31,7 @@
 #include <QObject>
 #include <QDateTime>
 #include <QMetaMethod>
-
+#include <QDebug>
 
 namespace KDbUtils
 {
