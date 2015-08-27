@@ -462,13 +462,6 @@
 #include <alloca.h>
 #endif
 
-inline static KDbExpression fromPtr(KDbExpression* e)
-{
-    KDbExpression exp(*e);
-    delete e;
-    return exp;
-}
-
 QDebug operator<<(QDebug dbg, const KDbExpressionPtr& expr)
 {
     dbg.nospace() << expr.e;

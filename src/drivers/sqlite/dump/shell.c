@@ -69,11 +69,6 @@
 static sqlite3 *db = 0;
 
 /*
-** True if an interrupt (Control-C) has been received.
-*/
-static volatile int seenInterrupt = 0;
-
-/*
 ** A global char* and an SQL function to access its current value
 ** from within an SQL statement. This program used to use the
 ** sqlite_exec_printf() API to substitue a string into an SQL statement.
