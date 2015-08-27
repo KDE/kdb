@@ -1077,7 +1077,7 @@ void ExpressionsTest::testConstExpressionValidate()
     QCOMPARE(c.value(), QVariant(time));
     qDebug() << c;
     QVERIFY(validate(&c));
-    time.addSecs(1200);
+    time = time.addSecs(1200);
     c.setValue(time);
     QCOMPARE(c.value(), QVariant(time));
     QVERIFY(c.isValid());
