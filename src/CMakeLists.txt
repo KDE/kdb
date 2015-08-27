@@ -57,6 +57,7 @@ set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
         COMPILE_FLAGS "-DYYERROR_VERBOSE=1 ${EXTRA_PARSER_COMPILE_FLAGS} "
 )
 set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
+set_source_files_properties(${PARSER_SOURCE_DIR}/generated/KDbToken.h PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cpp PROPERTIES GENERATED TRUE)
 
 set_source_files_properties(
