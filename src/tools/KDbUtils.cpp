@@ -146,7 +146,7 @@ void* KDbUtils::stringToPtrInternal(const QString& str, int size)
         if (!ok)
             return 0;
     }
-    return *(void**)(array.data());
+    return static_cast<void*>(array.data());
 }
 
 //---------
