@@ -1540,7 +1540,8 @@ tristate KDbConnection::alterTable(KDbTableSchema* tableSchema, KDbTableSchema* 
     }
 //! @todo (js) implement real altering
 //! @todo (js) update any structure (e.g. query) that depend on this table!
-    bool ok, empty;
+    bool ok = true;
+    bool empty;
 #if 0 //! @todo uncomment:
     empty = isEmpty(tableSchema, ok) && ok;
 #else
