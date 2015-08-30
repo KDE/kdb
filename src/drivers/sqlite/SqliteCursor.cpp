@@ -329,7 +329,7 @@ bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 
 QVariant SqliteCursor::value(int i)
 {
-    if (i > (m_fieldCount - 1)) //range checking
+    if (i < 0 || i > (m_fieldCount - 1)) //range checking
         return QVariant();
 //! @todo allow disable range checking! - performance reasons
     KDbField *f = (m_fieldsExpanded && i < m_fieldsExpanded->count())
