@@ -31,7 +31,7 @@
 #include <QApplication>
 #include <QWidget>
 
-Q_GLOBAL_STATIC(DriverManagerInternal, s_self);
+Q_GLOBAL_STATIC(DriverManagerInternal, s_self)
 
 DriverManagerInternal::DriverManagerInternal() /* protected */
  : m_lookupDriversNeeded(true)

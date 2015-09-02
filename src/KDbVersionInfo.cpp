@@ -36,7 +36,7 @@ bool KDbServerVersionInfo::isNull() const
 {
 //! @todo add this to SDC:        bool operator==(const Data& other) const { return false; }
     return (*d.data() == Data());
-};
+}
 
 //------------------------
 
