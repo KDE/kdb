@@ -149,13 +149,15 @@ bool xBaseExportPrivate::appendRecord( const QString& sourceTableName , KDbRecor
   return true;
 }
 
-int xBaseExportPrivate::fieldLength(KDbField* f ) {
-  if ( f->type() == KDbField::Text ) {
+int xBaseExportPrivate::fieldLength(KDbField* f)
+{
+  const Field::Type t = f->type(); // cache: evaluating type of expressions can be expensive
+  if (KDbField::isTextType(t)) {
     return f->maxLength();
   }
   // return the max possible (string)length of the types
   // see http://linux.techass.com/projects/xdb/xbasedocs/xbase_c3.html
-  switch(type( f->type())) {
+  switch(type(t)) {
     case XB_CHAR_FLD:
       return 254;
     case XB_LOGICAL_FLD:

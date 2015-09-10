@@ -1021,6 +1021,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         foreach(KDbField* f, *newTable->fields()) {
             QString renamedFieldName(fieldHash.value(f->name()));
             KDbEscapedString sourceSQLString;
+            const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
             if (!renamedFieldName.isEmpty()) {
                 //this field should be renamed
                 sourceSQLString = KDbEscapedString(d->conn->escapeIdentifier(renamedFieldName));
@@ -1029,15 +1030,15 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 //! @todo support expressions (eg. TODAY()) as a default value
 //! @todo this field can be notNull or notEmpty - check whether the default is ok
 //!       (or do this checking also in the Table Designer?)
-                sourceSQLString = d->conn->driver()->valueToSQL(f->type(), f->defaultValue());
+                sourceSQLString = d->conn->driver()->valueToSQL(type, f->defaultValue());
             } else if (f->isNotNull()) {
                 //this field cannot be null
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KDb::emptyValueForFieldType(f->type()));
+                                      type, KDb::emptyValueForFieldType(type));
             } else if (f->isNotEmpty()) {
                 //this field cannot be empty - use any nonempty value..., e.g. " " for text or 0 for number
                 sourceSQLString = d->conn->driver()->valueToSQL(
-                                      f->type(), KDb::notEmptyValueForFieldType(f->type()));
+                                      type, KDb::notEmptyValueForFieldType(type));
             }
 //! @todo support unique, validatationRule, unsigned flags...
 //! @todo check for foreignKey values...

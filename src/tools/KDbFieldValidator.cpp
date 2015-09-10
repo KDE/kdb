@@ -33,8 +33,8 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
 //! @todo merge this code with KexiTableEdit code!
 //! @todo set maximum length validator
 //! @todo handle input mask (via QLineEdit::setInputMask()
-    const KDbField::Type t = field.type();
-    if (field.isIntegerType()) {
+    const KDbField::Type t = field.type(); // cache: evaluating type of expressions can be expensive
+    if (KDbField::isIntegerType(t)) {
         QValidator *validator = 0;
         const bool u = field.isUnsigned();
         int bottom = 0, top = 0;
@@ -55,7 +55,7 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
         if (!validator)
             validator = new QIntValidator(bottom, top, 0); //the default
         addSubvalidator(validator);
-    } else if (field.isFPNumericType()) {
+    } else if (KDbField::isFPNumericType(t)) {
         QValidator *validator;
         if (t == KDbField::Float) {
             if (field.isUnsigned()) //ok?
