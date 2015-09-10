@@ -34,14 +34,14 @@ MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         , mysql_owned(true)
         , res(0)
         , lowerCaseTableNames(false)
+        , serverVersion(0)
 {
 }
 
 MysqlConnectionInternal::~MysqlConnectionInternal()
 {
     if (mysql_owned && mysql) {
-        mysql_close(mysql);
-        mysql = 0;
+        db_disconnect();
     }
 }
 
@@ -91,6 +91,7 @@ bool MysqlConnectionInternal::db_connect(const KDbConnectionData& data)
                            data.port(), localSocket.isEmpty() ? 0 : localSocket.constData(),
                            client_flag))
     {
+        serverVersion = mysql_get_server_version(mysql);
         return true;
     }
     return false;
@@ -100,6 +101,7 @@ bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
     mysql = 0;
+    serverVersion = 0;
     mysqlDebug();
     return true;
 }
