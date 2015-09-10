@@ -163,9 +163,55 @@ inline QVariant pgsqlCStrToVariant(const pqxx::result::field& r)
 }
 #endif
 
-inline bool hasTimeZone(const QString& s)
+static inline bool hasTimeZone(const QString& s)
 {
     return s.at(s.length() - 3) == QLatin1Char('+') || s.at(s.length() - 3) == QLatin1Char('-');
+}
+
+static inline QVariant convertToKDbType(bool convert, const QVariant &value, QVariant::Type kdbVariantType)
+{
+    return (convert && value.canConvert(kdbVariantType)) ? value.value<kdbVariantType>() : value;
+}
+
+static inline QTime timeFromData(const char *data, int len)
+{
+    if (len == 0) {
+        return QTime();
+    }
+    QString s(QString::fromLatin1(data, len));
+    if (hasTimeZone(s)) {
+        s.chop(3); // skip timezone
+        return QTime::fromString(s, Qt::ISODate);
+    }
+    return QTime::fromString(s, Qt::ISODate);
+}
+
+static inline QDateTime dateTimeFromData(const char *data, int len)
+{
+    if (len < 10 /*ISO Date*/) {
+        return QDateTime();
+    }
+    QString s(QString::fromLatin1(data, len));
+    if (hasTimeZone(s)) {
+        s.chop(3); // skip timezone
+        if (s.isEmpty()) {
+            return QDateTime();
+        }
+    }
+    if (s.at(s.length() - 3).isPunct()) { // fix ms, should be three digits
+        s += QLatin1Char('0');
+    }
+    return QDateTime::fromString(s, Qt::ISODate);
+}
+
+static inline QDateTime byteArrayFromData(const char *data)
+{
+    size_t unescapedLen;
+    unsigned char *unescapedData = PQunescapeBytea((const unsigned char*)data, &unescapedLen);
+    const QByteArray result((const char*)unescapedData, unescapedLen);
+    //! @todo avoid deep copy; QByteArray does not allow passing ownership of data; maybe copy PQunescapeBytea code?
+    PQfreemem(unescapedData);
+    return result;
 }
 
 //==================================================================================
@@ -175,100 +221,63 @@ QVariant PostgresqlCursor::pValue(int pos) const
 //  KDbDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
     const qint64 row = at();
 
-#if 0
     KDbField *f = (m_fieldsExpanded && pos < qMin(m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
-#endif
 // KDbDrvDbg << "pos:" << pos;
 
     const QVariant::Type type = m_realTypes[pos];
-    if (PQgetisnull(d->res, row, pos)) {
-        return QVariant(type);
+    const KDbField::Type kdbType = f ? f->type() : KDbField::InvalidType; // cache: evaluating type of expressions can be expensive
+    const QVariant::Type kdbVariantType = KDbField::variantType(kdbType);
+    if (PQgetisnull(d->res, row, pos) || kdbType == KDbField::Null) {
+        return QVariant();
     }
     const char *data = PQgetvalue(d->res, row, pos);
     const int len = PQgetlength(d->res, row, pos);
 
     switch (type) { // from most to least frequently used types:
     case QVariant::String:
-        return d->unicode ? QString::fromUtf8(data, len) : QString::fromLatin1(data, len);
+        return convertToKDbType(!KDbField::isTextType(kdbType),
+                                d->unicode ? QString::fromUtf8(data, len) : QString::fromLatin1(data, len),
+                                kdbVariantType);
     case QVariant::Int:
-        return atoi(data); // the fastest way
+        return convertToKDbType(!KDbField::isIntegerType(kdbType),
+                                atoi(data), // the fastest way
+                                kdbVariantType);
     case QVariant::Bool:
-        return bool(data[0] == 't');
+        return convertToKDbType(kdbType != KDbField::Boolean,
+                                bool(data[0] == 't'),
+                                kdbVariantType);
     case QVariant::LongLong:
-        if (data[0] == '-')
-            return QByteArray::fromRawData(data, len).toLongLong();
-        else
-            return QByteArray::fromRawData(data, len).toULongLong();
+        return convertToKDbType(kdbType != KDbField::BigInteger,
+                                (data[0] == '-') ? QByteArray::fromRawData(data, len).toLongLong()
+                                                 : QByteArray::fromRawData(data, len).toULongLong(),
+                                kdbVariantType);
     case QVariant::Double:
 //! @todo support equivalent of QSql::NumericalPrecisionPolicy, especially for NUMERICOID
-        return QByteArray::fromRawData(data, len).toDouble();
+        return convertToKDbType(!KDbField::isFPNumericType(kdbType),
+                                QByteArray::fromRawData(data, len).toDouble(),
+                                kdbVariantType);
     case QVariant::Date:
-        if (len == 0) {
-            return QVariant(QDate());
-        } else {
-            return QVariant(QDate::fromString(QLatin1String(QByteArray::fromRawData(data, len)), Qt::ISODate));
-        }
+        return convertToKDbType(kdbType != KDbField::Date,
+                                (len == 0) ? QVariant(QDate())
+                                           : QVariant(QDate::fromString(QLatin1String(QByteArray::fromRawData(data, len)), Qt::ISODate)),
+                                kdbVariantType);
     case QVariant::Time:
-        if (len == 0) {
-            return QVariant(QTime());
-        } else {
-            QString s(QString::fromLatin1(data, len));
-            if (hasTimeZone(s)) {
-                s.chop(3); // skip timezone
-                return QVariant(QTime::fromString(s, Qt::ISODate));
-            }
-            return QVariant(QTime::fromString(s, Qt::ISODate));
-        }
+        return convertToKDbType(kdbType != KDbField::Time,
+                                timeFromData(data, len),
+                                kdbVariantType);
     case QVariant::DateTime:
-        if (len < 10 /*ISO Date*/) {
-            return QVariant(QDateTime());
-        } else {
-            QString s(QString::fromLatin1(data, len));
-            if (hasTimeZone(s)) {
-                s.chop(3); // skip timezone
-                if (s.isEmpty())
-                    return QVariant(QDateTime());
-            }
-            if (s.at(s.length() - 3).isPunct()) // fix ms, should be three digits
-                s += QLatin1Char('0');
-            return QVariant(QDateTime::fromString(s, Qt::ISODate));
-        }
+        return convertToKDbType(kdbType != KDbField::DateTime,
+                                dateTimeFromData(data, len),
+                                kdbVariantType);
     case QVariant::ByteArray:
-        {
-            size_t unescapedLen;
-            unsigned char *unescapedData = PQunescapeBytea((const unsigned char*)data, &unescapedLen);
-            const QByteArray result((const char*)unescapedData, unescapedLen);
-//! @todo avoid deep copy; QByteArray does not allow passing ownership of data; maybe copy PQunescapeBytea code?
-            PQfreemem(unescapedData);
-            return QVariant(result);
-        }
+        return convertToKDbType(kdbType != KDbField::BLOB,
+                                byteArrayFromData(data),
+                                kdbVariantType);
     default:
         qCWarning(KDB_LOG) << "PostgresqlCursor::pValue() data type?";
     }
-    return QVariant();
-
-#if 0
-        if ((f->isIntegerType()) || (/*ROWID*/!f && m_containsRecordIdInfo && pos == m_fieldCount)) {
-            return (*m_res)[at()][pos].as(int());
-        } else if (f->isTextType()) {
-            return QString::fromUtf8((*m_res)[at()][pos].c_str()); //utf8?
-        } else if (f->isFPNumericType()) {
-            return (*m_res)[at()][pos].as(double());
-        } else if (f->type() == KDbField::Boolean) {
-            return QString((*m_res)[at()][pos].c_str()).toLower() == "t" ? QVariant(true) : QVariant(false);
-        } else if (f->typeGroup() == KDbField::BLOBGroup) {
-//   KDbDrvDbg << r.name() << ", " << r.c_str() << ", " << r.type() << ", " << r.size();
-            return ::pgsqlByteaToByteArray((*m_res)[at()][pos]);
-        } else {
-            return pgsqlCStrToVariant((*m_res)[at()][pos]);
-        }
-    } else { // We probably have a raw type query so use pqxx to determin the column type
-        return pgsqlCStrToVariant((*m_res)[at()][pos]);
-    }
-
-    return QString::fromUtf8((*m_res)[at()][pos].c_str(), (*m_res)[at()][pos].size()); //utf8?
-#endif
+    return value.value<kdbVariantType>();
 }
 
 //==================================================================================
