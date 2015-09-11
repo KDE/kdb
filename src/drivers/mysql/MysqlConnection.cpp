@@ -208,6 +208,5 @@ KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 
 void MysqlConnection::storeResult()
 {
-    m_result.setServerMessage(QString::fromLatin1(mysql_error(d->mysql)));
-    m_result.setServerErrorCode(mysql_errno(d->mysql));
+    d->storeResult(&m_result);
 }

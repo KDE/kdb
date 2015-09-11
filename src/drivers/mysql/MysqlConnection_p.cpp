@@ -28,6 +28,11 @@
 #include <QStringList>
 #include <QFile>
 
+static inline QString escapeIdentifier(const QString& str)
+{
+    return QString(str).replace(QLatin1Char('`'), QLatin1Char('\''));
+}
+
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : KDbConnectionInternal(connection)
         , mysql(0)
@@ -124,16 +129,17 @@ bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
     return 0 == mysql_real_query(mysql, sql.constData(), sql.length());
 }
 
-QString MysqlConnectionInternal::escapeIdentifier(const QString& str) const
-{
-    return QString(str).replace(QLatin1Char('`'), QLatin1Char('\''));
-}
-
 //static
 QString MysqlConnectionInternal::serverResultName(MYSQL *mysql)
 {
     //! @todo use mysql_stmt_sqlstate() for prepared statements
     return QString::fromLatin1(mysql_sqlstate(mysql));
+}
+
+void MysqlConnectionInternal::storeResult(KDbResult *result)
+{
+    result->setServerMessage(QString::fromLatin1(mysql_error(mysql)));
+    result->setServerErrorCode(mysql_errno(mysql));
 }
 
 //--------------------------------------

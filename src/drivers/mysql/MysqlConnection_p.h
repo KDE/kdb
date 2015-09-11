@@ -35,6 +35,7 @@ typedef struct st_mysql MYSQL;
 
 class KDbConnectionData;
 class KDbEscapedString;
+class KDbResult;
 
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can
@@ -66,10 +67,9 @@ public:
     //! Executes query for a raw SQL statement @a sql
     bool executeSQL(const KDbEscapedString& sql);
 
-    //! Escapes a table, database or column name
-    QString escapeIdentifier(const QString& str) const;
-
     static QString serverResultName(MYSQL *mysql);
+
+    void storeResult(KDbResult *result);
 
     MYSQL *mysql;
     bool mysql_owned; //!< true if mysql pointer should be freed on destruction
@@ -83,7 +83,6 @@ public:
     //! @todo store in Connection base class as a property or as public server info
     unsigned long serverVersion;
 };
-
 
 //! Internal MySQL cursor data.
 /*! Provides a low-level abstraction for iterating over MySql result sets. */

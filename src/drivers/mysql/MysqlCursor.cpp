@@ -177,5 +177,5 @@ QString MysqlCursor::serverResultName() const
 
 void MysqlCursor::storeResult()
 {
-    m_result.setServerMessage(QString::fromLatin1(mysql_error(d->mysql)));
+    d->storeResult(&m_result);
 }
