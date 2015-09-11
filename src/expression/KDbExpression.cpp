@@ -214,7 +214,7 @@ bool KDbExpressionData::addToCallStack(QDebug *dbg, QList<const KDbExpressionDat
     if (callStack->contains(this)) {
         if (dbg)
             dbg->nospace() << "<CYCLE!>";
-        qCWarning(KDB_LOG) << "Cycle detected in"
+        kdbWarning() << "Cycle detected in"
             << expressionClassName(expressionClass) << token.value();
         return false;
     }
@@ -560,7 +560,7 @@ KDbFunctionExpression KDbExpression::toFunction() const
 void KDbExpression::setLeftOrRight(const KDbExpression& e, int index)
 {
     if (this == &e) {
-        qCWarning(KDB_LOG) << "KDbExpression::setLeftOrRight(): Expression cannot be own child";
+        kdbWarning() << "KDbExpression::setLeftOrRight(): Expression cannot be own child";
         return;
     }
     if (d->children.indexOf(e.d) == index) { // cannot set twice
