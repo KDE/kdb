@@ -93,10 +93,21 @@ foreach (suffix ${PostgreSQL_KNOWN_VERSIONS} )
     set(PostgreSQL_ADDITIONAL_SEARCH_PATHS ${PostgreSQL_ADDITIONAL_SEARCH_PATHS} "/usr/include/postgresql/${suffix}/server")
   endif()
 endforeach()
+
+# Use pkg-config to get the directories and then use these values in the find_path()
+# and find_library() calls.
+if(NOT WIN32)
+  find_package(PkgConfig)
+  pkg_check_modules(PC_LIBPQ QUIET libpq)
+  set(LIBPQ_DEFINITIONS ${PC_LIBPQ_CFLAGS_OTHER})
+endif()
+
 set( PostgreSQL_ROOT_DIRECTORIES
    ENV PostgreSQL_ROOT
    ${PostgreSQL_ROOT}
    ${PostgreSQL_ADDITIONAL_SEARCH_PATHS}
+   ${PC_LIBPQ_INCLUDEDIR}
+   ${PC_LIBPQ_INCLUDE_DIRS}
 )
 
 #
@@ -130,7 +141,11 @@ find_path(PostgreSQL_TYPE_INCLUDE_DIR
 )
 
 # The PostgreSQL library.
-set (PostgreSQL_LIBRARY_TO_FIND pq)
+if(PC_LIBPQ_LIBRARIES)
+    set(PostgreSQL_LIBRARY_TO_FIND ${PC_LIBPQ_LIBRARIES})
+else()
+    set(PostgreSQL_LIBRARY_TO_FIND pq)
+endif()
 # Setting some more prefixes for the library
 set (PostgreSQL_LIB_PREFIX "")
 if ( WIN32 )
@@ -149,23 +164,27 @@ find_library( PostgreSQL_LIBRARY
 )
 get_filename_component(PostgreSQL_LIBRARY_DIR ${PostgreSQL_LIBRARY} PATH)
 
-if (PostgreSQL_INCLUDE_DIR)
-  # Some platforms include multiple pg_config.hs for multi-lib configurations
-  # This is a temporary workaround.  A better solution would be to compile
-  # a dummy c file and extract the value of the symbol.
-  file(GLOB _PG_CONFIG_HEADERS "${PostgreSQL_INCLUDE_DIR}/pg_config*.h")
-  foreach(_PG_CONFIG_HEADER ${_PG_CONFIG_HEADERS})
-    if(EXISTS "${_PG_CONFIG_HEADER}")
-      file(STRINGS "${_PG_CONFIG_HEADER}" pgsql_version_str
-           REGEX "^#define[\t ]+PG_VERSION[\t ]+\".*\"")
-      if(pgsql_version_str)
-        string(REGEX REPLACE "^#define[\t ]+PG_VERSION[\t ]+\"([^\"]*)\".*"
-               "\\1" PostgreSQL_VERSION_STRING "${pgsql_version_str}")
-        break()
+if (PC_LIBPQ_VERSION)
+  set(PostgreSQL_VERSION_STRING ${PC_LIBPQ_VERSION})
+else()
+  if (PostgreSQL_INCLUDE_DIR)
+    # Some platforms include multiple pg_config.hs for multi-lib configurations
+    # This is a temporary workaround.  A better solution would be to compile
+    # a dummy c file and extract the value of the symbol.
+    file(GLOB _PG_CONFIG_HEADERS "${PostgreSQL_INCLUDE_DIR}/pg_config*.h")
+    foreach(_PG_CONFIG_HEADER ${_PG_CONFIG_HEADERS})
+      if(EXISTS "${_PG_CONFIG_HEADER}")
+        file(STRINGS "${_PG_CONFIG_HEADER}" pgsql_version_str
+             REGEX "^#define[\t ]+PG_VERSION[\t ]+\".*\"")
+        if(pgsql_version_str)
+          string(REGEX REPLACE "^#define[\t ]+PG_VERSION[\t ]+\"([^\"]*)\".*"
+                 "\\1" PostgreSQL_VERSION_STRING "${pgsql_version_str}")
+          break()
+        endif()
       endif()
-    endif()
-  endforeach()
-  unset(pgsql_version_str)
+    endforeach()
+    unset(pgsql_version_str)
+  endif()
 endif()
 
 # Did we find anything?
