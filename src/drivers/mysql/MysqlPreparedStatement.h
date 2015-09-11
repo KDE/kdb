@@ -42,8 +42,6 @@ protected:
         KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters);
 
-    bool bindValue(KDbField *field, const QVariant& value, int arg);
-
     bool init();
     void done();
 
