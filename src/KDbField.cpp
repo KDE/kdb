@@ -167,6 +167,46 @@ QVariant::Type KDbField::variantType(Type type)
     return QVariant::Invalid;
 }
 
+template <typename T>
+static inline QVariant tryConvert(const QVariant &value)
+{
+    return value.canConvert<T>() ? value.value<T>() : value;
+}
+
+//static
+//! @todo use an array of functions?
+QVariant KDbField::convertToType(const QVariant &value, Type type)
+{
+    switch (type) {
+    case Byte:
+    case ShortInteger:
+    case Integer:
+        return tryConvert<int>(value);
+    case BigInteger:
+        return tryConvert<qlonglong>(value);
+    case Boolean:
+        return tryConvert<bool>(value);
+    case Date:
+        return tryConvert<QDate>(value);
+    case DateTime:
+        return tryConvert<QDateTime>(value);
+    case Time:
+        return tryConvert<QTime>(value);
+    case Float:
+        return tryConvert<float>(value);
+    case Double:
+        return tryConvert<double>(value);
+    case Text:
+    case LongText:
+        return tryConvert<QString>(value);
+    case BLOB:
+        return tryConvert<QByteArray>(value);
+    default:
+        break;
+    }
+    return QVariant();
+}
+
 QString KDbField::typeName(Type type)
 {
     m_typeNames.init();

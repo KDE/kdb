@@ -172,6 +172,10 @@ public:
     //! Converts type @a type to QVariant equivalent as accurate as possible
     static QVariant::Type variantType(Type type);
 
+    //! Converts value @a value to variant corresponding to type @a type.
+    //! If converting is not possible @a value is returned.
+    static QVariant convertToType(const QVariant &value, Type type);
+
     //! @return a translated type name for @a type
     /*! @a type has to be an element from KDbField::Type, not greater than KDbField::LastType;
         KDbField::Null is also supported.
