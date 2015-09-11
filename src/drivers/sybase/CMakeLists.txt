@@ -1,3 +1,5 @@
+add_feature_info(BUILD_SYBASE_DB_DRIVER TRUE ${BUILD_SYBASE_DB_DRIVER_DESC})
+
 include_directories(
   ${FreeTDS_INCLUDE_DIR}
 )
@@ -8,18 +10,7 @@ set(kdb_sybasedriver_SRCS
    SybaseConnection_p.cpp
    SybaseCursor.cpp
    SybaseKeywords.cpp
-   SybasePreparedStatement.cpp )
-
-
-ecm_create_qm_loader(kdb_sybasedriver_SRCS kdb_sybasedriver_qt)
-
-add_library(kdb_sybasedriver SHARED ${kdb_sybasedriver_SRCS})
-kcoreaddons_desktop_to_json(kdb_sybasedriver kdb_sybasedriver.desktop)
-
-target_link_libraries(kdb_sybasedriver
-  ${FreeTDS_LIBRARIES}
-  kdb
+   SybasePreparedStatement.cpp
 )
-set_target_properties(kdb_sybasedriver PROPERTIES PREFIX "")
 
-install(TARGETS kdb_sybasedriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
+build_and_install_kdb_driver(sybase "${kdb_sybasedriver_SRCS}" "${FreeTDS_LIBRARIES}")

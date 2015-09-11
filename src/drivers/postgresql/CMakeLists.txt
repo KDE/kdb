@@ -13,20 +13,4 @@ set(kdb_postgresqldriver_SRCS
    PostgresqlPreparedStatement.cpp
 )
 
-set(kdb_postgresqldriver_MOC_SRCS
-   PostgresqlDriver.h
-)
-
-ecm_create_qm_loader(kdb_postgresqldriver_SRCS kdb_postgresqldriver_qt)
-
-add_library(kdb_postgresqldriver SHARED ${kdb_postgresqldriver_SRCS})
-kcoreaddons_desktop_to_json(kdb_postgresqldriver kdb_postgresqldriver.desktop)
-
-target_link_libraries(kdb_postgresqldriver
-  ${PostgreSQL_LIBRARIES}
-  kdb
-  Qt5::Network
-)
-set_target_properties(kdb_postgresqldriver PROPERTIES PREFIX "")
-
-install(TARGETS kdb_postgresqldriver DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
+build_and_install_kdb_driver(postgresql "${kdb_postgresqldriver_SRCS}" "${PostgreSQL_LIBRARIES}")
