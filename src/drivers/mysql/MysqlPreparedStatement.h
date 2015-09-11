@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef MYSQLPREPAREDSTATEMENT_H
-#define MYSQLPREPAREDSTATEMENT_H
+#ifndef KDB_MYSQLPREPAREDSTATEMENT_H
+#define KDB_MYSQLPREPAREDSTATEMENT_H
 
 #include "KDbPreparedStatementInterface.h"
 #include "MysqlConnection_p.h"

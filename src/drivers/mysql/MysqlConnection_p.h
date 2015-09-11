@@ -17,8 +17,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KDB_MYSQLCLIENT_P_H
-#define KDB_MYSQLCLIENT_P_H
+#ifndef KDB_MYSQLCONNECTION_P_H
+#define KDB_MYSQLCONNECTION_P_H
 
 #include "KDbConnection_p.h"
 

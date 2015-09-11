@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef _MYSQLCURSOR_H_
-#define _MYSQLCURSOR_H_
+#ifndef KDB_MYSQLCURSOR_H
+#define KDB_MYSQLCURSOR_H
 
 #include "KDbCursor.h"
 #include "KDbConnection.h"

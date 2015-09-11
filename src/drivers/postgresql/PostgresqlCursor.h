@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KDB_DRIVER_POSTGRESQLCURSOR_H
-#define KDB_DRIVER_POSTGRESQLCURSOR_H
+#ifndef KDB_POSTGRESQLCURSOR_H
+#define KDB_POSTGRESQLCURSOR_H
 
 #include "KDbCursor.h"
 #include "KDbConnection.h"
@@ -55,4 +55,4 @@ private:
     PostgresqlCursorData *d;
 };
 
-#endif // KDB_DRIVER_POSTGRESQLCURSOR_H
+#endif

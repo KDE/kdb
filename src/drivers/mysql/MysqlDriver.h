@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef MYSQLDRIVER_H
-#define MYSQLDRIVER_H
+#ifndef KDB_MYSQLDRIVER_H
+#define KDB_MYSQLDRIVER_H
 
 #include "KDbDriver.h"
 

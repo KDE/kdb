@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef POSTGRESQLPREPAREDSTATEMENT_H
-#define POSTGRESQLPREPAREDSTATEMENT_H
+#ifndef KDB_POSTGRESQLPREPAREDSTATEMENT_H
+#define KDB_POSTGRESQLPREPAREDSTATEMENT_H
 
 #include "KDbPreparedStatementInterface.h"
 #include "PostgresqlConnection_p.h"

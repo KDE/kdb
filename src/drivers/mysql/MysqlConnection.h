@@ -19,8 +19,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef MYSQLCONNECTION_H
-#define MYSQLCONNECTION_H
+#ifndef KDB_MYSQLCONNECTION_H
+#define KDB_MYSQLCONNECTION_H
 
 #include <QStringList>
 

@@ -18,8 +18,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KDB_DRIVER_POSTGRESQLCONNECTION_P_H
-#define KDB_DRIVER_POSTGRESQLCONNECTION_P_H
+#ifndef KDB_POSTGRESQLCONNECTION_P_H
+#define KDB_POSTGRESQLCONNECTION_P_H
 
 #include "KDbConnection_p.h"
 
@@ -63,4 +63,4 @@ public:
     virtual ~PostgresqlCursorData();
 };
 
-#endif // KDB_DRIVER_POSTGRESQLCONNECTION_P_H
+#endif
