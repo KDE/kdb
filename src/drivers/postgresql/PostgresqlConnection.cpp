@@ -70,14 +70,13 @@ KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, int cursor_
 
 bool PostgresqlConnection::drv_connect()
 {
-    KDbDrvDbg;
     return true;
 }
 
 bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     // http://www.postgresql.org/docs/8.4/static/libpq-status.html
-    KDbDrvDbg << "server_version:" << d->parameter("server_version");
+    //postgresqlDebug() << "server_version:" << d->parameter("server_version");
     version->setString(d->parameter("server_version"));
 
     QString versionString;
@@ -91,16 +90,15 @@ bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     if (   version->major() < MIN_SERVER_VERSION_MAJOR
         || (version->major() == MIN_SERVER_VERSION_MAJOR && version->minor() < MIN_SERVER_VERSION_MINOR))
     {
-        qWarning(
-            "PostgreSQL %d.%d is not supported and may not work. The minimum is %d.%d",
-            version->major(), version->minor(), MIN_SERVER_VERSION_MAJOR, MIN_SERVER_VERSION_MINOR);
+        postgresqlWarning()
+            << QString::fromLatin1("PostgreSQL %d.%d is not supported and may not work. The minimum is %d.%d")
+               .arg(version->major()).arg(version->minor()).arg(MIN_SERVER_VERSION_MAJOR).arg(MIN_SERVER_VERSION_MINOR);
     }
     return true;
 }
 
 bool PostgresqlConnection::drv_disconnect()
 {
-    KDbDrvDbg;
     return true;
 }
 
@@ -166,7 +164,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     if (!data().password().isEmpty())
         conninfo += buildConnParameter("password", data().password());
 
-    KDbDrvDbg << conninfo;
+    //postgresqlDebug() << conninfo;
 
     //! @todo other parameters: connect_timeout, options, options, sslmode, sslcert, sslkey, sslrootcert, sslcrl, krbsrvname, gsslib, service
     // http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
@@ -191,15 +189,15 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 
     result = PQexec(d->conn, "SET DATESTYLE TO 'ISO'");
     status = PQresultStatus(result);
-    if (status != PGRES_COMMAND_OK)
-        qCWarning(KDB_LOG) << "Failed to set DATESTYLE to 'ISO':" << PQerrorMessage(d->conn);
+    if (status != PGRES_COMMAND_OK) {
+        postgresqlWarning() << "Failed to set DATESTYLE to 'ISO':" << PQerrorMessage(d->conn);
+    }
     PQclear(result);
     return true;
 }
 
 bool PostgresqlConnection::drv_closeDatabase()
 {
-    KDbDrvDbg;
     PQclear(d->res);
     d->res = 0;
     PQfinish(d->conn);
@@ -209,7 +207,7 @@ bool PostgresqlConnection::drv_closeDatabase()
 
 bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 {
-    KDbDrvDbg << dbName;
+    //postgresqlDebug() << dbName;
 
     //! @todo Maybe should check that dbname is no the currentdb
     if (executeSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))

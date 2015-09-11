@@ -39,7 +39,7 @@ SybaseCursor::SybaseCursor(KDbConnection* conn, const KDbEscapedString& sql, int
     //m_options |= Buffered;
 
     d->dbProcess = static_cast<SybaseConnection*>(conn)->d->dbProcess;
-// KDbDrvDbg << "SybaseCursor: constructor for query statement";
+// sybaseDebug() << "SybaseCursor: constructor for query statement";
 }
 
 SybaseCursor::SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
@@ -49,7 +49,7 @@ SybaseCursor::SybaseCursor(KDbConnection* conn, KDbQuerySchema* query, int optio
     //  m_options |= Buffered;
 
     d->dbProcess = static_cast<SybaseConnection*>(conn)->d->dbProcess;
-// KDbDrvDbg << "SybaseCursor: constructor for query statement";
+// sybaseDebug() << "SybaseCursor: constructor for query statement";
 }
 
 SybaseCursor::~SybaseCursor()
@@ -79,7 +79,7 @@ bool SybaseCursor::drv_open(const KDbEscapedString& sql)
 
     // clear all previous results ( if remaining )
     if (dbcancel(d->dbProcess) == FAIL)
-        KDbDrvDbg << "drv_open" << "dead DBPROCESS ?";
+        sybaseWarning() << "drv_open" << "dead DBPROCESS ?";
 
     // insert into command buffer
     dbcmd(d->dbProcess, sql.toByteArray());
@@ -125,7 +125,7 @@ bool SybaseCursor::drv_close()
 
 void SybaseCursor::drv_getNextRecord()
 {
-// KDbDrvDbg;
+// sybaseDebug();
 
     // no buffering , and we don't know how many rows are there in result set
 
@@ -174,7 +174,7 @@ QVariant SybaseCursor::value(int pos)
  */
 bool SybaseCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
-// KDbDrvDbg << "Position is" << (long)m_at;
+// sybaseDebug() << "Position is" << (long)m_at;
 // if (d->numRows<=0)
 //  return false;
 

@@ -52,11 +52,11 @@ bool SybaseConnection::drv_connect(KDbServerVersionInfo* version)
     QString serverVersionString;
 
     if (!querySingleString(KDbEscapedString("SELECT @@servername") , &version.string)) {
-        KDbDrvDbg << "Couldn't fetch server name";
+        sybaseWarning() << "Couldn't fetch server name";
     }
 
     if (!querySingleString(KDbEscapedString("SELECT @@version"), &serverVersionString)) {
-        KDbDrvDbg << "Couldn't fetch server version";
+        sybaseWarning() << "Couldn't fetch server version";
     }
 
     QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)");
@@ -86,8 +86,6 @@ KDbCursor* SybaseConnection::prepareQuery(KDbQuerySchema* query, int cursor_opti
 
 bool SybaseConnection::drv_getDatabasesList(QStringList* list)
 {
-    KDbDrvDbg;
-
     // select * from master..sysdatabases ?
     // todo: verify.
     return queryStringList(KDbEscapedString("SELECT name FROM master..sysdatabases"), list) ;
@@ -95,7 +93,7 @@ bool SybaseConnection::drv_getDatabasesList(QStringList* list)
 
 bool SybaseConnection::drv_createDatabase(const QString &dbName)
 {
-    KDbDrvDbg << dbName;
+    //sybaseDebug() << dbName;
     // mysql_create_db deprecated, use SQL here.
     if (drv_executeSQL(KDbEscapedString("CREATE DATABASE ") + dbName)) {
         // set allow_nulls_by_default option to true

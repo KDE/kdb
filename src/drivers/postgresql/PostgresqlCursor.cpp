@@ -109,8 +109,6 @@ void PostgresqlCursor::drv_getNextRecord()
 #if 0
 void PostgresqlCursor::drv_getPrevRecord()
 {
-// KDbDrvDbg;
-
     if (at() < m_res->size() && at() >= 0) {
         m_fetchResult = FetchOK;
     } else if (at() >= m_res->size()) {
@@ -218,12 +216,12 @@ static inline QDateTime byteArrayFromData(const char *data)
 //Return the value for a given column for the current record - Private const version
 QVariant PostgresqlCursor::pValue(int pos) const
 {
-//  KDbDrvWarn << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
+//  postgresqlWarning() << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
     const qint64 row = at();
 
     KDbField *f = (m_fieldsExpanded && pos < qMin(m_fieldsExpanded->count(), m_fieldCount))
                        ? m_fieldsExpanded->at(pos)->field : 0;
-// KDbDrvDbg << "pos:" << pos;
+// postgresqlDebug() << "pos:" << pos;
 
     const QVariant::Type type = m_realTypes[pos];
     const KDbField::Type kdbType = f ? f->type() : KDbField::InvalidType; // cache: evaluating type of expressions can be expensive
@@ -275,9 +273,8 @@ QVariant PostgresqlCursor::pValue(int pos) const
                                 byteArrayFromData(data),
                                 kdbVariantType);
     default:
-        qCWarning(KDB_LOG) << "PostgresqlCursor::pValue() data type?";
+        postgresqlWarning() << "PostgresqlCursor::pValue() data type?";
     }
-    return value.value<kdbVariantType>();
 }
 
 //==================================================================================
@@ -292,7 +289,7 @@ const char** PostgresqlCursor::recordData() const
 //Store the current record in [data]
 bool PostgresqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
-// KDbDrvDbg << "POSITION IS" << (long)m_at;
+// postgresqlDebug() << "POSITION IS" << (long)m_at;
     for (int i = 0; i < m_fieldsToStoreInRecord; i++)
         (*data)[i] = pValue(i);
     return true;

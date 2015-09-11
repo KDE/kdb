@@ -61,7 +61,7 @@ SybaseConnectionInternal::~SybaseConnectionInternal()
 
 void SybaseConnectionInternal::storeResult()
 {
-    //KDbDrvDbg << "Store Result!!";
+    //sybaseDebug() << "Store Result!!";
     // all message numbers and message texts were handled in the messageHandler
     // so don't do anything here
 }
@@ -77,8 +77,7 @@ void SybaseConnectionInternal::messageHandler(DBINT msgno, int msgstate, int sev
 
     res = msgno;
     errmsg = QString::fromLatin1(msgtext);
-
-    KDbDrvDbg << "Message Handler" << res << errmsg;
+    //sybaseDebug() << "Message Handler" << res << errmsg;
 }
 
 bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
@@ -89,13 +88,12 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
     // set message handler
     dbmsghandle(connectionMessageHandler);
 
-    KDbDrvDbg;
     QByteArray localSocket;
     QString hostName = data.hostName;
 
 
     if (data.serverName.isEmpty()) {
-        KDbDrvDbg << "Can't connect without server name";
+        sybaseWarning() << "Can't connect without server name";
         return false;
     }
 
@@ -198,10 +196,8 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
 
 bool SybaseConnectionInternal::db_disconnect()
 {
-
     dbclose(dbProcess);
     dbProcess = 0;
-    KDbDrvDbg;
     return true;
 }
 

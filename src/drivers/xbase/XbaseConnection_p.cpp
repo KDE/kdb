@@ -63,7 +63,7 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   temporaryKexiFile.setAutoRemove( false );
 
   if ( !temporaryKexiFile.open() ) {
-    KDbDrvDbg<<"Couldn't create .kexi file for exporting from xBase to .kexi";
+    xbaseWarning() << "Couldn't create .kexi file for exporting from xBase to .kexi";
     return false;
   }
 
@@ -75,15 +75,14 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
   // set destination file name here.
   kexiConnectionData->driverId = KDb::defaultFileBasedDriverId();
   kexiConnectionData->setFileName( tempDatabase );
-  KDbDrvDbg << "Current file name: " << tempDatabase;
-
+  //xbaseDebug() << "Current file name: " << tempDatabase;
 
   QString sourceDriverId = "xbase";
   // get the source migration driver
   KexiMigration::KexiMigrate* sourceDriver = 0;
   sourceDriver = xBase2KexiMigrateManager.driver( sourceDriverId );
   if(!sourceDriver || xBase2KexiMigrateManager.error()) {
-    KDbDrvDbg << "Import migrate driver error...";
+    xbaseWarning() << "Import migrate driver error...";
     return false;
   }
 
@@ -98,7 +97,7 @@ bool xBaseConnectionInternal::db_connect(const KDbConnectionData& data)
 
   sourceDriver->setData(md);
   if ( !sourceDriver->performImport() ) {
-    KDbDrvDbg<<"Import failed";
+    xbaseWarning() << "Import failed";
     return false;
   }
 
@@ -166,7 +165,7 @@ bool xBaseConnectionInternal::useDatabase(const QString &dbName)
 
 bool xBaseConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
-//KDbDrvDbg << statement;
+//xbaseDebug() << statement;
   if ( !internalConn ) {
     return false;
   }
