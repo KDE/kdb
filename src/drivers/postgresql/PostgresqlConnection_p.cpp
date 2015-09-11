@@ -21,53 +21,45 @@
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlConnection.h"
 
-PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *conn)
-        : ConnectionInternal(conn)
+PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *_conn)
+        : KDbConnectionInternal(_conn)
         , conn(0)
         , unicode(true) // will be set in PostgresqlConnection::drv_useDatabase()
         , res(0)
 {
-    setServerResultCode(-1);
     escapingBuffer.reserve(0x8000);
 }
 
 PostgresqlConnectionInternal::~PostgresqlConnectionInternal()
 {
-
 }
 
-void PostgresqlConnectionInternal::storeResult()
+//static
+QString PostgresqlConnectionInternal::serverResultName(int resultCode)
 {
-    QString msg = QLatin1String(PQerrorMessage(conn));
-    if (msg.endsWith(QLatin1Char('\n'))) {
+    return QString::fromLatin1(PQresStatus(static_cast<ExecStatusType>(resultCode)));
+}
+
+void PostgresqlConnectionInternal::storeResult(KDbResult *result)
+{
+    QByteArray msg(PQerrorMessage(conn));
+    if (msg.endsWith('\n')) {
         msg.chop(1);
     }
-    setServerMessage(msg);
-/*    if (d->res) {
-        setServerResultCode(PQresultStatus(d->res));
+    result->setServerMessage(QString::fromLatin1(msg));
+    if (res) {
+        result->setServerErrorCode(PQresultStatus(res));
+        PQclear(res);
+        res = 0;
     }
-    else {
-        setServerResultCode(-1);
-    }*/
 }
 
-bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql, ExecStatusType expectedStatus)
+bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
-    if (res) { // for sanity
-        PQclear(res);
-    }
 //! @todo consider using binary mode with PQexecParams()
     res = PQexec(conn, sql.toByteArray().constData());
-    if (PQresultStatus(res) != expectedStatus) {
-        setServerResultCode(PQresultStatus(res));
-        storeResult();
-        PQclear(res);
-        return false;
-    }
-    else {
-        setServerResultCode(-1);
-    }
-    return true;
+    ExecStatusType resultType = PQresultStatus(res);
+    return resultType == PGRES_COMMAND_OK || resultType == PGRES_TUPLES_OK;
 }
 
 //--------------------------------------

@@ -20,9 +20,9 @@
 
 #include "PostgresqlConnection.h"
 #include "PostgresqlConnection_p.h"
-
 #include "PostgresqlPreparedStatement.h"
 #include "PostgresqlCursor.h"
+#include "postgresql_debug.h"
 #include "KDbError.h"
 #include "KDbGlobal.h"
 
@@ -31,6 +31,11 @@
 
 #define MIN_SERVER_VERSION_MAJOR 7
 #define MIN_SERVER_VERSION_MINOR 1
+
+inline static QByteArray parameter(PGconn *conn, const char *paramName)
+{
+    return PQparameterStatus(conn, paramName);
+}
 
 PostgresqlTransactionData::PostgresqlTransactionData(KDbConnection *conn)
         : KDbTransactionData(conn)
@@ -43,8 +48,9 @@ PostgresqlTransactionData::~PostgresqlTransactionData()
 
 //==================================================================================
 
-PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData)
-        : KDbConnection(driver, connData)
+PostgresqlConnection::PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                                           const KDbConnectionOptions &options)
+        : KDbConnection(driver, connData, options)
         , d(new PostgresqlConnectionInternal(this))
 {
 }
@@ -77,7 +83,7 @@ bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     // http://www.postgresql.org/docs/8.4/static/libpq-status.html
     //postgresqlDebug() << "server_version:" << d->parameter("server_version");
-    version->setString(d->parameter("server_version"));
+    version->setString(QString::fromLatin1(parameter(d->conn, "server_version")));
 
     QString versionString;
     int versionNumber = PQserverVersion(d->conn);
@@ -168,7 +174,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 
     //! @todo other parameters: connect_timeout, options, options, sslmode, sslcert, sslkey, sslrootcert, sslcrl, krbsrvname, gsslib, service
     // http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
-    d->conn = PQconnectdb(conninfo);
+    d->conn = PQconnectdb(conninfo.constData());
 
     if (!d->connectionOK()) {
         PQfinish(d->conn);
@@ -218,7 +224,11 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
 
 bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    return d->executeSQL(sql, PGRES_COMMAND_OK);
+    if (!d->executeSQL(sql)) {
+        storeResult();
+        return false;
+    }
+    return true;
 }
 
 bool PostgresqlConnection::drv_isDatabaseUsed() const
@@ -245,8 +255,8 @@ bool PostgresqlConnection::drv_getTablesList(QStringList* list)
 
 QString PostgresqlConnection::serverResultName() const
 {
-    if (m_result.serverResultCode() >= 0 && m_result.serverResultCode() <= PGRES_FATAL_ERROR) {
-        return QString::fromLatin1(PQresStatus(ExecStatusType(m_result.serverResultCode())));
+    if (m_result.code() >= 0 && m_result.code() <= PGRES_SINGLE_TUPLE) {
+        return QString::fromLatin1(PQresStatus(ExecStatusType(m_result.code())));
     }
     return QString();
 }
@@ -266,7 +276,7 @@ KDbEscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
     d->escapingBuffer.resize(count);
 
     if (error != 0) {
-        d->storeResult();
+        d->storeResult(const_cast<KDbResult*>(&m_result));
         const_cast<KDbResult&>(m_result) = KDbResult(ERR_INVALID_ENCODING,
                           PostgresqlConnection::tr("Escaping string failed. Invalid multibyte encoding."));
         return KDbEscapedString();
@@ -277,4 +287,9 @@ KDbEscapedString PostgresqlConnection::escapeString(const QByteArray& str) const
 KDbEscapedString PostgresqlConnection::escapeString(const QString& str) const
 {
     return escapeString(d->unicode ? str.toUtf8() : str.toLocal8Bit());
+}
+
+void PostgresqlConnection::storeResult()
+{
+    d->storeResult(&m_result);
 }

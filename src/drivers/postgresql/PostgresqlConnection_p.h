@@ -23,30 +23,32 @@
 
 #include "KDbConnection_p.h"
 
+#include <QString>
+
 #include <libpq-fe.h>
 
-class PostgresqlConnectionInternal : public ConnectionInternal
+class KDbEscapedString;
+class KDbResult;
+
+class PostgresqlConnectionInternal : public KDbConnectionInternal
 {
 public:
-    explicit PostgresqlConnectionInternal(KDbConnection *conn);
+    explicit PostgresqlConnectionInternal(KDbConnection *connection);
 
     virtual ~PostgresqlConnectionInternal();
 
     //! Executes query for a raw SQL statement @a sql on the database
-    //! @a expectedStatus can be PGRES_COMMAND_OK for command
-    //! not returning tuples, e.g. CREATE and PGRES_TUPLES_OK for command returning tuples, e.g. SELECT.
-    bool executeSQL(const KDbEscapedString& sql, ExecStatusType expectedStatus);
+    bool executeSQL(const KDbEscapedString& sql);
 
-    //! stores last result's message
-    virtual void storeResult();
+    static QString serverResultName(int resultCode);
+
+    void storeResult(KDbResult *result);
 
     //! @return true if status of connection is "OK".
     /*! From http://www.postgresql.org/docs/8.4/static/libpq-status.html:
         "Only two of these are seen outside of an asynchronous connection procedure:
          CONNECTION_OK and CONNECTION_BAD." */
     inline bool connectionOK() { return CONNECTION_OK == PQstatus(conn); }
-
-    QString parameter(const char *paramName) { return QLatin1String(PQparameterStatus(conn, paramName)); }
 
     PGconn *conn;
     bool unicode;

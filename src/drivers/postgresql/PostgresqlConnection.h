@@ -55,7 +55,8 @@ public:
 
 protected:
     /*! Used by driver */
-    PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData);
+    PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
+                         const KDbConnectionOptions &options);
 
     //! @return true if currently connected to a database, ignoring the m_is_connected flag.
     virtual bool drv_isDatabaseUsed() const;
@@ -88,6 +89,8 @@ protected:
     virtual bool drv_getTablesList(QStringList* list);
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual tristate drv_containsTable(const QString &tableName);
+
+    void storeResult();
 
     PostgresqlConnectionInternal *d;
 

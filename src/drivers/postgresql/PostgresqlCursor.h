@@ -46,6 +46,8 @@ public:
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
 
+    void storeResult();
+
 private:
     QVariant pValue(int pos)const;
 

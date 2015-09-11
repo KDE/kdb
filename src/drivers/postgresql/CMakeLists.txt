@@ -5,6 +5,8 @@ include_directories(
 )
 
 set(kdb_postgresqldriver_SRCS
+   postgresql_debug.cpp
+   PostgresqlTypes.cpp
    PostgresqlDriver.cpp
    PostgresqlConnection.cpp
    PostgresqlCursor.cpp
@@ -13,4 +15,13 @@ set(kdb_postgresqldriver_SRCS
    PostgresqlPreparedStatement.cpp
 )
 
-build_and_install_kdb_driver(postgresql "${kdb_postgresqldriver_SRCS}" "${PostgreSQL_LIBRARIES}")
+if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
+   set_source_files_properties(PostgresqlTypes.cpp
+      PROPERTIES
+         COMPILE_FLAGS " -Wno-undef " # needed because server/c.h uses #if _MSC_VER >= 1400
+   )
+endif()
+
+find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Network)
+
+build_and_install_kdb_driver(postgresql "${kdb_postgresqldriver_SRCS}" "${PostgreSQL_LIBRARIES};Qt5::Network")

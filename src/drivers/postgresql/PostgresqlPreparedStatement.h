@@ -27,7 +27,7 @@
 class PostgresqlPreparedStatement : public KDbPreparedStatementInterface, public PostgresqlConnectionInternal
 {
 public:
-    explicit PostgresqlPreparedStatement(ConnectionInternal* conn);
+    explicit PostgresqlPreparedStatement(PostgresqlConnectionInternal* conn);
 
     virtual ~PostgresqlPreparedStatement();
 
@@ -38,8 +38,6 @@ public:
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters);
-
-private:
 };
 
 #endif

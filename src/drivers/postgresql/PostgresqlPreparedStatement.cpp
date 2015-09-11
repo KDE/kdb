@@ -19,8 +19,9 @@
 */
 
 #include "PostgresqlPreparedStatement.h"
+#include "KDbConnection.h"
 
-PostgresqlPreparedStatement::PostgresqlPreparedStatement(ConnectionInternal* conn)
+PostgresqlPreparedStatement::PostgresqlPreparedStatement(PostgresqlConnectionInternal* conn)
         : KDbPreparedStatementInterface()
         , PostgresqlConnectionInternal(conn->connection)
 {

@@ -74,7 +74,7 @@ find_package(PostgreSQL)
 macro_log_feature(POSTGRESQL_FOUND "libpq" "C API to PostgreSQL"
                   "http://www.postgresql.org" FALSE "" "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}")
 if(POSTGRESQL_FOUND)
-   #ecm_optional_add_subdirectory(postgresql)
+   ecm_optional_add_subdirectory(postgresql)
 else()
    add_feature_info(BUILD_POSTGRESQL_DB_DRIVER FALSE "${BUILD_POSTGRESQL_DB_DRIVER_DESC} (because C API to PostgreSQL not found)")
 endif()
