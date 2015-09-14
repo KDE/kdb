@@ -225,7 +225,7 @@ private:
 //! @short Case insensitive hash container supporting QString or QByteArray keys.
 //! Keys are turned to lowercase before inserting.
 template <typename Key, typename T>
-class KDB_EXPORT CaseInsensitiveHash : public QHash<Key, T>
+class CaseInsensitiveHash : public QHash<Key, T>
 {
 public:
     CaseInsensitiveHash() : QHash<Key, T>() {}
