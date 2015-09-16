@@ -454,7 +454,7 @@ static void icuLoadCollation(
 /*
 ** Register the ICU extension functions with database db.
 */
-int sqlite3IcuInit(sqlite3 *db){
+KDB_SQLITE_ICU_EXPORT int sqlite3IcuInit(sqlite3 *db){
   struct IcuScalar {
     const char *zName;                        /* Function name */
     int nArg;                                 /* Number of arguments */
@@ -494,7 +494,7 @@ int sqlite3IcuInit(sqlite3 *db){
 }
 
 #if !defined SQLITE_CORE || !SQLITE_CORE
-int sqlite3_extension_init(
+KDB_SQLITE_ICU_EXPORT int sqlite3_extension_init(
   sqlite3 *db,
   char **pzErrMsg,
   const struct sqlite3_api_routines *pApi
