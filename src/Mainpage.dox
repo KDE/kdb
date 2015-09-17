@@ -1,0 +1,29 @@
+/**
+    \mainpage KDb
+
+    %KDb is a database connectivity and creation framework, consisted of a general-purpose
+    C++ Qt library and set of plugins delivering support for various database vendors.
+
+    Project's home page: http://community.kde.org/KDb
+
+ @authors
+ - Lucijan Busch <lucijan@kde.org>
+ - Martin Ellis <martin.ellis@kdemail.net>
+ - Till Busch <till@bux.at>
+ - Adam Pigg <adam@piggz.co.uk>
+ - Sharan Rao <sharanrao@gmail.com>
+ - Matt Rogers <mattr@kde.org>
+ - Julia Sanchez-Simon <hithwen@gmail.com>
+ - Sebastian Sauer <mail@dipe.org>
+ - Jarosław Staniek <staniek@kde.org>
+ - Joseph Wenninger<jowenn@kde.org>
+
+ Maintainers
+ - Jarosław Staniek <staniek@kde.org>
+
+ @licenses
+ @lgpl
+ */
+// DOXYGEN_SET_PROJECT_NAME = KDb
+// DOXYGEN_SET_IGNORE_PREFIX = KDb
+EXCLUDE=generated parser/generated drivers/sqlite/icu
