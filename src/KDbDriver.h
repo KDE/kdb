@@ -211,7 +211,7 @@ public:
     //! @return a list of internal property names for this driver.
     QList<QByteArray> internalPropertyNames() const;
 
-    const KDbDriverBehaviour* behaviour() const { return beh; }
+    inline const KDbDriverBehaviour* behaviour() const { return beh; }
 
     //! @internal
     virtual ~KDbDriver();

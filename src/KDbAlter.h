@@ -168,7 +168,7 @@ public:
 
         //! @return true if the action is NULL; used in the Table Designer
         //! for temporarily collecting actions that have no effect at all.
-        bool isNull() const {
+        inline bool isNull() const {
             return m_null;
         }
 
@@ -176,7 +176,7 @@ public:
         class DebugOptions
         {
         public:
-            DebugOptions() : showUID(true), showFieldDebug(false) {}
+            inline DebugOptions() : showUID(true), showFieldDebug(false) {}
 
             //! true if UID should be added to the action debug string (the default)
             bool showUID;
@@ -186,7 +186,7 @@ public:
             bool showFieldDebug;
         };
 
-        virtual QString debugString(const DebugOptions& debugOptions = DebugOptions()) {
+        inline virtual QString debugString(const DebugOptions& debugOptions = DebugOptions()) {
             Q_UNUSED(debugOptions); return QLatin1String("ActionBase");
         }
 
@@ -195,20 +195,20 @@ public:
 
     protected:
         //! Sets requirements for altering; used internally by KDbAlterTableHandler object
-        void setAlteringRequirements(int alteringRequirements) {
+        inline void setAlteringRequirements(int alteringRequirements) {
             m_alteringRequirements = alteringRequirements;
         }
 
-        int alteringRequirements() const {
+        inline int alteringRequirements() const {
             return m_alteringRequirements;
         }
 
-        virtual void updateAlteringRequirements() {}
+        inline virtual void updateAlteringRequirements() {}
 
         /*! Simplifies @a fieldActions dictionary. If this action has to be inserted
          Into the dictionary, an ActionDict is created first and then a copy of this action
          is inserted into it. */
-        virtual void simplifyActions(ActionDictDict &fieldActions) {
+        inline virtual void simplifyActions(ActionDictDict &fieldActions) {
             Q_UNUSED(fieldActions);
         }
 
@@ -216,18 +216,18 @@ public:
          shouldBeRemoved() is called for them as an additional step.
          This is used for ChangeFieldPropertyAction items so actions
          that do not change property values are removed. */
-        virtual bool shouldBeRemoved(ActionDictDict &fieldActions) {
+        inline virtual bool shouldBeRemoved(ActionDictDict &fieldActions) {
             Q_UNUSED(fieldActions); return false;
         }
 
-        virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
+        inline virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
                                            QHash<QString, QString>* fieldHash) {
             Q_UNUSED(table); Q_UNUSED(field); Q_UNUSED(fieldHash); return true;
         }
 
     private:
         //! Performs physical execution of this action.
-        virtual tristate execute(KDbConnection* /*conn*/, KDbTableSchema* /*table*/) {
+        inline virtual tristate execute(KDbConnection* /*conn*/, KDbTableSchema* /*table*/) {
             return true;
         }
 
@@ -251,7 +251,7 @@ public:
         virtual ~FieldActionBase();
 
         //! @return field name for this action
-        QString fieldName() const {
+        inline QString fieldName() const {
             return m_fieldName;
         }
 
@@ -264,12 +264,12 @@ public:
          1. At the beginning: [field A], [field B]
          2. Rename the 1st field to B: [field B], [field B]
          3. Rename the 2nd field to A: [field B], [field A] */
-        int uid() const {
+        inline int uid() const {
             return m_fieldUID;
         }
 
         //! Sets field name for this action
-        void setFieldName(const QString& fieldName) {
+        inline void setFieldName(const QString& fieldName) {
             m_fieldName = fieldName;
         }
 
@@ -298,10 +298,10 @@ public:
         ChangeFieldPropertyAction(bool null);
         virtual ~ChangeFieldPropertyAction();
 
-        QString propertyName() const {
+        inline QString propertyName() const {
             return m_propertyName;
         }
-        QVariant newValue() const {
+        inline QVariant newValue() const {
             return m_newValue;
         }
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
@@ -355,13 +355,13 @@ public:
         explicit InsertFieldAction(bool);
         virtual ~InsertFieldAction();
 
-        int index() const {
+        inline int index() const {
             return m_index;
         }
-        void setIndex(int index) {
+        inline void setIndex(int index) {
             m_index = index;
         }
-        const KDbField* field() const {
+        inline const KDbField* field() const {
             return m_field;
         }
         void setField(KDbField* field);
@@ -393,7 +393,7 @@ public:
         explicit MoveFieldPositionAction(bool);
         virtual ~MoveFieldPositionAction();
 
-        int index() const {
+        inline int index() const {
             return m_index;
         }
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
@@ -437,7 +437,7 @@ public:
     class ExecutionArguments
     {
     public:
-        ExecutionArguments()
+        inline ExecutionArguments()
                 : debugString(0)
                 , requirements(0)
                 , result(false)

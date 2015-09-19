@@ -129,7 +129,7 @@ public:
 
     /*! Assigns transaction @a trans to this guard.
      Previously assigned transaction will be unassigned from this guard. */
-    void setTransaction(const KDbTransaction& trans) {
+    inline void setTransaction(const KDbTransaction& trans) {
         m_trans = trans;
     }
 
@@ -141,7 +141,7 @@ public:
     void doNothing();
 
     /*! KDbTransaction that are controlled by this guard. */
-    const KDbTransaction transaction() const {
+    inline const KDbTransaction transaction() const {
         return m_trans;
     }
 

@@ -334,11 +334,11 @@ public:
      *! @return true if the field is of any text type */
     static bool isTextType(Type type);
 
-    Options options() const {
+    inline Options options() const {
         return m_options;
     }
 
-    void setOptions(Options options) {
+    inline void setOptions(Options options) {
         m_options = options;
     }
 
@@ -623,12 +623,12 @@ public:
     void setIndexed(bool s);
 
     /*! Sets caption for this field to @a caption. */
-    void setCaption(const QString& caption) {
+    inline void setCaption(const QString& caption) {
         m_caption = caption;
     }
 
     /*! Sets description for this field to @a description. */
-    void setDescription(const QString& description) {
+    inline void setDescription(const QString& description) {
         m_desc = description;
     }
 
@@ -670,14 +670,14 @@ public:
 
 //<TMP>
     /*! @return the hints for enum fields. */
-    QVector<QString> enumHints() const {
+    inline QVector<QString> enumHints() const {
         return m_hints;
     }
-    QString enumHint(int num) {
+    inline QString enumHint(int num) {
         return (num < m_hints.size()) ? m_hints.at(num) : QString();
     }
     /*! sets the hint for enum fields */
-    void setEnumHints(const QVector<QString> &l) {
+    inline void setEnumHints(const QVector<QString> &l) {
         m_hints = l;
     }
 //</TMP>

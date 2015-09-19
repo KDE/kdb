@@ -107,14 +107,14 @@ public:
     void prependMessage(const QString& message);
 
     //! Efficient clearing of the sql attribute, equivalent of setSql(QString()).
-    void clearSql() {
+    inline void clearSql() {
         d->sql.clear();
     }
 
     /*! @return sql string of actually executed SQL statement,
      usually using drv_executeSQL(). If there was error during executing SQL statement,
      before, that string is returned instead. */
-    virtual KDbEscapedString recentSQLString() const {
+    virtual inline KDbEscapedString recentSQLString() const {
         return d->errorSql;
     }
 

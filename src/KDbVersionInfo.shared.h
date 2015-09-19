@@ -60,7 +60,7 @@ public:
     */
     data_member int release default=0;
 
-    KDbVersionInfo(int majorVersion, int minorVersion, int releaseVersion)
+    inline KDbVersionInfo(int majorVersion, int minorVersion, int releaseVersion)
      : d(new Data)
     {
         d->major = majorVersion;
@@ -69,7 +69,7 @@ public:
     }
 
     //! @return true if @a major and @a minor exatcly matches major and minor version of this info, respectively.
-    bool matches(int major, int minor) const { return major == d->major && minor == d->minor; }
+    inline bool matches(int major, int minor) const { return major == d->major && minor == d->minor; }
 
     //! @return true if this version info is null, i.e. all the version numbers are zero.
     bool isNull() const;

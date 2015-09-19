@@ -92,24 +92,24 @@ public:
 
     /*! @return index defining master side of this relationship
      or null if there is no information defined. */
-    KDbIndexSchema* masterIndex() const {
+    inline KDbIndexSchema* masterIndex() const {
         return m_masterIndex;
     }
 
     /*! @return index defining referenced side of this relationship.
      or null if there is no information defined. */
-    KDbIndexSchema* detailsIndex() const {
+    inline KDbIndexSchema* detailsIndex() const {
         return m_detailsIndex;
     }
 
     /*! @return ordered list of field pairs -- alternative form
      for representation of relationship or null if there is no information defined.
      Each pair has a form of <master-side-field, details-side-field>. */
-    KDbField::PairList* fieldPairs() {
+    inline KDbField::PairList* fieldPairs() {
         return &m_pairs;
     }
 
-    bool isEmpty() const {
+    inline bool isEmpty() const {
         return m_pairs.isEmpty();
     }
 

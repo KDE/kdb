@@ -114,14 +114,14 @@ namespace KDb {
 class KDB_EXPORT KDbResultInfo
 {
 public:
-    KDbResultInfo()
+    inline KDbResultInfo()
         : success(true)
         , allowToDiscardChanges(false)
         , column(-1)
     {
     }
     /*! Sets information to default values. */
-    void clear() {
+    inline void clear() {
         success = true;
         allowToDiscardChanges = false;
         column = -1;

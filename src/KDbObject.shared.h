@@ -95,7 +95,7 @@ public:
 
     /*! @return caption of this object if it is not empty, else returns object's name.
     */
-    QString captionOrName() const {
+    inline QString captionOrName() const {
         return d->caption.isEmpty() ? d->name : d->caption;
     }
 

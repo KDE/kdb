@@ -43,7 +43,7 @@ public:
      Values are initialized to null. */
     inline explicit KDbRecordData(int numCols) { init(numCols); }
 
-    ~KDbRecordData() {
+    inline ~KDbRecordData() {
         if (m_numCols > 0) {
             for (int i = 0; i < m_numCols; i++)
                 delete m_data[i];
@@ -101,7 +101,7 @@ public:
      This is an overloaded function.
      If the index @a i is out of bounds, the function returns a @a defaultValue.
      If you are certain that i is within bounds, you can use at() instead, which is slightly faster. */
-    QVariant value(int i, const QVariant& defaultValue) const {
+    inline QVariant value(int i, const QVariant& defaultValue) const {
         if (!m_data || i < 0 || i >= m_numCols)
             return defaultValue;
         if (!m_data[i])
@@ -142,8 +142,7 @@ public:
 private:
     Q_DISABLE_COPY(KDbRecordData)
 
-    inline void init(int numCols)
-    {
+    inline void init(int numCols) {
         m_numCols = numCols;
         if (m_numCols > 0) {
             m_data = (QVariant**)malloc(m_numCols * sizeof(QVariant*));

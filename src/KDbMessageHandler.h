@@ -109,17 +109,17 @@ protected:
 class KDbGuiItem : private QHash<QByteArray, QVariant>
 {
 public:
-    KDbGuiItem() : QHash<QByteArray, QVariant>() {}
-    ~KDbGuiItem() {}
-    KDbGuiItem& setProperty(const QByteArray& name, const QVariant& value)
+    inline KDbGuiItem() : QHash<QByteArray, QVariant>() {}
+    inline ~KDbGuiItem() {}
+    inline KDbGuiItem& setProperty(const QByteArray& name, const QVariant& value)
         { insert(name, value); return *this; }
     void removeProperty(const QByteArray& name) { remove(name); }
-    bool isEmpty() const { return QHash<QByteArray, QVariant>::isEmpty(); }
-    QVariant property(const QByteArray& name, const QVariant& defaultValue = QVariant()) const
+    inline bool isEmpty() const { return QHash<QByteArray, QVariant>::isEmpty(); }
+    inline QVariant property(const QByteArray& name, const QVariant& defaultValue = QVariant()) const
         { return value(name, defaultValue); }
-    bool hasProperty(const QByteArray& name) const { return contains(name); }
-    QList<QByteArray> propertyNames() const { return keys(); }
-    void clear() { QHash<QByteArray, QVariant>::clear(); }
+    inline bool hasProperty(const QByteArray& name) const { return contains(name); }
+    inline QList<QByteArray> propertyNames() const { return keys(); }
+    inline void clear() { QHash<QByteArray, QVariant>::clear(); }
 };
 
 /*! A prototype for Message Handler usable

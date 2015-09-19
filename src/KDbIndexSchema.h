@@ -84,14 +84,14 @@ public:
      i.e. any such relationship in which this table is at 'master' side.
      See KDbRelationship class documentation for more information.
      All objects listed here will be automatically destroyed on this KDbIndexSchema object destruction. */
-    QList<KDbRelationship*>* masterRelationships() {
+    inline QList<KDbRelationship*>* masterRelationships() {
         return &m_master_rels;
     }
 
     /*! @return list of relationships to the table (of this index),
      i.e. any such relationship in which this table is at 'details' side.
      See KDbRelationship class documentation for more information. */
-    QList<KDbRelationship*>* detailsRelationships() {
+    inline QList<KDbRelationship*>* detailsRelationships() {
         return &m_details_rels;
     }
 
