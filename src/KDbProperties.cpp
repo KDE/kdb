@@ -45,8 +45,8 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
     if (result == true) {
         if (!m_conn->executeSQL(
                     KDbEscapedString("UPDATE kexi__db SET db_value=%1 WHERE db_property=%2")
-                    .arg(m_conn->escapeString(value.toString())
-                    .arg(m_conn->escapeString(name)))))
+                    .arg(m_conn->escapeString(value.toString()))
+                    .arg(m_conn->escapeString(name))))
         {
             m_result = m_conn->result();
             m_result.prependMessage(tr("Could not set value of database property \"%1\".").arg(name));
