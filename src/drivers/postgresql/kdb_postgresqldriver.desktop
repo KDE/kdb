@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=PostgreSQL
 Name[ca]=PostgreSQL
+Name[ca@valencia]=PostgreSQL
 Name[cs]=PostgreSQL
 Name[de]=PostgreSQL
 Name[es]=PostgreSQL
@@ -19,6 +20,7 @@ Name[x-test]=xxPostgreSQLxx
 Name[zh_CN]=PostgreSQL
 Comment=KDb driver for handling PostgreSQL databases
 Comment[ca]=Controlador del KDb per a gestionar bases de dades PostgreSQL
+Comment[ca@valencia]=Controlador del KDb per a gestionar bases de dades PostgreSQL
 Comment[cs]=Ovladač KDb pro práci s databázemi PostgreSQL
 Comment[de]=KDb-Treiber für die Handhabung von PostgreSQL-Datenbanken
 Comment[es]=Controlador de KDb para el manejo de bases de datos PostgreSQL

@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=xbase
 Name[ca]=xBase
+Name[ca@valencia]=xBase
 Name[cs]=xbase
 Name[de]=xBase
 Name[es]=xbase
@@ -20,6 +21,7 @@ Name[zh_CN]=xbase
 Caption=xBase
 Comment=KDb driver for handling xBase databases
 Comment[ca]=Controlador del KDb per a gestionar bases de dades xBase
+Comment[ca@valencia]=Controlador del KDb per a gestionar bases de dades xBase
 Comment[cs]=Ovladač KDb pro práci s databázemi xBase
 Comment[de]=KDb-Treiber für die Handhabung von xBase-Datenbanken
 Comment[es]=Controlador de KDb para el manejo de bases de datos xBase
