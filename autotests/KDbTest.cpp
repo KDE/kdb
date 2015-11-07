@@ -30,6 +30,7 @@ Q_DECLARE_METATYPE(KDbField::TypeGroup)
 Q_DECLARE_METATYPE(KDbField::Type)
 Q_DECLARE_METATYPE(KDb::Signedness)
 Q_DECLARE_METATYPE(QList<KDbField::Type>)
+Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
 
 void KDbTest::initTestCase()
 {
@@ -486,45 +487,127 @@ KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
     Also escapes \\n, \\r, \\t, \\\\, \\0.
     Use it for user-visible backend-independent statements. */
 KDB_EXPORT QString escapeString(const QString& string);
+#endif
 
-//! Escaping types for BLOBS. Used in escapeBLOB().
-enum BLOBEscapingType {
-    BLOBEscapeXHex = 1,        //!< Escaping like X'1FAD', used by sqlite (hex numbers)
-    BLOBEscape0xHex,           //!< Escaping like 0x1FAD, used by mysql (hex numbers)
-    BLOBEscapeHex,             //!< Escaping like 1FAD without quotes or prefixes
-    BLOBEscapeOctal,           //!< Escaping like 'zk\\000$x', used by PostgreSQL
-                               //!< (only non-printable characters are escaped using octal numbers);
-                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
-    BLOBEscapeByteaHex         //!< "bytea hex" escaping, e.g. E'\xDEADBEEF'::bytea used by PostgreSQL
-                               //!< (only non-printable characters are escaped using octal numbers);
-                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
-};
+void KDbTest::testEscapeBLOB_data()
+{
+    QTest::addColumn<QByteArray>("blob");
+    QTest::addColumn<QString>("escapedX");
+    QTest::addColumn<QString>("escaped0x");
+    QTest::addColumn<QString>("escapedHex");
+    QTest::addColumn<QString>("escapedOctal");
+    QTest::addColumn<QString>("escapedBytea");
 
-/*! @return a string containing escaped, printable representation of @a array.
- Escaping is controlled by @a type. For empty array, QString() is returned,
- so if you want to use this function in an SQL statement, empty arrays should be
- detected and "NULL" string should be put instead.
- This is helper, used in KDbDriver::escapeBLOB() and KDb::variantToString(). */
-KDB_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType type);
+    QTest::newRow("") << QByteArray()
+        << QString("X''") << QString() << QString("") << QString("''") << QString("E'\\\\x'::bytea");
+    QTest::newRow("0,1,k") << QByteArray("\0\1k", 3)
+        << QString("X'00016B'") << QString("0x00016B") << QString("00016B") << QString("'\\\\000\\\\001k'") << QString("E'\\\\x00016B'::bytea");
+    QTest::newRow("ABC\\\\0") << QByteArray("ABC\0", 4)
+        << QString("X'41424300'") << QString("0x41424300") << QString("41424300") << QString("'ABC\\\\000'") << QString("E'\\\\x41424300'::bytea");
+    QTest::newRow("'") << QByteArray("'")
+        << QString("X'27'") << QString("0x27") << QString("27") << QString("'\\\\047'") << QString("E'\\\\x27'::bytea");
+    QTest::newRow("\\") << QByteArray("\\")
+        << QString("X'5C'") << QString("0x5C") << QString("5C") << QString("'\\\\134'") << QString("E'\\\\x5C'::bytea");
+}
 
-/*! @return byte array converted from @a data of length @a length.
- @a data is escaped in format used by PostgreSQL's bytea datatype
- described at http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
- This function is used by PostgreSQL KDb and migration drivers. */
-KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length);
+void KDbTest::testEscapeBLOB()
+{
+    QFETCH(QByteArray, blob);
+    QFETCH(QString, escapedX);
+    QFETCH(QString, escaped0x);
+    QFETCH(QString, escapedHex);
+    QFETCH(QString, escapedOctal);
+    QFETCH(QString, escapedBytea);
 
-/*! @return byte array converted from @a data of length @a length.
- @a data is escaped in format X'*', where * is one or more hexadecimal digits.
- If @a ok is not 0, *ok is set to result of the conversion.
- See BLOBEscapeXHex. */
-KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length, bool *ok);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeXHex), escapedX);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscape0xHex), escaped0x);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeHex), escapedHex);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeOctal), escapedOctal);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeByteaHex), escapedBytea);
+}
 
-/*! @return byte array converted from @a data of length @a length.
- @a data is escaped in format 0x*, where * is one or more hexadecimal digits.
- If @a ok is not 0, *ok is set to result of the conversion.
- See BLOBEscape0xHex. */
-KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length, bool *ok);
+void KDbTest::testPgsqlByteaToByteArray()
+{
+    QCOMPARE(KDb::pgsqlByteaToByteArray(0, 0), QByteArray());
+    QCOMPARE(KDb::pgsqlByteaToByteArray("", 0), QByteArray());
+    QCOMPARE(KDb::pgsqlByteaToByteArray(" ", 0), QByteArray());
+    QCOMPARE(KDb::pgsqlByteaToByteArray("\\101"), QByteArray("A"));
+    QCOMPARE(KDb::pgsqlByteaToByteArray("\\101", 4), QByteArray("A"));
+    QCOMPARE(KDb::pgsqlByteaToByteArray("\\101B", 4), QByteArray("A")); // cut-off at #4
+    QCOMPARE(KDb::pgsqlByteaToByteArray("\\'\\\\\\'"), QByteArray("\'\\\'"));
+    QCOMPARE(KDb::pgsqlByteaToByteArray("\\\\a\\377bc\\'d\"\n"), QByteArray("\\a\377bc\'d\"\n"));
+}
 
+void KDbTest::testXHexToByteArray_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<int>("length"); // -2 means "compute length", other values: pass it as is
+    QTest::addColumn<bool>("ok");
+    QTest::addColumn<QByteArray>("result");
+
+    QTest::newRow("") << QByteArray() << 0 << false << QByteArray();
+    QTest::newRow("bad prefix") << QByteArray("bad") << -2 << false << QByteArray();
+    QTest::newRow("X") << QByteArray("X") << -2 << false << QByteArray();
+    QTest::newRow("X'") << QByteArray("X'") << -2 << false << QByteArray();
+    QTest::newRow("X''") << QByteArray("X''") << -2 << true << QByteArray();
+    QTest::newRow("X'1") << QByteArray("X'1") << -2 << false << QByteArray();
+    QTest::newRow("X'1' cut") << QByteArray("X'1'") << 3 << false << QByteArray();
+    QTest::newRow("X'1'") << QByteArray("X'1'") << -2 << true << QByteArray("\1");
+    QTest::newRow("X'0'") << QByteArray("X'0'") << -2 << true << QByteArray("\0", 1);
+    QTest::newRow("X'000'") << QByteArray("X'000'") << -2 << true << QByteArray("\0\0", 2);
+    QTest::newRow("X'01'") << QByteArray("X'01'") << -2 << true << QByteArray("\1");
+    QTest::newRow("X'FeAb2C'") << QByteArray("X'FeAb2C'") << -2 << true << QByteArray("\376\253\54");
+}
+
+void KDbTest::testXHexToByteArray()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(int, length);
+    QFETCH(bool, ok);
+    QFETCH(QByteArray, result);
+
+    bool actualOk;
+    QCOMPARE(KDb::xHexToByteArray(data.constData(), length == -1 ? data.length() : length, &actualOk), result);
+    QCOMPARE(actualOk, ok);
+    QCOMPARE(KDb::xHexToByteArray(data.constData(), length, 0), result);
+}
+
+void KDbTest::testZeroXHexToByteArray_data()
+{
+    QTest::addColumn<QByteArray>("data");
+    QTest::addColumn<int>("length"); // -2 means "compute length", other values: pass it as is
+    QTest::addColumn<bool>("ok");
+    QTest::addColumn<QByteArray>("result");
+
+    QTest::newRow("") << QByteArray() << 0 << false << QByteArray();
+    QTest::newRow("0") << QByteArray("0") << -2 << false << QByteArray();
+    QTest::newRow("0x") << QByteArray("0x") << -2 << false << QByteArray();
+    QTest::newRow("0X22") << QByteArray("0X22") << -2 << false << QByteArray();
+    QTest::newRow("bad prefix") << QByteArray("bad") << -2 << false << QByteArray();
+    QTest::newRow("0x0") << QByteArray("0x0") << -2 << true << QByteArray("\0", 1);
+    QTest::newRow("0x0 cut") << QByteArray("0x0") << 2 << false << QByteArray();
+    QTest::newRow("0X0") << QByteArray("0X0") << -2 << false << QByteArray();
+    QTest::newRow("0x0123") << QByteArray("0x0123") << -2 << true << QByteArray("\1\43");
+    QTest::newRow("0x0123 cut") << QByteArray("0x0123") << 4 << true << QByteArray("\1");
+    QTest::newRow("0x00000'") << QByteArray("0x00000") << -2 << true << QByteArray("\0\0\0", 3);
+    QTest::newRow("0xFeAb2C") << QByteArray("0xFeAb2C") << -2 << true << QByteArray("\376\253\54");
+}
+
+void KDbTest::testZeroXHexToByteArray()
+{
+    QFETCH(QByteArray, data);
+    QFETCH(int, length);
+    QFETCH(bool, ok);
+    QFETCH(QByteArray, result);
+
+    bool actualOk;
+    QCOMPARE(KDb::zeroXHexToByteArray(data.constData(), length == -1 ? data.length() : length, &actualOk), result);
+    QCOMPARE(actualOk, ok);
+    QCOMPARE(KDb::zeroXHexToByteArray(data.constData(), length, 0), result);
+}
+
+//! @todo add tests
+#if 0
 /*! @return int list converted from string list.
    If @a ok is not 0, *ok is set to result of the conversion. */
 KDB_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok);

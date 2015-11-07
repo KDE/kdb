@@ -37,6 +37,13 @@ private Q_SLOTS:
     void testSimplifiedFieldTypeName();
     void testIsEmptyValue_data();
     void testIsEmptyValue();
+    void testEscapeBLOB_data();
+    void testEscapeBLOB();
+    void testPgsqlByteaToByteArray();
+    void testXHexToByteArray_data();
+    void testXHexToByteArray();
+    void testZeroXHexToByteArray_data();
+    void testZeroXHexToByteArray();
     void testCstringToVariant_data();
     void testCstringToVariant();
     void cleanupTestCase();
