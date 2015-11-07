@@ -35,6 +35,8 @@ private Q_SLOTS:
     void testFieldTypeNamesAndStringsForGroup();
     void testDefaultFieldTypeForGroup();
     void testSimplifiedFieldTypeName();
+    void testIsEmptyValue_data();
+    void testIsEmptyValue();
     void testCstringToVariant_data();
     void testCstringToVariant();
     void cleanupTestCase();

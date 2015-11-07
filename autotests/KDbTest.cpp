@@ -159,6 +159,49 @@ void KDbTest::testSimplifiedFieldTypeName()
     QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Enum), KDbField::tr("Invalid Group"));
     QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Map), KDbField::tr("Invalid Group"));
     QCOMPARE(KDb::simplifiedFieldTypeName(KDbField::Tuple), KDbField::tr("Invalid Group"));
+
+void KDbTest::testIsEmptyValue_data()
+{
+    QTest::addColumn<KDbField::Type>("type");
+    QTest::addColumn<QVariant>("value");
+    QTest::addColumn<bool>("result");
+    QTest::addColumn<bool>("resultForNullValue");
+    QTest::addColumn<bool>("resultForEmptyString");
+
+    int c = 0;
+    ++c; QTest::newRow("Invalid") << KDbField::InvalidType << QVariant("abc") << false << true << false;
+    ++c; QTest::newRow("Byte") << KDbField::Byte << QVariant(17) << false << true << false;
+    ++c; QTest::newRow("ShortInteger") << KDbField::ShortInteger << QVariant(1733) << false << true << false;
+    ++c; QTest::newRow("Integer") << KDbField::Integer << QVariant(11733) << false << true << false;
+    ++c; QTest::newRow("BigInteger") << KDbField::BigInteger << QVariant(0xffffff12) << false << true << false;
+    ++c; QTest::newRow("Boolean") << KDbField::Boolean << QVariant(false) << false << true << false;
+    ++c; QTest::newRow("Date") << KDbField::Date << QVariant(QDate(2015, 11, 07)) << false << true << false;
+    ++c; QTest::newRow("DateTime") << KDbField::DateTime << QVariant(QDateTime(QDate(2015, 11, 07), QTime(12, 58, 17))) << false << true << false;
+    ++c; QTest::newRow("Time") << KDbField::Time << QVariant(QTime(12, 58, 17)) << false << true << false;
+    ++c; QTest::newRow("Float") << KDbField::Float << QVariant(3.14) << false << true << false;
+    ++c; QTest::newRow("Double") << KDbField::Double << QVariant(3.1415) << false << true << false;
+    ++c; QTest::newRow("Text") << KDbField::Text << QVariant(QLatin1String("abc")) << false << false << true;
+    ++c; QTest::newRow("LongText") << KDbField::LongText << QVariant(QLatin1String("abc")) << false << false << true;
+    ++c; QTest::newRow("BLOB") << KDbField::LongText << QVariant(QByteArray(5, 'X')) << false << false << true;
+    ++c; QTest::newRow("Null") << KDbField::Null << QVariant(123) << false << true << false;
+    ++c; QTest::newRow("Asterisk") << KDbField::Asterisk << QVariant(123) << false << true << false;
+    ++c; QTest::newRow("Enum") << KDbField::Enum << QVariant(123) << false << true << false;
+    ++c; QTest::newRow("Map") << KDbField::Map << QVariant(123) << false << true << false;
+    ++c; QTest::newRow("Tuple") << KDbField::Tuple << QVariant(123) << false << true << false;
+    QCOMPARE(c, KDbField::typesCount() + KDbField::specialTypesCount());
+}
+
+void KDbTest::testIsEmptyValue()
+{
+    QFETCH(KDbField::Type, type);
+    QFETCH(QVariant, value);
+    QFETCH(bool, result);
+    QFETCH(bool, resultForNullValue);
+    QFETCH(bool, resultForEmptyString);
+
+    QCOMPARE(KDb::isEmptyValue(type, QVariant()), resultForNullValue);
+    QCOMPARE(KDb::isEmptyValue(type, QVariant(QString(""))), resultForEmptyString);
+    QCOMPARE(KDb::isEmptyValue(type, value), result);
 }
 
 void KDbTest::testCstringToVariant_data()
