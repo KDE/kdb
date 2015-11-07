@@ -400,26 +400,34 @@ enum BLOBEscapingType {
 KDB_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType type);
 
 /*! @return byte array converted from @a data of length @a length.
+ If @a length is negative, the data is assumed to point to a null-terminated string
+ and its length is determined dynamically.
  @a data is escaped in format used by PostgreSQL's bytea datatype
  described at http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
  This function is used by PostgreSQL KDb and migration drivers. */
-KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length);
+KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length = -1);
 
 /*! @return byte array converted from @a data of length @a length.
+ If @a length is negative, the data is assumed to point to a null-terminated string
+ and its length is determined dynamically.
  @a data is escaped in format X'*', where * is one or more hexadecimal digits.
+ Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
  See BLOBEscapeXHex. */
-KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length, bool *ok);
+KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *ok = 0);
 
 /*! @return byte array converted from @a data of length @a length.
+ If @a length is negative, the data is assumed to point to a null-terminated string
+ and its length is determined dynamically.
  @a data is escaped in format 0x*, where * is one or more hexadecimal digits.
+ Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
  See BLOBEscape0xHex. */
-KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length, bool *ok);
+KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length = -1, bool *ok = 0);
 
 /*! @return int list converted from string list.
    If @a ok is not 0, *ok is set to result of the conversion. */
-KDB_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok);
+KDB_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok = 0);
 
 /*! @return string converted from list @a list.
    Separators are ',' characters, "," and "\\" are escaped.

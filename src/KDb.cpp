@@ -1338,14 +1338,20 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
 
 QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
 {
+    if (!data) {
+        return QByteArray();
+    }
     QByteArray array;
     int output = 0;
+    if (length < 0) {
+        length = qstrlen(data);
+    }
     for (int pass = 0; pass < 2; pass++) {//2 passes to avoid allocating buffer twice:
         //  0: count #of chars; 1: copy data
         const char* s = data;
         const char* end = s + length;
         if (pass == 1) {
-            kdbDebug() << "processBinaryData(): real size == " << output;
+            //kdbDebug() << "processBinaryData(): real size == " << output;
             array.resize(output);
             output = 0;
         }
@@ -1425,6 +1431,9 @@ inline static bool hexToByteArrayInternal(const char* data, int length, QByteArr
 
 QByteArray KDb::xHexToByteArray(const char* data, int length, bool *ok)
 {
+    if (length < 0) {
+        length = qstrlen(data);
+    }
     if (length < 3 || data[0] != 'X' || data[1] != '\'' || data[length-1] != '\'') { // must be at least X''
         if (ok) {
             *ok = false;
@@ -1451,6 +1460,9 @@ QByteArray KDb::xHexToByteArray(const char* data, int length, bool *ok)
  See BLOBEscape0xHex. */
 QByteArray KDb::zeroXHexToByteArray(const char* data, int length, bool *ok)
 {
+    if (length < 0) {
+        length = qstrlen(data);
+    }
     if (length < 3 || data[0] != '0' || data[1] != 'x') { // must be at least 0xD
         if (ok) {
             *ok = false;
