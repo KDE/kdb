@@ -315,8 +315,12 @@ bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
 
 bool KDb::isEmptyValue(KDbField::Type type, const QVariant &v)
 {
-    if (KDbField::hasEmptyProperty(type) && v.toString().isEmpty() && !v.toString().isNull())
-        return true;
+    if (KDbField::isTextType(type)) {
+        return v.toString().isEmpty() && !v.toString().isNull();
+    }
+    else if (type == KDbField::BLOB) {
+        return v.toByteArray().isEmpty() && !v.toByteArray().isNull();
+    }
     return v.isNull();
 }
 
