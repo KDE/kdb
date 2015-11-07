@@ -52,7 +52,8 @@ enum ExpressionClass {
     FieldListExpression,
     TableListExpression,
     ArgumentListExpression,
-    QueryParameterExpression
+    QueryParameterExpression,
+    LastExpressionClass = QueryParameterExpression //!< This line should be at the end of the list
 };
 }
 
