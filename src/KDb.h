@@ -375,17 +375,19 @@ KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
     Use it for user-visible backend-independent statements. */
 KDB_EXPORT QString escapeString(const QString& string);
 
-//! Escaping types for BLOCS. Used in escapeBLOB().
+//! Escaping types for BLOBS. Used in escapeBLOB().
 enum BLOBEscapingType {
-    BLOBEscapeXHex = 1,        //!< escaping like X'1FAD', used by sqlite (hex numbers)
-    BLOBEscape0xHex,           //!< escaping like 0x1FAD, used by mysql (hex numbers)
-    BLOBEscapeHex,              //!< escaping like 1FAD without quotes or prefixes
-    BLOBEscapeOctal           //!< escaping like 'zk\\000$x', used by pgsql
-    //!< (only non-printable characters are escaped using octal numbers)
-    //!< See http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
+    BLOBEscapeXHex = 1,        //!< Escaping like X'1FAD', used by sqlite (hex numbers)
+    BLOBEscape0xHex,           //!< Escaping like 0x1FAD, used by mysql (hex numbers)
+    BLOBEscapeHex,             //!< Escaping like 1FAD without quotes or prefixes
+    BLOBEscapeOctal,           //!< Escaping like 'zk\\000$x', used by PostgreSQL
+                               //!< (only non-printable characters are escaped using octal numbers);
+                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
+    BLOBEscapeByteaHex         //!< "bytea hex" escaping, e.g. E'\xDEADBEEF'::bytea used by PostgreSQL
+                               //!< (only non-printable characters are escaped using octal numbers);
+                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
 };
 
-//! @todo reverse function for BLOBEscapeOctal is available: processBinaryData() in PostgresqlCursor.cpp - move it here
 /*! @return a string containing escaped, printable representation of @a array.
  Escaping is controlled by @a type. For empty array, QString() is returned,
  so if you want to use this function in an SQL statement, empty arrays should be
@@ -398,6 +400,18 @@ KDB_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType type);
  described at http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
  This function is used by PostgreSQL KDb and migration drivers. */
 KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length);
+
+/*! @return byte array converted from @a data of length @a length.
+ @a data is escaped in format X'*', where * is one or more hexadecimal digits.
+ If @a ok is not 0, *ok is set to result of the conversion.
+ See BLOBEscapeXHex. */
+KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length, bool *ok);
+
+/*! @return byte array converted from @a data of length @a length.
+ @a data is escaped in format 0x*, where * is one or more hexadecimal digits.
+ If @a ok is not 0, *ok is set to result of the conversion.
+ See BLOBEscape0xHex. */
+KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length, bool *ok);
 
 /*! @return int list converted from string list.
    If @a ok is not 0, *ok is set to result of the conversion. */

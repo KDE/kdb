@@ -1259,16 +1259,25 @@ QString KDb::escapeString(const QString& string)
     return newString;
 }
 
+//! @return hex digit '0'..'F' for integer number 0..15
+inline static char intToHexDigit(unsigned char val)
+{
+    return (val < 10) ? ('0' + val) : ('A' + (val - 10));
+}
+
 QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
 {
     const int size = array.size();
-    if (size == 0)
+    if (size == 0 && type == BLOBEscape0xHex)
         return QString();
     int escaped_length = size * 2;
     if (type == BLOBEscape0xHex || type == BLOBEscapeOctal)
         escaped_length += 2/*0x or X'*/;
     else if (type == BLOBEscapeXHex)
         escaped_length += 3; //X' + '
+    else if (type == BLOBEscapeByteaHex)
+        escaped_length += (4 + 8); // E'\x + '::bytea
+
     QString str;
     str.reserve(escaped_length);
     if (str.capacity() < escaped_length) {
@@ -1281,6 +1290,8 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
         str = QString::fromLatin1("0x");
     else if (type == BLOBEscapeOctal)
         str = QString::fromLatin1("'");
+    else if (type == BLOBEscapeByteaHex)
+        str = QString::fromLatin1("E'\\\\x");
 
     int new_length = str.length(); //after X' or 0x, etc.
     if (type == BLOBEscapeOctal) {
@@ -1302,12 +1313,22 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     } else {
         for (int i = 0; i < size; i++) {
             const unsigned char val = array[i];
-            str[new_length++] = (val / 16) < 10 ? ('0' + (val / 16)) : ('A' + (val / 16) - 10);
-            str[new_length++] = (val % 16) < 10 ? ('0' + (val % 16)) : ('A' + (val % 16) - 10);
+            str[new_length++] = intToHexDigit(val / 16);
+            str[new_length++] = intToHexDigit(val % 16);
         }
     }
-    if (type == BLOBEscapeXHex || type == BLOBEscapeOctal)
+    if (type == BLOBEscapeXHex || type == BLOBEscapeOctal) {
         str[new_length++] = '\'';
+    } else if (type == BLOBEscapeByteaHex) {
+        str[new_length++] = '\'';
+        str[new_length++] = ':';
+        str[new_length++] = ':';
+        str[new_length++] = 'b';
+        str[new_length++] = 'y';
+        str[new_length++] = 't';
+        str[new_length++] = 'e';
+        str[new_length++] = 'a';
+    }
     return str;
 }
 
@@ -1351,6 +1372,98 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
             }
             //  kdbDebug()<<output<<": "<<(int)array[output];
         }
+    }
+    return array;
+}
+
+//! @return hex digit converted to integer (0 to 15), 0xFF on failure
+inline static unsigned char hexDigitToInt(char digit)
+{
+    if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    }
+    if (digit >= 'a' && digit <= 'f') {
+        return digit - 'a' + 10;
+    }
+    if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    }
+    return 0xFF;
+}
+
+//! Converts textual representation @a data of a hex number (@a length digits) to a byte array @a array
+//! @return true on success and false if @a data contains characters that are not hex digits.
+//! true is returned for empty @a data as well.
+inline static bool hexToByteArrayInternal(const char* data, int length, QByteArray *array)
+{
+    Q_ASSERT(length >= 0);
+    Q_ASSERT(data || length == 0);
+    array->resize(length / 2 + length % 2);
+    for(int i = 0; length > 0; --length, ++data, ++i) {
+        unsigned char d1 = hexDigitToInt(data[0]);
+        unsigned char d2;
+        if (i == 0 && (length % 2) == 1) { // odd number of digits; no leading 0
+            d2 = d1;
+            d1 = 0;
+        }
+        else {
+            --length;
+            ++data;
+            d2 = hexDigitToInt(data[0]);
+        }
+        if (d1 == 0xFF || d2 == 0xFF) {
+            return false;
+        }
+        (*array)[i] = (d1 << 4) + d2;
+    }
+    return true;
+}
+
+QByteArray KDb::xHexToByteArray(const char* data, int length, bool *ok)
+{
+    if (length < 3 || data[0] != 'X' || data[1] != '\'' || data[length-1] != '\'') { // must be at least X''
+        if (ok) {
+            *ok = false;
+        }
+        return QByteArray();
+    }
+    data += 2; // eat X'
+    length -= 3; // eax X' and '
+    QByteArray array;
+    if (!hexToByteArrayInternal(data, length, &array)) {
+        if (ok) {
+            *ok = false;
+        }
+        array.clear();
+    }
+    if (ok) {
+        *ok = true;
+    }
+    return array;
+}
+
+/*! \return byte array converted from \a data of length \a length.
+ \a data is escaped in format 0x*, where * is one or more bytes in hexadecimal format.
+ See BLOBEscape0xHex. */
+QByteArray KDb::zeroXHexToByteArray(const char* data, int length, bool *ok)
+{
+    if (length < 3 || data[0] != '0' || data[1] != 'x') { // must be at least 0xD
+        if (ok) {
+            *ok = false;
+        }
+        return QByteArray();
+    }
+    data += 2; // eat 0x
+    length -= 2;
+    QByteArray array;
+    if (!hexToByteArrayInternal(data, length, &array)) {
+        if (ok) {
+            *ok = false;
+        }
+        array.clear();
+    }
+    if (ok) {
+        *ok = true;
     }
     return array;
 }
