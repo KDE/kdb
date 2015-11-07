@@ -101,15 +101,16 @@ public:
 
         LastType = 13,   /*!< This line should be at the end of the list of types! */
 
-        Null = 64,       /*!< Used for fields that are "NULL" expressions. */
+        Null = 128,       /*!< Used for fields that are "NULL" expressions. */
 
         //! Special, internal types:
-        Asterisk = 128,  /*!< Used in KDbQueryAsterisk subclass objects only,
+        Asterisk = 129,  /*!< Used in KDbQueryAsterisk subclass objects only,
                              not used in table definitions,
                              but only in query definitions */
-        Enum = 129,      /*!< An integer internal with a string list of hints */
-        Map = 130,       /*!< Mapping from string to string list (more generic than Enum) */
-        Tuple = 131      /*!< A list of values (e.g. arguments of a function) */
+        Enum = 130,      /*!< An integer internal with a string list of hints */
+        Map = 131,       /*!< Mapping from string to string list (more generic than Enum) */
+        Tuple = 132,     /*!< A list of values (e.g. arguments of a function) */
+        LastSpecialType = Tuple /*!< This line should be at the end of the list of special types! */
     };
 
     /*! Type groups for fields. */
