@@ -170,6 +170,15 @@ public:
 
     virtual ~KDbField();
 
+    //! @return number of normal types available
+    inline static int typesCount() { return LastType - InvalidType + 1; }
+
+    //! @return number of special types available (Asterisk, Enum, etc.)
+    inline static int specialTypesCount() { return LastSpecialType - Null + 1; }
+
+    //! @return number of type groups available
+    inline static int typeGroupsCount() { return LastTypeGroup - InvalidGroup + 1; }
+
     //! Converts type @a type to QVariant equivalent as accurate as possible
     static QVariant::Type variantType(Type type);
 
