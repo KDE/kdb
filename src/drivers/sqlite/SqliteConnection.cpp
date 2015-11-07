@@ -21,6 +21,7 @@
 #include "SqliteConnection_p.h"
 #include "SqliteCursor.h"
 #include "SqlitePreparedStatement.h"
+#include "SqliteFunctions.h"
 #include "sqlite_debug.h"
 
 #include <sqlite3.h>
@@ -251,6 +252,10 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
         }
         // load ROOT collation for use as default collation
         if (!drv_executeSQL(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
+            drv_closeDatabaseSilently();
+            return false;
+        }
+        if (!createCustomSQLiteFunctions(d->data)) {
             drv_closeDatabaseSilently();
             return false;
         }

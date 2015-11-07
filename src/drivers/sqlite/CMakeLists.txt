@@ -53,6 +53,7 @@ set(kdb_sqlite_SRCS
    SqlitePreparedStatement.cpp
    SqliteAdmin.cpp
    SqliteAlter.cpp
+   SqliteFunctions.cpp
 )
 
 if (KDB_SQLITE_VACUUM)
