@@ -176,7 +176,8 @@ void ExpressionsTest::testExpressionClassName_data()
     QTest::addColumn<KDb::ExpressionClass>("expClass");
     QTest::addColumn<QString>("name");
 
-#define T(n, c) QTest::newRow(n) << c << n
+    int c = 0;
+#define T(n, t) ++c; QTest::newRow(n) << t << n
     T("Unknown", KDb::UnknownExpression);
     T("Unary", KDb::UnaryExpression);
     T("Arithm", KDb::ArithmeticExpression);
@@ -192,7 +193,7 @@ void ExpressionsTest::testExpressionClassName_data()
     T("ArgumentList", KDb::ArgumentListExpression);
     T("QueryParameter", KDb::QueryParameterExpression);
 #undef T
-    QCOMPARE(int(KDb::QueryParameterExpression), 13);
+    QCOMPARE(c, int(KDb::LastExpressionClass) + 1);
 }
 
 void ExpressionsTest::testExpressionClassName()
