@@ -17,8 +17,8 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KEXIDB_SQLITEFUNCTIONS_H
-#define KEXIDB_SQLITEFUNCTIONS_H
+#ifndef KDB_SQLITEFUNCTIONS_H
+#define KDB_SQLITEFUNCTIONS_H
 
 #include <sqlite3.h>
 
