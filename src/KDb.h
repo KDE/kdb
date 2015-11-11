@@ -264,13 +264,16 @@ KDB_EXPORT bool isExtendedTableFieldProperty(const QByteArray& propertyName);
 KDB_EXPORT bool isLookupFieldSchemaProperty(const QByteArray& propertyName);
 
 /*! @return type of field for integer value @a type.
- If @a type cannot be casted to KDbField::Type, KDbField::InvalidType is returned.
- This can be used when type information is deserialized from a string or QVariant. */
+ If @a type cannot be casted to KDbField::Type or is not normal type,
+ i.e. @a type > KDbField::LastType (e.g. KDbField::Null), KDbField::InvalidType is returned.
+ This can be used when type information is deserialized from a string or QVariant.
+ @see KDbField::typesCount() KDbField::specialTypesCount() */
 KDB_EXPORT KDbField::Type intToFieldType(int type);
 
 /*! @return type group of field for integer value @a typeGroup.
  If @a typeGroup cannot be casted to KDbField::TypeGroup, KDbField::InvalidGroup is returned.
- This can be used when type information is deserialized from a string or QVariant. */
+ This can be used when type information is deserialized from a string or QVariant.
+ @see KDbField::typeGroupsCount() */
 KDB_EXPORT KDbField::TypeGroup intToFieldTypeGroup(int typeGroup);
 
 /*! Gets property values for the lookup schema @a lookup.

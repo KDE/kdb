@@ -83,6 +83,7 @@ public:
 
     /*! Unified (most common used) types of fields. */
     enum Type {
+        //-- Normal types:
         InvalidType = 0, /*!< Unsupported/Unimplemented type */
         Byte = 1,        /*!< 1 byte, signed or unsigned */
         FirstType = 1, /*! First type */
@@ -103,7 +104,7 @@ public:
 
         Null = 128,       /*!< Used for fields that are "NULL" expressions. */
 
-        //! Special, internal types:
+        //-- Special, internal types:
         Asterisk = 129,  /*!< Used in KDbQueryAsterisk subclass objects only,
                              not used in table definitions,
                              but only in query definitions */
@@ -170,31 +171,36 @@ public:
 
     virtual ~KDbField();
 
-    //! @return number of normal types available
+    //! @return number of normal types available, i.e. types > InvalidType and <= LastType.
     inline static int typesCount() { return LastType - InvalidType + 1; }
 
-    //! @return number of special types available (Asterisk, Enum, etc.)
+    //! @return number of special types available (Asterisk, Enum, etc.), that means
     inline static int specialTypesCount() { return LastSpecialType - Null + 1; }
 
     //! @return number of type groups available
     inline static int typeGroupsCount() { return LastTypeGroup - InvalidGroup + 1; }
 
     //! Converts type @a type to QVariant equivalent as accurate as possible
+    /*! Only normal types are supported.
+     @see typesCount() specialTypesCount() */
     static QVariant::Type variantType(Type type);
 
     //! Converts value @a value to variant corresponding to type @a type.
-    //! If converting is not possible @a value is returned.
+    /*! Only normal types are supported.
+     If converting is not possible @a value is returned. */
     static QVariant convertToType(const QVariant &value, Type type);
 
     //! @return a translated type name for @a type
-    /*! @a type has to be an element from KDbField::Type, not greater than KDbField::LastType;
-        KDbField::Null is also supported.
-        For unsupported types empty string is returned. */
+    /*! @a type has to be an element from KDbField::Type, not greater than KDbField::LastType.
+     Only normal types and KDbField::Null are supported.
+     For unsupported types empty string is returned. */
+    //! @see typesCount() specialTypesCount()
     static QString typeName(Type type);
 
-    //! @return list of all available translated type names
+    //! @return list of all available translated names of normal types
     /*! The first element of the list is the name of KDbField::InvalidType, the last one
-        is a name of KDbField::LastType. */
+     is a name of KDbField::LastType.
+     @see typesCount() specialTypesCount() */
     static QStringList typeNames();
 
     //! @return a nontranslated type string for @a type
