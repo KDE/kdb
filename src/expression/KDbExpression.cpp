@@ -173,23 +173,26 @@ bool KDbExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expressio
     return true;
 }
 
-KDbEscapedString KDbExpressionData::toString(const KDbDriver *driver,
-                                             KDbQuerySchemaParameterValueListIterator* params) const
-{
-    KDb::ExpressionCallStack callStack;
-    return toString(driver, params, &callStack);
-}
-
 KDbEscapedString KDbExpressionData::toString(
                                        const KDbDriver *driver,
                                        KDbQuerySchemaParameterValueListIterator* params,
                                        KDb::ExpressionCallStack* callStack) const
 {
+    const bool owned = !callStack;
+    if (owned) {
+        callStack = new KDb::ExpressionCallStack();
+    }
     if (!addToCallStack(0, callStack)) {
+        if (owned) {
+            delete callStack;
+        }
         return KDbEscapedString("<CYCLE!>");
     }
     KDbEscapedString s = toStringInternal(driver, params, callStack);
     callStack->removeLast();
+    if (owned) {
+        delete callStack;
+    }
     return s;
 }
 
@@ -454,11 +457,12 @@ void KDbExpression::appendChild(const ExplicitlySharedExpressionDataPointer& chi
 }
 
 KDbEscapedString KDbExpression::toString(const KDbDriver *driver,
-                                         KDbQuerySchemaParameterValueListIterator* params) const
+                                         KDbQuerySchemaParameterValueListIterator* params,
+                                         KDb::ExpressionCallStack* callStack) const
 {
     if (isNull())
         return KDbEscapedString("<UNKNOWN!>");
-    return d->toString(driver, params);
+    return d->toString(driver, params, callStack);
 }
 
 void KDbExpression::getQueryParameters(QList<KDbQuerySchemaParameter>* params)

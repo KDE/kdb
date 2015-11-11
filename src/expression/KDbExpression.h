@@ -31,6 +31,10 @@
 #include "KDbExpressionData.h"
 #include "KDbToken.h"
 
+//! Maximum number of arguments in function
+//! Reasonable number, set after https://www.sqlite.org/limits.html#max_function_arg
+#define KDB_MAX_FUNCTION_ARGS 100
+
 //! @return class name of class @a c
 KDB_EXPORT QString expressionClassName(KDb::ExpressionClass c);
 
@@ -119,7 +123,8 @@ public:
      of a query parameter (used in QueryParameterExpr).
      The result may depend on the optional @a driver parameter.
      If @a driver is 0, representation for portable KDbSQL dialect is returned. */
-    KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = 0) const;
+    KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = 0,
+                              KDb::ExpressionCallStack* callStack = 0) const;
 
     /*! Collects query parameters (messages and types) recursively and saves them to @a params.
      The leaf nodes are objects of QueryParameterExpr class.
@@ -287,6 +292,7 @@ protected:
 
     friend class KDbExpression;
     friend class KDbFunctionExpression;
+    friend class KDbFunctionExpressionData;
 };
 
 //! The KDbUnaryExpression class represents unary expression (with a single argument).
@@ -524,16 +530,39 @@ public:
     //! Sets the list of arguments to @a arguments.
     void setArguments(const KDbNArgExpression &arguments);
 
-    /*! Constructs function expression with name @a name and arguments @a arguments. */
     static QStringList builtInAggregates();
 
     static bool isBuiltInAggregate(const QString& function);
+
+    using KDbExpression::toString;
+
+    /*! Constructs function expression with name @a name and args @a args. */
+    static KDbEscapedString toString(const QString &name, const KDbDriver *driver,
+                                     const KDbNArgExpression &args,
+                                     KDbQuerySchemaParameterValueListIterator* params,
+                                     KDb::ExpressionCallStack* callStack);
+
+    //! @return a native (driver-specific) GREATEST() and LEAST() function calls generated
+    //! to string using CASE WHEN... keywords.
+    //! This is a workaround for cases when LEAST()/GREATEST() function ignores
+    //! NULL values and only returns NULL if all the expressions evaluate to NULL.
+    //! Instead of using F(v0,..,vN), this is used:
+    //! (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE F(v0,..,vN) END)
+    //! where F == GREATEST or LEAST.
+    //! Actually it is needed by MySQL < 5.0.13 and PostgreSQL.
+    static KDbEscapedString greatestOrLeastFunctionUsingCaseToString(
+                                        const QString &name,
+                                        const KDbDriver *driver,
+                                        const KDbNArgExpression &args,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack);
 
 protected:
     explicit KDbFunctionExpression(KDbExpressionData* data);
     explicit KDbFunctionExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class KDbExpression;
+    friend class KDbFunctionExpressionData;
 };
 
 //! Sends information about expression  @a expr to debug output @a dbg.

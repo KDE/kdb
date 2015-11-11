@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -155,6 +155,50 @@ QByteArray PostgresqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 KDbEscapedString PostgresqlDriver::escapeBLOB(const QByteArray& array) const
 {
     return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapeByteaHex));
+}
+
+KDbEscapedString PostgresqlDriver::hexFunctionToString(const KDbNArgExpression &args,
+                                                       KDbQuerySchemaParameterValueListIterator* params,
+                                                       KDb::ExpressionCallStack* callStack) const
+{
+    Q_ASSERT(args.argCount() == 1);
+    return KDbEscapedString("UPPER(ENCODE(%1, 'hex'))").arg(args.arg(0).toString(this, params, callStack));
+}
+
+KDbEscapedString PostgresqlDriver::ifnullFunctionToString(const KDbNArgExpression &args,
+                                                          KDbQuerySchemaParameterValueListIterator* params,
+                                                          KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(QLatin1String("COALESCE"), this, args, params, callStack);
+}
+
+KDbEscapedString PostgresqlDriver::lengthFunctionToString(const KDbNArgExpression &args,
+                                                          KDbQuerySchemaParameterValueListIterator* params,
+                                                          KDb::ExpressionCallStack* callStack) const
+{
+    Q_ASSERT(args.argCount() == 1);
+    if (args.arg(0).type() == KDbField::BLOB) {
+        return KDbFunctionExpression::toString(QLatin1String("OCTET_LENGTH"), this, args, params, callStack);
+    }
+    return KDbDriver::lengthFunctionToString(args, params, callStack); // default
+}
+
+KDbEscapedString PostgresqlDriver::greatestOrLeastFunctionToString(const QString &name,
+                                                const KDbNArgExpression &args,
+                                                KDbQuerySchemaParameterValueListIterator* params,
+                                                KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::greatestOrLeastFunctionUsingCaseToString(
+                name, this, args, params, callStack);
+}
+
+KDbEscapedString PostgresqlDriver::unicodeFunctionToString(
+                                                const KDbNArgExpression &args,
+                                                KDbQuerySchemaParameterValueListIterator* params,
+                                                KDb::ExpressionCallStack* callStack) const
+{
+    Q_ASSERT(args.argCount() == 1);
+    return KDbEscapedString("ASCII(%1)").arg(args.arg(0).toString(this, params, callStack));
 }
 
 #include "PostgresqlDriver.moc"

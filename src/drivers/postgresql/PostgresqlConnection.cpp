@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -198,6 +198,9 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     if (status != PGRES_COMMAND_OK) {
         postgresqlWarning() << "Failed to set DATESTYLE to 'ISO':" << PQerrorMessage(d->conn);
     }
+    //! @todo call on first use of SOUNDEX(), etc.;
+    //!       it's not possible now because we don't have connection context in KDbFunctionExpressionData
+    drv_executeSQL(KDbEscapedString("CREATE EXTENSION fuzzystrmatch"));
     PQclear(result);
     return true;
 }

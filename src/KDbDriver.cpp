@@ -24,7 +24,7 @@
 #include "KDbConnection.h"
 #include "KDbConnectionData.h"
 #include "KDbAdmin.h"
-#include "KDb.h"
+#include "KDbExpression.h"
 #include "kdb_debug.h"
 
 #include <assert.h>
@@ -285,6 +285,75 @@ void KDbDriver::setMetaData(const KDbDriverMetaData *metaData)
 {
     d->metaData = metaData;
     d->initInternalProperties();
+}
+
+KDbEscapedString KDbDriver::hexFunctionToString(
+                                       const KDbNArgExpression &args,
+                                       KDbQuerySchemaParameterValueListIterator* params,
+                                       KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(QLatin1String("HEX"), this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::ifnullFunctionToString(
+                                          const KDbNArgExpression &args,
+                                          KDbQuerySchemaParameterValueListIterator* params,
+                                          KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(QLatin1String("IFNULL"), this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::lengthFunctionToString(
+                                          const KDbNArgExpression &args,
+                                          KDbQuerySchemaParameterValueListIterator* params,
+                                          KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(QLatin1String("LENGTH"), this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::greatestOrLeastFunctionToString(
+                                            const QString &name,
+                                            const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(name, this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::randomFunctionToString(
+                                            const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const
+{
+    static QLatin1String randomStatic("()");
+    if (!args.isNull() || args.argCount() < 1 ) {
+        return KDbEscapedString(beh->RANDOM_FUNCTION + randomStatic);
+    }
+    Q_ASSERT(args.argCount() == 2);
+    const KDbEscapedString x(args.arg(0).toString(this, params, callStack));
+    const KDbEscapedString y(args.arg(1).toString(this, params, callStack));
+    static KDbEscapedString floorRandomStatic("+FLOOR(");
+    static KDbEscapedString floorRandomStatic2("()*(");
+    static KDbEscapedString floorRandomStatic3(")))");
+    return KDbEscapedString('(') + x + floorRandomStatic + beh->RANDOM_FUNCTION
+            + floorRandomStatic2 + y + QLatin1Char('-') + x + floorRandomStatic3;
+}
+
+KDbEscapedString KDbDriver::ceilingOrFloorFunctionToString(
+                                                const QString &name,
+                                                const KDbNArgExpression &args,
+                                                KDbQuerySchemaParameterValueListIterator* params,
+                                                KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(name, this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::unicodeFunctionToString(
+                                        const KDbNArgExpression &args,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const
+{
+    return KDbFunctionExpression::toString(QLatin1String("UNICODE"), this, args, params, callStack);
 }
 
 //---------------

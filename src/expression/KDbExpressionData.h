@@ -92,7 +92,8 @@ public:
     bool isFPNumericType() const;
     bool isDateTimeType() const;
     KDbEscapedString toString(const KDbDriver *driver,
-                              KDbQuerySchemaParameterValueListIterator* params = 0) const;
+                              KDbQuerySchemaParameterValueListIterator* params = 0,
+                              KDb::ExpressionCallStack* callStack = 0) const;
     virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
     bool validate(KDbParseInfo *parseInfo);
     virtual KDbExpressionData* clone();
@@ -107,10 +108,6 @@ public:
     QDebug debug(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
 
     KDbField::Type type(KDb::ExpressionCallStack* callStack) const;
-
-    KDbEscapedString toString(const KDbDriver *driver,
-                              KDbQuerySchemaParameterValueListIterator* params,
-                              KDb::ExpressionCallStack* callStack) const;
 
     bool validate(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
 
@@ -328,6 +325,12 @@ public:
     virtual KDbFunctionExpressionData* clone();
 
     void setArguments(ExplicitlySharedExpressionDataPointer arguments);
+
+    static KDbEscapedString toString(const QString &name,
+                                     const KDbDriver *driver,
+                                     const KDbNArgExpressionData *args,
+                                     KDbQuerySchemaParameterValueListIterator* params,
+                                     KDb::ExpressionCallStack* callStack);
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).

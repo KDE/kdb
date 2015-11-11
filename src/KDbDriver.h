@@ -31,6 +31,7 @@
 #include "KDbField.h"
 #include "KDbResult.h"
 #include "KDbEscapedString.h"
+#include "KDbExpression.h"
 
 class KDbAdminTools;
 class KDbConnection;
@@ -39,6 +40,8 @@ class KDbConnectionOptions;
 class KDbDriverManager;
 class KDbDriverBehaviour;
 class KDbDriverMetaData;
+class KDbNArgExpression;
+class KDbQuerySchemaParameterValueListIterator;
 class DriverPrivate;
 
 #define KDB_DRIVER_PLUGIN_FACTORY(class_name, name) \
@@ -215,6 +218,67 @@ public:
 
     //! @internal
     virtual ~KDbDriver();
+
+    //! Generates native (driver-specific) HEX() function call.
+    //! Default implementation uses HEX(val).
+    virtual KDbEscapedString hexFunctionToString(
+                                        const KDbNArgExpression &args,
+                                        KDbQuerySchemaParameterValueListIterator* params,
+                                        KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) IFNULL() function call.
+    //! Default implementation uses IFNULL().
+    virtual KDbEscapedString ifnullFunctionToString(
+                                           const KDbNArgExpression &args,
+                                           KDbQuerySchemaParameterValueListIterator* params,
+                                           KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) LENGTH() function call.
+    //! Default implementation uses LENGTH().
+    virtual KDbEscapedString lengthFunctionToString(
+                                           const KDbNArgExpression &args,
+                                           KDbQuerySchemaParameterValueListIterator* params,
+                                           KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) GREATEST() and LEAST() function calls.
+    //! Default implementation just uses GREATEST() and LEAST(), respectively.
+    //! (this works only with MySQL >= 5.0.13).
+    //! For backends workarounds are added.
+    virtual KDbEscapedString greatestOrLeastFunctionToString(
+                                                    const QString &name,
+                                                    const KDbNArgExpression &args,
+                                                    KDbQuerySchemaParameterValueListIterator* params,
+                                                    KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) RANDOM() and RANDOM(X,Y) function calls.
+    //! Accepted @a args can contain zero or two positive integer arguments X, Y; X < Y.
+    //! In case of numeric arguments, RANDOM(X, Y) returns a random integer that is equal
+    //! or greater than X and less than Y.
+    //! Default implementation for RANDOM() returns F() where F is behaviour()->RANDOM_FUNCTION.
+    //! This works with PostgreSQL.
+    //! Default implementation for RANDOM(X,Y) returns (X + FLOOR(F()*(Y-X+1))) where
+    //! F is behaviour()->RANDOM_FUNCTION. This works with PostgreSQL.
+    virtual KDbEscapedString randomFunctionToString(
+                                           const KDbNArgExpression &args,
+                                           KDbQuerySchemaParameterValueListIterator* params,
+                                           KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) CEILING() and FLOOR() function calls.
+    //! Default implementation USES CEILING() and FLOOR(), respectively.
+    //! Special case is for SQLite.
+    virtual KDbEscapedString ceilingOrFloorFunctionToString(
+                                            const QString &name,
+                                            const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) UNICODE() function call.
+    //! Default implementation USES UNICODE().
+    //! Special case is for MYSQL and PostgreSQL.
+    virtual KDbEscapedString unicodeFunctionToString(
+                                            const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const;
 
 protected:
     /*! Used by KDbDriverManager.

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-    Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+    Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
     Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -20,7 +20,6 @@
 
 #include "KDbDriver_p.h"
 #include "KDbDriverMetaData.h"
-#include "KDb.h"
 
 KDbDriverBehaviour::KDbDriverBehaviour()
         : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))
@@ -41,6 +40,7 @@ KDbDriverBehaviour::KDbDriverBehaviour()
         , BOOLEAN_FALSE_LITERAL(QLatin1Char('0'))
         , TEXT_TYPE_MAX_LENGTH(0)
         , LIKE_OPERATOR(QLatin1String("LIKE"))
+        , RANDOM_FUNCTION(QLatin1String("RANDOM"))
 {
 }
 

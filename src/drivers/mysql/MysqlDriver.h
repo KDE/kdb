@@ -2,6 +2,7 @@
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -52,6 +53,29 @@ public:
 
     //! Escape BLOB value @a array
     virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
+
+    //! Generates native (driver-specific) LENGTH() function call.
+    //! char_length(val) is used because length(val) in mysql returns number of bytes,
+    //! what is not right for multibyte (unicode) encodings. */
+    virtual KDbEscapedString lengthFunctionToString(const KDbNArgExpression &args,
+                                                    KDbQuerySchemaParameterValueListIterator* params,
+                                                    KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) GREATEST() and LEAST() function call.
+    //! Since MySQL's LEAST()/GREATEST() function ignores NULL values, it only returns NULL
+    //! if all the expressions evaluate to NULL. So this is used for F(v0,..,vN):
+    //! (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE F(v0,..,vN) END)
+    //! where F == GREATEST or LEAST.
+    virtual KDbEscapedString greatestOrLeastFunctionToString(const QString &name,
+                                                    const KDbNArgExpression &args,
+                                                    KDbQuerySchemaParameterValueListIterator* params,
+                                                    KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) UNICODE() function call.
+    //! Uses ORD(CONVERT(X USING UTF16)).
+    virtual KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const;
 
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;

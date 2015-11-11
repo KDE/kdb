@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -151,6 +151,72 @@ KDbAdminTools* SqliteDriver::drv_createAdminTools() const
 KDbEscapedString SqliteDriver::collationSQL() const
 {
     return dp->collate;
+}
+
+KDbEscapedString SqliteDriver::greatestOrLeastFunctionToString(const QString &name,
+                                                      const KDbNArgExpression &args,
+                                                      KDbQuerySchemaParameterValueListIterator* params,
+                                                      KDb::ExpressionCallStack* callStack) const
+{
+    Q_ASSERT(args.argCount() >= 2);
+    static QString greatestString(QLatin1String("GREATEST"));
+    static QString maxString(QLatin1String("MAX"));
+    static QString minString(QLatin1String("MIN"));
+    const QString realName(
+        name == greatestString ? maxString : minString);
+    if (args.argCount() >= 2 && KDbField::isTextType(args.arg(0).type())) {
+        KDbEscapedString s;
+        s.reserve(256);
+        for(int i=0; i < args.argCount(); ++i) {
+            if (!s.isEmpty()) {
+                s += ", ";
+            }
+            s += QLatin1Char('(') + args.arg(i).toString(this, params, callStack) + QLatin1String(") ") + collationSQL();
+        }
+        return realName + QLatin1Char('(') + s + QLatin1Char(')');
+    }
+    return KDbFunctionExpression::toString(realName, this, args, params, callStack);
+}
+
+KDbEscapedString SqliteDriver::randomFunctionToString(const KDbNArgExpression &args,
+                                             KDbQuerySchemaParameterValueListIterator* params,
+                                             KDb::ExpressionCallStack* callStack) const
+{
+    if (!args.isNull() || args.argCount() < 1 ) {
+        static KDbEscapedString randomStatic("((RANDOM()+9223372036854775807)/18446744073709551615)");
+        return randomStatic;
+    }
+    Q_ASSERT(args.argCount() == 2);
+    const KDbEscapedString x(args.arg(0).toString(this, params, callStack));
+    const KDbEscapedString y(args.arg(1).toString(this, params, callStack));
+    static KDbEscapedString floorRandomStatic("+CAST(((");
+    static KDbEscapedString floorRandomStatic2("))*(RANDOM()+9223372036854775807)/18446744073709551615 AS INT))");
+    //! (X + CAST((Y - X) * (RANDOM()+9223372036854775807)/18446744073709551615 AS INT)).
+    return KDbEscapedString("((") + x + QLatin1Char(')') + floorRandomStatic + y + QLatin1Char(')')
+            + QLatin1String("-(") + x + floorRandomStatic2;
+}
+
+KDbEscapedString SqliteDriver::ceilingOrFloorFunctionToString(const QString &name,
+                                                     const KDbNArgExpression &args,
+                                                     KDbQuerySchemaParameterValueListIterator* params,
+                                                     KDb::ExpressionCallStack* callStack) const
+{
+    Q_ASSERT(args.argCount() == 1);
+    static QLatin1String ceilingString("CEILING");
+    KDbEscapedString x(args.arg(0).toString(this, params, callStack));
+    if (name == ceilingString) {
+        return KDbEscapedString("(CASE WHEN ")
+            + x + QLatin1String("=CAST(") + x + QLatin1String(" AS INT) THEN CAST(")
+            + x + QLatin1String(" AS INT) WHEN ")
+            + x + QLatin1String(">=0 THEN CAST(")
+            + x + QLatin1String(" AS INT)+1 ELSE CAST(")
+            + x + QLatin1String(" AS INT) END)");
+    }
+    // floor():
+    return KDbEscapedString("(CASE WHEN ") + x + QLatin1String(">=0 OR ")
+            + x + QLatin1String("=CAST(") + x + QLatin1String(" AS INT) THEN CAST(")
+            + x + QLatin1String(" AS INT) ELSE CAST(")
+            + x + QLatin1String(" AS INT)-1 END)");
 }
 
 #include "SqliteDriver.moc"
