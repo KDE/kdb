@@ -72,22 +72,25 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
                                   .arg(QLatin1String("BETWEEN...AND")));
             return false;
         }
-
-        if (!(   !KDbField::isNumericType(children[0]->type())
-              || !KDbField::isNumericType(children[1]->type())
-              || !KDbField::isNumericType(children[2]->type())))
+        const KDbField::Type t0 = children[0]->type();
+        const KDbField::Type t1 = children[1]->type();
+        const KDbField::Type t2 = children[2]->type();
+        if (t0 == KDbField::Null || t1 == KDbField::Null || t2 == KDbField::Null) {
+            return true;
+        }
+        if (!(   !KDbField::isNumericType(t0)
+              || !KDbField::isNumericType(t1)
+              || !KDbField::isNumericType(t2)))
         {
             return true;
-        } else if (!(   !KDbField::isTextType(children[0]->type())
-                     || !KDbField::isTextType(children[1]->type())
-                     || !KDbField::isTextType(children[2]->type())))
+        } else if (!(   !KDbField::isTextType(t0)
+                     || !KDbField::isTextType(t1)
+                     || !KDbField::isTextType(t2)))
         {
             return true;
         }
 
-        if ((   children[0]->type() == children[1]->type()
-             && children[1]->type() == children[2]->type()))
-        {
+        if (t0 == t1 && t1 == t2) {
             return true;
         }
 
