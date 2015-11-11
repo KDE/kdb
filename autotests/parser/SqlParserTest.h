@@ -20,8 +20,8 @@
 #ifndef KDB_SQLPARSERTEST_H
 #define KDB_SQLPARSERTEST_H
 
-#include <QObject>
 #include <QScopedPointer>
+#include <QFile>
 
 #include <KDbParser>
 
@@ -45,6 +45,8 @@ private:
 
     KDbTestUtils m_utils;
     QScopedPointer<KDbParser> m_parser;
+    QFile m_errorFile;
+    QTextStream m_errorStream;
 };
 
 #endif

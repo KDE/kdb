@@ -21,6 +21,8 @@
 ---------- CATEGORY: General --------------
 -- The same field used in two columns
 select id, id from persons;
+-- No args: OK
+select;
 -- Whitespace between table-identifier, dot field-identifier/asterisk
 select persons .  id from persons;
 select persons .	* from persons;
@@ -36,20 +38,32 @@ select 1, 2;
 select from cars;
 -- Totally empty statement (KDBSQL EXTENSION)
 select;
--- Keywords are case insensitive
+-- Keywords and constants are case insensitive
 SElEcT * FroM cars;
+select TRue;
+select FaLse;
+selecT FALse oR TRuE;
+selecT 1 LIKe 1;
 -- Constants
 select -12;
 select 7777777;
 select -1048576;
 select 16777216;
 select "01234567890";
+select '01234567890';
+select '"';
+select '\\';
+select '\"';
 select 3.14159;
+select 3.;
+select NULL;
+select TRUE;
 -- TODO: Date/Time
 
 -- TRUE and FALSE constants (KDBSQL EXTENSION)
 select TRUE, NOT FALSE;
 select NOT NOT TRUE;
+select NOT NULL;
 select NOT (NOT TRUE);
 select TRUE != FALSE;
 select TRUE <> FALSE;
@@ -63,6 +77,8 @@ select TRUE <> TRUE OR FALSE == TRUE;
 select TRUE IS NOT FALSE;
 -- IS NULL/IS NOT NULL
 select 1 IS NOT NULL;
+select NULL IS NULL;
+select NULL IS NOT NULL;
 -- ERROR: Extra ';'
 select 1; 2;
 -- Unary operators
@@ -71,6 +87,8 @@ select --1;
 select +1;
 select ++1;
 select +--+-1;
+select -NULL;
+select +NULL;
 -- Binary operators
 select 1+2;
 select 1-2;
@@ -80,6 +98,7 @@ select 1&2;
 select 1|2;
 select 1%2;
 select 2 >> 4;
+select 2 << 4;
 select 2 <> 4;
 select 2 != -4;
 select 2 = -4;
@@ -88,9 +107,52 @@ select 2 > 4;
 select 2 < 4;
 select 2 <= 4;
 select 2 >= -4;
+select NULL + NULL;
+select 7 + NULL;
+select NULL - NULL;
+select 7 - NULL;
+select NULL * NULL;
+select 7 * NULL;
+select NULL / NULL;
+select 7 / NULL;
+select NULL & NULL;
+select 7 & NULL;
+select NULL | NULL;
+select 7 | NULL;
+select NULL % NULL;
+select 7 % NULL;
+select NULL >> NULL;
+select 7 >> NULL;
+select NULL << NULL;
+select 7 << NULL;
+select NULL <> NULL;
+select 7 <> NULL;
+select NULL != NULL;
+select 7 != NULL;
+select NULL == NULL;
+select 7 == NULL;
+select NULL > NULL;
+select 7 > NULL;
+select NULL < NULL;
+select 7 < NULL;
+select NULL >= NULL;
+select 7 >= NULL;
+select NULL <= NULL;
+select 7 <= NULL;
 select 'ABC' LIKE 'A%';
+select 'ABC' NOT LIKE 'A%';
+select 'ABC' LIKE NULL;
+select NULL LIKE NULL;
+select NULL NOT LIKE NULL;
+select 1 BETWEEN 0 AND 5;
+select NULL BETWEEN 1 AND 5;
+select 1 BETWEEN NULL AND 5;
+select 1 BETWEEN 0 AND NULL;
+select NULL BETWEEN NULL AND NULL;
 select 3 SIMILAR TO 4;
+select NULL SIMILAR TO 4;
 select 3 NOT SIMILAR TO 4;
+select NULL SIMILAR TO NULL;
 select 'AB' || 'CD';
 select 'AB' || 'CD' || 'EF';
 select 'AB' + 'CD' || 'EF' + 'GH' || '';
@@ -103,6 +165,11 @@ select 'AB' + 1;
 select 7 || 'AB';
 select 7 + 'AB';
 select 7 || 1;
+-- ERROR: Type error near "1"
+select 'ABC' NOT LIKE 1;
+select 'ABC' NOT LIKE;
+select 3 SIMILAR TO;
+select 1 BETWEEN 'a' AND 5;
 -- ERROR: **
 select 1**2;
 -- ERROR: * or / are not unary operators
@@ -113,6 +180,12 @@ select 2+;
 select 2-;
 select 2*;
 select 2/;
+-- ERROR: unfinished '
+select ';
+select ";
+select \';
+select \"a";
+select 1';
 
 ---------- CATEGORY: Aliases in select statement --------------
 -- Aliases for columns
@@ -136,7 +209,7 @@ select persons.* from persons, cars persons;
 select * as c from cars;
 select cars.* as c from cars;
 
----------- CATEGORY: Expressions in columns of select statement --------------
+---------- CATEGORY: Expressions with infix operators in columns of select statement --------------
 -- Like "select p.id from persons p, cars p" but no error because we're not using fields from "p" tables
 select 1 from persons p, cars p;
 -- Complex expressions support, operators precedence, and brackets
@@ -170,6 +243,47 @@ select (2)));
 -- column names in expression
 select id * id - 2 / id from cars;
 select model || "---" || model from cars;
+
+---------- CATEGORY: Expressions with scalar functions --------------
+-- ABS
+SELECT ABS(-27), abs(-3.1415), ABS(NULL + 1);
+-- ERROR: ABS
+SELECT ABS(); -- 1 arg expected
+SELECT ABS(1, 2); -- 1 arg expected
+SELECT ABS("a"); -- type error
+-- CEILING
+SELECT CEILING(3.14), ceiling(-99.001);
+SELECT CEILING(0 + 0);
+SELECT CEILING(NULL);
+-- ERROR: CEILING
+SELECT CEILING(); -- 1 arg expected
+SELECT CEILING(1, 2); -- 1 arg expected
+SELECT CEILING("a"); -- type error
+-- CHAR
+SELECT CHAR(75,69,88,73), CHAR();
+SELECT CHAR(NULL);
+SELECT CHAR(NULL, NULL);
+-- ERROR: CHAR
+SELECT CHAR(''); -- type error
+SELECT CHAR(1.23); -- type error
+-- COALESCE
+SELECT COALESCE(NULL, 17, NULL, "A");
+SELECT COALESCE(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); -- 100 args == KDB_MAX_FUNCTION_ARGS
+-- ERROR: COALESCE
+SELECT COALESCE(); -- 2 or more args expected
+SELECT COALESCE(1); -- 2 or more args expected
+SELECT COALESCE(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1); -- 101 args is more than KDB_MAX_FUNCTION_ARGS
+-- FLOOR
+SELECT FLOOR(3.14), FLOOR(-99.001);
+SELECT FLOOR(0 + 0);
+SELECT FLOOR(NULL);
+-- ERROR: FLOOR
+SELECT FLOOR(); -- 1 arg expected
+SELECT FLOOR(1, 2); -- 1 arg expected
+SELECT FLOOR("a"); -- type error
+-- TODO: more functions...
+-- ERROR: unknown scalar function
+SELECT foobar();
 
 ---------- CATEGORY: "WHERE" section --------------
 -- ERROR: Empty WHERE section
