@@ -32,6 +32,12 @@ void SqlParserTest::initTestCase()
 {
     m_utils.testDriverManager();
     m_utils.testSqliteDriver();
+    QString dir(QFile::decodeName(OUTPUT_DIR));
+    QString fname("errors.txt");
+    m_errorFile.setFileName(dir + QDir::separator() + fname);
+    QVERIFY2(m_errorFile.open(QFile::WriteOnly | QFile::Text),
+             qPrintable(QString("Cannot open %1 file").arg(m_errorFile.fileName())));
+    m_errorStream.setDevice(&m_errorFile);
 }
 
 bool SqlParserTest::openDatabase(const QString &path)
@@ -109,7 +115,7 @@ static void eatComment(QString* string)
     *string = result;
 }
 
-static void eatEndComment(QString* string)
+static void eatEndLines(QString* string)
 {
     if (!string->endsWith("--")) {
         return;
@@ -118,6 +124,16 @@ static void eatEndComment(QString* string)
     for (; i >= 0 && string->at(i) == '-'; --i)
         ;
     *string = string->left(i+1).trimmed();
+}
+
+static void eatEndComment(QString* string)
+{
+    int pos = string->indexOf("; --");
+    if (pos == -1) {
+        return;
+    }
+    string->truncate(pos);
+    *string = string->trimmed() + ';';
 }
 
 void SqlParserTest::testParse_data()
@@ -144,7 +160,7 @@ void SqlParserTest::testParse_data()
         QString line(in.readLine());
         if (line.startsWith("--")) { // comment
             eatComment(&line);
-            eatEndComment(&line);
+            eatEndLines(&line);
             if (line.startsWith("TODO:")) {
                 continue;
             }
@@ -196,6 +212,7 @@ void SqlParserTest::testParse_data()
             }
         }
         else {
+            eatEndComment(&line);
             KDbEscapedString sql(line.trimmed());
             clearTestName = true;
             if (sql.isEmpty()) {
@@ -222,8 +239,12 @@ void SqlParserTest::testParse()
     QFETCH(KDbEscapedString, sql);
     QFETCH(bool, expectError);
 
-    QVERIFY2(sql.endsWith(';'), qPrintable(QString("%1:%2: Missing ';' at the end of line")
-                                           .arg(fname).arg(lineNum)));
+    QString message;
+    if (!sql.endsWith(';')) {
+        message = QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum);
+        m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
+        QVERIFY2(sql.endsWith(';'), qPrintable(message));
+    }
     sql.chop(1);
     //qDebug() << "SQL:" << sql.toString() << expectError;
     bool ok;
@@ -232,21 +253,33 @@ void SqlParserTest::testParse()
 
     if (ok) {
         // sucess, so error cannot be expected
-        QVERIFY2(!expectError,
-                 (qPrintable(QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
-                  .arg(sql.toString()).arg(result.toString()))));
-        if (!expectError) {
+        ok = !expectError;
+        message = QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
+                  .arg(sql.toString()).arg(result.toString());
+        if (ok) {
             qDebug() << "Result:" << result.toString();
+        } else {
+            m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
+            if (parser->query()) {
+                qDebug() << *parser->query();
+                m_errorStream << KDbUtils::debugString(*parser->query()) << endl;
+            }
         }
+        QVERIFY2(ok, qPrintable(message));
     }
     else {
         // failure, so error should be expected
-        QVERIFY2(expectError, qPrintable(QString("SQL statement: \"%1\"; %2")
+        ok = expectError;
+        message = QString("%1; Failed SQL Statement:\n\"%2\"\n %3^\n")
+                 .arg(KDbUtils::debugString(parser->error()))
                  .arg(sql.toString())
-                 .arg(KDbUtils::debugString(parser->error()))));
-        if (expectError) {
+                 .arg(QString(parser->error().position() - 1, QChar(' ')));
+        if (ok) {
             qDebug() << parser->error();
+        } else {
+            m_errorStream << fname << ':' << lineNum << message << endl;
         }
+        QVERIFY2(ok, qPrintable(message));
     }
 }
 
@@ -329,6 +362,7 @@ void SqlParserTest::testTokens()
 void SqlParserTest::cleanupTestCase()
 {
     m_utils.testDisconnect();
+    m_errorFile.close();
 #if 0
         if (!m_conn->dropDatabase()) {
             qDebug() << m_conn->result();
