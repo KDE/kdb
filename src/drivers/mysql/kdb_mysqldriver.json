@@ -1,0 +1,64 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "kexi@kde.org",
+                "Name": "Kexi Team"
+            }
+        ],
+        "Category": "",
+        "Dependencies": [
+        ],
+        "Description": "KDb driver for handling MySQL databases",
+        "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades MySQL",
+        "Description[ca]": "Controlador del KDb per a gestionar bases de dades MySQL",
+        "Description[cs]": "Ovladač KDb pro práci s databázemi MySQL",
+        "Description[de]": "KDb-Treiber für die Handhabung von MySQL-Datenbanken",
+        "Description[es]": "Controlador de KDb para el manejo de bases de datos MySQL",
+        "Description[fi]": "KDb-ajuri MySQL-tietokantojen käsittelyyn",
+        "Description[gl]": "Controlador de KDb para manexar bases de datos MySQL.",
+        "Description[hu]": "KDb illesztőprogram MySQL adatbázisok kezeléséhez",
+        "Description[nl]": "KDb-stuurprogramma for behandeling van MySQL databases",
+        "Description[pl]": "Sterownik KDb do obsługi baz danych MySQL",
+        "Description[pt]": "Controlador do KDb para lidar com bases de dados MySQL",
+        "Description[pt_BR]": "Driver do KDb para lidar com bancos de dados MySQL",
+        "Description[ru]": "Драйвер KDb для работы с базами данных MySQL",
+        "Description[sk]": "KDb ovládač na spracovanie databáz MySQL",
+        "Description[sv]": "Kdb-drivrutin för att hantera MySQL-databaser",
+        "Description[uk]": "Драйвер KDb для роботи з базами даних MySQL",
+        "Description[x-test]": "xxKDb driver for handling MySQL databasesxx",
+        "Description[zh_CN]": "处理 MySQL 数据库的 KDb 驱动",
+        "EnabledByDefault": true,
+        "Icon": "",
+        "Id": "org.kde.kdb.mysql",
+        "License": "LGPL",
+        "MimeTypes": [
+        ],
+        "Name": "MySQL",
+        "Name[ca@valencia]": "MySQL",
+        "Name[ca]": "MySQL",
+        "Name[cs]": "MySQL",
+        "Name[de]": "MySQL",
+        "Name[es]": "MySQL",
+        "Name[fi]": "MySQL",
+        "Name[gl]": "MySQL",
+        "Name[hu]": "MySQL",
+        "Name[nl]": "MySQL",
+        "Name[pl]": "MySQL",
+        "Name[pt]": "MySQL",
+        "Name[pt_BR]": "MySQL",
+        "Name[ru]": "MySQL",
+        "Name[sk]": "MySQL",
+        "Name[sv]": "MySQL",
+        "Name[uk]": "MySQL",
+        "Name[x-test]": "xxMySQLxx",
+        "Name[zh_CN]": "MySQL",
+        "ServiceTypes": [
+            "KDb/Driver"
+        ],
+        "Version": "1.0",
+        "Website": "http://kexi-project.org"
+    },
+    "X-KDb-FileBased": "false",
+    "X-KDb-ImportingEnabled": "true"
+}

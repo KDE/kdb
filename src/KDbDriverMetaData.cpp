@@ -32,7 +32,8 @@ class KDbDriverMetaData::Private
 public:
     Private(KDbDriverMetaData *metaData)
     {
-        mimeTypes = metaData->value(QLatin1String("MimeType")).split(QLatin1Char(';'));
+        const QJsonObject rootObject = metaData->rawData()[QLatin1String("KPlugin")].toObject();
+        mimeTypes = metaData->readStringList(rootObject, QLatin1String("MimeTypes"));
         fileBased = isTrue(metaData, "X-KDb-FileBased");
         importingEnabled = isTrue(metaData, "X-KDb-ImportingEnabled");
     }
@@ -61,6 +62,8 @@ QString KDbDriverMetaData::id() const
 
 QStringList KDbDriverMetaData::mimeTypes() const
 {
+    // There is KPluginMetaData::mimeTypes() but we're not using it because it's there since KF 5.16.
+    // See also https://git.reviewboard.kde.org/r/125527/
     return d->mimeTypes;
 }
 
