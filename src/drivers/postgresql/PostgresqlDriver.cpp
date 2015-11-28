@@ -130,7 +130,7 @@ KDbEscapedString PostgresqlDriver::escapeString(const QString& str) const
     return KDbEscapedString("E'")
            + KDbEscapedString(str).replace("\\", "\\\\").replace("'", "\\\'")
            + "'";
-};
+}
 
 KDbEscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
 {

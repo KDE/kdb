@@ -293,13 +293,13 @@ private:
     QHash<QString, BuiltInFunctionDeclaration*> m_aliases;
 };
 
-int BuiltInFunctions::multipleArgs[] = {};
+int BuiltInFunctions::multipleArgs[] = { 0 };
 
 BuiltInFunctions::BuiltInFunctions()
     : QHash<QString, BuiltInFunctionDeclaration*>()
 {
     BuiltInFunctionDeclaration *decl;
-#define _TYPES(name, args...) static int name[] = { args, KDbField::InvalidType }
+#define _TYPES(name, ...) static int name[] = { __VA_ARGS__, KDbField::InvalidType }
     _TYPES(argAnyTextOrNull, AnyText, KDbField::Null);
     _TYPES(argAnyIntOrNull, AnyInt, KDbField::Null);
     _TYPES(argAnyNumberOrNull, AnyNumber, KDbField::Null);
@@ -312,8 +312,8 @@ BuiltInFunctions::BuiltInFunctions()
 #undef _TYPES
 
 //! Adds a signature named @a name with specified arguments to declaration decl
-#define _SIG(name, args...) \
-    static int* name[] = { args, 0 }; \
+#define _SIG(name, ...) \
+    static int* name[] = { __VA_ARGS__, 0 }; \
     decl->signatures.push_back(name)
 
 //! Adds a signature with no arguments to declaration decl
