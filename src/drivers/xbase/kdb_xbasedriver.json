@@ -2,26 +2,25 @@
     "KPlugin": {
         "Authors": [
             {
-                "Email": "kexi@kde.org",
+                "Email": "kexi@kde.org", 
                 "Name": "Kexi Team"
             }
-        ],
-        "Category": "",
-        "Dependencies": [
-        ],
-        "Description": "KDb driver for handling xBase databases",
-        "EnabledByDefault": true,
-        "Icon": "",
-        "Id": "org.kde.kdb.xbase",
-        "License": "LGPL",
-        "MimeTypes": [],
-        "Name": "xBase",
+        ], 
+        "Category": "", 
+        "Dependencies": [], 
+        "Description": "KDb driver for handling xBase databases", 
+        "EnabledByDefault": true, 
+        "Icon": "", 
+        "Id": "org.kde.kdb.xbase", 
+        "License": "LGPL", 
+        "MimeTypes": [], 
+        "Name": "xBase", 
         "ServiceTypes": [
             "KDb/Driver"
-        ],
-        "Version": "1.0",
+        ], 
+        "Version": "1.0", 
         "Website": "http://kexi-project.org"
-    },
-    "X-KDb-FileBased": "true",
+    }, 
+    "X-KDb-FileBased": "true", 
     "X-KDb-ImportingEnabled": "false"
 }
