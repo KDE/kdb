@@ -991,7 +991,7 @@ void ExpressionsTest::testConstExpressionValidate()
     QVERIFY(c.isNumericType());
     QVERIFY(c.isFPNumericType());
     QCOMPARE(c.value(), QVariant());
-    QCOMPARE(c.toString(0), KDbEscapedString("0.0"));
+    QCOMPARE(c.toString(0), KDbEscapedString());
     QVERIFY(validate(&c));
     testCloneExpression(c);
     qDebug() << c;
@@ -1014,21 +1014,21 @@ void ExpressionsTest::testConstExpressionValidate()
     testCloneExpression(c);
     qDebug() << c;
 
-    QPoint largeDecimal(INT_MAX, INT_MAX);
+    QByteArray largeDecimal("2147483647.2147483647");
     c = KDbConstExpression(KDbToken::REAL_CONST, largeDecimal);
     QCOMPARE(c.type(), KDbField::Double);
     QVERIFY(c.isValid());
     QVERIFY(c.isNumericType());
     QVERIFY(c.isFPNumericType());
     QCOMPARE(c.value(), QVariant(largeDecimal));
-    QCOMPARE(c.toString(0), KDbEscapedString(QString("%1.%2").arg(largeDecimal.x()).arg(largeDecimal.y())));
-    largeDecimal.setY(-10);
+    QCOMPARE(c.toString(0), KDbEscapedString(largeDecimal));
+    largeDecimal = "-10.2147483647";
     QVERIFY(validate(&c));
     testCloneExpression(c);
     qDebug() << c;
     c = KDbConstExpression(KDbToken::REAL_CONST, largeDecimal);
     QCOMPARE(c.value(), QVariant(largeDecimal));
-    QCOMPARE(c.toString(0), KDbEscapedString(QString("%1.%2").arg(largeDecimal.x()).arg(-largeDecimal.y())));
+    QCOMPARE(c.toString(0), KDbEscapedString(largeDecimal));
     QVERIFY(validate(&c));
     testCloneExpression(c);
     qDebug() << c;

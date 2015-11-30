@@ -132,9 +132,9 @@ union YYSTYPE
 #line 487 "KDbSqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
+    QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
-    struct realType realValue;
     KDbField::Type colType;
     KDbField *field;
     KDbExpression *expr;

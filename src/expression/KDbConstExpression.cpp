@@ -121,15 +121,8 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
         return KDbEscapedString("TRUE");
     case SQL_FALSE:
         return KDbEscapedString("FALSE");
-    case REAL_CONST: {
-        if (value.type() == QVariant::Point) {
-            return KDbEscapedString("%1.%2").arg(value.toPoint().x()).arg(qAbs(value.toPoint().y()));
-        }
-        if (!value.canConvert<qreal>()) {
-            return KDbEscapedString("0.0");
-        }
-        break;
-    }
+    case REAL_CONST:
+        return KDbEscapedString(value.toByteArray());
     case DATE_CONST:
         return KDbEscapedString('\'') + value.toDate().toString(Qt::ISODate) + '\'';
     case DATETIME_CONST:

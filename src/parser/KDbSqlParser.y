@@ -415,7 +415,7 @@
 
 %type <colType> SQL_TYPE
 %type <integerValue> INTEGER_CONST
-%type <realValue> REAL_CONST
+%type <binaryValue> REAL_CONST
 /*%type <integerValue> SIGNED_INTEGER */
 
 %{
@@ -486,9 +486,9 @@ int yylex();
 
 %union {
     QString* stringValue;
+    QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
-    struct realType realValue;
     KDbField::Type colType;
     KDbField *field;
     KDbExpression *expr;
@@ -1143,8 +1143,9 @@ aExpr9:
 }
 | REAL_CONST
 {
-    $$ = new KDbConstExpression( KDbToken::REAL_CONST, QPoint( $1.integer, $1.fractional ) );
-    kdbDebug() << "  + real constant: " << $1.integer << "." << $1.fractional;
+    $$ = new KDbConstExpression( KDbToken::REAL_CONST, *$1 );
+    kdbDebug() << "  + real constant: " << *$1;
+    delete $1;
 }
 |
 aExpr10

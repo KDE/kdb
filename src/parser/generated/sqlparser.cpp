@@ -237,9 +237,9 @@ union YYSTYPE
 #line 487 "KDbSqlParser.y" /* yacc.c:355  */
 
     QString* stringValue;
+    QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
-    struct realType realValue;
     KDbField::Type colType;
     KDbField *field;
     KDbExpression *expr;
@@ -578,10 +578,10 @@ static const yytype_uint16 yyrline[] =
      902,   908,   914,   920,   926,   932,   938,   948,   959,   964,
      969,   975,   980,   986,   993,   998,  1004,  1008,  1014,  1020,
     1027,  1032,  1038,  1044,  1051,  1057,  1062,  1067,  1072,  1077,
-    1085,  1091,  1099,  1106,  1113,  1117,  1121,  1127,  1144,  1150,
-    1155,  1164,  1168,  1175,  1181,  1189,  1234,  1239,  1248,  1276,
-    1286,  1301,  1308,  1318,  1327,  1332,  1342,  1355,  1401,  1410,
-    1419
+    1085,  1091,  1099,  1106,  1113,  1117,  1121,  1127,  1144,  1151,
+    1156,  1165,  1169,  1176,  1182,  1190,  1235,  1240,  1249,  1277,
+    1287,  1302,  1309,  1319,  1328,  1333,  1343,  1356,  1402,  1411,
+    1420
 };
 #endif
 
@@ -2181,86 +2181,87 @@ yyreduce:
   case 78:
 #line 1145 "KDbSqlParser.y" /* yacc.c:1646  */
     {
-    (yyval.expr) = new KDbConstExpression( KDbToken::REAL_CONST, QPoint( (yyvsp[0].realValue).integer, (yyvsp[0].realValue).fractional ) );
-    kdbDebug() << "  + real constant: " << (yyvsp[0].realValue).integer << "." << (yyvsp[0].realValue).fractional;
+    (yyval.expr) = new KDbConstExpression( KDbToken::REAL_CONST, *(yyvsp[0].binaryValue) );
+    kdbDebug() << "  + real constant: " << *(yyvsp[0].binaryValue);
+    delete (yyvsp[0].binaryValue);
 }
-#line 2188 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2189 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 1156 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1157 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "(expr)";
     (yyval.expr) = new KDbUnaryExpression('(', *(yyvsp[-1].expr));
     delete (yyvsp[-1].expr);
 }
-#line 2198 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2199 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 1165 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1166 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[-1].exprList);
 }
-#line 2206 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2207 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 1169 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1170 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = new KDbNArgExpression(KDb::ArgumentListExpression, ',');
 }
-#line 2214 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2215 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 1176 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1177 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[0].exprList);
     (yyval.exprList)->prepend( *(yyvsp[-2].expr) );
     delete (yyvsp[-2].expr);
 }
-#line 2224 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2225 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 84:
-#line 1182 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1183 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = new KDbNArgExpression(KDb::ArgumentListExpression, ',');
     (yyval.exprList)->append( *(yyvsp[0].expr) );
 }
-#line 2233 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2234 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 85:
-#line 1190 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1191 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[0].exprList);
 }
-#line 2241 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2242 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 86:
-#line 1235 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1236 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[-2].exprList);
     (yyval.exprList)->append(*(yyvsp[0].expr));
 }
-#line 2250 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2251 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 1240 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1241 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = new KDbNArgExpression(KDb::TableListExpression, KDbToken::IDENTIFIER); //ok?
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
 }
-#line 2260 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2261 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 1249 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1250 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "FROM: '" << *(yyvsp[0].stringValue) << "'";
     (yyval.expr) = new KDbVariableExpression(*(yyvsp[0].stringValue));
@@ -2288,11 +2289,11 @@ yyreduce:
     }*/
     delete (yyvsp[0].stringValue);
 }
-#line 2292 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2293 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 89:
-#line 1277 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1278 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     //table + alias
     (yyval.expr) = new KDbBinaryExpression(
@@ -2302,11 +2303,11 @@ yyreduce:
     delete (yyvsp[-1].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2306 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2307 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 1287 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1288 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     //table + alias
     (yyval.expr) = new KDbBinaryExpression(
@@ -2316,33 +2317,33 @@ yyreduce:
     delete (yyvsp[-2].stringValue);
     delete (yyvsp[0].stringValue);
 }
-#line 2320 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2321 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 1302 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1303 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = (yyvsp[-2].exprList);
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
     kdbDebug() << "ColViews: ColViews , ColItem";
 }
-#line 2331 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2332 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 1309 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1310 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.exprList) = new KDbNArgExpression(KDb::FieldListExpression, KDbToken());
     (yyval.exprList)->append(*(yyvsp[0].expr));
     delete (yyvsp[0].expr);
     kdbDebug() << "ColViews: ColItem";
 }
-#line 2342 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2343 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 1319 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1320 "KDbSqlParser.y" /* yacc.c:1646  */
     {
 //    $$ = new KDbField();
 //    dummy->addField($$);
@@ -2351,20 +2352,20 @@ yyreduce:
     (yyval.expr) = (yyvsp[0].expr);
     kdbDebug() << " added column expr:" << *(yyvsp[0].expr);
 }
-#line 2355 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2356 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 1328 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1329 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[0].expr);
     kdbDebug() << " added column wildcard:" << *(yyvsp[0].expr);
 }
-#line 2364 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2365 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 1333 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1334 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(
         *(yyvsp[-2].expr), KDbToken::AS,
@@ -2374,11 +2375,11 @@ yyreduce:
     delete (yyvsp[-2].expr);
     delete (yyvsp[0].stringValue);
 }
-#line 2378 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2379 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 1343 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1344 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbBinaryExpression(
         *(yyvsp[-1].expr), KDbToken::AS_EMPTY,
@@ -2388,29 +2389,29 @@ yyreduce:
     delete (yyvsp[-1].expr);
     delete (yyvsp[0].stringValue);
 }
-#line 2392 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2393 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 1356 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1357 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[0].expr);
 }
-#line 2400 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2401 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 1402 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1403 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = (yyvsp[-1].expr);
 //! @todo DISTINCT '(' ColExpression ')'
 //    $$->setName("DISTINCT(" + $3->name() + ")");
 }
-#line 2410 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2411 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 1411 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1412 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     (yyval.expr) = new KDbVariableExpression(QLatin1String("*"));
     kdbDebug() << "all columns";
@@ -2419,11 +2420,11 @@ yyreduce:
 //    globalParser->select()->addAsterisk(ast);
 //    requiresTable = true;
 }
-#line 2423 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2424 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
   case 100:
-#line 1420 "KDbSqlParser.y" /* yacc.c:1646  */
+#line 1421 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     QString s( *(yyvsp[-2].stringValue) );
     s += QLatin1String(".*");
@@ -2431,11 +2432,11 @@ yyreduce:
     kdbDebug() << "  + all columns from " << s;
     delete (yyvsp[-2].stringValue);
 }
-#line 2435 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2436 "KDbSqlParser.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2439 "KDbSqlParser.cpp" /* yacc.c:1646  */
+#line 2440 "KDbSqlParser.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2663,7 +2664,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 1435 "KDbSqlParser.y" /* yacc.c:1906  */
+#line 1436 "KDbSqlParser.y" /* yacc.c:1906  */
 
 
 KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset) {
