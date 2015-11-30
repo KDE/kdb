@@ -158,13 +158,16 @@ void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
             ++masterIt, ++detailsIt) {
         KDbField *masterField = *masterIt;
         KDbField *detailsField = *detailsIt;
-        if (masterField->type() != detailsField->type()
-                && masterField->isIntegerType() != detailsField->isIntegerType()
-                && masterField->isTextType() != detailsField->isTextType()) {
+        const KDbField::Type masterType = masterField->type(); // cache: evaluating type of expressions can be expensive
+        const KDbField::Type detailsType = detailsField->type();
+        if (masterType != detailsType
+                && KDbField::isIntegerType(masterType) != KDbField::isIntegerType(detailsType)
+                && KDbField::isTextType(masterType) != KDbField::isTextType(detailsType))
+        {
             kdbWarning() << "INDEX on" << masterIndex->table()->name()
                 << ", INDEX on" << detailsIndex->table()->name() << ": !equal field types:"
-                << KDbDriver::defaultSQLTypeName(masterField->type()) << masterField->name() << ","
-                << KDbDriver::defaultSQLTypeName(detailsField->type()) << detailsField->name();
+                << KDbDriver::defaultSQLTypeName(masterType) << masterField->name() << ","
+                << KDbDriver::defaultSQLTypeName(detailsType) << detailsField->name();
             m_pairs.clear();
             return;
         }

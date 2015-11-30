@@ -1209,13 +1209,14 @@ static QVariant buildLengthValue(const KDbField &f)
 //! builds a list of values for field's @a f properties. Used by createTable().
 void buildValuesForKexi__Fields(QList<QVariant>& vals, KDbField* f)
 {
+    const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
     vals.clear();
     vals
     << QVariant(f->table()->id())
-    << QVariant(f->type())
+    << QVariant(type)
     << QVariant(f->name())
     << buildLengthValue(*f)
-    << QVariant(f->isFPNumericType() ? f->precision() : 0)
+    << QVariant(KDbField::isFPNumericType(type) ? f->precision() : 0)
     << QVariant(f->constraints())
     << QVariant(f->options())
     // KDb::variantToString() is needed here because the value can be of any QVariant type,
@@ -2505,13 +2506,14 @@ bool KDbConnection::storeExtendedTableSchemaData(KDbTableSchema* tableSchema)
     //for each field:
     foreach(KDbField* f, *tableSchema->fields()) {
         QDomElement extendedTableSchemaFieldEl;
-        if (f->visibleDecimalPlaces() >= 0/*nondefault*/ && KDb::supportsVisibleDecimalPlacesProperty(f->type())) {
+        const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
+        if (f->visibleDecimalPlaces() >= 0/*nondefault*/ && KDb::supportsVisibleDecimalPlacesProperty(type)) {
             addFieldPropertyToExtendedTableSchemaData(
                 *f, "visibleDecimalPlaces", f->visibleDecimalPlaces(), &doc,
                 &extendedTableSchemaMainEl, &extendedTableSchemaFieldEl,
                 &extendedTableSchemaStringIsEmpty);
         }
-        if (f->type() == KDbField::Text) {
+        if (type == KDbField::Text) {
             if (f->maxLengthStrategy() == KDbField::DefaultMaxLength) {
                 addFieldPropertyToExtendedTableSchemaData(
                     *f, "maxLengthIsDefault", true, &doc,

@@ -428,6 +428,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
         const bool autoinc = field->isAutoIncrement();
         const bool pk = field->isPrimaryKey() || (autoinc && d->driver()->beh->AUTO_INCREMENT_REQUIRES_PK);
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
+        const KDbField::Type type = field->type(); // cache: evaluating type of expressions can be expensive
         if (autoinc && d->driver()->beh->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
                 v.append(d->driver()->beh->AUTO_INCREMENT_TYPE).append(' ')
@@ -439,18 +440,18 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             if (autoinc && !d->driver()->beh->AUTO_INCREMENT_TYPE.isEmpty())
                 v += d->driver()->beh->AUTO_INCREMENT_TYPE;
             else
-                v += d->driver()->sqlTypeName(field->type(), field->precision());
+                v += d->driver()->sqlTypeName(type, field->precision());
 
             if (field->isUnsigned())
                 v.append(' ').append(d->driver()->beh->UNSIGNED_TYPE_KEYWORD);
 
-            if (field->isFPNumericType() && field->precision() > 0) {
+            if (KDbField::isFPNumericType(type) && field->precision() > 0) {
                 if (field->scale() > 0)
                     v += QString::fromLatin1("(%1,%2)").arg(field->precision()).arg(field->scale());
                 else
                     v += QString::fromLatin1("(%1)").arg(field->precision());
             }
-            else if (field->type() == KDbField::Text) {
+            else if (type == KDbField::Text) {
                 int realMaxLen;
                 if (d->driver()->beh->TEXT_TYPE_MAX_LENGTH == 0) {
                     realMaxLen = field->maxLength(); // allow to skip (N)

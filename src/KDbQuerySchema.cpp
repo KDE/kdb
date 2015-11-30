@@ -1511,14 +1511,17 @@ void KDbQuerySchema::addToWhereExpression(KDbField *field,
                                           const QVariant& value, KDbToken relation)
 {
     KDbToken token;
-    if (value.isNull())
+    if (value.isNull()) {
         token = KDbToken::SQL_NULL;
-    else if (field->isIntegerType()) {
-        token = KDbToken::INTEGER_CONST;
-    } else if (field->isFPNumericType()) {
-        token = KDbToken::REAL_CONST;
     } else {
-        token = KDbToken::CHARACTER_STRING_LITERAL;
+        const KDbField::Type type = field->type(); // cache: evaluating type of expressions can be expensive
+        if (KDbField::isIntegerType(type)) {
+            token = KDbToken::INTEGER_CONST;
+        } else if (KDbField::isFPNumericType(type)) {
+            token = KDbToken::REAL_CONST;
+        } else {
+            token = KDbToken::CHARACTER_STRING_LITERAL;
+        }
 //! @todo date, time
     }
 

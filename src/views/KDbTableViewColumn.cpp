@@ -323,9 +323,10 @@ bool KDbTableViewColumn::acceptsFirstChar(const QChar &ch) const
     // if lookup column is present
     KDbField *visibleField = d->visibleLookupColumnInfo
                                   ? d->visibleLookupColumnInfo->field : d->field;
-    if (visibleField->isNumericType()) {
+    const KDbField::Type type = visibleField->type(); // cache: evaluating type of expressions can be expensive
+    if (KDbField::isNumericType(type)) {
         if (ch == QLatin1Char('.') || ch == QLatin1Char(','))
-            return visibleField->isFPNumericType();
+            return KDbField::isFPNumericType(type);
         if (ch == QLatin1Char('-'))
             return !visibleField->isUnsigned();
         if (ch == QLatin1Char('+') || (ch >= QLatin1Char('0') && ch <= QLatin1Char('9')))
@@ -333,7 +334,7 @@ bool KDbTableViewColumn::acceptsFirstChar(const QChar &ch) const
         return false;
     }
 
-    switch (visibleField->type()) {
+    switch (type) {
     case KDbField::Boolean:
         return false;
     case KDbField::Date:
