@@ -42,6 +42,7 @@ extern void setError(const QString& errName, const QString& errDesc);
 
 whitespace         [ \t\n]
 digit              [0-9]
+string        (['][^']*[']|["][^\"]*["])
 /*identifier       [a-zA-Z_][a-zA-Z_0-9]* */
 identifier         [a-zA-Z_0-9]+
 /* quoted_identifier (\"[a-zA-Z_0-9]+\") */
@@ -89,12 +90,11 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
     //we're using QString:toLongLong() here because atoll() is not so portable:
     ECOUNT;
     bool ok;
-    yylval.integerValue = QByteArray(yytext).toLongLong( &ok );
+    yylval.integerValue = QByteArray(yytext).toLongLong(&ok);
     if (!ok) {
         setError(KDbParser::tr("Invalid integer number"), KDbParser::tr("This integer number may be too large."));
         return SCAN_ERROR;
     }
-//    yylval.integerValue = atol(yytext);
     return INTEGER_CONST;
 }
 
@@ -274,7 +274,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
     return DESC;
 }
 
-(['][^']*[']|["][^\"]*["]) {
+{string} {
     ECOUNT;
     yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
     return CHARACTER_STRING_LITERAL;

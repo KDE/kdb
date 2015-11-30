@@ -831,7 +831,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 54 "KDbSqlScanner.l"
+#line 55 "KDbSqlScanner.l"
 
 
 
@@ -916,7 +916,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 57 "KDbSqlScanner.l"
+#line 58 "KDbSqlScanner.l"
 {
     ECOUNT;
     return NOT_EQUAL;
@@ -924,7 +924,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 62 "KDbSqlScanner.l"
+#line 63 "KDbSqlScanner.l"
 {
     ECOUNT;
     return NOT_EQUAL2;
@@ -932,7 +932,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 67 "KDbSqlScanner.l"
+#line 68 "KDbSqlScanner.l"
 {
     ECOUNT;
     return '=';
@@ -940,7 +940,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 72 "KDbSqlScanner.l"
+#line 73 "KDbSqlScanner.l"
 {
     ECOUNT;
     return LESS_OR_EQUAL;
@@ -948,7 +948,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 77 "KDbSqlScanner.l"
+#line 78 "KDbSqlScanner.l"
 {
     ECOUNT;
     return GREATER_OR_EQUAL;
@@ -956,7 +956,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 82 "KDbSqlScanner.l"
+#line 83 "KDbSqlScanner.l"
 {
     ECOUNT;
     return SQL_IN;
@@ -964,18 +964,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 87 "KDbSqlScanner.l"
+#line 88 "KDbSqlScanner.l"
 {
 //! @todo what about hex or octal values?
     //we're using QString:toLongLong() here because atoll() is not so portable:
     ECOUNT;
     bool ok;
-    yylval.integerValue = QByteArray(yytext).toLongLong( &ok );
+    yylval.integerValue = QByteArray(yytext).toLongLong(&ok);
     if (!ok) {
         setError(KDbParser::tr("Invalid integer number"), KDbParser::tr("This integer number may be too large."));
         return SCAN_ERROR;
     }
-//    yylval.integerValue = atol(yytext);
     return INTEGER_CONST;
 }
 	YY_BREAK
@@ -1326,7 +1325,7 @@ YY_RULE_SETUP
 #line 314 "KDbSqlScanner.l"
 ECHO;
 	YY_BREAK
-#line 1330 "generated/sqlscanner.cpp"
+#line 1329 "generated/sqlscanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
