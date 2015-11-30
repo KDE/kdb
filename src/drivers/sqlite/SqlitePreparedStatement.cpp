@@ -222,16 +222,28 @@ bool SqlitePreparedStatement::execute(
     }
 
     //real execution
-    sqlite3_step(m_handle);
-    int res = sqlite3_reset(m_handle);
-    if (type == KDbPreparedStatement::InsertStatement && res == SQLITE_OK) {
-        return true;
+    int res = sqlite3_step(m_handle);
+    if (type == KDbPreparedStatement::InsertStatement) {
+        const bool ok = res == SQLITE_DONE;
+        if (!ok) {
+            sqliteDebug() << res << QString::fromLatin1(sqlite3_errmsg(data))
+                          << QString::fromLatin1(sqlite3_sql(m_handle));
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+        }
+        m_result.setServerErrorCode(res);
+        sqlite3_reset(m_handle);
+        return ok;
     }
-    if (type == KDbPreparedStatement::SelectStatement) {
-        //fetch result
-        //! @todo
+    else if (type == KDbPreparedStatement::SelectStatement) {
+        //! @todo fetch result
+        const bool ok = res == SQLITE_ROW;
+        if (!ok) {
+            sqliteDebug() << res << sqlite3_errmsg(data);
+            m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
+        }
+        m_result.setServerErrorCode(res);
+        sqlite3_reset(m_handle);
+        return ok;
     }
-    m_result.setServerErrorCode(res);
-    m_result.setServerMessage(QLatin1String(sqlite3_errmsg(data)));
     return false;
 }
