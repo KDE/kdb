@@ -218,13 +218,6 @@ public:
      */
     void setError(const KDbParserError &err);
 
-    /**
-     * @return true if the @param str is an reserved
-     * keyword (see tokens.cpp for a list of reserved
-     * keywords).
-     */
-    bool isReservedKeyword(const QByteArray& str);
-
 protected:
     void init();
 
