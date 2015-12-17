@@ -21,6 +21,7 @@
         "Description[sv]": "Kdb-drivrutin för att hantera SQLite-databaser", 
         "Description[uk]": "Драйвер KDb для роботи з базами даних SQLite", 
         "Description[x-test]": "xxKDb driver for handling SQLite databasesxx", 
+        "Description[zh_CN]": "处理 SQLite 数据库的 KDb 驱动", 
         "EnabledByDefault": true, 
         "Icon": "", 
         "Id": "org.kde.kdb.sqlite", 
@@ -42,6 +43,7 @@
         "Name[sv]": "SQLite", 
         "Name[uk]": "SQLite", 
         "Name[x-test]": "xxSQLitexx", 
+        "Name[zh_CN]": "SQLite", 
         "ServiceTypes": [
             "KDb/Driver"
         ], 

@@ -21,6 +21,7 @@
         "Description[sv]": "Kdb-drivrutin för att hantera Sybase- och MSSQL-databaser", 
         "Description[uk]": "Драйвер KDb для роботи з базами даних Sybase і MSSQL", 
         "Description[x-test]": "xxKDb driver for handling Sybase and MSSQL databasesxx", 
+        "Description[zh_CN]": "处理 Sybase 和 MSSQL 数据库的 KDb 驱动", 
         "EnabledByDefault": true, 
         "Icon": "", 
         "Id": "org.kde.kdb.sybase", 
@@ -39,6 +40,7 @@
         "Name[sv]": "Sybase", 
         "Name[uk]": "Sybase", 
         "Name[x-test]": "xxSybasexx", 
+        "Name[zh_CN]": "Sybase", 
         "ServiceTypes": [
             "KDb/Driver"
         ], 
