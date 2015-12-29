@@ -31,19 +31,7 @@
             "application/x-sqlite3"
         ], 
         "Name": "SQLite", 
-        "Name[ca@valencia]": "SQLite", 
-        "Name[ca]": "SQLite", 
-        "Name[es]": "SQLite", 
-        "Name[gl]": "SQLite", 
-        "Name[nl]": "SQLite", 
-        "Name[pl]": "SQLite", 
-        "Name[pt]": "SQLite", 
-        "Name[pt_BR]": "SQLite", 
-        "Name[sk]": "SQLite", 
-        "Name[sv]": "SQLite", 
-        "Name[uk]": "SQLite", 
         "Name[x-test]": "xxSQLitexx", 
-        "Name[zh_CN]": "SQLite", 
         "ServiceTypes": [
             "KDb/Driver"
         ], 
