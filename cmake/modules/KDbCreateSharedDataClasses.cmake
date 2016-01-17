@@ -28,7 +28,7 @@ macro(KDB_CREATE_SHARED_DATA_CLASSES)
         string(REGEX REPLACE "\\.shared\\.h" ".h" OUTPUT ${_input})
         string(REGEX REPLACE ".*/([^/]+)\\.h" "\\1.h" OUTPUT ${OUTPUT})
         #MESSAGE(DEBUG "--------- ${_input} ${OUTPUT} ${INPUT}")
-        #MESSAGE(DEBUG "COMMAND python ${CMAKE_SOURCE_DIR}/tools/sdc.py ${INPUT} ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT}")
+        #MESSAGE(DEBUG "COMMAND python2 ${CMAKE_SOURCE_DIR}/tools/sdc.py ${INPUT} ${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT}")
         message(STATUS "Creating shared data class in ${OUTPUT} from ${_input}")
         if(${PREFIX} STREQUAL "NO_PREFIX")
             set(OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR})
@@ -39,7 +39,7 @@ macro(KDB_CREATE_SHARED_DATA_CLASSES)
         # message(STATUS "OUTPUT_DIR: ${OUTPUT_DIR} ${PREFIX}")
         file(MAKE_DIRECTORY ${OUTPUT_DIR})
         execute_process(
-            COMMAND python ${CMAKE_SOURCE_DIR}/tools/sdc.py
+            COMMAND python2 ${CMAKE_SOURCE_DIR}/tools/sdc.py
                            ${INPUT}
                            ${OUTPUT_DIR}/${OUTPUT}
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
