@@ -28,14 +28,14 @@
  table schema or query schema.
  Default type of object is KDb::UnknownObjectType.
 */
-shared class export=KDB_EXPORT operator== virtual_dtor KDbObject
+class KDB_EXPORT KDbObject //SDC: operator== virtual_dtor
 {
 public:
     /*!
     @getter
     @return the type of this object.
     */
-    data_member int type default=KDb::UnknownObjectType no_setter;
+    int type; //SDC: default=KDb::UnknownObjectType no_setter
 
     /*!
     @getter
@@ -43,7 +43,7 @@ public:
     @setter
     Sets the identifier for this object.
     */
-    data_member int id default=-1;
+    int id; //SDC: default=-1
 
     /*!
     @getter
@@ -52,7 +52,7 @@ public:
     Sets the name for this object. It should be valid identifier,
     i.e. start with underscore or latin letter, contain underscores, latin letters and digits.
     */
-    data_member QString name;
+    QString name; //SDC:
 
     /*!
     @getter
@@ -61,7 +61,7 @@ public:
     @setter
     Sets the caption for this object.
     */
-    data_member QString caption;
+    QString caption; //SDC:
 
     /*!
     @getter
@@ -71,7 +71,7 @@ public:
     @setter
     Sets the description for this object.
     */
-    data_member QString description;
+    QString description; //SDC:
 
     /*!
     @getter
@@ -91,7 +91,7 @@ public:
     @setter
     Sets "native" flag for this object.
     */
-    data_member bool native default=false;
+    bool native;  //SDC: default=false
 
     /*! @return caption of this object if it is not empty, else returns object's name.
     */

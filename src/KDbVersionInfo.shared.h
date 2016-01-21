@@ -33,7 +33,7 @@
 /*! Provides KDb-specific information about version of the database.
 
  The version is stored as internal database properties. */
-shared class export=KDB_EXPORT operator== KDbVersionInfo
+class KDB_EXPORT KDbVersionInfo //SDC: operator==
 {
 public:
     /*!
@@ -42,7 +42,7 @@ public:
     @setter
     Sets the major version number.
     */
-    data_member int major default=0;
+    int major; //SDC: default=0
 
     /*!
     @getter
@@ -50,7 +50,7 @@ public:
     @setter
     Sets the minor version number.
     */
-    data_member int minor default=0;
+    int minor; //SDC: default=0
 
     /*!
     @getter
@@ -58,7 +58,7 @@ public:
     @setter
     Sets the release version number.
     */
-    data_member int release default=0;
+    int release; //SDC: default=0
 
     inline KDbVersionInfo(int majorVersion, int minorVersion, int releaseVersion)
      : d(new Data)
@@ -77,7 +77,7 @@ public:
 
 /*! Provides information about version of given database backend.
 */
-shared class export=KDB_EXPORT operator== KDbServerVersionInfo
+class KDB_EXPORT KDbServerVersionInfo //SDC: operator==
 {
 public:
     /*!
@@ -86,7 +86,7 @@ public:
     @setter
     Sets the major version number.
     */
-    data_member int major default=0;
+    int major; //SDC: default=0
 
     /*!
     @getter
@@ -94,7 +94,7 @@ public:
     @setter
     Sets the minor version number.
     */
-    data_member int minor default=0;
+    int minor; //SDC: default=0
 
     /*!
     @getter
@@ -102,7 +102,7 @@ public:
     @setter
     Sets the release version number.
     */
-    data_member int release default=0;
+    int release; //SDC: default=0
 
     /*!
     @getter
@@ -110,7 +110,7 @@ public:
     @setter
     Sets the version string, as returned by the server.
     */
-    data_member QString string;
+    QString string; //SDC:
 
     //! Clears the information - integers will be set to 0 and string to null
     void clear();

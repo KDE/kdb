@@ -31,7 +31,7 @@ class KDbMessageTitleSetter;
 
 /*! Stores detailed information about result of recent operation.
 */
-shared class export=KDB_EXPORT virtual_dtor operator== KDbResult
+class KDB_EXPORT KDbResult //SDC: virtual_dtor operator==
 {
     Q_DECLARE_TR_FUNCTIONS(KDbResult)
 public:
@@ -41,7 +41,7 @@ public:
     @setter
     Sets the result code if there was error.
     */
-    data_member int code default=ERR_NONE default_setter=ERR_OTHER;
+    int code; //SDC: default=ERR_NONE default_setter=ERR_OTHER
 
     /*!
     @getter
@@ -52,7 +52,7 @@ public:
     Note that this value is not the same as the one returned by code().
     @sa serverMessage()
     */
-    data_member int serverErrorCode default=0 no_setter;
+    int serverErrorCode; //SDC: default=0 no_setter
 
     /*!
     @getter
@@ -60,18 +60,18 @@ public:
     @setter
     Sets (localized) message to @a message.
     */
-    data_member QString message;
+    QString message; //SDC:
 
     /*!
     @getter
     @return message title that sometimes is provided and prepended
     to the main warning/error message. Used by KDbMessageHandler.
     */
-    data_member QString messageTitle;
+    QString messageTitle; //SDC:
 
-    data_member KDbEscapedString errorSql;
+    KDbEscapedString errorSql; //SDC:
 
-    data_member KDbEscapedString sql;
+    KDbEscapedString sql; //SDC:
 
     /*!
     @getter
@@ -83,9 +83,9 @@ public:
     @setter
     Sets message from the server.
     */
-    data_member QString serverMessage;
+    QString serverMessage; //SDC:
 
-    data_member bool serverErrorCodeSet default=false no_getter no_setter;
+    bool serverErrorCodeSet; //SDC: default=false no_getter no_setter
 
     KDbResult(int code, const QString& message);
 

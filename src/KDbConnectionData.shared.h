@@ -31,7 +31,7 @@
 
  KDbConnection data, once configured, can be later stored for reuse.
 */
-shared class export=KDB_EXPORT with_from_to_map operator== KDbConnectionData
+class KDB_EXPORT KDbConnectionData //SDC: with_from_to_map operator==
 {
 public:
     /*!
@@ -47,11 +47,10 @@ public:
 
     Can be empty, in which case if database name is required by the connection,
     after connecting KDbConnection::useDatabase() should be called.
-
     @setter
     Explicitly sets database name.
     */
-    data_member QString databaseName;
+    QString databaseName; //SDC:
 
     /*!
     @getter
@@ -60,7 +59,7 @@ public:
     @setter
     Sets caption of the connection
     */
-    data_member QString caption;
+    QString caption; //SDC:
 
     /*!
     @getter
@@ -68,7 +67,7 @@ public:
     @setter
     Sets additional description for the connection
     */
-    data_member QString description;
+    QString description; //SDC:
 
     /*!
     @getter
@@ -83,7 +82,7 @@ public:
     @setter
     Sets identifier of the driver to use
     */
-    data_member QString driverId;
+    QString driverId; //SDC:
 
     /*!
     @getter
@@ -92,7 +91,7 @@ public:
     @setter
     Sets username used for creating connections
     */
-    data_member QString userName;
+    QString userName; //SDC:
 
     /*!
     @getter
@@ -102,7 +101,7 @@ public:
     @setter
     Sets host name used for creating remote connections
     */
-    data_member QString hostName;
+    QString hostName; //SDC:
 
     /*!
     @getter port used for creating remote connections
@@ -110,7 +109,7 @@ public:
     @setter
     Sets port used for creating remote connections
     */
-    data_member int port default=0;
+    int port; //SDC: default=0
 
     /*!
     @getter
@@ -125,7 +124,7 @@ public:
     @setter
     Sets flag for usage of local socket file. @see useLocalSocketFile()
     */
-    data_member bool useLocalSocketFile default=true;
+    bool useLocalSocketFile; //SDC: default=true
 
     /*!
     @getter
@@ -136,7 +135,7 @@ public:
     @setter
     Sets name  of local (named) socket file
     */
-    data_member QString localSocketFileName;
+    QString localSocketFileName; //SDC:
 
     /*!
     @getter
@@ -149,7 +148,7 @@ public:
     @setter
     Sets password used for creating connections
     */
-    data_member QString password;
+    QString password; //SDC:
 
     /*!
     @getter
@@ -160,24 +159,7 @@ public:
     Sets password-saving flag used to decide if the connection's password should be stored
     in a configuration file for later use
     */
-    data_member bool savePassword default=false;
-
-#if 0
-    /*!
-    @return value used for identifying a single piece of data in a set
-    Optional ID used for identifying a single piece data in a set.
-    KDbConnectionData::ConstList for example) This is set automatically
-    when needed. By default: -1.
-     */
-    int id;
-#endif
-#if 0
-    //needed? only used by sybase?
-    /*!
-    @return server name of the server to be connected to
-    */
-    QString serverName;
-#endif
+    bool savePassword; //SDC: default=false
 
     //! Used in toUserVisibleString()
     enum UserVisibleStringOption {
@@ -187,7 +169,6 @@ public:
     Q_DECLARE_FLAGS(UserVisibleStringOptions, UserVisibleStringOption)
 
     /*! @return A user-visible string for the connection data
-
     driverId() is used to know if driver handles server connections. If it's not possible
     to check the driver, defaults to "file" connection.
 
