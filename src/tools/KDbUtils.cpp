@@ -457,10 +457,15 @@ void PropertySet::insert(const QByteArray &name, const QVariant &value, const QS
 {
     QString realCaption = caption;
     Property *existing = d->data.value(name);
-    if (caption.isEmpty() && existing) {
-        realCaption = existing->caption; // reuse
+    if (existing) {
+        existing->isNull = false;
+        existing->value = value;
+        if (!caption.isEmpty()) { // if not, reuse
+            existing->caption = caption;
+        }
+    } else {
+        d->data.insert(name, new Property(value, realCaption));
     }
-    d->data.insert(name, new Property(value, realCaption));
 }
 
 void PropertySet::remove(const QByteArray &name)

@@ -380,9 +380,9 @@ public:
     Property(const Property &other)
     : value(other.value), caption(other.caption), isNull(other.isNull)
     {}
-    QVariant const value;  //!< Property value
-    QString const caption; //!< User visible property caption
-    bool const isNull;     //!< true if this is a null property
+    QVariant value;  //!< Property value
+    QString caption; //!< User visible property caption
+    bool isNull;     //!< true if this is a null property
 };
 
 //! A set of properties.
