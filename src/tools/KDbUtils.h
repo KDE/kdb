@@ -116,34 +116,75 @@ type* stringToPtr(const QString& str)
     return static_cast<type*>(stringToPtrInternal(str, sizeof(type*)));
 }
 
-//! @short Autodeleted hash
+//! @short Autodeleting hash
 template <class Key, class T>
 class KDB_EXPORT AutodeletedHash : public QHash<Key, T>
 {
 public:
+    //! Creates autodeleting hash as a copy of @a other.
+    //! Auto-deletion is not enabled as it would cause double deletion for items.
+    //! If you enable auto-deletion on here, make sure you disable it in the @a other hash.
     AutodeletedHash(const AutodeletedHash& other) : QHash<Key, T>(other), m_autoDelete(false) {}
+
+    //! Creates empty autodeleting hash.
+    //! Auto-deletion is enabled by default.
     AutodeletedHash(bool autoDelete = true) : QHash<Key, T>(), m_autoDelete(autoDelete) {}
+
+    ~AutodeletedHash() {
+        if (m_autoDelete) {
+            qDeleteAll(*this);
+        }
+    }
     void setAutoDelete(bool set) {
         m_autoDelete = set;
     }
     bool autoDelete() const {
         return m_autoDelete;
     }
-    ~AutodeletedHash() {
-        if (m_autoDelete) qDeleteAll(*this);
+    void clear() {
+        if (m_autoDelete) {
+            qDeleteAll(*this);
+        }
+        QHash<Key, T>::clear();
     }
+    typename QHash<Key, T>::iterator erase(typename QHash<Key, T>::iterator pos) {
+        typename QHash<Key, T>::iterator it = QHash<Key, T>::erase(pos);
+        if (m_autoDelete) {
+            delete it.value();
+            it.value() = 0;
+            return it;
+        }
+    }
+    typename QHash<Key, T>::iterator insert(const Key &key, const T &value) {
+        if (m_autoDelete) {
+            T &oldValue = QHash<Key, T>::operator[](key);
+            if (oldValue && oldValue != value) { // only delete if differs
+                delete oldValue;
+            }
+        }
+        return QHash<Key, T>::insert(key, value);
+    }
+    // note: no need to override insertMulti(), unite(), take(), they does not replace items
+
 private:
     bool m_autoDelete;
 };
 
-//! @short Autodeleted list
+//! @short Autodeleting list
 template <typename T>
 class KDB_EXPORT AutodeletedList : public QList<T>
 {
 public:
+    //! Creates autodeleting list as a copy of @a other.
+    //! Auto-deletion is not enabled as it would cause double deletion for items.
+    //! If you enable auto-deletion on here, make sure you disable it in the @a other list.
     AutodeletedList(const AutodeletedList& other)
             : QList<T>(other), m_autoDelete(false) {}
+
+    //! Creates empty autodeleting list.
+    //! Auto-deletion is enabled by default.
     AutodeletedList(bool autoDelete = true) : QList<T>(), m_autoDelete(autoDelete) {}
+
     ~AutodeletedList() {
         if (m_autoDelete) qDeleteAll(*this);
     }
