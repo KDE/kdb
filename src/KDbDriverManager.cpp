@@ -188,6 +188,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         return 0;
     }
     driver->setMetaData(metaData);
+    m_drivers.insert(id.toLower(), driver);
     return driver;
 }
 
