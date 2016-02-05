@@ -77,9 +77,9 @@ bool DriverManagerInternal::lookupDrivers()
     clearResult();
 
     //drivermanagerDebug() << "Load all plugins";
-    const QList<QPluginLoader*> offers
+    QList<QPluginLoader*> offers
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
-    foreach(QPluginLoader *loader, offers) {
+    foreach(const QPluginLoader *loader, offers) {
         //QJsonObject json = loader->metaData();
         //drivermanagerDebug() << json;
         //! @todo check version
@@ -96,6 +96,8 @@ bool DriverManagerInternal::lookupDrivers()
         m_driversMetaData.insert(metaData->id(), metaData.data());
         metaData.take();
     }
+    qDeleteAll(offers);
+    offers.clear();
     if (m_driversMetaData.isEmpty()) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not find any database drivers."));
