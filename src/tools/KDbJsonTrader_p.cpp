@@ -61,6 +61,33 @@ KDbJsonTrader* KDbJsonTrader::self()
     return KDbJsonTrader_instance;
 }
 
+//! Checks loader @a loader
+static bool checkLoader(QPluginLoader *loader, const QString &servicetype,
+                        const QString &mimetype)
+{
+    QJsonObject json = loader->metaData().value(QLatin1String("MetaData")).toObject();
+    if (json.isEmpty()) {
+        //kdbDebug() << dirIter.filePath() << "has no json!";
+        return false;
+    }
+    QJsonObject pluginData = json.value(QLatin1String("KPlugin")).toObject();
+    if (!pluginData.value(QLatin1String("ServiceTypes")).toArray()
+            .contains(QJsonValue(servicetype)))
+    {
+        return false;
+    }
+
+    if (!mimetype.isEmpty()) {
+        QStringList mimeTypes
+                = json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
+        mimeTypes += json.value(QLatin1String("X-KDE-NativeMimeType")).toString();
+        if (! mimeTypes.contains(mimetype)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 static QList<QPluginLoader *> findPlugins(const QString &path, const QString &servicetype,
                                           const QString &mimetype)
 {
@@ -70,27 +97,11 @@ static QList<QPluginLoader *> findPlugins(const QString &path, const QString &se
         dirIter.next();
         if (dirIter.fileInfo().isFile()) {
             QPluginLoader *loader = new QPluginLoader(dirIter.filePath());
-            QJsonObject json = loader->metaData().value(QLatin1String("MetaData")).toObject();
-            if (json.isEmpty()) {
-                //kdbDebug() << dirIter.filePath() << "has no json!";
-                continue;
+            if (checkLoader(loader, servicetype, mimetype)) {
+                list.append(loader);
+            } else {
+                delete loader;
             }
-            QJsonObject pluginData = json.value(QLatin1String("KPlugin")).toObject();
-            if (!pluginData.value(QLatin1String("ServiceTypes")).toArray()
-                    .contains(QJsonValue(servicetype)))
-            {
-                continue;
-            }
-
-            if (!mimetype.isEmpty()) {
-                QStringList mimeTypes
-                        = json.value(QLatin1String("MimeType")).toString().split(QLatin1Char(';'));
-                mimeTypes += json.value(QLatin1String("X-KDE-NativeMimeType")).toString();
-                if (! mimeTypes.contains(mimetype)) {
-                    continue;
-                }
-            }
-            list.append(loader);
         }
     }
     return list;
