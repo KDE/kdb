@@ -44,6 +44,8 @@ DriverManagerInternal::~DriverManagerInternal()
     drivermanagerDebug();
     qDeleteAll(m_drivers);
     m_drivers.clear();
+    qDeleteAll(m_driversMetaData);
+    m_driversMetaData.clear();
     drivermanagerDebug() << "ok";
 }
 
