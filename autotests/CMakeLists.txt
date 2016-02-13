@@ -47,6 +47,8 @@ ecm_add_tests(
         kdbtestutils
 )
 
-add_subdirectory(headers)
+if(NOT WIN32) #TODO enable for Windows when headers_test.sh is ported e.g. to python
+    add_subdirectory(headers)
+endif()
 add_subdirectory(tools)
 add_subdirectory(parser)
