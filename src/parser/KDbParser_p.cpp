@@ -325,6 +325,7 @@ KDbQuerySchema* buildSelectQuery(
         delete _tablesList;
     }
     QScopedPointer<SelectOptionsInternal> optionsPtr(options);
+    QScopedPointer<KDbQuerySchema> querySchemaPtr(querySchema); // destroy query on any error
 
     //-------tables list
     int columnNum = 0;
@@ -489,5 +490,5 @@ KDbQuerySchema* buildSelectQuery(
     }
 // kdbDebug() << "Select ColViews=" << (colViews ? colViews->debugString() : QString())
 //  << " Tables=" << (tablesList ? tablesList->debugString() : QString()s);
-    return querySchema;
+    return querySchemaPtr.take();
 }
