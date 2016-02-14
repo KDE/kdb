@@ -59,10 +59,9 @@ KDbVariableExpressionData* KDbVariableExpressionData::clone()
 void KDbVariableExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
-    dbg.nospace() << "VariableExp(" << name
-        << QString::fromLatin1(",type=%1)")
-          .arg(field ? KDbDriver::defaultSQLTypeName(type())
-                     : QLatin1String("FIELD NOT DEFINED YET"));
+    dbg.nospace() << qPrintable(QString::fromLatin1("VariableExp(\"%1\",type=%2)")
+        .arg(name).arg(field ? KDbDriver::defaultSQLTypeName(type())
+                             : QLatin1String("FIELD_NOT_DEFINED_YET")));
 }
 
 KDbEscapedString KDbVariableExpressionData::toStringInternal(
