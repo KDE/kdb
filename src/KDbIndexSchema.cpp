@@ -77,14 +77,14 @@ KDbIndexSchema::~KDbIndexSchema()
     qDeleteAll(m_master_owned_rels);
 }
 
-KDbFieldList& KDbIndexSchema::addField(KDbField *field)
+bool KDbIndexSchema::addField(KDbField *field)
 {
     if (field->table() != m_tableSchema) {
         kdbWarning() << (field ? field->name() : QString())
         << "WARNING: field does not belong to the same table"
         << (field && field->table() ? field->table()->name() : QString())
         << "as index!";
-        return *this;
+        return false;
     }
     return KDbFieldList::addField(field);
 }

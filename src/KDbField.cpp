@@ -742,7 +742,8 @@ KDbExpression KDbField::expression()
     return *m_expr;
 }
 
-const KDbExpression KDbField::expression() const {
+const KDbExpression KDbField::expression() const
+{
     return *m_expr;
 }
 

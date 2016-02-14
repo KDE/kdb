@@ -105,19 +105,22 @@ void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDb
 //@todo: check if it already exists
         m_detailsIndex = new KDbIndexSchema(detailsField->table());
         m_detailsIndexOwned = true;
-        m_detailsIndex->addField(detailsField);
+        const bool ok = m_detailsIndex->addField(detailsField);
+        Q_ASSERT(ok);
         m_detailsIndex->setForeignKey(true);
     } else if (!p1 && !p2) {
         masterField = field1;
         m_masterIndex = new KDbIndexSchema(masterField->table());
         m_masterIndexOwned = true;
-        m_masterIndex->addField(masterField);
+        bool ok = m_masterIndex->addField(masterField);
+        Q_ASSERT(ok);
         m_masterIndex->setForeignKey(true);
 
         detailsField = field2;
         m_detailsIndex = new KDbIndexSchema(detailsField->table());
         m_detailsIndexOwned = true;
-        m_detailsIndex->addField(detailsField);
+        ok = m_detailsIndex->addField(detailsField);
+        Q_ASSERT(ok);
         m_detailsIndex->setForeignKey(true);
     }
 

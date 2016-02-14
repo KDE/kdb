@@ -428,40 +428,42 @@ void KDbQuerySchema::clear()
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::insertField(int position, KDbField *field, bool visible)
+bool KDbQuerySchema::insertField(int position, KDbField *field, bool visible)
 {
     return insertField(position, field, -1/*don't bind*/, visible);
 }
 
 /*virtual*/
-KDbFieldList& KDbQuerySchema::insertField(int position, KDbField *field)
+bool KDbQuerySchema::insertField(int position, KDbField *field)
 {
     return insertField(position, field, -1/*don't bind*/, true);
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::insertField(int position, KDbField *field,
-                                    int bindToTable, bool visible)
+bool KDbQuerySchema::insertField(int position, KDbField *field,
+                                 int bindToTable, bool visible)
 {
     if (!field) {
         kdbWarning() << "!field";
-        return *this;
+        return false;
     }
 
     if (position > m_fields.count()) {
         kdbWarning() << "position" << position << "out of range";
-        return *this;
+        return false;
     }
     if (!field->isQueryAsterisk() && !field->isExpression() && !field->table()) {
         kdbWarning() << "field" << field->name() << "must contain table information!";
-        return *this;
+        return false;
     }
     if (fieldCount() >= d->visibility.size()) {
         d->visibility.resize(d->visibility.size()*2);
         d->tablesBoundToColumns.resize(d->tablesBoundToColumns.size()*2);
     }
     d->clearCachedData();
-    KDbFieldList::insertField(position, field);
+    if (!KDbFieldList::insertField(position, field)) {
+        return false;
+    }
     if (field->isQueryAsterisk()) {
         d->asterisks.append(field);
         //if this is single-table asterisk,
@@ -503,7 +505,7 @@ KDbFieldList& KDbQuerySchema::insertField(int position, KDbField *field,
     if (field->isExpression())
         d->regenerateExprAliases = true;
 
-    return *this;
+    return true;
 }
 
 int KDbQuerySchema::tableBoundToColumn(int columnPosition) const
@@ -517,14 +519,13 @@ int KDbQuerySchema::tableBoundToColumn(int columnPosition) const
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::addField(KDbField* field, bool visible)
+bool KDbQuerySchema::addField(KDbField* field, bool visible)
 {
     return insertField(m_fields.count(), field, visible);
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::addField(KDbField* field, int bindToTable,
-        bool visible)
+bool KDbQuerySchema::addField(KDbField* field, int bindToTable, bool visible)
 {
     return insertField(m_fields.count(), field, bindToTable, visible);
 }
@@ -549,9 +550,14 @@ bool KDbQuerySchema::removeField(KDbField *field)
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::addExpression(const KDbExpression& expr, bool visible)
+bool KDbQuerySchema::addExpression(const KDbExpression& expr, bool visible)
 {
-    return addField(new KDbField(this, expr), visible);
+    KDbField *field = new KDbField(this, expr);
+    if (!addField(field, visible)) {
+        delete field;
+        return false;
+    }
+    return true;
 }
 
 bool KDbQuerySchema::isColumnVisible(int position) const
@@ -566,10 +572,11 @@ void KDbQuerySchema::setColumnVisible(int position, bool v)
 }
 
 //! @todo IMPORTANT: move visible to overload
-KDbFieldList& KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visible)
+bool KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visible)
 {
-    if (!asterisk)
-        return *this;
+    if (!asterisk) {
+        return false;
+    }
     //make unique name
     asterisk->setName((asterisk->table() ? (asterisk->table()->name() + QLatin1String(".*"))
                                          : QString(QLatin1Char('*')))

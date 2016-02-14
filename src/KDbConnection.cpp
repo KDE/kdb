@@ -2758,11 +2758,10 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
             break;
         }
         KDbField *f = setupField(fieldData);
-        if (!f) {
+        if (!f || !t->addField(f)) {
             ok = false;
             break;
         }
-        t->addField(f);
         cursor->moveNext();
     }
 
@@ -2999,38 +2998,38 @@ bool KDbConnection::setupKDbSystemSchema()
 
     KDbTableSchema *t_objects = newKDbSystemTableSchema(QLatin1String("kexi__objects"));
     t_objects->addField(new KDbField(QLatin1String("o_id"),
-                                  KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned))
-    .addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned))
-    .addField(new KDbField(QLatin1String("o_name"), KDbField::Text))
-    .addField(new KDbField(QLatin1String("o_caption"), KDbField::Text))
-    .addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
+                                  KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
+    t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
+    t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
+    t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
+    t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
 
     kdbDebug() << *t_objects;
 
     KDbTableSchema *t_objectdata = newKDbSystemTableSchema(QLatin1String("kexi__objectdata"));
     t_objectdata->addField(new KDbField(QLatin1String("o_id"),
-                                     KDbField::Integer, KDbField::NotNull, KDbField::Unsigned))
-    .addField(new KDbField(QLatin1String("o_data"), KDbField::LongText))
-    .addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
+                                     KDbField::Integer, KDbField::NotNull, KDbField::Unsigned));
+    t_objectdata->addField(new KDbField(QLatin1String("o_data"), KDbField::LongText));
+    t_objectdata->addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
 
     KDbTableSchema *t_fields = newKDbSystemTableSchema(QLatin1String("kexi__fields"));
-    t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned))
-    .addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned))
-    .addField(new KDbField(QLatin1String("f_name"), KDbField::Text))
-    .addField(new KDbField(QLatin1String("f_length"), KDbField::Integer))
-    .addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer))
-    .addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer))
-    .addField(new KDbField(QLatin1String("f_options"), KDbField::Integer))
-    .addField(new KDbField(QLatin1String("f_default"), KDbField::Text))
+    t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
+    t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
+    t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
+    t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
+    t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
+    t_fields->addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer));
+    t_fields->addField(new KDbField(QLatin1String("f_options"), KDbField::Integer));
+    t_fields->addField(new KDbField(QLatin1String("f_default"), KDbField::Text));
     //these are additional properties:
-    .addField(new KDbField(QLatin1String("f_order"), KDbField::Integer))
-    .addField(new KDbField(QLatin1String("f_caption"), KDbField::Text))
-    .addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
+    t_fields->addField(new KDbField(QLatin1String("f_order"), KDbField::Integer));
+    t_fields->addField(new KDbField(QLatin1String("f_caption"), KDbField::Text));
+    t_fields->addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
 
     KDbTableSchema *t_db = newKDbSystemTableSchema(QLatin1String("kexi__db"));
     t_db->addField(new KDbField(QLatin1String("db_property"),
-                             KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32))
-    .addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
+                             KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32));
+    t_db->addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
 
     return true;
 }
@@ -3114,7 +3113,8 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         if (!sqlset.isEmpty())
             sqlset += ',';
         KDbField* currentField = it.key()->field;
-        affectedFields.addField(currentField);
+        const bool affectedFieldsAddOk = affectedFields.addField(currentField);
+        Q_ASSERT(affectedFieldsAddOk);
         sqlset += KDbEscapedString(escapeIdentifier(currentField->name())) + '=' +
                   m_driver->valueToSQL(currentField, it.value());
     }
@@ -3251,7 +3251,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         }
         sqlcols += escapeIdentifier(anyField->name());
         sqlvals += m_driver->valueToSQL(anyField, QVariant()/*NULL*/);
-        affectedFields.addField(anyField);
+        const bool affectedFieldsAddOk = affectedFields.addField(anyField);
+        Q_ASSERT(affectedFieldsAddOk);
     } else {
         // non-empty record inserting requested:
         for (KDbRecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
@@ -3262,7 +3263,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                 sqlvals += ',';
             }
             KDbField* currentField = it.key()->field;
-            affectedFields.addField(currentField);
+            const bool affectedFieldsAddOk = affectedFields.addField(currentField);
+            Q_ASSERT(affectedFieldsAddOk);
             sqlcols += escapeIdentifier(currentField->name());
             sqlvals += m_driver->valueToSQL(currentField, it.value());
         }

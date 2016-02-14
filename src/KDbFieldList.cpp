@@ -38,7 +38,8 @@ KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
             KDbField *f = origField->copy();
             if (origField->m_parent == &fl)
                 f->m_parent = this;
-            addField(f);
+            const bool addFieldOk = addField(f);
+            Q_ASSERT(addFieldOk);
         }
     }
 }
@@ -67,14 +68,15 @@ void KDbFieldList::clear()
     m_sqlFields.clear();
 }
 
-KDbFieldList& KDbFieldList::insertField(int index, KDbField *field)
+bool KDbFieldList::insertField(int index, KDbField *field)
 {
     Q_ASSERT(field);
-    if (!field)
-        return *this;
+    if (!field) {
+        return false;
+    }
     if (index > m_fields.count()) {
         kdbCritical() << "index (" << index << ") out of range";
-        return *this;
+        return false;
     }
     m_fields.insert(index, field);
     if (!field->name().isEmpty())
@@ -82,7 +84,7 @@ KDbFieldList& KDbFieldList::insertField(int index, KDbField *field)
     m_sqlFields.clear();
     delete m_autoinc_fields;
     m_autoinc_fields = 0;
-    return *this;
+    return true;
 }
 
 void KDbFieldList::renameField(const QString& oldName, const QString& newName)
@@ -112,7 +114,7 @@ void KDbFieldList::renameFieldInternal(KDbField *field, const QString& newNameLo
 }
 
 
-KDbFieldList& KDbFieldList::addField(KDbField *field)
+bool KDbFieldList::addField(KDbField *field)
 {
     return insertField(m_fields.count(), field);
 }
@@ -196,8 +198,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
     { \
         if (fname.isEmpty()) return fl; \
         KDbField *f = m_fields_by_name.value(fname.toLower()); \
-        if (!f) { kdbWarning() << subListWarning1(fname); delete fl; return 0; } \
-        fl->addField(f); \
+        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(fname); delete fl; return 0; } \
     }
 
 static QString subListWarning1(const QString& fname)
@@ -254,8 +255,7 @@ KDbFieldList* KDbFieldList::subList(const QStringList& list)
     { \
         if (fname.isEmpty()) return fl; \
         KDbField *f = m_fields_by_name.value(QLatin1String(fname.toLower())); \
-        if (!f) { kdbWarning() << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
-        fl->addField(f); \
+        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
     }
 
 KDbFieldList* KDbFieldList::subList(const QList<QByteArray>& list)
@@ -271,17 +271,19 @@ KDbFieldList* KDbFieldList::subList(const QList<QByteArray>& list)
 
 KDbFieldList* KDbFieldList::subList(const QList<int>& list)
 {
-    KDbFieldList *fl = new KDbFieldList(false);
+    QScopedPointer<KDbFieldList> fl(new KDbFieldList(false));
     foreach(int index, list) {
         KDbField *f = field(index);
         if (!f) {
             kdbWarning() << QString::fromLatin1("could not find field at position %1").arg(index);
-            delete fl;
             return 0;
         }
-        fl->addField(f);
+        if (!fl->addField(f)) {
+            kdbWarning() << QString::fromLatin1("could not add field at position %1").arg(index);
+            return 0;
+        }
     }
-    return fl;
+    return fl.take();
 }
 
 QStringList KDbFieldList::names() const

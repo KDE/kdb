@@ -56,7 +56,7 @@ public:
 
     /*! Inserts @a field into a specified position (@a index).
      'order' property of @a field is set automatically. */
-    virtual KDbFieldList& insertField(int index, KDbField *field);
+    virtual bool insertField(int index, KDbField *field);
 
     /*! Reimplemented for internal reasons. */
     virtual bool removeField(KDbField *field);

@@ -57,13 +57,13 @@ public:
     bool isEmpty() const;
 
     /*! Adds @a field at the and of field list. */
-    KDbFieldList& addField(KDbField *field);
+    bool addField(KDbField *field);
 
     /*! Inserts @a field into a specified position (@a index).
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
-    virtual KDbFieldList& insertField(int index, KDbField *field);
+    virtual bool insertField(int index, KDbField *field);
 
     /*! Removes field from the field list. Use with care.
 

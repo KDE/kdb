@@ -238,25 +238,25 @@ public:
      Added field will be visible. Use insertField(position, field, false)
      to add invisible field.
     */
-    virtual KDbFieldList& insertField(int position, KDbField *field);
+    virtual bool insertField(int position, KDbField *field);
 
     /* Like above method, but you can also set column's visibility.
      New column is not bound explicitly to any table.
     */
-    KDbFieldList& insertField(int position, KDbField *field, bool visible);
+    bool insertField(int position, KDbField *field, bool visible);
 
-    /* Like above method, but you can also explicitly bound the new column
-     to specific position on tables list.
+    /* Like above method, but the new column can also be explicitly bound
+     to a specific position on tables list.
      If @a visible is true (the default), the field will be visible.
      If bindToTable==-1, no particular table should be bound.
      @see tableBoundToColumn(int columnPosition) */
-    KDbFieldList& insertField(int position, KDbField *field,
-                           int bindToTable, bool visible = true);
+    bool insertField(int position, KDbField *field,
+                     int bindToTable, bool visible = true);
 
     /*! Adds @a field to the columns list.
      If @a visible is true (the default), the field will be visible.
      @see insertField() */
-    KDbFieldList& addField(KDbField* field, bool visible = true);
+    bool addField(KDbField* field, bool visible = true);
 
     /*! Adds @a field to the columns list. Also binds to a table
      at @a bindToTable position. Use bindToTable==-1 if no table should be bound.
@@ -264,8 +264,7 @@ public:
      @see insertField()
      @see tableBoundToColumn(int columnPosition)
     */
-    KDbFieldList& addField(KDbField* field, int bindToTable,
-                        bool visible = true);
+    bool addField(KDbField* field, int bindToTable, bool visible = true);
 
     /*! Removes field from the columns list. Use with care. */
     virtual bool removeField(KDbField *field);
@@ -273,7 +272,7 @@ public:
     /*! Adds a field built on top of @a expr expression.
      This creates a new KDbField object and adds it to the query schema using addField().
      @a expr will be owned by the query object. */
-    KDbFieldList& addExpression(const KDbExpression& expr, bool visible = true);
+    bool addExpression(const KDbExpression& expr, bool visible = true);
 
     /*! @return visibility flag for column at @a position.
      By default column is visible. */
@@ -283,7 +282,7 @@ public:
     void setColumnVisible(int position, bool v);
 
     /*! Adds @a asterisk at the and of columns list. */
-    KDbFieldList& addAsterisk(KDbQueryAsterisk *asterisk, bool visible = true);
+    bool addAsterisk(KDbQueryAsterisk *asterisk, bool visible = true);
 
     /*! Removes all columns and their aliases from the columns list,
      removes all tables and their aliases from the tables list within this query.
@@ -721,7 +720,7 @@ public:
      Any previous ORDER BY settings will be removed.
 
      Note that this information is cleared whenever you call methods that
-     modify list of columns (KDbQueryColumnInfo), i.e. insertFiled(),
+     modify list of columns (KDbQueryColumnInfo), i.e. insertField(),
      addField(), removeField(), addExpression(), etc.
      (because KDbOrderByColumn items can point to a KDbQueryColumnInfo that's removed by these
      methods), so you should use setOrderByColumnList() method after the query

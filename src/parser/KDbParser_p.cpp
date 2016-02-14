@@ -278,12 +278,24 @@ bool addColumn(KDbParseInfo *parseInfo, const KDbExpression &columnExpr)
                 setError(KDbParser::tr("\"*\" could not be used if no tables are specified."));
                 return false;
             }
-            parseInfo->querySchema()->addAsterisk(new KDbQueryAsterisk(parseInfo->querySchema()));
+            KDbQueryAsterisk *a = new KDbQueryAsterisk(parseInfo->querySchema());
+            if (!parseInfo->querySchema()->addAsterisk(a)) {
+                delete a;
+                setError(KDbParser::tr("Could not add all-tables asterisk \"*\"."));
+                return false;
+            }
         } else if (v_e.tableForQueryAsterisk()) {//one-table asterisk
-            parseInfo->querySchema()->addAsterisk(
-                new KDbQueryAsterisk(parseInfo->querySchema(), v_e.tableForQueryAsterisk()));
+            KDbQueryAsterisk *a = new KDbQueryAsterisk(parseInfo->querySchema(), v_e.tableForQueryAsterisk());
+            if (!parseInfo->querySchema()->addAsterisk(a)) {
+                delete a;
+                setError(KDbParser::tr("Could not add one-table asterisk \"*\"."));
+                return false;
+            }
         } else if (v_e.field()) {//"table.field" or "field" (bound to a table or not)
-            parseInfo->querySchema()->addField(v_e.field(), v_e.tablePositionForField());
+            if (!parseInfo->querySchema()->addField(v_e.field(), v_e.tablePositionForField())) {
+                setError(KDbParser::tr("Could not add binding to a field."));
+                return false;
+            }
         } else {
             IMPL_ERROR("addColumn(): unknown case!");
             return false;
@@ -292,8 +304,7 @@ bool addColumn(KDbParseInfo *parseInfo, const KDbExpression &columnExpr)
     }
 
     //it's complex expression
-    parseInfo->querySchema()->addExpression(columnExpr);
-    return true;
+    return parseInfo->querySchema()->addExpression(columnExpr);
 }
 
 KDbQuerySchema* buildSelectQuery(

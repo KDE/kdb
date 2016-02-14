@@ -75,7 +75,7 @@ public:
     /*! Adds field at the end of field list.
      KDbField will not be owned by index. KDbField must belong to a table
      the index is bulit on, otherwise field couldn't be added. */
-    virtual KDbFieldList& addField(KDbField *field);
+    virtual bool addField(KDbField *field);
 
     /*! @return table that index is defined for. */
     KDbTableSchema* table() const;
