@@ -285,12 +285,12 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 {identifier} {
     kdbDebug() << "yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
-    yylval.stringValue = new QString(QString::fromUtf8(yytext, yyleng));
     if (yytext[0]>='0' && yytext[0]<='9') {
         setError(KDbParser::tr("Invalid identifier"),
                  KDbParser::tr("Identifiers should start with a letter or '_' character"));
         return SCAN_ERROR;
     }
+    yylval.stringValue = new QString(QString::fromUtf8(yytext, yyleng));
     return IDENTIFIER;
 }
 
