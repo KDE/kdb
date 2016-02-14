@@ -1002,6 +1002,8 @@ aExpr8 '+' aExpr7
 | aExpr8 CONCATENATION aExpr7
 {
     $$ = new KDbBinaryExpression(*$1, KDbToken::CONCATENATION, *$3);
+    delete $1;
+    delete $3;
 }
 | aExpr8 '-' %prec UMINUS aExpr7
 {
@@ -1181,6 +1183,7 @@ aExpr ',' aExprList2
 {
     $$ = new KDbNArgExpression(KDb::ArgumentListExpression, ',');
     $$->append( *$1 );
+    delete $1;
 }
 ;
 
@@ -1234,6 +1237,7 @@ FlatTableList ',' FlatTable
 {
     $$ = $1;
     $$->append(*$3);
+    delete $3;
 }
 |FlatTable
 {
