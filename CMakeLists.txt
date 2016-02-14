@@ -27,7 +27,7 @@ include(KDbCreateSharedDataClasses)
 include(KDbMacros)
 string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" CMAKE_COMPILER_IS_CLANG)
 
-set(KDB_VERSION "2.96.1") # Update this
+set(KDB_VERSION "2.96.2") # Update this
 
 # Dependencies
 set(REQUIRED_QT_VERSION "5.2.0")
