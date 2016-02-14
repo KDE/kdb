@@ -232,7 +232,7 @@ QDebug KDbExpressionData::debug(QDebug dbg, KDb::ExpressionCallStack* callStack)
     }
     debugInternal(dbg, callStack);
     callStack->removeLast();
-    return dbg.nospace();
+    return dbg.space();
 }
 
 QDebug operator<<(QDebug dbg, const KDbExpressionData& expr)
