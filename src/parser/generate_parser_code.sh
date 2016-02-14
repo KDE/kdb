@@ -82,7 +82,7 @@ cat KDbSqlParser.tab.h >> generated/sqlparser.h
 echo '#endif' >> generated/sqlparser.h
 sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.h
 
-cat KDbSqlParser.tab.c | sed -e "s/KDbSqlParser\.tab\.c/KDbSqlParser.cpp/g" > generated/sqlparser.cpp
+cat KDbSqlParser.tab.c | sed -e "s/KDbSqlParser\.tab\.c/sqlparser.cpp/g" > generated/sqlparser.cpp
 cat << EOF >> generated/sqlparser.cpp
 KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset) {
     const int t = YYTRANSLATE(offset);
