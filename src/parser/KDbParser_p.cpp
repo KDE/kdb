@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -35,25 +35,48 @@ extern int yylex_destroy(void);
 
 //-------------------------------------
 
-KDbParser::Private::Private()
-        : initialized(false)
+KDbParserPrivate::KDbParserPrivate()
+    : table(0), query(0), connection(0), initialized(false)
 {
-    clear();
-    table = 0;
-    select = 0;
-    db = 0;
+    reset();
 }
 
-KDbParser::Private::~Private()
+KDbParserPrivate::~KDbParserPrivate()
 {
-    delete select;
-    delete table;
+    reset();
 }
 
-void KDbParser::Private::clear()
+void KDbParserPrivate::reset()
 {
-    operation = KDbParser::OP_None;
+    statementType = KDbParser::NoType;
+    sql.clear();
     error = KDbParserError();
+    delete table;
+    table = 0;
+    delete query;
+    query = 0;
+}
+
+void KDbParserPrivate::setStatementType(KDbParser::StatementType type)
+{
+    statementType = type;
+}
+
+void KDbParserPrivate::setError(const KDbParserError &err)
+{
+    error = err;
+}
+
+void KDbParserPrivate::setTableSchema(KDbTableSchema *table)
+{
+    delete this->table;
+    this->table = table;
+}
+
+void KDbParserPrivate::setQuerySchema(KDbQuerySchema *query)
+{
+    delete this->query;
+    this->query = query;
 }
 
 //-------------------------------------
@@ -130,7 +153,7 @@ void yyerror(const char *str)
 {
     kdbDebug() << "error: " << str;
     kdbDebug() << "at character " << globalCurrentPos << " near tooken " << globalToken;
-    globalParser->setOperation(KDbParser::OP_Error);
+    KDbParserPrivate::get(globalParser)->setStatementType(KDbParser::NoType);
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
     const bool syntaxError = qstrnicmp(str, "syntax error", 12) == 0;
@@ -161,16 +184,16 @@ void yyerror(const char *str)
             const bool isKDbSQLKeyword = KDb::isKDbSQLKeyword(globalToken);
             if (isKDbSQLKeyword || syntaxError) {
                 if (isKDbSQLKeyword) {
-                    globalParser->setError(KDbParserError(KDbParser::tr("Syntax Error"),
+                    KDbParserPrivate::get(globalParser)->setError(KDbParserError(KDbParser::tr("Syntax Error"),
                                                           KDbParser::tr("\"%1\" is a reserved keyword.").arg(QLatin1String(globalToken)),
                                                           globalToken, globalCurrentPos));
                 } else {
-                    globalParser->setError(KDbParserError(KDbParser::tr("Syntax Error"),
+                    KDbParserPrivate::get(globalParser)->setError(KDbParserError(KDbParser::tr("Syntax Error"),
                                                           KDbParser::tr("Syntax error."),
                                                           globalToken, globalCurrentPos));
                 }
             } else {
-                globalParser->setError(KDbParserError(KDbParser::tr("Error"),
+                KDbParserPrivate::get(globalParser)->setError(KDbParserError(KDbParser::tr("Error"),
                                                       KDbParser::tr("Error near \"%1\".").arg(QLatin1String(globalToken)),
                                                       globalToken, globalCurrentPos));
             }
@@ -180,7 +203,7 @@ void yyerror(const char *str)
 
 void setError(const QString& errName, const QString& errDesc)
 {
-    globalParser->setError(KDbParserError(errName, errDesc, globalToken, globalCurrentPos));
+    KDbParserPrivate::get(globalParser)->setError(KDbParserError(errName, errDesc, globalToken, globalCurrentPos));
     yyerror(qPrintable(errName));
 }
 
@@ -192,11 +215,12 @@ void setError(const QString& errDesc)
 /* this is better than assert() */
 #define IMPL_ERROR(errmsg) setError(KDbParser::tr("Implementation error"), QLatin1String(errmsg))
 
+//! @internal Parses @a data for parser @a p
+//! @todo Make it REENTRANT
 bool parseData(KDbParser *p, const char *data)
 {
-    /* todo: make this REENTRANT */
     globalParser = p;
-    globalParser->clear();
+    globalParser->reset();
     globalField = 0;
     fieldList.clear();
 
@@ -204,7 +228,7 @@ bool parseData(KDbParser *p, const char *data)
         KDbParserError err(KDbParser::tr("Error"),
                            KDbParser::tr("No query statement specified."),
                            globalToken, globalCurrentPos);
-        globalParser->setError(err);
+        KDbParserPrivate::get(globalParser)->setError(err);
         yyerror("");
         globalParser = 0;
         return false;
@@ -218,7 +242,7 @@ bool parseData(KDbParser *p, const char *data)
     yyparse();
 
     bool ok = true;
-    if (globalParser->operation() == KDbParser::OP_Select) {
+    if (globalParser->statementType() == KDbParser::Select) {
         kdbDebug() << "parseData(): ok";
 //   kdbDebug() << "parseData(): " << tableDict.count() << " loaded tables";
         /*   KDbTableSchema *ts;
@@ -235,18 +259,19 @@ bool parseData(KDbParser *p, const char *data)
 }
 
 
-/* Adds @a column to @a querySchema. @a column can be in a form of
- table.field, tableAlias.field or field
+/*! Adds @a columnExpr to @a parseInfo
+ The column can be in a form table.field, tableAlias.field or field.
+ @return true on success. On error message in globalParser object is updated.
 */
-bool addColumn(KDbParseInfo *parseInfo, KDbExpression *columnExpr)
+bool addColumn(KDbParseInfo *parseInfo, const KDbExpression &columnExpr)
 {
-    if (!columnExpr->validate(parseInfo)) {
+    if (!KDbExpression(columnExpr).validate(parseInfo)) { // (KDbExpression(columnExpr) used to avoid constness problem)
         setError(parseInfo->errorMessage(), parseInfo->errorDescription());
         return false;
     }
 
-    KDbVariableExpression v_e(columnExpr->toVariable());
-    if (columnExpr->expressionClass() == KDb::VariableExpression && !v_e.isNull()) {
+    const KDbVariableExpression v_e(columnExpr.toVariable());
+    if (columnExpr.expressionClass() == KDb::VariableExpression && !v_e.isNull()) {
         //it's a variable:
         if (v_e.name() == QLatin1String("*")) {//all tables asterisk
             if (parseInfo->querySchema()->tables()->isEmpty()) {
@@ -267,7 +292,7 @@ bool addColumn(KDbParseInfo *parseInfo, KDbExpression *columnExpr)
     }
 
     //it's complex expression
-    parseInfo->querySchema()->addExpression(*columnExpr);
+    parseInfo->querySchema()->addExpression(columnExpr);
     return true;
 }
 
@@ -339,7 +364,7 @@ KDbQuerySchema* buildSelectQuery(
         columnNum = 0;
         bool containsAsteriskColumn = false; // used to check duplicated asterisks (disallowed)
         for (int i = 0; i < colViews.argCount(); i++, columnNum++) {
-            KDbExpression e(colViews.arg(i));
+            const KDbExpression e(colViews.arg(i));
             KDbExpression columnExpr(e);
             KDbVariableExpression aliasVariable;
             if (e.expressionClass() == KDb::SpecialBinaryExpression && e.isBinary()
@@ -354,7 +379,7 @@ KDbQuerySchema* buildSelectQuery(
                 }
             }
 
-            const int c = columnExpr.expressionClass();
+            const KDb::ExpressionClass c = columnExpr.expressionClass();
             const bool isExpressionField =
                 c == KDb::ConstExpression
                 || c == KDb::UnaryExpression
@@ -390,7 +415,7 @@ KDbQuerySchema* buildSelectQuery(
                 e.toBinary().setLeft(KDbExpression());
             }
 
-            if (!addColumn(&parseInfo, &columnExpr)) {
+            if (!addColumn(&parseInfo, columnExpr)) {
                 break;
             }
 

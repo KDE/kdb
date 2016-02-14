@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2004 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -542,8 +542,8 @@ StatementList
 {
 //todo: multiple statements
 //todo: not only "select" statements
-    globalParser->setOperation(KDbParser::OP_Select);
-    globalParser->setQuerySchema($1);
+    KDbParserPrivate::get(globalParser)->setStatementType(KDbParser::Select);
+    KDbParserPrivate::get(globalParser)->setQuerySchema($1);
 }
 ;
 
@@ -577,7 +577,7 @@ SelectStatement
 /*CreateTableStatement :
 CREATE TABLE IDENTIFIER
 {
-    globalParser->setOperation(KDbParser::OP_CreateTable);
+    globalParser->setStatementType(KDbParser::CreateTable);
     globalParser->createTable($3->toLatin1());
     delete $3;
 }
@@ -709,8 +709,6 @@ Select:
 SELECT
 {
     kdbDebug() << "SELECT";
-//    globalParser->createSelect();
-//    globalParser->setOperation(KDbParser::OP_Select);
     $$ = KDbQuerySchema::Private::createQuery(globalParser->connection());
 }
 ;
@@ -1253,7 +1251,7 @@ IDENTIFIER
 
     //! @todo this isn't ok for more tables:
     /*
-    KDbField::ListIterator it = globalParser->select()->fieldsIterator();
+    KDbField::ListIterator it = globalParser->query()->fieldsIterator();
     for(KDbField *item; (item = it.current()); ++it)
     {
         if(item->table() == dummy)
@@ -1321,7 +1319,7 @@ ColExpression
 //    $$ = new KDbField();
 //    dummy->addField($$);
 //    $$->setExpression( $1 );
-//    globalParser->select()->addField($$);
+//    globalParser->query()->addField($$);
     $$ = $1;
     kdbDebug() << " added column expr:" << *$1;
 }
@@ -1370,7 +1368,7 @@ aExpr
 //    $$ = new AggregationExpression( SUM,  );
 //    $$->setName("SUM(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
-//wait    globalParser->select()->grouped(true);
+//wait    globalParser->query()->grouped(true);
 }*/
 //! @todo
 /*
@@ -1379,7 +1377,7 @@ aExpr
     $$ = $3;
 //    $$->setName("MIN(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
-//wait    globalParser->select()->grouped(true);
+//wait    globalParser->query()->grouped(true);
 }*/
 //! @todo
 /*
@@ -1388,7 +1386,7 @@ aExpr
     $$ = $3;
 //    $$->setName("MAX(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
-//wait    globalParser->select()->grouped(true);
+//wait    globalParser->query()->grouped(true);
 }*/
 //! @todo
 /*
@@ -1397,7 +1395,7 @@ aExpr
     $$ = $3;
 //    $$->setName("AVG(" + $3->name() + ")");
 //wait    $$->containsGroupingAggregate(true);
-//wait    globalParser->select()->grouped(true);
+//wait    globalParser->query()->grouped(true);
 }*/
 | DISTINCT '(' ColExpression ')'
 {
@@ -1413,8 +1411,8 @@ ColWildCard:
     $$ = new KDbVariableExpression(QLatin1String("*"));
     kdbDebug() << "all columns";
 
-//    KDbQueryAsterisk *ast = new KDbQueryAsterisk(globalParser->select(), dummy);
-//    globalParser->select()->addAsterisk(ast);
+//    KDbQueryAsterisk *ast = new KDbQueryAsterisk(globalParser->query(), dummy);
+//    globalParser->query()->addAsterisk(ast);
 //    requiresTable = true;
 }
 | IDENTIFIER '.' '*'

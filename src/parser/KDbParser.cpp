@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -32,26 +32,25 @@ class ParserStatic
 {
 public:
     ParserStatic()
-     : operationStrings({
+     : statementTypeStrings({
             QLatin1String("None"),
-            QLatin1String("Error"),
+            QLatin1String("Select"),
             QLatin1String("CreateTable"),
             QLatin1String("AlterTable"),
-            QLatin1String("Select"),
             QLatin1String("Insert"),
             QLatin1String("Update"),
             QLatin1String("Delete")})
     {
     }
-    const std::vector<QString> operationStrings;
+    const std::vector<QString> statementTypeStrings;
 };
 
 Q_GLOBAL_STATIC(ParserStatic, KDb_parserStatic)
 
-KDbParser::KDbParser(KDbConnection *db)
-        : d(new Private)
+KDbParser::KDbParser(KDbConnection *connection)
+        : d(new KDbParserPrivate)
 {
-    d->db = db;
+    d->connection = connection;
 }
 
 KDbParser::~KDbParser()
@@ -59,30 +58,34 @@ KDbParser::~KDbParser()
     delete d;
 }
 
-KDbParser::OPCode KDbParser::operation() const
+KDbParser::StatementType KDbParser::statementType() const
 {
-    return (OPCode)d->operation;
+    return d->statementType;
 }
 
-QString KDbParser::operationString() const
+QString KDbParser::statementTypeString() const
 {
-    Q_ASSERT(size_t(d->operation) < sizeof(KDb_parserStatic->operationStrings));
-    return KDb_parserStatic->operationStrings[d->operation];
+    Q_ASSERT(size_t(d->statementType) < sizeof(KDb_parserStatic->statementTypeStrings));
+    return KDb_parserStatic->statementTypeStrings[d->statementType];
 }
 
 KDbTableSchema *KDbParser::table()
 {
-    KDbTableSchema *t = d->table; d->table = 0; return t;
+    KDbTableSchema *t = d->table;
+    d->table = 0;
+    return t;
 }
 
 KDbQuerySchema *KDbParser::query()
 {
-    KDbQuerySchema *s = d->select; d->select = 0; return s;
+    KDbQuerySchema *s = d->query;
+    d->query = 0;
+    return s;
 }
 
 KDbConnection *KDbParser::connection() const
 {
-    return d->db;
+    return d->connection;
 }
 
 KDbParserError KDbParser::error() const
@@ -93,37 +96,6 @@ KDbParserError KDbParser::error() const
 KDbEscapedString KDbParser::statement() const
 {
     return d->sql;
-}
-
-void KDbParser::setOperation(OPCode op)
-{
-    d->operation = op;
-}
-
-KDbQuerySchema *KDbParser::select() const
-{
-    return d->select;
-}
-
-void KDbParser::setError(const KDbParserError &err)
-{
-    d->error = err;
-}
-
-void KDbParser::createTable(const QByteArray &name)
-{
-    if (d->table)
-        return;
-
-    d->table = new KDbTableSchema(QLatin1String(name));
-}
-
-void KDbParser::setQuerySchema(KDbQuerySchema *query)
-{
-    if (d->select)
-        delete d->select;
-
-    d->select = query;
 }
 
 void KDbParser::init()
@@ -137,7 +109,7 @@ void KDbParser::init()
 bool KDbParser::parse(const KDbEscapedString &sql)
 {
     init();
-    clear();
+    reset();
     d->sql = sql;
 
     KDbParser *oldParser = globalParser;
@@ -148,9 +120,9 @@ bool KDbParser::parse(const KDbEscapedString &sql)
     return res;
 }
 
-void KDbParser::clear()
+void KDbParser::reset()
 {
-    d->clear();
+    d->reset();
 }
 
 //-------------------------------------
@@ -161,7 +133,7 @@ KDbParserError::KDbParserError()
 }
 
 KDbParserError::KDbParserError(const QString &type, const QString &message, const QByteArray &token,
-                         int position)
+                               int position)
 {
     m_type = type;
     m_message = message;

@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -32,7 +32,10 @@ class KDbTableSchema;
 class KDbEscapedString;
 
 /**
- * Provides detailed i18n'ed error description about KDbParser.
+ * Provides detailed error description about KDbParser.
+ *
+ * @todo Make it explicitly shared using SDC
+ * @todo change type to enum
  */
 class KDB_EXPORT KDbParserError
 {
@@ -59,21 +62,21 @@ public:
     ~KDbParserError();
 
     /**
-     * @return the errortype.
+     * @return the error type.
      */
     QString type() const {
         return m_type;
     }
 
     /**
-     * @return error message.
+     * @return translated error message.
      */
     QString message() const {
         return m_message;
     }
 
     /**
-     * @return position where the error happened.
+     * @return (character) position where the error happened.
      */
     int position() const {
         return m_position;
@@ -86,26 +89,17 @@ private:
     int m_position;
 };
 
+class KDbParserPrivate; //!< @internal
+
 /**
- * Parser for SQL statements.
+ * A parser tool for SQL statements.
  *
- * The best and prefeerred way to run queries is using the KDbParser functionality
- * and use the resulting KDbQuerySchema object since this offers a database-backend-independent
- * way to deal with SQL statements on the one hand and offers high level
- * functionality on the other. Also BLOBs like images are handled that way.
+ * The KDbParser class offers functionality of a SQL parser for database-backend-independent
+ * KDbSQL dialect. Schema objects such as KDbQuerySchema that are created after successful parsing
+ * can be then used for running the queries on actual data or used for further modification.
  *
- * For example if we like to use the SELECT statement
- * "SELECT dir.path, media.filename FROM dir, media WHERE dir.id=media.dirId AND media.id=%s"
- * we are able to use the @a KDbConnection::prepareStatement method which takes the type of
- * the statement (in our case @a KDbPreparedStatement::SelectStatement ), a list of fields (in
- * our case dir.path and media.filename) and returns a @a KDbPreparedStatement instance.
- * By using the @a KDbQuerySchema::addRelationship and @a KDbQuerySchema::addToWhereExpression methods
- * the SQL statement could be extended with relationships and WHERE expressions.
- *
- * For more, see @a KDbPreparedStatement and @a KDbConnection::selectStatement() . A more
- * complex example that looks at what the user has defined and carefully builds
- * @a KDbQuerySchema object, including the WHERE expression can be found in
- * the Query Designer's source code in the method @a KexiQueryDesignerGuiEditor::buildSchema().
+ * @todo Add examples
+ * @todo Support more types than the SELECT
  */
 class KDB_EXPORT KDbParser
 {
@@ -113,24 +107,25 @@ class KDB_EXPORT KDbParser
 public:
 
     /**
-     * The operation-code of the statement.
+     * The type of the statement.
      */
-    enum OPCode {
-        OP_None, //!< No statement parsed or reseted.
-        OP_Error, //!< Error while parsing.
-        OP_CreateTable, //!< Create a table.
-        OP_AlterTable, //!< Alter an existing table
-        OP_Select, //!< Query-statement.
-        OP_Insert, //!< Insert new content.
-        OP_Update, //!< Update existing content.
-        OP_Delete  //!< Delete existing content.
+    enum StatementType {
+        NoType,      //!< No statement type specified or detected
+        Select,      //!< Query-statement
+        CreateTable, //!< Create a new table
+        AlterTable,  //!< Alter schema of an existing table
+        Insert,      //!< Insert new records
+        Update,      //!< Update existing records
+        Delete       //!< Delete existing records
     };
 
     /**
-     * constructs an empty object of the parser
-     * @param connection is used for things like wildcard resolution. If 0 parser works in "pure mode"
+     * Constructs an new parser object.
+     * @a connection is used to obtain context, for example wildcards "T.*" resolution
+     * is possible only if information about table T is available.
      */
     explicit KDbParser(KDbConnection *connection);
+
     ~KDbParser();
 
     /**
@@ -139,90 +134,60 @@ public:
     bool parse(const KDbEscapedString &sql);
 
     /**
-     * Clear the parser's status.
+     * Reset the parser's status (table, query, error, statement, statement type).
      */
-    void clear();
+    void reset();
 
     /**
-     * @return the resulting operation or OP_Error if failed
+     * @return the resulting statement type
+     * NoType is returned if parsing failed or it has not been yet performed or reset() was called.
      */
-    OPCode operation() const;
+    StatementType statementType() const;
 
     /**
-     * @return the resulting operation as string.
+     * @return the resulting statement type as string. It is not translated.
      */
-    QString operationString() const;
+    QString statementTypeString() const;
 
     /**
-     * @return a pointer to a table schema on CREATE TABLE
-     * or 0 on any other operation or error. Returned object is owned by you.
-     * You can call this method only once every time after doing parse().
-     * Next time, the call will return 0.
+     * @return a pointer to a query schema if 'CREATE TABLE ...' statement was parsed
+     * or @c nullptr for any other statements or on error.
+     * @note A proper table schema is returned only once for each successful parse() call,
+     * and the object is owned by the caller. In all other cases @c nullptr is returned.
+     *
+     * @todo Implement this
      */
     KDbTableSchema *table();
 
     /**
-     * @return a pointer to a query schema if 'SELECT ...' was called
-     * or 0 on any other operation or error. Returned object is owned by you.
-     * You can call this method only once every time after doing parse().
-     * Next time, the call will return 0.
+     * @return a pointer to a query schema if 'SELECT ...' statement was parsed
+     * or @c nullptr for any other statements or on error.
+     * @note A proper query schema is returned only once for each successful parse() call,
+     * and the object is owned by the caller. In all other cases nullptr is returned.
      */
     KDbQuerySchema *query();
 
     /**
-     * @return a pointer to the used database connection or 0 if it is not set.
-     * You can call this method only once every time after doing parse().
-     * Next time, the call will return 0.
+     * @return a pointer to the used database connection or @c nullptr if it was not set.
      */
     KDbConnection *connection() const;
 
     /**
      * @return detailed information about last error.
-     * If no error occurred KDbParserError isNull()
+     * If no error occurred KDbParserError::type() is empty.
      */
     KDbParserError error() const;
 
     /**
-     * @return the statement passed on the last @a parse method-call.
+     * @return the statement passed on the most recent call of parse().
      */
     KDbEscapedString statement() const;
-
-    /**
-     * @internal
-     * sets the operation (only parser will need to call this)
-     */
-    void setOperation(OPCode op);
-
-    /**
-     * @internal
-     * creates a new table with name @a name (only parser will need to call this)
-     */
-    void createTable(const QByteArray &name);
-
-    /**
-     * @internal
-     * sets @a query schema object (only parser will need to call this)
-     */
-//! @todo other query types
-    void setQuerySchema(KDbQuerySchema *query);
-
-    /**
-     * @internal
-     * @return query schema
-     */
-    KDbQuerySchema *select() const;
-
-    /**
-     * @internal
-     * INTERNAL use only: sets a error
-     */
-    void setError(const KDbParserError &err);
 
 protected:
     void init();
 
-    class Private;
-    Private * const d; //!< @internal d-pointer class.
+    friend class KDbParserPrivate;
+    KDbParserPrivate * const d; //!< @internal d-pointer class.
 };
 
 //! Sends information about parser error @a error to debug output @a dbg.

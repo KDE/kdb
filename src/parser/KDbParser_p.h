@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -34,18 +34,47 @@
 #include <QString>
 
 //! @internal
-class KDbParser::Private
+class KDbParserPrivate
 {
 public:
-    Private();
-    ~Private();
+    KDbParserPrivate();
+    ~KDbParserPrivate();
 
-    void clear();
+    void reset();
 
-    int operation;
+    //! For use by parser's low level C functions
+    inline static KDbParserPrivate* get(KDbParser *parser) {
+        return parser->d;
+    }
+
+    /**
+     * Sets the type of statement.
+     */
+    void setStatementType(KDbParser::StatementType type);
+
+    /**
+     * Sets @a table schema object.
+     */
+    void setTableSchema(KDbTableSchema *table);
+
+    /**
+     * Sets @a query schema object.
+     */
+    //! @todo Add other query types
+    void setQuerySchema(KDbQuerySchema *query);
+
+    /**
+     * Sets a error.
+     */
+    void setError(const KDbParserError &err);
+
+    friend class KDbParser;
+
+protected:
+    KDbParser::StatementType statementType;
     KDbTableSchema *table;
-    KDbQuerySchema *select;
-    KDbConnection *db;
+    KDbQuerySchema *query;
+    KDbConnection *connection;
     KDbEscapedString sql;
     KDbParserError error;
     bool initialized;
