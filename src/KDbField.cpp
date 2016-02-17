@@ -30,11 +30,84 @@
 
 #include <assert.h>
 
-KDbField::FieldTypeNames KDbField::m_typeNames;
-KDbField::FieldTypeGroupNames KDbField::m_typeGroupNames;
-
 //! @todo make this configurable
 static int m_defaultMaxLength = 0; // unlimited
+
+//-------------------------------------------------------
+//! @internal Used in m_typeNames member to handle translated type names
+class FieldTypeNames : public QVector<QString>
+{
+public:
+    FieldTypeNames();
+    QHash<QString, KDbField::Type> str2num;
+    QStringList names;
+};
+
+//! @internal Used in m_typeGroupNames member to handle translated type group names
+class FieldTypeGroupNames : public QVector<QString>
+{
+public:
+    FieldTypeGroupNames();
+    QHash<QString, KDbField::TypeGroup> str2num;
+    QStringList names;
+};
+
+//! real translated type names (and nontranslated type name strings)
+Q_GLOBAL_STATIC(FieldTypeNames, s_typeNames)
+
+//! real translated type group names (and nontranslated group name strings)
+Q_GLOBAL_STATIC(FieldTypeGroupNames, s_typeGroupNames)
+
+#define ADDTYPE(type, i18, str) \
+    (*this)[KDbField::type] = i18; \
+    (*this)[KDbField::type+KDbField::Null+1] = QLatin1String(str); \
+    str2num[ QString::fromLatin1(str).toLower() ] = KDbField::type; \
+    names.append(i18)
+#define ADDGROUP(type, i18, str) \
+    (*this)[KDbField::type] = i18; \
+    (*this)[KDbField::type+KDbField::LastTypeGroup+1] = QLatin1String(str); \
+    str2num[ QString::fromLatin1(str).toLower() ] = KDbField::type; \
+    names.append(i18)
+
+FieldTypeNames::FieldTypeNames()
+        : QVector<QString>()
+{
+    resize((KDbField::Null + 1)*2);
+
+    ADDTYPE(InvalidType, KDbField::tr("Invalid Type"), "InvalidType");
+    ADDTYPE(Byte, KDbField::tr("Byte"), "Byte");
+    ADDTYPE(ShortInteger, KDbField::tr("Short Integer Number"), "ShortInteger");
+    ADDTYPE(Integer, KDbField::tr("Integer Number"), "Integer");
+    ADDTYPE(BigInteger, KDbField::tr("Big Integer Number"), "BigInteger");
+    ADDTYPE(Boolean, KDbField::tr("Yes/No Value"), "Boolean");
+    ADDTYPE(Date, KDbField::tr("Date"), "Date");
+    ADDTYPE(DateTime, KDbField::tr("Date and Time"), "DateTime");
+    ADDTYPE(Time, KDbField::tr("Time"), "Time");
+    ADDTYPE(Float, KDbField::tr("Single Precision Number"), "Float");
+    ADDTYPE(Double, KDbField::tr("Double Precision Number"), "Double");
+    ADDTYPE(Text, KDbField::tr("Text"), "Text");
+    ADDTYPE(LongText, KDbField::tr("Long Text"), "LongText");
+    ADDTYPE(BLOB, KDbField::tr("Object"), "BLOB");
+    ADDTYPE(Null, QLatin1String("NULL")/*don't translate*/, "NULL");
+}
+
+//-------------------------------------------------------
+
+FieldTypeGroupNames::FieldTypeGroupNames()
+        : QVector<QString>()
+{
+    resize((KDbField::LastTypeGroup + 1)*2);
+
+    ADDGROUP(InvalidGroup, KDbField::tr("Invalid Group"), "InvalidGroup");
+    ADDGROUP(TextGroup, KDbField::tr("Text"), "TextGroup");
+    ADDGROUP(IntegerGroup, KDbField::tr("Integer Number"), "IntegerGroup");
+    ADDGROUP(FloatGroup, KDbField::tr("Floating Point Number"), "FloatGroup");
+    ADDGROUP(BooleanGroup, KDbField::tr("Yes/No"), "BooleanGroup");
+    ADDGROUP(DateTimeGroup, KDbField::tr("Date/Time"), "DateTimeGroup");
+    ADDGROUP(BLOBGroup, KDbField::tr("Object"), "BLOBGroup");
+}
+
+//-------------------------------------------------------
 
 KDbField::KDbField()
 {
@@ -209,52 +282,44 @@ QVariant KDbField::convertToType(const QVariant &value, Type type)
 
 QString KDbField::typeName(Type type)
 {
-    m_typeNames.init();
-    return m_typeNames.value(type, QString::number(type));
+    return s_typeNames->value(type, QString::number(type));
 }
 
 QStringList KDbField::typeNames()
 {
-    m_typeNames.init();
-    return m_typeNames.names;
+    return s_typeNames->names;
 }
 
 QString KDbField::typeString(Type type)
 {
-    m_typeNames.init();
-    return (type <= Null) ? m_typeNames.at(int(Null) + 1 + type)
+    return (type <= Null) ? s_typeNames->at(int(Null) + 1 + type)
                               : (QLatin1String("Type") + QString::number(type));
 }
 
 QString KDbField::typeGroupName(TypeGroup typeGroup)
 {
-    m_typeGroupNames.init();
-    return (typeGroup <= LastTypeGroup) ? m_typeGroupNames.at(typeGroup) : typeGroupString(typeGroup);
+    return (typeGroup <= LastTypeGroup) ? s_typeGroupNames->at(typeGroup) : typeGroupString(typeGroup);
 }
 
 QStringList KDbField::typeGroupNames()
 {
-    m_typeGroupNames.init();
-    return m_typeGroupNames.names;
+    return s_typeGroupNames->names;
 }
 
 QString KDbField::typeGroupString(TypeGroup typeGroup)
 {
-    m_typeGroupNames.init();
-    return m_typeGroupNames.value(int(LastTypeGroup) + 1 + typeGroup,
+    return s_typeGroupNames->value(int(LastTypeGroup) + 1 + typeGroup,
                                   QLatin1String("TypeGroup") + QString::number(typeGroup));
 }
 
 KDbField::Type KDbField::typeForString(const QString& typeString)
 {
-    m_typeNames.init();
-    return m_typeNames.str2num.value(typeString.toLower(), InvalidType);
+    return s_typeNames->str2num.value(typeString.toLower(), InvalidType);
 }
 
 KDbField::TypeGroup KDbField::typeGroupForString(const QString& typeGroupString)
 {
-    m_typeGroupNames.init();
-    return m_typeGroupNames.str2num.value(typeGroupString.toLower(), InvalidGroup);
+    return s_typeGroupNames->str2num.value(typeGroupString.toLower(), InvalidGroup);
 }
 
 bool KDbField::isIntegerType(Type type)
@@ -770,70 +835,4 @@ void KDbField::setCustomProperty(const QByteArray& propertyName, const QVariant&
     if (!m_customProperties)
         m_customProperties = new CustomPropertiesMap();
     m_customProperties->insert(propertyName, value);
-}
-
-//-------------------------------------------------------
-#define ADDTYPE(type, i18, str) \
-    (*this)[KDbField::type] = i18; \
-    (*this)[KDbField::type+KDbField::Null+1] = QLatin1String(str); \
-    str2num[ QString::fromLatin1(str).toLower() ] = type; \
-    names.append(i18)
-#define ADDGROUP(type, i18, str) \
-    (*this)[KDbField::type] = i18; \
-    (*this)[KDbField::type+KDbField::LastTypeGroup+1] = QLatin1String(str); \
-    str2num[ QString::fromLatin1(str).toLower() ] = type; \
-    names.append(i18)
-
-KDbField::FieldTypeNames::FieldTypeNames()
-        : QVector<QString>()
-        , m_initialized(false)
-{
-}
-
-void KDbField::FieldTypeNames::init()
-{
-    if (m_initialized)
-        return;
-    m_initialized = true;
-    resize((KDbField::Null + 1)*2);
-
-    ADDTYPE(InvalidType, tr("Invalid Type"), "InvalidType");
-    ADDTYPE(Byte, tr("Byte"), "Byte");
-    ADDTYPE(ShortInteger, tr("Short Integer Number"), "ShortInteger");
-    ADDTYPE(Integer, tr("Integer Number"), "Integer");
-    ADDTYPE(BigInteger, tr("Big Integer Number"), "BigInteger");
-    ADDTYPE(Boolean, tr("Yes/No Value"), "Boolean");
-    ADDTYPE(Date, tr("Date"), "Date");
-    ADDTYPE(DateTime, tr("Date and Time"), "DateTime");
-    ADDTYPE(Time, tr("Time"), "Time");
-    ADDTYPE(Float, tr("Single Precision Number"), "Float");
-    ADDTYPE(Double, tr("Double Precision Number"), "Double");
-    ADDTYPE(Text, tr("Text"), "Text");
-    ADDTYPE(LongText, tr("Long Text"), "LongText");
-    ADDTYPE(BLOB, tr("Object"), "BLOB");
-    ADDTYPE(Null, QLatin1String("NULL")/*don't translate*/, "NULL");
-}
-
-//-------------------------------------------------------
-
-KDbField::FieldTypeGroupNames::FieldTypeGroupNames()
-        : QVector<QString>()
-        , m_initialized(false)
-{
-}
-
-void KDbField::FieldTypeGroupNames::init()
-{
-    if (m_initialized)
-        return;
-    m_initialized = true;
-    resize((KDbField::LastTypeGroup + 1)*2);
-
-    ADDGROUP(InvalidGroup, KDbField::tr("Invalid Group"), "InvalidGroup");
-    ADDGROUP(TextGroup, KDbField::tr("Text"), "TextGroup");
-    ADDGROUP(IntegerGroup, KDbField::tr("Integer Number"), "IntegerGroup");
-    ADDGROUP(FloatGroup, KDbField::tr("Floating Point Number"), "FloatGroup");
-    ADDGROUP(BooleanGroup, KDbField::tr("Yes/No"), "BooleanGroup");
-    ADDGROUP(DateTimeGroup, KDbField::tr("Date/Time"), "DateTimeGroup");
-    ADDGROUP(BLOBGroup, KDbField::tr("Object"), "BLOBGroup");
 }

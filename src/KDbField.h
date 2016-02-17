@@ -745,42 +745,12 @@ protected:
     int m_order;
     QString m_caption;
     QString m_desc;
-    QVector<QString> m_hints;
 
     KDbExpression* m_expr;
     CustomPropertiesMap* m_customProperties;
 
-    //! @internal Used in m_typeNames member to handle translated type names
-    class KDB_EXPORT FieldTypeNames : public QVector<QString>
-    {
-    public:
-        FieldTypeNames();
-        void init();
-        QHash<QString, Type> str2num;
-        QStringList names;
-    protected:
-        bool m_initialized;
-    };
-
-    //! @internal Used in m_typeGroupNames member to handle translated type group names
-    class KDB_EXPORT FieldTypeGroupNames : public QVector<QString>
-    {
-    public:
-        FieldTypeGroupNames();
-        void init();
-        QHash<QString, TypeGroup> str2num;
-        QStringList names;
-    protected:
-        bool m_initialized;
-    };
-
-    //! real translated type names (and nontranslated type name strings)
-    static FieldTypeNames m_typeNames;
-
-    //! real translated type group names (and nontranslated group name strings)
-    static FieldTypeGroupNames m_typeGroupNames;
-
 private:
+    QVector<QString> m_hints;
     Type m_type;
 
     friend class KDbConnection;
