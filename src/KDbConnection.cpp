@@ -2422,7 +2422,7 @@ static void createExtendedTableSchemaMainElementIfNeeded(
     QDomDocument* doc, QDomElement* extendedTableSchemaMainEl,
     bool* extendedTableSchemaStringIsEmpty)
 {
-    if (!extendedTableSchemaStringIsEmpty)
+    if (!*extendedTableSchemaStringIsEmpty)
         return;
     //init document
     *extendedTableSchemaMainEl = doc->createElement(QLatin1String("EXTENDED_TABLE_SCHEMA"));
