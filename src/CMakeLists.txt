@@ -17,21 +17,25 @@ add_subdirectory(drivers)
 ########### generate parser/lexer files ###############
 # as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
+# Create target for the parser
+add_custom_target(parser echo "Creating parser/lexer files")
+
 set(PARSER_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/parser)
 
 # Create custom command for flex/lex (note the outputs)
+# TODO(GEN) uncomment GENERATED if we ever use this patch: https://phabricator.kde.org/D357 "No more generated parser/scanner files in the source dir"
 add_custom_command(
+    TARGET parser
     COMMAND ${PARSER_SOURCE_DIR}/generate_parser_code.sh
     DEPENDS ${PARSER_SOURCE_DIR}/KDbSqlParser.y
             ${PARSER_SOURCE_DIR}/KDbSqlScanner.l
             ${PARSER_SOURCE_DIR}/generate_parser_code.sh
     OUTPUT
-        ${PARSER_SOURCE_DIR}/generated/sqlparser.h
-        ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
-        ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
-        ${PARSER_SOURCE_DIR}/generated/KDbToken.h
-        ${PARSER_SOURCE_DIR}/generated/KDbToken.cpp
-    COMMENT "Creating parser/lexer files"
+    #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/sqlparser.h
+    #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
+    #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
+    #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/KDbToken.h
+    #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/KDbToken.cpp
 )
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
