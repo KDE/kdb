@@ -24,14 +24,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include <QString>
 
-#ifdef Q_OS_WIN
-#include <my_Global.h>
-#endif
-#include <mysql_version.h>
-#include <mysql.h>
-
-typedef struct st_mysql MYSQL;
-#undef bool
+#include <mysql/mysql_version.h>
+#include <mysql/mysql.h>
 
 class KDbConnectionData;
 class KDbEscapedString;
