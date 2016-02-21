@@ -866,8 +866,8 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         const int c2 = argCounts[1];
         if (c2 == 1) {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires %3 or %4 argument.")
-                                              .arg(firstSentence).arg(name).arg(c1).arg(c2));
+                KDbExpression::tr("%1%2() function requires 0 or 1 argument.")
+                                              .arg(firstSentence).arg(name));
         }
         else {
             parseInfo->setErrorDescription(
