@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -303,22 +303,14 @@ const char ** SqliteCursor::recordData() const
 
 bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
-    if (!m_fieldsExpanded) {//simple version: without types
+    if (!m_visibleFieldsExpanded) {//simple version: without types
         for (int i = 0; i < m_fieldCount; i++) {
             (*data)[i] = QString::fromUtf8((const char*)sqlite3_column_text(d->prepared_st_handle, i));
         }
         return true;
     }
-    const int maxCount = qMin(m_fieldCount, m_fieldsExpanded->count());
-    // i - visible field's index, j - physical index
-    for (int i = 0, j = 0; i < m_fieldCount; i++, j++) {
-        while (j < maxCount && !m_fieldsExpanded->at(j)->visible)
-            j++;
-        if (j >= (maxCount /*+(m_containsROWIDInfo ? 1 : 0)*/)) {
-            //ERR!
-            break;
-        }
-        KDbField *f = (i >= m_fieldCount) ? 0 : m_fieldsExpanded->at(j)->field;
+    for (int i = 0; i < m_fieldCount; ++i) {
+        KDbField *f = m_visibleFieldsExpanded->at(i)->field;
 //  sqliteDebug() << "col=" << (col ? *col : 0);
         (*data)[i] = d->getValue(f, i);
     }
@@ -330,8 +322,8 @@ QVariant SqliteCursor::value(int i)
     if (i < 0 || i > (m_fieldCount - 1)) //range checking
         return QVariant();
 //! @todo allow disable range checking! - performance reasons
-    KDbField *f = (m_fieldsExpanded && i < m_fieldsExpanded->count())
-                       ? m_fieldsExpanded->at(i)->field : 0;
+    KDbField *f = (m_visibleFieldsExpanded && i < m_visibleFieldsExpanded->count())
+                  ? m_visibleFieldsExpanded->at(i)->field : 0;
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }
 

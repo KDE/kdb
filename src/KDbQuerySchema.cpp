@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -979,28 +979,33 @@ KDbQueryColumnInfo* KDbQuerySchema::columnInfo(const QString& identifier, bool e
             : d->columnInfosByName.value(identifier);
 }
 
-KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(FieldsExpandedOptions options) const
+KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpandedInternal(
+        FieldsExpandedOptions options, bool onlyVisible) const
 {
     computeFieldsExpanded();
+    KDbQueryColumnInfo::Vector *realFieldsExpanded = onlyVisible ? d->visibleFieldsExpanded
+                                                                 : d->fieldsExpanded;
     if (options == WithInternalFields || options == WithInternalFieldsAndRecordId) {
         //a ref to a proper pointer (as we cache the vector for two cases)
         KDbQueryColumnInfo::Vector*& tmpFieldsExpandedWithInternal =
-            (options == WithInternalFields) ? d->fieldsExpandedWithInternal : d->fieldsExpandedWithInternalAndRecordId;
+            (options == WithInternalFields) ?
+                (onlyVisible ? d->visibleFieldsExpandedWithInternal : d->fieldsExpandedWithInternal)
+              : (onlyVisible ? d->visibleFieldsExpandedWithInternalAndRecordId : d->fieldsExpandedWithInternalAndRecordId);
         //special case
         if (!tmpFieldsExpandedWithInternal) {
             //glue expanded and internal fields and cache it
-            const int size = d->fieldsExpanded->count()
-                              + (d->internalFields ? d->internalFields->count() : 0)
-                              + ((options == WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
-            tmpFieldsExpandedWithInternal = new KDbQueryColumnInfo::Vector(size);
-            const int fieldsExpandedVectorSize = d->fieldsExpanded->size();
-            for (int i = 0; i < fieldsExpandedVectorSize; i++) {
-                (*tmpFieldsExpandedWithInternal)[i] = d->fieldsExpanded->at(i);
-            }
             const int internalFieldCount = d->internalFields ? d->internalFields->size() : 0;
+            const int fieldsExpandedVectorSize = realFieldsExpanded->size();
+            const int size = fieldsExpandedVectorSize + internalFieldCount
+                             + ((options == WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
+            tmpFieldsExpandedWithInternal = new KDbQueryColumnInfo::Vector(size);
+            for (int i = 0; i < fieldsExpandedVectorSize; ++i) {
+                (*tmpFieldsExpandedWithInternal)[i] = realFieldsExpanded->at(i);
+            }
             if (internalFieldCount > 0) {
-                for (int i = 0; i < internalFieldCount; i++) {
-                    (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = d->internalFields->at(i);
+                for (int i = 0; i < internalFieldCount; ++i) {
+                    KDbQueryColumnInfo *info = d->internalFields->at(i);
+                    (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = info;
                 }
             }
             if (options == WithInternalFieldsAndRecordId) {
@@ -1014,17 +1019,18 @@ KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(FieldsExpandedOptions 
         return *tmpFieldsExpandedWithInternal;
     }
 
-    if (options == Default)
-        return *d->fieldsExpanded;
+    if (options == Default) {
+        return *realFieldsExpanded;
+    }
 
     //options == Unique:
     QSet<QString> columnsAlreadyFound;
-    const int fieldsExpandedCount(d->fieldsExpanded->count());
+    const int fieldsExpandedCount(realFieldsExpanded->count());
     KDbQueryColumnInfo::Vector result(fieldsExpandedCount);   //initial size is set
     //compute unique list
     int uniqueListCount = 0;
     for (int i = 0; i < fieldsExpandedCount; i++) {
-        KDbQueryColumnInfo *ci = d->fieldsExpanded->at(i);
+        KDbQueryColumnInfo *ci = realFieldsExpanded->at(i);
         if (!columnsAlreadyFound.contains(ci->aliasOrName())) {
             columnsAlreadyFound.insert(ci->aliasOrName());
             result[uniqueListCount++] = ci;
@@ -1224,11 +1230,14 @@ void KDbQuerySchema::computeFieldsExpanded() const
     //prepare clean vector for expanded list, and a map for order information
     if (!d->fieldsExpanded) {
         d->fieldsExpanded = new KDbQueryColumnInfo::Vector(list.count());
+        d->visibleFieldsExpanded = new KDbQueryColumnInfo::Vector(list.count());
         d->columnsOrderExpanded = new QHash<KDbQueryColumnInfo*, int>();
     } else {//for future:
         qDeleteAll(*d->fieldsExpanded);
         d->fieldsExpanded->clear();
         d->fieldsExpanded->resize(list.count());
+        d->visibleFieldsExpanded->clear();
+        d->visibleFieldsExpanded->resize(list.count());
         d->columnsOrderExpanded->clear();
     }
 
@@ -1240,9 +1249,14 @@ void KDbQuerySchema::computeFieldsExpanded() const
     d->columnInfosByName.clear();
     d->columnInfosByNameExpanded.clear();
     i = -1;
+    int visibleIndex = -1;
     foreach(KDbQueryColumnInfo* ci, list) {
         i++;
         (*d->fieldsExpanded)[i] = ci;
+        if (ci->visible) {
+            ++visibleIndex;
+            (*d->visibleFieldsExpanded)[visibleIndex] = ci;
+        }
         d->columnsOrderExpanded->insert(ci, i);
         //remember field by name/alias/table.name if there's no such string yet in d->columnInfosByNameExpanded
         if (!ci->alias.isEmpty()) {
@@ -1287,6 +1301,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             }
         }
     }
+    d->visibleFieldsExpanded->resize(visibleIndex + 1);
 
     //remove duplicates for lookup fields
     QHash<QString, int> lookup_dict; //used to fight duplicates and to update KDbQueryColumnInfo::indexForVisibleLookupValue()

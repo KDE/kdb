@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -74,15 +74,16 @@ void KDbCursor::init()
 
     if (m_query) {
         //get list of all fields
-        m_fieldsExpanded = new KDbQueryColumnInfo::Vector();
-        *m_fieldsExpanded = m_query->fieldsExpanded(
-                                m_containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId : KDbQuerySchema::WithInternalFields);
-        m_logicalFieldCount = m_fieldsExpanded->count()
+        m_visibleFieldsExpanded = new KDbQueryColumnInfo::Vector();
+        *m_visibleFieldsExpanded = m_query->visibleFieldsExpanded(
+                    m_containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
+                                           : KDbQuerySchema::WithInternalFields);
+        m_logicalFieldCount = m_visibleFieldsExpanded->count()
                               - m_query->internalFields().count() - (m_containsRecordIdInfo ? 1 : 0);
-        m_fieldCount = m_fieldsExpanded->count();
+        m_fieldCount = m_visibleFieldsExpanded->count();
         m_fieldsToStoreInRecord = m_fieldCount;
     } else {
-        m_fieldsExpanded = 0;
+        m_visibleFieldsExpanded = 0;
         m_logicalFieldCount = 0;
         m_fieldCount = 0;
         m_fieldsToStoreInRecord = 0;
@@ -114,7 +115,7 @@ KDbCursor::~KDbCursor()
             kdbCritical() << "can be destroyed with Conenction::deleteCursor(), not with delete operator!";
         }
     }
-    delete m_fieldsExpanded;
+    delete m_visibleFieldsExpanded;
     delete m_queryParameters;
 }
 

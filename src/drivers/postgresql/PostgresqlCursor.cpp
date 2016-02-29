@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -220,8 +220,8 @@ QVariant PostgresqlCursor::pValue(int pos) const
 //  postgresqlWarning() << "PostgresqlCursor::value - ERROR: requested position is greater than the number of fields";
     const qint64 row = at();
 
-    KDbField *f = (m_fieldsExpanded && pos < qMin(m_fieldsExpanded->count(), m_fieldCount))
-                       ? m_fieldsExpanded->at(pos)->field : 0;
+    KDbField *f = (m_visibleFieldsExpanded && pos < qMin(m_visibleFieldsExpanded->count(), m_fieldCount))
+                       ? m_visibleFieldsExpanded->at(pos)->field : 0;
 // postgresqlDebug() << "pos:" << pos;
 
     const QVariant::Type type = m_realTypes[pos];

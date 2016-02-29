@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -132,6 +132,9 @@ public:
     /*! Temporary field vector for using in fieldsExpanded() */
     KDbQueryColumnInfo::Vector *fieldsExpanded;
 
+    /*! Like fieldsExpanded but only visible column infos; infos are not owned. */
+    KDbQueryColumnInfo::Vector *visibleFieldsExpanded;
+
     /*! Temporary field vector containing internal fields used for lookup columns. */
     KDbQueryColumnInfo::Vector *internalFields;
 
@@ -139,9 +142,15 @@ public:
      Contains not auto-deleted items.*/
     KDbQueryColumnInfo::Vector *fieldsExpandedWithInternalAndRecordId;
 
+    /*! Like fieldsExpandedWithInternalAndRecordId but only contains visible column infos; infos are not owned.*/
+    KDbQueryColumnInfo::Vector *visibleFieldsExpandedWithInternalAndRecordId;
+
     /*! Temporary, used to cache sum of expanded fields and internal fields used for lookup columns.
      Contains not auto-deleted items.*/
     KDbQueryColumnInfo::Vector *fieldsExpandedWithInternal;
+
+    /*! Like fieldsExpandedWithInternal but only contains visible column infos; infos are not owned.*/
+    KDbQueryColumnInfo::Vector *visibleFieldsExpandedWithInternal;
 
     /*! A list of fields for ORDER BY section. @see KDbQuerySchema::orderByColumnList(). */
     KDbOrderByColumnList* orderByColumnList;

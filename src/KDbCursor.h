@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -322,8 +322,8 @@ protected:
     bool m_buffering_completed;   //!< true if we already have all records stored in the buffer
     //</members related to buffering>
 
-    //! Useful e.g. for value(int) method when we need access to schema def.
-    KDbQueryColumnInfo::Vector* m_fieldsExpanded;
+    //! Useful e.g. for value(int) method to obtain access to schema definition.
+    KDbQueryColumnInfo::Vector* m_visibleFieldsExpanded;
 
     //! Used by setOrderByColumnList()
     KDbQueryColumnInfo::Vector* m_orderByColumnList;

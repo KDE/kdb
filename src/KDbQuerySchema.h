@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -525,7 +525,7 @@ public:
      explicitly specify "t2.name" as the identifier to get the second column. */
     KDbQueryColumnInfo* columnInfo(const QString& identifier, bool expanded = true) const;
 
-    /*! Options used in fieldsExpanded(). */
+    /*! Options used in fieldsExpanded() and visibleFieldsExpanded(). */
     enum FieldsExpandedOptions {
         Default,                      //!< All fields are returned even if duplicated
         Unique,                       //!< Unique list of fields is returned
@@ -575,7 +575,18 @@ public:
      This method's result is cached by KDbQuerySchema object.
     @todo js: UPDATE CACHE!
     */
-    KDbQueryColumnInfo::Vector fieldsExpanded(FieldsExpandedOptions options = Default) const;
+    inline KDbQueryColumnInfo::Vector fieldsExpanded(
+            FieldsExpandedOptions options = Default) const
+    {
+        return fieldsExpandedInternal(options, false);
+    }
+
+    /*! Like fieldsExpanded() but returns only visible fields. */
+    inline KDbQueryColumnInfo::Vector visibleFieldsExpanded(
+            FieldsExpandedOptions options = Default) const
+    {
+        return fieldsExpandedInternal(options, true);
+    }
 
     /*! @return list of fields internal fields used for lookup columns. */
     KDbQueryColumnInfo::Vector internalFields() const;
@@ -761,6 +772,11 @@ protected:
     void init();
 
     void computeFieldsExpanded() const;
+
+    //! Used by fieldsExpanded(FieldsExpandedOptions)
+    //! and visibleFieldsExpanded(FieldsExpandedOptions options).
+    KDbQueryColumnInfo::Vector fieldsExpandedInternal(FieldsExpandedOptions options,
+                                                      bool onlyVisible) const;
 
     Private * const d;
 };

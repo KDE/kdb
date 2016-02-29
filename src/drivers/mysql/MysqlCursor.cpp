@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -100,8 +100,8 @@ QVariant MysqlCursor::value(int pos)
     if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
         return QVariant();
 
-    KDbField *f = (m_fieldsExpanded && pos < m_fieldsExpanded->count())
-                       ? m_fieldsExpanded->at(pos)->field : 0;
+    KDbField *f = (m_visibleFieldsExpanded && pos < m_visibleFieldsExpanded->count())
+                       ? m_visibleFieldsExpanded->at(pos)->field : 0;
 
 //! @todo js: use MYSQL_FIELD::type here!
 
@@ -119,15 +119,14 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
     if (d->numRows == 0)
         return false;
 
-//! @todo js: use MYSQL_FIELD::type here!
-//!           see SqliteCursor::storeCurrentRecord()
-
-    const int fieldsExpandedCount = m_fieldsExpanded ? m_fieldsExpanded->count() : INT_MAX;
-    const int realCount = qMin(fieldsExpandedCount, m_fieldsToStoreInRecord);
-    for (int i = 0; i < realCount; i++) {
-        KDbField *f = m_fieldsExpanded ? m_fieldsExpanded->at(i)->field : 0;
-        if (m_fieldsExpanded && !f)
-            continue;
+    if (!m_visibleFieldsExpanded) {//simple version: without types
+        for (int i = 0; i < m_fieldCount; ++i) {
+            (*data)[i] = QString::fromUtf8(d->mysqlrow[i], d->lengths[i]);
+        }
+        return true;
+    }
+    for (int i = 0; i < m_fieldCount; ++i) {
+        KDbField *f = m_visibleFieldsExpanded->at(i)->field;
         bool ok;
         (*data)[i] = KDb::cstringToVariant(d->mysqlrow[i], f ? f->type() : KDbField::Text,
                                            &ok, d->lengths[i]);

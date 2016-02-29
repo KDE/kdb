@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -28,9 +28,12 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         , maxIndexWithAlias(-1)
         , visibility(64)
         , fieldsExpanded(0)
+        , visibleFieldsExpanded(0)
         , internalFields(0)
         , fieldsExpandedWithInternalAndRecordId(0)
+        , visibleFieldsExpandedWithInternalAndRecordId(0)
         , fieldsExpandedWithInternal(0)
+        , visibleFieldsExpandedWithInternal(0)
         , orderByColumnList(0)
         , autoincFields(0)
         , columnsOrder(0)
@@ -48,6 +51,7 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         *this = *copy;
         // <clear, so computeFieldsExpanded() will re-create it>
         fieldsExpanded = 0;
+        visibleFieldsExpanded = 0;
         internalFields = 0;
         columnsOrder = 0;
         columnsOrderWithoutAsterisks = 0;
@@ -59,7 +63,9 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         columnInfosByName.clear();
         ownedVisibleColumns = 0;
         fieldsExpandedWithInternalAndRecordId = 0;
+        visibleFieldsExpandedWithInternalAndRecordId = 0;
         fieldsExpandedWithInternal = 0;
+        visibleFieldsExpandedWithInternal = 0;
         pkeyFieldsOrder = 0;
         fakeRecordIdCol = 0;
         fakeRecordIdField = 0;
@@ -100,7 +106,9 @@ KDbQuerySchema::Private::~Private()
         delete internalFields;
     }
     delete fieldsExpandedWithInternalAndRecordId;
+    delete visibleFieldsExpandedWithInternalAndRecordId;
     delete fieldsExpandedWithInternal;
+    delete visibleFieldsExpandedWithInternal;
 }
 
 //static
@@ -148,6 +156,8 @@ void KDbQuerySchema::Private::clearCachedData()
         qDeleteAll(*fieldsExpanded);
         delete fieldsExpanded;
         fieldsExpanded = 0;
+        delete visibleFieldsExpanded; // NO qDeleteAll, items not owned
+        visibleFieldsExpanded = 0;
         if (internalFields) {
             qDeleteAll(*internalFields);
             delete internalFields;
@@ -155,8 +165,12 @@ void KDbQuerySchema::Private::clearCachedData()
         }
         delete fieldsExpandedWithInternalAndRecordId;
         fieldsExpandedWithInternalAndRecordId = 0;
+        delete visibleFieldsExpandedWithInternalAndRecordId;
+        visibleFieldsExpandedWithInternalAndRecordId = 0;
         delete fieldsExpandedWithInternal;
         fieldsExpandedWithInternal = 0;
+        delete visibleFieldsExpandedWithInternal;
+        visibleFieldsExpandedWithInternal = 0;
     }
 }
 
