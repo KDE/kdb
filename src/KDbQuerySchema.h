@@ -531,7 +531,7 @@ public:
         Unique,                       //!< Unique list of fields is returned
         WithInternalFields,           //!< Like Default but internal fields (for lookup) are appended
         WithInternalFieldsAndRecordId //!< Like WithInternalFields but record ID (big int type) field
-        //!< is appended after internal fields
+                                      //!< is appended after internal fields
     };
 
     /*! @return fully expanded list of fields.
@@ -588,7 +588,7 @@ public:
         return fieldsExpandedInternal(options, true);
     }
 
-    /*! @return list of fields internal fields used for lookup columns. */
+    /*! @return list of internal fields used for lookup columns. */
     KDbQueryColumnInfo::Vector internalFields() const;
 
     /*! @return info for expanded of internal field at index @a index.
