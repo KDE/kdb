@@ -558,9 +558,9 @@ public:
 
      If @a options is WithInternalFieldsAndRecordId,
      one fake BigInteger column is appended to make space for Record ID column used
-     by KDbCursor implementations. For example, let persons be TABLE( surname, city_id ),
-     let city_number reference cities.is in TABLE cities( id, name ) and let query q be defined
-     by "SELECT * FROM t" statement. If we want to display persons' city names instead of city_id's.
+     by KDbCursor implementations. For example, let city_id in TABLE persons(surname, city_id)
+     reference cities.id in TABLE cities(id, name) and let query q be defined
+     by "SELECT * FROM persons" statement. We want to display persons' city names instead of city_id's.
      To do this, cities.name has to be retrieved as well, so the following statement should be used:
      "SELECT * FROM persons, cities.name LEFT OUTER JOIN cities ON persons.city_id=cities.id".
      Thus, calling fieldsExpanded(WithInternalFieldsAndRecordId) will return 4 elements instead of 2:
