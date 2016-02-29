@@ -153,6 +153,10 @@ void KDbQuerySchema::Private::clearCachedData()
             delete internalFields;
             internalFields = 0;
         }
+        delete fieldsExpandedWithInternalAndRecordId;
+        fieldsExpandedWithInternalAndRecordId = 0;
+        delete fieldsExpandedWithInternal;
+        fieldsExpandedWithInternal = 0;
     }
 }
 
