@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2011-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2011-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -700,6 +700,7 @@ void ExpressionsTest::testBinaryExpressionCloning_data()
     T(KDbToken::INTEGER_CONST, 3, KDbToken::AND, KDbToken::INTEGER_CONST, 4, "3 AND 4");
     T(KDbToken::INTEGER_CONST, 3, KDbToken::XOR, KDbToken::INTEGER_CONST, 4, "3 XOR 4");
     T(KDbToken::CHARACTER_STRING_LITERAL, "AB", KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "CD", "'AB' || 'CD'");
+    T(KDbToken::CHARACTER_STRING_LITERAL, "AB", '+', KDbToken::CHARACTER_STRING_LITERAL, "CD", "'AB' + 'CD'");
 #undef T
 }
 
@@ -1299,12 +1300,18 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
     T(KDbToken::REAL_CONST, 30.2, KDbToken::XOR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
     // string
     T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Text);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '+', KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Text);
+
     T(KDbToken::SQL_NULL, QVariant(), KDbToken::CONCATENATION, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Null);
+    T(KDbToken::SQL_NULL, QVariant(), '+', KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Null);
+
     T(KDbToken::INTEGER_CONST, 50, KDbToken::CONCATENATION, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
     T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::CONCATENATION, KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '+', KDbToken::INTEGER_CONST, 20, KDbField::InvalidType);
+
     T(KDbToken::CHARACTER_STRING_LITERAL, "ab", KDbToken::GREATER_OR_EQUAL, KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Boolean);
     T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '<', KDbToken::INTEGER_CONST, 3, KDbField::InvalidType);
-    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '+', KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::InvalidType);
+    T(KDbToken::CHARACTER_STRING_LITERAL, "ab", '+', KDbToken::CHARACTER_STRING_LITERAL, "cd", KDbField::Text);
     T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::OR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
     T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::AND, KDbToken::REAL_CONST, 20, KDbField::InvalidType);
     T(KDbToken::CHARACTER_STRING_LITERAL, "A", KDbToken::XOR, KDbToken::REAL_CONST, 20, KDbField::InvalidType);

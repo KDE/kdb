@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -354,6 +354,14 @@ KDbEscapedString KDbDriver::unicodeFunctionToString(
                                         KDb::ExpressionCallStack* callStack) const
 {
     return KDbFunctionExpression::toString(QLatin1String("UNICODE"), this, args, params, callStack);
+}
+
+KDbEscapedString KDbDriver::concatenateFunctionToString(const KDbBinaryExpression &args,
+                                               KDbQuerySchemaParameterValueListIterator* params,
+                                               KDb::ExpressionCallStack* callStack) const
+{
+    return args.left().toString(this, params, callStack) + KDbEscapedString("||")
+            + args.right().toString(this, params, callStack);
 }
 
 //---------------

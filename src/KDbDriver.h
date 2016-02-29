@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,6 +40,7 @@ class KDbConnectionOptions;
 class KDbDriverManager;
 class KDbDriverBehaviour;
 class KDbDriverMetaData;
+class KDbBinaryExpression;
 class KDbNArgExpression;
 class KDbQuerySchemaParameterValueListIterator;
 class DriverPrivate;
@@ -279,6 +280,16 @@ public:
                                             const KDbNArgExpression &args,
                                             KDbQuerySchemaParameterValueListIterator* params,
                                             KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) function call for concatenation of two strings.
+    //! Default implementation USES infix "||" operator.
+    //! Special case is for MYSQL (CONCAT()).
+    //! @todo API supporting KDbNArgExpression would be useful so instead of a||b||c can be
+    //!       expressed as CONCAT(a,b,c) instead of CONCAT(CONCAT(a,b),c).
+    //!       This requires changes to the KDbSQL parser.
+    KDbEscapedString concatenateFunctionToString(const KDbBinaryExpression &args,
+                                                 KDbQuerySchemaParameterValueListIterator* params,
+                                                 KDb::ExpressionCallStack* callStack) const;
 
 protected:
     /*! Used by KDbDriverManager.

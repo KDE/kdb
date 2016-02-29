@@ -2,7 +2,7 @@
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -219,6 +219,14 @@ KDbEscapedString MysqlDriver::unicodeFunctionToString(
     Q_ASSERT(args.argCount() == 1);
     return KDbEscapedString("ORD(CONVERT(%1 USING UTF16))")
                             .arg(args.arg(0).toString(this, params, callStack));
+}
+
+KDbEscapedString MysqlDriver::concatenateFunctionToString(const KDbBinaryExpression &args,
+                                                          KDbQuerySchemaParameterValueListIterator* params,
+                                                          KDb::ExpressionCallStack* callStack) const
+{
+    return KDbEscapedString("CONCAT(%1, %2)").arg(args.left().toString(this, params, callStack))
+                                             .arg(args.right().toString(this, params, callStack));
 }
 
 #include "MysqlDriver.moc"

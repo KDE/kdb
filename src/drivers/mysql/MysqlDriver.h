@@ -2,7 +2,7 @@
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -76,6 +76,12 @@ public:
     virtual KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
                                             KDbQuerySchemaParameterValueListIterator* params,
                                             KDb::ExpressionCallStack* callStack) const;
+
+    //! Generates native (driver-specific) function call for concatenation of two strings.
+    //! Uses CONCAT().
+    KDbEscapedString concatenateFunctionToString(const KDbBinaryExpression &args,
+                                                 KDbQuerySchemaParameterValueListIterator* params,
+                                                 KDb::ExpressionCallStack* callStack) const;
 
 protected:
     virtual QString drv_escapeIdentifier(const QString& str) const;

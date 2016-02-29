@@ -92,6 +92,17 @@ select 'ABC' LIKE 'A%';
 select 3 SIMILAR TO 4;
 select 3 NOT SIMILAR TO 4;
 select 'AB' || 'CD';
+select 'AB' || 'CD' || 'EF';
+select 'AB' + 'CD' || 'EF' + 'GH' || '';
+select NULL || NULL;
+select NULL || 'AB';
+select 'AB' + NULL;
+-- ERROR: ||
+select 'AB' || 1;
+select 'AB' + 1;
+select 7 || 'AB';
+select 7 + 'AB';
+select 7 || 1;
 -- ERROR: **
 select 1**2;
 -- ERROR: * or / are not unary operators

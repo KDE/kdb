@@ -369,6 +369,7 @@ protected:
     explicit KDbBinaryExpression(const ExplicitlySharedExpressionDataPointer &ptr);
 
     friend class KDbExpression;
+    friend class KDbBinaryExpressionData;
 };
 
 

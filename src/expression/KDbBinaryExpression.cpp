@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -139,6 +139,7 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
             return KDbField::Null;
         }
         return (ltBool && rtBool) ? KDbField::Boolean : KDbField::InvalidType;
+    case '+':
     case CONCATENATION:
         if (lt == KDbField::Text && rt == KDbField::Text) {
             return KDbField::Text;
@@ -150,8 +151,10 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
             || (rtText && ltNull))
         {
             return KDbField::Null;
+        } else if (token.value() == CONCATENATION) {
+            return KDbField::InvalidType;
         }
-        return KDbField::InvalidType;
+        break; // '+' can still be handled below for non-text types
     default:;
     }
 
@@ -244,6 +247,18 @@ KDbEscapedString KDbBinaryExpressionData::toStringInternal(
                                         KDbQuerySchemaParameterValueListIterator* params,
                                         KDb::ExpressionCallStack* callStack) const
 {
+    switch (token.value()) {
+    case '+':
+    case CONCATENATION: {
+        if (driver && KDbField::isTextType(type())) {
+            const KDbBinaryExpression binaryExpr(const_cast<KDbBinaryExpressionData*>(this));
+            return driver->concatenateFunctionToString(binaryExpr, params, callStack);
+        }
+        break;
+    }
+    default:;
+    }
+
 #define INFIX(a) \
     (left().constData() ? left()->toString(driver, params, callStack) : KDbEscapedString("<NULL>")) \
     + " " + a + " " + (right().constData() ? right()->toString(driver, params, callStack) : KDbEscapedString("<NULL>"))
