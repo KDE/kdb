@@ -275,7 +275,7 @@ bool MysqlPreparedStatement::execute(
     else if (m_type == InsertStatement)
         fieldList = m_fields->fields();
     else
-        assert(0); //impl. error
+        Q_ASSERT(0); //impl. error
 
     KDbField::ListIterator itFields(fieldList->constBegin());
     for (QList<QVariant>::ConstIterator it(parameters.constBegin());

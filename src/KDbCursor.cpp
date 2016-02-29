@@ -57,7 +57,7 @@ KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
 
 void KDbCursor::init()
 {
-    assert(m_conn);
+    Q_ASSERT(m_conn);
     m_conn->addCursor(this);
     m_opened = false;
     m_atLast = false;

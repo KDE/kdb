@@ -814,7 +814,7 @@ const KDbExpression KDbField::expression() const
 
 void KDbField::setExpression(const KDbExpression& expr)
 {
-    assert(!m_parent || dynamic_cast<KDbQuerySchema*>(m_parent));
+    Q_ASSERT(!m_parent || dynamic_cast<KDbQuerySchema*>(m_parent));
     if (*m_expr == expr)
         return;
     *m_expr = expr;

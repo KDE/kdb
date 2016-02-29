@@ -40,7 +40,7 @@ KDbTransactionData::KDbTransactionData(KDbConnection *conn)
         , m_active(true)
         , refcount(1)
 {
-    assert(conn);
+    Q_ASSERT(conn);
     KDbTransaction::globalcount++; //because refcount(1) init.
     KDbTransactionData::globalcount++;
     transactionsDebug() << "-- globalcount ==" << KDbTransactionData::globalcount;

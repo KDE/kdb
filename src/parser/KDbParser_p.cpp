@@ -339,16 +339,16 @@ KDbQuerySchema* buildSelectQuery(
             QString aliasString;
             if (e.expressionClass() == KDb::SpecialBinaryExpression) {
                 KDbBinaryExpression t_with_alias = e.toBinary();
-                assert(e.isBinary());
-                assert(t_with_alias.left().expressionClass() == KDb::VariableExpression);
-                assert(t_with_alias.right().expressionClass() == KDb::VariableExpression
+                Q_ASSERT(e.isBinary());
+                Q_ASSERT(t_with_alias.left().expressionClass() == KDb::VariableExpression);
+                Q_ASSERT(t_with_alias.right().expressionClass() == KDb::VariableExpression
                        && (t_with_alias.token() == KDbToken::AS || t_with_alias.token() == KDbToken::AS_EMPTY));
                 t_e = t_with_alias.left().toVariable();
                 aliasString = t_with_alias.right().toVariable().name();
             } else {
                 t_e = e.toVariable();
             }
-            assert(t_e.isVariable());
+            Q_ASSERT(t_e.isVariable());
             QString tname = t_e.name();
             KDbTableSchema *s = globalParser->connection()->tableSchema(tname);
             if (!s) {
