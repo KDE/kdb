@@ -111,15 +111,25 @@ QString KDbUtils::stringToFileName(const QString& string)
 void KDbUtils::simpleCrypt(QString *string)
 {
     Q_ASSERT(string);
-    for (int i = 0; i < string->length(); i++)
-        (*string)[i] = QChar((*string)[i].unicode() + 47 + i);
+    for (int i = 0; i < string->length(); i++) {
+        ushort& unicode = (*string)[i].unicode();
+        unicode += (47 + i);
+    }
 }
 
-void KDbUtils::simpleDecrypt(QString *string)
+bool KDbUtils::simpleDecrypt(QString *string)
 {
     Q_ASSERT(string);
-    for (int i = 0; i < string->length(); i++)
-        (*string)[i] = QChar((*string)[i].unicode() - 47 - i);
+    QString result(*string);
+    for (int i = 0; i < result.length(); i++) {
+        ushort& unicode = result[i].unicode();
+        if (unicode <= (47 + i)) {
+            return false;
+        }
+        unicode -= (47 + i);
+    }
+    *string = result;
+    return true;
 }
 
 QString KDbUtils::ptrToStringInternal(void* ptr, int size)

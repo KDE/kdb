@@ -89,13 +89,16 @@ KDB_EXPORT QString stringToFileName(const QString& string);
 
 /*! Performs a simple @a string  encryption using rot47-like algorithm.
  Each character's unicode value is increased by 47 + i (where i is index of the character).
- The resulting string still contains redable characters.
- Do not use this for data that can be accessed by attackers! */
+ The resulting string still contains readable characters but some of them can be non-ASCII.
+ @note Do not use this for data that can be accessed by attackers! */
 KDB_EXPORT void simpleCrypt(QString *string);
 
 /*! Performs a simple @a string decryption using rot47-like algorithm,
- using opposite operations to KexiUtils::simpleCrypt(). */
-KDB_EXPORT void simpleDecrypt(QString *string);
+ using opposite operations to KexiUtils::simpleCrypt().
+ @return true on success and false on failure. Failue means that one or more characters have unicode
+ numbers smaller than value of 47 + i. On failure @a string is not altered.
+*/
+KDB_EXPORT bool simpleDecrypt(QString *string);
 
 //! @internal
 KDB_EXPORT QString ptrToStringInternal(void* ptr, int size);
