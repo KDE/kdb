@@ -100,7 +100,8 @@ void KDbFieldList::renameField(const QString& oldName, const QString& newName)
 void KDbFieldList::renameField(KDbField *field, const QString& newName)
 {
     if (!field || field != m_fields_by_name.value(field->name().toLower())) {
-        kdbCritical() << "no field found" << QString::fromLatin1("\"%1\"").arg(field->name());
+        kdbCritical() << "no field found"
+                      << QString::fromLatin1("\"%1\"").arg(field ? field->name() : QString());
         return;
     }
     renameFieldInternal(field, newName.toLower());

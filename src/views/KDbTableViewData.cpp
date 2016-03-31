@@ -53,12 +53,12 @@ public:
         if (U_FAILURE(status)) {
             kdbWarning() << "Could not create instance of collator:" << status;
             m_collator = 0;
-        }
-
-        // enable normalization by default
-        m_collator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
-        if (U_FAILURE(status)) {
-            kdbWarning() << "Could not set collator attribute:" << status;
+        } else {
+            // enable normalization by default
+            m_collator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
+            if (U_FAILURE(status)) {
+                kdbWarning() << "Could not set collator attribute:" << status;
+            }
         }
     }
 
