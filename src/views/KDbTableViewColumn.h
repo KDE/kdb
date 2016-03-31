@@ -164,8 +164,6 @@ protected:
     //! special ctor that does not allocate d member;
     explicit KDbTableViewColumn(bool);
 
-    void init();
-
     //! used by KDbTableViewData::addColumn()
     void setData(KDbTableViewData *data);
 

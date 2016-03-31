@@ -39,9 +39,16 @@ class KDbTableViewColumn::Private
 public:
   Private()
       : data(0)
+      , validator(0)
+      , relatedData(0)
       , field(0)
       , columnInfo(0)
       , visibleLookupColumnInfo(0)
+      , width(0)
+      , readOnly(false)
+      , visible(true)
+      , relatedDataEditable(false)
+      , headerTextVisible(true)
     {
     }
 
@@ -83,7 +90,6 @@ KDbTableViewColumn::KDbTableViewColumn(KDbField *f, bool owner)
     d->isDBAware = false;
     d->fieldOwned = owner;
     d->captionAliasOrName = d->field->captionOrName();
-    init();
 }
 
 KDbTableViewColumn::KDbTableViewColumn(const QString &name, KDbField::Type ctype,
@@ -100,7 +106,6 @@ KDbTableViewColumn::KDbTableViewColumn(const QString &name, KDbField::Type ctype
     d->isDBAware = false;
     d->fieldOwned = true;
     d->captionAliasOrName = d->field->captionOrName();
-    init();
 }
 
 KDbTableViewColumn::KDbTableViewColumn(const QString &name, KDbField::Type ctype,
@@ -118,7 +123,6 @@ KDbTableViewColumn::KDbTableViewColumn(const QString &name, KDbField::Type ctype
     d->isDBAware = false;
     d->fieldOwned = true;
     d->captionAliasOrName = d->field->captionOrName();
-    init();
 }
 
 // db-aware
@@ -145,7 +149,6 @@ KDbTableViewColumn::KDbTableViewColumn(
             d->captionAliasOrName = d->columnInfo->field->name();
         //! @todo compute other auto-name?
     }
-    init();
     //setup column's readonly flag: true, if
     // - it's not from parent table's field, or
     // - if the query itself is coming from read-only connection, or
@@ -163,7 +166,6 @@ KDbTableViewColumn::KDbTableViewColumn(bool)
         : d(new Private)
 {
     d->isDBAware = false;
-    init();
 }
 
 KDbTableViewColumn::~KDbTableViewColumn()
@@ -173,17 +175,6 @@ KDbTableViewColumn::~KDbTableViewColumn()
     setValidator(0);
     delete d->relatedData;
     delete d;
-}
-
-void KDbTableViewColumn::init()
-{
-    d->relatedData = 0;
-    d->readOnly = false;
-    d->visible = true;
-    d->validator = 0;
-    d->relatedDataEditable = false;
-    d->headerTextVisible = true;
-    d->width = 0;
 }
 
 void KDbTableViewColumn::setValidator(KDbValidator *v)
