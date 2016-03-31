@@ -598,7 +598,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
     //low-level create
     if (!drv_createDatabase(dbName)) {
         m_result.prependMessage(tr("Error creating database \"%1\" on the server.").arg(dbName));
-        closeDatabase();//sanity
+        (void)closeDatabase();//sanity
         return false;
     }
 

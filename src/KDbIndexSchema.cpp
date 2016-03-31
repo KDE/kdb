@@ -53,7 +53,7 @@ KDbIndexSchema::KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema& parent
             KDbFieldList::clear();
             break;
         }
-        addField(parentTableField);
+        (void)addField(parentTableField);
     }
 
 //! @todo copy relationships!
