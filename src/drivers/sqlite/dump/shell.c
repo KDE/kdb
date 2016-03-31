@@ -441,7 +441,7 @@ static int do_meta_command(char *zLine, struct callback_data *p){
   int totalRecords;
   int prevPercent;
   int size;
-  int percent;
+  int percent = 100;
   int rc = 0;
   UNUSED_PARAMETER(zLine);
 
@@ -509,7 +509,9 @@ static int do_meta_command(char *zLine, struct callback_data *p){
       sqlite3_finalize(pSelect);
       return 1;
     }
-    percent = 100 * i / totalRecords;
+    if (totalRecords > 0) {
+        percent = 100 * i / totalRecords;
+    }
     if(prevPercent < percent){
       fprintf(stderr, "DUMP: %d%%\n", percent);
       prevPercent = percent;
