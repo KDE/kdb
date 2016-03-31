@@ -128,7 +128,7 @@ public:
             return;
         else if (m_numCols < numCols) { // grow
             m_data = (QVariant**)realloc(m_data, numCols * sizeof(QVariant*));
-            memset(m_data + m_numCols * sizeof(QVariant*), 0, (numCols - m_numCols) * sizeof(QVariant*));
+            memset(m_data + m_numCols, 0, (numCols - m_numCols) * sizeof(QVariant*));
             m_numCols = numCols;
         }
         else { // shrink
