@@ -411,7 +411,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
     if (!result.recentSQLString().isEmpty())
         *details += QLatin1String("<p><b>") + kdb::tr("SQL statement:")
                    + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
-    int serverErrorCode;
+    int serverErrorCode = 0;
     QString serverResultName;
     if (result.isError()) {
         serverErrorCode = result.serverErrorCode();
@@ -1742,7 +1742,8 @@ QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, 
         }
     }
     if (KDbField::isFPNumericType(type)) {
-        return KDb::iif(*thisOk, QVariant(QString::fromLatin1(data, length).toDouble(thisOk)));
+        const QVariant result(QString::fromLatin1(data, length).toDouble(thisOk));
+        return KDb::iif(*thisOk, result);
     }
     if (type == KDbField::BLOB) {
         *thisOk = length >= 0;
