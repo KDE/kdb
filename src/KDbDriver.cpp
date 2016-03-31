@@ -119,9 +119,9 @@ KDbAdminTools* KDbDriver::drv_createAdminTools() const
 QString KDbDriver::sqlTypeName(int id_t, int p) const
 {
     Q_UNUSED(p);
-    if (id_t > KDbField::InvalidType && id_t <= KDbField::LastType)
-        return d->typeNames[(id_t>0 && id_t<=KDbField::LastType) ? id_t : KDbField::InvalidType /*sanity*/];
-
+    if (id_t > KDbField::InvalidType && id_t <= KDbField::LastType) { /*sanity*/
+        return d->typeNames[id_t];
+    }
     return d->typeNames[KDbField::InvalidType];
 }
 
