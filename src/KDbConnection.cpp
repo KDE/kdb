@@ -1597,9 +1597,6 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
 
     // drop the table replaced (with schema)
     if (destTableExists) {
-        if (!replace) {
-            return false;
-        }
         if (!dropTable(newName)) {
             return false;
         }
