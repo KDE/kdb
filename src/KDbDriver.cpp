@@ -154,7 +154,7 @@ KDbConnection* KDbDriver::removeConnection(KDbConnection *conn)
 
 QString KDbDriver::defaultSQLTypeName(int id_t)
 {
-    if (id_t < 0 || id_t > (KDbField::LastType + 1))
+    if (id_t < 0 || id_t > KDbField::LastType)
         return QLatin1String("Null");
     return QLatin1String(KDb_defaultSQLTypeNames[id_t]);
 }
