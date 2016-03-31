@@ -190,9 +190,10 @@ def insert_fromMap_toMap_methods():
     open_sdc()
     outfile_sdc.write("""%s::Data::Data(const QMap<QString, QString> &map, bool *ok)
 {
-%s
-    if (ok)
+    if (ok) {
         *ok = true;
+    }
+%s
 }
 
 QMap<QString, QString> %s::Data::toMap() const
@@ -530,13 +531,9 @@ def generate_fromString_conversion(name, _type):
     s = 'map[QLatin1String(\"%s\")]' % name
     if _type == 'bool': # 0 or 1
         return """%s = %s.toInt(ok) == 1;
-    if (ok && !(*ok))
-        return;
 """ % (name, s)
     elif _type == 'int':
         return """%s = %s.toInt(ok);
-    if (ok && !(*ok))
-        return;
 """ % (name, s)
     else: # QString...
         return "%s = %s;" % (name, s)
