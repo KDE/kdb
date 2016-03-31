@@ -227,7 +227,6 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Ty
         return KDbEscapedString("!INVALIDTYPE!");
     default:
         kdbDebug() << KDbEscapedString("UNKNOWN!");
-        return KDbEscapedString();
     }
     return KDbEscapedString();
 }

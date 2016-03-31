@@ -420,8 +420,9 @@ tristate KDbAlterTableHandler::ChangeFieldPropertyAction::execute(KDbConnection*
     }
 
 //! @todo
+#if 1
     return true;
-
+#else
     //2. Harder cases, that often require special care
     if (m_propertyName == QLatin1String("name")) {
         /*mysql:
@@ -459,6 +460,7 @@ tristate KDbAlterTableHandler::ChangeFieldPropertyAction::execute(KDbConnection*
       bool result = KDb::setFieldProperty(*field, m_propertyName.toLatin1(), newValue());
     */
     return result;
+#endif
 }
 
 //--------------------------------------------------------
