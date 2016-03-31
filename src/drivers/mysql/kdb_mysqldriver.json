@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org", 
                 "Name": "Kexi Team", 
+                "Name[ast]": "L'equipu de Kexi", 
                 "Name[ca@valencia]": "L'equip del Kexi", 
                 "Name[ca]": "L'equip del Kexi", 
                 "Name[cs]": "Tým Kexi", 
@@ -24,6 +25,7 @@
         "Category": "", 
         "Dependencies": [], 
         "Description": "KDb driver for handling MySQL databases", 
+        "Description[ast]": "Controlador de KDb pa remanar bases de datos MySQL", 
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades MySQL", 
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades MySQL", 
         "Description[cs]": "Ovladač KDb pro práci s databázemi MySQL", 
