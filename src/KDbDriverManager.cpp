@@ -158,12 +158,12 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     clearResult();
     drivermanagerDebug() << "loading" << id;
 
-    KDbDriver *drv = 0;
+    KDbDriver *driver = 0;
     if (!id.isEmpty()) {
-        drv = m_drivers.value(id.toLower());
+        driver = m_drivers.value(id.toLower());
     }
-    if (drv)
-        return drv; //cached
+    if (driver)
+        return driver; //cached
 
     if (!m_driversMetaData.contains(id.toLower())) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
@@ -183,7 +183,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         kdbWarning() << m_result.message() << m_result.serverMessage();
         return 0;
     }
-    KDbDriver *driver = factory->create<KDbDriver>();
+    driver = factory->create<KDbDriver>();
     if (!driver) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not open database driver from plugin \"%1\".")
