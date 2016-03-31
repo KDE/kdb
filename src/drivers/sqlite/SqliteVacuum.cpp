@@ -176,18 +176,24 @@ void SqliteVacuum::readFromStdErr()
     sqliteDebug() << s;
         if (s.startsWith("DUMP: ")) {
             //set previously known progress
-            m_dlg->setValue(m_percent);
+            if (m_dlg) {
+                m_dlg->setValue(m_percent);
+            }
             //update progress info
             if (s.mid(6, 4) == "100%") {
                 m_percent = 100;
 //! @todo IMPORTANT: m_dlg->setAllowCancel(false);
-                m_dlg->setCursor(QCursor(Qt::WaitCursor));
+                if (m_dlg) {
+                    m_dlg->setCursor(QCursor(Qt::WaitCursor));
+                }
             } else if (s.mid(7, 1) == "%") {
                 m_percent = s.mid(6, 1).toInt();
             } else if (s.mid(8, 1) == "%") {
                 m_percent = s.mid(6, 2).toInt();
             }
-            m_dlg->setValue(m_percent);
+            if (m_dlg) {
+                m_dlg->setValue(m_percent);
+            }
         }
     }
 }
