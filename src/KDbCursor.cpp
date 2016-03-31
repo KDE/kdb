@@ -62,6 +62,7 @@ void KDbCursor::init()
     m_opened = false;
     m_atLast = false;
     m_afterLast = false;
+    m_validRecord = false;
     m_readAhead = false;
     m_at = 0;
     m_records_in_buf = 0;

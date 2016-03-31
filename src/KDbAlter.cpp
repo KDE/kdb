@@ -698,6 +698,7 @@ KDbAlterTableHandler::MoveFieldPositionAction::MoveFieldPositionAction(
 
 KDbAlterTableHandler::MoveFieldPositionAction::MoveFieldPositionAction(bool)
         : FieldActionBase(true)
+        , m_index(-1)
 {
 }
 

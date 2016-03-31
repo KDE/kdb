@@ -52,6 +52,7 @@ KDbDriverBehaviour::~KDbDriverBehaviour()
 
 DriverPrivate::DriverPrivate(KDbDriver *aDriver)
         : driver(aDriver)
+        , metaData(0)
         , isDBOpenedAfterCreate(false)
         , features(KDbDriver::NoFeatures)
         , adminTools(0)

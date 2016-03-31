@@ -40,6 +40,7 @@ PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& 
 //Constructor base on query object
 PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
         : KDbCursor(conn, query, options)
+        , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
 {
     m_options |= Buffered;
