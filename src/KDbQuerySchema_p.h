@@ -120,9 +120,6 @@ public:
     /*! Helper used with aliases */
     int maxIndexWithAlias;
 
-    /*! Helper used with tableAliases */
-    int maxIndexWithTableAlias;
-
     /*! Used to store visibility flag for every field */
     QBitArray visibility;
 
