@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -34,6 +34,9 @@ Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
 
 void KDbTest::initTestCase()
 {
+    utils.testDriverManager();
+    //! @todo don't hardcode SQLite here
+    utils.testSqliteDriver();
 }
 
 void KDbTest::testVersionInfo()
@@ -867,15 +870,35 @@ T iif(bool ok, const T &value)
  subdirectory "kdb".
  @see QCoreApplication::libraryPaths() */
 KDB_EXPORT QStringList libraryPaths();
+#endif
 
-/*! @return new temporary name suitable for creating new table.
- The name has mask tmp__{baseName}{rand} where baseName is passed as argument and {rand}
- is a 10 digits long hexadecimal number. @a baseName can be empty. It is adviced to use
- the returned name as quickly as possible for creating new physical table.
- It is not 100% guaranteed that table with this name will not exist at an attempt of creation
- but it is very unlikely. The function checks for existence of table in connection @a conn.*/
-KDB_EXPORT QString temporaryTableName(KDbConnection *conn, const QString &baseName);
+void KDbTest::testTemporaryTableName()
+{
+    QVERIFY(utils.driver);
+    QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/KDbTest.kexi")));
+    utils.testCreate(dbName);
+    utils.connection->useDatabase();
+    utils.testCreateTables();
 
+    QString baseName = QLatin1String("foobar");
+    QString tempName1 = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QVERIFY(!tempName1.isEmpty());
+    QVERIFY(tempName1.contains(baseName));
+    QString tempName2 = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QVERIFY(!tempName2.isEmpty());
+    QVERIFY(tempName2.contains(baseName));
+    QVERIFY(tempName1 != tempName2);
+    utils.connection->closeDatabase();
+    QString tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created for closed connection");
+    utils.connection->disconnect();
+    tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created for closed connection");
+    utils.connection->dropDatabase(dbName);
+}
+
+//! @todo add tests
+#if 0
 /*! @return absolute path to "sqlite3" program.
  Empty string is returned if the program was not found. */
 KDB_EXPORT QString sqlite3ProgramPath();
