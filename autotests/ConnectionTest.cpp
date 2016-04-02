@@ -31,6 +31,7 @@ QTEST_GUILESS_MAIN(ConnectionTest)
 void ConnectionTest::initTestCase()
 {
     utils.testDriverManager();
+    //! @todo don't hardcode SQLite here
     utils.testSqliteDriver();
 }
 
@@ -65,7 +66,7 @@ void ConnectionTest::testConnectionData()
 
     KDbDriverManager manager;
     //! @todo more drivers
-    if (manager.driver("org.kde.kdb.sqlite")) { // only if mysql is present
+    if (manager.driver("org.kde.kdb.sqlite")) { // only if sqlite is present
         qDebug() << "org.kde.kdb.sqlite driver found, testing...";
         cdata = KDbConnectionData();
         cdata.setDriverId("org.kde.kdb.sqlite");
