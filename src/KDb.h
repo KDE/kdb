@@ -588,7 +588,10 @@ KDB_EXPORT QStringList libraryPaths();
  is a 10 digits long hexadecimal number. @a baseName can be empty. It is adviced to use
  the returned name as quickly as possible for creating new physical table.
  It is not 100% guaranteed that table with this name will not exist at an attempt of creation
- but it is very unlikely. The function checks for existence of table in connection @a conn.*/
+ but it is very unlikely. The function checks for existence of a table with temporary name
+ for connection @a conn. Empty string is returned if @a conn is not present or is not open
+ or if checking for existence of table withg temporary name failed.
+*/
 KDB_EXPORT QString temporaryTableName(KDbConnection *conn, const QString &baseName);
 
 /*! @return absolute path to "sqlite3" program.

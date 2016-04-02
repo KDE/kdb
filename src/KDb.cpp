@@ -1775,12 +1775,18 @@ QStringList KDb::libraryPaths()
 QString KDb::temporaryTableName(KDbConnection *conn, const QString &baseName)
 {
     Q_ASSERT(conn);
+    if (!conn) {
+        return QString();
+    }
     while (true) {
         QString name = QLatin1String("tmp__") + baseName;
         for (int i = 0; i < 10; ++i) {
-            name += QString::number(qrand() % 0x10, 16);
+            name += QString::number(int(double(qrand()) / RAND_MAX * 0x10), 16);
         }
-        if (!conn->drv_containsTable(name)) {
+        const tristate res = conn->drv_containsTable(name);
+        if (~res) {
+            return QString();
+        } else if (res == false) {
             return name;
         }
     }
