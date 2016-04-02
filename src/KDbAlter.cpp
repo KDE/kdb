@@ -926,13 +926,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     KDbTableSchema *newTable = recreateTable ? new KDbTableSchema(*oldTable, false/*!copy id*/) : oldTable;
     // find nonexisting temp name for new table schema
     if (recreateTable) {
-        QString tempDestTableName;
-        while (true) {
-            tempDestTableName = QString::fromLatin1("%1_temp%2%3")
-                .arg(newTable->name()).arg(QString::number(rand(), 16)).arg(QString::number(rand(), 16));
-            if (!d->conn->tableSchema(tempDestTableName))
-                break;
-        }
+        QString tempDestTableName = KDb::temporaryTableName(d->conn, newTable->name());
         newTable->setName(tempDestTableName);
     }
     kdbDebug() << *oldTable;
