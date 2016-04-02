@@ -62,6 +62,25 @@ T* KDB_POINTER_WRAPPER(const QScopedPointer<T> &t) { return t.data(); }
     } \
     while (false)
 
+//! Calls @a call and verifies status of @a resultable
+//! On error displays the status on debug and does the same as QVERIFY with @a errorMessage
+#define KDB_EXPECT_FAIL(resultable, call, expectedErrorCode, errorMessage) \
+    do { \
+        bool KDB_VERIFY_ok = (call); \
+        const KDbResultable *KDB_VERIFY_resultablePtr = KDB_POINTER_WRAPPER(resultable); \
+        if (KDB_VERIFY_resultablePtr->result().isError()) { \
+            qDebug() << KDB_VERIFY_resultablePtr->result(); \
+        } \
+        QVERIFY(KDB_VERIFY_resultablePtr->result().isError()); \
+        if (!QTest::qVerify(!KDB_VERIFY_ok, # call, (errorMessage), __FILE__, __LINE__)) {\
+            return; \
+        } \
+        if (!QTest::qCompare(KDB_VERIFY_resultablePtr->result().code(), expectedErrorCode, # call, # expectedErrorCode, __FILE__, __LINE__)) {\
+            return; \
+        } \
+    } \
+    while (false)
+
 //! Test utilities that provide basic database features
 class KDBTESTUTILS_EXPORT KDbTestUtils : public QObject
 {
@@ -78,9 +97,13 @@ public Q_SLOTS:
     void testSqliteDriver();
     void testConnect(const KDbConnectionData &cdata);
     void testUse();
+    void testCreate(const QString &dbName);
+    void testCreateTables();
     void testDisconnect();
+    void testDisconnectAndDropDb();
 
 protected:
+    void testDisconnectInternal();
     void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
 };
 

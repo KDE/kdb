@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@ private Q_SLOTS:
     void initTestCase();
     void testConnectionData();
     void testCreateDb();
+    void testConnectToNonexistingDb();
     void cleanupTestCase();
 
 private:

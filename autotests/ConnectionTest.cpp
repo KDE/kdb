@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -25,9 +25,6 @@
 #include <QDir>
 #include <QFile>
 #include <QTest>
-
-#define TABLETEST_DO_NOT_CREATE_DB
-#include "../tests/features/tables_test.h"
 
 QTEST_GUILESS_MAIN(ConnectionTest)
 
@@ -106,32 +103,31 @@ void ConnectionTest::testConnectionData()
 void ConnectionTest::testCreateDb()
 {
     QVERIFY(utils.driver);
+    QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi")));
+    utils.testCreate(dbName);
+    utils.testUse();
+    utils.testCreateTables();
+    utils.testDisconnectAndDropDb();
+}
 
-    QString db_name(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi")));
+void ConnectionTest::testConnectToNonexistingDb()
+{
+    QVERIFY(utils.driver);
 
     //open connection
     KDbConnectionData cdata;
-    cdata.setDatabaseName(db_name);
-
+    cdata.setDatabaseName(QLatin1String("/really-non-existing/path/fiuwehf2349f8h23c2jcoeqw"));
     utils.testConnect(cdata);
     QVERIFY(utils.connection);
-
-    //! @todo KDbDriver::metaData
-    {
-        QScopedPointer<KDbConnection> connGuard(utils.connection.data());
-        //! @todo move to KDbTestUtils::testCreate()
-        if (utils.connection->databaseExists(db_name)) {
-            KDB_VERIFY(utils.connection, utils.connection->dropDatabase(db_name), "Failed to drop database");
-        }
-        KDB_VERIFY(utils.connection, !utils.connection->databaseExists(db_name), "Database exists");
-        KDB_VERIFY(utils.connection, utils.connection->createDatabase(db_name), "Failed to create db");
-        KDB_VERIFY(utils.connection, utils.connection->databaseExists(db_name), "Database does not exists after creation");
-        utils.testUse();
-        QVERIFY2(tablesTest(utils.connection.data()) == 0, "Failed to create test data");
-        connGuard.take();
-    }
-
-    utils.testDisconnect();
+    KDB_VERIFY(utils.connection, !utils.connection->databaseExists(utils.connection->data().databaseName()),
+                    "Database should not exist");
+    KDB_EXPECT_FAIL(utils.connection, utils.connection->useDatabase(),
+                    ERR_OBJECT_NOT_FOUND, "Should fail to use database");
+    KDB_EXPECT_FAIL(utils.connection, utils.connection->isDatabaseUsed(),
+                    ERR_OBJECT_NOT_FOUND, "Database can't be used after call to useDatabase()");
+    QVERIFY2(utils.connection->closeDatabase(), "Closing after failed USE should work");
+    KDB_VERIFY(utils.connection, utils.connection->disconnect(), "Failed to disconnect database");
+    QVERIFY2(!utils.connection->isConnected(), "Should not be connected");
 }
 
 void ConnectionTest::cleanupTestCase()

@@ -27,6 +27,8 @@
 #include <QTest>
 #include <QMimeDatabase>
 
+#include "../tests/features/tables_test_p.h"
+
 KDbTestUtils::KDbTestUtils()
     : connection(0)
 {
@@ -85,6 +87,7 @@ void KDbTestUtils::testConnect(const KDbConnectionData &cdata)
     extraSqliteExtensionPaths << SQLITE_LOCAL_ICU_EXTENSION_PATH;
     connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
 
+    connection.reset(); // remove previous connection if present
     const int connCount = driver->connections().count();
     connection.reset(driver->createConnection(cdata, connOptions));
     KDB_VERIFY(driver, !connection.isNull(), "Failed to create connection");
@@ -114,18 +117,59 @@ void KDbTestUtils::testUse()
     KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
 }
 
-void KDbTestUtils::testDisconnect()
+void KDbTestUtils::testCreate(const QString &dbName)
+{
+    //open connection
+    KDbConnectionData cdata;
+    cdata.setDatabaseName(dbName);
+
+    testConnect(cdata);
+    QVERIFY(connection);
+
+    //! @todo KDbDriver::metaData
+    {
+        QScopedPointer<KDbConnection> connGuard(connection.data());
+
+        if (connection->databaseExists(dbName)) {
+            KDB_VERIFY(connection, connection->dropDatabase(dbName), "Failed to drop database");
+        }
+        KDB_VERIFY(connection, !connection->databaseExists(dbName), "Database exists");
+        KDB_VERIFY(connection, connection->createDatabase(dbName), "Failed to create db");
+        KDB_VERIFY(connection, connection->databaseExists(dbName), "Database does not exists after creation");
+        connGuard.take();
+    }
+}
+
+void KDbTestUtils::testCreateTables()
+{
+    QVERIFY2(tablesTest_createTables(connection.data()) == 0, "Failed to create test data");
+}
+
+void KDbTestUtils::testDisconnectInternal()
 {
     if (!connection) {
         return;
     }
-    const int connCount = driver->connections().count();
     KDB_VERIFY(connection, connection->closeDatabase(), "Failed to close database");
     KDB_VERIFY(connection, !connection->isDatabaseUsed(), "Database still used after closing");
     KDB_VERIFY(connection, connection->closeDatabase(), "Second closeDatabase() call  should not fail");
     KDB_VERIFY(connection, connection->disconnect(), "Failed to disconnect database");
     KDB_VERIFY(connection, !connection->isConnected(), "Database still connected after disconnecting");
     KDB_VERIFY(connection, connection->disconnect(), "Second disconnect() call should not fail");
+}
+
+void KDbTestUtils::testDisconnect()
+{
+    const int connCount = driver->connections().count();
+    testDisconnectInternal();
     connection.reset();
     QCOMPARE(driver->connections().count(), connCount - 1); // one less
+}
+
+void KDbTestUtils::testDisconnectAndDropDb()
+{
+    QString dbName(connection.data()->data().databaseName());
+    testDisconnectInternal();
+    KDB_VERIFY(connection, connection->dropDatabase(dbName), "Failed to drop database");
+    connection.reset();
 }
