@@ -23,19 +23,21 @@
 
 #include "KDbValidator.h"
 
-//! Validates input for idenKDbValidatorme.
+//! Validates input for identifier.
 class KDB_EXPORT KDbIdentifierValidator : public KDbValidator
 {
 public:
     explicit KDbIdentifierValidator(QObject * parent = 0);
+
     virtual ~KDbIdentifierValidator();
+
     virtual State validate(QString & input, int & pos) const;
 
-    //! @return true if lower case letters are forced.
-    //! By default letters are not forced to lowercase.
+    //! @return true if upper-case letters in the input are replaced to lower-case.
+    //! @c false by default.
     bool isLowerCaseForced() const;
 
-    //! SetsKDbValidators lower case forcing.
+    //! If @a set is true, upper-case letters in the input are replaced to lower-case.
     void setLowerCaseForced(bool set);
 
 protected:
