@@ -52,7 +52,9 @@ QValidator::State KDbIdentifierValidator::validate(QString& input, int& pos) con
         input += QLatin1Char('_');
     if (pos > input.length())
         pos = input.length();
-    return input.isEmpty() ? QValidator::Intermediate : Acceptable;
+    return (input.isEmpty() && !acceptsEmptyValue())
+            ? Intermediate
+            : Acceptable;
 }
 
 KDbValidator::Result KDbIdentifierValidator::internalCheck(
