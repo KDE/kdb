@@ -1898,7 +1898,7 @@ QString KDb::stringToIdentifier(const QString &s)
 
 QString KDb::identifierExpectedMessage(const QString &valueName, const QVariant& v)
 {
-    return QLatin1String("<p>") + kdb::tr("Value of \"%1\" column must be an identifier.")
+    return QLatin1String("<p>") + kdb::tr("Value of \"%1\" field must be an identifier.")
             .arg(valueName)
            + QLatin1String("</p><p>")
            + kdb::tr("\"%1\" is not a valid identifier.").arg(v.toString()) + QLatin1String("</p>");

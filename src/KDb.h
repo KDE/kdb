@@ -614,7 +614,7 @@ KDB_EXPORT bool isIdentifier(const QString& s);
  Empty strings are not changed. Case remains unchanged. */
 KDB_EXPORT QString stringToIdentifier(const QString &s);
 
-/*! @return useful message "Value of "valueName" column must be an identifier.
+/*! @return useful message "Value of "valueName" field must be an identifier.
   "v" is not a valid identifier.". It is also used by KDbIdentifierValidator.  */
 KDB_EXPORT QString identifierExpectedMessage(const QString &valueName,
         const QVariant& v);
