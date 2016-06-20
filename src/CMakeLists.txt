@@ -163,12 +163,6 @@ kdb_remove_extensions(
 generate_export_header(KDb)
 
 set(kdb_INCLUDE_DIRS
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb/expression
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb/interfaces
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb/parser
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb/tools
-    ${CMAKE_CURRENT_BINARY_DIR}/kdb/views
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/expression
     ${CMAKE_CURRENT_SOURCE_DIR}/interfaces
