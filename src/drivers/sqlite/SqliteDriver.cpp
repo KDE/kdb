@@ -182,7 +182,7 @@ KDbEscapedString SqliteDriver::randomFunctionToString(const KDbNArgExpression &a
                                              KDbQuerySchemaParameterValueListIterator* params,
                                              KDb::ExpressionCallStack* callStack) const
 {
-    if (!args.isNull() || args.argCount() < 1 ) {
+    if (args.isNull() || args.argCount() < 1 ) {
         static KDbEscapedString randomStatic("((RANDOM()+9223372036854775807)/18446744073709551615)");
         return randomStatic;
     }
