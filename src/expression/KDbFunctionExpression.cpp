@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -66,6 +66,21 @@ enum BuiltInFunctionArgumentType
     Any
 };
 
+//! @return any concrete type matching rule @a argType
+static KDbField::Type anyMatchingType(int argType)
+{
+    if (argType == AnyText || argType == Any) {
+        return KDbField::Text;
+    }
+    else if (argType == AnyInt || argType == AnyNumber) {
+        return KDbField::Integer;
+    }
+    else if (argType == AnyFloat) {
+        return KDbField::Double;
+    }
+    return KDbField::InvalidType;
+}
+
 //! Declaration of a single built-in function. It can offer multiple signatures.
 class BuiltInFunctionDeclaration
 {
@@ -82,6 +97,19 @@ public:
             return KDbField::Null;
         }
         if (copyReturnTypeFromArg >= 0 && copyReturnTypeFromArg < argsData->children.count()) {
+            KDbQueryParameterExpressionData *queryParameterExpressionData = argsData->children.at(copyReturnTypeFromArg)->convert<KDbQueryParameterExpressionData>();
+            if (queryParameterExpressionData) {
+                // Set query parameter type (if there are any) to deduced result type
+                //! @todo Most likely but can be also other type
+                for (size_t i = 0; i < signatures.size(); ++i) {
+                    int** signature = signatures[i];
+                    const KDbField::Type t = anyMatchingType(signature[copyReturnTypeFromArg][0]);
+                    if (t != KDbField::InvalidType) {
+                        queryParameterExpressionData->m_type = t;
+                        return t;
+                    }
+                }
+            }
             return argsData->children.at(copyReturnTypeFromArg)->type();
         }
         return defaultReturnType;
@@ -100,14 +128,26 @@ public:
     CoalesceFunctionDeclaration() {}
     virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
         Q_UNUSED(parseInfo);
+        // Find type
+        //! @todo Most likely but can be also other type
+        KDbField::Type t = KDbField::Integer;
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         foreach(const ExplicitlySharedExpressionDataPointer &expr, argsData->children) {
-            const KDbField::Type t = expr->type();
-            if (t != KDbField::Null) {
-                return t;
+            KDbQueryParameterExpressionData *queryParameterExpressionData = expr->convert<KDbQueryParameterExpressionData>();
+            const KDbField::Type currentType = expr->type();
+            if (!queryParameterExpressionData && currentType != KDbField::Null) {
+                t = currentType;
+                break;
             }
         }
-        return KDbField::Null;
+        foreach(const ExplicitlySharedExpressionDataPointer &expr, argsData->children) {
+            KDbQueryParameterExpressionData *queryParameterExpressionData = expr->convert<KDbQueryParameterExpressionData>();
+            if (queryParameterExpressionData) {
+                // Set query parameter type (if there are any) to deduced result type
+                queryParameterExpressionData->m_type = t;
+            }
+        }
+        return t;
     }
 };
 
@@ -130,6 +170,7 @@ public:
             return type0;
         }
         KDbField::TypeGroup prevTg = KDbField::typeGroup(type0); // use typegroup for simplicity
+        bool prevTgIsAny = argsData->children.at(0)->convertConst<KDbQueryParameterExpressionData>();
         for(int i = 1; i < argsData->children.count(); ++i) {
             const ExplicitlySharedExpressionDataPointer expr = argsData->children.at(i);
             const KDbField::Type t = expr->type();
@@ -137,6 +178,16 @@ public:
                 return t;
             }
             const KDbField::TypeGroup tg = KDbField::typeGroup(t);
+            const bool tgIsAny = argsData->children.at(i)->convertConst<KDbQueryParameterExpressionData>();
+            if (prevTgIsAny) {
+                if (!tgIsAny) { // no longer "Any" (query parameter)
+                    prevTgIsAny = false;
+                    prevTg = tg;
+                }
+                continue;
+            } else if (tgIsAny) {
+                continue; // use previously found concrete type
+            }
             if ((prevTg == KDbField::IntegerGroup || prevTg == KDbField::FloatGroup)
                 && (tg == KDbField::IntegerGroup || tg == KDbField::FloatGroup))
             {
@@ -161,7 +212,19 @@ public:
             }
             return KDbField::InvalidType;
         }
-        return safeTypeForGroup(prevTg);
+        if (prevTgIsAny) {
+            //! @todo Most likely Integer but can be also Float/Double/Text/Date...
+            return KDbField::Integer;
+        }
+        const KDbField::Type resultType = safeTypeForGroup(prevTg);
+        // Set query parameter types (if there are any) to deduced result type
+        for(ExplicitlySharedExpressionDataPointer expr : argsData->children) {
+            KDbQueryParameterExpressionData *queryParameterExpressionData = expr->convert<KDbQueryParameterExpressionData>();
+            if (queryParameterExpressionData) {
+                queryParameterExpressionData->m_type = resultType;
+            }
+        }
+        return resultType;
     }
 private:
     static bool nullOrInvalid(KDbField::Type type) {
@@ -232,8 +295,28 @@ public:
                     }
                 }
             }
-            const KDbField::Type t0 = argsData->children.at(0)->type();
-            const KDbField::Type t1 = argsData->children.at(1)->type();
+            KDbField::Type t0;
+            KDbField::Type t1;
+            // deduce query parameter types
+            KDbQueryParameterExpressionData *queryParameterExpressionData0 = argsData->children.at(0)->convert<KDbQueryParameterExpressionData>();
+            KDbQueryParameterExpressionData *queryParameterExpressionData1 = argsData->children.at(1)->convert<KDbQueryParameterExpressionData>();
+            if (queryParameterExpressionData0 && queryParameterExpressionData1) {
+                queryParameterExpressionData0->m_type = KDbField::Integer;
+                queryParameterExpressionData1->m_type = KDbField::Integer;
+                t0 = KDbField::Integer;
+                t1 = KDbField::Integer;
+            } else if (queryParameterExpressionData0 && !queryParameterExpressionData1) {
+                queryParameterExpressionData0->m_type = KDbField::Integer;
+                t0 = queryParameterExpressionData0->m_type;
+                t1 = argsData->children.at(1)->type();
+            } else if (!queryParameterExpressionData0 && queryParameterExpressionData1) {
+                queryParameterExpressionData1->m_type = KDbField::Integer;
+                t0 = argsData->children.at(0)->type();
+                t1 = queryParameterExpressionData1->m_type;
+            } else {
+                t0 = argsData->children.at(0)->type();
+                t1 = argsData->children.at(1)->type();
+            }
             return KDb::maximumForIntegerFieldTypes(t0, t1);
         }
         return KDbField::InvalidType;
@@ -252,6 +335,13 @@ public:
         Q_UNUSED(parseInfo);
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         if (argsData->children.count() == 1) {
+            KDbQueryParameterExpressionData *queryParameterExpressionData = argsData->children.at(0)->convert<KDbQueryParameterExpressionData>();
+            if (queryParameterExpressionData) {
+                // Set query parameter type (if there are any) to deduced result type
+                //! @todo Most likely but can be also other type
+                queryParameterExpressionData->m_type = KDbField::Double;
+                return KDbField::BigInteger;
+            }
             const KDbField::Type type = argsData->children.at(0)->type(); // cache: evaluating type of expressions can be expensive
             if (KDbField::isFPNumericType(type)) {
                 return KDbField::BigInteger;
@@ -964,6 +1054,7 @@ static void setIncorrectTypeOfArgumentsErrorMessage(KDbParseInfo *parseInfo, int
     }
 }
 
+//! @return true if type rule @a argType matches concrete type @a actualType
 static bool typeMatches(int argType, KDbField::Type actualType)
 {
     if (argType == AnyText) {
@@ -1111,10 +1202,13 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
         int i = 0;
         foreach(const ExplicitlySharedExpressionDataPointer &expr, args->children) {
             const KDbField::Type exprType = expr->type(); // cache: evaluating type of expressions can be expensive
-            const int matchingType = findMatchingType(typesForAllArgs, exprType);
-            if (matchingType == KDbField::InvalidType) {
-                setIncorrectTypeOfArgumentsErrorMessage(parseInfo, i, exprType, typesForAllArgs, name);
-                return false;
+            const bool isQueryParameter = expr->convertConst<KDbQueryParameterExpressionData>();
+            if (!isQueryParameter) { // (query parameter always matches)
+                const int matchingType = findMatchingType(typesForAllArgs, exprType);
+                if (matchingType == KDbField::InvalidType) {
+                    setIncorrectTypeOfArgumentsErrorMessage(parseInfo, i, exprType, typesForAllArgs, name);
+                    return false;
+                }
             }
             ++i;
         }
@@ -1124,10 +1218,13 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
         int i=0;
         foreach(const ExplicitlySharedExpressionDataPointer &expr, args->children) {
             const KDbField::Type exprType = expr->type(); // cache: evaluating type of expressions can be expensive
-            const int matchingType = findMatchingType(arg[0], exprType);
-            if (matchingType == KDbField::InvalidType) {
-                setIncorrectTypeOfArgumentsErrorMessage(parseInfo, i, exprType, arg[0], name);
-                return false;
+            const bool isQueryParameter = expr->convertConst<KDbQueryParameterExpressionData>();
+            if (!isQueryParameter) { // (query parameter always matches)
+                const int matchingType = findMatchingType(arg[0], exprType);
+                if (matchingType == KDbField::InvalidType) {
+                    setIncorrectTypeOfArgumentsErrorMessage(parseInfo, i, exprType, arg[0], name);
+                    return false;
+                }
             }
             ++arg;
             ++i;
