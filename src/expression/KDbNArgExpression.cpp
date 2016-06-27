@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -96,8 +96,13 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
 
         parseInfo->setErrorMessage(KDbExpression::tr("Incompatible types of arguments"));
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1 operator requires compatible types of arguments.", "BETWEEN..AND type error")
-                              .arg(QLatin1String("BETWEEN..AND")));
+            KDbExpression::tr("Operator \"%1\" requires compatible types of arguments. "
+                              "Specified arguments are of type %2, %3, %4.",
+                              "BETWEEN..AND arguments type error")
+                              .arg(QLatin1String("BETWEEN..AND"))
+                              .arg(KDbField::typeName(t0))
+                              .arg(KDbField::typeName(t1))
+                              .arg(KDbField::typeName(t2)));
         return false;
     }
     return true;
