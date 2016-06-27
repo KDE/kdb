@@ -60,7 +60,18 @@ bool KDbBinaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Exp
         queryParameter->setType(right()->type());
     }
 #endif
-    return typeInternal(callStack) != KDbField::InvalidType;
+    if (typeInternal(callStack) == KDbField::InvalidType) {
+        parseInfo->setErrorMessage(KDbExpression::tr("Incompatible types of arguments"));
+        parseInfo->setErrorDescription(
+            KDbExpression::tr("Expression \"%1\" requires compatible types of arguments. "
+                              "Specified arguments are of type %2 and %3.",
+                              "Binary expression arguments type error")
+                              .arg(toStringInternal(0, 0, callStack).toString())
+                              .arg(KDbField::typeName(left()->type()))
+                              .arg(KDbField::typeName(right()->type())));
+        return false;
+    }
+    return true;
 }
 
 KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* callStack) const
