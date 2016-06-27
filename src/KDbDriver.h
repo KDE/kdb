@@ -390,6 +390,11 @@ KDB_EXPORT QString escapeIdentifier(const KDbDriver* driver,
 KDB_EXPORT QByteArray escapeIdentifier(const KDbDriver* driver,
                                        const QByteArray& str);
 
+inline KDbEscapedString valueToSQL(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
+{
+    return driver ? driver->valueToSQL(ftype, v) : KDb::valueToSQL(ftype, v);
+}
+
 }
 
 #endif

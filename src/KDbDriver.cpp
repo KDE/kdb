@@ -237,6 +237,11 @@ KDbEscapedString KDbDriver::valueToSQL(KDbField::Type ftype, const QVariant& v) 
     return valueToSQLInternal(this, ftype, v);
 }
 
+KDbEscapedString KDb::valueToSQL(KDbField::Type ftype, const QVariant& v)
+{
+    return valueToSQLInternal(0, ftype, v);
+}
+
 KDbEscapedString KDb::dateTimeToSQL(const QDateTime& v)
 {
     /*! (was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
