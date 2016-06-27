@@ -242,7 +242,6 @@ public:
 
 //! Declaration of a single built-in function CEILING(X) and FLOOR(X).
 //! Its return type is:
-//! - Double when number of arguments is zero
 //! - integer if there are two integer arguments (see KDb::maximumForIntegerFieldTypes())
 //! - InvalidType for other number of arguments
 class CeilingFloorFunctionDeclaration : public BuiltInFunctionDeclaration
