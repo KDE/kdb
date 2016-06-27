@@ -99,7 +99,7 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
                 return KDbField::Boolean;
             }
             else if ((ltBool && leftConst && !leftConst->value.toBool())  // false OR NULL is NULL
-                     || (rtBool && rightConst && !rightConst->value.toBool())) // NULL OR false is true
+                     || (rtBool && rightConst && !rightConst->value.toBool())) // NULL OR false is NULL
             {
                 return KDbField::Null;
             }
