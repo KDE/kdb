@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2011 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -112,10 +112,26 @@ KDbField::Type KDbUnaryExpressionData::typeInternal(KDb::ExpressionCallStack* ca
     switch (token.value()) {
     case SQL_IS_NULL:
     case SQL_IS_NOT_NULL:
+        //! @todo queryParameterExpressionData->m_type still is Text but can be any type
         return KDbField::Boolean;
     }
 
-    const KDbField::Type t = a->type(callStack);
+    KDbQueryParameterExpressionData *queryParameterExpressionData = a->convert<KDbQueryParameterExpressionData>();
+    if (queryParameterExpressionData) {
+        switch (token.value()) {
+        case '+':
+        case '-':
+        case '~':
+            queryParameterExpressionData->m_type = KDbField::Integer;
+            break;
+        case '!':
+        case NOT:
+            queryParameterExpressionData->m_type = KDbField::Boolean;
+            break;
+        default:;
+        }
+    }
+    KDbField::Type t = a->type(callStack);
     if (t == KDbField::Null)
         return KDbField::Null;
     if (token == KDbToken::NOT) {

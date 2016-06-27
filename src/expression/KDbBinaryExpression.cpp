@@ -24,6 +24,7 @@
 #include "KDb.h"
 #include "KDbQuerySchema.h"
 #include "KDbDriver.h"
+#include "KDbParser_p.h"
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
@@ -83,6 +84,8 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
     const bool rtBool = rt == KDbField::Boolean;
     const KDbField::TypeGroup ltGroup = KDbField::typeGroup(lt);
     const KDbField::TypeGroup rtGroup = KDbField::typeGroup(rt);
+    const bool lAny = left()->convertConst<KDbQueryParameterExpressionData>();
+    const bool rAny = right()->convertConst<KDbQueryParameterExpressionData>();
 
     if (ltNull || rtNull) {
         switch (token.value()) {
@@ -99,7 +102,11 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
                 return KDbField::Boolean;
             }
             else if ((ltBool && leftConst && !leftConst->value.toBool())  // false OR NULL is NULL
-                     || (rtBool && rightConst && !rightConst->value.toBool())) // NULL OR false is NULL
+                     || (rtBool && rightConst && !rightConst->value.toBool())  // NULL OR false is NULL
+                     || lAny  // Any OR NULL may be NULL
+                     || rAny) // NULL OR Any may be NULL
+                //! @todo Any OR NULL may be also TRUE -- but this needs support of fuzzy/multivalue types
+                //! @todo NULL OR Any may be also TRUE -- but this needs support of fuzzy/multivalue types
             {
                 return KDbField::Null;
             }
@@ -114,7 +121,11 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
                 return KDbField::Boolean;
             }
             else if ((ltBool && leftConst && leftConst->value.toBool())       // true AND NULL is NULL
-                     || (rtBool && rightConst && rightConst->value.toBool())) // NULL AND true is NULL
+                     || (rtBool && rightConst && rightConst->value.toBool()) // NULL AND true is NULL
+                     || lAny  // Any AND NULL may be NULL
+                     || rAny) // NULL AND Any may be NULL
+                //! @todo Any AND NULL may be also FALSE -- but this needs support of fuzzy/multivalue types
+                //! @todo NULL AND Any may be also FALSE -- but this needs support of fuzzy/multivalue types
             {
                 return KDbField::Null;
             }
@@ -134,24 +145,39 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
     switch (token.value()) {
     case OR:
     case AND:
-    case XOR:
+    case XOR: {
         if (ltNull && rtNull) {
             return KDbField::Null;
+        } else if ((ltBool && rtBool)
+                   || (ltBool && rAny)
+                   || (lAny && rtBool)
+                   || (lAny && rAny))
+        {
+            return KDbField::Boolean;
         }
-        return (ltBool && rtBool) ? KDbField::Boolean : KDbField::InvalidType;
+        return KDbField::InvalidType;
+    }
     case '+':
     case CONCATENATION:
         if (lt == KDbField::Text && rt == KDbField::Text) {
             return KDbField::Text;
         }
-        else if (ltText && rtText) {
+        else if ((ltText && rtText)
+                 || (ltText && rAny)
+                 || (lAny && rtText))
+        {
             return KDbField::LongText;
         }
         else if ((ltText && rtNull)
-            || (rtText && ltNull))
+            || (ltNull && rtText)
+            || (lAny && rtNull)
+            || (ltNull && rAny))
         {
             return KDbField::Null;
         } else if (token.value() == CONCATENATION) {
+            if (lAny && rAny) {
+                return KDbField::LongText;
+            }
             return KDbField::InvalidType;
         }
         break; // '+' can still be handled below for non-text types
@@ -160,11 +186,25 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
 
     if (expressionClass == KDb::RelationalExpression) {
         if ((ltText && rtText)
+            || (ltText && rAny)
+            || (lAny && rtText)
+            || (lAny && rAny)
+
             || (ltInt && rtInt)
+            || (ltInt && rAny)
+            || (lAny && rtInt)
+
             || (ltFP && rtFP) || (ltInt && rtFP) || (ltFP && rtInt)
+            || (ltFP && rAny) || (lAny && rtFP)
+
             || (ltBool && rtBool) || (ltBool && rtInt) || (ltInt && rtBool)
+            || (ltBool && rAny) || (lAny && rtBool)
+
             || (ltBool && rtFP) || (ltFP && rtBool)
-            || (ltGroup == KDbField::DateTimeGroup && rtGroup == KDbField::DateTimeGroup))
+
+            || (ltGroup == KDbField::DateTimeGroup && rtGroup == KDbField::DateTimeGroup)
+            || (ltGroup == KDbField::DateTimeGroup && rAny)
+            || (lAny && rtGroup == KDbField::DateTimeGroup))
         {
             return KDbField::Boolean;
         }
@@ -172,7 +212,12 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
     }
 
     if (expressionClass == KDb::ArithmeticExpression) {
-        if (ltInt && rtInt) {
+        if (lAny && rAny) {
+            return KDbField::Integer;
+        } else if ((ltInt && rtInt)
+                   || (ltInt && rAny)
+                   || (lAny && rtInt))
+        {
             /* From documentation of KDb::maximumForIntegerFieldTypes():
              In case of KDb::ArithmeticExpression:
              returned type may not fit to the result of evaluated expression that involves the arguments.
@@ -182,7 +227,14 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
              Solution: for types smaller than Integer (e.g. Byte and ShortInteger) we are returning
              Integer type.
             */
-            KDbField::Type t = KDb::maximumForIntegerFieldTypes(lt, rt);
+            KDbField::Type t;
+            if (lAny) {
+                t = rt;
+            } else if (rAny) {
+                t = lt;
+            } else {
+                t = KDb::maximumForIntegerFieldTypes(lt, rt);
+            }
             if (t == KDbField::Byte || t == KDbField::ShortInteger) {
                 return KDbField::Integer;
             }
@@ -193,13 +245,20 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
         case '&':
         case BITWISE_SHIFT_RIGHT:
         case BITWISE_SHIFT_LEFT:
-            if (ltFP && rtFP) {
+            if ((ltFP && rtFP)
+                 || (ltFP && rAny)  //! @todo can be other Integer too
+                 || (lAny && rtFP)) //! @todo can be other Integer too
+            {
                 return KDbField::Integer;
             }
-            else if (ltFP && rtInt) { // inherit from right
+            else if ((ltFP && rtInt) // inherit from right
+                     || (lAny && rtInt))
+            {
                 return rt;
             }
-            else if (rtFP && ltInt) { // inherit from left
+            else if ((ltInt && rtFP) // inherit from left
+                     || (ltInt && rAny))
+            {
                 return lt;
             }
             break;
@@ -207,9 +266,9 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
         }
 
         /* inherit floating point (Float or Double) type */
-        if (ltFP && (rtInt || lt == rt))
+        if (ltFP && (rtInt || lt == rt || rAny))
             return lt;
-        if (rtFP && (ltInt || lt == rt))
+        if (rtFP && (ltInt || lt == rt || lAny))
             return rt;
     }
     return KDbField::InvalidType;
