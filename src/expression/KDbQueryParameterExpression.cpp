@@ -66,7 +66,11 @@ KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
                                         KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
-    return params ? driver->valueToSQL(type(), params->getPreviousValue())
+    return params
+           // Enclose in () because for example if the parameter is -1 and parent expression
+           // unary '-' then the result would be "--1" (a comment in SQL!).
+           // With the () the result will be a valid expression "-(-1)".
+           ? KDbEscapedString("(%1)").arg(driver->valueToSQL(type(), params->getPreviousValue()))
            : KDbEscapedString("[%1]").arg(KDbEscapedString(value.toString()));
 }
 
