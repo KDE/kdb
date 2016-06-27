@@ -113,29 +113,30 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
     Q_UNUSED(callStack);
     switch (token.value()) {
     case SQL_NULL:
-        return KDbEscapedString("NULL");
+        return KDb::valueToSQL(driver, KDbField::Null, QVariant());
     case CHARACTER_STRING_LITERAL:
 //! @todo better escaping!
-        return KDbEscapedString('\'') + value.toString() + '\'';
+        return KDb::valueToSQL(driver, KDbField::Text, value);
     case SQL_TRUE:
-        return KDbEscapedString("TRUE");
+        return KDb::valueToSQL(driver, KDbField::Boolean, 1);
     case SQL_FALSE:
-        return KDbEscapedString("FALSE");
+        return KDb::valueToSQL(driver, KDbField::Boolean, 0);
     case REAL_CONST:
         return KDbEscapedString(value.toByteArray());
     case DATE_CONST:
-        return KDbEscapedString('\'') + value.toDate().toString(Qt::ISODate) + '\'';
+        return KDb::valueToSQL(driver, KDbField::Date, value);
     case DATETIME_CONST:
-        return KDbEscapedString('\'')
+        return driver ? driver->valueToSQL(KDbField::DateTime, value)
+                : KDbEscapedString('\'')
                 + KDbEscapedString(value.toDateTime().date().toString(Qt::ISODate))
                 + ' ' + value.toDateTime().time().toString(Qt::ISODate) + '\'';
     case TIME_CONST:
-        return KDbEscapedString('\'') + value.toTime().toString(Qt::ISODate) + '\'';
+        return KDb::valueToSQL(driver, KDbField::Time, value);
     case INTEGER_CONST:
     default:
         break;
     }
-    return KDbEscapedString(value.toString());
+    return KDbEscapedString(value.toByteArray());
 }
 
 void KDbConstExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
