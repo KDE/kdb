@@ -178,8 +178,9 @@ bool KDbDriver::isSystemFieldName(const QString& n) const
 
 static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
 {
-    if (v.isNull())
+    if (v.isNull() || ftype == KDbField::Null) {
         return KDbEscapedString("NULL");
+    }
     switch (ftype) {
     case KDbField::Text:
     case KDbField::LongText: {
@@ -202,9 +203,10 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Ty
     }
 //! @todo here special encoding method needed
     case KDbField::Boolean:
-        return KDbEscapedString(v.toInt() == 0
-                 ? driver->behaviour()->BOOLEAN_FALSE_LITERAL
-                 : driver->behaviour()->BOOLEAN_TRUE_LITERAL);
+        return driver
+            ? KDbEscapedString(v.toInt() == 0 ? driver->behaviour()->BOOLEAN_FALSE_LITERAL
+                                              : driver->behaviour()->BOOLEAN_TRUE_LITERAL)
+            : KDbEscapedString(v.toInt() == 0 ? "FALSE" : "TRUE");
     case KDbField::Time:
         return KDbEscapedString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
     case KDbField::Date:
