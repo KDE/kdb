@@ -113,7 +113,7 @@ public:
 
 //! Declaration of a single built-in function MIN(), MAX() and similar ones.
 //! Its return type is:
-//! - NULL is any argument is NULL
+//! - NULL if any argument is NULL
 //! - valid type if types of all arguments are compatible (e.g. text, numeric, date...)
 //! - InvalidType if types of any two are incompatible
 class MinMaxFunctionDeclaration : public BuiltInFunctionDeclaration
