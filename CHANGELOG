@@ -1,4 +1,4 @@
-Predicate CHANGELOG
+KDb CHANGELOG
 
 TODO: add explanation of expressions equality with examples, similar to
       bool QDomNode::operator== ( const QDomNode & n ) const
