@@ -1,4 +1,4 @@
-add_library(kdb_sqlite_icu MODULE icu.cpp)
+add_library(kdb_sqlite_icu MODULE icu.cpp sqliteicu.h README.txt)
 
 generate_export_header(kdb_sqlite_icu)
 

@@ -11,6 +11,7 @@ set(kdb_sybasedriver_SRCS
    SybaseCursor.cpp
    SybaseKeywords.cpp
    SybasePreparedStatement.cpp
+   kdb_sybasedriver.json
 )
 
 build_and_install_kdb_driver(sybase "${kdb_sybasedriver_SRCS}" "${FreeTDS_LIBRARIES}")

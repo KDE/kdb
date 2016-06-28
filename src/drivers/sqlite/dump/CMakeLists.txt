@@ -1,4 +1,4 @@
-set(kdb_sqlite_dump_tool_SRCS main.cpp shell.c)
+set(kdb_sqlite_dump_tool_SRCS main.cpp shell.c README)
 
 add_executable(${KDB_SQLITE_DUMP_TOOL} ${kdb_sqlite_dump_tool_SRCS})
 

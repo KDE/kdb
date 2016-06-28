@@ -77,6 +77,11 @@ set(kdb_LIB_SRCS
    parser/generated/KDbToken.cpp
    parser/KDbParser.cpp
    parser/KDbParser_p.cpp
+   parser/KDbSqlParser.y
+   parser/KDbSqlScanner.l
+   parser/generate_parser_code.sh
+   parser/extract_tokens.sh
+   parser/TODO
 
    tools/KDbJsonTrader_p.cpp # mostly copied from KReport's KReportJsonTrader_p.cpp
    tools/KDbValidator.cpp
@@ -85,9 +90,12 @@ set(kdb_LIB_SRCS
    tools/KDbObjectNameValidator.cpp
    tools/KDbIdentifierValidator.cpp
    tools/KDbUtils.cpp
+   #TODO tools/debuggui.cpp
+   #TODO tools/SimpleCommandLineApp.cpp
+
    tools/transliteration/transliteration_table.cpp
-#TODO tools/debuggui.cpp
-#TODO tools/SimpleCommandLineApp.cpp
+   tools/transliteration/generate_transliteration_table.sh
+   tools/transliteration/transliteration_table.readme
 
    KDbEscapedString.cpp
    KDbResult.cpp
@@ -136,6 +144,11 @@ set(kdb_LIB_SRCS
 
    views/KDbTableViewData.cpp
    views/KDbTableViewColumn.cpp
+   views/chartable.txt
+
+   # non-source:
+   Mainpage.dox
+   Messages.sh
 )
 
 ecm_create_qm_loader(kdb_LIB_SRCS kdb_qt)
