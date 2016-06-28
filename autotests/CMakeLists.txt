@@ -29,7 +29,6 @@ add_library(kdbtestutils SHARED
 target_link_libraries(kdbtestutils
     PUBLIC
         KDb
-    PRIVATE
         Qt5::Test
 )
 generate_export_header(kdbtestutils)
@@ -42,8 +41,6 @@ ecm_add_tests(
     KDbTest.cpp
 
     LINK_LIBRARIES
-        Qt5::Test
-        KDb
         kdbtestutils
 )
 
