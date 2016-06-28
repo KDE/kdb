@@ -105,7 +105,7 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n"
 "\nA set of tests for the KDb library API."
 "\nEvery test is mostly driver-independent."
-"\n (c) 2003-2010, Kexi Team"
+"\n (c) 2003-2016, Kexi Team"
 "\n (c) 2003-2006, OpenOffice Software LLC."
 "\n"
 "\nUsage: " APPNAME " --test <test_name> [options]"
@@ -152,7 +152,9 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n     e.g. using the \"tables\" test"
 "\n"
 "\nArguments:"
-"\n  driver_id                 Driver ID, e.g. org.kde.kdb.sqlite"
+"\n  driver_id                 Driver ID, e.g. org.kde.kdb.sqlite;"
+"\n                            if a word without \".\" is used,"
+"\n                            \"org.kde.kdb.\" will be prepended"
 "\n  db_name                   Database name"
 "\n  sql_statement             Optional SQL statement (for parser test)"
 "\n"
@@ -243,6 +245,9 @@ int main(int argc, char** argv)
     }
 
     drv_id = args.first();
+    if (!drv_id.contains('.')) {
+        drv_id.prepend(QLatin1String("org.kde.kdb."));
+    }
 
     KDbDriverManager manager;
     const QStringList driverIds = manager.driverIds();
