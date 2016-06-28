@@ -2,9 +2,11 @@
 
 # sqltest - fast parser testing using sqlite database.
 # Type sqltest --help for usage info.
-# Copyright (C) 2004, 2006 Jaroslaw Staniek <staniek@kde.org>
+# Copyright (C) 2004-2016 Jaroslaw Staniek <staniek@kde.org>
 
-[ $# -lt 1 ] && echo "Usage: $0 <sqlite-database-name> <sql-statement> [-v] [other_options]" && \
+apppath=`realpath $0`
+app=`basename $apppath`
+[ $# -lt 1 ] && echo "Usage: $app <sqlite-database-name> \"<sql-statement>\" [-v] [other_options]" && \
  echo " -v    Verbose mode" && exit 1
 
 dbname=$1
@@ -19,9 +21,9 @@ if [ "$1" = "-v" ] ; then
 	shift
 fi
 
-temp=`mktemp /tmp/$0.XXXXXX`
+temp=`mktemp /tmp/$app.XXXXXX`
 
-./kdbfeaturestest -test parser sqlite3 "$dbname" "$sql" $* 2> $temp || \
+./kdbfeaturestest --test parser sqlite "$dbname" "$sql" $* 2> $temp || \
 	cat $temp && test "$verbose" -eq 1 && cat $temp
 
 rm -f $temp
