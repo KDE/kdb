@@ -2,8 +2,12 @@
 
 # sqltest_int - fast parser testing using sqlite database (interactive)
 # Type sqltest_int for usage info.
+# Copyright (C) 2004-2016 Jaroslaw Staniek <staniek@kde.org>
 
-[ $# -lt 1 ] && echo "Usage: $0 <sqlite-database-name> [-v] [other_options]" && \
+apppath=`realpath $0`
+appdir=`dirname $apppath`
+app=`basename $apppath`
+[ $# -lt 1 ] && echo "Usage: $app <sqlite-database-name> [-v] [other_options]" && \
  echo " -v    Verbose mode" && exit 1
 
 dbname=$1
@@ -12,4 +16,4 @@ shift
 echo "Enter SQL Statement:"
 read
 
-./sqltest "$dbname" "$REPLY" $*
+"$appdir/sqltest" "$dbname" "$REPLY" $*
