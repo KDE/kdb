@@ -12,6 +12,7 @@ set(kdb_mysqldriver_SRCS
     MysqlCursor.cpp
     MysqlKeywords.cpp
     MysqlPreparedStatement.cpp
+    kdb_mysqldriver.json
 )
 
 build_and_install_kdb_driver(mysql "${kdb_mysqldriver_SRCS}" "${MYSQL_LIBRARIES}")

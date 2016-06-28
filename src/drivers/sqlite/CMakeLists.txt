@@ -54,6 +54,7 @@ set(kdb_sqlite_SRCS
    SqliteAdmin.cpp
    SqliteAlter.cpp
    SqliteFunctions.cpp
+   kdb_sqlitedriver.json
 )
 
 if (KDB_SQLITE_VACUUM)

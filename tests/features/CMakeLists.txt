@@ -5,7 +5,12 @@ add_definitions(
 
 ########### next target ###############
 
-set(kdbfeaturestest_SRCS main.cpp )
+set(kdbfeaturestest_SRCS
+    main.cpp
+    sqltest
+    sqltest_int
+    README
+)
 
 add_executable(kdbfeaturestest ${kdbfeaturestest_SRCS})
 

@@ -13,6 +13,8 @@ set(kdb_postgresqldriver_SRCS
    PostgresqlKeywords.cpp
    PostgresqlConnection_p.cpp
    PostgresqlPreparedStatement.cpp
+   kdb_postgresqldriver.json
+   README
 )
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)

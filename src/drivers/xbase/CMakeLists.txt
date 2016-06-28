@@ -11,6 +11,7 @@ set(kdb_xbasedriver_SRCS
    XbaseCursor.cpp
    XbaseKeywords.cpp
    XbaseExport.cpp
+   kdb_xbasedriver.json
 )
 
 build_and_install_kdb_driver(xbase "${kdb_xbasedriver_SRCS}" "${XBase_LIBRARIES}")
