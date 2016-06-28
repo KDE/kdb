@@ -21,7 +21,7 @@ fi
 
 temp=`mktemp /tmp/$0.XXXXXX`
 
-./predicatefeaturestest -test parser sqlite3 "$dbname" "$sql" $* 2> $temp || \
+./kdbfeaturestest -test parser sqlite3 "$dbname" "$sql" $* 2> $temp || \
 	cat $temp && test "$verbose" -eq 1 && cat $temp
 
 rm -f $temp
