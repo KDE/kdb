@@ -145,6 +145,8 @@ private:
     Q_DISABLE_COPY(KDbParseInfoInternal)
 };
 
+KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset);
+
 void yyerror(const char *str);
 void setError(const QString& errName, const QString& errDesc);
 void setError(const QString& errDesc);
