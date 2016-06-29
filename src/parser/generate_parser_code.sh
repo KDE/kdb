@@ -73,8 +73,6 @@ cat << EOF > generated/sqlparser.h
 #include "KDbSqlTypes.h"
 #include "KDbToken.h"
 
-bool parseData(KDbParser *p, const char *data);
-KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset);
 EOF
 
 # Fine-tune the code: extra functions and remove trailing white space
@@ -279,6 +277,7 @@ cat << EOF > generated/KDbToken.cpp
 #include "KDbDriver.h"
 #include "KDbDriver_p.h"
 #include "sqlparser.h"
+#include "parser/KDbParser_p.h"
 
 KDbToken::KDbToken(char charToken)
     : v(g_tokenName(charToken) == 0 ? 0 : charToken)

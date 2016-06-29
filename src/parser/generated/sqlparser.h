@@ -9,8 +9,6 @@
 #include "KDbSqlTypes.h"
 #include "KDbToken.h"
 
-bool parseData(KDbParser *p, const char *data);
-KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset);
 /* A Bison parser, made by GNU Bison 3.0.4.  */
 
 /* Bison interface for Yacc-like parsers in C

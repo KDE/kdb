@@ -27,6 +27,8 @@
 
 #include <vector>
 
+bool parseData(KDbParser *p, const KDbEscapedString &sql);
+
 //! Cache
 class ParserStatic
 {
@@ -114,7 +116,7 @@ bool KDbParser::parse(const KDbEscapedString &sql)
 
     KDbParser *oldParser = globalParser;
     KDbField *oldField = globalField;
-    bool res = parseData(this, sql.toByteArray().constData());
+    bool res = parseData(this, sql);
     globalParser = oldParser;
     globalField = oldField;
     return res;

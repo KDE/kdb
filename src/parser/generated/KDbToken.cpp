@@ -25,6 +25,7 @@
 #include "KDbDriver.h"
 #include "KDbDriver_p.h"
 #include "sqlparser.h"
+#include "parser/KDbParser_p.h"
 
 KDbToken::KDbToken(char charToken)
     : v(g_tokenName(charToken) == 0 ? 0 : charToken)

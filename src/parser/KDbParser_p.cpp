@@ -217,14 +217,14 @@ void setError(const QString& errDesc)
 
 //! @internal Parses @a data for parser @a p
 //! @todo Make it REENTRANT
-bool parseData(KDbParser *p, const char *data)
+bool parseData(KDbParser *p, const KDbEscapedString &sql)
 {
     globalParser = p;
     globalParser->reset();
     globalField = 0;
     fieldList.clear();
 
-    if (!data) {
+    if (sql.isEmpty()) {
         KDbParserError err(KDbParser::tr("Error"),
                            KDbParser::tr("No query statement specified."),
                            globalToken, globalCurrentPos);
@@ -234,15 +234,26 @@ bool parseData(KDbParser *p, const char *data)
         return false;
     }
 
+    const char *data = sql.constData();
     tokenize(data);
     if (!globalParser->error().type().isEmpty()) {
         globalParser = 0;
         return false;
     }
-    yyparse();
 
-    bool ok = true;
-    if (globalParser->statementType() == KDbParser::Select) {
+    bool ok = yyparse() == 0;
+    if (ok && globalCurrentPos < sql.length()) {
+        kdbWarning() << "Parse error: tokens left"
+                     << "globalCurrentPos:" << globalCurrentPos << "sql.length():" << sql.length()
+                     << "globalToken:" << QString::fromUtf8(globalToken);
+        KDbParserError err(KDbParser::tr("Error"),
+                           KDbParser::tr("Unexpected character."),
+                           globalToken, globalCurrentPos);
+        KDbParserPrivate::get(globalParser)->setError(err);
+        yyerror("");
+        ok = false;
+    }
+    if (ok && globalParser->statementType() == KDbParser::Select) {
         kdbDebug() << "parseData(): ok";
 //   kdbDebug() << "parseData(): " << tableDict.count() << " loaded tables";
         /*   KDbTableSchema *ts;
