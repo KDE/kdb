@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -375,12 +375,74 @@ KDB_EXPORT QString escapeIdentifierAndAddQuotes(const QString& string);
 //! @overload QString escapeIdentifierAndAddQuotes(const QString&)
 KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
 
-/*! @return escaped string @a string w using KDbSQL dialect,
+/*! @return escaped string @a string for the KDbSQL dialect,
             i.e. doubles single quotes ("'") and inserts the string into single quotes.
     Quotes "'" are prepended and appended.
     Also escapes \\n, \\r, \\t, \\\\, \\0.
-    Use it for user-visible backend-independent statements. */
+    Use it for user-visible backend-independent statements.
+    @see unescapeString() */
 KDB_EXPORT QString escapeString(const QString& string);
+
+//! Unescapes characters in string @a string for the KDbSQL dialect.
+/** The operation depends on @a quote character, which can be be ' or ".
+ * @a string is assumed to be properly constructed. This is assured by the lexer's grammar.
+ * Used by lexer to recognize the CHARACTER_STRING_LITERAL token.
+ * @return unescaped string and sets value pointed by @a errorPosition (if any) to -1 on success;
+ * and to index of problematic character on failure.
+ * The function fails when unsupported @a quote character is passed or for unsupported sequences.
+ *
+ * Example sequences for ' character quote:
+ * - \' -> ' (escaping)
+ * - \" -> " (escaping)
+ * - '' -> ' (repeated quote escapes too)
+ * - "" -> "" (repeated but this is not the quote)
+ * - ' -> (disallowed, escaping needed)
+ * - " -> "
+ * Example sequences for " character quote:
+ * - \' -> ' (escaping)
+ * - \" -> " (escaping)
+ * - " -> " (disallowed, escaping needed)
+ * - "" -> " (repeated quote escapes too)
+ * - '' -> '' (repeated but this is not the quote)
+ * - ' -> '
+ *
+ * Following sequences are always unescaped (selection based on a mix of MySQL and C/JavaScript):
+ * - \0 -> NULL (QChar())
+ * - \b -> backspace 0x8
+ * - \f -> form feed 0xc
+ * - \n -> new line 0xa
+ * - \r -> carriage return 0xd
+ * - \t -> horizontal tab 0x9
+ * - \v -> vertical tab 0xb
+ * - \\ -> backslash
+ * - \? -> ? (useful when '?' placeholders are used)
+ * - \% ->  (useful when '%' wildcards are used e.g. for the LIKE operator)
+ * - \_ ->  (useful when '_' pattern is used e.g. for the LIKE operator)
+ * - \xhh -> a character for which hh (exactly 2 digits) is interpreted as an hexadecimal
+ *           number, 00 <= hh <= FF. Widely supported by programming languages.
+ *           Can be also 00 <= hh <= ff.
+ *           Example: \xA9 translates to "©".
+ * - \uxxxx -> 16-bit unicode character, exactly 4 digits, each x is a hexadecimal digit,
+ *           case insensitive; known from JavaScript, Java, C/C++. 0000 <= xxxxxx <= FFFF
+ *           Example: \u2665 translates to "♥".
+ * - \u{xxxxxx} -> 24-bit unicode "code point" character, each x is a hexadecimal digit,
+ *           case insensitive; known from JavaScript (ECMAScript 6). 0 <= xxxxxx <= 10FFFF
+ *           Example: \u{1D306} translates to "𝌆"
+ *
+ * @note Characters without special meaning can be escaped, but then the "\" character
+ *       is skipped, e.g. "\a" == "a".
+ * @note Trailing "\" character in @a string is ignored.
+ * @note \nnn octal notation is not supported, it may be confusing and conflicting
+ *       when combined with other characters (\0012 is not the same as \012).
+ *       The industry is moving away from it and EcmaScript 5 deprecates it.
+ *
+ * See also:
+ * - http://dev.mysql.com/doc/refman/5.7/en/string-literals.html
+ * - https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
+ * - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#Using_special_characters_in_strings
+ * - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#String_literals
+ */
+KDB_EXPORT QString unescapeString(const QString& string, char quote, int *errorPosition = nullptr);
 
 //! Escaping types for BLOBS. Used in escapeBLOB().
 enum BLOBEscapingType {

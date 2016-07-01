@@ -42,7 +42,9 @@ extern void setError(const QString& errName, const QString& errDesc);
 
 whitespace         [ \t\n]
 digit              [0-9]
-string        (['][^']*[']|["][^\"]*["])
+e_str1             (\\\'|\'\'|[^'])
+e_str2             (\\\"|\"\"|[^"])
+string             (\'{e_str1}*\'|\"{e_str2}*\")
 /*identifier       [a-zA-Z_][a-zA-Z_0-9]* */
 identifier         [a-zA-Z_0-9]+
 /* quoted_identifier (\"[a-zA-Z_0-9]+\") */
@@ -276,14 +278,23 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 
 {string} {
     ECOUNT;
-    yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
+    //kdbDebug() << "{string} yytext: '" << yytext << "' (" << yyleng << ")";
+    int errorPosition;
+    const QString unescaped(
+        KDb::unescapeString(QString::fromUtf8(yytext+1, yyleng-2), yytext[0], &errorPosition));
+    if (errorPosition >= 0) { // sanity check
+        setError(KDbParser::tr("Invalid string"),
+                 KDbParser::tr("Invalid character in string"));
+        return SCAN_ERROR;
+    }
+    yylval.stringValue = new QString(unescaped);
     return CHARACTER_STRING_LITERAL;
 
 /* "ZZZ" sentinel for script */
 }
 
 {identifier} {
-    kdbDebug() << "yytext: '" << yytext << "' (" << yyleng << ")";
+    kdbDebug() << "{identifier} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     if (yytext[0]>='0' && yytext[0]<='9') {
         setError(KDbParser::tr("Invalid identifier"),
@@ -295,7 +306,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 }
 
 {query_parameter} {
-    kdbDebug() << "yytext: '" << yytext << "' (" << yyleng << ")";
+    kdbDebug() << "{query_parameter} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
     return QUERY_PARAMETER;
