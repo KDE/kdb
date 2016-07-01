@@ -260,6 +260,48 @@ class kdb
 Q_DECLARE_TR_FUNCTIONS(KDb)
 };
 
+//! @return hex digit converted to integer (0 to 15), 0xFF on failure
+inline static unsigned char hexDigitToInt(char digit)
+{
+    if (digit >= '0' && digit <= '9') {
+        return digit - '0';
+    }
+    if (digit >= 'a' && digit <= 'f') {
+        return digit - 'a' + 10;
+    }
+    if (digit >= 'A' && digit <= 'F') {
+        return digit - 'A' + 10;
+    }
+    return 0xFF;
+}
+
+//! Converts textual representation @a data of a hex number (@a length digits) to a byte array @a array
+//! @return true on success and false if @a data contains characters that are not hex digits.
+//! true is returned for empty @a data as well.
+inline static bool hexToByteArrayInternal(const char* data, int length, QByteArray *array)
+{
+    Q_ASSERT(length >= 0);
+    Q_ASSERT(data || length == 0);
+    array->resize(length / 2 + length % 2);
+    for(int i = 0; length > 0; --length, ++data, ++i) {
+        unsigned char d1 = hexDigitToInt(data[0]);
+        unsigned char d2;
+        if (i == 0 && (length % 2) == 1) { // odd number of digits; no leading 0
+            d2 = d1;
+            d1 = 0;
+        }
+        else {
+            --length;
+            ++data;
+            d2 = hexDigitToInt(data[0]);
+        }
+        if (d1 == 0xFF || d2 == 0xFF) {
+            return false;
+        }
+        (*array)[i] = (d1 << 4) + d2;
+    }
+    return true;
+}
 
 KDbVersionInfo KDb::version()
 {
@@ -1384,49 +1426,6 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
         }
     }
     return array;
-}
-
-//! @return hex digit converted to integer (0 to 15), 0xFF on failure
-inline static unsigned char hexDigitToInt(char digit)
-{
-    if (digit >= '0' && digit <= '9') {
-        return digit - '0';
-    }
-    if (digit >= 'a' && digit <= 'f') {
-        return digit - 'a' + 10;
-    }
-    if (digit >= 'A' && digit <= 'F') {
-        return digit - 'A' + 10;
-    }
-    return 0xFF;
-}
-
-//! Converts textual representation @a data of a hex number (@a length digits) to a byte array @a array
-//! @return true on success and false if @a data contains characters that are not hex digits.
-//! true is returned for empty @a data as well.
-inline static bool hexToByteArrayInternal(const char* data, int length, QByteArray *array)
-{
-    Q_ASSERT(length >= 0);
-    Q_ASSERT(data || length == 0);
-    array->resize(length / 2 + length % 2);
-    for(int i = 0; length > 0; --length, ++data, ++i) {
-        unsigned char d1 = hexDigitToInt(data[0]);
-        unsigned char d2;
-        if (i == 0 && (length % 2) == 1) { // odd number of digits; no leading 0
-            d2 = d1;
-            d1 = 0;
-        }
-        else {
-            --length;
-            ++data;
-            d2 = hexDigitToInt(data[0]);
-        }
-        if (d1 == 0xFF || d2 == 0xFF) {
-            return false;
-        }
-        (*array)[i] = (d1 << 4) + d2;
-    }
-    return true;
 }
 
 QByteArray KDb::xHexToByteArray(const char* data, int length, bool *ok)
