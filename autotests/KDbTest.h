@@ -37,6 +37,8 @@ private Q_SLOTS:
     void testSimplifiedFieldTypeName();
     void testIsEmptyValue_data();
     void testIsEmptyValue();
+    void testUnescapeString_data();
+    void testUnescapeString();
     void testEscapeBLOB_data();
     void testEscapeBLOB();
     void testPgsqlByteaToByteArray();
@@ -49,6 +51,8 @@ private Q_SLOTS:
     void testTemporaryTableName();
     void cleanupTestCase();
 private:
+    void testUnescapeStringHelper(const QString &sequenceString, const QString &resultString,
+                                  char quote, int errorPosition, int offset);
     KDbTestUtils utils;
 };
 

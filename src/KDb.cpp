@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
    Copyright (c) 2006, 2007 Thomas Braxton <kde.braxton@gmail.com>
    Copyright (c) 1999 Preston Brown <pbrown@kde.org>
    Copyright (c) 1997 Matthias Kalle Dalheimer <kalle@kde.org>
@@ -46,6 +46,7 @@
 #include <QProcess>
 #include <QtDebug>
 
+#include <limits>
 #include <memory>
 
 Q_DECLARE_METATYPE(KDbField::Type)
@@ -1303,6 +1304,207 @@ QString KDb::escapeString(const QString& string)
     }
     newString.append(QLatin1Char(quote));
     return newString;
+}
+
+//! @see handleHex()
+const int CODE_POINT_DIGITS = std::numeric_limits<int>::max();
+//! @see handleHex()
+const int MAX_CODE_POINT_VALUE = 0x10FFFF;
+
+//! @internal Decodes hex of length @a digits for handleXhh(), handleUxxxx() and handleUcodePoint()
+//! If @a digits is CODE_POINT_DIGITS, any number of hex digits is decoded until '}' character
+//! is found (error if not found), and the function succeeds when the resulting number
+//! is not larger than MAX_CODE_POINT_VALUE.
+//! If @a digits is smaller than CODE_POINT_DIGITS the function succeeds only if exactly @a digits
+//! number of digits has been found.
+//! @return -1 on error (when invalid character found or on missing character
+//! or if the resulting number is too large)
+//! @see KDb::unescapeString()
+static int handleHex(QString *result, int *from, int stringLen, int *errorPosition, int digits)
+{
+    int digit = 0;
+    for (int i=0; i<digits; ++i) {
+        if ((*from + 1) >=  stringLen) { // unfinished
+            if (errorPosition) {
+                *errorPosition = *from;
+            }
+            return -1;
+        }
+        ++(*from);
+        if (digits == CODE_POINT_DIGITS && (*result)[*from] == QLatin1Char('}')) {
+            // special case: code point character decoded
+            if (i == 0) {
+                if (errorPosition) {
+                    *errorPosition = *from;
+                }
+                return -1;
+            }
+            return digit;
+        }
+        const unsigned char d = hexDigitToInt((*result)[*from].toLatin1());
+        if (d == 0xFF) { // unfinished or wrong character
+            if (errorPosition) {
+                *errorPosition = *from;
+            }
+            return -1;
+        }
+        digit = (digit << 4) + d;
+        if (digits == CODE_POINT_DIGITS) {
+            if (digit > MAX_CODE_POINT_VALUE) { // special case: exceeded limit of code point
+                if (errorPosition) {
+                    *errorPosition = *from;
+                }
+                return -1;
+            }
+        }
+    }
+    return digit;
+}
+
+//! @internal Handles \xhh format for handleEscape()
+//! Assumption: the @a *from points to "x" in the "\x"
+//! @see KDb::unescapeString()
+static bool handleXhh(QString *result, int *from, int to, int stringLen, int *errorPosition)
+{
+    const int intDigit = handleHex(result, from, stringLen, errorPosition, 2);
+    if (intDigit == -1) {
+        return false;
+    }
+    (*result)[to] = QChar(static_cast<unsigned char>(intDigit), 0);
+    return true;
+}
+
+//! @internal Handles \uxxxx format for handleEscape()
+//! Assumption: the @a *from points to the "u" in the "\u".
+//! @see KDb::unescapeString()
+static bool handleUxxxx(QString *result, int *from, int to, int stringLen, int *errorPosition)
+{
+    const int intDigit = handleHex(result, from, stringLen, errorPosition, 4);
+    if (intDigit == -1) {
+        return false;
+    }
+    (*result)[to] = QChar(static_cast<unsigned short>(intDigit));
+    return true;
+}
+
+//! @internal Handles \u{xxxxxx} format for handleEscape()
+//! Assumption: the @a *from points to the "{" in the "\u{".
+//! @see KDb::unescapeString()
+static bool handleUcodePoint(QString *result, int *from, int to, int stringLen, int *errorPosition)
+{
+    const int intDigit = handleHex(result, from, stringLen, errorPosition, CODE_POINT_DIGITS);
+    if (intDigit == -1) {
+        return false;
+    }
+    (*result)[to] = QChar(intDigit);
+    return true;
+}
+
+//! @internal Handles escaped character @a c2 for KDb::unescapeString()
+//! Updates @a result
+//! @return true on success
+static bool handleEscape(QString *result, int *from, int *to, int stringLen, int *errorPosition)
+{
+    const QCharRef c2 = (*result)[*from];
+    if (c2 == QLatin1Char('x')) { // \xhh
+        if (!handleXhh(result, from, *to, stringLen, errorPosition)) {
+            return false;
+        }
+    } else if (c2 == QLatin1Char('u')) { // \u
+        if ((*from + 1) >=  stringLen) { // unfinished
+            if (errorPosition) {
+                *errorPosition = *from;
+            }
+            return false;
+        }
+        ++(*from);
+        const QCharRef c3 = (*result)[*from];
+        if (c3 == QLatin1Char('{')) { // \u{
+            if (!handleUcodePoint(result, from, *to, stringLen, errorPosition)) {
+                return false;
+            }
+        } else {
+            --(*from);
+            if (!handleUxxxx(result, from, *to, stringLen, errorPosition)) {
+                return false;
+            }
+        }
+#define _RULE(in, out) \
+    } else if (c2 == QLatin1Char(in)) { \
+        (*result)[*to] = QLatin1Char(out);
+    _RULE('0', '\0') _RULE('b', '\b') _RULE('f', '\f') _RULE('n', '\n')
+    _RULE('r', '\r') _RULE('t', '\t') _RULE('v', '\v')
+#undef _RULE
+    } else { // \ ' " ? % _ and any other without special meaning can be escaped: just skip "\"
+        (*result)[*to] = c2;
+    }
+    return true;
+}
+
+QString KDb::unescapeString(const QString& string, char quote, int *errorPosition)
+{
+    if (quote != '\'' && quote != '\"') {
+        if (errorPosition) {
+            *errorPosition = 0;
+        }
+        return QString();
+    }
+    const QLatin1Char quoteChar(quote);
+    if (string.isEmpty()
+        || (!string.contains(QLatin1Char('\\')) && !string.contains(quoteChar)))
+    {
+        if (errorPosition) {
+            *errorPosition = -1;
+        }
+        return string; // optimization: there are no escapes and quotes
+    }
+    QString result(string);
+    const int stringLen = string.length();
+    int from = 0;
+    int to = 0;
+    bool doubleQuoteExpected = false;
+    while (from < stringLen) {
+        const QCharRef c = result[from];
+        if (doubleQuoteExpected) {
+            if (c == quoteChar) {
+                result[to] = c;
+                doubleQuoteExpected = false;
+            } else {
+                // error: missing second quote
+                if (errorPosition) {
+                    *errorPosition = from - 1; // -1 because error is at prev. char
+                }
+                return QString();
+            }
+        } else if (c == quoteChar) {
+            doubleQuoteExpected = true;
+            ++from;
+            continue;
+        } else if (c == QLatin1Char('\\')) { // escaping
+            if ((from + 1) >=  stringLen) { // ignore unfinished '\'
+                break;
+            }
+            ++from;
+            if (!handleEscape(&result, &from, &to, stringLen, errorPosition)) {
+                return QString();
+            }
+        } else { // normal character: skip
+            result[to] = result[from];
+        }
+        ++from;
+        ++to;
+    }
+    if (doubleQuoteExpected) { // error: string ends with a single quote
+        if (errorPosition) {
+            *errorPosition = from - 1;
+        }
+        return QString();
+    }
+    if (errorPosition) {
+        *errorPosition = -1;
+    }
+    result.truncate(to);
+    return result;
 }
 
 //! @return hex digit '0'..'F' for integer number 0..15

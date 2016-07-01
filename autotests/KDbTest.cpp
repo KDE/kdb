@@ -492,6 +492,171 @@ KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
 KDB_EXPORT QString escapeString(const QString& string);
 #endif
 
+void KDbTest::testUnescapeString_data()
+{
+    QTest::addColumn<QString>("sequence");
+    QTest::addColumn<QString>("result");
+    QTest::addColumn<char>("quote"); // can be ' or ", if 0 then both variants are checked
+    QTest::addColumn<int>("errorPosition");
+    QTest::addColumn<int>("errorPositionWhenAppended");
+
+    // quote-independent cases, success
+#define T2(tag, sequence, result, quote) QTest::newRow(tag) << QString::fromUtf8(sequence) \
+            << QString::fromUtf8(result) << quote << -1 << -1
+#define T(tag, sequence, result) T2(tag, sequence, result, '\0')
+    QTest::newRow("null") << QString() << QString() << '\0' << -1 << -1;
+    QTest::newRow("\\0") << QString("\\0") << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
+    const char *s = " String without escaping %_? 𝌆 ©";
+    T("without escaping", s, s);
+    T("empty", "", "");
+    T("\\'", "\\'", "'");
+    T("\\\"", "\\\"", "\"");
+    T("\\\\", "\\\\", "\\");
+    T("\\b", "\\b", "\b");
+    T("\\f", "\\f", "\f");
+    T("\\n", "\\n", "\n");
+    T("\\r", "\\r", "\r");
+    T("\\t", "\\t", "\t");
+    T("\\v", "\\v", "\v");
+    T("_\\_", "_\\_", "__");
+    T("?\\?", "?\\?", "??");
+    T("%\\%", "%\\%", "%%");
+    T("ignored \\ in \\a", "\\a", "a");
+    T("ignored \\ in \\♥", "\\♥ ", "♥ ");
+    T("ignored \\ in 𝌆\\\\\\a", "𝌆\\\\\\a", "𝌆\\a");
+    T("unfinished \\", "\\", "");
+    T("unfinished \\ 2", "one two\\", "one two");
+    T("\\xA9", "\\xA9", "©");
+    T("\\xa9\\xa9", "\\xa9\\xa9", "©©");
+    T("\\xff", "\\xff", "\u00ff");
+    QTest::newRow("\\x00") << QString("\\x00") << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
+    QTest::newRow("\\u0000") << QString("\\u0000") << QString(QChar(static_cast<unsigned short>(0)))
+                             << '\0' << -1 << -1;
+    T("\\u2665", "\\u2665", "♥");
+    T("\\uffff", "\\uffff", "\uffff");
+    QTest::newRow("\\u{0}") << QString("\\u{0}") << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
+    QTest::newRow("\\u{0000000000}") << QString("\\u{0000000000}")
+                                     << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
+    T("\\u{A9}", "\\u{A9}", "©");
+    T("\\u{a9}", "\\u{a9}", "©");
+    T("\\u{0a9}", "\\u{0a9}", "©");
+    T("\\u{00a9}", "\\u{00a9}", "©");
+    T("\\u{2665}", "\\u{2665}", "♥");
+    T("\\u{02665}", "\\u{02665}", "♥");
+    QTest::newRow("\\u{1D306}") << QString("\\u{1D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
+    QTest::newRow("\\u{1d306}") << QString("\\u{1d306}") << QString(QChar(0x1d306)) << '\0' << -1 << -1;
+    QTest::newRow("\\u{01D306}") << QString("\\u{01D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
+    QTest::newRow("\\u{01d306}") << QString("\\u{01d306}") << QString(QChar(0x1d306)) << '\0' << -1 << -1;
+    QTest::newRow("\\u{00001D306}") << QString("\\u{00001D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
+    QTest::newRow("\\u{10FFFF}") << QString("\\u{10FFFF}") << QString(QChar(0x10FFFF)) << '\0' << -1 << -1;
+
+    // quote-dependent cases, success
+    T2("2x ' for ' quote", "''", "'", '\'');
+    T2("4x ' for ' quote", "''''", "''", '\'');
+    T2("2x \" for ' quote", "\"\"", "\"\"", '\'');
+    T2("3x \" for ' quote", "\"\"\"", "\"\"\"", '\'');
+    T2("2x ' for \" quote", "''", "''", '"');
+    T2("3x ' for \" quote", "'''", "'''", '"');
+    T2("2x \" for \" quote", "\"\"", "\"", '"');
+    T2("4x \" for \" quote", "\"\"\"\"", "\"\"", '"');
+#undef T
+#undef T2
+    // failures
+    QTest::newRow("invalid quote") << QString::fromUtf8("abc") << QString() << 'x' << 0 << 0;
+#define T(tag, sequence, quote, errorPosition, errorPositionWhenAppended) \
+        QTest::newRow(tag) << QString::fromUtf8(sequence) << QString() << quote \
+                           << errorPosition << errorPositionWhenAppended
+    T("missing ' quote", "'", '\'', 0, 0);
+    T("missing \" quote", "\"", '"', 0, 0);
+    T("invalid \\x", "\\x", '\0', 1, 2);
+    T("invalid \\xQ", "\\xQ", '\0', 2, 2);
+    T("invalid \\xQt", "\\xQt", '\0', 2, 2);
+    T("invalid \\xAQ", "\\xAQ", '\0', 3, 3);
+    T("invalid \\u", "\\u", '\0', 1, 2);
+    T("invalid \\ua", "\\ua", '\0', 2, 3);
+    T("invalid \\u40", "\\u40", '\0', 3, 4);
+    T("invalid \\u405", "\\u405", '\0', 4, 5);
+    T("invalid \\uQ", "\\uQ", '\0', 2, 2);
+    T("invalid \\uQt", "\\uQt", '\0', 2, 2);
+    T("invalid \\uQt5", "\\uQt5", '\0', 2, 2);
+    T("invalid \\uQt57", "\\uQt57", '\0', 2, 2);
+    T("invalid \\uaQ", "\\uaQ", '\0', 3, 3);
+    T("invalid \\uabQ", "\\uabQ", '\0', 4, 4);
+    T("invalid \\uabcQ", "\\uabcQ", '\0', 5, 5);
+    T("invalid \\u{", "\\u{", '\0', 2, 3);
+    T("invalid \\u{26", "\\u{26", '\0', 4, 5);
+    T("invalid \\u{266", "\\u{266", '\0', 5, 6);
+    T("invalid \\u{2665", "\\u{2665", '\0', 6, 7);
+    T("invalid \\u{2665a", "\\u{2665a", '\0', 7, 8);
+    T("invalid \\u{}", "\\u{}", '\0', 3, 3);
+    T("invalid \\u{Q}", "\\u{Q}", '\0', 3, 3);
+    T("invalid \\u{Qt}", "\\u{Qt}", '\0', 3, 3);
+    T("invalid \\u{Qt5}", "\\u{Qt5}", '\0', 3, 3);
+    T("invalid \\u{Qt57}", "\\u{Qt57}", '\0', 3, 3);
+    T("invalid \\u{Qt57", "\\u{Qt57", '\0', 3, 3);
+    T("invalid \\u{aQ}", "\\u{aQ}", '\0', 4, 4);
+    T("invalid \\u{abQ}", "\\u{abQ}", '\0', 5, 5);
+    T("invalid \\u{abcQ}", "\\u{abcQ}", '\0', 6, 6);
+    T("invalid \\u{abcdQ}", "\\u{abcdQ}", '\0', 7, 7);
+    T("invalid \\u{abcdQ}", "\\u{abcdQ}", '\0', 7, 7);
+    T("invalid \\u{abcdfQ}", "\\u{abcdfQ}", '\0', 8, 8);
+    T("invalid too large \\u{110000}", "\\u{110000}", '\0', 8, 8);
+    T("invalid too large \\u{1100000}", "\\u{1100000}", '\0', 8, 8);
+    T("invalid too large \\u{00110000}", "\\u{00110000}", '\0', 10, 10);
+}
+
+void KDbTest::testUnescapeStringHelper(const QString &sequenceString, const QString &resultString_,
+                                       char quote, int errorPosition, int offset)
+{
+    int actualErrorPosition = -2;
+    QString resultString(resultString_);
+    if (errorPosition >= 0) {
+        errorPosition += offset;
+        resultString.clear();
+    }
+    //qDebug() << KDb::unescapeString("\\0bar", '\'', &errorPosition);
+
+#define COMPARE(x, y) \
+    if (x != y) { \
+        qDebug() << "sequenceString:" << sequenceString << "resultString:" << resultString; \
+    } \
+    QCOMPARE(x, y)
+
+    if (quote == 0) { // both cases
+        COMPARE(KDb::unescapeString(sequenceString, '\'', &actualErrorPosition), resultString);
+        COMPARE(actualErrorPosition, errorPosition);
+        COMPARE(KDb::unescapeString(sequenceString, '\'', 0), resultString);
+
+        COMPARE(KDb::unescapeString(sequenceString, '"', &actualErrorPosition), resultString);
+        COMPARE(actualErrorPosition, errorPosition);
+        COMPARE(KDb::unescapeString(sequenceString, '"', 0), resultString);
+    } else {
+        if (quote != '\'' && quote != '"') {
+            resultString.clear();
+            errorPosition = 0;
+        }
+        COMPARE(KDb::unescapeString(sequenceString, quote, &actualErrorPosition), resultString);
+        COMPARE(actualErrorPosition, errorPosition);
+        COMPARE(KDb::unescapeString(sequenceString, quote, 0), resultString);
+    }
+#undef CHECK_POS
+}
+
+void KDbTest::testUnescapeString()
+{
+    QFETCH(QString, sequence);
+    QFETCH(QString, result);
+    QFETCH(char, quote);
+    QFETCH(int, errorPosition);
+    QFETCH(int, errorPositionWhenAppended);
+    testUnescapeStringHelper(sequence, result, quote, errorPosition, 0);
+    testUnescapeStringHelper("foo" + sequence, "foo" + result, quote, errorPosition, 3);
+    testUnescapeStringHelper(sequence + " bar", result + " bar", quote, errorPositionWhenAppended,
+                             0);
+    testUnescapeStringHelper("foo" + sequence + " bar", "foo" + result + " bar",
+                             quote, errorPositionWhenAppended, 3);
+}
+
 void KDbTest::testEscapeBLOB_data()
 {
     QTest::addColumn<QByteArray>("blob");
