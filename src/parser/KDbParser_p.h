@@ -148,9 +148,13 @@ private:
 KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset);
 
 void yyerror(const char *str);
+
 void setError(const QString& errName, const QString& errDesc);
+
 void setError(const QString& errDesc);
+
 bool addColumn(KDbParseInfo* parseInfo, KDbExpression* columnExpr);
+
 KDbQuerySchema* buildSelectQuery(
     KDbQuerySchema* querySchema, KDbNArgExpression* colViews,
     KDbNArgExpression* tablesList = 0, SelectOptionsInternal * options = 0);
