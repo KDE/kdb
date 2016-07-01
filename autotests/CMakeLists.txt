@@ -25,6 +25,9 @@ find_package(Qt5Test REQUIRED)
 # A helper library for db-related tests
 add_library(kdbtestutils SHARED
     KDbTestUtils.cpp
+    # A hack to show the files in the project even if they don't belong to kdbtestutils:
+    headers/headers_test.sh
+    headers/HeadersTestInclude.cmake
 )
 target_link_libraries(kdbtestutils
     PUBLIC
