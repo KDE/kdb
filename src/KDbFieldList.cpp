@@ -318,18 +318,18 @@ bool KDbFieldList::isOwner() const
 
 //static
 KDbEscapedString KDbFieldList::sqlFieldsList(const KDbField::List& list, KDbConnection *conn,
-                                       const QString& separator, const QString& tableAlias,
+                                       const QString& separator, const QString& tableOrAlias,
                                        KDb::IdentifierEscapingType escapingType)
 {
     KDbEscapedString result;
     result.reserve(256);
     bool start = true;
-    QString tableAliasAndDot;
-    if (!tableAlias.isEmpty()) {
-        tableAliasAndDot
+    QString tableOrAliasAndDot;
+    if (!tableOrAlias.isEmpty()) {
+        tableOrAliasAndDot
                  = ((conn && escapingType == KDb::DriverEscaping)
-                        ? conn->escapeIdentifier(tableAlias)
-                        : KDb::escapeIdentifier(tableAlias))
+                        ? conn->escapeIdentifier(tableOrAlias)
+                        : KDb::escapeIdentifier(tableOrAlias))
                    + QLatin1Char('.');
     }
     foreach(KDbField *f, list) {
@@ -337,7 +337,7 @@ KDbEscapedString KDbFieldList::sqlFieldsList(const KDbField::List& list, KDbConn
             result.append(separator);
         else
             start = false;
-        result = (result + tableAliasAndDot +
+        result = (result + tableOrAliasAndDot +
                    ((conn && escapingType == KDb::DriverEscaping)
                         ? conn->escapeIdentifier(f->name())
                         : KDb::escapeIdentifier(f->name()))
@@ -347,13 +347,13 @@ KDbEscapedString KDbFieldList::sqlFieldsList(const KDbField::List& list, KDbConn
 }
 
 KDbEscapedString KDbFieldList::sqlFieldsList(KDbConnection *conn,
-                                 const QString& separator, const QString& tableAlias,
+                                 const QString& separator, const QString& tableOrAlias,
                                  KDb::IdentifierEscapingType escapingType) const
 {
     if (!m_sqlFields.isEmpty())
         return m_sqlFields;
 
-    m_sqlFields = KDbFieldList::sqlFieldsList(m_fields, conn, separator, tableAlias, escapingType);
+    m_sqlFields = KDbFieldList::sqlFieldsList(m_fields, conn, separator, tableOrAlias, escapingType);
     return m_sqlFields;
 }
 

@@ -148,8 +148,8 @@ public:
      and it is invalidated when set of fields changes (e.g. using clear()
      or addField()).
 
-     @a tableAlias, if provided is prepended to each field, so the resulting
-     names will be in form tableAlias.fieldName. This option is used for building
+     @a tableOrAlias, if provided is prepended to each field, so the resulting
+     names will be in form tableOrAlias.fieldName. This option is used for building
      queries with joins, where fields have to be spicified without ambiguity.
      See @ref KDbConnection::selectStatement() for example use.
 
@@ -157,13 +157,13 @@ public:
      If @a conn is not provided for DriverEscaping, no escaping is performed.
     */
     KDbEscapedString sqlFieldsList(KDbConnection *conn, const QString& separator = QLatin1String(","),
-                                const QString& tableAlias = QString(),
+                                const QString& tableOrAlias = QString(),
                                 KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
     /*! Like above, but this is convenient static function, so you can pass any @a list here. */
     static KDbEscapedString sqlFieldsList(const KDbField::List& list, KDbConnection *conn,
                                        const QString& separator = QLatin1String(","),
-                                       const QString& tableAlias = QString(),
+                                       const QString& tableOrAlias = QString(),
                                        KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
 
     /*! @internal Renames field @a oldName to @a newName.
