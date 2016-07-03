@@ -1160,8 +1160,9 @@ quint64 KDbConnection::lastInsertedAutoIncValue(const QString& aiFieldName, cons
     }
     KDbRecordData rdata;
     if (foundRecordId <= 0 || true != querySingleRecord(
-                  KDbEscapedString("SELECT ") + tableName + '.' + aiFieldName
-                + " FROM " + tableName
+                  KDbEscapedString("SELECT ") + escapeIdentifier(tableName) + '.'
+                + escapeIdentifier(aiFieldName)
+                + " FROM " + escapeIdentifier(tableName)
                 + " WHERE " + m_driver->beh->ROW_ID_FIELD_NAME
                 + '=' + KDbEscapedString::number(foundRecordId), &rdata))
     {
