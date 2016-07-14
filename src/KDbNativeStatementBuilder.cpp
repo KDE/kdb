@@ -442,8 +442,9 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             else
                 v += d->driver()->sqlTypeName(type, field->precision());
 
-            if (field->isUnsigned())
+            if (KDbField::isIntegerType(type) && field->isUnsigned()) {
                 v.append(' ').append(d->driver()->beh->UNSIGNED_TYPE_KEYWORD);
+            }
 
             if (KDbField::isFPNumericType(type) && field->precision() > 0) {
                 if (field->scale() > 0)

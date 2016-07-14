@@ -521,6 +521,9 @@ KDbField::setVisibleDecimalPlaces(int p)
 void
 KDbField::setUnsigned(bool u)
 {
+    if (!isIntegerType()) {
+        return;
+    }
     m_options |= Unsigned;
     if (!u)
         m_options ^= Unsigned;
