@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -33,12 +33,6 @@ public:
     //! @return internal name of the plugin, a shortcut of pluginId()
     QString id() const;
 
-    //! @return list of mime types supported by the driver.
-    /*! This is only used for file-based databases like SQLite.
-        The first element is the main mime type, the others are extra mimetypes acceptable,
-        e.g. through importing or usable with with limited feature set.
-        Defined by a MimeType field in "kdb_*.desktop" information files. */
-    QStringList mimeTypes() const;
 
     //! @return true if the driver is for file-based databases like SQLite.
     /*! Defined by a "X-KDb-FileBased" field in "kdb_*.desktop" information files. */

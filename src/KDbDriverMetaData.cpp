@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -58,13 +58,6 @@ KDbDriverMetaData::~KDbDriverMetaData()
 QString KDbDriverMetaData::id() const
 {
     return pluginId();
-}
-
-QStringList KDbDriverMetaData::mimeTypes() const
-{
-    // There is KPluginMetaData::mimeTypes() but we're not using it because it's there since KF 5.16.
-    // See also https://git.reviewboard.kde.org/r/125527/
-    return d->mimeTypes;
 }
 
 bool KDbDriverMetaData::isFileBased() const
