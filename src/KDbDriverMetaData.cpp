@@ -32,8 +32,6 @@ class KDbDriverMetaData::Private
 public:
     Private(KDbDriverMetaData *metaData)
     {
-        const QJsonObject rootObject = metaData->rawData()[QLatin1String("KPlugin")].toObject();
-        mimeTypes = metaData->readStringList(rootObject, QLatin1String("MimeTypes"));
         fileBased = isTrue(metaData, "X-KDb-FileBased");
         importingEnabled = isTrue(metaData, "X-KDb-ImportingEnabled");
     }
