@@ -42,11 +42,17 @@ DriverManagerInternal::DriverManagerInternal()
 DriverManagerInternal::~DriverManagerInternal()
 {
     drivermanagerDebug();
+    clear();
+    drivermanagerDebug() << "ok";
+}
+
+void DriverManagerInternal::clear()
+{
+    drivermanagerDebug() << "Clearing drivers...";
     qDeleteAll(m_drivers);
     m_drivers.clear();
     qDeleteAll(m_driversMetaData);
     m_driversMetaData.clear();
-    drivermanagerDebug() << "ok";
 }
 
 void DriverManagerInternal::slotAppQuits()
@@ -55,9 +61,7 @@ void DriverManagerInternal::slotAppQuits()
             && qApp->topLevelWidgets().first()->isVisible()) {
         return; //what a hack! - we give up when app is still there
     }
-    drivermanagerDebug() << "let's clear drivers...";
-    qDeleteAll(m_drivers);
-    m_drivers.clear();
+    clear();
 }
 
 //static

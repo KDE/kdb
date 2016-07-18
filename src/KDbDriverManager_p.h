@@ -59,6 +59,8 @@ protected Q_SLOTS:
 private:
     bool lookupDrivers();
 
+    void clear();
+
     QMap<QString, KDbDriverMetaData*> m_metadata_by_mimetype;
     QMap<QString, KDbDriverMetaData*> m_driversMetaData; //!< used to store driver metadata
     QMap<QString, KDbDriver*> m_drivers; //!< for owning drivers
