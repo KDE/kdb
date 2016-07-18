@@ -49,7 +49,8 @@ class KDbTableOrQuerySchema;
 namespace KDb
 {
 
-//! @return KDb-specific information about version of the database.
+//! @return runtime information about version of the KDb library.
+//! @see KDbConnection::databaseVersion() KDbConnection::serverVersion() KDbDriverMetaData::version()
 KDB_EXPORT KDbVersionInfo version();
 
 //! @overload bool deleteRecord(KDbConnection*, const KDbTableSchema&, const QString &, KDbField::Type, const QVariant &)

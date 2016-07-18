@@ -33,14 +33,13 @@ public:
     //! @return internal name of the plugin, a shortcut of pluginId()
     QString id() const;
 
-
     //! @return true if the driver is for file-based databases like SQLite.
-    /*! Defined by a "X-KDb-FileBased" field in "kdb_*.desktop" information files. */
+    /*! Defined by a "X-KDb-FileBased" field in .json information files. */
     bool isFileBased() const;
 
     //! @return true if the driver is for a backend that allows importing.
-    /*! Defined by X-KDb-ImportingEnabled field in "kdb_*.desktop" information files.
-        Used for migration. */
+    /*! Defined by a "X-KDb-ImportingEnabled" field in .json information files.
+        Used for database migration. */
     bool isImportingEnabled() const;
 
 protected:

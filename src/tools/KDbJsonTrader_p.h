@@ -48,7 +48,7 @@ public:
      * returned based on the constraints you give it.
      *
      * The keys used in the query (Type, ServiceType, Exec) are all
-     * fields found in the .desktop files.
+     * fields found in .json information files.
      *
      * @param servicetype A service type like 'KMyApp/Plugin' or 'KFilePlugin'.
      * @param mimetype    A mimetype constraint to limit the choices returned, QString() to

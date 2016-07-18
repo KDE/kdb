@@ -33,7 +33,7 @@
 
 Q_GLOBAL_STATIC(DriverManagerInternal, s_self)
 
-DriverManagerInternal::DriverManagerInternal() /* protected */
+DriverManagerInternal::DriverManagerInternal()
  : m_lookupDriversNeeded(true)
 {
     qsrand(QTime::currentTime().msec()); // needed e.g. to create random table names

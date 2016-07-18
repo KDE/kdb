@@ -30,9 +30,16 @@
 # undef major
 #endif
 
-/*! Provides KDb-specific information about version of the database.
+/*! Provides version information.
 
- The version is stored as internal database properties. */
+ KDb::version() provides library version that can be compared to driver's plugin version
+ KDbDriverMetaData::version().
+
+ @note There is also KDbConnection::databaseVersion() that is retrieved from
+ database/connection properties.
+
+ @see KDbConnection::serverVersion()
+*/
 class KDB_EXPORT KDbVersionInfo //SDC: operator==
 {
 public:

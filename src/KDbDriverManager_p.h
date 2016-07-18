@@ -37,8 +37,8 @@ public:
 
     QStringList driverIds();
 
-    /*! Tries to load db driver @a name.
-      @return db driver, or 0 if error (then error message is also set) */
+    /*! Tries to load a driver with identifier @a id.
+      @return db driver, or @c nullptr on error (then error result is also set) */
     KDbDriver* driver(const QString& id);
 
     const KDbDriverMetaData* driverMetaData(const QString &id);
