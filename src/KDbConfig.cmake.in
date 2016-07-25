@@ -10,14 +10,25 @@
 # Additionally, the following imported library targets are created, which may be used directly
 # with target_link_libraries():
 #   KDb - the KDb library
+#
+# Provided features are available under KDB_* variables at the end of this file.
 
 @PACKAGE_INIT@
 
 find_dependency(Qt5Core @REQUIRED_QT_VERSION@)
 find_dependency(Qt5Widgets @REQUIRED_QT_VERSION@)
 find_dependency(Qt5Xml @REQUIRED_QT_VERSION@)
+find_dependency(KF5CoreAddons @REQUIRED_KF5_VERSION@)
 
 include("${CMAKE_CURRENT_LIST_DIR}/KDbTargets.cmake")
 
-# "public" variables:
-# TODO
+# Features
+set(KDB_DEBUG_GUI @KDB_DEBUG_GUI@)
+
+# Match COMPONENTS to features (KDB_ prefixes)
+#message(status " KDb_FIND_COMPONENTS=${KDb_FIND_COMPONENTS}")
+foreach (_COMP ${KDb_FIND_COMPONENTS})
+    if(NOT DEFINED KDB_${_COMP} OR NOT ${KDB_${_COMP}})
+        message(FATAL_ERROR "KDb does not contain required component ${_COMP}. Update KDb or remove this requirement.")
+    endif()
+endforeach()

@@ -1,8 +1,11 @@
-# Options
+# Private options (visible only within KDb)
 simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DRIVERMANAGER_DEBUG "Debugging of the Driver Manager class" OFF)
 simple_option(KDB_TRANSACTIONS_DEBUG "Debugging of the Transaction class" OFF)
+
+# Public options (affecting public behavior or contents of KDb)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
+# NOTE: always add public options to KDbConfig.cmake.in as well
 
 include(CheckIncludeFile)
 check_include_file(unistd.h HAVE_UNISTD_H)
