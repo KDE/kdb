@@ -10,7 +10,7 @@ set(KDB_PLUGIN_INSTALL_DIR ${PLUGIN_INSTALL_DIR}/kdb)
 # -----------------------
 macro(build_and_install_kdb_driver _name _srcs _extra_libs)
     set(_target kdb_${_name}driver)
-    ecm_create_qm_loader(${_srcs} ${_target}_qt)
+    ecm_create_qm_loader(_srcs ${_target}_qt)
     add_library(${_target} MODULE ${_srcs})
 
     target_link_libraries(${_target}
