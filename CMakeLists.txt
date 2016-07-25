@@ -30,12 +30,13 @@ string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" CMAKE_COMPILER_IS_CLANG)
 set(KDB_VERSION "2.96.4") # Update this
 
 # Dependencies
-set(REQUIRED_QT_VERSION "5.2.0")
+set(REQUIRED_QT_VERSION 5.4.0)
+set(REQUIRED_KF5_VERSION 5.16.0)
 
 # Required components to build this framework
 # TODO move Widgets-dependent part to a libKDbWidgets
 find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Core Widgets Xml)
-find_package(KF5 5.16.0 REQUIRED CoreAddons)
+find_package(KF5 ${REQUIRED_KF5_VERSION} REQUIRED CoreAddons)
 find_package(ICU REQUIRED)
 
 get_git_revision_and_branch()
