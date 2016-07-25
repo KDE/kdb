@@ -192,7 +192,6 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(PostgreSQL
                                   REQUIRED_VARS PostgreSQL_LIBRARY PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR
                                   VERSION_VAR PostgreSQL_VERSION_STRING)
-set( PostgreSQL_FOUND  ${POSTGRESQL_FOUND})
 
 # Now try to get the include and library path.
 if(PostgreSQL_FOUND)
