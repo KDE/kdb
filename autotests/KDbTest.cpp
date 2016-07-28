@@ -528,12 +528,15 @@ void KDbTest::testUnescapeString_data()
     T("unfinished \\ 2", "one two\\", "one two");
     T("\\xA9", "\\xA9", "©");
     T("\\xa9\\xa9", "\\xa9\\xa9", "©©");
-    T("\\xff", "\\xff", "\u00ff");
     QTest::newRow("\\x00") << QString("\\x00") << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
     QTest::newRow("\\u0000") << QString("\\u0000") << QString(QChar(static_cast<unsigned short>(0)))
                              << '\0' << -1 << -1;
     T("\\u2665", "\\u2665", "♥");
+#ifndef _MSC_VER // does not work with MSVC: "warning C4566: character represented
+                 // by universal-character-name cannot be represented in the current code page"
+    T("\\xff", "\\xff", "\u00ff");
     T("\\uffff", "\\uffff", "\uffff");
+#endif
     QTest::newRow("\\u{0}") << QString("\\u{0}") << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
     QTest::newRow("\\u{0000000000}") << QString("\\u{0000000000}")
                                      << QString(QLatin1Char('\0')) << '\0' << -1 << -1;
