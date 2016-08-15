@@ -1140,6 +1140,7 @@ bool KDbConnection::executeSQL(const KDbEscapedString& sql)
         m_result.setErrorSql(sql);
         m_result.prependMessage(ERR_SQL_EXECUTION_ERROR,
                                 tr("Error while executing SQL statement."));
+        qWarning() << m_result;
         return false;
     }
     return true;
