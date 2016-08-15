@@ -149,6 +149,10 @@ set(kdb_LIB_SRCS
    views/KDbTableViewColumn.cpp
    views/chartable.txt
 
+   sql/KDbSqlField.cpp
+   sql/KDbSqlRecord.cpp
+   sql/KDbSqlResult.cpp
+
    # non-source:
    Mainpage.dox
    Messages.sh
@@ -184,6 +188,7 @@ set(kdb_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}/interfaces
     ${CMAKE_CURRENT_SOURCE_DIR}/parser
     ${CMAKE_CURRENT_SOURCE_DIR}/parser/generated
+    ${CMAKE_CURRENT_SOURCE_DIR}/sql
     ${CMAKE_CURRENT_SOURCE_DIR}/tools
     ${CMAKE_CURRENT_SOURCE_DIR}/views
 )
@@ -330,6 +335,17 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
     RELATIVE parser/generated
     HEADER_NAMES
         KDbToken
+)
+
+ecm_generate_headers(kdb_FORWARDING_HEADERS
+    REQUIRED_HEADERS kdb_HEADERS
+    ORIGINAL CAMELCASE
+    RELATIVE sql
+    HEADER_NAMES
+        KDbSqlField
+        KDbSqlRecord
+        KDbSqlResult
+        KDbSqlString
 )
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS

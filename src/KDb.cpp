@@ -1984,7 +1984,7 @@ QString KDb::temporaryTableName(KDbConnection *conn, const QString &baseName)
         for (int i = 0; i < 10; ++i) {
             name += QString::number(int(double(qrand()) / RAND_MAX * 0x10), 16);
         }
-        const tristate res = conn->drv_containsTable(name);
+        const tristate res = conn->containsTable(name);
         if (~res) {
             return QString();
         } else if (res == false) {

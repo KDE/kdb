@@ -34,10 +34,12 @@
 #include "KDbUtils.h"
 #include "KDbTristate.h"
 
+class KDbConnectionProxy;
 class KDbCursor;
 class ConnectionPrivate;
 class KDbRecordEditBuffer;
 class KDbProperties;
+class KDbSqlResult;
 
 /*! @brief Generic options for a single connection.
     The options are accessible using key/value pairs. This enables extensibility
@@ -207,6 +209,12 @@ public:
      On error, the function returns empty list.
      @see kdbSystemTableNames() objectNames(int,bool*) */
     QStringList tableNames(bool alsoSystemTables = false, bool* ok = 0);
+
+    /*! @return true if table with name @a tableName exists in the database.
+     @return @c false if it does not exist or @c cancelled if error occurred.
+     The lookup is case insensitive.
+     This method can be much faster than tableNames(). */
+    tristate containsTable(const QString &tableName);
 
     /*! @return list of internal KDb system table names
      (kexi__*). This does not mean that these tables can be found
@@ -876,80 +884,11 @@ public:
 
     tristate closeAllTableSchemaChangeListeners(KDbTableSchema* tableSchema);
 
-//! @todo move this somewhere to low level class (MIGRATION?)
-    /*! LOW LEVEL METHOD. For implementation: returns true if table
-     with name @a tableName exists in the database.
-     @return @c false if it does not exist or @c cancelled if error occurred.
-     The lookup is case insensitive. */
-    virtual tristate drv_containsTable(const QString &tableName) = 0;
-
-    /*! Creates table using @a tableSchema information.
-     @return true on success. Default implementation
-     builds a statement using createTableStatement() and calls drv_executeSQL()
-     Note for driver developers: reimplement this only if you want do to
-     this in other way.
-
-     Moved to public for KexiMigrate.
-     @todo fix this after refactoring
-     */
-    virtual bool drv_createTable(const KDbTableSchema& tableSchema);
-
-    /*! Alters table's described @a tableSchema name to @a newName.
-     This is the default implementation, using "ALTER TABLE <oldname> RENAME TO <newname>",
-     what's supported by SQLite >= 3.2, PostgreSQL, MySQL.
-     Backends lacking ALTER TABLE, for example SQLite2, reimplement this with by an inefficient
-     data copying to a new table. In any case, renaming is performed at the backend.
-     It's good idea to keep the operation within a transaction.
-     @return true on success.
-
-     Moved to public for KexiProject.
-     @todo fix this after refactoring
-    */
-    virtual bool drv_alterTableName(KDbTableSchema* tableSchema, const QString& newName);
-
-    /*! Copies table data from @a tableSchema to @a destinationTableSchema
-     Default implementation executes "INSERT INTO .. SELECT * FROM .."
-     @return true on success. */
-    virtual bool drv_copyTableData(const KDbTableSchema &tableSchema,
-                                   const KDbTableSchema &destinationTableSchema);
-
-    /*! Physically drops table named with @a name.
-     Default impelmentation executes "DROP TABLE.." command,
-     so you rarely want to change this.
-
-      Moved to public for KexiMigrate
-      @todo fix this after refactoring
-    */
-    virtual bool drv_dropTable(const QString& tableName);
-
     /*! Prepare an SQL statement and return a @a KDbPreparedStatement instance. */
     KDbPreparedStatement prepareStatement(KDbPreparedStatement::Type type,
         KDbFieldList* fields, const QStringList& whereFieldNames = QStringList());
 
     bool isInternalTableSchema(const QString& tableName);
-
-    /*! Setups data for object that owns @a object (e.g. table, query)
-      opened on 'kexi__objects' table, pointing to a record
-      corresponding to given object.
-
-      Moved to public for KexiMigrate
-    */
-    bool setupObjectData(const KDbRecordData& data, KDbObject* object);
-
-    /*! @return a new field table schema for a table retrieved from @a data.
-     Used internally by tableSchema().
-
-      Moved to public for KexiMigrate
-      @todo fix this after refatoring
-    */
-    KDbField* setupField(const KDbRecordData& data);
-
-    /*! @internal. Inserts internal table to KDbConnection's structures, so it can be found by name.
-     This method is used for example in KexiProject to insert information about "kexi__blobs"
-     table schema. Use createTable() to physically create table. After createTable()
-     calling insertInternalTable() is not required.
-     Also used internally by KDbConnection::newKDbSystemTableSchema(const QString&) */
-    void insertInternalTable(KDbTableSchema* tableSchema);
 
     //! Identifier escaping function in the associated KDbDriver.
     /*! Calls the identifier escaping function in this connection to
@@ -971,6 +910,13 @@ public:
         return m_driver->escapeIdentifier(id);
     }
 
+    /*! @internal. Inserts internal table to KDbConnection's structures, so it can be found by name.
+     This method is used for example in KexiProject to insert information about "kexi__blobs"
+     table schema. Use createTable() to physically create table. After createTable()
+     calling insertInternalTable() is not required.
+     Also used internally by KDbConnection::newKDbSystemTableSchema(const QString&) */
+    void insertInternalTable(KDbTableSchema* tableSchema);
+
 protected:
     /*! Used by KDbDriver */
     KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
@@ -980,16 +926,13 @@ protected:
      @see ~KDbConnection() */
     void destroy();
 
-    /*! @internal drops table @a tableSchema physically, but destroys
-     @a tableSchema object only if @a alsoRemoveSchema is true.
-     Used (alsoRemoveSchema==false) on table altering:
-     if recreating table can fail we're giving up and keeping
-     the original table schema (even if it is no longer points to any real data). */
-    tristate dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
-
     /*! For implementation: connects to database.
       @return true on success. */
     virtual bool drv_connect() = 0;
+
+    /*! For implementation: disconnects database
+      @return true on success. */
+    virtual bool drv_disconnect() = 0;
 
     /*! For implementation: Sets @a version to real server's version.
      Depending on backend type this method is called after
@@ -1001,9 +944,55 @@ protected:
      @return true on success. */
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version) = 0;
 
-    /*! For implementation: disconnects database
-      @return true on success. */
-    virtual bool drv_disconnect() = 0;
+    /*! LOW LEVEL METHOD. For implementation: returns true if table
+     with name @a tableName exists in the database.
+     @return @c false if it does not exist or @c cancelled if error occurred.
+     The lookup is case insensitive. */
+    virtual tristate drv_containsTable(const QString &tableName) = 0;
+
+    /*! Creates table using @a tableSchema information.
+     @return true on success. Default implementation
+     builds a statement using createTableStatement() and calls drv_executeSQL()
+     Note for driver developers: reimplement this only if you want do to
+     this in other way. */
+    virtual bool drv_createTable(const KDbTableSchema& tableSchema);
+
+    /*! Alters table's described @a tableSchema name to @a newName.
+     This is the default implementation, using "ALTER TABLE <oldname> RENAME TO <newname>",
+     what's supported by SQLite >= 3.2, PostgreSQL, MySQL.
+     Backends lacking ALTER TABLE, for example SQLite2, reimplement this with by an inefficient
+     data copying to a new table. In any case, renaming is performed at the backend.
+     It's good idea to keep the operation within a transaction.
+     @return true on success. */
+    virtual bool drv_alterTableName(KDbTableSchema* tableSchema, const QString& newName);
+
+    /*! Copies table data from @a tableSchema to @a destinationTableSchema
+     Default implementation executes "INSERT INTO .. SELECT * FROM .."
+     @return true on success. */
+    virtual bool drv_copyTableData(const KDbTableSchema &tableSchema,
+                                   const KDbTableSchema &destinationTableSchema);
+
+    /*! Physically drops table named with @a name.
+     Default impelmentation executes "DROP TABLE.." command,
+     so you rarely want to change this. */
+    virtual bool drv_dropTable(const QString& tableName);
+
+    /*! @internal drops table @a tableSchema physically, but destroys
+     @a tableSchema object only if @a alsoRemoveSchema is true.
+     Used (alsoRemoveSchema==false) on table altering:
+     if recreating table can fail we're giving up and keeping
+     the original table schema (even if it is no longer points to any real data). */
+    tristate dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
+
+    /*! Setups data for object that owns @a object (e.g. table, query)
+      opened on 'kexi__objects' table, pointing to a record
+      corresponding to given object. */
+    bool setupObjectData(const KDbRecordData& data, KDbObject* object);
+
+    /*! @return a new field table schema for a table retrieved from @a data.
+     Ownership of the returned object is passed to the caller.
+     Used internally by tableSchema(). */
+    KDbField* setupField(const KDbRecordData& data) Q_REQUIRED_RESULT;
 
     /*! Executes query for a raw SQL statement @a sql without returning resulting
      records. It is useful mostly for functional queries.
@@ -1330,6 +1319,15 @@ protected:
      @return true on success and false on failure. */
     bool storeMainFieldSchema(KDbField *field);
 
+    /*! @internal
+     Uses result of execution raw SQL query using executeSQL().
+     For low-level access to the results (without cursors).
+     The result may be not stored (not buffered) yet.
+     Use KDbSqlResult::fetchRecord() to fetch each record.
+     @return @c nullptr if there is no proper result.
+     Ownership of the returned object is passed to the caller. */
+    virtual KDbSqlResult* useSqlResult() Q_REQUIRED_RESULT { return nullptr; }
+
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     /*! This is a part of alter table interface implementing lower-level operations
@@ -1371,6 +1369,7 @@ private:
     friend class KDbProperties; //!< for setError()
     friend class ConnectionPrivate;
     friend class KDbAlterTableHandler;
+    friend class KDbConnectionProxy;
 };
 
 #endif
