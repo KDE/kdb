@@ -203,10 +203,10 @@ public:
     //! @return @a str string with applied driver-specific identifier escaping
     /*! This escaping can be used for field, table, database names, etc.
         @see KDb::escapeIdentifier */
-    inline QString escapeIdentifier(const QString& str) const { return drv_escapeIdentifier(str); }
+    QString escapeIdentifier(const QString& str) const;
 
     //! @overload QString escapeIdentifier(const QString&) const
-    inline QByteArray escapeIdentifier(const QByteArray& str) const  { return drv_escapeIdentifier(str); }
+    QByteArray escapeIdentifier(const QByteArray& str) const;
 
     //! @return internal property with a name @a name for this driver.
     //! If there's no such property defined for driver, a null property is returned.
