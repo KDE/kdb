@@ -2702,16 +2702,13 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
     if (!ok)
         return 0;
 
-    QString name(data.at(2).toString().toLower());
+    QString name(data.at(2).toString());
     if (!KDb::isIdentifier(name)) {
-        m_result = KDbResult(ERR_INVALID_IDENTIFIER,
-                             tr("Invalid object name \"%1\".").arg(data.at(2).toString()));
-        ok = false;
-        return 0;
+        name = KDb::stringToIdentifier(name);
     }
 
     KDbField *f = new KDbField(
-        data.at(2).toString(), f_type, f_constr, f_opts, f_len, f_prec);
+        name, f_type, f_constr, f_opts, f_len, f_prec);
 
     f->setDefaultValue(KDb::stringToVariant(data.at(7).toString(), KDbField::variantType(f_type), &ok));
     if (!ok) {
