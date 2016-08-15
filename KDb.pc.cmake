@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: KDb
 Description: A database connectivity and creation library
-Version: @KDB_VERSION@
+Version: @PROJECT_VERSION@
 URL: http://community.kde.org/KDb
 Requires: Qt5Core Qt5Gui Qt5Xml icu-lo KF5CoreAddons
 Libs: -L${libdir}

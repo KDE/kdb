@@ -221,7 +221,7 @@ set_target_properties(KDb
 # Create a Config.cmake and a ConfigVersion.cmake file and install them
 set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KDb")
 
-ecm_setup_version(${KDB_VERSION}
+ecm_setup_version(${PROJECT_VERSION}
     VARIABLE_PREFIX KDB
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"

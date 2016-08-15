@@ -1,5 +1,6 @@
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-project(KDb)
+cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_policy(SET CMP0048 NEW)
+project(KDb VERSION 2.96.6) # Update this
 
 # ECM setup
 find_package(ECM 1.8.0 REQUIRED NO_MODULE)
@@ -26,8 +27,6 @@ include(MacroLogFeature)
 include(KDbCreateSharedDataClasses)
 include(KDbMacros)
 string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" CMAKE_COMPILER_IS_CLANG)
-
-set(KDB_VERSION "2.96.5") # Update this
 
 # Dependencies
 set(REQUIRED_QT_VERSION 5.4.0)
