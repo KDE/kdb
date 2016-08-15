@@ -34,11 +34,11 @@ class xBaseConnection : public KDbConnection
 public:
     virtual ~xBaseConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
+    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
     //! @todo returns 0 for now
-    virtual KDbPreparedStatementInterface* prepareStatementInternal();
+    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
   protected:
 

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -390,8 +390,9 @@ public:
 
     /*! Prepares SELECT query described by a raw statement @a sql.
      @return opened cursor created for results of this query
-     or NULL if there was any error. KDbCursor can have optionally applied @a cursor_options
-     (one of more selected from KDbCursor::Options).
+     or @c nullptr if there was any error. Ownership of the returned object is passed
+     to the caller.
+     KDbCursor can have optionally applied @a cursor_options (one of more selected from KDbCursor::Options).
      Preparation means that returned cursor is created but not opened.
      Open this when you would like to do it with KDbCursor::open().
 
@@ -399,7 +400,7 @@ public:
      resources and return KDbCursor subclass' object
      (passing @a sql and @a cursor_options to its constructor).
     */
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) = 0;
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_REQUIRED_RESULT = 0;
 
     /*! @overload prepareQuery(const KDbEscapedString&, int)
      Prepares query described by @a query schema. @a params are values of parameters that
@@ -411,28 +412,29 @@ public:
      Kexi SQL and driver-specific escaping is performed on table names.
     */
     KDbCursor* prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            int cursor_options = 0);
+                            int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! @overload prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
       int cursor_options = 0 )
      Prepares query described by @a query schema without parameters.
     */
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) = 0;
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_REQUIRED_RESULT = 0;
 
     /*! @overload prepareQuery(const KDbEscapedString&, int)
      Statement is build from data provided by @a table schema,
      it is like "select * from table_name".*/
-    KDbCursor* prepareQuery(KDbTableSchema* table, int cursor_options = 0);
+    KDbCursor* prepareQuery(KDbTableSchema* table, int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! Executes SELECT query described by a raw SQL statement @a sql.
      @return opened cursor created for results of this query
      or 0 if there was any error on the cursor creation or opening.
+     Ownership of the returned object is passed to the caller.
      KDbCursor can have optionally applied @a cursor_options
      (one of more selected from KDbCursor::Options).
      Identifiers in @a sql that are the same as keywords
      in KDbSQL dialect or the backend's SQL have to be escaped.
      */
-    KDbCursor* executeQuery(const KDbEscapedString& sql, int cursor_options = 0);
+    KDbCursor* executeQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! @overload executeQuery(const KDbEscapedString&, int)
      @a params are values of parameters that
@@ -441,17 +443,17 @@ public:
      Statement is build from data provided by @a query schema.
      Kexi SQL and driver-specific escaping is performed on table names. */
     KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            int cursor_options = 0);
+                            int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! @overload executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
       int cursor_options = 0 ) */
-    KDbCursor* executeQuery(KDbQuerySchema* query, int cursor_options = 0);
+    KDbCursor* executeQuery(KDbQuerySchema* query, int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! @overload executeQuery(const KDbEscapedString&, int)
      Executes query described by @a query schema without parameters.
      Statement is build from data provided by @a table schema,
      it is like "select * from table_name".*/
-    KDbCursor* executeQuery(KDbTableSchema* table, int cursor_options = 0);
+    KDbCursor* executeQuery(KDbTableSchema* table, int cursor_options = 0) Q_REQUIRED_RESULT;
 
     /*! Deletes cursor @a cursor previously created by functions like executeQuery()
      for this connection.
@@ -1093,6 +1095,7 @@ protected:
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just
      executes "BEGIN" sql statement and returns just empty data (KDbTransactionData object).
+     Ownership of the returned object is passed to the caller.
 
      Drivers that do not support transactions (see KDbDriver::features())
      do never call this method.
@@ -1103,7 +1106,7 @@ protected:
      You should return NULL if any error occurred.
      Do not check anything in connection (isConnected(), etc.) - all is already done.
     */
-    virtual KDbTransactionData* drv_beginTransaction();
+    virtual KDbTransactionData* drv_beginTransaction() Q_REQUIRED_RESULT;
 
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just
@@ -1186,8 +1189,9 @@ protected:
      */
     virtual bool drv_setAutoCommit(bool on);
 
-    /*! Prepare an SQL statement and return a @a KDbPreparedStatementInterface-derived object. */
-    virtual KDbPreparedStatementInterface* prepareStatementInternal() = 0;
+    /*! Prepare an SQL statement and return a @a KDbPreparedStatementInterface-derived object.
+     Ownership of the returned object is passed to the caller. */
+    virtual KDbPreparedStatementInterface* prepareStatementInternal() Q_REQUIRED_RESULT = 0;
 
     /*! Internal, for handling autocommited transactions:
      begins transaction if one is supported.
@@ -1237,12 +1241,14 @@ protected:
     bool checkIsDatabaseUsed();
 
     /*! @return a full table schema for a table retrieved using 'kexi__*' system tables.
+     Connection keeps ownership of the returned object.
      Used internally by tableSchema() methods. */
-    KDbTableSchema* setupTableSchema(const KDbRecordData& data);
+    KDbTableSchema* setupTableSchema(const KDbRecordData& data) Q_REQUIRED_RESULT;
 
     /*! @return a full query schema for a query using 'kexi__*' system tables.
+     Connection keeps ownership of the returned object.
      Used internally by querySchema() methods. */
-    KDbQuerySchema* setupQuerySchema(const KDbRecordData& data);
+    KDbQuerySchema* setupQuerySchema(const KDbRecordData& data) Q_REQUIRED_RESULT;
 
     /*! Update a record. */
     bool updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId = false);
@@ -1300,9 +1306,10 @@ protected:
                                  int column, bool (*filterFunction)(const QString&));
 
     /*! @internal used by *Internal() methods.
-     Executes query based on a raw SQL statement @a sql or @a query with optional @a params. */
+     Executes query based on a raw SQL statement @a sql or @a query with optional @a params.
+     Ownership of the returned object is passed to the caller.*/
     KDbCursor* executeQueryInternal(const KDbEscapedString& sql, KDbQuerySchema* query,
-                                    const QList<QVariant>* params);
+                                    const QList<QVariant>* params) Q_REQUIRED_RESULT;
 
     /*! Loads extended schema information for table @a tableSchema,
      if present (see ExtendedTableSchemaInformation in Kexi Wiki).

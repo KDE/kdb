@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -37,10 +37,10 @@ class MysqlConnection : public KDbConnection
 public:
     virtual ~MysqlConnection();
 
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0);
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0);
+    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
-    virtual KDbPreparedStatementInterface* prepareStatementInternal();
+    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
 protected:
     /*! Used by driver */
