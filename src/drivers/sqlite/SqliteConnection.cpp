@@ -379,9 +379,9 @@ bool SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
         clearResult();
         m_result.setServerMessage(QLatin1String(errmsg_p));
         sqlite3_free(errmsg_p);
+    } else {
+        storeResult();
     }
-
-    storeResult();
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QLatin1String( res == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
