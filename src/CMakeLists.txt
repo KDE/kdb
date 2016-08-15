@@ -127,6 +127,7 @@ set(kdb_LIB_SRCS
    KDbDriver_p.cpp
    KDbDriverMetaData.cpp
    KDbConnection.cpp
+   KDbConnectionProxy.cpp
    generated/sqlkeywords.cpp
    KDbObject.cpp
    KDb.cpp
@@ -279,6 +280,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbAdmin
         KDbAlter
         KDbConnection
+        KDbConnectionProxy
         KDbCursor
         KDbProperties
         KDbDriver
