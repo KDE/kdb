@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -39,7 +39,7 @@ public:
     //! @todo use equivalent of QPointer<KDbConnection>
     KDbConnection *connection;
 
-    inline KDbDriver *driver() { return connection->driver(); }
+    inline KDbDriver *driver() { return connection ? connection->driver() : nullptr; }
 };
 
 //================================================
@@ -47,7 +47,6 @@ public:
 KDbNativeStatementBuilder::KDbNativeStatementBuilder(KDbConnection *connection)
     : d(new Private)
 {
-    Q_ASSERT(connection);
     d->connection = connection;
 }
 
@@ -414,19 +413,20 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
 {
     Q_ASSERT(target);
     // Each SQL identifier needs to be escaped in the generated query.
+    const KDbDriver *driver = d->connection ? d->connection->driver() : nullptr;
     KDbEscapedString sql;
     sql.reserve(4096);
     sql = KDbEscapedString("CREATE TABLE ")
-            + d->connection->escapeIdentifier(tableSchema.name()) + " (";
+            + KDb::escapeIdentifier(driver, tableSchema.name()) + " (";
     bool first = true;
     foreach(KDbField *field, tableSchema.m_fields) {
         if (first)
             first = false;
         else
             sql += ", ";
-        KDbEscapedString v = KDbEscapedString(d->connection->escapeIdentifier(field->name())) + ' ';
+        KDbEscapedString v = KDbEscapedString(KDb::escapeIdentifier(driver, field->name())) + ' ';
         const bool autoinc = field->isAutoIncrement();
-        const bool pk = field->isPrimaryKey() || (autoinc && d->driver()->beh->AUTO_INCREMENT_REQUIRES_PK);
+        const bool pk = field->isPrimaryKey() || (autoinc && driver && driver->beh->AUTO_INCREMENT_REQUIRES_PK);
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         const KDbField::Type type = field->type(); // cache: evaluating type of expressions can be expensive
         if (autoinc && d->driver()->beh->SPECIAL_AUTO_INCREMENT_DEF) {

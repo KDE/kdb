@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -51,8 +51,10 @@ public:
 class KDB_EXPORT KDbNativeStatementBuilder
 {
 public:
-    //! Creates a new native builder object. @a connection must not be 0.
-    explicit KDbNativeStatementBuilder(KDbConnection *connection);
+    //! Creates a new native builder object. If @a connection is nullptr,
+    //! generated statement strings are of KDbSQL dialect, else they are specific
+    //! to database connection or connection's database driver.
+    explicit KDbNativeStatementBuilder(KDbConnection *connection = nullptr);
 
     ~KDbNativeStatementBuilder();
 
