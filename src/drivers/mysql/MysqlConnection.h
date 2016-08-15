@@ -71,10 +71,13 @@ protected:
 
     void storeResult();
 
+    KDbSqlResult* useSqlResult() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+
     MysqlConnectionInternal* d;
 
     friend class MysqlDriver;
     friend class MysqlCursorData;
+    friend class MysqlSqlResult;
 };
 
 #endif

@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Joseph Wenninger<jowenn@kde.org>
-   Copyright (C) 2004-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -209,4 +209,11 @@ KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 void MysqlConnection::storeResult()
 {
     d->storeResult(&m_result);
+}
+
+KDbSqlResult* MysqlConnection::useSqlResult()
+{
+    MYSQL_RES *data = mysql_use_result(d->mysql); // more optimal than mysql_store_result
+    //! @todo use mysql_error()
+    return data ? new MysqlSqlResult(this, data) : nullptr;
 }

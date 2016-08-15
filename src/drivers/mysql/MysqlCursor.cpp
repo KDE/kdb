@@ -52,6 +52,8 @@ bool MysqlCursor::drv_open(const KDbEscapedString& sql)
 {
     if (mysql_real_query(d->mysql, sql.constData(), sql.length()) == 0) {
         if (mysql_errno(d->mysql) == 0) {
+            //! @todo Add option somewhere so we can use more optimal mysql_num_rows().
+            //!       In this case mysql_num_rows() does not work however.
             d->mysqlres = mysql_store_result(d->mysql);
             m_fieldCount = mysql_num_fields(d->mysqlres);
             m_fieldsToStoreInRecord = m_fieldCount;
