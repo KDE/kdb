@@ -2028,7 +2028,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
 bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object)
 {
     if (data.count() < 5) {
-        kdbWarning() << "Aborting, object data should have 5 elements, found" << data.count();
+        kdbWarning() << "Aborting, object data should have at least 5 elements, found" << data.count();
         return false;
     }
     bool ok;
