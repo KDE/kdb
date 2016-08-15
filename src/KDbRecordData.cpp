@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002   Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003   Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -53,4 +53,14 @@ void KDbRecordData::clear()
         m_data = 0;
         m_numCols = 0;
     }
+}
+
+QList<QVariant> KDbRecordData::toList() const
+{
+    QList<QVariant> list;
+    list.reserve(m_numCols);
+    for (int i = 0; i < m_numCols; ++i) {
+        list.append(*m_data[i]);
+    }
+    return list;
 }
