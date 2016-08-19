@@ -18,15 +18,15 @@ include(CheckCXXSourceCompiles)
 include(MacroPushRequiredVars)
 
 if(WIN32)
-   find_path(MYSQL_INCLUDE_DIR mysql/mysql.h
+   find_path(MYSQL_INCLUDE_DIR mysql.h
       PATHS
       $ENV{MYSQL_INCLUDE_DIR}
-      $ENV{MYSQL_DIR}/include
-      $ENV{ProgramW6432}/MySQL/*/include
-      $ENV{ProgramFiles}/MySQL/*/include
-      $ENV{SystemDrive}/MySQL/*/include
-      $ENV{ProgramW6432}/*/include # MariaDB
-      $ENV{ProgramFiles}/*/include # MariaDB
+      $ENV{MYSQL_DIR}/include/*
+      $ENV{ProgramW6432}/MySQL/*/include/*
+      $ENV{ProgramFiles}/MySQL/*/include/*
+      $ENV{SystemDrive}/MySQL/*/include/*
+      $ENV{ProgramW6432}/*/include/* # MariaDB
+      $ENV{ProgramFiles}/*/include/* # MariaDB
    )
 else()
    # use pkg-config to get the directories and then use these values
@@ -93,25 +93,25 @@ else()
    set(MYSQL_LIBRARIES ${_MYSQLCLIENT_LIBRARY})
 endif()
 
-find_library(MYSQL_EMBEDDED_LIBRARIES NAMES mysqld
-   PATHS
-   ${MYSQL_LIB_PATHS}
-)
-
 if(_LIBMYSQL_LIBRARY)
    get_filename_component(MYSQL_LIB_DIR ${_LIBMYSQL_LIBRARY} PATH)
    unset(_LIBMYSQL_LIBRARY)
 endif()
 
+find_library(MYSQL_EMBEDDED_LIBRARIES NAMES mysqld
+   PATHS
+   ${MYSQL_LIB_PATHS}
+)
+
 if(MYSQL_EMBEDDED_LIBRARIES)
    get_filename_component(MYSQL_EMBEDDED_LIB_DIR ${MYSQL_EMBEDDED_LIBRARIES} PATH)
-endif()
 
-macro_push_required_vars()
-set( CMAKE_REQUIRED_INCLUDES ${MYSQL_INCLUDE_DIR} )
-set( CMAKE_REQUIRED_LIBRARIES ${MYSQL_EMBEDDED_LIBRARIES} )
-check_cxx_source_compiles( "#include <mysql.h>\nint main() { int i = MYSQL_OPT_USE_EMBEDDED_CONNECTION; }" HAVE_MYSQL_OPT_EMBEDDED_CONNECTION )
-macro_pop_required_vars()
+    macro_push_required_vars()
+    set( CMAKE_REQUIRED_INCLUDES ${MYSQL_INCLUDE_DIR} )
+    set( CMAKE_REQUIRED_LIBRARIES ${MYSQL_EMBEDDED_LIBRARIES} )
+    check_cxx_source_compiles( "#include <mysql.h>\nint main() { int i = MYSQL_OPT_USE_EMBEDDED_CONNECTION; }" HAVE_MYSQL_OPT_EMBEDDED_CONNECTION )
+    macro_pop_required_vars()
+endif()
 
 # Did we find anything?
 include(FindPackageHandleStandardArgs)

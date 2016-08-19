@@ -27,8 +27,8 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include <KDbSqlRecord>
 #include <KDbSqlResult>
 
-#include <mysql/mysql_version.h>
-#include <mysql/mysql.h>
+#include <mysql_version.h>
+#include <mysql.h>
 
 class KDbConnectionData;
 class KDbEscapedString;

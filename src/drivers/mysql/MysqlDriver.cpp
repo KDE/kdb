@@ -26,8 +26,8 @@
 #include "KDbDriver_p.h"
 #include "KDb.h"
 
-#include <mysql/mysql_version.h>
-#include <mysql/mysql.h>
+#include <mysql_version.h>
+#include <mysql.h>
 
 KDB_DRIVER_PLUGIN_FACTORY(MysqlDriver, "kdb_mysqldriver.json")
 
