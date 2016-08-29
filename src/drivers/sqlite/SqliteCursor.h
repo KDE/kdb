@@ -74,7 +74,7 @@ protected:
 
     void storeResult();
 
-    SqliteCursorData *d;
+    SqliteCursorData * const d;
 
     friend class SqliteConnection;
 };

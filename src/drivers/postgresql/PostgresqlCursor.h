@@ -54,7 +54,7 @@ private:
     unsigned long m_numRows;
     QVector<QVariant::Type> m_realTypes;
 
-    PostgresqlCursorData *d;
+    PostgresqlCursorData * const d;
 };
 
 #endif

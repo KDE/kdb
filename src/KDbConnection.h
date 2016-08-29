@@ -1324,6 +1324,7 @@ private:
     bool m_destructor_started; //!< helper: true if destructor is started.
     bool m_insideCloseDatabase; //!< helper: true while closeDatabase() is executed
 
+    Q_DISABLE_COPY(KDbConnection)
     friend class KDbDriver;
     friend class KDbCursor;
     friend class KDbTableSchema; //!< for removeMe()

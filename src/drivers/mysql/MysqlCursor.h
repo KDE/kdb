@@ -50,7 +50,7 @@ public:
 
 private:
     void storeResult();
-    MysqlCursorData *d;
+    MysqlCursorData * const d;
 };
 
 #endif

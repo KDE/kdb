@@ -92,7 +92,7 @@ protected:
 
     void storeResult();
 
-    PostgresqlConnectionInternal *d;
+    PostgresqlConnectionInternal * const d;
 
     friend class PostgresqlDriver;
     friend class PostgresqlCursorData;
