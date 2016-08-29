@@ -36,7 +36,7 @@ typedef QList<QVariant> KDbPreparedStatementParameters;
 /*! @short Prepared database command for optimizing sequences of multiple database actions
 
   Currently INSERT and SELECT statements are supported.
-  For example, wher using KDbPreparedStatement for INSERTs,
+  For example when using KDbPreparedStatement for INSERTs,
   you can gain about 30% speedup compared to using multiple
   connection.insertRecord(*tabelSchema, dbRecordBuffer).
 

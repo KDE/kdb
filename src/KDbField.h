@@ -187,7 +187,7 @@ public:
 
     //! Converts value @a value to variant corresponding to type @a type.
     /*! Only normal types are supported.
-     If converting is not possible @a value is returned. */
+     If converting is not possible a null value is returned. */
     static QVariant convertToType(const QVariant &value, Type type);
 
     //! @return a translated type name for @a type
