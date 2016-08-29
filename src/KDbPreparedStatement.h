@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -98,6 +98,7 @@ public:
         bool dirty; //!< true if the statement has to be internally
                     //!< prepared (possible again) before calling executeInternal()
         KDbPreparedStatementInterface *iface;
+        quint64 lastInsertRecordId;
     };
 
     //! Creates an invalid prepared statement.
@@ -125,6 +126,12 @@ public:
      @return false on failure. Detailed error status can be obtained
      from KDbConnection object that was used to create this statement object. */
     bool execute(const KDbPreparedStatementParameters& parameters);
+
+    /*! @return unique identifier of the most recently inserted record.
+     Typically this is just primary key value. This identifier could be reused when we want
+     to reference just inserted record. If there was no insertion recently performed,
+     std::numeric_limits<quint64>::max() is returned. */
+    quint64 lastInsertRecordId() const;
 
 protected:
     //! Creates a new prepared statement. In your code use

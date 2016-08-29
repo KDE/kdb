@@ -565,7 +565,7 @@ public:
 
     //PROTOTYPE:
 #define A , const QVariant&
-#define H_INS_REC(args) bool insertRecord(KDbTableSchema* tableSchema args)
+#define H_INS_REC(args) bool insertRecord(KDbTableSchema* tableSchema args, KDbSqlResult** result = 0)
 #define H_INS_REC_ALL \
     H_INS_REC(A); \
     H_INS_REC(A A); \
@@ -578,16 +578,16 @@ public:
     H_INS_REC_ALL;
 
 #undef H_INS_REC
-#define H_INS_REC(args) bool insertRecord(KDbFieldList* fields args)
+#define H_INS_REC(args) bool insertRecord(KDbFieldList* fields args, KDbSqlResult** result = 0)
 
     H_INS_REC_ALL;
 #undef H_INS_REC_ALL
 #undef H_INS_REC
 #undef A
 
-    bool insertRecord(KDbTableSchema* tableSchema, const QList<QVariant>& values);
+    bool insertRecord(KDbTableSchema* tableSchema, const QList<QVariant>& values, KDbSqlResult** result = 0);
 
-    bool insertRecord(KDbFieldList* fields, const QList<QVariant>& values);
+    bool insertRecord(KDbFieldList* fields, const QList<QVariant>& values, KDbSqlResult** result = 0);
 
     /*! Creates table defined by @a tableSchema.
      Schema information is also added into kexi system tables, for later reuse.
@@ -736,30 +736,28 @@ public:
     */
     bool useTemporaryDatabaseIfNeeded(QString* name);
 
-    /*! @return autoincrement field's @a aiFieldName value
-     of last inserted record. This refers @a tableName table.
+    /*! Executes a new native (raw, backend-specific) SQL query for statement @a sql.
+     * Only use this method in cases if a non-portable raw query is required.
+     * Access to results can be obtained using the returned KDbSqlResult object.
+     * @c nullptr is returned on failure. Use result() to obtain detailed status information.
+     * The KDbConnection object is owner of the returned object. Before closing, the
+     * connection object deletes all its owned KDbSqlResult objects. It is also possible
+     * and recommended that caller deletes the KDbSqlResult object as soon as the result
+     * is not needed.
+     * If the query is not supposed to return records (e.g. is a functional query)
+     * or the caller is not interested in the records, the returned object can be just deleted.
+     * In this case executeVoidSQL() can be a better choice.
+     * Using QScopedPointer<KDbSqlResult> construct may simplify memory management of the
+     * returned object.
+     */
+    KDbSqlResult* executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
 
-     Simply, method internally fetches last inserted record and returns selected
-     field's value. Requirements: field must be of integer type, there must be a
-     record inserted in current database session (whatever this means).
-     On error (quint64)-1 is returned.
-     Last inserted record is identified by magical record identifier, usually called
-     ROWID (PostgreSQL has it as well as SQLite;
-     see KDbDriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
-     ROWID's value will be assigned back to @a recordId if this pointer is not null.
-    */
-    quint64 lastInsertedAutoIncValue(const QString& aiFieldName, const QString& tableName,
-                                     quint64* recordId = 0);
-
-    /*! @overload int lastInsertedAutoIncValue(const QString&, const QString&, quint64*)
-    */
-    quint64 lastInsertedAutoIncValue(const QString& aiFieldName,
-                                     const KDbTableSchema& table, quint64* recordId = 0);
-
-    /*! Executes query for a raw SQL statement @a sql, but without returning resulting
-     records (used mostly for functional queries).
-     Only use this method if you really need. */
-    bool executeSQL(const KDbEscapedString& sql);
+    /*! Executes a new native (raw, backend-specific) SQL query for statement @a sql.
+     * This method is equivalent of executeSQL() useful for cases when the query is not
+     * supposed to return records (e.g. is a functional query) or if the caller is not
+     * interested in the records.
+     */
+    bool executeVoidSQL(const KDbEscapedString& sql);
 
     /*! Stores object (id, name, caption, description)
     described by @a object on the backend. It is expected that entry on the
@@ -955,18 +953,41 @@ protected:
      Used internally by tableSchema(). */
     KDbField* setupField(const KDbRecordData& data) Q_REQUIRED_RESULT;
 
-    /*! Executes query for a raw SQL statement @a sql without returning resulting
-     records. It is useful mostly for functional queries.
-     It is already verified that @a sql is valid (properly escaped).
-     Only use this method if you really need. */
-    virtual bool drv_executeSQL(const KDbEscapedString& sql) = 0;
+    /*! Executes query for a raw SQL statement @a sql with possibility of returning records.
+
+     It is useful mostly for functional (SELECT) queries. While INSERT queries do not
+     return records, the KDbSqlResult object offers KDbSqlResult::lastInsertRecordId().
+     The @sql should be is valid and properly escaped. Only use this method if you really
+     need. For low-level access to the results (without cursors). The result may be not
+     stored (not buffered) yet. Use KDbSqlResult::fetchRecord() to fetch each record.
+     @return @c nullptr if there is no proper result. Ownership of the returned object is
+     passed to the caller.
+     @see executeSQL */
+    virtual KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT = 0;
+
+    /*! Executes query for a raw SQL statement @a sql without returning resulting records.
+
+     It is useful mostly for INSERT queries but it is possible to execute SELECT queries
+     when returned records can be ignored. The @sql should be is valid and properly escaped.
+     Only use this method if you really need.
+     @see executeVoidSQL */
+    virtual bool drv_executeVoidSQL(const KDbEscapedString& sql) = 0;
+
+    /*! Uses result of execution of raw SQL query using drv_executeSQL().
+     For low-level access to the results (without cursors).
+     The result may be not stored (not buffered) yet.
+     Use KDbSqlResult::fetchRecord() to fetch each record.
+     @return @c nullptr if there is no proper result.
+     Ownership of the returned object is passed to the caller. */
+    //virtual KDbSqlResult* drv_getSqlResult() Q_REQUIRED_RESULT = 0;
 
     /*! For reimplementation: loads list of databases' names available for this connection
      and adds these names to @a list. If your server is not able to offer such a list,
      consider reimplementing drv_databaseExists() instead.
      The method should return true only if there was no error on getting database names
      list from the server.
-     Default implementation puts empty list into @a list and returns true. */
+     Default implementation puts empty list into @a list and returns true.
+     @see databaseNames */
     virtual bool drv_getDatabasesList(QStringList* list);
 
 //! @todo move this somewhere to low level class (MIGRATION?)
@@ -1032,15 +1053,6 @@ protected:
      @return true on success
     */
     virtual bool drv_createTable(const QString& tableName);
-
-    /*! @return unique identifier of the most recently inserted record.
-     Typically this is just primary key value.
-     This identifier could be reused when we want to reference
-     just inserted record.
-     If there was no insertion recently performed for this connection, 0 is returned.
-     Note for driver developers: contact staniek (at) kde.org
-     if your engine does not offer this information. */
-    virtual quint64 drv_lastInsertRecordId() = 0;
 
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just
@@ -1232,6 +1244,10 @@ protected:
      else, sets appropriate error with a message and returns false. */
     bool checkIfColumnExists(KDbCursor *cursor, int column);
 
+    /*! @internal used by insertRecord() methods. */
+    bool insertRecordInternal(const QString &tableSchemaName, KDbFieldList* fields,
+                              const KDbEscapedString &sql, KDbSqlResult** result);
+
     /*! @internal used by querySingleRecord() methods.
      Note: "LIMIT 1" is appended to @a sql statement if @a addLimitTo1 is true (the default). */
     tristate querySingleRecordInternal(KDbRecordData* data, const KDbEscapedString* sql,
@@ -1279,15 +1295,6 @@ protected:
      Used in table altering code when information in kexi__fields has to be updated.
      @return true on success and false on failure. */
     bool storeMainFieldSchema(KDbField *field);
-
-    /*! @internal
-     Uses result of execution raw SQL query using executeSQL().
-     For low-level access to the results (without cursors).
-     The result may be not stored (not buffered) yet.
-     Use KDbSqlResult::fetchRecord() to fetch each record.
-     @return @c nullptr if there is no proper result.
-     Ownership of the returned object is passed to the caller. */
-    virtual KDbSqlResult* useSqlResult() Q_REQUIRED_RESULT { return nullptr; }
 
     //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

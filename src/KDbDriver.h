@@ -369,6 +369,7 @@ protected:
 
     friend class KDbConnection;
     friend class KDbCursor;
+    friend class KDbDriverBehaviour;
     friend class KDbNativeStatementBuilder;
     friend class DriverManagerInternal;
     friend class DriverPrivate;

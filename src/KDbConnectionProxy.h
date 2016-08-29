@@ -55,8 +55,6 @@ public:
     //! object.
     void setParentConnectionIsOwned(bool set);
 
-    KDbSqlResult *useSqlResult() Q_DECL_OVERRIDE;
-
     KDbConnectionData data() const;
 
     KDbDriver* driver() const;
@@ -251,13 +249,9 @@ public:
 
     bool useTemporaryDatabaseIfNeeded(QString* name);
 
-    quint64 lastInsertedAutoIncValue(const QString& aiFieldName, const QString& tableName,
-                                     quint64* recordId = nullptr);
+    KDbSqlResult* executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
 
-    quint64 lastInsertedAutoIncValue(const QString& aiFieldName,
-                                     const KDbTableSchema& table, quint64* recordId = nullptr);
-
-    bool executeSQL(const KDbEscapedString& sql);
+    bool executeVoidSQL(const KDbEscapedString& sql);
 
     bool storeObjectData(KDbObject* object);
 
@@ -321,7 +315,9 @@ public:
 
     KDbField* setupField(const KDbRecordData& data);
 
-    bool drv_executeSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE;
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE;
 
     bool drv_getDatabasesList(QStringList* list) Q_DECL_OVERRIDE;
 
@@ -341,8 +337,6 @@ public:
     bool drv_dropDatabase(const QString &dbName = QString()) Q_DECL_OVERRIDE;
 
     bool drv_createTable(const QString& tableName) Q_DECL_OVERRIDE;
-
-    quint64 drv_lastInsertRecordId() Q_DECL_OVERRIDE;
 
     KDbTransactionData* drv_beginTransaction() Q_DECL_OVERRIDE;
 

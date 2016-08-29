@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -19,12 +19,12 @@
 
 #include "KDbPreparedStatement.h"
 #include "KDbPreparedStatementInterface.h"
+#include "KDbSqlResult.h"
 #include "KDbTableSchema.h"
 #include "kdb_debug.h"
 
 KDbPreparedStatement::Data::Data()
-    : type(InvalidStatement), fields(0), fieldsForParameters(0), whereFields(0),
-      dirty(true), iface(0)
+    : Data(InvalidStatement, nullptr, nullptr, QStringList())
 {
 }
 
@@ -33,6 +33,7 @@ KDbPreparedStatement::Data::Data(Type _type, KDbPreparedStatementInterface* _ifa
      const QStringList& _whereFieldNames)
     : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
     , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
+    , lastInsertRecordId(std::numeric_limits<quint64>::max())
 {
 }
 
@@ -77,7 +78,12 @@ bool KDbPreparedStatement::execute(const KDbPreparedStatementParameters& paramet
         }
         d->dirty = false;
     }
-    return d->iface->execute(d->type, *d->fieldsForParameters, d->fields, parameters);
+    QScopedPointer<KDbSqlResult> result(d->iface->execute(d->type, *d->fieldsForParameters, d->fields, parameters));
+    if (!result) {
+        return false;
+    }
+    d->lastInsertRecordId = result->lastInsertRecordId();
+    return true;
 }
 
 bool KDbPreparedStatement::generateStatementString(KDbEscapedString * s)
@@ -200,6 +206,11 @@ void KDbPreparedStatement::setWhereFieldNames(const QStringList& whereFieldNames
 {
     d->whereFieldNames = whereFieldNames;
     d->dirty = true;
+}
+
+quint64 KDbPreparedStatement::lastInsertRecordId() const
+{
+    return d->lastInsertRecordId;
 }
 
 /*bool KDbPreparedStatement::insert()

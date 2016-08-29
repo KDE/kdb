@@ -25,6 +25,8 @@
 #include "KDbResult.h"
 #include "KDbPreparedStatement.h"
 
+class KDbSqlResult;
+
 //! Prepared statement interface for backend-dependent implementations.
 class KDB_EXPORT KDbPreparedStatementInterface : public KDbResultable
 {
@@ -41,7 +43,7 @@ protected:
     virtual bool prepare(const KDbEscapedString& sql) = 0;
 
     //! For implementation. Executes the prepared statement using parameters @a parameters.
-    virtual bool execute(
+    virtual KDbSqlResult* execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,

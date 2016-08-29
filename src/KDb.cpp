@@ -23,11 +23,13 @@
 #include "KDb.h"
 #include "KDbCursor.h"
 #include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbTableOrQuerySchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbConnectionData.h"
 #include "KDbNativeStatementBuilder.h"
+#include "KDbSqlResult.h"
 #include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
 #include "config-kdb.h"
@@ -314,7 +316,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
 {
     Q_ASSERT(conn);
-    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
+    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname))
                             .arg(conn->driver()->valueToSQL(keytype, keyval)));
@@ -325,7 +327,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2)
 {
     Q_ASSERT(conn);
-    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
+    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
                             .arg(conn->driver()->valueToSQL(keytype1, keyval1))
@@ -339,7 +341,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3)
 {
     Q_ASSERT(conn);
-    return conn->executeSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
+    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
                             .arg(conn->driver()->valueToSQL(keytype1, keyval1))
@@ -352,8 +354,41 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
 bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
 {
     Q_ASSERT(conn);
-    return conn->executeSQL(KDbEscapedString("DELETE FROM %1")
+    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1")
                             .arg(conn->escapeIdentifier(tableName)));
+}
+
+KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbSqlResult *result,
+    const QString& autoIncrementFieldName, const QString& tableName, quint64* recordId)
+{
+    Q_ASSERT(result);
+    const quint64 foundRecordId = result->lastInsertRecordId();
+    if (recordId) {
+        *recordId = foundRecordId;
+    }
+    return KDb::lastInsertedAutoIncValue(result->connection(),
+                                         foundRecordId, autoIncrementFieldName, tableName);
+}
+
+KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quint64 recordId,
+    const QString& autoIncrementFieldName, const QString& tableName)
+{
+    const KDbDriverBehaviour *behaviour = KDbDriverBehaviour::get(conn->driver());
+    if (behaviour->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
+        return recordId;
+    }
+    KDbRecordData rdata;
+    if (recordId == std::numeric_limits<quint64>::max()
+        || true != conn->querySingleRecord(
+                  KDbEscapedString("SELECT ") + escapeIdentifier(tableName) + '.'
+                + escapeIdentifier(autoIncrementFieldName)
+                + " FROM " + escapeIdentifier(tableName)
+                + " WHERE " + behaviour->ROW_ID_FIELD_NAME
+                + '=' + KDbEscapedString::number(recordId), &rdata))
+    {
+        return std::numeric_limits<quint64>::max();
+    }
+    return rdata[0].toULongLong();
 }
 
 bool KDb::isEmptyValue(KDbField::Type type, const QVariant &v)

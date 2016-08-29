@@ -23,6 +23,7 @@
 #include "kdb_export.h"
 #include <QString>
 
+class KDbConnection;
 class KDbField;
 class KDbRecordData;
 class KDbResult;
@@ -40,6 +41,9 @@ public:
     KDbSqlResult();
 
     virtual ~KDbSqlResult();
+
+    //! @return connection for this result
+    virtual KDbConnection *connection() const { return nullptr; }
 
     //! @return number of fields in this result
     virtual int fieldsCount() = 0;
@@ -65,6 +69,12 @@ public:
 
     //! @return result of last operation on this SQL result
     virtual KDbResult lastResult() = 0;
+
+    /*! @return unique identifier of the most recently inserted record.
+     Typically this is just primary key value. This identifier could be reused when we want
+     to reference just inserted record. If there was no insertion recently performed for
+     the result, std::numeric_limits<quint64>::max() is returned. */
+    virtual quint64 lastInsertRecordId() { return std::numeric_limits<quint64>::max(); }
 };
 
 #endif

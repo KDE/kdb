@@ -44,6 +44,9 @@ public:
 
     ~KDbDriverBehaviour();
 
+    //! Accessor for objects that need the KDbDriver::beh.
+    inline static const KDbDriverBehaviour* get(const KDbDriver *driver) { return driver->beh; }
+
     //! "UNSIGNED" by default
     QString UNSIGNED_TYPE_KEYWORD;
 
@@ -70,7 +73,7 @@ public:
     bool AUTO_INCREMENT_REQUIRES_PK;
 
     /*! Name of a field (or built-in function) with autoincremented unique value,
-     typically returned by KDbConnection::drv_lastInsertRecordId().
+     typically returned by KDbSqlResult::lastInsertRecordId().
 
      Examples:
      - PostgreSQL and SQLite engines use 'OID' field

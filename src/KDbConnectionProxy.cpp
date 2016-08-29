@@ -65,11 +65,6 @@ void KDbConnectionProxy::setParentConnectionIsOwned(bool set)
     d->connectionIsOwned = set;
 }
 
-KDbSqlResult* KDbConnectionProxy::useSqlResult()
-{
-    return d->connection->useSqlResult();
-}
-
 KDbConnectionData KDbConnectionProxy::data() const
 {
     return d->connection->data();
@@ -505,21 +500,14 @@ bool KDbConnectionProxy::useTemporaryDatabaseIfNeeded(QString* name)
     return d->connection->useTemporaryDatabaseIfNeeded(name);
 }
 
-quint64 KDbConnectionProxy::lastInsertedAutoIncValue(const QString& aiFieldName, const QString& tableName,
-                                 quint64* recordId)
-{
-    return d->connection->lastInsertedAutoIncValue(aiFieldName, tableName, recordId);
-}
-
-quint64 KDbConnectionProxy::lastInsertedAutoIncValue(const QString& aiFieldName,
-                                 const KDbTableSchema& table, quint64* recordId)
-{
-    return d->connection->lastInsertedAutoIncValue(aiFieldName, table, recordId);
-}
-
-bool KDbConnectionProxy::executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* KDbConnectionProxy::executeSQL(const KDbEscapedString& sql)
 {
     return d->connection->executeSQL(sql);
+}
+
+bool KDbConnectionProxy::executeVoidSQL(const KDbEscapedString& sql)
+{
+    return d->connection->executeVoidSQL(sql);
 }
 
 bool KDbConnectionProxy::storeObjectData(KDbObject* object)
@@ -668,9 +656,14 @@ KDbField* KDbConnectionProxy::setupField(const KDbRecordData& data)
     return d->connection->setupField(data);
 }
 
-bool KDbConnectionProxy::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* KDbConnectionProxy::drv_executeSQL(const KDbEscapedString& sql)
 {
     return d->connection->drv_executeSQL(sql);
+}
+
+bool KDbConnectionProxy::drv_executeVoidSQL(const KDbEscapedString& sql)
+{
+    return d->connection->drv_executeVoidSQL(sql);
 }
 
 bool KDbConnectionProxy::drv_getDatabasesList(QStringList* list)
@@ -717,11 +710,6 @@ bool KDbConnectionProxy::drv_dropDatabase(const QString &dbName)
 bool KDbConnectionProxy::drv_createTable(const QString& tableName)
 {
     return d->connection->drv_createTable(tableName);
-}
-
-quint64 KDbConnectionProxy::drv_lastInsertRecordId()
-{
-    return d->connection->drv_lastInsertRecordId();
 }
 
 KDbTransactionData* KDbConnectionProxy::drv_beginTransaction()
