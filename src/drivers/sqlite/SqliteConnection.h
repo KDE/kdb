@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -79,9 +79,8 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     virtual bool drv_dropDatabase(const QString &dbName = QString());
 
-    virtual bool drv_executeSQL(const KDbEscapedString& sql);
-
-    virtual quint64 drv_lastInsertRecordId();
+    virtual KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql);
+    virtual bool drv_executeVoidSQL(const KDbEscapedString& sql);
 
     //! Implemented for KDbResultable
     virtual QString serverResultName() const;
@@ -113,6 +112,7 @@ private:
 
     friend class SqliteDriver;
     friend class SqliteCursor;
+    friend class SqliteSqlResult;
 };
 
 #endif

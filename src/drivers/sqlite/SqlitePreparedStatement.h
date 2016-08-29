@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2005-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2005-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -36,7 +36,7 @@ public:
 protected:
     virtual bool prepare(const KDbEscapedString& sql);
 
-    virtual bool execute(
+    virtual KDbSqlResult* execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
@@ -44,7 +44,7 @@ protected:
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 
-    sqlite3_stmt *m_handle;
+    QScopedPointer<SqliteSqlResult> m_sqlResult;
 };
 
 #endif

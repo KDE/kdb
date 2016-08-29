@@ -47,6 +47,7 @@ endif()
 set(kdb_sqlite_SRCS
    sqlite_debug.cpp
    SqliteConnection.cpp
+   SqliteConnection_p.cpp
    SqliteDriver.cpp
    SqliteCursor.cpp
    SqliteKeywords.cpp

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -53,8 +53,7 @@ SqliteConnection::~SqliteConnection()
 
 void SqliteConnection::storeResult()
 {
-    m_result.setServerMessage(
-        QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));
+    d->storeResult(&m_result);
 }
 
 bool SqliteConnection::drv_connect()
@@ -167,7 +166,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
         // Works with 3.6.23. Earlier version just ignore this pragma.
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
-        if (!drv_executeSQL(KDbEscapedString("PRAGMA secure_delete = on"))) {
+        if (!drv_executeVoidSQL(KDbEscapedString("PRAGMA secure_delete = on"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -177,7 +176,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
             return false;
         }
         // load ROOT collation for use as default collation
-        if (!drv_executeSQL(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
+        if (!drv_executeVoidSQL(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -285,18 +284,44 @@ KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, int cursor_opti
     return new SqliteCursor(this, query, cursor_options);
 }
 
-bool SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
 #endif
 
-    char *errmsg_p = 0;
-    int res = sqlite3_exec(
+    sqlite3_stmt *prepared_st = nullptr;
+    const int res = sqlite3_prepare(
+                 d->data,            /* Database handle */
+                 sql.constData(),    /* SQL statement, UTF-8 encoded */
+                 sql.length(),       /* Length of zSql in bytes. */
+                 &prepared_st,       /* OUT: Statement handle */
+                 nullptr/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
+             );
+    if (res != SQLITE_OK) {
+        m_result.setServerErrorCode(res);
+        storeResult();
+        return nullptr;
+    }
+
+#ifdef KDB_DEBUG_GUI
+    KDb::debugGUI(QLatin1String( res == SQLITE_OK ? "  Success" : "  Failure"));
+#endif
+    return new SqliteSqlResult(this, prepared_st);
+}
+
+bool SqliteConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+{
+#ifdef KDB_DEBUG_GUI
+    KDb::debugGUI(QLatin1String("ExecuteVoidSQL (SQLite): ") + sql.toString());
+#endif
+
+    char *errmsg_p = nullptr;
+    const int res = sqlite3_exec(
                  d->data,
                  sql.constData(),
-                 0/*callback*/,
-                 0,
+                 nullptr/*callback*/,
+                 nullptr,
                  &errmsg_p);
     if (res != SQLITE_OK) {
         m_result.setServerErrorCode(res);
@@ -308,15 +333,11 @@ bool SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
     } else {
         storeResult();
     }
+
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QLatin1String( res == SQLITE_OK ? "  Success" : "  Failure"));
 #endif
     return res == SQLITE_OK;
-}
-
-quint64 SqliteConnection::drv_lastInsertRecordId()
-{
-    return (quint64)sqlite3_last_insert_rowid(d->data);
 }
 
 QString SqliteConnection::serverResultName() const

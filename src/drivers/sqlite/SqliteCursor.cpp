@@ -87,21 +87,27 @@ public:
             return QVariant();
         } else if (!f || type == SQLITE_TEXT) {
 //! @todo support for UTF-16
-#define GET_sqlite3_column_text QString::fromUtf8( (const char*)sqlite3_column_text(prepared_st_handle, i) )
-            const KDbField::Type t = f ? f->type() : KDbField::LongText; // cache: evaluating type of expressions can be expensive
-            if (KDbField::isTextType(t)) {
-                return GET_sqlite3_column_text;
+            QString text(QString::fromUtf8(
+                (const char*)sqlite3_column_text(prepared_st_handle, i),
+                 sqlite3_column_bytes(prepared_st_handle, i)));
+            KDbField::Type t;
+            if (f) {
+                t = f->type(); // cache: evaluating type of expressions can be expensive
+            }
+            if (!f || KDbField::isTextType(t)) {
+                return text;
             } else if (t == KDbField::Date) {
-                return QDate::fromString(GET_sqlite3_column_text, Qt::ISODate);
+                return QDate::fromString(text, Qt::ISODate);
             } else if (t == KDbField::Time) {
                 //QDateTime - a hack needed because QVariant(QTime) has broken isNull()
-                return KDbUtils::stringToHackedQTime(GET_sqlite3_column_text);
+                return KDbUtils::stringToHackedQTime(text);
             } else if (t == KDbField::DateTime) {
-                QString tmp(GET_sqlite3_column_text);
-                tmp[10] = 'T'; //for ISODate compatibility
-                return QDateTime::fromString(tmp, Qt::ISODate);
+                if (text.length() > 10) {
+                    text[10] = QLatin1Char('T'); //for ISODate compatibility
+                }
+                return QDateTime::fromString(text, Qt::ISODate);
             } else if (t == KDbField::Boolean) {
-                return sqliteStringToBool(GET_sqlite3_column_text);
+                return sqliteStringToBool(text);
             } else {
                 return QVariant(); //!< @todo
             }
@@ -305,7 +311,9 @@ bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
 {
     if (!m_visibleFieldsExpanded) {//simple version: without types
         for (int i = 0; i < m_fieldCount; i++) {
-            (*data)[i] = QString::fromUtf8((const char*)sqlite3_column_text(d->prepared_st_handle, i));
+            (*data)[i] = QString::fromUtf8(
+                            (const char*)sqlite3_column_text(d->prepared_st_handle, i),
+                            sqlite3_column_bytes(d->prepared_st_handle, i));
         }
         return true;
     }
@@ -334,6 +342,5 @@ QString SqliteCursor::serverResultName() const
 
 void SqliteCursor::storeResult()
 {
-    m_result.setServerMessage(
-        QLatin1String( (d->data && m_result.isError()) ? sqlite3_errmsg(d->data) : 0 ));
+    d->storeResult(&m_result);
 }
