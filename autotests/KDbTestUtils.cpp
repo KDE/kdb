@@ -22,6 +22,7 @@
 #include <KDbDriverManager>
 #include <KDbDriverMetaData>
 #include <KDbConnection>
+#include <KDbConnectionOptions>
 
 #include <QFile>
 #include <QTest>

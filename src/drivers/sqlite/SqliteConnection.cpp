@@ -26,87 +26,13 @@
 
 #include <sqlite3.h>
 
-#include "KDbDriver.h"
-#include "KDbCursor.h"
-#include "KDbError.h"
+#include "KDbConnectionOptions.h"
 #include "KDbUtils.h"
 
 #include <QFile>
 #include <QDir>
 #include <QRegExp>
 
-SqliteConnectionInternal::SqliteConnectionInternal(KDbConnection *connection)
-        : KDbConnectionInternal(connection)
-        , data(0)
-        , data_owned(true)
-        , m_extensionsLoadingEnabled(false)
-{
-}
-
-SqliteConnectionInternal::~SqliteConnectionInternal()
-{
-    if (data_owned && data) {
-        sqlite3_close(data);
-        data = 0;
-    }
-}
-
-static const char* const serverResultNames[] = {
-    "SQLITE_OK", // 0
-    "SQLITE_ERROR",
-    "SQLITE_INTERNAL",
-    "SQLITE_PERM",
-    "SQLITE_ABORT",
-    "SQLITE_BUSY",
-    "SQLITE_LOCKED",
-    "SQLITE_NOMEM",
-    "SQLITE_READONLY",
-    "SQLITE_INTERRUPT",
-    "SQLITE_IOERR",
-    "SQLITE_CORRUPT",
-    "SQLITE_NOTFOUND",
-    "SQLITE_FULL",
-    "SQLITE_CANTOPEN",
-    "SQLITE_PROTOCOL",
-    "SQLITE_EMPTY",
-    "SQLITE_SCHEMA",
-    "SQLITE_TOOBIG",
-    "SQLITE_CONSTRAINT",
-    "SQLITE_MISMATCH",
-    "SQLITE_MISUSE",
-    "SQLITE_NOLFS",
-    "SQLITE_AUTH",
-    "SQLITE_FORMAT",
-    "SQLITE_RANGE",
-    "SQLITE_NOTADB", // 26
-};
-
-// static
-QString SqliteConnectionInternal::serverResultName(int serverResultCode)
-{
-    if (serverResultCode >= 0 && serverResultCode <= SQLITE_NOTADB)
-        return QString::fromLatin1(serverResultNames[serverResultCode]);
-    else if (serverResultCode == SQLITE_ROW)
-        return QLatin1String("SQLITE_ROW");
-    else if (serverResultCode == SQLITE_DONE)
-        return QLatin1String("SQLITE_DONE");
-    return QString();
-}
-
-bool SqliteConnectionInternal::extensionsLoadingEnabled() const
-{
-    return m_extensionsLoadingEnabled;
-}
-
-void SqliteConnectionInternal::setExtensionsLoadingEnabled(bool set)
-{
-    if (set == m_extensionsLoadingEnabled)
-        return;
-    sqlite3_enable_load_extension(data, set);
-    m_extensionsLoadingEnabled = set;
-}
-
-/*! Used by driver */
 SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData,
                                    const KDbConnectionOptions &options)
         : KDbConnection(driver, connData, options)

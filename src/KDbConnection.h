@@ -20,8 +20,6 @@
 #ifndef KDB_CONNECTION_H
 #define KDB_CONNECTION_H
 
-#include <QStringList>
-
 #include "KDbConnectionData.h"
 #include "KDbTableSchema.h"
 #include "KDbQuerySchema.h"
@@ -30,52 +28,15 @@
 #include "KDbDriver.h"
 #include "KDbPreparedStatement.h"
 #include "KDbRecordData.h"
-#include "KDb.h"
-#include "KDbUtils.h"
 #include "KDbTristate.h"
 
+class KDbConnectionOptions;
 class KDbConnectionProxy;
 class KDbCursor;
 class ConnectionPrivate;
 class KDbRecordEditBuffer;
 class KDbProperties;
 class KDbSqlResult;
-
-/*! @brief Generic options for a single connection.
-    The options are accessible using key/value pairs. This enables extensibility
-    depending on driver's type and version.
-    @see KDbDriver::createConnection(const KDbConnectionData&) KDbConnection::options()
-*/
-class KDB_EXPORT KDbConnectionOptions : public KDbUtils::PropertySet
-{
-public:
-    KDbConnectionOptions();
-
-    /*! @return true for read-only connection. Used especially for file-based drivers.
-     Can be implemented in a driver to provide real read-only flag of the connection
-     (sqlite driver does this). */
-    bool isReadOnly() const;
-
-    /*! @internal used by KDbDriver::createConnection().
-     Only works if connection is not yet established. */
-    void setReadOnly(bool set);
-
-    //! Inserts option with a given @a name, @a value and @a caption.
-    //! If @a caption is empty, caption from existing option is reused.
-    void insert(const QByteArray &name, const QVariant &value, const QString &caption = QString());
-
-    //! Sets caption for property @a name to @a caption.
-    //! If @a caption is not empty, does nothing.
-    void setCaption(const QByteArray &name, const QString &caption);
-
-    //! Removes option with a given @a name.
-    void remove(const QByteArray &name);
-
-private:
-    friend class ConnectionPrivate;
-
-    KDbConnection *m_connection;
-};
 
 /*! @short Provides database connection, allowing queries and data modification.
 

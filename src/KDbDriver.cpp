@@ -23,6 +23,7 @@
 #include "KDbError.h"
 #include "KDbConnection.h"
 #include "KDbConnectionData.h"
+#include "KDbConnectionOptions.h"
 #include "KDbAdmin.h"
 #include "KDbExpression.h"
 #include "kdb_debug.h"

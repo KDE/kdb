@@ -19,6 +19,7 @@
 
 #include "KDbConnection.h"
 #include "KDbConnection_p.h"
+#include "KDbConnectionOptions.h"
 #include "KDbError.h"
 #include "KDbExpression.h"
 #include "KDbConnectionData.h"
@@ -58,10 +59,29 @@ KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
 
 //================================================
 
+class KDbConnectionOptions::Private
+{
+public:
+    Private() : connection(nullptr) {}
+    KDbConnection *connection;
+};
+
 KDbConnectionOptions::KDbConnectionOptions()
- : m_connection(0)
+ : d(new Private)
 {
     KDbUtils::PropertySet::insert("readOnly", false, KDbConnection::tr("Read only", "Read only connection"));
+}
+
+KDbConnectionOptions::KDbConnectionOptions(const KDbConnectionOptions &other)
+ : KDbUtils::PropertySet(other)
+ , d(new Private)
+{
+    *d = *other.d;
+}
+
+KDbConnectionOptions::~KDbConnectionOptions()
+{
+    delete d;
 }
 
 bool KDbConnectionOptions::isReadOnly() const
@@ -98,10 +118,15 @@ void KDbConnectionOptions::remove(const QByteArray &name)
 
 void KDbConnectionOptions::setReadOnly(bool set)
 {
-    if (m_connection && m_connection->isConnected()) {
+    if (d->connection && d->connection->isConnected()) {
         return; //sanity
     }
     KDbUtils::PropertySet::insert("readOnly", set);
+}
+
+void KDbConnectionOptions::setConnection(KDbConnection *connection)
+{
+    d->connection = connection;
 }
 
 //================================================
@@ -123,11 +148,11 @@ public:
             , autoCommit(true)
             , takeTableEnabled(true)
     {
-        options.m_connection = conn;
+        options.setConnection(conn);
     }
 
     ~ConnectionPrivate() {
-        options.m_connection = 0;
+        options.setConnection(nullptr);
         qDeleteAll(cursors);
         delete m_parser;
         qDeleteAll(tableSchemaChangeListeners);

@@ -28,6 +28,7 @@
 #include "KDbField.h"
 #include "KDbQuerySchema.h"
 #include "KDbRecordEditBuffer.h"
+#include "KDbConnectionOptions.h"
 #include "KDbCursor.h"
 #include "KDb.h"
 #include "KDbTableViewData.h"

@@ -280,6 +280,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbAdmin
         KDbAlter
         KDbConnection
+        KDbConnectionOptions
         KDbConnectionProxy
         KDbCursor
         KDbProperties
