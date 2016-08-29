@@ -38,7 +38,7 @@ bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& sql)
     return true;
 }
 
-bool PostgresqlPreparedStatement::execute(
+KDbSqlResult* PostgresqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList* insertFieldList,
@@ -54,8 +54,12 @@ bool PostgresqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        return connection->insertRecord(insertFieldList, myParameters);
+        KDbSqlResult* result;
+        if (connection->insertRecord(insertFieldList, myParameters, &result)) {
+            return result;
+        }
+        return nullptr;
     }
 //! @todo support select
-    return false;
+    return nullptr;
 }

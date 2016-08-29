@@ -24,37 +24,37 @@
 #include <libpq-fe.h>
 #include <catalog/pg_type.h> // needed for BOOLOID, etc.
 
-void PostgresqlDriver::initPgsqlToVariantMap()
+void PostgresqlDriver::initPgsqlToKDbMap()
 {
-    m_pgsqlToVariantTypes.insert(BOOLOID, QVariant::Bool);
-    m_pgsqlToVariantTypes.insert(BYTEAOID, QVariant::ByteArray);
-    m_pgsqlToVariantTypes.insert(CHAROID, QVariant::Int);
-    m_pgsqlToVariantTypes.insert(NAMEOID, QVariant::ByteArray);
-    m_pgsqlToVariantTypes.insert(INT8OID, QVariant::LongLong);
-    m_pgsqlToVariantTypes.insert(INT2OID, QVariant::Int);
+    m_pgsqlToKDbTypes.insert(BOOLOID, KDbField::Boolean);
+    m_pgsqlToKDbTypes.insert(BYTEAOID, KDbField::BLOB);
+    m_pgsqlToKDbTypes.insert(CHAROID, KDbField::Integer);
+    m_pgsqlToKDbTypes.insert(NAMEOID, KDbField::BLOB);
+    m_pgsqlToKDbTypes.insert(INT8OID, KDbField::BigInteger);
+    m_pgsqlToKDbTypes.insert(INT2OID, KDbField::Integer);
     //! @todo INT2VECTOROID? (array of int2, used in system tables)
-    m_pgsqlToVariantTypes.insert(INT4OID, QVariant::Int);
-    m_pgsqlToVariantTypes.insert(REGPROCOID, QVariant::Int);
-    m_pgsqlToVariantTypes.insert(TEXTOID, QVariant::String);
-    m_pgsqlToVariantTypes.insert(OIDOID, QVariant::Int);
+    m_pgsqlToKDbTypes.insert(INT4OID, KDbField::Integer);
+    m_pgsqlToKDbTypes.insert(REGPROCOID, KDbField::Integer);
+    m_pgsqlToKDbTypes.insert(TEXTOID, KDbField::LongText);
+    m_pgsqlToKDbTypes.insert(OIDOID, KDbField::Integer);
     //! @todo TIDOID? (block, offset), physical location of tuple
-    m_pgsqlToVariantTypes.insert(XIDOID, QVariant::Int);
-    m_pgsqlToVariantTypes.insert(CIDOID, QVariant::Int);
+    m_pgsqlToKDbTypes.insert(XIDOID, KDbField::Integer);
+    m_pgsqlToKDbTypes.insert(CIDOID, KDbField::Integer);
     //! @todo OIDVECTOROID? (array of oids, used in system tables)
     // PG_TYPE_RELTYPE_OID
     // PG_ATTRIBUTE_RELTYPE_OID
     // PG_PROC_RELTYPE_OID
     // PG_CLASS_RELTYPE_OID
-    m_pgsqlToVariantTypes.insert(XMLOID, QVariant::String);
+    m_pgsqlToKDbTypes.insert(XMLOID, KDbField::LongText);
     //! @todo POINTOID geometric point '(x, y)
     //! @todo LSEGOID geometric line segment '(pt1,pt2)
     //! @todo PATHOID geometric path '(pt1,...)'
     //! @todo BOXOID geometric box '(lower left,upper right)
     //! @todo POLYGONOID geometric polygon '(pt1,...)'
-    m_pgsqlToVariantTypes.insert(FLOAT4OID, QVariant::Double);
-    m_pgsqlToVariantTypes.insert(FLOAT8OID, QVariant::Double);
-    m_pgsqlToVariantTypes.insert(ABSTIMEOID, QVariant::Date);
-    m_pgsqlToVariantTypes.insert(RELTIMEOID, QVariant::Date);
+    m_pgsqlToKDbTypes.insert(FLOAT4OID, KDbField::Double);
+    m_pgsqlToKDbTypes.insert(FLOAT8OID, KDbField::Double);
+    m_pgsqlToKDbTypes.insert(ABSTIMEOID, KDbField::Date);
+    m_pgsqlToKDbTypes.insert(RELTIMEOID, KDbField::Date);
     //! @todo TINTERVALOID (abstime,abstime), time interval
     //! @todo CIRCLEOID geometric circle '(center,radius)'
     //! @todo CASHOID monetary amounts, $d,ddd.cc
@@ -64,22 +64,22 @@ void PostgresqlDriver::initPgsqlToVariantMap()
     //! @todo INT4ARRAYOID
     //! @todo FLOAT4ARRAYOID
     //! @todo ACLITEMOID access control list
-    m_pgsqlToVariantTypes.insert(CSTRINGARRAYOID, QVariant::ByteArray);
-    m_pgsqlToVariantTypes.insert(BPCHAROID, QVariant::String); // char(length), blank-padded string,
-                                                               // fixed storage length
-    m_pgsqlToVariantTypes.insert(VARCHAROID, QVariant::String); // varchar(length), non-blank-padded string,
-                                                                // variable storage length
-    m_pgsqlToVariantTypes.insert(DATEOID, QVariant::Date);
-    m_pgsqlToVariantTypes.insert(TIMEOID, QVariant::Time);
-    m_pgsqlToVariantTypes.insert(TIMESTAMPOID, QVariant::DateTime);
-    m_pgsqlToVariantTypes.insert(TIMESTAMPTZOID, QVariant::DateTime);
+    m_pgsqlToKDbTypes.insert(CSTRINGARRAYOID, KDbField::BLOB);
+    m_pgsqlToKDbTypes.insert(BPCHAROID, KDbField::LongText);  // char(length), blank-padded string,
+                                                              // fixed storage length
+    m_pgsqlToKDbTypes.insert(VARCHAROID, KDbField::LongText); // varchar(length), non-blank-padded string,
+                                                              // variable storage length
+    m_pgsqlToKDbTypes.insert(DATEOID, KDbField::Date);
+    m_pgsqlToKDbTypes.insert(TIMEOID, KDbField::Time);
+    m_pgsqlToKDbTypes.insert(TIMESTAMPOID, KDbField::DateTime);
+    m_pgsqlToKDbTypes.insert(TIMESTAMPTZOID, KDbField::DateTime);
     //! @todo INTERVALOID @ <number> <units>, time interval
-    m_pgsqlToVariantTypes.insert(TIMETZOID, QVariant::Time);
+    m_pgsqlToKDbTypes.insert(TIMETZOID, KDbField::Time);
     //! @todo BITOID ok?
-    m_pgsqlToVariantTypes.insert(BITOID, QVariant::ByteArray);
+    m_pgsqlToKDbTypes.insert(BITOID, KDbField::BLOB);
     //! @todo VARBITOID ok?
-    m_pgsqlToVariantTypes.insert(VARBITOID, QVariant::ByteArray);
-    m_pgsqlToVariantTypes.insert(NUMERICOID, QVariant::Double);
+    m_pgsqlToKDbTypes.insert(VARBITOID, KDbField::BLOB);
+    m_pgsqlToKDbTypes.insert(NUMERICOID, KDbField::Double);
     //! @todo REFCURSOROID reference cursor (portal name)
     //! @todo REGPROCEDUREOID registered procedure (with args)
     //! @todo REGOPEROID registered operator

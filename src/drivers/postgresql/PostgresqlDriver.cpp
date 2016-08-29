@@ -54,7 +54,7 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
     beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED = true;
 
     initDriverSpecificKeywords(m_keywords);
-    initPgsqlToVariantMap();
+    initPgsqlToKDbMap();
 
     //predefined properties
     //http://www.postgresql.org/docs/9.5/static/libpq-misc.html#LIBPQ-PQLIBVERSION

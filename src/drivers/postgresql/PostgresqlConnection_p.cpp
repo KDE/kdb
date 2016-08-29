@@ -20,12 +20,12 @@
 
 #include "PostgresqlConnection_p.h"
 #include "PostgresqlConnection.h"
+#include "PostgresqlDriver.h"
 
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *_conn)
         : KDbConnectionInternal(_conn)
         , conn(0)
         , unicode(true) // will be set in PostgresqlConnection::drv_useDatabase()
-        , res(0)
 {
     escapingBuffer.reserve(0x8000);
 }
@@ -40,6 +40,21 @@ QString PostgresqlConnectionInternal::serverResultName(int resultCode)
     return QString::fromLatin1(PQresStatus(static_cast<ExecStatusType>(resultCode)));
 }
 
+void PostgresqlConnectionInternal::storeResultAndClear(KDbResult *result, PGresult **pgResult,
+                                                       ExecStatusType execStatus)
+{
+    QByteArray msg(PQresultErrorMessage(*pgResult));
+    if (msg.endsWith('\n')) {
+        msg.chop(1);
+    }
+    result->setServerMessage(QString::fromLatin1(msg));
+    if (*pgResult) {
+        result->setServerErrorCode(execStatus);
+        PQclear(*pgResult);
+        *pgResult = nullptr;
+    }
+}
+
 void PostgresqlConnectionInternal::storeResult(KDbResult *result)
 {
     QByteArray msg(PQerrorMessage(conn));
@@ -47,29 +62,49 @@ void PostgresqlConnectionInternal::storeResult(KDbResult *result)
         msg.chop(1);
     }
     result->setServerMessage(QString::fromLatin1(msg));
-    if (res) {
-        result->setServerErrorCode(PQresultStatus(res));
-        PQclear(res);
-        res = 0;
-    }
 }
 
-bool PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
+PGresult* PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
 {
 //! @todo consider using binary mode with PQexecParams()
-    res = PQexec(conn, sql.toByteArray().constData());
-    ExecStatusType resultType = PQresultStatus(res);
-    return resultType == PGRES_COMMAND_OK || resultType == PGRES_TUPLES_OK;
+    return PQexec(conn, sql.toByteArray().constData());
 }
 
 //--------------------------------------
 
 PostgresqlCursorData::PostgresqlCursorData(KDbConnection* connection)
-        : PostgresqlConnectionInternal(connection)
+        : PostgresqlConnectionInternal(connection), res(nullptr), resultStatus(PGRES_FATAL_ERROR)
 {
     conn = static_cast<PostgresqlConnection*>(connection)->d->conn;
 }
 
 PostgresqlCursorData::~PostgresqlCursorData()
 {
+}
+
+KDbField* PostgresqlSqlResult::createField(const QString &tableName, int index)
+{
+    Q_UNUSED(tableName)
+    QScopedPointer<PostgresqlSqlField> f(static_cast<PostgresqlSqlField*>(field(index)));
+    if (!f) {
+        return nullptr;
+    }
+    const QString caption(f->name());
+    QString realFieldName(KDb::stringToIdentifier(caption.toLower()));
+    const PostgresqlDriver *pgdriver = static_cast<const PostgresqlDriver*>(conn->driver());
+    const KDbField::Type kdbType = pgdriver->pgsqlToKDbType(
+                PQftype(result, index), PQfmod(result, index), nullptr);
+    KDbField *kdbField = new KDbField(realFieldName, kdbType);
+    kdbField->setCaption(caption);
+    if (KDbField::isTextType(kdbType)) {
+        const int len = f->length();
+        if (len != -1) {
+            kdbField->setMaxLength(len);
+        }
+    }
+    //! @todo use information_schema.table_constraints to get constraints
+    //copyConstraints(...);
+    //! @todo use information_schema.columns to get options
+    //copyOptions(...);
+    return kdbField;
 }

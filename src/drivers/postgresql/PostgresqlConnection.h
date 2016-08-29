@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2010-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,9 +21,9 @@
 #ifndef KDB_POSTGRESQLCONNECTION_H
 #define KDB_POSTGRESQLCONNECTION_H
 
-#include <QStringList>
-
 #include "KDbConnection.h"
+
+#include <libpq-fe.h>
 
 class PostgresqlConnectionInternal;
 
@@ -78,9 +78,8 @@ protected:
     //! Drops the given database
     virtual bool drv_dropDatabase(const QString &dbName = QString());
     //! Executes an SQL statement
-    virtual bool drv_executeSQL(const KDbEscapedString& sql);
-    //! @return the oid of the last insert - only works if sql was insert of 1 row
-    virtual quint64 drv_lastInsertRecordId();
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE;
 
     //! Implemented for KDbResultable
     virtual QString serverResultName() const;
@@ -90,13 +89,14 @@ protected:
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual tristate drv_containsTable(const QString &tableName);
 
-    void storeResult();
+    void storeResult(PGresult *pgResult, ExecStatusType execStatus);
 
     PostgresqlConnectionInternal * const d;
 
     friend class PostgresqlDriver;
     friend class PostgresqlCursorData;
     friend class PostgresqlTransactionData;
+    friend class PostgresqlSqlResult;
 };
 
 #endif

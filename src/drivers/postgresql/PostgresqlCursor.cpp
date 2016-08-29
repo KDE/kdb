@@ -54,13 +54,14 @@ PostgresqlCursor::~PostgresqlCursor()
     delete d;
 }
 
-
 //==================================================================================
 //Create a cursor result set
 bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
 {
-    if (!d->executeSQL(sql)) {
-        storeResult();
+    d->res = d->executeSQL(sql);
+    d->resultStatus = PQresultStatus(d->res);
+    if (d->resultStatus != PGRES_TUPLES_OK && d->resultStatus != PGRES_COMMAND_OK) {
+        storeResultAndClear(&d->res, d->resultStatus);
         return false;
     }
     m_fieldsToStoreInRecord = PQnfields(d->res);
@@ -73,9 +74,11 @@ bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
     PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(m_conn->driver());
 
     m_realTypes.resize(m_fieldsToStoreInRecord);
+    m_realLengths.resize(m_fieldsToStoreInRecord);
     for (int i = 0; i < int(m_fieldsToStoreInRecord); i++) {
         const int pqtype = PQftype(d->res, i);
-        m_realTypes[i] = drv->pgsqlToVariantType(pqtype);
+        const int pqfmod = PQfmod(d->res, i);
+        m_realTypes[i] = drv->pgsqlToKDbType(pqtype, pqfmod, &m_realLengths[i]);
     }
     return true;
 }
@@ -225,51 +228,57 @@ QVariant PostgresqlCursor::pValue(int pos) const
                        ? m_visibleFieldsExpanded->at(pos)->field : 0;
 // postgresqlDebug() << "pos:" << pos;
 
-    const QVariant::Type type = m_realTypes[pos];
+    const KDbField::Type type = m_realTypes[pos];
     const KDbField::Type kdbType = f ? f->type() : KDbField::InvalidType; // cache: evaluating type of expressions can be expensive
     if (PQgetisnull(d->res, row, pos) || kdbType == KDbField::Null) {
         return QVariant();
     }
     const char *data = PQgetvalue(d->res, row, pos);
-    const int len = PQgetlength(d->res, row, pos);
+    int len = PQgetlength(d->res, row, pos);
 
     switch (type) { // from most to least frequently used types:
-    case QVariant::String:
+    case KDbField::Text:
+    case KDbField::LongText: {
+        const int maxLength = m_realLengths[pos];
+        if (maxLength > 0) {
+            len = qMin(len, maxLength);
+        }
         return convertToKDbType(!KDbField::isTextType(kdbType),
                                 d->unicode ? QString::fromUtf8(data, len) : QString::fromLatin1(data, len),
                                 kdbType);
-    case QVariant::Int:
+    }
+    case KDbField::Integer:
         return convertToKDbType(!KDbField::isIntegerType(kdbType),
                                 atoi(data), // the fastest way
                                 kdbType);
-    case QVariant::Bool:
+    case KDbField::Boolean:
         return convertToKDbType(kdbType != KDbField::Boolean,
                                 bool(data[0] == 't'),
                                 kdbType);
-    case QVariant::LongLong:
+    case KDbField::BigInteger:
         return convertToKDbType(kdbType != KDbField::BigInteger,
                                 (data[0] == '-') ? QByteArray::fromRawData(data, len).toLongLong()
                                                  : QByteArray::fromRawData(data, len).toULongLong(),
                                 kdbType);
-    case QVariant::Double:
+    case KDbField::Double:
 //! @todo support equivalent of QSql::NumericalPrecisionPolicy, especially for NUMERICOID
         return convertToKDbType(!KDbField::isFPNumericType(kdbType),
                                 QByteArray::fromRawData(data, len).toDouble(),
                                 kdbType);
-    case QVariant::Date:
+    case KDbField::Date:
         return convertToKDbType(kdbType != KDbField::Date,
                                 (len == 0) ? QVariant(QDate())
                                            : QVariant(QDate::fromString(QLatin1String(QByteArray::fromRawData(data, len)), Qt::ISODate)),
                                 kdbType);
-    case QVariant::Time:
+    case KDbField::Time:
         return convertToKDbType(kdbType != KDbField::Time,
                                 timeFromData(data, len),
                                 kdbType);
-    case QVariant::DateTime:
+    case KDbField::DateTime:
         return convertToKDbType(kdbType != KDbField::DateTime,
                                 dateTimeFromData(data, len),
                                 kdbType);
-    case QVariant::ByteArray:
+    case KDbField::BLOB:
         return convertToKDbType(kdbType != KDbField::BLOB,
                                 byteArrayFromData(data),
                                 kdbType);
@@ -337,7 +346,7 @@ void PostgresqlCursor::drv_bufferMovePointerTo(qint64 to)
     Q_UNUSED(to);
 }
 
-void PostgresqlCursor::storeResult()
+void PostgresqlCursor::storeResultAndClear(PGresult **pgResult, ExecStatusType execStatus)
 {
-    d->storeResult(&m_result);
+    d->storeResultAndClear(&m_result, pgResult, execStatus);
 }

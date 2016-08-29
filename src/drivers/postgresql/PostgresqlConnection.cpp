@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Adam Pigg <adam@piggz.co.uk>
-   Copyright (C) 2010-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2010-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -115,7 +115,7 @@ bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 
 bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
-    return executeSQL(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
+    return executeVoidSQL(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
 }
 
 QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
@@ -200,15 +200,13 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     }
     //! @todo call on first use of SOUNDEX(), etc.;
     //!       it's not possible now because we don't have connection context in KDbFunctionExpressionData
-    drv_executeSQL(KDbEscapedString("CREATE EXTENSION fuzzystrmatch"));
+    drv_executeVoidSQL(KDbEscapedString("CREATE EXTENSION fuzzystrmatch"));
     PQclear(result);
     return true;
 }
 
 bool PostgresqlConnection::drv_closeDatabase()
 {
-    PQclear(d->res);
-    d->res = 0;
     PQfinish(d->conn);
     d->conn = 0;
     return true;
@@ -219,30 +217,34 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     //postgresqlDebug() << dbName;
 
     //! @todo Maybe should check that dbname is no the currentdb
-    if (executeSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
+    if (executeVoidSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
         return true;
 
     return false;
 }
 
-bool PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    if (!d->executeSQL(sql)) {
-        storeResult();
-        return false;
+    PGresult* result = d->executeSQL(sql);
+    const ExecStatusType status = PQresultStatus(result);
+    if (status == PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
+        return new PostgresqlSqlResult(this, result, status);
     }
-    return true;
+    storeResult(result, status);
+    return nullptr;
+}
+
+bool PostgresqlConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+{
+    PGresult* result = d->executeSQL(sql);
+    const ExecStatusType status = PQresultStatus(result);
+    d->storeResultAndClear(&m_result, &result, status);
+    return status == PGRES_TUPLES_OK || status == PGRES_COMMAND_OK;
 }
 
 bool PostgresqlConnection::drv_isDatabaseUsed() const
 {
     return d->conn;
-}
-
-quint64 PostgresqlConnection::drv_lastInsertRecordId()
-{
-    // InvalidOid is 0, so the cast is OK
-    return static_cast<quint64>(PQoidValue(d->res));
 }
 
 tristate PostgresqlConnection::drv_containsTable(const QString &tableName)
@@ -292,7 +294,7 @@ KDbEscapedString PostgresqlConnection::escapeString(const QString& str) const
     return escapeString(d->unicode ? str.toUtf8() : str.toLocal8Bit());
 }
 
-void PostgresqlConnection::storeResult()
+void PostgresqlConnection::storeResult(PGresult *pgResult, ExecStatusType execStatus)
 {
-    d->storeResult(&m_result);
+    d->storeResultAndClear(&m_result, &pgResult, execStatus);
 }

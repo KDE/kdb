@@ -25,6 +25,8 @@
 #include "KDbConnection.h"
 #include "KDb.h"
 
+#include <libpq-fe.h>
+
 class PostgresqlCursorData;
 
 class PostgresqlCursor: public KDbCursor
@@ -46,13 +48,14 @@ public:
     virtual void drv_bufferMovePointerPrev();
     virtual void drv_bufferMovePointerTo(qint64 to);
 
-    void storeResult();
+    void storeResultAndClear(PGresult **pgResult, ExecStatusType execStatus);
 
 private:
     QVariant pValue(int pos)const;
 
     unsigned long m_numRows;
-    QVector<QVariant::Type> m_realTypes;
+    QVector<KDbField::Type> m_realTypes;
+    QVector<int> m_realLengths;
 
     PostgresqlCursorData * const d;
 };
