@@ -58,8 +58,8 @@ protected:
                                  KDbMessageHandler* msgHandler = 0);
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const KDbEscapedString& sql);
-    virtual quint64 drv_lastInsertRecordId();
+    virtual KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
+    virtual bool drv_executeVoidSQL(const KDbEscapedString& sql);
 
     //! Implemented for KDbResultable
     virtual QString serverResultName() const;
@@ -71,7 +71,6 @@ protected:
 
     void storeResult();
 
-    KDbSqlResult* useSqlResult() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
     MysqlConnectionInternal* const d;
 
     friend class MysqlDriver;

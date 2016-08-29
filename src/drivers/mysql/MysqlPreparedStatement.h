@@ -36,7 +36,7 @@ public:
 protected:
     virtual bool prepare(const KDbEscapedString& sql);
 
-    virtual bool execute(
+    virtual KDbSqlResult* execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,

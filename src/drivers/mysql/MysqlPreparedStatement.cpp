@@ -233,7 +233,7 @@ bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, i
 }
 #endif
 
-bool MysqlPreparedStatement::execute(
+KDbSqlResult* MysqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList* insertFieldList,
@@ -308,10 +308,14 @@ bool MysqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        return connection->insertRecord(insertFieldList, myParameters);
+        KDbSqlResult* result;
+        if (connection->insertRecord(insertFieldList, myParameters, &result)) {
+            return result;
+        }
+        return nullptr;
     }
 //! @todo support select
 
 #endif // !KDB_USE_MYSQL_STMT
-    return false;
+    return nullptr;
 }

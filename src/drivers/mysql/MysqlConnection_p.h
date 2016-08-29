@@ -61,8 +61,8 @@ public:
     //! Selects a database that is about to be used
     bool useDatabase(const QString &dbName = QString());
 
-    //! Executes query for a raw SQL statement @a sql
-    bool executeSQL(const KDbEscapedString& sql);
+    //! Executes query for a raw SQL statement @a sql using mysql_real_query()
+    bool executeVoidSQL(const KDbEscapedString& sql);
 
     static QString serverResultName(MYSQL *mysql);
 
@@ -143,19 +143,27 @@ public:
         : conn(c), data(d), fields(nullptr)
     {
         Q_ASSERT(c);
-        Q_ASSERT(d);
     }
 
     inline ~MysqlSqlResult() {
-        mysql_free_result(data);
+        if (data) {
+            mysql_free_result(data);
+        }
     }
 
-    inline int fieldsCount() Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
-        return mysql_num_fields(data);
+    inline KDbConnection *connection() const Q_DECL_OVERRIDE {
+        return conn;
+    }
+
+    inline int fieldsCount() Q_DECL_OVERRIDE {
+        return data ? mysql_num_fields(data) : 0;
     }
 
     inline KDbSqlField *field(int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
         if (!fields) {
+            if (!data) {
+                return nullptr;
+            }
             fields = mysql_fetch_fields(data);
         }
         return new MysqlSqlField(fields + index);
@@ -164,7 +172,7 @@ public:
     KDbField *createField(const QString &tableName, int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
     inline KDbSqlRecord* fetchRecord() Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
-        MYSQL_ROW row = mysql_fetch_row(data);
+        MYSQL_ROW row = data ? mysql_fetch_row(data) : nullptr;
         if (!row) {
             return nullptr;
         }
@@ -180,6 +188,11 @@ public:
             res.setServerErrorCode(err);
         }
         return res;
+    }
+
+    inline quint64 lastInsertRecordId() Q_DECL_OVERRIDE {
+        //! @todo
+        return static_cast<quint64>(mysql_insert_id(conn->d->mysql));
     }
 
 protected:

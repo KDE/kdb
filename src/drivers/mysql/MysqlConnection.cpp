@@ -138,10 +138,7 @@ bool MysqlConnection::drv_createDatabase(const QString &dbName)
     mysqlDebug() << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
-    if (drv_executeSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName))))
-        return true;
-    storeResult();
-    return false;
+    return drv_executeVoidSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
 bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KDbMessageHandler* msgHandler)
@@ -167,22 +164,26 @@ bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    return drv_executeSQL(KDbEscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
+    return drv_executeVoidSQL(KDbEscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
-bool MysqlConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* MysqlConnection::drv_executeSQL(const KDbEscapedString& sql)
 {
-    if (!d->executeSQL(sql)) {
+    if (!drv_executeVoidSQL(sql)) {
+        return nullptr;
+    }
+    MYSQL_RES *data = mysql_use_result(d->mysql); // more optimal than mysql_store_result
+    //! @todo use mysql_error()
+    return new MysqlSqlResult(this, data);
+}
+
+bool MysqlConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+{
+    if (!d->executeVoidSQL(sql)) {
         storeResult();
         return false;
     }
     return true;
-}
-
-quint64 MysqlConnection::drv_lastInsertRecordId()
-{
-    //! @todo
-    return static_cast<quint64>(mysql_insert_id(d->mysql));
 }
 
 QString MysqlConnection::serverResultName() const
@@ -209,11 +210,4 @@ KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 void MysqlConnection::storeResult()
 {
     d->storeResult(&m_result);
-}
-
-KDbSqlResult* MysqlConnection::useSqlResult()
-{
-    MYSQL_RES *data = mysql_use_result(d->mysql); // more optimal than mysql_store_result
-    //! @todo use mysql_error()
-    return data ? new MysqlSqlResult(this, data) : nullptr;
 }

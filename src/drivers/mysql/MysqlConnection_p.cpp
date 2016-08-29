@@ -114,17 +114,17 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
-    if (!executeSQL(KDbEscapedString("USE ") + escapeIdentifier(dbName))) {
+    if (!executeVoidSQL(KDbEscapedString("USE ") + escapeIdentifier(dbName))) {
         return false;
     }
-    if (!executeSQL(KDbEscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
+    if (!executeVoidSQL(KDbEscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
         // needed to turn warnings about trimming string values into SQL errors
         return false;
     }
     return true;
 }
 
-bool MysqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
+bool MysqlConnectionInternal::executeVoidSQL(const KDbEscapedString& sql)
 {
     return 0 == mysql_real_query(mysql, sql.constData(), sql.length());
 }
@@ -190,7 +190,7 @@ QStringList examineEnumField(const QString& table, const KDbSqlField* field)
         = KDbEscapedString("SHOW COLUMNS FROM `") + conn->escapeIdentifier(table) +
                         "` LIKE '" + conn->escapeIdentifier(fld->name) + '\'';
 
-    if (!conn->executeSQL(query))
+    if (!conn->executeVoidSQL(query))
         // Huh? MySQL wont tell us what values it can take.
         return QStringList();
 
@@ -252,8 +252,9 @@ KDbField::Type MysqlSqlResult::blobType(const QString& tableName, MysqlSqlField 
     KDbField::Type kdbType = KDbField::LongText;
     const KDbEscapedString sql = KDbEscapedString("SHOW COLUMNS FROM %1 LIKE '%2'")
             .arg(escapeIdentifier(tableName)).arg(field->name());
-    if (conn->executeSQL(sql)) {
-        QScopedPointer<MysqlSqlResult> result(static_cast<MysqlSqlResult*>(conn->useSqlResult()));
+    //! @todo this conflicts with active query
+    QScopedPointer<MysqlSqlResult> result(static_cast<MysqlSqlResult*>(conn->executeSQL(sql)));
+    if (result) {
         QScopedPointer<MysqlSqlRecord> record;
         const KDbSqlString typeName(mysqlTypeName(result.data(), &record));
         if (typeName.rawDataToByteArray().toLower().contains("blob")) {
@@ -341,13 +342,13 @@ KDbField::Type MysqlSqlResult::type(const QString& tableName, MysqlSqlField *fie
     return kdbType;
 }
 
-static inline void copyConstraints(int mysqlFieldFlags, KDbField* field)
+inline void copyConstraints(int mysqlFieldFlags, KDbField* field)
 {
     field->setPrimaryKey(mysqlFieldFlags & PRI_KEY_FLAG);
     field->setAutoIncrement(mysqlFieldFlags & AUTO_INCREMENT_FLAG);
     field->setNotNull(mysqlFieldFlags & NOT_NULL_FLAG);
     field->setUniqueKey(mysqlFieldFlags & UNIQUE_KEY_FLAG);
-    //! @todo: Keys and uniqueness
+    //! @todo: support keys
 }
 
 static inline void copyOptions(int mysqlFieldFlags, KDbField* field)
