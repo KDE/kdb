@@ -469,9 +469,10 @@ bool KDbCursor::updateRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool
 bool KDbCursor::insertRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId)
 {
 //! @todo doesn't update cursor's buffer YET!
-    clearResult();
-    if (!m_query)
+    if (!m_query) {
+        clearResult();
         return false;
+    }
     return m_conn->insertRecord(m_query, data, buf, useRecordId);
 }
 
