@@ -38,6 +38,7 @@ KDB_DRIVER_PLUGIN_FACTORY(MysqlDriver, "kdb_mysqldriver.json")
 
 MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
     : KDbDriver(parent, args)
+    , m_longTextPrimaryKeyType(QLatin1String("VARCHAR(255)")) // fair enough for PK
 {
     d->features = IgnoreTransactions | CursorForward;
 
@@ -192,6 +193,15 @@ QString MysqlDriver::drv_escapeIdentifier(const QString& str) const
 QByteArray MysqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 {
     return QByteArray(str).replace('`', '\'');
+}
+
+//! Overrides the default implementation
+QString MysqlDriver::sqlTypeName(KDbField::Type type, const KDbField &field) const
+{
+    if (field.isPrimaryKey() && type == KDbField::LongText) {
+        return m_longTextPrimaryKeyType;
+    }
+    return KDbDriver::sqlTypeName(type, field);
 }
 
 KDbEscapedString MysqlDriver::lengthFunctionToString(const KDbNArgExpression &args,

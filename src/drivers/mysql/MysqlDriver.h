@@ -54,6 +54,9 @@ public:
     //! Escape BLOB value @a array
     virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
 
+    //! Overrides the default implementation
+    virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
+
     //! Generates native (driver-specific) LENGTH() function call.
     //! char_length(val) is used because length(val) in mysql returns number of bytes,
     //! what is not right for multibyte (unicode) encodings. */
@@ -92,6 +95,7 @@ protected:
 
 private:
     static const char *keywords[];
+    QString m_longTextPrimaryKeyType;
 };
 
 #endif
