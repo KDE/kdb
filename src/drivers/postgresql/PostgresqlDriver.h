@@ -43,7 +43,8 @@ public:
     //! Escape a string for use as a value
     virtual KDbEscapedString escapeString(const QString& str) const;
     virtual KDbEscapedString escapeString(const QByteArray& str) const;
-    virtual QString sqlTypeName(int id_t, int p = 0) const;
+    //! Overrides the default implementation to allow for NUMERIC type natively
+    virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
 
     //! Escape BLOB value @a array
     virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;

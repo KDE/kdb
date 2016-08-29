@@ -147,10 +147,10 @@ public:
     KDbAdminTools& adminTools() const;
 
     /*! SQL-implementation-dependent name of given type */
-    virtual QString sqlTypeName(int id_t, int p = 0) const;
+    virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
 
     /*! used when we do not have KDbDriver instance yet */
-    static QString defaultSQLTypeName(int id_t);
+    static QString defaultSQLTypeName(KDbField::Type type);
 
     /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.

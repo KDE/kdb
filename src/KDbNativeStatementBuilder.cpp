@@ -440,7 +440,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             if (autoinc && !d->driver()->beh->AUTO_INCREMENT_TYPE.isEmpty())
                 v += d->driver()->beh->AUTO_INCREMENT_TYPE;
             else
-                v += d->driver()->sqlTypeName(type, field->precision());
+                v += d->driver()->sqlTypeName(type, *field);
 
             if (KDbField::isIntegerType(type) && field->isUnsigned()) {
                 v.append(' ').append(d->driver()->beh->UNSIGNED_TYPE_KEYWORD);

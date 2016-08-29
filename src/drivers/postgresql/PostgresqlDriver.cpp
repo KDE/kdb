@@ -82,20 +82,17 @@ PostgresqlDriver::~PostgresqlDriver()
 {
 }
 
-//Override the default implementation to allow for NUMERIC type natively
-QString PostgresqlDriver::sqlTypeName(int id_t, int p) const
+QString PostgresqlDriver::sqlTypeName(KDbField::Type type, const KDbField &field) const
 {
-    if (id_t == KDbField::Null)
+    if (type == KDbField::Null) {
         return QLatin1String("NULL");
-    if (id_t == KDbField::Float || id_t == KDbField::Double) {
-        if (p > 0) {
-            return QLatin1String("NUMERIC");
-        } else {
-            return d->typeNames[id_t];
-        }
-    } else {
-        return d->typeNames[id_t];
     }
+    if (type == KDbField::Float || type == KDbField::Double) {
+        if (field.precision() > 0) {
+            return QLatin1String("NUMERIC");
+        }
+    }
+    return KDbDriver::sqlTypeName(type, field);
 }
 
 KDbConnection* PostgresqlDriver::drv_createConnection(const KDbConnectionData& connData,
