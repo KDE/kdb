@@ -48,7 +48,9 @@ public:
     virtual KDbSqlField *field(int index) Q_REQUIRED_RESULT = 0;
 
     //! Creates a KDb field for field @a index and returns it
-    //! On failure returns @c nullptr
+    //! On failure returns @c nullptr.
+    //! @a tableName is the table name and may be used to retrieve information but may
+    //! be ignored as well if the KDbSqlResult already has field metadata available.
     virtual KDbField* createField(const QString &tableName, int index) Q_REQUIRED_RESULT = 0;
 
     //! Fetches one record and returns it. @return nullptr if there is no record to fetch or on error.

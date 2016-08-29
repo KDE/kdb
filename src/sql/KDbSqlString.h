@@ -38,7 +38,7 @@ public:
     //! Creates string object from raw string @a s, of specified length
     inline KDbSqlString(const char *s, quint64 len) : string(s), length(len) {}
 
-    //! @return true is this string value is empty.
+    //! @return true is this string value is empty. Here, NULL values are considered empty too.
     inline bool isEmpty() const { return !string || length == 0; }
 
     //! @return string value converted to bytea array
