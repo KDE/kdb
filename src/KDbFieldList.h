@@ -131,16 +131,16 @@ public:
                        const QString& n13 = QString(), const QString& n14 = QString(),
                        const QString& n15 = QString(), const QString& n16 = QString(),
                        const QString& n17 = QString(), const QString& n18 = QString()
-                      );
+                      ) Q_REQUIRED_RESULT;
 
     /*! Like above, but for QStringList. */
-    KDbFieldList* subList(const QStringList& list);
+    KDbFieldList* subList(const QStringList& list) Q_REQUIRED_RESULT;
 
     /*! @overload subList(const QStringList&) */
-    KDbFieldList* subList(const QList<QByteArray>& list);
+    KDbFieldList* subList(const QList<QByteArray>& list) Q_REQUIRED_RESULT;
 
     /*! Like above, but with a list of field indices */
-    KDbFieldList* subList(const QList<int>& list);
+    KDbFieldList* subList(const QList<int>& list) Q_REQUIRED_RESULT;
 
     /*! @return a string that is a result of all field names concatenated
      and with @a separator. This is usable e.g. as argument like "field1,field2"
