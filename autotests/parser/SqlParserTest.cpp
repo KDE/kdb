@@ -30,8 +30,8 @@ QTEST_GUILESS_MAIN(SqlParserTest)
 
 void SqlParserTest::initTestCase()
 {
-    m_utils.testDriverManager();
-    m_utils.testSqliteDriver();
+    QVERIFY(m_utils.testDriverManager());
+    QVERIFY(m_utils.testSqliteDriver());
     QString dir(QFile::decodeName(OUTPUT_DIR));
     QString fname("errors.txt");
     m_errorFile.setFileName(dir + QDir::separator() + fname);
@@ -48,8 +48,7 @@ bool SqlParserTest::openDatabase(const QString &path)
 
     KDbConnectionData cdata;
     cdata.setDatabaseName(path);
-    m_utils.testConnect(cdata);
-    if (!m_utils.connection) {
+    if (!m_utils.testConnect(cdata) || !m_utils.connection) {
         qDebug() << m_utils.driver->result();
         return false;
     }
@@ -68,10 +67,9 @@ bool SqlParserTest::openDatabase(const QString &path)
         return false;
     }
 #endif
-    m_utils.testUse();
-    if (!m_utils.connection->isDatabaseUsed()) {
+    if (!m_utils.testUse() || !m_utils.connection->isDatabaseUsed()) {
         qDebug() << m_utils.connection->result();
-        m_utils.testDisconnect();
+        Q_UNUSED(m_utils.testDisconnect());
         return false;
     }
     return true;
@@ -361,7 +359,7 @@ void SqlParserTest::testTokens()
 
 void SqlParserTest::cleanupTestCase()
 {
-    m_utils.testDisconnect();
+    QVERIFY(m_utils.testDisconnect());
     m_errorFile.close();
 #if 0
         if (!m_conn->dropDatabase()) {

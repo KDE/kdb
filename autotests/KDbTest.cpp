@@ -34,9 +34,9 @@ Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
 
 void KDbTest::initTestCase()
 {
-    utils.testDriverManager();
+    QVERIFY(utils.testDriverManager());
     //! @todo don't hardcode SQLite here
-    utils.testSqliteDriver();
+    QVERIFY(utils.testSqliteDriver());
 }
 
 void KDbTest::testVersionInfo()
@@ -1044,9 +1044,10 @@ void KDbTest::testTemporaryTableName()
 {
     QVERIFY(utils.driver);
     QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/KDbTest.kexi")));
-    utils.testCreate(dbName);
+    QVERIFY(utils.testCreate(dbName));
+    QVERIFY(utils.connection);
     utils.connection->useDatabase();
-    utils.testCreateTables();
+    QVERIFY(utils.testCreateTables());
 
     QString baseName = QLatin1String("foobar");
     QString tempName1 = KDb::temporaryTableName(utils.connection.data(), baseName);

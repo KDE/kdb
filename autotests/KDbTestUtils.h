@@ -23,6 +23,7 @@
 #include "kdbtestutils_export.h"
 
 #include <QPointer>
+#include <QTest>
 #include <KDbDriver>
 #include <KDbDriverManager>
 #include <KDbConnection>
@@ -81,6 +82,15 @@ T* KDB_POINTER_WRAPPER(const QScopedPointer<T> &t) { return t.data(); }
     } \
     while (false)
 
+//! Declares method @a name that returns false on test failure, it can be called as utility function.
+//! Also declared internal method name ## Internal which performs the actual test.
+//! This way users of this method can call QVERIFY(utils.<name>());
+#define KDBTEST_METHOD_DECL(name, argsDecl, args) \
+public: \
+    bool name argsDecl Q_REQUIRED_RESULT { name ## Internal args ; return !QTest::currentTestFailed(); } \
+private Q_SLOTS: \
+    void name ## Internal argsDecl
+
 //! Test utilities that provide basic database features
 class KDBTESTUTILS_EXPORT KDbTestUtils : public QObject
 {
@@ -92,18 +102,18 @@ public:
     QPointer<KDbDriver> driver;
     QScopedPointer<KDbConnection> connection;
 
-public Q_SLOTS:
-    void testDriverManager();
-    void testSqliteDriver();
-    void testConnect(const KDbConnectionData &cdata);
-    void testUse();
-    void testCreate(const QString &dbName);
-    void testCreateTables();
-    void testDisconnect();
-    void testDisconnectAndDropDb();
+    KDBTEST_METHOD_DECL(testDriverManager, (), ());
+    KDBTEST_METHOD_DECL(testSqliteDriver, (), ());
+    KDBTEST_METHOD_DECL(testConnect, (const KDbConnectionData &cdata), (cdata));
+    KDBTEST_METHOD_DECL(testUse, (), ());
+    KDBTEST_METHOD_DECL(testCreate, (const QString &dbName), (dbName));
+    KDBTEST_METHOD_DECL(testProperties, (), ());
+    KDBTEST_METHOD_DECL(testCreateTables, (), ());
+    KDBTEST_METHOD_DECL(testDisconnect, (), ());
+    KDBTEST_METHOD_DECL(testDisconnectAndDropDb, (), ());
 
 protected:
-    void testDisconnectInternal();
+    void testDisconnectPrivate();
     void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
 };
 

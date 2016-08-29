@@ -30,9 +30,9 @@ QTEST_GUILESS_MAIN(ConnectionTest)
 
 void ConnectionTest::initTestCase()
 {
-    utils.testDriverManager();
+    QVERIFY(utils.testDriverManager());
     //! @todo don't hardcode SQLite here
-    utils.testSqliteDriver();
+    QVERIFY(utils.testSqliteDriver());
 }
 
 void ConnectionTest::testConnectionData()
@@ -105,10 +105,11 @@ void ConnectionTest::testCreateDb()
 {
     QVERIFY(utils.driver);
     QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi")));
-    utils.testCreate(dbName);
-    utils.testUse();
-    utils.testCreateTables();
-    utils.testDisconnectAndDropDb();
+    QVERIFY(utils.testCreate(dbName));
+    QVERIFY(utils.testUse());
+    QVERIFY(utils.testProperties());
+    QVERIFY(utils.testCreateTables());
+    QVERIFY(utils.testDisconnectAndDropDb());
 }
 
 void ConnectionTest::testConnectToNonexistingDb()
@@ -118,7 +119,7 @@ void ConnectionTest::testConnectToNonexistingDb()
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(QLatin1String("/really-non-existing/path/fiuwehf2349f8h23c2jcoeqw"));
-    utils.testConnect(cdata);
+    QVERIFY(utils.testConnect(cdata));
     QVERIFY(utils.connection);
     KDB_VERIFY(utils.connection, !utils.connection->databaseExists(utils.connection->data().databaseName()),
                     "Database should not exist");

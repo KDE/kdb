@@ -29,12 +29,12 @@ void DriverTest::initTestCase()
 
 void DriverTest::testDriverManager()
 {
-    utils.testDriverManager();
+    QVERIFY(utils.testDriverManager());
 }
 
 void DriverTest::testSqliteDriver()
 {
-    utils.testSqliteDriver();
+    QVERIFY(utils.testSqliteDriver());
 }
 
 void DriverTest::cleanupTestCase()

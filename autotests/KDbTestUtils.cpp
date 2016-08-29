@@ -23,6 +23,7 @@
 #include <KDbDriverMetaData>
 #include <KDbConnection>
 #include <KDbConnectionOptions>
+#include <KDbProperties>
 
 #include <QFile>
 #include <QTest>
@@ -35,7 +36,7 @@ KDbTestUtils::KDbTestUtils()
 {
 }
 
-void KDbTestUtils::testDriverManager()
+void KDbTestUtils::testDriverManagerInternal()
 {
     QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
     QStringList ids = manager.driverIds();
@@ -69,7 +70,7 @@ void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QSt
     KDB_VERIFY(manager.resultable(), driver = manager.driver(driverId), "Driver not found");
 }
 
-void KDbTestUtils::testSqliteDriver()
+void KDbTestUtils::testSqliteDriverInternal()
 {
     QStringList mimeTypes;
     mimeTypes << "application/x-kexiproject-sqlite3" << "application/x-sqlite3";
@@ -79,7 +80,7 @@ void KDbTestUtils::testSqliteDriver()
     QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()), "SQLite's MIME types should include the default file based one");
 }
 
-void KDbTestUtils::testConnect(const KDbConnectionData &cdata)
+void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
 {
     qDebug() << cdata;
 
@@ -111,42 +112,55 @@ void KDbTestUtils::testConnect(const KDbConnectionData &cdata)
     KDB_VERIFY(connection, connection->isConnected(), "Database not connected after call to connect()");
 }
 
-void KDbTestUtils::testUse()
+void KDbTestUtils::testUseInternal()
 {
     KDB_VERIFY(connection, connection->databaseExists(connection->data().databaseName()), "Database does not exists");
     KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
     KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
 }
 
-void KDbTestUtils::testCreate(const QString &dbName)
+void KDbTestUtils::testCreateInternal(const QString &dbName)
 {
     //open connection
     KDbConnectionData cdata;
     cdata.setDatabaseName(dbName);
 
-    testConnect(cdata);
+    QVERIFY(testConnect(cdata));
     QVERIFY(connection);
 
     //! @todo KDbDriver::metaData
     {
-        QScopedPointer<KDbConnection> connGuard(connection.data());
+        QScopedPointer<KDbConnection> connGuard(connection.take());
 
-        if (connection->databaseExists(dbName)) {
-            KDB_VERIFY(connection, connection->dropDatabase(dbName), "Failed to drop database");
+        if (connGuard->databaseExists(dbName)) {
+            KDB_VERIFY(connGuard, connGuard->dropDatabase(dbName), "Failed to drop database");
         }
-        KDB_VERIFY(connection, !connection->databaseExists(dbName), "Database exists");
-        KDB_VERIFY(connection, connection->createDatabase(dbName), "Failed to create db");
-        KDB_VERIFY(connection, connection->databaseExists(dbName), "Database does not exists after creation");
-        connGuard.take();
+        KDB_VERIFY(connGuard, !connGuard->databaseExists(dbName), "Database exists");
+        KDB_VERIFY(connGuard, connGuard->createDatabase(dbName), "Failed to create db");
+        KDB_VERIFY(connGuard, connGuard->databaseExists(dbName), "Database does not exists after creation");
+        connection.reset(connGuard.take());
     }
 }
 
-void KDbTestUtils::testCreateTables()
+void KDbTestUtils::testPropertiesInternal()
+{
+    QStringList properties;
+    properties << connection->databaseProperties().names();
+    QVERIFY(properties.contains("kexidb_major_ver"));
+    bool ok;
+    QVERIFY(connection->databaseProperties().value("kexidb_major_ver").toInt(&ok) >= 0);
+    QVERIFY(ok);
+    QVERIFY(properties.contains("kexidb_minor_ver"));
+    QVERIFY(connection->databaseProperties().value("kexidb_minor_ver").toInt(&ok) >= 0);
+    QVERIFY(ok);
+}
+
+void KDbTestUtils::testCreateTablesInternal()
 {
     QVERIFY2(tablesTest_createTables(connection.data()) == 0, "Failed to create test data");
 }
 
-void KDbTestUtils::testDisconnectInternal()
+void KDbTestUtils::testDisconnectPrivate()
 {
     if (!connection) {
         return;
@@ -159,18 +173,20 @@ void KDbTestUtils::testDisconnectInternal()
     KDB_VERIFY(connection, connection->disconnect(), "Second disconnect() call should not fail");
 }
 
-void KDbTestUtils::testDisconnect()
+void KDbTestUtils::testDisconnectInternal()
 {
     const int connCount = driver->connections().count();
-    testDisconnectInternal();
+    testDisconnectPrivate();
+    QVERIFY(!QTest::currentTestFailed());
     connection.reset();
     QCOMPARE(driver->connections().count(), connCount - 1); // one less
 }
 
-void KDbTestUtils::testDisconnectAndDropDb()
+void KDbTestUtils::testDisconnectAndDropDbInternal()
 {
     QString dbName(connection.data()->data().databaseName());
-    testDisconnectInternal();
+    testDisconnectPrivate();
+    QVERIFY(!QTest::currentTestFailed());
     KDB_VERIFY(connection, connection->dropDatabase(dbName), "Failed to drop database");
     connection.reset();
 }
