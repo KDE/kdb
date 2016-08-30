@@ -484,7 +484,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
 ///@todo IS this ok for all engines?: if (!autoinc && !field->isPrimaryKey() && field->isNotNull())
             if (!autoinc && !pk && field->isNotNull())
                 v += " NOT NULL"; //only add not null option if no autocommit is set
-            if (field->defaultValue().isValid()) {
+            if (d->driver()->supportsDefaultValue(*field) && field->defaultValue().isValid()) {
                 KDbEscapedString valToSQL(d->driver()->valueToSQL(field, field->defaultValue()));
                 if (!valToSQL.isEmpty()) //for sanity
                     v += " DEFAULT " + valToSQL;

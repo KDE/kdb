@@ -106,6 +106,17 @@ bool MysqlDriver::drv_isSystemFieldName(const QString& n) const
     return false;
 }
 
+bool MysqlDriver::supportsDefaultValue(const KDbField &field) const
+{
+    switch(field.type()) {
+    case KDbField::LongText:
+    case KDbField::BLOB:
+        return false;
+    default:
+        return true;
+    }
+}
+
 KDbEscapedString MysqlDriver::escapeString(const QString& str) const
 {
     //escape as in http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html

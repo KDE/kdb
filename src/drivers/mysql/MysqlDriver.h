@@ -92,6 +92,7 @@ protected:
     virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
                                                 const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName(const QString& n) const;
+    bool supportsDefaultValue(const KDbField &field) const Q_DECL_OVERRIDE;
 
 private:
     static const char *keywords[];
