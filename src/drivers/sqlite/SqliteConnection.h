@@ -54,8 +54,10 @@ protected:
     virtual bool drv_disconnect();
     virtual bool drv_getDatabasesList(QStringList* list);
 
+#if 0 // TODO
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual bool drv_getTablesList(QStringList* list);
+#endif
 
 //! @todo move this somewhere to low level class (MIGRATION?)
     virtual tristate drv_containsTable(const QString &tableName);

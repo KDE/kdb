@@ -321,8 +321,6 @@ public:
 
     bool drv_getDatabasesList(QStringList* list) Q_DECL_OVERRIDE;
 
-    bool drv_getTablesList(QStringList* list) Q_DECL_OVERRIDE;
-
     bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true) Q_DECL_OVERRIDE;
 
     bool drv_createDatabase(const QString &dbName = QString()) Q_DECL_OVERRIDE;

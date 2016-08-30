@@ -671,11 +671,6 @@ bool KDbConnectionProxy::drv_getDatabasesList(QStringList* list)
     return d->connection->drv_getDatabasesList(list);
 }
 
-bool KDbConnectionProxy::drv_getTablesList(QStringList* list)
-{
-    return d->connection->drv_getTablesList(list);
-}
-
 bool KDbConnectionProxy::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 {
     return d->connection->drv_databaseExists(dbName, ignoreErrors);

@@ -93,6 +93,7 @@ tristate SqliteConnection::drv_containsTable(const QString &tableName)
                             .arg(escapeString(tableName)));
 }
 
+#if 0 // TODO
 bool SqliteConnection::drv_getTablesList(QStringList* list)
 {
     KDbCursor *cursor;
@@ -112,6 +113,7 @@ bool SqliteConnection::drv_getTablesList(QStringList* list)
     }
     return deleteCursor(cursor);
 }
+#endif
 
 bool SqliteConnection::drv_createDatabase(const QString &dbName)
 {

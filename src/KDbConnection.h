@@ -990,13 +990,6 @@ protected:
      @see databaseNames */
     virtual bool drv_getDatabasesList(QStringList* list);
 
-//! @todo move this somewhere to low level class (MIGRATION?)
-    /*! LOW LEVEL METHOD. For implementation: loads low-level list of table names
-     available for this connection. The names are in lower case.
-     The method should return true only if there was no error on getting database names
-     list from the server. */
-    virtual bool drv_getTablesList(QStringList* list) = 0;
-
     /*! For optional reimplementation: asks server if database @a dbName exists.
      This method is used internally in databaseExists(). The default  implementation
      calls databaseNames and checks if that list contains @a dbName. If you need to

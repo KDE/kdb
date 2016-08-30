@@ -85,8 +85,6 @@ protected:
     virtual QString serverResultName() const;
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual bool drv_getTablesList(QStringList* list);
-//! @todo move this somewhere to low level class (MIGRATION?)
     virtual tristate drv_containsTable(const QString &tableName);
 
     void storeResult(PGresult *pgResult, ExecStatusType execStatus);

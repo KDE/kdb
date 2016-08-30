@@ -253,11 +253,6 @@ tristate PostgresqlConnection::drv_containsTable(const QString &tableName)
                         .arg(escapeString(tableName)));
 }
 
-bool PostgresqlConnection::drv_getTablesList(QStringList* list)
-{
-    return queryStringList(KDbEscapedString("SELECT lower(relname) FROM pg_class WHERE relkind='r'"), list);
-}
-
 QString PostgresqlConnection::serverResultName() const
 {
     if (m_result.code() >= 0 && m_result.code() <= PGRES_SINGLE_TUPLE) {

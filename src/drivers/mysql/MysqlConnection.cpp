@@ -197,11 +197,6 @@ tristate MysqlConnection::drv_containsTable(const QString& tableName)
                         .arg(escapeString(tableName)));
 }
 
-bool MysqlConnection::drv_getTablesList(QStringList* list)
-{
-    return true == queryStringList(KDbEscapedString("SHOW TABLES"), list);
-}
-
 KDbPreparedStatementInterface* MysqlConnection::prepareStatementInternal()
 {
     return new MysqlPreparedStatement(d);
