@@ -390,11 +390,6 @@ bool KDbConnection::connect()
                              tr("Connection already established."));
         return false;
     }
-    if (m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT && d->connData.databaseName().isEmpty()) {
-        m_result = KDbResult(ERR_MISSING_DB_LOCATION,
-                             tr("Database name required to create connection."));
-        return 0;
-    }
 
     d->serverVersion.clear();
     if (!(d->isConnected = drv_connect())) {
