@@ -472,8 +472,7 @@ QStringList KDbConnection::databaseNames(bool also_system_db)
     if (!useTemporaryDatabaseIfNeeded(&tmpdbName))
         return QStringList();
 
-    QStringList list, non_system_list;
-
+    QStringList list;
     bool ret = drv_getDatabasesList(&list);
 
     if (!tmpdbName.isEmpty()) {
@@ -488,14 +487,12 @@ QStringList KDbConnection::databaseNames(bool also_system_db)
     if (also_system_db)
         return list;
     //filter system databases:
-    for (QStringList::ConstIterator it = list.constBegin(); it != list.constEnd(); ++it) {
-        //kdbDebug() << *it;
-        if (!m_driver->isSystemDatabaseName(*it)) {
-            //kdbDebug() << "add " << *it;
-            non_system_list << (*it);
+    for (QMutableListIterator<QString> it(list); it.hasNext();) {
+        if (m_driver->isSystemDatabaseName(it.next())) {
+            it.remove();
         }
     }
-    return non_system_list;
+    return list;
 }
 
 bool KDbConnection::drv_getDatabasesList(QStringList* list)
