@@ -2717,11 +2717,16 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
     KDbField *f = new KDbField(
         name, f_type, f_constr, f_opts, f_len, f_prec);
 
-    f->setDefaultValue(KDb::stringToVariant(data.at(7).toString(), KDbField::variantType(f_type), &ok));
-    if (!ok) {
-        kdbWarning() << "problem with KDb::stringToVariant(" << data.at(7).toString() << ')';
+    QVariant defaultVariant = data.at(7);
+    if (defaultVariant.isValid()) {
+        defaultVariant = KDb::stringToVariant(defaultVariant.toString(), KDbField::variantType(f_type), &ok);
+        if (ok) {
+            f->setDefaultValue(defaultVariant);
+        } else {
+            kdbWarning() << "problem with KDb::stringToVariant(" << defaultVariant << ')';
+            ok = true; //problem with defaultValue is not critical
+        }
     }
-    ok = true; //problem with defaultValue is not critical
 
     f->setCaption(data.at(9).toString());
     f->setDescription(data.at(10).toString());
