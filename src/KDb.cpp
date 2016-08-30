@@ -88,7 +88,7 @@ protected Q_SLOTS:
     virtual void reject();
 
 protected:
-    ConnectionTestThread* m_thread;
+    QPointer<ConnectionTestThread> m_thread;
     KDbConnectionData m_connData;
     QTimer m_timer;
     KDbMessageHandler* m_msgHandler;
@@ -132,7 +132,7 @@ void ConnectionTestThread::run()
         emitError(*m_driver);
         return;
     }
-    if (conn->connect() || conn->result().isError()) {
+    if (!conn->connect() || conn->result().isError()) {
         emitError(*conn);
         return;
     }
@@ -142,6 +142,9 @@ void ConnectionTestThread::run()
     if (!conn->useTemporaryDatabaseIfNeeded(&tmpDbName)) {
         emitError(*conn);
         return;
+    }
+    if (!tmpDbName.isEmpty()) {
+        conn->closeDatabase();
     }
     emitError(KDbResultable());
 }
@@ -169,8 +172,10 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
 
 ConnectionTestDialog::~ConnectionTestDialog()
 {
-    m_thread->terminate();
-    delete m_thread;
+    if (m_thread->isRunning()) {
+        m_thread->terminate();
+    }
+    m_thread->deleteLater();
 }
 
 int ConnectionTestDialog::exec()
@@ -199,31 +204,29 @@ void ConnectionTestDialog::slotTimeout()
         m_timer.stop();
         reject();
         kdbDebug() << "after reject";
+        QString message;
+        QString details;
+        KDbMessageHandler::MessageType type;
         if (m_error) {
-            kdbDebug() << "show?";
-            if (m_msgHandler) {
-                m_msgHandler->showErrorMessage(KDbMessageHandler::Sorry, m_msg, m_details);
+            message = tr("Test connection to \"%1\" database server failed.")
+                         .arg(m_connData.toUserVisibleString());
+            details = m_msg;
+            if (!m_details.isEmpty()) {
+                details += QLatin1Char('\n') + m_details;
             }
-            kdbDebug() << "shown";
+            type = KDbMessageHandler::Sorry;
             m_error = false;
         } else if (notResponding) {
-            if (m_msgHandler) {
-                m_msgHandler->showErrorMessage(
-                    KDbMessageHandler::Sorry,
-                    tr("Test connection to \"%1\" database server failed. The server is not responding.")
-                        .arg(m_connData.toUserVisibleString()),
-                    QString(),
-                    tr("Test Connection"));
-            }
+            message = tr("Test connection to \"%1\" database server failed. The server is not responding.")
+                         .arg(m_connData.toUserVisibleString());
+            type = KDbMessageHandler::Sorry;
         } else {
-            if (m_msgHandler) {
-                m_msgHandler->showErrorMessage(
-                    KDbMessageHandler::Information,
-                    tr("Test connection to \"%1\" database server established successfully.")
-                        .arg(m_connData.toUserVisibleString()),
-                    QString(),
-                    tr("Test Connection"));
-            }
+            message = tr("Test connection to \"%1\" database server established successfully.")
+                         .arg(m_connData.toUserVisibleString()),
+            type = KDbMessageHandler::Information;
+        }
+        if (m_msgHandler) {
+            m_msgHandler->showErrorMessage(type, message, details, tr("Test Connection"));
         }
         return;
     }
@@ -236,17 +239,19 @@ void ConnectionTestDialog::error(const QString& msg, const QString& details)
     //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
     kdbDebug() << msg << details;
     m_stopWaiting = true;
-    if (!msg.isEmpty() || !details.isEmpty()) {
-        m_error = true;
-        m_msg = msg;
-        m_details = details;
+    m_msg = msg;
+    m_details = details;
+    m_error = !msg.isEmpty() || !details.isEmpty();
+    if (m_error) {
         kdbDebug() << "ERR!";
     }
 }
 
 void ConnectionTestDialog::reject()
 {
-    m_thread->terminate();
+    if (m_thread->isRunning()) {
+        m_thread->terminate();
+    }
     m_timer.disconnect(this);
     m_timer.stop();
     QProgressDialog::reject(); // krazy:exclude=qclasses
