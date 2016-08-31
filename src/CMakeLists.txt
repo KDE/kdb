@@ -197,7 +197,7 @@ set(kdb_INCLUDE_DIRS
 target_include_directories(KDb
     PUBLIC "$<BUILD_INTERFACE:${kdb_INCLUDE_DIRS}>"
     INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KDb>"
-    PRIVATE expression generated interfaces parser tools views ${ICU_INCLUDE_DIRS}
+    PRIVATE ${ICU_INCLUDE_DIRS}
 )
 
 target_link_libraries(KDb
