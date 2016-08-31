@@ -99,7 +99,7 @@ EOF
 sed --in-place 's/[[:space:]]\+$//;s/\t/        /g' generated/sqlparser.cpp
 
 # Extract table of SQL tokens
-./extract_tokens.sh > generated/tokens.cpp
+# unused ./extract_tokens.sh > generated/tokens.cpp
 rm -f KDbSqlParser.tab.h KDbSqlParser.tab.c
 
 # Create KDbToken.h
