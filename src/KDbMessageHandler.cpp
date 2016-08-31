@@ -50,10 +50,10 @@ KDbMessageGuard::KDbMessageGuard(const KDbResult &result, KDbMessageHandler *han
 
 KDbMessageGuard::~KDbMessageGuard()
 {
-    if (d->handler && d->result->isError()) { // variant 1
+    if (d->handler && d->result && d->result->isError()) { // variant 1
         d->handler->showErrorMessage(*d->result);
     }
-    else if (d->resultable->messageHandler() && d->resultable->result().isError()){ // variant 2
+    else if (d->resultable && d->resultable->messageHandler() && d->resultable->result().isError()){ // variant 2
         d->resultable->messageHandler()->showErrorMessage(d->resultable->result());
     }
     delete d;
