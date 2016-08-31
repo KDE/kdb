@@ -29,7 +29,7 @@
  * objects to avoid premature converting to QString or QByteArray. This way memory allocations
  * are not required.
  */
-class KDB_EXPORT KDbSqlString
+class KDbSqlString
 {
 public:
     //! Creates an empty string object

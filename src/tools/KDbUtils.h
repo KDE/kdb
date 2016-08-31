@@ -121,7 +121,7 @@ type* stringToPtr(const QString& str)
 
 //! @short Autodeleting hash
 template <class Key, class T>
-class KDB_EXPORT AutodeletedHash : public QHash<Key, T>
+class AutodeletedHash : public QHash<Key, T>
 {
 public:
     //! Creates autodeleting hash as a copy of @a other.
@@ -175,7 +175,7 @@ private:
 
 //! @short Autodeleting list
 template <typename T>
-class KDB_EXPORT AutodeletedList : public QList<T>
+class AutodeletedList : public QList<T>
 {
 public:
     //! Creates autodeleting list as a copy of @a other.
