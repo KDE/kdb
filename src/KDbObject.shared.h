@@ -20,6 +20,7 @@
 #ifndef KDB_OBJECT_H
 #define KDB_OBJECT_H
 
+#include "kdb_export.h"
 #include "KDbGlobal.h"
 
 /*! Provides common attributes for KDb objects: id, name, caption,

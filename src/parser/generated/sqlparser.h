@@ -8,8 +8,8 @@
 #include "KDbExpression.h"
 #include "KDbField.h"
 
-class OrderByColumnInternal;
-class SelectOptionsInternal;
+struct OrderByColumnInternal;
+struct SelectOptionsInternal;
 
 /* A Bison parser, made by GNU Bison 3.0.4.  */
 

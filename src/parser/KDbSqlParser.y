@@ -459,7 +459,7 @@
 #include "KDbTableSchema.h"
 #include "kdb_debug.h"
 
-class OrderByColumnInternal;
+struct OrderByColumnInternal;
 
 #ifdef Q_OS_SOLARIS
 #include <alloca.h>
