@@ -6,7 +6,7 @@ configure_file(SqliteGlobal.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/SqliteGlobal.h)
 simple_option(KDB_SQLITE_VACUUM "Support for SQLite VACUUM (compacting)" ON)
 
 if (KDB_SQLITE_VACUUM)
-  set(KDB_SQLITE_DUMP_TOOL kdb_sqlite3_dump)
+  set(KDB_SQLITE_DUMP_TOOL ${KDB_BASE_NAME_LOWER}_sqlite3_dump)
   add_definitions(-DKDB_SQLITE_DUMP_TOOL=\"${KDB_SQLITE_DUMP_TOOL}\")
 endif ()
 
