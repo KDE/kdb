@@ -46,5 +46,10 @@ add_pc_file()
 
 add_subdirectory(src)
 
+add_custom_target(cppclean
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/cppclean-kdb.sh ${CMAKE_BINARY_DIR}
+    COMMENT "Running CPPCLEAN"
+)
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 macro_display_feature_log()
