@@ -20,7 +20,7 @@
 */
 
 #include "KDbJsonTrader_p.h"
-#include "KDbGlobal.h"
+#include "KDb.h"
 #include "kdb_debug.h"
 
 #include <QList>
@@ -111,16 +111,7 @@ QList<QPluginLoader *> KDbJsonTrader::query(const QString &servicetype,
                                             const QString &mimetype)
 {
     if (!d->pluginPathFound) {
-        QStringList searchDirs;
-        searchDirs += QCoreApplication::libraryPaths();
-        foreach(const QString &dir, searchDirs) {
-            //kdbDebug() << dir;
-            QString possiblePath = dir + QLatin1String("/kdb");
-            if (QDir(possiblePath).exists()) {
-                d->pluginPaths += possiblePath;
-            }
-        }
-        d->pluginPathFound = true;
+        d->pluginPaths = KDb::libraryPaths();
     }
 
     QList<QPluginLoader *> list;
