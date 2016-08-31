@@ -5,7 +5,7 @@ endif()
 
 #TODO  add_definitions(-DKDE_DEFAULT_DEBUG_AREA=44001)
 
-set(KDB_PLUGIN_INSTALL_DIR ${PLUGIN_INSTALL_DIR}/kdb)
+set(KDB_PLUGIN_INSTALL_DIR ${PLUGIN_INSTALL_DIR}/${KDB_BASE_NAME_LOWER})
 
 # -----------------------
 macro(build_and_install_kdb_driver _name _srcs _extra_libs)

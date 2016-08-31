@@ -1,12 +1,20 @@
 # Additional CMake macros
 #
-# Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+# Copyright (C) 2015-2016 Jarosław Staniek <staniek@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
 
 include(FeatureSummary)
 include(GetGitRevisionDescription)
+
+# x.80.y or larger means test release, so the stable major version is x+1
+if(PROJECT_VERSION_MINOR GREATER 80)
+    set(PROJECT_UNSTABLE ON)
+    math(EXPR PROJECT_STABLE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR} + 1")
+else()
+    set(PROJECT_STABLE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+endif()
 
 # Adds a feature info using add_feature_info() with _NAME and _DESCRIPTION.
 # If _NAME is equal to _DEFAULT, shows this fact.
@@ -95,7 +103,23 @@ endmacro()
 # ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pc.cmake should exist.
 macro(add_pc_file)
   if (NOT WIN32)
-    configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pc.cmake ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
-    install(FILES ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+    set(_name ${PROJECT_NAME}${PROJECT_STABLE_VERSION_MAJOR})
+    configure_file(${CMAKE_SOURCE_DIR}/${PROJECT_NAME}.pc.cmake ${CMAKE_BINARY_DIR}/${_name}.pc @ONLY)
+    install(FILES ${CMAKE_BINARY_DIR}/${_name}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
   endif()
+endmacro()
+
+# Sets detailed version information for library co-installability.
+# - adds PROJECT_VERSION_MAJOR to the lib name
+# - sets VERSION and SOVERSION to PROJECT_VERSION_MAJOR.PROJECT_VERSION_MINOR
+# Sets _var variable to final lib name
+macro(set_coinstallable_lib_version _target _var)
+    set(_name ${_target}${PROJECT_STABLE_VERSION_MAJOR})
+    set_target_properties(${_target}
+        PROPERTIES VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+                   SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+                   EXPORT_NAME ${_target}
+                   OUTPUT_NAME ${_name}
+    )
+    set(${_var} ${_name})
 endmacro()

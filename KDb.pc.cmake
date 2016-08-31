@@ -3,7 +3,7 @@ exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
-Name: KDb
+Name: @PROJECT_NAME@@PROJECT_STABLE_VERSION_MAJOR@
 Description: A database connectivity and creation library
 Version: @PROJECT_VERSION@
 URL: http://community.kde.org/KDb

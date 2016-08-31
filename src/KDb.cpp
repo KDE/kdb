@@ -2008,7 +2008,7 @@ QStringList KDb::libraryPaths()
 {
     QStringList result;
     foreach (const QString& path, qApp->libraryPaths()) {
-        const QString dir(path + QLatin1String("/kdb"));
+        const QString dir(path + QLatin1Char('/') + QLatin1String(KDB_BASE_NAME_LOWER));
         if (QDir(dir).exists() && QDir(dir).isReadable()) {
             result += dir;
         }

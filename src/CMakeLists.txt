@@ -9,9 +9,6 @@ simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
 
 include(CheckIncludeFile)
 check_include_file(unistd.h HAVE_UNISTD_H)
-configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
-
-add_subdirectory(drivers)
 
 #add_definitions(
 #    TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
@@ -162,6 +159,9 @@ set(kdb_LIB_SRCS
 ecm_create_qm_loader(kdb_LIB_SRCS kdb_qt)
 
 add_library(KDb SHARED ${kdb_LIB_SRCS})
+set_coinstallable_lib_version(KDb KDB_BASE_NAME)
+string(TOLOWER ${KDB_BASE_NAME} KDB_BASE_NAME_LOWER)
+set(KDB_INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_DIR}/${KDB_BASE_NAME})
 
 kdb_create_shared_data_classes(
     kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
@@ -196,7 +196,7 @@ set(kdb_INCLUDE_DIRS
 
 target_include_directories(KDb
     PUBLIC "$<BUILD_INTERFACE:${kdb_INCLUDE_DIRS}>"
-    INTERFACE "$<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}/KDb>"
+    INTERFACE "$<INSTALL_INTERFACE:${KDB_INCLUDE_INSTALL_DIR}>"
     PRIVATE ${ICU_INCLUDE_DIRS}
 )
 
@@ -218,17 +218,12 @@ if(BUILD_TEST_COVERAGE)
     )
 endif()
 
-set_target_properties(KDb
-    PROPERTIES VERSION 1.0
-               SOVERSION 1.0.0
-               EXPORT_NAME KDb
-)
-
 # Create a Config.cmake and a ConfigVersion.cmake file and install them
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KDb")
+set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/${KDB_BASE_NAME}")
 
 ecm_setup_version(${PROJECT_VERSION}
     VARIABLE_PREFIX KDB
+    SOVERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     VERSION_HEADER "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
     PACKAGE_VERSION_FILE "${CMAKE_CURRENT_BINARY_DIR}/KDbConfigVersion.cmake"
 )
@@ -236,9 +231,6 @@ ecm_setup_version(${PROJECT_VERSION}
 install(TARGETS KDb
         EXPORT KDbTargets
         ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
-
-# Create a Config.cmake and a ConfigVersion.cmake file and install them
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/KDb")
 
 ecm_configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KDbConfig.cmake.in"
@@ -257,18 +249,18 @@ install(EXPORT KDbTargets
         FILE KDbTargets.cmake)
 
 ecm_generate_pri_file(
-    BASE_NAME KDb
-    LIB_NAME KDb
+    BASE_NAME ${KDB_BASE_NAME}
+    LIB_NAME ${KDB_BASE_NAME}
     DEPS "widgets xml"
     FILENAME_VAR PRI_FILENAME
-    INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_DIR}/KDb
+    INCLUDE_INSTALL_DIR ${KDB_INCLUDE_INSTALL_DIR}
 )
 
 install(FILES ${PRI_FILENAME}
         DESTINATION ${ECM_MKSPECS_INSTALL_DIR})
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/kdb_version.h"
-        DESTINATION "${INCLUDE_INSTALL_DIR}"
+        DESTINATION "${KDB_INCLUDE_INSTALL_DIR}"
         COMPONENT Devel)
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS
@@ -391,7 +383,7 @@ install(
     FILES
         ${kdb_HEADERS}
         ${kdb_HEADERS_FROM_BUILDDIR}
-    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
+    DESTINATION ${KDB_INCLUDE_INSTALL_DIR}
     COMPONENT Devel
 )
 
@@ -401,7 +393,7 @@ install(
         ${kdb_FORWARDING_HEADERS_FROM_BUILDDIR}
         ${PROJECT_BINARY_DIR}/src/kdb_export.h
         ${PROJECT_BINARY_DIR}/src/config-kdb.h
-    DESTINATION ${INCLUDE_INSTALL_DIR}/KDb
+    DESTINATION ${KDB_INCLUDE_INSTALL_DIR}
     COMPONENT Devel
 )
 
@@ -409,13 +401,17 @@ install(
 # install( FILES
 #   Connection_p.h
 #   Driver_p.h
-#   DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/Private COMPONENT Devel
+#   DESTINATION ${KDB_INCLUDE_INSTALL_DIR}/Private COMPONENT Devel
 # )
 
 # KDb/Interfaces includes
 # install( FILES
 #   Interfaces/KDbPreparedStatementInterface.h includes/KDb/Interfaces/KDbPreparedStatementInterface
-#   DESTINATION ${INCLUDE_INSTALL_DIR}/KDb/Interfaces COMPONENT Devel
+#   DESTINATION ${KDB_INCLUDE_INSTALL_DIR}/Interfaces COMPONENT Devel
 # )
 
+add_subdirectory(drivers)
+
 enable_testing()
+
+configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)

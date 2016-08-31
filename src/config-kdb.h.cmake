@@ -19,6 +19,15 @@
 //! @brief The subdirectory relative to the install prefix for executables.
 #define BIN_INSTALL_DIR "${BIN_INSTALL_DIR}"
 
+//! @def KDB_BASE_NAME
+//! @brief Base name for the framework, based on major stable version.
+//!        Useful for co-installability.
+#define KDB_BASE_NAME "@KDB_BASE_NAME@"
+
+//! @def KDB_BASE_NAME_LOWER
+//! @brief Like KDB_BASE_NAME but lowercase.
+#define KDB_BASE_NAME_LOWER "@KDB_BASE_NAME_LOWER@"
+
 //! @def KDB_TESTING_EXPORT
 //! @brief Export symbols for testing
 #ifdef BUILD_TESTING
