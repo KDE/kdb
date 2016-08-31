@@ -20,8 +20,7 @@
 #include "MysqlPreparedStatement.h"
 #include "KDbConnection.h"
 
-#include <mysql/errmsg.h>
-
+//#include <mysql/errmsg.h>
 // For example prepared MySQL statement code see:
 // http://dev.mysql.com/doc/refman/4.1/en/mysql-stmt-execute.html
 
