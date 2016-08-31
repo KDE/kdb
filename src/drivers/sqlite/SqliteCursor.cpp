@@ -23,15 +23,10 @@
 #include "SqliteConnection_p.h"
 #include "sqlite_debug.h"
 
-#include "KDbError.h"
 #include "KDbDriver.h"
+#include "KDbError.h"
+#include "KDbRecordData.h"
 #include "KDbUtils.h"
-
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-
-
 
 #include <QVector>
 #include <QDateTime>

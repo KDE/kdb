@@ -18,7 +18,9 @@
 */
 
 #include "KDbConnectionProxy.h"
+#include "KDbConnectionData.h"
 #include "KDbProperties.h"
+#include "KDbVersionInfo.h"
 
 class KDbConnectionProxy::Private
 {

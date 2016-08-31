@@ -22,6 +22,7 @@
 #include <KDbDriverManager>
 #include <KDbDriverMetaData>
 #include <KDbConnection>
+#include <KDbConnectionData>
 #include <KDbConnectionOptions>
 #include <KDbProperties>
 

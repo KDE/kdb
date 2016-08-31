@@ -19,6 +19,7 @@
 
 #include "ConnectionTest.h"
 
+#include <KDbConnectionData>
 #include <KDbDriverManager>
 #include <KDbDriverMetaData>
 

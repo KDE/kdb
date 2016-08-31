@@ -24,10 +24,10 @@
 #include <QStringList>
 #include <QSharedData>
 
-#include "KDbFieldList.h"
+#include "KDbField.h"
 #include "KDbResult.h"
 
-class KDbTableSchema;
+class KDbFieldList;
 class KDbPreparedStatementInterface;
 
 //! Prepared statement paraneters used in KDbPreparedStatement::execute()

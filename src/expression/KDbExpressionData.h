@@ -24,14 +24,17 @@
 #define KDB_EXPRESSION_P_H
 
 #include "config-kdb.h"
-#include "KDb.h"
-#include "KDbQuerySchema.h"
+#include "KDbToken.h"
+#include "KDbField.h"
 
-class KDbExpressionData;
-class KDbUnaryExpressionData;
 class KDbConstExpressionData;
-class KDbQueryParameterExpressionData;
+class KDbEscapedString;
+class KDbExpressionData;
 class KDbParseInfo;
+class KDbQueryParameterExpressionData;
+class KDbQuerySchemaParameter;
+class KDbQuerySchemaParameterValueListIterator;
+class KDbUnaryExpressionData;
 
 namespace KDb
 {

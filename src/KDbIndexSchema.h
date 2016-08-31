@@ -25,7 +25,6 @@
 
 #include "KDbObject.h"
 #include "KDbFieldList.h"
-#include "KDbRelationship.h"
 
 class KDbConnection;
 class KDbTableSchema;

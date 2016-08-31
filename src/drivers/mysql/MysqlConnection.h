@@ -25,7 +25,6 @@
 #include <QStringList>
 
 #include "KDbConnection.h"
-#include "MysqlCursor.h"
 
 class MysqlConnectionInternal;
 

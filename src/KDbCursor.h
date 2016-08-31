@@ -23,8 +23,12 @@
 #include <QString>
 #include <QVariant>
 
-#include "KDbConnection.h"
+#include "KDbResult.h"
+#include "KDbQueryColumnInfo.h"
 
+class KDbConnection;
+class KDbRecordData;
+class KDbQuerySchema;
 class KDbRecordEditBuffer;
 
 //! Provides database cursor functionality.

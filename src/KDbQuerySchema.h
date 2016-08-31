@@ -26,13 +26,13 @@
 #include "KDbFieldList.h"
 #include "KDbObject.h"
 #include "KDbQueryColumnInfo.h"
-#include "KDbQuerySchemaParameter.h"
 #include "KDbToken.h"
 
 class KDbConnection;
 class KDbTableSchema;
 class KDbRelationship;
 class KDbQueryAsterisk;
+class KDbQuerySchemaParameter;
 
 //! @short KDbOrderByColumn provides information about a single query column used for sorting
 /*! The column can be expression or table field. */

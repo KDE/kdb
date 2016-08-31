@@ -24,16 +24,17 @@
 #include "KDbConnection_p.h"
 #include "PostgresqlConnection.h"
 #include "PostgresqlDriver.h"
-#include <KDbSqlField>
-#include <KDbSqlRecord>
-#include <KDbSqlResult>
+#include "KDbResult.h"
+#include "KDbSqlField.h"
+#include "KDbSqlRecord.h"
+#include "KDbSqlResult.h"
+#include "KDbSqlString.h"
 
 #include <QString>
 
 #include <libpq-fe.h>
 
 class KDbEscapedString;
-class KDbResult;
 
 class PostgresqlConnectionInternal : public KDbConnectionInternal
 {

@@ -315,7 +315,6 @@ KDbSqlResult* MysqlPreparedStatement::execute(
         return nullptr;
     }
 //! @todo support select
-
 #endif // !KDB_USE_MYSQL_STMT
     return nullptr;
 }

@@ -43,7 +43,6 @@ struct OrderByColumnInternal {
         List() {}
         ~List() {}
     };
-    typedef QList<OrderByColumnInternal>::ConstIterator ListConstIterator;
     OrderByColumnInternal()
             : columnNumber(-1)
             , ascending(true) {
@@ -72,7 +71,7 @@ struct SelectOptionsInternal {
         delete orderByColumns; // delete because this is internal temp. structure
     }
     KDbExpression whereExpr;
-    OrderByColumnInternal::List* orderByColumns;
+    QList<OrderByColumnInternal>* orderByColumns;
 };
 
 class KDbExpressionPtr

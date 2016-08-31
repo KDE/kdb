@@ -26,6 +26,7 @@
 #include <KDbDriver>
 #include <KDbDriverMetaData>
 #include <KDbConnection>
+#include <KDbConnectionData>
 #include <KDbCursor>
 #include <KDbTableSchema>
 #include <KDbQuerySchema>

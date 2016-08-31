@@ -23,7 +23,6 @@
 #include <QString>
 
 #include "KDbCursor.h"
-#include "KDbConnection.h"
 
 class SqliteCursorData;
 class SqliteConnection;

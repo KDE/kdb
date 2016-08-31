@@ -20,6 +20,7 @@
 #include "SqliteAdmin.h"
 #include "SqliteVacuum.h"
 
+#include "KDbConnectionData.h"
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
 

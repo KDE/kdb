@@ -23,6 +23,7 @@
 #include "KDbConnection.h"
 #include "KDbDriver.h"
 #include "KDbExpression.h"
+#include "KDbQuerySchema.h"
 #include "KDb.h"
 #include "kdb_debug.h"
 

@@ -23,12 +23,14 @@
 #include "KDbDriverManager.h"
 #include "KDbDriverManager_p.h"
 #include "KDbJsonTrader_p.h"
+#include "KDbDriver.h"
 #include "KDbDriverMetaData.h"
 #include "kdb_debug.h"
 
 #include <KPluginFactory>
 
 #include <QApplication>
+#include <QTime>
 #include <QWidget>
 
 Q_GLOBAL_STATIC(DriverManagerInternal, s_self)

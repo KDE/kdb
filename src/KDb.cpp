@@ -21,18 +21,21 @@
 */
 
 #include "KDb.h"
+#include "KDbConnectionData.h"
+#include "KDbConnection.h"
 #include "KDbCursor.h"
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
 #include "KDbLookupFieldSchema.h"
-#include "KDbTableOrQuerySchema.h"
 #include "KDbMessageHandler.h"
-#include "KDbConnectionData.h"
 #include "KDbNativeStatementBuilder.h"
+#include "KDbQuerySchema.h"
+#include "KDbRecordData.h"
 #include "KDbSqlResult.h"
+#include "KDbTableOrQuerySchema.h"
+#include "KDbVersionInfo.h"
 #include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
-#include "config-kdb.h"
 
 #include <QMap>
 #include <QHash>

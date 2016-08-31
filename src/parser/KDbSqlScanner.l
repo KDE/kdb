@@ -20,6 +20,9 @@
 
 %{
 #include "sqlparser.h"
+#include "KDb.h"
+#include "KDbExpression.h"
+#include "KDbParser.h"
 #include "KDbSqlTypes.h"
 #include "kdb_debug.h"
 

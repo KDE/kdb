@@ -18,15 +18,17 @@
 */
 
 #include "SqliteDriver.h"
-#include "KDbConnection.h"
-#include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
-#include "KDb.h"
-
 #include "SqliteConnection.h"
 #include "SqliteConnection_p.h"
 #include "SqliteAdmin.h"
 
+#include "KDbConnection.h"
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
+#include "KDbExpression.h"
+#include "KDb.h"
+
+#include <KPluginFactory>
 
 #include <sqlite3.h>
 

@@ -20,16 +20,14 @@
 #ifndef KDB_QUERYSCHEMA_P_H
 #define KDB_QUERYSCHEMA_P_H
 
-#include "KDbQuerySchema.h"
 #include "KDbDriver.h"
-#include "KDbDriverManager_p.h"
-#include "KDbConnection.h"
 #include "KDbExpression.h"
-#include "KDb.h"
-#include "KDbLookupFieldSchema.h"
+#include "KDbQuerySchema.h"
 
 #include <QBitArray>
 #include <QWeakPointer>
+
+class KDbConnection;
 
 //! @internal
 class KDbQuerySchema::Private

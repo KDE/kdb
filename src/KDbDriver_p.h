@@ -27,11 +27,12 @@
 #include <QByteArray>
 #include <QSet>
 
-#include "KDbConnection.h"
 #include "KDbAdmin.h"
 #include "KDbUtils.h"
-#include "KDbVersionInfo.h"
+#include "KDbDriver.h"
 
+class KDbAdmin;
+class KDbConnection;
 
 //! @internal Detailed definition of driver's default behaviour
 /*! @note For driver developers:

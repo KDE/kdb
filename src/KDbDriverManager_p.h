@@ -20,10 +20,11 @@
 #ifndef KDB_DRIVER_MANAGER_P_H
 #define KDB_DRIVER_MANAGER_P_H
 
-#include <QObject>
+#include <QMap>
+#include "KDbResult.h"
 
-#include "KDbDriver.h"
-#include "KDbDriverMetaData.h"
+class KDbDriverMetaData;
+class KDbDriver;
 
 //! Internal class of the driver manager.
 class DriverManagerInternal : public QObject, public KDbResultable

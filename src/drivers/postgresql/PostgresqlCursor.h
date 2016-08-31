@@ -22,11 +22,11 @@
 #define KDB_POSTGRESQLCURSOR_H
 
 #include "KDbCursor.h"
-#include "KDbConnection.h"
-#include "KDb.h"
+#include "KDbField.h"
 
 #include <libpq-fe.h>
 
+class KDbConnection;
 class PostgresqlCursorData;
 
 class PostgresqlCursor: public KDbCursor

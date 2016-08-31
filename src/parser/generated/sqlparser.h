@@ -4,10 +4,12 @@
  ****************************************************************************/
 #ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
+
+#include "KDbExpression.h"
 #include "KDbField.h"
-#include "KDbParser.h"
-#include "KDbSqlTypes.h"
-#include "KDbToken.h"
+
+class OrderByColumnInternal;
+class SelectOptionsInternal;
 
 /* A Bison parser, made by GNU Bison 3.0.4.  */
 
@@ -127,7 +129,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 487 "KDbSqlParser.y" /* yacc.c:1909  */
+#line 490 "KDbSqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
     QByteArray* binaryValue;
@@ -140,7 +142,7 @@ union YYSTYPE
     KDbConstExpression *constExpression;
     KDbQuerySchema *querySchema;
     SelectOptionsInternal *selectOptions;
-    OrderByColumnInternal::List *orderByColumns;
+    QList<OrderByColumnInternal> *orderByColumns;
     QVariant *variantValue;
 
 #line 136 "KDbSqlParser.tab.h" /* yacc.c:1909  */

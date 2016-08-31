@@ -23,9 +23,12 @@
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
+#include "KDbExpression.h"
 #include "KDb.h"
 
 #include "PostgresqlConnection.h"
+
+#include <KPluginFactory>
 
 #include <libpq-fe.h>
 

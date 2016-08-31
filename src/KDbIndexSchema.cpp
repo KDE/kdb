@@ -17,9 +17,10 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "KDbIndexSchema.h"
-#include "KDbDriver.h"
 #include "KDbConnection.h"
+#include "KDbDriver.h"
+#include "KDbIndexSchema.h"
+#include "KDbRelationship.h"
 #include "KDbTableSchema.h"
 #include "kdb_debug.h"
 

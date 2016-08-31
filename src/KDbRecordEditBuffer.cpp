@@ -19,6 +19,7 @@
 
 #include "KDbRecordEditBuffer.h"
 #include "KDb.h"
+#include "KDbQueryColumnInfo.h"
 #include "kdb_debug.h"
 
 KDbRecordEditBuffer::KDbRecordEditBuffer(bool dbAwareBuffer)

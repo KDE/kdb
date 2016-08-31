@@ -26,7 +26,6 @@
 
 #include "KDbFieldList.h"
 #include "KDbIndexSchema.h"
-#include "KDbRelationship.h"
 
 class KDbConnection;
 class KDbLookupFieldSchema;

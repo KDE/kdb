@@ -22,9 +22,6 @@
 
 #include "KDbField.h"
 
-class KDbDriver;
-class KDbEscapedString;
-
 //! @short A single parameter of a query schema
 class KDB_EXPORT KDbQuerySchemaParameter
 {

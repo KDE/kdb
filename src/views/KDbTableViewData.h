@@ -26,13 +26,14 @@
 #ifndef KDB_TABLEVIEWDATA_H
 #define KDB_TABLEVIEWDATA_H
 
+#include "KDbField.h"
 #include "KDbUtils.h"
 #include "KDbRecordData.h"
-#include "KDbTableViewColumn.h"
 
+class KDbCursor;
 class KDbRecordEditBuffer;
 class KDbResultInfo;
-class KDbCursor;
+class KDbTableViewColumn;
 
 typedef KDbUtils::AutodeletedList<KDbRecordData*> KDbTableViewDataBase;
 typedef KDbTableViewDataBase::ConstIterator KDbTableViewDataConstIterator;

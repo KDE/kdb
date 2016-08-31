@@ -20,23 +20,24 @@
 #ifndef KDB_CONNECTION_H
 #define KDB_CONNECTION_H
 
-#include "KDbConnectionData.h"
-#include "KDbTableSchema.h"
-#include "KDbQuerySchema.h"
-#include "KDbQuerySchemaParameter.h"
-#include "KDbTransaction.h"
 #include "KDbDriver.h"
 #include "KDbPreparedStatement.h"
-#include "KDbRecordData.h"
+#include "KDbTableSchema.h"
+#include "KDbTransaction.h"
 #include "KDbTristate.h"
 
+class ConnectionPrivate;
+class KDbConnectionData;
 class KDbConnectionOptions;
 class KDbConnectionProxy;
 class KDbCursor;
-class ConnectionPrivate;
-class KDbRecordEditBuffer;
+class KDbDriver;
 class KDbProperties;
+class KDbRecordData;
+class KDbRecordEditBuffer;
+class KDbServerVersionInfo;
 class KDbSqlResult;
+class KDbVersionInfo;
 
 /*! @short Provides database connection, allowing queries and data modification.
 

@@ -20,9 +20,11 @@
 #ifndef KDB_SQLRECORD_H
 #define KDB_SQLRECORD_H
 
-#include "KDbSqlString.h"
+#include "kdb_export.h"
 
+class QByteArray;
 class QString;
+class KDbSqlString;
 
 //! The KDbSqlRecord class abstracts a single record obtained from a KDbSqlResult object
 /**

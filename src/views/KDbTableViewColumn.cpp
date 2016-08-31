@@ -24,14 +24,14 @@
 
 #include "KDbTableViewColumn.h"
 
-#include "KDbValidator.h"
-#include "KDbField.h"
-#include "KDbQuerySchema.h"
-#include "KDbRecordEditBuffer.h"
+#include "KDbConnection.h"
 #include "KDbConnectionOptions.h"
 #include "KDbCursor.h"
 #include "KDb.h"
+#include "KDbQuerySchema.h"
+#include "KDbRecordEditBuffer.h"
 #include "KDbTableViewData.h"
+#include "KDbValidator.h"
 
 #include <QIcon>
 

@@ -22,9 +22,12 @@
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include "KDbField.h"
 #include "KDbDriver_p.h"
+#include "KDbExpression.h"
+#include "KDbField.h"
 #include "KDb.h"
+
+#include <KPluginFactory>
 
 #include <mysql_version.h>
 #include <mysql.h>

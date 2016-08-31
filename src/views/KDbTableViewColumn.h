@@ -25,8 +25,12 @@
 #ifndef KDB_TABLEVIEWCOLUMN_H
 #define KDB_TABLEVIEWCOLUMN_H
 
-#include "KDbQuerySchema.h"
+#include "kdb_export.h"
 
+#include "KDbField.h"
+
+class KDbQueryColumnInfo;
+class KDbQuerySchema;
 class KDbTableViewColumn;
 class KDbTableViewData;
 class KDbValidator;

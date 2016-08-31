@@ -21,7 +21,6 @@
 #define KDB_OBJECT_H
 
 #include "KDbGlobal.h"
-#include "KDbField.h"
 
 /*! Provides common attributes for KDb objects: id, name, caption,
  help text. A KDb object is typically storable in database, for example:

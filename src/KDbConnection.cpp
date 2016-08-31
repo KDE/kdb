@@ -18,29 +18,28 @@
 */
 
 #include "KDbConnection.h"
-#include "KDbConnection_p.h"
+#include "KDbConnectionData.h"
 #include "KDbConnectionOptions.h"
+#include "KDbConnection_p.h"
+#include "KDbCursor.h"
+#include "kdb_debug.h"
+#include "KDbDriverMetaData.h"
+#include "KDbDriver_p.h"
 #include "KDbError.h"
 #include "KDbExpression.h"
-#include "KDbConnectionData.h"
-#include "KDbDriver.h"
-#include "KDbDriver_p.h"
-#include "KDbDriverMetaData.h"
-#include "KDbObject.h"
-#include "KDbTableSchema.h"
-#include "KDbRelationship.h"
-#include "KDbTransaction.h"
-#include "KDbCursor.h"
-#include "KDbRecordEditBuffer.h"
 #include "KDb.h"
-#include "KDbProperties.h"
 #include "KDbLookupFieldSchema.h"
-#include "KDbPreparedStatementInterface.h"
-#include "KDbParser.h"
 #include "KDbNativeStatementBuilder.h"
+#include "KDbParser.h"
+#include "KDbPreparedStatementInterface.h"
+#include "KDbQuerySchema.h"
+#include "KDbRecordData.h"
+#include "KDbProperties.h"
+#include "KDbRecordEditBuffer.h"
+#include "KDbRelationship.h"
 #include "KDbSqlRecord.h"
 #include "KDbSqlResult.h"
-#include "kdb_debug.h"
+#include "KDbVersionInfo.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -344,7 +343,7 @@ private:
 //================================================
 
 //! static: list of internal KDb system table names
-QStringList KDb_kdbSystemTableNames;
+static QStringList KDb_kdbSystemTableNames;
 
 KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
                              const KDbConnectionOptions &options)
@@ -1225,7 +1224,7 @@ static QVariant buildLengthValue(const KDbField &f)
 }
 
 //! builds a list of values for field's @a f properties. Used by createTable().
-void buildValuesForKexi__Fields(QList<QVariant>& vals, KDbField* f)
+static void buildValuesForKexi__Fields(QList<QVariant>& vals, KDbField* f)
 {
     const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
     vals.clear();
@@ -3063,7 +3062,7 @@ void KDbConnection::setAvailableDatabaseName(const QString& dbName)
 }
 
 //! @internal used in updateRecord(), insertRecord(),
-inline void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* data, const KDbRecordEditBuffer::DBMap& b,
+inline static void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* data, const KDbRecordEditBuffer::DBMap& b,
                                           QHash<KDbQueryColumnInfo*, int>* columnsOrderExpanded)
 {
     *columnsOrderExpanded = query->columnsOrder(KDbQuerySchema::ExpandedList);

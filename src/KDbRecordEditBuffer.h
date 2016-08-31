@@ -21,9 +21,12 @@
 #define KDB_RECORDEDITBUFFER_H
 
 #include <QMap>
+#include <QVariant>
 
-#include "KDbField.h"
-#include "KDbQuerySchema.h"
+#include "kdb_export.h"
+
+class KDbQueryColumnInfo;
+class KDbField;
 
 /*!  @short provides data for single edited database record
 

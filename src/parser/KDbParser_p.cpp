@@ -18,6 +18,10 @@
 */
 
 #include "KDbParser_p.h"
+#include "KDb.h"
+#include "KDbConnection.h"
+#include "KDbTableSchema.h"
+#include "KDbQuerySchema.h"
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
@@ -467,7 +471,7 @@ KDbQuerySchema* buildSelectQuery(
         if (options->orderByColumns) {
             KDbOrderByColumnList *orderByColumnList = querySchema->orderByColumnList();
             int count = options->orderByColumns->count();
-            OrderByColumnInternal::ListConstIterator it(options->orderByColumns->constEnd());
+            QList<OrderByColumnInternal>::ConstIterator it(options->orderByColumns->constEnd());
             --it;
             for (;count > 0; --it, --count)
                 /*opposite direction due to parser specifics*/

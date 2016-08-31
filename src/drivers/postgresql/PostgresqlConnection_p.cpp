@@ -19,8 +19,6 @@
 */
 
 #include "PostgresqlConnection_p.h"
-#include "PostgresqlConnection.h"
-#include "PostgresqlDriver.h"
 
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *_conn)
         : KDbConnectionInternal(_conn)

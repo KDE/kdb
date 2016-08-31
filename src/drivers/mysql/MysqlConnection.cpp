@@ -24,6 +24,8 @@
 #include "MysqlCursor.h"
 #include "MysqlPreparedStatement.h"
 #include "mysql_debug.h"
+#include "KDbConnectionData.h"
+#include "KDbVersionInfo.h"
 
 #include <QRegExp>
 

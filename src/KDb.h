@@ -24,12 +24,9 @@
 #include <QVariant>
 #include <QByteArray>
 
-#include "config-kdb.h"
 #include "KDbGlobal.h"
 #include "KDbField.h"
 #include "KDbTableSchema.h"
-#include "KDbVersionInfo.h"
-#include "KDbTristate.h"
 
 class QDomNode;
 class QDomElement;
@@ -46,6 +43,8 @@ class KDbResultable;
 class KDbResultInfo;
 class KDbSqlResult;
 class KDbTableOrQuerySchema;
+class KDbVersionInfo;
+class tristate;
 
 namespace KDb
 {

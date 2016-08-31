@@ -21,7 +21,8 @@
 #define KDB_LOOKUPFIELDSCHEMA_H
 
 #include <QMap>
-#include "KDbGlobal.h"
+
+#include "kdb_export.h"
 
 class QStringList;
 class QDomElement;

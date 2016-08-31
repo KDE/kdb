@@ -18,6 +18,7 @@
 */
 
 #include "KDbProperties.h"
+#include "KDbConnection.h"
 
 //! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn;
 KDbProperties::KDbProperties(KDbConnection *conn)

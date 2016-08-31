@@ -68,10 +68,12 @@ cat << EOF > generated/sqlparser.h
  ****************************************************************************/
 #ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
+
+#include "KDbExpression.h"
 #include "KDbField.h"
-#include "KDbParser.h"
-#include "KDbSqlTypes.h"
-#include "KDbToken.h"
+
+class OrderByColumnInternal;
+class SelectOptionsInternal;
 
 EOF
 

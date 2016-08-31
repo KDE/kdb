@@ -23,6 +23,7 @@
 #include "MysqlConnection_p.h"
 #include "KDbError.h"
 #include "KDb.h"
+#include "KDbRecordData.h"
 
 #include <limits.h>
 

@@ -20,7 +20,6 @@
 #ifndef KDBGLOBAL_H
 #define KDBGLOBAL_H
 
-#include "kdb_export.h"
 #include "kdb_version.h"
 
 #include <QString>

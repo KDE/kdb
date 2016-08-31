@@ -24,7 +24,6 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "SybaseDriver.h"
 #include "SybaseConnection.h"
 #include "SybaseConnection_p.h"
-#include "SybaseCursor.h"
 #include "SybasePreparedStatement.h"
 #include "KDbError.h"
 

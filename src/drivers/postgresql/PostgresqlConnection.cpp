@@ -23,8 +23,10 @@
 #include "PostgresqlPreparedStatement.h"
 #include "PostgresqlCursor.h"
 #include "postgresql_debug.h"
+#include "KDbConnectionData.h"
 #include "KDbError.h"
 #include "KDbGlobal.h"
+#include "KDbVersionInfo.h"
 
 #include <QFileInfo>
 #include <QHostAddress>

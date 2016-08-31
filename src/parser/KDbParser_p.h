@@ -20,18 +20,18 @@
 #ifndef KDB_PARSER_P_H
 #define KDB_PARSER_P_H
 
-#include "config-kdb.h"
 #include "KDbParser.h"
-#include "KDbQuerySchema.h"
-#include "KDbTableSchema.h"
-#include "KDbConnection.h"
-#include "KDbExpression.h"
 #include "KDbSqlTypes.h"
 
 #include <QList>
 #include <QHash>
 #include <QCache>
 #include <QString>
+
+class KDbQuerySchema;
+class KDbTableSchema;
+class KDbConnection;
+class KDbExpression;
 
 //! @internal
 class KDbParserPrivate

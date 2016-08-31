@@ -21,7 +21,6 @@
 #define KDBOBJECTNAMEVALIDATOR_H
 
 #include <QString>
-#include "KDbGlobal.h"
 #include "KDbValidator.h"
 
 class KDbDriver;

@@ -20,7 +20,9 @@
 #ifndef KDB_DBPROPERTIES_H
 #define KDB_DBPROPERTIES_H
 
-#include "KDbConnection.h"
+#include "KDbResult.h"
+
+class KDbConnection;
 
 //! @todo implement KConfigBase interface here?
 

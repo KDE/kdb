@@ -20,8 +20,6 @@
 #ifndef KDB_MYSQLDRIVER_DEBUG_H
 #define KDB_MYSQLDRIVER_DEBUG_H
 
-#include "config-kdb.h"
-
 #include <QLoggingCategory>
 Q_DECLARE_LOGGING_CATEGORY(KDB_MYSQLDRIVER_LOG)
 

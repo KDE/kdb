@@ -23,16 +23,17 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 
 #include "KDbConnection_p.h"
 #include "MysqlConnection.h"
-#include <KDbSqlField>
-#include <KDbSqlRecord>
-#include <KDbSqlResult>
+#include "KDbResult.h"
+#include "KDbSqlField.h"
+#include "KDbSqlRecord.h"
+#include "KDbSqlResult.h"
+#include "KDbSqlString.h"
 
 #include <mysql_version.h>
 #include <mysql.h>
 
 class KDbConnectionData;
 class KDbEscapedString;
-class KDbResult;
 
 //! Internal MySQL connection data.
 /*! Provides a low-level API for accessing MySQL databases, that can

@@ -22,6 +22,7 @@
 #include "KDbDriver.h"
 #include "KDbConnection.h"
 #include "KDbLookupFieldSchema.h"
+#include "KDbQuerySchema.h"
 #include "kdb_debug.h"
 
 #include <assert.h>

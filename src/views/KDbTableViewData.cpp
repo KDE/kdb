@@ -24,12 +24,14 @@
 */
 
 #include "KDbTableViewData.h"
-#include "KDbField.h"
-#include "KDbRecordEditBuffer.h"
+#include "KDbConnection.h"
 #include "KDbConnectionOptions.h"
 #include "KDbCursor.h"
-#include "KDb.h"
 #include "KDbError.h"
+#include "KDb.h"
+#include "KDbQuerySchema.h"
+#include "KDbRecordEditBuffer.h"
+#include "KDbTableViewColumn.h"
 #include "kdb_debug.h"
 
 #include <QApplication>
@@ -38,7 +40,7 @@
 
 // #define TABLEVIEW_NO_PROCESS_EVENTS
 
-unsigned short charTable[] = {
+static unsigned short charTable[] = {
 #include "chartable.txt"
 };
 

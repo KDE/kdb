@@ -20,24 +20,17 @@
 #ifndef KDB_DRIVER_H
 #define KDB_DRIVER_H
 
-#include <QList>
-#include <QByteArray>
 #include <QDateTime>
 
-#include <KPluginFactory>
-
 #include "KDb.h"
-#include "KDbVersionInfo.h"
-#include "KDbField.h"
 #include "KDbResult.h"
 #include "KDbEscapedString.h"
-#include "KDbExpression.h"
+#include "KDbExpressionData.h"
 
 class KDbAdminTools;
 class KDbConnection;
 class KDbConnectionData;
 class KDbConnectionOptions;
-class KDbDriverManager;
 class KDbDriverBehaviour;
 class KDbDriverMetaData;
 class KDbBinaryExpression;

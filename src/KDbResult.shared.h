@@ -21,7 +21,6 @@
 #ifndef KDB_RESULT_H
 #define KDB_RESULT_H
 
-#include "KDbError.h"
 #include "KDbEscapedString.h"
 
 #include <QCoreApplication>

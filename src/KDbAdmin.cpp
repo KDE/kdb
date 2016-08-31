@@ -18,7 +18,6 @@
 */
 
 #include "KDbAdmin.h"
-#include "KDbAdmin.h"
 #include "KDbDriver_p.h"
 
 KDbAdminTools::KDbAdminTools()

@@ -26,6 +26,7 @@
 
 #include "KDbError.h"
 #include "KDbGlobal.h"
+#include "KDbRecordData.h"
 
 // Constructor based on query statement
 PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)

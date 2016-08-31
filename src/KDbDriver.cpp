@@ -18,13 +18,14 @@
 */
 
 #include "KDbDriver.h"
-#include "KDbDriver_p.h"
-#include "KDbDriverManager_p.h"
-#include "KDbError.h"
-#include "KDbConnection.h"
-#include "KDbConnectionData.h"
-#include "KDbConnectionOptions.h"
 #include "KDbAdmin.h"
+#include "KDbConnectionData.h"
+#include "KDbConnection.h"
+#include "KDbConnectionOptions.h"
+#include "KDbDriverManager_p.h"
+#include "KDbDriverMetaData.h"
+#include "KDbDriver_p.h"
+#include "KDbError.h"
 #include "KDbExpression.h"
 #include "kdb_debug.h"
 

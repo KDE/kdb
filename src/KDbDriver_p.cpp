@@ -20,6 +20,7 @@
 
 #include "KDbDriver_p.h"
 #include "KDbDriverMetaData.h"
+#include "KDbVersionInfo.h"
 
 KDbDriverBehaviour::KDbDriverBehaviour()
         : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))

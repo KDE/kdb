@@ -18,12 +18,15 @@
 */
 
 #include "KDbCursor.h"
+#include "KDbConnection.h"
 #include "KDbDriver.h"
 #include "KDbDriver_p.h"
 #include "KDbError.h"
-#include "KDbRecordEditBuffer.h"
-#include "KDbNativeStatementBuilder.h"
 #include "KDb.h"
+#include "KDbNativeStatementBuilder.h"
+#include "KDbQuerySchema.h"
+#include "KDbRecordData.h"
+#include "KDbRecordEditBuffer.h"
 #include "kdb_debug.h"
 
 #include <assert.h>

@@ -24,12 +24,9 @@
 #ifndef KDB_EXPRESSION_H
 #define KDB_EXPRESSION_H
 
-#include "KDbGlobal.h"
 #include "KDbField.h"
-#include "KDbQuerySchemaParameter.h"
 #include "KDbEscapedString.h"
 #include "KDbExpressionData.h"
-#include "KDbToken.h"
 
 //! Maximum number of arguments in function
 //! Reasonable number, set after https://www.sqlite.org/limits.html#max_function_arg
@@ -38,15 +35,17 @@
 //! @return class name of class @a c
 KDB_EXPORT QString expressionClassName(KDb::ExpressionClass c);
 
-class KDbParseInfo;
-class KDbNArgExpression;
-class KDbUnaryExpression;
 class KDbBinaryExpression;
 class KDbConstExpression;
-class KDbVariableExpression;
 class KDbFunctionExpression;
+class KDbNArgExpression;
+class KDbParseInfo;
 class KDbQueryParameterExpression;
+class KDbQuerySchemaParameter;
 class KDbQuerySchemaParameterValueListIterator;
+class KDbToken;
+class KDbUnaryExpression;
+class KDbVariableExpression;
 
 //! The KDbExpression class represents a base class for all expressions.
 class KDB_EXPORT KDbExpression

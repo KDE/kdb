@@ -449,14 +449,17 @@
 #include <QPoint>
 
 #include "KDbConnection.h"
-#include "KDbQuerySchema.h"
-#include "KDbQuerySchema_p.h"
+#include "KDbExpression.h"
 #include "KDbField.h"
-#include "KDbTableSchema.h"
 #include "KDbParser.h"
 #include "KDbParser_p.h"
+#include "KDbQuerySchema.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbSqlTypes.h"
+#include "KDbTableSchema.h"
 #include "kdb_debug.h"
+
+class OrderByColumnInternal;
 
 #ifdef Q_OS_SOLARIS
 #include <alloca.h>
@@ -496,7 +499,7 @@ int yylex();
     KDbConstExpression *constExpression;
     KDbQuerySchema *querySchema;
     SelectOptionsInternal *selectOptions;
-    OrderByColumnInternal::List *orderByColumns;
+    QList<OrderByColumnInternal> *orderByColumns;
     QVariant *variantValue;
 }
 
@@ -758,7 +761,7 @@ OrderByClause:
 OrderByColumnId
 {
     kdbDebug() << "ORDER BY IDENTIFIER";
-    $$ = new OrderByColumnInternal::List;
+    $$ = new QList<OrderByColumnInternal>;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
     $$->append( orderByColumn );
@@ -767,7 +770,7 @@ OrderByColumnId
 | OrderByColumnId OrderByOption
 {
     kdbDebug() << "ORDER BY IDENTIFIER OrderByOption";
-    $$ = new OrderByColumnInternal::List;
+    $$ = new QList<OrderByColumnInternal>;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
     orderByColumn.ascending = $2;

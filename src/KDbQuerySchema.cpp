@@ -17,8 +17,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include "KDbQuerySchema.h"
 #include "KDbQuerySchema_p.h"
+#include "KDbQuerySchemaParameter.h"
+#include "KDbConnection.h"
+#include "KDbLookupFieldSchema.h"
 #include "KDbParser_p.h"
+#include "KDbRelationship.h"
 #include "kdb_debug.h"
 
 KDbOrderByColumn::KDbOrderByColumn()
@@ -1051,7 +1056,7 @@ KDbQueryColumnInfo* KDbQuerySchema::expandedOrInternalField(int index) const
     return fieldsExpanded(WithInternalFields).value(index);
 }
 
-inline QString lookupColumnKey(KDbField *foreignField, KDbField* field)
+inline static QString lookupColumnKey(KDbField *foreignField, KDbField* field)
 {
     QString res;
     if (field->table()) // can be 0 for anonymous fields built as joined multiple visible columns

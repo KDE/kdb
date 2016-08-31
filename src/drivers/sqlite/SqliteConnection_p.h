@@ -25,10 +25,9 @@
 #include "KDbSqlField.h"
 #include "KDbSqlRecord.h"
 #include "KDbSqlResult.h"
+#include "KDbSqlString.h"
 
 #include <sqlite3.h>
-
-class SqliteConnection;
 
 /*! Internal SQLite connection data. Also used by SqliteCursor. */
 class SqliteConnectionInternal : public KDbConnectionInternal

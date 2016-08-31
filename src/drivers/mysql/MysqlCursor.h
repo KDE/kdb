@@ -22,8 +22,8 @@
 #define KDB_MYSQLCURSOR_H
 
 #include "KDbCursor.h"
-#include "KDbConnection.h"
 
+class KDbConnection;
 class MysqlCursorData;
 
 class MysqlCursor: public KDbCursor

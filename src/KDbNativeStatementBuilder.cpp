@@ -22,6 +22,9 @@
 #include "KDbDriver_p.h"
 #include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
+#include "KDbQuerySchema.h"
+#include "KDbQuerySchemaParameter.h"
+#include "KDbRelationship.h"
 #include "kdb_debug.h"
 
 KDbSelectStatementOptions::KDbSelectStatementOptions()

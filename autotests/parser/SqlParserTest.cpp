@@ -20,8 +20,10 @@
 #include "SqlParserTest.h"
 #include <QtTest>
 
+#include <KDbConnectionData>
 #include <KDbDriverManager>
 #include <KDbNativeStatementBuilder>
+#include <KDbQuerySchema>
 #include <KDbToken>
 
 Q_DECLARE_METATYPE(KDbEscapedString)

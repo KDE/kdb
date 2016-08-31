@@ -19,7 +19,6 @@
 */
 
 #include "MysqlConnection_p.h"
-#include "MysqlConnection.h"
 #include "mysql_debug.h"
 
 #include "KDbConnectionData.h"

@@ -26,8 +26,10 @@
 
 #include <sqlite3.h>
 
+#include "KDbConnectionData.h"
 #include "KDbConnectionOptions.h"
 #include "KDbUtils.h"
+#include "KDbVersionInfo.h"
 
 #include <QFile>
 #include <QDir>

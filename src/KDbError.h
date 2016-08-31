@@ -24,7 +24,7 @@
 #include <QString>
 #include <QSharedData>
 
-#include "KDbGlobal.h"
+#include "kdb_export.h"
 
 namespace KDb {
 

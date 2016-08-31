@@ -22,6 +22,7 @@
 
 #include "KDbTableOrQuerySchema.h"
 #include "KDbConnection.h"
+#include "KDbQuerySchema.h"
 #include "kdb_debug.h"
 
 class KDbTableOrQuerySchema::Private
