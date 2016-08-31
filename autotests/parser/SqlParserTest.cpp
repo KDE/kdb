@@ -69,7 +69,8 @@ bool SqlParserTest::openDatabase(const QString &path)
 #endif
     if (!m_utils.testUse() || !m_utils.connection->isDatabaseUsed()) {
         qDebug() << m_utils.connection->result();
-        Q_UNUSED(m_utils.testDisconnect());
+        bool result = m_utils.testDisconnect();
+        Q_UNUSED(result);
         return false;
     }
     return true;
