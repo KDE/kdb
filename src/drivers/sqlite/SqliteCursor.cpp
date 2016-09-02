@@ -85,11 +85,11 @@ public:
             QString text(QString::fromUtf8(
                 (const char*)sqlite3_column_text(prepared_st_handle, i),
                  sqlite3_column_bytes(prepared_st_handle, i)));
-            KDbField::Type t;
-            if (f) {
-                t = f->type(); // cache: evaluating type of expressions can be expensive
+            if (!f) {
+                return text;
             }
-            if (!f || KDbField::isTextType(t)) {
+            const KDbField::Type t = f->type(); // cache: evaluating type of expressions can be expensive
+            if (KDbField::isTextType(t)) {
                 return text;
             } else if (t == KDbField::Date) {
                 return QDate::fromString(text, Qt::ISODate);

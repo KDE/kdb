@@ -2111,8 +2111,11 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
         if (object->id() <= 0) {//get new ID
             QScopedPointer<KDbFieldList> fl(ts->subList(
                 QList<QByteArray>() << "o_type" << "o_name" << "o_caption" << "o_desc"));
+            if (!fl) {
+                return false;
+            }
             KDbSqlResult* result;
-            if (fl && !insertRecord(fl.data(), QVariant(object->type()), QVariant(object->name()),
+            if (!insertRecord(fl.data(), QVariant(object->type()), QVariant(object->name()),
                                     QVariant(object->caption()), QVariant(object->description()), &result))
             {
                 return false;
