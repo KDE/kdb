@@ -235,7 +235,7 @@ QVariant::Type KDbField::variantType(Type type)
     case BLOB:
         return QVariant::ByteArray;
     default:
-        return QVariant::Invalid;
+        break;
     }
 
     return QVariant::Invalid;
