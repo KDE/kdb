@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 cmake_policy(SET CMP0048 NEW)
-project(KDb VERSION 2.96.7) # Update this
+project(KDb VERSION 2.96.8) # Update this
 
 # ECM setup
 find_package(ECM 1.8.0 REQUIRED NO_MODULE)
