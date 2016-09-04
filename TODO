@@ -5,7 +5,7 @@ Legend: [ ] TODO [x] done [p] in progress
 General hints:
 *Use explicit ctors where possible
 *check other==this in operator=() overloads
-*look at http://ebn.kde.org/krazy/reports/playground/libs/predicate-git/index.html
+*look at http://ebn.kde.org/krazy/reports/playground/libs/kdb/
 *Use prepared SQL statements everywhere and cache them instead of constructing SQL strings by hand
 *Move members of public classes to d-pointers
 *Remove boolean traps everywhere [http://ariya.ofilabs.com/2011/08/hall-of-api-shame-boolean-trap.html]
@@ -24,11 +24,25 @@ General hints:
 **TableSchema: ctor 
 **TableOrQuerySchema: ctor
 
+TODO: add explanation of expressions equality with examples, similar to
+      bool QDomNode::operator== ( const QDomNode & n ) const
+TODO: port KEXI_DEBUG_GUI; merge 3fa9e1a75c5fae1c from calligra/master
+TODO: port 'Field list: return bool from removeFiled(), add moveField()' 9ab089d7a1306d45be from calligra/master
+TODO: port 'Force lowercase letters for object ids; fix for not-all-lowercase namespace' 5d39c992354a from calligra/master
+TODO: port 'Fix possible crash when saving changes to design of table used elsewhere' e410a4f4fc9da from calligra/master
+
+UNIT TESTS TODO:
+*FunctionExpression
+*ExpresionData*
+*QueryParameterExpression
+*VariableExpression
+*Pass expression string to parser, parse it and compare with the original string
+
 Buildsystem:
 [ ] find replacement for -DKDE_DEFAULT_DEBUG_AREA=44000
 [ ] move drivers/ to the main dir
-[ ] move *Validator classes from tools to a separate PredicateGui lib
-[x] version macros like PREDICATE_VERSION are generated using cmake
+[ ] move *Validator classes from tools to a separate KDbGui lib
+[x] version macros like KDB_VERSION are generated using cmake
 
 Drivers:
 [x] add SQLite driver for 3.6.1+ version (use FindSQLite.cmake);
@@ -102,7 +116,7 @@ Naming, API:
      if a working connection is lost."
 
 Other:
-[ ] store config in ~/.config/predicate/, e.g. *rc files
+[ ] store config in ~/.config/kdb/, e.g. *rc files
 [x] load plugins from QT_PLUGINS_DIR and similar locations
 [ ] add more Q_INTERFACES than just Driver: add Import, Export (replaces KexiDB migration) so driver plugin can support more or less features
 
@@ -198,8 +212,8 @@ TODO: more changes like these related to WHERE expression
   Utils.h
   Utils_p.h
   Utils.cpp
-  predicate_export.h
-  predicate_global.h
+  kdb_export.h
+  kdb_global.h
 
 parser:
 * parser/extract_tokens.sh
