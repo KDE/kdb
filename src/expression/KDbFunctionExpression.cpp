@@ -946,7 +946,7 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         }
         else {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires %3 arguments.")
+                KDbExpression::tr("%1%2() function requires %3 argument(s).", "", c)
                                              .arg(firstSentence).arg(name).arg(c));
         }
     }
@@ -960,13 +960,13 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         }
         else {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires %3 or %4 arguments.")
+                KDbExpression::tr("%1%2() function requires %3 or %4 argument(s).", "", c2)
                                              .arg(firstSentence).arg(name).arg(c1).arg(c2));
         }
     }
     else if (argCounts.size() == 3) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1%2() function requires %3 or %4 or %5 arguments.")
+            KDbExpression::tr("%1%2() function requires %3 or %4 or %5 argument(s).", "", argCounts[2])
                                          .arg(firstSentence).arg(name).arg(argCounts[0])
                                          .arg(argCounts[1]).arg(argCounts[2]));
     }
@@ -980,8 +980,9 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
             }
         }
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1%2() function requires %3 arguments.")
-                                          .arg(firstSentence).arg(name).arg(listCounts));
+            KDbExpression::tr("%1%2() function requires %3 argument(s).", "",
+                              argCounts[argCounts.size() - 1])
+                              .arg(firstSentence).arg(name).arg(listCounts));
     }
 }
 
