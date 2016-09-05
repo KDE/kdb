@@ -51,5 +51,9 @@ add_custom_target(cppclean
     COMMENT "Running CPPCLEAN"
 )
 
+if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
+    ki18n_install(po)
+endif()
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 macro_display_feature_log()
