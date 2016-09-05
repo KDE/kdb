@@ -52,6 +52,7 @@ add_custom_target(cppclean
 )
 
 if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
+    find_package(KF5 ${REQUIRED_KF5_VERSION} REQUIRED I18n)
     ki18n_install(po)
 endif()
 
