@@ -964,13 +964,20 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
                                              .arg(firstSentence).arg(name).arg(c1).arg(c2));
         }
     }
+    else if (argCounts.size() == 3) {
+        parseInfo->setErrorDescription(
+            KDbExpression::tr("%1%2() function requires %3 or %4 or %5 arguments.")
+                                         .arg(firstSentence).arg(name).arg(argCounts[0])
+                                         .arg(argCounts[1]).arg(argCounts[2]));
+    }
     else {
         QString listCounts;
         for(std::vector<int>::const_iterator it(argCounts.begin()); it != argCounts.end(); ++it) {
-            if (!listCounts.isEmpty()) {
-                listCounts += KDbExpression::tr(" or ");
+            if (listCounts.isEmpty()) {
+                listCounts += QString::number(*it);
+            } else {
+                listCounts = KDbExpression::tr("%1 or %2").arg(listCounts).arg(*it);
             }
-            listCounts += QString::number(*it);
         }
         parseInfo->setErrorDescription(
             KDbExpression::tr("%1%2() function requires %3 arguments.")
