@@ -159,9 +159,7 @@ set(kdb_LIB_SRCS
 ecm_create_qm_loader(kdb_LIB_SRCS kdb_qt)
 
 add_library(KDb SHARED ${kdb_LIB_SRCS})
-set_coinstallable_lib_version(KDb KDB_BASE_NAME)
-string(TOLOWER ${KDB_BASE_NAME} KDB_BASE_NAME_LOWER)
-set(KDB_INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_DIR}/${KDB_BASE_NAME})
+set_coinstallable_lib_version(KDb)
 
 kdb_create_shared_data_classes(
     kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
@@ -232,7 +230,7 @@ install(TARGETS KDb
         EXPORT KDbTargets
         ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
-ecm_configure_package_config_file(
+configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KDbConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
     INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"

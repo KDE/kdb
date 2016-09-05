@@ -1,18 +1,12 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-cmake_policy(SET CMP0048 NEW)
-project(KDb VERSION 2.96.8) # Update this
-
-# ECM setup
 find_package(ECM 1.8.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
-if(POLICY CMP0063) # Honor visibility properties for all target types (since cmake 3.3)
-    cmake_policy(SET CMP0063 OLD)
-endif()
+project(KDb VERSION 2.99.1) # Update this
 
 include(KDbGenerateHeaders)
 include(ECMGeneratePriFile)
-include(ECMPackageConfigHelpers)
 include(ECMPoQmTools)
 include(ECMSetupVersion)
 include(ECMInstallIcons)
@@ -26,7 +20,6 @@ include(GenerateExportHeader)
 include(MacroLogFeature)
 include(KDbCreateSharedDataClasses)
 include(KDbMacros)
-string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" CMAKE_COMPILER_IS_CLANG)
 
 # Dependencies
 set(REQUIRED_QT_VERSION 5.4.0)
@@ -42,7 +35,7 @@ get_git_revision_and_branch()
 add_tests()
 add_examples()
 add_unfinished_features_option()
-add_pc_file()
+add_pc_file(${PROJECT_NAME})
 
 add_subdirectory(src)
 
