@@ -927,10 +927,12 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
     const int minArgCount = argCounts[0];
     QString firstSentence;
     if (count > maxArgCount) {
-        firstSentence = KDbExpression::tr("Too many arguments.%1").arg(QLatin1String(" "));
+        firstSentence = KDbExpression::tr("Too many arguments.%1", "don't use space before %1")
+                                          .arg(QLatin1String(" "));
     }
     if (count < minArgCount) {
-        firstSentence = KDbExpression::tr("Too few arguments.%1").arg(QLatin1String(" "));
+        firstSentence = KDbExpression::tr("Too few arguments.%1", "don't use space before %1")
+                                          .arg(QLatin1String(" "));
     }
     if (argCounts.size() == 1) {
         const int c = argCounts[0];
@@ -955,7 +957,8 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         const int c2 = argCounts[1];
         if (c2 == 1) {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires 0 or 1 argument.")
+                KDbExpression::tr("%1%2() function requires 0 or 1 argument.",
+                                  "the function requires zero or one argument")
                                               .arg(firstSentence).arg(name));
         }
         else {
@@ -1022,7 +1025,7 @@ static void setIncorrectTypeOfArgumentsErrorMessage(KDbParseInfo *parseInfo, int
             listTypes += KDbExpression::tr("\"Number\"");
         }
         else if (*argType == Any) {
-            listTypes += KDbExpression::tr("\"Any\"");
+            listTypes += KDbExpression::tr("\"Any\"", "Any data type");
         }
         ++argType;
     }

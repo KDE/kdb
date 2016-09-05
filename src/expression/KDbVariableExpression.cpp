@@ -133,7 +133,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
                     parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous field name"));
                     parseInfo->setErrorDescription(
                         KDbExpression::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
-                                          "Use \"<tableName>.%4\" notation to specify table name.")
+                                          "Use \"<tableName>.%4\" notation to specify table name.",
+                                          "Note: translate also <tableName>")
                                           .arg(firstField->table()->name(), f->table()->name(),
                                                fieldName, fieldName));
                     return false;
