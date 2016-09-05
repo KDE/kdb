@@ -6,20 +6,19 @@
 
     Project's home page: http://community.kde.org/KDb
 
- @authors
- - Lucijan Busch <lucijan@kde.org>
- - Martin Ellis <martin.ellis@kdemail.net>
- - Till Busch <till@bux.at>
- - Adam Pigg <adam@piggz.co.uk>
- - Sharan Rao <sharanrao@gmail.com>
- - Matt Rogers <mattr@kde.org>
- - Julia Sanchez-Simon <hithwen@gmail.com>
- - Sebastian Sauer <mail@dipe.org>
- - Jarosław Staniek <staniek@kde.org>
- - Joseph Wenninger<jowenn@kde.org>
+@authors
+- Jarosław Staniek <staniek@kde.org> - Maintainer, main author, Qt 5 port
+- Adam Pigg <adam@piggz.co.uk> - pqxx driver, migration
+- Sharan Rao <sharanrao@gmail.com> - Sybase, MS SQL, xBase drivers, fixes
+- Martin Ellis <martin.ellis@kdemail.net> - fixes, MySQL driver
+- Julia Sanchez-Simon <hithwen@gmail.com> - Oracle driver
 
- Maintainers
- - Jarosław Staniek <staniek@kde.org>
+Contributors:
+- Lucijan Busch <lucijan@kde.org> - early code
+- Sebastian Sauer <mail@dipe.org> - fixes
+- Joseph Wenninger <kde@jowenn.at> - fixes, early MySQL driver
+- Matt Rogers <mattr@kde.org> - ODBC driver
+- Laurent Montel <montel@kde.org> - cleanups
 
  @licenses
  @lgpl

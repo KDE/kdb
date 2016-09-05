@@ -96,8 +96,6 @@ enum tristate_cancelled_t {
  * Storing values of type QDialog::DialogCode there could be found as unreadable, and
  * casting these to int is not typesafe. With tristate class it's easier to make it obvious that
  * cancellation should be taken into account.
- *
- * @author Jarosław Staniek
  */
 class tristate
 {
