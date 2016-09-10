@@ -40,7 +40,8 @@ SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& c
         : KDbConnection(driver, connData, options)
         , d(new SqliteConnectionInternal(this))
 {
-    this->options()->setCaption("extraSqliteExtensionPaths", SqliteConnection::tr("Extra SQLite extension paths"));
+    this->options()->setCaption("extraSqliteExtensionPaths",
+                                SqliteConnection::tr("Extra paths for SQLite plugins"));
 }
 
 SqliteConnection::~SqliteConnection()
@@ -368,7 +369,7 @@ bool SqliteConnection::findAndLoadExtension(const QString & name)
     }
     clearResult();
     m_result = KDbResult(ERR_CANNOT_LOAD_OBJECT,
-                         SqliteConnection::tr("Could not load SQLite extension \"%1\".").arg(name));
+                         SqliteConnection::tr("Could not load SQLite plugin \"%1\".").arg(name));
     return false;
 }
 
@@ -379,7 +380,7 @@ bool SqliteConnection::loadExtension(const QString& path)
     QFileInfo fileInfo(path);
     if (!fileInfo.exists()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                             SqliteConnection::tr("Could not find SQLite extension file \"%1\".").arg(path));
+                             SqliteConnection::tr("Could not find SQLite plugin file \"%1\".").arg(path));
         //sqliteWarning() << "SqliteConnection::loadExtension(): Could not find SQLite extension";
         return false;
     }
