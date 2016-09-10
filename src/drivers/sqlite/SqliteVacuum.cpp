@@ -74,7 +74,7 @@ tristate SqliteVacuum::run()
     const QString dump_app = QString::fromLatin1(KDB_SQLITE_DUMP_TOOL);
     sqliteDebug() << dump_app;
     if (dump_app.isEmpty()) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find tool <filename>%1</filename>.")
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find tool \"%1\".")
                              .arg(dump_app));
         sqliteWarning() << m_result;
         return false;
@@ -82,7 +82,7 @@ tristate SqliteVacuum::run()
     const QString sqlite_app(KDb::sqlite3ProgramPath());
     sqliteDebug() << sqlite_app;
     if (sqlite_app.isEmpty()) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find application <filename>%1</filename>.")
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find application \"%1\".")
                              .arg(sqlite_app));
         sqliteWarning() << m_result;
         return false;
@@ -90,7 +90,7 @@ tristate SqliteVacuum::run()
 
     QFileInfo fi(m_filePath);
     if (!fi.isReadable()) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not read file <filename>%1</filename>.")
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not read file \"%1\".")
                              .arg(m_filePath));
         sqliteWarning() << m_result;
         return false;
@@ -218,7 +218,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
 
     const QByteArray oldName(QFile::encodeName(m_tmpFilePath)), newName(QFile::encodeName(fi.absoluteFilePath()));
     if (0 != ::rename(oldName.constData(), newName.constData())) {
-        m_result.setMessage(tr("Could not rename file <filename>%1</filename> to <filename>%2</filename>.")
+        m_result.setMessage(tr("Could not rename file \"%1\" to \"%2\".")
                             .arg(m_tmpFilePath).arg(fi.absoluteFilePath()));
         sqliteWarning() << m_result;
     }
