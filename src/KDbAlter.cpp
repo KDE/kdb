@@ -490,7 +490,7 @@ void KDbAlterTableHandler::RemoveFieldAction::updateAlteringRequirements()
 
 QString KDbAlterTableHandler::RemoveFieldAction::debugString(const DebugOptions& debugOptions)
 {
-    QString s = QString::fromLatin1("Remove table field \"%1\"").arg(fieldName());
+    QString s = QString::fromLatin1("Delete table field \"%1\"").arg(fieldName());
     if (debugOptions.showUID) {
         s.append(QString::fromLatin1(" (UID=%1)").arg(uid()));
     }

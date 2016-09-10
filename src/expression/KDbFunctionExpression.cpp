@@ -1120,9 +1120,9 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
     }
     if (args->children.count() > KDB_MAX_FUNCTION_ARGS) {
         parseInfo->setErrorMessage(
-            KDbFunctionExpression::tr("Maximum number of function arguments exceeded."));
+            KDbFunctionExpression::tr("Too many arguments for function."));
         parseInfo->setErrorDescription(
-            KDbFunctionExpression::tr("Too many arguments for function (%1). Maximum allowed is %2.")
+            KDbFunctionExpression::tr("Maximum number of arguments for function %1() is %2.")
                                       .arg(args->children.count()).arg(KDB_MAX_FUNCTION_ARGS));
         return false;
     }

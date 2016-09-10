@@ -269,7 +269,7 @@ bool SqliteConnection::drv_dropDatabase(const QString &dbName)
     const QString filename = data().databaseName();
     if (QFile::exists(filename) && !QFile::remove(filename)) {
         m_result = KDbResult(ERR_ACCESS_RIGHTS,
-                             SqliteConnection::tr("Could not remove file \"%1\". "
+                             SqliteConnection::tr("Could not delete file \"%1\". "
                              "Check the file's permissions and whether it is already "
                              "opened and locked by another application.")
                    .arg(QDir::fromNativeSeparators(filename)));

@@ -573,7 +573,8 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 
 #define createDatabase_CLOSE \
     { if (!closeDatabase()) { \
-            m_result = KDbResult(KDbConnection::tr("Database \"%1\" created but could not be closed after creation.").arg(dbName)); \
+            m_result = KDbResult(KDbConnection::tr("Database \"%1\" has been created but " \
+                                 "could not be closed after creation.").arg(dbName)); \
             return false; \
         } }
 
@@ -629,7 +630,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
     if (!tmpdbName.isEmpty() || !m_driver->d->isDBOpenedAfterCreate) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
-            m_result = KDbResult(tr("Database \"%1\" created but could not be opened.").arg(dbName));
+            m_result = KDbResult(tr("Database \"%1\" has been created but could not be opened.").arg(dbName));
             return false;
         }
     } else {
@@ -822,7 +823,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
                 || (m_driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
-                                 tr("Could not delete database - name not specified."));
+                                 tr("Could not delete database. Name is not specified."));
             return false;
         }
         //this is a file driver so reuse previously passed filename
@@ -840,7 +841,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
 
     if (dbToDrop.isEmpty()) {
         m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
-                             tr("Could not delete database - name not specified."));
+                             tr("Could not delete database. Name is not specified."));
         return false;
     }
 
@@ -1152,7 +1153,7 @@ inline static bool checkSql(const KDbEscapedString& sql, KDbResult* result)
     Q_ASSERT(result);
     if (!sql.isValid()) {
         *result = KDbResult(ERR_SQL_EXECUTION_ERROR,
-                            KDbConnection::tr("SQL statement for execution is invalid (empty)."));
+                            KDbConnection::tr("SQL statement for execution is invalid or empty."));
         result->setSql(sql); //remember for error handling
         return false;
     }
@@ -1170,7 +1171,7 @@ bool KDbConnection::executeVoidSQL(const KDbEscapedString& sql)
     m_result.setSql(sql);
     if (!sql.isValid()) {
         m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
-                            KDbConnection::tr("SQL statement for execution is invalid (empty)."));
+                            KDbConnection::tr("SQL statement for execution is invalid or empty."));
         m_result.setErrorSql(sql);
         return false;
     }
@@ -1454,7 +1455,7 @@ bool KDbConnection::removeObject(int objId)
         || !KDb::deleteRecords(this, *kexi__objectdata, QLatin1String("o_id"), objId)) //data blocks
     {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
-                             tr("Could not remove object's data."));
+                             tr("Could not delete object's data."));
         return false;
     }
     return true;
@@ -1477,13 +1478,14 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
     if (!tableSchema)
         return false;
 
-    QString errmsg = tr("Table \"%1\" cannot be removed.\n");
     //be sure that we handle the correct KDbTableSchema object:
     if (tableSchema->id() < 0
             || this->tableSchema(tableSchema->name()) != tableSchema
             || this->tableSchema(tableSchema->id()) != tableSchema) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND, errmsg.arg(tableSchema->name())
-                          + tr("Unexpected name or identifier."));
+        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
+                             tr("Could not delete table \"%1\". %2")
+                               .arg(tr("Unexpected name or identifier."))
+                               .arg(tableSchema->name()));
         return false;
     }
 
@@ -1493,8 +1495,10 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
 
     //sanity checks:
     if (m_driver->isSystemObjectName(tableSchema->name())) {
-        m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED, errmsg.arg(tableSchema->name())
-                          + d->strItIsASystemObject());
+        m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
+                             tr("Could not delete table \"%1\". %2")
+                                .arg(tableSchema->name())
+                                .arg(d->strItIsASystemObject()));
         return false;
     }
 
@@ -2911,7 +2915,7 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
     QString sql;
     if (!loadDataBlock(objID, &sql, QLatin1String("sql"))) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                             tr("Could not find definition for query \"%1\". Removing this query is recommended.").arg(data[2].toString()));
+                             tr("Could not find definition for query \"%1\". Deleting this query is recommended.").arg(data[2].toString()));
         return 0;
     }
     KDbQuerySchema *query = 0;
@@ -2923,7 +2927,7 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
         m_result = KDbResult(ERR_SQL_PARSE_ERROR,
                              tr("<p>Could not load definition for query \"%1\". "
                                 "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
-                                "<p>You can open this query in Text View and correct it.</p>")
+                                "<p>This query can be edited only in Text View.</p>")
                                 .arg(data[2].toString()).arg(sql));
         return 0;
     }

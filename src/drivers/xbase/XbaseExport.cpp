@@ -261,14 +261,14 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   if (!m_migrateData) {
     xbaseWarning() << "Migration Data not set yet";
-    result->setStatus(&drvManager, tr("Data not set for migration"));
+    result->setStatus(&drvManager, tr("Data not set for migration."));
     return false;
   }
 
   KDbDriver *sourceDriver = drvManager.driver(m_migrateData->source->driverId);
   if (!sourceDriver) {
     result->setStatus(&drvManager,
-      tr("Could not export back to destination database"));
+      tr("Could not export back to destination database."));
     return false;
   }
 

@@ -944,5 +944,5 @@ bool KDbTableViewData::isReadOnly() const
 // static
 QString KDbTableViewData::messageYouCanImproveData()
 {
-    return tr("You can correct data in this record or use \"Cancel record changes\" function.");
+    return tr("Please correct data in this record or use the \"Cancel record changes\" function.");
 }

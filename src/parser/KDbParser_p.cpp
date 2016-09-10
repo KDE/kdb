@@ -296,14 +296,14 @@ bool addColumn(KDbParseInfo *parseInfo, const KDbExpression &columnExpr)
             KDbQueryAsterisk *a = new KDbQueryAsterisk(parseInfo->querySchema());
             if (!parseInfo->querySchema()->addAsterisk(a)) {
                 delete a;
-                setError(KDbParser::tr("Could not add all-tables asterisk \"*\"."));
+                setError(KDbParser::tr("\"*\" could not be added."));
                 return false;
             }
         } else if (v_e.tableForQueryAsterisk()) {//one-table asterisk
             KDbQueryAsterisk *a = new KDbQueryAsterisk(parseInfo->querySchema(), v_e.tableForQueryAsterisk());
             if (!parseInfo->querySchema()->addAsterisk(a)) {
                 delete a;
-                setError(KDbParser::tr("Could not add one-table asterisk \"*\"."));
+                setError(KDbParser::tr("\"<table>.*\" could not added."));
                 return false;
             }
         } else if (v_e.field()) {//"table.field" or "field" (bound to a table or not)
@@ -400,7 +400,7 @@ KDbQuerySchema* buildSelectQuery(
                 columnExpr = e.toBinary().left();
                 aliasVariable = e.toBinary().right().toVariable();
                 if (aliasVariable.isNull()) {
-                    setError(KDbParser::tr("Invalid alias definition for column \"%1\"")
+                    setError(KDbParser::tr("Invalid alias definition for column \"%1\".")
                                            .arg(columnExpr.toString(0).toString())); //ok?
                     break;
                 }
@@ -419,7 +419,7 @@ KDbQuerySchema* buildSelectQuery(
             if (c == KDb::VariableExpression) {
                 if (columnExpr.toVariable().name() == QLatin1String("*")) {
                     if (containsAsteriskColumn) {
-                        setError(KDbParser::tr("More than one asterisk (*) is not allowed"));
+                        setError(KDbParser::tr("More than one asterisk \"*\" is not allowed."));
                         return 0;
                     }
                     else {
@@ -433,7 +433,7 @@ KDbQuerySchema* buildSelectQuery(
 //  kdbDebug() << colViews->list.count() << " " << it.current()->debugString();
 //! @todo IMPORTANT: it.remove();
             } else if (aliasVariable.isNull()) {
-                setError(KDbParser::tr("Invalid \"%1\" column definition")
+                setError(KDbParser::tr("Invalid \"%1\" column definition.")
                                        .arg(e.toString(0).toString())); //ok?
                 break;
             }
@@ -485,15 +485,16 @@ KDbQuerySchema* buildSelectQuery(
                     if ((*it).columnNumber != -1) {
                         if (!orderByColumnList->appendColumn(querySchema,
                                                             (*it).ascending, (*it).columnNumber - 1)) {
-                            setError(KDbParser::tr("Could not define sorting - no column at position %1")
+                            setError(KDbParser::tr("Could not define sorting. Column at "
+                                                   "position %1 does not exist.")
                                                    .arg((*it).columnNumber));
                             return 0;
                         }
                     } else {
                         KDbField * f = querySchema->findTableField((*it).aliasOrName);
                         if (!f) {
-                            setError(KDbParser::tr("Could not define sorting - "
-                                                   "column name or alias \"%1\" does not exist")
+                            setError(KDbParser::tr("Could not define sorting. "
+                                                   "Column name or alias \"%1\" does not exist.")
                                                    .arg((*it).aliasOrName));
                             return 0;
                         }

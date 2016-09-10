@@ -198,8 +198,10 @@ void KDbQuerySchema::Private::tryRegenerateExprAliases()
             //missing
             do { //find 1st unused
                 colNum++;
-                columnAlias = tr("expr", "short for 'expression' word, e.g. 'expr' (only latin letters, please, no '.')")
-                              + QString::number(colNum);
+                columnAlias = tr("expr%1", "short for 'expression' word, it will expand "
+                                           "to 'expr1', 'expr2', etc. Please use ONLY latin "
+                                           "letters and DON'T use '.'").arg(colNum);
+                columnAlias = KDb::stringToIdentifier(columnAlias); // sanity fix, translators make mistakes!
             } while (-1 != tablePositionForAlias(columnAlias));
 
             setColumnAliasInternal(p, columnAlias);

@@ -284,7 +284,7 @@ public:
     KDbRecordData* createItem() const;
 
     //! @return reusable i18n'd message
-    //!         "You can correct data in this record or use 'Cancel record changes' function."
+    //!         "Please correct data in this record or use the \"Cancel record changes\" function."
     static QString messageYouCanImproveData();
 
 public Q_SLOTS:

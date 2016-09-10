@@ -163,7 +163,7 @@ ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
         , m_error(false)
         , m_stopWaiting(false)
 {
-    setWindowTitle(tr("Test Connection"));
+    setWindowTitle(tr("Test Connection", "Dialog's title: testing database connection"));
     setLabelText(tr("Testing connection to \"%1\" database server...")
                  .arg(data.toUserVisibleString()));
     setModal(true);

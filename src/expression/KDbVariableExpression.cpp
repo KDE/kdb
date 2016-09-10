@@ -144,7 +144,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         if (!firstField) {
             parseInfo->setErrorMessage(KDbExpression::tr("Field not found"));
             parseInfo->setErrorDescription(
-                KDbExpression::tr("Table containing \"%1\" field not found.").arg(fieldName));
+                KDbExpression::tr("Could not find table containing field \"%1\".").arg(fieldName));
             return false;
         }
         //ok
@@ -171,8 +171,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         if (covered) {
             parseInfo->setErrorMessage(KDbExpression::tr("Could not access the table directly using its name"));
             parseInfo->setErrorDescription(
-                KDbExpression::tr("Table name \"%1\" is covered by aliases. Instead of \"%2\", "
-                                  "you can write \"%3\".")
+                KDbExpression::tr("Table name \"%1\" is covered by aliases. "
+                                  "Instead of \"%2\", \"%3\" can be used.")
                                   .arg(tableName,
                                        tableName + QLatin1Char('.') + fieldName,
                                        tableAlias + QLatin1Char('.') + fieldName));
