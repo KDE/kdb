@@ -165,9 +165,9 @@ bool KDbUnaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expr
 
     n->check();
     /*typ wyniku:
-        const bool dla "NOT <bool>" (negacja)
-        int dla "# <str>" (dlugosc stringu)
-        int dla "+/- <int>"
+        const bool for "NOT <bool>" (negative)
+        int for "# <str>" (string length)
+        int for "+/- <int>"
         */
     if (is(NOT) && n->nodeTypeIs(TYP_BOOL)) {
         node_type = new NConstType(TYP_BOOL);
@@ -176,7 +176,7 @@ bool KDbUnaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expr
     } else if ((is('+') || is('-')) && n->nodeTypeIs(TYP_INT)) {
         node_type = new NConstType(TYP_INT);
     } else {
-        ERR("Niepoprawny argument typu '%s' dla operatora '%s'",
+        ERR("Invalid argument of type '%s' for operator '%s'",
             n->nodeTypeName(), is(NOT) ? QString("not") : QChar(typ()));
     }
 #endif
