@@ -303,7 +303,7 @@ bool addColumn(KDbParseInfo *parseInfo, const KDbExpression &columnExpr)
             KDbQueryAsterisk *a = new KDbQueryAsterisk(parseInfo->querySchema(), v_e.tableForQueryAsterisk());
             if (!parseInfo->querySchema()->addAsterisk(a)) {
                 delete a;
-                setError(KDbParser::tr("\"<table>.*\" could not added."));
+                setError(KDbParser::tr("\"<table>.*\" could not be added."));
                 return false;
             }
         } else if (v_e.field()) {//"table.field" or "field" (bound to a table or not)
