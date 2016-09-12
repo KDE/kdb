@@ -3288,22 +3288,15 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     sql += (sqlcols + ") VALUES (" + sqlvals + ')');
 // kdbDebug() << " -- SQL == " << sql;
 
-    // do driver specific pre-processing
-    if (!drv_beforeInsert(mt->name(), &affectedFields))
-        return false;
-
-    QScopedPointer<KDbSqlResult> result(executeSQL(sql));
-
-    // do driver specific post-processing
-    if (!drv_afterInsert(mt->name(), &affectedFields))
-        return false;
-
-    if (!result) {
+    // low-level insert
+    KDbSqlResult* result;
+    if (!insertRecordInternal(mt->name(), &affectedFields, sql, &result)) {
         m_result = KDbResult(ERR_INSERT_SERVER_ERROR,
                              tr("Record inserting on the server failed."));
         return false;
     }
     //success: now also assign a new value in memory:
+    QScopedPointer<KDbSqlResult> resultGuard(result);
     QHash<KDbQueryColumnInfo*, int> columnsOrderExpanded;
     updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
 
@@ -3314,7 +3307,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         //! @todo now only if PKEY is present, this should also work when there's no PKEY
         KDbQueryColumnInfo *id_columnInfo = aif_list->first();
 //! @todo safe to cast it?
-        quint64 last_id = KDb::lastInsertedAutoIncValue(result.data(),
+        quint64 last_id = KDb::lastInsertedAutoIncValue(result,
             id_columnInfo->field->name(), id_columnInfo->field->table()->name(), &recordId);
         if (last_id == std::numeric_limits<quint64>::max()) {
             //! @todo show error
