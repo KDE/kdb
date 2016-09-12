@@ -868,16 +868,7 @@ public:
      Invalid strings are set to null in addition, that is KDbEscapedString::isNull() is true,
      not just isEmpty().
     */
-    virtual QString escapeIdentifier(const QString& id) const {
-        return m_driver->escapeIdentifier(id);
-    }
-
-    /*! @internal. Inserts internal table to KDbConnection's structures, so it can be found by name.
-     This method is used for example in KexiProject to insert information about "kexi__blobs"
-     table schema. Use createTable() to physically create table. After createTable()
-     calling insertInternalTable() is not required.
-     Also used internally by KDbConnection::newKDbSystemTableSchema(const QString&) */
-    void insertInternalTable(KDbTableSchema* tableSchema);
+    virtual QString escapeIdentifier(const QString& id) const;
 
 protected:
     /*! Used by KDbDriver */
@@ -1217,20 +1208,6 @@ protected:
     /*! Delete all existing records. */
     bool deleteAllRecords(KDbQuerySchema* query);
 
-    /*! Allocates all needed table KDb system objects for kexi__* KDb library's
-     system tables schema.
-     These objects are used internally in this connection
-     and are added to list of tables (by name,
-     not by id because these have no ids).
-    */
-    bool setupKDbSystemSchema();
-
-    /*! used internally by setupKDbSystemSchema():
-     Allocates single table KDb system object named @a tableName
-     and adds this to list of such objects (for later removal on closeDatabase()).
-    */
-    KDbTableSchema* newKDbSystemTableSchema(const QString& tableName);
-
     /*! Called by KDbTableSchema -- signals destruction to KDbConnection object
      To avoid having deleted table object on its list. */
     void removeMe(KDbTableSchema *ts);
@@ -1323,9 +1300,6 @@ private:
     QString escapeIdentifier(const QString& id, KDb::IdentifierEscapingType escapingType) const;
 
     ConnectionPrivate* d; //!< @internal d-pointer class.
-    KDbDriver* const m_driver; //!< The driver this @a KDbConnection instance uses.
-    bool m_destructor_started; //!< helper: true if destructor is started.
-    bool m_insideCloseDatabase; //!< helper: true while closeDatabase() is executed
 
     Q_DISABLE_COPY(KDbConnection)
     friend class KDbDriver;

@@ -93,26 +93,18 @@ public:
       otherwise 0. */
     KDbConnection* connection() const;
 
-    /*! @return true if this is KDb storage system's table
-     (used internally by KDb). This helps in hiding such tables
-     in applications (if desired) and will also enable lookup of system
-     tables for schema export/import functionality.
+    /*! @return true if this is internal KDb's table.
+     Internal tables are hidden in applications (if desired) but are available
+     for schema export/import functionality.
 
      Any internal KDb system table's schema (kexi__*) has
      cleared its KDbObject part, e.g. id=-1 for such table,
      and no description, caption and so on. This is because
      it represents a native database table rather that extended Kexi table.
 
-     isKDbSystem()==true implies isNative()==true.
-
-     By default (after allocation), KDbTableSchema object
-     has this property set to false. */
-    bool isKDbSystem() const;
-
-    /*! Sets KDbSystem flag to on or off. When on, native flag is forced to be on.
-     When off, native flag is not affected.
-     @see isKDbSystem() */
-    void setKDbSystem(bool set);
+     KDbTableSchema object has this property set to false, KDbInternalTableSchema has it
+     set to true. */
+    bool isInternal() const;
 
     /*! @return query schema object that is defined by "select * from <this_table_name>"
      This query schema object is owned by the table schema object.
@@ -148,13 +140,8 @@ protected:
     /*! Automatically retrieves table schema via connection. */
     explicit KDbTableSchema(KDbConnection *conn, const QString & name = QString());
 
-    KDbIndexSchema::List m_indices;
-
-    KDbConnection *m_conn;
-
-    KDbIndexSchema *m_pkey;
-
-    KDbQuerySchema *m_query; //!< cached query schema that is defined by "select * from <this_table_name>"
+    /*! For KDbConnection. */
+    void setConnection(KDbConnection* conn);
 
     class Private;
     Private * const d;

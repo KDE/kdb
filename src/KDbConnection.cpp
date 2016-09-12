@@ -58,6 +58,14 @@ KDbConnectionInternal::KDbConnectionInternal(KDbConnection *conn)
 {
 }
 
+class CursorDeleter
+{
+public:
+    explicit CursorDeleter(KDbCursor *cursor) {
+        delete cursor;
+    }
+};
+
 //================================================
 
 class KDbConnectionOptions::Private
@@ -135,11 +143,12 @@ void KDbConnectionOptions::setConnection(KDbConnection *connection)
 class ConnectionPrivate
 {
 public:
-    ConnectionPrivate(KDbConnection* const conn, const KDbConnectionData& _connData,
+    ConnectionPrivate(KDbConnection* const conn, KDbDriver *drv, const KDbConnectionData& _connData,
                       const KDbConnectionOptions &_options)
             : conn(conn)
             , connData(_connData)
             , options(_options)
+            , driver(drv)
             , m_parser(0)
             , dbProperties(conn)
             , dont_remove_transactions(false)
@@ -147,17 +156,25 @@ public:
             , default_trans_started_inside(false)
             , isConnected(false)
             , autoCommit(true)
-            , takeTableEnabled(true)
+            , insideCloseDatabase(false)
     {
         options.setConnection(conn);
     }
 
     ~ConnectionPrivate() {
         options.setConnection(nullptr);
-        qDeleteAll(cursors);
+        deleteAllCursors();
         delete m_parser;
         qDeleteAll(tableSchemaChangeListeners);
         qDeleteAll(obsoleteQueries);
+    }
+
+    void deleteAllCursors() {
+        QSet<KDbCursor*> cursorsToDelete(cursors);
+        cursors.clear();
+        for(KDbCursor* c : cursorsToDelete) {
+            CursorDeleter deleter(c);
+        }
     }
 
     void errorInvalidDBContents(const QString& details) {
@@ -182,20 +199,70 @@ public:
     }
 
     //! used just for removing system KDbTableSchema objects on db close.
-    inline QSet<KDbTableSchema*> kdbSystemTables() const {
-        return _kdbSystemTables;
+    inline QSet<KDbInternalTableSchema*> internalKDbTables() const {
+        return _internalKDbTables;
     }
 
-    inline void insertTable(KDbTableSchema* tableSchema) {
-        tables.insert(tableSchema->id(), tableSchema);
-        tables_byname.insert(tableSchema->name(), tableSchema);
+    /*! Allocates all needed table KDb system objects for kexi__* KDb library's
+     system tables schema.
+     These objects are used internally in this connection and are added to list of tables
+     (by name,      not by id because these have no ids).
+    */
+    void setupKDbSystemSchema() {
+        if (!_internalKDbTables.isEmpty()) {
+            return; //already set up
+        }
+        {
+            KDbInternalTableSchema *t_objects = new KDbInternalTableSchema(QLatin1String("kexi__objects"));
+            t_objects->addField(new KDbField(QLatin1String("o_id"),
+                                          KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
+            t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
+            t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
+            t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
+            t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
+            //kdbDebug() << *t_objects;
+            insertTable(t_objects);
+        }
+        {
+            KDbInternalTableSchema *t_objectdata = new KDbInternalTableSchema(QLatin1String("kexi__objectdata"));
+            t_objectdata->addField(new KDbField(QLatin1String("o_id"),
+                                             KDbField::Integer, KDbField::NotNull, KDbField::Unsigned));
+            t_objectdata->addField(new KDbField(QLatin1String("o_data"), KDbField::LongText));
+            t_objectdata->addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
+            insertTable(t_objectdata);
+        }
+        {
+            KDbInternalTableSchema *t_fields = new KDbInternalTableSchema(QLatin1String("kexi__fields"));
+            t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
+            t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
+            t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
+            t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
+            t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
+            t_fields->addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer));
+            t_fields->addField(new KDbField(QLatin1String("f_options"), KDbField::Integer));
+            t_fields->addField(new KDbField(QLatin1String("f_default"), KDbField::Text));
+            //these are additional properties:
+            t_fields->addField(new KDbField(QLatin1String("f_order"), KDbField::Integer));
+            t_fields->addField(new KDbField(QLatin1String("f_caption"), KDbField::Text));
+            t_fields->addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
+            insertTable(t_fields);
+        }
+        {
+            KDbInternalTableSchema *t_db = new KDbInternalTableSchema(QLatin1String("kexi__db"));
+            t_db->addField(new KDbField(QLatin1String("db_property"),
+                                     KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32));
+            t_db->addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
+            insertTable(t_db);
+        }
     }
 
-    /*! @internal. Inserts internal table to KDbConnection's structures, so it can be found by name.
-     Used by KDbConnection::insertInternalTable(KDbTableSchema*) */
-    void insertInternalTable(KDbTableSchema* tableSchema) {
-        tableSchema->setKDbSystem(true);
-        _kdbSystemTables.insert(tableSchema);
+    void insertTable(KDbTableSchema* tableSchema) {
+        KDbInternalTableSchema* internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
+        if (internalTable) {
+            _internalKDbTables.insert(internalTable);
+        } else {
+            tables.insert(tableSchema->id(), tableSchema);
+        }
         tables_byname.insert(tableSchema->name(), tableSchema);
     }
 
@@ -209,8 +276,9 @@ public:
     }
 
     void takeTable(KDbTableSchema* tableSchema) {
-        if (!takeTableEnabled)
+        if (tables.isEmpty()) {
             return;
+        }
         tables.take(tableSchema->id());
         tables_byname.take(tableSchema->name());
     }
@@ -228,13 +296,11 @@ public:
 
     void clearTables() {
         tables_byname.clear();
-        qDeleteAll(_kdbSystemTables);
-        _kdbSystemTables.clear();
-        takeTableEnabled = false; //!< needed because otherwise 'tables' hash will
-        //!< be touched by takeTable() what's not allowed during qDeleteAll()
-        qDeleteAll(tables);
-        takeTableEnabled = true;
+        qDeleteAll(_internalKDbTables);
+        _internalKDbTables.clear();
+        QHash<int, KDbTableSchema*> tablesToDelete(tables);
         tables.clear();
+        qDeleteAll(tablesToDelete);
     }
 
     inline KDbQuerySchema* query(const QString& name) const {
@@ -274,6 +340,9 @@ public:
 
     //! True for read only connection. Used especially for file-based drivers.
     KDbConnectionOptions options;
+
+    //!< The driver this @a KDbConnection instance uses.
+    KDbDriver * const driver;
 
     /*! Default transaction handle.
     If transactions are supported: Any operation on database (e.g. inserts)
@@ -327,17 +396,17 @@ public:
 
     bool autoCommit;
 
+    bool insideCloseDatabase; //!< helper: true while closeDatabase() is executed
+
 private:
     //! Table schemas retrieved on demand with tableSchema()
     QHash<int, KDbTableSchema*> tables;
     QHash<QString, KDbTableSchema*> tables_byname;
     //! used just for removing system KDbTableSchema objects on db close.
-    QSet<KDbTableSchema*> _kdbSystemTables;
+    QSet<KDbInternalTableSchema*> _internalKDbTables;
     //! Query schemas retrieved on demand with querySchema()
     QHash<int, KDbQuerySchema*> queries;
     QHash<QString, KDbQuerySchema*> queries_byname;
-    bool takeTableEnabled; //!< used by takeTable() needed because otherwise 'tables' hash will
-                           //!< be touched by takeTable() what's not allowed during qDeleteAll()
     Q_DISABLE_COPY(ConnectionPrivate)
 };
 
@@ -348,13 +417,10 @@ static QStringList KDb_kdbSystemTableNames;
 
 KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
                              const KDbConnectionOptions &options)
-        : d(new ConnectionPrivate(this, connData, options))
-        , m_driver(driver)
-        , m_destructor_started(false)
-        , m_insideCloseDatabase(false)
+        : d(new ConnectionPrivate(this, driver, connData, options))
 {
     if (d->connData.driverId().isEmpty()) {
-        d->connData.setDriverId(m_driver->metaData()->id());
+        d->connData.setDriverId(d->driver->metaData()->id());
     }
 }
 
@@ -362,14 +428,14 @@ void KDbConnection::destroy()
 {
     disconnect();
     //do not allow the driver to touch me: I will kill myself.
-    m_driver->d->connections.remove(this);
+    d->driver->d->connections.remove(this);
 }
 
 KDbConnection::~KDbConnection()
 {
-    m_destructor_started = true;
-    delete d;
-    d = 0;
+    ConnectionPrivate *thisD = d;
+    d = nullptr; // make sure d is nullptr before destructing
+    delete thisD;
 }
 
 KDbConnectionData KDbConnection::data() const
@@ -379,7 +445,7 @@ KDbConnectionData KDbConnection::data() const
 
 KDbDriver* KDbConnection::driver() const
 {
-    return m_driver;
+    return d->driver;
 }
 
 bool KDbConnection::connect()
@@ -396,13 +462,13 @@ bool KDbConnection::connect()
         if (m_result.code() == ERR_NONE) {
             m_result.setCode(ERR_OTHER);
         }
-        m_result.setMessage(m_driver->metaData()->isFileBased() ?
+        m_result.setMessage(d->driver->metaData()->isFileBased() ?
                     tr("Could not open \"%1\" project file.")
                        .arg(QDir::fromNativeSeparators(QFileInfo(d->connData.databaseName()).fileName()))
                  :  tr("Could not connect to \"%1\" database server.")
                        .arg(d->connData.toUserVisibleString()));
     }
-    if (d->isConnected && !m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+    if (d->isConnected && !d->driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
         if (!drv_getServerVersion(&d->serverVersion))
             return false;
     }
@@ -488,7 +554,7 @@ QStringList KDbConnection::databaseNames(bool also_system_db)
         return list;
     //filter system databases:
     for (QMutableListIterator<QString> it(list); it.hasNext();) {
-        if (m_driver->isSystemDatabaseName(it.next())) {
+        if (d->driver->isSystemDatabaseName(it.next())) {
             it.remove();
         }
     }
@@ -521,11 +587,11 @@ bool KDbConnection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 {
 // kdbDebug() << dbName << ignoreErrors;
-    if (m_driver->beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE && !checkConnected())
+    if (d->driver->beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE && !checkConnected())
         return false;
     clearResult();
 
-    if (m_driver->metaData()->isFileBased()) {
+    if (d->driver->metaData()->isFileBased()) {
         //for file-based db: file must exists and be accessible
         QFileInfo file(d->connData.databaseName());
         if (!file.exists() || (!file.isFile() && !file.isSymLink())) {
@@ -585,7 +651,7 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 
 bool KDbConnection::createDatabase(const QString &dbName)
 {
-    if (m_driver->beh->CONNECTION_REQUIRED_TO_CREATE_DB && !checkConnected())
+    if (d->driver->beh->CONNECTION_REQUIRED_TO_CREATE_DB && !checkConnected())
         return false;
 
     if (databaseExists(dbName)) {
@@ -593,12 +659,12 @@ bool KDbConnection::createDatabase(const QString &dbName)
                              tr("Database \"%1\" already exists.").arg(dbName));
         return false;
     }
-    if (m_driver->isSystemDatabaseName(dbName)) {
+    if (d->driver->isSystemDatabaseName(dbName)) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
                              tr("Could not create database \"%1\". This name is reserved for system database.").arg(dbName));
         return false;
     }
-    if (m_driver->metaData()->isFileBased()) {
+    if (d->driver->metaData()->isFileBased()) {
         //update connection data if filename differs
         if (QFileInfo(dbName).isAbsolute()) {
             d->connData.setDatabaseName(dbName);
@@ -628,7 +694,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
             return false;
     }
 
-    if (!tmpdbName.isEmpty() || !m_driver->d->isDBOpenedAfterCreate) {
+    if (!tmpdbName.isEmpty() || !d->driver->d->isDBOpenedAfterCreate) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
             m_result = KDbResult(tr("Database \"%1\" has been created but could not be opened.").arg(dbName));
@@ -641,19 +707,18 @@ bool KDbConnection::createDatabase(const QString &dbName)
     }
 
     KDbTransaction trans;
-    if (m_driver->transactionsSupported()) {
+    if (d->driver->transactionsSupported()) {
         trans = beginTransaction();
         if (!trans.active())
             return false;
     }
 
     //-create system tables schema objects
-    if (!setupKDbSystemSchema())
-        return false;
+    d->setupKDbSystemSchema();
 
-    //-physically create system tables
-    foreach(KDbTableSchema* t, d->kdbSystemTables()) {
-        if (!drv_createTable(t->name()))
+    //-physically create internal KDb tables
+    foreach(KDbInternalTableSchema* t, d->internalKDbTables()) {
+        if (!drv_createTable(*t))
             createDatabase_ERROR;
     }
 
@@ -712,15 +777,14 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
         m_result.prependMessage(msg);
         return false;
     }
-    if (d->serverVersion.isNull() && m_driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+    if (d->serverVersion.isNull() && d->driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
         // get version just now, it was not possible earlier
         if (!drv_getServerVersion(&d->serverVersion))
             return false;
     }
 
     //-create system tables schema objects
-    if (!setupKDbSystemSchema())
-        return false;
+    d->setupKDbSystemSchema();
 
     if (kexiCompatible && my_dbName.compare(anyAvailableDatabaseName(), Qt::CaseInsensitive) != 0) {
         //-get global database information
@@ -752,7 +816,7 @@ bool KDbConnection::closeDatabase()
     bool ret = true;
 
     /*! @todo (js) add CLEVER algorithm here for nested transactions */
-    if (m_driver->transactionsSupported()) {
+    if (d->driver->transactionsSupported()) {
         //rollback all transactions
         d->dont_remove_transactions = true; //lock!
         foreach(const KDbTransaction& tr, d->transactions) {
@@ -767,16 +831,11 @@ bool KDbConnection::closeDatabase()
         d->transactions.clear(); //free trans. data
     }
 
-    m_insideCloseDatabase = true;
-
     //delete own cursors:
-    qDeleteAll(d->cursors);
-    d->cursors.clear();
+    d->deleteAllCursors();
     //delete own schemas
     d->clearTables();
     d->clearQueries();
-
-    m_insideCloseDatabase = false;
 
     if (!drv_closeDatabase())
         return false;
@@ -792,7 +851,7 @@ QString KDbConnection::currentDatabase() const
 
 bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
 {
-    if (m_driver->beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED && !isDatabaseUsed()) {
+    if (d->driver->beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED && !isDatabaseUsed()) {
         //we have no db used, but it is required by engine to have used any!
         *name = anyAvailableDatabaseName();
         if (name->isEmpty()) {
@@ -815,13 +874,13 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
 
 bool KDbConnection::dropDatabase(const QString &dbName)
 {
-    if (m_driver->beh->CONNECTION_REQUIRED_TO_DROP_DB && !checkConnected())
+    if (d->driver->beh->CONNECTION_REQUIRED_TO_DROP_DB && !checkConnected())
         return false;
 
     QString dbToDrop;
     if (dbName.isEmpty() && d->usedDatabase.isEmpty()) {
-        if (!m_driver->metaData()->isFileBased()
-                || (m_driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
+        if (!d->driver->metaData()->isFileBased()
+                || (d->driver->metaData()->isFileBased() && d->connData.databaseName().isEmpty()))
         {
             m_result = KDbResult(ERR_NO_NAME_SPECIFIED,
                                  tr("Could not delete database. Name is not specified."));
@@ -833,7 +892,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
         if (dbName.isEmpty()) {
             dbToDrop = d->usedDatabase;
         } else {
-            if (m_driver->metaData()->isFileBased()) //lets get full path
+            if (d->driver->metaData()->isFileBased()) //lets get full path
                 dbToDrop = QFileInfo(dbName).absoluteFilePath();
             else
                 dbToDrop = dbName;
@@ -846,7 +905,7 @@ bool KDbConnection::dropDatabase(const QString &dbName)
         return false;
     }
 
-    if (m_driver->isSystemDatabaseName(dbToDrop)) {
+    if (d->driver->isSystemDatabaseName(dbToDrop)) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
                              tr("Could not delete system database \"%1\".").arg(dbToDrop));
         return false;
@@ -887,7 +946,7 @@ QStringList KDbConnection::objectNames(int objectType, bool* ok)
         sql = "SELECT o_name FROM kexi__objects ORDER BY o_id";
     } else {
         sql = KDbEscapedString("SELECT o_name FROM kexi__objects WHERE o_type=%1"
-                               " ORDER BY o_id").arg(m_driver->valueToSQL(KDbField::Integer, objectType));
+                               " ORDER BY o_id").arg(d->driver->valueToSQL(KDbField::Integer, objectType));
     }
     QStringList list;
     const bool success = queryStringListInternal(&sql, &list, 0, 0, 0, KDb::isIdentifier);
@@ -996,8 +1055,8 @@ QList<int> KDbConnection::objectIds(int objectType, bool* ok)
 //yeah, it is very efficient:
 #define C_A(a) , const QVariant& c ## a
 
-#define V_A0 m_driver->valueToSQL( tableSchema->field(0), c0 )
-#define V_A(a) + ',' + m_driver->valueToSQL( \
+#define V_A0 d->driver->valueToSQL( tableSchema->field(0), c0 )
+#define V_A(a) + ',' + d->driver->valueToSQL( \
         tableSchema->field(a) ? tableSchema->field(a)->type() : KDbField::Text, c ## a )
 
 //  kdbDebug() << "******** " << QString("INSERT INTO ") +
@@ -1057,8 +1116,8 @@ C_INS_REC_ALL
 #undef V_A
 #undef C_INS_REC
 
-#define V_A0 value += m_driver->valueToSQL( it.next(), c0 );
-#define V_A( a ) value += (',' + m_driver->valueToSQL( it.next(), c ## a ));
+#define V_A0 value += d->driver->valueToSQL( it.next(), c0 );
+#define V_A( a ) value += (',' + d->driver->valueToSQL( it.next(), c ## a ));
 
 #define C_INS_REC(args, vals) \
     bool KDbConnection::insertRecord(KDbFieldList* fields args, KDbSqlResult** result) \
@@ -1105,8 +1164,8 @@ bool KDbConnection::insertRecord(KDbTableSchema* tableSchema, const QList<QVaria
         else {
             sql += ',';
         }
-        sql += m_driver->valueToSQL(f, *it);
-//  kdbDebug() << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
+        sql += d->driver->valueToSQL(f, *it);
+//  kdbDebug() << "val" << i++ << ": " << d->driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
     }
@@ -1137,8 +1196,8 @@ bool KDbConnection::insertRecord(KDbFieldList* fields, const QList<QVariant>& va
         else {
             sql += ',';
         }
-        sql += m_driver->valueToSQL(f, *it);
-//  kdbDebug() << "val" << i++ << ": " << m_driver->valueToSQL( f, *it );
+        sql += d->driver->valueToSQL(f, *it);
+//  kdbDebug() << "val" << i++ << ": " << d->driver->valueToSQL( f, *it );
         ++it;
         ++fieldsIt;
         if (fieldsIt == flist->constEnd())
@@ -1190,7 +1249,7 @@ bool KDbConnection::executeVoidSQL(const KDbEscapedString& sql)
 KDbField* KDbConnection::findSystemFieldName(const KDbFieldList& fieldlist)
 {
     for (KDbField::ListIterator it(fieldlist.fieldsIterator()); it != fieldlist.fieldsIteratorConstEnd(); ++it) {
-        if (m_driver->isSystemFieldName((*it)->name()))
+        if (d->driver->isSystemFieldName((*it)->name()))
             return *it;
     }
     return 0;
@@ -1262,7 +1321,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
     KDbEscapedString sql("UPDATE kexi__fields SET ");
     foreach(KDbField *f, *fl->fields()) {
         sql.append((first ? QString() : QLatin1String(", ")) +
-                   f->name() + QLatin1Char('=') + m_driver->valueToSQL(f, *valsIt));
+                   f->name() + QLatin1Char('=') + d->driver->valueToSQL(f, *valsIt));
         if (first)
             first = false;
         ++valsIt;
@@ -1270,7 +1329,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
     delete fl;
 
     sql.append(KDbEscapedString(" WHERE t_id=%1 AND f_name=%2")
-                .arg(m_driver->valueToSQL(KDbField::Integer, field->table()->id()))
+                .arg(d->driver->valueToSQL(KDbField::Integer, field->table()->id()))
                 .arg(escapeString(field->name())));
     return executeVoidSQL(sql);
 }
@@ -1293,12 +1352,11 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
                              tr("Could not create table without fields."));
         return false;
     }
-    const bool internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
-
+    KDbInternalTableSchema* internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
     const QString tableName(tableSchema->name());
 
     if (!internalTable) {
-        if (m_driver->isSystemObjectName(tableName)) {
+        if (d->driver->isSystemObjectName(tableName)) {
             clearResult();
             m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
                                  tr("System name \"%1\" cannot be used as table name.")
@@ -1348,8 +1406,17 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     if (!beginAutoCommitTransaction(&tg))
         return false;
 
-    if (!drv_createTable(*tableSchema))
-        createTable_ERR;
+    if (internalTable) {
+        if (!drv_containsTable(internalTable->name())) { // internal table may exist
+            if (!drv_createTable(*tableSchema)) {
+                createTable_ERR;
+            }
+        }
+    } else {
+        if (!drv_createTable(*tableSchema)) {
+            createTable_ERR;
+        }
+    }
 
     //add the object data to kexi__* tables
     if (!internalTable) {
@@ -1381,19 +1448,16 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     }
     bool res = commitAutoCommitTransaction(tg.transaction());
     if (res) {
-        if (internalTable) {
-            //insert the internal table into structures
-            insertInternalTable(tableSchema);
-        } else {
+        if (!internalTable) {
             if (previousSchemaStillKept) {
                 //remove previous table schema
                 d->removeTable(*tableSchema);
             }
-            //store one schema object locally:
-            d->insertTable(tableSchema);
         }
+        //store locally
+        d->insertTable(tableSchema);
         //ok, this table is not created by the connection
-        tableSchema->m_conn = this;
+        tableSchema->setConnection(this);
     }
     return res;
 }
@@ -1495,7 +1559,7 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
         return res;
 
     //sanity checks:
-    if (m_driver->isSystemObjectName(tableSchema->name())) {
+    if (d->driver->isSystemObjectName(tableSchema->name())) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
                              tr("Could not delete table \"%1\". %2")
                                 .arg(tableSchema->name())
@@ -1626,15 +1690,15 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
         // the new table owns the previous table's id:
         if (!executeVoidSQL(
                     KDbEscapedString("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
-                    .arg(m_driver->valueToSQL(KDbField::Integer, origID))
-                    .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))
-                    .arg(m_driver->valueToSQL(KDbField::Integer, int(KDb::TableObjectType)))))
+                    .arg(d->driver->valueToSQL(KDbField::Integer, origID))
+                    .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))
+                    .arg(d->driver->valueToSQL(KDbField::Integer, int(KDb::TableObjectType)))))
         {
             return false;
         }
         if (!executeVoidSQL(KDbEscapedString("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
-                        .arg(m_driver->valueToSQL(KDbField::Integer, origID))
-                        .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
+                        .arg(d->driver->valueToSQL(KDbField::Integer, origID))
+                        .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
         {
             return false;
         }
@@ -1653,7 +1717,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
     //! @todo
     if (!executeVoidSQL(KDbEscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
                     .arg(escapeString(tableSchema->name()))
-                    .arg(m_driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
+                    .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
     {
         alterTableName_ERR;
         return false;
@@ -1741,7 +1805,7 @@ bool KDbConnection::drv_createTable(const QString& tableName)
 
 bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 {
-    if ((m_driver->d->features & KDbDriver::IgnoreTransactions)
+    if ((d->driver->d->features & KDbDriver::IgnoreTransactions)
             || !d->autoCommit) {
         tg->setTransaction(KDbTransaction());
         return true;
@@ -1749,7 +1813,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
     // commit current transaction (if present) for drivers
     // that allow single transaction per connection
-    if (m_driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->d->features & KDbDriver::SingleTransactions) {
         if (d->default_trans_started_inside) //only commit internally started transaction
             if (!commitTransaction(d->default_trans, true)) {
                 tg->setTransaction(KDbTransaction());
@@ -1762,7 +1826,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
             tg->doNothing();
             return true; //reuse externally started transaction
         }
-    } else if (!(m_driver->d->features & KDbDriver::MultipleTransactions)) {
+    } else if (!(d->driver->d->features & KDbDriver::MultipleTransactions)) {
         tg->setTransaction(KDbTransaction());
         return true; //no trans. supported at all - just return
     }
@@ -1772,11 +1836,11 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
 bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
 {
-    if (m_driver->d->features & KDbDriver::IgnoreTransactions)
+    if (d->driver->d->features & KDbDriver::IgnoreTransactions)
         return true;
-    if (trans.isNull() || !m_driver->transactionsSupported())
+    if (trans.isNull() || !d->driver->transactionsSupported())
         return true;
-    if (m_driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->d->features & KDbDriver::SingleTransactions) {
         if (!d->default_trans_started_inside) //only commit internally started transaction
             return true; //give up
     }
@@ -1785,14 +1849,14 @@ bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
 
 bool KDbConnection::rollbackAutoCommitTransaction(const KDbTransaction& trans)
 {
-    if (trans.isNull() || !m_driver->transactionsSupported())
+    if (trans.isNull() || !d->driver->transactionsSupported())
         return true;
     return rollbackTransaction(trans);
 }
 
 #define SET_ERR_TRANS_NOT_SUPP \
     { m_result = KDbResult(ERR_UNSUPPORTED_DRV_FEATURE, \
-                           KDbConnection::tr("Transactions are not supported for \"%1\" driver.").arg( m_driver->metaData()->name() )); }
+                           KDbConnection::tr("Transactions are not supported for \"%1\" driver.").arg( d->driver->metaData()->name() )); }
 
 #define SET_BEGIN_TR_ERROR \
     { if (!m_result.isError()) \
@@ -1804,14 +1868,14 @@ KDbTransaction KDbConnection::beginTransaction()
     if (!checkIsDatabaseUsed())
         return KDbTransaction();
     KDbTransaction trans;
-    if (m_driver->d->features & KDbDriver::IgnoreTransactions) {
+    if (d->driver->d->features & KDbDriver::IgnoreTransactions) {
         //we're creating dummy transaction data here,
         //so it will look like active
         trans.m_data = new KDbTransactionData(this);
         d->transactions.append(trans);
         return trans;
     }
-    if (m_driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->d->features & KDbDriver::SingleTransactions) {
         if (d->default_trans.active()) {
             m_result = KDbResult(ERR_TRANSACTION_ACTIVE,
                                  tr("Transaction already started."));
@@ -1825,7 +1889,7 @@ KDbTransaction KDbConnection::beginTransaction()
         d->transactions.append(trans);
         return d->default_trans;
     }
-    if (m_driver->d->features & KDbDriver::MultipleTransactions) {
+    if (d->driver->d->features & KDbDriver::MultipleTransactions) {
         if (!(trans.m_data = drv_beginTransaction())) {
             SET_BEGIN_TR_ERROR;
             return KDbTransaction();
@@ -1842,8 +1906,8 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
 {
     if (!isDatabaseUsed())
         return false;
-    if (!m_driver->transactionsSupported()
-            && !(m_driver->d->features & KDbDriver::IgnoreTransactions)) {
+    if (!d->driver->transactionsSupported()
+            && !(d->driver->d->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1861,7 +1925,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(m_driver->d->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions))
         ret = drv_commitTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1877,8 +1941,8 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
 {
     if (!isDatabaseUsed())
         return false;
-    if (!m_driver->transactionsSupported()
-            && !(m_driver->d->features & KDbDriver::IgnoreTransactions)) {
+    if (!d->driver->transactionsSupported()
+            && !(d->driver->d->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1896,7 +1960,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(m_driver->d->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions))
         ret = drv_rollbackTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1925,8 +1989,8 @@ void KDbConnection::setDefaultTransaction(const KDbTransaction& trans)
 {
     if (!isDatabaseUsed())
         return;
-    if (!(m_driver->d->features & KDbDriver::IgnoreTransactions)
-            && (!trans.active() || !m_driver->transactionsSupported())) {
+    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions)
+            && (!trans.active() || !d->driver->transactionsSupported())) {
         return;
     }
     d->default_trans = trans;
@@ -1944,7 +2008,7 @@ bool KDbConnection::autoCommit() const
 
 bool KDbConnection::setAutoCommit(bool on)
 {
-    if (d->autoCommit == on || m_driver->d->features & KDbDriver::IgnoreTransactions)
+    if (d->autoCommit == on || d->driver->d->features & KDbDriver::IgnoreTransactions)
         return true;
     if (!drv_setAutoCommit(on))
         return false;
@@ -1983,7 +2047,7 @@ KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, int cursor_o
         return 0;
     if (!c->open()) {//err - kill that
         m_result = c->result();
-        delete c;
+        CursorDeleter deleter(c);
         return 0;
     }
     return c;
@@ -1997,7 +2061,7 @@ KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, const QList<QVaria
         return 0;
     if (!c->open()) {//err - kill that
         m_result = c->result();
-        delete c;
+        CursorDeleter deleter(c);
         return 0;
     }
     return c;
@@ -2036,7 +2100,7 @@ bool KDbConnection::deleteCursor(KDbCursor *cursor)
         return false;
     }
     const bool ret = cursor->close();
-    delete cursor;
+    CursorDeleter deleter(cursor);
     return ret;
 }
 
@@ -2071,7 +2135,7 @@ tristate KDbConnection::loadObjectData(int id, KDbObject* object)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(m_driver->valueToSQL(KDbField::Integer, id)),
+                             .arg(d->driver->valueToSQL(KDbField::Integer, id)),
             &data))
     {
         return cancelled;
@@ -2085,7 +2149,7 @@ tristate KDbConnection::loadObjectData(int type, const QString& name, KDbObject*
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
                           "FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
-                          .arg(m_driver->valueToSQL(KDbField::Integer, type))
+                          .arg(d->driver->valueToSQL(KDbField::Integer, type))
                           .arg(escapeString(name)),
             &data))
     {
@@ -2103,7 +2167,7 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
         int existingID;
         if (true == querySingleNumber(
                 KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_type=%1 AND o_name=%2")
-                                 .arg(m_driver->valueToSQL(KDbField::Integer, object->type()))
+                                 .arg(d->driver->valueToSQL(KDbField::Integer, object->type()))
                                  .arg(escapeString(object->name())), &existingID))
         {
             //we already have stored an object data with the same name and type:
@@ -2146,8 +2210,8 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
     //existing object:
     return executeVoidSQL(
                KDbEscapedString("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
-               .arg(m_driver->valueToSQL(KDbField::Integer, object->id()))
-               .arg(m_driver->valueToSQL(KDbField::Integer, object->type()))
+               .arg(d->driver->valueToSQL(KDbField::Integer, object->id()))
+               .arg(d->driver->valueToSQL(KDbField::Integer, object->type()))
                .arg(escapeString(object->caption()))
                .arg(escapeString(object->description())));
 }
@@ -2195,7 +2259,7 @@ tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data,
     Q_ASSERT(sql || query);
     if (sql) {
         //! @todo does not work with non-SQL data sources
-        m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
+        m_result.setSql(d->driver->addLimitTo1(*sql, addLimitTo1));
     }
     KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
     if (!cursor) {
@@ -2250,7 +2314,7 @@ tristate KDbConnection::querySingleStringInternal(const KDbEscapedString* sql,
     Q_ASSERT(sql || query);
     if (sql) {
         //! @todo does not work with non-SQL data sources
-        m_result.setSql(m_driver->addLimitTo1(*sql, addLimitTo1));
+        m_result.setSql(d->driver->addLimitTo1(*sql, addLimitTo1));
     }
     KDbCursor *cursor = executeQueryInternal(m_result.sql(), query, params);
     if (!cursor) {
@@ -2386,18 +2450,18 @@ bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
 tristate KDbConnection::resultExists(const KDbEscapedString& sql, bool addLimitTo1)
 {
     //optimization
-    if (m_driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
+    if (d->driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
         //this is at least for sqlite
         if (addLimitTo1 && sql.left(6).toUpper() == "SELECT") {
             m_result.setSql(
-                m_driver->addLimitTo1("SELECT 1 FROM (" + sql + ')', addLimitTo1));
+                d->driver->addLimitTo1("SELECT 1 FROM (" + sql + ')', addLimitTo1));
         }
         else {
             m_result.setSql(sql);
         }
     } else {
         if (addLimitTo1 && sql.startsWith("SELECT")) {
-            m_result.setSql(m_driver->addLimitTo1(sql, addLimitTo1));
+            m_result.setSql(d->driver->addLimitTo1(sql, addLimitTo1));
         }
         else {
             m_result.setSql(sql);
@@ -2750,7 +2814,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
             KDbEscapedString("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
                              "f_options, f_default, f_order, f_caption, f_help "
                              "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order")
-                            .arg(m_driver->valueToSQL(KDbField::Integer, t->id())))))
+                            .arg(d->driver->valueToSQL(KDbField::Integer, t->id())))))
     {
         delete t;
         return 0;
@@ -2812,7 +2876,7 @@ KDbTableSchema* KDbConnection::tableSchema(const QString& tableName)
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
                              "WHERE o_name=%1 AND o_type=%2")
                              .arg(escapeString(tableName))
-                             .arg(m_driver->valueToSQL(KDbField::Integer, KDb::TableObjectType)), &data))
+                             .arg(d->driver->valueToSQL(KDbField::Integer, KDb::TableObjectType)), &data))
     {
         return 0;
     }
@@ -2828,7 +2892,7 @@ KDbTableSchema* KDbConnection::tableSchema(int tableId)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(m_driver->valueToSQL(KDbField::Integer, tableId)), &data))
+                             .arg(d->driver->valueToSQL(KDbField::Integer, tableId)), &data))
     {
         return 0;
     }
@@ -2841,8 +2905,8 @@ tristate KDbConnection::loadDataBlock(int objectID, QString* dataString, const Q
         return false;
     return querySingleString(
                KDbEscapedString("SELECT o_data FROM kexi__objectdata WHERE o_id=%1 AND ")
-                                .arg(m_driver->valueToSQL(KDbField::Integer, objectID))
-                                + KDbEscapedString(KDb::sqlWhere(m_driver, KDbField::Text,
+                                .arg(d->driver->valueToSQL(KDbField::Integer, objectID))
+                                + KDbEscapedString(KDb::sqlWhere(d->driver, KDbField::Text,
                                                 QLatin1String("o_sub_id"),
                                                 dataID.isEmpty() ? QVariant() : QVariant(dataID))),
                dataString);
@@ -2854,8 +2918,8 @@ bool KDbConnection::storeDataBlock(int objectID, const QString &dataString, cons
         return false;
     KDbEscapedString sql(
         KDbEscapedString("SELECT kexi__objectdata.o_id FROM kexi__objectdata WHERE o_id=%1")
-                        .arg(m_driver->valueToSQL(KDbField::Integer, objectID)));
-    KDbEscapedString sql_sub(KDb::sqlWhere(m_driver, KDbField::Text, QLatin1String("o_sub_id"),
+                        .arg(d->driver->valueToSQL(KDbField::Integer, objectID)));
+    KDbEscapedString sql_sub(KDb::sqlWhere(d->driver, KDbField::Text, QLatin1String("o_sub_id"),
                                               dataID.isEmpty() ? QVariant() : QVariant(dataID)));
 
     const tristate result = resultExists(sql + " AND " + sql_sub);
@@ -2864,14 +2928,14 @@ bool KDbConnection::storeDataBlock(int objectID, const QString &dataString, cons
     }
     if (result == true) {
         return executeVoidSQL(KDbEscapedString("UPDATE kexi__objectdata SET o_data=%1 WHERE o_id=%2 AND ")
-                          .arg(m_driver->valueToSQL(KDbField::LongText, dataString))
-                          .arg(m_driver->valueToSQL(KDbField::Integer, objectID))
+                          .arg(d->driver->valueToSQL(KDbField::LongText, dataString))
+                          .arg(d->driver->valueToSQL(KDbField::Integer, objectID))
                           + sql_sub);
     }
     return executeVoidSQL(
                KDbEscapedString("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
-               + KDbEscapedString::number(objectID) + ',' + m_driver->valueToSQL(KDbField::LongText, dataString)
-               + ',' + m_driver->valueToSQL(KDbField::Text, dataID) + ')');
+               + KDbEscapedString::number(objectID) + ',' + d->driver->valueToSQL(KDbField::LongText, dataString)
+               + ',' + d->driver->valueToSQL(KDbField::Text, dataID) + ')');
 }
 
 bool KDbConnection::copyDataBlock(int sourceObjectID, int destObjectID, const QString &dataID)
@@ -2885,10 +2949,10 @@ bool KDbConnection::copyDataBlock(int sourceObjectID, int destObjectID, const QS
     KDbEscapedString sql = KDbEscapedString(
          "INSERT INTO kexi__objectdata SELECT %1, t.o_data, t.o_sub_id "
          "FROM kexi__objectdata AS t WHERE o_id=%2")
-         .arg(m_driver->valueToSQL(KDbField::Integer, destObjectID))
-         .arg(m_driver->valueToSQL(KDbField::Integer, sourceObjectID));
+         .arg(d->driver->valueToSQL(KDbField::Integer, destObjectID))
+         .arg(d->driver->valueToSQL(KDbField::Integer, sourceObjectID));
     if (!dataID.isEmpty()) {
-        sql += KDbEscapedString(" AND ") + KDb::sqlWhere(m_driver, KDbField::Text,
+        sql += KDbEscapedString(" AND ") + KDb::sqlWhere(d->driver, KDbField::Text,
                                                             QLatin1String("o_sub_id"), dataID);
     }
     return executeVoidSQL(sql);
@@ -2952,7 +3016,7 @@ KDbQuerySchema* KDbConnection::querySchema(const QString& queryName)
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
                              "WHERE o_name=%1 AND o_type=%2")
                              .arg(escapeString(m_queryName))
-                             .arg(m_driver->valueToSQL(KDbField::Integer, int(KDb::QueryObjectType))),
+                             .arg(d->driver->valueToSQL(KDbField::Integer, int(KDb::QueryObjectType))),
             &data))
     {
         return 0;
@@ -2970,7 +3034,7 @@ KDbQuerySchema* KDbConnection::querySchema(int queryId)
     KDbRecordData data;
     if (true != querySingleRecord(
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(m_driver->valueToSQL(KDbField::Integer, queryId)),
+                             .arg(d->driver->valueToSQL(KDbField::Integer, queryId)),
             &data))
     {
         return 0;
@@ -2987,73 +3051,25 @@ bool KDbConnection::setQuerySchemaObsolete(const QString& queryName)
     return true;
 }
 
-void KDbConnection::insertInternalTable(KDbTableSchema* tableSchema)
+QString KDbConnection::escapeIdentifier(const QString& id) const
 {
-    d->insertInternalTable(tableSchema);
-}
-
-KDbTableSchema* KDbConnection::newKDbSystemTableSchema(const QString& tableName)
-{
-    KDbTableSchema *ts = new KDbTableSchema(tableName.toLower());
-    insertInternalTable(ts);
-    return ts;
+    return d->driver->escapeIdentifier(id);
 }
 
 bool KDbConnection::isInternalTableSchema(const QString& tableName)
 {
-    return (d->kdbSystemTables().contains(tableSchema(tableName)))
+    KDbTableSchema* schema = d->table(tableName);
+    return (schema && schema->isInternal())
            // these are here for compatiblility because we're no longer instantiate
            // them but can exist in projects created with previous Kexi versions:
            || tableName == QLatin1String("kexi__final") || tableName == QLatin1String("kexi__useractions");
 }
 
-bool KDbConnection::setupKDbSystemSchema()
-{
-    if (!d->kdbSystemTables().isEmpty())
-        return true; //already set up
-
-    KDbTableSchema *t_objects = newKDbSystemTableSchema(QLatin1String("kexi__objects"));
-    t_objects->addField(new KDbField(QLatin1String("o_id"),
-                                  KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
-    t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
-    t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
-    t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
-    t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
-
-    kdbDebug() << *t_objects;
-
-    KDbTableSchema *t_objectdata = newKDbSystemTableSchema(QLatin1String("kexi__objectdata"));
-    t_objectdata->addField(new KDbField(QLatin1String("o_id"),
-                                     KDbField::Integer, KDbField::NotNull, KDbField::Unsigned));
-    t_objectdata->addField(new KDbField(QLatin1String("o_data"), KDbField::LongText));
-    t_objectdata->addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
-
-    KDbTableSchema *t_fields = newKDbSystemTableSchema(QLatin1String("kexi__fields"));
-    t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
-    t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
-    t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
-    t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
-    t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
-    t_fields->addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer));
-    t_fields->addField(new KDbField(QLatin1String("f_options"), KDbField::Integer));
-    t_fields->addField(new KDbField(QLatin1String("f_default"), KDbField::Text));
-    //these are additional properties:
-    t_fields->addField(new KDbField(QLatin1String("f_order"), KDbField::Integer));
-    t_fields->addField(new KDbField(QLatin1String("f_caption"), KDbField::Text));
-    t_fields->addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
-
-    KDbTableSchema *t_db = newKDbSystemTableSchema(QLatin1String("kexi__db"));
-    t_db->addField(new KDbField(QLatin1String("db_property"),
-                             KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32));
-    t_db->addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
-
-    return true;
-}
-
 void KDbConnection::removeMe(KDbTableSchema *table)
 {
-    if (table && !m_destructor_started)
+    if (table && d) {
         d->takeTable(table);
+    }
 }
 
 QString KDbConnection::anyAvailableDatabaseName()
@@ -3061,7 +3077,7 @@ QString KDbConnection::anyAvailableDatabaseName()
     if (!d->availableDatabaseName.isEmpty()) {
         return d->availableDatabaseName;
     }
-    return m_driver->beh->ALWAYS_AVAILABLE_DATABASE_NAME;
+    return d->driver->beh->ALWAYS_AVAILABLE_DATABASE_NAME;
 }
 
 void KDbConnection::setAvailableDatabaseName(const QString& dbName)
@@ -3132,7 +3148,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         const bool affectedFieldsAddOk = affectedFields.addField(currentField);
         Q_ASSERT(affectedFieldsAddOk);
         sqlset += KDbEscapedString(escapeIdentifier(currentField->name())) + '=' +
-                  m_driver->valueToSQL(currentField, it.value());
+                  d->driver->valueToSQL(currentField, it.value());
     }
     if (pkey) {
         const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
@@ -3156,13 +3172,13 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                     return false;
                 }
                 sqlwhere += KDbEscapedString(escapeIdentifier(f->name())) + '=' +
-                            m_driver->valueToSQL(f, val);
+                            d->driver->valueToSQL(f, val);
                 i++;
             }
         }
     } else { //use RecordId
-        sqlwhere = KDbEscapedString(escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME)) + '='
-                   + m_driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
+        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->beh->ROW_ID_FIELD_NAME)) + '='
+                   + d->driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += (sqlset + " WHERE " + sqlwhere);
     //kdbDebug() << " -- SQL == " << ((sql.length() > 400) ? (sql.left(400) + "[.....]") : sql);
@@ -3266,7 +3282,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             }
         }
         sqlcols += escapeIdentifier(anyField->name());
-        sqlvals += m_driver->valueToSQL(anyField, QVariant()/*NULL*/);
+        sqlvals += d->driver->valueToSQL(anyField, QVariant()/*NULL*/);
         const bool affectedFieldsAddOk = affectedFields.addField(anyField);
         Q_ASSERT(affectedFieldsAddOk);
     } else {
@@ -3282,7 +3298,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             const bool affectedFieldsAddOk = affectedFields.addField(currentField);
             Q_ASSERT(affectedFieldsAddOk);
             sqlcols += escapeIdentifier(currentField->name());
-            sqlvals += m_driver->valueToSQL(currentField, it.value());
+            sqlvals += d->driver->valueToSQL(currentField, it.value());
         }
     }
     sql += (sqlcols + ") VALUES (" + sqlvals + ')');
@@ -3335,8 +3351,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     } else {
         recordId = result->lastInsertRecordId();
 //  kdbDebug() << "new recordId ==" << recordId;
-        if (m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
-            kdbWarning() << "m_driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
+        if (d->driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
+            kdbWarning() << "d->driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
             return false;
         }
     }
@@ -3396,12 +3412,12 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
                 return false;
             }
             sqlwhere += KDbEscapedString(escapeIdentifier(f->name())) + '=' +
-                         m_driver->valueToSQL(f, val);
+                         d->driver->valueToSQL(f, val);
             i++;
         }
     } else {//use RecordId
-        sqlwhere = KDbEscapedString(escapeIdentifier(m_driver->beh->ROW_ID_FIELD_NAME)) + '='
-                    + m_driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
+        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->beh->ROW_ID_FIELD_NAME)) + '='
+                    + d->driver->valueToSQL(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += sqlwhere;
     //kdbDebug() << " -- SQL == " << sql;
@@ -3497,7 +3513,9 @@ void KDbConnection::addCursor(KDbCursor* cursor)
 
 void KDbConnection::takeCursor(KDbCursor* cursor)
 {
-    d->cursors.remove(cursor);
+    if (d && !d->cursors.isEmpty()) { // checking because this may be called from ~KDbConnection()
+        d->cursors.remove(cursor);
+    }
 }
 
 KDbPreparedStatement KDbConnection::prepareStatement(KDbPreparedStatement::Type type,
@@ -3516,7 +3534,7 @@ KDbEscapedString KDbConnection::recentSQLString() const {
 
 KDbEscapedString KDbConnection::escapeString(const QString& str) const
 {
-    return m_driver->escapeString(str);
+    return d->driver->escapeString(str);
 }
 
 //! @todo extraMessages

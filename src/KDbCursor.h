@@ -75,8 +75,6 @@ public:
         Buffered = 1
     };
 
-    virtual ~KDbCursor();
-
     /*! @return connection used for the cursor */
     KDbConnection* connection() const;
 
@@ -157,7 +155,7 @@ public:
      (this happens eg. after open(), close(),
      and after moving after last record or before first one. */
     inline qint64 at() const {
-        return m_readAhead ? 0 : (m_at - 1);
+        return readAhead() ? 0 : (m_at - 1);
     }
 
     /*! @return number of fields available for this cursor.
@@ -199,9 +197,11 @@ public:
 
      Use this method before calling open(). You can also call reopen() after calling this method
      to see effects of applying records order. */
+    //! @todo implement this
     void setOrderByColumnList(const QStringList& columnNames);
 
     /*! Convenience method, similar to setOrderByColumnList(const QStringList&). */
+    //! @todo implement this
     void setOrderByColumnList(const QString& column1, const QString& column2 = QString(),
                               const QString& column3 = QString(), const QString& column4 = QString(),
                               const QString& column5 = QString());
@@ -235,7 +235,9 @@ protected:
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
 
-    void init();
+    virtual ~KDbCursor();
+
+    void init(KDbConnection* conn);
 
     /*! Internal: cares about proper flag setting depending on result of drv_getNextRecord()
      and depending on wherher a cursor is buffered. */
@@ -273,12 +275,6 @@ protected:
     */
     virtual void drv_bufferMovePointerTo(qint64 at) = 0;
 
-    /*DISABLED: ! This is called only once in open(), after successful drv_open().
-      Reimplement this if you need (or not) to do get the first record after drv_open(),
-      eg. to know if there are any records in table. Value returned by this method
-      will be assigned to m_readAhead.
-      Default implementation just calls drv_getNextRecord(). */
-
     /*! Clears cursor's buffer if this was allocated (only for buffered cursor type).
       Otherwise do nothing. For reimplementing. Default implementation does nothing. */
     virtual void drv_clearBuffer() {}
@@ -294,13 +290,8 @@ protected:
      to simple public KDbRecordData representation. */
     virtual bool drv_storeCurrentRecord(KDbRecordData* data) const = 0;
 
-    KDbConnection *m_conn;
     KDbQuerySchema *m_query;
-    KDbEscapedString m_rawSql;
-    bool m_opened;
-    bool m_atLast;
     bool m_afterLast;
-    bool m_validRecord; //!< true if valid record is currently retrieved @ current position
     bool m_containsRecordIdInfo; //!< true if result contains extra column for record id;
                                  //!< used only for PostgreSQL now
     qint64 m_at;
@@ -329,19 +320,13 @@ protected:
     //! Useful e.g. for value(int) method to obtain access to schema definition.
     KDbQueryColumnInfo::Vector* m_visibleFieldsExpanded;
 
-    //! Used by setOrderByColumnList()
-    KDbQueryColumnInfo::Vector* m_orderByColumnList;
-
-    QList<QVariant>* m_queryParameters;
-
 private:
+    bool readAhead() const;
+
     Q_DISABLE_COPY(KDbCursor)
-
-    bool m_readAhead;
-
-    //<members related to buffering>
-    bool m_at_buffer; //!< true if we already point to the buffer with curr_coldata
-    //</members related to buffering>
+    friend class CursorDeleter;
+    class Private;
+    Private * const d;
 };
 
 //! Sends information about object @a cursor to debug output @a dbg.

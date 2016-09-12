@@ -72,7 +72,7 @@ bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
     m_buffering_completed = true;
 
     // get real types for all fields
-    PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(m_conn->driver());
+    PostgresqlDriver* drv = static_cast<PostgresqlDriver*>(connection()->driver());
 
     m_realTypes.resize(m_fieldsToStoreInRecord);
     m_realLengths.resize(m_fieldsToStoreInRecord);

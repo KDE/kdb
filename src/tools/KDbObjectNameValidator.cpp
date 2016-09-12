@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -21,15 +21,24 @@
 
 #include "KDbDriver.h"
 
-//! @todo IMPORTANT: replace QPointer<KDbDriver> m_drv;
-KDbObjectNameValidator::KDbObjectNameValidator(KDbDriver *drv, QObject * parent)
-        : KDbValidator(parent)
-        , m_drv(drv)
+class KDbObjectNameValidator::Private
 {
+public:
+    Private() {}
+    const KDbDriver *driver;
+};
+
+//! @todo IMPORTANT: replace QPointer<KDbDriver> m_drv;
+KDbObjectNameValidator::KDbObjectNameValidator(const KDbDriver *driver, QObject * parent)
+        : KDbValidator(parent)
+        , d(new Private)
+{
+    d->driver = driver;
 }
 
 KDbObjectNameValidator::~KDbObjectNameValidator()
 {
+    delete d;
 }
 
 KDbValidator::Result KDbObjectNameValidator::internalCheck(
@@ -37,8 +46,8 @@ KDbValidator::Result KDbObjectNameValidator::internalCheck(
     QString *message, QString *details)
 {
     Q_UNUSED(valueName);
-    if (!m_drv ? !KDbDriver::isKDbSystemObjectName(value.toString())
-            : !m_drv->isSystemObjectName(value.toString()))
+    if (!d->driver ? !KDbDriver::isKDbSystemObjectName(value.toString())
+            : !d->driver->isSystemObjectName(value.toString()))
         return KDbValidator::Ok;
     if (message) {
         *message = KDbDriver::tr("Could not use reserved name \"%1\" for objects. "

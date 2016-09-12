@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2005 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -33,14 +33,15 @@ public:
     /*! @a drv is a KDb driver on which isSystemObjectName() will be
      called inside check(). If @a drv is 0, KDbDriver::isKDbSystemObjectName()
      static function is called instead. */
-    explicit KDbObjectNameValidator(KDbDriver *drv, QObject * parent = 0);
+    explicit KDbObjectNameValidator(const KDbDriver *drv, QObject * parent = nullptr);
     virtual ~KDbObjectNameValidator();
 
 protected:
     virtual KDbValidator::Result internalCheck(const QString &valueName, const QVariant& value,
                                                QString *message, QString *details);
-    KDbDriver* m_drv;
 private:
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbObjectNameValidator)
 };
 

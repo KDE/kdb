@@ -76,7 +76,6 @@ bool MysqlCursor::drv_close()
     d->mysqlres = 0;
     d->mysqlrow = 0;
     d->lengths = 0;
-    m_opened = false;
     d->numRows = 0;
     return true;
 }

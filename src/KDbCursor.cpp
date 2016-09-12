@@ -32,58 +32,87 @@
 #include <assert.h>
 #include <stdlib.h>
 
-//! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn;
+class KDbCursor::Private
+{
+public:
+    Private()
+        : opened(false)
+        , atLast(false)
+        , readAhead(false)
+        , validRecord(false)
+        , atBuffer(false)
+    {
+    }
+
+    ~Private() {
+    }
+
+    bool containsRecordIdInfo; //!< true if result contains extra column for record id;
+                               //!< used only for PostgreSQL now
+    //! @todo IMPORTANT: use something like QPointer<KDbConnection> conn;
+    KDbConnection *conn;
+    KDbEscapedString rawSql;
+    bool opened;
+    bool atLast;
+    bool readAhead;
+    bool validRecord; //!< true if valid record is currently retrieved @ current position
+
+    //! Used by setOrderByColumnList()
+    KDbQueryColumnInfo::Vector orderByColumnList;
+    QList<QVariant> queryParameters;
+
+    //<members related to buffering>
+    bool atBuffer; //!< true if we already point to the buffer with curr_coldata
+    //</members related to buffering>
+};
+
 KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)
-        : m_conn(conn)
-        , m_query(0)
-        , m_rawSql(sql)
+        : m_query(0)
         , m_options(options)
+        , d(new Private)
 {
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QLatin1String("Create cursor for raw SQL: ") + sql.toString());
 #endif
-    init();
+    init(conn);
+    d->rawSql = sql;
 }
 
 KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
-        : m_conn(conn)
-        , m_query(query)
+        : m_query(query)
         , m_options(options)
+        , d(new Private)
 {
 #ifdef KDB_DEBUG_GUI
     KDb::debugGUI(QString::fromLatin1("Create cursor for query \"%1\":\n")
                   .arg(KDb::iifNotEmpty(query->name(), QString::fromLatin1("<unnamed>")))
                   + KDbUtils::debugString(query));
 #endif
-    init();
+    init(conn);
 }
 
-void KDbCursor::init()
+void KDbCursor::init(KDbConnection* conn)
 {
-    Q_ASSERT(m_conn);
-    m_conn->addCursor(this);
-    m_opened = false;
-    m_atLast = false;
+    Q_ASSERT(conn);
+    d->conn = conn;
+    d->conn->addCursor(this);
     m_afterLast = false;
-    m_validRecord = false;
-    m_readAhead = false;
     m_at = 0;
     m_records_in_buf = 0;
     m_buffering_completed = false;
-    m_at_buffer = false;
     m_fetchResult = FetchInvalid;
 
-    m_containsRecordIdInfo = (m_query && m_query->masterTable())
-                          && m_conn->driver()->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
+    d->containsRecordIdInfo = (m_query && m_query->masterTable())
+                              && d->conn->driver()->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
 
     if (m_query) {
         //get list of all fields
         m_visibleFieldsExpanded = new KDbQueryColumnInfo::Vector();
         *m_visibleFieldsExpanded = m_query->visibleFieldsExpanded(
-                    m_containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
-                                           : KDbQuerySchema::WithInternalFields);
+                    d->containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
+                                            : KDbQuerySchema::WithInternalFields);
         m_logicalFieldCount = m_visibleFieldsExpanded->count()
-                              - m_query->internalFields().count() - (m_containsRecordIdInfo ? 1 : 0);
+                              - m_query->internalFields().count() - (d->containsRecordIdInfo ? 1 : 0);
         m_fieldCount = m_visibleFieldsExpanded->count();
         m_fieldsToStoreInRecord = m_fieldCount;
     } else {
@@ -92,8 +121,6 @@ void KDbCursor::init()
         m_fieldCount = 0;
         m_fieldsToStoreInRecord = 0;
     }
-    m_orderByColumnList = 0;
-    m_queryParameters = 0;
 }
 
 KDbCursor::~KDbCursor()
@@ -111,21 +138,19 @@ KDbCursor::~KDbCursor()
       else
         kdbDebug() << "KDbCursor::~KDbCursor() ";*/
 
-    //take me if delete was
-    if (!m_conn->m_insideCloseDatabase) {
-        if (!m_conn->m_destructor_started) {
-            m_conn->takeCursor(this);
-        } else {
-            kdbCritical() << "can be destroyed with Conenction::deleteCursor(), not with delete operator!";
-        }
-    }
+    d->conn->takeCursor(this);
     delete m_visibleFieldsExpanded;
-    delete m_queryParameters;
+    delete d;
+}
+
+bool KDbCursor::readAhead() const
+{
+    return d->readAhead;
 }
 
 KDbConnection* KDbCursor::connection() const
 {
-    return m_conn;
+    return d->conn;
 }
 
 KDbQuerySchema *KDbCursor::query() const
@@ -135,7 +160,7 @@ KDbQuerySchema *KDbCursor::query() const
 
 KDbEscapedString KDbCursor::rawSql() const
 {
-    return m_rawSql;
+    return d->rawSql;
 }
 
 int KDbCursor::options() const
@@ -145,12 +170,12 @@ int KDbCursor::options() const
 
 bool KDbCursor::isOpened() const
 {
-    return m_opened;
+    return d->opened;
 }
 
 bool KDbCursor::containsRecordIdInfo() const
 {
-    return m_containsRecordIdInfo;
+    return d->containsRecordIdInfo;
 }
 
 KDbRecordData* KDbCursor::storeCurrentRecord() const
@@ -172,12 +197,12 @@ bool KDbCursor::storeCurrentRecord(KDbRecordData* data) const
 
 bool KDbCursor::open()
 {
-    if (m_opened) {
+    if (d->opened) {
         if (!close())
             return false;
     }
-    if (!m_rawSql.isEmpty()) {
-        m_result.setSql(m_rawSql);
+    if (!d->rawSql.isEmpty()) {
+        m_result.setSql(d->rawSql);
     }
     else {
         if (!m_query) {
@@ -187,11 +212,10 @@ bool KDbCursor::open()
             return false;
         }
         KDbSelectStatementOptions options;
-        options.alsoRetrieveRecordId = m_containsRecordIdInfo; /*get record Id if needed*/
-        KDbNativeStatementBuilder builder(m_conn);
+        options.alsoRetrieveRecordId = d->containsRecordIdInfo; /*get record Id if needed*/
+        KDbNativeStatementBuilder builder(d->conn);
         KDbEscapedString sql;
-        if (!builder.generateSelectStatement(&sql, m_query, options,
-                                             m_queryParameters ? *m_queryParameters : QList<QVariant>())
+        if (!builder.generateSelectStatement(&sql, m_query, options, d->queryParameters)
             || sql.isEmpty())
         {
             kdbDebug() << "no statement generated!";
@@ -206,20 +230,20 @@ bool KDbCursor::open()
                       + m_result.sql().toString());
 #endif
     }
-    m_opened = drv_open(m_result.sql());
+    d->opened = drv_open(m_result.sql());
     m_afterLast = false; //we are not @ the end
     m_at = 0; //we are before 1st rec
-    if (!m_opened) {
+    if (!d->opened) {
         m_result.setCode(ERR_SQL_EXECUTION_ERROR);
         m_result.setMessage(tr("Error opening database cursor."));
         return false;
     }
-    m_validRecord = false;
+    d->validRecord = false;
 
-    if (m_conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
+    if (d->conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
 //  kdbDebug() << "READ AHEAD:";
-        m_readAhead = getNextRecord(); //true if any record in this query
-//  kdbDebug() << "READ AHEAD = " << m_readAhead;
+        d->readAhead = getNextRecord(); //true if any record in this query
+//  kdbDebug() << "READ AHEAD = " << d->readAhead;
     }
     m_at = 0; //we are still before 1st rec
     return !m_result.isError();
@@ -227,15 +251,16 @@ bool KDbCursor::open()
 
 bool KDbCursor::close()
 {
-    if (!m_opened)
+    if (!d->opened) {
         return true;
+    }
     bool ret = drv_close();
 
     clearBuffer();
 
-    m_opened = false;
+    d->opened = false;
     m_afterLast = false;
-    m_readAhead = false;
+    d->readAhead = false;
     m_fieldCount = 0;
     m_fieldsToStoreInRecord = 0;
     m_logicalFieldCount = 0;
@@ -247,16 +272,18 @@ bool KDbCursor::close()
 
 bool KDbCursor::reopen()
 {
-    if (!m_opened)
+    if (!d->opened) {
         return open();
+    }
     return close() && open();
 }
 
 bool KDbCursor::moveFirst()
 {
-    if (!m_opened)
+    if (!d->opened) {
         return false;
-    if (!m_readAhead) {
+    }
+    if (!d->readAhead) {
         if (m_options & Buffered) {
             if (m_records_in_buf == 0 && m_buffering_completed) {
                 //eof and bof should now return true:
@@ -266,13 +293,13 @@ bool KDbCursor::moveFirst()
             }
             if (m_records_in_buf > 0) {
                 //set state as we would be before first rec:
-                m_at_buffer = false;
+                d->atBuffer = false;
                 m_at = 0;
                 //..and move to next, ie. 1st record
                 m_afterLast = !getNextRecord();
                 return !m_afterLast;
             }
-        } else if (!(m_conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY))  {
+        } else if (!(d->conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY))  {
             // not buffered
             m_at = 0;
             m_afterLast = !getNextRecord();
@@ -291,35 +318,37 @@ bool KDbCursor::moveFirst()
     }
     //get first record
     m_afterLast = false;
-    m_readAhead = false; //1st record had been read
-    return m_validRecord;
+    d->readAhead = false; //1st record had been read
+    return d->validRecord;
 }
 
 bool KDbCursor::moveLast()
 {
-    if (!m_opened)
+    if (!d->opened) {
         return false;
-    if (m_afterLast || m_atLast) {
-        return m_validRecord; //we already have valid last record retrieved
+    }
+    if (m_afterLast || d->atLast) {
+        return d->validRecord; //we already have valid last record retrieved
     }
     if (!getNextRecord()) { //at least next record must be retrieved
         m_afterLast = true;
-        m_validRecord = false;
-        m_atLast = false;
+        d->validRecord = false;
+        d->atLast = false;
         return false; //no records
     }
     while (getNextRecord()) //move after last rec.
         ;
     m_afterLast = false;
     //cursor shows last record data
-    m_atLast = true;
+    d->atLast = true;
     return true;
 }
 
 bool KDbCursor::moveNext()
 {
-    if (!m_opened || m_afterLast)
+    if (!d->opened || m_afterLast) {
         return false;
+    }
     if (getNextRecord()) {
         return true;
     }
@@ -328,36 +357,36 @@ bool KDbCursor::moveNext()
 
 bool KDbCursor::movePrev()
 {
-    if (!m_opened /*|| m_beforeFirst*/ || !(m_options & Buffered))
+    if (!d->opened /*|| m_beforeFirst*/ || !(m_options & Buffered)) {
         return false;
-
+    }
     //we're after last record and there are records in the buffer
     //--let's move to last record
     if (m_afterLast && (m_records_in_buf > 0)) {
         drv_bufferMovePointerTo(m_records_in_buf - 1);
         m_at = m_records_in_buf;
-        m_at_buffer = true; //now current record is stored in the buffer
-        m_validRecord = true;
+        d->atBuffer = true; //now current record is stored in the buffer
+        d->validRecord = true;
         m_afterLast = false;
         return true;
     }
     //we're at first record: go BOF
     if ((m_at <= 1) || (m_records_in_buf <= 1/*sanity*/)) {
         m_at = 0;
-        m_at_buffer = false;
-        m_validRecord = false;
+        d->atBuffer = false;
+        d->validRecord = false;
         return false;
     }
 
     m_at--;
-    if (m_at_buffer) {//we already have got a pointer to buffer
+    if (d->atBuffer) {//we already have got a pointer to buffer
         drv_bufferMovePointerPrev(); //just move to prev record in the buffer
     } else {//we have no pointer
         //compute a place in the buffer that contain next record's data
         drv_bufferMovePointerTo(m_at - 1);
-        m_at_buffer = true; //now current record is stored in the buffer
+        d->atBuffer = true; //now current record is stored in the buffer
     }
-    m_validRecord = true;
+    d->validRecord = true;
     m_afterLast = false;
     return true;
 }
@@ -369,8 +398,9 @@ bool KDbCursor::isBuffered() const
 
 void KDbCursor::setBuffered(bool buffered)
 {
-    if (!m_opened)
+    if (!d->opened) {
         return;
+    }
     if (isBuffered() == buffered)
         return;
     m_options ^= Buffered;
@@ -384,7 +414,7 @@ void KDbCursor::clearBuffer()
     drv_clearBuffer();
 
     m_records_in_buf = 0;
-    m_at_buffer = false;
+    d->atBuffer = false;
 }
 
 bool KDbCursor::getNextRecord()
@@ -394,15 +424,15 @@ bool KDbCursor::getNextRecord()
     if (m_options & Buffered) {//this cursor is buffered:
 //  kdbDebug() << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
-            if (m_at_buffer) {//we already have got a pointer to buffer
+            if (d->atBuffer) {//we already have got a pointer to buffer
                 drv_bufferMovePointerNext(); //just move to next record in the buffer
             } else {//we have no pointer
                 //compute a place in the buffer that contain next record's data
                 drv_bufferMovePointerTo(m_at - 1 + 1);
-                m_at_buffer = true; //now current record is stored in the buffer
+                d->atBuffer = true; //now current record is stored in the buffer
             }
         } else {//we are after last retrieved record: we need to physically fetch next record:
-            if (!m_readAhead) {//we have no record that was read ahead
+            if (!d->readAhead) {//we have no record that was read ahead
                 if (!m_buffering_completed) {
                     //retrieve record only if we are not after
                     //the last buffer's item (i.e. when buffer is not fully filled):
@@ -412,7 +442,7 @@ bool KDbCursor::getNextRecord()
                 if (m_fetchResult != FetchOK) {//there is no record
                     m_buffering_completed = true; //no more records for buffer
 //     kdbDebug()<<"m_fetchResult != FetchOK ********";
-                    m_validRecord = false;
+                    d->validRecord = false;
                     m_afterLast = true;
                     m_at = -1; //position is invalid now and will not be used
                     if (m_fetchResult == FetchError) {
@@ -426,15 +456,15 @@ bool KDbCursor::getNextRecord()
                 drv_appendCurrentRecordToBuffer();
                 m_records_in_buf++;
             } else //we have a record that was read ahead: eat this
-                m_readAhead = false;
+                d->readAhead = false;
         }
     } else {//we are after last retrieved record: we need to physically fetch next record:
-        if (!m_readAhead) {//we have no record that was read ahead
+        if (!d->readAhead) {//we have no record that was read ahead
 //   kdbDebug()<<"==== no prefetched record ====";
             drv_getNextRecord();
             if (m_fetchResult != FetchOK) {//there is no record
 //    kdbDebug()<<"m_fetchResult != FetchOK ********";
-                m_validRecord = false;
+                d->validRecord = false;
                 m_afterLast = true;
                 m_at = -1;
                 if (m_fetchResult == FetchEnd) {
@@ -444,8 +474,9 @@ bool KDbCursor::getNextRecord()
                                      tr("Could not fetch next record."));
                 return false;
             }
-        } else //we have a record that was read ahead: eat this
-            m_readAhead = false;
+        } else { //we have a record that was read ahead: eat this
+            d->readAhead = false;
+        }
     }
 
     m_at++;
@@ -456,7 +487,7 @@ bool KDbCursor::getNextRecord()
 //  }
 // kdbDebug()<<"m_at == "<<(long)m_at;
 
-    m_validRecord = true;
+    d->validRecord = true;
     return true;
 }
 
@@ -466,7 +497,7 @@ bool KDbCursor::updateRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool
     clearResult();
     if (!m_query)
         return false;
-    return m_conn->updateRecord(m_query, data, buf, useRecordId);
+    return d->conn->updateRecord(m_query, data, buf, useRecordId);
 }
 
 bool KDbCursor::insertRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId)
@@ -476,7 +507,7 @@ bool KDbCursor::insertRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool
         clearResult();
         return false;
     }
-    return m_conn->insertRecord(m_query, data, buf, useRecordId);
+    return d->conn->insertRecord(m_query, data, buf, useRecordId);
 }
 
 bool KDbCursor::deleteRecord(KDbRecordData* data, bool useRecordId)
@@ -485,7 +516,7 @@ bool KDbCursor::deleteRecord(KDbRecordData* data, bool useRecordId)
     clearResult();
     if (!m_query)
         return false;
-    return m_conn->deleteRecord(m_query, data, useRecordId);
+    return d->conn->deleteRecord(m_query, data, useRecordId);
 }
 
 bool KDbCursor::deleteAllRecords()
@@ -494,7 +525,7 @@ bool KDbCursor::deleteAllRecords()
     clearResult();
     if (!m_query)
         return false;
-    return m_conn->deleteAllRecords(m_query);
+    return d->conn->deleteAllRecords(m_query);
 }
 
 QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
@@ -535,11 +566,10 @@ QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
 void KDbCursor::setOrderByColumnList(const QStringList& columnNames)
 {
     Q_UNUSED(columnNames);
-//! @todo implement this:
-// all field names should be fooun, exit otherwise ..........
+//! @todo implement this: all field names should be found, exit otherwise
 
     // OK
-//! @todo if (!m_orderByColumnList)
+//! @todo if (!d->orderByColumnList)
 }
 
 /*! Convenience method, similar to setOrderBy(const QStringList&). */
@@ -557,20 +587,17 @@ void KDbCursor::setOrderByColumnList(const QString& column1, const QString& colu
 
 KDbQueryColumnInfo::Vector KDbCursor::orderByColumnList() const
 {
-    return m_orderByColumnList ? *m_orderByColumnList : KDbQueryColumnInfo::Vector();
+    return d->orderByColumnList;
 }
 
 QList<QVariant> KDbCursor::queryParameters() const
 {
-    return m_queryParameters ? *m_queryParameters : QList<QVariant>();
+    return d->queryParameters;
 }
 
 void KDbCursor::setQueryParameters(const QList<QVariant>& params)
 {
-    if (!m_queryParameters)
-        m_queryParameters = new QList<QVariant>(params);
-    else
-        *m_queryParameters = params;
+    d->queryParameters = params;
 }
 
 //! @todo extraMessages

@@ -599,11 +599,6 @@ QString KDbConnectionProxy::escapeIdentifier(const QString& id) const
     return d->connection->escapeIdentifier(id);
 }
 
-void KDbConnectionProxy::insertInternalTable(KDbTableSchema* tableSchema)
-{
-    return d->connection->insertInternalTable(tableSchema);
-}
-
 bool KDbConnectionProxy::drv_connect()
 {
     return d->connection->drv_connect();
@@ -809,16 +804,6 @@ bool KDbConnectionProxy::deleteRecord(KDbQuerySchema* query, KDbRecordData* data
 bool KDbConnectionProxy::deleteAllRecords(KDbQuerySchema* query)
 {
     return d->connection->deleteAllRecords(query);
-}
-
-bool KDbConnectionProxy::setupKDbSystemSchema()
-{
-    return d->connection->setupKDbSystemSchema();
-}
-
-KDbTableSchema* KDbConnectionProxy::newKDbSystemTableSchema(const QString& tableName)
-{
-    return d->connection->newKDbSystemTableSchema(tableName);
 }
 
 bool KDbConnectionProxy::checkIfColumnExists(KDbCursor *cursor, int column)

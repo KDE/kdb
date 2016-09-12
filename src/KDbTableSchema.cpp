@@ -32,11 +32,17 @@ class KDbTableSchema::Private
 {
 public:
     Private()
-            : anyNonPKField(0) {
+            : anyNonPKField(nullptr)
+            , conn(nullptr)
+            , pkey(nullptr)
+            , query(nullptr)
+    {
     }
 
     ~Private() {
         clearLookupFields();
+        qDeleteAll(indices);
+        delete query;
     }
 
     void clearLookupFields() {
@@ -47,6 +53,11 @@ public:
     KDbField *anyNonPKField;
     QHash<const KDbField*, KDbLookupFieldSchema*> lookupFields;
     QVector<KDbLookupFieldSchema*> lookupFieldsList;
+    KDbIndexSchema::List indices;
+    //! @todo IMPORTANT: use something like QPointer<KDbConnection> conn
+    KDbConnection *conn;
+    KDbIndexSchema *pkey;
+    KDbQuerySchema *query; //!< cached query schema that is defined by "select * from <this_table_name>"
 private:
     Q_DISABLE_COPY(Private)
 };
@@ -57,7 +68,6 @@ KDbTableSchema::KDbTableSchema(const QString& name)
         : KDbFieldList(true)
         , KDbObject(KDb::TableObjectType)
         , d( new Private )
-        , m_isKDbSystem(false)
 {
     setName(name);
     init(0);
@@ -109,40 +119,35 @@ KDbTableSchema::KDbTableSchema(KDbConnection *conn, const QString & name)
 
 KDbTableSchema::~KDbTableSchema()
 {
-    if (m_conn)
-        m_conn->removeMe(this);
-    qDeleteAll(m_indices);
-    delete m_query;
+    if (d->conn) {
+        d->conn->removeMe(this);
+    }
     delete d;
 }
 
 void KDbTableSchema::init(KDbConnection* conn)
 {
-    m_conn = conn;
-    m_query = 0; //not cached
-    m_isKDbSystem = false;
-    m_pkey = new KDbIndexSchema(this);
-    m_indices.append(m_pkey);
+    d->conn = conn;
+    d->pkey = new KDbIndexSchema(this);
+    d->indices.append(d->pkey);
 }
 
 void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
 {
-    m_conn = ts.m_conn;
-    m_query = 0; //not cached
-    m_isKDbSystem = false;
+    d->conn = ts.connection();
     setName(ts.name());
-    m_pkey = 0; //will be copied
+    d->pkey = nullptr; //will be copied
     if (!copyId)
         setId(-1);
 
     //deep copy all members
-    foreach(KDbIndexSchema* otherIdx, ts.m_indices) {
+    foreach(KDbIndexSchema* otherIdx, *ts.indices()) {
         KDbIndexSchema *idx = new KDbIndexSchema(
             *otherIdx, this /*fields from _this_ table will be assigned to the index*/);
         if (idx->isPrimaryKey()) {//assign pkey
-            m_pkey = idx;
+            d->pkey = idx;
         }
-        m_indices.append(idx);
+        d->indices.append(idx);
     }
 
     KDbField::ListIterator tsIter(ts.fieldsIterator());
@@ -157,33 +162,33 @@ void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
 
 KDbIndexSchema* KDbTableSchema::primaryKey() const
 {
-    return m_pkey;
+    return d->pkey;
 }
 
 const KDbIndexSchema::ListIterator KDbTableSchema::indicesIterator() const
 {
-    return KDbIndexSchema::ListIterator(m_indices.constBegin());
+    return KDbIndexSchema::ListIterator(d->indices.constBegin());
 }
 
 const KDbIndexSchema::List* KDbTableSchema::indices() const
 {
-    return &m_indices;
+    return &d->indices;
 }
 
-bool KDbTableSchema::isKDbSystem() const
+bool KDbTableSchema::isInternal() const
 {
-    return m_isKDbSystem;
+    return dynamic_cast<const KDbInternalTableSchema*>(this);
 }
 
 void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
 {
-    if (m_pkey && m_pkey != pkey) {
-        if (m_pkey->fieldCount() == 0) {//this is empty key, probably default - remove it
-            m_indices.removeOne(m_pkey);
-            delete m_pkey;
+    if (d->pkey && d->pkey != pkey) {
+        if (d->pkey->fieldCount() == 0) {//this is empty key, probably default - remove it
+            d->indices.removeOne(d->pkey);
+            delete d->pkey;
         }
         else {
-            m_pkey->setPrimaryKey(false); //there can be only one pkey..
+            d->pkey->setPrimaryKey(false); //there can be only one pkey..
             //thats ok, the old pkey is still on indices list, if not empty
         }
     }
@@ -191,9 +196,9 @@ void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
     if (!pkey) {//clearing - set empty pkey
         pkey = new KDbIndexSchema(this);
     }
-    m_pkey = pkey; //!< @todo
-    m_pkey->setPrimaryKey(true);
-    d->anyNonPKField = 0; //for safety
+    d->pkey = pkey; //!< @todo
+    d->pkey->setPrimaryKey(true);
+    d->anyNonPKField = nullptr; //for safety
 }
 
 bool KDbTableSchema::insertField(int index, KDbField *field)
@@ -237,7 +242,7 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
         }
     }
     if (idx) {
-        m_indices.append(idx);
+        d->indices.append(idx);
     }
     return true;
 }
@@ -256,11 +261,11 @@ bool KDbTableSchema::removeField(KDbField *field)
 
 void KDbTableSchema::clear()
 {
-    m_indices.clear();
+    d->indices.clear();
     d->clearLookupFields();
     KDbFieldList::clear();
     KDbObject::clear();
-    m_conn = 0;
+    d->conn = nullptr;
 }
 
 QDebug KDbTableSchema::debugFields(QDebug dbg) const
@@ -290,27 +295,22 @@ QDebug operator<<(QDebug dbg, const KDbInternalTableSchema& table)
     return dbg.space();
 }
 
-//! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn
 KDbConnection* KDbTableSchema::connection() const
 {
-    return static_cast<KDbConnection*>(m_conn);
+    return d->conn;
 }
 
-void KDbTableSchema::setKDbSystem(bool set)
+void KDbTableSchema::setConnection(KDbConnection* conn)
 {
-    if (set)
-        setNative(true);
-    m_isKDbSystem = set;
-    if (m_isKDbSystem)
-        setNative(true);
+    d->conn = conn;
 }
 
 KDbQuerySchema* KDbTableSchema::query()
 {
-    if (m_query)
-        return m_query;
-    m_query = new KDbQuerySchema(this);   //it's owned by me
-    return m_query;
+    if (d->query)
+        return d->query;
+    d->query = new KDbQuerySchema(this);   //it's owned by me
+    return d->query;
 }
 
 KDbField* KDbTableSchema::anyNonPKField()
@@ -319,7 +319,7 @@ KDbField* KDbTableSchema::anyNonPKField()
         KDbField *f = 0;
         for (QListIterator<KDbField*> it(m_fields); it.hasPrevious();) {
             f = it.previous();
-            if (!f->isPrimaryKey() && (!m_pkey || !m_pkey->hasField(*f)))
+            if (!f->isPrimaryKey() && (!d->pkey || !d->pkey->hasField(*f)))
                 break;
         }
         d->anyNonPKField = f;

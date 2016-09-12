@@ -290,8 +290,6 @@ public:
 
     QString escapeIdentifier(const QString& id) const Q_DECL_OVERRIDE;
 
-    void insertInternalTable(KDbTableSchema* tableSchema);
-
     bool drv_connect() Q_DECL_OVERRIDE;
 
     bool drv_disconnect() Q_DECL_OVERRIDE;
@@ -375,10 +373,6 @@ public:
     bool deleteRecord(KDbQuerySchema* query, KDbRecordData* data, bool useRecordId = false);
 
     bool deleteAllRecords(KDbQuerySchema* query);
-
-    bool setupKDbSystemSchema();
-
-    KDbTableSchema* newKDbSystemTableSchema(const QString& tableName);
 
     bool checkIfColumnExists(KDbCursor *cursor, int column);
 

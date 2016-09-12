@@ -148,18 +148,37 @@ void KDbResultable::storePreviousError()
     kdbDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
+class KDbResultable::Private
+{
+public:
+    Private() : messageHandler(nullptr)
+    {
+    }
+    KDbMessageHandler* messageHandler;
+};
+
 KDbResultable::KDbResultable()
- : m_messageHandler(0)
+ : d(new Private)
 {
 }
 
 KDbResultable::KDbResultable(const KDbResultable &other)
- : m_result(other.m_result), m_messageHandler(other.m_messageHandler)
+    : m_result(other.m_result)
+    , d(new Private)
 {
+    d->messageHandler = other.messageHandler();
 }
 
 KDbResultable::~KDbResultable()
 {
+    delete d;
+}
+
+KDbResultable& KDbResultable::operator=(const KDbResultable &other)
+{
+    d->messageHandler = other.messageHandler();
+    m_result = other.m_result;
+    return *this;
 }
 
 KDbResult KDbResultable::result() const
@@ -179,17 +198,17 @@ QString KDbResultable::serverResultName() const
 
 void KDbResultable::setMessageHandler(KDbMessageHandler *handler)
 {
-    m_messageHandler = handler;
+    d->messageHandler = handler;
 }
 
 KDbMessageHandler* KDbResultable::messageHandler() const
 {
-    return m_messageHandler;
+    return d->messageHandler;
 }
 
 void KDbResultable::showMessage()
 {
-    if (m_messageHandler && m_result.isError()) {
-        m_messageHandler->showErrorMessage(m_result);
+    if (d->messageHandler && m_result.isError()) {
+        d->messageHandler->showErrorMessage(m_result);
     }
 }

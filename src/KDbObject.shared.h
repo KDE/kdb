@@ -73,26 +73,6 @@ public:
     */
     QString description; //SDC:
 
-    /*!
-    @getter
-    @return true if this object represents native database object,
-    for example native table. This flag is set when object (currently -- database table)
-    is not retrieved using kexi__* schema storage system,
-    but just based on the information about native database object.
-
-    Native database objects have no additional metadata like caption
-    or description properties.
-
-    Native objects schemas are used mostly for representing kexi system
-    (kexi__*) tables in memory for later reference.
-    @see KDbConnection::tableNames().
-
-    By default (on allocation) objects are not native.
-    @setter
-    Sets "native" flag for this object.
-    */
-    bool native;  //SDC: default=false
-
     /*! @return caption of this object if it is not empty, else returns object's name.
     */
     inline QString captionOrName() const {

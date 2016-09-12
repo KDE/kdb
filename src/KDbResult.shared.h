@@ -153,6 +153,8 @@ public:
 
     KDbResultable(const KDbResultable &other);
 
+    KDbResultable& operator=(const KDbResultable &other);
+
     virtual ~KDbResultable();
 
     KDbResult result() const;
@@ -178,7 +180,8 @@ public:
 protected:
     friend class KDbMessageTitleSetter;
     KDbResult m_result;
-    KDbMessageHandler *m_messageHandler;
+    class Private;
+    Private * const d;
 };
 
 //! Sends result @a result to debug output @a dbg.
