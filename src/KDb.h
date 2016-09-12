@@ -273,17 +273,28 @@ KDB_EXPORT bool splitToTableAndFieldParts(const QString& string,
 KDB_EXPORT bool supportsVisibleDecimalPlacesProperty(KDbField::Type type);
 
 /*! @return string constructed by converting @a value.
- * If @a decimalPlaces is < 0, all meaningful fractional digits are returned.
+ * If @a decimalPlaces is < 0, all meaningful fractional digits are returned (up to 10).
  * If @a automatically is 0, just integer part is returned.
  * If @a automatically is > 0, fractional part should take exactly
    N digits: if the fractional part is shorter than N, additional zeros are appended.
-   For example, "12.345" becomes "12.345000" if N=6.
+   Examples:
+   * numberToString(12.345, 6) == "12.345000"
+   * numberToString(12.345, 0) == "12"
+   * numberToString(12.345, -1) == "12.345"
+   * numberToString(12.0, -1) == "12"
+   * numberToString(0.0, -1) == "0"
 
- No rounding is actually performed.
- KLocale::formatNumber() and KLocale::decimalSymbol() are used to get locale settings.
+ @note No rounding is performed
+ @note No thousands group separator is used. Decimal symbol is '.'.
 
- @see KDbField::visibleDecimalPlaces() */
-KDB_EXPORT QString formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces);
+ @see KDb::numberToLocaleString() KDbField::visibleDecimalPlaces() */
+KDB_EXPORT QString numberToString(double value, int decimalPlaces);
+
+/*! Like KDb::numberToString() but formats the string using locale.toString().
+ If @a locale if @c nullptr, desault QLocale is used.
+
+ @see KDb::numberToString() KDbField::visibleDecimalPlaces() */
+KDB_EXPORT QString numberToLocaleString(double value, int decimalPlaces, const QLocale *locale = nullptr);
 
 //! @return true if @a propertyName is a builtin field property.
 KDB_EXPORT bool isBuiltinTableFieldProperty(const QByteArray& propertyName);

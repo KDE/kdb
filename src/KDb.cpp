@@ -650,22 +650,43 @@ bool KDb::supportsVisibleDecimalPlacesProperty(KDbField::Type type)
     return KDbField::isFPNumericType(type);
 }
 
-QString KDb::formatNumberForVisibleDecimalPlaces(double value, int decimalPlaces)
+inline static QString numberToString(double value, int decimalPlaces, const QLocale *locale)
 {
 //! @todo round?
-    if (decimalPlaces < 0) {
-        QString s(QString::number(value, 'f', 10 /*reasonable precision*/));
-        int i = s.length() - 1;
-        while (i > 0 && s[i] == QLatin1Char('0'))
-            i--;
-        if (s[i] == QLatin1Char('.')) //remove '.'
-            i--;
-        s = s.left(i + 1).replace(QLatin1Char('.'), QLocale().decimalPoint());
-        return s;
+    QString result;
+    if (decimalPlaces == 0) {
+        result = locale ? locale->toString(qlonglong(value))
+                        : QString::number(qlonglong(value));
+    } else {
+        const int realDecimalPlaces = decimalPlaces < 0 ? 10 : decimalPlaces;
+        result = locale ? locale->toString(value, 'f', realDecimalPlaces)
+                        : QString::number(value, 'f', realDecimalPlaces);
+        if (decimalPlaces < 0) { // cut off zeros
+            int i = result.length() - 1;
+            while (i > 0 && result[i] == QLatin1Char('0')) {
+                i--;
+            }
+            if (result[i].isDigit()) {// last digit
+                ++i;
+            }
+            result.truncate(i);
+        }
     }
-    if (decimalPlaces == 0)
-        return QString::number(int(value));
-    return QLocale().toString(value, 'g', decimalPlaces);
+    return result;
+}
+
+QString KDb::numberToString(double value, int decimalPlaces)
+{
+    return ::numberToString(value, decimalPlaces, nullptr);
+}
+
+QString KDb::numberToLocaleString(double value, int decimalPlaces, const QLocale *locale)
+{
+    if (locale) {
+        return ::numberToString(value, decimalPlaces, locale);
+    }
+    QLocale defaultLocale;
+    return ::numberToString(value, decimalPlaces, &defaultLocale);
 }
 
 KDbField::Type KDb::intToFieldType(int type)
