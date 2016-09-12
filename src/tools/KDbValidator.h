@@ -72,7 +72,7 @@ public:
     virtual QValidator::State validate(QString & input, int & pos) const;
 
     //! A generic error/warning message "... value has to be entered."
-    static const QString msgColumnNotEmpty();
+    static const QString messageColumnNotEmpty();
 
     //! Adds a child validator @a v
     void addChildValidator(KDbValidator* v);

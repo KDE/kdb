@@ -63,7 +63,7 @@ KDbValidator::Result KDbValidator::check(const QString &valueName, const QVarian
     if (v.isNull() || (v.type() == QVariant::String && v.toString().isEmpty())) {
         if (!d->acceptsEmptyValue) {
             if (message) {
-                *message = KDbValidator::msgColumnNotEmpty().arg(valueName);
+                *message = KDbValidator::messageColumnNotEmpty().arg(valueName);
             }
             return Error;
         }
@@ -97,7 +97,7 @@ bool KDbValidator::acceptsEmptyValue() const
     return d->acceptsEmptyValue;
 }
 
-const QString KDbValidator::msgColumnNotEmpty()
+const QString KDbValidator::messageColumnNotEmpty()
 {
     return QLatin1String(QT_TR_NOOP("\"%1\" value has to be entered."));
 }
