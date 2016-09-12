@@ -78,7 +78,8 @@ class ConnectionTestDialog : public QProgressDialog // krazy:exclude=qclasses
 {
     Q_OBJECT
 public:
-    ConnectionTestDialog(QWidget* parent, const KDbConnectionData& data, KDbMessageHandler* msgHandler);
+    ConnectionTestDialog(const KDbConnectionData& data, KDbMessageHandler* msgHandler,
+                         QWidget* parent = nullptr);
     virtual ~ConnectionTestDialog();
 
     int exec();
@@ -152,9 +153,8 @@ void ConnectionTestThread::run()
     emitError(KDbResultable());
 }
 
-ConnectionTestDialog::ConnectionTestDialog(QWidget* parent,
-        const KDbConnectionData& data,
-        KDbMessageHandler* msgHandler)
+ConnectionTestDialog::ConnectionTestDialog(const KDbConnectionData& data,
+        KDbMessageHandler* msgHandler, QWidget* parent)
         : QProgressDialog(parent)
         , m_thread(new ConnectionTestThread(this, data))
         , m_connData(data)
@@ -555,7 +555,7 @@ tristate KDb::idForObjectName(KDbConnection* conn, int *id, const QString& objNa
 void KDb::connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
                                KDbMessageHandler* msgHandler)
 {
-    ConnectionTestDialog dlg(parent, data, msgHandler);
+    ConnectionTestDialog dlg(data, msgHandler, parent);
     dlg.exec();
 }
 
