@@ -96,11 +96,11 @@ bool MysqlDriver::isSystemObjectName(const QString& name) const
     return false;
 }
 
-bool MysqlDriver::isSystemDatabaseName(const QString &n) const
+bool MysqlDriver::isSystemDatabaseName(const QString &name) const
 {
-    return    0 == n.compare(QLatin1String("mysql"), Qt::CaseInsensitive)
-           || 0 == n.compare(QLatin1String("information_schema"), Qt::CaseInsensitive)
-           || 0 == n.compare(QLatin1String("performance_schema"), Qt::CaseInsensitive);
+    return    0 == name.compare(QLatin1String("mysql"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("information_schema"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("performance_schema"), Qt::CaseInsensitive);
 }
 
 bool MysqlDriver::drv_isSystemFieldName(const QString& name) const

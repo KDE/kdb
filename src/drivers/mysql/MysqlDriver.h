@@ -45,7 +45,7 @@ public:
     virtual bool isSystemObjectName(const QString& name) const;
 
     /*! @return true if @a is "mysql", "information_schema" or "performance_schema". */
-    virtual bool isSystemDatabaseName(const QString &n) const;
+    virtual bool isSystemDatabaseName(const QString &name) const;
 
     //! Escape a string for use as a value
     virtual KDbEscapedString escapeString(const QString& str) const;
