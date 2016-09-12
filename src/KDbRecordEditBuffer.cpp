@@ -176,19 +176,17 @@ const KDbRecordEditBuffer::DBMap KDbRecordEditBuffer::dbBuffer() const
 QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
 {
     if (buffer.isDBAware()) {
-        dbg.space() << "RecordEditBuffer type=DB-AWARE,";
-        dbg.space() << buffer.dbBuffer().count() << " items\n";
+        dbg.space() << "RecordEditBuffer type=DB-AWARE," << buffer.dbBuffer().count() << "field(s):\n";
         for (KDbRecordEditBuffer::DBMap::ConstIterator it = buffer.dbBuffer().constBegin(); it != buffer.dbBuffer().constEnd(); ++it) {
-            dbg.nospace() << "* field name=" << it.key()->field->name() << "val="
+            dbg.nospace() << "* field name=" << qPrintable(it.key()->field->name()) << " val="
             << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString())
             << (buffer.hasDefaultValueAt(it.key()) ? " DEFAULT\n" : "\n");
         }
         return dbg.space();
     }
-    dbg.space() << "RecordEditBuffer type=SIMPLE,";
-    dbg.space() << buffer.simpleBuffer().count() << " items\n";
+    dbg.space() << "RecordEditBuffer type=SIMPLE," << buffer.simpleBuffer().count() << "field(s):\n";
     for (KDbRecordEditBuffer::SimpleMap::ConstIterator it = buffer.simpleBuffer().constBegin(); it != buffer.simpleBuffer().constEnd(); ++it) {
-        dbg.space() << "* field name=" << it.key() << "val="
+        dbg.nospace() << "* field name=" << qPrintable(it.key()) << " val="
         << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString()) << "\n";
     }
     return dbg.space();
