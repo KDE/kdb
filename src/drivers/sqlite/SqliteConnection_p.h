@@ -70,7 +70,7 @@ public:
     }
     //! @return length limit - no limits for SQLite
     inline int length() Q_DECL_OVERRIDE {
-        return std::numeric_limits<quint64>::max();
+        return std::numeric_limits<int>::max();
     }
 private:
     sqlite3_stmt * const prepared_st;
