@@ -36,9 +36,9 @@ public:
     virtual ~PostgresqlDriver();
 
     //! @todo implement
-    virtual bool isSystemObjectName(const QString& n) const;
+    virtual bool isSystemObjectName(const QString& name) const;
 
-    virtual bool isSystemDatabaseName(const QString& n) const;
+    virtual bool isSystemDatabaseName(const QString& name) const;
 
     //! Escape a string for use as a value
     virtual KDbEscapedString escapeString(const QString& str) const;
@@ -139,7 +139,7 @@ protected:
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
                                                 const KDbConnectionOptions &options);
-    virtual bool drv_isSystemFieldName(const QString& n)const;
+    virtual bool drv_isSystemFieldName(const QString& name)const;
 
 private:
     void initPgsqlToKDbMap();

@@ -42,7 +42,7 @@ public:
     virtual ~MysqlDriver();
 
     /*! @return false for this driver. */
-    virtual bool isSystemObjectName(const QString& n) const;
+    virtual bool isSystemObjectName(const QString& name) const;
 
     /*! @return true if @a is "mysql", "information_schema" or "performance_schema". */
     virtual bool isSystemDatabaseName(const QString &n) const;
@@ -91,7 +91,7 @@ protected:
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
     virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
                                                 const KDbConnectionOptions &options);
-    virtual bool drv_isSystemFieldName(const QString& n) const;
+    virtual bool drv_isSystemFieldName(const QString& name) const;
     bool supportsDefaultValue(const KDbField &field) const Q_DECL_OVERRIDE;
 
 private:

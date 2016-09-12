@@ -432,9 +432,9 @@ KDbField::setQuery(KDbQuerySchema *querySchema)
 }
 
 void
-KDbField::setName(const QString& n)
+KDbField::setName(const QString& name)
 {
-    m_name = n.toLower();
+    m_name = name.toLower();
 }
 
 void

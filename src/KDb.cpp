@@ -399,15 +399,15 @@ KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quin
     return rdata[0].toULongLong();
 }
 
-bool KDb::isEmptyValue(KDbField::Type type, const QVariant &v)
+bool KDb::isEmptyValue(KDbField::Type type, const QVariant &value)
 {
     if (KDbField::isTextType(type)) {
-        return v.toString().isEmpty() && !v.toString().isNull();
+        return value.toString().isEmpty() && !value.toString().isNull();
     }
     else if (type == KDbField::BLOB) {
-        return v.toByteArray().isEmpty() && !v.toByteArray().isNull();
+        return value.toByteArray().isEmpty() && !value.toByteArray().isNull();
     }
-    return v.isNull();
+    return value.isNull();
 }
 
 KDbEscapedString KDb::sqlWhere(KDbDriver *drv, KDbField::Type t,

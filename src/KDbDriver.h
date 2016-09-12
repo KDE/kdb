@@ -100,28 +100,28 @@ public:
      and in most cases a name that user shouldn't even see.
      @see isSystemDatabaseName() isKDbSystemObjectName() isSystemFieldName()
     */
-    virtual bool isSystemObjectName(const QString& n) const = 0;
+    virtual bool isSystemObjectName(const QString& name) const = 0;
 
-    /*! @return true if @a n is a related to KDb's 'system' object's
-     name, i.e. when @a n starts with "kexi__" prefix.
+    /*! @return true if @a name is a related to KDb's 'system' object's
+     name, i.e. when @a name starts with "kexi__" prefix.
      @see isSystemDatabaseName() isSystemObjectName() isSystemFieldName()
     */
-    static bool isKDbSystemObjectName(const QString& n);
+    static bool isKDbSystemObjectName(const QString& name);
 
-    /*! @return true if @a n is a database type-specific system database's name,
+    /*! @return true if @a name is a database type-specific system database's name,
      e.g. name of a built-in system database that cannot be created by a user,
      and in most cases user a name that user shouldn't even see.
      @see isKDbSystemObjectName() isSystemObjectName() isSystemFieldName()
     */
-    virtual bool isSystemDatabaseName(const QString& n) const = 0;
+    virtual bool isSystemDatabaseName(const QString& name) const = 0;
 
-    /*! @return true if @a n is a system field's name, build-in system
+    /*! @return true if @a name is a system field's name, build-in system
      field that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation.
      @see isSystemDatabaseName() isKDbSystemObjectName() isSystemObjectName()
     */
-    bool isSystemFieldName(const QString& n) const;
+    bool isSystemFieldName(const QString& name) const;
 
     /*! @return true if @a word is a driver-specific keyword.
      @see KDb::isKDbSQLKeyword(const QByteArray&) */
@@ -318,11 +318,11 @@ protected:
     */
     virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const = 0;
 
-    /*! @return true if @a n is a system field's name, build-in system
+    /*! @return true if @a name is a system field's name, build-in system
      field that cannot be used or created by a user,
      and in most cases user even shouldn't see this. The list is specific for
      a given driver implementation. For implementation.*/
-    virtual bool drv_isSystemFieldName(const QString& n) const = 0;
+    virtual bool drv_isSystemFieldName(const QString& name) const = 0;
 
     /*! Creates admin tools object providing a number of database administration
      tools for the driver. This is called once per driver.

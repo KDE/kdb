@@ -161,21 +161,21 @@ QString KDbDriver::defaultSQLTypeName(KDbField::Type type)
     return QLatin1String(KDb_defaultSQLTypeNames[type]);
 }
 
-bool KDbDriver::isKDbSystemObjectName(const QString& n)
+bool KDbDriver::isKDbSystemObjectName(const QString& name)
 {
-    if (!n.startsWith(QLatin1String("kexi__"), Qt::CaseInsensitive))
+    if (!name.startsWith(QLatin1String("kexi__"), Qt::CaseInsensitive))
         return false;
-    return KDbConnection::kdbSystemTableNames().contains(n, Qt::CaseInsensitive);
+    return KDbConnection::kdbSystemTableNames().contains(name, Qt::CaseInsensitive);
 }
 
-bool KDbDriver::isSystemFieldName(const QString& n) const
+bool KDbDriver::isSystemFieldName(const QString& name) const
 {
     if (!beh->ROW_ID_FIELD_NAME.isEmpty()
-        && 0 == n.compare(beh->ROW_ID_FIELD_NAME, Qt::CaseInsensitive))
+        && 0 == name.compare(beh->ROW_ID_FIELD_NAME, Qt::CaseInsensitive))
     {
         return true;
     }
-    return drv_isSystemFieldName(n);
+    return drv_isSystemFieldName(name);
 }
 
 static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)

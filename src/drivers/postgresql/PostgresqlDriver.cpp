@@ -104,22 +104,23 @@ KDbConnection* PostgresqlDriver::drv_createConnection(const KDbConnectionData& c
     return new PostgresqlConnection(this, connData, options);
 }
 
-bool PostgresqlDriver::isSystemObjectName(const QString& n) const
+bool PostgresqlDriver::isSystemObjectName(const QString& name) const
 {
-    Q_UNUSED(n);
+    Q_UNUSED(name);
     return false;
 }
 
-bool PostgresqlDriver::drv_isSystemFieldName(const QString&) const
+bool PostgresqlDriver::drv_isSystemFieldName(const QString& name) const
 {
+    Q_UNUSED(name);
     return false;
 }
 
-bool PostgresqlDriver::isSystemDatabaseName(const QString& n) const
+bool PostgresqlDriver::isSystemDatabaseName(const QString& name) const
 {
-    return    0 == n.compare(QLatin1String("template1"), Qt::CaseInsensitive)
-           || 0 == n.compare(QLatin1String("template0"), Qt::CaseInsensitive)
-           || 0 == n.compare(QLatin1String("postgres"), Qt::CaseInsensitive);
+    return    0 == name.compare(QLatin1String("template1"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("template0"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("postgres"), Qt::CaseInsensitive);
 }
 
 KDbEscapedString PostgresqlDriver::escapeString(const QString& str) const

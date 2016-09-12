@@ -164,14 +164,14 @@ KDB_EXPORT KDbField::Type defaultFieldTypeForGroup(KDbField::TypeGroup typeGroup
 //! @todo support names of other BLOB subtypes
 KDB_EXPORT QString simplifiedFieldTypeName(KDbField::Type type);
 
-/*! @return true if value @a v represents an empty (but not null) value.
+/*! @return true if value @a value represents an empty (but not null) value.
   - Case 1: If field type @a type is of any text type (KDbField::isTextType(type) == true)
-    then the function returns true if @a v casted to a QString value is empty and not null.
-  - Case 2: If field type @a type is KDbField::BLOB then the function returns if @a v casted
+    then the function returns true if @a value casted to a QString value is empty and not null.
+  - Case 2: If field type @a type is KDbField::BLOB then the function returns if @a value casted
     to a QByteArray value is empty and not null.
-  - Case 3: If field type @a type is of any other type then the function returns true if v.isNull().
+  - Case 3: If field type @a type is of any other type then the function returns true if value.isNull().
  @see KDbField::hasEmptyProperty() */
-KDB_EXPORT bool isEmptyValue(KDbField::Type type, const QVariant &v);
+KDB_EXPORT bool isEmptyValue(KDbField::Type type, const QVariant &value);
 
 /*! Sets string pointed by @a msg to an error message retrieved from @a resultable,
  and string pointed by @a details to details of this error (server message and result number).
