@@ -58,11 +58,11 @@ public:
 
      To copy an index within the same table it's enough to call:
      @code
-     new KDbIndexSchema(idx, *idx.table());
+     new KDbIndexSchema(idx, idx.table());
      @endcode
      @todo All relationships should be also copied
      */
-    KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema& parentTable);
+    KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema* parentTable);
 
     /*! Destroys the index. KDbField objects are not deleted.
      All KDbRelationship objects listed in masterRelationships() list
