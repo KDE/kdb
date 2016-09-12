@@ -47,6 +47,8 @@ public:
     KDbField *anyNonPKField;
     QHash<const KDbField*, KDbLookupFieldSchema*> lookupFields;
     QVector<KDbLookupFieldSchema*> lookupFieldsList;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 //-------------------------------------
@@ -280,6 +282,14 @@ QDebug operator<<(QDebug dbg, const KDbTableSchema& table)
     return dbg.space();
 }
 
+QDebug operator<<(QDebug dbg, const KDbInternalTableSchema& table)
+{
+    dbg.nospace() << "INTERNAL_TABLE";
+    dbg.space() << static_cast<const KDbObject&>(table) << '\n';
+    table.debugFields(dbg);
+    return dbg.space();
+}
+
 //! @todo IMPORTANT: replace QPointer<KDbConnection> m_conn
 KDbConnection* KDbTableSchema::connection() const
 {
@@ -373,6 +383,11 @@ KDbInternalTableSchema::KDbInternalTableSchema(const QString& name)
 }
 
 KDbInternalTableSchema::KDbInternalTableSchema(const KDbTableSchema& ts)
+        : KDbTableSchema(ts, false)
+{
+}
+
+KDbInternalTableSchema::KDbInternalTableSchema(const KDbInternalTableSchema& ts)
         : KDbTableSchema(ts, false)
 {
 }
