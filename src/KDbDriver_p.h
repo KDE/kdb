@@ -217,7 +217,7 @@ public:
     /*! Driver's metadata. */
     const KDbDriverMetaData *metaData;
 
-    /*! Internal constant flag: Set this in subclass if after successful
+    /*! Internal constant flag: Set to @c true in a subclass if after successful
      drv_createDatabase() the database is in opened state (as after useDatabase()).
      For most engines this is not true. */
     bool isDBOpenedAfterCreate;
