@@ -271,10 +271,4 @@ protected:
 #define BLOB_ESCAPING_TYPE_USE_0x    1 //!< escaping like 0xabcd0, used by mysql
 #define BLOB_ESCAPING_TYPE_USE_OCTAL 2 //!< escaping like 'abcd\\000', used by pgsql
 
-class KDB_EXPORT KDbAdminTools::Private
-{
-public:
-    Private();
-    ~Private();
-};
 #endif

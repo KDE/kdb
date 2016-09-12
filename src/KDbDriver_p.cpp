@@ -107,13 +107,3 @@ DriverPrivate::~DriverPrivate()
 {
     delete adminTools;
 }
-
-//--------------------------
-
-KDbAdminTools::Private::Private()
-{
-}
-
-KDbAdminTools::Private::~Private()
-{
-}

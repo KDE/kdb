@@ -21,6 +21,13 @@
 #include "KDbDriver_p.h"
 #include "KDbConnectionData.h"
 
+class KDbAdminTools::Private
+{
+public:
+    Private() {}
+    ~Private() {}
+};
+
 KDbAdminTools::KDbAdminTools()
  : d(new Private())
 {
