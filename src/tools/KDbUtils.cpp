@@ -132,29 +132,29 @@ bool KDbUtils::simpleDecrypt(QString *string)
     return true;
 }
 
-QString KDbUtils::ptrToStringInternal(void* ptr, int size)
+QString KDbUtils::pointerToStringInternal(void* pointer, int size)
 {
-    QString str;
-    unsigned char* cstr_ptr = (unsigned char*) & ptr;
+    QString string;
+    unsigned char* cstr_pointer = (unsigned char*) & pointer;
     for (int i = 0; i < size; i++) {
         QString s;
-        s.sprintf("%2.2x", cstr_ptr[i]);
-        str.append(s);
+        s.sprintf("%2.2x", cstr_pointer[i]);
+        string.append(s);
     }
-    return str;
+    return string;
 }
 
-void* KDbUtils::stringToPtrInternal(const QString& str, int size)
+void* KDbUtils::stringToPointerInternal(const QString& string, int size)
 {
-    if ((str.length() / 2) < size)
-        return 0;
+    if ((string.length() / 2) < size)
+        return nullptr;
     QByteArray array;
     array.resize(size);
     bool ok;
     for (int i = 0; i < size; i++) {
-        array[i] = (unsigned char)(str.mid(i * 2, 2).toUInt(&ok, 16));
+        array[i] = (unsigned char)(string.mid(i * 2, 2).toUInt(&ok, 16));
         if (!ok)
-            return 0;
+            return nullptr;
     }
     return static_cast<void*>(array.data());
 }

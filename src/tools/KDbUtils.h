@@ -101,22 +101,22 @@ KDB_EXPORT void simpleCrypt(QString *string);
 KDB_EXPORT bool simpleDecrypt(QString *string);
 
 //! @internal
-KDB_EXPORT QString ptrToStringInternal(void* ptr, int size);
+KDB_EXPORT QString pointerToStringInternal(void* pointer, int size);
 //! @internal
-KDB_EXPORT void* stringToPtrInternal(const QString& str, int size);
+KDB_EXPORT void* stringToPointerInternal(const QString& string, int size);
 
-//! @return a pointer @a ptr safely serialized to string
+//! @return a pointer @a pointer safely serialized to string
 template<class type>
-QString ptrToString(type *ptr)
+QString pointerToString(type *pointer)
 {
-    return ptrToStringInternal(ptr, sizeof(type*));
+    return pointerToStringInternal(pointer, sizeof(type*));
 }
 
-//! @return a pointer of type @a type safely deserialized from @a str
+//! @return a pointer of type @a type safely deserialized from @a string
 template<class type>
-type* stringToPtr(const QString& str)
+type* stringToPointer(const QString& string)
 {
-    return static_cast<type*>(stringToPtrInternal(str, sizeof(type*)));
+    return static_cast<type*>(stringToPointerInternal(string, sizeof(type*)));
 }
 
 //! @short Autodeleting hash
