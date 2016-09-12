@@ -53,7 +53,7 @@ public:
   KDbTransaction object is value-based, internal data (handle) structure,
   reference-counted.
 */
-class KDB_EXPORT KDbTransaction : public QObject
+class KDB_EXPORT KDbTransaction
 {
 public:
 /*! Constructs uninitialised (null) transaction.

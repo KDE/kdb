@@ -55,14 +55,12 @@ KDbTransactionData::~KDbTransactionData()
 //---------------------------------------------------
 
 KDbTransaction::KDbTransaction()
-        : QObject(0)
-        , m_data(0)
+        : m_data(0)
 {
 }
 
 KDbTransaction::KDbTransaction(const KDbTransaction& trans)
-        : QObject(0)
-        , m_data(trans.m_data)
+        : m_data(trans.m_data)
 {
     if (m_data) {
         m_data->refcount++;
