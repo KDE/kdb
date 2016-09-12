@@ -30,10 +30,10 @@ static bool isTrue(KPluginMetaData *metaData, const char* fieldName)
 class KDbDriverMetaData::Private
 {
 public:
-    Private(KDbDriverMetaData *metaData)
+    explicit Private(KDbDriverMetaData *metaData)
+        : fileBased(isTrue(metaData, "X-KDb-FileBased"))
+        , importingEnabled(isTrue(metaData, "X-KDb-ImportingEnabled"))
     {
-        fileBased = isTrue(metaData, "X-KDb-FileBased");
-        importingEnabled = isTrue(metaData, "X-KDb-ImportingEnabled");
     }
 
     QStringList mimeTypes;
