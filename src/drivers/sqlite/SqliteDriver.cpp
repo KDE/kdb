@@ -103,22 +103,22 @@ SqliteDriver::drv_createConnection(const KDbConnectionData& connData,
     return new SqliteConnection(this, connData, options);
 }
 
-bool SqliteDriver::isSystemObjectName(const QString& n) const
+bool SqliteDriver::isSystemObjectName(const QString& name) const
 {
-    return n.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
+    return name.startsWith(QLatin1String("sqlite_"), Qt::CaseInsensitive);
 }
 
-bool SqliteDriver::isSystemDatabaseName(const QString&) const
+bool SqliteDriver::isSystemDatabaseName(const QString& name) const
 {
+    Q_UNUSED(name);
     return false;
 }
 
-bool SqliteDriver::drv_isSystemFieldName(const QString& n) const
+bool SqliteDriver::drv_isSystemFieldName(const QString& name) const
 {
-    const QString lcName(n.toLower());
-    return (lcName == QLatin1String("_rowid_"))
-           || (lcName == QLatin1String("rowid"))
-           || (lcName == QLatin1String("oid"));
+    return    0 == name.compare(QLatin1String("_rowid_"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("rowid"), Qt::CaseInsensitive)
+           || 0 == name.compare(QLatin1String("oid"), Qt::CaseInsensitive);
 }
 
 KDbEscapedString SqliteDriver::escapeString(const QString& str) const
