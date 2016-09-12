@@ -45,6 +45,8 @@ public:
     {
     }
     const std::vector<QString> statementTypeStrings;
+private:
+    Q_DISABLE_COPY(ParserStatic)
 };
 
 Q_GLOBAL_STATIC(ParserStatic, KDb_parserStatic)

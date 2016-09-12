@@ -40,6 +40,8 @@ protected:
     virtual KDbValidator::Result internalCheck(const QString &valueName, const QVariant& value,
                                                QString *message, QString *details);
     KDbDriver* m_drv;
+private:
+    Q_DISABLE_COPY(KDbObjectNameValidator)
 };
 
 #endif

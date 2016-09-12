@@ -337,7 +337,8 @@ private:
     QHash<int, KDbQuerySchema*> queries;
     QHash<QString, KDbQuerySchema*> queries_byname;
     bool takeTableEnabled; //!< used by takeTable() needed because otherwise 'tables' hash will
-    //!< be touched by takeTable() what's not allowed during qDeleteAll()
+                           //!< be touched by takeTable() what's not allowed during qDeleteAll()
+    Q_DISABLE_COPY(ConnectionPrivate)
 };
 
 //================================================

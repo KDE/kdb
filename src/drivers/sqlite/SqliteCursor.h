@@ -76,6 +76,7 @@ protected:
     SqliteCursorData * const d;
 
     friend class SqliteConnection;
+    Q_DISABLE_COPY(SqliteCursor)
 };
 
 #endif

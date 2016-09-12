@@ -33,6 +33,8 @@ class PostgresqlTransactionData : public KDbTransactionData
 public:
     explicit PostgresqlTransactionData(KDbConnection *conn);
     ~PostgresqlTransactionData();
+private:
+    Q_DISABLE_COPY(PostgresqlTransactionData)
 };
 
 class PostgresqlConnection : public KDbConnection
@@ -53,7 +55,7 @@ public:
     virtual KDbEscapedString escapeString(const QString& str) const;
     virtual KDbEscapedString escapeString(const QByteArray& str) const;
 
-protected:
+private:
     /*! Used by driver */
     PostgresqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
                          const KDbConnectionOptions &options);
@@ -95,6 +97,7 @@ protected:
     friend class PostgresqlCursorData;
     friend class PostgresqlTransactionData;
     friend class PostgresqlSqlResult;
+    Q_DISABLE_COPY(PostgresqlConnection)
 };
 
 #endif

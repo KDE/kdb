@@ -39,6 +39,8 @@ public:
 
     //! @return length limit
     virtual int length() = 0;
+private:
+    Q_DISABLE_COPY(KDbSqlField)
 };
 
 #endif

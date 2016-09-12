@@ -36,6 +36,8 @@ public:
     KDbTableSchema* table;
 
     KDbQuerySchema* query;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name)

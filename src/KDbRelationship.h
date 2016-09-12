@@ -155,6 +155,9 @@ protected:
     friend class KDbTableSchema;
     friend class KDbQuerySchema;
     friend class KDbIndexSchema;
+
+private:
+    Q_DISABLE_COPY(KDbRelationship)
 };
 
 #endif

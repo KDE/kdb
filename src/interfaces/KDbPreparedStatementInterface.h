@@ -51,6 +51,8 @@ protected:
 
     friend class KDbConnection;
     friend class KDbPreparedStatement;
+private:
+    Q_DISABLE_COPY(KDbPreparedStatementInterface)
 };
 
 #endif

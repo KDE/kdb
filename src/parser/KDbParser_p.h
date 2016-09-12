@@ -70,7 +70,7 @@ public:
 
     friend class KDbParser;
 
-protected:
+private:
     KDbParser::StatementType statementType;
     KDbTableSchema *table;
     KDbQuerySchema *query;
@@ -78,6 +78,7 @@ protected:
     KDbEscapedString sql;
     KDbParserError error;
     bool initialized;
+    Q_DISABLE_COPY(KDbParserPrivate)
 };
 
 /*! Info used on parsing. */
@@ -108,9 +109,10 @@ protected:
     //! Constructs parse info structure for query @a query.
     explicit KDbParseInfo(KDbQuerySchema *query);
 
-    Q_DISABLE_COPY(KDbParseInfo)
     class Private;
     Private * const d;
+private:
+    Q_DISABLE_COPY(KDbParseInfo)
 };
 
 class KDbParseInfo::Private
@@ -127,6 +129,8 @@ public:
     QString errorMessage, errorDescription; // helpers
 
     KDbQuerySchema *querySchema;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 /*! Internal info used on parsing (writable). */

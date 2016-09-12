@@ -60,7 +60,7 @@ public Q_SLOTS:
     void sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
     void cancelClicked();
 
-protected:
+private:
     QString m_filePath;
     QString m_tmpFilePath;
     QProcess *m_dumpProcess;
@@ -68,6 +68,7 @@ protected:
     QProgressDialog* m_dlg; // krazy:exclude=qclasses
     int m_percent;
     bool m_canceled;
+    Q_DISABLE_COPY(SqliteVacuum)
 };
 
 #endif

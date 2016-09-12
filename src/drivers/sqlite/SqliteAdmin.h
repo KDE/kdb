@@ -34,6 +34,8 @@ public:
     /*! Performs vacuum (compacting) for connection @a conn. */
     virtual bool vacuum(const KDbConnectionData& data, const QString& databaseName);
 #endif
+private:
+    Q_DISABLE_COPY(SqliteAdminTools)
 };
 
 #endif

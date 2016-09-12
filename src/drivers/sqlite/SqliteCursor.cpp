@@ -140,6 +140,7 @@ public:
         }
         return QVariant();
     }
+    Q_DISABLE_COPY(SqliteCursorData)
 };
 
 SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, int options)

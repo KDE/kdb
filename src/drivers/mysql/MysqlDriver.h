@@ -97,6 +97,7 @@ protected:
 private:
     static const char *keywords[];
     QString m_longTextPrimaryKeyType;
+    Q_DISABLE_COPY(MysqlDriver)
 };
 
 #endif

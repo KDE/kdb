@@ -44,6 +44,7 @@ public:
     {
     }
     KDbEscapedString collate;
+    Q_DISABLE_COPY(SqliteDriverPrivate)
 };
 
 SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)

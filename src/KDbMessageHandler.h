@@ -103,6 +103,8 @@ public:
 protected:
     KDbResult* m_result;
     QString m_prevMsgTitle;
+private:
+    Q_DISABLE_COPY(KDbMessageTitleSetter)
 };
 
 //! An abstract class used to specify GUI information such as button texts tooltips and icons.
@@ -120,6 +122,8 @@ public:
     inline bool hasProperty(const QByteArray& name) const { return contains(name); }
     inline QList<QByteArray> propertyNames() const { return keys(); }
     inline void clear() { QHash<QByteArray, QVariant>::clear(); }
+private:
+    Q_DISABLE_COPY(KDbGuiItem)
 };
 
 /*! A prototype for Message Handler usable
@@ -234,9 +238,10 @@ protected:
      Can be 0 for non-gui cases. */
     QWidget *parentWidget();
 
-    Q_DISABLE_COPY(KDbMessageHandler)
     class Private;
     Private * const d;
+private:
+    Q_DISABLE_COPY(KDbMessageHandler)
 };
 
 #endif

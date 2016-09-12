@@ -28,6 +28,8 @@ public:
     const KDbResult *result;
     KDbResultable *resultable;
     KDbMessageHandler *handler;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbMessageGuard::KDbMessageGuard(KDbResultable *resultable)
@@ -94,6 +96,8 @@ public:
     QPointer<QWidget> messageHandlerParentWidget;
     KDbMessageHandler *messageRedirection;
     bool enableMessages;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 //------------------------------------------------

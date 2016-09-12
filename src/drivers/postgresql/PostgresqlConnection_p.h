@@ -61,6 +61,8 @@ public:
     PGconn *conn;
     bool unicode;
     QByteArray escapingBuffer;
+private:
+    Q_DISABLE_COPY(PostgresqlConnectionInternal)
 };
 
 //! Internal PostgreSQL cursor data.
@@ -73,6 +75,8 @@ public:
 
     PGresult* res;
     ExecStatusType resultStatus;
+private:
+    Q_DISABLE_COPY(PostgresqlCursorData)
 };
 
 class PostgresqlSqlField : public KDbSqlField
@@ -93,6 +97,8 @@ public:
     }
     const PGresult * const result;
     const int number;
+private:
+    Q_DISABLE_COPY(PostgresqlSqlField)
 };
 
 class PostgresqlSqlRecord : public KDbSqlRecord
@@ -121,9 +127,10 @@ public:
                              PQgetlength(result, record, index));
     }
 
-protected:
+private:
     const PGresult * const result;
     const int record;
+    Q_DISABLE_COPY(PostgresqlSqlRecord)
 };
 
 class PostgresqlSqlResult : public KDbSqlResult
@@ -180,7 +187,7 @@ public:
         return oid == 0 ? std::numeric_limits<quint64>::max() : static_cast<quint64>(oid);
     }
 
-protected:
+private:
     //! @return a KDb type for PostgreSQL type
     //! @todo prompt user if necessary?
     KDbField::Type type(const QString& tableName, PostgresqlSqlField *field);
@@ -190,6 +197,7 @@ protected:
     ExecStatusType resultStatus;
     int recordToFetch;
     int recordsCount;
+    Q_DISABLE_COPY(PostgresqlSqlResult)
 };
 
 #endif

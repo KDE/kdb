@@ -21,6 +21,7 @@
 #define KDB_SQLRECORD_H
 
 #include "kdb_export.h"
+#include <QtGlobal>
 
 class QByteArray;
 class QString;
@@ -43,6 +44,8 @@ public:
     virtual QByteArray toByteArray(int index) = 0;
 
     virtual KDbSqlString cstringValue(int index) = 0;
+private:
+    Q_DISABLE_COPY(KDbSqlRecord)
 };
 
 #endif

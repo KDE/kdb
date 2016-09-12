@@ -80,6 +80,8 @@ public:
     //! See https://dev.mysql.com/doc/refman/5.7/en/mysql-get-server-version.html
     //! @todo store in Connection base class as a property or as public server info
     unsigned long serverVersion;
+private:
+    Q_DISABLE_COPY(MysqlConnectionInternal)
 };
 
 //! Internal MySQL cursor data.
@@ -94,6 +96,8 @@ public:
     MYSQL_ROW mysqlrow;
     unsigned long *lengths;
     qint64 numRows;
+private:
+    Q_DISABLE_COPY(MysqlCursorData)
 };
 
 class MysqlSqlField : public KDbSqlField
@@ -113,6 +117,8 @@ public:
         return data->length;
     }
     MYSQL_FIELD *data;
+private:
+    Q_DISABLE_COPY(MysqlSqlField)
 };
 
 class MysqlSqlRecord : public KDbSqlRecord
@@ -132,9 +138,10 @@ public:
         return QByteArray(record[index], lengths[index]);
     }
 
-protected:
+private:
     MYSQL_ROW record;
     unsigned long* lengths;
+    Q_DISABLE_COPY(MysqlSqlRecord)
 };
 
 class MysqlSqlResult : public KDbSqlResult
@@ -196,7 +203,7 @@ public:
         return static_cast<quint64>(mysql_insert_id(conn->d->mysql));
     }
 
-protected:
+private:
     //! @return a KDb type for MySQL type
     //! @todo prompt user if necessary?
     KDbField::Type type(const QString& tableName, MysqlSqlField *field);
@@ -214,6 +221,7 @@ protected:
     MysqlConnection * const conn;
     MYSQL_RES * const data;
     MYSQL_FIELD *fields;
+    Q_DISABLE_COPY(MysqlSqlResult)
 };
 
 #endif

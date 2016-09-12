@@ -33,7 +33,7 @@ public:
 
     virtual ~MysqlPreparedStatement();
 
-protected:
+private:
     virtual bool prepare(const KDbEscapedString& sql);
 
     virtual KDbSqlResult* execute(
@@ -53,6 +53,7 @@ protected:
 #endif
     KDbEscapedString m_tempStatementString;
     bool m_resetRequired;
+    Q_DISABLE_COPY(MysqlPreparedStatement)
 };
 
 #endif

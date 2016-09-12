@@ -38,6 +38,8 @@ public:
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters);
+private:
+    Q_DISABLE_COPY(PostgresqlPreparedStatement)
 };
 
 #endif

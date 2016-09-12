@@ -39,6 +39,8 @@ public:
     QStringList mimeTypes;
     bool fileBased;
     bool importingEnabled;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 // ---

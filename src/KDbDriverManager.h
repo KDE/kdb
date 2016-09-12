@@ -79,6 +79,9 @@ public:
 
     /*! @return true if there is at least one server-based database driver installed. */
     bool hasDatabaseServerDrivers();
+
+private:
+    Q_DISABLE_COPY(KDbDriverManager)
 };
 
 #endif

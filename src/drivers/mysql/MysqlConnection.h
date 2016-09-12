@@ -73,6 +73,8 @@ protected:
     friend class MysqlDriver;
     friend class MysqlCursorData;
     friend class MysqlSqlResult;
+private:
+    Q_DISABLE_COPY(MysqlConnection)
 };
 
 #endif

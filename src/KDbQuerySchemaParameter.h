@@ -45,7 +45,8 @@ public:
     //! @return previous value
     QVariant getPreviousValue();
 
-protected:
+private:
+    Q_DISABLE_COPY(KDbQuerySchemaParameterValueListIterator)
     class Private;
     Private * const d;
 };

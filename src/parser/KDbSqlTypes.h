@@ -92,6 +92,8 @@ public:
     }
 //private:
     KDbExpression *e;
+private:
+    Q_DISABLE_COPY(KDbExpressionPtr)
 };
 
 QDebug operator<<(QDebug dbg, const KDbExpressionPtr& expr);

@@ -51,6 +51,7 @@ public:
 private:
     void storeResult();
     MysqlCursorData * const d;
+    Q_DISABLE_COPY(MysqlCursor)
 };
 
 #endif

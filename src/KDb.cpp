@@ -72,6 +72,8 @@ protected:
     ConnectionTestDialog* m_dlg;
     KDbConnectionData m_connData;
     KDbDriver *m_driver;
+private:
+    Q_DISABLE_COPY(ConnectionTestThread)
 };
 
 class ConnectionTestDialog : public QProgressDialog // krazy:exclude=qclasses
@@ -101,6 +103,9 @@ protected:
     QString m_msg;
     QString m_details;
     bool m_stopWaiting;
+
+private:
+    Q_DISABLE_COPY(ConnectionTestDialog)
 };
 
 ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const KDbConnectionData& connData)

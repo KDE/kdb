@@ -58,6 +58,8 @@ protected Q_SLOTS:
     void slotAppQuits();
 
 private:
+    Q_DISABLE_COPY(DriverManagerInternal)
+
     bool lookupDrivers();
 
     void clear();

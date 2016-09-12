@@ -46,6 +46,8 @@ public:
     KComponentData componentData;
     KDbConnectionData connData;
     QPointer<KDbConnection> conn;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 //-----------------------------------------

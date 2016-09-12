@@ -119,6 +119,8 @@ protected:
     KDbField::Type defaultReturnType;
     int copyReturnTypeFromArg;
     friend class BuiltInFunctions;
+private:
+    Q_DISABLE_COPY(BuiltInFunctionDeclaration)
 };
 
 //! Declaration of a single built-in function COALESCE() and similar ones.
@@ -149,6 +151,8 @@ public:
         }
         return t;
     }
+private:
+    Q_DISABLE_COPY(CoalesceFunctionDeclaration)
 };
 
 //! Declaration of a single built-in function MIN(), MAX() and similar ones.
@@ -256,6 +260,7 @@ private:
         }
         return KDbField::InvalidType;
     }
+    Q_DISABLE_COPY(MinMaxFunctionDeclaration)
 };
 
 //! Declaration of a single built-in function RANDOM() and RANDOM(X,Y).
@@ -321,6 +326,8 @@ public:
         }
         return KDbField::InvalidType;
     }
+private:
+    Q_DISABLE_COPY(RandomFunctionDeclaration)
 };
 
 //! Declaration of a single built-in function CEILING(X) and FLOOR(X).
@@ -357,6 +364,8 @@ public:
         }
         return KDbField::InvalidType;
     }
+private:
+    Q_DISABLE_COPY(CeilingFloorFunctionDeclaration)
 };
 
 //! A map of built-in SQL functions
@@ -380,6 +389,7 @@ public:
     static int multipleArgs[];
 private:
     QHash<QString, BuiltInFunctionDeclaration*> m_aliases;
+    Q_DISABLE_COPY(BuiltInFunctions)
 };
 
 int BuiltInFunctions::multipleArgs[] = { 0 };

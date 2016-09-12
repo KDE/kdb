@@ -58,6 +58,7 @@ private:
     QVector<int> m_realLengths;
 
     PostgresqlCursorData * const d;
+    Q_DISABLE_COPY(PostgresqlCursor)
 };
 
 #endif

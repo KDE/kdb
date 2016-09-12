@@ -112,6 +112,7 @@ protected:
 
 private:
     static const char * const keywords[];
+    Q_DISABLE_COPY(SqliteDriver)
 };
 
 #endif

@@ -827,6 +827,8 @@ public:
         /*! i18n-ed string that can be displayed for user to inform about
          e.g. conflicting listeners. */
         QString listenerInfoString;
+    private:
+        Q_DISABLE_COPY(TableSchemaChangeListenerInterface)
     };
     //! @todo will be more generic
     /** Register @a listener for receiving (listening) information about changes

@@ -64,6 +64,7 @@ private:
     qint64 m_base;
     qint64 m_min;
     qint64 m_max;
+    Q_DISABLE_COPY(KDbLongLongValidator)
 };
 
 #endif

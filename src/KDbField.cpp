@@ -42,6 +42,8 @@ public:
     FieldTypeNames();
     QHash<QString, KDbField::Type> str2num;
     QStringList names;
+private:
+    Q_DISABLE_COPY(FieldTypeNames)
 };
 
 //! @internal Used in m_typeGroupNames member to handle translated type group names
@@ -51,6 +53,8 @@ public:
     FieldTypeGroupNames();
     QHash<QString, KDbField::TypeGroup> str2num;
     QStringList names;
+private:
+    Q_DISABLE_COPY(FieldTypeGroupNames)
 };
 
 //! real translated type names (and nontranslated type name strings)

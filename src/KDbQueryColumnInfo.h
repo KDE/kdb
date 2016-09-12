@@ -78,6 +78,8 @@ private:
 
     //! Non-0 if this column is a visible column for @a m_foreignColumn
     KDbQueryColumnInfo *m_foreignColumn;
+
+    Q_DISABLE_COPY(KDbQueryColumnInfo)
 };
 
 //! Sends information about column info @a info to debug output @a dbg.

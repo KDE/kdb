@@ -132,6 +132,9 @@ protected:
     DBMap::Iterator *m_dbBufferIt;
     QMap<KDbQueryColumnInfo*, bool> *m_defaultValuesDbBuffer;
     QMap<KDbQueryColumnInfo*, bool>::ConstIterator *m_defaultValuesDbBufferIt;
+
+private:
+    Q_DISABLE_COPY(KDbRecordEditBuffer)
 };
 
 //! Sends information about object @a buffer to debug output @a dbg.

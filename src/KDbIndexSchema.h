@@ -194,6 +194,8 @@ protected:
     friend class KDbTableSchema;
     friend class KDbQuerySchema;
     friend class KDbRelationship;
+private:
+    Q_DISABLE_COPY(KDbIndexSchema)
 };
 
 //! Sends information about index schema @a index to debug output @a dbg.

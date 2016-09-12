@@ -146,6 +146,7 @@ private:
 
     static const char *m_keywords[];
     QMap<int, KDbField::Type> m_pgsqlToKDbTypes;
+    Q_DISABLE_COPY(PostgresqlDriver)
 };
 
 #endif // KDB_DRIVER_POSTGRESQLDRIVER_H

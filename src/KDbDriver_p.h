@@ -201,6 +201,9 @@ public:
     /*! "RANDOM()" function name, used in Driver::randomFunctionToString() to construct native
      expressions. */
     QString RANDOM_FUNCTION;
+
+private:
+    Q_DISABLE_COPY(KDbDriverBehaviour)
 };
 
 /*! Private driver's data members. Available for implementation. */
@@ -264,6 +267,8 @@ protected:
     void initInternalProperties();
 
     friend class KDbDriver;
+private:
+    Q_DISABLE_COPY(DriverPrivate)
 };
 
 //! Escaping types for KDbDriver::escapeBLOBInternal()

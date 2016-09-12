@@ -66,6 +66,8 @@ public:
     const QList<QVariant> params;
     QList<QVariant>::ConstIterator paramsIt;
     int paramsItPosition;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbQuerySchemaParameterValueListIterator::KDbQuerySchemaParameterValueListIterator(

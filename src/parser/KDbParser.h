@@ -183,11 +183,12 @@ public:
      */
     KDbEscapedString statement() const;
 
-protected:
+private:
     void init();
 
     friend class KDbParserPrivate;
     KDbParserPrivate * const d; //!< @internal d-pointer class.
+    Q_DISABLE_COPY(KDbParser)
 };
 
 //! Sends information about parser error @a error to debug output @a dbg.

@@ -97,6 +97,9 @@ protected:
     KDbField* m_field; //!< Used only in case when the second contructor is used.
 
     bool m_ascending; //!< true if ascending sorting should be performed (the default).
+
+private:
+    Q_DISABLE_COPY(KDbOrderByColumn)
 };
 
 //! @short KDbOrderByColumnList provides list of sorted columns for a query schema
@@ -190,6 +193,8 @@ public:
     KDbEscapedString toSQLString(bool includeTableNames = true,
                                  KDbConnection *conn = 0,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
+private:
+    Q_DISABLE_COPY(KDbOrderByColumnList)
 };
 
 //! @short KDbQuerySchema provides information about database query

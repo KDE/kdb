@@ -75,6 +75,8 @@ public:
      to reference just inserted record. If there was no insertion recently performed for
      the result, std::numeric_limits<quint64>::max() is returned. */
     virtual quint64 lastInsertRecordId() { return std::numeric_limits<quint64>::max(); }
+private:
+    Q_DISABLE_COPY(KDbSqlResult)
 };
 
 #endif

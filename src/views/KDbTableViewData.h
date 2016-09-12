@@ -349,6 +349,7 @@ private:
 
     friend class KDbTableViewColumn;
 
+    Q_DISABLE_COPY(KDbTableViewData)
     class Private;
     Private * const d;
 };

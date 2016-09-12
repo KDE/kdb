@@ -37,6 +37,8 @@ public:
     }
     bool connectionIsOwned;
     KDbConnection *connection;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbConnectionProxy::KDbConnectionProxy(KDbConnection *parentConnection)

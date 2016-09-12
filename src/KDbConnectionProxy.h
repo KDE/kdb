@@ -408,6 +408,7 @@ public:
     bool storeMainFieldSchema(KDbField *field);
 
 private:
+    Q_DISABLE_COPY(KDbConnectionProxy)
     class Private;
     Private * const d;
 };

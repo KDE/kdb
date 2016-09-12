@@ -99,9 +99,11 @@ public:
     KDbConnection* connection() const;
 
 protected:
-    Q_DISABLE_COPY(KDbTableOrQuerySchema)
     class Private;
     Private * const d;
+
+private:
+    Q_DISABLE_COPY(KDbTableOrQuerySchema)
 };
 
 namespace KDb {

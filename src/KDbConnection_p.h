@@ -21,6 +21,7 @@
 #define KDB_CONNECTION_P_H
 
 #include "kdb_export.h"
+#include <QtGlobal>
 
 class KDbConnection;
 
@@ -30,6 +31,8 @@ class KDB_EXPORT KDbConnectionInternal
 public:
     explicit KDbConnectionInternal(KDbConnection *conn);
     KDbConnection* const connection;
+private:
+    Q_DISABLE_COPY(KDbConnectionInternal)
 };
 
 #endif

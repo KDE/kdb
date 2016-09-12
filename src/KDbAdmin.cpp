@@ -26,6 +26,8 @@ class KDbAdminTools::Private
 public:
     Private() {}
     ~Private() {}
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbAdminTools::KDbAdminTools()

@@ -43,7 +43,8 @@ public:
      (then you can get error status from the KDbAdminTools object). */
     virtual bool vacuum(const KDbConnectionData& data, const QString& databaseName);
 
-protected:
+private:
+    Q_DISABLE_COPY(KDbAdminTools)
     class Private;
     Private * const d;
 };

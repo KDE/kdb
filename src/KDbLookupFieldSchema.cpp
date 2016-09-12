@@ -83,6 +83,8 @@ public:
     }
     const std::vector<QString> typeNames;
     QHash<QString, KDbLookupFieldSchema::RecordSource::Type> typesForNames;
+private:
+    Q_DISABLE_COPY(LookupFieldSchemaStatic)
 };
 
 Q_GLOBAL_STATIC(LookupFieldSchemaStatic, KDb_lookupFieldSchemaStatic)

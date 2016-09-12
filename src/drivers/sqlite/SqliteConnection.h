@@ -115,6 +115,7 @@ private:
     friend class SqliteDriver;
     friend class SqliteCursor;
     friend class SqliteSqlResult;
+    Q_DISABLE_COPY(SqliteConnection)
 };
 
 #endif

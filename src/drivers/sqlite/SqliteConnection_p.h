@@ -51,6 +51,7 @@ public:
 
 private:
     bool m_extensionsLoadingEnabled;
+    Q_DISABLE_COPY(SqliteConnectionInternal)
 };
 
 class SqliteSqlField : public KDbSqlField
@@ -71,9 +72,10 @@ public:
     inline int length() Q_DECL_OVERRIDE {
         return std::numeric_limits<quint64>::max();
     }
-protected:
+private:
     sqlite3_stmt * const prepared_st;
     const int index;
+    Q_DISABLE_COPY(SqliteSqlField)
 };
 
 class SqliteSqlRecord : public KDbSqlRecord
@@ -101,8 +103,9 @@ public:
                           sqlite3_column_bytes(prepared_st, index));
     }
 
-protected:
+private:
     sqlite3_stmt * const prepared_st;
+    Q_DISABLE_COPY(SqliteSqlRecord)
 };
 
 //! Used by SqliteSqlResult::cacheFieldInfo(const QString&)
@@ -190,10 +193,12 @@ protected:
     //! @todo Default values are only encoded as string
     bool cacheFieldInfo(const QString &tableName);
 
+private:
     SqliteConnection * const conn;
     sqlite3_stmt * const prepared_st;
     KDbUtils::AutodeletedHash<QString, SqliteSqlFieldInfo*> cachedFieldInfos;
     friend class SqlitePreparedStatement;
+    Q_DISABLE_COPY(SqliteSqlResult)
 };
 
 #endif

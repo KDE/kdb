@@ -43,6 +43,8 @@ public:
     KDbConnection *m_conn;
     bool m_active;
     int refcount;
+private:
+    Q_DISABLE_COPY(KDbTransactionData)
 };
 
 //! This class encapsulates KDbTransaction handle.
@@ -148,6 +150,9 @@ public:
 protected:
     KDbTransaction m_trans;
     bool m_doNothing;
+
+private:
+    Q_DISABLE_COPY(KDbTransactionGuard)
 };
 
 #endif

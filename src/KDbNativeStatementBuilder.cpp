@@ -43,6 +43,8 @@ public:
     KDbConnection *connection;
 
     inline KDbDriver *driver() { return connection ? connection->driver() : nullptr; }
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 //================================================

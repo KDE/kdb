@@ -26,6 +26,8 @@ class KDbIdentifierValidator::Private
 public:
     Private() : isLowerCaseForced(false) {}
     bool isLowerCaseForced;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 KDbIdentifierValidator::KDbIdentifierValidator(QObject * parent)

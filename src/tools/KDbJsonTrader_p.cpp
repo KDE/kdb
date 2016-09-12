@@ -41,6 +41,8 @@ public:
     }
     bool pluginPathFound;
     QStringList pluginPaths;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
 // ---

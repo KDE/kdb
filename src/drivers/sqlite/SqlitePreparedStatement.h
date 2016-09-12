@@ -45,6 +45,8 @@ protected:
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 
     QScopedPointer<SqliteSqlResult> m_sqlResult;
+private:
+    Q_DISABLE_COPY(SqlitePreparedStatement)
 };
 
 #endif

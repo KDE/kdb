@@ -374,6 +374,8 @@ protected:
 
     KDbDriverBehaviour *beh;
     DriverPrivate * const d;
+private:
+    Q_DISABLE_COPY(KDbDriver)
 };
 
 namespace KDb {

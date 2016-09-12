@@ -335,6 +335,7 @@ protected:
     QList<QVariant>* m_queryParameters;
 
 private:
+    Q_DISABLE_COPY(KDbCursor)
 
     bool m_readAhead;
 
