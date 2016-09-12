@@ -158,7 +158,6 @@ public:
     class KDB_EXPORT ActionBase
     {
     public:
-        explicit ActionBase(bool null = false);
         virtual ~ActionBase();
 
         ChangeFieldPropertyAction& toChangeFieldPropertyAction();
@@ -194,6 +193,9 @@ public:
         void debug(const DebugOptions& debugOptions = DebugOptions());
 
     protected:
+        //! @internal, used for constructing null action
+        explicit ActionBase(bool null);
+
         //! Sets requirements for altering; used internally by KDbAlterTableHandler object
         inline void setAlteringRequirements(int alteringRequirements) {
             m_alteringRequirements = alteringRequirements;
@@ -208,7 +210,7 @@ public:
         /*! Simplifies @a fieldActions dictionary. If this action has to be inserted
          Into the dictionary, an ActionDict is created first and then a copy of this action
          is inserted into it. */
-        inline virtual void simplifyActions(ActionDictDict &fieldActions) {
+        inline virtual void simplifyActions(ActionDictDict *fieldActions) {
             Q_UNUSED(fieldActions);
         }
 
@@ -216,7 +218,7 @@ public:
          shouldBeRemoved() is called for them as an additional step.
          This is used for ChangeFieldPropertyAction items so actions
          that do not change property values are removed. */
-        inline virtual bool shouldBeRemoved(ActionDictDict &fieldActions) {
+        inline virtual bool shouldBeRemoved(ActionDictDict *fieldActions) {
             Q_UNUSED(fieldActions); return false;
         }
 
@@ -237,7 +239,7 @@ public:
         //! @internal used for "simplify" algorithm
         int m_order;
 
-        bool m_null;
+        const bool m_null;
 
         friend class KDbAlterTableHandler;
     };
@@ -247,7 +249,6 @@ public:
     {
     public:
         FieldActionBase(const QString& fieldName, int uid);
-        explicit FieldActionBase(bool);
         virtual ~FieldActionBase();
 
         //! @return field name for this action
@@ -274,6 +275,8 @@ public:
         }
 
     protected:
+        //! @internal, used for constructing null action
+        explicit FieldActionBase(bool null);
 
         //! field's unique identifier, @see uid()
         int m_fieldUID;
@@ -294,8 +297,10 @@ public:
     public:
         ChangeFieldPropertyAction(const QString& fieldName,
                                   const QString& propertyName, const QVariant& newValue, int uid);
-        //! @internal, used for constructing null action
-        ChangeFieldPropertyAction(bool null);
+
+        //! Creates null action
+        ChangeFieldPropertyAction();
+
         virtual ~ChangeFieldPropertyAction();
 
         inline QString propertyName() const {
@@ -306,14 +311,17 @@ public:
         }
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
 
-        virtual void simplifyActions(ActionDictDict &fieldActions);
+        virtual void simplifyActions(ActionDictDict *fieldActions);
 
-        virtual bool shouldBeRemoved(ActionDictDict &fieldActions);
+        virtual bool shouldBeRemoved(ActionDictDict *fieldActions);
 
         virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
                                            QHash<QString, QString>* fieldHash);
 
     protected:
+        //! @internal, used for constructing null action
+        explicit ChangeFieldPropertyAction(bool null);
+
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
@@ -328,17 +336,20 @@ public:
     {
     public:
         RemoveFieldAction(const QString& fieldName, int uid);
-        RemoveFieldAction(bool);
+
         virtual ~RemoveFieldAction();
 
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
 
-        virtual void simplifyActions(ActionDictDict &fieldActions);
+        virtual void simplifyActions(ActionDictDict *fieldActions);
 
         virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
                                            QHash<QString, QString>* fieldHash);
 
     protected:
+        //! @internal, used for constructing null action
+        explicit RemoveFieldAction(bool null);
+
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
@@ -350,9 +361,13 @@ public:
     {
     public:
         InsertFieldAction(int fieldIndex, KDbField *newField, int uid);
-        //copy ctor
+
+        //! copy ctor
         InsertFieldAction(const InsertFieldAction& action);
-        explicit InsertFieldAction(bool);
+
+        //! Creates null action
+        InsertFieldAction();
+
         virtual ~InsertFieldAction();
 
         inline int index() const {
@@ -367,12 +382,15 @@ public:
         void setField(KDbField* field);
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
 
-        virtual void simplifyActions(ActionDictDict &fieldActions);
+        virtual void simplifyActions(ActionDictDict *fieldActions);
 
         virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
                                            QHash<QString, QString>* fieldHash);
 
     protected:
+        //! @internal, used for constructing null action
+        explicit InsertFieldAction(bool null);
+
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
@@ -390,7 +408,7 @@ public:
     {
     public:
         MoveFieldPositionAction(int fieldIndex, const QString& fieldName, int uid);
-        explicit MoveFieldPositionAction(bool);
+
         virtual ~MoveFieldPositionAction();
 
         inline int index() const {
@@ -398,9 +416,12 @@ public:
         }
         virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
 
-        virtual void simplifyActions(ActionDictDict &fieldActions);
+        virtual void simplifyActions(ActionDictDict *fieldActions);
 
     protected:
+        //! @internal, used for constructing null action
+        explicit MoveFieldPositionAction(bool null);
+
         virtual void updateAlteringRequirements();
 
         //! Performs physical execution of this action.
@@ -455,6 +476,8 @@ public:
         /*! Set to true if requirements should be computed
          and the execute() method should return afterwards. */
         bool onlyComputeRequirements;
+    private:
+        Q_DISABLE_COPY(ExecutionArguments)
     };
 
     /*! Performs table alteration using predefined actions for table named @a tableName,
@@ -493,7 +516,8 @@ public:
      (e.g. caption or extended properties like visibleDecimalPlaces. */
     static int alteringTypeForProperty(const QByteArray& propertyName);
 
-protected:
+private:
+    Q_DISABLE_COPY(KDbAlterTableHandler)
     class Private;
     Private * const d;
 };

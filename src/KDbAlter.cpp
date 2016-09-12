@@ -37,13 +37,23 @@ public:
     ActionList actions;
 //! @todo IMPORTANT: replace QPointer<KDbConnection> conn;
     KDbConnection* conn;
+private:
+    Q_DISABLE_COPY(Private)
 };
 
-//! a global instance used to when returning null is needed
-KDbAlterTableHandler::ChangeFieldPropertyAction nullChangeFieldPropertyAction(true);
-KDbAlterTableHandler::RemoveFieldAction nullRemoveFieldAction(true);
-KDbAlterTableHandler::InsertFieldAction nullInsertFieldAction(true);
-KDbAlterTableHandler::MoveFieldPositionAction nullMoveFieldPositionAction(true);
+//! Define a global instance used to when returning null is needed
+#define DEFINE_NULL_OBJECT(name) \
+class Null ## name : public KDbAlterTableHandler::name \
+{ \
+    public: \
+        Null ## name() : KDbAlterTableHandler::name(true) {} \
+}; \
+Null ## name null ## name
+
+DEFINE_NULL_OBJECT(ChangeFieldPropertyAction);
+DEFINE_NULL_OBJECT(RemoveFieldAction);
+DEFINE_NULL_OBJECT(InsertFieldAction);
+DEFINE_NULL_OBJECT(MoveFieldPositionAction);
 
 //--------------------------------------------------------
 
@@ -95,7 +105,7 @@ void KDbAlterTableHandler::ActionBase::debug(const DebugOptions& debugOptions)
 //--------------------------------------------------------
 
 KDbAlterTableHandler::FieldActionBase::FieldActionBase(const QString& fieldName, int uid)
-        : ActionBase()
+        : ActionBase(false)
         , m_fieldUID(uid)
         , m_fieldName(fieldName)
 {
@@ -189,8 +199,13 @@ KDbAlterTableHandler::ChangeFieldPropertyAction::ChangeFieldPropertyAction(
 {
 }
 
-KDbAlterTableHandler::ChangeFieldPropertyAction::ChangeFieldPropertyAction(bool)
-        : FieldActionBase(true)
+KDbAlterTableHandler::ChangeFieldPropertyAction::ChangeFieldPropertyAction()
+    : ChangeFieldPropertyAction(true)
+{
+}
+
+KDbAlterTableHandler::ChangeFieldPropertyAction::ChangeFieldPropertyAction(bool null)
+        : FieldActionBase(null)
 {
 }
 
@@ -214,10 +229,10 @@ QString KDbAlterTableHandler::ChangeFieldPropertyAction::debugString(const Debug
 }
 
 static KDbAlterTableHandler::ActionDict* createActionDict(
-    KDbAlterTableHandler::ActionDictDict &fieldActions, int forFieldUID)
+    KDbAlterTableHandler::ActionDictDict *fieldActions, int forFieldUID)
 {
     KDbAlterTableHandler::ActionDict* dict = new KDbAlterTableHandler::ActionDict();
-    fieldActions.insert(forFieldUID, dict);
+    fieldActions->insert(forFieldUID, dict);
     return dict;
 }
 
@@ -307,9 +322,9 @@ static void debugFieldActions(const KDbAlterTableHandler::ActionDictDict &fieldA
     =>
     do not add [change property in field A] because it will be removed anyway or the property will change
 */
-void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDict &fieldActions)
+void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDictDict *fieldActions)
 {
-    ActionDict *actionsLikeThis = fieldActions.value(uid());
+    ActionDict *actionsLikeThis = fieldActions->value(uid());
     if (m_propertyName == QLatin1String("name")) {
         // Case 1. special: name1 -> name2, i.e. rename action
         QByteArray newName(newValue().toString().toLatin1());
@@ -325,7 +340,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
                   // (m_order is the same as in newAction)
                   // replace prev. rename action (if any)
                   actionsLikeThis->remove( "name" );
-                  ActionDict *adict = fieldActions[ fieldName().toLatin1() ];
+                  ActionDict *adict = (*fieldActions)[ fieldName().toLatin1() ];
                   if (!adict)
                     adict = createActionDict( fieldActions, fieldName() );
                   adict->insert(m_propertyName.toLatin1(), newRenameAction);*/
@@ -365,7 +380,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
     // so, e.g. [ setCaption(A, "captionA"), setCaption(A, "captionB") ]
     //  becomes: [ setCaption(A, "captionB") ]
     // because adding this action does nothing
-    ActionDict *nextActionsLikeThis = fieldActions.value(uid());
+    ActionDict *nextActionsLikeThis = fieldActions->value(uid());
     if (!nextActionsLikeThis || !nextActionsLikeThis->value(m_propertyName.toLatin1())) {
         //no such action, add this
         KDbAlterTableHandler::ChangeFieldPropertyAction* newAction
@@ -376,7 +391,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
     }
 }
 
-bool KDbAlterTableHandler::ChangeFieldPropertyAction::shouldBeRemoved(ActionDictDict &fieldActions)
+bool KDbAlterTableHandler::ChangeFieldPropertyAction::shouldBeRemoved(ActionDictDict *fieldActions)
 {
     Q_UNUSED(fieldActions);
     return 0 == fieldName().compare(m_newValue.toString(), Qt::CaseInsensitive);
@@ -471,8 +486,8 @@ KDbAlterTableHandler::RemoveFieldAction::RemoveFieldAction(const QString& fieldN
 {
 }
 
-KDbAlterTableHandler::RemoveFieldAction::RemoveFieldAction(bool)
-        : FieldActionBase(true)
+KDbAlterTableHandler::RemoveFieldAction::RemoveFieldAction(bool null)
+        : FieldActionBase(null)
 {
 }
 
@@ -503,12 +518,12 @@ QString KDbAlterTableHandler::RemoveFieldAction::debugString(const DebugOptions&
   (except for [remove A], [insert A])
  General Case: it's safe to always insert a [remove A] action.
 */
-void KDbAlterTableHandler::RemoveFieldAction::simplifyActions(ActionDictDict &fieldActions)
+void KDbAlterTableHandler::RemoveFieldAction::simplifyActions(ActionDictDict *fieldActions)
 {
     //! @todo not checked
     KDbAlterTableHandler::RemoveFieldAction* newAction
         = new KDbAlterTableHandler::RemoveFieldAction(*this);
-    ActionDict *actionsLikeThis = fieldActions.value(uid());
+    ActionDict *actionsLikeThis = fieldActions->value(uid());
     if (!actionsLikeThis)
         actionsLikeThis = createActionDict(fieldActions, uid());
     actionsLikeThis->insert(":remove:", newAction);   //special
@@ -548,8 +563,13 @@ KDbAlterTableHandler::InsertFieldAction::InsertFieldAction(const InsertFieldActi
     m_field = new KDbField(*action.field());
 }
 
-KDbAlterTableHandler::InsertFieldAction::InsertFieldAction(bool)
-        : FieldActionBase(true)
+KDbAlterTableHandler::InsertFieldAction::InsertFieldAction()
+        : InsertFieldAction(true)
+{
+}
+
+KDbAlterTableHandler::InsertFieldAction::InsertFieldAction(bool null)
+        : FieldActionBase(null)
         , m_index(0)
         , m_field(0)
 {
@@ -601,10 +621,10 @@ QString KDbAlterTableHandler::InsertFieldAction::debugString(const DebugOptions&
  Comment: we need to do this reduction because otherwise we'd need to do psyhical altering
   right after [Insert A] if [rename A to B] follows.
 */
-void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &fieldActions)
+void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict *fieldActions)
 {
     // Try to find actions related to this action
-    ActionDict *actionsForThisField = fieldActions.value(uid());
+    ActionDict *actionsForThisField = fieldActions->value(uid());
 
     ActionBase *removeActionForThisField = actionsForThisField ? actionsForThisField->value(":remove:") : 0;
     if (removeActionForThisField) {
@@ -637,8 +657,8 @@ void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict &fi
         actionsForThisField->setAutoDelete(false);
         delete actionsForThisField;
         actionsForThisField = newActionsForThisField;
-        fieldActions.take(uid());
-        fieldActions.insert(uid(), actionsForThisField);
+        fieldActions->take(uid());
+        fieldActions->insert(uid(), actionsForThisField);
         if (!values.isEmpty()) {
             //update field, so it will be created as one step
             KDbField *f = new KDbField(*field());
@@ -697,8 +717,8 @@ KDbAlterTableHandler::MoveFieldPositionAction::MoveFieldPositionAction(
 {
 }
 
-KDbAlterTableHandler::MoveFieldPositionAction::MoveFieldPositionAction(bool)
-        : FieldActionBase(true)
+KDbAlterTableHandler::MoveFieldPositionAction::MoveFieldPositionAction(bool null)
+        : FieldActionBase(null)
         , m_index(-1)
 {
 }
@@ -723,7 +743,7 @@ QString KDbAlterTableHandler::MoveFieldPositionAction::debugString(const DebugOp
     return s;
 }
 
-void KDbAlterTableHandler::MoveFieldPositionAction::simplifyActions(ActionDictDict &fieldActions)
+void KDbAlterTableHandler::MoveFieldPositionAction::simplifyActions(ActionDictDict *fieldActions)
 {
     Q_UNUSED(fieldActions);
     //! @todo
@@ -856,7 +876,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     ActionDictDict fieldActions;
     ActionBase* action;
     for (int i = d->actions.count() - 1; i >= 0; i--) {
-        d->actions[i]->simplifyActions(fieldActions);
+        d->actions[i]->simplifyActions(&fieldActions);
     }
 
     if (!args->debugString)
@@ -873,7 +893,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         for (KDbAlterTableHandler::ActionDictConstIterator it2(it.value()->constBegin());
              it2 != it.value()->constEnd(); ++it2, currentActionsCount++)
         {
-            if (it2.value()->shouldBeRemoved(fieldActions))
+            if (it2.value()->shouldBeRemoved(&fieldActions))
                 continue;
             actionsVector[ it2.value()->m_order ] = it2.value();
             // a sum of requirements...
