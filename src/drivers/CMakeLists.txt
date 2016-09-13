@@ -21,7 +21,7 @@ macro(build_and_install_kdb_driver _name _srcs _extra_libs)
     )
     # Needed for examples and autotests:
     set_target_properties(${_target}
-                          PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/plugins/kdb")
+                          PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/plugins/${KDB_BASE_NAME_LOWER}")
     install(TARGETS ${_target} DESTINATION ${KDB_PLUGIN_INSTALL_DIR})
 endmacro()
 # -----------------------
