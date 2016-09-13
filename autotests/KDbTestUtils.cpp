@@ -176,11 +176,11 @@ void KDbTestUtils::testDisconnectPrivate()
 
 void KDbTestUtils::testDisconnectInternal()
 {
-    const int connCount = driver->connections().count();
+    const int connCount = driver ? driver->connections().count() : 0;
     testDisconnectPrivate();
     QVERIFY(!QTest::currentTestFailed());
     connection.reset();
-    QCOMPARE(driver->connections().count(), connCount - 1); // one less
+    QCOMPARE(driver ? driver->connections().count() : -1, connCount - 1); // one less
 }
 
 void KDbTestUtils::testDisconnectAndDropDbInternal()
