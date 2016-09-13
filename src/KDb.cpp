@@ -21,6 +21,7 @@
 */
 
 #include "KDb.h"
+#include "KDb_p.h"
 #include "KDbConnectionData.h"
 #include "KDbConnection.h"
 #include "KDbCursor.h"
@@ -266,15 +267,6 @@ void ConnectionTestDialog::reject()
 }
 
 // ----
-
-//! @internal Dummy class to get simply translation markup expressions
-//! of the form kdb::tr("foo") instead of the complicated and harder to read
-//! QCoreApplication::translate("KDb", "foo") which also runs the chance of
-//! typos in the class context argument
-class kdb
-{
-Q_DECLARE_TR_FUNCTIONS(KDb)
-};
 
 //! @return hex digit converted to integer (0 to 15), 0xFF on failure
 inline static unsigned char hexDigitToInt(char digit)

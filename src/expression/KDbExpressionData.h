@@ -133,6 +133,7 @@ protected:
 //! Provides thread-safe reference counting.
 class KDbNArgExpressionData : public KDbExpressionData
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbNArgExpressionData)
 public:
     KDbNArgExpressionData();
     virtual ~KDbNArgExpressionData();
@@ -186,6 +187,7 @@ protected:
 //! Provides thread-safe reference counting.
 class KDbBinaryExpressionData : public KDbExpressionData
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbBinaryExpressionData)
 public:
     KDbBinaryExpressionData();
     virtual ~KDbBinaryExpressionData();
@@ -265,6 +267,7 @@ protected:
 //! Provides thread-safe reference counting.
 class KDbVariableExpressionData : public KDbExpressionData
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbVariableExpressionData)
 public:
     KDbVariableExpressionData();
     explicit KDbVariableExpressionData(const QString& aName);
@@ -315,6 +318,7 @@ protected:
 //! Provides thread-safe reference counting.
 class KDbFunctionExpressionData : public KDbExpressionData
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbFunctionExpressionData)
 public:
     KDbFunctionExpressionData();
     explicit KDbFunctionExpressionData(const QString& aName,

@@ -67,9 +67,9 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
 
     if (token == KDbToken::BETWEEN_AND || token == KDbToken::NOT_BETWEEN_AND) {
         if (children.count() != 3) {
-            parseInfo->setErrorMessage(KDbExpression::tr("Three arguments required"));
+            parseInfo->setErrorMessage(tr("Three arguments required"));
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1 operator requires exactly three arguments.", "BETWEEN..AND error")
+                tr("%1 operator requires exactly three arguments.", "BETWEEN..AND error")
                                   .arg(QLatin1String("BETWEEN...AND")));
             return false;
         }
@@ -95,9 +95,9 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
             return true;
         }
 
-        parseInfo->setErrorMessage(KDbExpression::tr("Incompatible types of arguments"));
+        parseInfo->setErrorMessage(tr("Incompatible types of arguments"));
         parseInfo->setErrorDescription(
-            KDbExpression::tr("Operator \"%1\" requires compatible types of arguments. "
+                           tr("Operator \"%1\" requires compatible types of arguments. "
                               "Specified arguments are of type %2, %3, %4.",
                               "BETWEEN..AND arguments type error")
                               .arg(QLatin1String("BETWEEN..AND"))

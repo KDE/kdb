@@ -34,6 +34,7 @@
 */
 class KDB_EXPORT KDbLongLongValidator : public QValidator
 {
+    Q_OBJECT
 public:
     explicit KDbLongLongValidator(QWidget * parent, int base = 10);
     KDbLongLongValidator(qint64 bottom, qint64 top, QWidget * parent, int base = 10);

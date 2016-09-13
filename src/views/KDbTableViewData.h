@@ -44,7 +44,6 @@ typedef KDbTableViewDataBase::Iterator KDbTableViewDataIterator;
 class KDB_EXPORT KDbTableViewData : public QObject, protected KDbTableViewDataBase
 {
     Q_OBJECT
-
 public:
     //! Non-db-aware version
     KDbTableViewData();

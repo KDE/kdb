@@ -40,7 +40,7 @@
  */
 class KDB_EXPORT KDbValidator : public QValidator
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     enum Result { Error = 0, Ok = 1, Warning = 2 };
 
@@ -117,6 +117,7 @@ private:
 */
 class KDB_EXPORT KDbMultiValidator : public KDbValidator
 {
+    Q_OBJECT
 public:
     /*! Constructs multivalidator with no subvalidators defined.
      You can add more validators with addSubvalidator(). */

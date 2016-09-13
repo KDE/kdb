@@ -26,6 +26,7 @@
 //! Validates input for identifier.
 class KDB_EXPORT KDbIdentifierValidator : public KDbValidator
 {
+    Q_OBJECT
 public:
     explicit KDbIdentifierValidator(QObject * parent = 0);
 

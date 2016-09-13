@@ -61,9 +61,9 @@ bool KDbBinaryExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Exp
     }
 #endif
     if (typeInternal(callStack) == KDbField::InvalidType) {
-        parseInfo->setErrorMessage(KDbExpression::tr("Incompatible types of arguments"));
+        parseInfo->setErrorMessage(tr("Incompatible types of arguments"));
         parseInfo->setErrorDescription(
-            KDbExpression::tr("Expression \"%1\" requires compatible types of arguments. "
+                           tr("Expression \"%1\" requires compatible types of arguments. "
                               "Specified arguments are of type %2 and %3.",
                               "Binary expression arguments type error")
                               .arg(toStringInternal(0, 0, callStack).toString())

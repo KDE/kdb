@@ -20,6 +20,12 @@
 #include "KDbResult.h"
 #include "KDbMessageHandler.h"
 #include "kdb_debug.h"
+#include "KDb_p.h"
+
+#if 0 // needed by lupdate to avoid "Qualifying with unknown namespace/class" because header is generated
+class KDbResult { Q_DECLARE_TR_FUNCTIONS(KDbResult) };
+class KDbResultable {};
+#endif
 
 #define ERRMSG(a) \
     { if (m_msgHandler) m_msgHandler->showErrorMessage(a); }

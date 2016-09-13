@@ -50,12 +50,12 @@ KDbValidator::Result KDbObjectNameValidator::internalCheck(
             : !d->driver->isSystemObjectName(value.toString()))
         return KDbValidator::Ok;
     if (message) {
-        *message = KDbDriver::tr("Could not use reserved name \"%1\" for objects. "
-                                 "Please choose another name.")
+        *message = tr("Could not use reserved name \"%1\" for objects. "
+                      "Please choose another name.")
                                  .arg(value.toString());
     }
     if (details) {
-        *details = KDbDriver::tr("Names of internal database objects start with \"kexi__\".");
+        *details = tr("Names of internal database objects start with \"kexi__\".");
     }
     return KDbValidator::Error;
 }

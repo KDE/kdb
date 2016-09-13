@@ -130,9 +130,9 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
                     firstField = f;
                 } else if (f->table() != firstField->table()) {
                     //ambiguous field name
-                    parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous field name"));
+                    parseInfo->setErrorMessage(tr("Ambiguous field name"));
                     parseInfo->setErrorDescription(
-                        KDbExpression::tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
+                                       tr("Both table \"%1\" and \"%2\" have defined \"%3\" field. "
                                           "Use \"<tableName>.%4\" notation to specify table name.",
                                           "Note: translate also <tableName>")
                                           .arg(firstField->table()->name(), f->table()->name(),
@@ -142,9 +142,9 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
             }
         }
         if (!firstField) {
-            parseInfo->setErrorMessage(KDbExpression::tr("Field not found"));
+            parseInfo->setErrorMessage(tr("Field not found"));
             parseInfo->setErrorDescription(
-                KDbExpression::tr("Could not find table containing field \"%1\".").arg(fieldName));
+                tr("Could not find table containing field \"%1\".").arg(fieldName));
             return false;
         }
         //ok
@@ -169,9 +169,9 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
             kdbDebug() << " --" << "covered by " << tableAlias << " alias";
         }
         if (covered) {
-            parseInfo->setErrorMessage(KDbExpression::tr("Could not access the table directly using its name"));
+            parseInfo->setErrorMessage(tr("Could not access the table directly using its name"));
             parseInfo->setErrorDescription(
-                KDbExpression::tr("Table name \"%1\" is covered by aliases. "
+                               tr("Table name \"%1\" is covered by aliases. "
                                   "Instead of \"%2\", \"%3\" can be used.")
                                   .arg(tableName,
                                        tableName + QLatin1Char('.') + fieldName,
@@ -193,8 +193,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
     }
 
     if (!ts) {
-        parseInfo->setErrorMessage(KDbExpression::tr("Table not found"));
-        parseInfo->setErrorDescription(KDbExpression::tr("Unknown table \"%1\".").arg(tableName));
+        parseInfo->setErrorMessage(tr("Table not found"));
+        parseInfo->setErrorDescription(tr("Unknown table \"%1\".").arg(tableName));
         return false;
     }
 
@@ -208,8 +208,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
     //it's a table.*
     if (fieldName == QLatin1String("*")) {
         if (positionsList.count() > 1) {
-            parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous \"%1.*\" expression").arg(tableName));
-            parseInfo->setErrorDescription(KDbExpression::tr("More than one \"%1\" table or alias defined.").arg(tableName));
+            parseInfo->setErrorMessage(tr("Ambiguous \"%1.*\" expression").arg(tableName));
+            parseInfo->setErrorDescription(tr("More than one \"%1\" table or alias defined.").arg(tableName));
             return false;
         }
         tableForQueryAsterisk = ts;
@@ -219,18 +219,18 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
 // kdbDebug() << " --it's a table.name";
     KDbField *realField = ts->field(fieldName);
     if (!realField) {
-        parseInfo->setErrorMessage(KDbExpression::tr("Field not found"));
+        parseInfo->setErrorMessage(tr("Field not found"));
         parseInfo->setErrorDescription(
-            KDbExpression::tr("Table \"%1\" has no \"%2\" field.").arg(tableName, fieldName));
+            tr("Table \"%1\" has no \"%2\" field.").arg(tableName, fieldName));
         return false;
     }
 
     // check if table or alias is used twice and both have the same column
     // (so the column is ambiguous)
     if (positionsList.count() > 1) {
-        parseInfo->setErrorMessage(KDbExpression::tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName));
+        parseInfo->setErrorMessage(tr("Ambiguous \"%1.%2\" expression").arg(tableName, fieldName));
         parseInfo->setErrorDescription(
-            KDbExpression::tr("More than one \"%1\" table or alias defined containing \"%2\" field.")
+            tr("More than one \"%1\" table or alias defined containing \"%2\" field.")
                               .arg(tableName, fieldName));
         return false;
     }

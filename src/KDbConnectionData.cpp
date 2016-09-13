@@ -22,6 +22,10 @@
 #include "KDbDriverMetaData.h"
 #include "KDbConnection.h"
 
+#if 0 // needed by lupdate to avoid "Qualifying with unknown namespace/class"
+class KDbConnectionData { Q_DECLARE_TR_FUNCTIONS(KDbConnectionData) };
+#endif
+
 KDbConnectionData::~KDbConnectionData()
 {
 }
@@ -34,9 +38,9 @@ QString KDbConnectionData::toUserVisibleString(UserVisibleStringOptions options)
         return d->databaseName;
     } else if (metaData->isValid() && metaData->isFileBased()) {
         if (d->databaseName.isEmpty()) {
-            return KDbConnection::tr("<file>");
+            return tr("<file>");
         }
-        return KDbConnection::tr("file: %1").arg(d->databaseName);
+        return tr("file: %1").arg(d->databaseName);
     }
     return ((d->userName.isEmpty() || !(options & AddUserToUserVisibleString)) ? QString() : (d->userName + QLatin1Char('@')))
            + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)

@@ -91,7 +91,7 @@ set(kdb_LIB_SRCS
    tools/KDbIdentifierValidator.cpp
    tools/KDbUtils.cpp
    #TODO tools/debuggui.cpp
-   #TODO tools/SimpleCommandLineApp.cpp
+   #TODO tools/KDbSimpleCommandLineApp.cpp
 
    tools/transliteration/transliteration_table.cpp
    tools/transliteration/generate_transliteration_table.sh
@@ -359,7 +359,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbValidator
         KDbUtils
         KDbTristate
-        #todo SimpleCommandLineApp
+        #todo KDbSimpleCommandLineApp
         KDbLongLongValidator
         KDbIdentifierValidator
         KDbFieldValidator

@@ -29,6 +29,7 @@ class KDbDriver;
  accepts if the name is not reserved for internal kexi objects. */
 class KDB_EXPORT KDbObjectNameValidator : public KDbValidator
 {
+    Q_OBJECT
 public:
     /*! @a drv is a KDb driver on which isSystemObjectName() will be
      called inside check(). If @a drv is 0, KDbDriver::isKDbSystemObjectName()

@@ -585,55 +585,6 @@ inline bool operator==(const char *a1, const KDbEscapedString &a2)
     return a2.isValid() && a1 == a2.toByteArray();
 }
 
-#if 0
-(a1.size() == a2.size()) && (memcmp(a1.constData(), a2.constData(), a1.size())==0); }
-inline bool operator==(const QByteArray &a1, const char *a2)
-{ return a2 ? qstrcmp(a1,a2) == 0 : a1.isEmpty(); }
-inline bool operator==(const char *a1, const QByteArray &a2)
-{ return a1 ? qstrcmp(a1,a2) == 0 : a2.isEmpty(); }
-inline bool operator!=(const QByteArray &a1, const QByteArray &a2)
-{ return !(a1==a2); }
-inline bool operator!=(const QByteArray &a1, const char *a2)
-{ return a2 ? qstrcmp(a1,a2) != 0 : !a1.isEmpty(); }
-inline bool operator!=(const char *a1, const QByteArray &a2)
-{ return a1 ? qstrcmp(a1,a2) != 0 : !a2.isEmpty(); }
-inline bool operator<(const QByteArray &a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) < 0; }
- inline bool operator<(const QByteArray &a1, const char *a2)
-{ return qstrcmp(a1, a2) < 0; }
-inline bool operator<(const char *a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) < 0; }
-inline bool operator<=(const QByteArray &a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) <= 0; }
-inline bool operator<=(const QByteArray &a1, const char *a2)
-{ return qstrcmp(a1, a2) <= 0; }
-inline bool operator<=(const char *a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) <= 0; }
-inline bool operator>(const QByteArray &a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) > 0; }
-inline bool operator>(const QByteArray &a1, const char *a2)
-{ return qstrcmp(a1, a2) > 0; }
-inline bool operator>(const char *a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) > 0; }
-inline bool operator>=(const QByteArray &a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) >= 0; }
-inline bool operator>=(const QByteArray &a1, const char *a2)
-{ return qstrcmp(a1, a2) >= 0; }
-inline bool operator>=(const char *a1, const QByteArray &a2)
-{ return qstrcmp(a1, a2) >= 0; }
-#endif
-#if 0
-inline const QByteArray operator+(const QByteArray &a1, const QByteArray &a2)
-{ return QByteArray(a1) += a2; }
-inline const QByteArray operator+(const QByteArray &a1, const char *a2)
-{ return QByteArray(a1) += a2; }
-inline const QByteArray operator+(const QByteArray &a1, char a2)
-{ return QByteArray(a1) += a2; }
-inline const QByteArray operator+(const char *a1, const QByteArray &a2)
-{ return QByteArray(a1) += a2; }
-inline const QByteArray operator+(char a1, const QByteArray &a2)
-{ return QByteArray(&a1, 1) += a2; }
-#endif
 Q_DECLARE_TYPEINFO(KDbEscapedString, Q_MOVABLE_TYPE);
 //Q_DECLARE_SHARED(KDbEscapedString)
 

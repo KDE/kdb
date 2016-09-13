@@ -162,6 +162,7 @@ private:
 //! - InvalidType if types of any two are incompatible
 class MinMaxFunctionDeclaration : public BuiltInFunctionDeclaration
 {
+    Q_DECLARE_TR_FUNCTIONS(MinMaxFunctionDeclaration)
 public:
     MinMaxFunctionDeclaration() {}
     virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
@@ -205,9 +206,9 @@ public:
             }
             if (parseInfo) {
                 parseInfo->setErrorMessage(
-                    KDbExpression::tr("Incompatible types in %1() function").arg(f->name));
+                    tr("Incompatible types in %1() function").arg(f->name));
                 parseInfo->setErrorDescription(
-                    KDbExpression::tr("Argument #%1 of type \"%2\" in function %3() is not "
+                    tr("Argument #%1 of type \"%2\" in function %3() is not "
                        "compatible with previous arguments of type \"%4\".")
                             .arg(i+1)
                             .arg(KDbField::typeName(simpleTypeForGroup(tg)))
@@ -270,6 +271,7 @@ private:
 //! - InvalidType for other number of arguments
 class RandomFunctionDeclaration : public BuiltInFunctionDeclaration
 {
+    Q_DECLARE_TR_FUNCTIONS(RandomFunctionDeclaration)
 public:
     RandomFunctionDeclaration() {}
     virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
@@ -290,11 +292,10 @@ public:
                     if (val0 >= val1) {
                         if (parseInfo) {
                             parseInfo->setErrorMessage(
-                                KDbExpression::tr("Invalid arguments of %1() function")
-                                    .arg(f->name));
+                                tr("Invalid arguments of %1() function").arg(f->name));
                             parseInfo->setErrorDescription(
-                                KDbExpression::tr("Value of the first argument should be less than "
-                                    "value of the second argument."));
+                                tr("Value of the first argument should be less than "
+                                   "value of the second argument."));
                         }
                         return KDbField::InvalidType;
                     }
@@ -932,33 +933,35 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
                                                       const QString &name)
 {
     parseInfo->setErrorMessage(
-                KDbExpression::tr("Incorrect number of arguments (%1)").arg(count));
+                KDbFunctionExpressionData::tr("Incorrect number of arguments (%1)").arg(count));
     const int maxArgCount = argCounts[argCounts.size() - 1];
     const int minArgCount = argCounts[0];
     QString firstSentence;
     if (count > maxArgCount) {
-        firstSentence = KDbExpression::tr("Too many arguments.%1", "don't use space before %1")
+        firstSentence = KDbFunctionExpressionData::tr("Too many arguments.%1", "don't use space before %1")
                                           .arg(QLatin1String(" "));
     }
     if (count < minArgCount) {
-        firstSentence = KDbExpression::tr("Too few arguments.%1", "don't use space before %1")
+        firstSentence = KDbFunctionExpressionData::tr("Too few arguments.%1", "don't use space before %1")
                                           .arg(QLatin1String(" "));
     }
     if (argCounts.size() == 1) {
         const int c = argCounts[0];
         if (c == 0) {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function does not accept any arguments.")
+                KDbFunctionExpressionData::tr("%1%2() function does not accept any arguments.")
                                               .arg(firstSentence).arg(name));
         }
         else if (c == 1) {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires 1 argument.")
+                KDbFunctionExpressionData::tr("%1%2() function requires 1 argument.")
                                              .arg(firstSentence).arg(name));
         }
         else {
+            //~ singular %1%2() function requires %3 argument.
+            //~ plural %1%2() function requires %3 arguments.
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires %3 argument(s).", "", c)
+                KDbFunctionExpressionData::tr("%1%2() function requires %3 argument(s).", "", c)
                                              .arg(firstSentence).arg(name).arg(c));
         }
     }
@@ -967,19 +970,23 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         const int c2 = argCounts[1];
         if (c2 == 1) {
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires 0 or 1 argument.",
+                KDbFunctionExpressionData::tr("%1%2() function requires 0 or 1 argument.",
                                   "the function requires zero or one argument")
                                               .arg(firstSentence).arg(name));
         }
         else {
+            //~ singular %1%2() function requires %3 or %4 argument.
+            //~ plural %1%2() function requires %3 or %4 arguments.
             parseInfo->setErrorDescription(
-                KDbExpression::tr("%1%2() function requires %3 or %4 argument(s).", "", c2)
+                KDbFunctionExpressionData::tr("%1%2() function requires %3 or %4 argument(s).", "", c2)
                                              .arg(firstSentence).arg(name).arg(c1).arg(c2));
         }
     }
     else if (argCounts.size() == 3) {
+        //~ singular %1%2() function requires %3 or %4 or %5 argument.
+        //~ plural %1%2() function requires %3 or %4 or %5 arguments.
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1%2() function requires %3 or %4 or %5 argument(s).", "", argCounts[2])
+            KDbFunctionExpressionData::tr("%1%2() function requires %3 or %4 or %5 argument(s).", "", argCounts[2])
                                          .arg(firstSentence).arg(name).arg(argCounts[0])
                                          .arg(argCounts[1]).arg(argCounts[2]));
     }
@@ -989,11 +996,11 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
             if (listCounts.isEmpty()) {
                 listCounts += QString::number(*it);
             } else {
-                listCounts = KDbExpression::tr("%1 or %2").arg(listCounts).arg(*it);
+                listCounts = KDbFunctionExpressionData::tr("%1 or %2").arg(listCounts).arg(*it);
             }
         }
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1%2() function requires %3 argument(s).", "",
+            KDbFunctionExpressionData::tr("%1%2() function requires %3 argument(s).", "",
                               argCounts[argCounts.size() - 1])
                               .arg(firstSentence).arg(name).arg(listCounts));
     }
@@ -1007,70 +1014,70 @@ static void setIncorrectTypeOfArgumentsErrorMessage(KDbParseInfo *parseInfo, int
     int *argType = argTypes;
     while(*argType != KDbField::InvalidType) {
         if (!listTypes.isEmpty()) {
-            listTypes += KDbExpression::tr(" or ");
+            listTypes += KDbFunctionExpressionData::tr(" or ");
         }
         const KDbField::Type realFieldType = KDb::intToFieldType(*argType);
         if (realFieldType != KDbField::InvalidType) {
-            listTypes += KDbExpression::tr("\"%1\"")
+            listTypes += KDbFunctionExpressionData::tr("\"%1\"")
                             .arg(KDbField::typeName(realFieldType));
         }
         else if (*argType == KDbField::Null) {
-            listTypes += KDbExpression::tr("\"%1\"")
+            listTypes += KDbFunctionExpressionData::tr("\"%1\"")
                             .arg(KDbField::typeName(KDbField::Null));
         }
         else if (*argType == AnyText) {
-            listTypes += KDbExpression::tr("\"%1\"")
+            listTypes += KDbFunctionExpressionData::tr("\"%1\"")
                             .arg(KDbField::typeName(KDbField::Text));
         }
         else if (*argType == AnyInt) {
-            listTypes += KDbExpression::tr("\"%1\"")
+            listTypes += KDbFunctionExpressionData::tr("\"%1\"")
                             .arg(KDbField::typeName(KDbField::Integer));
         }
         else if (*argType == AnyFloat) {
-            listTypes += KDbExpression::tr("\"%1\"")
+            listTypes += KDbFunctionExpressionData::tr("\"%1\"")
                             .arg(KDbField::typeGroupName(KDbField::FloatGroup));
                          // better than typeName() in this case
         }
         else if (*argType == AnyNumber) {
-            listTypes += KDbExpression::tr("\"Number\"");
+            listTypes += KDbFunctionExpressionData::tr("\"Number\"");
         }
         else if (*argType == Any) {
-            listTypes += KDbExpression::tr("\"Any\"", "Any data type");
+            listTypes += KDbFunctionExpressionData::tr("\"Any\"", "Any data type");
         }
         ++argType;
     }
-    parseInfo->setErrorMessage(KDbExpression::tr("Incorrect type of argument"));
+    parseInfo->setErrorMessage(KDbFunctionExpressionData::tr("Incorrect type of argument"));
     QString lastSentence
-        = KDbExpression::tr("Specified argument is of type \"%1\".")
+        = KDbFunctionExpressionData::tr("Specified argument is of type \"%1\".")
             .arg(KDbField::typeName(type));
     if (argNum == 0) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's first argument should be of type %2. %3")
+            KDbFunctionExpressionData::tr("%1() function's first argument should be of type %2. %3")
                                           .arg(name).arg(listTypes).arg(lastSentence));
     }
     else if (argNum == 1) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's second argument should be of type %2. %3")
+            KDbFunctionExpressionData::tr("%1() function's second argument should be of type %2. %3")
                                           .arg(name).arg(listTypes).arg(lastSentence));
     }
     else if (argNum == 2) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's third argument should be of type %2. %3")
+            KDbFunctionExpressionData::tr("%1() function's third argument should be of type %2. %3")
                                           .arg(name).arg(listTypes).arg(lastSentence));
     }
     else if (argNum == 3) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's fourth argument should be of type %2. %3")
+            KDbFunctionExpressionData::tr("%1() function's fourth argument should be of type %2. %3")
                                           .arg(name).arg(listTypes).arg(lastSentence));
     }
     else if (argNum == 4) {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's fifth argument should be of type %2. %3")
+            KDbFunctionExpressionData::tr("%1() function's fifth argument should be of type %2. %3")
                                           .arg(name).arg(listTypes).arg(lastSentence));
     }
     else {
         parseInfo->setErrorDescription(
-            KDbExpression::tr("%1() function's %2 argument should be of type %3. %4")
+            KDbFunctionExpressionData::tr("%1() function's %2 argument should be of type %3. %4")
                                           .arg(name).arg(argNum + 1).arg(listTypes).arg(lastSentence));
     }
 }
@@ -1130,10 +1137,10 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
     }
     if (args->children.count() > KDB_MAX_FUNCTION_ARGS) {
         parseInfo->setErrorMessage(
-            KDbFunctionExpression::tr("Too many arguments for function."));
+            tr("Too many arguments for function."));
         parseInfo->setErrorDescription(
-            KDbFunctionExpression::tr("Maximum number of arguments for function %1() is %2.")
-                                      .arg(args->children.count()).arg(KDB_MAX_FUNCTION_ARGS));
+            tr("Maximum number of arguments for function %1() is %2.")
+               .arg(args->children.count()).arg(KDB_MAX_FUNCTION_ARGS));
         return false;
     }
     if (!args->validate(parseInfo)) {
@@ -1176,26 +1183,26 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
             properArgCount = count >= minArgs;
             if (!properArgCount) {
                 parseInfo->setErrorMessage(
-                    KDbFunctionExpression::tr("Incorrect number of arguments (%1)").arg(count));
+                    tr("Incorrect number of arguments (%1)").arg(count));
                 if (minArgs == 1) {
                     parseInfo->setErrorDescription(
-                        KDbFunctionExpression::tr("Too few arguments. %1() function requires "
-                                                  "at least one argument.").arg(name));
+                        tr("Too few arguments. %1() function requires "
+                           "at least one argument.").arg(name));
                 }
                 else if (minArgs == 2) {
                     parseInfo->setErrorDescription(
-                        KDbFunctionExpression::tr("Too few arguments. %1() function requires "
-                                                  "at least two arguments.").arg(name));
+                        tr("Too few arguments. %1() function requires "
+                           "at least two arguments.").arg(name));
                 }
                 else if (minArgs == 3) {
                     parseInfo->setErrorDescription(
-                        KDbFunctionExpression::tr("Too few arguments. %1() function requires "
-                                                  "at least three arguments.").arg(name));
+                        tr("Too few arguments. %1() function requires "
+                           "at least three arguments.").arg(name));
                 }
                 else {
                     parseInfo->setErrorDescription(
-                        KDbFunctionExpression::tr("Too few arguments. %1() function requires "
-                                                  "at least %2 arguments.").arg(name).arg(minArgs));
+                        tr("Too few arguments. %1() function requires "
+                           "at least %2 arguments.").arg(name).arg(minArgs));
                 }
                 return false;
             }

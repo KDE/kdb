@@ -17,7 +17,7 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#include "SimpleCommandLineApp.h"
+#include "KDbSimpleCommandLineApp.h"
 
 #include <QFileInfo>
 #include <QTextStream>
@@ -29,8 +29,8 @@
 #include "KDbDriverManager.h"
 #include "KDb.h"
 
-//! @internal used for SimpleCommandLineApp
-class SimpleCommandLineApp::Private
+//! @internal used for KDbSimpleCommandLineApp
+class KDbSimpleCommandLineApp::Private
 {
 public:
     Private()
@@ -52,7 +52,7 @@ private:
 
 //-----------------------------------------
 
-SimpleCommandLineApp::SimpleCommandLineApp(
+KDbSimpleCommandLineApp::KDbSimpleCommandLineApp(
     int argc, char** argv, const KCmdLineOptions &options,
     const char *programName, const char *version,
     const char *shortDescription, KAboutData::LicenseKey licenseType,
@@ -64,8 +64,8 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     QFileInfo fi(argv[0]);
     QByteArray appName(fi.baseName().toLatin1());
     KCmdLineArgs::init(argc, argv,
-                       new KAboutData(appName, 0, ktr(programName),
-                                      version, ktr(shortDescription), licenseType, ktr(copyrightStatement), ktr(text),
+                       new KAboutData(appName, 0, tr(programName),
+                                      version, tr(shortDescription), licenseType, tr(copyrightStatement), tr(text),
                                       homePageAddress, bugsEmailAddress));
 
     d->componentData = KComponentData(appName);
@@ -74,16 +74,16 @@ SimpleCommandLineApp::SimpleCommandLineApp(
 
     // add predefined options
     allOptions.add("drv", KLocalizedString(), KDb::defaultFileBasedDriverId().toUtf8());
-    allOptions.add("driver <id>", ktr("Database driver ID"));
+    allOptions.add("driver <id>", tr("Database driver ID"));
     allOptions.add("u");
-    allOptions.add("user <name>", ktr("Database user name"));
+    allOptions.add("user <name>", tr("Database user name"));
     allOptions.add("p");
-    allOptions.add("password", ktr("Prompt for password"));
+    allOptions.add("password", tr("Prompt for password"));
     allOptions.add("h");
-    allOptions.add("host <name>", ktr("Host (server) name"));
-    allOptions.add("port <number>", ktr("Server's port number"));
+    allOptions.add("host <name>", tr("Host (server) name"));
+    allOptions.add("port <number>", tr("Server's port number"));
     allOptions.add("s");
-    allOptions.add("local-socket <filename>", ktr("Server's local socket filename"));
+    allOptions.add("local-socket <filename>", tr("Server's local socket filename"));
 
     // add user options
     allOptions.add(options);
@@ -112,13 +112,13 @@ SimpleCommandLineApp::SimpleCommandLineApp(
     }
 }
 
-SimpleCommandLineApp::~SimpleCommandLineApp()
+KDbSimpleCommandLineApp::~KDbSimpleCommandLineApp()
 {
     closeDatabase();
     delete d;
 }
 
-bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
+bool KDbSimpleCommandLineApp::openDatabase(const QString& databaseName)
 {
     if (!d->conn) {
         if (d->manager.error()) {
@@ -165,7 +165,7 @@ bool SimpleCommandLineApp::openDatabase(const QString& databaseName)
     return true;
 }
 
-bool SimpleCommandLineApp::closeDatabase()
+bool KDbSimpleCommandLineApp::closeDatabase()
 {
     if (!d->conn)
         return true;
@@ -176,17 +176,17 @@ bool SimpleCommandLineApp::closeDatabase()
     return true;
 }
 
-const KComponentData &SimpleCommandLineApp::componentData() const
+const KComponentData &KDbSimpleCommandLineApp::componentData() const
 {
     return d->componentData;
 }
 
-KDbConnectionData* SimpleCommandLineApp::connectionData() const
+KDbConnectionData* KDbSimpleCommandLineApp::connectionData() const
 {
     return &d->connData;
 }
 
-KDbConnection* SimpleCommandLineApp::connection() const
+KDbConnection* KDbSimpleCommandLineApp::connection() const
 {
     return d->conn;
 }

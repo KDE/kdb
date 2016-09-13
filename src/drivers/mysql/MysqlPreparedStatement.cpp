@@ -281,8 +281,6 @@ KDbSqlResult* MysqlPreparedStatement::execute(
             itFields != fieldList->constEnd() && arg < m_realParamCount; ++it, ++itFields, par++) {
         if (!bindValue(*itFields, it == parameters.constEnd() ? QVariant() : *it, par))
             return false;
-
-        }//else
     }//for
 
     //real execution

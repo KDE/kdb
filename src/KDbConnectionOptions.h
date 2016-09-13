@@ -20,6 +20,7 @@
 #ifndef KDB_CONNECTIONOPTIONS_H
 #define KDB_CONNECTIONOPTIONS_H
 
+#include <QCoreApplication>
 #include "KDbUtils.h"
 
 class ConnectionPrivate;
@@ -33,6 +34,7 @@ class KDbConnection;
 */
 class KDB_EXPORT KDbConnectionOptions : public KDbUtils::PropertySet
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbConnectionOptions)
 public:
     KDbConnectionOptions();
 

@@ -41,10 +41,11 @@ class KComponentData;
  a KDb-compatible database using command line arguments, do some data processing
  and close the database.
 */
-class KDB_EXPORT SimpleCommandLineApp : public KDbObject
+class KDB_EXPORT KDbSimpleCommandLineApp : public KDbObject
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbSimpleCommandLineApp)
 public:
-    SimpleCommandLineApp(
+    KDbSimpleCommandLineApp(
         int argc, char** argv,
         const KCmdLineOptions &options, const char *programName,
         const char *version, const char *shortDescription = 0,
@@ -52,7 +53,7 @@ public:
         const char *copyrightStatement = 0, const char *text = 0,
         const char *homePageAddress = 0, const char *bugsEmailAddress = "submit@bugs.kde.org");
 
-    ~SimpleCommandLineApp();
+    ~KDbSimpleCommandLineApp();
 
     //! @return program instance
     const KComponentData &componentData() const;

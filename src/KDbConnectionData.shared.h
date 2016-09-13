@@ -22,10 +22,11 @@
 
 #include "kdb_export.h"
 
-#include <QMap>
-#include <QString>
-#include <QSharedData>
+#include <QCoreApplication>
 #include <QDebug>
+#include <QMap>
+#include <QSharedData>
+#include <QString>
 
 /*! @brief Database specific connection data, e.g. host, port.
 
@@ -33,6 +34,7 @@
 */
 class KDB_EXPORT KDbConnectionData //SDC: with_from_to_map operator==
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbConnectionData)
 public:
     /*!
     @getter

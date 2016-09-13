@@ -79,7 +79,7 @@ public:
 KDbConnectionOptions::KDbConnectionOptions()
  : d(new Private)
 {
-    KDbUtils::PropertySet::insert("readOnly", false, KDbConnection::tr("Read only", "Read only connection"));
+    KDbUtils::PropertySet::insert("readOnly", false, tr("Read only", "Read only connection"));
 }
 
 KDbConnectionOptions::KDbConnectionOptions(const KDbConnectionOptions &other)
@@ -3541,6 +3541,6 @@ KDbEscapedString KDbConnection::escapeString(const QString& str) const
 //! @todo extraMessages
 #if 0
 static const char *extraMessages[] = {
-    QT_TR_NOOP("Unknown error.")
+    QT_TRANSLATE_NOOP("KDbConnection", "Unknown error.")
 };
 #endif
