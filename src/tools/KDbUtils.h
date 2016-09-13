@@ -357,7 +357,7 @@ Q_DECLARE_FLAGS(FindExeOptions, FindExeOption)
  * @param appname The name of the executable file for which to search.
  *                if this contains a path separator, it will be resolved
  *                according to the current working directory
- *                (shell-like behaviour).
+ *                (shell-like behavior).
  * @param path    The path which will be searched. If this is
  *                null (default), the @c $PATH environment variable will
  *                be searched.

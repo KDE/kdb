@@ -25,6 +25,7 @@
 #include "kdb_debug.h"
 #include "KDbDriverMetaData.h"
 #include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbError.h"
 #include "KDbExpression.h"
 #include "KDb.h"
@@ -387,7 +388,7 @@ public:
      (by beginAutoCommitTransaction()), otherwise default transaction has been started outside
      of the object (e.g. before createTable()), so we shouldn't autocommit the transaction
      in commitAutoCommitTransaction(). Also, beginAutoCommitTransaction() doesn't restarts
-     transaction if default_trans_started_inside is false. Such behaviour allows user to
+     transaction if default_trans_started_inside is false. Such behavior allows user to
      execute a sequence of actions like CREATE TABLE...; INSERT DATA...; within a single transaction
      and commit it or rollback by hand. */
     bool default_trans_started_inside;
@@ -694,7 +695,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
             return false;
     }
 
-    if (!tmpdbName.isEmpty() || !d->driver->d->isDBOpenedAfterCreate) {
+    if (!tmpdbName.isEmpty() || !d->driver->beh->IS_DB_OPEN_AFTER_CREATE) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
             m_result = KDbResult(tr("Database \"%1\" has been created but could not be opened.").arg(dbName));
@@ -1805,7 +1806,7 @@ bool KDbConnection::drv_createTable(const QString& tableName)
 
 bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 {
-    if ((d->driver->d->features & KDbDriver::IgnoreTransactions)
+    if ((d->driver->beh->features & KDbDriver::IgnoreTransactions)
             || !d->autoCommit) {
         tg->setTransaction(KDbTransaction());
         return true;
@@ -1813,7 +1814,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
     // commit current transaction (if present) for drivers
     // that allow single transaction per connection
-    if (d->driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
         if (d->default_trans_started_inside) //only commit internally started transaction
             if (!commitTransaction(d->default_trans, true)) {
                 tg->setTransaction(KDbTransaction());
@@ -1826,7 +1827,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
             tg->doNothing();
             return true; //reuse externally started transaction
         }
-    } else if (!(d->driver->d->features & KDbDriver::MultipleTransactions)) {
+    } else if (!(d->driver->beh->features & KDbDriver::MultipleTransactions)) {
         tg->setTransaction(KDbTransaction());
         return true; //no trans. supported at all - just return
     }
@@ -1836,11 +1837,11 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
 bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
 {
-    if (d->driver->d->features & KDbDriver::IgnoreTransactions)
+    if (d->driver->beh->features & KDbDriver::IgnoreTransactions)
         return true;
     if (trans.isNull() || !d->driver->transactionsSupported())
         return true;
-    if (d->driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
         if (!d->default_trans_started_inside) //only commit internally started transaction
             return true; //give up
     }
@@ -1868,14 +1869,14 @@ KDbTransaction KDbConnection::beginTransaction()
     if (!checkIsDatabaseUsed())
         return KDbTransaction();
     KDbTransaction trans;
-    if (d->driver->d->features & KDbDriver::IgnoreTransactions) {
+    if (d->driver->beh->features & KDbDriver::IgnoreTransactions) {
         //we're creating dummy transaction data here,
         //so it will look like active
         trans.m_data = new KDbTransactionData(this);
         d->transactions.append(trans);
         return trans;
     }
-    if (d->driver->d->features & KDbDriver::SingleTransactions) {
+    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
         if (d->default_trans.active()) {
             m_result = KDbResult(ERR_TRANSACTION_ACTIVE,
                                  tr("Transaction already started."));
@@ -1889,7 +1890,7 @@ KDbTransaction KDbConnection::beginTransaction()
         d->transactions.append(trans);
         return d->default_trans;
     }
-    if (d->driver->d->features & KDbDriver::MultipleTransactions) {
+    if (d->driver->beh->features & KDbDriver::MultipleTransactions) {
         if (!(trans.m_data = drv_beginTransaction())) {
             SET_BEGIN_TR_ERROR;
             return KDbTransaction();
@@ -1907,7 +1908,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
     if (!isDatabaseUsed())
         return false;
     if (!d->driver->transactionsSupported()
-            && !(d->driver->d->features & KDbDriver::IgnoreTransactions)) {
+            && !(d->driver->beh->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1925,7 +1926,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions))
         ret = drv_commitTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1942,7 +1943,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
     if (!isDatabaseUsed())
         return false;
     if (!d->driver->transactionsSupported()
-            && !(d->driver->d->features & KDbDriver::IgnoreTransactions)) {
+            && !(d->driver->beh->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1960,7 +1961,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions))
         ret = drv_rollbackTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1989,7 +1990,7 @@ void KDbConnection::setDefaultTransaction(const KDbTransaction& trans)
 {
     if (!isDatabaseUsed())
         return;
-    if (!(d->driver->d->features & KDbDriver::IgnoreTransactions)
+    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions)
             && (!trans.active() || !d->driver->transactionsSupported())) {
         return;
     }
@@ -2008,7 +2009,7 @@ bool KDbConnection::autoCommit() const
 
 bool KDbConnection::setAutoCommit(bool on)
 {
-    if (d->autoCommit == on || d->driver->d->features & KDbDriver::IgnoreTransactions)
+    if (d->autoCommit == on || d->driver->beh->features & KDbDriver::IgnoreTransactions)
         return true;
     if (!drv_setAutoCommit(on))
         return false;

@@ -22,7 +22,6 @@
 
 #include "KDbConnectionData.h"
 #include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
 
 #include <QDir>
 

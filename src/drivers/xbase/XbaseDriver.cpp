@@ -21,7 +21,7 @@
 
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDb.h"
 
 
@@ -49,8 +49,7 @@ xBaseDriver::xBaseDriver(QObject *parent, const QVariantList &args)
   dp->internalDriver = manager.driver(KDb::defaultFileBasedDriverId());
 
 //  d->isFileDriver = true ;
-  d->isDBOpenedAfterCreate = true;
-  d->features = SingleTransactions | CursorForward;
+  beh->features = SingleTransactions | CursorForward;
 
   // Everything below is for the SQLite (default file based) driver
 
@@ -61,6 +60,7 @@ xBaseDriver::xBaseDriver(QObject *parent, const QVariantList &args)
   beh->AUTO_INCREMENT_PK_FIELD_OPTION = "PRIMARY KEY";
   beh->AUTO_INCREMENT_REQUIRES_PK = true;
   beh->ROW_ID_FIELD_NAME = "OID";
+  beh->IS_DB_OPEN_AFTER_CREATE = true;
 
   beh->QUOTATION_MARKS_FOR_IDENTIFIER='"';
   beh->SELECT_1_SUBQUERY_SUPPORTED = true;
@@ -71,19 +71,19 @@ xBaseDriver::xBaseDriver(QObject *parent, const QVariantList &args)
   initDriverSpecificKeywords(keywords);
 
   // Ditto like SQLite , as it won't matter
-  d->typeNames[KDbField::Byte]="Byte";
-  d->typeNames[KDbField::ShortInteger]="ShortInteger";
-  d->typeNames[KDbField::Integer]="Integer";
-  d->typeNames[KDbField::BigInteger]="BigInteger";
-  d->typeNames[KDbField::Boolean]="Boolean";
-  d->typeNames[KDbField::Date]="Date";
-  d->typeNames[KDbField::DateTime]="DateTime";
-  d->typeNames[KDbField::Time]="Time";
-  d->typeNames[KDbField::Float]="Float";
-  d->typeNames[KDbField::Double]="Double";
-  d->typeNames[KDbField::Text]="Text";
-  d->typeNames[KDbField::LongText]="CLOB";
-  d->typeNames[KDbField::BLOB]="BLOB";
+  beh->typeNames[KDbField::Byte]="Byte";
+  beh->typeNames[KDbField::ShortInteger]="ShortInteger";
+  beh->typeNames[KDbField::Integer]="Integer";
+  beh->typeNames[KDbField::BigInteger]="BigInteger";
+  beh->typeNames[KDbField::Boolean]="Boolean";
+  beh->typeNames[KDbField::Date]="Date";
+  beh->typeNames[KDbField::DateTime]="DateTime";
+  beh->typeNames[KDbField::Time]="Time";
+  beh->typeNames[KDbField::Float]="Float";
+  beh->typeNames[KDbField::Double]="Double";
+  beh->typeNames[KDbField::Text]="Text";
+  beh->typeNames[KDbField::LongText]="CLOB";
+  beh->typeNames[KDbField::BLOB]="BLOB";
 }
 
 xBaseDriver::~xBaseDriver()

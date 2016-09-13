@@ -759,7 +759,7 @@ def process():
 """)
             else:
                 outfile.write("""/*! @note objects of this class are implicitly shared, what means they have value semantics
-          by offering copy-on-write behaviour to maximize resource usage and minimize copying.
+          by offering copy-on-write behavior to maximize resource usage and minimize copying.
           Only a pointer to the data is passed around. See <a href="http://doc.qt.io/qt-5/qshareddatapointer.html#details">Qt documentation</a>.
  */
 """)

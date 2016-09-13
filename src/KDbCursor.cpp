@@ -20,7 +20,7 @@
 #include "KDbCursor.h"
 #include "KDbConnection.h"
 #include "KDbDriver.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbError.h"
 #include "KDb.h"
 #include "KDbNativeStatementBuilder.h"

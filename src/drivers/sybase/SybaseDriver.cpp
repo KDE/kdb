@@ -21,7 +21,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "SybaseDriver.h"
 #include "SybaseConnection.h"
 #include "KDbField.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDb.h"
 
 KDB_DRIVER_PLUGIN_FACTORY(SybaseDriver, "kdb_sybasedriver.json")
@@ -30,7 +30,7 @@ SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
     : KDbDriver(parent, args)
 {
     // Sybase supports Nested Transactions. Ignore for now
-    d->features = IgnoreTransactions | CursorForward;
+    beh->features = IgnoreTransactions | CursorForward;
 
     // Last value assigned is stored in variable @@IDENTITY
     beh->ROW_ID_FIELD_NAME = "@@IDENTITY";
@@ -53,35 +53,35 @@ SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
     initDriverSpecificKeywords(m_keywords);
 
     //predefined properties
-    d->properties["client_library_version"] = ""; //!< @todo
-    d->properties["default_server_encoding"] = ""; //!< @todo
+    beh->properties["client_library_version"] = ""; //!< @todo
+    beh->properties["default_server_encoding"] = ""; //!< @todo
 
     // datatypes
     // integers
-    d->typeNames[KDbField::Byte] = "TINYINT";
-    d->typeNames[KDbField::ShortInteger] = "SMALLINT";
-    d->typeNames[KDbField::Integer] = "INT";
-    d->typeNames[KDbField::BigInteger] = "BIGINT";
+    beh->typeNames[KDbField::Byte] = "TINYINT";
+    beh->typeNames[KDbField::ShortInteger] = "SMALLINT";
+    beh->typeNames[KDbField::Integer] = "INT";
+    beh->typeNames[KDbField::BigInteger] = "BIGINT";
 
     // boolean
-    d->typeNames[KDbField::Boolean] = "BIT";
+    beh->typeNames[KDbField::Boolean] = "BIT";
 
     // date and time. There's only one integrated datetime datatype in Sybase
     // Though there are smalldatetime (4 bytes) and datetime (8 bytes) data types
-    d->typeNames[KDbField::Date] = "DATETIME";
-    d->typeNames[KDbField::DateTime] = "DATETIME";
-    d->typeNames[KDbField::Time] = "DATETIME"; // or should we use timestamp ?
+    beh->typeNames[KDbField::Date] = "DATETIME";
+    beh->typeNames[KDbField::DateTime] = "DATETIME";
+    beh->typeNames[KDbField::Time] = "DATETIME"; // or should we use timestamp ?
 
     // floating point
-    d->typeNames[KDbField::Float] = "REAL"; // 4 bytes
-    d->typeNames[KDbField::Double] = "DOUBLE PRECISION"; // 8 bytes
+    beh->typeNames[KDbField::Float] = "REAL"; // 4 bytes
+    beh->typeNames[KDbField::Double] = "DOUBLE PRECISION"; // 8 bytes
 
     // strings
-    d->typeNames[KDbField::Text] = "VARCHAR";
-    d->typeNames[KDbField::LongText] = "TEXT";
+    beh->typeNames[KDbField::Text] = "VARCHAR";
+    beh->typeNames[KDbField::LongText] = "TEXT";
 
     // Large Binary Objects
-    d->typeNames[KDbField::BLOB] = "IMAGE";
+    beh->typeNames[KDbField::BLOB] = "IMAGE";
 }
 
 SybaseDriver::~SybaseDriver()

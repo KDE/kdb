@@ -329,7 +329,7 @@ public:
      this method shouldn't be called because it does nothing ans always returns false.
 
      No internal KDb object should changes this option, although auto commit's
-     behaviour depends on database engine's specifics. Engines that support only single
+     behavior depends on database engine's specifics. Engines that support only single
      transaction per connection (see KDbDriver::SingleTransactions),
      use this single connection for autocommiting, so if there is already transaction
      started by the KDb user program (with beginTransaction()), this transaction
@@ -698,10 +698,10 @@ public:
      Default implementation returns:
      - value that previously had been set using setAvailableDatabaseName() for
        this connection, if it is not empty
-     - else (2nd priority): value of KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME
+     - else (2nd priority): value of KDbDriverBehavior::ALWAYS_AVAILABLE_DATABASE_NAME
      if it is not empty.
 
-     See description of KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME member.
+     See description of KDbDriverBehavior::ALWAYS_AVAILABLE_DATABASE_NAME member.
      You may want to reimplement this method only when you need to depend on
      this connection specifics
      (e.g. you need to check something remotely).
@@ -710,10 +710,10 @@ public:
 
     /*! Sets @a dbName as name of a database that can be accessible.
      This is option that e.g. application that make use of KDb library can set
-     to tune connection's behaviour when it needs to temporary connect to any database
+     to tune connection's behavior when it needs to temporary connect to any database
      in the server to do some work.
      You can pass empty dbName - then anyAvailableDatabaseName() will try return
-     KDbDriverBehaviour::ALWAYS_AVAILABLE_DATABASE_NAME (the default) value
+     KDbDriverBehavior::ALWAYS_AVAILABLE_DATABASE_NAME (the default) value
      instead of the one previously set with setAvailableDatabaseName().
 
      @see anyAvailableDatabaseName()
@@ -889,9 +889,9 @@ protected:
 
     /*! For implementation: Sets @a version to real server's version.
      Depending on backend type this method is called after
-     (if KDbDriverBehaviour::USING_DATABASE_REQUIRED_TO_CONNECT is true)
+     (if KDbDriverBehavior::USING_DATABASE_REQUIRED_TO_CONNECT is true)
      or before database is used
-     (if KDbDriverBehaviour::USING_DATABASE_REQUIRED_TO_CONNECT is false),
+     (if KDbDriverBehavior::USING_DATABASE_REQUIRED_TO_CONNECT is false),
      i.e. for PostgreSQL it is called after.
      In any case it is called after successful drv_connect().
      @return true on success. */
@@ -1127,7 +1127,7 @@ protected:
 
       Note for driver developers: reimplement this only if your engine
       allows to set special auto commit option (like "SET AUTOCOMMIT=.." in MySQL).
-      If not, auto commit behaviour will be simulated if at least single
+      If not, auto commit behavior will be simulated if at least single
       transactions per connection are supported by the engine.
       Do not set any internal flags for autocommiting -- it is already done inside
       setAutoCommit().

@@ -266,34 +266,35 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
     ORIGINAL CAMELCASE
     HEADER_NAMES
         KDb
-        KDbGlobal
         KDbAdmin
         KDbAlter
         KDbConnection
         KDbConnectionOptions
         KDbConnectionProxy
         KDbCursor
-        KDbProperties
         KDbDriver
-        KDbDriverMetaData
+        KDbDriverBehavior
         KDbDriverManager
+        KDbDriverMetaData
         KDbError
         KDbEscapedString
         KDbField
         KDbFieldList
+        KDbGlobal
         KDbIndexSchema
         KDbLookupFieldSchema
         KDbMessageHandler
         KDbNativeStatementBuilder
         KDbPreparedStatement
-        KDbQuerySchema
+        KDbProperties
         KDbQueryColumnInfo
+        KDbQuerySchema
         KDbQuerySchemaParameter
         KDbRecordData
         KDbRecordEditBuffer
         KDbRelationship
-        KDbTableSchema
         KDbTableOrQuerySchema
+        KDbTableSchema
         KDbTransaction
 )
 

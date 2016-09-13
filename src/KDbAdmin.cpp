@@ -18,7 +18,6 @@
 */
 
 #include "KDbAdmin.h"
-#include "KDbDriver_p.h"
 #include "KDbConnectionData.h"
 
 class KDbAdminTools::Private

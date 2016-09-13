@@ -69,7 +69,7 @@ class KDB_EXPORT KDbCursor: public KDbResultable
 {
     Q_DECLARE_TR_FUNCTIONS(KDbCursor)
 public:
-    //! KDbCursor options that describes its behaviour
+    //! KDbCursor options that describes its behavior
     enum Options {
         NoOptions = 0,
         Buffered = 1
@@ -166,14 +166,14 @@ public:
 
     /*! @return true if ROWID information is available for each record.
      ROWID information is available
-     if KDbDriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
+     if KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
      for a KDb database driver and the master table has no primary key defined.
      Phisically, ROWID value is returned after last returned field,
      so data vector's length is expanded by one. */
     bool containsRecordIdInfo() const;
 
     /*! @return a value stored in column number @a i (counting from 0).
-     Is has unspecified behaviour if the cursor is not at valid record.
+     Is has unspecified behavior if the cursor is not at valid record.
      Note for driver developers:
      If @a i is >= than m_fieldCount, null QVariant value should be returned.
      To return a value typically you can use a pointer to internal structure
@@ -283,7 +283,7 @@ protected:
     void clearBuffer();
 
     /*! Puts current record's data into @a data (makes a deep copy of each field).
-     This method has unspecified behaviour if the cursor is not at valid record.
+     This method has unspecified behavior if the cursor is not at valid record.
      @return true on success.
      Note: For reimplementation in driver's code. Shortly, this method translates
      a record data from internal representation (probably also used in buffer)
@@ -300,7 +300,7 @@ protected:
                                   //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
                                   //!< sets m_fieldCount+1 here)
     int m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
-    int m_options; //!< cursor options that describes its behaviour
+    int m_options; //!< cursor options that describes its behavior
 
     //! possible results of record fetching, used for m_fetchResult
     enum FetchResult {

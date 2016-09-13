@@ -121,7 +121,7 @@ inline bool deleteAllRecords(KDbConnection* conn, const KDbTableSchema &table)
  for which the @a result is returned.
  On error std::numeric_limits<quint64>::max() is returned.
  Last inserted record is identified by a magical record identifier, usually called ROWID
- (PostgreSQL has it as well as SQLite; see KDbDriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
+ (PostgreSQL has it as well as SQLite; see KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
  ROWID's value will be assigned back to @a recordId if this pointer is not null.
 */
 KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbSqlResult *result,

@@ -19,7 +19,7 @@
 
 #include "KDbNativeStatementBuilder.h"
 #include "KDbConnection.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbQuerySchema.h"
@@ -273,7 +273,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             s = ", ";
         if (querySchema->masterTable())
             s += KDbEscapedString(querySchema->tableAliasOrName(querySchema->masterTable()->name())) + '.';
-        s += driver->behaviour()->ROW_ID_FIELD_NAME;
+        s += driver->behavior()->ROW_ID_FIELD_NAME;
         sql += s;
     }
 

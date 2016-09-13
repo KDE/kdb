@@ -274,7 +274,7 @@ public:
 
     /*! @return true if ROWID information is stored within every record.
      Only reasonable for db-aware version. ROWID information is available
-     if KDbDriverBehaviour::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
+     if KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false
      for a KDb database driver and a table has no primary key defined.
      Phisically, ROWID information is stored after last KDbRecordData's element,
      so every KDbRecordData's length is expanded by one. */

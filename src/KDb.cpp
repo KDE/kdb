@@ -25,7 +25,7 @@
 #include "KDbConnection.h"
 #include "KDbCursor.h"
 #include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbNativeStatementBuilder.h"
@@ -386,8 +386,8 @@ KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbSqlResult *result,
 KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quint64 recordId,
     const QString& autoIncrementFieldName, const QString& tableName)
 {
-    const KDbDriverBehaviour *behaviour = KDbDriverBehaviour::get(conn->driver());
-    if (behaviour->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
+    const KDbDriverBehavior *behavior = KDbDriverBehavior::get(conn->driver());
+    if (behavior->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
         return recordId;
     }
     KDbRecordData rdata;
@@ -396,7 +396,7 @@ KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quin
                   KDbEscapedString("SELECT ") + escapeIdentifier(tableName) + '.'
                 + escapeIdentifier(autoIncrementFieldName)
                 + " FROM " + escapeIdentifier(tableName)
-                + " WHERE " + behaviour->ROW_ID_FIELD_NAME
+                + " WHERE " + behavior->ROW_ID_FIELD_NAME
                 + '=' + KDbEscapedString::number(recordId), &rdata))
     {
         return std::numeric_limits<quint64>::max();
@@ -1988,7 +1988,7 @@ QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, 
 
     if (KDbField::isTextType(type)) {
         *thisOk = true;
-        //! @todo use KDbDriverBehaviour::TEXT_TYPE_MAX_LENGTH for Text type?
+        //! @todo use KDbDriverBehavior::TEXT_TYPE_MAX_LENGTH for Text type?
         return QString::fromUtf8(data, length);
     }
     if (KDbField::isIntegerType(type)) {

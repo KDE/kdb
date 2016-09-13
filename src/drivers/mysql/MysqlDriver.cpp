@@ -22,7 +22,7 @@
 
 #include "MysqlDriver.h"
 #include "MysqlConnection.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
 #include "KDbField.h"
 #include "KDb.h"
@@ -43,7 +43,7 @@ MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
     : KDbDriver(parent, args)
     , m_longTextPrimaryKeyType(QLatin1String("VARCHAR(255)")) // fair enough for PK
 {
-    d->features = IgnoreTransactions | CursorForward;
+    beh->features = IgnoreTransactions | CursorForward;
 
     beh->ROW_ID_FIELD_NAME = QLatin1String("LAST_INSERT_ID()");
     beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE = true;
@@ -57,27 +57,27 @@ MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
 
     //predefined properties
 #if MYSQL_VERSION_ID < 40000
-    d->properties["client_library_version"] = MYSQL_SERVER_VERSION; //nothing better
-    d->properties["default_server_encoding"] = MYSQL_CHARSET; //nothing better
+    beh->properties["client_library_version"] = MYSQL_SERVER_VERSION; //nothing better
+    beh->properties["default_server_encoding"] = MYSQL_CHARSET; //nothing better
 #else
     // https://dev.mysql.com/doc/refman/5.7/en/mysql-get-client-version.html
-    d->properties.insert("client_library_version", int(mysql_get_client_version()));
+    beh->properties.insert("client_library_version", int(mysql_get_client_version()));
 #endif
 
-    d->typeNames[KDbField::Byte] = QLatin1String("TINYINT");
-    d->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
-    d->typeNames[KDbField::Integer] = QLatin1String("INT");
-    d->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
+    beh->typeNames[KDbField::Byte] = QLatin1String("TINYINT");
+    beh->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
+    beh->typeNames[KDbField::Integer] = QLatin1String("INT");
+    beh->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
     // Can use BOOLEAN here, but BOOL has been in MySQL longer
-    d->typeNames[KDbField::Boolean] = QLatin1String("BOOL");
-    d->typeNames[KDbField::Date] = QLatin1String("DATE");
-    d->typeNames[KDbField::DateTime] = QLatin1String("DATETIME");
-    d->typeNames[KDbField::Time] = QLatin1String("TIME");
-    d->typeNames[KDbField::Float] = QLatin1String("FLOAT");
-    d->typeNames[KDbField::Double] = QLatin1String("DOUBLE");
-    d->typeNames[KDbField::Text] = QLatin1String("VARCHAR");
-    d->typeNames[KDbField::LongText] = QLatin1String("LONGTEXT");
-    d->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
+    beh->typeNames[KDbField::Boolean] = QLatin1String("BOOL");
+    beh->typeNames[KDbField::Date] = QLatin1String("DATE");
+    beh->typeNames[KDbField::DateTime] = QLatin1String("DATETIME");
+    beh->typeNames[KDbField::Time] = QLatin1String("TIME");
+    beh->typeNames[KDbField::Float] = QLatin1String("FLOAT");
+    beh->typeNames[KDbField::Double] = QLatin1String("DOUBLE");
+    beh->typeNames[KDbField::Text] = QLatin1String("VARCHAR");
+    beh->typeNames[KDbField::LongText] = QLatin1String("LONGTEXT");
+    beh->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
 }
 
 MysqlDriver::~MysqlDriver()

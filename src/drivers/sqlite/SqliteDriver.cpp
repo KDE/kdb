@@ -24,7 +24,7 @@
 
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
 #include "KDb.h"
 
@@ -51,9 +51,7 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
         , dp(new SqliteDriverPrivate)
 {
-    d->isDBOpenedAfterCreate = true;
-    d->features = SingleTransactions | CursorForward
-                  | CompactingDatabaseSupported;
+    beh->features = SingleTransactions | CursorForward | CompactingDatabaseSupported;
 
     //special method for autoincrement definition
     beh->SPECIAL_AUTO_INCREMENT_DEF = true;
@@ -62,6 +60,7 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
     beh->AUTO_INCREMENT_PK_FIELD_OPTION = QLatin1String("PRIMARY KEY");
     beh->AUTO_INCREMENT_REQUIRES_PK = true;
     beh->ROW_ID_FIELD_NAME = QLatin1String("OID");
+    beh->IS_DB_OPEN_AFTER_CREATE = true;
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = true;
     beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
     beh->SELECT_1_SUBQUERY_SUPPORTED = true;
@@ -72,22 +71,22 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
     initDriverSpecificKeywords(keywords);
 
     // internal properties
-    d->properties.insert("client_library_version", QLatin1String(sqlite3_libversion()));
-    d->properties.insert("default_server_encoding", QLatin1String("UTF8")); //OK?
+    beh->properties.insert("client_library_version", QLatin1String(sqlite3_libversion()));
+    beh->properties.insert("default_server_encoding", QLatin1String("UTF8")); //OK?
 
-    d->typeNames[KDbField::Byte] = QLatin1String("Byte");
-    d->typeNames[KDbField::ShortInteger] = QLatin1String("ShortInteger");
-    d->typeNames[KDbField::Integer] = QLatin1String("Integer");
-    d->typeNames[KDbField::BigInteger] = QLatin1String("BigInteger");
-    d->typeNames[KDbField::Boolean] = QLatin1String("Boolean");
-    d->typeNames[KDbField::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
-    d->typeNames[KDbField::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
-    d->typeNames[KDbField::Time] = QLatin1String("Time");
-    d->typeNames[KDbField::Float] = QLatin1String("Float");
-    d->typeNames[KDbField::Double] = QLatin1String("Double");
-    d->typeNames[KDbField::Text] = QLatin1String("Text");
-    d->typeNames[KDbField::LongText] = QLatin1String("CLOB");
-    d->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
+    beh->typeNames[KDbField::Byte] = QLatin1String("Byte");
+    beh->typeNames[KDbField::ShortInteger] = QLatin1String("ShortInteger");
+    beh->typeNames[KDbField::Integer] = QLatin1String("Integer");
+    beh->typeNames[KDbField::BigInteger] = QLatin1String("BigInteger");
+    beh->typeNames[KDbField::Boolean] = QLatin1String("Boolean");
+    beh->typeNames[KDbField::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
+    beh->typeNames[KDbField::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
+    beh->typeNames[KDbField::Time] = QLatin1String("Time");
+    beh->typeNames[KDbField::Float] = QLatin1String("Float");
+    beh->typeNames[KDbField::Double] = QLatin1String("Double");
+    beh->typeNames[KDbField::Text] = QLatin1String("Text");
+    beh->typeNames[KDbField::LongText] = QLatin1String("CLOB");
+    beh->typeNames[KDbField::BLOB] = QLatin1String("BLOB");
 }
 
 SqliteDriver::~SqliteDriver()

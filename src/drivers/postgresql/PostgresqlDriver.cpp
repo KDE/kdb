@@ -22,7 +22,7 @@
 
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
-#include "KDbDriver_p.h"
+#include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
 #include "KDb.h"
 
@@ -37,8 +37,8 @@ KDB_DRIVER_PLUGIN_FACTORY(PostgresqlDriver, "kdb_postgresqldriver.json")
 PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
 {
-    d->features = SingleTransactions | CursorForward | CursorBackward;
-//! @todo enable this when kexidb supports multiple: d->features = MultipleTransactions | CursorForward | CursorBackward;
+    beh->features = SingleTransactions | CursorForward | CursorBackward;
+//! @todo enable this when kexidb supports multiple: beh->features = MultipleTransactions | CursorForward | CursorBackward;
 
     beh->UNSIGNED_TYPE_KEYWORD = QString();
     beh->ROW_ID_FIELD_NAME = QLatin1String("oid");
@@ -62,23 +62,23 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
     //predefined properties
     //http://www.postgresql.org/docs/9.5/static/libpq-misc.html#LIBPQ-PQLIBVERSION
 //! @todo use QLibrary to resolve PQlibVersion
-    d->properties.insert("client_library_version", PQlibVersion());
+    beh->properties.insert("client_library_version", PQlibVersion());
     //! @todo pgsql default_server_encoding: should be a property of connection
-    //d->properties["default_server_encoding"] = QString();
+    //beh->properties["default_server_encoding"] = QString();
 
-    d->typeNames[KDbField::Byte] = QLatin1String("SMALLINT");
-    d->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
-    d->typeNames[KDbField::Integer] = QLatin1String("INTEGER");
-    d->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
-    d->typeNames[KDbField::Boolean] = QLatin1String("BOOLEAN");
-    d->typeNames[KDbField::Date] = QLatin1String("DATE");
-    d->typeNames[KDbField::DateTime] = QLatin1String("TIMESTAMP");
-    d->typeNames[KDbField::Time] = QLatin1String("TIME");
-    d->typeNames[KDbField::Float] = QLatin1String("REAL");
-    d->typeNames[KDbField::Double] = QLatin1String("DOUBLE PRECISION");
-    d->typeNames[KDbField::Text] = QLatin1String("CHARACTER VARYING");
-    d->typeNames[KDbField::LongText] = QLatin1String("TEXT");
-    d->typeNames[KDbField::BLOB] = QLatin1String("BYTEA");
+    beh->typeNames[KDbField::Byte] = QLatin1String("SMALLINT");
+    beh->typeNames[KDbField::ShortInteger] = QLatin1String("SMALLINT");
+    beh->typeNames[KDbField::Integer] = QLatin1String("INTEGER");
+    beh->typeNames[KDbField::BigInteger] = QLatin1String("BIGINT");
+    beh->typeNames[KDbField::Boolean] = QLatin1String("BOOLEAN");
+    beh->typeNames[KDbField::Date] = QLatin1String("DATE");
+    beh->typeNames[KDbField::DateTime] = QLatin1String("TIMESTAMP");
+    beh->typeNames[KDbField::Time] = QLatin1String("TIME");
+    beh->typeNames[KDbField::Float] = QLatin1String("REAL");
+    beh->typeNames[KDbField::Double] = QLatin1String("DOUBLE PRECISION");
+    beh->typeNames[KDbField::Text] = QLatin1String("CHARACTER VARYING");
+    beh->typeNames[KDbField::LongText] = QLatin1String("TEXT");
+    beh->typeNames[KDbField::BLOB] = QLatin1String("BYTEA");
 }
 
 PostgresqlDriver::~PostgresqlDriver()

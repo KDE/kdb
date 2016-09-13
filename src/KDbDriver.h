@@ -31,7 +31,7 @@ class KDbAdminTools;
 class KDbConnection;
 class KDbConnectionData;
 class KDbConnectionOptions;
-class KDbDriverBehaviour;
+class KDbDriverBehavior;
 class KDbDriverMetaData;
 class KDbBinaryExpression;
 class KDbNArgExpression;
@@ -147,7 +147,7 @@ public:
 
     /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.
-     Reimplement this if you need other behaviour (eg. for 'date' type handling)
+     Reimplement this if you need other behavior (eg. for 'date' type handling)
      This implementation return date, datetime and time values in ISO format,
      what seems to be accepted by SQL servers.
      @see Qt::DateFormat */
@@ -208,8 +208,8 @@ public:
     //! @return a list of internal property names for this driver.
     QList<QByteArray> internalPropertyNames() const;
 
-    //! @return a structure that provides detailed information about driver's default behaviour.
-    inline const KDbDriverBehaviour* behaviour() const { return beh; }
+    //! @return a structure that provides detailed information about driver's default behavior.
+    inline const KDbDriverBehavior* behavior() const { return this->beh; }
 
     //! @internal
     virtual ~KDbDriver();
@@ -249,10 +249,10 @@ public:
     //! Accepted @a args can contain zero or two positive integer arguments X, Y; X < Y.
     //! In case of numeric arguments, RANDOM(X, Y) returns a random integer that is equal
     //! or greater than X and less than Y.
-    //! Default implementation for RANDOM() returns F() where F is behaviour()->RANDOM_FUNCTION.
+    //! Default implementation for RANDOM() returns F() where F is behavior()->RANDOM_FUNCTION.
     //! This works with PostgreSQL.
     //! Default implementation for RANDOM(X,Y) returns (X + FLOOR(F()*(Y-X+1))) where
-    //! F is behaviour()->RANDOM_FUNCTION. This works with PostgreSQL.
+    //! F is behavior()->RANDOM_FUNCTION. This works with PostgreSQL.
     virtual KDbEscapedString randomFunctionToString(
                                            const KDbNArgExpression &args,
                                            KDbQuerySchemaParameterValueListIterator* params,
@@ -289,10 +289,10 @@ protected:
     /*! Used by KDbDriverManager.
      Note for driver developers: Reimplement this.
      In your reimplementation you should initialize:
-     - d->typeNames - to types accepted by your engine
-     - d->features - to combination of selected values from Features enum
+     - beh->typeNames - to types accepted by your engine
+     - beh->features - to combination of selected values from Features enum
 
-     You may also want to change options in KDbDriverBehaviour *beh member.
+     You may also want to change options in KDbDriverBehavior *beh member.
      See drivers/mySQL/mysqldriver.cpp for usage example.
      */
     KDbDriver(QObject *parent, const QVariantList &args);
@@ -309,7 +309,7 @@ protected:
      Implement escaping for any character like " or ' as your
      database engine requires. Do not append or prepend any quotation
      marks characters - it is automatically done by escapeIdentifier() using
-     KDbDriverBehaviour::QUOTATION_MARKS_FOR_IDENTIFIER.
+     KDbDriverBehavior::QUOTATION_MARKS_FOR_IDENTIFIER.
     */
     virtual QString drv_escapeIdentifier(const QString& str) const = 0;
 
@@ -367,12 +367,12 @@ protected:
 
     friend class KDbConnection;
     friend class KDbCursor;
-    friend class KDbDriverBehaviour;
+    friend class KDbDriverBehavior;
     friend class KDbNativeStatementBuilder;
     friend class DriverManagerInternal;
     friend class DriverPrivate;
 
-    KDbDriverBehaviour *beh;
+    KDbDriverBehavior *beh;
     DriverPrivate * const d;
 private:
     Q_DISABLE_COPY(KDbDriver)

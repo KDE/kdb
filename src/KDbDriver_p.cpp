@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-    Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+    Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
     Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -19,11 +19,21 @@
 */
 
 #include "KDbDriver_p.h"
+#include "KDbAdmin.h"
+#include "KDbDriverBehavior.h"
 #include "KDbDriverMetaData.h"
 #include "KDbVersionInfo.h"
 
-KDbDriverBehaviour::KDbDriverBehaviour()
-        : UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))
+class KDbDriverBehavior::Private
+{
+public:
+    Private() {}
+    KDbDriver *driver;
+};
+
+KDbDriverBehavior::KDbDriverBehavior(KDbDriver *driver)
+        : features(KDbDriver::NoFeatures)
+        , UNSIGNED_TYPE_KEYWORD(QLatin1String("UNSIGNED"))
         , AUTO_INCREMENT_FIELD_OPTION(QLatin1String("AUTO_INCREMENT"))
         , AUTO_INCREMENT_PK_FIELD_OPTION(QLatin1String("AUTO_INCREMENT PRIMARY KEY"))
         , SPECIAL_AUTO_INCREMENT_DEF(false)
@@ -35,6 +45,7 @@ KDbDriverBehaviour::KDbDriverBehaviour()
         , CONNECTION_REQUIRED_TO_CREATE_DB(true)
         , CONNECTION_REQUIRED_TO_DROP_DB(true)
         , USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED(false)
+        , IS_DB_OPEN_AFTER_CREATE(false)
         , _1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY(false)
         , SELECT_1_SUBQUERY_SUPPORTED(false)
         , BOOLEAN_TRUE_LITERAL(QLatin1Char('1'))
@@ -42,34 +53,26 @@ KDbDriverBehaviour::KDbDriverBehaviour()
         , TEXT_TYPE_MAX_LENGTH(0)
         , LIKE_OPERATOR(QLatin1String("LIKE"))
         , RANDOM_FUNCTION(QLatin1String("RANDOM"))
+        , d(new Private)
 {
-}
-
-KDbDriverBehaviour::~KDbDriverBehaviour()
-{
-}
-
-//---------------------------------------------
-
-DriverPrivate::DriverPrivate(KDbDriver *aDriver)
-        : driver(aDriver)
-        , metaData(0)
-        , isDBOpenedAfterCreate(false)
-        , features(KDbDriver::NoFeatures)
-        , adminTools(0)
-{
+    d->driver = driver;
     properties.insert("client_library_version", QVariant(),
                       KDbDriver::tr("Client library version"));
     properties.insert("default_server_encoding", QVariant(),
                       KDbDriver::tr("Default character encoding on server"));
 }
 
-void DriverPrivate::initInternalProperties()
+KDbDriverBehavior::~KDbDriverBehavior()
 {
-    properties.insert("is_file_database", metaData->isFileBased(),
+    delete d;
+}
+
+void KDbDriverBehavior::initInternalProperties()
+{
+    properties.insert("is_file_database", d->driver->metaData()->isFileBased(),
                       KDbDriver::tr("File-based database driver"));
-    if (metaData->isFileBased()) {
-        properties.insert("file_database_mimetypes", metaData->mimeTypes(),
+    if (d->driver->metaData()->isFileBased()) {
+        properties.insert("file_database_mimetypes", d->driver->metaData()->mimeTypes(),
                           KDbDriver::tr("File-based database's MIME types"));
     }
 
@@ -88,19 +91,28 @@ void DriverPrivate::initInternalProperties()
 #endif
 // properties["transaction_support"] = features & KDbDriver::TransactionsMask;
 // propertyCaptions["transaction_support"] = KDbDriver::tr("Transaction support");
-    properties.insert("transactions_single", bool(features & KDbDriver::SingleTransactions),
+    properties.insert("transactions_single", bool(d->driver->behavior()->features & KDbDriver::SingleTransactions),
                       KDbDriver::tr("Single transactions support"));
-    properties.insert("transactions_multiple", bool(features & KDbDriver::MultipleTransactions),
+    properties.insert("transactions_multiple", bool(d->driver->behavior()->features & KDbDriver::MultipleTransactions),
                       KDbDriver::tr("Multiple transactions support"));
-    properties.insert("transactions_nested", bool(features & KDbDriver::NestedTransactions),
+    properties.insert("transactions_nested", bool(d->driver->behavior()->features & KDbDriver::NestedTransactions),
                       KDbDriver::tr("Nested transactions support"));
-    properties.insert("transactions_ignored", bool(features & KDbDriver::IgnoreTransactions),
+    properties.insert("transactions_ignored", bool(d->driver->behavior()->features & KDbDriver::IgnoreTransactions),
                       KDbDriver::tr("Ignored transactions support"));
     //! @todo more KDbDriver::Features
 
     const KDbVersionInfo v(KDb::version());
     properties.insert("kdb_driver_version", QString::fromLatin1("%1.%2.%3").arg(v.major()).arg(v.minor()).arg(v.release()),
                       KDbDriver::tr("KDb driver version"));
+}
+
+//---------------------------------------------
+
+DriverPrivate::DriverPrivate(KDbDriver *aDriver)
+        : driver(aDriver)
+        , metaData(0)
+        , adminTools(0)
+{
 }
 
 DriverPrivate::~DriverPrivate()

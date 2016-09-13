@@ -127,7 +127,7 @@ APPNAME ", version " KDB_VERSION_STRING
 "\n                            to replace [...] placeholders"
 "\n  -t, --test <test_name>    Specifies test to execute; required"
 "\n                            Available tests:"
-"\n                            - cursors: test for cursors behaviour"
+"\n                            - cursors: test for cursors behavior"
 "\n                            - schema: test for db schema retrieving"
 "\n                            - dbcreation: test for new db creation"
 "\n                            - tables: test for tables creation and data"
