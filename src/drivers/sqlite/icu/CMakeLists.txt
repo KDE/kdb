@@ -14,7 +14,7 @@ set_target_properties(kdb_sqlite_icu PROPERTIES
                       # nonstandard path for sqlite3 extensions, they would work too if we placed them
                       # in ${PROJECT_BINARY_DIR}/plugins/kdb/sqlite3 but we want to test the "extraSqliteExtensionPaths"
                       # connection option in ConnectionTest::testCreateDb():
-                      LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/plugins/sqlite3"
+                      LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/plugins/${KDB_BASE_NAME_LOWER}/sqlite3"
                       DEFINE_SYMBOL kdb_sqlite_icu_EXPORTS)
 
 install(TARGETS kdb_sqlite_icu
