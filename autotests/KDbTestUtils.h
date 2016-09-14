@@ -115,6 +115,7 @@ public:
 protected:
     void testDisconnectPrivate();
     void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
+    void testDriverManagerInternal(bool forceEmpty);
 };
 
 #endif

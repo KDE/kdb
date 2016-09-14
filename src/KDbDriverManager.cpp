@@ -77,11 +77,24 @@ bool DriverManagerInternal::lookupDrivers()
     if (!m_lookupDriversNeeded)
         return true;
 
+    if (!forceEmpty) {
+        lookupDriversInternal();
+        m_lookupDriversNeeded = false;
+    }
+    if (m_driversMetaData.isEmpty()) {
+        m_result = KDbResult(ERR_DRIVERMANAGER,
+                             tr("Could not find any database drivers."));
+        return false;
+    }
+    return true;
+}
+
+void DriverManagerInternal::lookupDriversInternal()
+{
     if (qApp) {
         connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(slotAppQuits()));
     }
 
-    m_lookupDriversNeeded = false;
     clearResult();
 
     //drivermanagerDebug() << "Load all plugins";
@@ -106,12 +119,6 @@ bool DriverManagerInternal::lookupDrivers()
     }
     qDeleteAll(offers);
     offers.clear();
-    if (m_driversMetaData.isEmpty()) {
-        m_result = KDbResult(ERR_DRIVERMANAGER,
-                             tr("Could not find any database drivers."));
-        return false;
-    }
-    return true;
 }
 
 QStringList DriverManagerInternal::driverIds()

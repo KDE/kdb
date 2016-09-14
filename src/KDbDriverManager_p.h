@@ -21,13 +21,14 @@
 #define KDB_DRIVER_MANAGER_P_H
 
 #include <QMap>
+#include "config-kdb.h"
 #include "KDbResult.h"
 
 class KDbDriverMetaData;
 class KDbDriver;
 
 //! Internal class of the driver manager.
-class DriverManagerInternal : public QObject, public KDbResultable
+class KDB_TESTING_EXPORT DriverManagerInternal : public QObject, public KDbResultable
 {
     Q_OBJECT
 public:
@@ -50,6 +51,14 @@ public:
 
     static DriverManagerInternal *self();
 
+#if BUILD_TESTING
+    //! If @c true, sets the driver manager to have no drivers so this case can be tested.
+    //! Afects driverIds(), driver(), driverMetaData(), driverIdsForMimeType()
+    bool forceEmpty = false;
+#else
+    const bool forceEmpty = false;
+#endif
+
 protected Q_SLOTS:
     /*! Used to destroy all drivers on QApplication quit, so even if there are
      KDbDriverManager's static instances that are destroyed on program
@@ -61,7 +70,7 @@ private:
     Q_DISABLE_COPY(DriverManagerInternal)
 
     bool lookupDrivers();
-
+    void lookupDriversInternal();
     void clear();
 
     QMap<QString, KDbDriverMetaData*> m_metadata_by_mimetype;

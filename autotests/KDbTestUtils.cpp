@@ -20,6 +20,7 @@
 #include "KDbTestUtils.h"
 
 #include <KDbDriverManager>
+#include <KDbDriverManager_p.h>
 #include <KDbDriverMetaData>
 #include <KDbConnection>
 #include <KDbConnectionData>
@@ -35,16 +36,43 @@
 KDbTestUtils::KDbTestUtils()
     : connection(0)
 {
+    QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
+}
+
+void KDbTestUtils::testDriverManagerInternal(bool forceEmpty)
+{
+    DriverManagerInternal::self()->forceEmpty = forceEmpty;
+    QStringList ids = manager.driverIds();
+    qDebug() << "DRIVERS:" << ids;
+    QVERIFY2(forceEmpty == manager.result().isError(), "Error in driver manager");
+    qDebug() << manager.result().message();
+    QVERIFY2(forceEmpty == ids.isEmpty(), "No db drivers found");
+    if (forceEmpty) { // no drivers, so try to find one and expect failure
+        ids << "org.kde.kdb.sqlite";
+    }
+    for (const QString &id : ids) {
+        const KDbDriverMetaData* driverMetaData;
+        if (forceEmpty) {
+            KDB_EXPECT_FAIL(manager.resultable(), driverMetaData = manager.driverMetaData(id),
+                            ERR_DRIVERMANAGER, "Driver metadata not found");
+            // find driver for the metadata
+            KDB_EXPECT_FAIL(manager.resultable(), driver = manager.driver(id),
+                            ERR_DRIVERMANAGER, "Driver not found");
+        } else {
+            KDB_VERIFY(manager.resultable(), driverMetaData = manager.driverMetaData(id),
+                       "Driver metadata not found");
+            QCOMPARE(driverMetaData->id(), id);
+            // find driver for the metadata
+            KDB_VERIFY(manager.resultable(), driver = manager.driver(id), "Driver not found");
+        }
+    }
+    DriverManagerInternal::self()->forceEmpty = false; // default state
 }
 
 void KDbTestUtils::testDriverManagerInternal()
 {
-    QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
-    QStringList ids = manager.driverIds();
-    qDebug() << "DRIVERS:" << ids;
-    QVERIFY2(!manager.result().isError(), "Error in driver manager");
-    qDebug() << manager.result().message();
-    QVERIFY2(!ids.isEmpty(), "No db drivers found");
+    testDriverManagerInternal(true);
+    testDriverManagerInternal(false);
 }
 
 void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes)
