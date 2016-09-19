@@ -8,6 +8,8 @@
 include(FeatureSummary)
 include(GetGitRevisionDescription)
 
+string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
+string(TOLOWER ${PROJECT_NAME} PROJECT_NAME_LOWER)
 string(COMPARE EQUAL "${CMAKE_CXX_COMPILER_ID}" "Clang" CMAKE_COMPILER_IS_CLANG)
 
 # x.80.y or larger means test release, so the stable major version is x+1
@@ -105,7 +107,6 @@ endmacro()
 # (useful for testing but may confuse end-user) are compiled-in.
 # This option is OFF by default.
 macro(add_unfinished_features_option)
-  string(TOUPPER ${PROJECT_NAME} PROJECT_NAME_UPPER)
   simple_option(${PROJECT_NAME_UPPER}_UNFINISHED
                 "Include unfinished features (useful for testing but may confuse end-user)" OFF)
 endmacro()
