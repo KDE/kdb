@@ -13,3 +13,4 @@ CMakeLists.txt.user*
 .kdev_include_paths
 src/parser/KDbSqlParser.output
 .gdbinit
+GIT_VERSION
