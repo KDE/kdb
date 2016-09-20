@@ -100,11 +100,21 @@ void DriverManagerInternal::lookupDriversInternal()
     //drivermanagerDebug() << "Load all plugins";
     QList<QPluginLoader*> offers
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
+    const QString expectedVersion = QString::fromLatin1("%1.%2")
+            .arg(KDB_STABLE_VERSION_MAJOR).arg(KDB_STABLE_VERSION_MINOR);
     foreach(const QPluginLoader *loader, offers) {
         //QJsonObject json = loader->metaData();
         //drivermanagerDebug() << json;
-        //! @todo check version
         QScopedPointer<KDbDriverMetaData> metaData(new KDbDriverMetaData(*loader));
+        //qDebug() << "VER:" << metaData->version();
+        if (metaData->version() != expectedVersion) {
+            kdbWarning() << "Driver with ID" << metaData->id()
+                         << "(" << metaData->fileName() << ")"
+                         << "has version" << metaData->version() << "but expected version is"
+                         << expectedVersion
+                         << "-- skipping it";
+            continue;
+        }
         if (m_driversMetaData.contains(metaData->id())) {
             kdbWarning() << "Driver with ID" << metaData->id() << "already found at"
                          << m_driversMetaData.value(metaData->id())->fileName()
