@@ -23,7 +23,7 @@
 #include "KDbPreparedStatementInterface.h"
 #include "MysqlConnection_p.h"
 
-//! @todo 1.1 - unfinished: #define KDB_USE_MYSQL_STMT; for 1.0 we're using unoptimized version
+//! @todo 3.1 - unfinished: #define KDB_USE_MYSQL_STMT; for 3.0 we're using unoptimized version
 
 /*! Implementation of prepared statements for MySQL driver. */
 class MysqlPreparedStatement : public KDbPreparedStatementInterface, public MysqlConnectionInternal
