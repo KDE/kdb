@@ -28,6 +28,18 @@
 //! @brief Like KDB_BASE_NAME but lowercase.
 #define KDB_BASE_NAME_LOWER "@KDB_BASE_NAME_LOWER@"
 
+//! @def KDB_STABLE_VERSION_MAJOR
+//! @brief Extra version info, stable major, e.g. 3 for 2.99.91 (3.0.0 Alpha)
+#define KDB_STABLE_VERSION_MAJOR @PROJECT_STABLE_VERSION_MAJOR@
+
+//! @def KDB_STABLE_VERSION_MINOR
+//! @brief Extra version info, stable minor, e.g. 0 for 2.99.91 (3.0.0 Alpha)
+#define KDB_STABLE_VERSION_MINOR @PROJECT_STABLE_VERSION_MINOR@
+
+//! @def KDB_STABLE_VERSION_RELEASE
+//! @brief Extra version info, stable minor, e.g. 0 for 2.99.91 (3.0.0 Alpha)
+#define KDB_STABLE_VERSION_RELEASE @PROJECT_STABLE_VERSION_RELEASE@
+
 //! @def KDB_TESTING_EXPORT
 //! @brief Export symbols for testing
 #ifdef BUILD_TESTING
