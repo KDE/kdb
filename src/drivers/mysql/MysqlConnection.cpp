@@ -27,7 +27,7 @@
 #include "KDbConnectionData.h"
 #include "KDbVersionInfo.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 MysqlConnection::MysqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
                                  const KDbConnectionOptions &options)
@@ -74,14 +74,15 @@ bool MysqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     QString versionString;
     tristate res = querySingleString(KDbEscapedString("SELECT @@version"),
                                      &versionString, /*column*/0, false /*!addLimitTo1*/);
-    QRegExp versionRe(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
+    QRegularExpression versionRe(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
+    QRegularExpressionMatch match  = versionRe.match(versionString);
     if (res == false) // sanity
         return false;
-    if (versionRe.exactMatch(versionString)) {
+    if (match.hasMatch()) {
         // (if querySingleString failed, the version will be 0.0.0...
-        version->setMajor(versionRe.cap(1).toInt());
-        version->setMinor(versionRe.cap(2).toInt());
-        version->setRelease(versionRe.cap(3).toInt());
+        version->setMajor(match.captured(1).toInt());
+        version->setMinor(match.captured(2).toInt());
+        version->setRelease(match.captured(3).toInt());
     }
     return true;
 }

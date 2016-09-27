@@ -33,7 +33,7 @@
 #include "kdb_debug.h"
 #include "config-kdb.h"
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QDataStream>
 #include <QDir>
 #include <QFile>
@@ -104,7 +104,7 @@ QMap<QString, QString> KDbUtils::deserializeMap(const QString& string)
 QString KDbUtils::stringToFileName(const QString& string)
 {
     QString _string(string);
-    _string.replace(QRegExp(QLatin1String("[\\\\/:\\*?\"<>|]")), QLatin1String(" "));
+    _string.replace(QRegularExpression(QLatin1String("[\\\\/:\\*?\"<>|]")), QLatin1String(" "));
     return _string.simplified();
 }
 

@@ -222,11 +222,11 @@ QStringList examineEnumField(const QString& table, const KDbSqlField* field)
     // to be careful as enum values can have commas and quote marks in them
     // e.g. CREATE TABLE t(f enum('option,''') gives one option: "option,'"
     vals.remove(0, 5);
-    QRegExp rx = QRegExp("^'((?:[^,']|,|'')*)'");
+    QRegularExpression rx = QRegularExpression("^'((?:[^,']|,|'')*)'");
     QStringList values = QStringList();
     int index = 0;
 
-    while ((index = rx.indexIn(vals, index, QRegExp::CaretAtOffset)) != -1) {
+    while ((index = rx.indexIn(vals, index, QRegularExpression::CaretAtOffset)) != -1) {
         int len = rx.matchedLength();
         if (len != -1) {
             //qDebug() << "3 " << rx.cap(1);

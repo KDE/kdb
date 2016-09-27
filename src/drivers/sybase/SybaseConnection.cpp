@@ -17,7 +17,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  * Boston, MA 02110-1301, USA.
 */
 
-#include <QRegExp>
+#include <QRegularExpression>
 
 #include <kgenericfactory.h>
 
@@ -58,11 +58,12 @@ bool SybaseConnection::drv_connect(KDbServerVersionInfo* version)
         sybaseWarning() << "Couldn't fetch server version";
     }
 
-    QRegExp versionRe("(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)");
-    if (versionRe.exactMatch(serverVersionString)) {
-        version.major = versionRe.cap(1).toInt();
-        version.minor = versionRe.cap(2).toInt();
-        version.release = versionRe.cap(3).toInt();
+    QRegularExpression versionRe("^(\\d+)\\.(\\d+)\\.(\\d+)\\.(\\d+)$");
+    QRegularExpressionMatch match  = versionRe.match(serverVersionString);
+    if (match.hasMatch()) {
+        version.major = match.captured(1).toInt();
+        version.minor = match.captured(2).toInt();
+        version.release = match.captured(3).toInt();
     }
 
     return true;

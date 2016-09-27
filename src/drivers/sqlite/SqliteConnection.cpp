@@ -33,7 +33,7 @@
 
 #include <QFile>
 #include <QDir>
-#include <QRegExp>
+#include <QRegularExpression>
 
 SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData,
                                    const KDbConnectionOptions &options)
@@ -68,11 +68,12 @@ bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     sqliteDebug();
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
-    QRegExp re(QLatin1String("(\\d+)\\.(\\d+)\\.(\\d+)"));
-    if (re.exactMatch(version->string())) {
-        version->setMajor(re.cap(1).toInt());
-        version->setMinor(re.cap(2).toInt());
-        version->setRelease(re.cap(3).toInt());
+    QRegularExpression re(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
+    QRegularExpressionMatch match  = re.match(version->string());
+    if (match.hasMatch()) {
+        version->setMajor(match.captured(1).toInt());
+        version->setMinor(match.captured(2).toInt());
+        version->setRelease(match.captured(3).toInt());
     }
     return true;
 }
