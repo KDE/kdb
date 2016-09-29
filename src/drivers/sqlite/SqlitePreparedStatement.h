@@ -40,7 +40,8 @@ protected:
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters);
+        const KDbPreparedStatementParameters& parameters,
+        bool *resultOwned) Q_REQUIRED_RESULT;
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 

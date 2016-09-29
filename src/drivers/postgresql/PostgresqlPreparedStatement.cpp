@@ -42,7 +42,7 @@ KDbSqlResult* PostgresqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList* insertFieldList,
-    const KDbPreparedStatementParameters& parameters)
+    const KDbPreparedStatementParameters& parameters, bool *resultOwned)
 {
     Q_UNUSED(selectFieldList);
     if (type == KDbPreparedStatement::InsertStatement) {
@@ -56,6 +56,7 @@ KDbSqlResult* PostgresqlPreparedStatement::execute(
         }
         KDbSqlResult* result;
         if (connection->insertRecord(insertFieldList, myParameters, &result)) {
+            *resultOwned = false;
             return result;
         }
         return nullptr;

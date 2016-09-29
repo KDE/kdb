@@ -236,7 +236,7 @@ KDbSqlResult* MysqlPreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList* insertFieldList,
-    const KDbPreparedStatementParameters& parameters)
+    const KDbPreparedStatementParameters& parameters, bool *resultOwned)
 {
     Q_UNUSED(selectFieldList);
 #ifdef KDB_USE_MYSQL_STMT
@@ -307,6 +307,7 @@ KDbSqlResult* MysqlPreparedStatement::execute(
         }
         KDbSqlResult* result;
         if (connection->insertRecord(insertFieldList, myParameters, &result)) {
+            *resultOwned = false;
             return result;
         }
         return nullptr;

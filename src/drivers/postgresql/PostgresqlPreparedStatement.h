@@ -37,7 +37,9 @@ public:
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters);
+        const KDbPreparedStatementParameters& parameters,
+        bool *resultOwned) Q_REQUIRED_RESULT;
+
 private:
     Q_DISABLE_COPY(PostgresqlPreparedStatement)
 };

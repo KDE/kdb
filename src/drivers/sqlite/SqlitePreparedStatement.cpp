@@ -192,9 +192,10 @@ KDbSqlResult* SqlitePreparedStatement::execute(
     KDbPreparedStatement::Type type,
     const KDbField::List& selectFieldList,
     KDbFieldList* insertFieldList,
-    const KDbPreparedStatementParameters& parameters)
+    const KDbPreparedStatementParameters& parameters, bool *resultOwned)
 {
     Q_UNUSED(insertFieldList);
+    Q_UNUSED(resultOwned);
     if (!m_sqlResult->prepared_st) {
         return nullptr;
     }
