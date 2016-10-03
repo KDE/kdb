@@ -72,7 +72,7 @@ SqliteVacuum::~SqliteVacuum()
 tristate SqliteVacuum::run()
 {
     const QString dump_app = QString::fromLatin1(KDB_SQLITE_DUMP_TOOL);
-    sqliteDebug() << dump_app;
+    //sqliteDebug() << dump_app;
     if (dump_app.isEmpty()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find tool \"%1\".")
                              .arg(dump_app));
@@ -80,7 +80,7 @@ tristate SqliteVacuum::run()
         return false;
     }
     const QString sqlite_app(KDb::sqlite3ProgramPath());
-    sqliteDebug() << sqlite_app;
+    //sqliteDebug() << sqlite_app;
     if (sqlite_app.isEmpty()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND, tr("Could not find application \"%1\".")
                              .arg(sqlite_app));
@@ -96,7 +96,7 @@ tristate SqliteVacuum::run()
         return false;
     }
 
-    sqliteDebug() << fi.absoluteFilePath() << fi.absoluteDir().path();
+    //sqliteDebug() << fi.absoluteFilePath() << fi.absoluteDir().path();
 
     delete m_dumpProcess;
     m_dumpProcess = new QProcess(this);
@@ -125,7 +125,7 @@ tristate SqliteVacuum::run()
     tempFile->open();
     m_tmpFilePath = tempFile->fileName();
     delete tempFile;
-    sqliteDebug() << m_tmpFilePath;
+    //sqliteDebug() << m_tmpFilePath;
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
     if (!m_sqliteProcess->waitForStarted()) {
         delete m_dumpProcess;
@@ -173,7 +173,7 @@ void SqliteVacuum::readFromStdErr()
         QByteArray s(m_dumpProcess->readLine(1000));
         if (s.isEmpty())
             break;
-    sqliteDebug() << s;
+        //sqliteDebug() << s;
         if (s.startsWith("DUMP: ")) {
             //set previously known progress
             if (m_dlg) {
@@ -200,7 +200,7 @@ void SqliteVacuum::readFromStdErr()
 
 void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    sqliteDebug() << exitCode << exitStatus;
+    //sqliteDebug() << exitCode << exitStatus;
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         cancelClicked();
         m_result.setCode(ERR_OTHER);
@@ -234,7 +234,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
 
 void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    sqliteDebug() << exitCode << exitStatus;
+    //sqliteDebug() << exitCode << exitStatus;
 
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         m_result.setCode(ERR_OTHER);

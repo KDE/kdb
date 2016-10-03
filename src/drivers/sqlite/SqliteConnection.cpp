@@ -46,12 +46,8 @@ SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& c
 
 SqliteConnection::~SqliteConnection()
 {
-    sqliteDebug();
-    //disconnect if was connected
-// disconnect();
     destroy();
     delete d;
-    sqliteDebug() << "ok";
 }
 
 void SqliteConnection::storeResult()
@@ -66,7 +62,6 @@ bool SqliteConnection::drv_connect()
 
 bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
-    sqliteDebug();
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
     QRegularExpression re(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
     QRegularExpressionMatch match  = re.match(version->string());
@@ -80,7 +75,6 @@ bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 
 bool SqliteConnection::drv_disconnect()
 {
-    sqliteDebug();
     return true;
 }
 
@@ -152,7 +146,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
 //    int allowReadonly = 1;
 //    const bool wasReadOnly = KDbConnection::isReadOnly();
 
-    sqliteDebug() << data().databaseName();
+    //sqliteDebug() << data().databaseName();
     int res = sqlite3_open_v2(
                  /* unicode expected since SQLite 3.1 */
                  QDir::toNativeSeparators(data().databaseName()).toUtf8().constData(),
