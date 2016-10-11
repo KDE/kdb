@@ -211,9 +211,9 @@ public:
                     tr("Argument #%1 of type \"%2\" in function %3() is not "
                        "compatible with previous arguments of type \"%4\".")
                             .arg(i+1)
-                            .arg(KDbField::typeName(simpleTypeForGroup(tg)))
-                            .arg(f->name)
-                            .arg(KDbField::typeName(simpleTypeForGroup(prevTg))));
+                            .arg(KDbField::typeName(simpleTypeForGroup(tg)),
+                                 f->name,
+                                 KDbField::typeName(simpleTypeForGroup(prevTg))));
             }
             return KDbField::InvalidType;
         }
@@ -848,17 +848,13 @@ void KDbFunctionExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallSta
     dbg.nospace() << QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSQLTypeName(type()));
 }
 
-static QByteArray maxString("MAX");
-static QByteArray minString("MIN");
-static QByteArray greatestString("GREATEST");
-static QByteArray leastString("LEAST");
 static QByteArray greatestOrLeastName(const QByteArray &name)
 {
-    if (name == maxString) {
-        return greatestString;
+    if (name == "MAX") {
+        return "GREATEST";
     }
-    if (name == minString) {
-        return leastString;
+    if (name == "MIN") {
+        return "LEAST";
     }
     return name;
 }
@@ -950,19 +946,19 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         if (c == 0) {
             parseInfo->setErrorDescription(
                 KDbFunctionExpressionData::tr("%1%2() function does not accept any arguments.")
-                                              .arg(firstSentence).arg(name));
+                                              .arg(firstSentence, name));
         }
         else if (c == 1) {
             parseInfo->setErrorDescription(
                 KDbFunctionExpressionData::tr("%1%2() function requires 1 argument.")
-                                             .arg(firstSentence).arg(name));
+                                             .arg(firstSentence, name));
         }
         else {
             //~ singular %1%2() function requires %3 argument.
             //~ plural %1%2() function requires %3 arguments.
             parseInfo->setErrorDescription(
                 KDbFunctionExpressionData::tr("%1%2() function requires %3 argument(s).", "", c)
-                                             .arg(firstSentence).arg(name).arg(c));
+                                             .arg(firstSentence, name).arg(c));
         }
     }
     else if (argCounts.size() == 2) {
@@ -972,14 +968,14 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
             parseInfo->setErrorDescription(
                 KDbFunctionExpressionData::tr("%1%2() function requires 0 or 1 argument.",
                                   "the function requires zero or one argument")
-                                              .arg(firstSentence).arg(name));
+                                              .arg(firstSentence, name));
         }
         else {
             //~ singular %1%2() function requires %3 or %4 argument.
             //~ plural %1%2() function requires %3 or %4 arguments.
             parseInfo->setErrorDescription(
                 KDbFunctionExpressionData::tr("%1%2() function requires %3 or %4 argument(s).", "", c2)
-                                             .arg(firstSentence).arg(name).arg(c1).arg(c2));
+                                             .arg(firstSentence, name).arg(c1).arg(c2));
         }
     }
     else if (argCounts.size() == 3) {
@@ -987,7 +983,7 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         //~ plural %1%2() function requires %3 or %4 or %5 arguments.
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1%2() function requires %3 or %4 or %5 argument(s).", "", argCounts[2])
-                                         .arg(firstSentence).arg(name).arg(argCounts[0])
+                                         .arg(firstSentence, name).arg(argCounts[0])
                                          .arg(argCounts[1]).arg(argCounts[2]));
     }
     else {
@@ -1002,7 +998,7 @@ static void setIncorrectNumberOfArgumentsErrorMessage(KDbParseInfo *parseInfo, i
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1%2() function requires %3 argument(s).", "",
                               argCounts[argCounts.size() - 1])
-                              .arg(firstSentence).arg(name).arg(listCounts));
+                              .arg(firstSentence, name, listCounts));
     }
 }
 
@@ -1053,32 +1049,32 @@ static void setIncorrectTypeOfArgumentsErrorMessage(KDbParseInfo *parseInfo, int
     if (argNum == 0) {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's first argument should be of type %2. %3")
-                                          .arg(name).arg(listTypes).arg(lastSentence));
+                                          .arg(name, listTypes, lastSentence));
     }
     else if (argNum == 1) {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's second argument should be of type %2. %3")
-                                          .arg(name).arg(listTypes).arg(lastSentence));
+                                          .arg(name, listTypes, lastSentence));
     }
     else if (argNum == 2) {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's third argument should be of type %2. %3")
-                                          .arg(name).arg(listTypes).arg(lastSentence));
+                                          .arg(name, listTypes, lastSentence));
     }
     else if (argNum == 3) {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's fourth argument should be of type %2. %3")
-                                          .arg(name).arg(listTypes).arg(lastSentence));
+                                          .arg(name, listTypes, lastSentence));
     }
     else if (argNum == 4) {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's fifth argument should be of type %2. %3")
-                                          .arg(name).arg(listTypes).arg(lastSentence));
+                                          .arg(name, listTypes, lastSentence));
     }
     else {
         parseInfo->setErrorDescription(
             KDbFunctionExpressionData::tr("%1() function's %2 argument should be of type %3. %4")
-                                          .arg(name).arg(argNum + 1).arg(listTypes).arg(lastSentence));
+                                          .arg(name).arg(argNum + 1).arg(listTypes, lastSentence));
     }
 }
 

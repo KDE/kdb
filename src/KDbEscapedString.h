@@ -38,7 +38,7 @@ public:
     explicit inline KDbEscapedString(char ch)
         : QByteArray(1, ch), m_valid(true) {}
 
-    explicit inline KDbEscapedString(const QLatin1Char &ch)
+    explicit inline KDbEscapedString(QChar ch)
         : QByteArray(1, ch.toLatin1()), m_valid(true) {}
 
     explicit inline KDbEscapedString(const char* string)
@@ -522,7 +522,7 @@ inline KDbEscapedString operator+(const KDbEscapedString &a1, const char* a2)
         return KDbEscapedString::invalid();
     return a1 + KDbEscapedString(a2);
 }
-inline KDbEscapedString operator+(const KDbEscapedString &a1, const QLatin1Char &a2)
+inline KDbEscapedString operator+(const KDbEscapedString &a1, QChar a2)
 {
     if (!a1.isValid())
         return KDbEscapedString::invalid();
@@ -552,7 +552,7 @@ inline KDbEscapedString operator+(const char* a1, const KDbEscapedString &a2)
         return KDbEscapedString::invalid();
     return KDbEscapedString(a1) + a2;
 }
-inline KDbEscapedString operator+(const QLatin1Char &a1, const KDbEscapedString &a2)
+inline KDbEscapedString operator+(QChar a1, const KDbEscapedString &a2)
 {
     if (!a2.isValid())
         return KDbEscapedString::invalid();

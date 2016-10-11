@@ -152,7 +152,7 @@ void* KDbUtils::stringToPointerInternal(const QString& string, int size)
     array.resize(size);
     bool ok;
     for (int i = 0; i < size; i++) {
-        array[i] = (unsigned char)(string.mid(i * 2, 2).toUInt(&ok, 16));
+        array[i] = (unsigned char)(string.midRef(i * 2, 2).toUInt(&ok, 16));
         if (!ok)
             return nullptr;
     }
@@ -329,7 +329,7 @@ static QString tildeExpand(const QString &fname)
         int pos = fname.indexOf( QLatin1Char('/') );
         QString ret = QDir::homePath(); // simplified
         if (pos > 0) {
-            ret += fname.mid(pos);
+            ret += fname.midRef(pos);
         }
         return ret;
     } else if (fname.length() > 1 && fname[0] == QLatin1Char(ESCAPE) && fname[1] == QLatin1Char('~')) {
@@ -399,7 +399,6 @@ QString KDbUtils::findExe(const QString& appname,
         return QString();
     }
 #endif
-    QFileInfo info;
 
     // absolute or relative path?
     if (appname.contains(QDir::separator())) {

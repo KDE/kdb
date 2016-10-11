@@ -37,7 +37,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
     const bool ok = parser.parse(st);
     KDbQuerySchema *q = parser.query();
     QList<QVariant> variantParams;
-    foreach(const QString param, params) {
+    for(const QString &param : params) {
         variantParams.append(param.toLocal8Bit());
     }
     if (ok && q) {

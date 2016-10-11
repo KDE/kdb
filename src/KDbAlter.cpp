@@ -221,7 +221,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::updateAlteringRequirements
 QString KDbAlterTableHandler::ChangeFieldPropertyAction::debugString(const DebugOptions& debugOptions)
 {
     QString s = QString::fromLatin1("Set \"%1\" property for table field \"%2\" to \"%3\"")
-                .arg(m_propertyName).arg(fieldName()).arg(m_newValue.toString());
+                .arg(m_propertyName, fieldName(), m_newValue.toString());
     if (debugOptions.showUID) {
         s.append(QString::fromLatin1(" (UID=%1)").arg(m_fieldUID));
     }

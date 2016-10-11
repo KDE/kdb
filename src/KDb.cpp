@@ -748,6 +748,25 @@ bool KDb::isBuiltinTableFieldProperty(const QByteArray& propertyName)
     return KDb_builtinFieldProperties->set.contains(propertyName);
 }
 
+static QVariant visibleColumnValue(const KDbLookupFieldSchema *lookup)
+{
+    if (!lookup || lookup->visibleColumns().count() == 1) {
+        if (lookup) {
+            const QList<int> visibleColumns = lookup->visibleColumns();
+            if (!visibleColumns.isEmpty()) {
+                return visibleColumns.first();
+            }
+        }
+        return QVariant();
+    }
+    QList<QVariant> variantList;
+    const QList<int> visibleColumns(lookup->visibleColumns());
+    for(int column : visibleColumns) {
+        variantList.append(column);
+    }
+    return variantList;
+}
+
 void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values)
 {
     Q_ASSERT(values);
@@ -760,22 +779,11 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
     values->insert("rowSourceValues",
         (lookup && !recordSource.values().isEmpty()) ? recordSource.values() : QVariant());
     values->insert("boundColumn", lookup ? lookup->boundColumn() : QVariant());
-    QList<QVariant> variantList;
-    if (!lookup || lookup->visibleColumns().count() == 1) {
-        values->insert("visibleColumn", lookup ? lookup->visibleColumns().first() : QVariant());
-    }
-    else {
-        QList<int> visibleColumns = lookup->visibleColumns();
-        foreach(const QVariant& variant, visibleColumns) {
-            variantList.append(variant);
-        }
-        values->insert("visibleColumn", variantList);
-    }
-    QList<int> columnWidths;
-    variantList.clear();
+    values->insert("visibleColumn", visibleColumnValue(lookup));
+   QList<QVariant> variantList;
     if (lookup) {
-        columnWidths = lookup->columnWidths();
-        foreach(const QVariant& variant, columnWidths) {
+        const QList<int> columnWidths = lookup->columnWidths();
+        for(const QVariant& variant : columnWidths) {
             variantList.append(variant);
         }
     }
@@ -959,8 +967,10 @@ struct KDb_LookupFieldSchemaProperties {
     KDb_LookupFieldSchemaProperties() {
         QMap<QByteArray, QVariant> tmp;
         KDb::getProperties(0, &tmp);
-        foreach (const QByteArray &p, tmp.keys()) {
-            set.insert(p.toLower());
+        for (QMap<QByteArray, QVariant>::ConstIterator it(tmp.constBegin());
+             it != tmp.constEnd(); ++it)
+        {
+            set.insert(it.key());
         }
     }
     QSet<QByteArray> set;
@@ -1857,7 +1867,7 @@ QVariant KDb::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
         ba.resize(len / 2 + len % 2);
         for (int i = 0; i < (len - 1); i += 2) {
             bool _ok;
-            int c = s.mid(i, 2).toInt(&_ok, 16);
+            int c = s.midRef(i, 2).toInt(&_ok, 16);
             if (!_ok) {
                 if (ok)
                     *ok = _ok;

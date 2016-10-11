@@ -26,6 +26,7 @@
 #include <KDbConnectionData>
 #include <KDbConnectionOptions>
 #include <KDbProperties>
+#include "KDbUtils_p.h"
 
 #include <QFile>
 #include <QTest>
@@ -50,7 +51,7 @@ void KDbTestUtils::testDriverManagerInternal(bool forceEmpty)
     if (forceEmpty) { // no drivers, so try to find one and expect failure
         ids << "org.kde.kdb.sqlite";
     }
-    for (const QString &id : ids) {
+    for (const QString &id : qAsConst(ids)) {
         const KDbDriverMetaData* driverMetaData;
         if (forceEmpty) {
             KDB_EXPECT_FAIL(manager.resultable(), driverMetaData = manager.driverMetaData(id),

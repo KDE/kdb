@@ -787,9 +787,9 @@ QDebug operator<<(QDebug dbg, const KDbField& field)
                 first = false;
             else
                 dbg.nospace() << ',';
-            dbg.space() << QString::fromLatin1("%1 = %2 (%3)")
-                .arg(QLatin1String(it.key())).arg(it.value().toString())
-                .arg(QLatin1String(it.value().typeName()));
+            dbg.space() << qPrintable(QString::fromLatin1("%1 = %2 (%3)")
+                .arg(QLatin1String(it.key()), it.value().toString(),
+                     QLatin1String(it.value().typeName())));
         }
     }
     return dbg.space();

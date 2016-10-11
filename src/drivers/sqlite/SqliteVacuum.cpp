@@ -219,7 +219,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
     const QByteArray oldName(QFile::encodeName(m_tmpFilePath)), newName(QFile::encodeName(fi.absoluteFilePath()));
     if (0 != ::rename(oldName.constData(), newName.constData())) {
         m_result.setMessage(tr("Could not rename file \"%1\" to \"%2\".")
-                            .arg(m_tmpFilePath).arg(fi.absoluteFilePath()));
+                            .arg(m_tmpFilePath, fi.absoluteFilePath()));
         sqliteWarning() << m_result;
     }
 

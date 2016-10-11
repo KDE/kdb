@@ -210,8 +210,8 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     if (!driver) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not open database driver \"%1\" from plugin file \"%2\".")
-                                .arg(metaData->id())
-                                .arg(metaData->fileName()));
+                                .arg(metaData->id(),
+                                     metaData->fileName()));
         kdbWarning() << m_result.message();
         return 0;
     }

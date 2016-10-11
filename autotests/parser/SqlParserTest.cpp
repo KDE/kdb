@@ -225,8 +225,8 @@ void SqlParserTest::testParse_data()
                                             "could not execute statement").arg(lineNum)));
 
             QTest::newRow(qPrintable(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
-                          .arg(fname).arg(lineNum).arg(category).arg(testName)
-                          .arg(expectError ? "; Error expected" :"")))
+                          .arg(fname).arg(lineNum).arg(category, testName,
+                               expectError ? "; Error expected" : "")))
                 << fname << lineNum << sql << expectError;
         }
     }
@@ -256,7 +256,7 @@ void SqlParserTest::testParse()
         // sucess, so error cannot be expected
         ok = !expectError;
         message = QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
-                  .arg(sql.toString()).arg(result.toString());
+                  .arg(sql.toString(), result.toString());
         if (ok) {
             qDebug() << "Result:" << result.toString();
         } else {
@@ -272,9 +272,9 @@ void SqlParserTest::testParse()
         // failure, so error should be expected
         ok = expectError;
         message = QString("%1; Failed SQL Statement:\n\"%2\"\n %3^\n")
-                 .arg(KDbUtils::debugString(parser->error()))
-                 .arg(sql.toString())
-                 .arg(QString(parser->error().position() - 1, QChar(' ')));
+                 .arg(KDbUtils::debugString(parser->error()),
+                      sql.toString(),
+                      QString(parser->error().position() - 1, QChar(' ')));
         if (ok) {
             qDebug() << parser->error();
         } else {

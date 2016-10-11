@@ -38,7 +38,7 @@ QDebug operator<<(QDebug dbg, const KDbRecordData& data)
         for (int i = 0; i < data.size(); i++) {
             dbg.space()
                 << QString::fromLatin1("%1:[%2]%3").arg(i)
-                       .arg(QLatin1String(data[i].typeName())).arg(data[i].toString());
+                       .arg(QLatin1String(data[i].typeName()), data[i].toString());
         }
     }
     return dbg.space();
