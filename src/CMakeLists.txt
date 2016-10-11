@@ -151,6 +151,9 @@ set(kdb_LIB_SRCS
    sql/KDbSqlRecord.cpp
    sql/KDbSqlResult.cpp
 
+   # private:
+   tools/KDbUtils_p.h
+
    # non-source:
    Mainpage.dox
    Messages.sh

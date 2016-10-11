@@ -202,6 +202,8 @@ void ExpressionsTest::testExpressionClassName()
     QTEST(expressionClassName(expClass), "name");
 }
 
+#include "KDbUtils_p.h"
+
 void ExpressionsTest::testExpressionToken()
 {
     KDbExpression e1;
@@ -219,9 +221,10 @@ void ExpressionsTest::testExpressionToken()
     QVERIFY(KDbToken::LEFT.isValid());
     QVERIFY(KDbToken::maxCharTokenValue > 0);
     QVERIFY(KDbToken::LEFT.value() > KDbToken::maxCharTokenValue);
-    QVERIFY(!KDbToken::allTokens().isEmpty());
+    const QList<KDbToken> allTokens(KDbToken::allTokens());
+    QVERIFY(!allTokens.isEmpty());
 
-    foreach(KDbToken t, KDbToken::allTokens()) {
+    for(const KDbToken &t : allTokens) {
         //qDebug() << t << t.value();
         if (t.toChar() > 0) {
             QVERIFY(t.value() <= KDbToken::maxCharTokenValue);

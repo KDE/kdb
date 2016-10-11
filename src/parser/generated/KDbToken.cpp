@@ -27,6 +27,8 @@
 #include "sqlparser.h"
 #include "parser/KDbParser_p.h"
 
+#include <QGlobalStatic>
+
 KDbToken::KDbToken(char charToken)
     : v(g_tokenName(charToken) == 0 ? 0 : charToken)
 {
@@ -97,20 +99,27 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, KDbToken token)
     return dbg.space();
 }
 
-static QList<KDbToken> g_allTokens;
+//! @internal
+class KDbToken::List : public QList<KDbToken>
+{
+public:
+    List() {
+        for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
+            if (g_tokenName(i) != 0) {
+                append(KDbToken(i));
+            }
+        }
+    }
+};
+
+Q_GLOBAL_STATIC(KDbToken::List, g_allTokens)
 
 //static
 QList<KDbToken> KDbToken::allTokens()
 {
-    if (g_allTokens.isEmpty()) {
-        for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
-            if (g_tokenName(i) != 0) {
-                g_allTokens.append(i);
-            }
-        }
-    }
-    return g_allTokens;
+    return *g_allTokens;
 }
+
 const KDbToken KDbToken::SQL_TYPE(::SQL_TYPE);
 const KDbToken KDbToken::AS(::AS);
 const KDbToken KDbToken::AS_EMPTY(::AS_EMPTY);

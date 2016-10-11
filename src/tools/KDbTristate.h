@@ -141,7 +141,7 @@ public:
         return m_value == Cancelled;
     }
 
-    inline tristate& operator=(const tristate& tsValue);
+    inline tristate& operator=(tristate tsValue);
 
     inline tristate& operator=(bool boolValue);
 
@@ -177,9 +177,10 @@ public:
      * @return text representation of the value: "true", "false" or "cancelled".
      */
     QString toString() const {
-        if (m_value == False)
-            return QString::fromLatin1("false");
-        return m_value == True ? QString::fromLatin1("true") : QString::fromLatin1("cancelled");
+        if (m_value == False) {
+            return QStringLiteral("false");
+        }
+        return m_value == True ? QStringLiteral("true") : QStringLiteral("cancelled");
     }
 
 private:
@@ -199,7 +200,7 @@ private:
     Value m_value;
 };
 
-tristate& tristate::operator=(const tristate& tsValue)
+tristate& tristate::operator=(tristate tsValue)
 {
     m_value = tsValue.m_value;
     return *this;

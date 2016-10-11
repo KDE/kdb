@@ -413,8 +413,22 @@ private:
 
 //================================================
 
-//! static: list of internal KDb system table names
-static QStringList KDb_kdbSystemTableNames;
+namespace {
+//! @internal static: list of internal KDb system table names
+class SystemTables : public QStringList
+{
+public:
+    SystemTables()
+        : QStringList({
+            QLatin1String("kexi__objects"),
+            QLatin1String("kexi__objectdata"),
+            QLatin1String("kexi__fields"),
+            QLatin1String("kexi__db")})
+    {}
+};
+}
+
+Q_GLOBAL_STATIC(SystemTables, g_kdbSystemTableNames)
 
 KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
                              const KDbConnectionOptions &options)
@@ -983,15 +997,7 @@ tristate KDbConnection::containsTable(const QString &tableName)
 
 QStringList KDbConnection::kdbSystemTableNames()
 {
-    if (KDb_kdbSystemTableNames.isEmpty()) {
-        KDb_kdbSystemTableNames
-        << QLatin1String("kexi__objects")
-        << QLatin1String("kexi__objectdata")
-        << QLatin1String("kexi__fields")
-        << QLatin1String("kexi__db")
-        ;
-    }
-    return KDb_kdbSystemTableNames;
+    return *g_kdbSystemTableNames;
 }
 
 KDbServerVersionInfo KDbConnection::serverVersion() const
@@ -1215,7 +1221,7 @@ inline static bool checkSql(const KDbEscapedString& sql, KDbResult* result)
     if (!sql.isValid()) {
         *result = KDbResult(ERR_SQL_EXECUTION_ERROR,
                             KDbConnection::tr("SQL statement for execution is invalid or empty."));
-        result->setSql(sql); //remember for error handling
+        result->setErrorSql(sql); //remember for error handling
         return false;
     }
     return true;
@@ -1230,10 +1236,7 @@ KDbSqlResult* KDbConnection::executeSQL(const KDbEscapedString& sql)
 bool KDbConnection::executeVoidSQL(const KDbEscapedString& sql)
 {
     m_result.setSql(sql);
-    if (!sql.isValid()) {
-        m_result = KDbResult(ERR_SQL_EXECUTION_ERROR,
-                            KDbConnection::tr("SQL statement for execution is invalid or empty."));
-        m_result.setErrorSql(sql);
+    if (!checkSql(sql, &m_result)) {
         return false;
     }
     if (!drv_executeVoidSQL(sql)) {
@@ -1550,8 +1553,8 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
             || this->tableSchema(tableSchema->id()) != tableSchema) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              tr("Could not delete table \"%1\". %2")
-                               .arg(tr("Unexpected name or identifier."))
-                               .arg(tableSchema->name()));
+                               .arg(tr("Unexpected name or identifier."),
+                                    tableSchema->name()));
         return false;
     }
 
@@ -1563,8 +1566,8 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
     if (d->driver->isSystemObjectName(tableSchema->name())) {
         m_result = KDbResult(ERR_SYSTEM_NAME_RESERVED,
                              tr("Could not delete table \"%1\". %2")
-                                .arg(tableSchema->name())
-                                .arg(d->strItIsASystemObject()));
+                                .arg(tableSchema->name(),
+                                     d->strItIsASystemObject()));
         return false;
     }
 
@@ -2994,7 +2997,7 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
                              tr("<p>Could not load definition for query \"%1\". "
                                 "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
                                 "<p>This query can be edited only in Text View.</p>")
-                                .arg(data[2].toString()).arg(sql));
+                                .arg(data[2].toString(), sql));
         return 0;
     }
     if (!setupObjectData(data, query)) {

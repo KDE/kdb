@@ -1372,7 +1372,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 } else {
                     const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
                                       .arg(++numberOfColumnsWithMultipleVisibleFields)
-                                      .arg(ci->field->table()->name()).arg(ci->field->name()));
+                                      .arg(ci->field->table()->name(), ci->field->name()));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
                         ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
@@ -1405,7 +1405,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             } else {
                 const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
                                   .arg(++numberOfColumnsWithMultipleVisibleFields)
-                                  .arg(ci->field->table()->name()).arg(ci->field->name()));
+                                  .arg(ci->field->table()->name(), ci->field->name()));
                 int index = lookup_dict.value(key, -99);
                 if (index != -99)
                     ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);

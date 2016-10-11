@@ -86,9 +86,7 @@ bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
     // http://www.postgresql.org/docs/8.4/static/libpq-status.html
     //postgresqlDebug() << "server_version:" << d->parameter("server_version");
     version->setString(QString::fromLatin1(parameter(d->conn, "server_version")));
-
-    QString versionString;
-    int versionNumber = PQserverVersion(d->conn);
+    const int versionNumber = PQserverVersion(d->conn);
     if (versionNumber > 0) {
         version->setMajor(versionNumber / 10000);
         version->setMinor((versionNumber % 1000) / 100);

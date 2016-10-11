@@ -100,10 +100,10 @@ bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::Expre
                            tr("Operator \"%1\" requires compatible types of arguments. "
                               "Specified arguments are of type %2, %3, %4.",
                               "BETWEEN..AND arguments type error")
-                              .arg(QLatin1String("BETWEEN..AND"))
-                              .arg(KDbField::typeName(t0))
-                              .arg(KDbField::typeName(t1))
-                              .arg(KDbField::typeName(t2)));
+                              .arg(QLatin1String("BETWEEN..AND"),
+                                   KDbField::typeName(t0),
+                                   KDbField::typeName(t1),
+                                   KDbField::typeName(t2)));
         return false;
     }
     return true;

@@ -57,8 +57,8 @@ KDbQueryParameterExpressionData* KDbQueryParameterExpressionData::clone()
 void KDbQueryParameterExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const
 {
     Q_UNUSED(callStack);
-    dbg.nospace() << QString::fromLatin1("QueryParExp([%1],type=%2)")
-        .arg(value.toString()).arg(KDbDriver::defaultSQLTypeName(type()));
+    dbg.nospace() << qPrintable(QString::fromLatin1("QueryParExp([%1],type=%2)")
+        .arg(value.toString(), KDbDriver::defaultSQLTypeName(type())));
 }
 
 KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(

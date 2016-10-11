@@ -27,6 +27,7 @@
 #define KDB_TOOLS_UTILS_H
 
 #include "kdb_export.h"
+#include "config-kdb.h"
 
 #include <QObject>
 #include <QDateTime>

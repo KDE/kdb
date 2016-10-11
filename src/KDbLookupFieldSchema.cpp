@@ -299,14 +299,13 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
     dbg.space() << "columnWidths:";
 
     first = true;
-    for (QList<int>::ConstIterator it = lookup.columnWidths().constBegin();
-            it != lookup.columnWidths().constEnd();++it)
-    {
+    const QList<int> columnWidths(lookup.columnWidths());
+    for (int width : columnWidths) {
         if (first)
             first = false;
         else
             dbg.nospace() << ';';
-        dbg.space() << *it;
+        dbg.space() << width;
     }
     dbg.nospace() << ')';
     return dbg.space();
@@ -381,7 +380,6 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 ...
                 <number>int</number>
                </column-widths> */
-            QVariant val;
             QVariantList columnWidths;
             for (el = el.firstChild().toElement(); !el.isNull(); el = el.nextSibling().toElement()) {
                 bool ok;
