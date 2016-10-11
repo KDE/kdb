@@ -77,7 +77,7 @@ class KDB_EXPORT KDbRecordEditBuffer
 {
 public:
     typedef QMap<QString, QVariant> SimpleMap;
-    typedef QMap<KDbQueryColumnInfo*, QVariant> DBMap;
+    typedef QHash<KDbQueryColumnInfo*, QVariant> DbHash;
 
     explicit KDbRecordEditBuffer(bool dbAwareBuffer);
 
@@ -121,15 +121,15 @@ public:
     //! at( ci ) is obtained from column's default value
     bool hasDefaultValueAt(KDbQueryColumnInfo *ci) const;
 
-    const KDbRecordEditBuffer::SimpleMap simpleBuffer() const;
+    KDbRecordEditBuffer::SimpleMap simpleBuffer() const;
 
-    const KDbRecordEditBuffer::DBMap dbBuffer() const;
+    KDbRecordEditBuffer::DbHash dbBuffer() const;
 
 protected:
     SimpleMap *m_simpleBuffer;
     SimpleMap::ConstIterator *m_simpleBufferIt;
-    DBMap *m_dbBuffer;
-    DBMap::Iterator *m_dbBufferIt;
+    DbHash *m_dbBuffer;
+    DbHash::Iterator *m_dbBufferIt;
     QMap<KDbQueryColumnInfo*, bool> *m_defaultValuesDbBuffer;
     QMap<KDbQueryColumnInfo*, bool>::ConstIterator *m_defaultValuesDbBufferIt;
 

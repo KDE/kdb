@@ -71,7 +71,6 @@ class KDbExpression;
 class KDB_EXPORT KDbField
 {
     Q_GADGET
-    Q_ENUMS(Type TypeGroup)
     Q_FLAGS(Constraints Constraint Options Option)
     Q_DECLARE_TR_FUNCTIONS(KDbField)
 public:
@@ -113,6 +112,7 @@ public:
         Tuple = 132,     /*!< A list of values (e.g. arguments of a function) */
         LastSpecialType = Tuple /*!< This line should be at the end of the list of special types! */
     };
+    Q_ENUM(Type)
 
     /*! Type groups for fields. */
     enum TypeGroup {
@@ -126,6 +126,7 @@ public:
 
         LastTypeGroup = 6 // This line should be at the end of the enum!
     };
+    Q_ENUM(TypeGroup)
 
     /*! Possible constraints defined for a field. */
     enum Constraint {
@@ -432,6 +433,7 @@ public:
         DefinedMaxLength   //!< Used if setMaxLength() was called to set specific maximum value
                            //!< or to unlimited (0).
     };
+    Q_ENUM(MaxLengthStrategy)
 
     /*! @return a hint that indicates if the maximum length of text for this field is based on default setting
       (defaultMaxLength()) or was explicitly set.

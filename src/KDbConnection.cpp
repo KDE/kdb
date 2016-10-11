@@ -3090,12 +3090,13 @@ void KDbConnection::setAvailableDatabaseName(const QString& dbName)
 }
 
 //! @internal used in updateRecord(), insertRecord(),
-inline static void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* data, const KDbRecordEditBuffer::DBMap& b,
-                                          QHash<KDbQueryColumnInfo*, int>* columnsOrderExpanded)
+inline static void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* data,
+                                                 const KDbRecordEditBuffer::DbHash& b,
+                                                 QHash<KDbQueryColumnInfo*, int>* columnsOrderExpanded)
 {
     *columnsOrderExpanded = query->columnsOrder(KDbQuerySchema::ExpandedList);
     QHash<KDbQueryColumnInfo*, int>::ConstIterator columnsOrderExpandedIt;
-    for (KDbRecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+    for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
         if (columnsOrderExpandedIt == columnsOrderExpanded->constEnd()) {
             kdbWarning() << "(KDbConnection) \"now also assign new value in memory\" step"
@@ -3139,11 +3140,11 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     KDbEscapedString sqlset, sqlwhere;
     sqlset.reserve(1024);
     sqlwhere.reserve(1024);
-    KDbRecordEditBuffer::DBMap b = buf->dbBuffer();
+    KDbRecordEditBuffer::DbHash b = buf->dbBuffer();
 
     //gather the fields which are updated ( have values in KDbRecordEditBuffer)
     KDbFieldList affectedFields;
-    for (KDbRecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+    for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         if (it.key()->field->table() != mt)
             continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
         if (!sqlset.isEmpty())
@@ -3237,7 +3238,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     KDbEscapedString sql;
     sql.reserve(4096);
     sql = KDbEscapedString("INSERT INTO ") + escapeIdentifier(mt->name()) + " (";
-    KDbRecordEditBuffer::DBMap b = buf->dbBuffer();
+    KDbRecordEditBuffer::DbHash b = buf->dbBuffer();
 
     // add default values, if available (for any column without value explicitly set)
     const KDbQueryColumnInfo::Vector fieldsExpanded(query->fieldsExpanded(KDbQuerySchema::Unique));
@@ -3291,7 +3292,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         Q_ASSERT(affectedFieldsAddOk);
     } else {
         // non-empty record inserting requested:
-        for (KDbRecordEditBuffer::DBMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
+        for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
             if (it.key()->field->table() != mt)
                 continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
             if (!sqlcols.isEmpty()) {
