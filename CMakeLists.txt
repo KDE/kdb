@@ -7,6 +7,7 @@ project(KDb VERSION 3.0.90) # Update this
 
 include(KDbGenerateHeaders)
 include(ECMGeneratePriFile)
+include(ECMPackageConfigHelpers)
 include(ECMPoQmTools)
 include(ECMSetupVersion)
 include(ECMInstallIcons)
