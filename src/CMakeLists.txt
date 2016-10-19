@@ -233,7 +233,7 @@ install(TARGETS KDb
         EXPORT KDbTargets
         ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
-configure_package_config_file(
+ecm_configure_package_config_file(
     "${CMAKE_CURRENT_SOURCE_DIR}/KDbConfig.cmake.in"
     "${CMAKE_CURRENT_BINARY_DIR}/KDbConfig.cmake"
     INSTALL_DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
