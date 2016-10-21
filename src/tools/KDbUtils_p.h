@@ -28,11 +28,12 @@
 
 #include <QtGlobal>
 
+#if QT_VERSION < 0x050700
+//! @internal for qAsConst()
 template <typename T> struct QAddConst {
     typedef const T Type;
 };
 
-#if QT_VERSION < 0x050700
 //! Adds const to non-const objects (like std::as_const)
 template <typename T>
 Q_DECL_CONSTEXPR typename QAddConst<T>::Type& qAsConst(T& t) Q_DECL_NOTHROW { return t; }
@@ -40,7 +41,7 @@ Q_DECL_CONSTEXPR typename QAddConst<T>::Type& qAsConst(T& t) Q_DECL_NOTHROW { re
 // prevent rvalue arguments:
 template <typename T>
 void qAsConst(const T &&) Q_DECL_EQ_DELETE;
-#endif
+#endif // QT_VERSION < 0x050700
 
 //! @def KDB_SHARED_LIB_EXTENSION operating system-dependent extension for shared library files
 #if defined(Q_OS_WIN)
