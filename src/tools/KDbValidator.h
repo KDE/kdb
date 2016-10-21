@@ -143,11 +143,12 @@ public:
      (can return weir results), so think twice before.. */
     virtual void fixup(QString & input) const;
 
-private:
+protected:
     virtual KDbValidator::Result internalCheck(
         const QString &valueName, const QVariant& value,
         QString *message, QString *details);
 
+private:
     class Private;
     Private* const d;
     Q_DISABLE_COPY(KDbMultiValidator)
