@@ -52,6 +52,65 @@
 
 using namespace KDbUtils;
 
+class Q_DECL_HIDDEN Property::Private
+{
+public:
+    Private() {}
+    Private(const QVariant &aValue, const QString &aCaption)
+        : value(aValue), caption(aCaption)
+    {
+    }
+    QVariant value;  //!< Property value
+    QString caption; //!< User visible property caption
+};
+
+Property::Property()
+    : d(new Private)
+{
+}
+
+Property::Property(const QVariant &value, const QString &caption)
+    : d(new Private(value, caption))
+{
+}
+
+Property::Property(const Property &other)
+: d(new Private(*other.d))
+{
+}
+
+Property::~Property()
+{
+    delete d;
+}
+
+bool Property::isNull() const
+{
+    return d->caption.isEmpty();
+}
+
+QVariant Property::value() const
+{
+    return d->value;
+}
+
+void Property::setValue(const QVariant &value)
+{
+    d->value = value;
+}
+
+QString Property::caption() const
+{
+    return d->caption;
+}
+
+void Property::setCaption(const QString &caption)
+{
+    d->caption = caption;
+}
+
+//---------
+
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)
 {
     Q_ASSERT(array);
@@ -467,10 +526,9 @@ void PropertySet::insert(const QByteArray &name, const QVariant &value, const QS
     QString realCaption = caption;
     Property *existing = d->data.value(name);
     if (existing) {
-        existing->isNull = false;
-        existing->value = value;
+        existing->setValue(value);
         if (!caption.isEmpty()) { // if not, reuse
-            existing->caption = caption;
+            existing->setCaption(caption);
         }
     } else {
         d->data.insert(name, new Property(value, realCaption));

@@ -27,8 +27,8 @@ int drPropTest()
     foreach(const QByteArray& propertyName, names) {
         KDbUtils::Property property = driver->internalProperty(propertyName);
         qDebug() << " - " << propertyName << ":"
-        << " caption=" << property.caption
-        << " value=" << property.value;
+        << " caption=" << property.caption()
+        << " value=" << property.value();
     }
     return 0;
 }

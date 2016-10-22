@@ -96,7 +96,7 @@ KDbConnectionOptions::~KDbConnectionOptions()
 
 bool KDbConnectionOptions::isReadOnly() const
 {
-    return property("readOnly").value.toBool();
+    return property("readOnly").value().toBool();
 }
 
 void KDbConnectionOptions::insert(const QByteArray &name, const QVariant &value,
@@ -107,7 +107,7 @@ void KDbConnectionOptions::insert(const QByteArray &name, const QVariant &value,
         return;
     }
     QString realCaption;
-    if (property(name).caption.isEmpty()) { // don't allow to change the caption
+    if (property(name).caption().isEmpty()) { // don't allow to change the caption
         realCaption = caption;
     }
     KDbUtils::PropertySet::insert(name, value, realCaption);
@@ -115,7 +115,7 @@ void KDbConnectionOptions::insert(const QByteArray &name, const QVariant &value,
 
 void KDbConnectionOptions::setCaption(const QByteArray &name, const QString &caption)
 {
-    KDbUtils::PropertySet::insert(name, property(name).value, caption);
+    KDbUtils::PropertySet::insert(name, property(name).value(), caption);
 }
 
 void KDbConnectionOptions::remove(const QByteArray &name)

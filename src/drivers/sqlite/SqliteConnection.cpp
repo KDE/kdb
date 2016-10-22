@@ -356,7 +356,7 @@ bool SqliteConnection::findAndLoadExtension(const QString & name)
     foreach (const QString& path, KDb::libraryPaths()) {
         pluginPaths += path + QLatin1String("/sqlite3");
     }
-    pluginPaths += options()->property("extraSqliteExtensionPaths").value.toStringList();
+    pluginPaths += options()->property("extraSqliteExtensionPaths").value().toStringList();
     foreach (const QString& path, pluginPaths) {
         if (loadExtension(path + QLatin1Char('/') + name + QLatin1String(KDB_SHARED_LIB_EXTENSION))) {
             return true;

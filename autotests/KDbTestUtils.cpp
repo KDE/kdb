@@ -129,12 +129,12 @@ void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
     QCOMPARE(driver->connections().count(), connCount + 1); // one more
 
     const KDbUtils::Property extraSqliteExtensionPathsProperty = connection->options()->property("extraSqliteExtensionPaths");
-    QVERIFY2(!extraSqliteExtensionPathsProperty.isNull, "extraSqliteExtensionPaths property not found");
-    QCOMPARE(extraSqliteExtensionPathsProperty.value.toStringList(), extraSqliteExtensionPaths);
+    QVERIFY2(!extraSqliteExtensionPathsProperty.isNull(), "extraSqliteExtensionPaths property not found");
+    QCOMPARE(extraSqliteExtensionPathsProperty.value().toStringList(), extraSqliteExtensionPaths);
 
     const KDbUtils::Property readOnlyProperty = connection->options()->property("readOnly");
-    QVERIFY2(!readOnlyProperty.isNull, "readOnly property not found");
-    QCOMPARE(readOnlyProperty.value.toBool(), connection->options()->isReadOnly());
+    QVERIFY2(!readOnlyProperty.isNull(), "readOnly property not found");
+    QCOMPARE(readOnlyProperty.value().toBool(), connection->options()->isReadOnly());
 
     //! @todo Add extensive test for a read-only connection
 

@@ -377,16 +377,28 @@ QString findExe(const QString& appname,
 //! @see KDbUtils::PropertySet
 class KDB_EXPORT Property {
 public:
-    Property() : isNull(true) {}
-    Property(const QVariant &aValue, const QString &aCaption)
-        : value(aValue), caption(aCaption), isNull(false)
-    {}
-    Property(const Property &other)
-    : value(other.value), caption(other.caption), isNull(other.isNull)
-    {}
-    QVariant value;  //!< Property value
-    QString caption; //!< User visible property caption
-    bool isNull;     //!< true if this is a null property
+    //! Constructs a null property
+    Property();
+
+    Property(const QVariant &aValue, const QString &aCaption);
+
+    Property(const Property &other);
+
+    ~Property();
+
+    bool isNull() const;
+
+    QVariant value() const;
+
+    void setValue(const QVariant &value);
+
+    QString caption() const;
+
+    void setCaption(const QString &caption);
+
+private:
+    class Private;
+    Private * const d;
 };
 
 //! A set of properties.
