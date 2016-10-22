@@ -84,6 +84,25 @@ KDbMessageTitleSetter::~KDbMessageTitleSetter()
 
 //------------------------------------------------
 
+class Q_DECL_HIDDEN KDbGuiItem::Private
+{
+public:
+    Private() {}
+    bool dummy;
+};
+
+KDbGuiItem::KDbGuiItem()
+    : d(new Private)
+{
+}
+
+KDbGuiItem::~KDbGuiItem()
+{
+    delete d;
+}
+
+//------------------------------------------------
+
 class KDbMessageHandler::Private
 {
 public:

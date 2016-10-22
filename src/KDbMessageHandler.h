@@ -111,8 +111,8 @@ private:
 class KDbGuiItem : private QHash<QByteArray, QVariant>
 {
 public:
-    inline KDbGuiItem() : QHash<QByteArray, QVariant>() {}
-    inline ~KDbGuiItem() {}
+    KDbGuiItem();
+    ~KDbGuiItem();
     inline KDbGuiItem& setProperty(const QByteArray& name, const QVariant& value)
         { insert(name, value); return *this; }
     void removeProperty(const QByteArray& name) { remove(name); }
@@ -123,6 +123,8 @@ public:
     inline QList<QByteArray> propertyNames() const { return keys(); }
     inline void clear() { QHash<QByteArray, QVariant>::clear(); }
 private:
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbGuiItem)
 };
 
