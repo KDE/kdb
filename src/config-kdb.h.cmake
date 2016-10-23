@@ -36,9 +36,9 @@
 //! @brief Extra version info, stable minor, e.g. 0 for 2.99.91 (3.0.0 Alpha)
 #define KDB_STABLE_VERSION_MINOR @PROJECT_STABLE_VERSION_MINOR@
 
-//! @def KDB_STABLE_VERSION_RELEASE
-//! @brief Extra version info, stable minor, e.g. 0 for 2.99.91 (3.0.0 Alpha)
-#define KDB_STABLE_VERSION_RELEASE @PROJECT_STABLE_VERSION_RELEASE@
+//! @def KDB_STABLE_VERSION_PATCH
+//! @brief Extra version info, stable patch, e.g. 0 for 3.1.0 Alpha (3.0.90)
+#define KDB_STABLE_VERSION_PATCH @PROJECT_STABLE_VERSION_PATCH@
 
 //! @def KDB_TESTING_EXPORT
 //! @brief Export symbols for testing
