@@ -29,11 +29,11 @@
 #define KDB_BASE_NAME_LOWER "@KDB_BASE_NAME_LOWER@"
 
 //! @def KDB_STABLE_VERSION_MAJOR
-//! @brief Extra version info, stable major, e.g. 3 for 2.99.91 (3.0.0 Alpha)
+//! @brief Extra version info, stable major, e.g. 3 for 3.1.0 Alpha (3.0.90)
 #define KDB_STABLE_VERSION_MAJOR @PROJECT_STABLE_VERSION_MAJOR@
 
 //! @def KDB_STABLE_VERSION_MINOR
-//! @brief Extra version info, stable minor, e.g. 0 for 2.99.91 (3.0.0 Alpha)
+//! @brief Extra version info, stable minor, e.g. 1 for 3.1.0 Alpha (3.0.90)
 #define KDB_STABLE_VERSION_MINOR @PROJECT_STABLE_VERSION_MINOR@
 
 //! @def KDB_STABLE_VERSION_PATCH
