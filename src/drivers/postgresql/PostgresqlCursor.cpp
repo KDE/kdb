@@ -66,7 +66,7 @@ bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
         return false;
     }
     m_fieldsToStoreInRecord = PQnfields(d->res);
-    m_fieldCount = m_fieldsToStoreInRecord - (m_containsRecordIdInfo ? 1 : 0);
+    m_fieldCount = m_fieldsToStoreInRecord - (containsRecordIdInfo() ? 1 : 0);
     m_numRows = PQntuples(d->res);
     m_records_in_buf = m_numRows;
     m_buffering_completed = true;
