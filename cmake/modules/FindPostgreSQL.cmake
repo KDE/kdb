@@ -149,7 +149,7 @@ endif()
 # Setting some more prefixes for the library
 set (PostgreSQL_LIB_PREFIX "")
 if ( WIN32 )
-  set (PostgreSQL_LIB_PREFIX ${PostgreSQL_LIB_PREFIX} "lib")
+  set (PostgreSQL_LIB_PREFIX "lib")
   set ( PostgreSQL_LIBRARY_TO_FIND ${PostgreSQL_LIB_PREFIX}${PostgreSQL_LIBRARY_TO_FIND})
 endif()
 
@@ -197,12 +197,15 @@ find_package_handle_standard_args(PostgreSQL
 if(PostgreSQL_FOUND)
 
   set(PostgreSQL_INCLUDE_DIRS ${PostgreSQL_INCLUDE_DIR} ${PostgreSQL_TYPE_INCLUDE_DIR} )
+  if(WIN32)
+    list(APPEND PostgreSQL_INCLUDE_DIRS ${PostgreSQL_TYPE_INCLUDE_DIR}/port/win32)
+  endif()
   set(PostgreSQL_LIBRARY_DIRS ${PostgreSQL_LIBRARY_DIR} )
-  set(PostgreSQL_LIBRARIES ${PostgreSQL_LIBRARY_TO_FIND})
+  set(PostgreSQL_LIBRARIES ${PostgreSQL_LIBRARY})
 
   #message("Final PostgreSQL include dir: ${PostgreSQL_INCLUDE_DIRS}")
   #message("Final PostgreSQL library dir: ${PostgreSQL_LIBRARY_DIRS}")
   #message("Final PostgreSQL libraries:   ${PostgreSQL_LIBRARIES}")
 endif()
 
-mark_as_advanced(PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR PostgreSQL_LIBRARY )
+mark_as_advanced(PostgreSQL_INCLUDE_DIR PostgreSQL_TYPE_INCLUDE_DIR PostgreSQL_LIBRARY PostgreSQL_ADDITIONAL_SEARCH_PATHS)
