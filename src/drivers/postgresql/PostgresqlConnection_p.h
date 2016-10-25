@@ -61,6 +61,7 @@ public:
     PGconn *conn;
     bool unicode;
     QByteArray escapingBuffer;
+    bool fuzzystrmatchExtensionCreated = false;
 private:
     Q_DISABLE_COPY(PostgresqlConnectionInternal)
 };
