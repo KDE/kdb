@@ -292,8 +292,6 @@ protected:
 
     KDbQuerySchema *m_query;
     bool m_afterLast;
-    bool m_containsRecordIdInfo; //!< true if result contains extra column for record id;
-                                 //!< used only for PostgreSQL now
     qint64 m_at;
     int m_fieldCount; //!< cached field count information
     int m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
