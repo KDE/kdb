@@ -186,7 +186,7 @@ enum Signedness
      C:\MyCode.cpp(111) : Your message
 */
 # define _MSGLINENO __FILE__ "(" _MSG1(__LINE__) ") : warning: "
-# define WARNING(msg) message(_MSGLINENO #msg)
+# define KDB_WARNING(msg) message(_MSGLINENO #msg)
 #endif /*_MSC_VER*/
 #endif /*WARNING*/
 
