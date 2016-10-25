@@ -701,7 +701,8 @@ BuiltInFunctions::BuiltInFunctions()
      alphabetic characters. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_soundex
     // See also http://www.postgresql.org/docs/9.5/static/fuzzystrmatch.html#AEN165853
-    //! @todo we call drv_executeVoidSQL("CREATE EXTENSION fuzzystrmatch") on connection, do that on first use of SOUNDEX()
+    //! @todo we call drv_executeVoidSQL("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch") on connection,
+    //!       do that on first use of SOUNDEX()
     // example: SELECT SOUNDEX("John")
     // result: "J500"
     decl->defaultReturnType = KDbField::Text;

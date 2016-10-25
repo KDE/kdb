@@ -200,7 +200,10 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     }
     //! @todo call on first use of SOUNDEX(), etc.;
     //!       it's not possible now because we don't have connection context in KDbFunctionExpressionData
-    drv_executeVoidSQL(KDbEscapedString("CREATE EXTENSION fuzzystrmatch"));
+    if (!d->fuzzystrmatchExtensionCreated) {
+        d->fuzzystrmatchExtensionCreated
+            = drv_executeVoidSQL(KDbEscapedString("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch"));
+    }
     PQclear(result);
     return true;
 }
