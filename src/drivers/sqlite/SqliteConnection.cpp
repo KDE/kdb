@@ -301,11 +301,14 @@ KDbSqlResult* SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
     if (res != SQLITE_OK) {
         m_result.setServerErrorCode(res);
         storeResult();
+#ifdef KDB_DEBUG_GUI
+        KDb::debugGUI(QLatin1String("  Failure"));
+#endif
         return nullptr;
     }
 
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String( res == SQLITE_OK ? "  Success" : "  Failure"));
+    KDb::debugGUI(QLatin1String("  Success"));
 #endif
     return new SqliteSqlResult(this, prepared_st);
 }
