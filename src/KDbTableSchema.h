@@ -153,8 +153,6 @@ private:
     //! Used by some ctors.
     void init(const KDbTableSchema& ts, bool copyId);
 
-    bool m_isKDbSystem;
-
     friend class KDbConnection;
     friend class KDbNativeStatementBuilder;
 };
