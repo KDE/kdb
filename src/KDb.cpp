@@ -154,7 +154,9 @@ void ConnectionTestThread::run()
         return;
     }
     if (!tmpDbName.isEmpty()) {
-        conn->closeDatabase();
+        if (!conn->closeDatabase()) {
+            emitError(*conn);
+        }
     }
     emitError(KDbResultable());
 }
