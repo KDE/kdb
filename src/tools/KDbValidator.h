@@ -87,6 +87,7 @@ protected:
 private:
     class Private;
     Private* const d;
+    Q_DISABLE_COPY(KDbValidator)
 };
 
 //! @short A validator groupping multiple QValidators

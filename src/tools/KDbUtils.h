@@ -333,6 +333,7 @@ public:
 private:
     class Private;
     Private * const d;
+    Q_DISABLE_COPY(StaticSetOfStrings)
 };
 
 /*! @return debugging string for object @a object of type @a T */

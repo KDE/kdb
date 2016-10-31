@@ -43,7 +43,7 @@ public:
     /*! Copy constructor.
      If @a copyId is true, it's copied as well, otherwise the table id becomes -1,
      what is usable when we want to store the copy as an independent table. */
-    explicit KDbTableSchema(const KDbTableSchema& ts, bool copyId = true);
+    explicit KDbTableSchema(const KDbTableSchema& ts, bool copyId);
 
     /*! Copy constructor like @ref KDbTableSchema(const KDbTableSchema&, bool).
      @a id is set as the table identifier. This is rarely usable, e.g.
@@ -155,6 +155,7 @@ private:
 
     friend class KDbConnection;
     friend class KDbNativeStatementBuilder;
+    Q_DISABLE_COPY(KDbTableSchema)
 };
 
 /*! Internal table with a name @a name. Rarely used.
