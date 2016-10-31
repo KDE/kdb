@@ -73,6 +73,12 @@ class Q_DECL_HIDDEN KDbConnectionOptions::Private
 {
 public:
     Private() : connection(nullptr) {}
+    void copy(const Private &other) {
+        *this = other;
+    }
+    bool operator==(const Private &other) const {
+        return std::tie(connection) == std::tie(other.connection);
+    }
     KDbConnection *connection;
 };
 
@@ -86,12 +92,26 @@ KDbConnectionOptions::KDbConnectionOptions(const KDbConnectionOptions &other)
  : KDbUtils::PropertySet(other)
  , d(new Private)
 {
-    *d = *other.d;
+    d->copy(*other.d);
 }
 
 KDbConnectionOptions::~KDbConnectionOptions()
 {
     delete d;
+}
+
+KDbConnectionOptions& KDbConnectionOptions::operator=(const KDbConnectionOptions &other)
+{
+    if (this != &other) {
+        KDbUtils::PropertySet::operator=(other);
+        d->copy(*other.d);
+    }
+    return *this;
+}
+
+bool KDbConnectionOptions::operator==(const KDbConnectionOptions &other) const
+{
+    return KDbUtils::PropertySet::operator==(other) && *d == *other.d;
 }
 
 bool KDbConnectionOptions::isReadOnly() const
@@ -115,7 +135,19 @@ void KDbConnectionOptions::insert(const QByteArray &name, const QVariant &value,
 
 void KDbConnectionOptions::setCaption(const QByteArray &name, const QString &caption)
 {
-    KDbUtils::PropertySet::insert(name, property(name).value(), caption);
+    if (name == "readOnly") {
+        return;
+    }
+    KDbUtils::PropertySet::setCaption(name, caption);
+}
+
+void KDbConnectionOptions::setValue(const QByteArray &name, const QVariant &value)
+{
+    if (name == "readOnly") {
+        setReadOnly(value.toBool());
+        return;
+    }
+    KDbUtils::PropertySet::setValue(name, value);
 }
 
 void KDbConnectionOptions::remove(const QByteArray &name)
@@ -131,7 +163,7 @@ void KDbConnectionOptions::setReadOnly(bool set)
     if (d->connection && d->connection->isConnected()) {
         return; //sanity
     }
-    KDbUtils::PropertySet::insert("readOnly", set);
+    KDbUtils::PropertySet::setValue("readOnly", set);
 }
 
 void KDbConnectionOptions::setConnection(KDbConnection *connection)

@@ -42,6 +42,16 @@ public:
 
     ~KDbConnectionOptions();
 
+    KDbConnectionOptions& operator=(const KDbConnectionOptions &other);
+
+    //! @return true if these options have exactly the same set ope options as @a other
+    //! @since 3.1
+    bool operator==(const KDbConnectionOptions &other) const;
+
+    //! @return true if thsese options differs in at least one option from @a other
+    //! @since 3.1
+    bool operator!=(const KDbConnectionOptions &other) const { return !operator==(other); }
+
     /*! @return true for read-only connection. Used especially for file-based drivers.
      Can be implemented in a driver to provide real read-only flag of the connection
      (sqlite driver does this). */
@@ -52,14 +62,20 @@ public:
     void setReadOnly(bool set);
 
     //! Inserts option with a given @a name, @a value and @a caption.
-    //! If @a caption is empty, caption from existing option is reused.
+    //! If such option exists, value is updated but caption only if existing caption is empty.
+    //! @a name must be a valid identifier (see KDb::isIdentifier()).
     void insert(const QByteArray &name, const QVariant &value, const QString &caption = QString());
 
-    //! Sets caption for property @a name to @a caption.
-    //! If @a caption is not empty, does nothing.
+    //! Sets caption for option @a name to @a caption.
+    //! If such option does not exist, does nothing.
     void setCaption(const QByteArray &name, const QString &caption);
 
-    //! Removes option with a given @a name.
+    //! Sets value for option @a name to @a value.
+    //! If such option does not exist, does nothing.
+    //! @since 3.1
+    void setValue(const QByteArray &name, const QVariant &value);
+
+    //! Removes option with a given @a name if exists.
     void remove(const QByteArray &name);
 
 private:
