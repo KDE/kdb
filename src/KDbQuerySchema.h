@@ -824,7 +824,7 @@ public:
      */
     explicit KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table = 0);
 
-    /*! Constructs a deep copu of query asterisk definition object @a asterisk. */
+    /*! Constructs a deep copy of query asterisk definition object @a asterisk. */
     KDbQueryAsterisk(const KDbQueryAsterisk& asterisk);
 
     virtual ~KDbQueryAsterisk();
