@@ -70,6 +70,7 @@ void IdentifierTest::testIsIdentifier()
     QFETCH(QString, string);
     QFETCH(bool, result);
     QCOMPARE(KDb::isIdentifier(string), result);
+    QCOMPARE(KDb::isIdentifier(string.toLatin1()), result);
 }
 
 void IdentifierTest::escapeIdentifier_data()

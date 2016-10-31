@@ -712,6 +712,10 @@ KDB_EXPORT bool importSqliteFile(const QString &inputFileName, const QString &ou
  and contains only letters, numbers and '_' character. */
 KDB_EXPORT bool isIdentifier(const QString& s);
 
+//! @overload isIdentifier(const QString& s)
+//! @since 3.1
+KDB_EXPORT bool isIdentifier(const QByteArray& s);
+
 /*! @return valid identifier based on @a s.
  Non-alphanumeric characters (or spaces) are replaced with '_'.
  If a number is at the beginning, '_' is added at start.

@@ -2129,6 +2129,19 @@ bool KDb::isIdentifier(const QString& s)
     return i > 0 && i == sLength;
 }
 
+bool KDb::isIdentifier(const QByteArray& s)
+{
+    int i;
+    const int sLength = s.length();
+    for (i = 0; i < sLength; i++) {
+        const char c = s.at(i);
+        if (c == 0 || !(c == '_' || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (i > 0 && c >= '0' && c <= '9'))) {
+            break;
+        }
+    }
+    return i > 0 && i == sLength;
+}
+
 static inline QString charToIdentifier(const QChar& c)
 {
     if (c.unicode() >= TRANSLITERATION_TABLE_SIZE)
