@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -55,13 +55,17 @@ using namespace KDbUtils;
 class Q_DECL_HIDDEN Property::Private
 {
 public:
-    Private() {}
+    Private() : isNull(true) {}
     Private(const QVariant &aValue, const QString &aCaption)
-        : value(aValue), caption(aCaption)
+        : value(aValue), caption(aCaption), isNull(false)
     {
+    }
+    bool operator==(const Private &other) const {
+        return std::tie(value, caption, isNull)  == std::tie(other.value, other.caption, other.isNull);
     }
     QVariant value;  //!< Property value
     QString caption; //!< User visible property caption
+    bool isNull;
 };
 
 Property::Property()
@@ -84,9 +88,14 @@ Property::~Property()
     delete d;
 }
 
+bool Property::operator==(const Property &other) const
+{
+    return *d == *other.d;
+}
+
 bool Property::isNull() const
 {
-    return d->caption.isEmpty();
+    return d->isNull;
 }
 
 QVariant Property::value() const
@@ -97,6 +106,7 @@ QVariant Property::value() const
 void Property::setValue(const QVariant &value)
 {
     d->value = value;
+    d->isNull = false;
 }
 
 QString Property::caption() const
@@ -107,6 +117,7 @@ QString Property::caption() const
 void Property::setCaption(const QString &caption)
 {
     d->caption = caption;
+    d->isNull = false;
 }
 
 //---------
@@ -498,6 +509,27 @@ QString KDbUtils::findExe(const QString& appname,
 class Q_DECL_HIDDEN PropertySet::Private
 {
 public:
+    void copy(const Private &other) {
+        for (AutodeletedHash<QByteArray, Property*>::ConstIterator it(other.data.constBegin());
+             it != other.data.constEnd(); ++it)
+        {
+            data.insert(it.key(), new Property(*it.value()));
+        }
+    }
+    bool operator==(const Private &other) const {
+        if (data.count() != other.data.count()) {
+            return false;
+        }
+        for (AutodeletedHash<QByteArray, Property*>::ConstIterator it(other.data.constBegin());
+             it != other.data.constEnd(); ++it)
+        {
+            AutodeletedHash<QByteArray, Property*>::ConstIterator findHere(data.constFind(it.key()));
+            if (*findHere.value() != *it.value()) {
+                return false;
+            }
+        }
+        return true;
+    }
     AutodeletedHash<QByteArray, Property*> data;
 };
 
@@ -509,16 +541,26 @@ PropertySet::PropertySet()
 PropertySet::PropertySet(const PropertySet &other)
     : d(new Private)
 {
-    for (AutodeletedHash<QByteArray, Property*>::ConstIterator it(other.d->data.constBegin());
-         it != other.d->data.constEnd(); ++it)
-    {
-        d->data.insert(it.key(), new Property(*it.value()));
-    }
+    d->copy(*other.d);
 }
 
 PropertySet::~PropertySet()
 {
     delete d;
+}
+
+PropertySet& PropertySet::operator=(const PropertySet &other)
+{
+    if (this != &other) {
+        d->data.clear();
+        d->copy(*other.d);
+    }
+    return *this;
+}
+
+bool PropertySet::operator==(const PropertySet &other) const
+{
+    return *d == *other.d;
 }
 
 void PropertySet::insert(const QByteArray &name, const QVariant &value, const QString &caption)
@@ -531,7 +573,27 @@ void PropertySet::insert(const QByteArray &name, const QVariant &value, const QS
             existing->setCaption(caption);
         }
     } else {
-        d->data.insert(name, new Property(value, realCaption));
+        if (KDb::isIdentifier(name)) {
+            d->data.insert(name, new Property(value, realCaption));
+        } else {
+            kdbWarning() << name << "cannot be used as property name";
+        }
+    }
+}
+
+void PropertySet::setCaption(const QByteArray &name, const QString &caption)
+{
+    Property *existing = d->data.value(name);
+    if (existing) {
+        existing->setCaption(caption);
+    }
+}
+
+void PropertySet::setValue(const QByteArray &name, const QVariant &value)
+{
+    Property *existing = d->data.value(name);
+    if (existing) {
+        existing->setValue(value);
     }
 }
 

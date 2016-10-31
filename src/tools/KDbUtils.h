@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -386,6 +386,10 @@ public:
 
     ~Property();
 
+    bool operator==(const Property &other) const;
+
+    bool operator!=(const Property &other) const { return !operator==(other); }
+
     bool isNull() const;
 
     QVariant value() const;
@@ -413,9 +417,30 @@ public:
 
     ~PropertySet();
 
+    PropertySet& operator=(const PropertySet &other);
+
+    //! @return true if this property set has exactly the same properties as @a other
+    //! @since 3.1
+    bool operator==(const PropertySet &other) const;
+
+    //! @return true if this property differs in at least one property from @a other
+    //! @since 3.1
+    bool operator!=(const PropertySet &other) const { return !operator==(other); }
+
     //! Inserts property with a given @a name, @a value and @a caption.
     //! If @a caption is empty, caption from existing property is reused.
+    //! @a name must be a valid identifier (see KDb::isIdentifier()).
     void insert(const QByteArray &name, const QVariant &value, const QString &caption = QString());
+
+    //! Sets caption for property @a name to @a caption.
+    //! If such property does not exist, does nothing.
+    //! @since 3.1
+    void setCaption(const QByteArray &name, const QString &caption);
+
+    //! Sets value for property @a name to @a value.
+    //! If such property does not exist, does nothing.
+    //! @since 3.1
+    void setValue(const QByteArray &name, const QVariant &value);
 
     //! Removes property with a given @a name.
     void remove(const QByteArray &name);
