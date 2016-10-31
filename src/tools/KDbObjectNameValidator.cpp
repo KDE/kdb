@@ -21,7 +21,7 @@
 
 #include "KDbDriver.h"
 
-class KDbObjectNameValidator::Private
+class Q_DECL_HIDDEN KDbObjectNameValidator::Private
 {
 public:
     Private() {}

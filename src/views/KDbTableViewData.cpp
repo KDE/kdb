@@ -238,7 +238,7 @@ public:
 #undef CAST_AND_COMPARE
 
 //! @internal
-class KDbTableViewData::Private
+class Q_DECL_HIDDEN KDbTableViewData::Private
 {
 public:
     Private()

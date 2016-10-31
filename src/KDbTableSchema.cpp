@@ -28,7 +28,7 @@
 #include <assert.h>
 
 //! @internal
-class KDbTableSchema::Private
+class Q_DECL_HIDDEN KDbTableSchema::Private
 {
 public:
     Private()

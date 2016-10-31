@@ -69,7 +69,7 @@ public:
 
 //================================================
 
-class KDbConnectionOptions::Private
+class Q_DECL_HIDDEN KDbConnectionOptions::Private
 {
 public:
     Private() : connection(nullptr) {}

@@ -35,7 +35,7 @@
 
 #include <QIcon>
 
-class KDbTableViewColumn::Private
+class Q_DECL_HIDDEN KDbTableViewColumn::Private
 {
 public:
   Private()

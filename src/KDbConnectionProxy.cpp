@@ -22,7 +22,7 @@
 #include "KDbProperties.h"
 #include "KDbVersionInfo.h"
 
-class KDbConnectionProxy::Private
+class Q_DECL_HIDDEN KDbConnectionProxy::Private
 {
 public:
     Private()

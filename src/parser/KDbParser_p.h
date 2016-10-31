@@ -115,7 +115,7 @@ private:
     Q_DISABLE_COPY(KDbParseInfo)
 };
 
-class KDbParseInfo::Private
+class Q_DECL_HIDDEN KDbParseInfo::Private
 {
 public:
     Private() {}

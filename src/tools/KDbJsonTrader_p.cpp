@@ -33,7 +33,7 @@
 
 Q_GLOBAL_STATIC(KDbJsonTrader, KDbJsonTrader_instance)
 
-class KDbJsonTrader::Private
+class Q_DECL_HIDDEN KDbJsonTrader::Private
 {
 public:
     Private() : pluginPathFound(false)

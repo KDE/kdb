@@ -30,7 +30,7 @@
 #include "KDb.h"
 
 //! @internal used for KDbSimpleCommandLineApp
-class KDbSimpleCommandLineApp::Private
+class Q_DECL_HIDDEN KDbSimpleCommandLineApp::Private
 {
 public:
     Private()

@@ -21,7 +21,7 @@
 #include "KDbIdentifierValidator.h"
 #include "KDb.h"
 
-class KDbIdentifierValidator::Private
+class Q_DECL_HIDDEN KDbIdentifierValidator::Private
 {
 public:
     Private() : isLowerCaseForced(false) {}

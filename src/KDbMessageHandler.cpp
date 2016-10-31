@@ -21,7 +21,7 @@
 
 #include "KDbResult.h"
 
-class KDbMessageGuard::Private
+class Q_DECL_HIDDEN KDbMessageGuard::Private
 {
 public:
     Private() {}
@@ -103,7 +103,7 @@ KDbGuiItem::~KDbGuiItem()
 
 //------------------------------------------------
 
-class KDbMessageHandler::Private
+class Q_DECL_HIDDEN KDbMessageHandler::Private
 {
 public:
     Private()

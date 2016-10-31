@@ -30,7 +30,7 @@
 class KDbConnection;
 
 //! @internal
-class KDbQuerySchema::Private
+class Q_DECL_HIDDEN KDbQuerySchema::Private
 {
     Q_DECLARE_TR_FUNCTIONS(KDbQuerySchema)
 public:

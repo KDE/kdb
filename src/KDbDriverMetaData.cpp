@@ -27,7 +27,7 @@ static bool isTrue(KPluginMetaData *metaData, const char* fieldName)
                 .compare(QLatin1String("true"), Qt::CaseInsensitive);
 }
 
-class KDbDriverMetaData::Private
+class Q_DECL_HIDDEN KDbDriverMetaData::Private
 {
 public:
     explicit Private(KDbDriverMetaData *metaData)

@@ -24,7 +24,7 @@
 #include "KDbDriverMetaData.h"
 #include "KDbVersionInfo.h"
 
-class KDbDriverBehavior::Private
+class Q_DECL_HIDDEN KDbDriverBehavior::Private
 {
 public:
     Private() {}

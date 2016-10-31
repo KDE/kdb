@@ -20,7 +20,7 @@
 #include "KDbAdmin.h"
 #include "KDbConnectionData.h"
 
-class KDbAdminTools::Private
+class Q_DECL_HIDDEN KDbAdminTools::Private
 {
 public:
     Private() {}

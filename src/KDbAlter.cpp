@@ -27,7 +27,7 @@
 
 #include <stdlib.h>
 
-class KDbAlterTableHandler::Private
+class Q_DECL_HIDDEN KDbAlterTableHandler::Private
 {
 public:
     Private() {}

@@ -50,7 +50,7 @@ QDebug operator<<(QDebug dbg, const QList<KDbQuerySchemaParameter>& list)
 
 //================================================
 
-class KDbQuerySchemaParameterValueListIterator::Private
+class Q_DECL_HIDDEN KDbQuerySchemaParameterValueListIterator::Private
 {
 public:
     Private(/*const KDbDriver &driver, */const QList<QVariant>& aParams)

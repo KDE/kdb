@@ -29,7 +29,7 @@
 #include <vector>
 
 //! @internal
-class KDbLookupFieldSchema::RecordSource::Private
+class Q_DECL_HIDDEN KDbLookupFieldSchema::RecordSource::Private
 {
 public:
     Private()
@@ -41,7 +41,7 @@ public:
 };
 
 //! @internal
-class KDbLookupFieldSchema::Private
+class Q_DECL_HIDDEN KDbLookupFieldSchema::Private
 {
 public:
     Private()

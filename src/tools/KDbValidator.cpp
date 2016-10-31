@@ -19,7 +19,7 @@
 
 #include "KDbValidator.h"
 
-class KDbValidator::Private
+class Q_DECL_HIDDEN KDbValidator::Private
 {
 public:
     Private()
@@ -30,7 +30,7 @@ public:
 
 //-----------------------------------------------------------
 
-class KDbMultiValidator::Private
+class Q_DECL_HIDDEN KDbMultiValidator::Private
 {
 public:
     Private() {

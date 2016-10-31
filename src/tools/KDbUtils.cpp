@@ -221,7 +221,7 @@ void* KDbUtils::stringToPointerInternal(const QString& string, int size)
 //---------
 
 //! @internal
-class StaticSetOfStrings::Private
+class Q_DECL_HIDDEN StaticSetOfStrings::Private
 {
 public:
     Private() : array(0), set(0) {}
@@ -495,7 +495,7 @@ QString KDbUtils::findExe(const QString& appname,
 
 // ---
 
-class PropertySet::Private
+class Q_DECL_HIDDEN PropertySet::Private
 {
 public:
     AutodeletedHash<QByteArray, Property*> data;

@@ -154,7 +154,7 @@ void KDbResultable::storePreviousError()
     kdbDebug() << "Object ERROR:" << m_previousServerResultCode2 << ":" << m_previousServerResultName2;
 }*/
 
-class KDbResultable::Private
+class Q_DECL_HIDDEN KDbResultable::Private
 {
 public:
     Private() : messageHandler(nullptr)

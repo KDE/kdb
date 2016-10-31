@@ -25,7 +25,7 @@
 #include "KDbQuerySchema.h"
 #include "kdb_debug.h"
 
-class KDbTableOrQuerySchema::Private
+class Q_DECL_HIDDEN KDbTableOrQuerySchema::Private
 {
 public:
     Private() {}

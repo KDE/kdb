@@ -35,7 +35,7 @@ KDbSelectStatementOptions::KDbSelectStatementOptions()
 
 //================================================
 
-class KDbNativeStatementBuilder::Private
+class Q_DECL_HIDDEN KDbNativeStatementBuilder::Private
 {
 public:
     Private() {}

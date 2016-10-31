@@ -32,7 +32,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-class KDbCursor::Private
+class Q_DECL_HIDDEN KDbCursor::Private
 {
 public:
     Private()
