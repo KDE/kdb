@@ -130,6 +130,7 @@ void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
 
     const KDbUtils::Property extraSqliteExtensionPathsProperty = connection->options()->property("extraSqliteExtensionPaths");
     QVERIFY2(!extraSqliteExtensionPathsProperty.isNull(), "extraSqliteExtensionPaths property not found");
+    QCOMPARE(extraSqliteExtensionPathsProperty.value().type(), QVariant::StringList);
     QCOMPARE(extraSqliteExtensionPathsProperty.value().toStringList(), extraSqliteExtensionPaths);
 
     const KDbUtils::Property readOnlyProperty = connection->options()->property("readOnly");

@@ -40,8 +40,12 @@ SqliteConnection::SqliteConnection(KDbDriver *driver, const KDbConnectionData& c
         : KDbConnection(driver, connData, options)
         , d(new SqliteConnectionInternal(this))
 {
-    this->options()->setCaption("extraSqliteExtensionPaths",
-                                SqliteConnection::tr("Extra paths for SQLite plugins"));
+    QByteArray propertyName = "extraSqliteExtensionPaths";
+    KDbUtils::Property extraSqliteExtensionPathsProperty = this->options()->property(propertyName);
+    if (extraSqliteExtensionPathsProperty.isNull()) {
+        this->options()->insert(propertyName, QStringList());
+    }
+    this->options()->setCaption(propertyName, SqliteConnection::tr("Extra paths for SQLite plugins"));
 }
 
 SqliteConnection::~SqliteConnection()
