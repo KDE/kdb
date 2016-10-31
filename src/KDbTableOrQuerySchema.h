@@ -98,11 +98,10 @@ public:
     /*! @return connection object, for table or query or 0 if there's no table or query defined. */
     KDbConnection* connection() const;
 
-protected:
+private:
     class Private;
     Private * const d;
 
-private:
     Q_DISABLE_COPY(KDbTableOrQuerySchema)
 };
 

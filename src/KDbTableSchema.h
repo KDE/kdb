@@ -143,15 +143,15 @@ protected:
     /*! For KDbConnection. */
     void setConnection(KDbConnection* conn);
 
-    class Private;
-    Private * const d;
-
 private:
     //! Used by some ctors.
     void init(KDbConnection* conn);
 
     //! Used by some ctors.
     void init(const KDbTableSchema& ts, bool copyId);
+
+    class Private;
+    Private * const d;
 
     friend class KDbConnection;
     friend class KDbNativeStatementBuilder;

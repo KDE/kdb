@@ -45,9 +45,9 @@ protected:
     virtual KDbValidator::Result internalCheck(const QString &valueName, const QVariant& value,
                                                QString *message, QString *details);
 
+private:
     class Private;
     Private* const d;
-private:
     Q_DISABLE_COPY(KDbIdentifierValidator)
 };
 
