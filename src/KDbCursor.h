@@ -173,7 +173,7 @@ public:
     bool containsRecordIdInfo() const;
 
     /*! @return a value stored in column number @a i (counting from 0).
-     Is has unspecified behavior if the cursor is not at valid record.
+     It has unspecified behavior if the cursor is not at valid record.
      Note for driver developers:
      If @a i is >= than m_fieldCount, null QVariant value should be returned.
      To return a value typically you can use a pointer to internal structure

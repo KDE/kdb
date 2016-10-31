@@ -36,7 +36,7 @@ public:
     explicit SqliteConnectionInternal(KDbConnection *connection);
     virtual ~SqliteConnectionInternal();
 
-    //! @return true is loading extensions is enabled
+    //! @return true if loading extensions is enabled
     bool extensionsLoadingEnabled() const;
 
     //! Sets loading extensions flag to @a set

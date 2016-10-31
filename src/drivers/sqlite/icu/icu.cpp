@@ -232,7 +232,7 @@ static void icuRegexpDelete(void *p){
 ** Implementation of SQLite REGEXP operator. This scalar function takes
 ** two arguments. The first is a regular expression pattern to compile
 ** the second is a string to match against that pattern. If either
-** argument is an SQL NULL, then NULL Is returned. Otherwise, the result
+** argument is an SQL NULL, then NULL is returned. Otherwise, the result
 ** is 1 if the string matches the pattern, or 0 otherwise.
 **
 ** SQLite maps the regexp() function to the regexp() operator such

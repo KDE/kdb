@@ -437,7 +437,7 @@ public:
     int tablePositionForAlias(const QString& name) const;
 
     /*! @return position (within the FROM section) of table @a tableName.
-     -1 is returend if there's no such table declared in the FROM section.
+     -1 is returned if there's no such table declared in the FROM section.
      @see tablePositions()
     */
     int tablePosition(const QString& tableName) const;

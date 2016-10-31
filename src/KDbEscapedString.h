@@ -58,8 +58,9 @@ public:
     //! @return invalid escaped string.
     static inline KDbEscapedString invalid() { return KDbEscapedString(false); }
 
-    //! @return true is the string valid. Valid string means that the escaping process has finished
-    //! successfully; it does not mean that the statement itself parses or executed without errors.
+    //! @return true if the string is valid. Valid string means that the escaping process
+    //! has finished successfully. It does not mean that the statement itself parses
+    //! or can be executed without errors.
     inline bool isValid() const { return m_valid; }
 
     inline QByteArray toByteArray() const { return static_cast<const QByteArray&>(*this); }
