@@ -549,6 +549,7 @@ bool KDbLookupFieldSchema::setProperty(const QByteArray& propertyName, const QVa
         } else {
             kdbCritical() << "impl. error: unsupported property" << propertyName;
         }
+        this->setRecordSource(recordSource);
     }
     else if ("boundColumn" == propertyName) {
         if (!::setBoundColumn(this, value)) {
