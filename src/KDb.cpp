@@ -972,7 +972,7 @@ struct KDb_LookupFieldSchemaProperties {
         for (QMap<QByteArray, QVariant>::ConstIterator it(tmp.constBegin());
              it != tmp.constEnd(); ++it)
         {
-            set.insert(it.key());
+            set.insert(it.key().toLower());
         }
     }
     QSet<QByteArray> set;
@@ -983,7 +983,7 @@ Q_GLOBAL_STATIC(KDb_LookupFieldSchemaProperties, KDb_lookupFieldSchemaProperties
 
 bool KDb::isLookupFieldSchemaProperty(const QByteArray& propertyName)
 {
-    return KDb_lookupFieldSchemaProperties->set.contains(QByteArray(propertyName).toLower());
+    return KDb_lookupFieldSchemaProperties->set.contains(propertyName.toLower());
 }
 
 bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, const QVariant& value)
