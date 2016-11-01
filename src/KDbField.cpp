@@ -20,6 +20,7 @@
  */
 
 #include "KDbField.h"
+#include "KDbField_p.h"
 #include "KDbConnection.h"
 #include "KDbDriver.h"
 #include "KDbExpression.h"
@@ -734,13 +735,15 @@ void KDbField::setIndexed(bool s)
     }
 }
 
-QDebug operator<<(QDebug dbg, const KDbField& field)
+void debug(QDebug dbg, const KDbField& field, KDbFieldDebugOptions options)
 {
     KDbConnection *conn = field.table() ? field.table()->connection() : 0;
-    if (field.name().isEmpty()) {
-        dbg.nospace() << "<NONAME>";
-    } else {
-        dbg.nospace() << field.name();
+    if (options & KDbFieldDebugAddName) {
+        if (field.name().isEmpty()) {
+            dbg.nospace() << "<NONAME> ";
+        } else {
+            dbg.nospace() << field.name() << ' ';
+        }
     }
     if (field.options() & KDbField::Unsigned)
         dbg.nospace() << " UNSIGNED";
@@ -792,6 +795,11 @@ QDebug operator<<(QDebug dbg, const KDbField& field)
                      QLatin1String(it.value().typeName())));
         }
     }
+}
+
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbField& field)
+{
+    debug(dbg, field, KDbFieldDebugAddName);
     return dbg.space();
 }
 

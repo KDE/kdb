@@ -20,6 +20,7 @@
 #include "KDbQueryColumnInfo.h"
 #include "KDbTableSchema.h"
 #include "KDbField.h"
+#include "KDbField_p.h"
 #include "kdb_debug.h"
 
 KDbQueryColumnInfo::KDbQueryColumnInfo(KDbField *f, const QString& _alias, bool _visible,
@@ -60,11 +61,18 @@ KDbQueryColumnInfo *KDbQueryColumnInfo::foreignColumn() const
 
 QDebug operator<<(QDebug dbg, const KDbQueryColumnInfo& info)
 {
+    QString fieldName;
+    if (info.field->name().isEmpty()) {
+        fieldName = QLatin1String("<NONAME>");
+    } else {
+        fieldName = info.field->name();
+    }
     dbg.nospace()
         << (info.field->table() ? (info.field->table()->name() + QLatin1Char('.')) : QString())
-        << *info.field
-        << (info.alias.isEmpty() ? QString()
-            : (QLatin1String(" AS ") + info.alias))
-            + (info.visible ? QString() : QLatin1String(" [INVISIBLE]"));
+           + fieldName;
+    debug(dbg, *info.field, KDbFieldDebugNoOptions);
+    dbg.nospace()
+        << qPrintable(info.alias.isEmpty() ? QString() : (QLatin1String(" AS ") + info.alias))
+        << qPrintable(info.visible ? QLatin1String() : QLatin1String(" [INVISIBLE]"));
     return dbg.space();
 }
