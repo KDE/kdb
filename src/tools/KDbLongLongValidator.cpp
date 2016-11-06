@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2016 Jarosław Staniek <staniek@kde.org>
 
    Based on KIntValidator code by Glen Parker <glenebob@nwlink.com>
 
@@ -23,16 +23,30 @@
 
 #include <QWidget>
 
+class Q_DECL_HIDDEN KDbLongLongValidator::Private
+{
+public:
+    Private()
+        : min(0)
+        , max(0)
+    {
+    }
+    qint64 base;
+    qint64 min;
+    qint64 max;
+};
+
 KDbLongLongValidator::KDbLongLongValidator(QWidget * parent, int base)
         : QValidator(parent)
-        , m_min(0), m_max(0)
+        , d(new Private)
 {
     setBase(base);
 }
 
 KDbLongLongValidator::KDbLongLongValidator(qint64 bottom, qint64 top,
-                                     QWidget * parent, int base)
+                                           QWidget * parent, int base)
         : QValidator(parent)
+        , d(new Private)
 {
     setBase(base);
     setRange(bottom, top);
@@ -40,6 +54,7 @@ KDbLongLongValidator::KDbLongLongValidator(qint64 bottom, qint64 top,
 
 KDbLongLongValidator::~KDbLongLongValidator()
 {
+    delete d;
 }
 
 QValidator::State KDbLongLongValidator::validate(QString &str, int &) const
@@ -49,16 +64,16 @@ QValidator::State KDbLongLongValidator::validate(QString &str, int &) const
     QString newStr;
 
     newStr = str.trimmed();
-    if (m_base > 10)
+    if (d->base > 10)
         newStr = newStr.toUpper();
 
     if (newStr == QString::fromLatin1("-")) {// a special case
-        if ((m_min || m_max) && m_min >= 0)
+        if ((d->min || d->max) && d->min >= 0)
             ok = false;
         else
             return QValidator::Acceptable;
     } else if (!newStr.isEmpty())
-        val = newStr.toLongLong(&ok, m_base);
+        val = newStr.toLongLong(&ok, d->base);
     else {
         val = 0;
         ok = true;
@@ -67,10 +82,10 @@ QValidator::State KDbLongLongValidator::validate(QString &str, int &) const
     if (! ok)
         return QValidator::Invalid;
 
-    if ((! m_min && ! m_max) || (val >= m_min && val <= m_max))
+    if ((! d->min && ! d->max) || (val >= d->min && val <= d->max))
         return QValidator::Acceptable;
 
-    if (m_max && m_min >= 0 && val < 0)
+    if (d->max && d->min >= 0 && val < 0)
         return QValidator::Invalid;
 
     return QValidator::Acceptable;
@@ -87,48 +102,48 @@ void KDbLongLongValidator::fixup(QString &str) const
     if (state == QValidator::Invalid || state == QValidator::Acceptable)
         return;
 
-    if (! m_min && ! m_max)
+    if (! d->min && ! d->max)
         return;
 
-    val = str.toLongLong(0, m_base);
+    val = str.toLongLong(0, d->base);
 
-    if (val < m_min)
-        val = m_min;
-    if (val > m_max)
-        val = m_max;
+    if (val < d->min)
+        val = d->min;
+    if (val > d->max)
+        val = d->max;
 
-    str.setNum(val, m_base);
+    str.setNum(val, d->base);
 }
 
 void KDbLongLongValidator::setRange(qint64 bottom, qint64 top)
 {
-    m_min = bottom;
-    m_max = top;
+    d->min = bottom;
+    d->max = top;
 
-    if (m_max < m_min)
-        m_max = m_min;
+    if (d->max < d->min)
+        d->max = d->min;
 }
 
 void KDbLongLongValidator::setBase(int base)
 {
-    m_base = base;
-    if (m_base < 2)
-        m_base = 2;
-    if (m_base > 36)
-        m_base = 36;
+    d->base = base;
+    if (d->base < 2)
+        d->base = 2;
+    if (d->base > 36)
+        d->base = 36;
 }
 
 qint64 KDbLongLongValidator::bottom() const
 {
-    return m_min;
+    return d->min;
 }
 
 qint64 KDbLongLongValidator::top() const
 {
-    return m_max;
+    return d->max;
 }
 
 int KDbLongLongValidator::base() const
 {
-    return m_base;
+    return d->base;
 }

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -62,9 +62,8 @@ public:
     virtual int base() const;
 
 private:
-    qint64 m_base;
-    qint64 m_min;
-    qint64 m_max;
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbLongLongValidator)
 };
 
