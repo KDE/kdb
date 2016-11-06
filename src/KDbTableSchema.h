@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -64,23 +64,61 @@ public:
      This method never returns 0 value,
      if there is no primary key, empty KDbIndexSchema object is returned.
      KDbIndexSchema object is owned by the table schema. */
-    KDbIndexSchema* primaryKey() const;
+    KDbIndexSchema* primaryKey();
 
-    /*! Sets table's primary key index to @a pkey. Pass pkey==0 if you want to unassign
-     existing primary key ("primary" property of given KDbIndexSchema object will be
-     cleared then so this index becomes ordinary index, still existing on table indeices list).
+    //! @overload KDbIndexSchema* primaryKey()
+    const KDbIndexSchema* primaryKey() const;
 
-     If this table already has primary key assigned,
-     it is unassigned using setPrimaryKey(0) call.
+    /*! Sets table's primary key index to @a pkey.
+     Pass pkey as @c nullptr to unassign existing primary key. In this case "primary"
+     property of previous primary key KDbIndexSchema object that will be cleared,
+     making it an ordinary index.
+
+     If this table already has primary key assigned, it is unassigned using setPrimaryKey(nullptr).
 
      Before assigning as primary key, you should add the index to indices list
      with addIndex() (this is not done automatically!).
     */
     void setPrimaryKey(KDbIndexSchema *pkey);
 
-    const KDbIndexSchema::ListIterator indicesIterator() const;
+    const QList<KDbIndexSchema*>::ConstIterator indicesIterator() const;
 
-    const KDbIndexSchema::List* indices() const;
+    const QList<KDbIndexSchema*>* indices() const;
+
+    //! Adds index @a index to this table schema
+    //! Ownership of the index is transferred to the table schema.
+    //! @return true on success
+    //! @since 3.1
+    bool addIndex(KDbIndexSchema *index);
+
+    //! Removes index @a index from this table schema
+    //! Ownership of the index is transferred to the table schema.
+    //! @return true on success
+    //! @since 3.1
+    bool removeIndex(KDbIndexSchema *index);
+
+    /*! Creates a copy of index @a index with references moved to fields of this table.
+     The new index is added to this table schema.
+     Table fields are taken by name from this table. This way it's possible to copy index
+     owned by other table and add it to another table, e.g. a copied one.
+
+     To copy an index from another table, call:
+     @code
+     KDbIndexSchema *originalIndex = anotherTable->indices()->at(...);
+     KDbIndexSchema *newIndex = table->copyIndex(*originalIndex);
+     // newIndex is now created and is added to the table 'table'
+     @endcode
+
+     To copy an index within the same table, call:
+     @code
+     KDbIndexSchema *originalIndex = table->indices()->at(...);
+     KDbIndexSchema *newIndex = table->copyIndex(*originalIndex);
+     // newIndex is now created and is added to the table
+     @endcode
+     @since 3.1
+     @todo All relationships should be also copied
+     */
+    KDbIndexSchema* copyIndexFrom(const KDbIndexSchema& index);
 
     /*! Removes all fields from the list, clears name and all other properties.
       @see KDbFieldList::clear() */

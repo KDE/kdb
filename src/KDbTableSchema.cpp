@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2007 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -31,8 +31,9 @@
 class Q_DECL_HIDDEN KDbTableSchema::Private
 {
 public:
-    Private()
-            : anyNonPKField(nullptr)
+    Private(KDbTableSchema *t)
+            : q(t)
+            , anyNonPKField(nullptr)
             , conn(nullptr)
             , pkey(nullptr)
             , query(nullptr)
@@ -50,10 +51,16 @@ public:
         lookupFields.clear();
     }
 
+    void addIndex(KDbIndexSchema *index) {
+        indices.append(index);
+        index->setTable(q);
+    }
+
+    KDbTableSchema * const q;
     KDbField *anyNonPKField;
     QHash<const KDbField*, KDbLookupFieldSchema*> lookupFields;
     QVector<KDbLookupFieldSchema*> lookupFieldsList;
-    KDbIndexSchema::List indices;
+    QList<KDbIndexSchema*> indices;
     //! @todo IMPORTANT: use something like QPointer<KDbConnection> conn
     KDbConnection *conn;
     KDbIndexSchema *pkey;
@@ -67,7 +74,7 @@ private:
 KDbTableSchema::KDbTableSchema(const QString& name)
         : KDbFieldList(true)
         , KDbObject(KDb::TableObjectType)
-        , d( new Private )
+        , d(new Private(this))
 {
     setName(name);
     init(0);
@@ -76,7 +83,7 @@ KDbTableSchema::KDbTableSchema(const QString& name)
 KDbTableSchema::KDbTableSchema(const KDbObject& other)
         : KDbFieldList(true)
         , KDbObject(other)
-        , d( new Private )
+        , d(new Private(this))
 {
     init(0);
 }
@@ -84,7 +91,7 @@ KDbTableSchema::KDbTableSchema(const KDbObject& other)
 KDbTableSchema::KDbTableSchema()
         : KDbFieldList(true)
         , KDbObject(KDb::TableObjectType)
-        , d( new Private )
+        , d(new Private(this))
 {
     init(0);
 }
@@ -92,7 +99,7 @@ KDbTableSchema::KDbTableSchema()
 KDbTableSchema::KDbTableSchema(const KDbTableSchema& ts, bool copyId)
         : KDbFieldList(static_cast<const KDbFieldList&>(ts))
         , KDbObject(static_cast<const KDbObject&>(ts))
-        , d( new Private )
+        , d(new Private(this))
 {
     init(ts, copyId);
 }
@@ -100,7 +107,7 @@ KDbTableSchema::KDbTableSchema(const KDbTableSchema& ts, bool copyId)
 KDbTableSchema::KDbTableSchema(const KDbTableSchema& ts, int id)
         : KDbFieldList(static_cast<const KDbFieldList&>(ts))
         , KDbObject(static_cast<const KDbObject&>(ts))
-        , d( new Private )
+        , d(new Private(this))
 {
     init(ts, false);
     setId(id);
@@ -110,7 +117,7 @@ KDbTableSchema::KDbTableSchema(const KDbTableSchema& ts, int id)
 KDbTableSchema::KDbTableSchema(KDbConnection *conn, const QString & name)
         : KDbFieldList(true)
         , KDbObject(KDb::TableObjectType)
-        , d( new Private )
+        , d(new Private(this))
 {
     Q_ASSERT(conn);
     setName(name);
@@ -128,8 +135,8 @@ KDbTableSchema::~KDbTableSchema()
 void KDbTableSchema::init(KDbConnection* conn)
 {
     d->conn = conn;
-    d->pkey = new KDbIndexSchema(this);
-    d->indices.append(d->pkey);
+    d->pkey = new KDbIndexSchema;
+    d->addIndex(d->pkey);
 }
 
 void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
@@ -142,12 +149,11 @@ void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
 
     //deep copy all members
     foreach(KDbIndexSchema* otherIdx, *ts.indices()) {
-        KDbIndexSchema *idx = new KDbIndexSchema(
-            *otherIdx, this /*fields from _this_ table will be assigned to the index*/);
+        // fields from _this_ table will be assigned to the index
+        KDbIndexSchema *idx = copyIndexFrom(*otherIdx);
         if (idx->isPrimaryKey()) {//assign pkey
             d->pkey = idx;
         }
-        d->indices.append(idx);
     }
 
     KDbField::ListIterator tsIter(ts.fieldsIterator());
@@ -160,19 +166,49 @@ void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
     }
 }
 
-KDbIndexSchema* KDbTableSchema::primaryKey() const
+KDbIndexSchema* KDbTableSchema::primaryKey()
 {
     return d->pkey;
 }
 
-const KDbIndexSchema::ListIterator KDbTableSchema::indicesIterator() const
+const KDbIndexSchema* KDbTableSchema::primaryKey() const
 {
-    return KDbIndexSchema::ListIterator(d->indices.constBegin());
+    return d->pkey;
 }
 
-const KDbIndexSchema::List* KDbTableSchema::indices() const
+const QList<KDbIndexSchema*>::ConstIterator KDbTableSchema::indicesIterator() const
+{
+    return QList<KDbIndexSchema*>::ConstIterator (d->indices.constBegin());
+}
+
+const QList<KDbIndexSchema*>* KDbTableSchema::indices() const
 {
     return &d->indices;
+}
+
+bool KDbTableSchema::addIndex(KDbIndexSchema *index)
+{
+    if (index && !d->indices.contains(index)) {
+        d->addIndex(index);
+        return true;
+    }
+    return false;
+}
+
+bool KDbTableSchema::removeIndex(KDbIndexSchema *index)
+{
+    if (index) {
+        d->indices.removeOne(index);
+        return true;
+    }
+    return false;
+}
+
+KDbIndexSchema* KDbTableSchema::copyIndexFrom(const KDbIndexSchema& index)
+{
+    KDbIndexSchema *newIndex = new KDbIndexSchema(index, this);
+    addIndex(newIndex);
+    return newIndex;
 }
 
 bool KDbTableSchema::isInternal() const
@@ -182,6 +218,11 @@ bool KDbTableSchema::isInternal() const
 
 void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
 {
+    if (pkey && !d->indices.contains(pkey)) {
+        kdbWarning() << *pkey << "index can't be made primary key because it does not belong "
+                                 "to table schema" << name();
+        return;
+    }
     if (d->pkey && d->pkey != pkey) {
         if (d->pkey->fieldCount() == 0) {//this is empty key, probably default - remove it
             d->indices.removeOne(d->pkey);
@@ -189,12 +230,13 @@ void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
         }
         else {
             d->pkey->setPrimaryKey(false); //there can be only one pkey..
-            //thats ok, the old pkey is still on indices list, if not empty
+            //that's ok, the old pkey is still on indices list, if not empty
         }
     }
 
     if (!pkey) {//clearing - set empty pkey
-        pkey = new KDbIndexSchema(this);
+        pkey = new KDbIndexSchema;
+        d->addIndex(pkey);
     }
     d->pkey = pkey; //!< @todo
     d->pkey->setPrimaryKey(true);
@@ -218,7 +260,8 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
     //Check for auto-generated indices:
     KDbIndexSchema *idx = 0;
     if (field->isPrimaryKey()) {// this is auto-generated single-field unique index
-        idx = new KDbIndexSchema(this);
+        idx = new KDbIndexSchema;
+        d->addIndex(idx);
         idx->setAutoGenerated(true);
         const bool ok = idx->addField(field);
         Q_ASSERT(ok);
@@ -226,7 +269,8 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
     }
     if (field->isUniqueKey()) {
         if (!idx) {
-            idx = new KDbIndexSchema(this);
+            idx = new KDbIndexSchema;
+            d->addIndex(idx);
             idx->setAutoGenerated(true);
             const bool ok = idx->addField(field);
             Q_ASSERT(ok);
@@ -235,14 +279,12 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
     }
     if (field->isIndexed()) {// this is auto-generated single-field
         if (!idx) {
-            idx = new KDbIndexSchema(this);
+            idx = new KDbIndexSchema;
+            d->addIndex(idx);
             idx->setAutoGenerated(true);
             const bool ok = idx->addField(field);
             Q_ASSERT(ok);
         }
-    }
-    if (idx) {
-        d->indices.append(idx);
     }
     return true;
 }

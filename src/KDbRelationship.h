@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -132,7 +132,7 @@ public:
      On success, this KDbRelationship object is detached from previous KDbIndexSchema objects that were
      assigned before, and new are attached.
      */
-    void setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex);
+    bool setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex);
 
 protected:
     KDbRelationship(KDbQuerySchema *query, KDbField *field1, KDbField *field2);
@@ -141,7 +141,7 @@ protected:
 
     /*! Internal version of setIndices(). @a ownedByMaster parameter is passed
      to KDbIndexSchema::attachRelationship() */
-    void setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster);
+    bool setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster);
 
     KDbIndexSchema *m_masterIndex;
     KDbIndexSchema *m_detailsIndex;

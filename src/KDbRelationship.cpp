@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2004 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -38,7 +38,7 @@ KDbRelationship::KDbRelationship(KDbIndexSchema* masterIndex, KDbIndexSchema* de
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
-    setIndices(masterIndex, detailsIndex);
+    (void)setIndices(masterIndex, detailsIndex);
 }
 
 KDbRelationship::KDbRelationship(KDbQuerySchema *query, KDbField *field1, KDbField *field2)
@@ -103,21 +103,24 @@ void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDb
         detailsField = field2;
         //create foreign key
 //@todo: check if it already exists
-        m_detailsIndex = new KDbIndexSchema(detailsField->table());
+        m_detailsIndex = new KDbIndexSchema;
+        detailsField->table()->addIndex(m_detailsIndex);
         m_detailsIndexOwned = true;
         const bool ok = m_detailsIndex->addField(detailsField);
         Q_ASSERT(ok);
         m_detailsIndex->setForeignKey(true);
     } else if (!p1 && !p2) {
         masterField = field1;
-        m_masterIndex = new KDbIndexSchema(masterField->table());
+        m_masterIndex = new KDbIndexSchema;
+        masterField->table()->addIndex(m_masterIndex);
         m_masterIndexOwned = true;
         bool ok = m_masterIndex->addField(masterField);
         Q_ASSERT(ok);
         m_masterIndex->setForeignKey(true);
 
         detailsField = field2;
-        m_detailsIndex = new KDbIndexSchema(detailsField->table());
+        m_detailsIndex = new KDbIndexSchema;
+        detailsField->table()->addIndex(m_detailsIndex);
         m_detailsIndexOwned = true;
         ok = m_detailsIndex->addField(detailsField);
         Q_ASSERT(ok);
@@ -127,7 +130,7 @@ void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDb
     if (!m_masterIndex || !m_detailsIndex)
         return; //failed
 
-    setIndices(m_masterIndex, m_detailsIndex, false);
+    (void)setIndices(m_masterIndex, m_detailsIndex, false);
 }
 
 KDbTableSchema* KDbRelationship::masterTable() const
@@ -140,19 +143,21 @@ KDbTableSchema* KDbRelationship::detailsTable() const
     return m_detailsIndex ? m_detailsIndex->table() : 0;
 }
 
-void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex)
+bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex)
 {
-    setIndices(masterIndex, detailsIndex, true);
+    return setIndices(masterIndex, detailsIndex, true);
 }
 
-void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster)
+bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster)
 {
     m_masterIndex = 0;
     m_detailsIndex = 0;
     m_pairs.clear();
     if (!masterIndex || !detailsIndex || !masterIndex->table() || !detailsIndex->table()
             || masterIndex->table() == detailsIndex->table() || masterIndex->fieldCount() != detailsIndex->fieldCount())
-        return;
+    {
+        return false;
+    }
     const KDbField::List* masterIndexFields = masterIndex->fields();
     const KDbField::List* detailsIndexFields = detailsIndex->fields();
     KDbField::ListIterator masterIt(masterIndexFields->constBegin());
@@ -172,7 +177,7 @@ void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
                 << KDbDriver::defaultSQLTypeName(masterType) << masterField->name() << ","
                 << KDbDriver::defaultSQLTypeName(detailsType) << detailsField->name();
             m_pairs.clear();
-            return;
+            return false;
         }
 #if 0 //too STRICT!
         if ((masterField->isUnsigned() && !detailsField->isUnsigned())
@@ -198,4 +203,5 @@ void KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
     m_detailsIndex = detailsIndex;
     m_masterIndex->attachRelationship(this, ownedByMaster);
     m_detailsIndex->attachRelationship(this, ownedByMaster);
+    return true;
 }

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2010 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,7 +20,6 @@
 #ifndef KDB_INDEXSCHEMA_H
 #define KDB_INDEXSCHEMA_H
 
-#include <QList>
 #include <QSet>
 
 #include "KDbObject.h"
@@ -40,59 +39,45 @@ class KDbRelationship;
 class KDB_EXPORT KDbIndexSchema : public KDbFieldList, public KDbObject
 {
 public:
-    typedef QList<KDbIndexSchema*> List;
-    typedef QList<KDbIndexSchema*>::ConstIterator ListIterator;
-
-    /*! Constructs empty index schema object
-     that is assigned to @a table, and will be owned by this table.
-     Any fields added with addField() won't be owned by index,
-     but by its table. Do not forget to add these fields to table,
-     because adding these to KDbIndexSchema is not enough.
+    /*! Constructs empty index schema object that not assigned to any @a table.
+     KDbTableSchema::addIndex() should be called afterwards, before adding any fields
+     or attaching relationships.
+     Any fields added with addField() will not be owned by index but by their table.
      */
-    explicit KDbIndexSchema(KDbTableSchema *tableSchema);
+    explicit KDbIndexSchema();
 
-    /*! Copy constructor. Copies all attributes from index @a idx, and
-     fields assigned with it but the fields are taken (by name) from
-     @a parentTable, not from @a idx itself, so it's possible to copy of index
-     for a copy of table.
-
-     To copy an index within the same table it's enough to call:
-     @code
-     new KDbIndexSchema(idx, idx.table());
-     @endcode
-     @todo All relationships should be also copied
-     */
-    KDbIndexSchema(const KDbIndexSchema& idx, KDbTableSchema* parentTable);
-
-    /*! Destroys the index. KDbField objects are not deleted.
-     All KDbRelationship objects listed in masterRelationships() list
-     are destroyed (these are also detached from
-     detail-side indices before destruction).
-     KDbRelationship objects listed in detailsRelationships() are not touched. */
+    /*! Deletes the index. Referenced KDbField objects are not deleted.
+     All KDbRelationship objects listed by masterRelationships() are detached from
+     detail-side indices and then deleted.
+     KDbRelationship objects listed by detailsRelationships() are not deleted. */
     virtual ~KDbIndexSchema();
 
     /*! Adds field at the end of field list.
      KDbField will not be owned by index. KDbField must belong to a table
-     the index is bulit on, otherwise field couldn't be added. */
+     specified by a KDbTableSchema::addIndex() call, otherwise field couldn't be added.
+     @note Do not forget to add the field to a table, because adding it only to
+     the KDbIndexSchema is not enough. */
     virtual bool addField(KDbField *field);
 
-    /*! @return table that index is defined for. */
-    KDbTableSchema* table() const;
+    /*! @return table that index belongs to
+     Index should be assigned to a table using KDbTableSchema::addIndex().
+     If it is not, table() returns @c nullptr. */
+    KDbTableSchema* table();
+
+    /*! @return table that index is defined for, const version. */
+    const KDbTableSchema* table() const;
 
     /*! @return list of relationships from the table (of this index),
      i.e. any such relationship in which this table is at 'master' side.
      See KDbRelationship class documentation for more information.
-     All objects listed here will be automatically destroyed on this KDbIndexSchema object destruction. */
-    inline QList<KDbRelationship*>* masterRelationships() {
-        return &m_master_rels;
-    }
+     All objects on this list will be automatically deleted when this KDbIndexSchema
+     object is deleted. */
+    QList<const KDbRelationship*> masterRelationships() const;
 
     /*! @return list of relationships to the table (of this index),
      i.e. any such relationship in which this table is at 'details' side.
      See KDbRelationship class documentation for more information. */
-    inline QList<KDbRelationship*>* detailsRelationships() {
-        return &m_details_rels;
-    }
+    QList<const KDbRelationship*> detailsRelationships() const;
 
     /*! Attaches relationship definition @a rel to this KDbIndexSchema object.
      If @a rel relationship has this KDbIndexSchema defined at the master-side,
@@ -102,7 +87,9 @@ public:
      For the former case, attached @a rel object is now owned by this KDbIndexSchema object.
 
      Note: call detachRelationship() for KDbIndexSchema object that @a rel
-     was previously attached to, if any. */
+     was previously attached to, if any.
+     @note Before using attachRelationship() the index KDbField must already belong to a table
+     specified by a KDbTableSchema::addIndex() call. */
     void attachRelationship(KDbRelationship *rel);
 
     /*! Detaches relationship definition @a rel for this KDbIndexSchema object
@@ -111,7 +98,7 @@ public:
      is this IndexSchem object assigned.
 
      Note: If @a rel was detached from masterRelationships() list,
-     this object now has no parent, so you need to attach it to somewhere or destruct it.
+     this object now has no parent, so it must be attached to other index or deleted.
     */
     void detachRelationship(KDbRelationship *rel);
 
@@ -156,6 +143,14 @@ public:
     bool isForeignKey() const;
 
 protected:
+    //! Used by KDbTableSchema::copyIndex(const KDbIndexSchema&)
+    KDbIndexSchema(const KDbIndexSchema& index, KDbTableSchema* parentTable);
+
+    //! Assigns this index to @a table
+    //! table() must be @c nullptr and @a table must be not @a nullptr
+    //! @since 3.1
+    void setTable(KDbTableSchema *table);
+
     /*! Sets auto-generated flag. This method should be called only
      from KDbTableSchema code
     @see isAutoGenerated(). */
@@ -172,29 +167,13 @@ protected:
      attached @a rel object will be owned by this index. */
     void attachRelationship(KDbRelationship *rel, bool ownedByMaster);
 
-    KDbTableSchema *m_tableSchema; //! table on that index is built
-
-    /*! A set of master relationships for the table (of this index),
-     this index is a master key for these relationships
-     and therefore - owner of these */
-    QSet<KDbRelationship*> m_master_owned_rels;
-
-    /*! a list of master relationships that are not owned by this schema */
-    QList<KDbRelationship*> m_master_rels;
-
-    /*! a list of relationships to table (of this index) */
-    QList<KDbRelationship*> m_details_rels;
-
-    bool m_primary;
-    bool m_unique;
-    bool m_isAutoGenerated;
-    bool m_isForeignKey;
-
     friend class KDbConnection;
     friend class KDbTableSchema;
     friend class KDbQuerySchema;
     friend class KDbRelationship;
 private:
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbIndexSchema)
 };
 

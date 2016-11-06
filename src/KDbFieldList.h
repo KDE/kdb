@@ -65,7 +65,7 @@ public:
      this implementation in your subclass. */
     virtual bool insertField(int index, KDbField *field);
 
-    /*! Removes field from the field list. Use with care.
+    /*! Removes field from the field list and deletes it. Use with care.
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass.
