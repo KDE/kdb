@@ -205,8 +205,12 @@ class KDB_EXPORT KDbInternalTableSchema : public KDbTableSchema
 public:
     explicit KDbInternalTableSchema(const QString& name);
     explicit KDbInternalTableSchema(const KDbTableSchema& ts);
-    explicit KDbInternalTableSchema(const KDbInternalTableSchema& ts);
+    KDbInternalTableSchema(const KDbInternalTableSchema& ts);
     virtual ~KDbInternalTableSchema();
+
+private:
+    class Private;
+    Private * const d;
 };
 
 //! Sends information about table schema @a table to debug output @a dbg.

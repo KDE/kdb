@@ -419,21 +419,32 @@ QVector<KDbLookupFieldSchema*> KDbTableSchema::lookupFields() const
 
 //--------------------------------------
 
+class Q_DECL_HIDDEN KDbInternalTableSchema::Private
+{
+public:
+    Private() {}
+    bool dummy = false;
+};
+
 KDbInternalTableSchema::KDbInternalTableSchema(const QString& name)
         : KDbTableSchema(name)
+        , d(new Private)
 {
 }
 
 KDbInternalTableSchema::KDbInternalTableSchema(const KDbTableSchema& ts)
         : KDbTableSchema(ts, false)
+        , d(new Private)
 {
 }
 
 KDbInternalTableSchema::KDbInternalTableSchema(const KDbInternalTableSchema& ts)
         : KDbTableSchema(ts, false)
+        , d(new Private)
 {
 }
 
 KDbInternalTableSchema::~KDbInternalTableSchema()
 {
+    delete d;
 }
