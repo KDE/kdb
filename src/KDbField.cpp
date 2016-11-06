@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -168,15 +168,16 @@ KDbField::KDbField(const QString& name, Type type,
 }
 
 /*! Copy constructor. */
-KDbField::KDbField(const KDbField& f)
+KDbField::KDbField(KDbField* f)
 {
-    (*this) = f;
-    if (f.m_customProperties)
-        m_customProperties = new CustomPropertiesMap(f.customProperties());
+    Q_ASSERT(f);
+    (*this) = *f;
+    if (f->m_customProperties)
+        m_customProperties = new CustomPropertiesMap(f->customProperties());
 
-    if (!f.m_expr->isNull()) {//deep copy the expression
+    if (!f->m_expr->isNull()) {//deep copy the expression
 //! @todo  m_expr = new KDbExpression(*f.m_expr);
-            m_expr = new KDbExpression(f.m_expr->clone());
+            m_expr = new KDbExpression(f->m_expr->clone());
     }
     else
         m_expr = new KDbExpression();
@@ -188,7 +189,7 @@ KDbField::~KDbField()
     delete m_expr;
 }
 
-KDbField* KDbField::copy() const
+KDbField* KDbField::copy()
 {
     return new KDbField(*this);
 }
@@ -412,10 +413,14 @@ KDbField::TypeGroup KDbField::typeGroup(Type type)
     return InvalidGroup; //unknown
 }
 
-KDbTableSchema*
-KDbField::table() const
+KDbTableSchema* KDbField::table()
 {
     return dynamic_cast<KDbTableSchema*>(m_parent);
+}
+
+const KDbTableSchema* KDbField::table() const
+{
+    return dynamic_cast<const KDbTableSchema*>(m_parent);
 }
 
 void
@@ -424,10 +429,14 @@ KDbField::setTable(KDbTableSchema *tableSchema)
     m_parent = tableSchema;
 }
 
-KDbQuerySchema*
-KDbField::query() const
+KDbQuerySchema* KDbField::query()
 {
     return dynamic_cast<KDbQuerySchema*>(m_parent);
+}
+
+const KDbQuerySchema* KDbField::query() const
+{
+    return dynamic_cast<const KDbQuerySchema*>(m_parent);
 }
 
 void

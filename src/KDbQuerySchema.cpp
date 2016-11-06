@@ -1656,9 +1656,9 @@ KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table)
     setType(KDbField::Asterisk);
 }
 
-KDbQueryAsterisk::KDbQueryAsterisk(const KDbQueryAsterisk &asterisk)
-        : KDbField(asterisk)
-        , m_table(asterisk.table())
+KDbQueryAsterisk::KDbQueryAsterisk(KDbQueryAsterisk *asterisk)
+        : KDbField(*asterisk)
+        , m_table(asterisk->table())
 {
 }
 
@@ -1666,19 +1666,29 @@ KDbQueryAsterisk::~KDbQueryAsterisk()
 {
 }
 
-KDbQuerySchema *KDbQueryAsterisk::query() const
+KDbQuerySchema *KDbQueryAsterisk::query()
 {
     return static_cast<KDbQuerySchema*>(m_parent);
 }
 
-KDbTableSchema* KDbQueryAsterisk::table() const
+const KDbQuerySchema *KDbQueryAsterisk::query() const
+{
+    return static_cast<const KDbQuerySchema*>(m_parent);
+}
+
+KDbTableSchema* KDbQueryAsterisk::table()
 {
     return m_table;
 }
 
-KDbField* KDbQueryAsterisk::copy() const
+const KDbTableSchema* KDbQueryAsterisk::table() const
 {
-    return new KDbQueryAsterisk(*this);
+    return m_table;
+}
+
+KDbField* KDbQueryAsterisk::copy()
+{
+    return new KDbQueryAsterisk(this);
 }
 
 void KDbQueryAsterisk::setTable(KDbTableSchema *table)

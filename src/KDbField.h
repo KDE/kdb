@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -167,8 +167,8 @@ public:
           const QString& caption = QString(),
           const QString& description = QString());
 
-    /*! Copy constructor. */
-    KDbField(const KDbField& f);
+    /*! Constructs a deep copy of field @a f. */
+    KDbField(KDbField *f);
 
     virtual ~KDbField();
 
@@ -248,7 +248,10 @@ public:
     /*! @return table schema of table that owns this field
      or null if it has no table assigned.
      @see query() */
-    virtual KDbTableSchema* table() const;
+    virtual KDbTableSchema* table();
+
+    //! @overload KDbTableSchema* table()
+    const KDbTableSchema* table() const;
 
     /*! Sets @a table schema of table that owns this field.
      This does not adds the field to @a table object.
@@ -261,7 +264,10 @@ public:
      @return query schema of query that owns this field
      or null if it has no query assigned.
      @see table() */
-    KDbQuerySchema* query() const;
+    KDbQuerySchema* query();
+
+    //! @overload KDbQuerySchema* query()
+    const KDbQuerySchema* query() const;
 
     /*! For special use when field defines expression.
      Sets @a query schema of query that owns this field.
@@ -731,7 +737,7 @@ protected:
     void init();
 
     //! @return a deep copy of this object. Used in @ref KDbFieldList(const KDbFieldList& fl).
-    virtual KDbField* copy() const;
+    virtual KDbField* copy();
 
     KDbFieldList *m_parent; //!< In most cases this points to a KDbTableSchema
     //!< object that field is assigned.

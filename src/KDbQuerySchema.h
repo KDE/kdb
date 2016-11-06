@@ -825,17 +825,22 @@ public:
     explicit KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table = 0);
 
     /*! Constructs a deep copy of query asterisk definition object @a asterisk. */
-    KDbQueryAsterisk(const KDbQueryAsterisk& asterisk);
+    KDbQueryAsterisk(KDbQueryAsterisk* asterisk);
 
     virtual ~KDbQueryAsterisk();
 
     /*! @return Query object for that this asterisk object is defined */
-    KDbQuerySchema *query() const;
+    KDbQuerySchema *query();
+
+    /*! @overload KDbQuerySchema *query() */
+    const KDbQuerySchema *query() const;
 
     /*! @return Table schema for this asterisk
      if it has "single-table" type (1st type)
      or 0 if it has "all-tables" type (2nd type) defined. */
-    virtual KDbTableSchema* table() const;
+    virtual KDbTableSchema* table();
+
+    virtual const KDbTableSchema* table() const;
 
     /*! Sets table schema for this asterisk.
      @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
@@ -851,11 +856,12 @@ public:
 
 protected:
     //! @return a deep copy of this object. Used in KDbFieldList(const KDbFieldList& fl).
-    virtual KDbField* copy() const;
+    virtual KDbField* copy();
 
     /*! Table schema for this asterisk */
     KDbTableSchema* m_table;
 
+    Q_DISABLE_COPY(KDbQueryAsterisk)
     friend class KDbQuerySchema;
 };
 
