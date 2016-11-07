@@ -226,7 +226,7 @@ QVariant PostgresqlCursor::pValue(int pos) const
     const qint64 row = at();
 
     KDbField *f = (m_visibleFieldsExpanded && pos < qMin(m_visibleFieldsExpanded->count(), m_fieldCount))
-                       ? m_visibleFieldsExpanded->at(pos)->field : 0;
+                       ? m_visibleFieldsExpanded->at(pos)->field() : nullptr;
 // postgresqlDebug() << "pos:" << pos;
 
     const KDbField::Type type = m_realTypes[pos];

@@ -207,7 +207,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                         kdbWarning() << "!boundColumnInfo";
                         return false;
                     }
-                    KDbField *boundField = boundColumnInfo->field;
+                    KDbField *boundField = boundColumnInfo->field();
                     if (!boundField) {
                         kdbWarning() << "!boundField";
                         return false;

@@ -159,13 +159,13 @@ KDbEscapedString KDbOrderByColumn::toSQLString(bool includeTableName,
         if (m_pos > -1)
             return KDbEscapedString::number(m_pos + 1) + orderString;
         else {
-            if (includeTableName && m_column->alias.isEmpty()) {
-                tableName = KDbEscapedString(escapeIdentifier(m_column->field->table()->name(), conn, escapingType));
+            if (includeTableName && m_column->alias().isEmpty()) {
+                tableName = KDbEscapedString(escapeIdentifier(m_column->field()->table()->name(), conn, escapingType));
                 tableName += '.';
             }
             fieldName = KDbEscapedString(escapeIdentifier(m_column->aliasOrName(), conn, escapingType));
         }
-        if (m_column->field->isTextType()) {
+        if (m_column->field()->isTextType()) {
             collationString = conn->driver()->collationSQL();
         }
     }
@@ -964,7 +964,7 @@ KDbField* KDbQuerySchema::field(const QString& name)
 KDbField* KDbQuerySchema::field(const QString& identifier, bool expanded) const
 {
     KDbQueryColumnInfo *ci = columnInfo(identifier, expanded);
-    return ci ? ci->field : 0;
+    return ci ? ci->field() : nullptr;
 }
 
 KDbField* KDbQuerySchema::field(int id)
@@ -1184,7 +1184,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 KDbQueryColumnInfo *boundColumnInfo = 0;
                 if (!(boundColumnInfo = lookupQueryFieldsExpanded.value(lookupFieldSchema->boundColumn())))
                     continue;
-                KDbField *boundField = boundColumnInfo->field;
+                KDbField *boundField = boundColumnInfo->field();
                 if (!boundField)
                     continue;
                 const QList<int> visibleColumns(lookupFieldSchema->visibleColumns());
@@ -1201,7 +1201,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 KDbField *visibleColumn = 0;
                 // for single visible column, just add it as-is
                 if (visibleColumns.count() == 1) {
-                    visibleColumn = lookupQueryFieldsExpanded.value(visibleColumns.first())->field;
+                    visibleColumn = lookupQueryFieldsExpanded.value(visibleColumns.first())->field();
                 } else {
                     // for multiple visible columns, build an expression column
                     // (the expression object will be owned by column info)
@@ -1258,27 +1258,27 @@ void KDbQuerySchema::computeFieldsExpanded() const
     foreach(KDbQueryColumnInfo* ci, list) {
         i++;
         (*d->fieldsExpanded)[i] = ci;
-        if (ci->visible) {
+        if (ci->isVisible()) {
             ++visibleIndex;
             (*d->visibleFieldsExpanded)[visibleIndex] = ci;
         }
         d->columnsOrderExpanded->insert(ci, i);
         //remember field by name/alias/table.name if there's no such string yet in d->columnInfosByNameExpanded
-        if (!ci->alias.isEmpty()) {
+        if (!ci->alias().isEmpty()) {
             //store alias and table.alias
-            if (!d->columnInfosByNameExpanded.contains(ci->alias)) {
-                d->columnInfosByNameExpanded.insert(ci->alias, ci);
+            if (!d->columnInfosByNameExpanded.contains(ci->alias())) {
+                d->columnInfosByNameExpanded.insert(ci->alias(), ci);
             }
-            QString tableAndAlias(ci->alias);
-            if (ci->field->table())
-                tableAndAlias.prepend(ci->field->table()->name() + QLatin1Char('.'));
+            QString tableAndAlias(ci->alias());
+            if (ci->field()->table())
+                tableAndAlias.prepend(ci->field()->table()->name() + QLatin1Char('.'));
             if (!d->columnInfosByNameExpanded.contains(tableAndAlias)) {
                 d->columnInfosByNameExpanded.insert(tableAndAlias, ci);
             }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName.contains(ci->alias)) {
-                    d->columnInfosByName.insert(ci->alias, ci);
+                if (!d->columnInfosByName.contains(ci->alias())) {
+                    d->columnInfosByName.insert(ci->alias(), ci);
                 }
                 if (!d->columnInfosByName.contains(tableAndAlias)) {
                     d->columnInfosByName.insert(tableAndAlias, ci);
@@ -1286,19 +1286,19 @@ void KDbQuerySchema::computeFieldsExpanded() const
             }
         } else {
             //no alias: store name and table.name
-            if (!d->columnInfosByNameExpanded.contains(ci->field->name())) {
-                d->columnInfosByNameExpanded.insert(ci->field->name(), ci);
+            if (!d->columnInfosByNameExpanded.contains(ci->field()->name())) {
+                d->columnInfosByNameExpanded.insert(ci->field()->name(), ci);
             }
-            QString tableAndName(ci->field->name());
-            if (ci->field->table())
-                tableAndName.prepend(ci->field->table()->name() + QLatin1Char('.'));
+            QString tableAndName(ci->field()->name());
+            if (ci->field()->table())
+                tableAndName.prepend(ci->field()->table()->name() + QLatin1Char('.'));
             if (!d->columnInfosByNameExpanded.contains(tableAndName)) {
                 d->columnInfosByNameExpanded.insert(tableAndName, ci);
             }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName.contains(ci->field->name())) {
-                    d->columnInfosByName.insert(ci->field->name(), ci);
+                if (!d->columnInfosByName.contains(ci->field()->name())) {
+                    d->columnInfosByName.insert(ci->field()->name(), ci);
                 }
                 if (!d->columnInfosByName.contains(tableAndName)) {
                     d->columnInfosByName.insert(tableAndName, ci);
@@ -1314,7 +1314,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
     i = 0;
     for (QMutableListIterator<KDbQueryColumnInfo*> it(lookup_list); it.hasNext();) {
         KDbQueryColumnInfo* ci = it.next();
-        const QString key(lookupColumnKey(ci->foreignColumn()->field, ci->field));
+        const QString key(lookupColumnKey(ci->foreignColumn()->field(), ci->field()));
         if (lookup_dict.contains(key)) {
             // this table.field is already fetched by this query
             it.remove();
@@ -1352,7 +1352,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
         KDbQueryColumnInfo* ci = d->fieldsExpanded->at(i);
 //! @todo KDbQuerySchema itself will also support lookup fields...
         KDbLookupFieldSchema *lookupFieldSchema
-        = ci->field->table() ? ci->field->table()->lookupFieldSchema(*ci->field) : 0;
+            = ci->field()->table() ? ci->field()->table()->lookupFieldSchema(*ci->field()) : nullptr;
         if (!lookupFieldSchema || lookupFieldSchema->boundColumn() < 0)
             continue;
         const KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
@@ -1365,14 +1365,14 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 // for single visible column, just add it as-is
                 if (visibleColumns->fieldCount() == 1) {
                     KDbField *visibleColumn = visibleColumns->fields()->first();
-                    const QString key(lookupColumnKey(ci->field, visibleColumn));
+                    const QString key(lookupColumnKey(ci->field(), visibleColumn));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
                         ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
                 } else {
                     const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
                                       .arg(++numberOfColumnsWithMultipleVisibleFields)
-                                      .arg(ci->field->table()->name(), ci->field->name()));
+                                      .arg(ci->field()->table()->name(), ci->field()->name()));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
                         ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
@@ -1389,15 +1389,15 @@ void KDbQuerySchema::computeFieldsExpanded() const
             KDbQueryColumnInfo *boundColumnInfo = 0;
             if (!(boundColumnInfo = lookupQueryFieldsExpanded.value(lookupFieldSchema->boundColumn())))
                 continue;
-            KDbField *boundField = boundColumnInfo->field;
+            KDbField *boundField = boundColumnInfo->field();
             if (!boundField)
                 continue;
             const QList<int> visibleColumns(lookupFieldSchema->visibleColumns());
             // for single visible column, just add it as-is
             if (visibleColumns.count() == 1) {
                 if (lookupQueryFieldsExpanded.count() > visibleColumns.first()) { // sanity check
-                    KDbField *visibleColumn = lookupQueryFieldsExpanded.at(visibleColumns.first())->field;
-                    const QString key(lookupColumnKey(ci->field, visibleColumn));
+                    KDbField *visibleColumn = lookupQueryFieldsExpanded.at(visibleColumns.first())->field();
+                    const QString key(lookupColumnKey(ci->field(), visibleColumn));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
                         ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
@@ -1405,7 +1405,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             } else {
                 const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
                                   .arg(++numberOfColumnsWithMultipleVisibleFields)
-                                  .arg(ci->field->table()->name(), ci->field->name()));
+                                  .arg(ci->field()->table()->name(), ci->field()->name()));
                 int index = lookup_dict.value(key, -99);
                 if (index != -99)
                     ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
@@ -1445,10 +1445,10 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
     d->pkeyFieldCount = 0;
     for (int i = 0; i < fCount; i++) {
         KDbQueryColumnInfo *fi = d->fieldsExpanded->at(i);
-        const int fieldIndex = fi->field->table() == tbl ? pkey->indexOf(*fi->field) : -1;
+        const int fieldIndex = fi->field()->table() == tbl ? pkey->indexOf(*fi->field()) : -1;
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
-            kdbDebug() << "FIELD" << fi->field->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
+            kdbDebug() << "FIELD" << fi->field()->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldCount++;
         }
@@ -1490,9 +1490,9 @@ KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields() const
     if (d->autoincFields->isEmpty()) {//no cache
         KDbQueryColumnInfo::Vector fexp = fieldsExpanded();
         for (int i = 0; i < fexp.count(); i++) {
-            KDbQueryColumnInfo *fi = fexp[i];
-            if (fi->field->table() == mt && fi->field->isAutoIncrement()) {
-                d->autoincFields->append(fi);
+            KDbQueryColumnInfo *ci = fexp[i];
+            if (ci->field()->table() == mt && ci->field()->isAutoIncrement()) {
+                d->autoincFields->append(ci);
             }
         }
     }
@@ -1511,7 +1511,7 @@ KDbEscapedString KDbQuerySchema::sqlColumnsList(const KDbQueryColumnInfo::List& 
             result += ",";
         else
             start = false;
-        result += escapeIdentifier(ci->field->name(), conn, escapingType);
+        result += escapeIdentifier(ci->field()->name(), conn, escapingType);
     }
     return result;
 }

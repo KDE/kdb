@@ -332,7 +332,7 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
     const int fieldCount = fields.count();
     for (int i = 0;i < fieldCount;i++) {
         KDbQueryColumnInfo *ci = fields[i];
-        if (ci->visible) {
+        if (ci->isVisible()) {
             KDbQueryColumnInfo *visibleLookupColumnInfo = 0;
             if (ci->indexForVisibleLookupValue() != -1) {
                 //Lookup field is defined
@@ -549,7 +549,7 @@ void KDbTableViewData::setSorting(int column, Qt::SortOrder order)
     // find proper column information for sorting (lookup column points to alternate column with visible data)
     const KDbTableViewColumn *tvcol = d->columns.at(column);
     KDbQueryColumnInfo* visibleLookupColumnInfo = tvcol->visibleLookupColumnInfo();
-    const KDbField *field = visibleLookupColumnInfo ? visibleLookupColumnInfo->field : tvcol->field();
+    const KDbField *field = visibleLookupColumnInfo ? visibleLookupColumnInfo->field() : tvcol->field();
     d->sortColumn = column;
     d->realSortColumn = tvcol->columnInfo()->indexForVisibleLookupValue() != -1
                           ? tvcol->columnInfo()->indexForVisibleLookupValue() : d->sortColumn;

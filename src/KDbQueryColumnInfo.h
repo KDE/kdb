@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -22,8 +22,8 @@
 
 #include "kdb_export.h"
 
+#include <QList>
 #include <QVector>
-#include <QHash>
 #include <QString>
 
 class KDbField;
@@ -42,9 +42,24 @@ public:
     typedef QList<KDbQueryColumnInfo*> List;
     typedef QList<KDbQueryColumnInfo*>::ConstIterator ListIterator;
 
-    KDbQueryColumnInfo(KDbField *f, const QString& _alias, bool _visible,
-                       KDbQueryColumnInfo *foreignColumn = 0);
+    KDbQueryColumnInfo(KDbField *f, const QString &alias, bool visible,
+                       KDbQueryColumnInfo *foreignColumn = nullptr);
     ~KDbQueryColumnInfo();
+
+    //! @return field for this column
+    KDbField *field();
+
+    //! @overload KDbField *field()
+    const KDbField *field() const;
+
+    //! Sets the field
+    void setField(KDbField *field);
+
+    //! @return alias for this column
+    QString alias() const;
+
+    //! Sets the alias
+    void setAlias(const QString &alias);
 
     //! @return alias if it is not empty, field's name otherwise.
     QString aliasOrName() const;
@@ -53,8 +68,11 @@ public:
     //! If alias is also empty - returns field's name.
     QString captionOrAliasOrName() const;
 
-    KDbField *field;
-    QString alias;
+    //! @return true is this column is visible
+    bool isVisible() const;
+
+    //! Sets the visible flag
+    void setVisible(bool set);
 
     /*! @return index of column with visible lookup value within the 'fields expanded' vector.
      -1 means no visible lookup value is available because there is no lookup for the column defined.
@@ -65,20 +83,15 @@ public:
     /*! Sets index of column with visible lookup value within the 'fields expanded' vector. */
     void setIndexForVisibleLookupValue(int index);
 
-    //! @return non-0 if this column is a visible column for other column
-    KDbQueryColumnInfo *foreignColumn() const;
+    //! @return non-nullptr if this column is a visible column for other column
+    KDbQueryColumnInfo *foreignColumn();
 
-    //! true if this column is visible to the user (and its data is fetched by the engine)
-    bool visible;
+    //! @overload KDbQueryColumnInfo *foreignColumn();
+    const KDbQueryColumnInfo *foreignColumn() const;
 
 private:
-    /*! Index of column with visible lookup value within the 'fields expanded' vector.
-     @see indexForVisibleLookupValue() */
-    int m_indexForVisibleLookupValue;
-
-    //! Non-0 if this column is a visible column for @a m_foreignColumn
-    KDbQueryColumnInfo *m_foreignColumn;
-
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbQueryColumnInfo)
 };
 

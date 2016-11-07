@@ -133,28 +133,28 @@ KDbTableViewColumn::KDbTableViewColumn(
         : d(new Private)
 {
     Q_ASSERT(aColumnInfo);
-    d->field = aColumnInfo->field;
+    d->field = aColumnInfo->field();
     d->columnInfo = aColumnInfo;
     d->visibleLookupColumnInfo = aVisibleLookupColumnInfo;
     d->isDBAware = true;
     d->fieldOwned = false;
 
     //setup column's caption:
-    if (!d->columnInfo->field->caption().isEmpty()) {
-        d->captionAliasOrName = d->columnInfo->field->caption();
+    if (!d->columnInfo->field()->caption().isEmpty()) {
+        d->captionAliasOrName = d->columnInfo->field()->caption();
     } else {
         //reuse alias if available:
-        d->captionAliasOrName = d->columnInfo->alias;
+        d->captionAliasOrName = d->columnInfo->alias();
         //last hance: use field name
         if (d->captionAliasOrName.isEmpty())
-            d->captionAliasOrName = d->columnInfo->field->name();
+            d->captionAliasOrName = d->columnInfo->field()->name();
         //! @todo compute other auto-name?
     }
     //setup column's readonly flag: true, if
     // - it's not from parent table's field, or
     // - if the query itself is coming from read-only connection, or
     // - if the query itself is stored (i.e. has connection) and lookup column is defined
-    const bool columnFromMasterTable = query.masterTable() == d->columnInfo->field->table();
+    const bool columnFromMasterTable = query.masterTable() == d->columnInfo->field()->table();
     d->readOnly = !columnFromMasterTable
                  || (query.connection() && query.connection()->options()->isReadOnly());
 //! @todo remove this when queries become editable            ^^^^^^^^^^^^^^
@@ -227,14 +227,14 @@ void KDbTableViewColumn::setReadOnly(bool ro)
 
 bool KDbTableViewColumn::isVisible() const
 {
-    return d->columnInfo ? d->columnInfo->visible : d->visible;
+    return d->columnInfo ? d->columnInfo->isVisible() : d->visible;
 }
 
 void KDbTableViewColumn::setVisible(bool v)
 {
     bool changed = d->visible != v;
-    if (d->columnInfo && d->columnInfo->visible != v) {
-        d->columnInfo->visible = v;
+    if (d->columnInfo && d->columnInfo->isVisible() != v) {
+        d->columnInfo->setVisible(v);
         changed = true;
     }
     d->visible = v;
@@ -314,7 +314,7 @@ bool KDbTableViewColumn::acceptsFirstChar(const QChar &ch) const
     // the field we're looking at can be related to "visible lookup column"
     // if lookup column is present
     KDbField *visibleField = d->visibleLookupColumnInfo
-                                  ? d->visibleLookupColumnInfo->field : d->field;
+                                  ? d->visibleLookupColumnInfo->field() : d->field;
     const KDbField::Type type = visibleField->type(); // cache: evaluating type of expressions can be expensive
     if (KDbField::isNumericType(type)) {
         if (ch == QLatin1Char('.') || ch == QLatin1Char(','))

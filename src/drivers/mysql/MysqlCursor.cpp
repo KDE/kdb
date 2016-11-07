@@ -103,7 +103,7 @@ QVariant MysqlCursor::value(int pos)
         return QVariant();
 
     KDbField *f = (m_visibleFieldsExpanded && pos < m_visibleFieldsExpanded->count())
-                       ? m_visibleFieldsExpanded->at(pos)->field : 0;
+                       ? m_visibleFieldsExpanded->at(pos)->field() : nullptr;
 
 //! @todo js: use MYSQL_FIELD::type here!
 
@@ -128,7 +128,7 @@ bool MysqlCursor::drv_storeCurrentRecord(KDbRecordData* data) const
         return true;
     }
     for (int i = 0; i < m_fieldCount; ++i) {
-        KDbField *f = m_visibleFieldsExpanded->at(i)->field;
+        KDbField *f = m_visibleFieldsExpanded->at(i)->field();
         bool ok;
         (*data)[i] = KDb::cstringToVariant(d->mysqlrow[i], f ? f->type() : KDbField::Text,
                                            &ok, d->lengths[i]);

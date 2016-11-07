@@ -314,7 +314,7 @@ bool SqliteCursor::drv_storeCurrentRecord(KDbRecordData* data) const
         return true;
     }
     for (int i = 0; i < m_fieldCount; ++i) {
-        KDbField *f = m_visibleFieldsExpanded->at(i)->field;
+        KDbField *f = m_visibleFieldsExpanded->at(i)->field();
 //  sqliteDebug() << "col=" << (col ? *col : 0);
         (*data)[i] = d->getValue(f, i);
     }
@@ -327,7 +327,7 @@ QVariant SqliteCursor::value(int i)
         return QVariant();
 //! @todo allow disable range checking! - performance reasons
     KDbField *f = (m_visibleFieldsExpanded && i < m_visibleFieldsExpanded->count())
-                  ? m_visibleFieldsExpanded->at(i)->field : 0;
+                  ? m_visibleFieldsExpanded->at(i)->field() : nullptr;
     return d->getValue(f, i); //, i==m_logicalFieldCount/*ROWID*/);
 }
 

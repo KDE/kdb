@@ -3177,11 +3177,11 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     //gather the fields which are updated ( have values in KDbRecordEditBuffer)
     KDbFieldList affectedFields;
     for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
-        if (it.key()->field->table() != mt)
+        if (it.key()->field()->table() != mt)
             continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
         if (!sqlset.isEmpty())
             sqlset += ',';
-        KDbField* currentField = it.key()->field;
+        KDbField* currentField = it.key()->field();
         const bool affectedFieldsAddOk = affectedFields.addField(currentField);
         Q_ASSERT(affectedFieldsAddOk);
         sqlset += KDbEscapedString(escapeIdentifier(currentField->name())) + '=' +
@@ -3277,12 +3277,12 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     int fieldsExpandedCount = fieldsExpanded.count();
     for (int i = 0; i < fieldsExpandedCount; i++) {
         KDbQueryColumnInfo *ci = fieldsExpanded.at(i);
-        if (ci->field && KDb::isDefaultValueAllowed(*ci->field)
-                && !ci->field->defaultValue().isNull()
+        if (ci->field() && KDb::isDefaultValueAllowed(*ci->field())
+                && !ci->field()->defaultValue().isNull()
                 && !b.contains(ci))
         {
             //kdbDebug() << "adding default value" << ci->field->defaultValue().toString() << "for column" << ci->field->name();
-            b.insert(ci, ci->field->defaultValue());
+            b.insert(ci, ci->field()->defaultValue());
         }
     }
 
@@ -3325,13 +3325,13 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     } else {
         // non-empty record inserting requested:
         for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
-            if (it.key()->field->table() != mt)
+            if (it.key()->field()->table() != mt)
                 continue; // skip values for fields outside of the master table (e.g. a "visible value" of the lookup field)
             if (!sqlcols.isEmpty()) {
                 sqlcols += ',';
                 sqlvals += ',';
             }
-            KDbField* currentField = it.key()->field;
+            KDbField* currentField = it.key()->field();
             const bool affectedFieldsAddOk = affectedFields.addField(currentField);
             Q_ASSERT(affectedFieldsAddOk);
             sqlcols += escapeIdentifier(currentField->name());
@@ -3361,7 +3361,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         KDbQueryColumnInfo *id_columnInfo = aif_list->first();
 //! @todo safe to cast it?
         quint64 last_id = KDb::lastInsertedAutoIncValue(result,
-            id_columnInfo->field->name(), id_columnInfo->field->table()->name(), &recordId);
+            id_columnInfo->field()->name(), id_columnInfo->field()->table()->name(), &recordId);
         if (last_id == std::numeric_limits<quint64>::max()) {
             //! @todo show error
 //! @todo remove just inserted record. How? Using ROLLBACK?
@@ -3371,9 +3371,9 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         KDbEscapedString getAutoIncForInsertedValue("SELECT "
                                              + query->autoIncrementSQLFieldsList(this)
                                              + " FROM "
-                                             + escapeIdentifier(id_columnInfo->field->table()->name())
+                                             + escapeIdentifier(id_columnInfo->field()->table()->name())
                                              + " WHERE "
-                                             + escapeIdentifier(id_columnInfo->field->name()) + '='
+                                             + escapeIdentifier(id_columnInfo->field()->name()) + '='
                                              + QByteArray::number(last_id));
         if (true != querySingleRecord(getAutoIncForInsertedValue, &aif_data)) {
             //! @todo show error
@@ -3382,7 +3382,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         int i = 0;
         foreach(KDbQueryColumnInfo *ci, *aif_list) {
 //   kdbDebug() << "AUTOINCREMENTED FIELD" << fi->field->name() << "==" << aif_data[i].toInt();
-            ((*data)[ columnsOrderExpanded.value(ci)] = aif_data.value(i)).convert(ci->field->variantType());        //cast to get proper type
+            ((*data)[ columnsOrderExpanded.value(ci)]
+                = aif_data.value(i)).convert(ci->field()->variantType()); //cast to get proper type
             i++;
         }
     } else {
