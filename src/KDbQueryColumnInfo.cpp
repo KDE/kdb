@@ -140,6 +140,6 @@ QDebug operator<<(QDebug dbg, const KDbQueryColumnInfo& info)
     debug(dbg, *info.field(), KDbFieldDebugNoOptions);
     dbg.nospace()
         << qPrintable(info.alias().isEmpty() ? QString() : (QLatin1String(" AS ") + info.alias()))
-        << qPrintable(info.isVisible() ? QLatin1String() : QLatin1String(" [INVISIBLE]"));
+        << qPrintable(QLatin1String(info.isVisible() ? 0 : " [INVISIBLE]"));
     return dbg.space();
 }
