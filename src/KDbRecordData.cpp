@@ -24,6 +24,7 @@
 
 #include "KDbRecordData.h"
 #include "KDbGlobal.h"
+#include "KDbUtils.h"
 #include "kdb_debug.h"
 
 QVariant KDbRecordData::s_null;
@@ -34,11 +35,10 @@ QDebug operator<<(QDebug dbg, const KDbRecordData& data)
         dbg.nospace() << QLatin1String("EMPTY RECORD DATA");
     }
     else {
-        dbg.nospace() << QString::fromLatin1("RECORD DATA (%1 COLUMNS):").arg(data.size());
+        dbg.nospace() << "RECORD DATA (" << data.size() << " COLUMNS):";
         for (int i = 0; i < data.size(); i++) {
-            dbg.space()
-                << QString::fromLatin1("%1:[%2]%3").arg(i)
-                       .arg(QLatin1String(data[i].typeName()), data[i].toString());
+            dbg.nospace()
+                << " " << i << ":" << KDbUtils::squeezedValue(data[i]);
         }
     }
     return dbg.space();
