@@ -30,6 +30,7 @@
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
 #include "KDbUtils.h"
+#include "KDbUtils_p.h"
 #include "kdb_debug.h"
 #include "config-kdb.h"
 
@@ -38,6 +39,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+
+static const int SQUEEZED_TEXT_LIMIT = 1024;
+static const int SQUEEZED_TEXT_SUFFIX = 24;
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -491,4 +495,31 @@ Property PropertySet::property(const QByteArray &name) const
 QList<QByteArray> PropertySet::names() const
 {
     return d->data.keys();
+}
+
+QVariant KDbUtilsInternal::squeezedValue(const QVariant &value)
+{
+    switch(value.type()) {
+    case QVariant::String:
+        if (value.toString().length() > SQUEEZED_TEXT_LIMIT) {
+            return QVariant(value.toString().left(SQUEEZED_TEXT_LIMIT - SQUEEZED_TEXT_SUFFIX)
+                    + QString::fromLatin1("...")
+                    + value.toString().right(SQUEEZED_TEXT_SUFFIX)
+                    + QString::fromLatin1("[%1 characters]").arg(value.toString().length()));
+        }
+        break;
+    case QVariant::ByteArray:
+        if (value.toByteArray().length() > SQUEEZED_TEXT_LIMIT) {
+            return QVariant(value.toByteArray().left(SQUEEZED_TEXT_LIMIT - SQUEEZED_TEXT_SUFFIX)
+                    + "..."
+                    + value.toByteArray().right(SQUEEZED_TEXT_SUFFIX)
+                    + '[' + QByteArray::number(value.toByteArray().length())
+                    + " bytes]");
+        }
+        break;
+    default:
+        break;
+    }
+//! @todo add BitArray, Url, Hash, Map, Pixmap, Image?
+    return value;
 }

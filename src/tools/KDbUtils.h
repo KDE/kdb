@@ -120,6 +120,11 @@ type* stringToPointer(const QString& string)
     return static_cast<type*>(stringToPointerInternal(string, sizeof(type*)));
 }
 
+//! @return value converted to text, squeezed to reasonable length, useful for debugging
+//! If the value is not a byte array or string, or if it's not longer than 1024 characters,
+//! @a value is returned.
+KDB_EXPORT QVariant squeezedValue(const QVariant &value);
+
 //! @short Autodeleting hash
 template <class Key, class T>
 class AutodeletedHash : public QHash<Key, T>

@@ -53,4 +53,14 @@ void qAsConst(const T &&) Q_DECL_EQ_DELETE;
 #define KDB_SHARED_LIB_EXTENSION ".so"
 #endif
 
+namespace KDbUtilsInternal {
+
+//! @return value converted to text, squeezed to reasonable length, useful for debugging
+//! If the value is not a byte array or string, or if it's not longer than 1024 characters,
+//! @a value is returned.
+//! @internal
+QVariant squeezedValue(const QVariant &value);
+
+}
+
 #endif //KDB_TOOLS_UTILS_P_H
