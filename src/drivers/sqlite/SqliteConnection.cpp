@@ -29,6 +29,7 @@
 #include "KDbConnectionData.h"
 #include "KDbConnectionOptions.h"
 #include "KDbUtils.h"
+#include "KDbUtils_p.h"
 #include "KDbVersionInfo.h"
 
 #include <QFile>
