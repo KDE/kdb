@@ -39,6 +39,7 @@ add_unfinished_features_option()
 add_pc_file(${PROJECT_NAME})
 
 add_subdirectory(src)
+add_subdirectory(tools)
 
 add_custom_target(cppclean
     COMMAND ${CMAKE_SOURCE_DIR}/tools/cppclean-kdb.sh ${CMAKE_BINARY_DIR}
