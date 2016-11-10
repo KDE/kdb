@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 #
@@ -190,10 +190,9 @@ def insert_fromMap_toMap_methods():
     open_sdc()
     outfile_sdc.write("""%s::Data::Data(const QMap<QString, QString> &map, bool *ok)
 {
-    if (ok) {
-        *ok = true;
-    }
 %s
+    if (ok)
+        *ok = true;
 }
 
 QMap<QString, QString> %s::Data::toMap() const
@@ -531,9 +530,13 @@ def generate_fromString_conversion(name, _type):
     s = 'map[QLatin1String(\"%s\")]' % name
     if _type == 'bool': # 0 or 1
         return """%s = %s.toInt(ok) == 1;
+    if (ok && !(*ok))
+        return;
 """ % (name, s)
     elif _type == 'int':
         return """%s = %s.toInt(ok);
+    if (ok && !(*ok))
+        return;
 """ % (name, s)
     else: # QString...
         return "%s = %s;" % (name, s)
@@ -759,7 +762,7 @@ def process():
 """)
             else:
                 outfile.write("""/*! @note objects of this class are implicitly shared, what means they have value semantics
-          by offering copy-on-write behavior to maximize resource usage and minimize copying.
+          by offering copy-on-write behaviour to maximize resource usage and minimize copying.
           Only a pointer to the data is passed around. See <a href="http://doc.qt.io/qt-5/qshareddatapointer.html#details">Qt documentation</a>.
  */
 """)
