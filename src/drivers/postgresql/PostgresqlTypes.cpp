@@ -20,9 +20,18 @@
 
 #include "PostgresqlDriver.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable: 4200) // "nonstandard extension used : zero-sized array in struct/union"
+#endif
+
 #include <postgres.h>
 #include <libpq-fe.h>
 #include <catalog/pg_type.h> // needed for BOOLOID, etc.
+
+#ifdef _MSC_VER
+#pragma warning( pop )
+#endif
 
 void PostgresqlDriver::initPgsqlToKDbMap()
 {
