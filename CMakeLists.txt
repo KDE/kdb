@@ -21,6 +21,9 @@ include(GenerateExportHeader)
 include(MacroLogFeature)
 include(KDbCreateSharedDataClasses)
 include(KDbMacros)
+include(KDbAddQCH)
+
+simple_option(BUILD_QCH "Build API documentation in QCH format" OFF)
 
 # Dependencies
 set(REQUIRED_QT_VERSION 5.4.0)

@@ -412,6 +412,37 @@ install(
 #   DESTINATION ${KDB_INCLUDE_INSTALL_DIR}/Interfaces COMPONENT Devel
 # )
 
+if(BUILD_QCH)
+    kdb_add_qch(
+        KDb_QCH
+        OUTPUT_BASENAME ${KDB_BASE_NAME}
+        VERSION ${PROJECT_VERSION}
+        ORG_DOMAIN org.kde
+        SOURCES
+            Mainpage.dox
+            ${kdb_HEADERS}
+            ${kdb_HEADERS_FROM_BUILDDIR}
+        LINK_QCHS
+            Qt5Core_QCH
+            Qt5Gui_QCH
+            Qt5Widgets_QCH
+            KF5CoreAddons_QCH
+        BLANK_MACROS
+            KDB_EXPORT
+            KDB_DEPRECATED
+        TAGFILE_INSTALL_DESTINATION ${KDB_QTQCH_FULL_INSTALL_DIR}
+        QCH_INSTALL_DESTINATION ${KDB_QTQCH_FULL_INSTALL_DIR}
+    )
+    set(kdb_qch_targets KDb_QCH)
+endif()
+
+kdb_install_qch_export(
+    TARGETS ${kdb_qch_targets}
+    FILE KDbQCHTargets.cmake
+​    DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
+​    COMPONENT Devel
+​)
+
 add_subdirectory(drivers)
 
 enable_testing()

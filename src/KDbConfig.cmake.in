@@ -21,6 +21,7 @@ find_dependency(Qt5Xml @REQUIRED_QT_VERSION@)
 find_dependency(KF5CoreAddons @REQUIRED_KF5_VERSION@)
 
 include("${CMAKE_CURRENT_LIST_DIR}/KDbTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/KDbQCHTargets.cmake")
 
 # Features
 set(KDB_DEBUG_GUI @KDB_DEBUG_GUI@)
