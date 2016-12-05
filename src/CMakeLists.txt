@@ -415,9 +415,10 @@ install(
 if(BUILD_QCH)
     kdb_add_qch(
         KDb_QCH
-        OUTPUT_BASENAME ${KDB_BASE_NAME}
+        NAME KDb
+        BASE_NAME ${KDB_BASE_NAME}
         VERSION ${PROJECT_VERSION}
-        ORG_DOMAIN org.kde
+        NAMESPACE org.kde.${KDB_BASE_NAME}
         SOURCES
             Mainpage.dox
             ${kdb_HEADERS}

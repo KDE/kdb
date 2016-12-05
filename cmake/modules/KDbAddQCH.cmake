@@ -10,11 +10,12 @@
 #
 # ::
 #
-#   kdb_add_qch(<name>
-#       OUTPUT_BASENAME <basename>
+#   kdb_add_qch(<target_name>
+#       NAME <name>
 #       VERSION <version>
 #       QCH_INSTALL_DESTINATION <qchfile_install_path>
 #       TAGFILE_INSTALL_DESTINATION <tagsfile_install_path>
+#       [BASE_NAME <basename>]
 #       [SOURCE_DIRS <dir> [<dir2> [...]]]
 #       [SOURCES <file> [<file2> [...]]]
 #       |MD_MAINPAGE <md_file>]
@@ -29,14 +30,13 @@
 #       [VERBOSE]
 #   )
 #
-# This macro adds a target called <name> for the creation of an API
-# documentation manual named ``<basename>.qch``in the QCH format from the
-# given sources.
+# This macro adds a target called <target_name> for the creation of an API
+# documentation manual in the QCH format from the given sources.
 # It currently uses doxygen, future versions might optionally also allow other
 # tools.
 # Next to the QCH file the target will generate a corresponding doxygen tag
-# file name ``<basename>.tags``, which enables creating links from other
-# documentation into the generated QCH file.
+# file, which enables creating links from other documentation into the
+# generated QCH file.
 #
 # If the required tools are not found, the macro will skip creation of the
 # target and only emit a warning, so the use of the macro can be introduced
@@ -51,18 +51,20 @@
 # The macro will set the target properties DOXYGEN_TAGFILE, QHP_NAMESPACE,
 # QHP_NAMESPACE_VERSIONED and QHP_VIRTUALFOLDER to the respective values, to
 # allow other code access to them, e.g. the macro kdb_install_qch_export().
-# To enable the use of the target <name> as item for LINK_QCHS or
+# To enable the use of the target <target_name> as item for LINK_QCHS or
 # LINK_QCHS_VERSIONED in further ``kdb_add_qch()`` calls in the current build,
 # additionally a target property DOXYGEN_TAGFILE_BUILD is set, with the path
 # of the created doxygen tag file in the build dir.
 # If existing, ``kdb_add_qch()`` will use this property instead of
 # DOXYGEN_TAGFILE for access to the tags file.
 #
-# OUTPUT_BASENAME specifies the base name for the generated documentation and
-# the files.
+# NAME specifies the name for the generated documentation.
 #
 # VERSION specifies the version of the library for which the documentation is
 # created.
+#
+# BASE_NAME specifies the base name for the generated files.
+# The default basename is ``<name>``.
 #
 # SOURCE_DIRS specifies the dirs (incl. subdirs) with the source files for
 # which the API documentation should be generated.  Dirs can be relative to
@@ -94,7 +96,7 @@
 # NAMESPACE can be used to set a custom namespace <namespace> of the generated
 # QCH file. The namepspace is used as the unique id by QHelpEngine (cmp.
 # http://doc.qt.io/qt-5/qthelpproject.html#namespace).
-# The default namespace is ``<domain>.<basename>``.
+# The default namespace is ``<domain>.<name>``.
 # Needs to be used when ORG_DOMAIN is not used.
 #
 # ORG_DOMAIN can be used to define the organization domain prefix for the
@@ -149,7 +151,7 @@
 #
 #   kdb_add_qch(
 #       MyLib_QCH
-#       OUTPUT_BASENAME MyLib
+#       NAME MyLib
 #       VERSION "0.42.0"
 #       ORG_DOMAIN org.myorg
 #       SOURCE_DIRS
@@ -172,7 +174,7 @@
 #
 #   kdb_add_qch(
 #       MyLib_QCH
-#       OUTPUT_BASENAME MyLib
+#       NAME MyLib
 #       VERSION ${MyLib_VERSION}
 #       ORG_DOMAIN org.myorg
 #       SOURCES ${MyLib_PUBLIC_HEADERS}
@@ -183,7 +185,7 @@
 #   )
 #   kdb_add_qch(
 #       MyOtherLib_QCH
-#       OUTPUT_BASENAME MyOtherLib
+#       NAME MyOtherLib
 #       VERSION ${MyOtherLib_VERSION}
 #       ORG_DOMAIN org.myorg
 #       SOURCES ${MyOtherLib_PUBLIC_HEADERS}
@@ -234,8 +236,6 @@
 #       DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake/MyLib"
 #       COMPONENT Devel
 #   )
-#
-# Since 5.29.0.
 
 #=============================================================================
 # Copyright 2016 Friedrich W. H. Kossebau <kossebau@kde.org>
@@ -281,12 +281,12 @@ include(CMakeParseArguments)
 function(kdb_add_qch target_name)
     # Parse arguments
     set(options VERBOSE)
-    set(oneValueArgs OUTPUT_BASENAME QCH_INSTALL_DESTINATION TAGFILE_INSTALL_DESTINATION VERSION NAMESPACE MD_MAINPAGE ORG_DOMAIN CONFIG_TEMPLATE)
+    set(oneValueArgs NAME BASE_NAME QCH_INSTALL_DESTINATION TAGFILE_INSTALL_DESTINATION VERSION NAMESPACE MD_MAINPAGE ORG_DOMAIN CONFIG_TEMPLATE)
     set(multiValueArgs SOURCE_DIRS SOURCES IMAGE_DIRS EXAMPLE_DIRS BLANK_MACROS LINK_QCHS LINK_QCHS_VERSIONED)
     cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     # check required args
-    foreach(_arg_name OUTPUT_BASENAME QCH_INSTALL_DESTINATION TAGFILE_INSTALL_DESTINATION VERSION)
+    foreach(_arg_name NAME QCH_INSTALL_DESTINATION TAGFILE_INSTALL_DESTINATION VERSION)
         if(NOT DEFINED ARGS_${_arg_name})
             message(FATAL_ERROR "${_arg_name} needs to be defined when calling kdb_add_qch")
         endif()
@@ -376,15 +376,20 @@ function(kdb_add_qch target_name)
         endif()
 
         # prepare base dirs, working file names and other vars
-        set(_qch_file_basename "${ARGS_OUTPUT_BASENAME}.qch")
-        set(_tags_file_basename "${ARGS_OUTPUT_BASENAME}.tags")
+        if (DEFINED ARGS_BASE_NAME)
+            set(_basename ${ARGS_BASE_NAME})
+        else()
+            set(_basename ${ARGS_NAME})
+        endif()
+        set(_qch_file_basename "${_basename}.qch")
+        set(_tags_file_basename "${_basename}.tags")
         set(_qch_buildpath "${CMAKE_CURRENT_BINARY_DIR}/${_qch_file_basename}")
         set(_tags_buildpath "${CMAKE_CURRENT_BINARY_DIR}/${_tags_file_basename}")
-        set(_apidox_builddir "${CMAKE_CURRENT_BINARY_DIR}/${ARGS_OUTPUT_BASENAME}_ECMDoxygenQCH")
+        set(_apidox_builddir "${CMAKE_CURRENT_BINARY_DIR}/${_basename}_ECMDoxygenQCH")
         if (DEFINED ARGS_NAMESPACE)
             set(_namespace "${ARGS_NAMESPACE}")
         else()
-            set(_namespace "${ARGS_ORG_DOMAIN}.${ARGS_OUTPUT_BASENAME}")
+            set(_namespace "${ARGS_ORG_DOMAIN}.${ARGS_NAME}")
         endif()
         string(REPLACE "." "_" _dotLessVersion ${ARGS_VERSION})
         set(_versioned_namespace "${_namespace}.${_dotLessVersion}")
@@ -393,7 +398,7 @@ function(kdb_add_qch target_name)
         set(_dep_qch_targets)
 
         ### Create doxygen config file
-        set(_doxygenconfig_file "${CMAKE_CURRENT_BINARY_DIR}/${ARGS_OUTPUT_BASENAME}_ECMDoxygenQCH.config")
+        set(_doxygenconfig_file "${CMAKE_CURRENT_BINARY_DIR}/${_basename}_ECMDoxygenQCH.config")
         if (DEFINED ARGS_CONFIG_TEMPLATE)
             set(_doxygenconfig_template_file "${ARGS_CONFIG_TEMPLATE}")
         else()
@@ -460,11 +465,11 @@ function(kdb_add_qch target_name)
             set(ECM_DOXYGENQCH_FILE_PATTERNS "")
         endif()
 
-        set(ECM_DOXYGENQCH_PROJECTNAME ${ARGS_OUTPUT_BASENAME})
+        set(ECM_DOXYGENQCH_PROJECTNAME ${ARGS_NAME})
         file(RELATIVE_PATH _builddirrelative_filepath "${_apidox_builddir}/html"  ${_qch_buildpath})
         set(ECM_DOXYGENQCH_FILEPATH "\"${_builddirrelative_filepath}\"")
         set(ECM_DOXYGENQCH_PROJECTVERSION ${ARGS_VERSION})
-        set(ECM_DOXYGENQCH_VIRTUALFOLDER "${ARGS_OUTPUT_BASENAME}")
+        set(ECM_DOXYGENQCH_VIRTUALFOLDER "${ARGS_NAME}")
         set(ECM_DOXYGENQCH_FULLNAMESPACE ${_versioned_namespace})
         set(ECM_DOXYGENQCH_BLANK_MACROS)
         foreach(_macro IN LISTS ARGS_BLANK_MACROS)
@@ -484,6 +489,7 @@ function(kdb_add_qch target_name)
                         QHP_NAMESPACE${_versioned_postfix}
                         QHP_VIRTUALFOLDER
                     )
+                        get_target_property(_property ${_target} ${_propertyname})
                         if(NOT "${_property}")
                             message(STATUS "No property ${_propertyname} set on ${_link_qch} when calling kdb_add_qch().")
                             set(_target_usable FALSE)
@@ -497,7 +503,7 @@ function(kdb_add_qch target_name)
                     get_target_property(_link_qch_namespace ${_link_qch} QHP_NAMESPACE${_versioned_postfix})
                     get_target_property(_link_qch_virtualfolder ${_link_qch} QHP_VIRTUALFOLDER)
                     # if same build, then prefer build version over any installed one
-                    if (${_link_qch_tagfile_build})
+                    if (_link_qch_tagfile_build)
                         set(_link_qch_tagfile ${_link_qch_tagfile_build})
                         list(APPEND _dep_tagfiles "${_link_qch_tagfile}")
                     endif()
