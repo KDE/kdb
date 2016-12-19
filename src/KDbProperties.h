@@ -62,7 +62,7 @@ protected:
     explicit KDbProperties(KDbConnection *conn);
 
     KDbConnection* m_conn;
-    friend class ConnectionPrivate;
+    friend class KDbConnectionPrivate;
 };
 
 #endif

@@ -114,6 +114,7 @@ set(kdb_LIB_SRCS
    expression/KDbFunctionExpression.cpp
    KDbFieldList.cpp
    KDbTableSchema.cpp
+   KDbTableSchemaChangeListener.cpp
    KDbIndexSchema.cpp
    KDbQuerySchema.cpp
    KDbQuerySchema_p.cpp
@@ -298,6 +299,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbRelationship
         KDbTableOrQuerySchema
         KDbTableSchema
+        KDbTableSchemaChangeListener
         KDbTransaction
 )
 

@@ -18,29 +18,21 @@
 */
 
 #include "KDbConnection.h"
-#include "KDbConnectionData.h"
-#include "KDbConnectionOptions.h"
 #include "KDbConnection_p.h"
 #include "KDbCursor.h"
 #include "kdb_debug.h"
+#include "KDbDriverBehavior.h"
 #include "KDbDriverMetaData.h"
 #include "KDbDriver_p.h"
-#include "KDbDriverBehavior.h"
-#include "KDbError.h"
-#include "KDbExpression.h"
-#include "KDb.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbNativeStatementBuilder.h"
-#include "KDbParser.h"
-#include "KDbPreparedStatementInterface.h"
 #include "KDbQuerySchema.h"
 #include "KDbRecordData.h"
-#include "KDbProperties.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDbRelationship.h"
 #include "KDbSqlRecord.h"
 #include "KDbSqlResult.h"
-#include "KDbVersionInfo.h"
+#include "KDbTableSchemaChangeListener.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -172,276 +164,171 @@ void KDbConnectionOptions::setConnection(KDbConnection *connection)
 }
 
 //================================================
-//! @internal
-class ConnectionPrivate
+
+KDbConnectionPrivate::KDbConnectionPrivate(KDbConnection* const conn, KDbDriver *drv, const KDbConnectionData& _connData,
+                  const KDbConnectionOptions &_options)
+        : conn(conn)
+        , connData(_connData)
+        , options(_options)
+        , driver(drv)
+        , dbProperties(conn)
 {
-public:
-    ConnectionPrivate(KDbConnection* const conn, KDbDriver *drv, const KDbConnectionData& _connData,
-                      const KDbConnectionOptions &_options)
-            : conn(conn)
-            , connData(_connData)
-            , options(_options)
-            , driver(drv)
-            , m_parser(0)
-            , dbProperties(conn)
-            , dont_remove_transactions(false)
-            , skip_databaseExists_check_in_useDatabase(false)
-            , default_trans_started_inside(false)
-            , isConnected(false)
-            , autoCommit(true)
-            , insideCloseDatabase(false)
+    options.setConnection(conn);
+}
+
+KDbConnectionPrivate::~KDbConnectionPrivate()
+{
+    options.setConnection(nullptr);
+    deleteAllCursors();
+    delete m_parser;
+    qDeleteAll(tableSchemaChangeListeners);
+    qDeleteAll(obsoleteQueries);
+}
+
+void KDbConnectionPrivate::deleteAllCursors()
+{
+    QSet<KDbCursor*> cursorsToDelete(cursors);
+    cursors.clear();
+    for(KDbCursor* c : cursorsToDelete) {
+        CursorDeleter deleter(c);
+    }
+}
+
+void KDbConnectionPrivate::errorInvalidDBContents(const QString& details)
+{
+    conn->m_result = KDbResult(ERR_INVALID_DATABASE_CONTENTS,
+                               KDbConnection::tr("Invalid database contents. %1").arg(details));
+}
+
+QString KDbConnectionPrivate::strItIsASystemObject() const
+{
+    return KDbConnection::tr("It is a system object.");
+}
+
+void KDbConnectionPrivate::setupKDbSystemSchema()
+{
+    if (!m_internalKDbTables.isEmpty()) {
+        return; //already set up
+    }
     {
-        options.setConnection(conn);
+        KDbInternalTableSchema *t_objects = new KDbInternalTableSchema(QLatin1String("kexi__objects"));
+        t_objects->addField(new KDbField(QLatin1String("o_id"),
+                                      KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
+        t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
+        t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
+        t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
+        t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
+        //kdbDebug() << *t_objects;
+        insertTable(t_objects);
     }
-
-    ~ConnectionPrivate() {
-        options.setConnection(nullptr);
-        deleteAllCursors();
-        delete m_parser;
-        qDeleteAll(tableSchemaChangeListeners);
-        qDeleteAll(obsoleteQueries);
+    {
+        KDbInternalTableSchema *t_objectdata = new KDbInternalTableSchema(QLatin1String("kexi__objectdata"));
+        t_objectdata->addField(new KDbField(QLatin1String("o_id"),
+                                         KDbField::Integer, KDbField::NotNull, KDbField::Unsigned));
+        t_objectdata->addField(new KDbField(QLatin1String("o_data"), KDbField::LongText));
+        t_objectdata->addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
+        insertTable(t_objectdata);
     }
-
-    void deleteAllCursors() {
-        QSet<KDbCursor*> cursorsToDelete(cursors);
-        cursors.clear();
-        for(KDbCursor* c : cursorsToDelete) {
-            CursorDeleter deleter(c);
-        }
+    {
+        KDbInternalTableSchema *t_fields = new KDbInternalTableSchema(QLatin1String("kexi__fields"));
+        t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
+        t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
+        t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
+        t_fields->addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer));
+        t_fields->addField(new KDbField(QLatin1String("f_options"), KDbField::Integer));
+        t_fields->addField(new KDbField(QLatin1String("f_default"), KDbField::Text));
+        //these are additional properties:
+        t_fields->addField(new KDbField(QLatin1String("f_order"), KDbField::Integer));
+        t_fields->addField(new KDbField(QLatin1String("f_caption"), KDbField::Text));
+        t_fields->addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
+        insertTable(t_fields);
     }
-
-    void errorInvalidDBContents(const QString& details) {
-        conn->m_result = KDbResult(ERR_INVALID_DATABASE_CONTENTS,
-                                   KDbConnection::tr("Invalid database contents. %1").arg(details));
+    {
+        KDbInternalTableSchema *t_db = new KDbInternalTableSchema(QLatin1String("kexi__db"));
+        t_db->addField(new KDbField(QLatin1String("db_property"),
+                                 KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32));
+        t_db->addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
+        insertTable(t_db);
     }
+}
 
-    QString strItIsASystemObject() const {
-        return KDbConnection::tr("It is a system object.");
+void KDbConnectionPrivate::insertTable(KDbTableSchema* tableSchema)
+{
+    KDbInternalTableSchema* internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
+    if (internalTable) {
+        m_internalKDbTables.insert(internalTable);
+    } else {
+        m_tables.insert(tableSchema->id(), tableSchema);
     }
+    m_tablesByName.insert(tableSchema->name(), tableSchema);
+}
 
-    inline KDbParser *parser() {
-        return m_parser ? m_parser : (m_parser = new KDbParser(conn));
+void KDbConnectionPrivate::removeTable(const KDbTableSchema& tableSchema)
+{
+    m_tablesByName.remove(tableSchema.name());
+    KDbTableSchema *toDelete = m_tables.take(tableSchema.id());
+    delete toDelete;
+}
+
+void KDbConnectionPrivate::takeTable(KDbTableSchema* tableSchema)
+{
+    if (m_tables.isEmpty()) {
+        return;
     }
+    m_tables.take(tableSchema->id());
+    m_tablesByName.take(tableSchema->name());
+}
 
-    inline KDbTableSchema* table(const QString& name) const {
-        return tables_byname.value(name);
-    }
+void KDbConnectionPrivate::renameTable(KDbTableSchema* tableSchema, const QString& newName)
+{
+    m_tablesByName.take(tableSchema->name());
+    tableSchema->setName(newName);
+    m_tablesByName.insert(tableSchema->name(), tableSchema);
+}
 
-    inline KDbTableSchema* table(int id) const {
-        return tables.value(id);
-    }
+void KDbConnectionPrivate::changeTableId(KDbTableSchema* tableSchema, int newId)
+{
+    m_tables.take(tableSchema->id());
+    m_tables.insert(newId, tableSchema);
+}
 
-    //! used just for removing system KDbTableSchema objects on db close.
-    inline QSet<KDbInternalTableSchema*> internalKDbTables() const {
-        return _internalKDbTables;
-    }
+void KDbConnectionPrivate::clearTables()
+{
+    m_tablesByName.clear();
+    qDeleteAll(m_internalKDbTables);
+    m_internalKDbTables.clear();
+    QHash<int, KDbTableSchema*> tablesToDelete(m_tables);
+    m_tables.clear();
+    qDeleteAll(tablesToDelete);
+}
 
-    /*! Allocates all needed table KDb system objects for kexi__* KDb library's
-     system tables schema.
-     These objects are used internally in this connection and are added to list of tables
-     (by name,      not by id because these have no ids).
-    */
-    void setupKDbSystemSchema() {
-        if (!_internalKDbTables.isEmpty()) {
-            return; //already set up
-        }
-        {
-            KDbInternalTableSchema *t_objects = new KDbInternalTableSchema(QLatin1String("kexi__objects"));
-            t_objects->addField(new KDbField(QLatin1String("o_id"),
-                                          KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
-            t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
-            t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
-            t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
-            t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
-            //kdbDebug() << *t_objects;
-            insertTable(t_objects);
-        }
-        {
-            KDbInternalTableSchema *t_objectdata = new KDbInternalTableSchema(QLatin1String("kexi__objectdata"));
-            t_objectdata->addField(new KDbField(QLatin1String("o_id"),
-                                             KDbField::Integer, KDbField::NotNull, KDbField::Unsigned));
-            t_objectdata->addField(new KDbField(QLatin1String("o_data"), KDbField::LongText));
-            t_objectdata->addField(new KDbField(QLatin1String("o_sub_id"), KDbField::Text));
-            insertTable(t_objectdata);
-        }
-        {
-            KDbInternalTableSchema *t_fields = new KDbInternalTableSchema(QLatin1String("kexi__fields"));
-            t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
-            t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
-            t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
-            t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
-            t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
-            t_fields->addField(new KDbField(QLatin1String("f_constraints"), KDbField::Integer));
-            t_fields->addField(new KDbField(QLatin1String("f_options"), KDbField::Integer));
-            t_fields->addField(new KDbField(QLatin1String("f_default"), KDbField::Text));
-            //these are additional properties:
-            t_fields->addField(new KDbField(QLatin1String("f_order"), KDbField::Integer));
-            t_fields->addField(new KDbField(QLatin1String("f_caption"), KDbField::Text));
-            t_fields->addField(new KDbField(QLatin1String("f_help"), KDbField::LongText));
-            insertTable(t_fields);
-        }
-        {
-            KDbInternalTableSchema *t_db = new KDbInternalTableSchema(QLatin1String("kexi__db"));
-            t_db->addField(new KDbField(QLatin1String("db_property"),
-                                     KDbField::Text, KDbField::NoConstraints, KDbField::NoOptions, 32));
-            t_db->addField(new KDbField(QLatin1String("db_value"), KDbField::LongText));
-            insertTable(t_db);
-        }
-    }
+void KDbConnectionPrivate::insertQuery(KDbQuerySchema* query)
+{
+    m_queries.insert(query->id(), query);
+    m_queriesByName.insert(query->name(), query);
+}
 
-    void insertTable(KDbTableSchema* tableSchema) {
-        KDbInternalTableSchema* internalTable = dynamic_cast<KDbInternalTableSchema*>(tableSchema);
-        if (internalTable) {
-            _internalKDbTables.insert(internalTable);
-        } else {
-            tables.insert(tableSchema->id(), tableSchema);
-        }
-        tables_byname.insert(tableSchema->name(), tableSchema);
-    }
+void KDbConnectionPrivate::removeQuery(KDbQuerySchema* querySchema)
+{
+    m_queriesByName.remove(querySchema->name());
+    m_queries.remove(querySchema->id());
+    delete querySchema;
+}
 
-    /*! @internal Removes table schema pointed by tableSchema.id() and tableSchema.name()
-     from internal structures and destroys it. Does not make any change at the backend.
-     Note that the table schema being removed may be not the same as @a tableSchema. */
-    void removeTable(const KDbTableSchema& tableSchema) {
-        tables_byname.remove(tableSchema.name());
-        KDbTableSchema *toDelete = tables.take(tableSchema.id());
-        delete toDelete;
-    }
+void KDbConnectionPrivate::setQueryObsolete(KDbQuerySchema* query)
+{
+    obsoleteQueries.insert(query);
+    m_queriesByName.take(query->name());
+    m_queries.take(query->id());
+}
 
-    void takeTable(KDbTableSchema* tableSchema) {
-        if (tables.isEmpty()) {
-            return;
-        }
-        tables.take(tableSchema->id());
-        tables_byname.take(tableSchema->name());
-    }
-
-    void renameTable(KDbTableSchema* tableSchema, const QString& newName) {
-        tables_byname.take(tableSchema->name());
-        tableSchema->setName(newName);
-        tables_byname.insert(tableSchema->name(), tableSchema);
-    }
-
-    void changeTableId(KDbTableSchema* tableSchema, int newId) {
-        tables.take(tableSchema->id());
-        tables.insert(newId, tableSchema);
-    }
-
-    void clearTables() {
-        tables_byname.clear();
-        qDeleteAll(_internalKDbTables);
-        _internalKDbTables.clear();
-        QHash<int, KDbTableSchema*> tablesToDelete(tables);
-        tables.clear();
-        qDeleteAll(tablesToDelete);
-    }
-
-    inline KDbQuerySchema* query(const QString& name) const {
-        return queries_byname.value(name);
-    }
-
-    inline KDbQuerySchema* query(int id) const {
-        return queries.value(id);
-    }
-
-    void insertQuery(KDbQuerySchema* query) {
-        queries.insert(query->id(), query);
-        queries_byname.insert(query->name(), query);
-    }
-
-    /*! @internal Removes @a querySchema from internal structures and
-     destroys it. Does not make any change at the backend. */
-    void removeQuery(KDbQuerySchema* querySchema) {
-        queries_byname.remove(querySchema->name());
-        queries.remove(querySchema->id());
-        delete querySchema;
-    }
-
-    void setQueryObsolete(KDbQuerySchema* query) {
-        obsoleteQueries.insert(query);
-        queries_byname.take(query->name());
-        queries.take(query->id());
-    }
-
-    void clearQueries() {
-        qDeleteAll(queries);
-        queries.clear();
-    }
-
-    KDbConnection* const conn; //!< The @a KDbConnection instance this @a ConnectionPrivate belongs to.
-    KDbConnectionData connData; //!< the @a KDbConnectionData used within that connection.
-
-    //! True for read only connection. Used especially for file-based drivers.
-    KDbConnectionOptions options;
-
-    //!< The driver this @a KDbConnection instance uses.
-    KDbDriver * const driver;
-
-    /*! Default transaction handle.
-    If transactions are supported: Any operation on database (e.g. inserts)
-    that is started without specifying transaction context, will be performed
-    in the context of this transaction. */
-    KDbTransaction default_trans;
-    QList<KDbTransaction> transactions;
-
-    QHash<KDbTableSchema*, QSet<KDbConnection::TableSchemaChangeListenerInterface*>* > tableSchemaChangeListeners;
-
-    //! Used in KDbConnection::setQuerySchemaObsolete( const QString& queryName )
-    //! to collect obsolete queries. THese are deleted on connection deleting.
-    QSet<KDbQuerySchema*> obsoleteQueries;
-
-    //! server version information for this connection.
-    KDbServerVersionInfo serverVersion;
-
-    //! Database version information for this connection.
-    KDbVersionInfo databaseVersion;
-
-    KDbParser *m_parser;
-
-    //! cursors created for this connection
-    QSet<KDbCursor*> cursors;
-
-    //! Database properties
-    KDbProperties dbProperties;
-
-    QString availableDatabaseName; //!< used by anyAvailableDatabaseName()
-    QString usedDatabase; //!< database name that is opened now (the currentDatabase() name)
-
-    //! true if rollbackTransaction() and commitTransaction() shouldn't remove
-    //! the transaction object from 'transactions' list; used by closeDatabase()
-    bool dont_remove_transactions;
-
-    //! used to avoid endless recursion between useDatabase() and databaseExists()
-    //! when useTemporaryDatabaseIfNeeded() works
-    bool skip_databaseExists_check_in_useDatabase;
-
-    /*! Used when single transactions are only supported (KDbDriver::SingleTransactions).
-     True value means default KDbTransaction has been started inside connection object
-     (by beginAutoCommitTransaction()), otherwise default transaction has been started outside
-     of the object (e.g. before createTable()), so we shouldn't autocommit the transaction
-     in commitAutoCommitTransaction(). Also, beginAutoCommitTransaction() doesn't restarts
-     transaction if default_trans_started_inside is false. Such behavior allows user to
-     execute a sequence of actions like CREATE TABLE...; INSERT DATA...; within a single transaction
-     and commit it or rollback by hand. */
-    bool default_trans_started_inside;
-
-    bool isConnected;
-
-    bool autoCommit;
-
-    bool insideCloseDatabase; //!< helper: true while closeDatabase() is executed
-
-private:
-    //! Table schemas retrieved on demand with tableSchema()
-    QHash<int, KDbTableSchema*> tables;
-    QHash<QString, KDbTableSchema*> tables_byname;
-    //! used just for removing system KDbTableSchema objects on db close.
-    QSet<KDbInternalTableSchema*> _internalKDbTables;
-    //! Query schemas retrieved on demand with querySchema()
-    QHash<int, KDbQuerySchema*> queries;
-    QHash<QString, KDbQuerySchema*> queries_byname;
-    Q_DISABLE_COPY(ConnectionPrivate)
-};
+void KDbConnectionPrivate::clearQueries()
+{
+    qDeleteAll(m_queries);
+    m_queries.clear();
+}
 
 //================================================
 
@@ -464,7 +351,7 @@ Q_GLOBAL_STATIC(SystemTables, g_kdbSystemTableNames)
 
 KDbConnection::KDbConnection(KDbDriver *driver, const KDbConnectionData& connData,
                              const KDbConnectionOptions &options)
-        : d(new ConnectionPrivate(this, driver, connData, options))
+        : d(new KDbConnectionPrivate(this, driver, connData, options))
 {
     if (d->connData.driverId().isEmpty()) {
         d->connData.setDriverId(d->driver->metaData()->id());
@@ -480,7 +367,7 @@ void KDbConnection::destroy()
 
 KDbConnection::~KDbConnection()
 {
-    ConnectionPrivate *thisD = d;
+    KDbConnectionPrivate *thisD = d;
     d = nullptr; // make sure d is nullptr before destructing
     delete thisD;
 }
@@ -667,10 +554,10 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 
     QString tmpdbName;
     //some engines need to have opened any database before executing "create database"
-    const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
-    d->skip_databaseExists_check_in_useDatabase = true;
+    const bool orig_skipDatabaseExistsCheckInUseDatabase = d->skipDatabaseExistsCheckInUseDatabase;
+    d->skipDatabaseExistsCheckInUseDatabase = true;
     bool ret = useTemporaryDatabaseIfNeeded(&tmpdbName);
-    d->skip_databaseExists_check_in_useDatabase = orig_skip_databaseExists_check_in_useDatabase;
+    d->skipDatabaseExistsCheckInUseDatabase = orig_skipDatabaseExistsCheckInUseDatabase;
     if (!ret)
         return false;
 
@@ -807,7 +694,7 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
     if (d->usedDatabase == my_dbName)
         return true; //already used
 
-    if (!d->skip_databaseExists_check_in_useDatabase) {
+    if (!d->skipDatabaseExistsCheckInUseDatabase) {
         if (!databaseExists(my_dbName, false /*don't ignore errors*/))
             return false; //database must exist
     }
@@ -865,7 +752,7 @@ bool KDbConnection::closeDatabase()
     /*! @todo (js) add CLEVER algorithm here for nested transactions */
     if (d->driver->transactionsSupported()) {
         //rollback all transactions
-        d->dont_remove_transactions = true; //lock!
+        d->dontRemoveTransactions = true; //lock!
         foreach(const KDbTransaction& tr, d->transactions) {
             if (!rollbackTransaction(tr)) {//rollback as much as you can, don't stop on prev. errors
                 ret = false;
@@ -874,7 +761,7 @@ bool KDbConnection::closeDatabase()
                 kdbDebug() << "trans.refcount==" << (tr.m_data ? QString::number(tr.m_data->refcount) : QLatin1String("(null)"));
             }
         }
-        d->dont_remove_transactions = false; //unlock!
+        d->dontRemoveTransactions = false; //unlock!
         d->transactions.clear(); //free trans. data
     }
 
@@ -906,10 +793,10 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
                                  tr("Could not find any database for temporary connection."));
             return false;
         }
-        const bool orig_skip_databaseExists_check_in_useDatabase = d->skip_databaseExists_check_in_useDatabase;
-        d->skip_databaseExists_check_in_useDatabase = true;
+        const bool orig_skipDatabaseExistsCheckInUseDatabase = d->skipDatabaseExistsCheckInUseDatabase;
+        d->skipDatabaseExistsCheckInUseDatabase = true;
         bool ret = useDatabase(*name, false);
-        d->skip_databaseExists_check_in_useDatabase = orig_skip_databaseExists_check_in_useDatabase;
+        d->skipDatabaseExistsCheckInUseDatabase = orig_skipDatabaseExistsCheckInUseDatabase;
         if (!ret) {
             m_result = KDbResult(m_result.code(),
                                  tr("Error during starting temporary connection using \"%1\" database name.").arg(*name));
@@ -1590,7 +1477,7 @@ tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSc
         return false;
     }
 
-    tristate res = closeAllTableSchemaChangeListeners(tableSchema);
+    tristate res = KDbTableSchemaChangeListener::closeListeners(this, tableSchema);
     if (true != res)
         return res;
 
@@ -1651,7 +1538,7 @@ tristate KDbConnection::dropTable(const QString& tableName)
 tristate KDbConnection::alterTable(KDbTableSchema* tableSchema, KDbTableSchema* newTableSchema)
 {
     clearResult();
-    tristate res = closeAllTableSchemaChangeListeners(tableSchema);
+    tristate res = KDbTableSchemaChangeListener::closeListeners(this, tableSchema);
     if (true != res)
         return res;
 
@@ -1850,14 +1737,14 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
     // commit current transaction (if present) for drivers
     // that allow single transaction per connection
     if (d->driver->beh->features & KDbDriver::SingleTransactions) {
-        if (d->default_trans_started_inside) //only commit internally started transaction
+        if (d->defaultTransactionStartedInside) //only commit internally started transaction
             if (!commitTransaction(d->default_trans, true)) {
                 tg->setTransaction(KDbTransaction());
                 return false; //we have a real error
             }
 
-        d->default_trans_started_inside = d->default_trans.isNull();
-        if (!d->default_trans_started_inside) {
+        d->defaultTransactionStartedInside = d->default_trans.isNull();
+        if (!d->defaultTransactionStartedInside) {
             tg->setTransaction(d->default_trans);
             tg->doNothing();
             return true; //reuse externally started transaction
@@ -1877,7 +1764,7 @@ bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
     if (trans.isNull() || !d->driver->transactionsSupported())
         return true;
     if (d->driver->beh->features & KDbDriver::SingleTransactions) {
-        if (!d->default_trans_started_inside) //only commit internally started transaction
+        if (!d->defaultTransactionStartedInside) //only commit internally started transaction
             return true; //give up
     }
     return commitTransaction(trans, true);
@@ -1965,7 +1852,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
         ret = drv_commitTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
-    if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
+    if (!d->dontRemoveTransactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
         m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION,
@@ -2000,7 +1887,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
         ret = drv_rollbackTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
-    if (!d->dont_remove_transactions) //true=transaction obj will be later removed from list
+    if (!d->dontRemoveTransactions) //true=transaction obj will be later removed from list
         d->transactions.removeAt(d->transactions.indexOf(t));
     if (!ret && !m_result.isError())
         m_result = KDbResult(ERR_ROLLBACK_OR_COMMIT_TRANSACTION,
@@ -3489,54 +3376,6 @@ bool KDbConnection::deleteAllRecords(KDbQuerySchema* query)
         return false;
     }
     return true;
-}
-
-void KDbConnection::registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                               KDbTableSchema* schema)
-{
-    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(schema);
-    if (!listeners) {
-        listeners = new QSet<TableSchemaChangeListenerInterface*>();
-        d->tableSchemaChangeListeners.insert(schema, listeners);
-    }
-    listeners->insert(listener);
-}
-
-void KDbConnection::unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                                 KDbTableSchema* schema)
-{
-    QSet<TableSchemaChangeListenerInterface*>* listeners = d->tableSchemaChangeListeners.value(schema);
-    if (!listeners)
-        return;
-    listeners->remove(listener);
-}
-
-void KDbConnection::unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener)
-{
-    foreach(QSet<TableSchemaChangeListenerInterface*> *listeners, d->tableSchemaChangeListeners) {
-        listeners->remove(listener);
-    }
-}
-
-QSet<KDbConnection::TableSchemaChangeListenerInterface*>* KDbConnection::tableSchemaChangeListeners(KDbTableSchema* schema) const
-{
-    //kdbDebug() << d->tableSchemaChangeListeners.count();
-    return d->tableSchemaChangeListeners.value(schema);
-}
-
-tristate KDbConnection::closeAllTableSchemaChangeListeners(KDbTableSchema* schema)
-{
-    QSet<KDbConnection::TableSchemaChangeListenerInterface*> *listeners = d->tableSchemaChangeListeners.value(schema);
-    if (!listeners)
-        return true;
-
-    //try to close every window
-    tristate res = true;
-    QList<KDbConnection::TableSchemaChangeListenerInterface*> list(listeners->toList());
-    foreach (KDbConnection::TableSchemaChangeListenerInterface* listener, list) {
-        res = listener->closeListener();
-    }
-    return res;
 }
 
 KDbConnectionOptions* KDbConnection::options()

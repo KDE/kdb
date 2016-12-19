@@ -555,34 +555,6 @@ bool KDbConnectionProxy::removeDataBlock(int objectID, const QString& dataID)
     return d->connection->removeDataBlock(objectID, dataID);
 }
 
-void KDbConnectionProxy::registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                   KDbTableSchema* schema)
-{
-    d->connection->registerForTableSchemaChanges(listener, schema);
-}
-
-void KDbConnectionProxy::unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                                         KDbTableSchema* schema)
-{
-    d->connection->unregisterForTableSchemaChanges(listener, schema);
-}
-
-void KDbConnectionProxy::unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener)
-{
-    d->connection->unregisterForTablesSchemaChanges(listener);
-}
-
-QSet<KDbConnection::TableSchemaChangeListenerInterface*>*
-KDbConnectionProxy::tableSchemaChangeListeners(KDbTableSchema* tableSchema) const
-{
-    return d->connection->tableSchemaChangeListeners(tableSchema);
-}
-
-tristate KDbConnectionProxy::closeAllTableSchemaChangeListeners(KDbTableSchema* tableSchema)
-{
-    return d->connection->closeAllTableSchemaChangeListeners(tableSchema);
-}
-
 KDbPreparedStatement KDbConnectionProxy::prepareStatement(KDbPreparedStatement::Type type,
     KDbFieldList* fields, const QStringList& whereFieldNames)
 {

@@ -23,7 +23,7 @@
 #include <QCoreApplication>
 #include "KDbUtils.h"
 
-class ConnectionPrivate;
+class KDbConnectionPrivate;
 class KDbConnection;
 
 /*! @brief Generic options for a single connection.
@@ -81,7 +81,7 @@ public:
 private:
     void setConnection(KDbConnection *connection);
 
-    friend class ConnectionPrivate;
+    friend class KDbConnectionPrivate;
 
     class Private;
     Private * const d;

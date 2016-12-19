@@ -26,7 +26,7 @@
 #include "KDbTransaction.h"
 #include "KDbTristate.h"
 
-class ConnectionPrivate;
+class KDbConnectionPrivate;
 class KDbConnectionData;
 class KDbConnectionOptions;
 class KDbConnectionProxy;
@@ -37,6 +37,7 @@ class KDbRecordData;
 class KDbRecordEditBuffer;
 class KDbServerVersionInfo;
 class KDbSqlResult;
+class KDbTableSchemaChangeListener;
 class KDbVersionInfo;
 
 /*! @short Provides database connection, allowing queries and data modification.
@@ -814,38 +815,6 @@ public:
      @see loadDataBlock() storeDataBlock() copyDataBlock(). */
     bool removeDataBlock(int objectID, const QString& dataID = QString());
 
-    class KDB_EXPORT TableSchemaChangeListenerInterface
-    {
-    public:
-        TableSchemaChangeListenerInterface() {}
-        virtual ~TableSchemaChangeListenerInterface() {}
-
-        /*! Closes listening object so it will be deleted and thus no longer use
-         a conflicting table schema. */
-        virtual tristate closeListener() = 0;
-
-        /*! i18n-ed string that can be displayed for user to inform about
-         e.g. conflicting listeners. */
-        QString listenerInfoString;
-    private:
-        Q_DISABLE_COPY(TableSchemaChangeListenerInterface)
-    };
-    //! @todo will be more generic
-    /** Register @a listener for receiving (listening) information about changes
-     in KDbTableSchema object. Changes could be: altering and removing. */
-    void registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                       KDbTableSchema* schema);
-
-    void unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                         KDbTableSchema* schema);
-
-    void unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener);
-
-    QSet<KDbConnection::TableSchemaChangeListenerInterface*>*
-    tableSchemaChangeListeners(KDbTableSchema* tableSchema) const;
-
-    tristate closeAllTableSchemaChangeListeners(KDbTableSchema* tableSchema);
-
     /*! Prepare an SQL statement and return a @a KDbPreparedStatement instance. */
     KDbPreparedStatement prepareStatement(KDbPreparedStatement::Type type,
         KDbFieldList* fields, const QStringList& whereFieldNames = QStringList());
@@ -1299,16 +1268,17 @@ private:
     //! or by the KDb's built-in escape routine.
     QString escapeIdentifier(const QString& id, KDb::IdentifierEscapingType escapingType) const;
 
-    ConnectionPrivate* d; //!< @internal d-pointer class.
+    KDbConnectionPrivate* d; //!< @internal d-pointer class.
 
     Q_DISABLE_COPY(KDbConnection)
-    friend class KDbDriver;
-    friend class KDbCursor;
-    friend class KDbTableSchema; //!< for removeMe()
-    friend class KDbProperties; //!< for setError()
-    friend class ConnectionPrivate;
+    friend class KDbConnectionPrivate;
     friend class KDbAlterTableHandler;
     friend class KDbConnectionProxy;
+    friend class KDbCursor;
+    friend class KDbDriver;
+    friend class KDbProperties; //!< for setError()
+    friend class KDbTableSchemaChangeListener;
+    friend class KDbTableSchema; //!< for removeMe()
 };
 
 #endif

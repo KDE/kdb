@@ -270,19 +270,6 @@ public:
 
     bool removeDataBlock(int objectID, const QString& dataID = QString());
 
-    void registerForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                       KDbTableSchema* schema);
-
-    void unregisterForTableSchemaChanges(TableSchemaChangeListenerInterface* listener,
-                                         KDbTableSchema* schema);
-
-    void unregisterForTablesSchemaChanges(TableSchemaChangeListenerInterface* listener);
-
-    QSet<KDbConnection::TableSchemaChangeListenerInterface*>*
-    tableSchemaChangeListeners(KDbTableSchema* tableSchema) const;
-
-    tristate closeAllTableSchemaChangeListeners(KDbTableSchema* tableSchema);
-
     KDbPreparedStatement prepareStatement(KDbPreparedStatement::Type type,
         KDbFieldList* fields, const QStringList& whereFieldNames = QStringList());
 
