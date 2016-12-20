@@ -4,7 +4,6 @@
             {
                 "Email": "kexi@kde.org", 
                 "Name": "Kexi Team", 
-                "Name[ast]": "L'equipu de Kexi", 
                 "Name[ca@valencia]": "L'equip del Kexi", 
                 "Name[ca]": "L'equip del Kexi", 
                 "Name[cs]": "Tým Kexi", 
@@ -27,7 +26,6 @@
         "Category": "", 
         "Dependencies": [], 
         "Description": "KDb driver for handling Sybase and MSSQL databases", 
-        "Description[ast]": "Controlador de KDb pa remanar bases de datos MSSQL", 
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades Sybase i MSSQL", 
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades Sybase i MSSQL", 
         "Description[cs]": "Ovladač KDb pro práci s databázemi Sybase", 
