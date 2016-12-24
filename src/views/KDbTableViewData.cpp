@@ -296,7 +296,7 @@ public:
     //! @see KDbTableViewData::containsRecordIdInfo()
     bool containsRecordIdInfo;
 
-    int autoIncrementedColumn;
+    mutable int autoIncrementedColumn;
 };
 
 //-------------------------------
@@ -891,7 +891,7 @@ bool KDbTableViewData::deleteAllRecords(bool repaint)
     return res;
 }
 
-int KDbTableViewData::autoIncrementedColumn()
+int KDbTableViewData::autoIncrementedColumn() const
 {
     if (d->autoIncrementedColumn == -2) {
         //find such a column

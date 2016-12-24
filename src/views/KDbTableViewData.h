@@ -221,7 +221,7 @@ public:
     //! @return index of autoincremented column. The result is cached.
     //! @todo what about multiple autoinc columns?
     //! @todo what about changing column order?
-    int autoIncrementedColumn();
+    int autoIncrementedColumn() const;
 
     //! Emits reloadRequested() signal to reload presenters.
     void reload() {
