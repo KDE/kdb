@@ -218,3 +218,15 @@ void KDbResultable::showMessage()
         d->messageHandler->showErrorMessage(m_result);
     }
 }
+
+QDebug operator<<(QDebug dbg, const KDbResultInfo &info)
+{
+    dbg.nospace() << "ResultInfo(";
+    dbg.space() << "success:" << info.success
+                << "allowToDiscardChanges:" << info.allowToDiscardChanges
+                << "message:" << info.message
+                << "description:" << info.description
+                << "column:" << info.column;
+    dbg.nospace() << ")";
+    return dbg.space();
+}

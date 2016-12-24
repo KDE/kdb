@@ -353,4 +353,8 @@ private:
     Private * const d;
 };
 
+//! Sends information about data @a data to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbTableViewData &data);
+
 #endif

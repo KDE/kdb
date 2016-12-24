@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -346,4 +346,58 @@ void KDbTableViewColumn::setWidth(int w)
 int KDbTableViewColumn::width() const
 {
     return d->width;
+}
+
+QDebug operator<<(QDebug dbg, const KDbTableViewColumn &column)
+{
+    dbg.nospace() << "TableViewColumn(";
+    dbg.space() << "columnInfo:";
+    if (column.columnInfo()) {
+        dbg.space() << *column.columnInfo();
+    } else {
+        dbg.space() << "<NONE>";
+    }
+    dbg.space() << "captionAliasOrName:" << column.captionAliasOrName();
+    dbg.space() << "visibleLookupColumnInfo:";
+    if (column.visibleLookupColumnInfo()) {
+        dbg.space() << *column.visibleLookupColumnInfo();
+    } else {
+        dbg.space() << "<NONE>";
+    }
+    dbg.space() << "data: KDbTableViewData(";
+    const KDbTableViewData *data = column.d->data;
+    if (data) {
+        dbg.space() << "count:" << data->count() << ")";
+    } else {
+        dbg.space() << "<NONE>)";
+    }
+    dbg.space() << "relatedData: KDbTableViewData(";
+    const KDbTableViewData *relatedData = column.d->relatedData;
+    if (data) {
+        dbg.space() << "count:" << relatedData->count() << ")";
+    } else {
+        dbg.space() << "<NONE>)";
+    }
+    const KDbField *field = column.d->field;
+    if (data) {
+        dbg.space() << "field:" << *field;
+    } else {
+        dbg.space() << "<NONE>";
+    }
+    dbg.space() << "fieldOwned:" << column.d->fieldOwned;
+    dbg.space() << "validator:";
+    if (column.validator()) {
+        dbg.space() << "<YES>";
+    } else {
+        dbg.space() << "<NO>";
+    }
+    dbg.space() << "icon:" << column.icon().name();
+    dbg.space() << "fieldOwned:" << column.d->fieldOwned;
+    dbg.space() << "width:" << column.width();
+    dbg.space() << "isDBAware:" << column.isDBAware();
+    dbg.space() << "readOnly:" << column.isReadOnly();
+    dbg.space() << "visible:" << column.isVisible();
+    dbg.space() << "relatedDataEditable:" << column.isRelatedDataEditable();
+    dbg.space() << "headerTextVisible:" << column.isHeaderTextVisible();
+    return dbg.space();
 }

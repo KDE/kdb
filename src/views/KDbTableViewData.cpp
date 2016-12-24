@@ -946,3 +946,23 @@ QString KDbTableViewData::messageYouCanImproveData()
 {
     return tr("Please correct data in this record or use the \"Cancel record changes\" function.");
 }
+
+QDebug operator<<(QDebug dbg, const KDbTableViewData &data)
+{
+    dbg.nospace() << "TableViewData(";
+    dbg.space() << "sortColumn:" << data.sortColumn()
+                << "sortOrder:" << data.sortOrder()
+                << "isDBAware:" << data.isDBAware()
+                << "dbTableName:" << data.dbTableName()
+                << "cursor:" << (data.cursor() ? "yes" : "no")
+                << "columnCount:" << data.columnCount()
+                << "count:" << data.count()
+                << "autoIncrementedColumn:" << data.autoIncrementedColumn()
+                << "visibleColumnCount:" << data.visibleColumnCount()
+                << "isReadOnly:" << data.isReadOnly()
+                << "isInsertingEnabled:" << data.isInsertingEnabled()
+                << "containsRecordIdInfo:" << data.containsRecordIdInfo()
+                << "result:" << data.result();
+    dbg.nospace() << ")";
+    return dbg.space();
+}

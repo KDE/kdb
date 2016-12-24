@@ -136,4 +136,8 @@ public:
     int column; //!< Faulty column, -1 (the default) means: there is no faulty column
 };
 
+//! Sends information about result info @a info to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbResultInfo &info);
+
 #endif

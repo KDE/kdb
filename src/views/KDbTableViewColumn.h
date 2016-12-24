@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -176,7 +176,12 @@ private:
     Private * const d;
 
     friend class KDbTableViewData;
+    friend QDebug operator<<(QDebug, const KDbTableViewColumn&);
     Q_DISABLE_COPY(KDbTableViewColumn)
 };
+
+//! Sends information about column @a column to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbTableViewColumn &column);
 
 #endif
