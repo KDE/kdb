@@ -537,7 +537,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg)
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info)
 {
     Q_ASSERT(info);
-    getHTMLErrorMesage(resultable, &info->msg, &info->desc);
+    getHTMLErrorMesage(resultable, &info->message, &info->description);
 }
 
 tristate KDb::idForObjectName(KDbConnection* conn, int *id, const QString& objName, int objType)

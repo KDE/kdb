@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2006 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -125,15 +125,15 @@ public:
         success = true;
         allowToDiscardChanges = false;
         column = -1;
-        msg.clear();
-        desc.clear();
+        message.clear();
+        description.clear();
     }
     bool success; //!< result of the operation, true by default
     bool allowToDiscardChanges; //!< True if changes can be discarded, false by default
-    //!< If true, additional "Discard changes" messagebox
-    //!< button can be displayed.
-    QString msg, desc; //!< error message and detailed description, both empty by default
-    int column; //!< faulty column, -1 (the default) means: there is no faulty column
+    //!< If @c true, additional "Discard changes" messagebox button can be displayed.
+    QString message; //!< Error message, empty by default
+    QString description; //!< Detailed error description, empty by default
+    int column; //!< Faulty column, -1 (the default) means: there is no faulty column
 };
 
 #endif

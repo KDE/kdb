@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2014 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Michał Poteralski <michalpoteralskikde@gmail.com>
 
    This program is free software; you can redistribute it and/or
@@ -702,9 +702,9 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             //check it
             if (val.isNull() && !f->isAutoIncrement()) {
                 //NOT NULL violated
-                d->result.msg = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
+                d->result.message = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
                                 + QLatin1String("\n\n") + KDbTableViewData::messageYouCanImproveData();
-                d->result.desc = tr("The column's constraint is declared as NOT NULL.");
+                d->result.description = tr("The column's constraint is declared as NOT NULL.");
                 d->result.column = col;
                 return false;
             }
@@ -713,9 +713,9 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
             if (!f->isAutoIncrement() && (val.isNull() || KDb::isEmptyValue(f->type(), val))) {
                 //NOT EMPTY violated
-                d->result.msg = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
+                d->result.message = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
                                 + QLatin1String("\n\n") + KDbTableViewData::messageYouCanImproveData();
-                d->result.desc = tr("The column's constraint is declared as NOT EMPTY.");
+                d->result.description = tr("The column's constraint is declared as NOT EMPTY.");
                 d->result.column = col;
                 return false;
             }
@@ -727,7 +727,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             if (!d->cursor->insertRecord(record, d->pRecordEditBuffer,
                                          d->containsRecordIdInfo /*also retrieve ROWID*/))
             {
-                d->result.msg = tr("Record inserting failed.") + QLatin1String("\n\n")
+                d->result.message = tr("Record inserting failed.") + QLatin1String("\n\n")
                                 + KDbTableViewData::messageYouCanImproveData();
                 KDb::getHTMLErrorMesage(*d->cursor, &d->result);
 
@@ -743,10 +743,10 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
             if (!d->cursor->updateRecord(static_cast<KDbRecordData*>(record), d->pRecordEditBuffer,
                                          d->containsRecordIdInfo /*use ROWID*/))
             {
-                d->result.msg = tr("Record changing failed.") + QLatin1String("\n\n")
+                d->result.message = tr("Record changing failed.") + QLatin1String("\n\n")
                                 + KDbTableViewData::messageYouCanImproveData();
 //! @todo set d->result.column if possible
-                KDb::getHTMLErrorMesage(*d->cursor, &d->result.desc);
+                KDb::getHTMLErrorMesage(*d->cursor, &d->result.description);
                 return false;
             }
         }
@@ -813,8 +813,8 @@ bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
     if (d->cursor) {//db-aware
         d->result.success = false;
         if (!d->cursor->deleteRecord(static_cast<KDbRecordData*>(record), d->containsRecordIdInfo /*use ROWID*/)) {
-            d->result.msg = tr("Record deleting failed.");
-            //! @todo use KDberrorMessage() for description (desc) as in KDbTableViewData::saveRecord() */
+            d->result.message = tr("Record deleting failed.");
+            //! @todo use KDberrorMessage() for description as in KDbTableViewData::saveRecord() */
             KDb::getHTMLErrorMesage(*d->cursor, &d->result);
             d->result.success = false;
             return false;
