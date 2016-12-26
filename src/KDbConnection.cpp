@@ -65,11 +65,15 @@ class Q_DECL_HIDDEN KDbConnectionOptions::Private
 {
 public:
     Private() : connection(nullptr) {}
+    Private(const Private &other) {
+        copy(other);
+    }
+#define KDbConnectionOptionsPrivateArgs(o) std::tie(o.connection)
     void copy(const Private &other) {
-        *this = other;
+        KDbConnectionOptionsPrivateArgs((*this)) = KDbConnectionOptionsPrivateArgs(other);
     }
     bool operator==(const Private &other) const {
-        return std::tie(connection) == std::tie(other.connection);
+        return KDbConnectionOptionsPrivateArgs((*this)) == KDbConnectionOptionsPrivateArgs(other);
     }
     KDbConnection *connection;
 };
@@ -82,9 +86,8 @@ KDbConnectionOptions::KDbConnectionOptions()
 
 KDbConnectionOptions::KDbConnectionOptions(const KDbConnectionOptions &other)
  : KDbUtils::PropertySet(other)
- , d(new Private)
+ , d(new Private(*other.d))
 {
-    d->copy(*other.d);
 }
 
 KDbConnectionOptions::~KDbConnectionOptions()

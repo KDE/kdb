@@ -97,8 +97,16 @@ public:
      Using it clears name (see name()). */
     void setValues(const QStringList& values);
 
-    //! Assigns other to this record source and returns a reference to this record source.
+    //! Assigns @a other to this record source and returns a reference to this record source.
     KDbLookupFieldSchemaRecordSource& operator=(const KDbLookupFieldSchemaRecordSource& other);
+
+    //! @return @c true if this record source is equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    bool operator==(const KDbLookupFieldSchemaRecordSource &other) const;
+
+    //! @return @c true if this record source is not equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    inline bool operator!=(const KDbLookupFieldSchemaRecordSource &other) const { return !operator==(other); }
 
 private:
     class Private;
@@ -217,6 +225,17 @@ public:
      This function is used e.g. for altering table design.
      @return true on successful set and false on failure because of invalid value or invalid property name. */
     bool setProperties(const QMap<QByteArray, QVariant>& values);
+
+    //! Assigns @a other to this lookup schema and returns a reference to this lookup schema.
+    KDbLookupFieldSchema& operator=(const KDbLookupFieldSchema& other);
+
+    //! @return @c true if this lookup schema is equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    bool operator==(const KDbLookupFieldSchema &other) const;
+
+    //! @return @c true if this lookup schema is not equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    inline bool operator!=(const KDbLookupFieldSchema &other) const { return !operator==(other); }
 
 private:
     class Private;

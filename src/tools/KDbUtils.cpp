@@ -513,6 +513,10 @@ QString KDbUtils::findExe(const QString& appname,
 class Q_DECL_HIDDEN PropertySet::Private
 {
 public:
+    Private() {}
+    Private(const Private &other) {
+        copy(other);
+    }
     void copy(const Private &other) {
         for (AutodeletedHash<QByteArray, Property*>::ConstIterator it(other.data.constBegin());
              it != other.data.constEnd(); ++it)
@@ -543,9 +547,8 @@ PropertySet::PropertySet()
 }
 
 PropertySet::PropertySet(const PropertySet &other)
-    : d(new Private)
+    : d(new Private(*other.d))
 {
-    d->copy(*other.d);
 }
 
 PropertySet::~PropertySet()

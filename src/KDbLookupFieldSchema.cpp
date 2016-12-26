@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2006-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2006-2016 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -35,6 +35,19 @@ public:
     Private()
             : type(KDbLookupFieldSchemaRecordSource::NoType) {
     }
+    Private(const Private &other) {
+        copy(other);
+    }
+#define KDbLookupFieldSchemaRecordSourcePrivateArgs(o) std::tie(o.type, o.name, o.values)
+    void copy(const Private &other) {
+        KDbLookupFieldSchemaRecordSourcePrivateArgs((*this))
+                = KDbLookupFieldSchemaRecordSourcePrivateArgs(other);
+    }
+    bool operator==(const KDbLookupFieldSchemaRecordSource::Private &other) {
+        return KDbLookupFieldSchemaRecordSourcePrivateArgs((*this))
+                == KDbLookupFieldSchemaRecordSourcePrivateArgs(other);
+    }
+
     KDbLookupFieldSchemaRecordSource::Type type;
     QString name;
     QStringList values;
@@ -50,6 +63,18 @@ public:
             , displayWidget(KDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET)
             , columnHeadersVisible(KDB_LOOKUP_FIELD_DEFAULT_HEADERS_VISIBLE)
             , limitToList(KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
+    }
+    Private(const Private &other) {
+        copy(other);
+    }
+#define KDbLookupFieldSchemaPrivateArgs(o) std::tie(o.recordSource, o.boundColumn, o.visibleColumns, \
+                    o.columnWidths, o.maxVisibleRecords, o.displayWidget, \
+                    o.columnHeadersVisible, o.limitToList)
+    void copy(const Private &other) {
+        KDbLookupFieldSchemaPrivateArgs((*this)) = KDbLookupFieldSchemaPrivateArgs(other);
+    }
+    bool operator==(const KDbLookupFieldSchema::Private &other) {
+        return KDbLookupFieldSchemaPrivateArgs((*this)) == KDbLookupFieldSchemaPrivateArgs(other);
     }
 
     KDbLookupFieldSchemaRecordSource recordSource;
@@ -97,9 +122,8 @@ KDbLookupFieldSchemaRecordSource::KDbLookupFieldSchemaRecordSource()
 }
 
 KDbLookupFieldSchemaRecordSource::KDbLookupFieldSchemaRecordSource(const KDbLookupFieldSchemaRecordSource& other)
-        : d(new Private)
+        : d(new Private(*other.d))
 {
-    *d = *other.d;
 }
 
 KDbLookupFieldSchemaRecordSource::~KDbLookupFieldSchemaRecordSource()
@@ -158,6 +182,11 @@ KDbLookupFieldSchemaRecordSource& KDbLookupFieldSchemaRecordSource::operator=(co
     return *this;
 }
 
+bool KDbLookupFieldSchemaRecordSource::operator==(const KDbLookupFieldSchemaRecordSource &other) const
+{
+    return *d == *other.d;
+}
+
 QDebug operator<<(QDebug dbg, const KDbLookupFieldSchemaRecordSource& source)
 {
     dbg.nospace() << "LookupFieldSchemaRecordSource TYPE:";
@@ -177,9 +206,8 @@ KDbLookupFieldSchema::KDbLookupFieldSchema()
 }
 
 KDbLookupFieldSchema::KDbLookupFieldSchema(const KDbLookupFieldSchema &schema)
-: d(new Private)
+: d(new Private(*schema.d))
 {
-    *d = *schema.d;
 }
 
 KDbLookupFieldSchema::~KDbLookupFieldSchema()
@@ -711,4 +739,17 @@ KDbLookupFieldSchema::DisplayWidget KDbLookupFieldSchema::displayWidget() const
 void KDbLookupFieldSchema::setDisplayWidget(DisplayWidget widget)
 {
     d->displayWidget = widget;
+}
+
+KDbLookupFieldSchema& KDbLookupFieldSchema::operator=(const KDbLookupFieldSchema & other)
+{
+    if (this != &other) {
+        *d = *other.d;
+    }
+    return *this;
+}
+
+bool KDbLookupFieldSchema::operator==(const KDbLookupFieldSchema &other) const
+{
+    return *d == *other.d;
 }

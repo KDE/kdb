@@ -424,6 +424,7 @@ public:
 
     ~PropertySet();
 
+    //! Assigns @a other to this property set and returns a reference to this property set.
     PropertySet& operator=(const PropertySet &other);
 
     //! @return true if this property set has exactly the same properties as @a other
