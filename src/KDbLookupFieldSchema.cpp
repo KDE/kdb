@@ -29,13 +29,13 @@
 #include <vector>
 
 //! @internal
-class Q_DECL_HIDDEN KDbLookupFieldSchema::RecordSource::Private
+class Q_DECL_HIDDEN KDbLookupFieldSchemaRecordSource::Private
 {
 public:
     Private()
-            : type(KDbLookupFieldSchema::RecordSource::NoType) {
+            : type(KDbLookupFieldSchemaRecordSource::NoType) {
     }
-    KDbLookupFieldSchema::RecordSource::Type type;
+    KDbLookupFieldSchemaRecordSource::Type type;
     QString name;
     QStringList values;
 };
@@ -52,7 +52,7 @@ public:
             , limitToList(KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST) {
     }
 
-    RecordSource recordSource;
+    KDbLookupFieldSchemaRecordSource recordSource;
     int boundColumn;
     QList<int> visibleColumns;
     QList<int> columnWidths;
@@ -75,14 +75,14 @@ public:
             QLatin1String("valuelist"),
             QLatin1String("fieldlist")})
     {
-        typesForNames.insert(QLatin1String("table"), KDbLookupFieldSchema::RecordSource::Table);
-        typesForNames.insert(QLatin1String("query"), KDbLookupFieldSchema::RecordSource::Query);
-        typesForNames.insert(QLatin1String("sql"), KDbLookupFieldSchema::RecordSource::SQLStatement);
-        typesForNames.insert(QLatin1String("valuelist"), KDbLookupFieldSchema::RecordSource::ValueList);
-        typesForNames.insert(QLatin1String("fieldlist"), KDbLookupFieldSchema::RecordSource::KDbFieldList);
+        typesForNames.insert(QLatin1String("table"), KDbLookupFieldSchemaRecordSource::Table);
+        typesForNames.insert(QLatin1String("query"), KDbLookupFieldSchemaRecordSource::Query);
+        typesForNames.insert(QLatin1String("sql"), KDbLookupFieldSchemaRecordSource::SQLStatement);
+        typesForNames.insert(QLatin1String("valuelist"), KDbLookupFieldSchemaRecordSource::ValueList);
+        typesForNames.insert(QLatin1String("fieldlist"), KDbLookupFieldSchemaRecordSource::KDbFieldList);
     }
     const std::vector<QString> typeNames;
-    QHash<QString, KDbLookupFieldSchema::RecordSource::Type> typesForNames;
+    QHash<QString, KDbLookupFieldSchemaRecordSource::Type> typesForNames;
 private:
     Q_DISABLE_COPY(LookupFieldSchemaStatic)
 };
@@ -91,66 +91,66 @@ Q_GLOBAL_STATIC(LookupFieldSchemaStatic, KDb_lookupFieldSchemaStatic)
 
 //----------------------------
 
-KDbLookupFieldSchema::RecordSource::RecordSource()
+KDbLookupFieldSchemaRecordSource::KDbLookupFieldSchemaRecordSource()
         : d(new Private)
 {
 }
 
-KDbLookupFieldSchema::RecordSource::RecordSource(const RecordSource& other)
+KDbLookupFieldSchemaRecordSource::KDbLookupFieldSchemaRecordSource(const KDbLookupFieldSchemaRecordSource& other)
         : d(new Private)
 {
     *d = *other.d;
 }
 
-KDbLookupFieldSchema::RecordSource::~RecordSource()
+KDbLookupFieldSchemaRecordSource::~KDbLookupFieldSchemaRecordSource()
 {
     delete d;
 }
 
-KDbLookupFieldSchema::RecordSource::Type KDbLookupFieldSchema::RecordSource::type() const
+KDbLookupFieldSchemaRecordSource::Type KDbLookupFieldSchemaRecordSource::type() const
 {
     return d->type;
 }
 
-void KDbLookupFieldSchema::RecordSource::setType(Type type)
+void KDbLookupFieldSchemaRecordSource::setType(Type type)
 {
     d->type = type;
 }
 
-QString KDbLookupFieldSchema::RecordSource::name() const
+QString KDbLookupFieldSchemaRecordSource::name() const
 {
     return d->name;
 }
 
-void KDbLookupFieldSchema::RecordSource::setName(const QString& name)
+void KDbLookupFieldSchemaRecordSource::setName(const QString& name)
 {
     d->name = name;
     d->values.clear();
 }
 
-QString KDbLookupFieldSchema::RecordSource::typeName() const
+QString KDbLookupFieldSchemaRecordSource::typeName() const
 {
     Q_ASSERT(size_t(d->type) < KDb_lookupFieldSchemaStatic->typeNames.size());
     return KDb_lookupFieldSchemaStatic->typeNames[d->type];
 }
 
-void KDbLookupFieldSchema::RecordSource::setTypeByName(const QString& typeName)
+void KDbLookupFieldSchemaRecordSource::setTypeByName(const QString& typeName)
 {
     setType(KDb_lookupFieldSchemaStatic->typesForNames.value(typeName, NoType));
 }
 
-QStringList KDbLookupFieldSchema::RecordSource::values() const
+QStringList KDbLookupFieldSchemaRecordSource::values() const
 {
     return d->values;
 }
 
-void KDbLookupFieldSchema::RecordSource::setValues(const QStringList& values)
+void KDbLookupFieldSchemaRecordSource::setValues(const QStringList& values)
 {
     d->name.clear();
     d->values = values;
 }
 
-KDbLookupFieldSchema::RecordSource& KDbLookupFieldSchema::RecordSource::operator=(const RecordSource & other)
+KDbLookupFieldSchemaRecordSource& KDbLookupFieldSchemaRecordSource::operator=(const KDbLookupFieldSchemaRecordSource & other)
 {
     if (this != &other) {
         *d = *other.d;
@@ -158,9 +158,9 @@ KDbLookupFieldSchema::RecordSource& KDbLookupFieldSchema::RecordSource::operator
     return *this;
 }
 
-QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema::RecordSource& source)
+QDebug operator<<(QDebug dbg, const KDbLookupFieldSchemaRecordSource& source)
 {
-    dbg.nospace() << "RecordSource TYPE:";
+    dbg.nospace() << "LookupFieldSchemaRecordSource TYPE:";
     dbg.space() << source.typeName();
     dbg.space() << "NAME:";
     dbg.space() << source.name();
@@ -250,12 +250,12 @@ static bool setDisplayWidget(KDbLookupFieldSchema *lookup, const QVariant &val)
     return true;
 }
 
-KDbLookupFieldSchema::RecordSource KDbLookupFieldSchema::recordSource() const
+KDbLookupFieldSchemaRecordSource KDbLookupFieldSchema::recordSource() const
 {
     return d->recordSource;
 }
 
-void KDbLookupFieldSchema::setRecordSource(const KDbLookupFieldSchema::RecordSource& recordSource)
+void KDbLookupFieldSchema::setRecordSource(const KDbLookupFieldSchemaRecordSource& recordSource)
 {
     d->recordSource = recordSource;
 }
@@ -315,7 +315,7 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
 KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& lookupEl)
 {
     KDbLookupFieldSchema *lookupFieldSchema = new KDbLookupFieldSchema();
-    KDbLookupFieldSchema::RecordSource recordSource;
+    KDbLookupFieldSchemaRecordSource recordSource;
     for (QDomNode node = lookupEl.firstChild(); !node.isNull(); node = node.nextSibling()) {
         QDomElement el = node.toElement();
         const QByteArray name(el.tagName().toLatin1());
@@ -339,7 +339,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 }
                 else if (childName == "name") {
                     recordSource.setName(el.text());
-//! @todo handle fieldlist (retrieve from external table or so?), use RecordSource::setValues()
+//! @todo handle fieldlist (retrieve from external table or so?), use KDbLookupFieldSchemaRecordSource::setValues()
                 }
             }
         } else if (name == "bound-column") {
@@ -539,7 +539,7 @@ bool KDbLookupFieldSchema::setProperty(const QByteArray& propertyName, const QVa
         || "rowSourceType" == propertyName
         || "rowSourceValues" == propertyName)
     {
-        KDbLookupFieldSchema::RecordSource recordSource(this->recordSource());
+        KDbLookupFieldSchemaRecordSource recordSource(this->recordSource());
         if ("rowSource" == propertyName)
             recordSource.setName(value.toString());
         else if ("rowSourceType" == propertyName)
@@ -584,7 +584,7 @@ bool KDbLookupFieldSchema::setProperty(const QByteArray& propertyName, const QVa
 bool KDbLookupFieldSchema::setProperties(const QMap<QByteArray, QVariant>& values)
 {
     QMap<QByteArray, QVariant>::ConstIterator it;
-    KDbLookupFieldSchema::RecordSource recordSource(this->recordSource());
+    KDbLookupFieldSchemaRecordSource recordSource(this->recordSource());
     bool ok;
     bool updateRecordSource = false;
     if ((it = values.find("rowSource")) != values.constEnd()) {

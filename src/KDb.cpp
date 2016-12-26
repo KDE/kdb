@@ -772,7 +772,7 @@ static QVariant visibleColumnValue(const KDbLookupFieldSchema *lookup)
 void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values)
 {
     Q_ASSERT(values);
-    KDbLookupFieldSchema::RecordSource recordSource;
+    KDbLookupFieldSchemaRecordSource recordSource;
     if (lookup) {
         recordSource = lookup->recordSource();
     }

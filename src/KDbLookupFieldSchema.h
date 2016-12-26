@@ -44,6 +44,67 @@ class QVariant;
 //! default value for KDbLookupFieldSchema::displayWidget()
 #define KDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET KDbLookupFieldSchema::ComboBox
 
+//! Record source information that can be specified for the lookup field schema
+//! @since 3.1
+class KDB_EXPORT KDbLookupFieldSchemaRecordSource
+{
+public:
+    //! Record source type
+    enum Type {
+        NoType,         //!< used for invalid schema
+        Table,        //!< table as lookup record source
+        Query,        //!< named query as lookup record source
+        SQLStatement, //!< anonymous query as lookup record source
+        ValueList,    //!< a fixed list of values as lookup record source
+        KDbFieldList     //!< a list of column names from a table/query will be displayed
+    };
+
+    KDbLookupFieldSchemaRecordSource();
+
+    KDbLookupFieldSchemaRecordSource(const KDbLookupFieldSchemaRecordSource& other);
+
+    ~KDbLookupFieldSchemaRecordSource();
+
+    /*! @return record source type: table, query, anonymous; in the future it will
+     be also fixed value list and field list. The latter is basically a list
+     of column names of a table/query, "Field List" in MSA. */
+    Type type() const;
+
+    /*! Sets record source type to @a type. */
+    void setType(Type type);
+
+    /*! @return record source type name. @see setTypeByName() */
+    QString typeName() const;
+
+    /*! Sets record source type by name using @a typeName. Accepted (case sensitive)
+     names are "table", "query", "sql", "valuelist", "fieldlist".
+     For other value NoType type is set. */
+    void setTypeByName(const QString& typeName);
+
+    /*! @return a string for record source: table name, query name or anonymous query
+     provided as KEXISQL string. If recordSourceType() is a ValueList,
+     recordSourceValues() should be used instead. If recordSourceType() is a KDbFieldList,
+     recordSource() should return table or query name. */
+    QString name() const;
+
+    /*! Sets record source value. @see value() */
+    void setName(const QString& name);
+
+    /*! @return record source values specified if type() is ValueList. */
+    QStringList values() const;
+
+    /*! Sets record source values used if type() is ValueList.
+     Using it clears name (see name()). */
+    void setValues(const QStringList& values);
+
+    //! Assigns other to this record source and returns a reference to this record source.
+    KDbLookupFieldSchemaRecordSource& operator=(const KDbLookupFieldSchemaRecordSource& other);
+
+private:
+    class Private;
+    Private * const d;
+};
+
 //! @short Provides information about lookup field's setup.
 /*!
  KDbLookupFieldSchema object is owned by KDbTableSchema and created upon creating or retrieving the table schema
@@ -54,65 +115,6 @@ class QVariant;
 class KDB_EXPORT KDbLookupFieldSchema
 {
 public:
-
-    //! Record source information that can be specified for the lookup field schema
-    class KDB_EXPORT RecordSource
-    {
-    public:
-        //! Record source type
-        enum Type {
-            NoType,         //!< used for invalid schema
-            Table,        //!< table as lookup record source
-            Query,        //!< named query as lookup record source
-            SQLStatement, //!< anonymous query as lookup record source
-            ValueList,    //!< a fixed list of values as lookup record source
-            KDbFieldList     //!< a list of column names from a table/query will be displayed
-        };
-
-        RecordSource();
-        RecordSource(const RecordSource& other);
-        ~RecordSource();
-
-        /*! @return record source type: table, query, anonymous; in the future it will
-         be also fixed value list and field list. The latter is basically a list
-         of column names of a table/query, "Field List" in MSA. */
-        Type type() const;
-
-        /*! Sets record source type to @a type. */
-        void setType(Type type);
-
-        /*! @return record source type name. @see setTypeByName() */
-        QString typeName() const;
-
-        /*! Sets record source type by name using @a typeName. Accepted (case sensitive)
-         names are "table", "query", "sql", "valuelist", "fieldlist".
-         For other value NoType type is set. */
-        void setTypeByName(const QString& typeName);
-
-        /*! @return a string for record source: table name, query name or anonymous query
-         provided as KEXISQL string. If recordSourceType() is a ValueList,
-         recordSourceValues() should be used instead. If recordSourceType() is a KDbFieldList,
-         recordSource() should return table or query name. */
-        QString name() const;
-
-        /*! Sets record source value. @see value() */
-        void setName(const QString& name);
-
-        /*! @return record source values specified if type() is ValueList. */
-        QStringList values() const;
-
-        /*! Sets record source values used if type() is ValueList.
-         Using it clears name (see name()). */
-        void setValues(const QStringList& values);
-
-        //! Assigns other to this record source and returns a reference to this record source.
-        RecordSource& operator=(const RecordSource& other);
-
-    private:
-        class Private;
-        Private * const d;
-    };
-
     KDbLookupFieldSchema();
 
     KDbLookupFieldSchema(const KDbLookupFieldSchema &schema);
@@ -120,10 +122,10 @@ public:
     ~KDbLookupFieldSchema();
 
     /*! @return record source information for the lookup field schema */
-    RecordSource recordSource() const;
+    KDbLookupFieldSchemaRecordSource recordSource() const;
 
     /*! Sets record source for the lookup field schema */
-    void setRecordSource(const RecordSource& recordSource);
+    void setRecordSource(const KDbLookupFieldSchemaRecordSource& recordSource);
 
     /*! @return bound column: an integer specifying a column that is bound
      (counted from 0). -1 means unspecified value. */
@@ -222,7 +224,7 @@ private:
 };
 
 //! Sends lookup field schema's record source information @a source to debug output @a dbg.
-KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema::RecordSource& source);
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbLookupFieldSchemaRecordSource& source);
 
 //! Sends lookup field schema information @a lookup to debug output @a dbg.
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup);

@@ -1132,8 +1132,8 @@ void KDbQuerySchema::computeFieldsExpanded() const
             // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
             // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
             // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
-            KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
-            if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Table) {
+            KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
+            if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
                 KDbTableSchema *lookupTable = connection()->tableSchema(recordSource.name());
                 KDbFieldList* visibleColumns = 0;
                 KDbField *boundField = 0;
@@ -1174,7 +1174,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                               }*/
                 }
                 delete visibleColumns;
-            } else if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Query) {
+            } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
                 KDbQuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
                 if (!lookupQuery)
                     continue;
@@ -1355,8 +1355,8 @@ void KDbQuerySchema::computeFieldsExpanded() const
             = ci->field()->table() ? ci->field()->table()->lookupFieldSchema(*ci->field()) : nullptr;
         if (!lookupFieldSchema || lookupFieldSchema->boundColumn() < 0)
             continue;
-        const KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
-        if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Table) {
+        const KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
+        if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
             KDbTableSchema *lookupTable = connection()->tableSchema(recordSource.name());
             KDbFieldList* visibleColumns = 0;
             if (lookupTable
@@ -1379,7 +1379,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 }
             }
             delete visibleColumns;
-        } else if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Query) {
+        } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
             KDbQuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
             if (!lookupQuery)
                 continue;

@@ -158,8 +158,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
                 // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
                 // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
-                KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
-                if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Table) {
+                KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
+                if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
                     KDbTableSchema *lookupTable = querySchema->connection()->tableSchema(recordSource.name());
                     KDbFieldList* visibleColumns = 0;
                     KDbField *boundField = 0;
@@ -191,7 +191,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                                                    driver ? KDb::DriverEscaping : KDb::KDbEscaping);
                     }
                     delete visibleColumns;
-                } else if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Query) {
+                } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
                     KDbQuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
                     if (!lookupQuery) {
                         kdbWarning() << "!lookupQuery";
