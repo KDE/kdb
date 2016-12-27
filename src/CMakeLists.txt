@@ -116,6 +116,7 @@ set(kdb_LIB_SRCS
    KDbTableSchema.cpp
    KDbTableSchemaChangeListener.cpp
    KDbIndexSchema.cpp
+   KDbOrderByColumn.cpp
    KDbQuerySchema.cpp
    KDbQuerySchema_p.cpp
    KDbQueryColumnInfo.cpp
@@ -292,6 +293,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbPreparedStatement
         KDbProperties
         KDbQueryColumnInfo
+        KDbOrderByColumn
         KDbQuerySchema
         KDbQuerySchemaParameter
         KDbRecordData

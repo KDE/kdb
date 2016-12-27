@@ -71,6 +71,7 @@ cat << EOF > generated/sqlparser.h
 
 #include "KDbExpression.h"
 #include "KDbField.h"
+#include "KDbOrderByColumn.h"
 
 struct OrderByColumnInternal;
 struct SelectOptionsInternal;

@@ -7,6 +7,7 @@
 
 #include "KDbExpression.h"
 #include "KDbField.h"
+#include "KDbOrderByColumn.h"
 
 struct OrderByColumnInternal;
 struct SelectOptionsInternal;
@@ -129,12 +130,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 490 "KDbSqlParser.y" /* yacc.c:1909  */
+#line 491 "KDbSqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
     QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
+    KDbOrderByColumn::SortOrder sortOrderValue;
     KDbField::Type colType;
     KDbField *field;
     KDbExpression *expr;
@@ -145,7 +147,7 @@ union YYSTYPE
     QList<OrderByColumnInternal> *orderByColumns;
     QVariant *variantValue;
 
-#line 136 "KDbSqlParser.tab.h" /* yacc.c:1909  */
+#line 137 "KDbSqlParser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -22,6 +22,7 @@
 #include "KDbConnection.h"
 #include "KDbTableSchema.h"
 #include "KDbQuerySchema.h"
+#include "KDbOrderByColumn.h"
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
@@ -479,12 +480,12 @@ KDbQuerySchema* buildSelectQuery(
                 //first, try to find a column name or alias (outside of asterisks)
                 KDbQueryColumnInfo *columnInfo = querySchema->columnInfo((*it).aliasOrName, false/*outside of asterisks*/);
                 if (columnInfo) {
-                    orderByColumnList->appendColumn(columnInfo, (*it).ascending);
+                    orderByColumnList->appendColumn(columnInfo, (*it).order);
                 } else {
                     //failed, try to find a field name within all the tables
                     if ((*it).columnNumber != -1) {
                         if (!orderByColumnList->appendColumn(querySchema,
-                                                            (*it).ascending, (*it).columnNumber - 1)) {
+                                                            (*it).order, (*it).columnNumber - 1)) {
                             setError(KDbParser::tr("Could not define sorting. Column at "
                                                    "position %1 does not exist.")
                                                    .arg((*it).columnNumber));
@@ -498,7 +499,7 @@ KDbQuerySchema* buildSelectQuery(
                                                    .arg((*it).aliasOrName));
                             return 0;
                         }
-                        orderByColumnList->appendField(f, (*it).ascending);
+                        orderByColumnList->appendField(f, (*it).order);
                     }
                 }
             }

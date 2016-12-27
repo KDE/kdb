@@ -18,6 +18,7 @@
 */
 
 #include "KDbQuerySchema_p.h"
+#include "KDbOrderByColumn.h"
 
 KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         : query(q)

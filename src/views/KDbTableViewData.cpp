@@ -29,6 +29,7 @@
 #include "KDbCursor.h"
 #include "KDbError.h"
 #include "KDb.h"
+#include "KDbOrderByColumn.h"
 #include "KDbQuerySchema.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDbTableViewColumn.h"
@@ -83,7 +84,7 @@ Q_GLOBAL_STATIC(CollatorInstance, KDb_collator)
 class LessThanFunctor
 {
 private:
-    bool m_ascendingOrder;
+    KDbOrderByColumn::SortOrder m_order;
     QVariant m_leftTmp, m_rightTmp;
     int m_sortColumn;
 
@@ -172,7 +173,7 @@ private:
 
 public:
     LessThanFunctor()
-            : m_ascendingOrder(true)
+            : m_order(KDbOrderByColumn::SortOrder::Ascending)
             , m_sortColumn(-1)
             , m_lessThanFunction(0)
     {
@@ -213,8 +214,8 @@ public:
         }
     }
 
-    void setAscendingOrder(bool ascending) {
-        m_ascendingOrder = ascending;
+    void setSortOrder(KDbOrderByColumn::SortOrder order) {
+        m_order = order;
     }
 
     void setSortColumn(int column) {
@@ -227,11 +228,13 @@ public:
     bool operator()(KDbRecordData* record1, KDbRecordData* record2) {
         // compare NULLs : NULL is smaller than everything
         if ((m_leftTmp = record1->at(m_sortColumn)).isNull())
-            return _IIF(m_ascendingOrder, !record2->at(m_sortColumn).isNull());
+            return _IIF(m_order == KDbOrderByColumn::SortOrder::Ascending,
+                        !record2->at(m_sortColumn).isNull());
         if ((m_rightTmp = record2->at(m_sortColumn)).isNull())
-            return !m_ascendingOrder;
+            return m_order == KDbOrderByColumn::SortOrder::Descending;
 
-        return _IIF(m_ascendingOrder, m_lessThanFunction(m_leftTmp, m_rightTmp));
+        return _IIF(m_order == KDbOrderByColumn::SortOrder::Ascending,
+                    m_lessThanFunction(m_leftTmp, m_rightTmp));
     }
 };
 #undef _IIF
@@ -244,7 +247,7 @@ public:
     Private()
             : sortColumn(0)
             , realSortColumn(0)
-            , sortOrder(Qt::AscendingOrder)
+            , sortOrder(KDbOrderByColumn::SortOrder::Ascending)
             , type(1)
             , pRecordEditBuffer(0)
             , readOnly(false)
@@ -274,7 +277,7 @@ public:
     int realSortColumn;
 
     //! Specifies sorting order
-    Qt::SortOrder sortOrder;
+    KDbOrderByColumn::SortOrder sortOrder;
 
     LessThanFunctor lessThanFunctor;
 
@@ -538,7 +541,7 @@ QString KDbTableViewData::dbTableName() const
     return QString();
 }
 
-void KDbTableViewData::setSorting(int column, Qt::SortOrder order)
+void KDbTableViewData::setSorting(int column, KDbOrderByColumn::SortOrder order)
 {
     d->sortOrder = order;
     if (column < 0 || column >= d->columns.count()) {
@@ -556,7 +559,7 @@ void KDbTableViewData::setSorting(int column, Qt::SortOrder order)
 
     // setup compare functor
     d->lessThanFunctor.setColumnType(*field);
-    d->lessThanFunctor.setAscendingOrder(d->sortOrder == Qt::AscendingOrder);
+    d->lessThanFunctor.setSortOrder(d->sortOrder);
     d->lessThanFunctor.setSortColumn(column);
 }
 
@@ -565,7 +568,7 @@ int KDbTableViewData::sortColumn() const
     return d->sortColumn;
 }
 
-Qt::SortOrder KDbTableViewData::sortOrder() const
+KDbOrderByColumn::SortOrder KDbTableViewData::sortOrder() const
 {
     return d->sortOrder;
 }
@@ -951,7 +954,8 @@ QDebug operator<<(QDebug dbg, const KDbTableViewData &data)
 {
     dbg.nospace() << "TableViewData(";
     dbg.space() << "sortColumn:" << data.sortColumn()
-                << "sortOrder:" << data.sortOrder()
+                << "sortOrder:" << (data.sortOrder() == KDbOrderByColumn::SortOrder::Ascending
+                                    ? "asc" : "desc")
                 << "isDBAware:" << data.isDBAware()
                 << "dbTableName:" << data.dbTableName()
                 << "cursor:" << (data.cursor() ? "yes" : "no")

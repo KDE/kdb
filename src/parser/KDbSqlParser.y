@@ -400,7 +400,7 @@
 %type <exprList> aExprList2
 %type <expr> WhereClause
 %type <orderByColumns> OrderByClause
-%type <booleanValue> OrderByOption
+%type <sortOrderValue> OrderByOption
 %type <variantValue> OrderByColumnId
 %type <selectOptions> SelectOptions
 %type <expr> FlatTable
@@ -451,6 +451,7 @@
 #include "KDbConnection.h"
 #include "KDbExpression.h"
 #include "KDbField.h"
+#include "KDbOrderByColumn.h"
 #include "KDbParser.h"
 #include "KDbParser_p.h"
 #include "KDbQuerySchema.h"
@@ -492,6 +493,7 @@ int yylex();
     QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
+    KDbOrderByColumn::SortOrder sortOrderValue;
     KDbField::Type colType;
     KDbField *field;
     KDbExpression *expr;
@@ -773,7 +775,7 @@ OrderByColumnId
     $$ = new QList<OrderByColumnInternal>;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
-    orderByColumn.ascending = $2;
+    orderByColumn.order = $2;
     $$->append( orderByColumn );
     delete $1;
 }
@@ -790,7 +792,7 @@ OrderByColumnId
     $$ = $4;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
-    orderByColumn.ascending = $2;
+    orderByColumn.order = $2;
     $$->append( orderByColumn );
     delete $1;
 }
@@ -819,11 +821,11 @@ IDENTIFIER
 OrderByOption:
 ASC
 {
-    $$ = true;
+    $$ = KDbOrderByColumn::SortOrder::Ascending;
 }
 | DESC
 {
-    $$ = false;
+    $$ = KDbOrderByColumn::SortOrder::Descending;
 }
 ;
 

@@ -19,13 +19,14 @@
 
 #include "KDbNativeStatementBuilder.h"
 #include "KDbConnection.h"
+#include "kdb_debug.h"
 #include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
+#include "KDbOrderByColumn.h"
 #include "KDbQuerySchema.h"
 #include "KDbQuerySchemaParameter.h"
 #include "KDbRelationship.h"
-#include "kdb_debug.h"
 
 KDbSelectStatementOptions::KDbSelectStatementOptions()
         : alsoRetrieveRecordId(false)

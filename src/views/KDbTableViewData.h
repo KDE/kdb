@@ -29,6 +29,7 @@
 #include "KDbField.h"
 #include "KDbUtils.h"
 #include "KDbRecordData.h"
+#include "KDbOrderByColumn.h"
 
 class KDbCursor;
 class KDbRecordEditBuffer;
@@ -75,7 +76,7 @@ public:
     bool preloadAllRecords();
 
     /*! Sets sorting for @a column. If @a column is -1, sorting is disabled. */
-    void setSorting(int column, Qt::SortOrder OrderByColumn = Qt::AscendingOrder);
+    void setSorting(int column, KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending);
 
     /*! @return the column number by which the data is sorted,
      or -1 if sorting is disabled.
@@ -85,7 +86,7 @@ public:
     /*! @return sorting order. This is independent of whether the data is actually sorted.
      sortColumn() should be checked first to see if sorting for any column is enabled
      (by default it is not). */
-    Qt::SortOrder sortOrder() const;
+    KDbOrderByColumn::SortOrder sortOrder() const;
 
     //! Sorts this data using previously set order.
     void sort();

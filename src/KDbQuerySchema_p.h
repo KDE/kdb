@@ -212,4 +212,8 @@ public:
     bool regenerateExprAliases;
 };
 
+//! @return identifier string @a name escaped using @a conn connection and type @a escapingType
+QString escapeIdentifier(const QString& name, KDbConnection *conn,
+                         KDb::IdentifierEscapingType escapingType);
+
 #endif

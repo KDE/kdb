@@ -24,6 +24,7 @@
 #include <QList>
 
 #include "KDbExpression.h"
+#include "KDbOrderByColumn.h"
 
 struct dateType {
     int year;
@@ -45,7 +46,7 @@ struct OrderByColumnInternal {
     };
     OrderByColumnInternal()
             : columnNumber(-1)
-            , ascending(true) {
+            , order(KDbOrderByColumn::SortOrder::Ascending) {
     }
 
     void setColumnByNameOrNumber(const QVariant& nameOrNumber) {
@@ -58,10 +59,12 @@ struct OrderByColumnInternal {
         }
     }
 
-    QString aliasOrName; //!< Can include a "tablename." prefix
-    int columnNumber; //!< Optional, used instead of aliasOrName to refer to column
-    //!< by its number rather than name.
-    bool ascending;
+    //! Can include a "tablename." prefix
+    QString aliasOrName;
+    //! Optional, used instead of aliasOrName to refer to column
+    //! by its number rather than name.
+    int columnNumber;
+    KDbOrderByColumn::SortOrder order;
 };
 
 //! @internal
