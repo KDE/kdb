@@ -251,7 +251,7 @@ public:
     virtual KDbTableSchema* table();
 
     //! @overload KDbTableSchema* table()
-    const KDbTableSchema* table() const;
+    virtual const KDbTableSchema* table() const;
 
     /*! Sets @a table schema of table that owns this field.
      This does not adds the field to @a table object.
@@ -264,10 +264,10 @@ public:
      @return query schema of query that owns this field
      or null if it has no query assigned.
      @see table() */
-    KDbQuerySchema* query();
+    virtual KDbQuerySchema* query();
 
     //! @overload KDbQuerySchema* query()
-    const KDbQuerySchema* query() const;
+    virtual const KDbQuerySchema* query() const;
 
     /*! For special use when field defines expression.
      Sets @a query schema of query that owns this field.

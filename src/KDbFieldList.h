@@ -78,10 +78,10 @@ public:
     virtual bool moveField(KDbField *field, int newIndex);
 
     /*! @return field id or NULL if there is no such a field. */
-    KDbField* field(int id);
+    virtual KDbField* field(int id);
 
     /*! @overload KDbField* field(int id) */
-    const KDbField* field(int id) const;
+    virtual const KDbField* field(int id) const;
 
     /*! @return field with name @a name or NULL if there is no such a field. */
     virtual KDbField* field(const QString& name);

@@ -84,7 +84,7 @@ public:
 
      The field is not bound to any particular table within the query.
     */
-    virtual bool insertField(int position, KDbField *field);
+    bool insertField(int position, KDbField *field) override;
 
     /**
      * @overload bool insertField(int position, KDbField *field)
@@ -150,7 +150,7 @@ public:
     bool addInvisibleField(KDbField* field, int bindToTable);
 
     /*! Removes field from the columns list. Use with care. */
-    virtual bool removeField(KDbField *field);
+    bool removeField(KDbField *field) override;
 
     /**
      * Appends a column built on top of @a expr expression.
@@ -189,7 +189,7 @@ public:
      Sets master table information to NULL.
      Does not destroy any objects though. Clears name and all other properties.
      @see KDbFieldList::clear() */
-    virtual void clear();
+    void clear() override;
 
     /*! If query was created using a connection,
       returns this connection object, otherwise NULL. */
@@ -420,10 +420,10 @@ public:
     KDbField* unexpandedField(const QString& identifier);
 
     /*! @return field id or NULL if there is no such a field. */
-    KDbField* field(int id);
+    KDbField* field(int id) override;
 
     /*! @overload KDbField* field(int id) */
-    const KDbField* field(int id) const;
+    const KDbField* field(int id) const override;
 
     /*! Like KDbQuerySchema::field(const QString& name) but returns not only KDbField
      object for @a identifier but entire KDbQueryColumnInfo object.
@@ -758,21 +758,22 @@ public:
     virtual ~KDbQueryAsterisk();
 
     /*! @return Query object for that this asterisk object is defined */
-    KDbQuerySchema *query();
+    KDbQuerySchema *query() override;
 
     /*! @overload KDbQuerySchema *query() */
-    const KDbQuerySchema *query() const;
+    const KDbQuerySchema *query() const override;
 
     /*! @return Table schema for this asterisk
      if it has "single-table" type (1st type)
      or 0 if it has "all-tables" type (2nd type) defined. */
-    virtual KDbTableSchema* table();
+    KDbTableSchema* table() override;
 
-    virtual const KDbTableSchema* table() const;
+    /*! @overload KDbTableSchema* table() */
+    const KDbTableSchema* table() const override;
 
     /*! Sets table schema for this asterisk.
      @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
-    virtual void setTable(KDbTableSchema *table);
+    void setTable(KDbTableSchema *table) override;
 
     /*! This is convenience method that returns @c true
      if the asterisk has "all-tables" type (2nd type).*/
@@ -784,7 +785,7 @@ public:
 
 protected:
     //! @return a deep copy of this object. Used in KDbFieldList(const KDbFieldList& fl).
-    virtual KDbField* copy();
+    KDbField* copy() override;
 
     /*! Table schema for this asterisk */
     KDbTableSchema* m_table;
