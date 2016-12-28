@@ -21,9 +21,20 @@
 #include "KDbQuerySchema.h"
 #include "KDbTableSchema.h"
 
+class KDbQueryAsterisk::Private
+{
+public:
+    Private(KDbTableSchema *t) : table(t) {}
+
+    /*! Table schema for this asterisk */
+    KDbTableSchema* table;
+};
+
+// ----
+
 KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table)
         : KDbField()
-        , m_table(table)
+        , d(new Private(table))
 {
     Q_ASSERT(query);
     m_parent = query;
@@ -32,12 +43,13 @@ KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table)
 
 KDbQueryAsterisk::KDbQueryAsterisk(KDbQueryAsterisk *asterisk)
         : KDbField(*asterisk)
-        , m_table(asterisk->table())
+        , d(new Private(asterisk->table()))
 {
 }
 
 KDbQueryAsterisk::~KDbQueryAsterisk()
 {
+    delete d;
 }
 
 KDbQuerySchema *KDbQueryAsterisk::query()
@@ -52,12 +64,12 @@ const KDbQuerySchema *KDbQueryAsterisk::query() const
 
 KDbTableSchema* KDbQueryAsterisk::table()
 {
-    return m_table;
+    return d->table;
 }
 
 const KDbTableSchema* KDbQueryAsterisk::table() const
 {
-    return m_table;
+    return d->table;
 }
 
 KDbField* KDbQueryAsterisk::copy()
@@ -67,17 +79,17 @@ KDbField* KDbQueryAsterisk::copy()
 
 void KDbQueryAsterisk::setTable(KDbTableSchema *table)
 {
-    m_table = table;
+    d->table = table;
 }
 
 bool KDbQueryAsterisk::isSingleTableAsterisk() const
 {
-    return m_table;
+    return d->table;
 }
 
 bool KDbQueryAsterisk::isAllTableAsterisk() const
 {
-    return !m_table;
+    return !d->table;
 }
 
 QDebug operator<<(QDebug dbg, const KDbQueryAsterisk& asterisk)

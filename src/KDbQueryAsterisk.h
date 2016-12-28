@@ -96,9 +96,9 @@ protected:
     //! @return a deep copy of this object. Used in KDbFieldList(const KDbFieldList& fl).
     KDbField* copy() override;
 
-    /*! Table schema for this asterisk */
-    KDbTableSchema* m_table;
-
+private:
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbQueryAsterisk)
     friend class KDbQuerySchema;
 };
