@@ -87,7 +87,7 @@ public:
     virtual KDbField* field(const QString& name);
 
     /*! @overload . DbField* field(const QString& name) const */
-    const KDbField* field(const QString& name) const;
+    virtual const KDbField* field(const QString& name) const;
 
     /*! @return true if this list contains given @a field. */
     bool hasField(const KDbField& field) const;

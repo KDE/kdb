@@ -70,63 +70,119 @@ public:
 
     /*! Inserts @a field to the columns list at @a position.
      Inserted field will not be owned by this KDbQuerySchema object,
-     but still by corresponding KDbTableSchema.
+     but by the corresponding KDbTableSchema.
 
-     As @a field object you can also pass KDbQueryAsterisk,
-     (see KDbQueryAsterisk class description).
+     KDbQueryAsterisk can be also passed as @a field. See the KDbQueryAsterisk class
+     description.
 
-     Note: After inserting a field, corresponding table will be automatically
+     @note After inserting a field, corresponding table will be automatically
      added to query's tables list if it is not present there (see tables()).
      KDbField must have its table assigned.
 
-     Added field will be visible. Use insertField(position, field, false)
-     to add invisible field.
+     The inserted field will be visible. Use insertInvisibleField(position, field)
+     to add an invisible field.
+
+     The field is not bound to any particular table within the query.
     */
     virtual bool insertField(int position, KDbField *field);
 
-    /* Like above method, but you can also set column's visibility.
-     New column is not bound explicitly to any table.
-    */
-    bool insertField(int position, KDbField *field, bool visible);
+    /**
+     * @overload bool insertField(int position, KDbField *field)
+     * Inserts @a field to the columns list at @a position.
+     * @a bindToTable is a table index within the query for which the field should be bound.
+     * If @a bindToTable is -1, no particular table will be bound.
+     * @see tableBoundToColumn(int columnPosition)
+     */
+    bool insertField(int position, KDbField *field, int bindToTable);
 
-    /* Like above method, but the new column can also be explicitly bound
-     to a specific position on tables list.
-     If @a visible is true (the default), the field will be visible.
-     If bindToTable==-1, no particular table should be bound.
-     @see tableBoundToColumn(int columnPosition) */
-    bool insertField(int position, KDbField *field,
-                     int bindToTable, bool visible = true);
+    /**
+     * @overload bool insertField(int position, KDbField *field)
+     * Inserts @a field to the columns list at @a position.
+     * In addition sets field's visibility to @c false. It will not be bound to any table in this query.
+     * @since 3.1
+     */
+    bool insertInvisibleField(int position, KDbField *field);
 
-    /*! Adds @a field to the columns list.
-     If @a visible is true (the default), the field will be visible.
-     @see insertField() */
-    bool addField(KDbField* field, bool visible = true);
+    /**
+     * @overload bool insertInvisibleField(int position, KDbField *field)
+     * Inserts @a field to the columns list at @a position.
+     * In addition sets field's visibility to @c false.
+     * @a bindToTable is a table index within the query for which the field should be bound.
+     * If @a bindToTable is -1, no particular table will be bound.
+     * @see tableBoundToColumn(int columnPosition)
+     * @since 3.1
+     */
+    bool insertInvisibleField(int position, KDbField *field, int bindToTable);
 
-    /*! Adds @a field to the columns list. Also binds to a table
-     at @a bindToTable position. Use bindToTable==-1 if no table should be bound.
-     If @a visible is true (the default), the field will be visible.
-     @see insertField()
-     @see tableBoundToColumn(int columnPosition)
-    */
-    bool addField(KDbField* field, int bindToTable, bool visible = true);
+    /**
+     * Appends @a field to the columns list.
+     * The field will be visible. Use addInvisibleField(field) to add an invisible field.
+     * The field is not bound to any particular table within the query.
+     * @see insertField()
+     */
+    bool addField(KDbField* field);
+
+    /*! Appends @a field to the columns list. Also binds to a table at @a bindToTable position.
+     * Use bindToTable==-1 if no table should be bound.
+     * The field will be visible. Use addInvisibleField(field, bindToTable) to add
+     * an invisible field.
+     * @see insertField()
+     * @see tableBoundToColumn(int columnPosition)
+     */
+    bool addField(KDbField* field, int bindToTable);
+
+    /**
+     * @overload bool addField(KDbField* field)
+     * Appends @a field to the columns list.
+     * The field is not bound to any particular table within the query.
+     * In addition sets field's visibility to @c false. It will not be bound to any table in this query.
+     * @since 3.1
+     */
+    bool addInvisibleField(KDbField* field);
+
+    /**
+     * @overload bool addField(KDbField* field, int bindToTable)
+     * Appends @a field to the columns list. Also binds to a table at @a bindToTable position.
+     * In addition sets field's visibility to @c false.
+     * @see tableBoundToColumn(int columnPosition)
+     * @since 3.1
+     */
+    bool addInvisibleField(KDbField* field, int bindToTable);
 
     /*! Removes field from the columns list. Use with care. */
     virtual bool removeField(KDbField *field);
 
-    /*! Adds a field built on top of @a expr expression.
-     This creates a new KDbField object and adds it to the query schema using addField().
-     @a expr will be owned by the query object. */
-    bool addExpression(const KDbExpression& expr, bool visible = true);
+    /**
+     * Appends a column built on top of @a expr expression.
+     * This creates a new KDbField object and adds it to the query schema using addField().
+     */
+    bool addExpression(const KDbExpression& expr);
+
+    /**
+     * @overload bool addExpression(const KDbExpression& expr)
+     * Appends a column built on top of @a expr expression.
+     * In addition sets column's visibility to @c false.
+     * @since 3.1
+     */
+    bool addInvisibleExpression(const KDbExpression& expr);
 
     /*! @return visibility flag for column at @a position.
      By default column is visible. */
     bool isColumnVisible(int position) const;
 
-    //! Sets visibility flag for column at @a position to @a v.
-    void setColumnVisible(int position, bool v);
+    //! Sets visibility flag for column at @a position to @a visible.
+    void setColumnVisible(int position, bool visible);
 
-    /*! Adds @a asterisk at the and of columns list. */
-    bool addAsterisk(KDbQueryAsterisk *asterisk, bool visible = true);
+    /*! Appends @a asterisk at the and of columns list. */
+    bool addAsterisk(KDbQueryAsterisk *asterisk);
+
+    /**
+     * @overload bool addAsterisk(KDbQueryAsterisk *asterisk)
+     * Appends @a asterisk at the and of columns list.
+     * Sets the asterisk as invisible.
+     * @since 3.1
+     */
+    bool addInvisibleAsterisk(KDbQueryAsterisk *asterisk);
 
     /*! Removes all columns and their aliases from the columns list,
      removes all tables and their aliases from the tables list within this query.
@@ -162,7 +218,7 @@ public:
      @see masterTable() */
     QList<KDbTableSchema*>* tables() const;
 
-    /*! Adds @a table schema as one of tables used in a query.
+    /*! Appends @a table schema as one of tables used in a query.
      If @a alias is not empty, it will be assigned to this table
      using setTableAlias(position, alias). */
     void addTable(KDbTableSchema *table, const QString& alias = QString());
@@ -176,7 +232,7 @@ public:
     /*! @return table with name @a tableName or 0 if this query has no such table. */
     KDbTableSchema* table(const QString& tableName) const;
 
-    /*! @return true if the query uses @a table. */
+    /*! @return @c true if the query uses @a table. */
     bool contains(KDbTableSchema *table) const;
 
     /*! Convenience function.
@@ -211,10 +267,10 @@ public:
     int columnAliasesCount() const;
 
     /*! Provided for convenience.
-     @return true if a column at @a position has non empty alias defined
+     @return @c true if a column at @a position has non empty alias defined
      within the query.
      If there is no alias for this column,
-     or if there is no such column in the query defined, false is returned. */
+     or if there is no such column in the query defined, @c false is returned. */
     bool hasColumnAlias(int position) const;
 
     /*! Sets @a alias for a column at @a position, within the query.
@@ -288,10 +344,10 @@ public:
     QList<int> tablePositions(const QString& tableName) const;
 
     /*! Provided for convenience.
-     @return true if a table at @a position (within FROM section of the query)
+     @return @c true if a table at @a position (within FROM section of the query)
      has non empty alias defined.
      If there is no alias for this table,
-     or if there is no such table in the query defined, false is returned. */
+     or if there is no such table in the query defined, @c false is returned. */
     bool hasTableAlias(int position) const;
 
     /*! @return column position that has defined alias @a name.
@@ -307,7 +363,7 @@ public:
     /*! @return a list of relationships defined for this query */
     QList<KDbRelationship*>* relationships() const;
 
-    /*! Adds a new relationship defined by @a field1 and @a field2.
+    /*! Appends a new relationship defined by @a field1 and @a field2.
      Both fields should belong to two different tables of this query.
      This is convenience function useful for a typical cases.
      It automatically creates KDbRelationship object for this query.
@@ -319,7 +375,7 @@ public:
     /*! @return list of KDbQueryAsterisk objects defined for this query */
     KDbField::List* asterisks() const;
 
-    /*! @return field for @a identifier or 0 if no field for this name
+    /*! @return field for @a identifier or @c nullptr if no field for this name
      was found within the query. fieldsExpanded() method is used
      to lookup expanded list of the query fields, so queries with asterisks
      are processed well.
@@ -342,12 +398,26 @@ public:
        because it is covered by "X" alias). Additionally, calling field("X")
        will return the same pointer.
      - Calling field("T.A") will return the same pointer as field("A").
-     */
-    virtual KDbField* field(const QString& name, bool expanded) const;
 
-    /*! This is overloaded method KDbField* field(const QString& name, bool expanded)
-     with expanded = true. This method is also a product of inheritance from KDbFieldList.  */
-    virtual KDbField* field(const QString& name);
+     This method is also a product of inheritance from KDbFieldList.
+     */
+    const KDbField* field(const QString& identifier) const override;
+
+    /**
+     * @overload const KDbField* field(const QString& identifier) const
+     */
+    KDbField* field(const QString& identifier) override;
+
+    /**
+     * An overloaded method KDbField* field(const QString& identifier)
+     * where unexpanded list of fields is used to find a field.
+     */
+    const KDbField* unexpandedField(const QString& identifier) const;
+
+    /**
+     * @overload const KDbField* unexpandedField(const QString& identifier) const
+     */
+    KDbField* unexpandedField(const QString& identifier);
 
     /*! @return field id or NULL if there is no such a field. */
     KDbField* field(int id);
@@ -437,7 +507,7 @@ public:
 
     /*! @return info for expanded of internal field at index @a index.
      The returned field can be either logical or internal (for lookup),
-     the latter case is true if @a index &gt;= fieldsExpanded().count().
+     the latter case is @c true if @a index &gt;= fieldsExpanded().count().
      Equivalent of KDbQuerySchema::fieldsExpanded(WithInternalFields).at(index). */
     KDbQueryColumnInfo* expandedOrInternalField(int index) const;
 
@@ -564,7 +634,7 @@ public:
     /*! @return WHERE expression or 0 if this query has no WHERE expression */
     KDbExpression whereExpression() const;
 
-    /*! Adds a part to WHERE expression.
+    /*! Appends a part to WHERE expression.
      Simplifies creating of WHERE expression, if used instead
      of setWhereExpression(KDbExpression *expr). */
     void addToWhereExpression(KDbField *field, const QVariant& value, KDbToken relation = '=');
@@ -594,7 +664,7 @@ public:
      (a tree of expression items). */
     QList<KDbQuerySchemaParameter> parameters() const;
 
-    //! @return true if this query is valid
+    //! @return @c true if this query is valid
     /*! Detailed validation is performed in the same way as parsing of query statements
      * by the KDbParser.
      * Example :Let the query be "SELECT <fields> FROM <tables> WHERE <whereExpression>".
@@ -608,7 +678,7 @@ public:
     //! @todo add tests
     bool validate(QString *errorMessage, QString *errorDescription);
 
-    class Private;
+    class Private; // Protected not private because of the parser
 
 protected:
     //! @internal associates @a conn with this query so it's possible to find tables
@@ -622,6 +692,25 @@ protected:
     //! and visibleFieldsExpanded(FieldsExpandedOptions options).
     KDbQueryColumnInfo::Vector fieldsExpandedInternal(FieldsExpandedOptions options,
                                                       bool onlyVisible) const;
+
+    /** Internal method used by all insert*Field methods.
+     * The new column can also be explicitly bound to a specific position on tables list.
+     * @a bindToTable is a table index within the query for which the field should be bound.
+     * If @a bindToTable is -1, no particular table will be bound.
+     * @see tableBoundToColumn(int columnPosition)
+     */
+    bool insertFieldInternal(int position, KDbField *field, int bindToTable, bool visible);
+
+    /**
+     * Internal method used by add*Asterisk() methods.
+     * Appends @a asterisk at the and of columns list, sets visibility.
+     */
+    bool addAsteriskInternal(KDbQueryAsterisk *asterisk, bool visible);
+
+    /** Internal method used by all add*Expression methods.
+     * Appends expression @a expr at the and of columns list, sets visibility.
+     */
+    bool addExpressionInternal(const KDbExpression& expr, bool visible);
 
     Private * const d;
 };
@@ -685,11 +774,11 @@ public:
      @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
     virtual void setTable(KDbTableSchema *table);
 
-    /*! This is convenience method that returns true
+    /*! This is convenience method that returns @c true
      if the asterisk has "all-tables" type (2nd type).*/
     bool isSingleTableAsterisk() const;
 
-    /*! This is convenience method that returns true
+    /*! This is convenience method that returns @c true
      if the asterisk has "single-tables" type (2nd type).*/
     bool isAllTableAsterisk() const;
 

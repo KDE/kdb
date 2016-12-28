@@ -127,21 +127,29 @@ void KDbQuerySchema::clear()
     d->clear();
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::insertField(int position, KDbField *field, bool visible)
-{
-    return insertField(position, field, -1/*don't bind*/, visible);
-}
-
 /*virtual*/
 bool KDbQuerySchema::insertField(int position, KDbField *field)
 {
-    return insertField(position, field, -1/*don't bind*/, true);
+    return insertFieldInternal(position, field, -1/*don't bind*/, true);
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::insertField(int position, KDbField *field,
-                                 int bindToTable, bool visible)
+bool KDbQuerySchema::insertInvisibleField(int position, KDbField *field)
+{
+    return insertFieldInternal(position, field, -1/*don't bind*/, false);
+}
+
+bool KDbQuerySchema::insertField(int position, KDbField *field, int bindToTable)
+{
+    return insertFieldInternal(position, field, bindToTable, true);
+}
+
+bool KDbQuerySchema::insertInvisibleField(int position, KDbField *field, int bindToTable)
+{
+    return insertFieldInternal(position, field, bindToTable, false);
+}
+
+bool KDbQuerySchema::insertFieldInternal(int position, KDbField *field,
+                                         int bindToTable, bool visible)
 {
     if (!field) {
         kdbWarning() << "!field";
@@ -182,7 +190,7 @@ bool KDbQuerySchema::insertField(int position, KDbField *field,
     d->visibility.setBit(position, visible);
 
     //bind to table
-    if (bindToTable < -1 || bindToTable > int(d->tables.count())) {
+    if (bindToTable < -1 || bindToTable > d->tables.count()) {
         kdbWarning() << "bindToTable" << bindToTable << "out of range";
         bindToTable = -1;
     }
@@ -218,16 +226,24 @@ int KDbQuerySchema::tableBoundToColumn(int columnPosition) const
     return res;
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::addField(KDbField* field, bool visible)
+bool KDbQuerySchema::addField(KDbField* field)
 {
-    return insertField(m_fields.count(), field, visible);
+    return insertField(m_fields.count(), field);
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::addField(KDbField* field, int bindToTable, bool visible)
+bool KDbQuerySchema::addField(KDbField* field, int bindToTable)
 {
-    return insertField(m_fields.count(), field, bindToTable, visible);
+    return insertField(m_fields.count(), field, bindToTable);
+}
+
+bool KDbQuerySchema::addInvisibleField(KDbField* field)
+{
+    return insertInvisibleField(m_fields.count(), field);
+}
+
+bool KDbQuerySchema::addInvisibleField(KDbField* field, int bindToTable)
+{
+    return insertInvisibleField(m_fields.count(), field, bindToTable);
 }
 
 bool KDbQuerySchema::removeField(KDbField *field)
@@ -249,15 +265,29 @@ bool KDbQuerySchema::removeField(KDbField *field)
     return true;
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::addExpression(const KDbExpression& expr, bool visible)
+bool KDbQuerySchema::addExpressionInternal(const KDbExpression& expr, bool visible)
 {
     KDbField *field = new KDbField(this, expr);
-    if (!addField(field, visible)) {
-        delete field;
-        return false;
+    bool ok;
+    if (visible) {
+        ok = addField(field);
+    } else {
+        ok = addInvisibleField(field);
     }
-    return true;
+    if (!ok) {
+        delete field;
+    }
+    return ok;
+}
+
+bool KDbQuerySchema::addExpression(const KDbExpression& expr)
+{
+    return addExpressionInternal(expr, true);
+}
+
+bool KDbQuerySchema::addInvisibleExpression(const KDbExpression& expr)
+{
+    return addExpressionInternal(expr, false);
 }
 
 bool KDbQuerySchema::isColumnVisible(int position) const
@@ -265,14 +295,13 @@ bool KDbQuerySchema::isColumnVisible(int position) const
     return (position < fieldCount()) ? d->visibility.testBit(position) : false;
 }
 
-void KDbQuerySchema::setColumnVisible(int position, bool v)
+void KDbQuerySchema::setColumnVisible(int position, bool visible)
 {
     if (position < fieldCount())
-        d->visibility.setBit(position, v);
+        d->visibility.setBit(position, visible);
 }
 
-//! @todo IMPORTANT: move visible to overload
-bool KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visible)
+bool KDbQuerySchema::addAsteriskInternal(KDbQueryAsterisk *asterisk, bool visible)
 {
     if (!asterisk) {
         return false;
@@ -281,7 +310,17 @@ bool KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk, bool visible)
     asterisk->setName((asterisk->table() ? (asterisk->table()->name() + QLatin1String(".*"))
                                          : QString(QLatin1Char('*')))
                        + QString::number(asterisks()->count()));
-    return addField(asterisk, visible);
+    return visible ? addField(asterisk) : addInvisibleField(asterisk);
+}
+
+bool KDbQuerySchema::addAsterisk(KDbQueryAsterisk *asterisk)
+{
+    return addAsteriskInternal(asterisk, true);
+}
+
+bool KDbQuerySchema::addInvisibleAsterisk(KDbQueryAsterisk *asterisk)
+{
+    return addAsteriskInternal(asterisk, false);
 }
 
 KDbConnection* KDbQuerySchema::connection() const
@@ -651,15 +690,26 @@ void KDbQuerySchema::setStatement(const KDbEscapedString& sql)
     d->sql = sql;
 }
 
-KDbField* KDbQuerySchema::field(const QString& name)
+const KDbField* KDbQuerySchema::field(const QString& identifier) const
 {
-    return field(name, true);
+    KDbQueryColumnInfo *ci = columnInfo(identifier, true /*expanded*/);
+    return ci ? ci->field() : nullptr;
 }
 
-KDbField* KDbQuerySchema::field(const QString& identifier, bool expanded) const
+KDbField* KDbQuerySchema::field(const QString& identifier)
 {
-    KDbQueryColumnInfo *ci = columnInfo(identifier, expanded);
+    return const_cast<KDbField*>(static_cast<const KDbQuerySchema*>(this)->field(identifier));
+}
+
+const KDbField* KDbQuerySchema::unexpandedField(const QString& identifier) const
+{
+    KDbQueryColumnInfo *ci = columnInfo(identifier, false /*unexpanded*/);
     return ci ? ci->field() : nullptr;
+}
+
+KDbField* KDbQuerySchema::unexpandedField(const QString& identifier)
+{
+    return const_cast<KDbField*>(static_cast<const KDbQuerySchema*>(this)->unexpandedField(identifier));
 }
 
 KDbField* KDbQuerySchema::field(int id)
