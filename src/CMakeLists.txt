@@ -99,6 +99,7 @@ set(kdb_LIB_SRCS
 
    KDbEscapedString.cpp
    KDbResult.cpp
+   KDbQueryAsterisk.cpp
    KDbConnectionData.cpp
    KDbVersionInfo.cpp
    ${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cpp
@@ -273,6 +274,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDb
         KDbAdmin
         KDbAlter
+        KDbQueryAsterisk
         KDbConnection
         KDbConnectionOptions
         KDbConnectionProxy

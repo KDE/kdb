@@ -19,6 +19,7 @@
 
 #include "KDbQuerySchema.h"
 #include "KDbQuerySchema_p.h"
+#include "KDbQueryAsterisk.h"
 #include "KDbConnection.h"
 #include "kdb_debug.h"
 #include "KDbLookupFieldSchema.h"
@@ -1388,84 +1389,4 @@ bool KDbQuerySchema::validate(QString *errorMessage, QString *errorDescription)
         return false;
     }
     return true;
-}
-
-//---------------------------------------------------
-
-KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table)
-        : KDbField()
-        , m_table(table)
-{
-    Q_ASSERT(query);
-    m_parent = query;
-    setType(KDbField::Asterisk);
-}
-
-KDbQueryAsterisk::KDbQueryAsterisk(KDbQueryAsterisk *asterisk)
-        : KDbField(*asterisk)
-        , m_table(asterisk->table())
-{
-}
-
-KDbQueryAsterisk::~KDbQueryAsterisk()
-{
-}
-
-KDbQuerySchema *KDbQueryAsterisk::query()
-{
-    return static_cast<KDbQuerySchema*>(m_parent);
-}
-
-const KDbQuerySchema *KDbQueryAsterisk::query() const
-{
-    return static_cast<const KDbQuerySchema*>(m_parent);
-}
-
-KDbTableSchema* KDbQueryAsterisk::table()
-{
-    return m_table;
-}
-
-const KDbTableSchema* KDbQueryAsterisk::table() const
-{
-    return m_table;
-}
-
-KDbField* KDbQueryAsterisk::copy()
-{
-    return new KDbQueryAsterisk(this);
-}
-
-void KDbQueryAsterisk::setTable(KDbTableSchema *table)
-{
-    m_table = table;
-}
-
-bool KDbQueryAsterisk::isSingleTableAsterisk() const
-{
-    return m_table;
-}
-
-bool KDbQueryAsterisk::isAllTableAsterisk() const
-{
-    return !m_table;
-}
-
-QDebug operator<<(QDebug dbg, const KDbQueryAsterisk& asterisk)
-{
-    if (asterisk.isAllTableAsterisk()) {
-        dbg.nospace() << "ALL-TABLES ASTERISK (*) ON TABLES(";
-        bool first = true;
-        foreach(KDbTableSchema *table, *asterisk.query()->tables()) {
-            if (first)
-                first = false;
-            else
-                dbg.nospace() << ',';
-            dbg.space() << table->name();
-        }
-        dbg.space() << ')';
-    } else {
-        dbg.nospace() << "SINGLE-TABLE ASTERISK (" << asterisk.table()->name() << ".*)";
-    }
-    return dbg.space();
 }

@@ -24,6 +24,7 @@
 #include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbOrderByColumn.h"
+#include "KDbQueryAsterisk.h"
 #include "KDbQuerySchema.h"
 #include "KDbQuerySchemaParameter.h"
 #include "KDbRelationship.h"

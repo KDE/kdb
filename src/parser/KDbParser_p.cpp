@@ -21,6 +21,7 @@
 #include "KDb.h"
 #include "KDbConnection.h"
 #include "KDbTableSchema.h"
+#include "KDbQueryAsterisk.h"
 #include "KDbQuerySchema.h"
 #include "KDbOrderByColumn.h"
 #include "kdb_debug.h"
