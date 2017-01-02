@@ -188,7 +188,7 @@ protected:
     //! @todo support keys
     bool setConstraints(const QString &tableName, KDbField* field);
 
-    //! Caches information about the the fields, for setConstraints()
+    //! Caches information about the fields, for setConstraints()
     //! @todo Support composite primary keys
     //! @todo Default values are only encoded as string
     bool cacheFieldInfo(const QString &tableName);
