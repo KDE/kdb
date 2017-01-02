@@ -176,7 +176,7 @@ private:
     Private * const d;
 
     friend class KDbTableViewData;
-    friend QDebug operator<<(QDebug, const KDbTableViewColumn&);
+    friend KDB_EXPORT QDebug operator<<(QDebug, const KDbTableViewColumn&);
     Q_DISABLE_COPY(KDbTableViewColumn)
 };
 

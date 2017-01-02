@@ -173,7 +173,7 @@ KDbRecordEditBuffer::DbHash KDbRecordEditBuffer::dbBuffer() const
     return *m_dbBuffer;
 }
 
-QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
 {
     if (buffer.isDBAware()) {
         const KDbRecordEditBuffer::DbHash buf(buffer.dbBuffer());
