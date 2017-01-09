@@ -43,7 +43,7 @@ public:
         KDbLookupFieldSchemaRecordSourcePrivateArgs((*this))
                 = KDbLookupFieldSchemaRecordSourcePrivateArgs(other);
     }
-    bool operator==(const KDbLookupFieldSchemaRecordSource::Private &other) {
+    bool operator==(const KDbLookupFieldSchemaRecordSource::Private &other) const {
         return KDbLookupFieldSchemaRecordSourcePrivateArgs((*this))
                 == KDbLookupFieldSchemaRecordSourcePrivateArgs(other);
     }
@@ -73,7 +73,7 @@ public:
     void copy(const Private &other) {
         KDbLookupFieldSchemaPrivateArgs((*this)) = KDbLookupFieldSchemaPrivateArgs(other);
     }
-    bool operator==(const KDbLookupFieldSchema::Private &other) {
+    bool operator==(const KDbLookupFieldSchema::Private &other) const {
         return KDbLookupFieldSchemaPrivateArgs((*this)) == KDbLookupFieldSchemaPrivateArgs(other);
     }
 
