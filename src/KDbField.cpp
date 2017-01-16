@@ -168,19 +168,19 @@ KDbField::KDbField(const QString& name, Type type,
 }
 
 /*! Copy constructor. */
-KDbField::KDbField(KDbField* f)
+KDbField::KDbField(const KDbField &f)
 {
-    Q_ASSERT(f);
-    (*this) = *f;
-    if (f->m_customProperties)
-        m_customProperties = new CustomPropertiesMap(f->customProperties());
+    (*this) = f;
+    if (f.m_customProperties)
+        m_customProperties = new CustomPropertiesMap(f.customProperties());
 
-    if (!f->m_expr->isNull()) {//deep copy the expression
+    if (!f.m_expr->isNull()) {//deep copy the expression
 //! @todo  m_expr = new KDbExpression(*f.m_expr);
-            m_expr = new KDbExpression(f->m_expr->clone());
+            m_expr = new KDbExpression(f.m_expr->clone());
     }
-    else
+    else {
         m_expr = new KDbExpression();
+    }
 }
 
 KDbField::~KDbField()

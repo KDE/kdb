@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -168,7 +168,7 @@ public:
           const QString& description = QString());
 
     /*! Constructs a deep copy of field @a f. */
-    KDbField(KDbField *f);
+    KDbField(const KDbField &f);
 
     virtual ~KDbField();
 
@@ -248,26 +248,26 @@ public:
     /*! @return table schema of table that owns this field
      or null if it has no table assigned.
      @see query() */
-    virtual KDbTableSchema* table();
+    KDbTableSchema* table();
 
     //! @overload KDbTableSchema* table()
-    virtual const KDbTableSchema* table() const;
+    const KDbTableSchema* table() const;
 
     /*! Sets @a table schema of table that owns this field.
      This does not adds the field to @a table object.
      You do not need to call this method by hand.
      Call KDbTableSchema::addField(KDbField *field) instead.
      @see setQuery() */
-    virtual void setTable(KDbTableSchema *table);
+    void setTable(KDbTableSchema *table);
 
     /*! For special use when the field defines expression.
      @return query schema of query that owns this field
      or null if it has no query assigned.
      @see table() */
-    virtual KDbQuerySchema* query();
+    KDbQuerySchema* query();
 
     //! @overload KDbQuerySchema* query()
-    virtual const KDbQuerySchema* query() const;
+    const KDbQuerySchema* query() const;
 
     /*! For special use when field defines expression.
      Sets @a query schema of query that owns this field.

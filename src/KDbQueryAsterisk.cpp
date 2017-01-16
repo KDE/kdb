@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -24,26 +24,36 @@
 class KDbQueryAsterisk::Private
 {
 public:
-    Private(KDbTableSchema *t) : table(t) {}
+    Private(const KDbTableSchema *t) : table(t) {}
 
     /*! Table schema for this asterisk */
-    KDbTableSchema* table;
+    const KDbTableSchema* table;
 };
 
 // ----
 
-KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table)
-        : KDbField()
-        , d(new Private(table))
+KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query)
+    : KDbQueryAsterisk(query, nullptr)
+{
+}
+
+KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema &table)
+    : KDbQueryAsterisk(query, &table)
+{
+}
+
+KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema *table)
+    : KDbField()
+    , d(new Private(table))
 {
     Q_ASSERT(query);
     m_parent = query;
     setType(KDbField::Asterisk);
 }
 
-KDbQueryAsterisk::KDbQueryAsterisk(KDbQueryAsterisk *asterisk)
-        : KDbField(*asterisk)
-        , d(new Private(asterisk->table()))
+KDbQueryAsterisk::KDbQueryAsterisk(const KDbQueryAsterisk &asterisk)
+        : KDbField(asterisk)
+        , d(new Private(asterisk.table()))
 {
 }
 
@@ -62,7 +72,7 @@ const KDbQuerySchema *KDbQueryAsterisk::query() const
     return static_cast<const KDbQuerySchema*>(m_parent);
 }
 
-KDbTableSchema* KDbQueryAsterisk::table()
+const KDbTableSchema* KDbQueryAsterisk::table()
 {
     return d->table;
 }
@@ -74,10 +84,10 @@ const KDbTableSchema* KDbQueryAsterisk::table() const
 
 KDbField* KDbQueryAsterisk::copy()
 {
-    return new KDbQueryAsterisk(this);
+    return new KDbQueryAsterisk(*this);
 }
 
-void KDbQueryAsterisk::setTable(KDbTableSchema *table)
+void KDbQueryAsterisk::setTable(const KDbTableSchema *table)
 {
     d->table = table;
 }

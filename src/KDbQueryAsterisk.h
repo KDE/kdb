@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -50,57 +50,63 @@ class KDbQuerySchema;
 class KDB_EXPORT KDbQueryAsterisk : public KDbField
 {
 public:
-    /*! Constructs query asterisk definition object.
-     Pass table schema to @a table if this asterisk should be
-     of type "single-table", otherwise (if you want to define
-     "all-tables" type asterisk), omit this parameter.
+    /*! Constructs an "all-tables" query asterisk definition object ("*" in SQL notation).
 
      KDbQueryAsterisk objects are owned by KDbQuerySchema object
      (not by KDbTableSchema object like for ordinary KDbField objects)
-     for that the KDbQueryAsterisk object was added (using KDbQuerySchema::addField()).
-     */
-    explicit KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table = 0);
+     for that the KDbQueryAsterisk object was added (using KDbQuerySchema::addField()). */
+    explicit KDbQueryAsterisk(KDbQuerySchema *query);
+
+    /*! Constructs a "single-table" query asterisk definition object ("T.*" in SQL notation).
+     @a table schema is the single table for the asterisk.
+
+     KDbQueryAsterisk objects are owned by KDbQuerySchema object
+     (not by KDbTableSchema object like for ordinary KDbField objects)
+     for that the KDbQueryAsterisk object was added (using KDbQuerySchema::addField()). */
+    KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema &table);
 
     /*! Constructs a deep copy of query asterisk definition object @a asterisk. */
-    KDbQueryAsterisk(KDbQueryAsterisk* asterisk);
+    KDbQueryAsterisk(const KDbQueryAsterisk &asterisk);
 
     virtual ~KDbQueryAsterisk();
 
     /*! @return Query object for that this asterisk object is defined */
-    KDbQuerySchema *query() override;
+    KDbQuerySchema *query();
 
     /*! @overload KDbQuerySchema *query() */
-    const KDbQuerySchema *query() const override;
+    const KDbQuerySchema *query() const;
 
-    /*! @return Table schema for this asterisk
-     if it has "single-table" type (1st type)
-     or 0 if it has "all-tables" type (2nd type) defined. */
-    KDbTableSchema* table() override;
+    /*! @return table schema object for that this asterisk object is defined.
+    If this is a "all-tables" asterisk, @c nullptr is returned. */
+    const KDbTableSchema* table();
 
-    /*! @overload KDbTableSchema* table() */
-    const KDbTableSchema* table() const override;
+    /*! @overload const KDbTableSchema* table() */
+    const KDbTableSchema* table() const;
 
     /*! Sets table schema for this asterisk.
-     @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
-    void setTable(KDbTableSchema *table) override;
+     If table is supplied, the asterisk become a "single-table" asterisk.
+     If @a table is @c nullptr the asterisk becames "all-tables" asterisk. */
+    void setTable(const KDbTableSchema *table);
 
     /*! This is convenience method that returns @c true
      if the asterisk has "all-tables" type (2nd type).*/
     bool isSingleTableAsterisk() const;
 
     /*! This is convenience method that returns @c true
-     if the asterisk has "single-tables" type (2nd type).*/
+     if the asterisk has "single-table" type (2nd type).*/
     bool isAllTableAsterisk() const;
 
 protected:
     //! @return a deep copy of this object. Used in KDbFieldList(const KDbFieldList& fl).
     KDbField* copy() override;
 
+    KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema *table);
+
 private:
     class Private;
     Private * const d;
-    Q_DISABLE_COPY(KDbQueryAsterisk)
-    friend class KDbQuerySchema;
+    KDbQueryAsterisk& operator=(const KDbQueryAsterisk &) = delete;
+    void setTable(KDbTableSchema *table); // protect
 };
 
 //! Sends query asterisk information @a asterisk to debug output @a dbg.
