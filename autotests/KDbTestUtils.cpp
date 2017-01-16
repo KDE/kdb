@@ -114,6 +114,11 @@ void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
 {
     qDebug() << cdata;
 
+    if (!driver) {
+        //! @todo don't hardcode SQLite here
+        KDB_VERIFY(manager.resultable(), driver = manager.driver("org.kde.kdb.sqlite"), "Driver not found");
+    }
+
     KDbConnectionOptions connOptions;
     QStringList extraSqliteExtensionPaths;
     extraSqliteExtensionPaths << SQLITE_LOCAL_ICU_EXTENSION_PATH;
@@ -150,11 +155,14 @@ void KDbTestUtils::testUseInternal()
     KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
 }
 
-void KDbTestUtils::testCreateInternal(const QString &dbName)
+void KDbTestUtils::testCreateDbInternal(const QString &dbName)
 {
     //open connection
     KDbConnectionData cdata;
-    cdata.setDatabaseName(dbName);
+    //! @todo don't hardcode SQLite (.kexi) extension here
+    QString fullDbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/")
+                       + dbName + ".kexi"));
+    cdata.setDatabaseName(fullDbName);
 
     QVERIFY(testConnect(cdata));
     QVERIFY(connection);
@@ -164,13 +172,20 @@ void KDbTestUtils::testCreateInternal(const QString &dbName)
         QScopedPointer<KDbConnection> connGuard(connection.take());
 
         if (connGuard->databaseExists(dbName)) {
-            KDB_VERIFY(connGuard, connGuard->dropDatabase(dbName), "Failed to drop database");
+            KDB_VERIFY(connGuard, connGuard->dropDatabase(fullDbName), "Failed to drop database");
         }
-        KDB_VERIFY(connGuard, !connGuard->databaseExists(dbName), "Database exists");
-        KDB_VERIFY(connGuard, connGuard->createDatabase(dbName), "Failed to create db");
-        KDB_VERIFY(connGuard, connGuard->databaseExists(dbName), "Database does not exists after creation");
+        KDB_VERIFY(connGuard, !connGuard->databaseExists(fullDbName), "Database exists");
+        KDB_VERIFY(connGuard, connGuard->createDatabase(fullDbName), "Failed to create db");
+        KDB_VERIFY(connGuard, connGuard->databaseExists(fullDbName), "Database does not exists after creation");
         connection.reset(connGuard.take());
     }
+}
+
+void KDbTestUtils::testCreateDbWithTablesInternal(const QString &dbName)
+{
+    QVERIFY(testCreateDb(dbName));
+    KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
+    testCreateTablesInternal();
 }
 
 void KDbTestUtils::testPropertiesInternal()
@@ -211,6 +226,11 @@ void KDbTestUtils::testDisconnectInternal()
     QVERIFY(!QTest::currentTestFailed());
     connection.reset();
     QCOMPARE(driver ? driver->connections().count() : -1, connCount - 1); // one less
+}
+
+void KDbTestUtils::testDropDbInternal()
+{
+    QVERIFY(connection->dropDatabase(connection->data().databaseName()));
 }
 
 void KDbTestUtils::testDisconnectAndDropDbInternal()

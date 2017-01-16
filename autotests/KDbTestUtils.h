@@ -106,10 +106,21 @@ public:
     KDBTEST_METHOD_DECL(testSqliteDriver, (), ());
     KDBTEST_METHOD_DECL(testConnect, (const KDbConnectionData &cdata), (cdata));
     KDBTEST_METHOD_DECL(testUse, (), ());
-    KDBTEST_METHOD_DECL(testCreate, (const QString &dbName), (dbName));
+
+    //! Creates database with name @a dbName
+    //! Does not use the database.
+    //! @todo don't hardcode SQLite here
+    //! @note dbName should not include ".kexi" extension or path
+    KDBTEST_METHOD_DECL(testCreateDb, (const QString &dbName), (dbName));
+
+    //! Creates database with name @a dbName, then uses it and creates test tables
+    //! The database stays used.
+    //! @note dbName should not include ".kexi" extension or path
+    KDBTEST_METHOD_DECL(testCreateDbWithTables, (const QString &dbName), (dbName));
     KDBTEST_METHOD_DECL(testProperties, (), ());
     KDBTEST_METHOD_DECL(testCreateTables, (), ());
     KDBTEST_METHOD_DECL(testDisconnect, (), ());
+    KDBTEST_METHOD_DECL(testDropDb, (), ());
     KDBTEST_METHOD_DECL(testDisconnectAndDropDb, (), ());
 
 protected:

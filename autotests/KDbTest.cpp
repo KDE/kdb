@@ -20,6 +20,7 @@
 #include "KDbTest.h"
 
 #include <KDb>
+#include <KDbConnectionData>
 #include <KDbVersionInfo>
 
 #include <QTest>
@@ -34,9 +35,6 @@ Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
 
 void KDbTest::initTestCase()
 {
-    QVERIFY(utils.testDriverManager());
-    //! @todo don't hardcode SQLite here
-    QVERIFY(utils.testSqliteDriver());
 }
 
 void KDbTest::testVersionInfo()
@@ -1053,12 +1051,7 @@ KDB_EXPORT QStringList libraryPaths();
 
 void KDbTest::testTemporaryTableName()
 {
-    QVERIFY(utils.driver);
-    QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/KDbTest.kexi")));
-    QVERIFY(utils.testCreate(dbName));
-    QVERIFY(utils.connection);
-    utils.connection->useDatabase();
-    QVERIFY(utils.testCreateTables());
+    QVERIFY(utils.testCreateDbWithTables("KDbTest.kexi"));
 
     QString baseName = QLatin1String("foobar");
     QString tempName1 = KDb::temporaryTableName(utils.connection.data(), baseName);
@@ -1074,7 +1067,8 @@ void KDbTest::testTemporaryTableName()
     utils.connection->disconnect();
     tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
     QVERIFY2(tempName.isEmpty(), "Temporary name should not be created for closed connection");
-    utils.connection->dropDatabase(dbName);
+
+    utils.connection->dropDatabase(utils.connection->data().databaseName());
 }
 
 //! @todo add tests

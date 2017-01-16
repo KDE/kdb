@@ -32,8 +32,6 @@ QTEST_GUILESS_MAIN(SqlParserTest)
 
 void SqlParserTest::initTestCase()
 {
-    QVERIFY(m_utils.testDriverManager());
-    QVERIFY(m_utils.testSqliteDriver());
     QString dir(QFile::decodeName(OUTPUT_DIR));
     QString fname("errors.txt");
     m_errorFile.setFileName(dir + QDir::separator() + fname);
@@ -44,10 +42,6 @@ void SqlParserTest::initTestCase()
 
 bool SqlParserTest::openDatabase(const QString &path)
 {
-    if (!m_utils.driver) {
-        return false;
-    }
-
     KDbConnectionData cdata;
     cdata.setDatabaseName(path);
     if (!m_utils.testConnect(cdata) || !m_utils.connection) {

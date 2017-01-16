@@ -31,9 +31,6 @@ QTEST_GUILESS_MAIN(ConnectionTest)
 
 void ConnectionTest::initTestCase()
 {
-    QVERIFY(utils.testDriverManager());
-    //! @todo don't hardcode SQLite here
-    QVERIFY(utils.testSqliteDriver());
 }
 
 void ConnectionTest::testConnectionData()
@@ -104,9 +101,7 @@ void ConnectionTest::testConnectionData()
 
 void ConnectionTest::testCreateDb()
 {
-    QVERIFY(utils.driver);
-    QString dbName(QDir::fromNativeSeparators(QFile::decodeName(FILES_OUTPUT_DIR "/ConnectionTest.kexi")));
-    QVERIFY(utils.testCreate(dbName));
+    QVERIFY(utils.testCreateDb("ConnectionTest"));
     QVERIFY(utils.testUse());
     QVERIFY(utils.testProperties());
     QVERIFY(utils.testCreateTables());
