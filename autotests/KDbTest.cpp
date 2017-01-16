@@ -1051,7 +1051,7 @@ KDB_EXPORT QStringList libraryPaths();
 
 void KDbTest::testTemporaryTableName()
 {
-    QVERIFY(utils.testCreateDbWithTables("KDbTest.kexi"));
+    QVERIFY(utils.testCreateDbWithTables("KDbTest"));
 
     QString baseName = QLatin1String("foobar");
     QString tempName1 = KDb::temporaryTableName(utils.connection.data(), baseName);
