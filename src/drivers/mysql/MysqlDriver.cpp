@@ -49,7 +49,8 @@ MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
     beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE = true;
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = false;
     beh->USING_DATABASE_REQUIRED_TO_CONNECT = false;
-    beh->QUOTATION_MARKS_FOR_IDENTIFIER = '`';
+    beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '`';
+    beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '`';
     //! @todo add configuration option
     beh->TEXT_TYPE_MAX_LENGTH = 255;
     beh->RANDOM_FUNCTION = QLatin1String("RAND");

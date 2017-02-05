@@ -62,7 +62,8 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
     beh->ROW_ID_FIELD_NAME = QLatin1String("OID");
     beh->IS_DB_OPEN_AFTER_CREATE = true;
     beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY = true;
-    beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
+    beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '[';
+    beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = ']';
     beh->SELECT_1_SUBQUERY_SUPPORTED = true;
     beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE = false;
     beh->CONNECTION_REQUIRED_TO_CREATE_DB = false;

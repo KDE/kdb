@@ -48,7 +48,8 @@ SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
     // confirm
     //beh->SELECT_1_SUBQUERY_SUPPORTED = true;
 
-    beh->QUOTATION_MARKS_FOR_IDENTIFIER = '"';
+    beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '"';
+    beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '"';
 
     initDriverSpecificKeywords(m_keywords);
 

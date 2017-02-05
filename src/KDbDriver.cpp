@@ -265,14 +265,16 @@ KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
 
 QString KDbDriver::escapeIdentifier(const QString& str) const
 {
-    return QLatin1Char(beh->QUOTATION_MARKS_FOR_IDENTIFIER) + drv_escapeIdentifier(str)
-            + QLatin1Char(beh->QUOTATION_MARKS_FOR_IDENTIFIER);
+    return QLatin1Char(beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER)
+            + drv_escapeIdentifier(str)
+            + QLatin1Char(beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER);
 }
 
 QByteArray KDbDriver::escapeIdentifier(const QByteArray& str) const
 {
-    return beh->QUOTATION_MARKS_FOR_IDENTIFIER + drv_escapeIdentifier(str)
-        + beh->QUOTATION_MARKS_FOR_IDENTIFIER;
+    return beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER
+            + drv_escapeIdentifier(str)
+            + beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER;
 }
 
 KDbUtils::Property KDbDriver::internalProperty(const QByteArray& name) const

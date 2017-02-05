@@ -62,7 +62,8 @@ xBaseDriver::xBaseDriver(QObject *parent, const QVariantList &args)
   beh->ROW_ID_FIELD_NAME = "OID";
   beh->IS_DB_OPEN_AFTER_CREATE = true;
 
-  beh->QUOTATION_MARKS_FOR_IDENTIFIER='"';
+  beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '"';
+  beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '"';
   beh->SELECT_1_SUBQUERY_SUPPORTED = true;
 
   // As we provide a wrapper over SQLite, this aspect will be hidden by SQLite to us.

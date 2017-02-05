@@ -118,10 +118,15 @@ public:
     */
     QString ALWAYS_AVAILABLE_DATABASE_NAME;
 
-    /*! Quotation marks used for escaping identifier (see KDbDriver::escapeIdentifier()).
+    /*! Opening quotation mark used for escaping identifier (see KDbDriver::escapeIdentifier()).
      Default value is '"'. Change it for your driver.
     */
-    char QUOTATION_MARKS_FOR_IDENTIFIER;
+    char OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER;
+
+    /*! Opening quotation mark used for escaping identifier (see KDbDriver::escapeIdentifier()).
+     Default value is '"'. Change it for your driver.
+    */
+    char CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER;
 
     /*! True if using database is required to perform real connection.
      This is true for may engines, e.g. for PostgreSQL, where connection

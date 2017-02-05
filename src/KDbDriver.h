@@ -309,7 +309,8 @@ protected:
      Implement escaping for any character like " or ' as your
      database engine requires. Do not append or prepend any quotation
      marks characters - it is automatically done by escapeIdentifier() using
-     KDbDriverBehavior::QUOTATION_MARKS_FOR_IDENTIFIER.
+     KDbDriverBehavior::OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER
+     and KDbDriverBehavior::CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER.
     */
     virtual QString drv_escapeIdentifier(const QString& str) const = 0;
 
