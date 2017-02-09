@@ -28,7 +28,7 @@ endmacro()
 
 # find SQLite:
 set(SQLITE_MIN_VERSION 3.6.16)
-set(SQLITE_RECOMMENDED_VERSION 3.15.1)
+set(SQLITE_RECOMMENDED_VERSION 3.16.2)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
 find_package(Sqlite ${SQLITE_MIN_VERSION})
 macro_log_feature(SQLITE_FOUND "SQLite3" "Embedded SQL database engine with enabled extensions loading"
