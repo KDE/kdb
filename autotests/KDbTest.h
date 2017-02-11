@@ -49,6 +49,11 @@ private Q_SLOTS:
     void testCstringToVariant_data();
     void testCstringToVariant();
     void testTemporaryTableName();
+    void deleteRecordWithOneConstraintsTest();
+    void deleteNonExistingRecordTest();
+    void deleteRecordWithTwoConstraintsTest();
+    void deleteRecordWithThreeConstraintsTest();
+    void deleteAllRecordsTest();
     void cleanupTestCase();
 private:
     void testUnescapeStringHelper(const QString &sequenceString, const QString &resultString,
