@@ -27,7 +27,7 @@
 class KDbDriverMetaData;
 class KDbDriver;
 
-//! Internal class of the driver manager.
+//! Internal class of the KDbDriverManager.
 class KDB_TESTING_EXPORT DriverManagerInternal : public QObject, public KDbResultable
 {
     Q_OBJECT

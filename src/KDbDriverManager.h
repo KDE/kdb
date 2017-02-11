@@ -50,16 +50,20 @@ public:
 
     /*! @return information (metadata) about driver with ID @a id.
       The lookup is case insensitive.
-      0 is returned if the metadata has not been found.
-      On error status can be obtained using result(). */
+      The metadata object is owned by KDb internals and is not deleted after
+      this KDbDriverManager object is deleted.
+      @a nullptr is returned if the metadata has not been found.
+      On error status can be obtained using result().
 
       @see driver(const QString& id) for information about duplicated drivers. */
     const KDbDriverMetaData* driverMetaData(const QString &id);
 
     /*! Tries to load db driver with ID @a id.
       The lookup is case insensitive.
-      @return driver object or 0 on error.
-      On error status can be obtained using result(). */
+      @return driver object or @a nullptr on error.
+      On error status can be obtained using result().
+      The driver object is owned by KDb internals and is not deleted after
+      this KDbDriverManager object is deleted.
 
       @note If more than one driver with the same ID found on the search path, first
       located driver is selected. All other drivers for this ID are skip with a warning
