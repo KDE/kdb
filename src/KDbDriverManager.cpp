@@ -116,9 +116,11 @@ void DriverManagerInternal::lookupDriversInternal()
             continue;
         }
         if (m_driversMetaData.contains(metaData->id())) {
-            kdbWarning() << "Driver with ID" << metaData->id() << "already found at"
-                         << m_driversMetaData.value(metaData->id())->fileName()
-                         << "-- skipping another at" << metaData->fileName();
+            if (qgetenv("KDB_NO_DUPLICATED_DRIVER_WARNINGS").isEmpty()) {
+                kdbWarning() << "Driver with ID" << metaData->id() << "already found at"
+                             << m_driversMetaData.value(metaData->id())->fileName()
+                             << "-- skipping another at" << metaData->fileName();
+            }
             continue;
         }
         foreach (const QString& mimeType, metaData->mimeTypes()) {
