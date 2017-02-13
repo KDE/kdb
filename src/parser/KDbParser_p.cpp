@@ -247,9 +247,9 @@ bool parseData(KDbParser *p, const KDbEscapedString &sql)
 
     bool ok = yyparse() == 0;
     if (ok && globalCurrentPos < sql.length()) {
-        kdbWarning() << "Parse error: tokens left"
-                     << "globalCurrentPos:" << globalCurrentPos << "sql.length():" << sql.length()
-                     << "globalToken:" << QString::fromUtf8(globalToken);
+        kdbDebug() << "Parse error: tokens left"
+                   << "globalCurrentPos:" << globalCurrentPos << "sql.length():" << sql.length()
+                   << "globalToken:" << QString::fromUtf8(globalToken);
         KDbParserError err(KDbParser::tr("Error"),
                            KDbParser::tr("Unexpected character."),
                            globalToken, globalCurrentPos);
