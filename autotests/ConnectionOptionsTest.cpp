@@ -39,6 +39,7 @@ void ConnectionOptionsTest::testEmpty()
     QVERIFY(empty != opt);
     opt = KDbConnectionOptions();
     QVERIFY(empty == opt);
+    QTest::ignoreMessage(QtWarningMsg, "\"/\" cannot be used as property name");
     opt.insert("/", "bar"); // no effect, name must be a valid identifier
     QVERIFY(opt.property("/").isNull());
 }
