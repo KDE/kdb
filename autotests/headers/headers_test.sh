@@ -109,9 +109,9 @@ EOT
 # Finally, build:
 cd $test_app_builddir
 
-CXXCOMPILER=`cmake -LA ../../.. | grep CMAKE_CXX_COMPILER`
+CXXCOMPILER=`cmake -LA ../../.. | grep CMAKE_CXX_COMPILER || true`
 if [ -n "$CXXCOMPILER" ] ; then CXXCOMPILER=-D$CXXCOMPILER ; fi
-CCOMPILER=`cmake -LA ../../.. | grep CMAKE_C_COMPILER`
+CCOMPILER=`cmake -LA ../../.. | grep CMAKE_C_COMPILER || true`
 if [ -n "$CCOMPILER" ] ; then CCOMPILER=-D$CCOMPILER ; fi
 
 echo cmake $CXXCOMPILER $CCOMPILER ../app
