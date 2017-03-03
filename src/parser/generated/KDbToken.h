@@ -167,7 +167,6 @@ public:
     static const KDbToken NOT_BETWEEN_AND;
     // -- end of constants --
 
-    class List;
 private:
     inline KDbToken(int value) : v(value) {}
     int v;
