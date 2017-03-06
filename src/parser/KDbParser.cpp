@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -131,22 +131,63 @@ void KDbParser::reset()
 
 //-------------------------------------
 
+class Q_DECL_HIDDEN KDbParserError::Private
+{
+public:
+    Private() {}
+    QString type;
+    QString message;
+    QByteArray token;
+    int position = -1;
+};
+
 KDbParserError::KDbParserError()
-        : m_position(-1)
+    : d(new Private)
 {
 }
 
 KDbParserError::KDbParserError(const QString &type, const QString &message, const QByteArray &token,
                                int position)
+    : d(new Private)
 {
-    m_type = type;
-    m_message = message;
-    m_token = token;
-    m_position = position;
+    d->type = type;
+    d->message = message;
+    d->token = token;
+    d->position = position;
+}
+
+KDbParserError::KDbParserError(const KDbParserError &other)
+    : d(new Private)
+{
+    *d = *other.d;
 }
 
 KDbParserError::~KDbParserError()
 {
+    delete d;
+}
+
+KDbParserError& KDbParserError::operator=(const KDbParserError &other)
+{
+    if (this != &other) {
+        *d = *other.d;
+    }
+    return *this;
+}
+
+QString KDbParserError::type() const
+{
+    return d->type;
+}
+
+QString KDbParserError::message() const
+{
+    return d->message;
+}
+
+int KDbParserError::position() const
+{
+    return d->position;
 }
 
 QDebug operator<<(QDebug dbg, const KDbParserError& error)

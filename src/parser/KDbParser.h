@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -40,7 +40,6 @@ class KDbEscapedString;
 class KDB_EXPORT KDbParserError
 {
 public:
-
     /**
      * Empty constructor.
      */
@@ -57,36 +56,32 @@ public:
     KDbParserError(const QString &type, const QString &message, const QByteArray &token, int position);
 
     /**
-     * Destructor.
+     * Copy constructor.
      */
+    KDbParserError(const KDbParserError &other);
+
     ~KDbParserError();
+
+    KDbParserError& operator=(const KDbParserError &other);
 
     /**
      * @return the error type.
      */
-    QString type() const {
-        return m_type;
-    }
+    QString type() const;
 
     /**
      * @return translated error message.
      */
-    QString message() const {
-        return m_message;
-    }
+    QString message() const;
 
     /**
      * @return (character) position where the error happened.
      */
-    int position() const {
-        return m_position;
-    }
+    int position() const;
 
 private:
-    QString m_type;
-    QString m_message;
-    QByteArray m_token;
-    int m_position;
+    class Private;
+    Private * const d;
 };
 
 class KDbParserPrivate; //!< @internal
