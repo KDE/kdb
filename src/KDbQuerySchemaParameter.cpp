@@ -81,7 +81,7 @@ KDbQuerySchemaParameterValueListIterator::~KDbQuerySchemaParameterValueListItera
     delete d;
 }
 
-QVariant KDbQuerySchemaParameterValueListIterator::getPreviousValue()
+QVariant KDbQuerySchemaParameterValueListIterator::previousValue() const
 {
     if (d->paramsItPosition == 0) { //d->params.constEnd()) {
         kdbWarning() << "no prev value";

@@ -43,7 +43,7 @@ public:
     ~KDbQuerySchemaParameterValueListIterator();
 
     //! @return previous value
-    QVariant getPreviousValue();
+    QVariant previousValue() const;
 
 private:
     Q_DISABLE_COPY(KDbQuerySchemaParameterValueListIterator)
