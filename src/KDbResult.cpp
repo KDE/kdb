@@ -196,11 +196,6 @@ KDbResultable& KDbResultable::operator=(const KDbResultable &other)
     return *this;
 }
 
-bool KDbResultable::operator==(const KDbResultable &other) const
-{
-    return m_result == other.m_result && *d == *other.d;
-}
-
 KDbResult KDbResultable::result() const
 {
     return m_result;
