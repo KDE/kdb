@@ -79,8 +79,8 @@ void KDbQueryParameterExpressionData::getQueryParameters(QList<KDbQuerySchemaPar
 {
     Q_ASSERT(params);
     KDbQuerySchemaParameter param;
-    param.message = value.toString();
-    param.type = type();
+    param.setMessage(value.toString());
+    param.setType(type());
     params->append(param);
 }
 

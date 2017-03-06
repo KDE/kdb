@@ -24,18 +24,13 @@
 
 #include <QWeakPointer>
 
-KDbQuerySchemaParameter::KDbQuerySchemaParameter()
-        : type(KDbField::InvalidType)
-{
-}
-
 KDbQuerySchemaParameter::~KDbQuerySchemaParameter()
 {
 }
 
 QDebug operator<<(QDebug dbg, const KDbQuerySchemaParameter& parameter)
 {
-    dbg.nospace() << "MESSAGE=" << parameter.message << "TYPE=" << KDbField::typeName(parameter.type);
+    dbg.nospace() << "MESSAGE=" << parameter.message() << "TYPE=" << KDbField::typeName(parameter.type());
     return dbg.space();
 }
 

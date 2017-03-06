@@ -23,14 +23,24 @@
 #include "KDbField.h"
 
 //! @short A single parameter of a query schema
-class KDB_EXPORT KDbQuerySchemaParameter
+class KDB_EXPORT KDbQuerySchemaParameter //SDC: operator==
 {
 public:
-    KDbQuerySchemaParameter();
-    ~KDbQuerySchemaParameter();
+    /*!
+    @getter
+    @return datatype of the parameter.
+    @setter
+    Sets a datatype of the parameter.
+    */
+    KDbField::Type type; //SDC: default=KDbField::InvalidType
 
-    KDbField::Type type; //!< A datatype of the parameter
-    QString message; //!< A user-visible message that will be displayed to ask for value of the parameter
+    /*!
+    @getter
+    @return user-visible message that will be displayed when asking for value of the parameter.
+    @setter
+    Sets user-visible message that will be displayed when asking for value of the parameter.
+    */
+    QString message; //SDC:
 };
 
 //! @short An iterator for a list of values of query schema parameters

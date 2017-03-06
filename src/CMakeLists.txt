@@ -173,6 +173,7 @@ kdb_create_shared_data_classes(
     KDbResult.shared.h
     KDbVersionInfo.shared.h
     KDbConnectionData.shared.h
+    KDbQuerySchemaParameter.shared.h
     KDbObject.shared.h
 )
 
@@ -297,7 +298,6 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbQueryColumnInfo
         KDbOrderByColumn
         KDbQuerySchema
-        KDbQuerySchemaParameter
         KDbRecordData
         KDbRecordEditBuffer
         KDbRelationship
