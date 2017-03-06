@@ -44,10 +44,12 @@ public:
     virtual ~PostgresqlConnection();
 
     //! @return a new query based on a query statement
-    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(const KDbEscapedString& sql,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
     //! @return a new query based on a query object
-    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(KDbQuerySchema* query,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 
     KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
 

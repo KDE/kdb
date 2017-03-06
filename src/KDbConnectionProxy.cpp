@@ -245,40 +245,40 @@ KDbEscapedString KDbConnectionProxy::escapeString(const QString& str) const
     return d->connection->escapeString(str);
 }
 
-KDbCursor* KDbConnectionProxy::prepareQuery(const KDbEscapedString& sql, int cursor_options)
+KDbCursor* KDbConnectionProxy::prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
-    return d->connection->prepareQuery(sql, cursor_options);
+    return d->connection->prepareQuery(sql, options);
 }
 
-KDbCursor* KDbConnectionProxy::prepareQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* KDbConnectionProxy::prepareQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    return d->connection->prepareQuery(query, cursor_options);
+    return d->connection->prepareQuery(query, options);
 }
 
-KDbCursor* KDbConnectionProxy::prepareQuery(KDbTableSchema* table, int cursor_options)
+KDbCursor* KDbConnectionProxy::prepareQuery(KDbTableSchema* table, KDbCursor::Options options)
 {
-    return d->connection->prepareQuery(table, cursor_options);
+    return d->connection->prepareQuery(table, options);
 }
 
-KDbCursor* KDbConnectionProxy::executeQuery(const KDbEscapedString& sql, int cursor_options)
+KDbCursor* KDbConnectionProxy::executeQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
-    return d->connection->executeQuery(sql, cursor_options);
+    return d->connection->executeQuery(sql, options);
 }
 
 KDbCursor* KDbConnectionProxy::executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                        int cursor_options)
+                        KDbCursor::Options options)
 {
-    return d->connection->executeQuery(query, params, cursor_options);
+    return d->connection->executeQuery(query, params, options);
 }
 
-KDbCursor* KDbConnectionProxy::executeQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* KDbConnectionProxy::executeQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    return d->connection->executeQuery(query, cursor_options);
+    return d->connection->executeQuery(query, options);
 }
 
-KDbCursor* KDbConnectionProxy::executeQuery(KDbTableSchema* table, int cursor_options)
+KDbCursor* KDbConnectionProxy::executeQuery(KDbTableSchema* table, KDbCursor::Options options)
 {
-    return d->connection->executeQuery(table, cursor_options);
+    return d->connection->executeQuery(table, options);
 }
 
 bool KDbConnectionProxy::deleteCursor(KDbCursor *cursor)

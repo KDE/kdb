@@ -30,8 +30,9 @@ class MysqlCursor: public KDbCursor
 {
 public:
     MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
-                int cursor_options = NoOptions);
-    MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
+                KDbCursor::Options options = KDbCursor::Option::None);
+    MysqlCursor(KDbConnection* conn, KDbQuerySchema* query,
+                KDbCursor::Options options = KDbCursor::Option::None);
     virtual ~MysqlCursor();
 
     virtual QVariant value(int pos);

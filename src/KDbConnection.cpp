@@ -1964,11 +1964,11 @@ bool KDbConnection::drv_setAutoCommit(bool /*on*/)
     return true;
 }
 
-KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, int cursor_options)
+KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
     if (sql.isEmpty())
         return 0;
-    KDbCursor *c = prepareQuery(sql, cursor_options);
+    KDbCursor *c = prepareQuery(sql, options);
     if (!c)
         return 0;
     if (!c->open()) {//err - kill that
@@ -1980,9 +1980,9 @@ KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, int cursor_o
 }
 
 KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                                       int cursor_options)
+                                       KDbCursor::Options options)
 {
-    KDbCursor *c = prepareQuery(query, params, cursor_options);
+    KDbCursor *c = prepareQuery(query, params, options);
     if (!c)
         return 0;
     if (!c->open()) {//err - kill that
@@ -1993,25 +1993,25 @@ KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, const QList<QVaria
     return c;
 }
 
-KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    return executeQuery(query, QList<QVariant>(), cursor_options);
+    return executeQuery(query, QList<QVariant>(), options);
 }
 
-KDbCursor* KDbConnection::executeQuery(KDbTableSchema* table, int cursor_options)
+KDbCursor* KDbConnection::executeQuery(KDbTableSchema* table, KDbCursor::Options options)
 {
-    return executeQuery(table->query(), cursor_options);
+    return executeQuery(table->query(), options);
 }
 
-KDbCursor* KDbConnection::prepareQuery(KDbTableSchema* table, int cursor_options)
+KDbCursor* KDbConnection::prepareQuery(KDbTableSchema* table, KDbCursor::Options options)
 {
-    return prepareQuery(table->query(), cursor_options);
+    return prepareQuery(table->query(), options);
 }
 
 KDbCursor* KDbConnection::prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                                       int cursor_options)
+                                       KDbCursor::Options options)
 {
-    KDbCursor* cursor = prepareQuery(query, cursor_options);
+    KDbCursor* cursor = prepareQuery(query, options);
     if (cursor)
         cursor->setQueryParameters(params);
     return cursor;

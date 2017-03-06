@@ -20,6 +20,7 @@
 #ifndef KDB_CONNECTION_H
 #define KDB_CONNECTION_H
 
+#include "KDbCursor.h"
 #include "KDbDriver.h"
 #include "KDbPreparedStatement.h"
 #include "KDbTableSchema.h"
@@ -30,7 +31,6 @@ class KDbConnectionPrivate;
 class KDbConnectionData;
 class KDbConnectionOptions;
 class KDbConnectionProxy;
-class KDbCursor;
 class KDbDriver;
 class KDbProperties;
 class KDbRecordData;
@@ -363,49 +363,50 @@ public:
      @return opened cursor created for results of this query
      or @c nullptr if there was any error. Ownership of the returned object is passed
      to the caller.
-     KDbCursor can have optionally applied @a cursor_options (one of more selected from KDbCursor::Options).
+     KDbCursor can have optionally applied @a options (one of more selected from KDbCursor::Options).
      Preparation means that returned cursor is created but not opened.
      Open this when you would like to do it with KDbCursor::open().
 
      Note for driver developers: you should initialize cursor engine-specific
      resources and return KDbCursor subclass' object
-     (passing @a sql and @a cursor_options to its constructor).
+     (passing @a sql and @a options to its constructor).
     */
-    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_REQUIRED_RESULT = 0;
+    virtual KDbCursor* prepareQuery(const KDbEscapedString& sql,
+                                    KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT = 0;
 
-    /*! @overload prepareQuery(const KDbEscapedString&, int)
+    /*! @overload
      Prepares query described by @a query schema. @a params are values of parameters that
      will be inserted into places marked with [] before execution of the query.
 
      Note for driver developers: you should initialize cursor engine-specific
      resources and return KDbCursor subclass' object
-     (passing @a query and @a cursor_options to it's constructor).
+     (passing @a query and @a options to it's constructor).
      Kexi SQL and driver-specific escaping is performed on table names.
     */
     KDbCursor* prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            int cursor_options = 0) Q_REQUIRED_RESULT;
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
-    /*! @overload prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-      int cursor_options = 0 )
+    /*! @overload
      Prepares query described by @a query schema without parameters.
     */
-    virtual KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_REQUIRED_RESULT = 0;
+    virtual KDbCursor* prepareQuery(KDbQuerySchema* query,
+                                    KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT = 0;
 
-    /*! @overload prepareQuery(const KDbEscapedString&, int)
-     Statement is build from data provided by @a table schema,
-     it is like "select * from table_name".*/
-    KDbCursor* prepareQuery(KDbTableSchema* table, int cursor_options = 0) Q_REQUIRED_RESULT;
+    /*! @overload
+     Statement is build from data provided by @a table schema, it is like "select * from table_name".*/
+    KDbCursor* prepareQuery(KDbTableSchema* table,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
     /*! Executes SELECT query described by a raw SQL statement @a sql.
      @return opened cursor created for results of this query
      or 0 if there was any error on the cursor creation or opening.
      Ownership of the returned object is passed to the caller.
-     KDbCursor can have optionally applied @a cursor_options
-     (one of more selected from KDbCursor::Options).
+     KDbCursor can have optionally applied @a options.
      Identifiers in @a sql that are the same as keywords
      in KDbSQL dialect or the backend's SQL have to be escaped.
      */
-    KDbCursor* executeQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_REQUIRED_RESULT;
+    KDbCursor* executeQuery(const KDbEscapedString& sql,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
     /*! @overload executeQuery(const KDbEscapedString&, int)
      @a params are values of parameters that
@@ -414,17 +415,18 @@ public:
      Statement is build from data provided by @a query schema.
      Kexi SQL and driver-specific escaping is performed on table names. */
     KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            int cursor_options = 0) Q_REQUIRED_RESULT;
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
-    /*! @overload executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-      int cursor_options = 0 ) */
-    KDbCursor* executeQuery(KDbQuerySchema* query, int cursor_options = 0) Q_REQUIRED_RESULT;
+    /*! @overload */
+    KDbCursor* executeQuery(KDbQuerySchema* query,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
-    /*! @overload executeQuery(const KDbEscapedString&, int)
+    /*! @overload
      Executes query described by @a query schema without parameters.
      Statement is build from data provided by @a table schema,
      it is like "select * from table_name".*/
-    KDbCursor* executeQuery(KDbTableSchema* table, int cursor_options = 0) Q_REQUIRED_RESULT;
+    KDbCursor* executeQuery(KDbTableSchema* table,
+                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
 
     /*! Deletes cursor @a cursor previously created by functions like executeQuery()
      for this connection.

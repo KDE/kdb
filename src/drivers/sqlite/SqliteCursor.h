@@ -48,11 +48,12 @@ public:
 
 protected:
     /*! KDbCursor will operate on @a conn, raw @a sql statement will be used to execute query. */
-    SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, int options = NoOptions);
+    SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql,
+                 Options options = KDbCursor::Option::None);
 
     /*! KDbCursor will operate on @a conn, @a query schema will be used to execute query. */
     SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query,
-                 int options = NoOptions);
+                 Options options = KDbCursor::Option::None);
 
     virtual bool drv_open(const KDbEscapedString& sql);
 

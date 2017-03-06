@@ -64,16 +64,14 @@ PostgresqlConnection::~PostgresqlConnection()
     delete d;
 }
 
-KDbCursor* PostgresqlConnection::prepareQuery(const KDbEscapedString& sql,  int cursor_options)
+KDbCursor* PostgresqlConnection::prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
-    Q_UNUSED(cursor_options);
-    return new PostgresqlCursor(this, sql, 1); //Always used buffered cursor
+    return new PostgresqlCursor(this, sql, options);
 }
 
-KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* PostgresqlConnection::prepareQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    Q_UNUSED(cursor_options);
-    return new PostgresqlCursor(this, query, 1);//Always used buffered cursor
+    return new PostgresqlCursor(this, query, options);
 }
 
 bool PostgresqlConnection::drv_connect()

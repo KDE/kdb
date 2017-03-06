@@ -143,14 +143,15 @@ public:
     Q_DISABLE_COPY(SqliteCursorData)
 };
 
-SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql, int options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, const KDbEscapedString& sql,
+                           Options options)
         : KDbCursor(conn, sql, options)
         , d(new SqliteCursorData(conn))
 {
     d->data = static_cast<SqliteConnection*>(conn)->d->data;
 }
 
-SqliteCursor::SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query, int options)
+SqliteCursor::SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query, Options options)
         : KDbCursor(conn, query, options)
         , d(new SqliteCursorData(conn))
 {

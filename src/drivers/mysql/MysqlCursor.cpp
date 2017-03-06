@@ -29,18 +29,17 @@
 
 #define BOOL bool
 
-MysqlCursor::MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql, int cursor_options)
-        : KDbCursor(conn, sql, cursor_options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
+                         KDbCursor::Options options)
+        : KDbCursor(conn, sql, options | KDbCursor::Option::Buffered)
         , d(new MysqlCursorData(conn))
 {
-    m_options |= Buffered;
 }
 
-MysqlCursor::MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
-        : KDbCursor(conn, query, options)
+MysqlCursor::MysqlCursor(KDbConnection* conn, KDbQuerySchema* query, KDbCursor::Options options)
+        : KDbCursor(conn, query, options | KDbCursor::Option::Buffered)
         , d(new MysqlCursorData(conn))
 {
-    m_options |= Buffered;
 }
 
 MysqlCursor::~MysqlCursor()

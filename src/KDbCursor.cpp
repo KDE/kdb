@@ -66,7 +66,7 @@ public:
     //</members related to buffering>
 };
 
-KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)
+KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, Options options)
         : m_query(0)
         , m_options(options)
         , d(new Private)
@@ -78,7 +78,7 @@ KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int optio
     d->rawSql = sql;
 }
 
-KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
+KDbCursor::KDbCursor(KDbConnection* conn, KDbQuerySchema* query, Options options)
         : m_query(query)
         , m_options(options)
         , d(new Private)
@@ -163,7 +163,7 @@ KDbEscapedString KDbCursor::rawSql() const
     return d->rawSql;
 }
 
-int KDbCursor::options() const
+KDbCursor::Options KDbCursor::options() const
 {
     return m_options;
 }
@@ -284,7 +284,7 @@ bool KDbCursor::moveFirst()
         return false;
     }
     if (!d->readAhead) {
-        if (m_options & Buffered) {
+        if (m_options & KDbCursor::Option::Buffered) {
             if (m_records_in_buf == 0 && m_buffering_completed) {
                 //eof and bof should now return true:
                 m_afterLast = true;
@@ -357,7 +357,7 @@ bool KDbCursor::moveNext()
 
 bool KDbCursor::movePrev()
 {
-    if (!d->opened /*|| m_beforeFirst*/ || !(m_options & Buffered)) {
+    if (!d->opened /*|| m_beforeFirst*/ || !(m_options & KDbCursor::Option::Buffered)) {
         return false;
     }
     //we're after last record and there are records in the buffer
@@ -393,7 +393,7 @@ bool KDbCursor::movePrev()
 
 bool KDbCursor::isBuffered() const
 {
-    return m_options & Buffered;
+    return m_options & KDbCursor::Option::Buffered;
 }
 
 void KDbCursor::setBuffered(bool buffered)
@@ -403,7 +403,7 @@ void KDbCursor::setBuffered(bool buffered)
     }
     if (isBuffered() == buffered)
         return;
-    m_options ^= Buffered;
+    m_options ^= KDbCursor::Option::Buffered;
 }
 
 void KDbCursor::clearBuffer()
@@ -421,7 +421,7 @@ bool KDbCursor::getNextRecord()
 {
     m_fetchResult = FetchInvalid; //by default: invalid result of record fetching
 
-    if (m_options & Buffered) {//this cursor is buffered:
+    if (m_options & KDbCursor::Option::Buffered) {//this cursor is buffered:
 //  kdbDebug() << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
         if (m_at < m_records_in_buf) {//we have next record already buffered:
             if (d->atBuffer) {//we already have got a pointer to buffer

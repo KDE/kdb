@@ -92,14 +92,14 @@ bool MysqlConnection::drv_disconnect()
     return d->db_disconnect();
 }
 
-KDbCursor* MysqlConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
-    return new MysqlCursor(this, sql, cursor_options);
+    return new MysqlCursor(this, sql, options);
 }
 
-KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* MysqlConnection::prepareQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    return new MysqlCursor(this, query, cursor_options);
+    return new MysqlCursor(this, query, options);
 }
 
 bool MysqlConnection::drv_getDatabasesList(QStringList* list)

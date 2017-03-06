@@ -279,14 +279,14 @@ bool SqliteConnection::drv_dropDatabase(const QString &dbName)
     return true;
 }
 
-KDbCursor* SqliteConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
-    return new SqliteCursor(this, sql, cursor_options);
+    return new SqliteCursor(this, sql, options);
 }
 
-KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, int cursor_options)
+KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, KDbCursor::Options options)
 {
-    return new SqliteCursor(this, query, cursor_options);
+    return new SqliteCursor(this, query, options);
 }
 
 KDbSqlResult* SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)

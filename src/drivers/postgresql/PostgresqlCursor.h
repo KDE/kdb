@@ -33,8 +33,9 @@ class PostgresqlCursor: public KDbCursor
 {
 public:
     explicit PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
-                              int options = NoOptions);
-    PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
+                              KDbCursor::Options options = KDbCursor::Option::None);
+    PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query,
+                     KDbCursor::Options options = KDbCursor::Option::None);
     virtual ~PostgresqlCursor();
 
     virtual QVariant value(int pos);

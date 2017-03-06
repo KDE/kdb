@@ -29,22 +29,22 @@
 #include "KDbRecordData.h"
 
 // Constructor based on query statement
-PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql, int options)
-        : KDbCursor(conn, sql, options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, const KDbEscapedString& sql,
+                                   KDbCursor::Options options)
+        : KDbCursor(conn, sql, options | KDbCursor::Option::Buffered)
         , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
 {
-    m_options |= Buffered;
 }
 
 //==================================================================================
 //Constructor base on query object
-PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query, int options)
-        : KDbCursor(conn, query, options)
+PostgresqlCursor::PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query,
+                                   KDbCursor::Options options)
+        : KDbCursor(conn, query, options | KDbCursor::Option::Buffered)
         , m_numRows(0)
         , d(new PostgresqlCursorData(conn))
 {
-    m_options |= Buffered;
 }
 
 //==================================================================================

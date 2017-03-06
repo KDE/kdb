@@ -128,20 +128,20 @@ public:
 
     KDbEscapedString escapeString(const QString& str) const Q_DECL_OVERRIDE;
 
-    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_DECL_OVERRIDE;
+    KDbCursor* prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE;
 
-    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_DECL_OVERRIDE;
+    KDbCursor* prepareQuery(KDbQuerySchema* query, KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE;
 
-    KDbCursor* prepareQuery(KDbTableSchema* table, int cursor_options = 0);
+    KDbCursor* prepareQuery(KDbTableSchema* table, KDbCursor::Options options = KDbCursor::Option::None);
 
-    KDbCursor* executeQuery(const KDbEscapedString& sql, int cursor_options = 0);
+    KDbCursor* executeQuery(const KDbEscapedString& sql, KDbCursor::Options options = KDbCursor::Option::None);
 
     KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            int cursor_options = 0);
+                            KDbCursor::Options options = KDbCursor::Option::None);
 
-    KDbCursor* executeQuery(KDbQuerySchema* query, int cursor_options = 0);
+    KDbCursor* executeQuery(KDbQuerySchema* query, KDbCursor::Options options = KDbCursor::Option::None);
 
-    KDbCursor* executeQuery(KDbTableSchema* table, int cursor_options = 0);
+    KDbCursor* executeQuery(KDbTableSchema* table, KDbCursor::Options options = KDbCursor::Option::None);
 
     bool deleteCursor(KDbCursor *cursor);
 

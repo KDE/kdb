@@ -40,7 +40,7 @@ QByteArray prgname;
 QString db_name;
 QString drv_id;
 QString test_name;
-int cursor_options = 0;
+KDbCursor::Options cursor_options;
 bool db_name_required = true;
 
 KDbConnectionData conn_data;
@@ -288,7 +288,7 @@ int main(int argc, char** argv)
     if (!db_name.isEmpty() ) {
         //additional switches:
         if (bufCursors) {
-            cursor_options |= KDbCursor::Buffered;
+            cursor_options |= KDbCursor::Option::Buffered;
         }
         conn = driver->createConnection(conn_data);
 

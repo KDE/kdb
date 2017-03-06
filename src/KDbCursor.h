@@ -69,11 +69,12 @@ class KDB_EXPORT KDbCursor: public KDbResultable
 {
     Q_DECLARE_TR_FUNCTIONS(KDbCursor)
 public:
-    //! KDbCursor options that describes its behavior
-    enum Options {
-        NoOptions = 0,
+    //! Options that describe behavior of database cursor
+    enum class Option {
+        None = 0,
         Buffered = 1
     };
+    Q_DECLARE_FLAGS(Options, Option)
 
     /*! @return connection used for the cursor */
     KDbConnection* connection() const;
@@ -105,9 +106,8 @@ public:
      or null string if raw statement instead (but KDbQuerySchema is defined instead). */
     KDbEscapedString rawSql() const;
 
-    /*! @return logically or'd cursor's options,
-      selected from KDbCursor::Options enum. */
-    int options() const;
+    /*! @return cursor options */
+    Options options() const;
 
     /*! @return true if the cursor is opened. */
     bool isOpened() const;
@@ -230,10 +230,10 @@ public:
 
 protected:
     /*! Cursor will operate on @a conn, raw SQL statement @a sql will be used to execute query. */
-    KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, int options = NoOptions);
+    KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, Options options = KDbCursor::Option::None);
 
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
-    KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
+    KDbCursor(KDbConnection* conn, KDbQuerySchema* query, Options options = KDbCursor::Option::None);
 
     virtual ~KDbCursor();
 
@@ -298,7 +298,7 @@ protected:
                                   //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
                                   //!< sets m_fieldCount+1 here)
     int m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
-    int m_options; //!< cursor options that describes its behavior
+    KDbCursor::Options m_options; //!< cursor options that describes its behavior
 
     //! possible results of record fetching, used for m_fetchResult
     enum FetchResult {
@@ -329,5 +329,7 @@ private:
 
 //! Sends information about object @a cursor to debug output @a dbg.
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbCursor& cursor);
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbCursor::Options)
 
 #endif
