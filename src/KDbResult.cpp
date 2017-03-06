@@ -160,6 +160,16 @@ public:
     Private() : messageHandler(nullptr)
     {
     }
+    Private(const Private &other) {
+        copy(other);
+    }
+#define KDbResultablePrivateArgs(o) std::tie(o.messageHandler)
+    void copy(const Private &other) {
+        KDbResultablePrivateArgs((*this)) = KDbResultablePrivateArgs(other);
+    }
+    bool operator==(const Private &other) const {
+        return KDbResultablePrivateArgs((*this)) == KDbResultablePrivateArgs(other);
+    }
     KDbMessageHandler* messageHandler;
 };
 
@@ -170,9 +180,8 @@ KDbResultable::KDbResultable()
 
 KDbResultable::KDbResultable(const KDbResultable &other)
     : m_result(other.m_result)
-    , d(new Private)
+    , d(new Private(*other.d))
 {
-    d->messageHandler = other.messageHandler();
 }
 
 KDbResultable::~KDbResultable()
@@ -185,6 +194,11 @@ KDbResultable& KDbResultable::operator=(const KDbResultable &other)
     d->messageHandler = other.messageHandler();
     m_result = other.m_result;
     return *this;
+}
+
+bool KDbResultable::operator==(const KDbResultable &other) const
+{
+    return m_result == other.m_result && *d == *other.d;
 }
 
 KDbResult KDbResultable::result() const
