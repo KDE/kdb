@@ -64,6 +64,10 @@ public:
 
     KDbParserError& operator=(const KDbParserError &other);
 
+    bool operator==(const KDbParserError &other) const;
+
+    inline bool operator!=(const KDbParserError &other) const { return !operator==(other); }
+
     /**
      * @return the error type.
      */

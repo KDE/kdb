@@ -135,6 +135,16 @@ class Q_DECL_HIDDEN KDbParserError::Private
 {
 public:
     Private() {}
+    Private(const Private &other) {
+        copy(other);
+    }
+#define KDbParserErrorPrivateArgs(o) std::tie(o.type, o.message, o.token, o.position)
+    void copy(const Private &other) {
+        KDbParserErrorPrivateArgs((*this)) = KDbParserErrorPrivateArgs(other);
+    }
+    bool operator==(const Private &other) const {
+        return KDbParserErrorPrivateArgs((*this)) == KDbParserErrorPrivateArgs(other);
+    }
     QString type;
     QString message;
     QByteArray token;
@@ -157,7 +167,7 @@ KDbParserError::KDbParserError(const QString &type, const QString &message, cons
 }
 
 KDbParserError::KDbParserError(const KDbParserError &other)
-    : d(new Private)
+    : d(new Private(*other.d))
 {
     *d = *other.d;
 }
@@ -170,9 +180,14 @@ KDbParserError::~KDbParserError()
 KDbParserError& KDbParserError::operator=(const KDbParserError &other)
 {
     if (this != &other) {
-        *d = *other.d;
+        d->copy(*other.d);
     }
     return *this;
+}
+
+bool KDbParserError::operator==(const KDbParserError &other) const
+{
+    return *d == *other.d;
 }
 
 QString KDbParserError::type() const
