@@ -217,7 +217,7 @@ bool StaticSetOfStrings::contains(const QByteArray& string) const
 
 //---------
 
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
 //! Internal, from kdelibs' kstandarddirs.cpp
 static QString getBundle(const QString& path, bool ignore)
 {
@@ -245,7 +245,7 @@ static QString getBundle(const QString& path, bool ignore)
 //! Internal, from kdelibs' kstandarddirs.cpp
 static QString checkExecutable(const QString& path, bool ignoreExecBit)
 {
-#ifdef Q_OS_MAC
+#ifdef Q_OS_MACOS
     QString bundle = getBundle(path, ignoreExecBit);
     if (!bundle.isEmpty()) {
         return bundle;
@@ -253,7 +253,7 @@ static QString checkExecutable(const QString& path, bool ignoreExecBit)
 #endif
     QFileInfo info(path);
     QFileInfo orig = info;
-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+#ifdef Q_OS_MACOS
     FILE *file;
     if (file = fopen(orig.absoluteFilePath().toUtf8().constData(), "r")) {
         fclose(file);
