@@ -46,7 +46,7 @@ void qAsConst(const T &&) Q_DECL_EQ_DELETE;
 //! @def KDB_SHARED_LIB_EXTENSION operating system-dependent extension for shared library files
 #if defined(Q_OS_WIN)
 #define KDB_SHARED_LIB_EXTENSION ".dll"
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_MACOS)
 // shared libraries indeed have a dylib extension on OS X, but most apps use .so for plugins
 #define KDB_SHARED_LIB_EXTENSION ".so"
 #else
