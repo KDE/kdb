@@ -5,21 +5,24 @@ include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
 project(KDb VERSION 3.0.2) # Update this
 
-include(KDbGenerateHeaders)
+# CMake
+include(CMakePackageConfigHelpers)
+include(GenerateExportHeader)
+
+# ECM
 include(ECMGeneratePriFile)
-include(ECMPackageConfigHelpers)
-include(ECMPoQmTools)
-include(ECMSetupVersion)
 include(ECMInstallIcons)
 include(ECMOptionalAddSubdirectory)
-
+include(ECMPoQmTools)
+include(ECMSetupVersion)
 include(KDEInstallDirs)
-include(KDEFrameworkCompilerSettings)
-include(KDECMakeSettings)
+include(KDECMakeSettings NO_POLICY_SCOPE)
+include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 
-include(GenerateExportHeader)
+# Own
 include(MacroLogFeature)
 include(KDbCreateSharedDataClasses)
+include(KDbGenerateHeaders)
 include(KDbMacros)
 
 # Dependencies
