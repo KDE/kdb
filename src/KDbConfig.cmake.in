@@ -1,6 +1,8 @@
 # KDbConfig.cmake provides information about the installed KDb library.
 # It can be used directly from CMake via find_package(KDb NO_MODULE)
 #
+# Any changes in this ".cmake" file will be overwritten by CMake, the source is the ".cmake.in" file.
+#
 # The following CMake variables are provided:
 #   KDb_VERSION_MAJOR - the major version number of KDb
 #   KDb_VERSION_MINOR - the minor version number of KDb
@@ -14,6 +16,8 @@
 # Provided features are available under KDB_* variables at the end of this file.
 
 @PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
 
 find_dependency(Qt5Core @REQUIRED_QT_VERSION@)
 find_dependency(Qt5Widgets @REQUIRED_QT_VERSION@)
