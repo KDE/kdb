@@ -99,8 +99,23 @@ KDbParseInfo::~KDbParseInfo()
 
 QList<int> KDbParseInfo::tablesAndAliasesForName(const QString &tableOrAliasName) const
 {
+    QList<int> result;
     const QList<int> *list = d->repeatedTablesAndAliases.value(tableOrAliasName);
-    return list ? *list : QList<int>();
+    if (list) {
+        result = *list;
+    }
+    if (result.isEmpty()) {
+        int position = d->querySchema->tablePositionForAlias(tableOrAliasName);
+        if (position == -1) {
+            position = d->querySchema->tablePosition(tableOrAliasName);
+            if (position != -1) {
+                result.append(position);
+            }
+        } else {
+            result.append(position);
+        }
+    }
+    return result;
 }
 
 KDbQuerySchema* KDbParseInfo::querySchema() const
