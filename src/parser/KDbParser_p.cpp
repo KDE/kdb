@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -22,6 +22,7 @@
 #include "KDbConnection.h"
 #include "KDbTableSchema.h"
 #include "KDbQuerySchema.h"
+#include "KDbQuerySchema_p.h"
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
 
@@ -465,7 +466,7 @@ KDbQuerySchema* buildSelectQuery(
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
                 return 0;
             }
-            querySchema->setWhereExpression(options->whereExpr);
+            KDbQuerySchema::Private::setWhereExpressionInternal(querySchema, options->whereExpr);
         }
         //----- ORDER BY
         if (options->orderByColumns) {

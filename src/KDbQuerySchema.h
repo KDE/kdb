@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -717,18 +717,36 @@ public:
         driver escaping. */
     KDbEscapedString autoIncrementSQLFieldsList(KDbConnection *conn) const;
 
-    /*! Sets a WHERE expression @a exp.
-     Previously set WHERE expression will be removed.
-     You can pass null expression (KDbExpression()) to remove existing WHERE expresssion. */
-    void setWhereExpression(const KDbExpression& expr);
+    /**
+     * @brief Sets a WHERE expression @a exp.
+     *
+     * Previously set WHERE expression will be removed. A null expression
+     * (KDbExpression()) can be passed to remove existing WHERE expresssion.
+     * @return @c false if @a expr is not a valid WHERE expression. validate() is called
+     * to check this. On failure the WHERE expression for this query is cleared. In this
+     * case a string pointed by @a errorMessage (if provided) is set to a general error
+     * message and a string pointed by @a errorDescription (if provided) is set to a
+     * detailed description of the error.
+     */
+    bool setWhereExpression(const KDbExpression &expr, QString *errorMessage = nullptr,
+                            QString *errorDescription = nullptr);
 
     /*! @return WHERE expression or 0 if this query has no WHERE expression */
     KDbExpression whereExpression() const;
 
-    /*! Adds a part to WHERE expression.
-     Simplifies creating of WHERE expression, if used instead
-     of setWhereExpression(KDbExpression *expr). */
-    void addToWhereExpression(KDbField *field, const QVariant& value, KDbToken relation = '=');
+    /**
+     * @brief Appends a part to WHERE expression.
+     *
+     * Simplifies creating of WHERE expression if used instead of setWhereExpression().
+     * @return @c false if the newly constructed WHERE expression is not valid.
+     * validate() is called to check this. On failure the WHERE expression for this query
+     * is left unchanged. In this case a string pointed by @a errorMessage (if provided)
+     * is set to a general error message and a string pointed by @a errorDescription
+     * (if provided) is set to a detailed description of the error.
+     */
+    bool addToWhereExpression(KDbField *field, const QVariant &value,
+                              KDbToken relation = '=', QString *errorMessage = nullptr,
+                              QString *errorDescription = nullptr);
 
     /*! Sets a list of columns for ORDER BY section of the query.
      Each name on the list must be a field or alias present within the query
@@ -760,14 +778,16 @@ public:
      * by the KDbParser.
      * Example :Let the query be "SELECT <fields> FROM <tables> WHERE <whereExpression>".
      * First each field from <fields> (@see fields()) is validated using
-     * KDbField::expression().validate(). Then the <whereExpression> (@see whereExpression())
+     * KDbField::expression().validate(). Then the <whereExpression> (@see
+     * whereExpression())
      * is validated using KDbExpression::validate().
      *
-     * On error, a string pointed by @a errorMessage is set to a general error message
-     * and a string pointed by @a errorDescription is set to a detailed description
-     * of the error. */
+     * On error a string pointed by @a errorMessage (if provided) is set to a general
+     * error message and a string pointed by @a errorDescription (if provided) is set to a
+     * detailed description of the error.
+     */
     //! @todo add tests
-    bool validate(QString *errorMessage, QString *errorDescription);
+    bool validate(QString *errorMessage = nullptr, QString *errorDescription = nullptr);
 
     class Private;
 
@@ -783,6 +803,10 @@ protected:
     //! and visibleFieldsExpanded(FieldsExpandedOptions options).
     KDbQueryColumnInfo::Vector fieldsExpandedInternal(FieldsExpandedOptions options,
                                                       bool onlyVisible) const;
+
+    /** Internal method used by a query parser.
+     */
+    void setWhereExpressionInternal(const KDbExpression &expr);
 
     Private * const d;
 };

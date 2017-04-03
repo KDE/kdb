@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -1529,13 +1529,44 @@ KDbEscapedString KDbQuerySchema::autoIncrementSQLFieldsList(KDbConnection *conn)
     return d->autoIncrementSQLFieldsList;
 }
 
-void KDbQuerySchema::setWhereExpression(const KDbExpression& expr)
+static void setResult(const KDbParseInfoInternal &parseInfo,
+                      QString *errorMessage, QString *errorDescription)
 {
-    d->whereExpr = expr.clone();
+    if (errorMessage) {
+        *errorMessage = parseInfo.errorMessage();
+    }
+    if (errorDescription) {
+        *errorDescription = parseInfo.errorDescription();
+    }
 }
 
-void KDbQuerySchema::addToWhereExpression(KDbField *field,
-                                          const QVariant& value, KDbToken relation)
+bool KDbQuerySchema::setWhereExpression(const KDbExpression &expr, QString *errorMessage,
+                                        QString *errorDescription)
+{
+    KDbExpression newWhereExpr = expr.clone();
+    KDbParseInfoInternal parseInfo(this);
+    QString tempErrorMessage;
+    QString tempErrorDescription;
+    QString *errorMessagePointer = errorMessage ? errorMessage : &tempErrorMessage;
+    QString *errorDescriptionPointer
+        = errorDescription ? errorDescription : &tempErrorDescription;
+    if (!newWhereExpr.validate(&parseInfo)) {
+        setResult(parseInfo, errorMessagePointer, errorDescription);
+        kdbWarning() << "message=" << *errorMessagePointer
+                     << "description=" << *errorDescriptionPointer;
+        kdbWarning() << newWhereExpr;
+        d->whereExpr = KDbExpression();
+        return false;
+    }
+    errorMessagePointer->clear();
+    errorDescriptionPointer->clear();
+    Private::setWhereExpressionInternal(this, newWhereExpr);
+    return true;
+}
+
+bool KDbQuerySchema::addToWhereExpression(KDbField *field, const QVariant &value,
+                                          KDbToken relation, QString *errorMessage,
+                                          QString *errorDescription)
 {
     KDbToken token;
     if (value.isNull()) {
@@ -1557,16 +1588,19 @@ void KDbQuerySchema::addToWhereExpression(KDbField *field,
         relation,
         KDbVariableExpression((field->table() ? (field->table()->name() + QLatin1Char('.')) : QString()) + field->name())
     );
-    if (d->whereExpr.isNull()) {
-        d->whereExpr = newExpr;
-    }
-    else {
-        d->whereExpr = KDbBinaryExpression(
+    const KDbExpression origWhereExpr = d->whereExpr;
+    if (!d->whereExpr.isNull()) {
+        newExpr = KDbBinaryExpression(
             d->whereExpr,
             KDbToken::AND,
             newExpr
         );
     }
+    const bool result = setWhereExpression(newExpr, errorMessage, errorDescription);
+    if (!result) { // revert, setWhereExpression() cleared it
+        d->whereExpr = origWhereExpr;
+    }
+    return result;
 }
 
 /*
@@ -1614,17 +1648,6 @@ QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
     QList<KDbQuerySchemaParameter> params;
     whereExpression().getQueryParameters(&params);
     return params;
-}
-
-static void setResult(const KDbParseInfoInternal &parseInfo,
-                      QString *errorMessage, QString *errorDescription)
-{
-    if (errorMessage) {
-        *errorMessage = parseInfo.errorMessage();
-    }
-    if (errorDescription) {
-        *errorDescription = parseInfo.errorDescription();
-    }
 }
 
 bool KDbQuerySchema::validate(QString *errorMessage, QString *errorDescription)
