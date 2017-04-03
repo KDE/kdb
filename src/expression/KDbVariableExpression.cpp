@@ -198,12 +198,12 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         return false;
     }
 
-    if (parseInfo->tablesAndAliasesForName(tableName).isEmpty()) {  //for sanity
+    const QList<int> positionsList(parseInfo->tablesAndAliasesForName(tableName));
+    if (positionsList.isEmpty()) {  //for sanity
         validateImplError(parseInfo,
             QString::fromLatin1("%1.%2, !positionsList ").arg(tableName, fieldName));
         return false;
     }
-    const QList<int> positionsList(parseInfo->tablesAndAliasesForName(tableName));
 
     //it's a table.*
     if (fieldName == QLatin1String("*")) {

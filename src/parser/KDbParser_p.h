@@ -88,6 +88,8 @@ public:
     ~KDbParseInfo();
 
     //! @return positions of tables/aliases having the same name @a tableOrAliasName.
+    //! First tries to use information provided by appendPositionForTableOrAliasName(),
+    //! then information from the query schema.
     QList<int> tablesAndAliasesForName(const QString &tableOrAliasName) const;
 
     //! @return query schema for this parsing

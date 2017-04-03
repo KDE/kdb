@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,6 +23,7 @@
 #include "KDbTableSchema.h"
 #include "KDbQueryAsterisk.h"
 #include "KDbQuerySchema.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbOrderByColumn.h"
 #include "kdb_debug.h"
 #include "generated/sqlparser.h"
@@ -100,8 +101,23 @@ KDbParseInfo::~KDbParseInfo()
 
 QList<int> KDbParseInfo::tablesAndAliasesForName(const QString &tableOrAliasName) const
 {
+    QList<int> result;
     const QList<int> *list = d->repeatedTablesAndAliases.value(tableOrAliasName);
-    return list ? *list : QList<int>();
+    if (list) {
+        result = *list;
+    }
+    if (result.isEmpty()) {
+        int position = d->querySchema->tablePositionForAlias(tableOrAliasName);
+        if (position == -1) {
+            position = d->querySchema->tablePosition(tableOrAliasName);
+            if (position != -1) {
+                result.append(position);
+            }
+        } else {
+            result.append(position);
+        }
+    }
+    return result;
 }
 
 KDbQuerySchema* KDbParseInfo::querySchema() const
@@ -467,7 +483,7 @@ KDbQuerySchema* buildSelectQuery(
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
                 return 0;
             }
-            querySchema->setWhereExpression(options->whereExpr);
+            KDbQuerySchema::Private::setWhereExpressionInternal(querySchema, options->whereExpr);
         }
         //----- ORDER BY
         if (options->orderByColumns) {

@@ -80,6 +80,12 @@ public:
         return columnPositionsForAliases.value(alias.toLower(), -1);
     }
 
+    //! Accessor for buildSelectQuery()
+    static void setWhereExpressionInternal(KDbQuerySchema *query, const KDbExpression &expr)
+    {
+        query->d->whereExpr = expr;
+    }
+
     KDbQuerySchema *query;
 
     /*! Master table of the query. (may be NULL)
