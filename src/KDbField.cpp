@@ -149,7 +149,7 @@ KDbField::KDbField(KDbQuerySchema *querySchema)
 KDbField::KDbField(const QString& name, Type type,
              Constraints constr, Options options, int maxLength, int precision,
              QVariant defaultValue, const QString& caption, const QString& description)
-        : m_parent(0)
+        : m_parent(nullptr)
         , m_name(name.toLower())
         , m_precision(precision)
         , m_visibleDecimalPlaces(-1)
@@ -158,7 +158,7 @@ KDbField::KDbField(const QString& name, Type type,
         , m_order(-1)
         , m_caption(caption)
         , m_desc(description)
-        , m_customProperties(0)
+        , m_customProperties(nullptr)
         , m_type(type)
 {
     m_expr = new KDbExpression();
@@ -194,14 +194,14 @@ KDbField* KDbField::copy() const
 
 void KDbField::init()
 {
-    m_parent = 0;
+    m_parent = nullptr;
     m_type = InvalidType;
     m_precision = 0;
     m_visibleDecimalPlaces = -1;
     m_options = NoOptions;
     m_defaultValue = QVariant(QString());
     m_order = -1;
-    m_customProperties = 0;
+    m_customProperties = nullptr;
     m_expr = new KDbExpression();
     setMaxLength(0); // do not move this line up!
     setMaxLengthStrategy(DefinedMaxLength); // do not move this line up!
@@ -736,7 +736,7 @@ void KDbField::setIndexed(bool s)
 
 QDebug operator<<(QDebug dbg, const KDbField& field)
 {
-    KDbConnection *conn = field.table() ? field.table()->connection() : 0;
+    KDbConnection *conn = field.table() ? field.table()->connection() : nullptr;
     if (field.name().isEmpty()) {
         dbg.nospace() << "<NONAME>";
     } else {

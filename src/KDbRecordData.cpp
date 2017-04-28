@@ -50,7 +50,7 @@ void KDbRecordData::clear()
         for (int i = 0; i < m_numCols; i++)
             free(m_data[i]);
         free(m_data);
-        m_data = 0;
+        m_data = nullptr;
         m_numCols = 0;
     }
 }

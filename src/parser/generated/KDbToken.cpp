@@ -28,7 +28,7 @@
 #include "parser/KDbParser_p.h"
 
 KDbToken::KDbToken(char charToken)
-    : v(g_tokenName(charToken) == 0 ? 0 : charToken)
+    : v(g_tokenName(charToken) == nullptr ? 0 : charToken)
 {
 }
 
@@ -104,7 +104,7 @@ QList<KDbToken> KDbToken::allTokens()
 {
     if (g_allTokens.isEmpty()) {
         for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
-            if (g_tokenName(i) != 0) {
+            if (g_tokenName(i)) {
                 g_allTokens.append(i);
             }
         }

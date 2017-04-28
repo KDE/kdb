@@ -62,7 +62,7 @@ public:
 
     //! Db-aware version.
     KDbTableViewColumn(const KDbQuerySchema &query, KDbQueryColumnInfo *aColumnInfo,
-                    KDbQueryColumnInfo *aVisibleLookupColumnInfo = 0);
+                    KDbQueryColumnInfo *aVisibleLookupColumnInfo = nullptr);
 
     virtual ~KDbTableViewColumn();
 

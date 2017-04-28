@@ -61,15 +61,15 @@ public:
     {
     }
     //! @return column name
-    inline QString name() Q_DECL_OVERRIDE {
+    inline QString name() override {
         return QString::fromUtf8(sqlite3_column_name(prepared_st, index));
     }
     //! @return column type
-    inline int type() Q_DECL_OVERRIDE {
+    inline int type() override {
         return sqlite3_column_type(prepared_st, index);
     }
     //! @return length limit - no limits for SQLite
-    inline int length() Q_DECL_OVERRIDE {
+    inline int length() override {
         return std::numeric_limits<int>::max();
     }
 private:
@@ -86,19 +86,19 @@ public:
     {
         Q_ASSERT(st);
     }
-    inline ~SqliteSqlRecord() {
+    inline ~SqliteSqlRecord() override {
     }
-    inline QString stringValue(int index) Q_DECL_OVERRIDE {
+    inline QString stringValue(int index) override {
         return QString::fromUtf8(
                         (const char*)sqlite3_column_text(prepared_st, index),
                         sqlite3_column_bytes(prepared_st, index));
     }
-    inline KDbSqlString cstringValue(int index) Q_DECL_OVERRIDE {
+    inline KDbSqlString cstringValue(int index) override {
         // sqlite3_column_text() returns UTF-8 but it's OK if the data is a C string
         return KDbSqlString((const char*)sqlite3_column_text(prepared_st, index),
                             sqlite3_column_bytes(prepared_st, index));
     }
-    inline QByteArray toByteArray(int index) Q_DECL_OVERRIDE {
+    inline QByteArray toByteArray(int index) override {
         return QByteArray((const char*)sqlite3_column_blob(prepared_st, index),
                           sqlite3_column_bytes(prepared_st, index));
     }
@@ -125,28 +125,28 @@ public:
         Q_ASSERT(c);
     }
 
-    inline ~SqliteSqlResult() {
+    inline ~SqliteSqlResult() override {
         // don't check result here, done elsewhere already
         (void)sqlite3_finalize(prepared_st);
     }
 
-    inline KDbConnection *connection() const Q_DECL_OVERRIDE {
+    inline KDbConnection *connection() const override {
         return conn;
     }
 
-    inline int fieldsCount() Q_DECL_OVERRIDE {
+    inline int fieldsCount() override {
         // We're using sqlite3_column_count instead of sqlite3_data_count to know
         // the column count before fetching. User will know if fetching succeeded anyway.
         return sqlite3_column_count(prepared_st);
     }
 
-    inline KDbSqlField *field(int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlField *field(int index) override Q_REQUIRED_RESULT {
         return prepared_st ? new SqliteSqlField(prepared_st, index) : nullptr;
     }
 
-    KDbField *createField(const QString &tableName, int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
         SqliteSqlRecord *record;
         const int res = sqlite3_step(prepared_st);
         if (res == SQLITE_ROW) {
@@ -157,7 +157,7 @@ public:
         return record;
     }
 
-    inline KDbResult lastResult() Q_DECL_OVERRIDE {
+    inline KDbResult lastResult() override {
         KDbResult res;
         const int err = sqlite3_errcode(conn->d->data);
         if (err != SQLITE_ROW && err != SQLITE_OK && err != SQLITE_DONE) {
@@ -168,7 +168,7 @@ public:
         return res;
     }
 
-    inline quint64 lastInsertRecordId() Q_DECL_OVERRIDE {
+    inline quint64 lastInsertRecordId() override {
         return static_cast<quint64>(sqlite3_last_insert_rowid(conn->d->data));
     }
 

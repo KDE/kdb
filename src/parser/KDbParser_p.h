@@ -163,7 +163,7 @@ bool addColumn(KDbParseInfo* parseInfo, KDbExpression* columnExpr);
 
 KDbQuerySchema* buildSelectQuery(
     KDbQuerySchema* querySchema, KDbNArgExpression* colViews,
-    KDbNArgExpression* tablesList = 0, SelectOptionsInternal * options = 0);
+    KDbNArgExpression* tablesList = nullptr, SelectOptionsInternal * options = nullptr);
 
 extern KDbParser *globalParser;
 extern KDbField *globalField;

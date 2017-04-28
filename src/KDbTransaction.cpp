@@ -55,7 +55,7 @@ KDbTransactionData::~KDbTransactionData()
 //---------------------------------------------------
 
 KDbTransaction::KDbTransaction()
-        : m_data(0)
+        : m_data(nullptr)
 {
 }
 
@@ -108,7 +108,7 @@ bool KDbTransaction::operator==(const KDbTransaction& trans) const
 
 KDbConnection* KDbTransaction::connection() const
 {
-    return m_data ? m_data->m_conn : 0;
+    return m_data ? m_data->m_conn : nullptr;
 }
 
 bool KDbTransaction::active() const
@@ -118,7 +118,7 @@ bool KDbTransaction::active() const
 
 bool KDbTransaction::isNull() const
 {
-    return m_data == 0;
+    return m_data == nullptr;
 }
 
 //---------------------------------------------------

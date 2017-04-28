@@ -55,7 +55,7 @@ public:
         m_collator = icu::Collator::createInstance(status);
         if (U_FAILURE(status)) {
             kdbWarning() << "Could not create instance of collator:" << status;
-            m_collator = 0;
+            m_collator = nullptr;
         } else {
             // enable normalization by default
             m_collator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
@@ -128,13 +128,13 @@ private:
         const QString &as = left.toString();
         const QString &bs = right.toString();
 
-        const QChar *a = as.isEmpty() ? 0 : as.unicode();
-        const QChar *b = bs.isEmpty() ? 0 : bs.unicode();
+        const QChar *a = as.isEmpty() ? nullptr : as.unicode();
+        const QChar *b = bs.isEmpty() ? nullptr : bs.unicode();
 
-        if (a == 0) {
-            return b != 0;
+        if (a == nullptr) {
+            return b != nullptr;
         }
-        if (a == b || b == 0) {
+        if (a == b || b == nullptr) {
             return false;
         }
 
@@ -174,7 +174,7 @@ public:
     LessThanFunctor()
             : m_ascendingOrder(true)
             , m_sortColumn(-1)
-            , m_lessThanFunction(0)
+            , m_lessThanFunction(nullptr)
     {
     }
 
@@ -246,7 +246,7 @@ public:
             , realSortColumn(0)
             , sortOrder(Qt::AscendingOrder)
             , type(1)
-            , pRecordEditBuffer(0)
+            , pRecordEditBuffer(nullptr)
             , readOnly(false)
             , insertingEnabled(true)
             , containsRecordIdInfo(false)
@@ -333,7 +333,7 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
     for (int i = 0;i < fieldCount;i++) {
         KDbQueryColumnInfo *ci = fields[i];
         if (ci->visible) {
-            KDbQueryColumnInfo *visibleLookupColumnInfo = 0;
+            KDbQueryColumnInfo *visibleLookupColumnInfo = nullptr;
             if (ci->indexForVisibleLookupValue() != -1) {
                 //Lookup field is defined
                 visibleLookupColumnInfo = d->cursor->query()->expandedOrInternalField(ci->indexForVisibleLookupValue());
@@ -401,12 +401,12 @@ void KDbTableViewData::init(
 void KDbTableViewData::init()
 {
     d->realColumnCount = 0;
-    d->cursor = 0;
+    d->cursor = nullptr;
 }
 
 void KDbTableViewData::deleteLater()
 {
-    d->cursor = 0;
+    d->cursor = nullptr;
     QObject::deleteLater();
 }
 
@@ -498,7 +498,7 @@ KDbTableViewColumn* KDbTableViewData::visibleColumn(int index)
 
 bool KDbTableViewData::isDBAware() const
 {
-    return d->cursor != 0;
+    return d->cursor != nullptr;
 }
 
 KDbCursor* KDbTableViewData::cursor() const
@@ -693,7 +693,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
     //-check if every NOT NULL and NOT EMPTY field is filled
     QList<KDbTableViewColumn*>::ConstIterator it_f(d->columns.constBegin());
     int col = 0;
-    const QVariant *pval = 0;
+    const QVariant *pval = nullptr;
     QVariant val;
     for (;it_f != d->columns.constEnd() && col < record->count();++it_f, ++col) {
         KDbField *f = (*it_f)->field();

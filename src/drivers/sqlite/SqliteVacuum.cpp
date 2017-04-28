@@ -46,10 +46,10 @@ void usleep(unsigned int usec)
 SqliteVacuum::SqliteVacuum(const QString& filePath)
         : m_filePath(filePath)
 {
-    m_dumpProcess = 0;
-    m_sqliteProcess = 0;
+    m_dumpProcess = nullptr;
+    m_sqliteProcess = nullptr;
     m_percent = 0;
-    m_dlg = 0;
+    m_dlg = nullptr;
     m_canceled = false;
 }
 
@@ -116,7 +116,7 @@ tristate SqliteVacuum::run()
     m_dumpProcess->start(dump_app, QStringList() << fi.absoluteFilePath());
     if (!m_dumpProcess->waitForStarted()) {
         delete m_dumpProcess;
-        m_dumpProcess = 0;
+        m_dumpProcess = nullptr;
         m_result.setCode(ERR_OTHER);
         return false;
     }
@@ -129,15 +129,15 @@ tristate SqliteVacuum::run()
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
     if (!m_sqliteProcess->waitForStarted()) {
         delete m_dumpProcess;
-        m_dumpProcess = 0;
+        m_dumpProcess = nullptr;
         delete m_sqliteProcess;
-        m_sqliteProcess = 0;
+        m_sqliteProcess = nullptr;
         m_result.setCode(ERR_OTHER);
         return false;
     }
 
     delete m_dlg;
-    m_dlg = new QProgressDialog(0); // krazy:exclude=qclasses
+    m_dlg = new QProgressDialog(nullptr); // krazy:exclude=qclasses
     m_dlg->setWindowTitle(tr("Compacting database"));
     m_dlg->setLabelText(
         QLatin1String("<qt>") + tr("Compacting database \"%1\"...")
@@ -155,7 +155,7 @@ tristate SqliteVacuum::run()
         cancelClicked();
     }
     delete m_dlg;
-    m_dlg = 0;
+    m_dlg = nullptr;
     while (m_dumpProcess->state() == QProcess::Running
            && m_sqliteProcess->state()  == QProcess::Running)
     {
@@ -226,7 +226,7 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
     if (!m_result.isError()) {
         const qint64 newSize = QFileInfo(m_filePath).size();
         const qint64 decrease = 100 - 100 * newSize / origSize;
-        QMessageBox::information(0, QString(), // krazy:exclude=qclasses
+        QMessageBox::information(nullptr, QString(), // krazy:exclude=qclasses
             tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
     }

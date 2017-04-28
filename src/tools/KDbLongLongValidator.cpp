@@ -90,7 +90,7 @@ void KDbLongLongValidator::fixup(QString &str) const
     if (! m_min && ! m_max)
         return;
 
-    val = str.toLongLong(0, m_base);
+    val = str.toLongLong(nullptr, m_base);
 
     if (val < m_min)
         val = m_min;

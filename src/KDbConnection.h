@@ -54,7 +54,7 @@ public:
      from driver's connections list.
      Note for driver developers: you should call destroy()
      from you KDbConnection's subclass destructor. */
-    virtual ~KDbConnection();
+    ~KDbConnection() override;
 
     /*! @return parameters that were used to create this connection. */
     KDbConnectionData data() const;
@@ -126,11 +126,12 @@ public:
      If @a kexiCompatible is true (the default) initial checks will be performed
      to recognize database Kexi-specific format. Set @a kexiCompatible to false
      if you're using native database (one that have no Kexi System tables).
-     For file-based drivers, @a dbName can be skipped, so the same as specified for KDbConnectionData is used.
+     For file-based drivers, @a dbName can be skipped, so the same as specified for
+    KDbConnectionData is used.
      @return true on success, false on failure.
      If user has cancelled this action and @a cancelled is not 0, *cancelled is set to true. */
-    bool useDatabase(const QString &dbName = QString(), bool kexiCompatible = true, bool *cancelled = 0,
-                     KDbMessageHandler* msgHandler = 0);
+    bool useDatabase(const QString &dbName = QString(), bool kexiCompatible = true,
+                     bool *cancelled = nullptr, KDbMessageHandler *msgHandler = nullptr);
 
     /*!
     @brief Closes currently used database for this connection.
@@ -160,7 +161,7 @@ public:
     If @a ok is not 0 then variable pointed by it will be set to the result.
     On error, the function returns empty list.
     @see kdbSystemTableNames() tableNames(int,bool*) */
-    QStringList objectNames(int objectType = KDb::AnyObjectType, bool* ok = 0);
+    QStringList objectNames(int objectType = KDb::AnyObjectType, bool* ok = nullptr);
 
     /*! @return names of all table schemas stored in currently
      used database. If @a alsoSystemTables is true,
@@ -170,7 +171,7 @@ public:
      If @a ok is not 0 then variable pointed by it will be set to the result.
      On error, the function returns empty list.
      @see kdbSystemTableNames() objectNames(int,bool*) */
-    QStringList tableNames(bool alsoSystemTables = false, bool* ok = 0);
+    QStringList tableNames(bool alsoSystemTables = false, bool* ok = nullptr);
 
     /*! @return true if table with name @a tableName exists in the database.
      @return @c false if it does not exist or @c cancelled if error occurred.
@@ -219,7 +220,7 @@ public:
      are returned.
      @see queryIds()
      */
-    QList<int> tableIds(bool* ok = 0);
+    QList<int> tableIds(bool* ok = nullptr);
 
     /*! @return ids of all database query schemas stored in currently
      used database. These ids can be later used as argument for querySchema().
@@ -234,7 +235,7 @@ public:
      are returned.
      @see tableIds()
      */
-    QList<int> queryIds(bool* ok = 0);
+    QList<int> queryIds(bool* ok = nullptr);
 
     /*! @return names of all schemas of object with @a objectType type
      that are stored in currently used database.
@@ -247,7 +248,7 @@ public:
      Only IDs of objects with names that are identifiers (checked using KDb::isIdentifier())
      are returned.
      @see tableIds() queryIds() */
-    QList<int> objectIds(int objectType, bool* ok = 0);
+    QList<int> objectIds(int objectType, bool* ok = nullptr);
 
     /*! @brief Creates new KDbTransaction handle and starts a new transaction.
      @return KDbTransaction object if transaction has been started
@@ -586,9 +587,11 @@ public:
 #undef H_INS_REC
 #undef A
 
-    bool insertRecord(KDbTableSchema* tableSchema, const QList<QVariant>& values, KDbSqlResult** result = 0);
+    bool insertRecord(KDbTableSchema *tableSchema, const QList<QVariant> &values,
+                      KDbSqlResult **result = nullptr);
 
-    bool insertRecord(KDbFieldList* fields, const QList<QVariant>& values, KDbSqlResult** result = 0);
+    bool insertRecord(KDbFieldList *fields, const QList<QVariant> &values,
+                      KDbSqlResult **result = nullptr);
 
     /*! Creates table defined by @a tableSchema.
      Schema information is also added into kexi system tables, for later reuse.
@@ -1004,8 +1007,8 @@ protected:
     /*! For implementation: opens existing database using connection
      @return true on success, false on failure; sets @a cancelled to true if this action
      has been cancelled. */
-    virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 KDbMessageHandler* msgHandler = 0) = 0;
+    virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = nullptr,
+                                 KDbMessageHandler *msgHandler = nullptr) = 0;
 
     /*! For implementation: closes previously opened database
       using connection. */

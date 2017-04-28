@@ -49,7 +49,7 @@ inline bool hasParent(QObject* par, QObject* o)
 
 //! @return parent object of @a o that is of type @a type or NULL if no such parent
 template<class type>
-inline type findParent(QObject* o, const char* className = 0)
+inline type findParent(QObject* o, const char* className = nullptr)
 {
     if (!o)
         return 0;

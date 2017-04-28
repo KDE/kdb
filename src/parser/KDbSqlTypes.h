@@ -66,7 +66,7 @@ struct OrderByColumnInternal {
 
 //! @internal
 struct SelectOptionsInternal {
-    SelectOptionsInternal() : orderByColumns(0) {}
+    SelectOptionsInternal() : orderByColumns(nullptr) {}
     ~SelectOptionsInternal() {
         delete orderByColumns; // delete because this is internal temp. structure
     }
@@ -81,13 +81,13 @@ public:
     inline KDbExpression toExpr() {
         KDbExpression exp(*e);
         delete e;
-        e = 0;
+        e = nullptr;
         return exp;
     }
     inline KDbNArgExpression toNArg() {
         KDbNArgExpression exp(e->toNArg());
         delete e;
-        e = 0;
+        e = nullptr;
         return exp;
     }
 //private:

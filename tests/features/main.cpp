@@ -46,11 +46,11 @@ bool db_name_required = true;
 KDbConnectionData conn_data;
 
 //! @todo IMPORTANT: replace QPointer<KDbConnection> conn;
-KDbConnection* conn = 0;
+KDbConnection* conn = nullptr;
 
 //! @todo IMPORTANT: replace QPointer<KDbDriver> driver;
 KDbDriver* driver;
-QApplication *app = 0;
+QApplication *app = nullptr;
 
 #include "dbcreation_test.h"
 #include "cursors_test.h"

@@ -28,11 +28,11 @@ class SqliteAdminTools : public KDbAdminTools
 {
 public:
     SqliteAdminTools();
-    virtual ~SqliteAdminTools();
+    ~SqliteAdminTools() override;
 
 #ifdef KDB_SQLITE_VACUUM
     /*! Performs vacuum (compacting) for connection @a conn. */
-    virtual bool vacuum(const KDbConnectionData& data, const QString& databaseName);
+    bool vacuum(const KDbConnectionData& data, const QString& databaseName) override;
 #endif
 private:
     Q_DISABLE_COPY(SqliteAdminTools)

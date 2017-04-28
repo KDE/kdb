@@ -187,7 +187,7 @@ static void icuLikeFunc(
     int nE= sqlite3_value_bytes(argv[2]);
     const unsigned char *zE = sqlite3_value_text(argv[2]);
     int i = 0;
-    if( zE==0 ) return;
+    if( zE==nullptr ) return;
     U8_NEXT(zE, i, nE, uEsc);
     if( i!=nE){
       sqlite3_result_error(context,
@@ -268,7 +268,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
     if( !zPattern ){
       return;
     }
-    pExpr = uregex_open(zPattern, -1, 0, 0, &status);
+    pExpr = uregex_open(zPattern, -1, 0, nullptr, &status);
 
     if( U_SUCCESS(status) ){
       sqlite3_set_auxdata(p, 0, pExpr, icuRegexpDelete);
@@ -298,7 +298,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   ** leaving the regular expression object configured with an invalid
   ** pointer after this function returns.
   */
-  uregex_setText(pExpr, 0, 0, &status);
+  uregex_setText(pExpr, nullptr, 0, &status);
 
   /* Return 1 or 0. */
   sqlite3_result_int(p, res ? 1 : 0);
@@ -337,7 +337,7 @@ static void icuCaseFunc16(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   int nOutput;
 
   UErrorCode status = U_ZERO_ERROR;
-  const unsigned char *zLocale = 0;
+  const unsigned char *zLocale = nullptr;
 
   assert(nArg==1 || nArg==2);
   if( nArg==2 ){
@@ -462,20 +462,20 @@ KDB_SQLITE_ICU_EXPORT int sqlite3IcuInit(sqlite3 *db){
     void *pContext;                           /* sqlite3_user_data() context */
     void (*xFunc)(sqlite3_context*,int,sqlite3_value**);
   } scalars[] = {
-    {"regexp", 2, SQLITE_ANY,          0, icuRegexpFunc},
+    {"regexp", 2, SQLITE_ANY,          nullptr, icuRegexpFunc},
 
-    {"lower",  1, SQLITE_UTF16,        0, icuCaseFunc16},
-    {"lower",  2, SQLITE_UTF16,        0, icuCaseFunc16},
+    {"lower",  1, SQLITE_UTF16,        nullptr, icuCaseFunc16},
+    {"lower",  2, SQLITE_UTF16,        nullptr, icuCaseFunc16},
     {"upper",  1, SQLITE_UTF16, (void*)1, icuCaseFunc16},
     {"upper",  2, SQLITE_UTF16, (void*)1, icuCaseFunc16},
 
-    {"lower",  1, SQLITE_UTF8,         0, icuCaseFunc16},
-    {"lower",  2, SQLITE_UTF8,         0, icuCaseFunc16},
+    {"lower",  1, SQLITE_UTF8,         nullptr, icuCaseFunc16},
+    {"lower",  2, SQLITE_UTF8,         nullptr, icuCaseFunc16},
     {"upper",  1, SQLITE_UTF8,  (void*)1, icuCaseFunc16},
     {"upper",  2, SQLITE_UTF8,  (void*)1, icuCaseFunc16},
 
-    {"like",   2, SQLITE_UTF8,         0, icuLikeFunc},
-    {"like",   3, SQLITE_UTF8,         0, icuLikeFunc},
+    {"like",   2, SQLITE_UTF8,         nullptr, icuLikeFunc},
+    {"like",   3, SQLITE_UTF8,         nullptr, icuLikeFunc},
 
     {"icu_load_collation",  2, SQLITE_UTF8, (void*)db, icuLoadCollation},
   };
@@ -486,7 +486,7 @@ KDB_SQLITE_ICU_EXPORT int sqlite3IcuInit(sqlite3 *db){
   for(i=0; rc==SQLITE_OK && i<(int)(sizeof(scalars)/sizeof(scalars[0])); i++){
     struct IcuScalar *p = &scalars[i];
     rc = sqlite3_create_function(
-        db, p->zName, p->nArg, p->enc, p->pContext, p->xFunc, 0, 0
+        db, p->zName, p->nArg, p->enc, p->pContext, p->xFunc, nullptr, nullptr
     );
   }
 

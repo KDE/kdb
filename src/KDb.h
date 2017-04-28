@@ -125,7 +125,7 @@ inline bool deleteAllRecords(KDbConnection* conn, const KDbTableSchema &table)
  ROWID's value will be assigned back to @a recordId if this pointer is not null.
 */
 KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbSqlResult *result,
-    const QString& autoIncrementFieldName, const QString& tableName, quint64* recordId = 0);
+    const QString& autoIncrementFieldName, const QString& tableName, quint64* recordId = nullptr);
 
 /*! @overload int lastInsertedAutoIncValue(KDbSqlResult *, const QString&, const QString&, quint64*)
  * Accepts @a recordId that can be obtained from KDbPreparedStatement::lastInsertRecordId()
@@ -137,7 +137,7 @@ KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbConnection *conn, const quint64 r
 /*! @overload int lastInsertedAutoIncValue(KDbSqlResult *, const QString&, const QString&, quint64*)
 */
 inline quint64 lastInsertedAutoIncValue(KDbSqlResult *result,
-    const QString& autoIncrementFieldName, const KDbTableSchema& table, quint64* recordId = 0)
+    const QString& autoIncrementFieldName, const KDbTableSchema& table, quint64* recordId = nullptr)
 {
     return lastInsertedAutoIncValue(result, autoIncrementFieldName, table.name(), recordId);
 }
@@ -521,7 +521,7 @@ KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length = -1);
  Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
  See BLOBEscapeXHex. */
-KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *ok = 0);
+KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *ok = nullptr);
 
 /*! @return byte array converted from @a data of length @a length.
  If @a length is negative, the data is assumed to point to a null-terminated string
@@ -530,11 +530,11 @@ KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *o
  Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
  See BLOBEscape0xHex. */
-KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length = -1, bool *ok = 0);
+KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length = -1, bool *ok = nullptr);
 
 /*! @return int list converted from string list.
    If @a ok is not 0, *ok is set to result of the conversion. */
-KDB_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok = 0);
+KDB_EXPORT QList<int> stringListToIntList(const QStringList &list, bool *ok = nullptr);
 
 /*! @return string converted from list @a list.
    Separators are ',' characters, "," and "\\" are escaped.

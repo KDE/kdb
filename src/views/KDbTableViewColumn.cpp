@@ -39,12 +39,12 @@ class KDbTableViewColumn::Private
 {
 public:
   Private()
-      : data(0)
-      , validator(0)
-      , relatedData(0)
-      , field(0)
-      , columnInfo(0)
-      , visibleLookupColumnInfo(0)
+      : data(nullptr)
+      , validator(nullptr)
+      , relatedData(nullptr)
+      , field(nullptr)
+      , columnInfo(nullptr)
+      , visibleLookupColumnInfo(nullptr)
       , width(0)
       , readOnly(false)
       , visible(true)
@@ -173,7 +173,7 @@ KDbTableViewColumn::~KDbTableViewColumn()
 {
     if (d->fieldOwned)
         delete d->field;
-    setValidator(0);
+    setValidator(nullptr);
     delete d->relatedData;
     delete d;
 }
@@ -198,7 +198,7 @@ void KDbTableViewColumn::setRelatedData(KDbTableViewData *data)
         return;
     if (d->relatedData)
         delete d->relatedData;
-    d->relatedData = 0;
+    d->relatedData = nullptr;
     if (!data)
         return;
     //find a primary key

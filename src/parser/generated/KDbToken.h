@@ -64,11 +64,11 @@ public:
     //! For example "<>" is returned for the NOT_EQUAL token.
     //! Empty string is returned for an invalid string
     //! The result may depend on the optional @a driver parameter.
-    //! If @a driver is 0, representation for portable KDbSQL dialect is returned.
-    QString toString(const KDbDriver *driver = 0) const;
+    //! If @a driver is @c nullptr, representation for portable KDbSQL dialect is returned.
+    QString toString(const KDbDriver *driver = nullptr) const;
 
     //! Like toString(const KDbDriver *driver)
-    static QString toString(KDbToken token, const KDbDriver *driver = 0);
+    static QString toString(KDbToken token, const KDbDriver *driver = nullptr);
 
     //! Maximum character token value (253)
     static const int maxCharTokenValue;
@@ -78,7 +78,7 @@ public:
 
     //! @return character equivalent of this token
     //! Only character-based tokens are supported this way (toInt() <= maxCharTokenValue).
-    //! For unsupported tokens 0 is returned.
+    //! For unsupported tokens @c nullptr is returned.
     inline char toChar() const { return v <= maxCharTokenValue ? v : 0; }
 
     //! @return numeric value of this token

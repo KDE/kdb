@@ -43,7 +43,7 @@ public:
     typedef QList<KDbQueryColumnInfo*>::ConstIterator ListIterator;
 
     KDbQueryColumnInfo(KDbField *f, const QString& _alias, bool _visible,
-                       KDbQueryColumnInfo *foreignColumn = 0);
+                       KDbQueryColumnInfo *foreignColumn = nullptr);
     ~KDbQueryColumnInfo();
 
     //! @return alias if it is not empty, field's name otherwise.

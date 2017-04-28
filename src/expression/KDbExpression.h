@@ -121,8 +121,9 @@ public:
      of a query parameter (used in QueryParameterExpr).
      The result may depend on the optional @a driver parameter.
      If @a driver is 0, representation for portable KDbSQL dialect is returned. */
-    KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = 0,
-                              KDb::ExpressionCallStack* callStack = 0) const;
+    KDbEscapedString toString(const KDbDriver *driver,
+                              KDbQuerySchemaParameterValueListIterator *params = nullptr,
+                              KDb::ExpressionCallStack *callStack = nullptr) const;
 
     /*! Collects query parameters (messages and types) recursively and saves them to @a params.
      The leaf nodes are objects of QueryParameterExpr class.
@@ -223,7 +224,7 @@ public:
     KDbNArgExpression(const KDbNArgExpression& expr);
 
     //! Destroys the expression.
-    virtual ~KDbNArgExpression();
+    ~KDbNArgExpression() override;
 
     //! Inserts expression argument @a expr at the end of this expression.
     void append(const KDbExpression& expr);
@@ -310,7 +311,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbUnaryExpression(const KDbUnaryExpression& expr);
 
-    virtual ~KDbUnaryExpression();
+    ~KDbUnaryExpression() override;
 
     //! @return expression that is argument for this unary expression
     KDbExpression arg() const;
@@ -351,7 +352,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbBinaryExpression(const KDbBinaryExpression& expr);
 
-    virtual ~KDbBinaryExpression();
+    ~KDbBinaryExpression() override;
 
     KDbExpression left() const;
 
@@ -396,7 +397,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbConstExpression(const KDbConstExpression& expr);
 
-    virtual ~KDbConstExpression();
+    ~KDbConstExpression() override;
 
     QVariant value() const;
 
@@ -429,7 +430,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbQueryParameterExpression(const KDbQueryParameterExpression& expr);
 
-    virtual ~KDbQueryParameterExpression();
+    ~KDbQueryParameterExpression() override;
 
     /*! Sets expected type of the parameter. The default is String.
      This method is called from parent's expression validate().
@@ -462,7 +463,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbVariableExpression(const KDbVariableExpression& expr);
 
-    virtual ~KDbVariableExpression();
+    ~KDbVariableExpression() override;
 
     /*! Verbatim name as returned by scanner. */
     QString name() const;
@@ -481,9 +482,9 @@ public:
      Only meaningful for column expressions within a query. */
     int tablePositionForField() const;
 
-    /*! 0 by default. After successful validate() it returns table that
+    /*! @c nullptr by default. After successful validate() it returns table that
      is referenced by asterisk, i.e. "*.tablename".
-     It is 0 if this variable is not an asterisk of that form. */
+     It is @c nullptr if this variable is not an asterisk of that form. */
     KDbTableSchema *tableForQueryAsterisk() const;
 
 protected:
@@ -515,7 +516,7 @@ public:
      Resulting object is not a deep copy but rather a reference to the object @a expr. */
     KDbFunctionExpression(const KDbFunctionExpression& expr);
 
-    virtual ~KDbFunctionExpression();
+    ~KDbFunctionExpression() override;
 
     //! @return name of the function.
     QString name() const;

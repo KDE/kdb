@@ -176,11 +176,11 @@ cat << EOF >> generated/KDbToken.h
     //! For example "<>" is returned for the NOT_EQUAL token.
     //! Empty string is returned for an invalid string
     //! The result may depend on the optional @a driver parameter.
-    //! If @a driver is 0, representation for portable KDbSQL dialect is returned.
-    QString toString(const KDbDriver *driver = 0) const;
+    //! If @a driver is @c nullptr, representation for portable KDbSQL dialect is returned.
+    QString toString(const KDbDriver *driver = nullptr) const;
 
     //! Like toString(const KDbDriver *driver)
-    static QString toString(KDbToken token, const KDbDriver *driver = 0);
+    static QString toString(KDbToken token, const KDbDriver *driver = nullptr);
 
     //! Maximum character token value (253)
     static const int maxCharTokenValue;
@@ -190,7 +190,7 @@ cat << EOF >> generated/KDbToken.h
 
     //! @return character equivalent of this token
     //! Only character-based tokens are supported this way (toInt() <= maxCharTokenValue).
-    //! For unsupported tokens 0 is returned.
+    //! For unsupported tokens @c nullptr is returned.
     inline char toChar() const { return v <= maxCharTokenValue ? v : 0; }
 
     //! @return numeric value of this token
@@ -282,7 +282,7 @@ cat << EOF > generated/KDbToken.cpp
 #include "parser/KDbParser_p.h"
 
 KDbToken::KDbToken(char charToken)
-    : v(g_tokenName(charToken) == 0 ? 0 : charToken)
+    : v(g_tokenName(charToken) == nullptr ? 0 : charToken)
 {
 }
 
@@ -358,7 +358,7 @@ QList<KDbToken> KDbToken::allTokens()
 {
     if (g_allTokens.isEmpty()) {
         for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
-            if (g_tokenName(i) != 0) {
+            if (g_tokenName(i)) {
                 g_allTokens.append(i);
             }
         }

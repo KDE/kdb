@@ -173,7 +173,7 @@ public:
 
     /*! Constructs message handler, @a parent is a widget that will be a parent
      for displaying gui elements (e.g. message boxes). Can be 0 for non-gui usage. */
-    explicit KDbMessageHandler(QWidget *parent = 0);
+    explicit KDbMessageHandler(QWidget *parent = nullptr);
 
     virtual ~KDbMessageHandler();
 
@@ -220,8 +220,8 @@ public:
             const KDbGuiItem &buttonYes = KDbGuiItem(),
             const KDbGuiItem &buttonNo = KDbGuiItem(),
             const QString &dontShowAskAgainName = QString(),
-            KDbMessageHandler::Options options = 0,
-            KDbMessageHandler* msgHandler = 0);
+            KDbMessageHandler::Options options = nullptr,
+            KDbMessageHandler* msgHandler = nullptr);
 
     //! @return message redirection for this handler or 0 if there is no redirection.
     KDbMessageHandler* redirection();

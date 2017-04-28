@@ -95,7 +95,7 @@ KDbConnection* xBaseDriver::drv_createConnection(const KDbConnectionData& connDa
                                                  const KDbConnectionOptions &options)
 {
     if ( !dp->internalDriver ) {
-        return 0;
+        return nullptr;
     }
     return new xBaseConnection(this, dp->internalDriver, connData, options);
 }

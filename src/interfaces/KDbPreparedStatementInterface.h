@@ -32,7 +32,7 @@ class KDB_EXPORT KDbPreparedStatementInterface : public KDbResultable
 {
 protected:
     KDbPreparedStatementInterface() {}
-    virtual ~KDbPreparedStatementInterface() {}
+    ~KDbPreparedStatementInterface() override {}
 
     /*! For implementation. Initializes the prepared statement in a backend-dependent way
         using recently generated @a sql statement.

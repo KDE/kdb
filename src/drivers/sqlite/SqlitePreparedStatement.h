@@ -31,17 +31,17 @@ class SqlitePreparedStatement : public KDbPreparedStatementInterface, public Sql
 public:
     explicit SqlitePreparedStatement(SqliteConnectionInternal* conn);
 
-    virtual ~SqlitePreparedStatement();
+    ~SqlitePreparedStatement() override;
 
 protected:
-    virtual bool prepare(const KDbEscapedString& sql);
+    bool prepare(const KDbEscapedString& sql) override;
 
-    virtual KDbSqlResult* execute(
+    KDbSqlResult* execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters,
-        bool *resultOwned) Q_REQUIRED_RESULT;
+        bool *resultOwned) override Q_REQUIRED_RESULT;
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 

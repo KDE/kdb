@@ -235,7 +235,7 @@ protected:
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     KDbCursor(KDbConnection* conn, KDbQuerySchema* query, int options = NoOptions);
 
-    virtual ~KDbCursor();
+    ~KDbCursor() override;
 
     void init(KDbConnection* conn);
 

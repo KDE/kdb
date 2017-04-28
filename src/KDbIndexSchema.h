@@ -69,7 +69,7 @@ public:
      are destroyed (these are also detached from
      detail-side indices before destruction).
      KDbRelationship objects listed in detailsRelationships() are not touched. */
-    virtual ~KDbIndexSchema();
+    ~KDbIndexSchema() override;
 
     /*! Adds field at the end of field list.
      KDbField will not be owned by index. KDbField must belong to a table

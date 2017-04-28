@@ -44,9 +44,9 @@ class KDB_EXPORT KDbValidator : public QValidator
 public:
     enum Result { Error = 0, Ok = 1, Warning = 2 };
 
-    explicit KDbValidator(QObject *parent = 0);
+    explicit KDbValidator(QObject *parent = nullptr);
 
-    virtual ~KDbValidator();
+    ~KDbValidator() override;
 
     /*! Sets accepting empty values on (true) or off (false).
      By default the validator does not accepts empty values. */
@@ -69,7 +69,7 @@ public:
                  QString *details);
 
     /*! This implementation always returns value QValidator::Acceptable. */
-    virtual QValidator::State validate(QString & input, int & pos) const;
+    QValidator::State validate(QString &input, int &pos) const override;
 
     //! A generic error/warning message "... value has to be entered."
     static const QString messageColumnNotEmpty();
@@ -121,14 +121,14 @@ class KDB_EXPORT KDbMultiValidator : public KDbValidator
 public:
     /*! Constructs multivalidator with no subvalidators defined.
      You can add more validators with addSubvalidator(). */
-    explicit KDbMultiValidator(QObject *parent = 0);
+    explicit KDbMultiValidator(QObject *parent = nullptr);
 
     /*! Constructs multivalidator with one validator @a validator.
      It will be owned if has no parent defined.
      You can add more validators with addSubvalidator(). */
-    explicit KDbMultiValidator(QValidator *validator, QObject *parent = 0);
+    explicit KDbMultiValidator(QValidator *validator, QObject *parent = nullptr);
 
-    ~KDbMultiValidator();
+    ~KDbMultiValidator() override;
 
     /*! Adds validator @a validator as another subvalidator.
      Subvalidator will be owned by this multivalidator if @a owned is true
@@ -136,17 +136,16 @@ public:
     void addSubvalidator(QValidator* validator, bool owned = true);
 
     /*! Reimplemented to call validate() on subvalidators. */
-    virtual QValidator::State validate(QString & input, int & pos) const;
+    QValidator::State validate(QString &input, int &pos) const override;
 
     /*! Calls QValidator::fixup() on every subvalidator.
      This may be senseless to use this methog in certain cases
      (can return weir results), so think twice before.. */
-    virtual void fixup(QString & input) const;
+    void fixup(QString &input) const override;
 
 private:
-    virtual KDbValidator::Result internalCheck(
-        const QString &valueName, const QVariant& value,
-        QString *message, QString *details);
+    KDbValidator::Result internalCheck(const QString &valueName, const QVariant &value,
+                                       QString *message, QString *details) override;
 
     class Private;
     Private* const d;

@@ -35,7 +35,7 @@
 #include "../tests/features/tables_test_p.h"
 
 KDbTestUtils::KDbTestUtils()
-    : connection(0)
+    : connection(nullptr)
 {
     QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
 }

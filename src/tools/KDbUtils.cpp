@@ -169,7 +169,7 @@ void* KDbUtils::stringToPointerInternal(const QString& string, int size)
 class StaticSetOfStrings::Private
 {
 public:
-    Private() : array(0), set(0) {}
+    Private() : array(nullptr), set(nullptr) {}
     ~Private() {
         delete set;
     }
@@ -196,13 +196,13 @@ StaticSetOfStrings::~StaticSetOfStrings()
 void StaticSetOfStrings::setStrings(const char* const array[])
 {
     delete d->set;
-    d->set = 0;
+    d->set = nullptr;
     d->array = array;
 }
 
 bool StaticSetOfStrings::isEmpty() const
 {
-    return d->array == 0;
+    return d->array == nullptr;
 }
 
 bool StaticSetOfStrings::contains(const QByteArray& string) const

@@ -55,7 +55,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
         r = 1;
     }
     delete q;
-    q = 0;
+    q = nullptr;
 
 
     if (!conn->closeDatabase()) {

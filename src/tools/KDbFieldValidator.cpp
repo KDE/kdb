@@ -35,7 +35,7 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
 //! @todo handle input mask (via QLineEdit::setInputMask()
     const KDbField::Type t = field.type(); // cache: evaluating type of expressions can be expensive
     if (KDbField::isIntegerType(t)) {
-        QValidator *validator = 0;
+        QValidator *validator = nullptr;
         const bool u = field.isUnsigned();
         int bottom = 0, top = 0;
         if (t == KDbField::Byte) {
@@ -49,24 +49,24 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
             top = u ? 0xffffffff : 0x7fffffff;
         } else if (t == KDbField::BigInteger) {
 //! @todo handle unsigned (using ULongLongValidator)
-            validator = new KDbLongLongValidator(0);
+            validator = new KDbLongLongValidator(nullptr);
         }
 
         if (!validator)
-            validator = new QIntValidator(bottom, top, 0); //the default
+            validator = new QIntValidator(bottom, top, nullptr); //the default
         addSubvalidator(validator);
     } else if (KDbField::isFPNumericType(t)) {
         QValidator *validator;
         if (t == KDbField::Float) {
             if (field.isUnsigned()) //ok?
-                validator = new QDoubleValidator(0, 3.4e+38, field.scale(), 0);
+                validator = new QDoubleValidator(0, 3.4e+38, field.scale(), nullptr);
             else
-                validator = new QDoubleValidator((QObject*)0);
+                validator = new QDoubleValidator((QObject*)nullptr);
         } else {//double
             if (field.isUnsigned()) //ok?
-                validator = new QDoubleValidator(0, 1.7e+308, field.scale(), 0);
+                validator = new QDoubleValidator(0, 1.7e+308, field.scale(), nullptr);
             else
-                validator = new QDoubleValidator((QObject*)0);
+                validator = new QDoubleValidator((QObject*)nullptr);
         }
         addSubvalidator(validator);
     } else if (t == KDbField::Date) {
@@ -78,7 +78,7 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
     } else if (t == KDbField::DateTime) {
     } else if (t == KDbField::Boolean) {
 //! @todo add BooleanValidator
-        addSubvalidator(new QIntValidator(0, 1, 0));
+        addSubvalidator(new QIntValidator(0, 1, nullptr));
     }
 }
 

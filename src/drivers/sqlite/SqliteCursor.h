@@ -33,18 +33,18 @@ class SqliteConnection;
 class SqliteCursor : public KDbCursor
 {
 public:
-    virtual ~SqliteCursor();
-    virtual QVariant value(int i);
+    ~SqliteCursor() override;
+    QVariant value(int i) override;
 
     /*! [PROTOTYPE] @return internal buffer data. */
 //! @todo virtual const char *** bufferData()
     /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
-    virtual const char ** recordData() const;
+    const char ** recordData() const override;
 
-    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
+    bool drv_storeCurrentRecord(KDbRecordData* data) const override;
 
     //! Implemented for KDbResultable
-    virtual QString serverResultName() const;
+    QString serverResultName() const override;
 
 protected:
     /*! KDbCursor will operate on @a conn, raw @a sql statement will be used to execute query. */
@@ -54,22 +54,22 @@ protected:
     SqliteCursor(SqliteConnection* conn, KDbQuerySchema* query,
                  int options = NoOptions);
 
-    virtual bool drv_open(const KDbEscapedString& sql);
+    bool drv_open(const KDbEscapedString& sql) override;
 
-    virtual bool drv_close();
-    virtual void drv_getNextRecord();
+    bool drv_close() override;
+    void drv_getNextRecord() override;
 
-    virtual void drv_appendCurrentRecordToBuffer();
-    virtual void drv_bufferMovePointerNext();
-    virtual void drv_bufferMovePointerPrev();
-    virtual void drv_bufferMovePointerTo(qint64 at);
+    void drv_appendCurrentRecordToBuffer() override;
+    void drv_bufferMovePointerNext() override;
+    void drv_bufferMovePointerPrev() override;
+    void drv_bufferMovePointerTo(qint64 at) override;
 
 //! @todo virtual void drv_storeCurrentRecord();
 
     //PROTOTYPE:
     /*! Method called when cursor's buffer need to be cleared
       (only for buffered cursor type), eg. in close(). */
-    virtual void drv_clearBuffer();
+    void drv_clearBuffer() override;
 
     void storeResult();
 

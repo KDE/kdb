@@ -54,7 +54,7 @@ bool xBaseConnection::drv_disconnect() {
 KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, int cursor_options)
 {
   if ( !d->internalConn ) {
-    return 0;
+    return nullptr;
   }
   KDbCursor* internalCursor = d->internalConn->prepareQuery(sql,cursor_options);
   return new xBaseCursor( this, internalCursor, sql, cursor_options );
@@ -62,7 +62,7 @@ KDbCursor* xBaseConnection::prepareQuery(const KDbEscapedString& sql, int cursor
 
 KDbCursor* xBaseConnection::prepareQuery(KDbQuerySchema* query, int cursor_options) {
   if ( !d->internalConn ) {
-    return 0;
+    return nullptr;
   }
   KDbCursor* internalCursor = d->internalConn->prepareQuery(query, cursor_options);
   return new xBaseCursor( this, internalCursor, query, cursor_options );
@@ -163,7 +163,7 @@ bool xBaseConnection::drv_getTablesList(QStringList* list)
 KDbPreparedStatementInterface* xBaseConnection::prepareStatementInternal()
 {
     if ( !d->internalConn )
-        return 0;
+        return nullptr;
 //! @todo   return new XBasePreparedStatement(*d);
-        return 0;
+        return nullptr;
 }

@@ -128,7 +128,7 @@ class CoalesceFunctionDeclaration : public BuiltInFunctionDeclaration
 {
 public:
     CoalesceFunctionDeclaration() {}
-    virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
+    KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const override {
         Q_UNUSED(parseInfo);
         // Find type
         //! @todo Most likely but can be also other type
@@ -165,7 +165,7 @@ class MinMaxFunctionDeclaration : public BuiltInFunctionDeclaration
     Q_DECLARE_TR_FUNCTIONS(MinMaxFunctionDeclaration)
 public:
     MinMaxFunctionDeclaration() {}
-    virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
+    KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const override {
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         if (argsData->children.isEmpty()) {
             return KDbField::Null;
@@ -274,7 +274,7 @@ class RandomFunctionDeclaration : public BuiltInFunctionDeclaration
     Q_DECLARE_TR_FUNCTIONS(RandomFunctionDeclaration)
 public:
     RandomFunctionDeclaration() {}
-    virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
+    KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const override {
         Q_UNUSED(parseInfo);
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         if (argsData->children.isEmpty()) {
@@ -339,7 +339,7 @@ class CeilingFloorFunctionDeclaration : public BuiltInFunctionDeclaration
 {
 public:
     CeilingFloorFunctionDeclaration() {}
-    virtual KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const {
+    KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const override {
         Q_UNUSED(parseInfo);
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         if (argsData->children.count() == 1) {
@@ -420,7 +420,7 @@ BuiltInFunctions::BuiltInFunctions()
 #define _SIG0 \
     decl->signatures.push_back(sig0)
 
-    static int* sig0[] = { 0 };
+    static int* sig0[] = { nullptr };
 
     insert(QLatin1String("ABS"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
@@ -919,7 +919,7 @@ KDbField::Type KDbFunctionExpressionData::typeInternal(KDb::ExpressionCallStack*
     Q_UNUSED(callStack);
     const BuiltInFunctionDeclaration *decl = _builtInFunctions->value(name);
     if (decl) {
-        return decl->returnType(this, 0);
+        return decl->returnType(this, nullptr);
     }
     //! @todo
     return KDbField::InvalidType;
@@ -1161,7 +1161,7 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
     std::vector<int> argCounts;
     int i = 0;
     argCounts.resize(decl->signatures.size());
-    int **signature = 0;
+    int **signature = nullptr;
     bool multipleArgs = false; // special case, e.g. for CHARS(v1, ... vN)
     for(std::vector<int**>::const_iterator it(decl->signatures.begin());
         it != decl->signatures.end(); ++it, ++i)

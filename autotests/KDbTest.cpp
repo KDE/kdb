@@ -639,11 +639,11 @@ void KDbTest::testUnescapeStringHelper(const QString &sequenceString, const QStr
     if (quote == 0) { // both cases
         COMPARE(KDb::unescapeString(sequenceString, '\'', &actualErrorPosition), resultString);
         COMPARE(actualErrorPosition, errorPosition);
-        COMPARE(KDb::unescapeString(sequenceString, '\'', 0), resultString);
+        COMPARE(KDb::unescapeString(sequenceString, '\'', nullptr), resultString);
 
         COMPARE(KDb::unescapeString(sequenceString, '"', &actualErrorPosition), resultString);
         COMPARE(actualErrorPosition, errorPosition);
-        COMPARE(KDb::unescapeString(sequenceString, '"', 0), resultString);
+        COMPARE(KDb::unescapeString(sequenceString, '"', nullptr), resultString);
     } else {
         if (quote != '\'' && quote != '"') {
             resultString.clear();
@@ -651,7 +651,7 @@ void KDbTest::testUnescapeStringHelper(const QString &sequenceString, const QStr
         }
         COMPARE(KDb::unescapeString(sequenceString, quote, &actualErrorPosition), resultString);
         COMPARE(actualErrorPosition, errorPosition);
-        COMPARE(KDb::unescapeString(sequenceString, quote, 0), resultString);
+        COMPARE(KDb::unescapeString(sequenceString, quote, nullptr), resultString);
     }
 #undef CHECK_POS
 }
@@ -710,7 +710,7 @@ void KDbTest::testEscapeBLOB()
 
 void KDbTest::testPgsqlByteaToByteArray()
 {
-    QCOMPARE(KDb::pgsqlByteaToByteArray(0, 0), QByteArray());
+    QCOMPARE(KDb::pgsqlByteaToByteArray(nullptr, 0), QByteArray());
     QCOMPARE(KDb::pgsqlByteaToByteArray("", 0), QByteArray());
     QCOMPARE(KDb::pgsqlByteaToByteArray(" ", 0), QByteArray());
     QCOMPARE(KDb::pgsqlByteaToByteArray("\\101"), QByteArray("A"));
@@ -751,7 +751,7 @@ void KDbTest::testXHexToByteArray()
     bool actualOk;
     QCOMPARE(KDb::xHexToByteArray(data.constData(), length == -1 ? data.length() : length, &actualOk), result);
     QCOMPARE(actualOk, ok);
-    QCOMPARE(KDb::xHexToByteArray(data.constData(), length, 0), result);
+    QCOMPARE(KDb::xHexToByteArray(data.constData(), length, nullptr), result);
 }
 
 void KDbTest::testZeroXHexToByteArray_data()
@@ -785,7 +785,7 @@ void KDbTest::testZeroXHexToByteArray()
     bool actualOk;
     QCOMPARE(KDb::zeroXHexToByteArray(data.constData(), length == -1 ? data.length() : length, &actualOk), result);
     QCOMPARE(actualOk, ok);
-    QCOMPARE(KDb::zeroXHexToByteArray(data.constData(), length, 0), result);
+    QCOMPARE(KDb::zeroXHexToByteArray(data.constData(), length, nullptr), result);
 }
 
 //! @todo add tests
@@ -940,15 +940,15 @@ void KDbTest::testCstringToVariant()
     QFETCH(bool, okResult);
     bool ok;
     const QByteArray ba(data.toUtf8()); // to avoid pointer to temp.
-    const char *realData = ba.isNull() ? 0 : ba.constData();
+    const char *realData = ba.isNull() ? nullptr : ba.constData();
     QCOMPARE(KDb::cstringToVariant(realData, type, &ok, length, signedness), variant);
     QCOMPARE(ok, okResult);
-    QCOMPARE(KDb::cstringToVariant(realData, type, 0, length, signedness), variant); // a case where ok == 0
+    QCOMPARE(KDb::cstringToVariant(realData, type, nullptr, length, signedness), variant); // a case where ok == 0
     if (realData) {
         QCOMPARE(KDb::cstringToVariant(realData, type, &ok, data.length(), signedness), variant); // a case where length is set
         QCOMPARE(ok, okResult);
     }
-    QCOMPARE(KDb::cstringToVariant(0, type, &ok, length, signedness), QVariant()); // a case where data == 0 (NULL)
+    QCOMPARE(KDb::cstringToVariant(nullptr, type, &ok, length, signedness), QVariant()); // a case where data == 0 (NULL)
     QVERIFY(ok || type < KDbField::Byte || type > KDbField::LastType); // fails for NULL if this type isn't allowed
     if (type != KDbField::Boolean) {
         QCOMPARE(KDb::cstringToVariant(realData, type, &ok, 0, signedness), QVariant()); // a case where length == 0

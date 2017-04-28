@@ -73,7 +73,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 //  return QString();
 // Each SQL identifier needs to be escaped in the generated query.
 
-    const KDbDriver *driver = connection ? connection->driver() : 0;
+    const KDbDriver *driver = connection ? connection->driver() : nullptr;
 
     if (!querySchema->statement().isEmpty()) {
 //! @todo replace with KDbNativeQuerySchema? It shouldn't be here.
@@ -152,7 +152,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 //! @todo add option that allows to omit "AS" keyword
             }
             KDbLookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns && f->table())
-                                                   ? f->table()->lookupFieldSchema(*f) : 0;
+                                                   ? f->table()->lookupFieldSchema(*f) : nullptr;
             if (lookupFieldSchema && lookupFieldSchema->boundColumn() >= 0) {
                 // Lookup field schema found
                 // Now we also need to fetch "visible" value from the lookup table, not only the value of binding.
@@ -161,8 +161,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 KDbLookupFieldSchema::RecordSource recordSource = lookupFieldSchema->recordSource();
                 if (recordSource.type() == KDbLookupFieldSchema::RecordSource::Table) {
                     KDbTableSchema *lookupTable = querySchema->connection()->tableSchema(recordSource.name());
-                    KDbFieldList* visibleColumns = 0;
-                    KDbField *boundField = 0;
+                    KDbFieldList* visibleColumns = nullptr;
+                    KDbField *boundField = nullptr;
                     if (lookupTable
                             && lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
                             && (visibleColumns = lookupTable->subList(lookupFieldSchema->visibleColumns()))
@@ -344,7 +344,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
     if (!querySchema->whereExpression().isNull()) {
         KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
-        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr = parameters.isEmpty() ? 0 : &paramValuesIt;
+        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
+            = parameters.isEmpty() ? nullptr : &paramValuesIt;
         if (wasWhere) {
 //! @todo () are not always needed
             s_where = '(' + s_where + ") AND ("

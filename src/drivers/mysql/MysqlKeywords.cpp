@@ -351,5 +351,5 @@ const char* MysqlDriver::keywords[] = {
     "YEAR",
     "YEAR_MONTH",
     "ZEROFILL",
-    0
+    nullptr
 };

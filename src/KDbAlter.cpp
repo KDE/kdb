@@ -237,7 +237,7 @@ static KDbAlterTableHandler::ActionDict* createActionDict(
 }
 
 static void debugAction(KDbAlterTableHandler::ActionBase *action, int nestingLevel,
-                        bool simulate, const QString& prependString = QString(), QString * debugTarget = 0)
+                        bool simulate, const QString& prependString = QString(), QString * debugTarget = nullptr)
 {
     Q_UNUSED(simulate);
     Q_UNUSED(nestingLevel);
@@ -247,8 +247,8 @@ static void debugAction(KDbAlterTableHandler::ActionBase *action, int nestingLev
         debugString = prependString;
     if (action) {
         KDbAlterTableHandler::ActionBase::DebugOptions debugOptions;
-        debugOptions.showUID = debugTarget == 0;
-        debugOptions.showFieldDebug = debugTarget != 0;
+        debugOptions.showUID = debugTarget == nullptr;
+        debugOptions.showFieldDebug = debugTarget != nullptr;
         debugString += action->debugString(debugOptions);
     } else {
         if (!debugTarget) {
@@ -329,7 +329,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
         // Case 1. special: name1 -> name2, i.e. rename action
         QByteArray newName(newValue().toString().toLatin1());
         // try to find rename(newName, otherName) action
-        ActionBase *renameActionLikeThis = actionsLikeThis ? actionsLikeThis->value(newName) : 0;
+        ActionBase *renameActionLikeThis = actionsLikeThis ? actionsLikeThis->value(newName) : nullptr;
         if (dynamic_cast<ChangeFieldPropertyAction*>(renameActionLikeThis)) {
             // 1. instead of having rename(fieldName(), newValue()) action,
             // let's have rename(fieldName(), otherName) action
@@ -345,7 +345,8 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
                     adict = createActionDict( fieldActions, fieldName() );
                   adict->insert(m_propertyName.toLatin1(), newRenameAction);*/
         } else {
-            ActionBase *removeActionForThisField = actionsLikeThis ? actionsLikeThis->value(":remove:") : 0;
+            ActionBase *removeActionForThisField
+                = actionsLikeThis ? actionsLikeThis->value(":remove:") : nullptr;
             if (removeActionForThisField) {
                 //if this field is going to be removed, just change the action's field name
                 // and do not add a new action
@@ -371,7 +372,8 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
         }
         return;
     }
-    ActionBase *removeActionForThisField = actionsLikeThis ? actionsLikeThis->value(":remove:") : 0;
+    ActionBase *removeActionForThisField
+        = actionsLikeThis ? actionsLikeThis->value(":remove:") : nullptr;
     if (removeActionForThisField) {
         //if this field is going to be removed, do not add a new action
         return;
@@ -550,7 +552,7 @@ tristate KDbAlterTableHandler::RemoveFieldAction::execute(KDbConnection* conn, K
 KDbAlterTableHandler::InsertFieldAction::InsertFieldAction(int fieldIndex, KDbField *field, int uid)
         : FieldActionBase(field->name(), uid)
         , m_index(fieldIndex)
-        , m_field(0)
+        , m_field(nullptr)
 {
     Q_ASSERT(field);
     setField(field);
@@ -571,7 +573,7 @@ KDbAlterTableHandler::InsertFieldAction::InsertFieldAction()
 KDbAlterTableHandler::InsertFieldAction::InsertFieldAction(bool null)
         : FieldActionBase(null)
         , m_index(0)
-        , m_field(0)
+        , m_field(nullptr)
 {
 }
 
@@ -626,7 +628,8 @@ void KDbAlterTableHandler::InsertFieldAction::simplifyActions(ActionDictDict *fi
     // Try to find actions related to this action
     ActionDict *actionsForThisField = fieldActions->value(uid());
 
-    ActionBase *removeActionForThisField = actionsForThisField ? actionsForThisField->value(":remove:") : 0;
+    ActionBase *removeActionForThisField
+        = actionsForThisField ? actionsForThisField->value(":remove:") : nullptr;
     if (removeActionForThisField) {
         //if this field is going to be removed, do not add a new action
         //and remove the "Remove" action
@@ -815,20 +818,20 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     args->result = false;
     if (!d->conn) {
 //! @todo err msg?
-        return 0;
+        return nullptr;
     }
     if (d->conn->options()->isReadOnly()) {
 //! @todo err msg?
-        return 0;
+        return nullptr;
     }
     if (!d->conn->isDatabaseUsed()) {
 //! @todo err msg?
-        return 0;
+        return nullptr;
     }
     KDbTableSchema *oldTable = d->conn->tableSchema(tableName);
     if (!oldTable) {
 //! @todo err msg?
-        return 0;
+        return nullptr;
     }
 
     if (!args->debugString)
@@ -912,7 +915,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 
     if (args->onlyComputeRequirements) {
         args->result = true;
-        return 0;
+        return nullptr;
     }
 
     const bool recreateTable = (args->requirements & PhysicalAlteringRequired);
@@ -957,7 +960,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 
     // Update table schema in memory ----
     int lastUID = -1;
-    KDbField *currentField = 0;
+    KDbField *currentField = nullptr;
     QHash<QString, QString> fieldHash; // a map from new value to old value
     foreach(KDbField* f, *newTable->fields()) {
         fieldHash.insert(f->name(), f->name());
@@ -969,7 +972,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         //remember the current KDbField object because soon we may be unable to find it by name:
         FieldActionBase *fieldAction = dynamic_cast<FieldActionBase*>(action);
         if (!fieldAction) {
-            currentField = 0;
+            currentField = nullptr;
         } else {
             if (lastUID != fieldAction->uid()) {
                 currentField = newTable->field(fieldAction->fieldName());
@@ -985,7 +988,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         if (args->result != true) {
             if (recreateTable)
                 delete newTable;
-            return 0;
+            return nullptr;
         }
     }
 
@@ -995,7 +998,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             m_result = d->conn->result();
             delete newTable;
             args->result = false;
-            return 0;
+            return nullptr;
         }
     }
 
@@ -1021,7 +1024,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         m_result = d->conn->result();
 //! @todo delete newTable...
         args->result = false;
-        return 0;
+        return nullptr;
     }
 
     if (recreateTable) {
@@ -1078,7 +1081,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             m_result = d->conn->result();
 //! @todo delete newTable...
             args->result = false;
-            return 0;
+            return nullptr;
         }
 
         const QString oldTableName = oldTable->name();
@@ -1095,9 +1098,9 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             m_result = d->conn->result();
 //! @todo delete newTable...
             args->result = false;
-            return 0;
+            return nullptr;
         }
-        oldTable = 0;
+        oldTable = nullptr;
     }
 
     if (!recreateTable) {
@@ -1110,7 +1113,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
                         m_result = d->conn->result();
                         //! @todo delete newTable...
                         args->result = false;
-                        return 0;
+                        return nullptr;
                     }
                 }
             }

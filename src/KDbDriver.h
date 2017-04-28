@@ -80,7 +80,7 @@ public:
     };
 
     /*! Creates connection using @a connData as parameters.
-     @return 0 and sets error message on error.
+     @return @c nullptr and sets error message on error.
      driverId member of @a connData will be updated with the driver's ID.
      @a options can be set for the new connection. */
     KDbConnection *createConnection(const KDbConnectionData& connData,
@@ -212,7 +212,7 @@ public:
     inline const KDbDriverBehavior* behavior() const { return this->beh; }
 
     //! @internal
-    virtual ~KDbDriver();
+    ~KDbDriver() override;
 
     //! Generates native (driver-specific) HEX() function call.
     //! Default implementation uses HEX(val).
@@ -334,7 +334,7 @@ protected:
     virtual KDbAdminTools* drv_createAdminTools() const;
 
     /*! @return connection @a conn, does not delete it nor affect.
-     Returns 0 if @a conn is not owned by this driver.
+     Returns @c nullptr if @a conn is not owned by this driver.
      After this, you are owner of @a conn object, so you should
      eventually delete it. Better use KDbConnection destructor. */
     KDbConnection* removeConnection(KDbConnection *conn);

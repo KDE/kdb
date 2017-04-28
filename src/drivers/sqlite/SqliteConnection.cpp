@@ -117,7 +117,7 @@ bool SqliteConnection::drv_getTablesList(QStringList* list)
 bool SqliteConnection::drv_createDatabase(const QString &dbName)
 {
     Q_UNUSED(dbName);
-    return drv_useDatabaseInternal(0, 0, true/*create if missing*/);
+    return drv_useDatabaseInternal(nullptr, nullptr, true/*create if missing*/);
 }
 
 bool SqliteConnection::drv_useDatabase(const QString &dbName, bool *cancelled,
@@ -154,7 +154,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
                  &d->data,
                  openFlags, /*exclusiveFlag,
                  allowReadonly *//* If 1 and locking fails, try opening in read-only mode */
-                 0
+                 nullptr
              );
     if (res != SQLITE_OK) {
         m_result.setServerErrorCode(res);
@@ -247,7 +247,7 @@ bool SqliteConnection::drv_closeDatabase()
 
     const int res = sqlite3_close(d->data);
     if (SQLITE_OK == res) {
-        d->data = 0;
+        d->data = nullptr;
         return true;
     }
     if (SQLITE_BUSY == res) {
@@ -387,8 +387,9 @@ bool SqliteConnection::loadExtension(const QString& path)
         tempEnable = true;
         d->setExtensionsLoadingEnabled(true);
     }
-    char *errmsg_p = 0;
-    int res = sqlite3_load_extension(d->data, QDir::toNativeSeparators(path).toUtf8().constData(), 0, &errmsg_p);
+    char *errmsg_p = nullptr;
+    int res = sqlite3_load_extension(d->data, QDir::toNativeSeparators(path).toUtf8().constData(),
+                                     nullptr, &errmsg_p);
     bool ok = res == SQLITE_OK;
     if (!ok) {
         m_result.setServerErrorCode(res);

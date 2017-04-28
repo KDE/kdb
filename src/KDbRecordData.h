@@ -37,7 +37,7 @@ class KDB_EXPORT KDbRecordData
 {
 public:
     /*! Creates a new empty record. */
-    inline KDbRecordData() : m_data(0), m_numCols(0) {}
+    inline KDbRecordData() : m_data(nullptr), m_numCols(0) {}
 
     /*! Creates a new record data with @a numCols columns.
      Values are initialized to null. */
@@ -113,7 +113,7 @@ public:
     inline void clearValues() {
         for (int i = 0; i < m_numCols; i++) {
             delete m_data[i];
-            m_data[i] = 0;
+            m_data[i] = nullptr;
         }
     }
 
@@ -152,7 +152,7 @@ private:
             memset(m_data, 0, m_numCols * sizeof(QVariant*));
         }
         else
-            m_data = 0;
+            m_data = nullptr;
     }
 
     QVariant **m_data;

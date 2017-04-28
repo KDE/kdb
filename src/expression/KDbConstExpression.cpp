@@ -94,7 +94,7 @@ void KDbConstExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
     Q_UNUSED(callStack);
     QString res = QLatin1String("ConstExp(")
         + token.name()
-        + QLatin1String(",") + toString(0).toString()
+        + QLatin1String(",") + toString(nullptr).toString()
         + QString::fromLatin1(",type=%1").arg(KDbDriver::defaultSQLTypeName(type()));
     if (value.type() == QVariant::Point && token.value() == REAL_CONST) {
         res += QLatin1String(",DECIMAL");

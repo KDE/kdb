@@ -72,7 +72,7 @@ class PostgresqlCursorData : public PostgresqlConnectionInternal
 {
 public:
     explicit PostgresqlCursorData(KDbConnection* connection);
-    virtual ~PostgresqlCursorData();
+    ~PostgresqlCursorData() override;
 
     PGresult* res;
     ExecStatusType resultStatus;
@@ -86,14 +86,14 @@ public:
     inline PostgresqlSqlField(const PGresult *r, int n) : result(r), number(n) {
     }
     //! @return column name
-    inline QString name() Q_DECL_OVERRIDE {
+    inline QString name() override {
         //! @todo UTF8?
         return QString::fromLatin1(PQfname(result, number));
     }
-    inline int type() Q_DECL_OVERRIDE {
+    inline int type() override {
         return static_cast<int>(PQftype(result, number));
     }
-    inline int length() Q_DECL_OVERRIDE {
+    inline int length() override {
         return PostgresqlDriver::pqfmodToLength(PQfmod(result, number));
     }
     const PGresult * const result;
@@ -107,21 +107,21 @@ class PostgresqlSqlRecord : public KDbSqlRecord
 public:
     inline PostgresqlSqlRecord(const PGresult *res, int r) : result(res), record(r) {
     }
-    inline ~PostgresqlSqlRecord() {
+    inline ~PostgresqlSqlRecord() override {
     }
-    inline QString stringValue(int index) Q_DECL_OVERRIDE {
+    inline QString stringValue(int index) override {
         return PQgetisnull(result, record, index)
                 ? QString()
                 : QString::fromUtf8(PQgetvalue(result, record, index),
                                     PQgetlength(result, record, index));
     }
-    inline KDbSqlString cstringValue(int index) Q_DECL_OVERRIDE {
+    inline KDbSqlString cstringValue(int index) override {
         return PQgetisnull(result, record, index)
                 ? KDbSqlString()
                 : KDbSqlString(PQgetvalue(result, record, index),
                                PQgetlength(result, record, index));
     }
-    inline QByteArray toByteArray(int index) Q_DECL_OVERRIDE {
+    inline QByteArray toByteArray(int index) override {
         return PQgetisnull(result, record, index)
                 ? QByteArray()
                 : QByteArray(PQgetvalue(result, record, index),
@@ -143,31 +143,31 @@ public:
         Q_ASSERT(c);
     }
 
-    inline ~PostgresqlSqlResult() {
+    inline ~PostgresqlSqlResult() override {
         PQclear(result);
     }
 
-    inline KDbConnection *connection() const Q_DECL_OVERRIDE {
+    inline KDbConnection *connection() const override {
         return conn;
     }
 
-    inline int fieldsCount() Q_DECL_OVERRIDE {
+    inline int fieldsCount() override {
         return PQnfields(result);
     }
 
-    inline KDbSqlField *field(int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlField *field(int index) override Q_REQUIRED_RESULT {
         return new PostgresqlSqlField(result, index);
     }
 
-    KDbField *createField(const QString &tableName, int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
         return recordToFetch < recordsCount
                ? new PostgresqlSqlRecord(result, recordToFetch++)
                : nullptr;
     }
 
-    inline KDbResult lastResult() Q_DECL_OVERRIDE {
+    inline KDbResult lastResult() override {
         KDbResult r;
         if (resultStatus == PGRES_TUPLES_OK || resultStatus == PGRES_COMMAND_OK) {
             return r;
@@ -182,7 +182,7 @@ public:
     }
 
     //! @return the oid of the last insert - only works if there was insert of 1 row
-    inline quint64 lastInsertRecordId() Q_DECL_OVERRIDE {
+    inline quint64 lastInsertRecordId() override {
         // InvalidOid == 0 means error
         const Oid oid = PQoidValue(result);
         return oid == 0 ? std::numeric_limits<quint64>::max() : static_cast<quint64>(oid);

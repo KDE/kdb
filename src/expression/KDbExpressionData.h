@@ -95,9 +95,9 @@ public:
     bool isFPNumericType() const;
     bool isDateTimeType() const;
     KDbEscapedString toString(const KDbDriver *driver,
-                              KDbQuerySchemaParameterValueListIterator* params = 0,
-                              KDb::ExpressionCallStack* callStack = 0) const;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
+                              KDbQuerySchemaParameterValueListIterator *params = nullptr,
+                              KDb::ExpressionCallStack *callStack = nullptr) const;
+    virtual void getQueryParameters(QList<KDbQuerySchemaParameter> *params);
     bool validate(KDbParseInfo *parseInfo);
     virtual KDbExpressionData* clone();
 
@@ -108,25 +108,25 @@ public:
     T* convert() { return dynamic_cast<T*>(this); }
 
     //! Sends information about this expression  to debug output @a dbg.
-    QDebug debug(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    QDebug debug(QDebug dbg, KDb::ExpressionCallStack *callStack) const;
 
-    KDbField::Type type(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type type(KDb::ExpressionCallStack *callStack) const;
 
-    bool validate(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validate(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack);
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const;
 
     virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+                                              KDbQuerySchemaParameterValueListIterator *params,
+                                              KDb::ExpressionCallStack *callStack) const;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack);
 
-    bool addToCallStack(QDebug *dbg, QList<const KDbExpressionData*>* callStack) const;
+    bool addToCallStack(QDebug *dbg, QList<const KDbExpressionData*> *callStack) const;
 };
 
 //! Internal data class used to implement implicitly shared class KDbNArgExpression.
@@ -136,24 +136,24 @@ class KDbNArgExpressionData : public KDbExpressionData
     Q_DECLARE_TR_FUNCTIONS(KDbNArgExpressionData)
 public:
     KDbNArgExpressionData();
-    virtual ~KDbNArgExpressionData();
+    ~KDbNArgExpressionData() override;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbNArgExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbNArgExpressionData* clone() override;
     bool containsInvalidArgument() const;
     bool containsNullArgument() const;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbUnaryExpression.
@@ -162,25 +162,25 @@ class KDbUnaryExpressionData : public KDbExpressionData
 {
 public:
     KDbUnaryExpressionData();
-    virtual ~KDbUnaryExpressionData();
+    ~KDbUnaryExpressionData() override;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbUnaryExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbUnaryExpressionData* clone() override;
     inline ExplicitlySharedExpressionDataPointer arg() const {
         return children.isEmpty() ? ExplicitlySharedExpressionDataPointer() : children.first();
     }
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbBinaryExpression.
@@ -190,10 +190,10 @@ class KDbBinaryExpressionData : public KDbExpressionData
     Q_DECLARE_TR_FUNCTIONS(KDbBinaryExpressionData)
 public:
     KDbBinaryExpressionData();
-    virtual ~KDbBinaryExpressionData();
+    ~KDbBinaryExpressionData() override;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbBinaryExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbBinaryExpressionData *clone() override;
     ExplicitlySharedExpressionDataPointer left() const;
     ExplicitlySharedExpressionDataPointer right() const;
 
@@ -201,15 +201,15 @@ protected:
     void setLeft(const KDbExpressionData& left);
 
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbConstExpression.
@@ -218,23 +218,23 @@ class KDbConstExpressionData : public KDbExpressionData
 {
 public:
     explicit KDbConstExpressionData(const QVariant& aValue = QVariant());
-    virtual ~KDbConstExpressionData();
+    ~KDbConstExpressionData() override;
 
     QVariant value;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbConstExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbConstExpressionData *clone() override;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbQueryParameterExpression.
@@ -244,23 +244,23 @@ class KDbQueryParameterExpressionData : public KDbConstExpressionData
 public:
     KDbQueryParameterExpressionData();
     KDbQueryParameterExpressionData(KDbField::Type type, const QVariant& value);
-    virtual ~KDbQueryParameterExpressionData();
+    ~KDbQueryParameterExpressionData() override;
 
     KDbField::Type m_type;
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbQueryParameterExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbQueryParameterExpressionData* clone() override;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbVariableExpression.
@@ -271,7 +271,7 @@ class KDbVariableExpressionData : public KDbExpressionData
 public:
     KDbVariableExpressionData();
     explicit KDbVariableExpressionData(const QString& aName);
-    virtual ~KDbVariableExpressionData();
+    ~KDbVariableExpressionData() override;
 
     /*! Verbatim name as returned by scanner. */
     QString name;
@@ -295,23 +295,23 @@ public:
      This is set to NULL if this variable is not an asterisk of that form. */
     KDbTableSchema *tableForQueryAsterisk;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbVariableExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbVariableExpressionData* clone() override;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 //! Internal data class used to implement implicitly shared class KDbFunctionExpression.
@@ -323,36 +323,36 @@ public:
     KDbFunctionExpressionData();
     explicit KDbFunctionExpressionData(const QString& aName,
                                        ExplicitlySharedExpressionDataPointer arguments = ExplicitlySharedExpressionDataPointer());
-    virtual ~KDbFunctionExpressionData();
+    ~KDbFunctionExpressionData() override;
 
     QString name;
     ExplicitlySharedExpressionDataPointer args;
 
-    virtual void getQueryParameters(QList<KDbQuerySchemaParameter>* params);
-    virtual KDbFunctionExpressionData* clone();
+    void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
+    KDbFunctionExpressionData* clone() override;
 
     void setArguments(ExplicitlySharedExpressionDataPointer arguments);
 
     static KDbEscapedString toString(const QString &name,
                                      const KDbDriver *driver,
                                      const KDbNArgExpressionData *args,
-                                     KDbQuerySchemaParameterValueListIterator* params,
-                                     KDb::ExpressionCallStack* callStack);
+                                     KDbQuerySchemaParameterValueListIterator *params,
+                                     KDb::ExpressionCallStack *callStack);
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).
-    virtual void debugInternal(QDebug dbg, KDb::ExpressionCallStack* callStack) const;
+    void debugInternal(QDebug dbg, KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbEscapedString toStringInternal(const KDbDriver *driver,
-                                              KDbQuerySchemaParameterValueListIterator* params,
-                                              KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString toStringInternal(const KDbDriver *driver,
+                                      KDbQuerySchemaParameterValueListIterator *params,
+                                      KDb::ExpressionCallStack *callStack) const override;
 
-    virtual KDbField::Type typeInternal(KDb::ExpressionCallStack* callStack) const;
+    KDbField::Type typeInternal(KDb::ExpressionCallStack *callStack) const override;
 
     /*! Validation. Sets field, tablePositionForField
      and tableForQueryAsterisk members.
      See addColumn() in parse.y to see how it's used on column adding. */
-    virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack);
+    bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack) override;
 };
 
 QDebug operator<<(QDebug dbg, const KDbExpressionData& expr);

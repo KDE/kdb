@@ -35,7 +35,7 @@ public:
     /*! Used by self() */
     DriverManagerInternal();
 
-    ~DriverManagerInternal();
+    ~DriverManagerInternal() override;
 
     QStringList driverIds();
 

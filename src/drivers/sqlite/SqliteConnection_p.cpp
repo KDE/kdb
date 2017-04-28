@@ -21,7 +21,7 @@
 
 SqliteConnectionInternal::SqliteConnectionInternal(KDbConnection *connection)
         : KDbConnectionInternal(connection)
-        , data(0)
+        , data(nullptr)
         , data_owned(true)
         , m_extensionsLoadingEnabled(false)
 {
@@ -31,7 +31,7 @@ SqliteConnectionInternal::~SqliteConnectionInternal()
 {
     if (data_owned && data) {
         sqlite3_close(data);
-        data = 0;
+        data = nullptr;
     }
 }
 

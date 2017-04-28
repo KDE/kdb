@@ -64,7 +64,7 @@ class ConnectionTestThread : public QThread
     Q_OBJECT
 public:
     ConnectionTestThread(ConnectionTestDialog *dlg, const KDbConnectionData& connData);
-    virtual void run();
+    void run() override;
 Q_SIGNALS:
     void error(const QString& msg, const QString& details);
 protected:
@@ -83,16 +83,16 @@ class ConnectionTestDialog : public QProgressDialog // krazy:exclude=qclasses
 public:
     ConnectionTestDialog(const KDbConnectionData& data, KDbMessageHandler* msgHandler,
                          QWidget* parent = nullptr);
-    virtual ~ConnectionTestDialog();
+    ~ConnectionTestDialog() override;
 
-    int exec();
+    int exec() override;
 
 public Q_SLOTS:
     void error(const QString& msg, const QString& details);
 
 protected Q_SLOTS:
     void slotTimeout();
-    virtual void reject();
+    void reject() override;
 
 protected:
     QPointer<ConnectionTestThread> m_thread;
@@ -120,7 +120,7 @@ ConnectionTestThread::ConnectionTestThread(ConnectionTestDialog* dlg, const KDbC
     m_driver = manager.driver(m_connData.driverId());
     if (manager.result().isError()) {
         emitError(*manager.resultable());
-        m_driver = 0;
+        m_driver = nullptr;
     }
 }
 
@@ -926,7 +926,7 @@ bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& 
             if (createdLookup) {
                 if (field->table()->setLookupFieldSchema(field->name(), lookup)) {
                     createdLookup.take(); // ownership passed
-                    lookup = 0;
+                    lookup = nullptr;
                 }
             }
         }
@@ -968,7 +968,7 @@ bool KDb::isExtendedTableFieldProperty(const QByteArray& propertyName)
 struct KDb_LookupFieldSchemaProperties {
     KDb_LookupFieldSchemaProperties() {
         QMap<QByteArray, QVariant> tmp;
-        KDb::getProperties(0, &tmp);
+        KDb::getProperties(nullptr, &tmp);
         for (QMap<QByteArray, QVariant>::ConstIterator it(tmp.constBegin());
              it != tmp.constEnd(); ++it)
         {

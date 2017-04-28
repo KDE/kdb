@@ -51,17 +51,17 @@ public:
      @see KexiMigrate::performImport(). */
     KDbTableSchema(const KDbTableSchema& ts, int id);
 
-    virtual ~KDbTableSchema();
+    ~KDbTableSchema() override;
 
     /*! Inserts @a field into a specified position (@a index).
      'order' property of @a field is set automatically. */
-    virtual bool insertField(int index, KDbField *field);
+    bool insertField(int index, KDbField *field) override;
 
     /*! Reimplemented for internal reasons. */
-    virtual bool removeField(KDbField *field);
+    bool removeField(KDbField *field) override;
 
     /*! @return list of fields that are primary key of this table.
-     This method never returns 0 value,
+     This method never returns @c nullptr value,
      if there is no primary key, empty KDbIndexSchema object is returned.
      KDbIndexSchema object is owned by the table schema. */
     KDbIndexSchema* primaryKey() const;
@@ -84,7 +84,7 @@ public:
 
     /*! Removes all fields from the list, clears name and all other properties.
       @see KDbFieldList::clear() */
-    virtual void clear();
+    void clear() override;
 
     /*! Sends information about fields of this table schema to debug output @a dbg. */
     QDebug debugFields(QDebug dbg) const;
@@ -113,7 +113,7 @@ public:
     KDbQuerySchema* query();
 
     /*! @return any field not being a part of primary key of this table.
-     If there is no such field, returns 0. */
+     If there is no such field, returns @c nullptr. */
     KDbField* anyNonPKField();
 
     /*! Sets lookup field schema @a lookupFieldSchema for @a fieldName.
@@ -169,7 +169,7 @@ public:
     explicit KDbInternalTableSchema(const QString& name);
     explicit KDbInternalTableSchema(const KDbTableSchema& ts);
     explicit KDbInternalTableSchema(const KDbInternalTableSchema& ts);
-    virtual ~KDbInternalTableSchema();
+    ~KDbInternalTableSchema() override;
 };
 
 //! Sends information about table schema @a table to debug output @a dbg.

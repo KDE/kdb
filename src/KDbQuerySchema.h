@@ -85,7 +85,7 @@ public:
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
     KDbEscapedString toSQLString(bool includeTableName = true,
-                              KDbConnection *conn = 0,
+                              KDbConnection *conn = nullptr,
                               KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
 protected:
@@ -191,7 +191,7 @@ public:
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
     KDbEscapedString toSQLString(bool includeTableNames = true,
-                                 KDbConnection *conn = 0,
+                                 KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 private:
     Q_DISABLE_COPY(KDbOrderByColumnList)
@@ -227,7 +227,7 @@ public:
      KDbQueryAsterisk objects are deeply copied while only pointers to KDbField objects are copied. */
     KDbQuerySchema(const KDbQuerySchema& querySchema);
 
-    virtual ~KDbQuerySchema();
+    ~KDbQuerySchema() override;
 
     /*! Inserts @a field to the columns list at @a position.
      Inserted field will not be owned by this KDbQuerySchema object,
@@ -243,7 +243,7 @@ public:
      Added field will be visible. Use insertField(position, field, false)
      to add invisible field.
     */
-    virtual bool insertField(int position, KDbField *field);
+    bool insertField(int position, KDbField *field) override;
 
     /* Like above method, but you can also set column's visibility.
      New column is not bound explicitly to any table.
@@ -272,7 +272,7 @@ public:
     bool addField(KDbField* field, int bindToTable, bool visible = true);
 
     /*! Removes field from the columns list. Use with care. */
-    virtual bool removeField(KDbField *field);
+    bool removeField(KDbField *field) override;
 
     /*! Adds a field built on top of @a expr expression.
      This creates a new KDbField object and adds it to the query schema using addField().
@@ -294,7 +294,7 @@ public:
      Sets master table information to NULL.
      Does not destroy any objects though. Clears name and all other properties.
      @see KDbFieldList::clear() */
-    virtual void clear();
+    void clear() override;
 
     /*! If query was created using a connection,
       returns this connection object, otherwise NULL. */
@@ -508,7 +508,7 @@ public:
 
     /*! This is overloaded method KDbField* field(const QString& name, bool expanded)
      with expanded = true. This method is also a product of inheritance from KDbFieldList.  */
-    virtual KDbField* field(const QString& name);
+    KDbField* field(const QString& name) override;
 
     /*! @return field id or NULL if there is no such a field. */
     KDbField* field(int id);
@@ -709,8 +709,9 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    static KDbEscapedString sqlColumnsList(const KDbQueryColumnInfo::List& infolist, KDbConnection *conn = 0,
-        KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
+    static KDbEscapedString
+    sqlColumnsList(const KDbQueryColumnInfo::List &infolist, KDbConnection *conn = nullptr,
+                   KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
 
     /*! @return cached list of autoincrement fields created using sqlColumnsList()
         on a list returned by autoIncrementFields(). The field names are escaped using
@@ -846,12 +847,12 @@ public:
      (not by KDbTableSchema object like for ordinary KDbField objects)
      for that the KDbQueryAsterisk object was added (using KDbQuerySchema::addField()).
      */
-    explicit KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table = 0);
+    explicit KDbQueryAsterisk(KDbQuerySchema *query, KDbTableSchema *table = nullptr);
 
     /*! Constructs a deep copu of query asterisk definition object @a asterisk. */
     KDbQueryAsterisk(const KDbQueryAsterisk& asterisk);
 
-    virtual ~KDbQueryAsterisk();
+    ~KDbQueryAsterisk() override;
 
     /*! @return Query object for that this asterisk object is defined */
     KDbQuerySchema *query() const;
@@ -859,11 +860,11 @@ public:
     /*! @return Table schema for this asterisk
      if it has "single-table" type (1st type)
      or 0 if it has "all-tables" type (2nd type) defined. */
-    virtual KDbTableSchema* table() const;
+    KDbTableSchema* table() const override;
 
     /*! Sets table schema for this asterisk.
      @a table may be NULL - then the asterisk becames "all-tables" type asterisk. */
-    virtual void setTable(KDbTableSchema *table);
+    void setTable(KDbTableSchema *table) override;
 
     /*! This is convenience method that returns true
      if the asterisk has "all-tables" type (2nd type).*/
@@ -875,7 +876,7 @@ public:
 
 protected:
     //! @return a deep copy of this object. Used in KDbFieldList(const KDbFieldList& fl).
-    virtual KDbField* copy() const;
+    KDbField* copy() const override;
 
     /*! Table schema for this asterisk */
     KDbTableSchema* m_table;

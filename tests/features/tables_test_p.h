@@ -35,7 +35,7 @@ int tablesTest_createTables(KDbConnection *conn)
     t_persons->setCaption("Persons in our factory");
     t_persons->addField(f = new KDbField("id", KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
     f->setCaption("ID");
-    t_persons->addField(f = new KDbField("age", KDbField::Integer, 0, KDbField::Unsigned));
+    t_persons->addField(f = new KDbField("age", KDbField::Integer, nullptr, KDbField::Unsigned));
     f->setCaption("Age");
     t_persons->addField(f = new KDbField("name", KDbField::Text));
     f->setCaption("Name");
@@ -63,7 +63,7 @@ int tablesTest_createTables(KDbConnection *conn)
     t_cars->setCaption("Cars owned by persons");
     t_cars->addField(f = new KDbField("id", KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
     f->setCaption("ID");
-    t_cars->addField(f = new KDbField("owner", KDbField::Integer, 0, KDbField::Unsigned));
+    t_cars->addField(f = new KDbField("owner", KDbField::Integer, nullptr, KDbField::Unsigned));
     f->setCaption("Car owner");
     t_cars->addField(f = new KDbField("model", KDbField::Text));
     f->setCaption("Car model");

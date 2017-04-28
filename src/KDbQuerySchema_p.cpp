@@ -21,28 +21,28 @@
 
 KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         : query(q)
-        , masterTable(0)
-        , fakeRecordIdField(0)
-        , fakeRecordIdCol(0)
-        , conn(0)
+        , masterTable(nullptr)
+        , fakeRecordIdField(nullptr)
+        , fakeRecordIdCol(nullptr)
+        , conn(nullptr)
         , maxIndexWithAlias(-1)
         , visibility(64)
-        , fieldsExpanded(0)
-        , visibleFieldsExpanded(0)
-        , internalFields(0)
-        , fieldsExpandedWithInternalAndRecordId(0)
-        , visibleFieldsExpandedWithInternalAndRecordId(0)
-        , fieldsExpandedWithInternal(0)
-        , visibleFieldsExpandedWithInternal(0)
-        , orderByColumnList(0)
-        , autoincFields(0)
-        , columnsOrder(0)
-        , columnsOrderWithoutAsterisks(0)
-        , columnsOrderExpanded(0)
-        , pkeyFieldsOrder(0)
+        , fieldsExpanded(nullptr)
+        , visibleFieldsExpanded(nullptr)
+        , internalFields(nullptr)
+        , fieldsExpandedWithInternalAndRecordId(nullptr)
+        , visibleFieldsExpandedWithInternalAndRecordId(nullptr)
+        , fieldsExpandedWithInternal(nullptr)
+        , visibleFieldsExpandedWithInternal(nullptr)
+        , orderByColumnList(nullptr)
+        , autoincFields(nullptr)
+        , columnsOrder(nullptr)
+        , columnsOrderWithoutAsterisks(nullptr)
+        , columnsOrderExpanded(nullptr)
+        , pkeyFieldsOrder(nullptr)
         , pkeyFieldCount(0)
         , tablesBoundToColumns(64, -1) // will be resized if needed
-        , ownedVisibleColumns(0)
+        , ownedVisibleColumns(nullptr)
         , regenerateExprAliases(false)
 {
     visibility.fill(false);
@@ -50,27 +50,27 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         // deep copy
         *this = *copy;
         // <clear, so computeFieldsExpanded() will re-create it>
-        fieldsExpanded = 0;
-        visibleFieldsExpanded = 0;
-        internalFields = 0;
-        columnsOrder = 0;
-        columnsOrderWithoutAsterisks = 0;
-        columnsOrderExpanded = 0;
-        orderByColumnList = 0;
-        autoincFields = 0;
+        fieldsExpanded = nullptr;
+        visibleFieldsExpanded = nullptr;
+        internalFields = nullptr;
+        columnsOrder = nullptr;
+        columnsOrderWithoutAsterisks = nullptr;
+        columnsOrderExpanded = nullptr;
+        orderByColumnList = nullptr;
+        autoincFields = nullptr;
         autoIncrementSQLFieldsList.clear();
         columnInfosByNameExpanded.clear();
         columnInfosByName.clear();
-        ownedVisibleColumns = 0;
-        fieldsExpandedWithInternalAndRecordId = 0;
-        visibleFieldsExpandedWithInternalAndRecordId = 0;
-        fieldsExpandedWithInternal = 0;
-        visibleFieldsExpandedWithInternal = 0;
-        pkeyFieldsOrder = 0;
-        fakeRecordIdCol = 0;
-        fakeRecordIdField = 0;
-        conn = 0;
-        ownedVisibleColumns = 0;
+        ownedVisibleColumns = nullptr;
+        fieldsExpandedWithInternalAndRecordId = nullptr;
+        visibleFieldsExpandedWithInternalAndRecordId = nullptr;
+        fieldsExpandedWithInternal = nullptr;
+        visibleFieldsExpandedWithInternal = nullptr;
+        pkeyFieldsOrder = nullptr;
+        fakeRecordIdCol = nullptr;
+        fakeRecordIdField = nullptr;
+        conn = nullptr;
+        ownedVisibleColumns = nullptr;
         // </clear, so computeFieldsExpanded() will re-create it>
         if (!copy->whereExpr.isNull()) {
             whereExpr = copy->whereExpr.clone();
@@ -123,11 +123,11 @@ void KDbQuerySchema::Private::clear()
     tableAliases.clear();
     asterisks.clear();
     relations.clear();
-    masterTable = 0;
+    masterTable = nullptr;
     tables.clear();
     clearCachedData();
     delete pkeyFieldsOrder;
-    pkeyFieldsOrder = 0;
+    pkeyFieldsOrder = nullptr;
     visibility.fill(false);
     tablesBoundToColumns = QVector<int>(64, -1); // will be resized if needed
     tablePositionsForAliases.clear();
@@ -141,36 +141,36 @@ void KDbQuerySchema::Private::clearCachedData()
     }
     if (fieldsExpanded) {
         delete columnsOrder;
-        columnsOrder = 0;
+        columnsOrder = nullptr;
         delete columnsOrderWithoutAsterisks;
-        columnsOrderWithoutAsterisks = 0;
+        columnsOrderWithoutAsterisks = nullptr;
         delete columnsOrderExpanded;
-        columnsOrderExpanded = 0;
+        columnsOrderExpanded = nullptr;
         delete autoincFields;
-        autoincFields = 0;
+        autoincFields = nullptr;
         autoIncrementSQLFieldsList.clear();
         columnInfosByNameExpanded.clear();
         columnInfosByName.clear();
         delete ownedVisibleColumns;
-        ownedVisibleColumns = 0;
+        ownedVisibleColumns = nullptr;
         qDeleteAll(*fieldsExpanded);
         delete fieldsExpanded;
-        fieldsExpanded = 0;
+        fieldsExpanded = nullptr;
         delete visibleFieldsExpanded; // NO qDeleteAll, items not owned
-        visibleFieldsExpanded = 0;
+        visibleFieldsExpanded = nullptr;
         if (internalFields) {
             qDeleteAll(*internalFields);
             delete internalFields;
-            internalFields = 0;
+            internalFields = nullptr;
         }
         delete fieldsExpandedWithInternalAndRecordId;
-        fieldsExpandedWithInternalAndRecordId = 0;
+        fieldsExpandedWithInternalAndRecordId = nullptr;
         delete visibleFieldsExpandedWithInternalAndRecordId;
-        visibleFieldsExpandedWithInternalAndRecordId = 0;
+        visibleFieldsExpandedWithInternalAndRecordId = nullptr;
         delete fieldsExpandedWithInternal;
-        fieldsExpandedWithInternal = 0;
+        fieldsExpandedWithInternal = nullptr;
         delete visibleFieldsExpandedWithInternal;
-        visibleFieldsExpandedWithInternal = 0;
+        visibleFieldsExpandedWithInternal = nullptr;
     }
 }
 

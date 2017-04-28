@@ -37,22 +37,22 @@ class SqliteConnection : public KDbConnection
 {
     Q_DECLARE_TR_FUNCTIONS(SqliteConnection)
 public:
-    virtual ~SqliteConnection();
+    ~SqliteConnection() override;
 
-    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
-    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(const KDbEscapedString& sql, int cursor_options = 0) override Q_REQUIRED_RESULT;
+    KDbCursor* prepareQuery(KDbQuerySchema* query, int cursor_options = 0) override Q_REQUIRED_RESULT;
 
-    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbPreparedStatementInterface* prepareStatementInternal() override Q_REQUIRED_RESULT;
 
 protected:
     /*! Used by driver */
     SqliteConnection(KDbDriver *driver, const KDbConnectionData& connData,
                      const KDbConnectionOptions &options);
 
-    virtual bool drv_connect();
-    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
-    virtual bool drv_disconnect();
-    virtual bool drv_getDatabasesList(QStringList* list);
+    bool drv_connect() override;
+    bool drv_getServerVersion(KDbServerVersionInfo* version) override;
+    bool drv_disconnect() override;
+    bool drv_getDatabasesList(QStringList* list) override;
 
 #if 0 // TODO
 //! @todo move this somewhere to low level class (MIGRATION?)
@@ -60,37 +60,37 @@ protected:
 #endif
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual tristate drv_containsTable(const QString &tableName);
+    tristate drv_containsTable(const QString &tableName) override;
 
     /*! Creates new database using connection. Note: Do not pass @a dbName
       arg because for file-based engine (that has one database per connection)
       it is defined during connection. */
-    virtual bool drv_createDatabase(const QString &dbName = QString());
+    bool drv_createDatabase(const QString &dbName = QString()) override;
 
     /*! Opens existing database using connection. Do not pass @a dbName
       arg because for file-based engine (that has one database per connection)
       it is defined during connection. If you pass it,
       database file name will be changed. */
-    virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 KDbMessageHandler* msgHandler = 0);
+    bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = nullptr,
+                                 KDbMessageHandler* msgHandler = nullptr) override;
 
-    virtual bool drv_closeDatabase();
+    bool drv_closeDatabase() override;
 
     /*! Drops database from the server using connection.
       After drop, database shouldn't be accessible
       anymore, so database file is just removed. See note from drv_useDatabase(). */
-    virtual bool drv_dropDatabase(const QString &dbName = QString());
+    bool drv_dropDatabase(const QString &dbName = QString()) override;
 
-    virtual KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql);
-    virtual bool drv_executeVoidSQL(const KDbEscapedString& sql);
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override;
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable
-    virtual QString serverResultName() const;
+    QString serverResultName() const override;
 
     void storeResult();
 
-    virtual tristate drv_changeFieldProperty(KDbTableSchema* table, KDbField* field,
-            const QString& propertyName, const QVariant& value);
+    tristate drv_changeFieldProperty(KDbTableSchema* table, KDbField* field,
+            const QString& propertyName, const QVariant& value) override;
 
     //! for drv_changeFieldProperty()
     tristate changeFieldType(KDbTableSchema *table, KDbField *field, KDbField::Type type);
