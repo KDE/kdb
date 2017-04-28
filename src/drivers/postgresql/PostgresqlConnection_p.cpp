@@ -22,7 +22,7 @@
 
 PostgresqlConnectionInternal::PostgresqlConnectionInternal(KDbConnection *_conn)
         : KDbConnectionInternal(_conn)
-        , conn(0)
+        , conn(nullptr)
         , unicode(true) // will be set in PostgresqlConnection::drv_useDatabase()
 {
     escapingBuffer.reserve(0x8000);

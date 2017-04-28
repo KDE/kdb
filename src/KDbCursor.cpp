@@ -67,7 +67,7 @@ public:
 };
 
 KDbCursor::KDbCursor(KDbConnection* conn, const KDbEscapedString& sql, Options options)
-        : m_query(0)
+        : m_query(nullptr)
         , m_options(options)
         , d(new Private)
 {
@@ -116,7 +116,7 @@ void KDbCursor::init(KDbConnection* conn)
         m_fieldCount = m_visibleFieldsExpanded->count();
         m_fieldsToStoreInRecord = m_fieldCount;
     } else {
-        m_visibleFieldsExpanded = 0;
+        m_visibleFieldsExpanded = nullptr;
         m_logicalFieldCount = 0;
         m_fieldCount = 0;
         m_fieldsToStoreInRecord = 0;
@@ -183,7 +183,7 @@ KDbRecordData* KDbCursor::storeCurrentRecord() const
     KDbRecordData* data = new KDbRecordData(m_fieldsToStoreInRecord);
     if (!drv_storeCurrentRecord(data)) {
         delete data;
-        return 0;
+        return nullptr;
     }
     return data;
 }

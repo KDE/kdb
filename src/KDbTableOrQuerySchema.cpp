@@ -45,7 +45,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArr
 {
     d->name = name;
     d->table = conn->tableSchema(QLatin1String(name));
-    d->query = d->table ? 0 : conn->querySchema(QLatin1String(name));
+    d->query = d->table ? nullptr : conn->querySchema(QLatin1String(name));
     if (!d->table && !d->query) {
         kdbWarning() << "tableOrQuery is neither table nor query!";
     }
@@ -55,8 +55,8 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArr
         : d(new Private)
 {
     d->name = name;
-    d->table = table ? conn->tableSchema(QLatin1String(name)) : 0;
-    d->query = table ? 0 : conn->querySchema(QLatin1String(name));
+    d->table = table ? conn->tableSchema(QLatin1String(name)) : nullptr;
+    d->query = table ? nullptr : conn->querySchema(QLatin1String(name));
     if (table && !d->table) {
         kdbWarning() << "no table specified!";
     }
@@ -80,7 +80,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, int id)
     : d(new Private)
 {
     d->table = conn->tableSchema(id);
-    d->query = d->table ? 0 : conn->querySchema(id);
+    d->query = d->table ? nullptr : conn->querySchema(id);
     if (!d->table && !d->query) {
         kdbWarning() << "no table or query found for id==" << id;
     }
@@ -90,7 +90,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbTableSchema* table)
     : d(new Private)
 {
     d->table = table;
-    d->query = 0;
+    d->query = nullptr;
     if (!d->table) {
         kdbWarning() << "no table specified!";
     }
@@ -99,7 +99,7 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbTableSchema* table)
 KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbQuerySchema* query)
     : d(new Private)
 {
-    d->table = 0;
+    d->table = nullptr;
     d->query = query;
     if (!d->query) {
         kdbWarning() << "no query specified!";
@@ -156,7 +156,7 @@ KDbField* KDbTableOrQuerySchema::field(const QString& name)
     if (d->query)
         return d->query->field(name);
 
-    return 0;
+    return nullptr;
 }
 
 KDbQueryColumnInfo* KDbTableOrQuerySchema::columnInfo(const QString& name)
@@ -167,7 +167,7 @@ KDbQueryColumnInfo* KDbTableOrQuerySchema::columnInfo(const QString& name)
     if (d->query)
         return d->query->columnInfo(name);
 
-    return 0;
+    return nullptr;
 }
 
 //! Sends information about table or query schema @a schema to debug output @a dbg.
@@ -186,7 +186,7 @@ KDbConnection* KDbTableOrQuerySchema::connection() const
         return d->table->connection();
     else if (d->query)
         return d->query->connection();
-    return 0;
+    return nullptr;
 }
 
 KDbQuerySchema* KDbTableOrQuerySchema::query() const

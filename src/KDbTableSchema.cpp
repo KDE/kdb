@@ -77,7 +77,7 @@ KDbTableSchema::KDbTableSchema(const QString& name)
         , d(new Private(this))
 {
     setName(name);
-    init(0);
+    init(nullptr);
 }
 
 KDbTableSchema::KDbTableSchema(const KDbObject& other)
@@ -85,7 +85,7 @@ KDbTableSchema::KDbTableSchema(const KDbObject& other)
         , KDbObject(other)
         , d(new Private(this))
 {
-    init(0);
+    init(nullptr);
 }
 
 KDbTableSchema::KDbTableSchema()
@@ -93,7 +93,7 @@ KDbTableSchema::KDbTableSchema()
         , KDbObject(KDb::TableObjectType)
         , d(new Private(this))
 {
-    init(0);
+    init(nullptr);
 }
 
 KDbTableSchema::KDbTableSchema(const KDbTableSchema& ts, bool copyId)
@@ -258,7 +258,7 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
         m_fields.at(i)->m_order = i;
 
     //Check for auto-generated indices:
-    KDbIndexSchema *idx = 0;
+    KDbIndexSchema *idx = nullptr;
     if (field->isPrimaryKey()) {// this is auto-generated single-field unique index
         idx = new KDbIndexSchema;
         d->addIndex(idx);
@@ -296,7 +296,7 @@ bool KDbTableSchema::removeField(KDbField *field)
         return false;
     }
     if (d->anyNonPKField && field == d->anyNonPKField) //d->anyNonPKField will be removed!
-        d->anyNonPKField = 0;
+        d->anyNonPKField = nullptr;
     delete lookup;
     return true;
 }
@@ -358,7 +358,7 @@ KDbQuerySchema* KDbTableSchema::query()
 KDbField* KDbTableSchema::anyNonPKField()
 {
     if (!d->anyNonPKField) {
-        KDbField *f = 0;
+        KDbField *f = nullptr;
         for (QListIterator<KDbField*> it(m_fields); it.hasPrevious();) {
             f = it.previous();
             if (!f->isPrimaryKey() && (!d->pkey || !d->pkey->hasField(*f)))
@@ -393,7 +393,7 @@ KDbLookupFieldSchema *KDbTableSchema::lookupFieldSchema(const QString& fieldName
 {
     KDbField *f = KDbTableSchema::field(fieldName);
     if (!f)
-        return 0;
+        return nullptr;
     return lookupFieldSchema(*f);
 }
 

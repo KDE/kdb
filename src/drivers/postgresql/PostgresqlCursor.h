@@ -36,18 +36,18 @@ public:
                               KDbCursor::Options options = KDbCursor::Option::None);
     PostgresqlCursor(KDbConnection* conn, KDbQuerySchema* query,
                      KDbCursor::Options options = KDbCursor::Option::None);
-    virtual ~PostgresqlCursor();
+    ~PostgresqlCursor() override;
 
-    virtual QVariant value(int pos);
-    virtual const char** recordData() const;
-    virtual bool drv_storeCurrentRecord(KDbRecordData* data) const;
-    virtual bool drv_open(const KDbEscapedString& sql);
-    virtual bool drv_close();
-    virtual void drv_getNextRecord();
-    virtual void drv_appendCurrentRecordToBuffer();
-    virtual void drv_bufferMovePointerNext();
-    virtual void drv_bufferMovePointerPrev();
-    virtual void drv_bufferMovePointerTo(qint64 to);
+    QVariant value(int pos) override;
+    const char** recordData() const override;
+    bool drv_storeCurrentRecord(KDbRecordData* data) const override;
+    bool drv_open(const KDbEscapedString& sql) override;
+    bool drv_close() override;
+    void drv_getNextRecord() override;
+    void drv_appendCurrentRecordToBuffer() override;
+    void drv_bufferMovePointerNext() override;
+    void drv_bufferMovePointerPrev() override;
+    void drv_bufferMovePointerTo(qint64 to) override;
 
     void storeResultAndClear(PGresult **pgResult, ExecStatusType execStatus);
 

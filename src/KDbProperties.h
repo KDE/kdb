@@ -35,7 +35,7 @@ class KDB_EXPORT KDbProperties : public KDbResultable
 {
     Q_DECLARE_TR_FUNCTIONS(KDbProperties)
 public:
-    ~KDbProperties();
+    ~KDbProperties() override;
 
     /*! Sets @a value for property @a name. Optional caption can be also set.
      If there's no such property defined, it will be added. Existing value will be overwritten.

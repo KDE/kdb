@@ -70,7 +70,7 @@ public:
      (KDbRecordData object must have exactly two columns) */
     KDbTableViewData(KDbField::Type keyType, KDbField::Type valueType);
 
-    virtual ~KDbTableViewData();
+    ~KDbTableViewData() override;
 
     /*! Preloads all records provided by cursor (only for db-aware version). */
     bool preloadAllRecords();
@@ -167,7 +167,7 @@ public:
     bool updateRecordEditBufferRef(KDbRecordData *record,
                                    int colnum, KDbTableViewColumn* col, QVariant* newval,
                                    bool allowSignals = true,
-                                   QVariant *visibleValueForLookupField = 0);
+                                   QVariant *visibleValueForLookupField = nullptr);
 
     /*! Added for convenience. Like above but @a newval is passed by value. */
     bool updateRecordEditBuffer(KDbRecordData *record, int colnum, KDbTableViewColumn* col,

@@ -50,7 +50,7 @@ public:
      All KDbRelationship objects listed by masterRelationships() are detached from
      detail-side indices and then deleted.
      KDbRelationship objects listed by detailsRelationships() are not deleted. */
-    virtual ~KDbIndexSchema();
+    ~KDbIndexSchema() override;
 
     /*! Adds field at the end of field list.
      KDbField will not be owned by index. KDbField must belong to a table

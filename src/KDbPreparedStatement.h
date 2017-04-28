@@ -104,7 +104,7 @@ public:
     //! Creates an invalid prepared statement.
     KDbPreparedStatement();
 
-    virtual ~KDbPreparedStatement();
+    ~KDbPreparedStatement() override;
 
     bool isValid() const;
 

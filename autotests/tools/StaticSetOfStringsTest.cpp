@@ -41,7 +41,7 @@ const char* StaticSetOfStringsTest::keywords[] = {
     "BACKWARD",
     "BIGINT",
     "BINARY",
-    0
+    nullptr
 };
 
 void StaticSetOfStringsTest::initTestCase()

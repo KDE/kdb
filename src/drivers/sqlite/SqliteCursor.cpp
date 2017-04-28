@@ -46,10 +46,10 @@ class SqliteCursorData : public SqliteConnectionInternal
 public:
     explicit SqliteCursorData(SqliteConnection* conn)
             : SqliteConnectionInternal(conn)
-            , prepared_st_handle(0)
-            , utail(0)
-            , curr_coldata(0)
-            , curr_colname(0)
+            , prepared_st_handle(nullptr)
+            , utail(nullptr)
+            , curr_coldata(nullptr)
+            , curr_colname(nullptr)
             , cols_pointers_mem_size(0)
     {
         data_owned = false;
@@ -180,7 +180,7 @@ bool SqliteCursor::drv_open(const KDbEscapedString& sql)
                  sql.constData(),       /* SQL statement, UTF-8 encoded */
                  sql.length(),             /* Length of zSql in bytes. */
                  &d->prepared_st_handle,  /* OUT: Statement handle */
-                 0/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
+                 nullptr/*const char **pzTail*/     /* OUT: Pointer to unused portion of zSql */
              );
     if (res != SQLITE_OK) {
         m_result.setServerErrorCode(res);
@@ -249,7 +249,7 @@ void SqliteCursor::drv_appendCurrentRecordToBuffer()
     for (int i = 0; i < m_fieldCount; i++, src_col++, dest_col++) {
 //  sqliteDebug() << i <<": '" << *src_col << "'";
 //  sqliteDebug() << "src_col: " << src_col;
-        *dest_col = *src_col ? strdup(*src_col) : 0;
+        *dest_col = *src_col ? strdup(*src_col) : nullptr;
     }
     d->records[m_records_in_buf] = record;
 // sqliteDebug() << "ok.";

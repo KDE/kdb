@@ -601,7 +601,7 @@ IDENTIFIER ColType
     kdbDebug() << "adding field " << *$1;
     globalField->setName(*$1);
     globalParser->table()->addField(globalField);
-    globalField = 0;
+    globalField = nullptr;
     delete $1;
 }
 | IDENTIFIER ColType ColKeys
@@ -615,7 +615,7 @@ IDENTIFIER ColType
 //        globalParser->table()->addPrimaryKey(globalField->name());
 
 //    delete globalField;
-//    globalField = 0;
+//    globalField = nullptr;
 }
 ;
 

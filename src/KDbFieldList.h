@@ -77,13 +77,13 @@ public:
      @return false if this field does not belong to this list. */
     virtual bool moveField(KDbField *field, int newIndex);
 
-    /*! @return field id or NULL if there is no such a field. */
+    /*! @return field id or @c nullptr if there is no such a field. */
     virtual KDbField* field(int id);
 
     /*! @overload KDbField* field(int id) */
     virtual const KDbField* field(int id) const;
 
-    /*! @return field with name @a name or NULL if there is no such a field. */
+    /*! @return field with name @a name or @c nullptr if there is no such a field. */
     virtual KDbField* field(const QString& name);
 
     /*! @overload . DbField* field(const QString& name) const */

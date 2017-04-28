@@ -62,7 +62,7 @@ public:
 
     //! Db-aware version.
     KDbTableViewColumn(const KDbQuerySchema &query, KDbQueryColumnInfo *aColumnInfo,
-                    KDbQueryColumnInfo *aVisibleLookupColumnInfo = 0);
+                    KDbQueryColumnInfo *aVisibleLookupColumnInfo = nullptr);
 
     virtual ~KDbTableViewColumn();
 
@@ -119,12 +119,12 @@ public:
      The relationship will be used to generate a popup editor instead of just regular editor.
      This assignment has no result if @a data has no primary key defined.
      @a data is owned, so is will be destroyed when needed. It is also destroyed
-     when another data (or NULL) is set for the same column. */
+     when another data (or @c nullptr) is set for the same column. */
     void setRelatedData(KDbTableViewData *data);
 
     /*! For not-db-aware data only:
      Related data @a data for this column, what defines simple one-field.
-     NULL by default. @see setRelatedData() */
+     @c nullptr by default. @see setRelatedData() */
     KDbTableViewData *relatedData() const;
 
     /*! @return field for this column.

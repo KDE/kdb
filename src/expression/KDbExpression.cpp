@@ -107,7 +107,7 @@ KDbField::Type KDbExpressionData::typeInternal(KDb::ExpressionCallStack* callSta
 
 KDbField::Type KDbExpressionData::type(KDb::ExpressionCallStack* callStack) const
 {
-    if (!addToCallStack(0, callStack)) {
+    if (!addToCallStack(nullptr, callStack)) {
         return KDbField::InvalidType;
     }
     const KDbField::Type t = typeInternal(callStack);
@@ -159,7 +159,7 @@ bool KDbExpressionData::validate(KDbParseInfo *parseInfo)
 
 bool KDbExpressionData::validate(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack)
 {
-    if (!addToCallStack(0, callStack)) {
+    if (!addToCallStack(nullptr, callStack)) {
         return false;
     }
     bool result = validateInternal(parseInfo, callStack);
@@ -183,7 +183,7 @@ KDbEscapedString KDbExpressionData::toString(
     if (owned) {
         callStack = new KDb::ExpressionCallStack();
     }
-    if (!addToCallStack(0, callStack)) {
+    if (!addToCallStack(nullptr, callStack)) {
         if (owned) {
             delete callStack;
         }

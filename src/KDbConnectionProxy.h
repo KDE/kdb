@@ -42,7 +42,7 @@ public:
     explicit KDbConnectionProxy(KDbConnection *connection);
 
     //! Deletes this proxy. Owned connection is closed and destroyed.
-    ~KDbConnectionProxy();
+    ~KDbConnectionProxy() override;
 
     //! @return parent connection for this proxy
     KDbConnection *parentConnection();
@@ -126,15 +126,19 @@ public:
 
     bool setAutoCommit(bool on);
 
-    KDbEscapedString escapeString(const QString& str) const Q_DECL_OVERRIDE;
+    KDbEscapedString escapeString(const QString& str) const override;
 
-    KDbCursor* prepareQuery(const KDbEscapedString& sql, KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE;
+    KDbCursor *prepareQuery(const KDbEscapedString &sql,
+                            KDbCursor::Options options = KDbCursor::Option::None) override;
 
-    KDbCursor* prepareQuery(KDbQuerySchema* query, KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE;
+    KDbCursor *prepareQuery(KDbQuerySchema *query,
+                            KDbCursor::Options options = KDbCursor::Option::None) override;
 
-    KDbCursor* prepareQuery(KDbTableSchema* table, KDbCursor::Options options = KDbCursor::Option::None);
+    KDbCursor *prepareQuery(KDbTableSchema *table,
+                            KDbCursor::Options options = KDbCursor::Option::None);
 
-    KDbCursor* executeQuery(const KDbEscapedString& sql, KDbCursor::Options options = KDbCursor::Option::None);
+    KDbCursor *executeQuery(const KDbEscapedString &sql,
+                            KDbCursor::Options options = KDbCursor::Option::None);
 
     KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
                             KDbCursor::Options options = KDbCursor::Option::None);
@@ -193,7 +197,7 @@ public:
 
     tristate isEmpty(KDbTableSchema* table);
 
-    KDbEscapedString recentSQLString() const Q_DECL_OVERRIDE;
+    KDbEscapedString recentSQLString() const override;
 
     //PROTOTYPE:
 #define A , const QVariant&
@@ -243,7 +247,7 @@ public:
 
     KDbField* findSystemFieldName(const KDbFieldList& fieldlist);
 
-    QString anyAvailableDatabaseName() Q_DECL_OVERRIDE;
+    QString anyAvailableDatabaseName() override;
 
     void setAvailableDatabaseName(const QString& dbName);
 
@@ -275,24 +279,24 @@ public:
 
     bool isInternalTableSchema(const QString& tableName);
 
-    QString escapeIdentifier(const QString& id) const Q_DECL_OVERRIDE;
+    QString escapeIdentifier(const QString& id) const override;
 
-    bool drv_connect() Q_DECL_OVERRIDE;
+    bool drv_connect() override;
 
-    bool drv_disconnect() Q_DECL_OVERRIDE;
+    bool drv_disconnect() override;
 
-    bool drv_getServerVersion(KDbServerVersionInfo* version) Q_DECL_OVERRIDE;
+    bool drv_getServerVersion(KDbServerVersionInfo* version) override;
 
-    tristate drv_containsTable(const QString &tableName) Q_DECL_OVERRIDE;
+    tristate drv_containsTable(const QString &tableName) override;
 
-    bool drv_createTable(const KDbTableSchema& tableSchema) Q_DECL_OVERRIDE;
+    bool drv_createTable(const KDbTableSchema& tableSchema) override;
 
-    bool drv_alterTableName(KDbTableSchema* tableSchema, const QString& newName) Q_DECL_OVERRIDE;
+    bool drv_alterTableName(KDbTableSchema* tableSchema, const QString& newName) override;
 
     bool drv_copyTableData(const KDbTableSchema &tableSchema,
-                           const KDbTableSchema &destinationTableSchema) Q_DECL_OVERRIDE;
+                           const KDbTableSchema &destinationTableSchema) override;
 
-    bool drv_dropTable(const QString& tableName) Q_DECL_OVERRIDE;
+    bool drv_dropTable(const QString& tableName) override;
 
     tristate dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
 
@@ -300,44 +304,44 @@ public:
 
     KDbField* setupField(const KDbRecordData& data);
 
-    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
 
-    bool drv_executeVoidSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE;
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
 
-    bool drv_getDatabasesList(QStringList* list) Q_DECL_OVERRIDE;
+    bool drv_getDatabasesList(QStringList* list) override;
 
-    bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true) Q_DECL_OVERRIDE;
+    bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true) override;
 
-    bool drv_createDatabase(const QString &dbName = QString()) Q_DECL_OVERRIDE;
+    bool drv_createDatabase(const QString &dbName = QString()) override;
 
     bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = nullptr,
-                         KDbMessageHandler* msgHandler = nullptr) Q_DECL_OVERRIDE;
+                         KDbMessageHandler* msgHandler = nullptr) override;
 
-    bool drv_closeDatabase() Q_DECL_OVERRIDE;
+    bool drv_closeDatabase() override;
 
-    bool drv_isDatabaseUsed() const Q_DECL_OVERRIDE;
+    bool drv_isDatabaseUsed() const override;
 
-    bool drv_dropDatabase(const QString &dbName = QString()) Q_DECL_OVERRIDE;
+    bool drv_dropDatabase(const QString &dbName = QString()) override;
 
-    bool drv_createTable(const QString& tableName) Q_DECL_OVERRIDE;
+    bool drv_createTable(const QString& tableName) override;
 
-    KDbTransactionData* drv_beginTransaction() Q_DECL_OVERRIDE;
+    KDbTransactionData* drv_beginTransaction() override;
 
-    bool drv_commitTransaction(KDbTransactionData* trans) Q_DECL_OVERRIDE;
+    bool drv_commitTransaction(KDbTransactionData* trans) override;
 
-    bool drv_rollbackTransaction(KDbTransactionData* trans) Q_DECL_OVERRIDE;
+    bool drv_rollbackTransaction(KDbTransactionData* trans) override;
 
-    bool drv_beforeInsert(const QString& tableName, KDbFieldList* fields) Q_DECL_OVERRIDE;
+    bool drv_beforeInsert(const QString& tableName, KDbFieldList* fields) override;
 
-    bool drv_afterInsert(const QString& tableName, KDbFieldList* fields) Q_DECL_OVERRIDE;
+    bool drv_afterInsert(const QString& tableName, KDbFieldList* fields) override;
 
-    bool drv_beforeUpdate(const QString& tableName, KDbFieldList* fields) Q_DECL_OVERRIDE;
+    bool drv_beforeUpdate(const QString& tableName, KDbFieldList* fields) override;
 
-    bool drv_afterUpdate(const QString& tableName, KDbFieldList* fields) Q_DECL_OVERRIDE;
+    bool drv_afterUpdate(const QString& tableName, KDbFieldList* fields) override;
 
-    bool drv_setAutoCommit(bool on) Q_DECL_OVERRIDE;
+    bool drv_setAutoCommit(bool on) override;
 
-    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE;
+    KDbPreparedStatementInterface* prepareStatementInternal() override;
 
     bool beginAutoCommitTransaction(KDbTransactionGuard* tg);
 

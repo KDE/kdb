@@ -23,14 +23,14 @@
 
 KDbFieldList::KDbFieldList(bool owner)
         : m_fields(owner)
-        , m_autoinc_fields(0)
+        , m_autoinc_fields(nullptr)
 {
 }
 
 //! @todo IMPORTANT: (API) improve deepCopyFields
 KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
         : m_fields(fl.m_fields.autoDelete())
-        , m_autoinc_fields(0)
+        , m_autoinc_fields(nullptr)
 {
     if (deepCopyFields) {
         //deep copy for the fields
@@ -63,7 +63,7 @@ void KDbFieldList::clear()
 {
     m_fields_by_name.clear();
     delete m_autoinc_fields;
-    m_autoinc_fields = 0;
+    m_autoinc_fields = nullptr;
     m_fields.clear();
     m_sqlFields.clear();
 }
@@ -83,7 +83,7 @@ bool KDbFieldList::insertField(int index, KDbField *field)
         m_fields_by_name.insert(field->name().toLower(), field);
     m_sqlFields.clear();
     delete m_autoinc_fields;
-    m_autoinc_fields = 0;
+    m_autoinc_fields = nullptr;
     return true;
 }
 
@@ -130,7 +130,7 @@ bool KDbFieldList::removeField(KDbField *field)
     m_fields.removeAt(m_fields.indexOf(field));
     m_sqlFields.clear();
     delete m_autoinc_fields;
-    m_autoinc_fields = 0;
+    m_autoinc_fields = nullptr;
     return true;
 }
 
@@ -146,7 +146,7 @@ bool KDbFieldList::moveField(KDbField *field, int newIndex)
     m_fields.insert(newIndex, field);
     m_sqlFields.clear();
     delete m_autoinc_fields;
-    m_autoinc_fields = 0;
+    m_autoinc_fields = nullptr;
     return true;
 }
 
@@ -218,7 +218,7 @@ KDbFieldList* KDbFieldList::subList(const QString& n1, const QString& n2,
                               const QString& n17, const QString& n18)
 {
     if (n1.isEmpty())
-        return 0;
+        return nullptr;
     KDbFieldList *fl = new KDbFieldList(false);
     _ADD_FIELD(n1);
     _ADD_FIELD(n2);
@@ -277,11 +277,11 @@ KDbFieldList* KDbFieldList::subList(const QList<int>& list)
         KDbField *f = field(index);
         if (!f) {
             kdbWarning() << QString::fromLatin1("could not find field at position %1").arg(index);
-            return 0;
+            return nullptr;
         }
         if (!fl->addField(f)) {
             kdbWarning() << QString::fromLatin1("could not add field at position %1").arg(index);
-            return 0;
+            return nullptr;
         }
     }
     return fl.take();

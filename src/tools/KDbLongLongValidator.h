@@ -38,13 +38,13 @@ class KDB_EXPORT KDbLongLongValidator : public QValidator
 public:
     explicit KDbLongLongValidator(QWidget * parent, int base = 10);
     KDbLongLongValidator(qint64 bottom, qint64 top, QWidget * parent, int base = 10);
-    virtual ~KDbLongLongValidator();
+    ~KDbLongLongValidator() override;
 
     //! Validates the text, and returns the result.  Does not modify the parameters.
-    virtual State validate(QString &, int &) const;
+    State validate(QString &, int &) const override;
 
     //! Fixes the text if possible, providing a valid string.  The parameter may be modified.
-    virtual void fixup(QString &) const;
+    void fixup(QString &) const override;
 
     //! Sets the minimum and maximum values allowed.
     virtual void setRange(qint64 bottom, qint64 top);

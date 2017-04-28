@@ -217,7 +217,7 @@ void KDbConnectionPrivate::setupKDbSystemSchema()
         KDbInternalTableSchema *t_objects = new KDbInternalTableSchema(QLatin1String("kexi__objects"));
         t_objects->addField(new KDbField(QLatin1String("o_id"),
                                       KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
-        t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, 0, KDbField::Unsigned));
+        t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, nullptr, KDbField::Unsigned));
         t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
         t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
         t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
@@ -234,8 +234,8 @@ void KDbConnectionPrivate::setupKDbSystemSchema()
     }
     {
         KDbInternalTableSchema *t_fields = new KDbInternalTableSchema(QLatin1String("kexi__fields"));
-        t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, 0, KDbField::Unsigned));
-        t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, 0, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, nullptr, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, nullptr, KDbField::Unsigned));
         t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
         t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
         t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
@@ -886,7 +886,7 @@ QStringList KDbConnection::objectNames(int objectType, bool* ok)
                                " ORDER BY o_id").arg(d->driver->valueToSQL(KDbField::Integer, objectType));
     }
     QStringList list;
-    const bool success = queryStringListInternal(&sql, &list, 0, 0, 0, KDb::isIdentifier);
+    const bool success = queryStringListInternal(&sql, &list, nullptr, nullptr, 0, KDb::isIdentifier);
     if (ok) {
         *ok = success;
     }
@@ -993,7 +993,7 @@ QList<int> KDbConnection::objectIds(int objectType, bool* ok)
 //   " VALUES (" + vals + ")";
 
 bool KDbConnection::insertRecordInternal(const QString &tableSchemaName, KDbFieldList* fields,
-                     const KDbEscapedString &sql, KDbSqlResult** result = 0)
+                     const KDbEscapedString &sql, KDbSqlResult** result = nullptr)
 {
     if (!drv_beforeInsert(tableSchemaName,fields )) {
         return false;
@@ -1178,14 +1178,14 @@ KDbField* KDbConnection::findSystemFieldName(const KDbFieldList& fieldlist)
         if (d->driver->isSystemFieldName((*it)->name()))
             return *it;
     }
-    return 0;
+    return nullptr;
 }
 
 //! Creates a KDbField list for kexi__fields, for sanity. Used by createTable()
 static KDbFieldList* createFieldListForKexi__Fields(KDbTableSchema *kexi__fieldsSchema)
 {
     if (!kexi__fieldsSchema)
-        return 0;
+        return nullptr;
     return kexi__fieldsSchema->subList(
                QList<QByteArray>()
                << "t_id"
@@ -1302,7 +1302,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
 
     bool previousSchemaStillKept = false;
 
-    KDbTableSchema *existingTable = 0;
+    KDbTableSchema *existingTable = nullptr;
     if (replaceExisting) {
         //get previous table (do not retrieve, though)
         existingTable = this->tableSchema(tableName);
@@ -1321,7 +1321,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
                 return false;
         }
     } else {
-        if (this->tableSchema(tableSchema->name()) != 0) {
+        if (this->tableSchema(tableSchema->name()) != nullptr) {
             clearResult();
             m_result = KDbResult(ERR_OBJECT_EXISTS,
                                  tr("Table \"%1\" already exists.").arg(tableSchema->name()));
@@ -1394,7 +1394,7 @@ KDbTableSchema *KDbConnection::copyTable(const KDbTableSchema &tableSchema, cons
     if (this->tableSchema(tableSchema.name()) != &tableSchema) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              tr("Table \"%1\" does not exist.").arg(tableSchema.name()));
-        return 0;
+        return nullptr;
     }
     KDbTableSchema *copiedTable = new KDbTableSchema(tableSchema, false /* !copyId*/);
     // copy name, caption, description
@@ -1404,12 +1404,12 @@ KDbTableSchema *KDbConnection::copyTable(const KDbTableSchema &tableSchema, cons
     // copy the structure and data
     if (!createTable(copiedTable, false /* !replaceExisting */)) {
         delete copiedTable;
-        return 0;
+        return nullptr;
     }
     if (!drv_copyTableData(tableSchema, *copiedTable)) {
         dropTable(copiedTable);
         delete copiedTable;
-        return 0;
+        return nullptr;
     }
     return copiedTable;
 }
@@ -1421,7 +1421,7 @@ KDbTableSchema *KDbConnection::copyTable(const QString &tableName, const KDbObje
     if (!ts) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              tr("Table \"%1\" does not exist.").arg(tableName));
-        return 0;
+        return nullptr;
     }
     return copyTable(*ts, newData);
 }
@@ -1590,7 +1590,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
 //! @todo alter table name for server DB backends!
 //! @todo what about objects (queries/forms) that use old name?
     KDbTableSchema *tableToReplace = this->tableSchema(newName);
-    const bool destTableExists = tableToReplace != 0;
+    const bool destTableExists = tableToReplace != nullptr;
     const int origID = destTableExists ? tableToReplace->id() : -1; //will be reused in the new table
     if (!replace && destTableExists) {
         m_result = KDbResult(ERR_OBJECT_EXISTS,
@@ -1945,7 +1945,7 @@ bool KDbConnection::setAutoCommit(bool on)
 KDbTransactionData* KDbConnection::drv_beginTransaction()
 {
     if (!executeVoidSQL(KDbEscapedString("BEGIN")))
-        return 0;
+        return nullptr;
     return new KDbTransactionData(this);
 }
 
@@ -1967,14 +1967,14 @@ bool KDbConnection::drv_setAutoCommit(bool /*on*/)
 KDbCursor* KDbConnection::executeQuery(const KDbEscapedString& sql, KDbCursor::Options options)
 {
     if (sql.isEmpty())
-        return 0;
+        return nullptr;
     KDbCursor *c = prepareQuery(sql, options);
     if (!c)
-        return 0;
+        return nullptr;
     if (!c->open()) {//err - kill that
         m_result = c->result();
         CursorDeleter deleter(c);
-        return 0;
+        return nullptr;
     }
     return c;
 }
@@ -1984,11 +1984,11 @@ KDbCursor* KDbConnection::executeQuery(KDbQuerySchema* query, const QList<QVaria
 {
     KDbCursor *c = prepareQuery(query, params, options);
     if (!c)
-        return 0;
+        return nullptr;
     if (!c->open()) {//err - kill that
         m_result = c->result();
         CursorDeleter deleter(c);
-        return 0;
+        return nullptr;
     }
     return c;
 }
@@ -2168,7 +2168,7 @@ KDbCursor* KDbConnection::executeQueryInternal(const KDbEscapedString& sql,
         return executeQuery(sql);
     }
     if (!query) {
-        return 0;
+        return nullptr;
     }
     if (params) {
         return executeQuery(query, *params);
@@ -2208,18 +2208,18 @@ tristate KDbConnection::querySingleRecordInternal(KDbRecordData* data,
 
 tristate KDbConnection::querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, &sql, 0, 0, addLimitTo1);
+    return querySingleRecordInternal(data, &sql, nullptr, nullptr, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, 0, query, 0, addLimitTo1);
+    return querySingleRecordInternal(data, nullptr, query, nullptr, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
                                           const QList<QVariant>& params, bool addLimitTo1)
 {
-    return querySingleRecordInternal(data, 0, query, &params, addLimitTo1);
+    return querySingleRecordInternal(data, nullptr, query, &params, addLimitTo1);
 }
 
 bool KDbConnection::checkIfColumnExists(KDbCursor *cursor, int column)
@@ -2264,20 +2264,20 @@ tristate KDbConnection::querySingleStringInternal(const KDbEscapedString* sql,
 tristate KDbConnection::querySingleString(const KDbEscapedString& sql, QString* value,
                                           int column, bool addLimitTo1)
 {
-    return querySingleStringInternal(&sql, value, 0, 0, column, addLimitTo1);
+    return querySingleStringInternal(&sql, value, nullptr, nullptr, column, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleString(KDbQuerySchema* query, QString* value, int column,
                                           bool addLimitTo1)
 {
-    return querySingleStringInternal(0, value, query, 0, column, addLimitTo1);
+    return querySingleStringInternal(nullptr, value, query, nullptr, column, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleString(KDbQuerySchema* query, QString* value,
                                           const QList<QVariant>& params, int column,
                                           bool addLimitTo1)
 {
-    return querySingleStringInternal(0, value, query, &params, column, addLimitTo1);
+    return querySingleStringInternal(nullptr, value, query, &params, column, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleNumberInternal(const KDbEscapedString* sql,
@@ -2301,20 +2301,20 @@ tristate KDbConnection::querySingleNumberInternal(const KDbEscapedString* sql,
 tristate KDbConnection::querySingleNumber(const KDbEscapedString& sql, int* number,
                                           int column, bool addLimitTo1)
 {
-    return querySingleNumberInternal(&sql, number, 0, 0, column, addLimitTo1);
+    return querySingleNumberInternal(&sql, number, nullptr, nullptr, column, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleNumber(KDbQuerySchema* query, int* number, int column,
                                           bool addLimitTo1)
 {
-    return querySingleNumberInternal(0, number, query, 0, column, addLimitTo1);
+    return querySingleNumberInternal(nullptr, number, query, nullptr, column, addLimitTo1);
 }
 
 tristate KDbConnection::querySingleNumber(KDbQuerySchema* query, int* number,
                                           const QList<QVariant>& params, int column,
                                           bool addLimitTo1)
 {
-    return querySingleNumberInternal(0, number, query, &params, column, addLimitTo1);
+    return querySingleNumberInternal(nullptr, number, query, &params, column, addLimitTo1);
 }
 
 bool KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
@@ -2359,18 +2359,18 @@ bool KDbConnection::queryStringListInternal(const KDbEscapedString* sql,
 bool KDbConnection::queryStringList(const KDbEscapedString& sql, QStringList* list,
                                     int column)
 {
-    return queryStringListInternal(&sql, list, 0, 0, column, 0);
+    return queryStringListInternal(&sql, list, nullptr, nullptr, column, nullptr);
 }
 
 bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list, int column)
 {
-    return queryStringListInternal(0, list, query, 0, column, 0);
+    return queryStringListInternal(nullptr, list, query, nullptr, column, nullptr);
 }
 
 bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
                                     const QList<QVariant>& params, int column)
 {
-    return queryStringListInternal(0, list, query, &params, column, 0);
+    return queryStringListInternal(nullptr, list, query, &params, column, nullptr);
 }
 
 tristate KDbConnection::resultExists(const KDbEscapedString& sql, bool addLimitTo1)
@@ -2682,11 +2682,11 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
     if (f_int_type <= KDbField::InvalidType || f_int_type > KDbField::LastType)
         ok = false;
     if (!ok)
-        return 0;
+        return nullptr;
     KDbField::Type f_type = (KDbField::Type)f_int_type;
     int f_len = qMax(0, data.at(3).toInt(&ok)); // defined limit
     if (!ok) {
-        return 0;
+        return nullptr;
     }
     if (f_len < 0) {
         f_len = 0;
@@ -2695,13 +2695,13 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
 
     int f_prec = data.at(4).toInt(&ok);
     if (!ok)
-        return 0;
+        return nullptr;
     KDbField::Constraints f_constr = (KDbField::Constraints)data.at(5).toInt(&ok);
     if (!ok)
-        return 0;
+        return nullptr;
     KDbField::Options f_opts = (KDbField::Options)data.at(6).toInt(&ok);
     if (!ok)
-        return 0;
+        return nullptr;
 
     QString name(data.at(2).toString());
     if (!KDb::isIdentifier(name)) {
@@ -2732,7 +2732,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
     KDbTableSchema *t = new KDbTableSchema(this);
     if (!setupObjectData(data, t)) {
         delete t;
-        return 0;
+        return nullptr;
     }
 
     KDbCursor *cursor;
@@ -2743,7 +2743,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
                             .arg(d->driver->valueToSQL(KDbField::Integer, t->id())))))
     {
         delete t;
-        return 0;
+        return nullptr;
     }
     if (!cursor->moveFirst()) {
         if (!cursor->result().isError() && cursor->eof()) {
@@ -2751,7 +2751,7 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
         }
         deleteCursor(cursor);
         delete t;
-        return 0;
+        return nullptr;
     }
 
     // For each field: load its schema
@@ -2774,17 +2774,17 @@ KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
     if (!ok) {//error:
         deleteCursor(cursor);
         delete t;
-        return 0;
+        return nullptr;
     }
 
     if (!deleteCursor(cursor)) {
         delete t;
-        return 0;
+        return nullptr;
     }
 
     if (!loadExtendedTableSchemaData(t)) {
         delete t;
-        return 0;
+        return nullptr;
     }
     //store locally:
     d->insertTable(t);
@@ -2804,7 +2804,7 @@ KDbTableSchema* KDbConnection::tableSchema(const QString& tableName)
                              .arg(escapeString(tableName))
                              .arg(d->driver->valueToSQL(KDbField::Integer, KDb::TableObjectType)), &data))
     {
-        return 0;
+        return nullptr;
     }
     return setupTableSchema(data);
 }
@@ -2820,7 +2820,7 @@ KDbTableSchema* KDbConnection::tableSchema(int tableId)
             KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
                              .arg(d->driver->valueToSQL(KDbField::Integer, tableId)), &data))
     {
-        return 0;
+        return nullptr;
     }
     return setupTableSchema(data);
 }
@@ -2902,14 +2902,14 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
     bool ok = true;
     const int objID = data[0].toInt(&ok);
     if (!ok)
-        return 0;
+        return nullptr;
     QString sql;
     if (!loadDataBlock(objID, &sql, QLatin1String("sql"))) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              tr("Could not find definition for query \"%1\". Deleting this query is recommended.").arg(data[2].toString()));
-        return 0;
+        return nullptr;
     }
-    KDbQuerySchema *query = 0;
+    KDbQuerySchema *query = nullptr;
     if (d->parser()->parse(KDbEscapedString(sql))) {
         query = d->parser()->query();
     }
@@ -2920,11 +2920,11 @@ KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
                                 "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
                                 "<p>This query can be edited only in Text View.</p>")
                                 .arg(data[2].toString(), sql));
-        return 0;
+        return nullptr;
     }
     if (!setupObjectData(data, query)) {
         delete query;
-        return 0;
+        return nullptr;
     }
     d->insertQuery(query);
     return query;
@@ -2945,7 +2945,7 @@ KDbQuerySchema* KDbConnection::querySchema(const QString& queryName)
                              .arg(d->driver->valueToSQL(KDbField::Integer, int(KDb::QueryObjectType))),
             &data))
     {
-        return 0;
+        return nullptr;
     }
     return setupQuerySchema(data);
 }
@@ -2963,7 +2963,7 @@ KDbQuerySchema* KDbConnection::querySchema(int queryId)
                              .arg(d->driver->valueToSQL(KDbField::Integer, queryId)),
             &data))
     {
-        return 0;
+        return nullptr;
     }
     return setupQuerySchema(data);
 }
@@ -3047,7 +3047,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                              tr("Could not update record because there is no master table defined."));
         return false;
     }
-    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
+    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : nullptr;
     if (!useRecordId && !pkey) {
         kdbWarning() << " -- NO MASTER TABLE's PKEY!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
@@ -3147,7 +3147,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                              tr("Could not insert record because there is no master table specified."));
         return false;
     }
-    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
+    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : nullptr;
     if (!getRecordId && !pkey) {
         kdbWarning() << " -- WARNING: NO MASTER TABLE's PKEY";
     }
@@ -3302,7 +3302,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
                              tr("Could not delete record because there is no master table specified."));
         return false;
     }
-    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : 0;
+    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : nullptr;
 
 //! @todo allow to delete from a table without pkey
     if (!useRecordId && !pkey) {

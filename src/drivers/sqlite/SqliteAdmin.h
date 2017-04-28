@@ -28,7 +28,7 @@ class SqliteAdminTools : public KDbAdminTools
 {
 public:
     SqliteAdminTools();
-    virtual ~SqliteAdminTools();
+    ~SqliteAdminTools() override;
 
 #ifdef KDB_SQLITE_VACUUM
     /*! Performs vacuum (compacting) for connection @a conn. */

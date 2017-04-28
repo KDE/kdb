@@ -31,7 +31,7 @@ class KDB_EXPORT KDbAdminTools : public KDbResultable
 {
 public:
     KDbAdminTools();
-    virtual ~KDbAdminTools();
+    ~KDbAdminTools() override;
 
     /*! Performs vacuum (compacting) for connection @a data.
      Can be implemented for your driver.

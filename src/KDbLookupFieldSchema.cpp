@@ -378,7 +378,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
             const QVariant val = KDb::loadPropertyValueFromDom(el.firstChild(), &ok);
             if (!ok || !::setBoundColumn(lookupFieldSchema, val)) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
         } else if (name == "visible-column") {
             /* <visible-column> #a column that has to be visible in the combo box
@@ -394,13 +394,13 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 const QVariant val = KDb::loadPropertyValueFromDom(childNode, &ok);
                 if (!ok) {
                     delete lookupFieldSchema;
-                    return 0;
+                    return nullptr;
                 }
                 list.append(val);
             }
             if (!::setVisibleColumns(lookupFieldSchema, list)) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
         } else if (name == "column-widths") {
             /* <column-widths> #column widths, -1 means 'default'
@@ -414,13 +414,13 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                 QVariant val = KDb::loadPropertyValueFromDom(el, &ok);
                 if (!ok) {
                     delete lookupFieldSchema;
-                    return 0;
+                    return nullptr;
                 }
                 columnWidths.append(val);
             }
             if (!::setColumnWidths(lookupFieldSchema, columnWidths)) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
         } else if (name == "show-column-headers") {
             /* <show-column-headers>
@@ -430,7 +430,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
             const QVariant val = KDb::loadPropertyValueFromDom(el.firstChild(), &ok);
             if (!ok) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setColumnHeadersVisible(val.toBool());
@@ -442,7 +442,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
             const QVariant val = KDb::loadPropertyValueFromDom(el.firstChild(), &ok);
             if (!ok) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
             if (val.type() == QVariant::Int)
                 lookupFieldSchema->setMaxVisibleRecords(val.toInt());
@@ -454,7 +454,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
             const QVariant val = KDb::loadPropertyValueFromDom(el.firstChild(), &ok);
             if (!ok) {
                 delete lookupFieldSchema;
-                return 0;
+                return nullptr;
             }
             if (val.type() == QVariant::Bool)
                 lookupFieldSchema->setLimitToList(val.toBool());

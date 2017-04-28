@@ -34,7 +34,7 @@ static inline QString escapeIdentifier(const QString& str)
 
 MysqlConnectionInternal::MysqlConnectionInternal(KDbConnection* connection)
         : KDbConnectionInternal(connection)
-        , mysql(0)
+        , mysql(nullptr)
         , mysql_owned(true)
         , res(0)
         , lowerCaseTableNames(false)
@@ -88,11 +88,11 @@ bool MysqlConnectionInternal::db_connect(const KDbConnectionData& data)
     const QByteArray userName(data.userName().toLatin1());
     const QByteArray password(data.password().toLatin1());
     int client_flag = 0; //!< @todo support client_flag?
-    if (mysql_real_connect(mysql, hostName.isEmpty() ? 0 : hostName.constData(),
-                           data.userName().isEmpty() ? 0 : userName.constData(),
-                           data.password().isNull() ? 0 : password.constData(),
-                           0,
-                           data.port(), localSocket.isEmpty() ? 0 : localSocket.constData(),
+    if (mysql_real_connect(mysql, hostName.isEmpty() ? nullptr : hostName.constData(),
+                           data.userName().isEmpty() ? nullptr : userName.constData(),
+                           data.password().isNull() ? nullptr : password.constData(),
+                           nullptr,
+                           data.port(), localSocket.isEmpty() ? nullptr : localSocket.constData(),
                            client_flag))
     {
         serverVersion = mysql_get_server_version(mysql);
@@ -104,7 +104,7 @@ bool MysqlConnectionInternal::db_connect(const KDbConnectionData& data)
 bool MysqlConnectionInternal::db_disconnect()
 {
     mysql_close(mysql);
-    mysql = 0;
+    mysql = nullptr;
     serverVersion = 0;
     mysqlDebug();
     return true;
@@ -145,9 +145,9 @@ void MysqlConnectionInternal::storeResult(KDbResult *result)
 
 MysqlCursorData::MysqlCursorData(KDbConnection* connection)
         : MysqlConnectionInternal(connection)
-        , mysqlres(0)
-        , mysqlrow(0)
-        , lengths(0)
+        , mysqlres(nullptr)
+        , mysqlrow(nullptr)
+        , lengths(nullptr)
         , numRows(0)
 {
     mysql_owned = false;

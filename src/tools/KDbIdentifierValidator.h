@@ -28,11 +28,11 @@ class KDB_EXPORT KDbIdentifierValidator : public KDbValidator
 {
     Q_OBJECT
 public:
-    explicit KDbIdentifierValidator(QObject * parent = 0);
+    explicit KDbIdentifierValidator(QObject * parent = nullptr);
 
-    virtual ~KDbIdentifierValidator();
+    ~KDbIdentifierValidator() override;
 
-    virtual State validate(QString & input, int & pos) const;
+    State validate(QString & input, int & pos) const override;
 
     //! @return true if upper-case letters in the input are replaced to lower-case.
     //! @c false by default.
@@ -42,8 +42,8 @@ public:
     void setLowerCaseForced(bool set);
 
 protected:
-    virtual KDbValidator::Result internalCheck(const QString &valueName, const QVariant& value,
-                                               QString *message, QString *details);
+    KDbValidator::Result internalCheck(const QString &valueName, const QVariant &value,
+                                       QString *message, QString *details) override;
 
 private:
     class Private;

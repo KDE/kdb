@@ -32,8 +32,8 @@
 
 #include <assert.h>
 
-KDbParser *globalParser = 0;
-KDbField *globalField = 0;
+KDbParser *globalParser = nullptr;
+KDbField *globalField = nullptr;
 QList<KDbField*> fieldList;
 int globalCurrentPos = 0;
 QByteArray globalToken;
@@ -43,7 +43,7 @@ extern int yylex_destroy(void);
 //-------------------------------------
 
 KDbParserPrivate::KDbParserPrivate()
-    : table(0), query(0), connection(0), initialized(false)
+    : table(nullptr), query(nullptr), connection(nullptr), initialized(false)
 {
     reset();
 }
@@ -59,9 +59,9 @@ void KDbParserPrivate::reset()
     sql.clear();
     error = KDbParserError();
     delete table;
-    table = 0;
+    table = nullptr;
     delete query;
-    query = 0;
+    query = nullptr;
 }
 
 void KDbParserPrivate::setStatementType(KDbParser::StatementType type)
@@ -179,7 +179,7 @@ void yyerror(const char *str)
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
     const bool syntaxError = qstrnicmp(str, "syntax error", 12) == 0;
-    if ((   globalParser->error().type().isEmpty() && (str == 0 || strlen(str) == 0 || syntaxError))
+    if ((   globalParser->error().type().isEmpty() && (str == nullptr || strlen(str) == 0 || syntaxError))
         || otherError)
     {
         kdbDebug() << globalParser->statement();
@@ -243,7 +243,7 @@ bool parseData(KDbParser *p, const KDbEscapedString &sql)
 {
     globalParser = p;
     globalParser->reset();
-    globalField = 0;
+    globalField = nullptr;
     fieldList.clear();
 
     if (sql.isEmpty()) {
@@ -252,14 +252,14 @@ bool parseData(KDbParser *p, const KDbEscapedString &sql)
                            globalToken, globalCurrentPos);
         KDbParserPrivate::get(globalParser)->setError(err);
         yyerror("");
-        globalParser = 0;
+        globalParser = nullptr;
         return false;
     }
 
     const char *data = sql.constData();
     tokenize(data);
     if (!globalParser->error().type().isEmpty()) {
-        globalParser = 0;
+        globalParser = nullptr;
         return false;
     }
 
@@ -287,7 +287,7 @@ bool parseData(KDbParser *p, const KDbEscapedString &sql)
         ok = false;
     }
     yylex_destroy();
-    globalParser = 0;
+    globalParser = nullptr;
     return ok;
 }
 
@@ -386,7 +386,7 @@ KDbQuerySchema* buildSelectQuery(
             KDbTableSchema *s = globalParser->connection()->tableSchema(tname);
             if (!s) {
                 setError(KDbParser::tr("Table \"%1\" does not exist.").arg(tname));
-                return 0;
+                return nullptr;
             }
             QString tableOrAliasName = KDb::iifNotEmpty(aliasString, tname);
             if (!aliasString.isEmpty()) {
@@ -419,7 +419,7 @@ KDbQuerySchema* buildSelectQuery(
                 aliasVariable = e.toBinary().right().toVariable();
                 if (aliasVariable.isNull()) {
                     setError(KDbParser::tr("Invalid alias definition for column \"%1\".")
-                                           .arg(columnExpr.toString(0).toString())); //ok?
+                                           .arg(columnExpr.toString(nullptr).toString())); //ok?
                     break;
                 }
             }
@@ -438,7 +438,7 @@ KDbQuerySchema* buildSelectQuery(
                 if (columnExpr.toVariable().name() == QLatin1String("*")) {
                     if (containsAsteriskColumn) {
                         setError(KDbParser::tr("More than one asterisk \"*\" is not allowed."));
-                        return 0;
+                        return nullptr;
                     }
                     else {
                         containsAsteriskColumn = true;
@@ -452,7 +452,7 @@ KDbQuerySchema* buildSelectQuery(
 //! @todo IMPORTANT: it.remove();
             } else if (aliasVariable.isNull()) {
                 setError(KDbParser::tr("Invalid \"%1\" column definition.")
-                                       .arg(e.toString(0).toString())); //ok?
+                                       .arg(e.toString(nullptr).toString())); //ok?
                 break;
             }
             else {
@@ -472,7 +472,7 @@ KDbQuerySchema* buildSelectQuery(
         } // for
         if (!globalParser->error().message().isEmpty()) { // we could not return earlier (inside the loop)
                                                           // because we want run CLEANUP what could crash QMutableListIterator.
-            return 0;
+            return nullptr;
         }
     }
     //----- SELECT options
@@ -481,7 +481,7 @@ KDbQuerySchema* buildSelectQuery(
         if (!options->whereExpr.isNull()) {
             if (!options->whereExpr.validate(&parseInfo)) {
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
-                return 0;
+                return nullptr;
             }
             KDbQuerySchema::Private::setWhereExpressionInternal(querySchema, options->whereExpr);
         }
@@ -506,7 +506,7 @@ KDbQuerySchema* buildSelectQuery(
                             setError(KDbParser::tr("Could not define sorting. Column at "
                                                    "position %1 does not exist.")
                                                    .arg((*it).columnNumber));
-                            return 0;
+                            return nullptr;
                         }
                     } else {
                         KDbField * f = querySchema->findTableField((*it).aliasOrName);
@@ -514,7 +514,7 @@ KDbQuerySchema* buildSelectQuery(
                             setError(KDbParser::tr("Could not define sorting. "
                                                    "Column name or alias \"%1\" does not exist.")
                                                    .arg((*it).aliasOrName));
-                            return 0;
+                            return nullptr;
                         }
                         orderByColumnList->appendField(f, (*it).order);
                     }

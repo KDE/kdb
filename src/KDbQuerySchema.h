@@ -57,8 +57,8 @@ public:
      from table schema.
 
      We consider that query schema based on @a table is not (a least yet) stored
-     in a system table, so query connection is set to NULL
-     (even if @a tableSchema's connection is not NULL).
+     in a system table, so query connection is set to @c nullptr
+     (even if @a tableSchema's connection is not @c nullptr).
      Id of the created query is set to 0. */
     explicit KDbQuerySchema(KDbTableSchema *tableSchema);
 
@@ -66,7 +66,7 @@ public:
      KDbQueryAsterisk objects are deeply copied while only pointers to KDbField objects are copied. */
     KDbQuerySchema(const KDbQuerySchema& querySchema);
 
-    virtual ~KDbQuerySchema();
+    ~KDbQuerySchema() override;
 
     /*! Inserts @a field to the columns list at @a position.
      Inserted field will not be owned by this KDbQuerySchema object,
@@ -186,18 +186,18 @@ public:
 
     /*! Removes all columns and their aliases from the columns list,
      removes all tables and their aliases from the tables list within this query.
-     Sets master table information to NULL.
+     Sets master table information to @c nullptr.
      Does not destroy any objects though. Clears name and all other properties.
      @see KDbFieldList::clear() */
     void clear() override;
 
     /*! If query was created using a connection,
-      returns this connection object, otherwise NULL. */
+      returns this connection object, otherwise @c nullptr. */
     KDbConnection* connection() const;
 
     /*! @return table that is master to this query.
      All potentially-editable columns within this query belong just to this table.
-     This method also can return NULL if there are no tables at all,
+     This method also can return @c nullptr if there are no tables at all,
      or if previously assigned master table schema has been removed
      with removeTable().
      Every query that has at least one table defined, should have
@@ -209,7 +209,7 @@ public:
 
     /*! Sets master table of this query to @a table.
       This table should be also added to query's tables list
-      using addTable(). If @a table equals NULL, nothing is performed.
+      using addTable(). If @a table equals @c nullptr, nothing is performed.
       @see masterTable() */
     void setMasterTable(KDbTableSchema *table);
 
@@ -419,7 +419,7 @@ public:
      */
     KDbField* unexpandedField(const QString& identifier);
 
-    /*! @return field id or NULL if there is no such a field. */
+    /*! @return field id or @c nullptr if there is no such a field. */
     KDbField* field(int id) override;
 
     /*! @overload KDbField* field(int id) */
@@ -618,7 +618,7 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    static KDbEscapedString sqlColumnsList(const KDbQueryColumnInfo::List& infolist, KDbConnection *conn = 0,
+    static KDbEscapedString sqlColumnsList(const KDbQueryColumnInfo::List& infolist, KDbConnection *conn = nullptr,
         KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
 
     /*! @return cached list of autoincrement fields created using sqlColumnsList()

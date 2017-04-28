@@ -257,5 +257,5 @@ const char* PostgresqlDriver::m_keywords[] = {
     "WRITE",
     "YEAR",
     "ZONE",
-    0
+    nullptr
 };

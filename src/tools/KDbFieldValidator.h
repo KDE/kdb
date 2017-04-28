@@ -37,8 +37,8 @@ class KDB_EXPORT KDbFieldValidator : public KDbMultiValidator
     Q_OBJECT
 public:
     //! Setups the validator for @a field. Does not keep a pointer to @a field.
-    explicit KDbFieldValidator(const KDbField &field, QWidget * parent = 0);
-    ~KDbFieldValidator();
+    explicit KDbFieldValidator(const KDbField &field, QWidget * parent = nullptr);
+    ~KDbFieldValidator() override;
 private:
     Q_DISABLE_COPY(KDbFieldValidator)
 };

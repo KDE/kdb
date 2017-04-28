@@ -294,7 +294,7 @@ QVariant PostgresqlCursor::pValue(int pos) const
 const char** PostgresqlCursor::recordData() const
 {
     //! @todo
-    return 0;
+    return nullptr;
 }
 
 //==================================================================================

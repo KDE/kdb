@@ -39,46 +39,46 @@ public:
      */
     MysqlDriver(QObject *parent, const QVariantList &args);
 
-    virtual ~MysqlDriver();
+    ~MysqlDriver() override;
 
     /*! @return false for this driver. */
-    virtual bool isSystemObjectName(const QString& name) const;
+    bool isSystemObjectName(const QString& name) const override;
 
     /*! @return true if @a is "mysql", "information_schema" or "performance_schema". */
-    virtual bool isSystemDatabaseName(const QString &name) const;
+    bool isSystemDatabaseName(const QString &name) const override;
 
     //! Escape a string for use as a value
-    virtual KDbEscapedString escapeString(const QString& str) const;
-    virtual KDbEscapedString escapeString(const QByteArray& str) const;
+    KDbEscapedString escapeString(const QString& str) const override;
+    KDbEscapedString escapeString(const QByteArray& str) const override;
 
     //! Escape BLOB value @a array
-    virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
+    KDbEscapedString escapeBLOB(const QByteArray& array) const override;
 
     //! Overrides the default implementation
-    virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
+    QString sqlTypeName(KDbField::Type type, const KDbField &field) const override;
 
     //! Generates native (driver-specific) LENGTH() function call.
     //! char_length(val) is used because length(val) in mysql returns number of bytes,
     //! what is not right for multibyte (unicode) encodings. */
-    virtual KDbEscapedString lengthFunctionToString(const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString lengthFunctionToString(const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator *params,
+                                            KDb::ExpressionCallStack *callStack) const override;
 
     //! Generates native (driver-specific) GREATEST() and LEAST() function call.
     //! Since MySQL's LEAST()/GREATEST() function ignores NULL values, it only returns NULL
     //! if all the expressions evaluate to NULL. So this is used for F(v0,..,vN):
     //! (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE F(v0,..,vN) END)
     //! where F == GREATEST or LEAST.
-    virtual KDbEscapedString greatestOrLeastFunctionToString(const QString &name,
-                                                    const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString greatestOrLeastFunctionToString(const QString &name,
+                                                     const KDbNArgExpression &args,
+                                                     KDbQuerySchemaParameterValueListIterator* params,
+                                                     KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) UNICODE() function call.
     //! Uses ORD(CONVERT(X USING UTF16)).
-    virtual KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
-                                            KDbQuerySchemaParameterValueListIterator* params,
-                                            KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
+                                             KDbQuerySchemaParameterValueListIterator* params,
+                                             KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) function call for concatenation of two strings.
     //! Uses CONCAT().
@@ -87,12 +87,12 @@ public:
                                                  KDb::ExpressionCallStack* callStack) const;
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
-    virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
-                                                const KDbConnectionOptions &options);
-    virtual bool drv_isSystemFieldName(const QString& name) const;
-    bool supportsDefaultValue(const KDbField &field) const Q_DECL_OVERRIDE;
+    QString drv_escapeIdentifier(const QString& str) const override;
+    QByteArray drv_escapeIdentifier(const QByteArray &str) const override;
+    KDbConnection *drv_createConnection(const KDbConnectionData &connData,
+                                        const KDbConnectionOptions &options) override;
+    bool drv_isSystemFieldName(const QString& name) const override;
+    bool supportsDefaultValue(const KDbField &field) const override;
 
 private:
     static const char *keywords[];

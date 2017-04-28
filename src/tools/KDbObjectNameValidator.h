@@ -35,11 +35,12 @@ public:
      called inside check(). If @a drv is 0, KDbDriver::isKDbSystemObjectName()
      static function is called instead. */
     explicit KDbObjectNameValidator(const KDbDriver *drv, QObject * parent = nullptr);
-    virtual ~KDbObjectNameValidator();
+    ~KDbObjectNameValidator() override;
 
 protected:
-    virtual KDbValidator::Result internalCheck(const QString &valueName, const QVariant& value,
-                                               QString *message, QString *details);
+    KDbValidator::Result internalCheck(const QString &valueName, const QVariant &value,
+                                       QString *message, QString *details) override;
+
 private:
     class Private;
     Private * const d;

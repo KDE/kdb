@@ -111,8 +111,8 @@ void KDbDriverBehavior::initInternalProperties()
 
 DriverPrivate::DriverPrivate(KDbDriver *aDriver)
         : driver(aDriver)
-        , metaData(0)
-        , adminTools(0)
+        , metaData(nullptr)
+        , adminTools(nullptr)
 {
 }
 

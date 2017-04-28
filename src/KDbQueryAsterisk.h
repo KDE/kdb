@@ -68,7 +68,7 @@ public:
     /*! Constructs a deep copy of query asterisk definition object @a asterisk. */
     KDbQueryAsterisk(const KDbQueryAsterisk &asterisk);
 
-    virtual ~KDbQueryAsterisk();
+    ~KDbQueryAsterisk() override;
 
     /*! @return Query object for that this asterisk object is defined */
     KDbQuerySchema *query();

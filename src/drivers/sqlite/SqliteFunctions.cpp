@@ -28,8 +28,8 @@
 
 static bool tryExec(sqlite3 *db, const char *sql)
 {
-    return SQLITE_OK == sqlite3_exec(db, sql, 0 /*callback*/,
-                                     0 /* 1st argument to callback */, 0 /*err*/);
+    return SQLITE_OK == sqlite3_exec(db, sql, nullptr /*callback*/,
+                                     nullptr /* 1st argument to callback */, nullptr /*err*/);
 }
 
 // BEGIN from sqlite3.c
@@ -62,7 +62,7 @@ static void soundexFunc(
   };
   Q_ASSERT(argc==1);
   zIn = (uchar*)sqlite3_value_text(argv[0]);
-  if( zIn==0 ) zIn = (uchar*)"";
+  if( zIn==nullptr ) zIn = (uchar*)"";
   for(i=0; zIn[i] && !sqlite3Isalpha(zIn[i]); i++){}
   if( zIn[i] ){
     uchar prevcode = iCode[zIn[i]&0x7f];
@@ -102,11 +102,11 @@ bool createCustomSQLiteFunctions(sqlite3 *db)
             "SOUNDEX",
             1, //nArg
             eTextRep,
-            0, // pApp
+            nullptr, // pApp
             soundexFunc,
-            0, // xStep
-            0, // xFinal
-            0 // xDestroy
+            nullptr, // xStep
+            nullptr, // xFinal
+            nullptr // xDestroy
         );
         if (res != SQLITE_OK) {
             return false;

@@ -249,7 +249,7 @@ public:
     {
     public:
         FieldActionBase(const QString& fieldName, int uid);
-        virtual ~FieldActionBase();
+        ~FieldActionBase() override;
 
         //! @return field name for this action
         inline QString fieldName() const {
@@ -301,7 +301,7 @@ public:
         //! Creates null action
         ChangeFieldPropertyAction();
 
-        virtual ~ChangeFieldPropertyAction();
+        ~ChangeFieldPropertyAction() override;
 
         inline QString propertyName() const {
             return m_propertyName;
@@ -309,23 +309,23 @@ public:
         inline QVariant newValue() const {
             return m_newValue;
         }
-        virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
+        QString debugString(const DebugOptions& debugOptions = DebugOptions()) override;
 
-        virtual void simplifyActions(ActionDictDict *fieldActions);
+        void simplifyActions(ActionDictDict *fieldActions) override;
 
-        virtual bool shouldBeRemoved(ActionDictDict *fieldActions);
+        bool shouldBeRemoved(ActionDictDict *fieldActions) override;
 
-        virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
-                                           QHash<QString, QString>* fieldHash);
+        tristate updateTableSchema(KDbTableSchema *table, KDbField *field,
+                                   QHash<QString, QString> *fieldHash) override;
 
     protected:
         //! @internal, used for constructing null action
         explicit ChangeFieldPropertyAction(bool null);
 
-        virtual void updateAlteringRequirements();
+        void updateAlteringRequirements() override;
 
         //! Performs physical execution of this action.
-        virtual tristate execute(KDbConnection* conn, KDbTableSchema* table);
+        tristate execute(KDbConnection* conn, KDbTableSchema* table) override;
 
         QString m_propertyName;
         QVariant m_newValue;
@@ -337,23 +337,23 @@ public:
     public:
         RemoveFieldAction(const QString& fieldName, int uid);
 
-        virtual ~RemoveFieldAction();
+        ~RemoveFieldAction() override;
 
-        virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
+        QString debugString(const DebugOptions& debugOptions = DebugOptions()) override;
 
-        virtual void simplifyActions(ActionDictDict *fieldActions);
+        void simplifyActions(ActionDictDict *fieldActions) override;
 
-        virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
-                                           QHash<QString, QString>* fieldHash);
+        tristate updateTableSchema(KDbTableSchema *table, KDbField *field,
+                                   QHash<QString, QString> *fieldHash) override;
 
     protected:
         //! @internal, used for constructing null action
         explicit RemoveFieldAction(bool null);
 
-        virtual void updateAlteringRequirements();
+        void updateAlteringRequirements() override;
 
         //! Performs physical execution of this action.
-        virtual tristate execute(KDbConnection* conn, KDbTableSchema* table);
+        tristate execute(KDbConnection* conn, KDbTableSchema* table) override;
     };
 
     //! Defines an action for inserting a single table field.
@@ -368,7 +368,7 @@ public:
         //! Creates null action
         InsertFieldAction();
 
-        virtual ~InsertFieldAction();
+        ~InsertFieldAction() override;
 
         inline int index() const {
             return m_index;
@@ -380,21 +380,21 @@ public:
             return m_field;
         }
         void setField(KDbField* field);
-        virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
+        QString debugString(const DebugOptions& debugOptions = DebugOptions()) override;
 
-        virtual void simplifyActions(ActionDictDict *fieldActions);
+        void simplifyActions(ActionDictDict *fieldActions) override;
 
-        virtual tristate updateTableSchema(KDbTableSchema* table, KDbField* field,
-                                           QHash<QString, QString>* fieldHash);
+        tristate updateTableSchema(KDbTableSchema *table, KDbField *field,
+                                   QHash<QString, QString> *fieldHash) override;
 
     protected:
         //! @internal, used for constructing null action
         explicit InsertFieldAction(bool null);
 
-        virtual void updateAlteringRequirements();
+        void updateAlteringRequirements() override;
 
         //! Performs physical execution of this action.
-        virtual tristate execute(KDbConnection* conn, KDbTableSchema* table);
+        tristate execute(KDbConnection* conn, KDbTableSchema* table) override;
 
         int m_index;
 
@@ -409,30 +409,30 @@ public:
     public:
         MoveFieldPositionAction(int fieldIndex, const QString& fieldName, int uid);
 
-        virtual ~MoveFieldPositionAction();
+        ~MoveFieldPositionAction() override;
 
         inline int index() const {
             return m_index;
         }
-        virtual QString debugString(const DebugOptions& debugOptions = DebugOptions());
+        QString debugString(const DebugOptions& debugOptions = DebugOptions()) override;
 
-        virtual void simplifyActions(ActionDictDict *fieldActions);
+        void simplifyActions(ActionDictDict *fieldActions) override;
 
     protected:
         //! @internal, used for constructing null action
         explicit MoveFieldPositionAction(bool null);
 
-        virtual void updateAlteringRequirements();
+        void updateAlteringRequirements() override;
 
         //! Performs physical execution of this action.
-        virtual tristate execute(KDbConnection* conn, KDbTableSchema* table);
+        tristate execute(KDbConnection* conn, KDbTableSchema* table) override;
 
         int m_index;
     };
 
     explicit KDbAlterTableHandler(KDbConnection* conn);
 
-    virtual ~KDbAlterTableHandler();
+    ~KDbAlterTableHandler() override;
 
     /*! Appends @a action for the alter table tool. */
     void addAction(ActionBase* action);
@@ -459,7 +459,7 @@ public:
     {
     public:
         inline ExecutionArguments()
-                : debugString(0)
+                : debugString(nullptr)
                 , requirements(0)
                 , result(false)
                 , simulate(false)

@@ -133,7 +133,7 @@ KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData,
 {
     clearResult();
     if (!isValid())
-        return 0;
+        return nullptr;
 
     KDbConnection *conn = drv_createConnection(connData, options);
 
@@ -152,7 +152,7 @@ KDbConnection* KDbDriver::removeConnection(KDbConnection *conn)
     clearResult();
     if (d->connections.remove(conn))
         return conn;
-    return 0;
+    return nullptr;
 }
 
 QString KDbDriver::defaultSQLTypeName(KDbField::Type type)
@@ -244,7 +244,7 @@ KDbEscapedString KDbDriver::valueToSQL(KDbField::Type ftype, const QVariant& v) 
 
 KDbEscapedString KDb::valueToSQL(KDbField::Type ftype, const QVariant& v)
 {
-    return valueToSQLInternal(0, ftype, v);
+    return valueToSQLInternal(nullptr, ftype, v);
 }
 
 KDbEscapedString KDb::dateTimeToSQL(const QDateTime& v)

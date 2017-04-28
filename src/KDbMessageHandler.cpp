@@ -36,9 +36,9 @@ KDbMessageGuard::KDbMessageGuard(KDbResultable *resultable)
     : d(new Private)
 {
     Q_ASSERT(resultable);
-    d->result = 0;
+    d->result = nullptr;
     d->resultable = resultable;
-    d->handler = 0;
+    d->handler = nullptr;
 }
 
 KDbMessageGuard::KDbMessageGuard(const KDbResult &result, KDbMessageHandler *handler)
@@ -46,7 +46,7 @@ KDbMessageGuard::KDbMessageGuard(const KDbResult &result, KDbMessageHandler *han
 {
     Q_ASSERT(handler);
     d->result = &result;
-    d->resultable = 0;
+    d->resultable = nullptr;
     d->handler = handler;
 }
 
@@ -107,7 +107,7 @@ class Q_DECL_HIDDEN KDbMessageHandler::Private
 {
 public:
     Private()
-     : messageRedirection(0)
+     : messageRedirection(nullptr)
      , enableMessages(true)
     {
     }

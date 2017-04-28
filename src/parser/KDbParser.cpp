@@ -76,14 +76,14 @@ QString KDbParser::statementTypeString() const
 KDbTableSchema *KDbParser::table()
 {
     KDbTableSchema *t = d->table;
-    d->table = 0;
+    d->table = nullptr;
     return t;
 }
 
 KDbQuerySchema *KDbParser::query()
 {
     KDbQuerySchema *s = d->query;
-    d->query = 0;
+    d->query = nullptr;
     return s;
 }
 

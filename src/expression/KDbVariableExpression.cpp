@@ -29,9 +29,9 @@
 
 KDbVariableExpressionData::KDbVariableExpressionData()
  : KDbExpressionData()
- , field(0)
+ , field(nullptr)
  , tablePositionForField(-1)
- , tableForQueryAsterisk(0)
+ , tableForQueryAsterisk(nullptr)
 {
     ExpressionDebug << "VariableExpressionData" << ref;
 }
@@ -39,9 +39,9 @@ KDbVariableExpressionData::KDbVariableExpressionData()
 KDbVariableExpressionData::KDbVariableExpressionData(const QString& aName)
  : KDbExpressionData()
  , name(aName)
- , field(0)
+ , field(nullptr)
  , tablePositionForField(-1)
- , tableForQueryAsterisk(0)
+ , tableForQueryAsterisk(nullptr)
 {
    ExpressionDebug << "VariableExpressionData" << ref;
 }
@@ -103,9 +103,9 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
 {
     Q_UNUSED(callStack);
     KDbParseInfoInternal *parseInfo = static_cast<KDbParseInfoInternal*>(parseInfo_);
-    field = 0;
+    field = nullptr;
     tablePositionForField = -1;
-    tableForQueryAsterisk = 0;
+    tableForQueryAsterisk = nullptr;
 
     /* taken from parser's addColumn(): */
     kdbDebug() << "checking variable name: " << name;
@@ -122,7 +122,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         }
 
         //find first table that has this field
-        KDbField *firstField = 0;
+        KDbField *firstField = nullptr;
         foreach(KDbTableSchema *table, *parseInfo->querySchema()->tables()) {
             KDbField *f = table->field(fieldName);
             if (f) {

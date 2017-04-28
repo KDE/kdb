@@ -106,10 +106,10 @@ bool MysqlConnection::drv_getDatabasesList(QStringList* list)
 {
     mysqlDebug();
     list->clear();
-    MYSQL_RES *res = mysql_list_dbs(d->mysql, 0);
-    if (res != 0) {
+    MYSQL_RES *res = mysql_list_dbs(d->mysql, nullptr);
+    if (res != nullptr) {
         MYSQL_ROW row;
-        while ((row = mysql_fetch_row(res)) != 0) {
+        while ((row = mysql_fetch_row(res)) != nullptr) {
             *list << QString::fromUtf8(row[0]);
         }
         mysql_free_result(res);

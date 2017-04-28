@@ -32,7 +32,7 @@ KDbPreparedStatement::Data::Data(Type _type, KDbPreparedStatementInterface* _ifa
                                  KDbFieldList* _fields,
      const QStringList& _whereFieldNames)
     : type(_type), fields(_fields), whereFieldNames(_whereFieldNames)
-    , fieldsForParameters(0), whereFields(0), dirty(true), iface(_iface)
+    , fieldsForParameters(nullptr), whereFields(nullptr), dirty(true), iface(_iface)
     , lastInsertRecordId(std::numeric_limits<quint64>::max())
 {
 }
@@ -144,7 +144,7 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
 bool KDbPreparedStatement::generateInsertStatementString(KDbEscapedString * s)
 {
     //! @todo only tables supported for insert; what about views?
-    KDbTableSchema *table = d->fields->isEmpty() ? 0 : d->fields->field(0)->table();
+    KDbTableSchema *table = d->fields->isEmpty() ? nullptr : d->fields->field(0)->table();
     if (!table)
         return false; //err
 

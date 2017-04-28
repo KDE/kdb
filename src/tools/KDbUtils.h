@@ -47,17 +47,17 @@ inline bool hasParent(QObject* par, QObject* o)
     return o == par;
 }
 
-//! @return parent object of @a o that is of type @a type or NULL if no such parent
+//! @return parent object of @a o that is of type @a type or @c nullptr if no such parent
 template<class type>
-inline type findParent(QObject* o, const char* className = 0)
+inline type findParent(QObject* o, const char* className = nullptr)
 {
     if (!o)
-        return 0;
+        return nullptr;
     while ((o = o->parent())) {
         if (::qobject_cast< type >(o) && (!className || o->inherits(className)))
             return ::qobject_cast< type >(o);
     }
-    return 0;
+    return nullptr;
 }
 
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()

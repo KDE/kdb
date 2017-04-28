@@ -34,7 +34,7 @@ class Q_DECL_HIDDEN KDbQuerySchema::Private
 {
     Q_DECLARE_TR_FUNCTIONS(KDbQuerySchema)
 public:
-    explicit Private(KDbQuerySchema* q, Private* copy = 0);
+    explicit Private(KDbQuerySchema* q, Private* copy = nullptr);
 
     ~Private();
 
@@ -88,7 +88,7 @@ public:
 
     KDbQuerySchema *query;
 
-    /*! Master table of the query. (may be NULL)
+    /*! Master table of the query. Can be @c nullptr.
       Any data modifications can be performed if we know master table.
       If null, query's records cannot be modified. */
     KDbTableSchema *masterTable;

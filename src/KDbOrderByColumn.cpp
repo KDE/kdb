@@ -113,7 +113,7 @@ KDbOrderByColumn* KDbOrderByColumn::copy(KDbQuerySchema* fromQuery, KDbQuerySche
         return new KDbOrderByColumn(columnInfo, d->order, d->pos);
     }
     Q_ASSERT(d->field || d->column);
-    return 0;
+    return nullptr;
 }
 
 KDbQueryColumnInfo* KDbOrderByColumn::column() const

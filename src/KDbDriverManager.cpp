@@ -147,7 +147,7 @@ QStringList DriverManagerInternal::driverIds()
 const KDbDriverMetaData* DriverManagerInternal::driverMetaData(const QString &id)
 {
     if (!lookupDrivers()) {
-        return 0;
+        return nullptr;
     }
     const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
     if (!metaData || m_result.isError()) {
@@ -178,12 +178,12 @@ QStringList DriverManagerInternal::possibleProblems() const
 KDbDriver* DriverManagerInternal::driver(const QString& id)
 {
     if (!lookupDrivers())
-        return 0;
+        return nullptr;
 
     clearResult();
     drivermanagerDebug() << "loading" << id;
 
-    KDbDriver *driver = 0;
+    KDbDriver *driver = nullptr;
     if (!id.isEmpty()) {
         driver = m_drivers.value(id.toLower());
     }
@@ -193,7 +193,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     if (!m_driversMetaData.contains(id.toLower())) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not find database driver \"%1\".").arg(id));
-        return 0;
+        return nullptr;
     }
 
     const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
@@ -206,7 +206,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
         (void)loader.load();
         m_result.setServerMessage(loader.errorString());
         kdbWarning() << m_result.message() << m_result.serverMessage();
-        return 0;
+        return nullptr;
     }
     driver = factory->create<KDbDriver>();
     if (!driver) {
@@ -215,7 +215,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
                                 .arg(metaData->id(),
                                      metaData->fileName()));
         kdbWarning() << m_result.message();
-        return 0;
+        return nullptr;
     }
     driver->setMetaData(metaData);
     m_drivers.insert(id.toLower(), driver);

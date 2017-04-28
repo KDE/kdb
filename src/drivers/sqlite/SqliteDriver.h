@@ -33,23 +33,23 @@ class SqliteDriver : public KDbDriver
 public:
     SqliteDriver(QObject *parent, const QVariantList &args);
 
-    virtual ~SqliteDriver();
+    ~SqliteDriver() override;
 
     /*! @return true if @a n is a system object name;
       for this driver any object with name prefixed with "sqlite_"
       is considered as system object.
     */
-    virtual bool isSystemObjectName(const QString& n) const;
+    bool isSystemObjectName(const QString& n) const override;
 
     /*! @return false for this driver. */
-    virtual bool isSystemDatabaseName(const QString&) const;
+    bool isSystemDatabaseName(const QString&) const override;
 
     //! Escape a string for use as a value
-    virtual KDbEscapedString escapeString(const QString& str) const;
-    virtual KDbEscapedString escapeString(const QByteArray& str) const;
+    KDbEscapedString escapeString(const QString& str) const override;
+    KDbEscapedString escapeString(const QByteArray& str) const override;
 
     //! Escape BLOB value @a array
-    virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
+    KDbEscapedString escapeBLOB(const QByteArray& array) const override;
 
     /*! Implemented for KDbDriver class.
      @return SQL clause to add for unicode text collation sequence
@@ -58,18 +58,16 @@ public:
      One space character should be be prepended.
      Can be reimplemented for other drivers, e.g. the SQLite3 driver returns " COLLATE ''".
      Default implementation returns empty string. */
-    virtual KDbEscapedString collationSQL() const;
+    KDbEscapedString collationSQL() const override;
 
     //! Generates native (driver-specific) GREATEST() and LEAST() function calls.
     //! Uses MAX() and MIN(), respectively.
     //! If arguments are of text type, to each argument default (unicode) collation
     //! is assigned that is configured for SQLite by KexiDB.
     //! Example: SELECT MAX('ą' COLLATE '', 'z' COLLATE '').
-    virtual KDbEscapedString greatestOrLeastFunctionToString(
-                                                    const QString &name,
-                                                    const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString greatestOrLeastFunctionToString(const QString &name, const KDbNArgExpression &args,
+                                    KDbQuerySchemaParameterValueListIterator *params,
+                                    KDb::ExpressionCallStack *callStack) const override;
 
     //! Generates native (driver-specific) RANDOM() and RANDOM(X,Y) function calls.
     //! Accepted @a args can contain zero or two positive integer arguments X, Y; X < Y.
@@ -79,9 +77,9 @@ public:
     //! RANDOM() for SQLite is equal to (RANDOM()+9223372036854775807)/18446744073709551615.
     //! Similarly, RANDOM(X,Y) for SQLite is equal to
     //! (X + CAST((Y-X) * (RANDOM()+9223372036854775807)/18446744073709551615 AS INT)).
-    virtual KDbEscapedString randomFunctionToString(const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString randomFunctionToString(const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) CEILING() and FLOOR() function calls.
     //! Default implementation USES CEILING() and FLOOR(), respectively.
@@ -89,24 +87,22 @@ public:
     //! (CASE WHEN X = CAST(X AS INT) THEN CAST(X AS INT) WHEN X >= 0 THEN CAST(X AS INT) + 1 ELSE CAST(X AS INT) END).
     //! For FLOOR() uses:
     //! (CASE WHEN X >= 0 OR X = CAST(X AS INT) THEN CAST(X AS INT) ELSE CAST(X AS INT) - 1 END).
-    virtual KDbEscapedString ceilingOrFloorFunctionToString(
-                                                    const QString &name,
-                                                    const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString ceilingOrFloorFunctionToString(const QString &name, const KDbNArgExpression &args,
+                                   KDbQuerySchemaParameterValueListIterator *params,
+                                   KDb::ExpressionCallStack *callStack) const override;
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
-    virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
-                                                const KDbConnectionOptions &options);
-    virtual KDbAdminTools* drv_createAdminTools() const;
+    QString drv_escapeIdentifier(const QString& str) const override;
+    QByteArray drv_escapeIdentifier(const QByteArray& str) const override;
+    KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                                const KDbConnectionOptions &options) override;
+    KDbAdminTools* drv_createAdminTools() const override;
 
     /*! @return true if @a n is a system field name;
       for this driver fields with name equal "_ROWID_"
       is considered as system field.
     */
-    virtual bool drv_isSystemFieldName(const QString& n) const;
+    bool drv_isSystemFieldName(const QString& n) const override;
 
     SqliteDriverPrivate * const dp;
 

@@ -29,16 +29,16 @@ class PostgresqlPreparedStatement : public KDbPreparedStatementInterface, public
 public:
     explicit PostgresqlPreparedStatement(PostgresqlConnectionInternal* conn);
 
-    virtual ~PostgresqlPreparedStatement();
+    ~PostgresqlPreparedStatement() override;
 
-    virtual bool prepare(const KDbEscapedString& sql);
+    bool prepare(const KDbEscapedString& sql) override;
 
-    virtual KDbSqlResult* execute(
+    KDbSqlResult* execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
         const KDbPreparedStatementParameters& parameters,
-        bool *resultOwned) Q_REQUIRED_RESULT;
+        bool *resultOwned) override Q_REQUIRED_RESULT;
 
 private:
     Q_DISABLE_COPY(PostgresqlPreparedStatement)

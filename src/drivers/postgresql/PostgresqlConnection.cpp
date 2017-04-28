@@ -176,7 +176,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 
     if (!d->connectionOK()) {
         PQfinish(d->conn);
-        d->conn = 0;
+        d->conn = nullptr;
         return false;
     }
 
@@ -209,7 +209,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
 bool PostgresqlConnection::drv_closeDatabase()
 {
     PQfinish(d->conn);
-    d->conn = 0;
+    d->conn = nullptr;
     return true;
 }
 

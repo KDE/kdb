@@ -33,21 +33,21 @@ class PostgresqlDriver : public KDbDriver
 public:
     PostgresqlDriver(QObject *parent, const QVariantList &args);
 
-    virtual ~PostgresqlDriver();
+    ~PostgresqlDriver() override;
 
     //! @todo implement
-    virtual bool isSystemObjectName(const QString& name) const;
+    bool isSystemObjectName(const QString& name) const override;
 
-    virtual bool isSystemDatabaseName(const QString& name) const;
+    bool isSystemDatabaseName(const QString& name) const override;
 
     //! Escape a string for use as a value
-    virtual KDbEscapedString escapeString(const QString& str) const;
-    virtual KDbEscapedString escapeString(const QByteArray& str) const;
+    KDbEscapedString escapeString(const QString& str) const override;
+    KDbEscapedString escapeString(const QByteArray& str) const override;
     //! Overrides the default implementation to allow for NUMERIC type natively
-    virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
+    QString sqlTypeName(KDbField::Type type, const KDbField &field) const override;
 
     //! Escape BLOB value @a array
-    virtual KDbEscapedString escapeBLOB(const QByteArray& array) const;
+    KDbEscapedString escapeBLOB(const QByteArray& array) const override;
 
     //! Converts information converted from PQfmod() to length. -1 if missing.
     inline static int pqfmodToLength(int pqfmod) {
@@ -101,45 +101,45 @@ public:
     //! Generates native (driver-specific) HEX() function call.
     //! Uses UPPER(ENCODE(val, 'hex')).
     //! See http://www.postgresql.org/docs/9.3/static/functions-string.html#FUNCTIONS-STRING-OTHER */
-    virtual KDbEscapedString hexFunctionToString(const KDbNArgExpression &args,
-                                                 KDbQuerySchemaParameterValueListIterator* params,
-                                                 KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString hexFunctionToString(const KDbNArgExpression &args,
+                                         KDbQuerySchemaParameterValueListIterator* params,
+                                         KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) IFNULL() function call.
     //! Uses COALESCE().
-    virtual KDbEscapedString ifnullFunctionToString(const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString ifnullFunctionToString(const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) LENGTH() function call.
     //! For text types default LENGTH(val) is used, for BLOBs OCTET_LENGTH(val) is used because
     //! LENGTH(val) for BLOB returns number of bits.
-    virtual KDbEscapedString lengthFunctionToString(const KDbNArgExpression &args,
-                                                    KDbQuerySchemaParameterValueListIterator* params,
-                                                    KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString lengthFunctionToString(const KDbNArgExpression &args,
+                                            KDbQuerySchemaParameterValueListIterator* params,
+                                            KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) GREATEST() and LEAST() function calls.
     //! Since PostgreSQL's LEAST()/GREATEST() function ignores NULL values, it only returns NULL
     //! if all the expressions evaluate to NULL. So this is used for F(v0,..,vN):
     //! (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE F(v0,..,vN) END)
     //! where F == GREATEST or LEAST.
-    virtual KDbEscapedString greatestOrLeastFunctionToString(const QString &name,
-                                                             const KDbNArgExpression &args,
-                                                             KDbQuerySchemaParameterValueListIterator* params,
-                                                             KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString greatestOrLeastFunctionToString(const QString &name,
+                                                     const KDbNArgExpression &args,
+                                                     KDbQuerySchemaParameterValueListIterator* params,
+                                                     KDb::ExpressionCallStack* callStack) const override;
 
     //! Generates native (driver-specific) UNICODE() function call.
     //! Uses ASCII(X).
-    virtual KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
-                                                     KDbQuerySchemaParameterValueListIterator* params,
-                                                     KDb::ExpressionCallStack* callStack) const;
+    KDbEscapedString unicodeFunctionToString(const KDbNArgExpression &args,
+                                             KDbQuerySchemaParameterValueListIterator* params,
+                                             KDb::ExpressionCallStack* callStack) const override;
 
 protected:
-    virtual QString drv_escapeIdentifier(const QString& str) const;
-    virtual QByteArray drv_escapeIdentifier(const QByteArray& str) const;
-    virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
-                                                const KDbConnectionOptions &options);
-    virtual bool drv_isSystemFieldName(const QString& name)const;
+    QString drv_escapeIdentifier(const QString& str) const override;
+    QByteArray drv_escapeIdentifier(const QByteArray& str) const override;
+    KDbConnection *drv_createConnection(const KDbConnectionData& connData,
+                                        const KDbConnectionOptions &options) override;
+    bool drv_isSystemFieldName(const QString& name)const override;
 
 private:
     void initPgsqlToKDbMap();

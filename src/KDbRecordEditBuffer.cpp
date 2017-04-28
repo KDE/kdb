@@ -23,12 +23,12 @@
 #include "kdb_debug.h"
 
 KDbRecordEditBuffer::KDbRecordEditBuffer(bool dbAwareBuffer)
-        : m_simpleBuffer(dbAwareBuffer ? 0 : new SimpleMap())
-        , m_simpleBufferIt(dbAwareBuffer ? 0 : new SimpleMap::ConstIterator())
-        , m_dbBuffer(dbAwareBuffer ? new DbHash() : 0)
-        , m_dbBufferIt(dbAwareBuffer ? new DbHash::Iterator() : 0)
-        , m_defaultValuesDbBuffer(dbAwareBuffer ? new QMap<KDbQueryColumnInfo*, bool>() : 0)
-        , m_defaultValuesDbBufferIt(dbAwareBuffer ? new QMap<KDbQueryColumnInfo*, bool>::ConstIterator() : 0)
+        : m_simpleBuffer(dbAwareBuffer ? nullptr : new SimpleMap())
+        , m_simpleBufferIt(dbAwareBuffer ? nullptr : new SimpleMap::ConstIterator())
+        , m_dbBuffer(dbAwareBuffer ? new DbHash() : nullptr)
+        , m_dbBufferIt(dbAwareBuffer ? new DbHash::Iterator() : nullptr)
+        , m_defaultValuesDbBuffer(dbAwareBuffer ? new QMap<KDbQueryColumnInfo*, bool>() : nullptr)
+        , m_defaultValuesDbBufferIt(dbAwareBuffer ? new QMap<KDbQueryColumnInfo*, bool>::ConstIterator() : nullptr)
 {
 }
 
@@ -44,7 +44,7 @@ KDbRecordEditBuffer::~KDbRecordEditBuffer()
 
 bool KDbRecordEditBuffer::isDBAware() const
 {
-    return m_dbBuffer != 0;
+    return m_dbBuffer != nullptr;
 }
 
 const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultValueIfPossible) const
@@ -52,10 +52,10 @@ const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultV
     Q_ASSERT(ci);
     if (!m_dbBuffer) {
         kdbWarning() << "not db-aware buffer!";
-        return 0;
+        return nullptr;
     }
     *m_dbBufferIt = m_dbBuffer->find(ci);
-    QVariant* result = 0;
+    QVariant* result = nullptr;
     if (*m_dbBufferIt != m_dbBuffer->end())
         result = &(*m_dbBufferIt).value();
     if (useDefaultValueIfPossible
@@ -75,11 +75,11 @@ const QVariant* KDbRecordEditBuffer::at(const KDbField &field) const
 {
     if (!m_simpleBuffer) {
         kdbWarning() << "this is db-aware buffer!";
-        return 0;
+        return nullptr;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(field.name());
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
-        return 0;
+        return nullptr;
     return &(*m_simpleBufferIt).value();
 }
 
@@ -87,11 +87,11 @@ const QVariant* KDbRecordEditBuffer::at(const QString& fname) const
 {
     if (!m_simpleBuffer) {
         kdbWarning() << "this is db-aware buffer!";
-        return 0;
+        return nullptr;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(fname);
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
-        return 0;
+        return nullptr;
     return &(*m_simpleBufferIt).value();
 }
 

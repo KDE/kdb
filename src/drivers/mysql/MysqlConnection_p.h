@@ -90,7 +90,7 @@ class MysqlCursorData : public MysqlConnectionInternal
 {
 public:
     explicit MysqlCursorData(KDbConnection* connection);
-    virtual ~MysqlCursorData();
+    ~MysqlCursorData() override;
 
     MYSQL_RES *mysqlres;
     MYSQL_ROW mysqlrow;
@@ -106,14 +106,14 @@ public:
     inline MysqlSqlField(MYSQL_FIELD *f) : data(f) {
     }
     //! @return column name
-    inline QString name() Q_DECL_OVERRIDE {
+    inline QString name() override {
         //! @todo UTF8?
         return QString::fromLatin1(data->name);
     }
-    inline int type() Q_DECL_OVERRIDE {
+    inline int type() override {
         return data->type;
     }
-    inline int length() Q_DECL_OVERRIDE {
+    inline int length() override {
         return data->length;
     }
     MYSQL_FIELD *data;
@@ -126,15 +126,15 @@ class MysqlSqlRecord : public KDbSqlRecord
 public:
     inline MysqlSqlRecord(MYSQL_ROW r, unsigned long* len) : record(r), lengths(len) {
     }
-    inline ~MysqlSqlRecord() {
+    inline ~MysqlSqlRecord() override {
     }
-    inline QString stringValue(int index) Q_DECL_OVERRIDE {
+    inline QString stringValue(int index) override {
         return QString::fromUtf8(record[index], lengths[index]);
     }
-    inline KDbSqlString cstringValue(int index) Q_DECL_OVERRIDE {
+    inline KDbSqlString cstringValue(int index) override {
         return KDbSqlString(record[index], lengths[index]);
     }
-    inline QByteArray toByteArray(int index) Q_DECL_OVERRIDE {
+    inline QByteArray toByteArray(int index) override {
         return QByteArray(record[index], lengths[index]);
     }
 
@@ -153,21 +153,21 @@ public:
         Q_ASSERT(c);
     }
 
-    inline ~MysqlSqlResult() {
+    inline ~MysqlSqlResult() override {
         if (data) {
             mysql_free_result(data);
         }
     }
 
-    inline KDbConnection *connection() const Q_DECL_OVERRIDE {
+    inline KDbConnection *connection() const override {
         return conn;
     }
 
-    inline int fieldsCount() Q_DECL_OVERRIDE {
+    inline int fieldsCount() override {
         return data ? mysql_num_fields(data) : 0;
     }
 
-    inline KDbSqlField *field(int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlField *field(int index) override Q_REQUIRED_RESULT {
         if (!fields) {
             if (!data) {
                 return nullptr;
@@ -177,9 +177,9 @@ public:
         return new MysqlSqlField(fields + index);
     }
 
-    KDbField *createField(const QString &tableName, int index) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() Q_DECL_OVERRIDE Q_REQUIRED_RESULT {
+    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
         MYSQL_ROW row = data ? mysql_fetch_row(data) : nullptr;
         if (!row) {
             return nullptr;
@@ -188,7 +188,7 @@ public:
         return new MysqlSqlRecord(row, lengths);
     }
 
-    inline KDbResult lastResult() Q_DECL_OVERRIDE {
+    inline KDbResult lastResult() override {
         KDbResult res;
         const int err = mysql_errno(conn->d->mysql);
         if (err != 0) {
@@ -198,7 +198,7 @@ public:
         return res;
     }
 
-    inline quint64 lastInsertRecordId() Q_DECL_OVERRIDE {
+    inline quint64 lastInsertRecordId() override {
         //! @todo
         return static_cast<quint64>(mysql_insert_id(conn->d->mysql));
     }

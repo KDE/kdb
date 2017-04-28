@@ -155,5 +155,5 @@ const char* const SqliteDriver::keywords[] = {
     "WHERE",
     "WITH",
     "WITHOUT",
-    0
+    nullptr
 };

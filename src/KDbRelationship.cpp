@@ -25,16 +25,16 @@
 #include "kdb_debug.h"
 
 KDbRelationship::KDbRelationship()
-        : m_masterIndex(0)
-        , m_detailsIndex(0)
+        : m_masterIndex(nullptr)
+        , m_detailsIndex(nullptr)
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
 }
 
 KDbRelationship::KDbRelationship(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex)
-        : m_masterIndex(0)
-        , m_detailsIndex(0)
+        : m_masterIndex(nullptr)
+        , m_detailsIndex(nullptr)
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
@@ -42,8 +42,8 @@ KDbRelationship::KDbRelationship(KDbIndexSchema* masterIndex, KDbIndexSchema* de
 }
 
 KDbRelationship::KDbRelationship(KDbQuerySchema *query, KDbField *field1, KDbField *field2)
-        : m_masterIndex(0)
-        , m_detailsIndex(0)
+        : m_masterIndex(nullptr)
+        , m_detailsIndex(nullptr)
         , m_masterIndexOwned(false)
         , m_detailsIndexOwned(false)
 {
@@ -79,7 +79,7 @@ void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDb
 //! @todo: check more things: -types
 //! @todo: find existing global db relationships
 
-    KDbField *masterField = 0, *detailsField = 0;
+    KDbField *masterField = nullptr, *detailsField = nullptr;
     bool p1 = field1->isPrimaryKey(), p2 = field2->isPrimaryKey();
     if (p1 && p2) {
         //2 primary keys
@@ -135,12 +135,12 @@ void KDbRelationship::createIndices(KDbQuerySchema *query, KDbField *field1, KDb
 
 KDbTableSchema* KDbRelationship::masterTable() const
 {
-    return m_masterIndex ? m_masterIndex->table() : 0;
+    return m_masterIndex ? m_masterIndex->table() : nullptr;
 }
 
 KDbTableSchema* KDbRelationship::detailsTable() const
 {
-    return m_detailsIndex ? m_detailsIndex->table() : 0;
+    return m_detailsIndex ? m_detailsIndex->table() : nullptr;
 }
 
 bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex)
@@ -150,8 +150,8 @@ bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
 
 bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster)
 {
-    m_masterIndex = 0;
-    m_detailsIndex = 0;
+    m_masterIndex = nullptr;
+    m_detailsIndex = nullptr;
     m_pairs.clear();
     if (!masterIndex || !detailsIndex || !masterIndex->table() || !detailsIndex->table()
             || masterIndex->table() == detailsIndex->table() || masterIndex->fieldCount() != detailsIndex->fieldCount())

@@ -31,17 +31,15 @@ class MysqlPreparedStatement : public KDbPreparedStatementInterface, public Mysq
 public:
     explicit MysqlPreparedStatement(MysqlConnectionInternal* conn);
 
-    virtual ~MysqlPreparedStatement();
+    ~MysqlPreparedStatement() override;
 
 private:
-    virtual bool prepare(const KDbEscapedString& sql);
+    bool prepare(const KDbEscapedString& sql) override;
 
-    virtual KDbSqlResult* execute(
-        KDbPreparedStatement::Type type,
-        const KDbField::List& selectFieldList,
-        KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters,
-        bool *resultOwned) Q_REQUIRED_RESULT;
+    KDbSqlResult *execute(KDbPreparedStatement::Type type, const KDbField::List &selectFieldList,
+                          KDbFieldList *insertFieldList,
+                          const KDbPreparedStatementParameters &parameters,
+                          bool *resultOwned) override Q_REQUIRED_RESULT;
 
     bool init();
     void done();

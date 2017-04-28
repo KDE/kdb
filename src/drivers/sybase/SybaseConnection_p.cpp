@@ -104,7 +104,7 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
     LOGINREC* login;
 
     login = dblogin();
-    if (login == NULL) {
+    if (!login) {
         //dbexit();
         return false;
     }
@@ -173,7 +173,7 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
 
     // Set/ Unset quoted identifier ? ?
 
-    if (dbProcess != NULL) {
+    if (dbProcess) {
         // add to map
         SybaseConnectionInternal::dbProcessConnectionMap[dbProcess] = this;
 

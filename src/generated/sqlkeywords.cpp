@@ -104,5 +104,5 @@ const char* const DriverPrivate::kdbSQLKeywords[] = {
     "USING",
     "VALUES",
     "WHEN",
-    0
+    nullptr
 };

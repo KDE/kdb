@@ -180,7 +180,7 @@ public:
      that contain current record data (buffered or unbuffered). */
     virtual QVariant value(int i) = 0;
 
-    /*! [PROTOTYPE] @return current record data or NULL if there is no current records. */
+    /*! [PROTOTYPE] @return current record data or @c nullptr if there is no current records. */
     virtual const char ** recordData() const = 0;
 
     /*! Sets a list of columns for ORDER BY section of the query.
@@ -235,7 +235,7 @@ protected:
     /*! Cursor will operate on @a conn, @a query schema will be used to execute query. */
     KDbCursor(KDbConnection* conn, KDbQuerySchema* query, Options options = KDbCursor::Option::None);
 
-    virtual ~KDbCursor();
+    ~KDbCursor() override;
 
     void init(KDbConnection* conn);
 

@@ -30,7 +30,7 @@
 #include <QGlobalStatic>
 
 KDbToken::KDbToken(char charToken)
-    : v(g_tokenName(charToken) == 0 ? 0 : charToken)
+    : v(g_tokenName(charToken) == nullptr ? 0 : charToken)
 {
 }
 
@@ -105,7 +105,7 @@ class KDbToken::List : public QList<KDbToken>
 public:
     List() {
         for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
-            if (g_tokenName(i) != 0) {
+            if (g_tokenName(i)) {
                 append(KDbToken(i));
             }
         }

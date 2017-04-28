@@ -47,7 +47,7 @@ class SqliteVacuum : public QObject, public KDbResultable
     Q_OBJECT
 public:
     explicit SqliteVacuum(const QString& filePath);
-    ~SqliteVacuum();
+    ~SqliteVacuum() override;
 
     /*! Performs compacting procedure.
      @return true on success, false on failure and cancelled if user

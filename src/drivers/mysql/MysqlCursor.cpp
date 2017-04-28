@@ -72,9 +72,9 @@ bool MysqlCursor::drv_open(const KDbEscapedString& sql)
 bool MysqlCursor::drv_close()
 {
     mysql_free_result(d->mysqlres);
-    d->mysqlres = 0;
-    d->mysqlrow = 0;
-    d->lengths = 0;
+    d->mysqlres = nullptr;
+    d->mysqlrow = nullptr;
+    d->lengths = nullptr;
     d->numRows = 0;
     return true;
 }
@@ -98,7 +98,7 @@ void MysqlCursor::drv_getNextRecord()
 // This isn't going to work right now as it uses d->mysqlrow
 QVariant MysqlCursor::value(int pos)
 {
-    if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == 0)
+    if (!d->mysqlrow || pos >= m_fieldCount || d->mysqlrow[pos] == nullptr)
         return QVariant();
 
     KDbField *f = (m_visibleFieldsExpanded && pos < m_visibleFieldsExpanded->count())
@@ -167,7 +167,7 @@ void MysqlCursor::drv_bufferMovePointerTo(qint64 to)
 const char** MysqlCursor::recordData() const
 {
     //! @todo
-    return 0;
+    return nullptr;
 }
 
 QString MysqlCursor::serverResultName() const

@@ -34,39 +34,39 @@ class MysqlConnection : public KDbConnection
 {
     Q_DECLARE_TR_FUNCTIONS(MysqlConnection)
 public:
-    virtual ~MysqlConnection();
+    ~MysqlConnection() override;
 
-    KDbCursor* prepareQuery(const KDbEscapedString& sql,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
-    KDbCursor* prepareQuery(KDbQuerySchema* query,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor *prepareQuery(const KDbEscapedString &sql, KDbCursor::Options options
+                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
+    KDbCursor *prepareQuery(KDbQuerySchema *query, KDbCursor::Options options
+                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
 
-    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbPreparedStatementInterface *prepareStatementInternal() override Q_REQUIRED_RESULT;
 
 protected:
     /*! Used by driver */
     MysqlConnection(KDbDriver *driver, const KDbConnectionData& connData,
                     const KDbConnectionOptions &options);
 
-    virtual bool drv_connect();
-    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
-    virtual bool drv_disconnect();
-    virtual bool drv_getDatabasesList(QStringList* list);
+    bool drv_connect() override;
+    bool drv_getServerVersion(KDbServerVersionInfo* version) override;
+    bool drv_disconnect() override;
+    bool drv_getDatabasesList(QStringList* list) override;
     //! reimplemented using "SHOW DATABASES LIKE..." because MySQL stores db names in lower case.
-    virtual bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true);
-    virtual bool drv_createDatabase(const QString &dbName = QString());
-    virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 KDbMessageHandler* msgHandler = 0);
-    virtual bool drv_closeDatabase();
-    virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
-    virtual bool drv_executeVoidSQL(const KDbEscapedString& sql);
+    bool drv_databaseExists(const QString &dbName, bool ignoreErrors = true) override;
+    bool drv_createDatabase(const QString &dbName = QString()) override;
+    bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = nullptr,
+                                 KDbMessageHandler* msgHandler = nullptr) override;
+    bool drv_closeDatabase() override;
+    bool drv_dropDatabase(const QString &dbName = QString()) override;
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable
-    virtual QString serverResultName() const;
+    QString serverResultName() const override;
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual tristate drv_containsTable(const QString &tableName);
+    tristate drv_containsTable(const QString &tableName) override;
 
     void storeResult();
 

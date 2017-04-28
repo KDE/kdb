@@ -41,20 +41,20 @@ class PostgresqlConnection : public KDbConnection
 {
     Q_DECLARE_TR_FUNCTIONS(PostgresqlConnection)
 public:
-    virtual ~PostgresqlConnection();
+    ~PostgresqlConnection() override;
 
     //! @return a new query based on a query statement
-    KDbCursor* prepareQuery(const KDbEscapedString& sql,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor *prepareQuery(const KDbEscapedString &sql, KDbCursor::Options options
+                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
 
     //! @return a new query based on a query object
-    KDbCursor* prepareQuery(KDbQuerySchema* query,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbCursor *prepareQuery(KDbQuerySchema *query, KDbCursor::Options options
+                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
 
-    KDbPreparedStatementInterface* prepareStatementInternal() Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
+    KDbPreparedStatementInterface *prepareStatementInternal() override Q_REQUIRED_RESULT;
 
     /*! Connection-specific string escaping.  */
-    virtual KDbEscapedString escapeString(const QString& str) const;
+    KDbEscapedString escapeString(const QString& str) const override;
     virtual KDbEscapedString escapeString(const QByteArray& str) const;
 
 private:
@@ -63,33 +63,33 @@ private:
                          const KDbConnectionOptions &options);
 
     //! @return true if currently connected to a database, ignoring the m_is_connected flag.
-    virtual bool drv_isDatabaseUsed() const;
+    bool drv_isDatabaseUsed() const override;
     //! Noop: we tell we are connected, but we wont actually connect until we use a database.
-    virtual bool drv_connect();
-    virtual bool drv_getServerVersion(KDbServerVersionInfo* version);
+    bool drv_connect() override;
+    bool drv_getServerVersion(KDbServerVersionInfo* version) override;
     //! Noop: we tell we have disconnected, but it is actually handled by closeDatabase.
-    virtual bool drv_disconnect();
+    bool drv_disconnect() override;
     //! @return a list of database names
-    virtual bool drv_getDatabasesList(QStringList* list);
+    bool drv_getDatabasesList(QStringList* list) override;
     //! Create a new database
-    virtual bool drv_createDatabase(const QString &dbName = QString());
+    bool drv_createDatabase(const QString &dbName = QString()) override;
     //! Uses database. Note that if data().localSocketFileName() is not empty,
     //! only directory path is used for connecting; the local socket's filename stays ".s.PGSQL.5432".
-    virtual bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = 0,
-                                 KDbMessageHandler* msgHandler = 0);
+    bool drv_useDatabase(const QString &dbName = QString(), bool *cancelled = nullptr,
+                                 KDbMessageHandler* msgHandler = nullptr) override;
     //! Close the database connection
-    virtual bool drv_closeDatabase();
+    bool drv_closeDatabase() override;
     //! Drops the given database
-    virtual bool drv_dropDatabase(const QString &dbName = QString());
+    bool drv_dropDatabase(const QString &dbName = QString()) override;
     //! Executes an SQL statement
-    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE Q_REQUIRED_RESULT;
-    bool drv_executeVoidSQL(const KDbEscapedString& sql) Q_DECL_OVERRIDE;
+    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable
-    virtual QString serverResultName() const;
+    QString serverResultName() const override;
 
 //! @todo move this somewhere to low level class (MIGRATION?)
-    virtual tristate drv_containsTable(const QString &tableName);
+    tristate drv_containsTable(const QString &tableName) override;
 
     void storeResult(PGresult *pgResult, ExecStatusType execStatus);
 
