@@ -91,19 +91,19 @@ public:
     virtual ~KDbRelationship();
 
     /*! @return index defining master side of this relationship
-     or null if there is no information defined. */
+     or @c nullptr if there is no information defined. */
     inline KDbIndexSchema* masterIndex() const {
         return m_masterIndex;
     }
 
     /*! @return index defining referenced side of this relationship.
-     or null if there is no information defined. */
+     or @c nullptr if there is no information defined. */
     inline KDbIndexSchema* detailsIndex() const {
         return m_detailsIndex;
     }
 
     /*! @return ordered list of field pairs -- alternative form
-     for representation of relationship or null if there is no information defined.
+     for representation of relationship or @c nullptr if there is no information defined.
      Each pair has a form of <master-side-field, details-side-field>. */
     inline KDbField::PairList* fieldPairs() {
         return &m_pairs;
@@ -114,11 +114,11 @@ public:
     }
 
     /*! @return table assigned at "master / one" side of this relationship.
-     or null if there is no information defined. */
+     or @c nullptr if there is no information defined. */
     KDbTableSchema* masterTable() const;
 
     /*! @return table assigned at "details / many / foreign" side of this relationship.
-     or null if there is no information defined. */
+     or @c nullptr if there is no information defined. */
     KDbTableSchema* detailsTable() const;
 
     /*! Sets @a masterIndex and @a detailsIndex indices for this relationship.

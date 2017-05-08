@@ -155,7 +155,7 @@ public:
     KDbField* anyNonPKField();
 
     /*! Sets lookup field schema @a lookupFieldSchema for @a fieldName.
-     Passing null @a lookupFieldSchema will remove the previously set lookup field.
+     Passing @c nullptr @a lookupFieldSchema will remove the previously set lookup field.
      @return true if @a lookupFieldSchema has been added,
      or false if there is no such field @a fieldName. */
     bool setLookupFieldSchema(const QString& fieldName, KDbLookupFieldSchema *lookupFieldSchema);

@@ -681,7 +681,7 @@ public:
     bool removeObject(int objId);
 
     /*! @return first field from @a fieldlist that has system name,
-     null if there are no such field.
+     @c nullptr if there are no such field.
      For checking, KDbDriver::isSystemFieldName() is used, so this check can
      be driver-dependent. */
     KDbField* findSystemFieldName(const KDbFieldList& fieldlist);
@@ -1135,7 +1135,7 @@ protected:
      @return true if new transaction started
      successfully or no transactions are supported at all by the driver
      or if autocommit option is turned off.
-     A handle to a newly created transaction (or null on error) is passed
+     A handle to a newly created transaction (or @c nullptr on error) is passed
      to @a tg parameter.
 
      Special case when used database driver has only single transaction support
