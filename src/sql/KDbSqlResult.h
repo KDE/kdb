@@ -21,6 +21,7 @@
 #define KDB_SQLRESULT_H
 
 #include "kdb_export.h"
+#include <QSharedPointer>
 #include <QString>
 
 class KDbConnection;
@@ -30,10 +31,15 @@ class KDbResult;
 class KDbSqlField;
 class KDbSqlRecord;
 
-//! The KDbSqlResult class abstracts result of execution of raw SQL query executed using KDbConnection::executeSQL()
 /**
- * KDbSqlResult allows to return low-level information about fields of the result
- * and fetch records.
+ * The KDbSqlResult class abstracts result of a raw SQL query preparation by KDbConnection::prepareSql()
+ *
+ * The KDbSqlResult object provides low-level access to information about fields of the result and
+ * can fetch records by actual execution of the prepared query.
+ *
+ * @note the KDbSqlResult object should be deleted before closing the database connection that
+ * created it. This is needed because the connection is used by the object to retrieve data or to
+ * obtain status information.
  */
 class KDB_EXPORT KDbSqlResult
 {
@@ -57,9 +63,14 @@ public:
     //! be ignored as well if the KDbSqlResult already has field metadata available.
     virtual KDbField* createField(const QString &tableName, int index) Q_REQUIRED_RESULT = 0;
 
-    //! Fetches one record and returns it. @return nullptr if there is no record to fetch or on error.
-    //! Check lastResult() for errors.
-    virtual KDbSqlRecord* fetchRecord() Q_REQUIRED_RESULT = 0;
+    /**
+     * Fetches one record.
+     *
+     * @return a shared pointer to the record or a null pointer if there is no record to fetch or
+     * on error.
+     * Check lastResult() for detailed result. Ownership is transferred to the caller.
+     */
+    virtual QSharedPointer<KDbSqlRecord> fetchRecord() Q_REQUIRED_RESULT = 0;
 
     //! Convenience method. Fetches one record and all values into @a data.
     //! @return record data object and passes its ownership

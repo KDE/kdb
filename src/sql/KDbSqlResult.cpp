@@ -33,14 +33,13 @@ KDbSqlResult::~KDbSqlResult()
 
 KDbRecordData* KDbSqlResult::fetchRecordData()
 {
-    QScopedPointer<KDbSqlRecord> record(fetchRecord());
+    QSharedPointer<KDbSqlRecord> record = fetchRecord();
     if (!record) {
         return nullptr;
     }
-    QScopedPointer<KDbRecordData> data(new KDbRecordData(fieldsCount()));
+    KDbRecordData *data = new KDbRecordData(fieldsCount());
     for(int i = 0; i < data->count(); ++i) {
         (*data)[i] = record->toByteArray(i);
     }
-    return data.take();
+    return data;
 }
-

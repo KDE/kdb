@@ -139,8 +139,8 @@ bool SqliteSqlResult::cacheFieldInfo(const QString &tableName)
     if (!cachedFieldInfos.isEmpty()) {
         return true;
     }
-    QScopedPointer<KDbSqlResult> tableInfoResult(conn->executeSQL(
-        KDbEscapedString("PRAGMA table_info(%1)").arg(conn->escapeIdentifier(tableName))));
+    QSharedPointer<KDbSqlResult> tableInfoResult = conn->prepareSql(
+        KDbEscapedString("PRAGMA table_info(%1)").arg(conn->escapeIdentifier(tableName)));
     if (!tableInfoResult) {
         return false;
     }
@@ -179,7 +179,7 @@ bool SqliteSqlResult::cacheFieldInfo(const QString &tableName)
 
     bool ok = true;
     Q_FOREVER {
-        QScopedPointer<KDbSqlRecord> record(tableInfoResult->fetchRecord());
+        QSharedPointer<KDbSqlRecord> record = tableInfoResult->fetchRecord();
         if (!record) {
             ok = !tableInfoResult->lastResult().isError();
             break;

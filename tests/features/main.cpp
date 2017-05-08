@@ -338,7 +338,7 @@ int main(int argc, char** argv)
 #endif
 
     if (r)
-        qDebug() << "RECENT SQL STATEMENT: " << conn->recentSQLString();
+        qDebug() << "RECENT SQL STATEMENT: " << conn->recentSqlString();
 
     if (conn && !conn->disconnect())
         r = 1;

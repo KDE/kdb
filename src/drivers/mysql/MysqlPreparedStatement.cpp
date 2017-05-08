@@ -232,13 +232,13 @@ bool MysqlPreparedStatement::bindValue(KDbField *field, const QVariant& value, i
 }
 #endif
 
-KDbSqlResult* MysqlPreparedStatement::execute(
-    KDbPreparedStatement::Type type,
-    const KDbField::List& selectFieldList,
-    KDbFieldList* insertFieldList,
-    const KDbPreparedStatementParameters& parameters, bool *resultOwned)
+QSharedPointer<KDbSqlResult> MysqlPreparedStatement::execute(KDbPreparedStatement::Type type,
+                                const KDbField::List &selectFieldList,
+                                KDbFieldList *insertFieldList,
+                                const KDbPreparedStatementParameters &parameters)
 {
     Q_UNUSED(selectFieldList);
+    QSharedPointer<KDbSqlResult> result;
 #ifdef KDB_USE_MYSQL_STMT
     if (!m_statement || m_realParamCount <= 0)
         return false;
@@ -305,14 +305,9 @@ KDbSqlResult* MysqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        KDbSqlResult* result;
-        if (connection->insertRecord(insertFieldList, myParameters, &result)) {
-            *resultOwned = false;
-            return result;
-        }
-        return nullptr;
+        result = connection->insertRecord(insertFieldList, myParameters);
     }
 //! @todo support select
 #endif // !KDB_USE_MYSQL_STMT
-    return nullptr;
+    return result;
 }

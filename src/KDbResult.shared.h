@@ -112,9 +112,9 @@ public:
     }
 
     /*! @return sql string of actually executed SQL statement,
-     usually using drv_executeSQL(). If there was error during executing SQL statement,
+     usually using drv_executeSql(). If there was error during executing SQL statement,
      before, that string is returned instead. */
-    virtual inline KDbEscapedString recentSQLString() const {
+    virtual inline KDbEscapedString recentSqlString() const {
         return d->errorSql;
     }
 

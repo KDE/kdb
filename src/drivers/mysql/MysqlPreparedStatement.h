@@ -36,10 +36,10 @@ public:
 private:
     bool prepare(const KDbEscapedString& sql) override;
 
-    KDbSqlResult *execute(KDbPreparedStatement::Type type, const KDbField::List &selectFieldList,
-                          KDbFieldList *insertFieldList,
-                          const KDbPreparedStatementParameters &parameters,
-                          bool *resultOwned) override Q_REQUIRED_RESULT;
+    QSharedPointer<KDbSqlResult> execute(KDbPreparedStatement::Type type,
+                                         const KDbField::List &selectFieldList,
+                                         KDbFieldList *insertFieldList,
+                                         const KDbPreparedStatementParameters &parameters) override Q_REQUIRED_RESULT;
 
     bool init();
     void done();

@@ -391,9 +391,9 @@ tristate KDbConnectionProxy::isEmpty(KDbTableSchema* table)
     return d->connection->isEmpty(table);
 }
 
-KDbEscapedString KDbConnectionProxy::recentSQLString() const
+KDbEscapedString KDbConnectionProxy::recentSqlString() const
 {
-    return d->connection->recentSQLString();
+    return d->connection->recentSqlString();
 }
 
 //PROTOTYPE:
@@ -504,14 +504,14 @@ bool KDbConnectionProxy::useTemporaryDatabaseIfNeeded(QString* name)
     return d->connection->useTemporaryDatabaseIfNeeded(name);
 }
 
-KDbSqlResult* KDbConnectionProxy::executeSQL(const KDbEscapedString& sql)
+QSharedPointer<KDbSqlResult> KDbConnectionProxy::prepareSql(const KDbEscapedString& sql)
 {
-    return d->connection->executeSQL(sql);
+    return d->connection->prepareSql(sql);
 }
 
-bool KDbConnectionProxy::executeVoidSQL(const KDbEscapedString& sql)
+bool KDbConnectionProxy::executeSql(const KDbEscapedString& sql)
 {
-    return d->connection->executeVoidSQL(sql);
+    return d->connection->executeSql(sql);
 }
 
 bool KDbConnectionProxy::storeObjectData(KDbObject* object)
@@ -627,14 +627,14 @@ KDbField* KDbConnectionProxy::setupField(const KDbRecordData& data)
     return d->connection->setupField(data);
 }
 
-KDbSqlResult* KDbConnectionProxy::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* KDbConnectionProxy::drv_prepareSql(const KDbEscapedString& sql)
 {
-    return d->connection->drv_executeSQL(sql);
+    return d->connection->drv_prepareSql(sql);
 }
 
-bool KDbConnectionProxy::drv_executeVoidSQL(const KDbEscapedString& sql)
+bool KDbConnectionProxy::drv_executeSql(const KDbEscapedString& sql)
 {
-    return d->connection->drv_executeVoidSQL(sql);
+    return d->connection->drv_executeSql(sql);
 }
 
 bool KDbConnectionProxy::drv_getDatabasesList(QStringList* list)

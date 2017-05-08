@@ -59,7 +59,7 @@ PostgresqlCursor::~PostgresqlCursor()
 //Create a cursor result set
 bool PostgresqlCursor::drv_open(const KDbEscapedString& sql)
 {
-    d->res = d->executeSQL(sql);
+    d->res = d->executeSql(sql);
     d->resultStatus = PQresultStatus(d->res);
     if (d->resultStatus != PGRES_TUPLES_OK && d->resultStatus != PGRES_COMMAND_OK) {
         storeResultAndClear(&d->res, d->resultStatus);

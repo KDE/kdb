@@ -36,16 +36,15 @@ public:
 protected:
     bool prepare(const KDbEscapedString& sql) override;
 
-    KDbSqlResult* execute(
-        KDbPreparedStatement::Type type,
-        const KDbField::List& selectFieldList,
-        KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters,
-        bool *resultOwned) override Q_REQUIRED_RESULT;
+    QSharedPointer<KDbSqlResult> execute(KDbPreparedStatement::Type type,
+            const KDbField::List &selectFieldList, KDbFieldList *insertFieldList,
+            const KDbPreparedStatementParameters &parameters) override Q_REQUIRED_RESULT;
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 
-    QScopedPointer<SqliteSqlResult> m_sqlResult;
+    inline SqliteSqlResult *sqlResult() { return static_cast<SqliteSqlResult*>(m_sqlResult.data()); }
+
+    QSharedPointer<KDbSqlResult> m_sqlResult;
 private:
     Q_DISABLE_COPY(SqlitePreparedStatement)
 };

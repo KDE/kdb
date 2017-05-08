@@ -141,7 +141,7 @@ bool MysqlConnection::drv_createDatabase(const QString &dbName)
     mysqlDebug() << storedDbName;
     // mysql_create_db deprecated, use SQL here.
     // db names are lower case in mysql
-    return drv_executeVoidSQL(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName)));
+    return drv_executeSql(KDbEscapedString("CREATE DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
 bool MysqlConnection::drv_useDatabase(const QString &dbName, bool *cancelled, KDbMessageHandler* msgHandler)
@@ -167,12 +167,12 @@ bool MysqlConnection::drv_dropDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
     const QString storedDbName(d->lowerCaseTableNames ? dbName.toLower() : dbName);
-    return drv_executeVoidSQL(KDbEscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
+    return drv_executeSql(KDbEscapedString("DROP DATABASE %1").arg(escapeIdentifier(storedDbName)));
 }
 
-KDbSqlResult* MysqlConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* MysqlConnection::drv_prepareSql(const KDbEscapedString& sql)
 {
-    if (!drv_executeVoidSQL(sql)) {
+    if (!drv_executeSql(sql)) {
         return nullptr;
     }
     MYSQL_RES *data = mysql_use_result(d->mysql); // more optimal than mysql_store_result
@@ -180,9 +180,9 @@ KDbSqlResult* MysqlConnection::drv_executeSQL(const KDbEscapedString& sql)
     return new MysqlSqlResult(this, data);
 }
 
-bool MysqlConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+bool MysqlConnection::drv_executeSql(const KDbEscapedString& sql)
 {
-    if (!d->executeVoidSQL(sql)) {
+    if (!d->executeSql(sql)) {
         storeResult();
         return false;
     }

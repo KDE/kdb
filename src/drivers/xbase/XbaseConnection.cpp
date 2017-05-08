@@ -105,8 +105,8 @@ bool xBaseConnection::drv_dropDatabase(const QString &dbName) {
   return true;
 }
 
-bool xBaseConnection::drv_executeSQL( const KDbEscapedString& sql ) {
-  return d->executeSQL(sql);
+bool xBaseConnection::drv_executeSql( const KDbEscapedString& sql ) {
+  return d->executeSql(sql);
 }
 
 quint64 xBaseConnection::drv_lastInsertRecordId()

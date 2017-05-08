@@ -323,7 +323,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
 {
     Q_ASSERT(conn);
-    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
+    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname))
                             .arg(conn->driver()->valueToSQL(keytype, keyval)));
@@ -334,7 +334,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2)
 {
     Q_ASSERT(conn);
-    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
+    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
                             .arg(conn->driver()->valueToSQL(keytype1, keyval1))
@@ -348,7 +348,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3)
 {
     Q_ASSERT(conn);
-    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
+    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
                             .arg(conn->driver()->valueToSQL(keytype1, keyval1))
@@ -361,24 +361,26 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
 bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
 {
     Q_ASSERT(conn);
-    return conn->executeVoidSQL(KDbEscapedString("DELETE FROM %1")
+    return conn->executeSql(KDbEscapedString("DELETE FROM %1")
                             .arg(conn->escapeIdentifier(tableName)));
 }
 
-KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbSqlResult *result,
-    const QString& autoIncrementFieldName, const QString& tableName, quint64* recordId)
+KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+                                                 const QString &autoIncrementFieldName,
+                                                 const QString &tableName, quint64 *recordId)
 {
     Q_ASSERT(result);
-    const quint64 foundRecordId = result->lastInsertRecordId();
+    const quint64 foundRecordId = (*result)->lastInsertRecordId();
     if (recordId) {
         *recordId = foundRecordId;
     }
-    return KDb::lastInsertedAutoIncValue(result->connection(),
+    return KDb::lastInsertedAutoIncValue((*result)->connection(),
                                          foundRecordId, autoIncrementFieldName, tableName);
 }
 
 KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quint64 recordId,
-    const QString& autoIncrementFieldName, const QString& tableName)
+                                                 const QString &autoIncrementFieldName,
+                                                 const QString &tableName)
 {
     const KDbDriverBehavior *behavior = KDbDriverBehavior::get(conn->driver());
     if (behavior->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
@@ -493,9 +495,9 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
     if (!result.serverMessage().isEmpty())
         *details += QLatin1String("<p><b>") + kdb::tr("Message from server:")
                    + QLatin1String("</b> ") + result.serverMessage();
-    if (!result.recentSQLString().isEmpty())
+    if (!result.recentSqlString().isEmpty())
         *details += QLatin1String("<p><b>") + kdb::tr("SQL statement:")
-                   + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSQLString().toString());
+                   + QString::fromLatin1("</b> <tt>%1</tt>").arg(result.recentSqlString().toString());
     int serverErrorCode = 0;
     QString serverResultName;
     if (result.isError()) {
@@ -504,7 +506,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
     }
     if (   !details->isEmpty()
         && (   !result.serverMessage().isEmpty()
-            || !result.recentSQLString().isEmpty()
+            || !result.recentSqlString().isEmpty()
             || !serverResultName.isEmpty()
             || serverErrorCode != 0)
            )

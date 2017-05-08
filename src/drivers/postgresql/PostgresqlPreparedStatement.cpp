@@ -38,13 +38,12 @@ bool PostgresqlPreparedStatement::prepare(const KDbEscapedString& sql)
     return true;
 }
 
-KDbSqlResult* PostgresqlPreparedStatement::execute(
-    KDbPreparedStatement::Type type,
-    const KDbField::List& selectFieldList,
-    KDbFieldList* insertFieldList,
-    const KDbPreparedStatementParameters& parameters, bool *resultOwned)
+QSharedPointer<KDbSqlResult> PostgresqlPreparedStatement::execute(
+    KDbPreparedStatement::Type type, const KDbField::List &selectFieldList,
+    KDbFieldList *insertFieldList, const KDbPreparedStatementParameters &parameters)
 {
     Q_UNUSED(selectFieldList);
+    QSharedPointer<KDbSqlResult> result;
     if (type == KDbPreparedStatement::InsertStatement) {
         const int missingValues = insertFieldList->fieldCount() - parameters.count();
         KDbPreparedStatementParameters myParameters(parameters);
@@ -54,13 +53,8 @@ KDbSqlResult* PostgresqlPreparedStatement::execute(
                 myParameters.append(QVariant());
             }
         }
-        KDbSqlResult* result;
-        if (connection->insertRecord(insertFieldList, myParameters, &result)) {
-            *resultOwned = false;
-            return result;
-        }
-        return nullptr;
+        result = connection->insertRecord(insertFieldList, myParameters);
     }
 //! @todo support select
-    return nullptr;
+    return result;
 }

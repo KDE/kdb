@@ -44,7 +44,7 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
     }
 
     if (result == true) {
-        if (!m_conn->executeVoidSQL(
+        if (!m_conn->executeSql(
                     KDbEscapedString("UPDATE kexi__db SET db_value=%1 WHERE db_property=%2")
                     .arg(m_conn->escapeString(value.toString()))
                     .arg(m_conn->escapeString(name))))
@@ -56,7 +56,7 @@ bool KDbProperties::setValue(const QString& _name, const QVariant& value)
         return true;
     }
 
-    if (!m_conn->executeVoidSQL(
+    if (!m_conn->executeSql(
                 KDbEscapedString("INSERT INTO kexi__db (db_property, db_value) VALUES (%1, %2)")
                     .arg(m_conn->escapeString(name))
                     .arg(m_conn->escapeString(value.toString()))))
@@ -84,7 +84,7 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
     }
 
     if (result == true) {
-        if (!m_conn->executeVoidSQL(
+        if (!m_conn->executeSql(
                     KDbEscapedString("UPDATE kexi__db SET db_value=%1 WHERE db_property=%2")
                         .arg(m_conn->escapeString(caption))
                         .arg(m_conn->escapeString(name)))) {
@@ -95,7 +95,7 @@ bool KDbProperties::setCaption(const QString& _name, const QString& caption)
         return true;
     }
 
-    if (!m_conn->executeVoidSQL(
+    if (!m_conn->executeSql(
                 KDbEscapedString("INSERT INTO kexi__db (db_property, db_value) VALUES (%1, %2)")
                     .arg(m_conn->escapeString(name))
                     .arg(m_conn->escapeString(caption)))) {

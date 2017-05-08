@@ -78,16 +78,12 @@ bool KDbPreparedStatement::execute(const KDbPreparedStatementParameters& paramet
         }
         d->dirty = false;
     }
-    bool resultOwned = true;
-    QScopedPointer<KDbSqlResult> result(d->iface->execute(d->type, *d->fieldsForParameters,
-                                                          d->fields, parameters, &resultOwned));
+    QSharedPointer<KDbSqlResult> result
+        = d->iface->execute(d->type, *d->fieldsForParameters, d->fields, parameters);
     if (!result) {
         return false;
     }
     d->lastInsertRecordId = result->lastInsertRecordId();
-    if (resultOwned) {
-        result.take();
-    }
     return true;
 }
 

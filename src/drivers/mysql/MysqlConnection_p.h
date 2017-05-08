@@ -63,7 +63,7 @@ public:
     bool useDatabase(const QString &dbName = QString());
 
     //! Executes query for a raw SQL statement @a sql using mysql_real_query()
-    bool executeVoidSQL(const KDbEscapedString& sql);
+    bool executeSql(const KDbEscapedString& sql);
 
     static QString serverResultName(MYSQL *mysql);
 
@@ -179,13 +179,15 @@ public:
 
     KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
+    inline QSharedPointer<KDbSqlRecord> fetchRecord() override Q_REQUIRED_RESULT {
+        QSharedPointer<KDbSqlRecord> record;
         MYSQL_ROW row = data ? mysql_fetch_row(data) : nullptr;
         if (!row) {
-            return nullptr;
+            return record;
         }
         unsigned long* lengths = mysql_fetch_lengths(data);
-        return new MysqlSqlRecord(row, lengths);
+        record.reset(new MysqlSqlRecord(row, lengths));
+        return record;
     }
 
     inline KDbResult lastResult() override {

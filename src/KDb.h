@@ -121,23 +121,30 @@ inline bool deleteAllRecords(KDbConnection* conn, const KDbTableSchema &table)
  for which the @a result is returned.
  On error std::numeric_limits<quint64>::max() is returned.
  Last inserted record is identified by a magical record identifier, usually called ROWID
- (PostgreSQL has it as well as SQLite; see KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
+ (PostgreSQL has it as well as SQLite; see
+ KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
  ROWID's value will be assigned back to @a recordId if this pointer is not null.
 */
-KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbSqlResult *result,
-    const QString& autoIncrementFieldName, const QString& tableName, quint64* recordId = nullptr);
+KDB_EXPORT quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+                                            const QString &autoIncrementFieldName,
+                                            const QString &tableName, quint64 *recordId = nullptr);
 
-/*! @overload int lastInsertedAutoIncValue(KDbSqlResult *, const QString&, const QString&, quint64*)
+/**
+ * @overload
+ *
  * Accepts @a recordId that can be obtained from KDbPreparedStatement::lastInsertRecordId()
  * or KDbSqlResult::lastInsertRecordId().
 */
 KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbConnection *conn, const quint64 recordId,
-    const QString& autoIncrementFieldName, const QString& tableName);
+                                            const QString &autoIncrementFieldName,
+                                            const QString &tableName);
 
-/*! @overload int lastInsertedAutoIncValue(KDbSqlResult *, const QString&, const QString&, quint64*)
+/**
+@overload
 */
-inline quint64 lastInsertedAutoIncValue(KDbSqlResult *result,
-    const QString& autoIncrementFieldName, const KDbTableSchema& table, quint64* recordId = nullptr)
+inline quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+                                        const QString &autoIncrementFieldName,
+                                        const KDbTableSchema &table, quint64 *recordId = nullptr)
 {
     return lastInsertedAutoIncValue(result, autoIncrementFieldName, table.name(), recordId);
 }

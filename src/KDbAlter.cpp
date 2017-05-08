@@ -1074,7 +1074,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         }
         sql += (") SELECT " + sourceFields + " FROM " + oldTable->name());
         kdbDebug() << " ** " << sql;
-        if (!d->conn->executeVoidSQL(sql)) {
+        if (!d->conn->executeSql(sql)) {
             m_result = d->conn->result();
 //! @todo delete newTable...
             args->result = false;

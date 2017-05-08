@@ -82,8 +82,8 @@ private:
     //! Drops the given database
     bool drv_dropDatabase(const QString &dbName = QString()) override;
     //! Executes an SQL statement
-    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
-    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
+    KDbSqlResult* drv_prepareSql(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    bool drv_executeSql(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable
     QString serverResultName() const override;

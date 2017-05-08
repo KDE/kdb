@@ -47,15 +47,11 @@ protected:
     //! @a selectFieldList specifies fields for SELECT statement.
     //! @a insertFieldList is set to list of fields in INSERT statement.
     //! Parameters @a parameters are passed to the statement, usually using binding.
-    //! The value pointed by @a resultOwned is set to true if the returned SQL result is owned
-    //! by the prepared statement object. This is expected and the default behaviour.
-    //! If the value pointed by @a resultOwned is set to @c false, the KDbSqlResult object
-    //! will be deleted by the KDbPreparedStatement object before returning.
-    virtual KDbSqlResult* execute(
+    virtual QSharedPointer<KDbSqlResult> execute(
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters, bool *resultOwned) Q_REQUIRED_RESULT = 0;
+        const KDbPreparedStatementParameters& parameters) Q_REQUIRED_RESULT = 0;
 
     friend class KDbConnection;
     friend class KDbPreparedStatement;

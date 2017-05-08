@@ -113,17 +113,17 @@ bool MysqlConnectionInternal::db_disconnect()
 bool MysqlConnectionInternal::useDatabase(const QString &dbName)
 {
 //! @todo is here escaping needed?
-    if (!executeVoidSQL(KDbEscapedString("USE ") + escapeIdentifier(dbName))) {
+    if (!executeSql(KDbEscapedString("USE ") + escapeIdentifier(dbName))) {
         return false;
     }
-    if (!executeVoidSQL(KDbEscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
+    if (!executeSql(KDbEscapedString("SET SESSION sql_mode='TRADITIONAL'"))) {
         // needed to turn warnings about trimming string values into SQL errors
         return false;
     }
     return true;
 }
 
-bool MysqlConnectionInternal::executeVoidSQL(const KDbEscapedString& sql)
+bool MysqlConnectionInternal::executeSql(const KDbEscapedString& sql)
 {
     return 0 == mysql_real_query(mysql, sql.constData(), sql.length());
 }
@@ -160,13 +160,13 @@ MysqlCursorData::~MysqlCursorData()
 
 //--------------------------------------
 
-static inline KDbSqlString mysqlTypeName(MysqlSqlResult *result, QScopedPointer<MysqlSqlRecord> *recordPtr)
+static inline KDbSqlString mysqlTypeName(MysqlSqlResult *result)
 {
     KDbSqlString name;
     if (result && result->fieldsCount() >= 2) {
-        recordPtr->reset(static_cast<MysqlSqlRecord*>(result->fetchRecord()));
-        if (*recordPtr) {
-            name = (*recordPtr)->cstringValue(1);
+        QSharedPointer<KDbSqlRecord> record = result->fetchRecord();
+        if (record) {
+            name = static_cast<MysqlSqlRecord*>(record.data())->cstringValue(1);
         }
     }
     return name;
@@ -189,7 +189,7 @@ QStringList examineEnumField(const QString& table, const KDbSqlField* field)
         = KDbEscapedString("SHOW COLUMNS FROM `") + conn->escapeIdentifier(table) +
                         "` LIKE '" + conn->escapeIdentifier(fld->name) + '\'';
 
-    if (!conn->executeVoidSQL(query))
+    if (!conn->executeSql(query))
         // Huh? MySQL wont tell us what values it can take.
         return QStringList();
 
@@ -252,10 +252,10 @@ KDbField::Type MysqlSqlResult::blobType(const QString& tableName, MysqlSqlField 
     const KDbEscapedString sql = KDbEscapedString("SHOW COLUMNS FROM %1 LIKE '%2'")
             .arg(escapeIdentifier(tableName)).arg(field->name());
     //! @todo this conflicts with active query
-    QScopedPointer<MysqlSqlResult> result(static_cast<MysqlSqlResult*>(conn->executeSQL(sql)));
+    QSharedPointer<KDbSqlResult> result = conn->prepareSql(sql);
     if (result) {
-        QScopedPointer<MysqlSqlRecord> record;
-        const KDbSqlString typeName(mysqlTypeName(result.data(), &record));
+        MysqlSqlResult* mysqlResult = static_cast<MysqlSqlResult*>(result.data());
+        const KDbSqlString typeName(mysqlTypeName(mysqlResult));
         if (typeName.rawDataToByteArray().toLower().contains("blob")) {
             // Doesn't matter how big it is, it's binary
             kdbType = KDbField::BLOB;

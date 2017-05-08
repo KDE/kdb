@@ -197,7 +197,7 @@ public:
 
     tristate isEmpty(KDbTableSchema* table);
 
-    KDbEscapedString recentSQLString() const override;
+    KDbEscapedString recentSqlString() const override;
 
     //PROTOTYPE:
 #define A , const QVariant&
@@ -253,9 +253,9 @@ public:
 
     bool useTemporaryDatabaseIfNeeded(QString* name);
 
-    KDbSqlResult* executeSQL(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
+    QSharedPointer<KDbSqlResult> prepareSql(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
 
-    bool executeVoidSQL(const KDbEscapedString& sql);
+    bool executeSql(const KDbEscapedString& sql);
 
     bool storeObjectData(KDbObject* object);
 
@@ -304,9 +304,9 @@ public:
 
     KDbField* setupField(const KDbRecordData& data);
 
-    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    KDbSqlResult* drv_prepareSql(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
 
-    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
+    bool drv_executeSql(const KDbEscapedString& sql) override;
 
     bool drv_getDatabasesList(QStringList* list) override;
 

@@ -44,7 +44,7 @@ public:
     virtual ~PostgresqlConnectionInternal();
 
     //! Executes query for a raw SQL statement @a sql on the database
-    PGresult* executeSQL(const KDbEscapedString& sql);
+    PGresult* executeSql(const KDbEscapedString& sql);
 
     static QString serverResultName(int resultCode);
 
@@ -161,10 +161,11 @@ public:
 
     KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
-        return recordToFetch < recordsCount
-               ? new PostgresqlSqlRecord(result, recordToFetch++)
-               : nullptr;
+    inline QSharedPointer<KDbSqlRecord> fetchRecord() override Q_REQUIRED_RESULT
+    {
+        return QSharedPointer<KDbSqlRecord>(recordToFetch < recordsCount
+                                                ? new PostgresqlSqlRecord(result, recordToFetch++)
+                                                : nullptr);
     }
 
     inline KDbResult lastResult() override {

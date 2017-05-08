@@ -102,7 +102,7 @@ namespace KDb {
 
 //! errors related to queries
 #define ERR_SQL_EXECUTION_ERROR 260 //!< general server error for sql statement execution
-//!< usually returned by KDbConnection::executeSQL()
+//!< usually returned by KDbConnection::executeSql()
 #define ERR_SQL_PARSE_ERROR 270 //!< Parse error coming from arser::parse()
 
 #define ERR_OTHER 0xffff //!< use this if you have not (yet?) the name for given error

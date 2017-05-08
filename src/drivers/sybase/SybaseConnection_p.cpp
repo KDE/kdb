@@ -210,7 +210,7 @@ bool SybaseConnectionInternal::useDatabase(const QString &dbName)
     return false;
 }
 
-bool SybaseConnectionInternal::executeSQL(const KDbEscapedString& sql)
+bool SybaseConnectionInternal::executeSql(const KDbEscapedString& sql)
 {
     // remove queries in buffer if any. flush existing results if any
     dbcancel(dbProcess);

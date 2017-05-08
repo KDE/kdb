@@ -83,8 +83,9 @@ protected:
       anymore, so database file is just removed. See note from drv_useDatabase(). */
     bool drv_dropDatabase(const QString &dbName = QString()) override;
 
-    KDbSqlResult* drv_executeSQL(const KDbEscapedString& sql) override;
-    bool drv_executeVoidSQL(const KDbEscapedString& sql) override;
+    KDbSqlResult* drv_prepareSql(const KDbEscapedString& sql) override;
+
+    bool drv_executeSql(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable
     QString serverResultName() const override;

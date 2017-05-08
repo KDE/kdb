@@ -146,7 +146,7 @@ public:
 
     KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
 
-    inline KDbSqlRecord* fetchRecord() override Q_REQUIRED_RESULT {
+    inline QSharedPointer<KDbSqlRecord> fetchRecord() override Q_REQUIRED_RESULT {
         SqliteSqlRecord *record;
         const int res = sqlite3_step(prepared_st);
         if (res == SQLITE_ROW) {
@@ -154,7 +154,7 @@ public:
         } else {
             record = nullptr;
         }
-        return record;
+        return QSharedPointer<KDbSqlRecord>(record);
     }
 
     inline KDbResult lastResult() override {

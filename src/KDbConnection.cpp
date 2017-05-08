@@ -992,41 +992,41 @@ QList<int> KDbConnection::objectIds(int objectType, bool* ok)
 //   escapeIdentifier(tableSchema->name()) +
 //   " VALUES (" + vals + ")";
 
-bool KDbConnection::insertRecordInternal(const QString &tableSchemaName, KDbFieldList* fields,
-                     const KDbEscapedString &sql, KDbSqlResult** result = nullptr)
+QSharedPointer<KDbSqlResult> KDbConnection::insertRecordInternal(const QString &tableSchemaName,
+                                                                 KDbFieldList *fields,
+                                                                 const KDbEscapedString &sql)
 {
+    QSharedPointer<KDbSqlResult> res;
     if (!drv_beforeInsert(tableSchemaName,fields )) {
-        return false;
+        return res;
     }
-    QScopedPointer<KDbSqlResult> res(executeSQL(sql));
+    res = prepareSql(sql);
     if (!res || res->lastResult().isError()) {
-        return false;
+        res.clear();
+        return res;
     }
     if (!drv_afterInsert(tableSchemaName, fields)) {
-        return false;
+        res.clear();
+        return res;
     }
     {
-        // Fetching is needed to performs real execution, at least for some backends.
-        // Also we're not expecting record but let's delete if there's any.
-        QScopedPointer<KDbSqlRecord> record(res->fetchRecord());
+        // Fetching is needed to perform real execution at least for some backends.
+        // Also we are not expecting record but let's delete if there's any.
+        (void)res->fetchRecord();
     }
-    if (!res->lastResult().isError()) {
-        if (result) {
-            *result = res.take();
-        }
-        return true;
+    if (res->lastResult().isError()) {
+        res.clear();
     }
-    return false;
+    return res;
 }
 
 #define C_INS_REC(args, vals) \
-    bool KDbConnection::insertRecord(KDbTableSchema* tableSchema args, KDbSqlResult** result) {\
+    QSharedPointer<KDbSqlResult> KDbConnection::insertRecord(KDbTableSchema* tableSchema args) { \
         return insertRecordInternal(tableSchema->name(), tableSchema, \
                    KDbEscapedString("INSERT INTO ") + escapeIdentifier(tableSchema->name()) \
                        + " (" \
                        + tableSchema->sqlFieldsList(this) \
-                       + ") VALUES (" + vals + ")", \
-                   result); \
+                       + ") VALUES (" + vals + ')'); \
     }
 
 #define C_INS_REC_ALL \
@@ -1049,7 +1049,7 @@ C_INS_REC_ALL
 #define V_A( a ) value += (',' + d->driver->valueToSQL( it.next(), c ## a ));
 
 #define C_INS_REC(args, vals) \
-    bool KDbConnection::insertRecord(KDbFieldList* fields args, KDbSqlResult** result) \
+    QSharedPointer<KDbSqlResult> KDbConnection::insertRecord(KDbFieldList* fields args) \
     { \
         KDbEscapedString value; \
         const KDbField::List *flist = fields->fields(); \
@@ -1060,8 +1060,7 @@ C_INS_REC_ALL
         return insertRecordInternal(tableName, fields, \
                    KDbEscapedString(QLatin1String("INSERT INTO ") + escapeIdentifier(tableName)) \
                    + " (" + fields->sqlFieldsList(this) \
-                   + ") VALUES (" + value + ')', \
-                   result); \
+                   + ") VALUES (" + value + ')'); \
     }
 
 C_INS_REC_ALL
@@ -1072,13 +1071,14 @@ C_INS_REC_ALL
 #undef C_INS_REC
 #undef C_INS_REC_ALL
 
-bool KDbConnection::insertRecord(KDbTableSchema* tableSchema, const QList<QVariant>& values,
-                                 KDbSqlResult** result)
+QSharedPointer<KDbSqlResult> KDbConnection::insertRecord(KDbTableSchema *tableSchema,
+                                                         const QList<QVariant> &values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
+    QSharedPointer<KDbSqlResult> res;
     const KDbField::List *flist = tableSchema->fields();
     if (flist->isEmpty()) {
-        return false;
+        return res;
     }
     KDbField::ListIterator fieldsIt(flist->constBegin());
     QList<QVariant>::ConstIterator it = values.constBegin();
@@ -1100,16 +1100,18 @@ bool KDbConnection::insertRecord(KDbTableSchema* tableSchema, const QList<QVaria
     }
     sql += ')';
     m_result.setSql(sql);
-    return insertRecordInternal(tableSchema->name(), tableSchema, sql, result);
+    res = insertRecordInternal(tableSchema->name(), tableSchema, sql);
+    return res;
 }
 
-bool KDbConnection::insertRecord(KDbFieldList* fields, const QList<QVariant>& values,
-                                 KDbSqlResult** result)
+QSharedPointer<KDbSqlResult> KDbConnection::insertRecord(KDbFieldList *fields,
+                                                         const QList<QVariant> &values)
 {
 // Each SQL identifier needs to be escaped in the generated query.
+    QSharedPointer<KDbSqlResult> res;
     const KDbField::List *flist = fields->fields();
     if (flist->isEmpty()) {
-        return false;
+        return res;
     }
     KDbField::ListIterator fieldsIt(flist->constBegin());
     KDbEscapedString sql;
@@ -1134,7 +1136,8 @@ bool KDbConnection::insertRecord(KDbFieldList* fields, const QList<QVariant>& va
     }
     sql += ')';
     m_result.setSql(sql);
-    return insertRecordInternal(tableName, fields, sql, result);
+    res = insertRecordInternal(tableName, fields, sql);
+    return res;
 }
 
 inline static bool checkSql(const KDbEscapedString& sql, KDbResult* result)
@@ -1149,19 +1152,19 @@ inline static bool checkSql(const KDbEscapedString& sql, KDbResult* result)
     return true;
 }
 
-KDbSqlResult* KDbConnection::executeSQL(const KDbEscapedString& sql)
+QSharedPointer<KDbSqlResult> KDbConnection::prepareSql(const KDbEscapedString& sql)
 {
     m_result.setSql(sql);
-    return drv_executeSQL(sql);
+    return QSharedPointer<KDbSqlResult>(drv_prepareSql(sql));
 }
 
-bool KDbConnection::executeVoidSQL(const KDbEscapedString& sql)
+bool KDbConnection::executeSql(const KDbEscapedString& sql)
 {
     m_result.setSql(sql);
     if (!checkSql(sql, &m_result)) {
         return false;
     }
-    if (!drv_executeVoidSQL(sql)) {
+    if (!drv_executeSql(sql)) {
         m_result.setMessage(QString()); //clear as this could be most probably just "Unknown error" string.
         m_result.setErrorSql(sql);
         m_result.prependMessage(ERR_SQL_EXECUTION_ERROR,
@@ -1257,7 +1260,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
     sql.append(KDbEscapedString(" WHERE t_id=%1 AND f_name=%2")
                 .arg(d->driver->valueToSQL(KDbField::Integer, field->table()->id()))
                 .arg(escapeString(field->name())));
-    return executeVoidSQL(sql);
+    return executeSql(sql);
 }
 
 #define createTable_ERR \
@@ -1432,7 +1435,7 @@ bool KDbConnection::drv_copyTableData(const KDbTableSchema &tableSchema,
     KDbEscapedString sql = KDbEscapedString("INSERT INTO %1 SELECT * FROM %2")
                 .arg(escapeIdentifier(destinationTableSchema.name()))
                 .arg(escapeIdentifier(tableSchema.name()));
-    return executeVoidSQL(sql);
+    return executeSql(sql);
 }
 
 bool KDbConnection::removeObject(int objId)
@@ -1454,7 +1457,7 @@ bool KDbConnection::removeObject(int objId)
 
 bool KDbConnection::drv_dropTable(const QString& tableName)
 {
-    return executeVoidSQL(KDbEscapedString("DROP TABLE %1").arg(escapeIdentifier(tableName)));
+    return executeSql(KDbEscapedString("DROP TABLE %1").arg(escapeIdentifier(tableName)));
 }
 
 tristate KDbConnection::dropTable(KDbTableSchema* tableSchema)
@@ -1614,7 +1617,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
         }
 
         // the new table owns the previous table's id:
-        if (!executeVoidSQL(
+        if (!executeSql(
                     KDbEscapedString("UPDATE kexi__objects SET o_id=%1 WHERE o_id=%2 AND o_type=%3")
                     .arg(d->driver->valueToSQL(KDbField::Integer, origID))
                     .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))
@@ -1622,7 +1625,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
         {
             return false;
         }
-        if (!executeVoidSQL(KDbEscapedString("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
+        if (!executeSql(KDbEscapedString("UPDATE kexi__fields SET t_id=%1 WHERE t_id=%2")
                         .arg(d->driver->valueToSQL(KDbField::Integer, origID))
                         .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
         {
@@ -1641,7 +1644,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
 
     // Update kexi__objects
     //! @todo
-    if (!executeVoidSQL(KDbEscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
+    if (!executeSql(KDbEscapedString("UPDATE kexi__objects SET o_name=%1 WHERE o_id=%2")
                     .arg(escapeString(tableSchema->name()))
                     .arg(d->driver->valueToSQL(KDbField::Integer, tableSchema->id()))))
     {
@@ -1668,7 +1671,7 @@ bool KDbConnection::drv_alterTableName(KDbTableSchema* tableSchema, const QStrin
     const QString oldTableName = tableSchema->name();
     tableSchema->setName(newName);
 
-    if (!executeVoidSQL(KDbEscapedString("ALTER TABLE %1 RENAME TO %2")
+    if (!executeSql(KDbEscapedString("ALTER TABLE %1 RENAME TO %2")
                     .arg(KDbEscapedString(escapeIdentifier(oldTableName)),
                          KDbEscapedString(escapeIdentifier(newName)))))
     {
@@ -1718,7 +1721,7 @@ bool KDbConnection::drv_createTable(const KDbTableSchema& tableSchema)
         return false;
     }
     //kdbDebug() << "******** " << sql;
-    return executeVoidSQL(sql);
+    return executeSql(sql);
 }
 
 bool KDbConnection::drv_createTable(const QString& tableName)
@@ -1944,19 +1947,19 @@ bool KDbConnection::setAutoCommit(bool on)
 
 KDbTransactionData* KDbConnection::drv_beginTransaction()
 {
-    if (!executeVoidSQL(KDbEscapedString("BEGIN")))
+    if (!executeSql(KDbEscapedString("BEGIN")))
         return nullptr;
     return new KDbTransactionData(this);
 }
 
 bool KDbConnection::drv_commitTransaction(KDbTransactionData *)
 {
-    return executeVoidSQL(KDbEscapedString("COMMIT"));
+    return executeSql(KDbEscapedString("COMMIT"));
 }
 
 bool KDbConnection::drv_rollbackTransaction(KDbTransactionData *)
 {
-    return executeVoidSQL(KDbEscapedString("ROLLBACK"));
+    return executeSql(KDbEscapedString("ROLLBACK"));
 }
 
 bool KDbConnection::drv_setAutoCommit(bool /*on*/)
@@ -2109,16 +2112,15 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
             if (!fl) {
                 return false;
             }
-            KDbSqlResult* result;
-            if (!insertRecord(fl.data(), QVariant(object->type()), QVariant(object->name()),
-                                    QVariant(object->caption()), QVariant(object->description()), &result))
-            {
+            QSharedPointer<KDbSqlResult> result
+                = insertRecord(fl.data(), QVariant(object->type()), QVariant(object->name()),
+                               QVariant(object->caption()), QVariant(object->description()));
+            if (!result) {
                 return false;
             }
-            QScopedPointer<KDbSqlResult> resultGuard(result);
             //fetch newly assigned ID
 //! @todo safe to cast it?
-            quint64 obj_id = KDb::lastInsertedAutoIncValue(result, QLatin1String("o_id"), *ts);
+            quint64 obj_id = KDb::lastInsertedAutoIncValue(&result, QLatin1String("o_id"), *ts);
             //kdbDebug() << "NEW obj_id == " << obj_id;
             if (obj_id == std::numeric_limits<quint64>::max()) {
                 return false;
@@ -2134,7 +2136,7 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
         }
     }
     //existing object:
-    return executeVoidSQL(
+    return executeSql(
                KDbEscapedString("UPDATE kexi__objects SET o_type=%2, o_caption=%3, o_desc=%4 WHERE o_id=%1")
                .arg(d->driver->valueToSQL(KDbField::Integer, object->id()))
                .arg(d->driver->valueToSQL(KDbField::Integer, object->type()))
@@ -2853,12 +2855,12 @@ bool KDbConnection::storeDataBlock(int objectID, const QString &dataString, cons
         return false;
     }
     if (result == true) {
-        return executeVoidSQL(KDbEscapedString("UPDATE kexi__objectdata SET o_data=%1 WHERE o_id=%2 AND ")
+        return executeSql(KDbEscapedString("UPDATE kexi__objectdata SET o_data=%1 WHERE o_id=%2 AND ")
                           .arg(d->driver->valueToSQL(KDbField::LongText, dataString))
                           .arg(d->driver->valueToSQL(KDbField::Integer, objectID))
                           + sql_sub);
     }
-    return executeVoidSQL(
+    return executeSql(
                KDbEscapedString("INSERT INTO kexi__objectdata (o_id, o_data, o_sub_id) VALUES (")
                + KDbEscapedString::number(objectID) + ',' + d->driver->valueToSQL(KDbField::LongText, dataString)
                + ',' + d->driver->valueToSQL(KDbField::Text, dataID) + ')');
@@ -2881,7 +2883,7 @@ bool KDbConnection::copyDataBlock(int sourceObjectID, int destObjectID, const QS
         sql += KDbEscapedString(" AND ") + KDb::sqlWhere(d->driver, KDbField::Text,
                                                             QLatin1String("o_sub_id"), dataID);
     }
-    return executeVoidSQL(sql);
+    return executeSql(sql);
 }
 
 bool KDbConnection::removeDataBlock(int objectID, const QString& dataID)
@@ -3114,7 +3116,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (!drv_beforeUpdate(mt->name(), &affectedFields))
         return false;
 
-    bool res = executeVoidSQL(sql);
+    bool res = executeSql(sql);
 
     // postprocessing after update
     if (!drv_afterUpdate(mt->name(), &affectedFields))
@@ -3232,14 +3234,13 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
 // kdbDebug() << " -- SQL == " << sql;
 
     // low-level insert
-    KDbSqlResult* result;
-    if (!insertRecordInternal(mt->name(), &affectedFields, sql, &result)) {
+    QSharedPointer<KDbSqlResult> result = insertRecordInternal(mt->name(), &affectedFields, sql);
+    if (!result) {
         m_result = KDbResult(ERR_INSERT_SERVER_ERROR,
                              tr("Record inserting on the server failed."));
         return false;
     }
     //success: now also assign a new value in memory:
-    QScopedPointer<KDbSqlResult> resultGuard(result);
     QHash<KDbQueryColumnInfo*, int> columnsOrderExpanded;
     updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
 
@@ -3249,9 +3250,10 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (pkey && !aif_list->isEmpty()) {
         //! @todo now only if PKEY is present, this should also work when there's no PKEY
         KDbQueryColumnInfo *id_columnInfo = aif_list->first();
-//! @todo safe to cast it?
-        quint64 last_id = KDb::lastInsertedAutoIncValue(result,
-            id_columnInfo->field()->name(), id_columnInfo->field()->table()->name(), &recordId);
+        //! @todo safe to cast it?
+        quint64 last_id
+            = KDb::lastInsertedAutoIncValue(&result, id_columnInfo->field()->name(),
+                                            id_columnInfo->field()->table()->name(), &recordId);
         if (last_id == std::numeric_limits<quint64>::max()) {
             //! @todo show error
 //! @todo remove just inserted record. How? Using ROLLBACK?
@@ -3350,7 +3352,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     sql += sqlwhere;
     //kdbDebug() << " -- SQL == " << sql;
 
-    if (!executeVoidSQL(sql)) {
+    if (!executeSql(sql)) {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
                              tr("Record deletion on the server failed."));
         return false;
@@ -3373,7 +3375,7 @@ bool KDbConnection::deleteAllRecords(KDbQuerySchema* query)
     KDbEscapedString sql = KDbEscapedString("DELETE FROM ") + escapeIdentifier(mt->name());
     //kdbDebug() << "-- SQL == " << sql;
 
-    if (!executeVoidSQL(sql)) {
+    if (!executeSql(sql)) {
         m_result = KDbResult(ERR_DELETE_SERVER_ERROR,
                              tr("Record deletion on the server failed."));
         return false;
@@ -3408,7 +3410,7 @@ KDbPreparedStatement KDbConnection::prepareStatement(KDbPreparedStatement::Type 
     return KDbPreparedStatement(iface, type, fields, whereFieldNames);
 }
 
-KDbEscapedString KDbConnection::recentSQLString() const {
+KDbEscapedString KDbConnection::recentSqlString() const {
     return result().errorSql().isEmpty() ? m_result.sql() : result().errorSql();
 }
 

@@ -113,7 +113,7 @@ bool PostgresqlConnection::drv_getDatabasesList(QStringList* list)
 
 bool PostgresqlConnection::drv_createDatabase(const QString &dbName)
 {
-    return executeVoidSQL(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
+    return executeSql(KDbEscapedString("CREATE DATABASE ") + escapeIdentifier(dbName));
 }
 
 QByteArray buildConnParameter(const QByteArray& key, const QVariant& value)
@@ -200,7 +200,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     //!       it's not possible now because we don't have connection context in KDbFunctionExpressionData
     if (!d->fuzzystrmatchExtensionCreated) {
         d->fuzzystrmatchExtensionCreated
-            = drv_executeVoidSQL(KDbEscapedString("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch"));
+            = drv_executeSql(KDbEscapedString("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch"));
     }
     PQclear(result);
     return true;
@@ -218,15 +218,15 @@ bool PostgresqlConnection::drv_dropDatabase(const QString &dbName)
     //postgresqlDebug() << dbName;
 
     //! @todo Maybe should check that dbname is no the currentdb
-    if (executeVoidSQL(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
+    if (executeSql(KDbEscapedString("DROP DATABASE ") + escapeIdentifier(dbName)))
         return true;
 
     return false;
 }
 
-KDbSqlResult* PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* PostgresqlConnection::drv_prepareSql(const KDbEscapedString& sql)
 {
-    PGresult* result = d->executeSQL(sql);
+    PGresult* result = d->executeSql(sql);
     const ExecStatusType status = PQresultStatus(result);
     if (status == PGRES_TUPLES_OK || status == PGRES_COMMAND_OK) {
         return new PostgresqlSqlResult(this, result, status);
@@ -235,9 +235,9 @@ KDbSqlResult* PostgresqlConnection::drv_executeSQL(const KDbEscapedString& sql)
     return nullptr;
 }
 
-bool PostgresqlConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+bool PostgresqlConnection::drv_executeSql(const KDbEscapedString& sql)
 {
-    PGresult* result = d->executeSQL(sql);
+    PGresult* result = d->executeSql(sql);
     const ExecStatusType status = PQresultStatus(result);
     d->storeResultAndClear(&m_result, &result, status);
     return status == PGRES_TUPLES_OK || status == PGRES_COMMAND_OK;

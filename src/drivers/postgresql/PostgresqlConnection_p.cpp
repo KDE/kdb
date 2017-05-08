@@ -62,7 +62,7 @@ void PostgresqlConnectionInternal::storeResult(KDbResult *result)
     result->setServerMessage(QString::fromLatin1(msg));
 }
 
-PGresult* PostgresqlConnectionInternal::executeSQL(const KDbEscapedString& sql)
+PGresult* PostgresqlConnectionInternal::executeSql(const KDbEscapedString& sql)
 {
 //! @todo consider using binary mode with PQexecParams()
     return PQexec(conn, sql.toByteArray().constData());

@@ -171,7 +171,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
         // Works with 3.6.23. Earlier version just ignore this pragma.
         // See http://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
-        if (!drv_executeVoidSQL(KDbEscapedString("PRAGMA secure_delete = on"))) {
+        if (!drv_executeSql(KDbEscapedString("PRAGMA secure_delete = on"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -181,7 +181,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
             return false;
         }
         // load ROOT collation for use as default collation
-        if (!drv_executeVoidSQL(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
+        if (!drv_executeSql(KDbEscapedString("SELECT icu_load_collation('', '')"))) {
             drv_closeDatabaseSilently();
             return false;
         }
@@ -289,10 +289,10 @@ KDbCursor* SqliteConnection::prepareQuery(KDbQuerySchema* query, KDbCursor::Opti
     return new SqliteCursor(this, query, options);
 }
 
-KDbSqlResult* SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
+KDbSqlResult* SqliteConnection::drv_prepareSql(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
+    KDb::debugGUI(QLatin1String("PrepareSQL (SQLite): ") + sql.toString());
 #endif
 
     sqlite3_stmt *prepared_st = nullptr;
@@ -318,10 +318,10 @@ KDbSqlResult* SqliteConnection::drv_executeSQL(const KDbEscapedString& sql)
     return new SqliteSqlResult(this, prepared_st);
 }
 
-bool SqliteConnection::drv_executeVoidSQL(const KDbEscapedString& sql)
+bool SqliteConnection::drv_executeSql(const KDbEscapedString& sql)
 {
 #ifdef KDB_DEBUG_GUI
-    KDb::debugGUI(QLatin1String("ExecuteVoidSQL (SQLite): ") + sql.toString());
+    KDb::debugGUI(QLatin1String("ExecuteSQL (SQLite): ") + sql.toString());
 #endif
 
     char *errmsg_p = nullptr;

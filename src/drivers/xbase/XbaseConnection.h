@@ -55,7 +55,7 @@ protected:
       KDbMessageHandler* msgHandler = 0 );
     virtual bool drv_closeDatabase();
     virtual bool drv_dropDatabase(const QString &dbName = QString());
-    virtual bool drv_executeSQL(const KDbEscapedString& sql);
+    virtual bool drv_executeSql(const KDbEscapedString& sql);
     virtual quint64 drv_lastInsertRecordId();
 
     //! Implemented for KDbResultable
