@@ -365,16 +365,18 @@ bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
                             .arg(conn->escapeIdentifier(tableName)));
 }
 
-KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> result,
                                                  const QString &autoIncrementFieldName,
                                                  const QString &tableName, quint64 *recordId)
 {
-    Q_ASSERT(result);
-    const quint64 foundRecordId = (*result)->lastInsertRecordId();
+    if (!result) {
+        return std::numeric_limits<quint64>::max();
+    }
+    const quint64 foundRecordId = result->lastInsertRecordId();
     if (recordId) {
         *recordId = foundRecordId;
     }
-    return KDb::lastInsertedAutoIncValue((*result)->connection(),
+    return KDb::lastInsertedAutoIncValue(result->connection(),
                                          foundRecordId, autoIncrementFieldName, tableName);
 }
 

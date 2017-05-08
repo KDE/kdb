@@ -2120,7 +2120,7 @@ bool KDbConnection::storeObjectDataInternal(KDbObject* object, bool newObject)
             }
             //fetch newly assigned ID
 //! @todo safe to cast it?
-            quint64 obj_id = KDb::lastInsertedAutoIncValue(&result, QLatin1String("o_id"), *ts);
+            quint64 obj_id = KDb::lastInsertedAutoIncValue(result, QLatin1String("o_id"), *ts);
             //kdbDebug() << "NEW obj_id == " << obj_id;
             if (obj_id == std::numeric_limits<quint64>::max()) {
                 return false;
@@ -3252,7 +3252,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         KDbQueryColumnInfo *id_columnInfo = aif_list->first();
         //! @todo safe to cast it?
         quint64 last_id
-            = KDb::lastInsertedAutoIncValue(&result, id_columnInfo->field()->name(),
+            = KDb::lastInsertedAutoIncValue(result, id_columnInfo->field()->name(),
                                             id_columnInfo->field()->table()->name(), &recordId);
         if (last_id == std::numeric_limits<quint64>::max()) {
             //! @todo show error

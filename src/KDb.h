@@ -112,20 +112,20 @@ inline bool deleteAllRecords(KDbConnection* conn, const KDbTableSchema &table)
     return KDb::deleteAllRecords(conn, table.name());
 }
 
-/*! @return autoincrement field's @a autoIncrementFieldName value
- of last inserted record for result @a result.
-
- Simply, method internally fetches values of the last inserted record and returns selected
- field's value. The field belong to @a tableName table.
- Requirements: the field must be of integer type, there must be a record inserted using query
- for which the @a result is returned.
- On error std::numeric_limits<quint64>::max() is returned.
- Last inserted record is identified by a magical record identifier, usually called ROWID
- (PostgreSQL has it as well as SQLite; see
- KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
- ROWID's value will be assigned back to @a recordId if this pointer is not null.
-*/
-KDB_EXPORT quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+/**
+ * Returns value of last inserted record for an autoincrement field
+ *
+ * This method internally fetches values of the last inserted record for which @a result was
+ * returned and returns selected field's value. The field belong to @a tableName table.
+ * The field must be of integer type, there must be a record inserted using query for which the @a
+ * result is returned.
+ * std::numeric_limits<quint64>::max() is returned on error or if @a result is null.
+ * The last inserted record is identified by a magical record identifier, usually called ROWID
+ * (PostgreSQL has it as well as SQLite;
+ * see KDbDriverBehavior::ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE).
+ * ROWID's value will be assigned back to @a recordId if this pointer is not @c nullptr.
+ */
+KDB_EXPORT quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> result,
                                             const QString &autoIncrementFieldName,
                                             const QString &tableName, quint64 *recordId = nullptr);
 
@@ -142,7 +142,7 @@ KDB_EXPORT quint64 lastInsertedAutoIncValue(KDbConnection *conn, const quint64 r
 /**
 @overload
 */
-inline quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> *result,
+inline quint64 lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> result,
                                         const QString &autoIncrementFieldName,
                                         const KDbTableSchema &table, quint64 *recordId = nullptr)
 {
