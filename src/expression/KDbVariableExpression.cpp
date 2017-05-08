@@ -61,7 +61,7 @@ void KDbVariableExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallSta
 {
     Q_UNUSED(callStack);
     dbg.nospace() << qPrintable(QString::fromLatin1("VariableExp(\"%1\",type=%2)")
-        .arg(name, field ? KDbDriver::defaultSQLTypeName(type())
+        .arg(name, field ? KDbDriver::defaultSqlTypeName(type())
                              : QLatin1String("FIELD_NOT_DEFINED_YET")));
 }
 

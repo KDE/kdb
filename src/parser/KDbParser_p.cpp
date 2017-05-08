@@ -203,9 +203,9 @@ void yyerror(const char *str)
 
         //! @todo exact invalid expression can be selected in the editor, based on KDbParseInfo data
         if (!otherError) {
-            const bool isKDbSQLKeyword = KDb::isKDbSQLKeyword(globalToken);
-            if (isKDbSQLKeyword || syntaxError) {
-                if (isKDbSQLKeyword) {
+            const bool isKDbSqlKeyword = KDb::isKDbSqlKeyword(globalToken);
+            if (isKDbSqlKeyword || syntaxError) {
+                if (isKDbSqlKeyword) {
                     KDbParserPrivate::get(globalParser)->setError(KDbParserError(KDbParser::tr("Syntax Error"),
                                                           KDbParser::tr("\"%1\" is a reserved keyword.").arg(QLatin1String(globalToken)),
                                                           globalToken, globalCurrentPos));

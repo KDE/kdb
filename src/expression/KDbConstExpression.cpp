@@ -95,7 +95,7 @@ void KDbConstExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack*
     QString res = QLatin1String("ConstExp(")
         + token.name()
         + QLatin1String(",") + toString(nullptr).toString()
-        + QString::fromLatin1(",type=%1").arg(KDbDriver::defaultSQLTypeName(type()));
+        + QString::fromLatin1(",type=%1").arg(KDbDriver::defaultSqlTypeName(type()));
     if (value.type() == QVariant::Point && token.value() == REAL_CONST) {
         res += QLatin1String(",DECIMAL");
     }
@@ -113,25 +113,25 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
     Q_UNUSED(callStack);
     switch (token.value()) {
     case SQL_NULL:
-        return KDb::valueToSQL(driver, KDbField::Null, QVariant());
+        return KDb::valueToSql(driver, KDbField::Null, QVariant());
     case CHARACTER_STRING_LITERAL:
 //! @todo better escaping!
-        return KDb::valueToSQL(driver, KDbField::Text, value);
+        return KDb::valueToSql(driver, KDbField::Text, value);
     case SQL_TRUE:
-        return KDb::valueToSQL(driver, KDbField::Boolean, 1);
+        return KDb::valueToSql(driver, KDbField::Boolean, 1);
     case SQL_FALSE:
-        return KDb::valueToSQL(driver, KDbField::Boolean, 0);
+        return KDb::valueToSql(driver, KDbField::Boolean, 0);
     case REAL_CONST:
         return KDbEscapedString(value.toByteArray());
     case DATE_CONST:
-        return KDb::valueToSQL(driver, KDbField::Date, value);
+        return KDb::valueToSql(driver, KDbField::Date, value);
     case DATETIME_CONST:
-        return driver ? driver->valueToSQL(KDbField::DateTime, value)
+        return driver ? driver->valueToSql(KDbField::DateTime, value)
                 : KDbEscapedString('\'')
                 + KDbEscapedString(value.toDateTime().date().toString(Qt::ISODate))
                 + ' ' + value.toDateTime().time().toString(Qt::ISODate) + '\'';
     case TIME_CONST:
-        return KDb::valueToSQL(driver, KDbField::Time, value);
+        return KDb::valueToSql(driver, KDbField::Time, value);
     case INTEGER_CONST:
     default:
         break;

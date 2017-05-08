@@ -59,7 +59,7 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         columnsOrderExpanded = nullptr;
         orderByColumnList = nullptr;
         autoincFields = nullptr;
-        autoIncrementSQLFieldsList.clear();
+        autoIncrementSqlFieldsList.clear();
         columnInfosByNameExpanded.clear();
         columnInfosByName.clear();
         ownedVisibleColumns = nullptr;
@@ -149,7 +149,7 @@ void KDbQuerySchema::Private::clearCachedData()
         columnsOrderExpanded = nullptr;
         delete autoincFields;
         autoincFields = nullptr;
-        autoIncrementSQLFieldsList.clear();
+        autoIncrementSqlFieldsList.clear();
         columnInfosByNameExpanded.clear();
         columnInfosByName.clear();
         delete ownedVisibleColumns;

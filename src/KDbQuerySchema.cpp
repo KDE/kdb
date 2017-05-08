@@ -1262,17 +1262,17 @@ KDbEscapedString KDbQuerySchema::sqlColumnsList(const KDbQueryColumnInfo::List& 
     return result;
 }
 
-KDbEscapedString KDbQuerySchema::autoIncrementSQLFieldsList(KDbConnection *conn) const
+KDbEscapedString KDbQuerySchema::autoIncrementSqlFieldsList(KDbConnection *conn) const
 {
 //    QWeakPointer<const KDbDriver> driverWeakPointer
 //            = DriverManagerInternal::self()->driverWeakPointer(*conn->driver());
     if (   /*d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
-        ||*/ d->autoIncrementSQLFieldsList.isEmpty())
+        ||*/ d->autoIncrementSqlFieldsList.isEmpty())
     {
-        d->autoIncrementSQLFieldsList = KDbQuerySchema::sqlColumnsList(*autoIncrementFields(), conn);
+        d->autoIncrementSqlFieldsList = KDbQuerySchema::sqlColumnsList(*autoIncrementFields(), conn);
         //d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
     }
-    return d->autoIncrementSQLFieldsList;
+    return d->autoIncrementSqlFieldsList;
 }
 
 static void setResult(const KDbParseInfoInternal &parseInfo,

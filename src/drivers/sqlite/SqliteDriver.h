@@ -58,7 +58,7 @@ public:
      One space character should be be prepended.
      Can be reimplemented for other drivers, e.g. the SQLite3 driver returns " COLLATE ''".
      Default implementation returns empty string. */
-    KDbEscapedString collationSQL() const override;
+    KDbEscapedString collationSql() const override;
 
     //! Generates native (driver-specific) GREATEST() and LEAST() function calls.
     //! Uses MAX() and MIN(), respectively.

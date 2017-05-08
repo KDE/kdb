@@ -53,7 +53,7 @@ public:
       need to be escaped before sending to the DB-backend which will have
       it's own parser.
     */
-    KDbUtils::StaticSetOfStrings driverSpecificSQLKeywords;
+    KDbUtils::StaticSetOfStrings driverSpecificSqlKeywords;
 
     /*! KDbSQL keywords that need to be escaped if used as an identifier (e.g.
     for a table or column name).  These keywords will be escaped by the

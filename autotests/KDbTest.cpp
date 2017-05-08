@@ -474,7 +474,7 @@ KDB_EXPORT QVariant notEmptyValueForFieldType(KDbField::Type type);
 /*! @return true if the @a word is an reserved KDbSQL keyword
  See src/generated/sqlkeywords.cpp in the KDb source code.
  @todo add function returning list of keywords. */
-KDB_EXPORT bool isKDbSQLKeyword(const QByteArray& word);
+KDB_EXPORT bool isKDbSqlKeyword(const QByteArray& word);
 
 //! @return @a string string with applied KDbSQL identifier escaping
 /*! This escaping can be used for field, table, database names, etc.
@@ -975,16 +975,16 @@ KDB_EXPORT QString defaultFileBasedDriverId();
 
 /*! Escapes and converts value @a v (for type @a ftype)
     to string representation required by KDbSQL commands.
-    For Date/Time type KDb::dateTimeToSQL() is used.
+    For Date/Time type KDb::dateTimeToSql() is used.
     For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
-KDB_EXPORT KDbEscapedString valueToSQL(KDbField::Type ftype, const QVariant& v);
+KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:
     ISO 8601 DateTime format - with "T" delimiter/
     For specification see http://www.w3.org/TR/NOTE-datetime.
     Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
     @todo Add support for time zones */
-KDB_EXPORT KDbEscapedString dateTimeToSQL(const QDateTime& v);
+KDB_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);
 
 #ifdef KDB_DEBUG_GUI
 //! A prototype of handler for GUI debugger

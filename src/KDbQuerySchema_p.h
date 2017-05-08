@@ -159,8 +159,8 @@ public:
     /*! A cache for autoIncrementFields(). */
     KDbQueryColumnInfo::List *autoincFields;
 
-    /*! A cache for autoIncrementSQLFieldsList(). */
-    KDbEscapedString autoIncrementSQLFieldsList;
+    /*! A cache for autoIncrementSqlFieldsList(). */
+    KDbEscapedString autoIncrementSqlFieldsList;
     QWeakPointer<const KDbDriver> lastUsedDriverForAutoIncrementSQLFieldsList;
 
     /*! A hash for fast lookup of query columns' order (unexpanded version). */

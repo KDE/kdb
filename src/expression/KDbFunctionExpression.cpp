@@ -851,7 +851,7 @@ void KDbFunctionExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallSta
         dbg.nospace() << ',';
         args.data()->debug(dbg, callStack);
     }
-    dbg.nospace() << QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSQLTypeName(type()));
+    dbg.nospace() << QString::fromLatin1(",type=%1)").arg(KDbDriver::defaultSqlTypeName(type()));
 }
 
 static QByteArray greatestOrLeastName(const QByteArray &name)
@@ -1394,16 +1394,16 @@ KDbEscapedString KDbFunctionExpression::greatestOrLeastFunctionUsingCaseToString
 {
     // (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE F(v0,..,vN) END)
     if (args.argCount() >= 2) {
-        KDbEscapedString whenSQL;
-        whenSQL.reserve(256);
+        KDbEscapedString whenSql;
+        whenSql.reserve(256);
         foreach(const ExplicitlySharedExpressionDataPointer &child, args.d.constData()->children) {
-            if (!whenSQL.isEmpty()) {
-                whenSQL += " OR ";
+            if (!whenSql.isEmpty()) {
+                whenSql += " OR ";
             }
-            whenSQL += QLatin1Char('(') + child->toString(driver, params, callStack)
+            whenSql += QLatin1Char('(') + child->toString(driver, params, callStack)
                     + QLatin1String(") IS NULL");
         }
-        return KDbEscapedString("(CASE WHEN (") + whenSQL
+        return KDbEscapedString("(CASE WHEN (") + whenSql
                + QLatin1String(") THEN NULL ELSE (")
                + KDbFunctionExpression::toString(name, driver, args, params, callStack)
                + QLatin1String(") END)");

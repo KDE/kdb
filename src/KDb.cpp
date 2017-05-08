@@ -326,7 +326,7 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
     return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname))
-                            .arg(conn->driver()->valueToSQL(keytype, keyval)));
+                            .arg(conn->driver()->valueToSql(keytype, keyval)));
 }
 
 bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
@@ -337,9 +337,9 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
     return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
-                            .arg(conn->driver()->valueToSQL(keytype1, keyval1))
+                            .arg(conn->driver()->valueToSql(keytype1, keyval1))
                             .arg(conn->escapeIdentifier(keyname2))
-                            .arg(conn->driver()->valueToSQL(keytype2, keyval2)));
+                            .arg(conn->driver()->valueToSql(keytype2, keyval2)));
 }
 
 bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
@@ -351,11 +351,11 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
     return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
                             .arg(conn->escapeIdentifier(tableName))
                             .arg(conn->escapeIdentifier(keyname1))
-                            .arg(conn->driver()->valueToSQL(keytype1, keyval1))
+                            .arg(conn->driver()->valueToSql(keytype1, keyval1))
                             .arg(conn->escapeIdentifier(keyname2))
-                            .arg(conn->driver()->valueToSQL(keytype2, keyval2))
+                            .arg(conn->driver()->valueToSql(keytype2, keyval2))
                             .arg(conn->escapeIdentifier(keyname3))
-                            .arg(conn->driver()->valueToSQL(keytype3, keyval3)));
+                            .arg(conn->driver()->valueToSql(keytype3, keyval3)));
 }
 
 bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
@@ -418,7 +418,7 @@ KDbEscapedString KDb::sqlWhere(KDbDriver *drv, KDbField::Type t,
 {
     if (value.isNull())
         return KDbEscapedString(fieldName) + " is NULL";
-    return KDbEscapedString(fieldName) + '=' + drv->valueToSQL(t, value);
+    return KDbEscapedString(fieldName) + '=' + drv->valueToSql(t, value);
 }
 
 //! Cache

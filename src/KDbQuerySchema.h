@@ -624,7 +624,7 @@ public:
     /*! @return cached list of autoincrement fields created using sqlColumnsList()
         on a list returned by autoIncrementFields(). The field names are escaped using
         driver escaping. */
-    KDbEscapedString autoIncrementSQLFieldsList(KDbConnection *conn) const;
+    KDbEscapedString autoIncrementSqlFieldsList(KDbConnection *conn) const;
 
     /**
      * @brief Sets a WHERE expression @a exp.

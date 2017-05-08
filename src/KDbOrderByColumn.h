@@ -96,7 +96,7 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    KDbEscapedString toSQLString(bool includeTableName = true,
+    KDbEscapedString toSqlString(bool includeTableName = true,
                                  KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
@@ -203,7 +203,7 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    KDbEscapedString toSQLString(bool includeTableNames = true,
+    KDbEscapedString toSqlString(bool includeTableNames = true,
                                  KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 private:

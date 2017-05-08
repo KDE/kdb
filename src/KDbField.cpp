@@ -757,7 +757,7 @@ void debug(QDebug dbg, const KDbField& field, KDbFieldDebugOptions options)
     if (field.options() & KDbField::Unsigned)
         dbg.nospace() << " UNSIGNED";
     dbg.nospace() << ' ' << qPrintable((conn && conn->driver())
-        ? conn->driver()->sqlTypeName(field.type(), field) : KDbDriver::defaultSQLTypeName(field.type()));
+        ? conn->driver()->sqlTypeName(field.type(), field) : KDbDriver::defaultSqlTypeName(field.type()));
     if (field.isFPNumericType() && field.precision() > 0) {
         if (field.scale() > 0)
             dbg.nospace() << QString::fromLatin1("(%1,%2)").arg(field.precision()).arg(field.scale());

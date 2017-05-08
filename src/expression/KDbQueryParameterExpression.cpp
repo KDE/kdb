@@ -58,7 +58,7 @@ void KDbQueryParameterExpressionData::debugInternal(QDebug dbg, KDb::ExpressionC
 {
     Q_UNUSED(callStack);
     dbg.nospace() << qPrintable(QString::fromLatin1("QueryParExp([%1],type=%2)")
-        .arg(value.toString(), KDbDriver::defaultSQLTypeName(type())));
+        .arg(value.toString(), KDbDriver::defaultSqlTypeName(type())));
 }
 
 KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
@@ -71,7 +71,7 @@ KDbEscapedString KDbQueryParameterExpressionData::toStringInternal(
            // Enclose in () because for example if the parameter is -1 and parent expression
            // unary '-' then the result would be "--1" (a comment in SQL!).
            // With the () the result will be a valid expression "-(-1)".
-           ? KDbEscapedString("(%1)").arg(driver->valueToSQL(type(), params->previousValue()))
+           ? KDbEscapedString("(%1)").arg(driver->valueToSql(type(), params->previousValue()))
            : KDbEscapedString("[%1]").arg(KDbEscapedString(value.toString()));
 }
 

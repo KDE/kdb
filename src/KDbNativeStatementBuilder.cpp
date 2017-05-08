@@ -362,7 +362,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 
     // ORDER BY
     KDbEscapedString orderByString(
-        querySchema->orderByColumnList()->toSQLString(
+        querySchema->orderByColumnList()->toSqlString(
             !singleTable/*includeTableName*/, connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping)
     );
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());
@@ -381,7 +381,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             KDbQueryColumnInfo *ci = fieldsExpanded[ pkeyFieldsIndex ];
             automaticPKOrderBy.appendColumn(ci);
         }
-        orderByString = automaticPKOrderBy.toSQLString(!singleTable/*includeTableName*/,
+        orderByString = automaticPKOrderBy.toSqlString(!singleTable/*includeTableName*/,
                         connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping);
     }
     if (!orderByString.isEmpty())
@@ -492,9 +492,9 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             if (!autoinc && !pk && field->isNotNull())
                 v += " NOT NULL"; //only add not null option if no autocommit is set
             if (d->driver()->supportsDefaultValue(*field) && field->defaultValue().isValid()) {
-                KDbEscapedString valToSQL(d->driver()->valueToSQL(field, field->defaultValue()));
-                if (!valToSQL.isEmpty()) //for sanity
-                    v += " DEFAULT " + valToSQL;
+                KDbEscapedString valToSql(d->driver()->valueToSql(field, field->defaultValue()));
+                if (!valToSql.isEmpty()) //for sanity
+                    v += " DEFAULT " + valToSql;
             }
         }
         sql += v;

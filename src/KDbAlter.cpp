@@ -1038,30 +1038,30 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         KDbEscapedString sourceFields;
         foreach(KDbField* f, *newTable->fields()) {
             QString renamedFieldName(fieldHash.value(f->name()));
-            KDbEscapedString sourceSQLString;
+            KDbEscapedString sourceSqlString;
             const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
             if (!renamedFieldName.isEmpty()) {
                 //this field should be renamed
-                sourceSQLString = KDbEscapedString(d->conn->escapeIdentifier(renamedFieldName));
+                sourceSqlString = KDbEscapedString(d->conn->escapeIdentifier(renamedFieldName));
             } else if (!f->defaultValue().isNull()) {
                 //this field has a default value defined
 //! @todo support expressions (eg. TODAY()) as a default value
 //! @todo this field can be notNull or notEmpty - check whether the default is ok
 //!       (or do this checking also in the Table Designer?)
-                sourceSQLString = d->conn->driver()->valueToSQL(type, f->defaultValue());
+                sourceSqlString = d->conn->driver()->valueToSql(type, f->defaultValue());
             } else if (f->isNotNull()) {
                 //this field cannot be null
-                sourceSQLString = d->conn->driver()->valueToSQL(
+                sourceSqlString = d->conn->driver()->valueToSql(
                                       type, KDb::emptyValueForFieldType(type));
             } else if (f->isNotEmpty()) {
                 //this field cannot be empty - use any nonempty value..., e.g. " " for text or 0 for number
-                sourceSQLString = d->conn->driver()->valueToSQL(
+                sourceSqlString = d->conn->driver()->valueToSql(
                                       type, KDb::notEmptyValueForFieldType(type));
             }
 //! @todo support unique, validatationRule, unsigned flags...
 //! @todo check for foreignKey values...
 
-            if (!sourceSQLString.isEmpty()) {
+            if (!sourceSqlString.isEmpty()) {
                 if (first) {
                     first = false;
                 } else {
@@ -1069,7 +1069,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
                     sourceFields.append(", ");
                 }
                 sql += d->conn->escapeIdentifier(f->name());
-                sourceFields.append(sourceSQLString);
+                sourceFields.append(sourceSqlString);
             }
         }
         sql += (") SELECT " + sourceFields + " FROM " + oldTable->name());

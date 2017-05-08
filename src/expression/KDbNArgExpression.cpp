@@ -117,7 +117,7 @@ void KDbNArgExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* 
         dbg.nospace() << ", ";
         data->debug(dbg, callStack);
     }
-    dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
+    dbg.nospace() << ",type=" << KDbDriver::defaultSqlTypeName(type()) << ")";
 }
 
 KDbEscapedString KDbNArgExpressionData::toStringInternal(

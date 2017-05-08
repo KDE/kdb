@@ -151,7 +151,7 @@ KDbAdminTools* SqliteDriver::drv_createAdminTools() const
     return new SqliteAdminTools();
 }
 
-KDbEscapedString SqliteDriver::collationSQL() const
+KDbEscapedString SqliteDriver::collationSql() const
 {
     return dp->collate;
 }
@@ -174,7 +174,7 @@ KDbEscapedString SqliteDriver::greatestOrLeastFunctionToString(const QString &na
             if (!s.isEmpty()) {
                 s += ", ";
             }
-            s += QLatin1Char('(') + args.arg(i).toString(this, params, callStack) + QLatin1String(") ") + collationSQL();
+            s += QLatin1Char('(') + args.arg(i).toString(this, params, callStack) + QLatin1String(") ") + collationSql();
         }
         return realName + QLatin1Char('(') + s + QLatin1Char(')');
     }

@@ -246,7 +246,7 @@ void KDbExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* call
 {
     Q_UNUSED(callStack);
     dbg.nospace() << QString::fromLatin1("Exp(%1,type=%2)")
-                   .arg(token.value()).arg(KDbDriver::defaultSQLTypeName(type()));
+                   .arg(token.value()).arg(KDbDriver::defaultSqlTypeName(type()));
 }
 
 //=========================================

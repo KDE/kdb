@@ -124,7 +124,7 @@ public:
     bool isSystemFieldName(const QString& name) const;
 
     /*! @return true if @a word is a driver-specific keyword.
-     @see KDb::isKDbSQLKeyword(const QByteArray&) */
+     @see KDb::isKDbSqlKeyword(const QByteArray&) */
     bool isDriverSpecificKeyword(const QByteArray& word) const;
 
     /*! @return driver's features that are combination of KDbDriver::Features enum.
@@ -143,7 +143,7 @@ public:
     virtual QString sqlTypeName(KDbField::Type type, const KDbField &field) const;
 
     /*! used when we do not have KDbDriver instance yet */
-    static QString defaultSQLTypeName(KDbField::Type type);
+    static QString defaultSqlTypeName(KDbField::Type type);
 
     /*! Escapes and converts value @a v (for type @a ftype)
      to string representation required by SQL commands.
@@ -151,20 +151,20 @@ public:
      This implementation return date, datetime and time values in ISO format,
      what seems to be accepted by SQL servers.
      @see Qt::DateFormat */
-    virtual KDbEscapedString valueToSQL(KDbField::Type ftype, const QVariant& v) const;
+    virtual KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v) const;
 
     //! Like above but with the fildtype as string.
-    inline KDbEscapedString valueToSQL(const QString& ftype, const QVariant& v) const {
-        return valueToSQL(KDbField::typeForString(ftype), v);
+    inline KDbEscapedString valueToSql(const QString& ftype, const QVariant& v) const {
+        return valueToSql(KDbField::typeForString(ftype), v);
     }
 
     //! Like above method, for @a field.
-    inline KDbEscapedString valueToSQL(const KDbField *field, const QVariant& v) const {
-        return valueToSQL((field ? field->type() : KDbField::InvalidType), v);
+    inline KDbEscapedString valueToSql(const KDbField *field, const QVariant& v) const {
+        return valueToSql((field ? field->type() : KDbField::InvalidType), v);
     }
 
     /*! @todo not compatible with all drivers - reimplement */
-    virtual KDbEscapedString dateTimeToSQL(const QDateTime& v) const;
+    virtual KDbEscapedString dateTimeToSql(const QDateTime& v) const;
 
     /*! Driver-specific SQL string escaping.
      Implement escaping for any character like " or ' as your
@@ -189,7 +189,7 @@ public:
      One space character should be be prepended.
      Can be reimplemented for other drivers, e.g. the SQLite3 driver returns " COLLATE ''".
      Default implementation returns empty string. */
-    virtual KDbEscapedString collationSQL() const {
+    virtual KDbEscapedString collationSql() const {
         return KDbEscapedString();
     }
 
@@ -392,9 +392,9 @@ KDB_EXPORT QString escapeIdentifier(const KDbDriver* driver,
 KDB_EXPORT QByteArray escapeIdentifier(const KDbDriver* driver,
                                        const QByteArray& str);
 
-inline KDbEscapedString valueToSQL(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
+inline KDbEscapedString valueToSql(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
 {
-    return driver ? driver->valueToSQL(ftype, v) : KDb::valueToSQL(ftype, v);
+    return driver ? driver->valueToSql(ftype, v) : KDb::valueToSql(ftype, v);
 }
 
 }

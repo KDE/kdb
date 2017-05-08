@@ -175,7 +175,7 @@ QDebug operator<<(QDebug dbg, const KDbOrderByColumn& order)
     return dbg.space();
 }
 
-KDbEscapedString KDbOrderByColumn::toSQLString(bool includeTableName,
+KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
                                                KDbConnection *conn,
                                                KDb::IdentifierEscapingType escapingType) const
 {
@@ -192,7 +192,7 @@ KDbEscapedString KDbOrderByColumn::toSQLString(bool includeTableName,
             fieldName = KDbEscapedString(escapeIdentifier(d->column->aliasOrName(), conn, escapingType));
         }
         if (d->column->field()->isTextType()) {
-            collationString = conn->driver()->collationSQL();
+            collationString = conn->driver()->collationSql();
         }
     }
     else {
@@ -203,7 +203,7 @@ KDbEscapedString KDbOrderByColumn::toSQLString(bool includeTableName,
         fieldName = KDbEscapedString(escapeIdentifier(
             d->field ? d->field->name() : QLatin1String("??")/*error*/, conn, escapingType));
         if (d->field && d->field->isTextType()) {
-            collationString = conn->driver()->collationSQL();
+            collationString = conn->driver()->collationSql();
         }
     }
     return tableName + fieldName + collationString + orderString;
@@ -356,14 +356,14 @@ QDebug operator<<(QDebug dbg, const KDbOrderByColumnList& list)
     return dbg.space();
 }
 
-KDbEscapedString KDbOrderByColumnList::toSQLString(bool includeTableNames, KDbConnection *conn,
+KDbEscapedString KDbOrderByColumnList::toSqlString(bool includeTableNames, KDbConnection *conn,
                                        KDb::IdentifierEscapingType escapingType) const
 {
     KDbEscapedString string;
     for (QList<KDbOrderByColumn*>::ConstIterator it(constBegin()); it != constEnd(); ++it) {
         if (!string.isEmpty())
             string += ", ";
-        string += (*it)->toSQLString(includeTableNames, conn, escapingType);
+        string += (*it)->toSqlString(includeTableNames, conn, escapingType);
     }
     return string;
 }

@@ -174,8 +174,8 @@ bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
         {
             kdbWarning() << "INDEX on" << masterIndex->table()->name()
                 << ", INDEX on" << detailsIndex->table()->name() << ": !equal field types:"
-                << KDbDriver::defaultSQLTypeName(masterType) << masterField->name() << ","
-                << KDbDriver::defaultSQLTypeName(detailsType) << detailsField->name();
+                << KDbDriver::defaultSqlTypeName(masterType) << masterField->name() << ","
+                << KDbDriver::defaultSqlTypeName(detailsType) << detailsField->name();
             m_pairs.clear();
             return false;
         }
@@ -184,8 +184,8 @@ bool KDbRelationship::setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* de
                 || (!masterField->isUnsigned() && detailsField->isUnsigned())) {
             kdbWarning() << "KDbRelationship::setIndices(INDEX on '" << masterIndex->table()->name()
             << "',INDEX on " << detailsIndex->table()->name() << "): !equal signedness of field types: "
-            << KDbDriver::defaultSQLTypeName(masterField->type()) << " " << masterField->name() << ", "
-            << KDbDriver::defaultSQLTypeName(detailsField->type()) << " " << detailsField->name();
+            << KDbDriver::defaultSqlTypeName(masterField->type()) << " " << masterField->name() << ", "
+            << KDbDriver::defaultSqlTypeName(detailsField->type()) << " " << detailsField->name();
             m_pairs.clear();
             return;
         }

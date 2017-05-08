@@ -309,7 +309,7 @@ void KDbBinaryExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack
     else {
         dbg.nospace() << "<NONE>";
     }
-    dbg.nospace() << ",type=" << KDbDriver::defaultSQLTypeName(type()) << ")";
+    dbg.nospace() << ",type=" << KDbDriver::defaultSqlTypeName(type()) << ")";
 }
 
 KDbEscapedString KDbBinaryExpressionData::toStringInternal(

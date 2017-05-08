@@ -32,9 +32,9 @@
 
 #include <assert.h>
 
-/*! @internal Used in KDbDriver::defaultSQLTypeName(int)
+/*! @internal Used in KDbDriver::defaultSqlTypeName(int)
  when we do not have KDbDriver instance yet, or when we cannot get one */
-static const char* const KDb_defaultSQLTypeNames[] = {
+static const char* const KDb_defaultSqlTypeNames[] = {
     "InvalidType",
     "Byte",
     "ShortInteger",
@@ -155,11 +155,11 @@ KDbConnection* KDbDriver::removeConnection(KDbConnection *conn)
     return nullptr;
 }
 
-QString KDbDriver::defaultSQLTypeName(KDbField::Type type)
+QString KDbDriver::defaultSqlTypeName(KDbField::Type type)
 {
     if (type > KDbField::LastType)
         return QLatin1String("Null");
-    return QLatin1String(KDb_defaultSQLTypeNames[type]);
+    return QLatin1String(KDb_defaultSqlTypeNames[type]);
 }
 
 bool KDbDriver::isKDbSystemObjectName(const QString& name)
@@ -179,7 +179,7 @@ bool KDbDriver::isSystemFieldName(const QString& name) const
     return drv_isSystemFieldName(name);
 }
 
-static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
+static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
 {
     if (v.isNull() || ftype == KDbField::Null) {
         return KDbEscapedString("NULL");
@@ -215,8 +215,8 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Ty
     case KDbField::Date:
         return KDbEscapedString('\'') + v.toDate().toString(Qt::ISODate) + '\'';
     case KDbField::DateTime:
-        return driver ? driver->dateTimeToSQL(v.toDateTime())
-                      : KDb::dateTimeToSQL(v.toDateTime());
+        return driver ? driver->dateTimeToSql(v.toDateTime())
+                      : KDb::dateTimeToSql(v.toDateTime());
     case KDbField::BLOB: {
         if (v.toByteArray().isEmpty()) {
             return KDbEscapedString("NULL");
@@ -236,18 +236,18 @@ static KDbEscapedString valueToSQLInternal(const KDbDriver *driver, KDbField::Ty
     return KDbEscapedString();
 }
 
-KDbEscapedString KDbDriver::valueToSQL(KDbField::Type ftype, const QVariant& v) const
+KDbEscapedString KDbDriver::valueToSql(KDbField::Type ftype, const QVariant& v) const
 {
     //! note, it was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions.
-    return valueToSQLInternal(this, ftype, v);
+    return valueToSqlInternal(this, ftype, v);
 }
 
-KDbEscapedString KDb::valueToSQL(KDbField::Type ftype, const QVariant& v)
+KDbEscapedString KDb::valueToSql(KDbField::Type ftype, const QVariant& v)
 {
-    return valueToSQLInternal(nullptr, ftype, v);
+    return valueToSqlInternal(nullptr, ftype, v);
 }
 
-KDbEscapedString KDb::dateTimeToSQL(const QDateTime& v)
+KDbEscapedString KDb::dateTimeToSql(const QDateTime& v)
 {
     /*! (was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
         Now it's ISO 8601 DateTime format - with "T" delimiter:
@@ -258,9 +258,9 @@ KDbEscapedString KDb::dateTimeToSQL(const QDateTime& v)
     return KDbEscapedString('\'') + v.toString(Qt::ISODate) + KDbEscapedString('\'');
 }
 
-KDbEscapedString KDbDriver::dateTimeToSQL(const QDateTime& v) const
+KDbEscapedString KDbDriver::dateTimeToSql(const QDateTime& v) const
 {
-    return KDb::dateTimeToSQL(v);
+    return KDb::dateTimeToSql(v);
 }
 
 QString KDbDriver::escapeIdentifier(const QString& str) const
@@ -291,7 +291,7 @@ QList<QByteArray> KDbDriver::internalPropertyNames() const
 
 void KDbDriver::initDriverSpecificKeywords(const char* const* keywords)
 {
-    d->driverSpecificSQLKeywords.setStrings(keywords);
+    d->driverSpecificSqlKeywords.setStrings(keywords);
 }
 
 KDbEscapedString KDbDriver::addLimitTo1(const KDbEscapedString& sql, bool add)
@@ -301,7 +301,7 @@ KDbEscapedString KDbDriver::addLimitTo1(const KDbEscapedString& sql, bool add)
 
 bool KDbDriver::isDriverSpecificKeyword(const QByteArray& word) const
 {
-    return d->driverSpecificSQLKeywords.contains(word);
+    return d->driverSpecificSqlKeywords.contains(word);
 }
 
 void KDbDriver::setMetaData(const KDbDriverMetaData *metaData)
@@ -391,12 +391,12 @@ KDbEscapedString KDbDriver::concatenateFunctionToString(const KDbBinaryExpressio
 
 Q_GLOBAL_STATIC_WITH_ARGS(
     KDbUtils::StaticSetOfStrings,
-    KDb_kdbSQLKeywords,
+    KDb_kdbSqlKeywords,
     (DriverPrivate::kdbSQLKeywords) )
 
-KDB_EXPORT bool KDb::isKDbSQLKeyword(const QByteArray& word)
+KDB_EXPORT bool KDb::isKDbSqlKeyword(const QByteArray& word)
 {
-    return KDb_kdbSQLKeywords->contains(word.toUpper());
+    return KDb_kdbSqlKeywords->contains(word.toUpper());
 }
 
 KDB_EXPORT QString KDb::escapeIdentifier(const KDbDriver* driver,
