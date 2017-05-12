@@ -121,8 +121,9 @@ public:
      of a query parameter (used in QueryParameterExpr).
      The result may depend on the optional @a driver parameter.
      If @a driver is 0, representation for portable KDbSQL dialect is returned. */
-    KDbEscapedString toString(const KDbDriver *driver, KDbQuerySchemaParameterValueListIterator* params = nullptr,
-                              KDb::ExpressionCallStack* callStack = nullptr) const;
+    KDbEscapedString toString(const KDbDriver *driver,
+                              KDbQuerySchemaParameterValueListIterator *params = nullptr,
+                              KDb::ExpressionCallStack *callStack = nullptr) const;
 
     /*! Collects query parameters (messages and types) recursively and saves them to @a params.
      The leaf nodes are objects of QueryParameterExpr class.

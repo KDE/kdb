@@ -618,8 +618,9 @@ public:
 
      @a escapingType can be used to alter default escaping type.
      If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    static KDbEscapedString sqlColumnsList(const KDbQueryColumnInfo::List& infolist, KDbConnection *conn = nullptr,
-        KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
+    static KDbEscapedString
+    sqlColumnsList(const KDbQueryColumnInfo::List &infolist, KDbConnection *conn = nullptr,
+                   KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
 
     /*! @return cached list of autoincrement fields created using sqlColumnsList()
         on a list returned by autoIncrementFields(). The field names are escaped using

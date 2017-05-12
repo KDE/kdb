@@ -78,8 +78,8 @@ public:
     //! Similarly, RANDOM(X,Y) for SQLite is equal to
     //! (X + CAST((Y-X) * (RANDOM()+9223372036854775807)/18446744073709551615 AS INT)).
     KDbEscapedString randomFunctionToString(const KDbNArgExpression &args,
-                                            KDbQuerySchemaParameterValueListIterator* params,
-                                            KDb::ExpressionCallStack* callStack) const override;
+                                            KDbQuerySchemaParameterValueListIterator *params,
+                                            KDb::ExpressionCallStack *callStack) const override;
 
     //! Generates native (driver-specific) CEILING() and FLOOR() function calls.
     //! Default implementation USES CEILING() and FLOOR(), respectively.
@@ -102,7 +102,7 @@ protected:
       for this driver fields with name equal "_ROWID_"
       is considered as system field.
     */
-    bool drv_isSystemFieldName(const QString& n) const override;
+    bool drv_isSystemFieldName(const QString &n) const override;
 
     SqliteDriverPrivate * const dp;
 

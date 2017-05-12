@@ -346,9 +346,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
     if (!querySchema->whereExpression().isNull()) {
         KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
-        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr = parameters.isEmpty() ? nullptr : &paramValuesIt;
+        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
+            = parameters.isEmpty() ? nullptr : &paramValuesIt;
         if (wasWhere) {
-//! @todo () are not always needed
+            //! @todo () are not always needed
             s_where = '(' + s_where + ") AND ("
                 + querySchema->whereExpression().toString(driver, paramValuesItPtr) + ')';
         } else {

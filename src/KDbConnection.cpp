@@ -1324,7 +1324,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
                 return false;
         }
     } else {
-        if (this->tableSchema(tableSchema->name()) != nullptr) {
+        if (this->tableSchema(tableSchema->name())) {
             clearResult();
             m_result = KDbResult(ERR_OBJECT_EXISTS,
                                  tr("Table \"%1\" already exists.").arg(tableSchema->name()));
@@ -3053,7 +3053,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     if (!useRecordId && !pkey) {
         kdbWarning() << " -- NO MASTER TABLE's PKEY!";
         m_result = KDbResult(ERR_UPDATE_NO_MASTER_TABLES_PKEY,
-                             tr("Could not update record because master table has no primary key defined."));
+            tr("Could not update record because master table has no primary key defined."));
 //! @todo perhaps we can try to update without using PKEY?
         return false;
     }
@@ -3149,7 +3149,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                              tr("Could not insert record because there is no master table specified."));
         return false;
     }
-    KDbIndexSchema *pkey = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : nullptr;
+    KDbIndexSchema *pkey
+        = (mt->primaryKey() && !mt->primaryKey()->fields()->isEmpty()) ? mt->primaryKey() : nullptr;
     if (!getRecordId && !pkey) {
         kdbWarning() << " -- WARNING: NO MASTER TABLE's PKEY";
     }
@@ -3191,11 +3192,12 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         }
         if (pkey) {
             const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
-//   kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
-            if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
+            //   kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
+            if (pkey->fieldCount() != query->pkeyFieldCount()) { // sanity check
                 kdbWarning() << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
                 m_result = KDbResult(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
-                                     tr("Could not insert record because it does not contain entire master table's primary key."));
+                                     tr("Could not insert record because it does not contain "
+                                        "entire master table's primary key."));
                 return false;
             }
         }

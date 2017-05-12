@@ -44,7 +44,7 @@ public:
      or attaching relationships.
      Any fields added with addField() will not be owned by index but by their table.
      */
-    explicit KDbIndexSchema();
+    KDbIndexSchema();
 
     /*! Deletes the index. Referenced KDbField objects are not deleted.
      All KDbRelationship objects listed by masterRelationships() are detached from

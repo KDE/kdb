@@ -127,7 +127,8 @@ public:
      If @a kexiCompatible is true (the default) initial checks will be performed
      to recognize database Kexi-specific format. Set @a kexiCompatible to false
      if you're using native database (one that have no Kexi System tables).
-     For file-based drivers, @a dbName can be skipped, so the same as specified for KDbConnectionData is used.
+     For file-based drivers, @a dbName can be skipped, so the same as specified for
+     KDbConnectionData is used.
      @return true on success, false on failure.
      If user has cancelled this action and @a cancelled is not 0, *cancelled is set to true. */
     bool useDatabase(const QString &dbName = QString(), bool kexiCompatible = true, bool *cancelled = nullptr,

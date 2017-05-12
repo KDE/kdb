@@ -27,7 +27,7 @@
 
 class KDbxBaseCursorData {
   public:
-    explicit xBaseCursorData(KDbCursor* cursor = 0)
+    explicit xBaseCursorData(KDbCursor* cursor = nullptr)
       : internalCursor(cursor)
     {
     }
@@ -141,7 +141,7 @@ void xBaseCursor::drv_bufferMovePointerTo(qint64 to) {
 
 const char** xBaseCursor::recordData() const {
   if (!d->internalCursor) {
-    return 0;
+    return nullptr;
   }
   return d->internalCursor->recordData();
 }

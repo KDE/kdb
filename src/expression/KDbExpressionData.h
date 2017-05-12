@@ -193,7 +193,7 @@ public:
     ~KDbBinaryExpressionData() override;
 
     void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
-    KDbBinaryExpressionData* clone() override;
+    KDbBinaryExpressionData *clone() override;
     ExplicitlySharedExpressionDataPointer left() const;
     ExplicitlySharedExpressionDataPointer right() const;
 
@@ -222,7 +222,7 @@ public:
 
     QVariant value;
     void getQueryParameters(QList<KDbQuerySchemaParameter> *params) override;
-    KDbConstExpressionData* clone() override;
+    KDbConstExpressionData *clone() override;
 
 protected:
     //! Sends information about this expression  to debug output @a dbg (internal).

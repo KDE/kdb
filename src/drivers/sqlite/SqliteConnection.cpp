@@ -392,7 +392,8 @@ bool SqliteConnection::loadExtension(const QString& path)
         d->setExtensionsLoadingEnabled(true);
     }
     char *errmsg_p = nullptr;
-    int res = sqlite3_load_extension(d->data, QDir::toNativeSeparators(path).toUtf8().constData(), nullptr, &errmsg_p);
+    int res = sqlite3_load_extension(d->data, QDir::toNativeSeparators(path).toUtf8().constData(),
+                                     nullptr, &errmsg_p);
     bool ok = res == SQLITE_OK;
     if (!ok) {
         m_result.setServerErrorCode(res);

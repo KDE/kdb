@@ -78,7 +78,7 @@ public:
 
     //! @return character equivalent of this token
     //! Only character-based tokens are supported this way (toInt() <= maxCharTokenValue).
-    //! For unsupported tokens 0 is returned.
+    //! For unsupported tokens @c nullptr is returned.
     inline char toChar() const { return v <= maxCharTokenValue ? v : 0; }
 
     //! @return numeric value of this token

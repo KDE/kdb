@@ -179,7 +179,8 @@ void yyerror(const char *str)
 
     const bool otherError = (qstrnicmp(str, "other error", 11) == 0);
     const bool syntaxError = qstrnicmp(str, "syntax error", 12) == 0;
-    if ((   globalParser->error().type().isEmpty() && (str == nullptr || strlen(str) == 0 || syntaxError))
+    if ((globalParser->error().type().isEmpty()
+         && (str == nullptr || strlen(str) == 0 || syntaxError))
         || otherError)
     {
         kdbDebug() << globalParser->statement();

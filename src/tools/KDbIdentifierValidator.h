@@ -32,7 +32,7 @@ public:
 
     ~KDbIdentifierValidator() override;
 
-    State validate(QString & input, int & pos) const override;
+    State validate(QString &input, int &pos) const override;
 
     //! @return true if upper-case letters in the input are replaced to lower-case.
     //! @c false by default.
