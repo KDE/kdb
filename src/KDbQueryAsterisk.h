@@ -70,6 +70,28 @@ public:
 
     ~KDbQueryAsterisk() override;
 
+    /**
+     * @brief Returns @c true if this query asterisk is equal to @a other
+     *
+     * @return @c false if the objects are not equal.
+     * Two asterisks are equal if they return the same table() and query().
+     * This also means that both return the same value for isSingleTableAsterisk() and
+     * isAllTableAsterisk().
+     *
+     * @since 3.1
+     */
+    bool operator==(const KDbQueryAsterisk& other) const;
+
+    /**
+     * @brief Returns @c true if this query asterisk is not equal to @a other
+     *
+     * @return @c false if objects are equal.
+     *
+     * @see operator==(const KDbQueryAsterisk&)
+     * @since 3.1
+     */
+    inline bool operator!=(const KDbQueryAsterisk &other) const { return !operator==(other); }
+
     /*! @return Query object for that this asterisk object is defined */
     KDbQuerySchema *query();
 

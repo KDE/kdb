@@ -62,6 +62,11 @@ KDbQueryAsterisk::~KDbQueryAsterisk()
     delete d;
 }
 
+bool KDbQueryAsterisk::operator==(const KDbQueryAsterisk& other) const
+{
+    return d->table == other.d->table && m_parent == other.m_parent;
+}
+
 KDbQuerySchema *KDbQueryAsterisk::query()
 {
     return static_cast<KDbQuerySchema*>(m_parent);
