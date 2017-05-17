@@ -78,9 +78,6 @@ public:
 
     /*! @return table schema object for that this asterisk object is defined.
     If this is a "all-tables" asterisk, @c nullptr is returned. */
-    const KDbTableSchema* table();
-
-    /*! @overload const KDbTableSchema* table() */
     const KDbTableSchema* table() const;
 
     /*! Sets table schema for this asterisk.

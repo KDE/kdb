@@ -72,11 +72,6 @@ const KDbQuerySchema *KDbQueryAsterisk::query() const
     return static_cast<const KDbQuerySchema*>(m_parent);
 }
 
-const KDbTableSchema* KDbQueryAsterisk::table()
-{
-    return d->table;
-}
-
 const KDbTableSchema* KDbQueryAsterisk::table() const
 {
     return d->table;
