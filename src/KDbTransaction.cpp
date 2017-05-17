@@ -111,7 +111,7 @@ KDbConnection* KDbTransaction::connection() const
     return m_data ? m_data->m_conn : nullptr;
 }
 
-bool KDbTransaction::active() const
+bool KDbTransaction::isActive() const
 {
     return m_data && m_data->m_active;
 }
@@ -143,13 +143,13 @@ KDbTransactionGuard::KDbTransactionGuard()
 
 KDbTransactionGuard::~KDbTransactionGuard()
 {
-    if (!m_doNothing && m_trans.active() && m_trans.connection())
+    if (!m_doNothing && m_trans.isActive() && m_trans.connection())
         m_trans.connection()->rollbackTransaction(m_trans);
 }
 
 bool KDbTransactionGuard::commit()
 {
-    if (m_trans.active() && m_trans.connection()) {
+    if (m_trans.isActive() && m_trans.connection()) {
         return m_trans.connection()->commitTransaction(m_trans);
     }
     return false;

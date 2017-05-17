@@ -73,9 +73,13 @@ public:
 
     KDbConnection* connection() const;
 
-    /*! @return true if transaction is avtive (ie. started)
-     Returns false also if transaction is uninitialised (null). */
-    bool active() const;
+    /**
+     * @brief Returns @c true if transaction is active (ie. started)
+     *
+     * @return @c false also if transaction is uninitialised (null).
+     * @since 3.1
+     */
+    bool isActive() const;
 
     /*! @return true if transaction is uinitialised (null). */
     bool isNull() const;

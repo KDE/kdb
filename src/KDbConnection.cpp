@@ -646,7 +646,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
     KDbTransaction trans;
     if (d->driver->transactionsSupported()) {
         trans = beginTransaction();
-        if (!trans.active())
+        if (!trans.isActive())
             return false;
     }
 
@@ -668,7 +668,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
             || !insertRecord(table, QLatin1String("kexidb_minor_ver"), KDb::version().minor()))
         createDatabase_ERROR;
 
-    if (trans.active() && !commitTransaction(trans))
+    if (trans.isActive() && !commitTransaction(trans))
         createDatabase_ERROR;
 
     createDatabase_CLOSE;
@@ -1805,7 +1805,7 @@ KDbTransaction KDbConnection::beginTransaction()
         return trans;
     }
     if (d->driver->beh->features & KDbDriver::SingleTransactions) {
-        if (d->default_trans.active()) {
+        if (d->default_trans.isActive()) {
             m_result = KDbResult(ERR_TRANSACTION_ACTIVE,
                                  tr("Transaction already started."));
             return KDbTransaction();
@@ -1841,8 +1841,8 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
         return false;
     }
     KDbTransaction t = trans;
-    if (!t.active()) { //try default tr.
-        if (!d->default_trans.active()) {
+    if (!t.isActive()) { //try default tr.
+        if (!d->default_trans.isActive()) {
             if (ignore_inactive)
                 return true;
             clearResult();
@@ -1876,8 +1876,8 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
         return false;
     }
     KDbTransaction t = trans;
-    if (!t.active()) { //try default tr.
-        if (!d->default_trans.active()) {
+    if (!t.isActive()) { //try default tr.
+        if (!d->default_trans.isActive()) {
             if (ignore_inactive)
                 return true;
             clearResult();
@@ -1919,7 +1919,7 @@ void KDbConnection::setDefaultTransaction(const KDbTransaction& trans)
     if (!isDatabaseUsed())
         return;
     if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions)
-            && (!trans.active() || !d->driver->transactionsSupported())) {
+            && (!trans.isActive() || !d->driver->transactionsSupported())) {
         return;
     }
     d->default_trans = trans;

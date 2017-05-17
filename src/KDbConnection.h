@@ -314,7 +314,7 @@ public:
     /*! @return set of handles of currently active transactions.
      Note that in multithreading environment some of these
      transactions can be already inactive after calling this method.
-     Use KDbTransaction::active() to check that. Inactive transaction
+     Use KDbTransaction::isActive() to check that. Inactive transaction
      handle is useless and can be safely dropped.
     */
     QList<KDbTransaction> transactions();
