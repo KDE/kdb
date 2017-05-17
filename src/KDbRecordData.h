@@ -42,10 +42,14 @@ public:
     /*! Creates a new record data with @a numCols columns.
      Values are initialized to null. */
     inline explicit KDbRecordData(int numCols)
-        : m_data(numCols > 0 ? (QVariant **)malloc(m_numCols * sizeof(QVariant *)) : nullptr)
-        , m_numCols(numCols)
+        : m_numCols(numCols)
     {
-        memset(m_data, 0, m_numCols * sizeof(QVariant*));
+        if (m_numCols > 0) {
+            m_data = static_cast<QVariant **>(malloc(m_numCols * sizeof(QVariant *)));
+            memset(m_data, 0, m_numCols * sizeof(QVariant *));
+        } else {
+            m_data = nullptr;
+        }
     }
 
     inline ~KDbRecordData() {
