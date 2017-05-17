@@ -101,9 +101,9 @@ KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
     return *this;
 }
 
-bool KDbTransaction::operator==(const KDbTransaction& trans) const
+bool KDbTransaction::operator==(const KDbTransaction& other) const
 {
-    return m_data == trans.m_data;
+    return m_data == other.m_data;
 }
 
 KDbConnection* KDbTransaction::connection() const

@@ -69,7 +69,12 @@ public:
 
     KDbTransaction& operator=(const KDbTransaction& trans);
 
-    bool operator==(const KDbTransaction& trans) const;
+    //! @return @c true if this transaction is equal to @a other; otherwise returns @c false.
+    bool operator==(const KDbTransaction& other) const;
+
+    //! @return @c true if this transaction is not equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    inline bool operator!=(const KDbTransaction &other) const { return !operator==(other); }
 
     KDbConnection* connection() const;
 
