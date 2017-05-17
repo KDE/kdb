@@ -115,25 +115,19 @@ class KDB_EXPORT KDbResultInfo
 {
 public:
     inline KDbResultInfo()
-        : success(true)
-        , allowToDiscardChanges(false)
-        , column(-1)
     {
     }
-    /*! Sets information to default values. */
-    inline void clear() {
-        success = true;
-        allowToDiscardChanges = false;
-        column = -1;
-        message.clear();
-        description.clear();
-    }
-    bool success; //!< result of the operation, true by default
-    bool allowToDiscardChanges; //!< True if changes can be discarded, false by default
-    //!< If @c true, additional "Discard changes" messagebox button can be displayed.
+
+    /*! Resets information to default values. */
+    void clear();
+
+    bool success = true; //!< result of the operation, true by default
+    bool allowToDiscardChanges = false; //!< True if changes can be discarded, false by default
+                                        //!< If @c true, additional "Discard changes" message box
+                                        //!< button can be displayed.
     QString message; //!< Error message, empty by default
     QString description; //!< Detailed error description, empty by default
-    int column; //!< Faulty column, -1 (the default) means: there is no faulty column
+    int column = -1; //!< Faulty column, -1 (the default) means: there is no faulty column
 };
 
 //! Sends information about result info @a info to debug output @a dbg.

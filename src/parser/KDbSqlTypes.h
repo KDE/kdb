@@ -80,7 +80,7 @@ struct SelectOptionsInternal {
 class KDbExpressionPtr
 {
 public:
-    inline KDbExpressionPtr(KDbExpression *exp) : e(exp) {}
+    inline explicit KDbExpressionPtr(KDbExpression *exp) : e(exp) {}
     inline KDbExpression toExpr() {
         KDbExpression exp(*e);
         delete e;

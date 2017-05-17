@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
    Copyright (C) 2014 Michał Poteralski <michalpoteralskikde@gmail.com>
 
    This program is free software; you can redistribute it and/or
@@ -309,7 +309,8 @@ KDbTableViewData::KDbTableViewData()
         , KDbTableViewDataBase()
         , d(new Private)
 {
-    init();
+    d->realColumnCount = 0;
+    d->cursor = nullptr;
 }
 
 // db-aware ctor
@@ -318,7 +319,6 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
         , KDbTableViewDataBase()
         , d(new Private)
 {
-    init();
     d->cursor = c;
     d->containsRecordIdInfo = d->cursor->containsRecordIdInfo();
     if (d->cursor && d->cursor->query()) {
@@ -347,39 +347,10 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
     }
 }
 
-KDbTableViewData::KDbTableViewData(
-    const QList<QVariant> &keys, const QList<QVariant> &values,
-    KDbField::Type keyType, KDbField::Type valueType)
-        : QObject()
-        , KDbTableViewDataBase()
-        , d(new Private)
+KDbTableViewData::KDbTableViewData(const QList<QVariant> &keys, const QList<QVariant> &values,
+                                   KDbField::Type keyType, KDbField::Type valueType)
+    : KDbTableViewData()
 {
-    init(keys, values, keyType, valueType);
-}
-
-KDbTableViewData::KDbTableViewData(
-    KDbField::Type keyType, KDbField::Type valueType)
-        : QObject()
-        , KDbTableViewDataBase()
-        , d(new Private)
-{
-    const QList<QVariant> empty;
-    init(empty, empty, keyType, valueType);
-}
-
-KDbTableViewData::~KDbTableViewData()
-{
-    emit destroying();
-    clearInternal(false /* !processEvents */);
-    qDeleteAll(d->columns);
-    delete d;
-}
-
-void KDbTableViewData::init(
-    const QList<QVariant> &keys, const QList<QVariant> &values,
-    KDbField::Type keyType, KDbField::Type valueType)
-{
-    init();
     KDbField *keyField = new KDbField(QLatin1String("key"), keyType);
     keyField->setPrimaryKey(true);
     KDbTableViewColumn *keyColumn = new KDbTableViewColumn(keyField, true);
@@ -401,10 +372,17 @@ void KDbTableViewData::init(
     }
 }
 
-void KDbTableViewData::init()
+KDbTableViewData::KDbTableViewData(KDbField::Type keyType, KDbField::Type valueType)
+    : KDbTableViewData(QList<QVariant>(), QList<QVariant>(), keyType, valueType)
 {
-    d->realColumnCount = 0;
-    d->cursor = nullptr;
+}
+
+KDbTableViewData::~KDbTableViewData()
+{
+    emit destroying();
+    clearInternal(false /* !processEvents */);
+    qDeleteAll(d->columns);
+    delete d;
 }
 
 void KDbTableViewData::deleteLater()

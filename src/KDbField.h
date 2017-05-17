@@ -173,13 +173,13 @@ public:
     virtual ~KDbField();
 
     //! @return number of normal types available, i.e. types > InvalidType and <= LastType.
-    inline static int typesCount() { return LastType - InvalidType + 1; }
+    static int typesCount();
 
     //! @return number of special types available (Asterisk, Enum, etc.), that means
-    inline static int specialTypesCount() { return LastSpecialType - Null + 1; }
+    static int specialTypesCount();
 
     //! @return number of type groups available
-    inline static int typeGroupsCount() { return LastTypeGroup - InvalidGroup + 1; }
+    static int typeGroupsCount();
 
     //! Converts type @a type to QVariant equivalent as accurate as possible
     /*! Only normal types are supported.
@@ -701,8 +701,8 @@ public:
         return (num < m_hints.size()) ? m_hints.at(num) : QString();
     }
     /*! sets the hint for enum fields */
-    inline void setEnumHints(const QVector<QString> &l) {
-        m_hints = l;
+    inline void setEnumHints(const QVector<QString> &hints) {
+        m_hints = hints;
     }
 //</TMP>
 
@@ -718,9 +718,7 @@ public:
     typedef QHash<QByteArray, QVariant> CustomPropertiesMap;
 
     //! @return all custom properties
-    inline CustomPropertiesMap customProperties() const {
-        return m_customProperties ? *m_customProperties : CustomPropertiesMap();
-    }
+    CustomPropertiesMap customProperties() const;
 
 protected:
     /*! Creates a database field as a child of @a querySchema table

@@ -239,3 +239,12 @@ QDebug operator<<(QDebug dbg, const KDbResultInfo &info)
     dbg.nospace() << ")";
     return dbg.space();
 }
+
+void KDbResultInfo::clear()
+{
+    success = true;
+    allowToDiscardChanges = false;
+    column = -1;
+    message.clear();
+    description.clear();
+}

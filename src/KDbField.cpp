@@ -189,6 +189,24 @@ KDbField::~KDbField()
     delete m_expr;
 }
 
+// static
+int KDbField::typesCount()
+{
+    return LastType - InvalidType + 1;
+}
+
+// static
+int KDbField::specialTypesCount()
+{
+    return LastSpecialType - Null + 1;
+}
+
+// static
+int KDbField::typeGroupsCount()
+{
+    return LastTypeGroup - InvalidGroup + 1;
+}
+
 KDbField* KDbField::copy()
 {
     return new KDbField(*this);
@@ -860,4 +878,9 @@ void KDbField::setCustomProperty(const QByteArray& propertyName, const QVariant&
     if (!m_customProperties)
         m_customProperties = new CustomPropertiesMap();
     m_customProperties->insert(propertyName, value);
+}
+
+KDbField::CustomPropertiesMap KDbField::customProperties() const
+{
+    return m_customProperties ? *m_customProperties : CustomPropertiesMap();
 }

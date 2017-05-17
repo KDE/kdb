@@ -41,7 +41,12 @@ public:
 
     /*! Creates a new record data with @a numCols columns.
      Values are initialized to null. */
-    inline explicit KDbRecordData(int numCols) { init(numCols); }
+    inline explicit KDbRecordData(int numCols)
+        : m_data(numCols > 0 ? (QVariant **)malloc(m_numCols * sizeof(QVariant *)) : nullptr)
+        , m_numCols(numCols)
+    {
+        memset(m_data, 0, m_numCols * sizeof(QVariant*));
+    }
 
     inline ~KDbRecordData() {
         if (m_numCols > 0) {
@@ -88,16 +93,17 @@ public:
         return *m_data[i];
     }
 
-    /*! @return the value at index position i in the vector.
+    /*! @return the value at index position @a i in the vector.
      If the index @a i is out of bounds, the function returns a default-constructed value.
-     If you are certain that i is within bounds, you can use at() instead, which is slightly faster. */
+     If you are certain that @a i is within bounds, you can use at() or operator[] instead, which is
+     slightly faster. */
     inline QVariant value(int i) const {
         if (!m_data || i < 0 || i >= m_numCols || !m_data[i])
             return QVariant();
         return *m_data[i];
     }
 
-    /*! @return the value at index position i in the vector.
+    /*! @return the value at index position @a i in the vector.
      This is an overloaded function.
      If the index @a i is out of bounds, the function returns a @a defaultValue.
      If you are certain that i is within bounds, you can use at() instead, which is slightly faster. */
@@ -109,52 +115,22 @@ public:
         return *m_data[i];
     }
 
-    /*! Sets existing column values to null, current number of columns is preserved. */
-    inline void clearValues() {
-        for (int i = 0; i < m_numCols; i++) {
-            delete m_data[i];
-            m_data[i] = nullptr;
-        }
-    }
+    /*! Sets all column values to null, current number of columns is preserved. */
+    void clearValues();
 
     /*! Clears all columns, the record is set empty. */
     void clear();
 
-    /*! Resize existing record to @a numCols.
+    /*! Resizes the record to @a numCols.
      If @a numCols differ from size(), new with record with all values set to null is created.
      If @a numCols equals size() nothing is performed. */
-    inline void resize(int numCols) {
-        if (m_numCols == numCols)
-            return;
-        else if (m_numCols < numCols) { // grow
-            m_data = (QVariant**)realloc(m_data, numCols * sizeof(QVariant*));
-            memset(m_data + m_numCols, 0, (numCols - m_numCols) * sizeof(QVariant*));
-            m_numCols = numCols;
-        }
-        else { // shrink
-            for (int i = numCols; i < m_numCols; i++)
-                delete m_data[i];
-            m_data = (QVariant**)realloc(m_data, numCols * sizeof(QVariant*));
-            m_numCols = numCols;
-        }
-    }
+    void resize(int numCols);
 
     //! Converts this record to QList<QVariant>
     QList<QVariant> toList() const;
 
 private:
     Q_DISABLE_COPY(KDbRecordData)
-
-    inline void init(int numCols) {
-        m_numCols = numCols;
-        if (m_numCols > 0) {
-            m_data = (QVariant**)malloc(m_numCols * sizeof(QVariant*));
-            memset(m_data, 0, m_numCols * sizeof(QVariant*));
-        }
-        else
-            m_data = nullptr;
-    }
-
     QVariant **m_data;
     int m_numCols;
     static QVariant s_null;

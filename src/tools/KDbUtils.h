@@ -37,15 +37,8 @@
 namespace KDbUtils
 {
 
-//! @return true if @a o has parent @a par.
-inline bool hasParent(QObject* par, QObject* o)
-{
-    if (!o || !par)
-        return false;
-    while (o && o != par)
-        o = o->parent();
-    return o == par;
-}
+//! @return true if @a o has parent @a par (checks recursively)
+KDB_EXPORT bool hasParent(QObject* par, QObject* o);
 
 //! @return parent object of @a o that is of type @a type or @c nullptr if no such parent
 template<class type>
@@ -61,13 +54,7 @@ inline type findParent(QObject* o, const char* className = nullptr)
 }
 
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()
-inline QDateTime stringToHackedQTime(const QString& s)
-{
-    if (s.isEmpty())
-        return QDateTime();
-    //  kdbDebug() << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate ) ).toString(Qt::ISODate);
-    return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
-}
+KDB_EXPORT QDateTime stringToHackedQTime(const QString& s);
 
 /*! Serializes @a map to the array pointed by @a array.
  KDbUtils::deserializeMap() can be used to deserialize this array back to map. */

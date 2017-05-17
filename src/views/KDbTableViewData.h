@@ -340,10 +340,6 @@ protected:
     void columnVisibilityChanged(const KDbTableViewColumn &column);
 
 private:
-    void init();
-    void init(const QList<QVariant> &keys, const QList<QVariant> &values,
-              KDbField::Type keyType, KDbField::Type valueType);
-
     //! @internal for saveRecordChanges() and saveNewRecord()
     bool saveRecord(KDbRecordData *record, bool insert, bool repaint);
 

@@ -55,6 +55,30 @@ void KDbRecordData::clear()
     }
 }
 
+void KDbRecordData::resize(int numCols)
+{
+    if (m_numCols == numCols)
+        return;
+    else if (m_numCols < numCols) { // grow
+        m_data = (QVariant **)realloc(m_data, numCols * sizeof(QVariant *));
+        memset(m_data + m_numCols, 0, (numCols - m_numCols) * sizeof(QVariant *));
+        m_numCols = numCols;
+    } else { // shrink
+        for (int i = numCols; i < m_numCols; i++)
+            delete m_data[i];
+        m_data = (QVariant **)realloc(m_data, numCols * sizeof(QVariant *));
+        m_numCols = numCols;
+    }
+}
+
+void KDbRecordData::clearValues()
+{
+    for (int i = 0; i < m_numCols; i++) {
+        delete m_data[i];
+        m_data[i] = nullptr;
+    }
+}
+
 QList<QVariant> KDbRecordData::toList() const
 {
     QList<QVariant> list;

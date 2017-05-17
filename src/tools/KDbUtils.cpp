@@ -126,6 +126,27 @@ void Property::setCaption(const QString &caption)
 
 //---------
 
+bool KDbUtils::hasParent(QObject *par, QObject *o)
+{
+    if (!o || !par) {
+        return false;
+    }
+    while (o && o != par) {
+        o = o->parent();
+    }
+    return o == par;
+}
+
+QDateTime KDbUtils::stringToHackedQTime(const QString &s)
+{
+    if (s.isEmpty()) {
+        return QDateTime();
+    }
+    //  kdbDebug() << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate )
+    //  ).toString(Qt::ISODate);
+    return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
+}
+
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)
 {
     Q_ASSERT(array);
