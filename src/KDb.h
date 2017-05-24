@@ -20,12 +20,9 @@
 #ifndef KDB_H
 #define KDB_H
 
-#include <QList>
-#include <QVariant>
-#include <QByteArray>
-
-#include "KDbGlobal.h"
 #include "KDbField.h"
+#include "KDbGlobal.h"
+#include "KDbSqlResult.h"
 #include "KDbTableSchema.h"
 
 class QDomNode;
@@ -41,7 +38,6 @@ class KDbMessageHandler;
 class KDbQuerySchema;
 class KDbResultable;
 class KDbResultInfo;
-class KDbSqlResult;
 class KDbTableOrQuerySchema;
 class KDbVersionInfo;
 class tristate;
