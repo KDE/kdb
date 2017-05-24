@@ -51,7 +51,7 @@ public:
 
     static DriverManagerInternal *self();
 
-#if BUILD_TESTING
+#ifdef BUILD_TESTING
     //! If @c true, sets the driver manager to have no drivers so this case can be tested.
     //! Afects driverIds(), driver(), driverMetaData(), driverIdsForMimeType()
     bool forceEmpty = false;
