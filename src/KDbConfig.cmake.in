@@ -36,3 +36,8 @@ foreach (_COMP ${KDb_FIND_COMPONENTS})
         message(FATAL_ERROR "KDb does not contain required component ${_COMP}. Update KDb or remove this requirement.")
     endif()
 endforeach()
+
+include(FeatureSummary)
+set_package_properties(KDb PROPERTIES
+                       DESCRIPTION "Database connectivity and creation framework"
+                       URL "https://community.kde.org/KDb")
