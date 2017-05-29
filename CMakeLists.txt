@@ -20,7 +20,6 @@ include(KDECMakeSettings NO_POLICY_SCOPE)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 
 # Own
-include(MacroLogFeature)
 include(KDbCreateSharedDataClasses)
 include(KDbGenerateHeaders)
 include(KDbMacros)
@@ -54,4 +53,3 @@ if (IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/po")
 endif()
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
-macro_display_feature_log()
