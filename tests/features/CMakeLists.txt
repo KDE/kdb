@@ -14,8 +14,7 @@ set(kdbfeaturestest_SRCS
 
 add_executable(kdbfeaturestest ${kdbfeaturestest_SRCS})
 
-target_link_libraries(
-  kdbfeaturestest
-  Qt5::Core
-  KDb
+target_link_libraries(kdbfeaturestest
+    PUBLIC
+        KDb
 )

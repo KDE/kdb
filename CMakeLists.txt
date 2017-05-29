@@ -5,9 +5,10 @@ include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
 project(KDb VERSION 3.0.91) # Update this
 
-# CMake
-include(CMakePackageConfigHelpers)
-include(GenerateExportHeader)
+include(KDbAddTests)
+include(KDbAddExamples)
+kdb_add_tests(OFF)
+kdb_add_examples(OFF)
 
 # ECM
 include(ECMGeneratePriFile)
@@ -40,13 +41,16 @@ set_package_properties(ICU PROPERTIES TYPE REQUIRED
                        PURPOSE "Required by KDb for unicode-aware string comparisons")
 
 get_git_revision_and_branch()
-add_tests()
-add_examples()
 add_unfinished_features_option()
 add_pc_file(${PROJECT_NAME})
 
 add_subdirectory(src)
 add_subdirectory(tools)
+
+if(BUILD_TESTING)
+  add_subdirectory(autotests)
+  add_subdirectory(tests)
+endif()
 
 add_custom_target(cppclean
     COMMAND ${CMAKE_SOURCE_DIR}/tools/cppclean-kdb.sh ${CMAKE_BINARY_DIR}
