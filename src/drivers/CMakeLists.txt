@@ -30,19 +30,26 @@ endmacro()
 set(SQLITE_MIN_VERSION 3.6.16)
 set(SQLITE_RECOMMENDED_VERSION 3.19.1)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
-find_package(Sqlite ${SQLITE_MIN_VERSION})
-macro_log_feature(SQLITE_FOUND "SQLite3" "Embedded SQL database engine with enabled extensions loading"
-                  "http://www.sqlite.org" FALSE "${SQLITE_MIN_VERSION}"
-                  "Required by SQLite database driver")
-
 set(BUILD_SQLITE_DB_DRIVER_DESC "SQLite database driver")
+find_package(Sqlite ${SQLITE_MIN_VERSION})
+set_package_properties(Sqlite PROPERTIES
+                       DESCRIPTION "Embedded SQL database engine with enabled extensions loading"
+                       URL "http://www.sqlite.org"
+                       TYPE OPTIONAL
+                       PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}"
+)
+
 if(SQLITE_FOUND)
     ##
     ## Test for ICU
     ##
     find_package(ICU)
-    macro_log_feature(ICU_FOUND "ICU" "International Components for Unicode (ICU) Library"
-                      "http://icu-project.org" FALSE "" "Required by SQLite database driver")
+    set_package_properties(ICU PROPERTIES
+                           DESCRIPTION "International Components for Unicode (ICU) Library"
+                           URL "http://icu-project.org"
+                           TYPE OPTIONAL
+                           PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}"
+    )
     if(ICU_FOUND)
         ecm_optional_add_subdirectory(sqlite)
     else()
@@ -58,8 +65,12 @@ endif()
 
 set(BUILD_MYSQL_DB_DRIVER_DESC "MySQL database driver")
 find_package(MySQL)
-macro_log_feature(MYSQL_FOUND "libmysqlclient" "MySQL Client Library"
-                  "http://www.mysql.com" FALSE "" "Required by ${BUILD_MYSQL_DB_DRIVER_DESC}")
+set_package_properties(MySQL PROPERTIES
+                       DESCRIPTION "MySQL Client Library"
+                       URL "http://www.mysql.com"
+                       TYPE OPTIONAL
+                       PURPOSE "Required by ${BUILD_MYSQL_DB_DRIVER_DESC}"
+)
 if(MYSQL_FOUND)
    ecm_optional_add_subdirectory(mysql)
 else()
@@ -70,8 +81,12 @@ endif()
 
 set(BUILD_POSTGRESQL_DB_DRIVER_DESC "PostgreSQL database driver")
 find_package(PostgreSQL)
-macro_log_feature(POSTGRESQL_FOUND "libpq" "C API to PostgreSQL"
-                  "http://www.postgresql.org" FALSE "" "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}")
+set_package_properties(PostgreSQL PROPERTIES
+                       DESCRIPTION "C API to PostgreSQL"
+                       URL "http://www.postgresql.org"
+                       TYPE OPTIONAL
+                       PURPOSE "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}"
+)
 if(POSTGRESQL_FOUND)
    ecm_optional_add_subdirectory(postgresql)
 else()
@@ -80,8 +95,12 @@ endif()
 
 #set(BUILD_SYBASE_DB_DRIVER_DESC "Sybase/MSSQL database driver")
 #find_package(FreeTDS)
-#macro_log_feature(FREETDS_FOUND "FreeTDS" "Open source implementation of the TDS (Tabular Data Stream) protocol"
-#                  "http://www.freetds.org" FALSE "" "Required by ${BUILD_SYBASE_DB_DRIVER_DESC}")
+#set_package_properties(FreeTDS PROPERTIES
+#                       DESCRIPTION "Open source implementation of the TDS (Tabular Data Stream) protocol"
+#                       URL "http://www.freetds.org"
+#                       TYPE OPTIONAL
+#                       PURPOSE "Required by ${BUILD_SYBASE_DB_DRIVER_DESC}"
+#)
 #if(FreeTDS_FOUND)
 #   ecm_optional_add_subdirectory(sybase)
 #else()
@@ -90,8 +109,12 @@ endif()
 
 #set(BUILD_XBASE_DB_DRIVER_DESC "xBase database driver")
 #find_package(XBase)
-#macro_log_feature(XBASE_FOUND "XBase" "XBase compatible C++ class library"
-#                  "http://linux.techass.com/projects/xdb" FALSE "" "Required by ${BUILD_XBASE_DB_DRIVER_DESC}")
+#set_package_properties(XBase PROPERTIES
+#                       DESCRIPTION "XBase compatible C++ class library"
+#                       URL "http://linux.techass.com/projects/xdb"
+#                       TYPE OPTIONAL
+#                       PURPOSE "Required by ${BUILD_XBASE_DB_DRIVER_DESC}"
+#)
 #if(XBASE_FOUND)
 #   ecm_optional_add_subdirectory(xbase)
 #else()
