@@ -21,7 +21,7 @@
 #  find_package(SQLite 3.6.16 REQUIRED)
 #
 # Variables that FindSqlite.cmake sets:
-#  SQLITE_FOUND             TRUE if required version of Sqlite has been found
+#  Sqlite_FOUND             TRUE if required version of Sqlite has been found
 #  SQLITE_INCLUDE_DIR       include directories to use SQLite
 #  SQLITE_LIBRARIES         link these to use SQLite
 #  SQLITE_MIN_VERSION       minimum version, if as the second argument of find_package()
@@ -48,6 +48,12 @@
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
+
+set(Sqlite_FOUND TRUE)
+
+include(FeatureSummary)
+set_package_properties(Sqlite
+    PROPERTIES DESCRIPTION "SQLite3 client library" URL "http://www.sqlite.org")
 
 if(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
    if(SQLITE_LOAD_EXTENSION_REQUIRED AND SQLITE_LOAD_EXTENSION OR NOT SQLITE_LOAD_EXTENSION_REQUIRED)
@@ -101,9 +107,6 @@ find_library(SQLITE_LIBRARIES NAMES sqlite3
 #message(DEBUG " SQLITE_EXT_INCLUDE_PATH: ${SQLITE_EXT_INCLUDE_PATH}")
 #message(DEBUG " SQLITE_LIBRARIES: ${SQLITE_LIBRARIES}")
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(Sqlite DEFAULT_MSG SQLITE_INCLUDE_DIR SQLITE_LIBRARIES)
-
 macro(_check_min_sqlite_version)
     # Suppport finding at least a particular version, for instance FIND_PACKAGE(Sqlite 3.6.22)
     if(Sqlite_FIND_VERSION)
@@ -119,12 +122,12 @@ macro(_check_min_sqlite_version)
             else()
                 message(STATUS "WARNING: Minimal SQLite version required: ${SQLITE_MIN_VERSION}, found ${SQLITE_VERSION_STRING}")
             endif()
-            unset(SQLITE_FOUND)
-            unset(SQLITE_FOUND CACHE)
+            unset(SQLITE_VERSION CACHE)
+            set(Sqlite_FOUND FALSE)
         endif()
     endif()
 
-    if(SQLITE_FOUND)
+    if(Sqlite_FOUND)
         if(NOT Sqlite_FIND_QUIETLY)
             message(STATUS "Found SQLite version ${SQLITE_VERSION_STRING}")
         endif()
@@ -153,7 +156,6 @@ macro(_get_compile_options)
         string(REGEX REPLACE "=1\n" ";" SQLITE_COMPILE_OPTIONS "${_COMPILE_OPTIONS_RESULT}")
         string(REPLACE "\n" ";" SQLITE_COMPILE_OPTIONS "${SQLITE_COMPILE_OPTIONS}")
         set(SQLITE_COMPILE_OPTIONS ${SQLITE_COMPILE_OPTIONS})
-    else ()
     endif ()
 endmacro(_get_compile_options)
 
@@ -165,55 +167,67 @@ macro(SQLITE_CHECK_COMPILE_OPTION _OPTION_NAME)
 endmacro(SQLITE_CHECK_COMPILE_OPTION)
 
 if(NOT EXISTS "${SQLITE_INCLUDE_DIR}/sqlite3.h")
-    unset(SQLITE_FOUND)
-    unset(SQLITE_FOUND CACHE)
+    set(Sqlite_FOUND FALSE)
 endif()
 
-if(SQLITE_FOUND)
+if(Sqlite_FOUND)
    file(READ "${SQLITE_INCLUDE_DIR}/sqlite3.h" SQLITE_VERSION_CONTENT)
-   string(REGEX MATCH "#define SQLITE_VERSION[ ]*\"[0-9]+\\.[0-9]+\\.[0-9]+\".*\n" SQLITE_VERSION_STRING_MATCH ${SQLITE_VERSION_CONTENT})
+   string(REGEX MATCH "#define SQLITE_VERSION[ ]+\"[0-9]+\\.[0-9]+\\.[0-9]+\"" SQLITE_VERSION_STRING_MATCH ${SQLITE_VERSION_CONTENT})
+   if(NOT SQLITE_VERSION_STRING_MATCH)
+      string(REGEX MATCH "#define SQLITE_VERSION[ ]+\"[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+\"" SQLITE_VERSION_STRING_MATCH ${SQLITE_VERSION_CONTENT})
+   endif()
    string(REGEX MATCH "#define SQLITE_VERSION_NUMBER[ ]*[0-9]*\n" SQLITE_VERSION_MATCH ${SQLITE_VERSION_CONTENT})
    if(SQLITE_VERSION_STRING_MATCH AND SQLITE_VERSION_MATCH)
-      string(REGEX REPLACE "#define SQLITE_VERSION[ ]*\"([0-9]+\\.[0-9]+\\.[0-9]+)\".*\n" "\\1" SQLITE_VERSION_STRING ${SQLITE_VERSION_STRING_MATCH})
+      string(REGEX REPLACE "#define SQLITE_VERSION[ ]*\"(.*)\".*" "\\1" SQLITE_VERSION_STRING ${SQLITE_VERSION_STRING_MATCH})
       string(REGEX REPLACE "#define SQLITE_VERSION_NUMBER[ ]*([0-9]*)\n" "\\1" SQLITE_VERSION ${SQLITE_VERSION_MATCH})
       set(SQLITE_VERSION ${SQLITE_VERSION} CACHE STRING "SQLite numeric version")
       set(SQLITE_VERSION_STRING ${SQLITE_VERSION_STRING} CACHE STRING "SQLite version")
       _check_min_sqlite_version()
-      _check_recommended_sqlite_version()
+   else()
+       set(Sqlite_FOUND FALSE)
    endif()
-   _get_compile_options()
-   if(SQLITE_LOAD_EXTENSION_REQUIRED)
-      sqlite_check_compile_option(OMIT_LOAD_EXTENSION)
-      if(OMIT_LOAD_EXTENSION)
-          message(STATUS "WARNING: SQLite found but it is not built with support for extensions loading. It should be configured with --enable-load-extension option.")
-          unset(SQLITE_FOUND)
-          unset(SQLITE_FOUND CACHE)
-      else()
-          set(SQLITE_LOAD_EXTENSION ON CACHE STRING "Support for extensions loading in SQLite")
-          if(NOT Sqlite_FIND_QUIETLY)
-              message(STATUS "Found support for extensions loading in SQLite.")
+   if(Sqlite_FOUND)
+       _check_recommended_sqlite_version()
+       _get_compile_options()
+       if(SQLITE_LOAD_EXTENSION_REQUIRED)
+          sqlite_check_compile_option(OMIT_LOAD_EXTENSION)
+          if(OMIT_LOAD_EXTENSION)
+              message(STATUS "WARNING: SQLite found but it is not built with support for extensions loading. It should be configured with --enable-load-extension option.")
+              set(Sqlite_FOUND FALSE)
+          else()
+              set(SQLITE_LOAD_EXTENSION ON CACHE STRING "Support for extensions loading in SQLite")
+              if(NOT Sqlite_FIND_QUIETLY)
+                  message(STATUS "Found support for extensions loading in SQLite.")
+              endif()
           endif()
       endif()
    endif()
-else()
-   if(Sqlite_FIND_REQUIRED)
-      message(FATAL_ERROR "Required package SQLite NOT found")
-   else()
-      message(STATUS "WARNING: SQLite NOT found")
-   endif()
 endif()
 
-if(SQLITE_FOUND)
-   set(SQLITE_FOUND 1 CACHE INTERNAL "" FORCE)
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(Sqlite
+                                  REQUIRED_VARS SQLITE_INCLUDE_DIR SQLITE_LIBRARIES SQLITE_MIN_VERSION
+                                                SQLITE_VERSION_STRING SQLITE_VERSION
+                                                SQLITE_MIN_VERSION_MAJOR SQLITE_MIN_VERSION_MINOR
+                                                SQLITE_MIN_VERSION_PATCH
+)
+
+if(Sqlite_FOUND)
+   set(Sqlite_FOUND 1 CACHE INTERNAL "" FORCE)
 else()
-   unset(SQLITE_FOUND CACHE)
+   unset(Sqlite_FOUND CACHE)
+   set(Sqlite_FOUND FALSE)
+   unset(SQLITE_INCLUDE_DIR)
    unset(SQLITE_INCLUDE_DIR CACHE)
+   unset(SQLITE_LIBRARIES)
    unset(SQLITE_LIBRARIES CACHE)
+   unset(SQLITE_VERSION)
    unset(SQLITE_VERSION CACHE)
+   unset(SQLITE_VERSION_STRING)
    unset(SQLITE_VERSION_STRING CACHE)
+   unset(SQLITE_LOAD_EXTENSION)
    unset(SQLITE_LOAD_EXTENSION CACHE)
+   unset(Sqlite_EXT_INCLUDE_PATH)
 endif()
 
-mark_as_advanced(SQLITE_FOUND SQLITE_INCLUDE_DIR SQLITE_LIBRARIES SQLITE_VERSION_STRING SQLITE_VERSION
-                 SQLITE_SHELL SQLITE_MIN_VERSION SQLITE_MIN_VERSION_MAJOR SQLITE_MIN_VERSION_MINOR
-                 SQLITE_MIN_VERSION_PATCH)
+mark_as_advanced(SQLITE_INCLUDE_DIR SQLITE_LIBRARIES SQLITE_SHELL)

@@ -32,24 +32,15 @@ set(SQLITE_RECOMMENDED_VERSION 3.19.1)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
 set(BUILD_SQLITE_DB_DRIVER_DESC "SQLite database driver")
 find_package(Sqlite ${SQLITE_MIN_VERSION})
-set_package_properties(Sqlite PROPERTIES
-                       DESCRIPTION "Embedded SQL database engine with enabled extensions loading"
-                       URL "http://www.sqlite.org"
-                       TYPE OPTIONAL
-                       PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}"
-)
+set_package_properties(Sqlite PROPERTIES TYPE RECOMMENDED
+                       PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}")
 
-if(SQLITE_FOUND)
+if(Sqlite_FOUND)
     ##
     ## Test for ICU
     ##
     find_package(ICU)
-    set_package_properties(ICU PROPERTIES
-                           DESCRIPTION "International Components for Unicode (ICU) Library"
-                           URL "http://icu-project.org"
-                           TYPE OPTIONAL
-                           PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}"
-    )
+    set_package_properties(ICU PROPERTIES TYPE RECOMMENDED PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}")
     if(ICU_FOUND)
         ecm_optional_add_subdirectory(sqlite)
     else()
@@ -65,13 +56,9 @@ endif()
 
 set(BUILD_MYSQL_DB_DRIVER_DESC "MySQL database driver")
 find_package(MySQL)
-set_package_properties(MySQL PROPERTIES
-                       DESCRIPTION "MySQL Client Library"
-                       URL "http://www.mysql.com"
-                       TYPE OPTIONAL
-                       PURPOSE "Required by ${BUILD_MYSQL_DB_DRIVER_DESC}"
-)
-if(MYSQL_FOUND)
+set_package_properties(MySQL PROPERTIES TYPE RECOMMENDED
+                       PURPOSE "Required by ${BUILD_MYSQL_DB_DRIVER_DESC}")
+if(MySQL_FOUND)
    ecm_optional_add_subdirectory(mysql)
 else()
    add_feature_info(BUILD_MYSQL_DB_DRIVER FALSE "${BUILD_MYSQL_DB_DRIVER_DESC} (because MySQL Client Library not found)")
@@ -81,13 +68,9 @@ endif()
 
 set(BUILD_POSTGRESQL_DB_DRIVER_DESC "PostgreSQL database driver")
 find_package(PostgreSQL)
-set_package_properties(PostgreSQL PROPERTIES
-                       DESCRIPTION "C API to PostgreSQL"
-                       URL "http://www.postgresql.org"
-                       TYPE OPTIONAL
-                       PURPOSE "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}"
-)
-if(POSTGRESQL_FOUND)
+set_package_properties(PostgreSQL PROPERTIES TYPE RECOMMENDED
+                       PURPOSE "Required by ${BUILD_POSTGRESQL_DB_DRIVER_DESC}")
+if(PostgreSQL_FOUND)
    ecm_optional_add_subdirectory(postgresql)
 else()
    add_feature_info(BUILD_POSTGRESQL_DB_DRIVER FALSE "${BUILD_POSTGRESQL_DB_DRIVER_DESC} (because C API to PostgreSQL not found)")

@@ -9,6 +9,10 @@
 #  ICU_I18N_LIBRARIES - Libraries to link against for ICU internationaliation
 #                       (note: in addition to ICU_LIBRARIES)
 
+include(FeatureSummary)
+set_package_properties(ICU PROPERTIES DESCRIPTION "International Components for Unicode Library (ICU)"
+                       URL "http://icu-project.org")
+
 # Look for the header file.
 find_path(
   ICU_INCLUDE_DIR
