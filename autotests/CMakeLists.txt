@@ -20,7 +20,10 @@ add_definitions(
 
 include(ECMAddTests)
 
-find_package(Qt5Test REQUIRED)
+find_package(Qt5Test)
+set_package_properties(Qt5Test PROPERTIES DESCRIPTION "Qt5Test library"
+                       URL "https://www.qt.io" TYPE RECOMMENDED
+                       PURPOSE "Required by tests")
 
 # A helper library for db-related tests
 add_library(kdbtestutils SHARED
