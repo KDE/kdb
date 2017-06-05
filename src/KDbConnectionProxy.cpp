@@ -205,14 +205,16 @@ KDbTransaction KDbConnectionProxy::beginTransaction()
     return d->connection->beginTransaction();
 }
 
-bool KDbConnectionProxy::commitTransaction(KDbTransaction trans, bool ignore_inactive)
+bool KDbConnectionProxy::commitTransaction(KDbTransaction trans,
+                                           KDbConnection::TransactionOptions options)
 {
-    return d->connection->commitTransaction(trans, ignore_inactive);
+    return d->connection->commitTransaction(trans, options);
 }
 
-bool KDbConnectionProxy::rollbackTransaction(KDbTransaction trans, bool ignore_inactive)
+bool KDbConnectionProxy::rollbackTransaction(KDbTransaction trans,
+                                             KDbConnection::TransactionOptions options)
 {
-    return d->connection->rollbackTransaction(trans, ignore_inactive);
+    return d->connection->rollbackTransaction(trans, options);
 }
 
 KDbTransaction KDbConnectionProxy::defaultTransaction() const

@@ -1744,7 +1744,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
     // that allow single transaction per connection
     if (d->driver->beh->features & KDbDriver::SingleTransactions) {
         if (d->defaultTransactionStartedInside) //only commit internally started transaction
-            if (!commitTransaction(d->default_trans, true)) {
+            if (!commitTransaction(d->default_trans, TransactionOption::IgnoreInactive)) {
                 tg->setTransaction(KDbTransaction());
                 return false; //we have a real error
             }
@@ -1773,7 +1773,7 @@ bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
         if (!d->defaultTransactionStartedInside) //only commit internally started transaction
             return true; //give up
     }
-    return commitTransaction(trans, true);
+    return commitTransaction(trans, TransactionOption::IgnoreInactive);
 }
 
 bool KDbConnection::rollbackAutoCommitTransaction(const KDbTransaction& trans)
@@ -1831,7 +1831,7 @@ KDbTransaction KDbConnection::beginTransaction()
     return KDbTransaction();
 }
 
-bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_inactive)
+bool KDbConnection::commitTransaction(const KDbTransaction trans, TransactionOptions options)
 {
     if (!isDatabaseUsed())
         return false;
@@ -1843,8 +1843,9 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
     KDbTransaction t = trans;
     if (!t.isActive()) { //try default tr.
         if (!d->default_trans.isActive()) {
-            if (ignore_inactive)
+            if (options & TransactionOption::IgnoreInactive) {
                 return true;
+            }
             clearResult();
             m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE,
                                  tr("Transaction not started."));
@@ -1866,7 +1867,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, bool ignore_in
     return ret;
 }
 
-bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_inactive)
+bool KDbConnection::rollbackTransaction(const KDbTransaction trans, TransactionOptions options)
 {
     if (!isDatabaseUsed())
         return false;
@@ -1878,8 +1879,9 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, bool ignore_
     KDbTransaction t = trans;
     if (!t.isActive()) { //try default tr.
         if (!d->default_trans.isActive()) {
-            if (ignore_inactive)
+            if (options & TransactionOption::IgnoreInactive) {
                 return true;
+            }
             clearResult();
             m_result = KDbResult(ERR_NO_TRANSACTION_ACTIVE,
                                  tr("Transaction not started."));

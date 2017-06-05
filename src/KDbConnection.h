@@ -264,34 +264,41 @@ public:
     */
     KDbTransaction beginTransaction();
 
-    /*! @todo for nested transactions:
-        Tansaction* beginTransaction(transaction *parent_transaction);
-    */
-    /*! Commits transaction @a trans.
-     If there is not @a trans argument passed, and there is default transaction
-     (obtained from defaultTransaction()) defined, this one will be committed.
-     If default is not present, false is returned (when ignore_inactive is
-     false, the default), or true is returned (when ignore_inactive is true).
+    //! Options for commiting and rolling back transactions
+    enum class TransactionOption {
+        None = 0,
+        IgnoreInactive = 1 //!< Ignore inactive transactions in commitTransaction()
+                           //!< and rollbackTransaction()
+    };
+    Q_DECLARE_FLAGS(TransactionOptions, TransactionOption)
 
-     On successful commit, @a trans object will be destroyed.
-     If this was default transaction, there is no default transaction for now.
-    */
-    bool commitTransaction(KDbTransaction trans = KDbTransaction(),
-                           bool ignore_inactive = false);
+    /*
+     * @brief Commits transaction @a transaction.
+     *
+     * If @a transaction is null and default transaction (obtained from defaultTransaction()) exists,
+     * the default one will be committed. If neither the default one is not present returns @c true
+     * if IgnoreInactive is set in @a options or @c false if IgnoreInactive is not set in @a options.
+     * Returns @c false on any error.
+     *
+     * On successful commit, @a transaction object will point to a null transaction.
+     * After commiting a default transaction, there is no default transaction anymore.
+     */
+    bool commitTransaction(KDbTransaction transaction = KDbTransaction(),
+                           TransactionOptions options = TransactionOptions());
 
-    /*! Rollbacks transaction @a trans.
-     If there is not @a trans argument passed, and there is default transaction
-     (obtained from defaultTransaction()) defined, this one will be rolled back.
-     If default is not present, false is returned (when ignore_inactive is
-     false, the default), or true is returned (when ignore_inactive is true).
-
-     or any error occurred, false is returned.
-
-     On successful rollback, @a trans object will be destroyed.
-     If this was default transaction, there is no default transaction for now.
-    */
+    /**
+     * @brief Rollbacks transaction @a transaction.
+     *
+     * If @a transaction is null and default transaction (obtained from defaultTransaction()) exists,
+     * the default one will be rolled back. If neither the default one is not present returns @c true
+     * if IgnoreInactive is set in @a options or @c false if IgnoreInactive is not set in @a options.
+     * Returns @c false on any error.
+     *
+     * On successful rollback, @a transaction object will point to a null transaction.
+     * After rollong back a default transaction, there is no default transaction anymore.
+     */
     bool rollbackTransaction(KDbTransaction trans = KDbTransaction(),
-                             bool ignore_inactive = false);
+                             TransactionOptions options = TransactionOptions());
 
     /*! @return handle for default transaction for this connection
      or null transaction if there is no such a transaction defined.
@@ -1043,6 +1050,9 @@ protected:
      and return object of this subclass.
      @c nullptr should be returned on error.
      Do not check anything in connection (isConnected(), etc.) - all is already done.
+
+     @todo Add support for nested transactions,
+           e.g. KDbTransactionData* beginTransaction(KDbTransactionData *parent)
     */
     virtual KDbTransactionData* drv_beginTransaction() Q_REQUIRED_RESULT;
 
@@ -1301,5 +1311,7 @@ private:
     friend class KDbTableSchemaChangeListener;
     friend class KDbTableSchema; //!< for removeMe()
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::TransactionOptions)
 
 #endif
