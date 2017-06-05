@@ -51,16 +51,16 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArr
     }
 }
 
-KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name, bool table)
+KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray& name, Type type)
         : d(new Private)
 {
     d->name = name;
-    d->table = table ? conn->tableSchema(QLatin1String(name)) : nullptr;
-    d->query = table ? nullptr : conn->querySchema(QLatin1String(name));
-    if (table && !d->table) {
+    d->table = type == Type::Table ? conn->tableSchema(QLatin1String(name)) : nullptr;
+    d->query = type == Type::Query ? conn->querySchema(QLatin1String(name)) : nullptr;
+    if (type == Type::Table && !d->table) {
         kdbWarning() << "no table specified!";
     }
-    if (!table && !d->query) {
+    if (type == Type::Query && !d->query) {
         kdbWarning() << "no query specified!";
     }
 }
