@@ -40,9 +40,16 @@ class KDbValidator;
 class KDB_EXPORT KDbTableViewColumn
 {
 public:
-    /*! Not db-aware ctor. if @a owner is true, the field @a will be owned by this column,
-     so you shouldn't care about destroying this field. */
-    explicit KDbTableViewColumn(KDbField *f, bool owner = false);
+    /*! Specifies if the associated KDbField object is owned by the column so it will be
+     automatically destroyed when needed by this column. */
+    enum class FieldIsOwned {
+        Yes,
+        No
+    };
+
+    /*! Not db-aware ctor. if @a isOwned is Yes, the field @a will be owned by this column so it will be
+     automatically destroyed when needed by this column. */
+    explicit KDbTableViewColumn(KDbField *f, FieldIsOwned isOwned = FieldIsOwned::No);
 
     /*! Not db-aware, convenience ctor, like above. The field is created using specified parameters that are
      equal to these accepted by KDbField ctor. The column will be the owner

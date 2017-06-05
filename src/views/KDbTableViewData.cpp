@@ -353,12 +353,14 @@ KDbTableViewData::KDbTableViewData(const QList<QVariant> &keys, const QList<QVar
 {
     KDbField *keyField = new KDbField(QLatin1String("key"), keyType);
     keyField->setPrimaryKey(true);
-    KDbTableViewColumn *keyColumn = new KDbTableViewColumn(keyField, true);
+    KDbTableViewColumn *keyColumn
+        = new KDbTableViewColumn(keyField, KDbTableViewColumn::FieldIsOwned::Yes);
     keyColumn->setVisible(false);
     addColumn(keyColumn);
 
     KDbField *valueField = new KDbField(QLatin1String("value"), valueType);
-    KDbTableViewColumn *valueColumn = new KDbTableViewColumn(valueField, true);
+    KDbTableViewColumn *valueColumn
+        = new KDbTableViewColumn(valueField, KDbTableViewColumn::FieldIsOwned::Yes);
     addColumn(valueColumn);
 
     int cnt = qMin(keys.count(), values.count());

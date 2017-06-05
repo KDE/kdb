@@ -84,12 +84,12 @@ public:
 
 //------------------------
 
-KDbTableViewColumn::KDbTableViewColumn(KDbField *f, bool owner)
+KDbTableViewColumn::KDbTableViewColumn(KDbField *f, FieldIsOwned isOwned)
         : d(new Private)
 {
     d->field = f;
     d->isDBAware = false;
-    d->fieldOwned = owner;
+    d->fieldOwned = isOwned == FieldIsOwned::Yes;
     d->captionAliasOrName = d->field->captionOrName();
 }
 
