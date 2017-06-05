@@ -551,7 +551,7 @@ public:
 
     /*! @return table describing order of primary key (PKEY) fields within the query.
      Indexing is performed against vector returned by fieldsExpanded().
-     It is usable for e.g. Conenction::updateRecord(), when we need
+     It is usable for e.g. Connection::updateRecord(), when we need
      to locate each primary key's field in a constant time.
 
      Returned vector is owned and cached by KDbQuerySchema object. When you assign it,

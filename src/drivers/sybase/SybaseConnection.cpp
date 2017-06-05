@@ -116,7 +116,7 @@ bool SybaseConnection::drv_useDatabase(const QString &dbName, bool *cancelled, K
 
 bool SybaseConnection::drv_closeDatabase()
 {
-// here we disconenct the connection
+// here we disconnect the connection
     return true;
 }
 
