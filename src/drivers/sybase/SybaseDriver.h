@@ -51,7 +51,7 @@ protected:
     virtual KDbConnection *drv_createConnection(const KDbConnectionData& connData,
                                                 const KDbConnectionOptions &options);
     virtual bool drv_isSystemFieldName(const QString& n) const;
-    virtual KDbEscapedString addLimitTo1(const QString& sql, bool add);
+    virtual KDbEscapedString addLimitTo1(const QString& sql, bool add = true);
 
 private:
     static const char *m_keywords[];

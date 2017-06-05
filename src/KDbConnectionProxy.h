@@ -159,32 +159,35 @@ public:
 
     bool setQuerySchemaObsolete(const QString& queryName);
 
-    tristate querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1 = true);
-
-    tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1 = true);
+    tristate querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data,
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
-                               const QList<QVariant>& params, bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
+
+    tristate querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
+                               const QList<QVariant>& params,
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleString(const KDbEscapedString& sql, QString* value, int column = 0,
-                               bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleString(KDbQuerySchema* query, QString* value, int column = 0,
-                               bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleString(KDbQuerySchema* query, QString* value,
                                const QList<QVariant>& params, int column = 0,
-                               bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleNumber(const KDbEscapedString& sql, int* number, int column = 0,
-                               bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
      tristate querySingleNumber(KDbQuerySchema* query, int* number, int column = 0,
-                                bool addLimitTo1 = true);
+                                QueryRecordOptions options = QueryRecordOption::Default);
 
     tristate querySingleNumber(KDbQuerySchema* query, int* number,
                                const QList<QVariant>& params, int column = 0,
-                               bool addLimitTo1 = true);
+                               QueryRecordOptions options = QueryRecordOption::Default);
 
     bool queryStringList(const KDbEscapedString& sql, QStringList* list, int column = 0);
 
@@ -193,7 +196,8 @@ public:
     bool queryStringList(KDbQuerySchema* query, QStringList* list,
                          const QList<QVariant>& params, int column = 0);
 
-    tristate resultExists(const KDbEscapedString& sql, bool addLimitTo1 = true);
+    tristate resultExists(const KDbEscapedString &sql, QueryRecordOptions options
+                          = QueryRecordOption::Default);
 
     tristate isEmpty(KDbTableSchema* table);
 
@@ -369,15 +373,15 @@ public:
 
     tristate querySingleRecordInternal(KDbRecordData* data, const KDbEscapedString* sql,
                                        KDbQuerySchema* query, const QList<QVariant>* params,
-                                       bool addLimitTo1 = true);
+                                       QueryRecordOptions options);
 
     tristate querySingleStringInternal(const KDbEscapedString* sql, QString* value,
                                        KDbQuerySchema* query, const QList<QVariant>* params,
-                                       int column, bool addLimitTo1);
+                                       int column, QueryRecordOptions options);
 
     tristate querySingleNumberInternal(const KDbEscapedString* sql, int* number,
                                        KDbQuerySchema* query, const QList<QVariant>* params,
-                                       int column, bool addLimitTo1);
+                                       int column, QueryRecordOptions options);
 
     bool queryStringListInternal(const KDbEscapedString *sql, QStringList* list,
                                  KDbQuerySchema* query, const QList<QVariant>* params,

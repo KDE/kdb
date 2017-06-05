@@ -313,58 +313,60 @@ bool KDbConnectionProxy::setQuerySchemaObsolete(const QString& queryName)
     return d->connection->setQuerySchemaObsolete(queryName);
 }
 
-tristate KDbConnectionProxy::querySingleRecord(const KDbEscapedString& sql, KDbRecordData* data, bool addLimitTo1)
+tristate KDbConnectionProxy::querySingleRecord(const KDbEscapedString &sql, KDbRecordData *data,
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleRecord(sql, data, addLimitTo1);
-}
-
-tristate KDbConnectionProxy::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data, bool addLimitTo1)
-{
-    return d->connection->querySingleRecord(query, data, addLimitTo1);
+    return d->connection->querySingleRecord(sql, data, options);
 }
 
 tristate KDbConnectionProxy::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
-                           const QList<QVariant>& params, bool addLimitTo1)
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleRecord(query, data, params, addLimitTo1);
+    return d->connection->querySingleRecord(query, data, options);
+}
+
+tristate KDbConnectionProxy::querySingleRecord(KDbQuerySchema* query, KDbRecordData* data,
+                           const QList<QVariant>& params, QueryRecordOptions options)
+{
+    return d->connection->querySingleRecord(query, data, params, options);
 }
 
 tristate KDbConnectionProxy::querySingleString(const KDbEscapedString& sql, QString* value, int column,
-                           bool addLimitTo1)
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleString(sql, value, column, addLimitTo1);
+    return d->connection->querySingleString(sql, value, column, options);
 }
 
 tristate KDbConnectionProxy::querySingleString(KDbQuerySchema* query, QString* value, int column,
-                           bool addLimitTo1)
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleString(query, value, column, addLimitTo1);
+    return d->connection->querySingleString(query, value, column, options);
 }
 
 tristate KDbConnectionProxy::querySingleString(KDbQuerySchema* query, QString* value,
-                           const QList<QVariant>& params, int column,
-                           bool addLimitTo1)
+                                               const QList<QVariant>& params, int column,
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleString(query, value, params, column, addLimitTo1);
+    return d->connection->querySingleString(query, value, params, column, options);
 }
 
 tristate KDbConnectionProxy::querySingleNumber(const KDbEscapedString& sql, int* number, int column,
-                           bool addLimitTo1)
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleNumber(sql, number, column, addLimitTo1);
+    return d->connection->querySingleNumber(sql, number, column, options);
 }
 
  tristate KDbConnectionProxy::querySingleNumber(KDbQuerySchema* query, int* number, int column,
-                            bool addLimitTo1)
+                                                QueryRecordOptions options)
  {
-     return d->connection->querySingleNumber(query, number, column, addLimitTo1);
+     return d->connection->querySingleNumber(query, number, column, options);
  }
 
 tristate KDbConnectionProxy::querySingleNumber(KDbQuerySchema* query, int* number,
-                           const QList<QVariant>& params, int column,
-                           bool addLimitTo1)
+                                               const QList<QVariant>& params, int column,
+                                               QueryRecordOptions options)
 {
-    return d->connection->querySingleNumber(query, number, params, column, addLimitTo1);
+    return d->connection->querySingleNumber(query, number, params, column, options);
 }
 
 bool KDbConnectionProxy::queryStringList(const KDbEscapedString& sql, QStringList* list, int column)
@@ -383,9 +385,9 @@ bool KDbConnectionProxy::queryStringList(KDbQuerySchema* query, QStringList* lis
     return d->connection->queryStringList(query, list, params, column);
 }
 
-tristate KDbConnectionProxy::resultExists(const KDbEscapedString& sql, bool addLimitTo1)
+tristate KDbConnectionProxy::resultExists(const KDbEscapedString& sql, QueryRecordOptions options)
 {
-    return d->connection->resultExists(sql, addLimitTo1);
+    return d->connection->resultExists(sql, options);
 }
 
 tristate KDbConnectionProxy::isEmpty(KDbTableSchema* table)
@@ -786,24 +788,24 @@ bool KDbConnectionProxy::checkIfColumnExists(KDbCursor *cursor, int column)
 }
 
 tristate KDbConnectionProxy::querySingleRecordInternal(KDbRecordData* data, const KDbEscapedString* sql,
-                                   KDbQuerySchema* query, const QList<QVariant>* params,
-                                   bool addLimitTo1)
+                                                       KDbQuerySchema* query, const QList<QVariant>* params,
+                                                       QueryRecordOptions options)
 {
-    return d->connection->querySingleRecordInternal(data, sql, query, params, addLimitTo1);
+    return d->connection->querySingleRecordInternal(data, sql, query, params, options);
 }
 
 tristate KDbConnectionProxy::querySingleStringInternal(const KDbEscapedString* sql, QString* value,
                                    KDbQuerySchema* query, const QList<QVariant>* params,
-                                   int column, bool addLimitTo1)
+                                   int column, QueryRecordOptions options)
 {
-    return d->connection->querySingleStringInternal(sql, value, query, params, column, addLimitTo1);
+    return d->connection->querySingleStringInternal(sql, value, query, params, column, options);
 }
 
 tristate KDbConnectionProxy::querySingleNumberInternal(const KDbEscapedString* sql, int* number,
                                    KDbQuerySchema* query, const QList<QVariant>* params,
-                                   int column, bool addLimitTo1)
+                                   int column, QueryRecordOptions options)
 {
-    return d->connection->querySingleNumberInternal(sql, number, query, params, column, addLimitTo1);
+    return d->connection->querySingleNumberInternal(sql, number, query, params, column, options);
 }
 
 bool KDbConnectionProxy::queryStringListInternal(const KDbEscapedString *sql, QStringList* list,

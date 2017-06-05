@@ -54,9 +54,10 @@ bool MysqlConnection::drv_connect()
     // Get lower_case_table_name value so we know if there's case sensitivity supported
     // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
     int intLowerCaseTableNames = 0;
-    tristate res = querySingleNumber(KDbEscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"),
-                            &intLowerCaseTableNames,
-                            0/*col*/, false/* !addLimitTo1 */);
+    const tristate res = querySingleNumber(
+        KDbEscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"), &intLowerCaseTableNames,
+        0 /*col*/,
+        QueryRecordOptions(QueryRecordOption::Default) & ~QueryRecordOptions(QueryRecordOption::AddLimitTo1));
     if (res == false) // sanity
         return false;
     d->lowerCaseTableNames = intLowerCaseTableNames > 0;
@@ -72,8 +73,10 @@ bool MysqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
     // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-version.html
     QString versionString;
-    tristate res = querySingleString(KDbEscapedString("SELECT @@version"),
-                                     &versionString, /*column*/0, false /*!addLimitTo1*/);
+    tristate res = querySingleString(KDbEscapedString("SELECT @@version"), &versionString,
+        /*column*/ 0,
+        QueryRecordOptions(QueryRecordOption::Default) & ~QueryRecordOptions(QueryRecordOption::AddLimitTo1));
+
     QRegularExpression versionRe(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
     QRegularExpressionMatch match  = versionRe.match(versionString);
     if (res == false) // sanity

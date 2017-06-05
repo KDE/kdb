@@ -345,10 +345,10 @@ protected:
       @a keywords should be 0-terminated array of null-terminated strings. */
     void initDriverSpecificKeywords(const char* const* keywords);
 
-    /*! @return SQL statement @a sql modified by adding limiting command,
-     (if possible and if @add is true). Used for optimization for the server side.
+    /*! @return SQL statement @a sql modified by appending a "LIMIT 1" clause,
+     (if possible and if @a add is @c true). Used for optimization for the server side.
      Can be reimplemented for other drivers. */
-    virtual KDbEscapedString addLimitTo1(const KDbEscapedString& sql, bool add);
+    virtual KDbEscapedString addLimitTo1(const KDbEscapedString& sql, bool add = true);
 
     /*! @return true if the database supports specifying default values for field @a field.
      @c true by default.
