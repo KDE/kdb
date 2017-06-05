@@ -1569,7 +1569,8 @@ tristate KDbConnection::alterTable(KDbTableSchema* tableSchema, KDbTableSchema* 
     return ok;
 }
 
-bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& newName, bool replace)
+bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& newName,
+                                   AlterTableNameOptions options)
 {
     clearResult();
     if (tableSchema != this->tableSchema(tableSchema->id())) {
@@ -1595,7 +1596,7 @@ bool KDbConnection::alterTableName(KDbTableSchema* tableSchema, const QString& n
     KDbTableSchema *tableToReplace = this->tableSchema(newName);
     const bool destTableExists = tableToReplace != nullptr;
     const int origID = destTableExists ? tableToReplace->id() : -1; //will be reused in the new table
-    if (!replace && destTableExists) {
+    if (!(options & AlterTableNameOption::DropDestination) && destTableExists) {
         m_result = KDbResult(ERR_OBJECT_EXISTS,
                              tr("Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists.")
                                 .arg(tableSchema->name(), newName, newName));

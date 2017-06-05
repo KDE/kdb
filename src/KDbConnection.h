@@ -674,17 +674,33 @@ public:
 //! @todo (js): update any structure (e.g. query) that depend on this table!
     tristate alterTable(KDbTableSchema* tableSchema, KDbTableSchema* newTableSchema);
 
-    /*! Alters name of table described by @a tableSchema to @a newName.
-     If @a replace is true, destination table is completely dropped and replaced
-     by @a tableSchema, if present. In this case, identifier of
-     @a tableSchema becomes equal to the dropped table's id, what can be useful
-     if @a tableSchema was created with a temporary name and ID (used in KDbAlterTableHandler).
+    //! Options for altering table name
+    //! @since 3.1
+    enum class AlterTableNameOption {
+        DropDestination = 1, //!< Drop destination table if exists
+        Default = 0
+    };
+    Q_DECLARE_FLAGS(AlterTableNameOptions, AlterTableNameOption)
 
-     If @a replace is false (the default) and destination table is present
-     -- false is returned and ERR_OBJECT_EXISTS error is set.
-     The schema of @a tableSchema is updated on success.
-     @return true on success. */
-    bool alterTableName(KDbTableSchema* tableSchema, const QString& newName, bool replace = false);
+    /**
+     * @brief Alters name of table
+     *
+     * Alters name of table described by @a tableSchema to @a newName.
+     * If @a options include the DropDestination value and table having name @a newName already
+     * exists, it is physically dropped, removed from connection's list of tables  and replaced
+     * by @a tableSchema. In this case identifier of @a tableSchema is set to the dropped table's
+     * identifier. This can be useful if @a tableSchema was created with a temporary name and
+     * identifier. It is for example used in KDbAlterTableHandler.
+     *
+     * If @a options do not include the DropDestination value (the default) and table having name
+     * @a newName already exists, @c false is returned and @c ERR_OBJECT_EXISTS error is set in
+     * the connection object.
+     *
+     * Table name in the schema of @a tableSchema is updated on successful altering.
+     * @return true on success.
+     */
+    bool alterTableName(KDbTableSchema* tableSchema, const QString& newName,
+                        AlterTableNameOptions options = AlterTableNameOption::Default);
 
     /*! Drops a query defined by @a querySchema.
      If true is returned, schema information @a querySchema is destoyed
@@ -1324,5 +1340,6 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::TransactionOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::QueryRecordOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::AlterTableNameOptions)
 
 #endif

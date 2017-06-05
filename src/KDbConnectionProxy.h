@@ -241,7 +241,8 @@ public:
 
     tristate alterTable(KDbTableSchema* tableSchema, KDbTableSchema* newTableSchema);
 
-    bool alterTableName(KDbTableSchema* tableSchema, const QString& newName, bool replace = false);
+    bool alterTableName(KDbTableSchema* tableSchema, const QString& newName,
+                        AlterTableNameOptions options = AlterTableNameOption::Default);
 
     bool dropQuery(KDbQuerySchema* querySchema);
 

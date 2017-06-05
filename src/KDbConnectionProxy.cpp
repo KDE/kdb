@@ -468,9 +468,10 @@ tristate KDbConnectionProxy::alterTable(KDbTableSchema* tableSchema, KDbTableSch
     return d->connection->alterTable(tableSchema, newTableSchema);
 }
 
-bool KDbConnectionProxy::alterTableName(KDbTableSchema* tableSchema, const QString& newName, bool replace)
+bool KDbConnectionProxy::alterTableName(KDbTableSchema* tableSchema, const QString& newName,
+                                        AlterTableNameOptions options)
 {
-    return d->connection->alterTableName(tableSchema, newName, replace);
+    return d->connection->alterTableName(tableSchema, newName, options);
 }
 
 bool KDbConnectionProxy::dropQuery(KDbQuerySchema* querySchema)

@@ -1091,7 +1091,9 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
             oldTable = 0;*/
 
         // Replace the old table with the new one (oldTable will be destroyed)
-        if (!d->conn->alterTableName(newTable, oldTableName, true /*replace*/)) {
+        if (!d->conn->alterTableName(newTable, oldTableName,
+            KDbConnection::AlterTableNameOption::Default | KDbConnection::AlterTableNameOption::DropDestination))
+        {
             m_result = d->conn->result();
 //! @todo delete newTable...
             args->result = false;
