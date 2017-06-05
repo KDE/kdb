@@ -438,9 +438,9 @@ bool KDbConnectionProxy::insertRecord(KDbFieldList* fields, const QList<QVariant
     return d->connection->insertRecord(fields, values);
 }
 
-bool KDbConnectionProxy::createTable(KDbTableSchema* tableSchema, bool replaceExisting)
+bool KDbConnectionProxy::createTable(KDbTableSchema* tableSchema, CreateTableOptions options)
 {
-    return d->connection->createTable(tableSchema, replaceExisting);
+    return d->connection->createTable(tableSchema, options);
 }
 
 KDbTableSchema *KDbConnectionProxy::copyTable(const KDbTableSchema &tableSchema, const KDbObject &newData)

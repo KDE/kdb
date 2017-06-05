@@ -1269,7 +1269,7 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
         rollbackAutoCommitTransaction(tg.transaction()); \
         return false; }
 
-bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExisting)
+bool KDbConnection::createTable(KDbTableSchema* tableSchema, CreateTableOptions options)
 {
     if (!tableSchema || !checkIsDatabaseUsed())
         return false;
@@ -1306,7 +1306,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, bool replaceExistin
     bool previousSchemaStillKept = false;
 
     KDbTableSchema *existingTable = nullptr;
-    if (replaceExisting) {
+    if (options & CreateTableOption::DropDestination) {
         //get previous table (do not retrieve, though)
         existingTable = this->tableSchema(tableName);
         if (existingTable) {
@@ -1405,7 +1405,9 @@ KDbTableSchema *KDbConnection::copyTable(const KDbTableSchema &tableSchema, cons
     copiedTable->setCaption(newData.caption());
     copiedTable->setDescription(newData.description());
     // copy the structure and data
-    if (!createTable(copiedTable, false /* !replaceExisting */)) {
+    if (!createTable(copiedTable,
+        CreateTableOptions(CreateTableOption::Default) & ~CreateTableOptions(CreateTableOption::DropDestination)))
+    {
         delete copiedTable;
         return nullptr;
     }
@@ -1564,7 +1566,8 @@ tristate KDbConnection::alterTable(KDbTableSchema* tableSchema, KDbTableSchema* 
     empty = true;
 #endif
     if (empty) {
-        ok = createTable(newTableSchema, true/*replace*/);
+        ok = createTable(newTableSchema, KDbConnection::CreateTableOption::Default
+                             | KDbConnection::CreateTableOption::DropDestination);
     }
     return ok;
 }

@@ -991,7 +991,10 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 
     if (recreateTable) {
         // Create the destination table with temporary name
-        if (!d->conn->createTable(newTable, false)) {
+        if (!d->conn->createTable(newTable,
+          KDbConnection::CreateTableOptions(KDbConnection::CreateTableOption::Default)
+              & ~KDbConnection::CreateTableOptions(KDbConnection::CreateTableOption::DropDestination)))
+        {
             m_result = d->conn->result();
             delete newTable;
             args->result = false;

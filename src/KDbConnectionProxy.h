@@ -229,7 +229,8 @@ public:
 
     bool insertRecord(KDbFieldList* fields, const QList<QVariant>& values);
 
-    bool createTable(KDbTableSchema* tableSchema, bool replaceExisting = false);
+    bool createTable(KDbTableSchema *tableSchema,
+                     CreateTableOptions options = CreateTableOption::Default);
 
     KDbTableSchema *copyTable(const KDbTableSchema &tableSchema, const KDbObject &newData);
 

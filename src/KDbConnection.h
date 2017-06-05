@@ -613,30 +613,43 @@ public:
 
     QSharedPointer<KDbSqlResult> insertRecord(KDbFieldList *fields, const QList<QVariant> &values);
 
-    /*! Creates table defined by @a tableSchema.
-     Schema information is also added into kexi system tables, for later reuse.
-     @return true on success - @a tableSchema object is then
-     inserted to KDbConnection structures - it is owned by KDbConnection object now,
-     so you shouldn't destroy the tableSchema object by hand
-     (or declare it as local-scope variable).
+    //! Options for creating table
+    //! @since 3.1
+    enum class CreateTableOption {
+        DropDestination = 1, //!< Drop destination table if exists
+        Default = 0
+    };
+    Q_DECLARE_FLAGS(CreateTableOptions, CreateTableOption)
 
-     If @a replaceExisting is false (the default) and table with the same name
-     (as tableSchema->name()) exists, false is returned.
-     If @a replaceExisting is true, a table schema with the same name (if exists)
-     is overwritten, then a new table schema gets the same identifier
-     as existing table schema's identifier.
-
-     Table and column definitions are added to to kexi__* "system schema" tables.
-     Checks that a database is in use, and that the schema defines at least one column.
-
-     Note that on error:
-     - @a tableSchema is not inserted into KDbConnection's structures,
-       so you are still owner of this object
-     - existing table schema object is not destroyed (i.e. it is still available
-       e.g. using KDbConnection::tableSchema(const QString&), even if the table
-       was physically dropped.
-    */
-    bool createTable(KDbTableSchema* tableSchema, bool replaceExisting = false);
+    /**
+     * @brief Creates a new table
+     *
+     * Creates a new table defined by @a tableSchema. @c true is returned on success. In this case
+     * @a tableSchema object is added to KDbConnection's structures and becomes owned the
+     * KDbConnection object, so should not be destroyed by hand.
+     *
+     * If @a options include the DropDestination value and table schema with the same name as @a
+     * tableSchema exists, it is dropped and the original identifier of the dropped schem is
+     * assigned to the @a tableSchema object.
+     *
+     * If @a options do not include the DropDestination value and table schema with the same name
+     * as @a tableSchema exists, @c false is returned.
+     *
+     * Table and column definitions are added to "Kexi system" tables.
+     *
+     * Prior to dropping the method checks if the table for the schema is in use, and if the new
+     * schema defines at least one column.
+     *
+     * Note that on error:
+     * - @a tableSchema is not inserted into KDbConnection's structures, so caller is still owner
+     *   of the object,
+     * - existing table schema object is not destroyed (e.g. it is still available for
+     *   KDbConnection::tableSchema(const QString&), even if the table was physically dropped.
+     *
+     * @return true on success.
+     */
+    bool createTable(KDbTableSchema *tableSchema,
+                     CreateTableOptions options = CreateTableOption::Default);
 
     /*! Creates a copy of table schema defined by @a tableSchema with data.
      Name, caption and description will be copied from @a newData.
@@ -1341,5 +1354,6 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::TransactionOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::QueryRecordOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::AlterTableNameOptions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::CreateTableOptions)
 
 #endif
