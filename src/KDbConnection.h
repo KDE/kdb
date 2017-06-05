@@ -941,7 +941,7 @@ protected:
     /*! Alters table's described @a tableSchema name to @a newName.
      This is the default implementation, using "ALTER TABLE <oldname> RENAME TO <newname>",
      what's supported by SQLite >= 3.2, PostgreSQL, MySQL.
-     Backends lacking ALTER TABLE, for example SQLite2, reimplement this with by an inefficient
+     Backends lacking ALTER TABLE, for example SQLite, reimplement this with by an inefficient
      data copying to a new table. In any case, renaming is performed at the backend.
      It's good idea to keep the operation within a transaction.
      @return true on success. */
