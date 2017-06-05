@@ -56,6 +56,11 @@
 //! @brief Defined if debugging for the driver manager is enabled
 #cmakedefine KDB_DRIVERMANAGER_DEBUG
 
+//! @def KDB_TRANSACTIONS_DEBUG
+//! @brief Defined if debugging for database transactions is enabled
+//! @since 3.1
+#cmakedefine KDB_TRANSACTIONS_DEBUG
+
 //! @def KDB_DEBUG_GUI
 //! @brief Defined if a GUI for debugging is enabled
 #cmakedefine KDB_DEBUG_GUI

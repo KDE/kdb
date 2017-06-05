@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,8 +20,10 @@
 #ifndef KDB_TRANSACTION_H
 #define KDB_TRANSACTION_H
 
-#include <QObject>
+#include "config-kdb.h"
 #include "kdb_export.h"
+
+#include <QtGlobal>
 
 class KDbConnection;
 
@@ -35,11 +37,10 @@ public:
     explicit KDbTransactionData(KDbConnection *conn);
     ~KDbTransactionData();
 
-    //helper for debugging
-    static int globalcount;
-    //helper for debugging
+#ifdef KDB_TRANSACTIONS_DEBUG
+    //! Helper for debugging, returns value of global transaction data reference counter
     static int globalCount();
-
+#endif
     KDbConnection *m_conn;
     bool m_active;
     int refcount;
@@ -58,11 +59,16 @@ private:
 class KDB_EXPORT KDbTransaction
 {
 public:
-/*! Constructs uninitialised (null) transaction.
-     Only in Conenction code it can be initialised */
+    /**
+     * @brief Constructs a null transaction.
+     *
+     * @note It can be initialized only by KDbConnection.
+     */
     KDbTransaction();
 
-    //! Copy ctor.
+    /**
+     * @brief Copy constructor
+     */
     KDbTransaction(const KDbTransaction& trans);
 
     virtual ~KDbTransaction();
@@ -86,12 +92,13 @@ public:
      */
     bool isActive() const;
 
-    /*! @return true if transaction is uinitialised (null). */
+    /*! @return true if this transaction is null. */
     bool isNull() const;
 
-    //helper for debugging
+#ifdef KDB_TRANSACTIONS_DEBUG
+    //! Helper for debugging, returns value of global transaction data reference counter
     static int globalCount();
-    static int globalcount;
+#endif
 
 protected:
     KDbTransactionData *m_data;

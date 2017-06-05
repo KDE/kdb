@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,17 +23,22 @@
 
 #include <assert.h>
 
+#ifdef KDB_TRANSACTIONS_DEBUG
 //helper for debugging
-KDB_EXPORT int KDbTransaction::globalcount = 0;
+int KDbTransaction_globalcount = 0;
+
 KDB_EXPORT int KDbTransaction::globalCount()
 {
-    return KDbTransaction::globalcount;
+    return KDbTransaction_globalcount;
 }
-KDB_EXPORT int KDbTransactionData::globalcount = 0;
+
+int KDbTransactionData_globalcount = 0;
+
 KDB_EXPORT int KDbTransactionData::globalCount()
 {
-    return KDbTransactionData::globalcount;
+    return KDbTransactionData_globalcount;
 }
+#endif
 
 KDbTransactionData::KDbTransactionData(KDbConnection *conn)
         : m_conn(conn)
@@ -41,15 +46,19 @@ KDbTransactionData::KDbTransactionData(KDbConnection *conn)
         , refcount(1)
 {
     Q_ASSERT(conn);
-    KDbTransaction::globalcount++; //because refcount(1) init.
-    KDbTransactionData::globalcount++;
-    transactionsDebug() << "-- globalcount ==" << KDbTransactionData::globalcount;
+#ifdef KDB_TRANSACTIONS_DEBUG
+    KDbTransaction_globalcount++; // because of refcount(1) init.
+    KDbTransactionData_globalcount++;
+    transactionsDebug() << "-- globalcount ==" << KDbTransactionData_globalcount;
+#endif
 }
 
 KDbTransactionData::~KDbTransactionData()
 {
-    KDbTransactionData::globalcount--;
-    transactionsDebug() << "-- globalcount ==" << KDbTransactionData::globalcount;
+#ifdef KDB_TRANSACTIONS_DEBUG
+    KDbTransactionData_globalcount--;
+    transactionsDebug() << "-- globalcount ==" << KDbTransactionData_globalcount;
+#endif
 }
 
 //---------------------------------------------------
@@ -64,7 +73,9 @@ KDbTransaction::KDbTransaction(const KDbTransaction& trans)
 {
     if (m_data) {
         m_data->refcount++;
-        KDbTransaction::globalcount++;
+#ifdef KDB_TRANSACTIONS_DEBUG
+        KDbTransaction_globalcount++;
+#endif
     }
 }
 
@@ -72,14 +83,18 @@ KDbTransaction::~KDbTransaction()
 {
     if (m_data) {
         m_data->refcount--;
-        KDbTransaction::globalcount--;
+#ifdef KDB_TRANSACTIONS_DEBUG
+        KDbTransaction_globalcount--;
+#endif
         transactionsDebug() << "m_data->refcount==" << m_data->refcount;
         if (m_data->refcount == 0)
             delete m_data;
     } else {
         transactionsDebug() << "null";
     }
-    transactionsDebug() << "-- globalcount == " << KDbTransaction::globalcount;
+#ifdef KDB_TRANSACTIONS_DEBUG
+    transactionsDebug() << "-- globalcount == " << KDbTransaction_globalcount;
+#endif
 }
 
 KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
@@ -87,7 +102,9 @@ KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
     if (this != &trans) {
         if (m_data) {
             m_data->refcount--;
-            KDbTransaction::globalcount--;
+#ifdef KDB_TRANSACTIONS_DEBUG
+            KDbTransaction_globalcount--;
+#endif
             transactionsDebug() << "m_data->refcount==" << m_data->refcount;
             if (m_data->refcount == 0)
                 delete m_data;
@@ -95,7 +112,9 @@ KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
         m_data = trans.m_data;
         if (m_data) {
             m_data->refcount++;
-            KDbTransaction::globalcount++;
+#ifdef KDB_TRANSACTIONS_DEBUG
+            KDbTransaction_globalcount++;
+#endif
         }
     }
     return *this;
