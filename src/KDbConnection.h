@@ -677,8 +677,9 @@ public:
      @todo Update any structure (e.g. query) that depends on this table */
     tristate dropTable(KDbTableSchema* tableSchema);
 
-    /*! It is a convenience function, does exactly the same as
-     bool dropTable( KDbTableSchema* tableSchema ) */
+    /*! @overload
+     * It is a convenience function.
+     */
     tristate dropTable(const QString& tableName);
 
     /*! Alters @a tableSchema using @a newTableSchema in memory and on the db backend.
@@ -976,7 +977,7 @@ protected:
      Used (alsoRemoveSchema==false) on table altering:
      if recreating table can fail we're giving up and keeping
      the original table schema (even if it is no longer points to any real data). */
-    tristate dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
+    tristate dropTableInternal(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
 
     /*! Setups data for object that owns @a object (e.g. table, query)
       opened on 'kexi__objects' table, pointing to a record

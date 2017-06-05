@@ -617,9 +617,9 @@ bool KDbConnectionProxy::drv_dropTable(const QString& tableName)
     return d->connection->drv_dropTable(tableName);
 }
 
-tristate KDbConnectionProxy::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema)
+tristate KDbConnectionProxy::dropTableInternal(KDbTableSchema* tableSchema, bool alsoRemoveSchema)
 {
-    return d->connection->dropTable(tableSchema, alsoRemoveSchema);
+    return d->connection->dropTableInternal(tableSchema, alsoRemoveSchema);
 }
 
 bool KDbConnectionProxy::setupObjectData(const KDbRecordData& data, KDbObject* object)

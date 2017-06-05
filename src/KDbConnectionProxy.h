@@ -304,7 +304,7 @@ public:
 
     bool drv_dropTable(const QString& tableName) override;
 
-    tristate dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
+    tristate dropTableInternal(KDbTableSchema* tableSchema, bool alsoRemoveSchema);
 
     bool setupObjectData(const KDbRecordData& data, KDbObject* object);
 

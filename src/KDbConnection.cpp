@@ -1320,7 +1320,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, CreateTableOptions 
             if (existingTable->id() > 0)
                 tableSchema->setId(existingTable->id()); //copy id from existing table
             previousSchemaStillKept = true;
-            if (!dropTable(existingTable, false /*alsoRemoveSchema*/))
+            if (!dropTableInternal(existingTable, false /*alsoRemoveSchema*/))
                 return false;
         }
     } else {
@@ -1464,10 +1464,10 @@ bool KDbConnection::drv_dropTable(const QString& tableName)
 
 tristate KDbConnection::dropTable(KDbTableSchema* tableSchema)
 {
-    return dropTable(tableSchema, true);
+    return dropTableInternal(tableSchema, true);
 }
 
-tristate KDbConnection::dropTable(KDbTableSchema* tableSchema, bool alsoRemoveSchema)
+tristate KDbConnection::dropTableInternal(KDbTableSchema* tableSchema, bool alsoRemoveSchema)
 {
     // Each SQL identifier needs to be escaped in the generated query.
     clearResult();
