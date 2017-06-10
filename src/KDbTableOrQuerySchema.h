@@ -63,11 +63,11 @@ public:
      Check whether a query or table has been found by testing (query() || table()) expression. */
     KDbTableOrQuerySchema(KDbConnection *conn, int id);
 
-    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer so @a table
+    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer to @a table
      object. */
     explicit KDbTableOrQuerySchema(KDbTableSchema* table);
 
-    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer so @a query
+    /*! Creates a new KDbTableOrQuerySchema variant object, keeping a pointer to @a query
      object. */
     explicit KDbTableOrQuerySchema(KDbQuerySchema* query);
 
