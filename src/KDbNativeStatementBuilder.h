@@ -20,30 +20,16 @@
 #ifndef KDB_KDBNATIVESTATEMENTBUILDER_H
 #define KDB_KDBNATIVESTATEMENTBUILDER_H
 
+#include "KDbSelectStatementOptions.h"
 #include <QList>
 #include <QVariant>
 
 #include "kdb_export.h"
 
 class KDbConnection;
+class KDbEscapedString;
 class KDbQuerySchema;
 class KDbTableSchema;
-class KDbEscapedString;
-
-//! Options used in KDbNativeStatementBuilder::generateSelectStatement()
-class KDB_EXPORT KDbSelectStatementOptions
-{
-public:
-    KDbSelectStatementOptions();
-
-    //! @c true if record ID should be also retrieved. False by default.
-    bool alsoRetrieveRecordId;
-
-    /*! @c true if relations (LEFT OUTER JOIN) for visible lookup columns should be added.
-     @c true by default. This is set to false when user-visible statement is generated
-     e.g. for the Query Designer. */
-    bool addVisibleLookupColumns;
-};
 
 //! A builder for generating various types of native SQL statements
 /*! The statement strings can be specific for the used connection and database driver,

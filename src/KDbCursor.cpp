@@ -212,7 +212,7 @@ bool KDbCursor::open()
             return false;
         }
         KDbSelectStatementOptions options;
-        options.alsoRetrieveRecordId = d->containsRecordIdInfo; /*get record Id if needed*/
+        options.setAlsoRetrieveRecordId(d->containsRecordIdInfo); /*get record Id if needed*/
         KDbNativeStatementBuilder builder(d->conn);
         KDbEscapedString sql;
         if (!builder.generateSelectStatement(&sql, m_query, options, d->queryParameters)

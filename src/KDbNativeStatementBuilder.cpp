@@ -29,9 +29,7 @@
 #include "KDbQuerySchemaParameter.h"
 #include "KDbRelationship.h"
 
-KDbSelectStatementOptions::KDbSelectStatementOptions()
-        : alsoRetrieveRecordId(false)
-        , addVisibleLookupColumns(true)
+KDbSelectStatementOptions::~KDbSelectStatementOptions()
 {
 }
 
@@ -134,7 +132,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                         tableName = KDb::iifNotEmpty(querySchema->tableAlias(tablePosition),
                                                            f->table()->name());
                     }
-                    if (options.addVisibleLookupColumns) { // try to find table/alias name harder
+                    if (options.addVisibleLookupColumns()) { // try to find table/alias name harder
                         if (tableName.isEmpty()) {
                             tableName = querySchema->tableAlias(f->table()->name());
                         }
@@ -153,7 +151,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 }
 //! @todo add option that allows to omit "AS" keyword
             }
-            KDbLookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns && f->table())
+            KDbLookupFieldSchema *lookupFieldSchema = (options.addVisibleLookupColumns() && f->table())
                                                    ? f->table()->lookupFieldSchema(*f) : nullptr;
             if (lookupFieldSchema && lookupFieldSchema->boundColumn() >= 0) {
                 // Lookup field schema found
@@ -269,7 +267,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
     if (!s_additional_fields.isEmpty())
         sql += (", " + s_additional_fields);
 
-    if (driver && options.alsoRetrieveRecordId) { //append rowid column
+    if (driver && options.alsoRetrieveRecordId()) { //append rowid column
         KDbEscapedString s;
         if (!sql.isEmpty())
             s = ", ";

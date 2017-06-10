@@ -170,11 +170,12 @@ set_coinstallable_lib_version(KDb)
 kdb_create_shared_data_classes(
     kdb_GENERATED_SHARED_DATA_CLASS_HEADERS # output variable with list of headers
     NO_PREFIX # subdirectory in which the headers should be generated
-    KDbResult.shared.h
-    KDbVersionInfo.shared.h
     KDbConnectionData.shared.h
-    KDbQuerySchemaParameter.shared.h
     KDbObject.shared.h
+    KDbQuerySchemaParameter.shared.h
+    KDbResult.shared.h
+    KDbSelectStatementOptions.shared.h
+    KDbVersionInfo.shared.h
 )
 
 kdb_remove_extensions(
