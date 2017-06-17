@@ -83,7 +83,7 @@ public:
     //! @since 3.1
     KDbOrderByColumn& operator=(const KDbOrderByColumn &other);
 
-    //! @return true if this column is thesame as @a col
+    //! @return true if this column is the same as @a col
     bool operator==(const KDbOrderByColumn& col) const;
 
     //! @return @c true if this object is not equal to @a other; otherwise returns @c false.
