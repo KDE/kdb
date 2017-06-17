@@ -23,6 +23,7 @@
 #include <QSet>
 
 #include "KDbUtils.h"
+#include "KDbDriverBehavior.h"
 
 class KDbAdminTools;
 class KDbConnection;
@@ -30,13 +31,21 @@ class KDbDriver;
 class KDbDriverMetaData;
 
 /*! Private driver's data members. */
-class DriverPrivate
+class KDbDriverPrivate
 {
 public:
-    explicit DriverPrivate(KDbDriver *aDriver);
-    virtual ~DriverPrivate();
+    explicit KDbDriverPrivate(KDbDriver *aDriver);
+    virtual ~KDbDriverPrivate();
+
+    //! Accessor to the KDbDriverBehavior object for driver @a driver.
+    inline static const KDbDriverBehavior *behavior(const KDbDriver *driver) { return driver->behavior(); }
+
+    //! @overload
+    inline static KDbDriverBehavior *behavior(KDbDriver *driver) { return driver->behavior(); }
 
     KDbDriver *driver;
+
+    KDbDriverBehavior driverBehavior;
 
     QSet<KDbConnection*> connections;
 
@@ -64,7 +73,7 @@ public:
 
     friend class KDbDriver;
 private:
-    Q_DISABLE_COPY(DriverPrivate)
+    Q_DISABLE_COPY(KDbDriverPrivate)
 };
 
 #endif

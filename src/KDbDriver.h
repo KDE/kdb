@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -36,7 +36,7 @@ class KDbDriverMetaData;
 class KDbBinaryExpression;
 class KDbNArgExpression;
 class KDbQuerySchemaParameterValueListIterator;
-class DriverPrivate;
+class KDbDriverPrivate;
 
 #define KDB_DRIVER_PLUGIN_FACTORY(class_name, name) \
     K_PLUGIN_FACTORY_WITH_JSON(class_name ## Factory, name, registerPlugin<class_name>();)
@@ -208,9 +208,6 @@ public:
     //! @return a list of internal property names for this driver.
     QList<QByteArray> internalPropertyNames() const;
 
-    //! @return a structure that provides detailed information about driver's default behavior.
-    inline const KDbDriverBehavior* behavior() const { return this->beh; }
-
     //! @internal
     ~KDbDriver() override;
 
@@ -286,6 +283,18 @@ public:
                                                  KDb::ExpressionCallStack* callStack) const;
 
 protected:
+    /**
+     * @brief Returns structure that provides detailed information about driver's default behavior
+     *
+     * @since 3.1
+     */
+    KDbDriverBehavior *behavior();
+
+    /**
+     * @overload
+     */
+    const KDbDriverBehavior *behavior() const;
+
     /*! Used by KDbDriverManager.
      Note for driver developers: Reimplement this.
      In your reimplementation you should initialize:
@@ -371,10 +380,9 @@ protected:
     friend class KDbDriverBehavior;
     friend class KDbNativeStatementBuilder;
     friend class DriverManagerInternal;
-    friend class DriverPrivate;
+    friend class KDbDriverPrivate;
 
-    KDbDriverBehavior *beh;
-    DriverPrivate * const d;
+    KDbDriverPrivate * const d;
 private:
     Q_DISABLE_COPY(KDbDriver)
 };

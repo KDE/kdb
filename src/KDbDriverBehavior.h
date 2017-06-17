@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,19 +23,18 @@
 #include "KDbDriver.h"
 #include "KDbUtils.h"
 
-//! @internal Detailed definition of driver's default behavior
-/*! @note For driver developers:
- Change these defaults in you KDbDriver subclass constructor if needed.
-*/
+/**
+ * @brief Detailed definition of driver's default behavior
+ *
+ * This class is mostly interesting for KDb driver developers.
+ * Defaults can be changed by KDbDriver subclass in constructors.
+ */
 class KDB_EXPORT KDbDriverBehavior
 {
 public:
     explicit KDbDriverBehavior(KDbDriver *driver);
 
     ~KDbDriverBehavior();
-
-    //! Accessor for objects that need the KDbDriver::beh.
-    inline static const KDbDriverBehavior* get(const KDbDriver *driver) { return driver->beh; }
 
     /*! Features (like transactions, etc.) supported by this driver
      (sum of selected  Features enum items).

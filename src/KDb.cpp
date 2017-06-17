@@ -21,21 +21,22 @@
 */
 
 #include "KDb.h"
-#include "KDb_p.h"
 #include "KDbConnectionData.h"
 #include "KDbConnection.h"
 #include "KDbCursor.h"
-#include "KDbDriverManager.h"
+#include "kdb_debug.h"
 #include "KDbDriverBehavior.h"
+#include "KDbDriverManager.h"
+#include "KDbDriver_p.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbNativeStatementBuilder.h"
+#include "KDb_p.h"
 #include "KDbQuerySchema.h"
 #include "KDbRecordData.h"
 #include "KDbSqlResult.h"
 #include "KDbTableOrQuerySchema.h"
 #include "KDbVersionInfo.h"
-#include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
 
 #include <QMap>
@@ -384,7 +385,7 @@ KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(KDbConnection *conn, const quin
                                                  const QString &autoIncrementFieldName,
                                                  const QString &tableName)
 {
-    const KDbDriverBehavior *behavior = KDbDriverBehavior::get(conn->driver());
+    const KDbDriverBehavior *behavior = KDbDriverPrivate::behavior(conn->driver());
     if (behavior->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
         return recordId;
     }

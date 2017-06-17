@@ -51,6 +51,7 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
         , dp(new SqliteDriverPrivate)
 {
+    KDbDriverBehavior *beh = behavior();
     beh->features = SingleTransactions | CursorForward | CompactingDatabaseSupported;
 
     //special method for autoincrement definition

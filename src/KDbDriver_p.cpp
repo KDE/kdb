@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-    Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+    Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
     Copyright (C) 2004 Martin Ellis <martin.ellis@kdemail.net>
 
    This program is free software; you can redistribute it and/or
@@ -109,14 +109,15 @@ void KDbDriverBehavior::initInternalProperties()
 
 //---------------------------------------------
 
-DriverPrivate::DriverPrivate(KDbDriver *aDriver)
+KDbDriverPrivate::KDbDriverPrivate(KDbDriver *aDriver)
         : driver(aDriver)
+        , driverBehavior(driver)
         , metaData(nullptr)
         , adminTools(nullptr)
 {
 }
 
-DriverPrivate::~DriverPrivate()
+KDbDriverPrivate::~KDbDriverPrivate()
 {
     delete adminTools;
 }

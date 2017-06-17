@@ -307,7 +307,7 @@ checkTarballs () {
 checkKDbKeywords
 src=`printf "src/parser/KDbSqlScanner.l\n"\
 "   and tools/kdb_keywords.txt"`
-header "const char* const DriverPrivate::kdbSQLKeywords" "Driver_p.h" "$src" "keywords.cpp"
+header "const char* const KDbDriverPrivate::kdbSQLKeywords" "Driver_p.h" "$src" "keywords.cpp"
 body "kdb.all" "keywords.cpp"
 footer "keywords.cpp"
 

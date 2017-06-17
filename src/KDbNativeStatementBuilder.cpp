@@ -21,6 +21,7 @@
 #include "KDbConnection.h"
 #include "kdb_debug.h"
 #include "KDbDriverBehavior.h"
+#include "KDbDriver_p.h"
 #include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbOrderByColumn.h"
@@ -273,7 +274,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             s = ", ";
         if (querySchema->masterTable())
             s += KDbEscapedString(querySchema->tableAliasOrName(querySchema->masterTable()->name())) + '.';
-        s += driver->behavior()->ROW_ID_FIELD_NAME;
+        s += KDbDriverPrivate::behavior(driver)->ROW_ID_FIELD_NAME;
         sql += s;
     }
 
@@ -432,24 +433,24 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             sql += ", ";
         KDbEscapedString v = KDbEscapedString(KDb::escapeIdentifier(driver, field->name())) + ' ';
         const bool autoinc = field->isAutoIncrement();
-        const bool pk = field->isPrimaryKey() || (autoinc && driver && driver->beh->AUTO_INCREMENT_REQUIRES_PK);
+        const bool pk = field->isPrimaryKey() || (autoinc && driver && driver->behavior()->AUTO_INCREMENT_REQUIRES_PK);
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         const KDbField::Type type = field->type(); // cache: evaluating type of expressions can be expensive
-        if (autoinc && d->driver()->beh->SPECIAL_AUTO_INCREMENT_DEF) {
+        if (autoinc && d->driver()->behavior()->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
-                v.append(d->driver()->beh->AUTO_INCREMENT_TYPE).append(' ')
-                 .append(d->driver()->beh->AUTO_INCREMENT_PK_FIELD_OPTION);
+                v.append(d->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
+                 .append(d->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION);
             else
-                v.append(d->driver()->beh->AUTO_INCREMENT_TYPE).append(' ')
-                 .append(d->driver()->beh->AUTO_INCREMENT_FIELD_OPTION);
+                v.append(d->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
+                 .append(d->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
         } else {
-            if (autoinc && !d->driver()->beh->AUTO_INCREMENT_TYPE.isEmpty())
-                v += d->driver()->beh->AUTO_INCREMENT_TYPE;
+            if (autoinc && !d->driver()->behavior()->AUTO_INCREMENT_TYPE.isEmpty())
+                v += d->driver()->behavior()->AUTO_INCREMENT_TYPE;
             else
                 v += d->driver()->sqlTypeName(type, *field);
 
             if (KDbField::isIntegerType(type) && field->isUnsigned()) {
-                v.append(' ').append(d->driver()->beh->UNSIGNED_TYPE_KEYWORD);
+                v.append(' ').append(d->driver()->behavior()->UNSIGNED_TYPE_KEYWORD);
             }
 
             if (KDbField::isFPNumericType(type) && field->precision() > 0) {
@@ -460,15 +461,15 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             }
             else if (type == KDbField::Text) {
                 int realMaxLen;
-                if (d->driver()->beh->TEXT_TYPE_MAX_LENGTH == 0) {
+                if (d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH == 0) {
                     realMaxLen = field->maxLength(); // allow to skip (N)
                 }
                 else { // max length specified by driver
                     if (field->maxLength() == 0) { // as long as possible
-                        realMaxLen = d->driver()->beh->TEXT_TYPE_MAX_LENGTH;
+                        realMaxLen = d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH;
                     }
                     else { // not longer than specified by driver
-                        realMaxLen = qMin(d->driver()->beh->TEXT_TYPE_MAX_LENGTH, field->maxLength());
+                        realMaxLen = qMin(d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH, field->maxLength());
                     }
                 }
                 if (realMaxLen > 0) {
@@ -477,8 +478,8 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             }
 
             if (autoinc) {
-                v.append(' ').append(pk ? d->driver()->beh->AUTO_INCREMENT_PK_FIELD_OPTION
-                                        : d->driver()->beh->AUTO_INCREMENT_FIELD_OPTION);
+                v.append(' ').append(pk ? d->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION
+                                        : d->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
             }
             else {
                 //! @todo here is automatically a single-field key created

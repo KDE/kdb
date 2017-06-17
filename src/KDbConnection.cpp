@@ -405,7 +405,7 @@ bool KDbConnection::connect()
                  :  tr("Could not connect to \"%1\" database server.")
                        .arg(d->connData.toUserVisibleString()));
     }
-    if (d->isConnected && !d->driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+    if (d->isConnected && !d->driver->behavior()->USING_DATABASE_REQUIRED_TO_CONNECT) {
         if (!drv_getServerVersion(&d->serverVersion))
             return false;
     }
@@ -524,7 +524,7 @@ bool KDbConnection::drv_databaseExists(const QString &dbName, bool ignoreErrors)
 bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 {
 // kdbDebug() << dbName << ignoreErrors;
-    if (d->driver->beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE && !checkConnected())
+    if (d->driver->behavior()->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE && !checkConnected())
         return false;
     clearResult();
 
@@ -588,7 +588,7 @@ bool KDbConnection::databaseExists(const QString &dbName, bool ignoreErrors)
 
 bool KDbConnection::createDatabase(const QString &dbName)
 {
-    if (d->driver->beh->CONNECTION_REQUIRED_TO_CREATE_DB && !checkConnected())
+    if (d->driver->behavior()->CONNECTION_REQUIRED_TO_CREATE_DB && !checkConnected())
         return false;
 
     if (databaseExists(dbName)) {
@@ -631,7 +631,7 @@ bool KDbConnection::createDatabase(const QString &dbName)
             return false;
     }
 
-    if (!tmpdbName.isEmpty() || !d->driver->beh->IS_DB_OPEN_AFTER_CREATE) {
+    if (!tmpdbName.isEmpty() || !d->driver->behavior()->IS_DB_OPEN_AFTER_CREATE) {
         //db need to be opened
         if (!useDatabase(dbName, false/*not yet kexi compatible!*/)) {
             m_result = KDbResult(tr("Database \"%1\" has been created but could not be opened.").arg(dbName));
@@ -714,7 +714,7 @@ bool KDbConnection::useDatabase(const QString &dbName, bool kexiCompatible, bool
         m_result.prependMessage(msg);
         return false;
     }
-    if (d->serverVersion.isNull() && d->driver->beh->USING_DATABASE_REQUIRED_TO_CONNECT) {
+    if (d->serverVersion.isNull() && d->driver->behavior()->USING_DATABASE_REQUIRED_TO_CONNECT) {
         // get version just now, it was not possible earlier
         if (!drv_getServerVersion(&d->serverVersion))
             return false;
@@ -788,7 +788,7 @@ QString KDbConnection::currentDatabase() const
 
 bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
 {
-    if (d->driver->beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED && !isDatabaseUsed()) {
+    if (d->driver->behavior()->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED && !isDatabaseUsed()) {
         //we have no db used, but it is required by engine to have used any!
         *name = anyAvailableDatabaseName();
         if (name->isEmpty()) {
@@ -811,7 +811,7 @@ bool KDbConnection::useTemporaryDatabaseIfNeeded(QString* name)
 
 bool KDbConnection::dropDatabase(const QString &dbName)
 {
-    if (d->driver->beh->CONNECTION_REQUIRED_TO_DROP_DB && !checkConnected())
+    if (d->driver->behavior()->CONNECTION_REQUIRED_TO_DROP_DB && !checkConnected())
         return false;
 
     QString dbToDrop;
@@ -1738,7 +1738,7 @@ bool KDbConnection::drv_createTable(const QString& tableName)
 
 bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 {
-    if ((d->driver->beh->features & KDbDriver::IgnoreTransactions)
+    if ((d->driver->behavior()->features & KDbDriver::IgnoreTransactions)
             || !d->autoCommit) {
         tg->setTransaction(KDbTransaction());
         return true;
@@ -1746,7 +1746,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
     // commit current transaction (if present) for drivers
     // that allow single transaction per connection
-    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
+    if (d->driver->behavior()->features & KDbDriver::SingleTransactions) {
         if (d->defaultTransactionStartedInside) //only commit internally started transaction
             if (!commitTransaction(d->default_trans, TransactionOption::IgnoreInactive)) {
                 tg->setTransaction(KDbTransaction());
@@ -1759,7 +1759,7 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
             tg->doNothing();
             return true; //reuse externally started transaction
         }
-    } else if (!(d->driver->beh->features & KDbDriver::MultipleTransactions)) {
+    } else if (!(d->driver->behavior()->features & KDbDriver::MultipleTransactions)) {
         tg->setTransaction(KDbTransaction());
         return true; //no trans. supported at all - just return
     }
@@ -1769,11 +1769,11 @@ bool KDbConnection::beginAutoCommitTransaction(KDbTransactionGuard* tg)
 
 bool KDbConnection::commitAutoCommitTransaction(const KDbTransaction& trans)
 {
-    if (d->driver->beh->features & KDbDriver::IgnoreTransactions)
+    if (d->driver->behavior()->features & KDbDriver::IgnoreTransactions)
         return true;
     if (trans.isNull() || !d->driver->transactionsSupported())
         return true;
-    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
+    if (d->driver->behavior()->features & KDbDriver::SingleTransactions) {
         if (!d->defaultTransactionStartedInside) //only commit internally started transaction
             return true; //give up
     }
@@ -1801,14 +1801,14 @@ KDbTransaction KDbConnection::beginTransaction()
     if (!checkIsDatabaseUsed())
         return KDbTransaction();
     KDbTransaction trans;
-    if (d->driver->beh->features & KDbDriver::IgnoreTransactions) {
+    if (d->driver->behavior()->features & KDbDriver::IgnoreTransactions) {
         //we're creating dummy transaction data here,
         //so it will look like active
         trans.m_data = new KDbTransactionData(this);
         d->transactions.append(trans);
         return trans;
     }
-    if (d->driver->beh->features & KDbDriver::SingleTransactions) {
+    if (d->driver->behavior()->features & KDbDriver::SingleTransactions) {
         if (d->default_trans.isActive()) {
             m_result = KDbResult(ERR_TRANSACTION_ACTIVE,
                                  tr("Transaction already started."));
@@ -1822,7 +1822,7 @@ KDbTransaction KDbConnection::beginTransaction()
         d->transactions.append(trans);
         return d->default_trans;
     }
-    if (d->driver->beh->features & KDbDriver::MultipleTransactions) {
+    if (d->driver->behavior()->features & KDbDriver::MultipleTransactions) {
         if (!(trans.m_data = drv_beginTransaction())) {
             SET_BEGIN_TR_ERROR;
             return KDbTransaction();
@@ -1840,7 +1840,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, TransactionOpt
     if (!isDatabaseUsed())
         return false;
     if (!d->driver->transactionsSupported()
-            && !(d->driver->beh->features & KDbDriver::IgnoreTransactions)) {
+            && !(d->driver->behavior()->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1859,7 +1859,7 @@ bool KDbConnection::commitTransaction(const KDbTransaction trans, TransactionOpt
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->behavior()->features & KDbDriver::IgnoreTransactions))
         ret = drv_commitTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1876,7 +1876,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, TransactionO
     if (!isDatabaseUsed())
         return false;
     if (!d->driver->transactionsSupported()
-            && !(d->driver->beh->features & KDbDriver::IgnoreTransactions)) {
+            && !(d->driver->behavior()->features & KDbDriver::IgnoreTransactions)) {
         SET_ERR_TRANS_NOT_SUPP;
         return false;
     }
@@ -1895,7 +1895,7 @@ bool KDbConnection::rollbackTransaction(const KDbTransaction trans, TransactionO
         d->default_trans = KDbTransaction(); //now: no default tr.
     }
     bool ret = true;
-    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions))
+    if (!(d->driver->behavior()->features & KDbDriver::IgnoreTransactions))
         ret = drv_rollbackTransaction(t.m_data);
     if (t.m_data)
         t.m_data->m_active = false; //now this transaction if inactive
@@ -1924,7 +1924,7 @@ void KDbConnection::setDefaultTransaction(const KDbTransaction& trans)
 {
     if (!isDatabaseUsed())
         return;
-    if (!(d->driver->beh->features & KDbDriver::IgnoreTransactions)
+    if (!(d->driver->behavior()->features & KDbDriver::IgnoreTransactions)
             && (!trans.isActive() || !d->driver->transactionsSupported())) {
         return;
     }
@@ -1943,7 +1943,7 @@ bool KDbConnection::autoCommit() const
 
 bool KDbConnection::setAutoCommit(bool on)
 {
-    if (d->autoCommit == on || d->driver->beh->features & KDbDriver::IgnoreTransactions)
+    if (d->autoCommit == on || d->driver->behavior()->features & KDbDriver::IgnoreTransactions)
         return true;
     if (!drv_setAutoCommit(on))
         return false;
@@ -2380,7 +2380,7 @@ bool KDbConnection::queryStringList(KDbQuerySchema* query, QStringList* list,
 tristate KDbConnection::resultExists(const KDbEscapedString &sql, QueryRecordOptions options)
 {
     // optimization
-    if (d->driver->beh->SELECT_1_SUBQUERY_SUPPORTED) {
+    if (d->driver->behavior()->SELECT_1_SUBQUERY_SUPPORTED) {
         // this is at least for sqlite
         if ((options & QueryRecordOption::AddLimitTo1) && sql.left(6).toUpper() == "SELECT") {
             m_result.setSql(d->driver->addLimitTo1("SELECT 1 FROM (" + sql + ')'));
@@ -3004,7 +3004,7 @@ QString KDbConnection::anyAvailableDatabaseName()
     if (!d->availableDatabaseName.isEmpty()) {
         return d->availableDatabaseName;
     }
-    return d->driver->beh->ALWAYS_AVAILABLE_DATABASE_NAME;
+    return d->driver->behavior()->ALWAYS_AVAILABLE_DATABASE_NAME;
 }
 
 void KDbConnection::setAvailableDatabaseName(const QString& dbName)
@@ -3105,7 +3105,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             }
         }
     } else { //use RecordId
-        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->beh->ROW_ID_FIELD_NAME)) + '='
+        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->behavior()->ROW_ID_FIELD_NAME)) + '='
                    + d->driver->valueToSql(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += (sqlset + " WHERE " + sqlwhere);
@@ -3282,8 +3282,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     } else {
         recordId = result->lastInsertRecordId();
 //  kdbDebug() << "new recordId ==" << recordId;
-        if (d->driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
-            kdbWarning() << "d->driver->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
+        if (d->driver->behavior()->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE) {
+            kdbWarning() << "d->driver->behavior()->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE";
             return false;
         }
     }
@@ -3347,7 +3347,7 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
             i++;
         }
     } else {//use RecordId
-        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->beh->ROW_ID_FIELD_NAME)) + '='
+        sqlwhere = KDbEscapedString(escapeIdentifier(d->driver->behavior()->ROW_ID_FIELD_NAME)) + '='
                     + d->driver->valueToSql(KDbField::BigInteger, (*data)[data->size() - 1]);
     }
     sql += sqlwhere;

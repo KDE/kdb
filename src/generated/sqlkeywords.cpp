@@ -26,7 +26,7 @@
 
 #include "KDbDriver_p.h"
 
-const char* const DriverPrivate::kdbSQLKeywords[] = {
+const char* const KDbDriverPrivate::kdbSQLKeywords[] = {
     "AND",
     "AS",
     "CREATE",

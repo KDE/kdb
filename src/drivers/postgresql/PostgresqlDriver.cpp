@@ -37,6 +37,7 @@ KDB_DRIVER_PLUGIN_FACTORY(PostgresqlDriver, "kdb_postgresqldriver.json")
 PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)
 {
+    KDbDriverBehavior *beh = behavior();
     beh->features = SingleTransactions | CursorForward | CursorBackward;
 //! @todo enable this when kexidb supports multiple: beh->features = MultipleTransactions | CursorForward | CursorBackward;
 

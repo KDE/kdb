@@ -103,7 +103,7 @@ void KDbCursor::init(KDbConnection* conn)
     m_fetchResult = FetchInvalid;
 
     d->containsRecordIdInfo = (m_query && m_query->masterTable())
-                              && d->conn->driver()->beh->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
+                              && d->conn->driver()->behavior()->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
 
     if (m_query) {
         //get list of all fields
@@ -240,7 +240,7 @@ bool KDbCursor::open()
     }
     d->validRecord = false;
 
-    if (d->conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
+    if (d->conn->driver()->behavior()->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY) {
 //  kdbDebug() << "READ AHEAD:";
         d->readAhead = getNextRecord(); //true if any record in this query
 //  kdbDebug() << "READ AHEAD = " << d->readAhead;
@@ -299,7 +299,7 @@ bool KDbCursor::moveFirst()
                 m_afterLast = !getNextRecord();
                 return !m_afterLast;
             }
-        } else if (!(d->conn->driver()->beh->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY))  {
+        } else if (!(d->conn->driver()->behavior()->_1ST_ROW_READ_AHEAD_REQUIRED_TO_KNOW_IF_THE_RESULT_IS_EMPTY))  {
             // not buffered
             m_at = 0;
             m_afterLast = !getNextRecord();

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -55,11 +55,10 @@ static const char* const KDb_defaultSqlTypeNames[] = {
 
 KDbDriver::KDbDriver(QObject *parent, const QVariantList &args)
  : QObject(parent)
- , beh(new KDbDriverBehavior(this))
- , d(new DriverPrivate(this))
+ , d(new KDbDriverPrivate(this))
 {
     Q_UNUSED(args);
-    beh->typeNames.resize(KDbField::LastType + 1);
+    d->driverBehavior.typeNames.resize(KDbField::LastType + 1);
 }
 
 KDbDriver::~KDbDriver()
@@ -68,9 +67,18 @@ KDbDriver::~KDbDriver()
     QSet<KDbConnection*> connections(d->connections);
     qDeleteAll(connections);
     d->connections.clear();
-    delete beh;
     delete d;
 // kdbDebug() << "ok";
+}
+
+KDbDriverBehavior *KDbDriver::behavior()
+{
+    return &d->driverBehavior;
+}
+
+const KDbDriverBehavior *KDbDriver::behavior() const
+{
+    return &d->driverBehavior;
 }
 
 bool KDbDriver::isValid()
@@ -78,7 +86,7 @@ bool KDbDriver::isValid()
     clearResult();
     QString inv_impl(tr("Invalid database driver's \"%1\" implementation.").arg(metaData()->name()));
     QString not_init(tr("Value of \"%1\" is not initialized for the driver."));
-    if (beh->ROW_ID_FIELD_NAME.isEmpty()) {
+    if (d->driverBehavior.ROW_ID_FIELD_NAME.isEmpty()) {
         m_result = KDbResult(ERR_INVALID_DRIVER_IMPL,
                           inv_impl + QLatin1Char(' ')
                           + not_init.arg(QLatin1String("KDbDriverBehavior::ROW_ID_FIELD_NAME")));
@@ -99,12 +107,12 @@ const KDbDriverMetaData* KDbDriver::metaData() const
 
 int KDbDriver::features() const
 {
-    return beh->features;
+    return d->driverBehavior.features;
 }
 
 bool KDbDriver::transactionsSupported() const
 {
-    return beh->features & (SingleTransactions | MultipleTransactions);
+    return d->driverBehavior.features & (SingleTransactions | MultipleTransactions);
 }
 
 KDbAdminTools& KDbDriver::adminTools() const
@@ -123,9 +131,9 @@ QString KDbDriver::sqlTypeName(KDbField::Type type, const KDbField &field) const
 {
     Q_UNUSED(field);
     if (type > KDbField::InvalidType && type <= KDbField::LastType) { /*sanity*/
-        return beh->typeNames[type];
+        return d->driverBehavior.typeNames[type];
     }
-    return beh->typeNames[KDbField::InvalidType];
+    return d->driverBehavior.typeNames[KDbField::InvalidType];
 }
 
 KDbConnection *KDbDriver::createConnection(const KDbConnectionData& connData,
@@ -171,8 +179,8 @@ bool KDbDriver::isKDbSystemObjectName(const QString& name)
 
 bool KDbDriver::isSystemFieldName(const QString& name) const
 {
-    if (!beh->ROW_ID_FIELD_NAME.isEmpty()
-        && 0 == name.compare(beh->ROW_ID_FIELD_NAME, Qt::CaseInsensitive))
+    if (!d->driverBehavior.ROW_ID_FIELD_NAME.isEmpty()
+        && 0 == name.compare(d->driverBehavior.ROW_ID_FIELD_NAME, Qt::CaseInsensitive))
     {
         return true;
     }
@@ -207,8 +215,8 @@ static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Ty
 //! @todo here special encoding method needed
     case KDbField::Boolean:
         return driver
-            ? KDbEscapedString(v.toInt() == 0 ? driver->behavior()->BOOLEAN_FALSE_LITERAL
-                                              : driver->behavior()->BOOLEAN_TRUE_LITERAL)
+            ? KDbEscapedString(v.toInt() == 0 ? KDbDriverPrivate::behavior(driver)->BOOLEAN_FALSE_LITERAL
+                                              : KDbDriverPrivate::behavior(driver)->BOOLEAN_TRUE_LITERAL)
             : KDbEscapedString(v.toInt() == 0 ? "FALSE" : "TRUE");
     case KDbField::Time:
         return KDbEscapedString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
@@ -265,26 +273,26 @@ KDbEscapedString KDbDriver::dateTimeToSql(const QDateTime& v) const
 
 QString KDbDriver::escapeIdentifier(const QString& str) const
 {
-    return QLatin1Char(beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER)
+    return QLatin1Char(d->driverBehavior.OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER)
             + drv_escapeIdentifier(str)
-            + QLatin1Char(beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER);
+            + QLatin1Char(d->driverBehavior.CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER);
 }
 
 QByteArray KDbDriver::escapeIdentifier(const QByteArray& str) const
 {
-    return beh->OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER
+    return d->driverBehavior.OPENING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER
             + drv_escapeIdentifier(str)
-            + beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER;
+            + d->driverBehavior.CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER;
 }
 
 KDbUtils::Property KDbDriver::internalProperty(const QByteArray& name) const
 {
-    return beh->properties.property(name);
+    return d->driverBehavior.properties.property(name);
 }
 
 QList<QByteArray> KDbDriver::internalPropertyNames() const
 {
-    QList<QByteArray> names(beh->properties.names());
+    QList<QByteArray> names(d->driverBehavior.properties.names());
     qSort(names);
     return names;
 }
@@ -307,7 +315,7 @@ bool KDbDriver::isDriverSpecificKeyword(const QByteArray& word) const
 void KDbDriver::setMetaData(const KDbDriverMetaData *metaData)
 {
     d->metaData = metaData;
-    beh->initInternalProperties();
+    d->driverBehavior.initInternalProperties();
 }
 
 KDbEscapedString KDbDriver::hexFunctionToString(
@@ -350,7 +358,7 @@ KDbEscapedString KDbDriver::randomFunctionToString(
 {
     static QLatin1String randomStatic("()");
     if (!args.isNull() || args.argCount() < 1 ) {
-        return KDbEscapedString(beh->RANDOM_FUNCTION + randomStatic);
+        return KDbEscapedString(d->driverBehavior.RANDOM_FUNCTION + randomStatic);
     }
     Q_ASSERT(args.argCount() == 2);
     const KDbEscapedString x(args.arg(0).toString(this, params, callStack));
@@ -358,7 +366,7 @@ KDbEscapedString KDbDriver::randomFunctionToString(
     static KDbEscapedString floorRandomStatic("+FLOOR(");
     static KDbEscapedString floorRandomStatic2("()*(");
     static KDbEscapedString floorRandomStatic3(")))");
-    return KDbEscapedString('(') + x + floorRandomStatic + beh->RANDOM_FUNCTION
+    return KDbEscapedString('(') + x + floorRandomStatic + d->driverBehavior.RANDOM_FUNCTION
             + floorRandomStatic2 + y + QLatin1Char('-') + x + floorRandomStatic3;
 }
 
@@ -392,7 +400,7 @@ KDbEscapedString KDbDriver::concatenateFunctionToString(const KDbBinaryExpressio
 Q_GLOBAL_STATIC_WITH_ARGS(
     KDbUtils::StaticSetOfStrings,
     KDb_kdbSqlKeywords,
-    (DriverPrivate::kdbSQLKeywords) )
+    (KDbDriverPrivate::kdbSQLKeywords) )
 
 KDB_EXPORT bool KDb::isKDbSqlKeyword(const QByteArray& word)
 {

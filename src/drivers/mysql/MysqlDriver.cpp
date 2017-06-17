@@ -43,6 +43,7 @@ MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
     : KDbDriver(parent, args)
     , m_longTextPrimaryKeyType(QLatin1String("VARCHAR(255)")) // fair enough for PK
 {
+    KDbDriverBehavior *beh = behavior();
     beh->features = IgnoreTransactions | CursorForward;
 
     beh->ROW_ID_FIELD_NAME = QLatin1String("LAST_INSERT_ID()");
