@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -78,48 +78,75 @@ public:
     typedef QList<KDbRelationship*> List;
     typedef QList<KDbRelationship*>::ConstIterator ListIterator;
 
-    /*! Creates uninitialized KDbRelationship object.
-      setIndices() will be required to call.
-    */
+    /**
+     * @brief Creates a new uninitialized KDbRelationship object
+     */
     KDbRelationship();
 
-    /*! Creates KDbRelationship object and initialises it just by
-     calling setIndices(). If setIndices() failed, object is still uninitialised.
-    */
+    /**
+     * @brief Creates a new KDbRelationship object and initialises it using setIndices()
+     *
+     * If setIndices() failed, object is still uninitialised. Check this using isEmpty().
+     */
     KDbRelationship(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex);
 
     virtual ~KDbRelationship();
 
+    //! Assigns @a other to this object returns a reference to this object.
+    //! @since 3.1
+    KDbRelationship& operator=(KDbRelationship &other);
+
+    //! @return true if this relationship is the same as @a other
+    //! Relationships are equal if they have the same details and master indices are equal
+    //! @since 3.1
+    bool operator==(const KDbRelationship& other) const;
+
+    //! @return @c true if this object is not equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    inline bool operator!=(const KDbRelationship &other) const { return !operator==(other); }
+
     /*! @return index defining master side of this relationship
      or @c nullptr if there is no information defined. */
-    inline KDbIndexSchema* masterIndex() const {
-        return m_masterIndex;
-    }
+    KDbIndexSchema* masterIndex();
+
+    //! @overload
+    const KDbIndexSchema* masterIndex() const;
 
     /*! @return index defining referenced side of this relationship.
      or @c nullptr if there is no information defined. */
-    inline KDbIndexSchema* detailsIndex() const {
-        return m_detailsIndex;
-    }
+    KDbIndexSchema* detailsIndex();
 
-    /*! @return ordered list of field pairs -- alternative form
-     for representation of relationship or @c nullptr if there is no information defined.
-     Each pair has a form of <master-side-field, details-side-field>. */
-    inline KDbField::PairList* fieldPairs() {
-        return &m_pairs;
-    }
+    //! @overload
+    const KDbIndexSchema* detailsIndex() const;
 
-    inline bool isEmpty() const {
-        return m_pairs.isEmpty();
-    }
+    /**
+     * Returns ordered list of field pairs, alternative representation of relationship
+     *
+     * @c nullptr is returned if there is no information defined.
+     * Each pair has a form of <master-side-field, details-side-field>.
+     */
+    KDbField::PairList* fieldPairs();
+
+    //! @overload
+    const KDbField::PairList* fieldPairs() const;
+
+    //! @return true if there are no master-details pairs in this relationship object
+    //! @see fieldPairs()
+    bool isEmpty() const;
 
     /*! @return table assigned at "master / one" side of this relationship.
      or @c nullptr if there is no information defined. */
-    KDbTableSchema* masterTable() const;
+    KDbTableSchema* masterTable();
+
+    //! @overload
+    const KDbTableSchema* masterTable() const;
 
     /*! @return table assigned at "details / many / foreign" side of this relationship.
      or @c nullptr if there is no information defined. */
-    KDbTableSchema* detailsTable() const;
+    KDbTableSchema* detailsTable();
+
+    //! @overload
+    const KDbTableSchema* detailsTable() const;
 
     /*! Sets @a masterIndex and @a detailsIndex indices for this relationship.
      This also sets information about tables for master- and details- sides.
@@ -137,27 +164,14 @@ public:
 protected:
     KDbRelationship(KDbQuerySchema *query, KDbField *field1, KDbField *field2);
 
-    void createIndices(KDbQuerySchema *query, KDbField *field1, KDbField *field2);
-
-    /*! Internal version of setIndices(). @a ownedByMaster parameter is passed
-     to KDbIndexSchema::attachRelationship() */
-    bool setIndices(KDbIndexSchema* masterIndex, KDbIndexSchema* detailsIndex, bool ownedByMaster);
-
-    KDbIndexSchema *m_masterIndex;
-    KDbIndexSchema *m_detailsIndex;
-
-    KDbField::PairList m_pairs;
-
-    bool m_masterIndexOwned;
-    bool m_detailsIndexOwned;
-
     friend class KDbConnection;
     friend class KDbTableSchema;
     friend class KDbQuerySchema;
     friend class KDbIndexSchema;
 
 private:
-    Q_DISABLE_COPY(KDbRelationship)
+    class Private;
+    Private * const d;
 };
 
 #endif
