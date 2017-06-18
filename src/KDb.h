@@ -711,7 +711,7 @@ KDB_EXPORT QString sqlite3ProgramPath();
  @return true on success. */
 KDB_EXPORT bool importSqliteFile(const QString &inputFileName, const QString &outputFileName);
 
-/*! @return true if @a s is a valid identifier, ie. starts with a letter or '_' character
+/*! @return @c true if @a s is a valid identifier, i.e. starts with a letter or '_' character
  and contains only letters, numbers and '_' character. */
 KDB_EXPORT bool isIdentifier(const QString& s);
 

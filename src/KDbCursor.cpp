@@ -295,7 +295,7 @@ bool KDbCursor::moveFirst()
                 //set state as we would be before first rec:
                 d->atBuffer = false;
                 m_at = 0;
-                //..and move to next, ie. 1st record
+                //..and move to next, i.e. 1st record
                 m_afterLast = !getNextRecord();
                 return !m_afterLast;
             }
