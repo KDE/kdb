@@ -206,13 +206,13 @@ KDbTransaction KDbConnectionProxy::beginTransaction()
 }
 
 bool KDbConnectionProxy::commitTransaction(KDbTransaction trans,
-                                           KDbConnection::TransactionOptions options)
+                                           KDbTransaction::CommitOptions options)
 {
     return d->connection->commitTransaction(trans, options);
 }
 
 bool KDbConnectionProxy::rollbackTransaction(KDbTransaction trans,
-                                             KDbConnection::TransactionOptions options)
+                                             KDbTransaction::CommitOptions options)
 {
     return d->connection->rollbackTransaction(trans, options);
 }

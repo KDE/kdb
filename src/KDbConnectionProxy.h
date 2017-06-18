@@ -111,10 +111,10 @@ public:
     KDbTransaction beginTransaction();
 
     bool commitTransaction(KDbTransaction trans = KDbTransaction(),
-                           TransactionOptions options = TransactionOptions());
+                           KDbTransaction::CommitOptions options = KDbTransaction::CommitOptions());
 
     bool rollbackTransaction(KDbTransaction trans = KDbTransaction(),
-                             TransactionOptions options = TransactionOptions());
+                             KDbTransaction::CommitOptions options = KDbTransaction::CommitOptions());
 
     KDbTransaction defaultTransaction() const;
 

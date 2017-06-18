@@ -22,6 +22,7 @@
 #define KDB_POSTGRESQLCONNECTION_H
 
 #include "KDbConnection.h"
+#include "KDbTransactionData.h"
 
 #include <libpq-fe.h>
 

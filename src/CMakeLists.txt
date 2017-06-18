@@ -306,6 +306,8 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbTableSchema
         KDbTableSchemaChangeListener
         KDbTransaction
+        KDbTransactionData
+        KDbTransactionGuard
 )
 
 ecm_generate_headers(kdb_FORWARDING_HEADERS

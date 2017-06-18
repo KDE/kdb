@@ -19,6 +19,8 @@
 
 #include "KDbTransaction.h"
 #include "KDbConnection.h"
+#include "KDbTransactionData.h"
+#include "KDbTransactionGuard.h"
 #include "kdb_debug.h"
 
 #include <assert.h>
@@ -40,14 +42,23 @@ KDB_EXPORT int KDbTransactionData::globalCount()
 }
 #endif
 
-KDbTransactionData::KDbTransactionData(KDbConnection *conn)
-        : m_conn(conn)
-        , m_active(true)
-        , refcount(1)
+class Q_DECL_HIDDEN KDbTransactionData::Private
 {
-    Q_ASSERT(conn);
+public:
+    Private(KDbConnection *c) : connection(c)
+    {
+        Q_ASSERT(connection);
+    }
+    KDbConnection *connection;
+    bool active = true;
+    int refcount = 1;
+};
+
+KDbTransactionData::KDbTransactionData(KDbConnection *connection)
+    : d(new Private(connection))
+{
 #ifdef KDB_TRANSACTIONS_DEBUG
-    KDbTransaction_globalcount++; // because of refcount(1) init.
+    KDbTransaction_globalcount++; // because of refcount is initialized to 1
     KDbTransactionData_globalcount++;
     transactionsDebug() << "-- globalcount ==" << KDbTransactionData_globalcount;
 #endif
@@ -59,6 +70,37 @@ KDbTransactionData::~KDbTransactionData()
     KDbTransactionData_globalcount--;
     transactionsDebug() << "-- globalcount ==" << KDbTransactionData_globalcount;
 #endif
+    delete d;
+}
+
+void KDbTransactionData::ref()
+{
+    d->refcount++;
+}
+
+void KDbTransactionData::deref()
+{
+    d->refcount--;
+}
+
+int KDbTransactionData::refcount() const
+{
+    return d->refcount;
+}
+
+bool KDbTransactionData::isActive() const
+{
+    return d->active;
+}
+
+void KDbTransactionData::setActive(bool set)
+{
+    d->active = set;
+}
+
+KDbConnection *KDbTransactionData::connection()
+{
+    return d->connection;
 }
 
 //---------------------------------------------------
@@ -72,7 +114,7 @@ KDbTransaction::KDbTransaction(const KDbTransaction& trans)
         : m_data(trans.m_data)
 {
     if (m_data) {
-        m_data->refcount++;
+        m_data->ref();
 #ifdef KDB_TRANSACTIONS_DEBUG
         KDbTransaction_globalcount++;
 #endif
@@ -82,12 +124,12 @@ KDbTransaction::KDbTransaction(const KDbTransaction& trans)
 KDbTransaction::~KDbTransaction()
 {
     if (m_data) {
-        m_data->refcount--;
+        m_data->deref();
 #ifdef KDB_TRANSACTIONS_DEBUG
         KDbTransaction_globalcount--;
 #endif
-        transactionsDebug() << "m_data->refcount==" << m_data->refcount;
-        if (m_data->refcount == 0)
+        transactionsDebug() << "m_data->refcount==" << m_data->refcount();
+        if (m_data->refcount() == 0)
             delete m_data;
     } else {
         transactionsDebug() << "null";
@@ -101,17 +143,17 @@ KDbTransaction& KDbTransaction::operator=(const KDbTransaction & trans)
 {
     if (this != &trans) {
         if (m_data) {
-            m_data->refcount--;
+            m_data->deref();
 #ifdef KDB_TRANSACTIONS_DEBUG
             KDbTransaction_globalcount--;
 #endif
-            transactionsDebug() << "m_data->refcount==" << m_data->refcount;
-            if (m_data->refcount == 0)
+            transactionsDebug() << "m_data->refcount==" << m_data->refcount();
+            if (m_data->refcount() == 0)
                 delete m_data;
         }
         m_data = trans.m_data;
         if (m_data) {
-            m_data->refcount++;
+            m_data->ref();
 #ifdef KDB_TRANSACTIONS_DEBUG
             KDbTransaction_globalcount++;
 #endif
@@ -127,12 +169,12 @@ bool KDbTransaction::operator==(const KDbTransaction& other) const
 
 KDbConnection* KDbTransaction::connection() const
 {
-    return m_data ? m_data->m_conn : nullptr;
+    return m_data ? m_data->connection() : nullptr;
 }
 
 bool KDbTransaction::isActive() const
 {
-    return m_data && m_data->m_active;
+    return m_data && m_data->isActive();
 }
 
 bool KDbTransaction::isNull() const
@@ -142,39 +184,73 @@ bool KDbTransaction::isNull() const
 
 //---------------------------------------------------
 
-KDbTransactionGuard::KDbTransactionGuard(KDbConnection *conn)
-        : m_doNothing(false)
+class Q_DECL_HIDDEN KDbTransactionGuard::Private
 {
-    Q_ASSERT(conn);
-    m_trans = conn->beginTransaction();
+public:
+    Private() {}
+    KDbTransaction transaction;
+    bool doNothing = false;
+};
+
+KDbTransactionGuard::KDbTransactionGuard(KDbConnection *connection)
+    : KDbTransactionGuard()
+{
+    if (connection) {
+        d->transaction = connection->beginTransaction();
+    }
 }
 
-KDbTransactionGuard::KDbTransactionGuard(const KDbTransaction& trans)
-        : m_trans(trans)
-        , m_doNothing(false)
+KDbTransactionGuard::KDbTransactionGuard(const KDbTransaction &transaction)
+    : KDbTransactionGuard()
 {
+    d->transaction = transaction;
 }
 
 KDbTransactionGuard::KDbTransactionGuard()
-        : m_doNothing(false)
+    : d(new Private)
 {
 }
 
 KDbTransactionGuard::~KDbTransactionGuard()
 {
-    if (!m_doNothing && m_trans.isActive() && m_trans.connection())
-        m_trans.connection()->rollbackTransaction(m_trans);
+    if (!d->doNothing && d->transaction.isActive()) {
+        const bool result = rollback();
+#ifdef KDB_TRANSACTIONS_DEBUG
+        transactionsDebug() << "~KDbTransactionGuard is rolling back transaction:" << result;
+#else
+        Q_UNUSED(result)
+#endif
+    }
+    delete d;
 }
 
-bool KDbTransactionGuard::commit()
+void KDbTransactionGuard::setTransaction(const KDbTransaction& transaction)
 {
-    if (m_trans.isActive() && m_trans.connection()) {
-        return m_trans.connection()->commitTransaction(m_trans);
+    d->transaction = transaction;
+}
+
+bool KDbTransactionGuard::commit(KDbTransaction::CommitOptions options)
+{
+    if (d->transaction.connection()) {
+        return d->transaction.connection()->commitTransaction(d->transaction, options);
+    }
+    return false;
+}
+
+bool KDbTransactionGuard::rollback(KDbTransaction::CommitOptions options)
+{
+    if (d->transaction.connection()) {
+        return d->transaction.connection()->rollbackTransaction(d->transaction, options);
     }
     return false;
 }
 
 void KDbTransactionGuard::doNothing()
 {
-    m_doNothing = true;
+    d->doNothing = true;
+}
+
+const KDbTransaction KDbTransactionGuard::transaction() const
+{
+    return d->transaction;
 }

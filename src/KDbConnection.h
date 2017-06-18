@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,9 +27,9 @@
 #include "KDbTransaction.h"
 #include "KDbTristate.h"
 
-class KDbConnectionPrivate;
 class KDbConnectionData;
 class KDbConnectionOptions;
+class KDbConnectionPrivate;
 class KDbConnectionProxy;
 class KDbDriver;
 class KDbProperties;
@@ -38,6 +38,7 @@ class KDbRecordEditBuffer;
 class KDbServerVersionInfo;
 class KDbSqlResult;
 class KDbTableSchemaChangeListener;
+class KDbTransactionGuard;
 class KDbVersionInfo;
 
 /*! @short Provides database connection, allowing queries and data modification.
@@ -251,79 +252,82 @@ public:
      @see tableIds() queryIds() */
     QList<int> objectIds(int objectType, bool* ok = nullptr);
 
-    /*! @brief Creates new KDbTransaction handle and starts a new transaction.
-     @return KDbTransaction object if transaction has been started
-     successfully, otherwise null transaction.
-     For drivers that allow single transaction per connection
-     (KDbDriver::features() && SingleTransactions) this method can be called one time,
-     and then this single transaction will be default ( setDefaultTransaction() will
-     be called).
-     For drivers that allow multiple transactions per connection, no default transaction is
-     set automatically in beginTransaction() method, you could do this by hand.
-     @see setDefaultTransaction(), defaultTransaction().
-    */
+    /**
+     * @brief Starts a new database transaction
+     *
+     * @return KDbTransaction object. If transaction has been started successfully returned object
+     * points to it, otherwise null transaction is returned.
+     *
+     * For drivers that allow single transaction per connection
+     * (KDbDriver::features() && SingleTransactions) this method can be called once and that
+     * transaction will be default one (setDefaultTransaction() will be called).
+     * For drivers that allow multiple transactions per connection no default transaction is
+     * set automatically in beginTransaction(). setDefaultTransaction() can be called by hand.
+     *
+     * @see setDefaultTransaction(), defaultTransaction().
+     */
     KDbTransaction beginTransaction();
 
-    //! Options for commiting and rolling back transactions
-    enum class TransactionOption {
-        None = 0,
-        IgnoreInactive = 1 //!< Ignore inactive transactions in commitTransaction()
-                           //!< and rollbackTransaction()
-    };
-    Q_DECLARE_FLAGS(TransactionOptions, TransactionOption)
-
-    /*
-     * @brief Commits transaction @a transaction.
+    /**
+     * @brief Commits specified transaction for this connection
      *
-     * If @a transaction is null and default transaction (obtained from defaultTransaction()) exists,
-     * the default one will be committed. If neither the default one is not present returns @c true
-     * if IgnoreInactive is set in @a options or @c false if IgnoreInactive is not set in @a options.
-     * Returns @c false on any error.
+     * If @a transaction is not active and default transaction (obtained from defaultTransaction())
+     * exists, the default one will be committed. If neither the default one is not present returns
+     * @c true if IgnoreInactive is set in @a options or @c false if IgnoreInactive is not set in
+     * @a options.
+     *
+     * @return @c false on any error.
      *
      * On successful commit, @a transaction object will point to a null transaction.
      * After commiting a default transaction, there is no default transaction anymore.
      */
     bool commitTransaction(KDbTransaction transaction = KDbTransaction(),
-                           TransactionOptions options = TransactionOptions());
+                           KDbTransaction::CommitOptions options = KDbTransaction::CommitOptions());
 
     /**
-     * @brief Rollbacks transaction @a transaction.
+     * @brief Rolls back specified transaction for this connection
      *
-     * If @a transaction is null and default transaction (obtained from defaultTransaction()) exists,
-     * the default one will be rolled back. If neither the default one is not present returns @c true
-     * if IgnoreInactive is set in @a options or @c false if IgnoreInactive is not set in @a options.
-     * Returns @c false on any error.
+     * If @a transaction is not active and default transaction (obtained from defaultTransaction())
+     * exists, the default one will be rolled back. If neither default one is present @c true is
+     * returned if IgnoreInactive is set for @a options or @c false if IgnoreInactive is not set in
+     * @a options.
+     *
+     * @return @c false on any error.
      *
      * On successful rollback, @a transaction object will point to a null transaction.
      * After rollong back a default transaction, there is no default transaction anymore.
      */
     bool rollbackTransaction(KDbTransaction trans = KDbTransaction(),
-                             TransactionOptions options = TransactionOptions());
+                             KDbTransaction::CommitOptions options = KDbTransaction::CommitOptions());
 
-    /*! @return handle for default transaction for this connection
-     or null transaction if there is no such a transaction defined.
-     If transactions are supported: Any operation on database (e.g. inserts)
-     that is started without specifying transaction context, will be performed
-     in the context of this transaction.
-
-     Returned null transaction doesn't mean that there is no transactions
-     started at all.
-     Default transaction can be defined automatically for some drivers --
-     see beginTransaction().
-     @see KDbDriver::transactionsSupported()
-    */
+    /**
+     * @brief Returns handle of default transaction for this connection
+     *
+     * Null transaction is returned if there is no such a transaction declared.
+     * If transactions are supported any operation on database (e.g. inserts) that are started
+     * without specifying a transaction context, are be performed in the context of this transaction.
+     * Returned null transaction doesn't mean that there are no transactions started at all.
+     * Default transaction can be defined automatically for certain drivers, see beginTransaction().
+     *
+     * @see KDbDriver::transactionsSupported()
+     */
     KDbTransaction defaultTransaction() const;
 
-    /*! Sets default transaction that will be used as context for operations
-     on data in opened database for this connection. */
+    /**
+     * @brief Sets default transaction
+     *
+     * Default transaction is used as a context for data modifications for this connection when no
+     * specific transaction is provided.
+     */
     void setDefaultTransaction(const KDbTransaction& trans);
 
-    /*! @return set of handles of currently active transactions.
-     Note that in multithreading environment some of these
-     transactions can be already inactive after calling this method.
-     Use KDbTransaction::isActive() to check that. Inactive transaction
-     handle is useless and can be safely dropped.
-    */
+    /**
+     * @brief Returns set of handles of currently active transactions
+     *
+     * @note In multithreading environment some of these transactions can be already inactive after
+     * calling this method. Use KDbTransaction::isActive() to check that. Inactive transaction
+     * handle is useless and can be safely ignored.
+     */
     QList<KDbTransaction> transactions();
 
     /*! @return true if "auto commit" option is on.
@@ -1213,7 +1217,7 @@ protected:
     bool commitAutoCommitTransaction(const KDbTransaction& trans);
 
     /*! Internal, for handling autocommited transactions:
-     Rollbacks transaction prevoiusly started with beginAutoCommitTransaction().
+     Rolls back transaction prevoiusly started with beginAutoCommitTransaction().
      @return true on success or when no transactions are supported
      at all by the driver.
 
@@ -1352,7 +1356,6 @@ private:
     friend class KDbTableSchema; //!< for removeMe()
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::TransactionOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::QueryRecordOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::AlterTableNameOptions)
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbConnection::CreateTableOptions)

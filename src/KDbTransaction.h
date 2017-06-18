@@ -26,36 +26,20 @@
 #include <QtGlobal>
 
 class KDbConnection;
+class KDbTransactionData;
 
-/*! Internal prototype for storing KDbTransaction handles for KDbTransaction object.
- Only for driver developers: reimplement this class for driver that
- support KDbTransaction handles.
-*/
-class KDB_EXPORT KDbTransactionData
-{
-public:
-    explicit KDbTransactionData(KDbConnection *conn);
-    ~KDbTransactionData();
-
-#ifdef KDB_TRANSACTIONS_DEBUG
-    //! Helper for debugging, returns value of global transaction data reference counter
-    static int globalCount();
-#endif
-    KDbConnection *m_conn;
-    bool m_active;
-    int refcount;
-private:
-    Q_DISABLE_COPY(KDbTransactionData)
-};
-
-//! This class encapsulates KDbTransaction handle.
-/*! KDbTransaction handle is sql driver-dependent,
-  but outside KDbTransaction is visible as universal container
-  for any handler implementation.
-
-  KDbTransaction object is value-based, internal data (handle) structure,
-  reference-counted.
-*/
+/**
+ * @brief This class encapsulates a single database transaction
+ *
+ * The KDbTransaction handle abstracts a database transaction for given database connection.
+ * Transaction objects are value-based, implicitly shared.
+ *
+ * Lifetime of the transaction object is closely related to a KDbConnection object.
+ * Deleting the either instance does not commit or rollback the actual transaction.
+ * Use KDbTransactionGuard for automatic commits or rolls back.
+ *
+ * @see KDbConnection::beginTransaction()
+ */
 class KDB_EXPORT KDbTransaction
 {
 public:
@@ -71,28 +55,54 @@ public:
      */
     KDbTransaction(const KDbTransaction& trans);
 
-    virtual ~KDbTransaction();
+    ~KDbTransaction();
+
+    //! Options for commiting and rolling back transactions
+    //! @see KDbConnection::beginTransaction() KDbConnection::rollbackTransaction()
+    //! @see KDbTransactionGuard::commit() KDbTransactionGuard::rollback()
+    enum class CommitOption {
+        None = 0,
+        IgnoreInactive = 1 //!< Do not return error for inactive or null transactions when
+                           //!< requesting commit or rollback
+    };
+    Q_DECLARE_FLAGS(CommitOptions, CommitOption)
 
     KDbTransaction& operator=(const KDbTransaction& trans);
 
-    //! @return @c true if this transaction is equal to @a other; otherwise returns @c false.
+    /**
+     * @brief Returns @c true if this transaction is equal to @a other; otherwise returns @c false
+     *
+     * Two transactions are equal if they encapsulate the same physical transaction,
+     * i.e. copy constructor or assignment operator was used.
+     * Two null transaction objects are equal.
+     */
     bool operator==(const KDbTransaction& other) const;
 
     //! @return @c true if this transaction is not equal to @a other; otherwise returns @c false.
     //! @since 3.1
     inline bool operator!=(const KDbTransaction &other) const { return !operator==(other); }
 
+    /**
+     * @brief Returns database connection for which the transaction belongs.
+     *
+     * @c nullptr is returned for null transactions.
+     */
     KDbConnection* connection() const;
 
     /**
      * @brief Returns @c true if transaction is active (i.e. started)
      *
-     * @return @c false also if transaction is uninitialised (null).
+     * @return @c false also if transaction is uninitialised (null) or not started.
+     * @see KDbConnection::beginTransaction()
      * @since 3.1
      */
     bool isActive() const;
 
-    /*! @return true if this transaction is null. */
+    /**
+     * @brief Returns @c true if this transaction is null.
+     *
+     * Null implies !isActive().
+     */
     bool isNull() const;
 
 #ifdef KDB_TRANSACTIONS_DEBUG
@@ -106,69 +116,6 @@ protected:
     friend class KDbConnection;
 };
 
-//! Helper class for using inside methods for given connection.
-/*! It can be used in two ways:
-  - start new transaction in constructor and rollback on destruction (1st constructor),
-  - use already started transaction and rollback on destruction (2nd constructor).
-  In any case, if transaction is committed or rolled back outside this KDbTransactionGuard
-  object in the meantime, nothing happens on KDbTransactionGuard destruction.
-  <code>
-  Example usage:
-  void myclas::my_method()
-  {
-    KDbTransaction *transaction = connection->beginTransaction();
-    KDbTransactionGuard tg(transaction);
-    ...some code that operates inside started transaction...
-    if (something)
-      return //after return from this code block: tg will call
-               //connection->rollbackTransaction() automatically
-    if (something_else)
-      transaction->commit();
-    //for now tg won't do anything because transaction does not exist
-  }
-  </code>
-*/
-class KDB_EXPORT KDbTransactionGuard
-{
-public:
-    /*! Constructor #1: Starts new transaction constructor for @a connection.
-     Started KDbTransaction handle is available via transaction().*/
-    explicit KDbTransactionGuard(KDbConnection *conn);
-
-    /*! Constructor #2: Uses already started transaction. */
-    explicit KDbTransactionGuard(const KDbTransaction& trans);
-
-    /*! Constructor #3: Creates KDbTransactionGuard without transaction assigned.
-     setTransaction() can be used later to do so. */
-    KDbTransactionGuard();
-
-    /*! Rollbacks not committed transaction. */
-    ~KDbTransactionGuard();
-
-    /*! Assigns transaction @a trans to this guard.
-     Previously assigned transaction will be unassigned from this guard. */
-    inline void setTransaction(const KDbTransaction& trans) {
-        m_trans = trans;
-    }
-
-    /*! Comits the guarded transaction.
-     It is convenient shortcut to connection->commitTransaction(this->transaction()) */
-    bool commit();
-
-    /*! Makes guarded transaction not guarded, so nothing will be performed on guard's desctruction. */
-    void doNothing();
-
-    /*! KDbTransaction that are controlled by this guard. */
-    inline const KDbTransaction transaction() const {
-        return m_trans;
-    }
-
-protected:
-    KDbTransaction m_trans;
-    bool m_doNothing;
-
-private:
-    Q_DISABLE_COPY(KDbTransactionGuard)
-};
+Q_DECLARE_OPERATORS_FOR_FLAGS(KDbTransaction::CommitOptions)
 
 #endif
