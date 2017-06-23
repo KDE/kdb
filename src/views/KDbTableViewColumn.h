@@ -161,7 +161,6 @@ public:
 
     /*! @return width of this field (usually in pixels or points).
          0 (the default) means there is no hint for the width. */
-
     int width() const;
 
 protected:
