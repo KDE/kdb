@@ -165,7 +165,10 @@ public:
      Note that even id non-zero is returned here, you may want to check whether lookup field's
      recordSource().name() is empty (if so, the field should behave as there was no lookup field
      defined at all). */
-    KDbLookupFieldSchema *lookupFieldSchema(const KDbField& field) const;
+    KDbLookupFieldSchema *lookupFieldSchema(const KDbField& field);
+
+    //! @overload
+    const KDbLookupFieldSchema *lookupFieldSchema(const KDbField& field) const;
 
     /*! @overload KDbLookupFieldSchema *KDbTableSchema::lookupFieldSchema( KDbField& field ) const */
     KDbLookupFieldSchema *lookupFieldSchema(const QString& fieldName);

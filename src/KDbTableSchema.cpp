@@ -384,7 +384,12 @@ bool KDbTableSchema::setLookupFieldSchema(const QString& fieldName, KDbLookupFie
     return true;
 }
 
-KDbLookupFieldSchema *KDbTableSchema::lookupFieldSchema(const KDbField& field) const
+KDbLookupFieldSchema *KDbTableSchema::lookupFieldSchema(const KDbField& field)
+{
+    return d->lookupFields.value(&field);
+}
+
+const KDbLookupFieldSchema *KDbTableSchema::lookupFieldSchema(const KDbField& field) const
 {
     return d->lookupFields.value(&field);
 }

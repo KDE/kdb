@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -273,12 +273,22 @@ KDbValidator* KDbTableViewColumn::validator() const
     return d->validator;
 }
 
-KDbTableViewData *KDbTableViewColumn::relatedData() const
+KDbTableViewData *KDbTableViewColumn::relatedData()
 {
     return d->relatedData;
 }
 
-KDbField* KDbTableViewColumn::field() const
+const KDbTableViewData *KDbTableViewColumn::relatedData() const
+{
+    return d->relatedData;
+}
+
+KDbField* KDbTableViewColumn::field()
+{
+    return d->field;
+}
+
+const KDbField* KDbTableViewColumn::field() const
 {
     return d->field;
 }
@@ -293,12 +303,22 @@ bool KDbTableViewColumn::isRelatedDataEditable() const
     return d->relatedDataEditable;
 }
 
-KDbQueryColumnInfo* KDbTableViewColumn::columnInfo() const
+KDbQueryColumnInfo* KDbTableViewColumn::columnInfo()
 {
     return d->columnInfo;
 }
 
-KDbQueryColumnInfo* KDbTableViewColumn::visibleLookupColumnInfo() const
+const KDbQueryColumnInfo* KDbTableViewColumn::columnInfo() const
+{
+    return d->columnInfo;
+}
+
+KDbQueryColumnInfo* KDbTableViewColumn::visibleLookupColumnInfo()
+{
+    return d->visibleLookupColumnInfo;
+}
+
+const KDbQueryColumnInfo* KDbTableViewColumn::visibleLookupColumnInfo() const
 {
     return d->visibleLookupColumnInfo;
 }

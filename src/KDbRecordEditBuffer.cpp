@@ -61,7 +61,7 @@ const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultV
     if (useDefaultValueIfPossible
             && (!result || result->isNull())
             && ci->field() && !ci->field()->defaultValue().isNull() && KDb::isDefaultValueAllowed(*ci->field())
-            && !hasDefaultValueAt(ci)) {
+            && !hasDefaultValueAt(*ci)) {
         //no buffered or stored value: try to get a default value declared in a field, so user can modify it
         if (!result)
             m_dbBuffer->insert(ci, ci->field()->defaultValue());
@@ -157,10 +157,9 @@ void KDbRecordEditBuffer::insert(const QString &fname, const QVariant &val)
     }
 }
 
-bool KDbRecordEditBuffer::hasDefaultValueAt(KDbQueryColumnInfo *ci) const
+bool KDbRecordEditBuffer::hasDefaultValueAt(const KDbQueryColumnInfo &ci) const
 {
-    Q_ASSERT(ci);
-    return m_defaultValuesDbBuffer->value(ci, false);
+    return m_defaultValuesDbBuffer->value(const_cast<KDbQueryColumnInfo*>(&ci), false);
 }
 
 KDbRecordEditBuffer::SimpleMap KDbRecordEditBuffer::simpleBuffer() const
@@ -183,7 +182,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbRecordEditBuffer& buffer)
         {
             dbg.nospace() << "* field name=" << qPrintable(it.key()->field()->name()) << " val="
             << (it.value().isNull() ? QLatin1String("<NULL>") : it.value().toString())
-            << (buffer.hasDefaultValueAt(it.key()) ? " DEFAULT\n" : "\n");
+            << (buffer.hasDefaultValueAt(*it.key()) ? " DEFAULT\n" : "\n");
         }
         return dbg.space();
     }

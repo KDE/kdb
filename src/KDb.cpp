@@ -829,7 +829,7 @@ void KDb::getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *
         values->insert("visibleDecimalPlaces", field.defaultValue());
     }
     // insert lookup-related values
-    KDbLookupFieldSchema *lookup = field.table()->lookupFieldSchema(field);
+    const KDbLookupFieldSchema *lookup = field.table()->lookupFieldSchema(field);
     KDb::getProperties(lookup, values);
 }
 

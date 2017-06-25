@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2003 Daniel Molkentin <molkentin@kde.org>
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -132,11 +132,17 @@ public:
     /*! For not-db-aware data only:
      Related data @a data for this column, what defines simple one-field.
      @c nullptr by default. @see setRelatedData() */
-    KDbTableViewData *relatedData() const;
+    KDbTableViewData *relatedData();
+
+    //! @overload
+    const KDbTableViewData *relatedData() const;
 
     /*! @return field for this column.
      For db-aware information is taken from columnInfo(). */
-    KDbField* field() const;
+    KDbField* field();
+
+    //! @overload
+    const KDbField* field() const;
 
     /*! Only usable if related data is set (ie. this is for combo boxes).
      Sets 'editable' flag for this column, what means a new value can be entered
@@ -150,14 +156,20 @@ public:
 
     /*! A rich field information for db-aware data.
      For not-db-aware data it is always 0 (use field() instead). */
-    KDbQueryColumnInfo* columnInfo() const;
+    KDbQueryColumnInfo* columnInfo();
+
+    //! @overload
+    const KDbQueryColumnInfo* columnInfo() const;
 
     /*! A rich field information for db-aware data. Specifies information for a column
      that should be visible instead of columnInfo. For example case see
      @ref KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(KDbQuerySchema::FieldsExpandedOptions options = Default)
 
      For not-db-aware data it is always 0. */
-    KDbQueryColumnInfo* visibleLookupColumnInfo() const;
+    KDbQueryColumnInfo* visibleLookupColumnInfo();
+
+    //! @overload
+    const KDbQueryColumnInfo* visibleLookupColumnInfo() const;
 
     //! @return true if data is stored in DB, not only in memeory.
     bool isDBAware() const;

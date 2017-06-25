@@ -531,7 +531,7 @@ void KDbTableViewData::setSorting(int column, KDbOrderByColumn::SortOrder order)
     }
     // find proper column information for sorting (lookup column points to alternate column with visible data)
     const KDbTableViewColumn *tvcol = d->columns.at(column);
-    KDbQueryColumnInfo* visibleLookupColumnInfo = tvcol->visibleLookupColumnInfo();
+    const KDbQueryColumnInfo* visibleLookupColumnInfo = tvcol->visibleLookupColumnInfo();
     const KDbField *field = visibleLookupColumnInfo ? visibleLookupColumnInfo->field() : tvcol->field();
     d->sortColumn = column;
     d->realSortColumn = tvcol->columnInfo()->indexForVisibleLookupValue() != -1

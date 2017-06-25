@@ -119,7 +119,7 @@ public:
 
     //! Useful only for db-aware buffer: @return true if the value available as
     //! at( ci ) is obtained from column's default value
-    bool hasDefaultValueAt(KDbQueryColumnInfo *ci) const;
+    bool hasDefaultValueAt(const KDbQueryColumnInfo &ci) const;
 
     KDbRecordEditBuffer::SimpleMap simpleBuffer() const;
 
