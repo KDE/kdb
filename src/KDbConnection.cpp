@@ -2691,12 +2691,9 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
     if (!ok)
         return nullptr;
     KDbField::Type f_type = (KDbField::Type)f_int_type;
-    int f_len = qMax(0, data.at(3).toInt(&ok)); // defined limit
+    const int f_len = qMax(0, data.at(3).toInt(&ok)); // defined limit
     if (!ok) {
         return nullptr;
-    }
-    if (f_len < 0) {
-        f_len = 0;
     }
 //! @todo load maxLengthStrategy info to see if the maxLength is the default
 
