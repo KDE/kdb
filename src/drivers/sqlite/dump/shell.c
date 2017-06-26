@@ -406,6 +406,7 @@ static int table_size(struct callback_data *p, const unsigned char* table)
   strcat(sql, (const char*)table);
   /*fprintf(stderr, "%s", sql);*/
   rc = sqlite3_prepare(p->db, sql, -1, &pSelect, 0);
+  free(sql);
   if( rc!=SQLITE_OK || !pSelect ){
     fprintf(p->out, "/**** ERROR: (%d) %s *****/\n", rc, sqlite3_errmsg(p->db));
     return -1;
