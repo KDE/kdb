@@ -93,9 +93,12 @@ public Q_SLOTS:
 
 protected Q_SLOTS:
     void slotTimeout();
+    void accept() override;
     void reject() override;
 
 protected:
+    void finish();
+
     QPointer<ConnectionTestThread> m_thread;
     KDbConnectionData m_connData;
     QTimer m_timer;
@@ -204,22 +207,22 @@ int ConnectionTestDialog::exec()
 void ConnectionTestDialog::slotTimeout()
 {
     //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
-    kdbDebug() << m_error;
+    //kdbDebug() << m_error;
     bool notResponding = false;
     if (m_elapsedTime >= 1000*5) {//5 seconds
         m_stopWaiting = true;
         notResponding = true;
     }
-    kdbDebug() << m_elapsedTime << m_stopWaiting << notResponding;
+    //kdbDebug() << m_elapsedTime << m_stopWaiting << notResponding;
     if (m_stopWaiting) {
         m_timer.disconnect(this);
         m_timer.stop();
-        reject();
-        kdbDebug() << "after reject";
         QString message;
         QString details;
         KDbMessageHandler::MessageType type;
         if (m_error) {
+            reject();
+            //kdbDebug() << "after reject";
             message = tr("Test connection to \"%1\" database server failed.")
                          .arg(m_connData.toUserVisibleString());
             details = m_msg;
@@ -229,10 +232,14 @@ void ConnectionTestDialog::slotTimeout()
             type = KDbMessageHandler::Sorry;
             m_error = false;
         } else if (notResponding) {
+            reject();
+            //kdbDebug() << "after reject";
             message = tr("Test connection to \"%1\" database server failed. The server is not responding.")
                          .arg(m_connData.toUserVisibleString());
             type = KDbMessageHandler::Sorry;
         } else {
+            accept();
+            //kdbDebug() << "after accept";
             message = tr("Test connection to \"%1\" database server established successfully.")
                          .arg(m_connData.toUserVisibleString()),
             type = KDbMessageHandler::Information;
@@ -249,24 +256,35 @@ void ConnectionTestDialog::slotTimeout()
 void ConnectionTestDialog::error(const QString& msg, const QString& details)
 {
     //kdbDebug() << "tid:" << QThread::currentThread() << "this_thread:" << thread();
-    kdbDebug() << msg << details;
+    //kdbDebug() << msg << details;
     m_stopWaiting = true;
     m_msg = msg;
     m_details = details;
     m_error = !msg.isEmpty() || !details.isEmpty();
     if (m_error) {
-        kdbDebug() << "ERR!";
+        kdbDebug() << "Error:" << msg << details;
     }
 }
 
+void ConnectionTestDialog::accept()
+{
+    finish();
+    QProgressDialog::accept(); // krazy:exclude=qclasses
+}
+
 void ConnectionTestDialog::reject()
+{
+    finish();
+    QProgressDialog::reject(); // krazy:exclude=qclasses
+}
+
+void ConnectionTestDialog::finish()
 {
     if (m_thread->isRunning()) {
         m_thread->terminate();
     }
     m_timer.disconnect(this);
     m_timer.stop();
-    QProgressDialog::reject(); // krazy:exclude=qclasses
 }
 
 // ----
@@ -556,11 +574,15 @@ tristate KDb::idForObjectName(KDbConnection* conn, int *id, const QString& objNa
 
 //-----------------------------------------
 
-void KDb::connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
-                               KDbMessageHandler* msgHandler)
+tristate KDb::showConnectionTestDialog(QWidget *parent, const KDbConnectionData &data,
+                                   KDbMessageHandler *msgHandler)
 {
     ConnectionTestDialog dlg(data, msgHandler, parent);
-    dlg.exec();
+    const int result = dlg.exec();
+    if (dlg.wasCanceled()) {
+        return cancelled;
+    }
+    return result == QDialog::Accepted;
 }
 
 int KDb::recordCount(KDbConnection* conn, const KDbEscapedString& sql)

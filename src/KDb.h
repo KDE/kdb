@@ -240,12 +240,23 @@ KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
  has neither table or query assigned. */
 KDB_EXPORT int fieldCount(KDbTableOrQuerySchema* tableOrQuery);
 
-/*! shows connection test dialog with a progress bar indicating connection testing
- (within a second thread).
- @a data is used to perform a (temporary) test connection. @a msgHandler is used to display errors.
- On successful connecting, a message is displayed. After testing, temporary connection is closed. */
-KDB_EXPORT void connectionTestDialog(QWidget* parent, const KDbConnectionData& data,
-        KDbMessageHandler* msgHandler);
+/**
+ * @brief Shows connection test dialog
+ *
+ * Shows connection test dialog with a progress bar indicating connection testing
+ * (within a separate thread). @a data is used to perform a (temporary) test connection.
+ * @a msgHandler can be used for error handling. @a parent is used as dialog's parent widget.
+ *
+ * The dialog is modal so the call is blocking.
+ *
+ * On successful connecting, a successfull message of type KDbMessageHandler::Information is passed
+ * to @a msgHandler. After testing, temporary connection is closed.
+ *
+ * @return @c true for successfull connecting, @c for failed connecting and @c cancelled if the test
+ * has been cancelled.
+ */
+KDB_EXPORT tristate showConnectionTestDialog(QWidget* parent, const KDbConnectionData& data,
+                                             KDbMessageHandler* msgHandler);
 
 //! Used in splitToTableAndFieldParts().
 enum SplitToTableAndFieldPartsOptions {
