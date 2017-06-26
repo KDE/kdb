@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
    Copyright (c) 2006, 2007 Thomas Braxton <kde.braxton@gmail.com>
    Copyright (c) 1999 Preston Brown <pbrown@kde.org>
    Copyright (c) 1997 Matthias Kalle Dalheimer <kalle@kde.org>
@@ -1382,6 +1382,16 @@ QString KDb::escapeString(const QString& string)
     }
     newString.append(QLatin1Char(quote));
     return newString;
+}
+
+KDbEscapedString KDb::escapeString(KDbDriver *drv, const QString& string)
+{
+    return drv ? drv->escapeString(string) : KDbEscapedString(KDb::escapeString(string));
+}
+
+KDbEscapedString KDb::escapeString(KDbConnection *conn, const QString& string)
+{
+    return conn ? conn->escapeString(string) : KDbEscapedString(KDb::escapeString(string));
 }
 
 //! @see handleHex()

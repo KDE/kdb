@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -427,6 +427,26 @@ KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
     Use it for user-visible backend-independent statements.
     @see unescapeString() */
 KDB_EXPORT QString escapeString(const QString& string);
+
+/**
+ * @brief Returns escaped string @a string
+ *
+ * If @a drv driver is present, it is used to perform escaping, otherwise escapeString() is used
+ * so the KDbSQL dialect-escaping is performed.
+ *
+ * @since 3.1.0
+ */
+KDB_EXPORT KDbEscapedString escapeString(KDbDriver *drv, const QString& string);
+
+/**
+ * @brief Returns escaped string @a string
+ *
+ * If @a conn is present, its driver is used to perform escaping, otherwise escapeString() is used
+ * so the KDbSQL dialect-escaping is performed.
+ *
+ * @since 3.1.0
+ */
+KDB_EXPORT KDbEscapedString escapeString(KDbConnection *conn, const QString& string);
 
 //! Unescapes characters in string @a string for the KDbSQL dialect.
 /** The operation depends on @a quote character, which can be be ' or ".

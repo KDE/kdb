@@ -500,6 +500,22 @@ KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
     Also escapes \\n, \\r, \\t, \\\\, \\0.
     Use it for user-visible backend-independent statements. */
 KDB_EXPORT QString escapeString(const QString& string);
+
+/**
+ * @brief Returns escaped string @a string
+ *
+ * If @a drv driver is present, it is used to perform escaping, otherwise escapeString() is used
+ * so the KDbSQL dialect-escaping is performed.
+ */
+KDB_EXPORT KDbEscapedString escapeString(KDbDriver *drv, const QString& string);
+
+/**
+ * @brief Returns escaped string @a string
+ *
+ * If @a conn is present, its driver is used to perform escaping, otherwise escapeString() is used
+ * so the KDbSQL dialect-escaping is performed.
+ */
+KDB_EXPORT KDbEscapedString escapeString(KDbConnection *conn, const QString& string);
 #endif
 
 void KDbTest::testUnescapeString_data()
