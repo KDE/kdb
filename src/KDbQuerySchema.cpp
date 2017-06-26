@@ -157,7 +157,7 @@ bool KDbQuerySchema::insertFieldInternal(int position, KDbField *field,
         return false;
     }
 
-    if (position > m_fields.count()) {
+    if (position > fieldCount()) {
         kdbWarning() << "position" << position << "out of range";
         return false;
     }
@@ -229,22 +229,22 @@ int KDbQuerySchema::tableBoundToColumn(int columnPosition) const
 
 bool KDbQuerySchema::addField(KDbField* field)
 {
-    return insertField(m_fields.count(), field);
+    return insertField(fieldCount(), field);
 }
 
 bool KDbQuerySchema::addField(KDbField* field, int bindToTable)
 {
-    return insertField(m_fields.count(), field, bindToTable);
+    return insertField(fieldCount(), field, bindToTable);
 }
 
 bool KDbQuerySchema::addInvisibleField(KDbField* field)
 {
-    return insertInvisibleField(m_fields.count(), field);
+    return insertInvisibleField(fieldCount(), field);
 }
 
 bool KDbQuerySchema::addInvisibleField(KDbField* field, int bindToTable)
 {
-    return insertInvisibleField(m_fields.count(), field, bindToTable);
+    return insertInvisibleField(fieldCount(), field, bindToTable);
 }
 
 bool KDbQuerySchema::removeField(KDbField *field)
@@ -573,7 +573,7 @@ bool KDbQuerySchema::hasColumnAlias(int position) const
 
 void KDbQuerySchema::setColumnAlias(int position, const QString& alias)
 {
-    if (position >= m_fields.count()) {
+    if (position >= fieldCount()) {
         kdbWarning() << "position"  << position << "out of range!";
         return;
     }
@@ -833,7 +833,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
     int i = 0;
     int numberOfColumnsWithMultipleVisibleFields = 0; //used to find an unique name for anonymous field
     int fieldPosition = -1;
-    foreach(KDbField *f, m_fields) {
+    for (KDbField *f : *fields()) {
         fieldPosition++;
         if (f->isQueryAsterisk()) {
             if (static_cast<KDbQueryAsterisk*>(f)->isSingleTableAsterisk()) {

@@ -411,7 +411,7 @@ tristate KDbAlterTableHandler::ChangeFieldPropertyAction::updateTableSchema(KDbT
         if (fieldHash->value(field->name()) == field->name())
             fieldHash->remove(field->name());
         fieldHash->insert(newValue().toString(), field->name());
-        table->renameField(field, newValue().toString());
+        (void)table->renameField(field, newValue().toString());
         return true;
     }
     return cancelled;

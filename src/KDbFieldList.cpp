@@ -21,20 +21,62 @@
 #include "KDbConnection.h"
 #include "kdb_debug.h"
 
-KDbFieldList::KDbFieldList(bool owner)
-        : m_fields(owner)
-        , m_autoinc_fields(nullptr)
+class Q_DECL_HIDDEN KDbFieldList::Private
 {
+public:
+    Private()
+    {
+    }
+    ~Private()
+    {
+        delete autoincFields;
+    }
+
+    //! Clear cached autoinc fields list
+    void clearAutoincFields()
+    {
+        delete autoincFields;
+        autoincFields = nullptr;
+    }
+
+    bool renameFieldInternal(KDbField *field, const QString& newNameLower)
+    {
+        if (fieldsByName.value(newNameLower)) {
+            kdbWarning() << "Field" << newNameLower << "already exists";
+            return false;
+        }
+        fieldsByName.remove(field->name().toLower());
+        field->setName(newNameLower);
+        fieldsByName.insert(newNameLower, field);
+        return true;
+    }
+
+    KDbField::List fields;
+
+    //!< Fields collected by name. Not used by KDbQuerySchema.
+    QHash<QString, KDbField*> fieldsByName;
+
+    KDbField::List *autoincFields = nullptr;
+
+    //! cached
+    KDbEscapedString sqlFields;
+};
+
+//-------------------------------------------------------
+
+KDbFieldList::KDbFieldList(bool owner)
+        : d(new Private)
+{
+    d->fields.setAutoDelete(owner);
 }
 
 //! @todo IMPORTANT: (API) improve deepCopyFields
 KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
-        : m_fields(fl.m_fields.autoDelete())
-        , m_autoinc_fields(nullptr)
+        : KDbFieldList(fl.d->fields.autoDelete())
 {
     if (deepCopyFields) {
         //deep copy for the fields
-        foreach(KDbField *origField, fl.m_fields) {
+        for (KDbField *origField : *fl.fields()) {
             KDbField *f = origField->copy();
             if (origField->parent() == &fl) {
                 f->setParent(this);
@@ -47,26 +89,35 @@ KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
 
 KDbFieldList::~KDbFieldList()
 {
-    delete m_autoinc_fields;
+    delete d;
+}
+
+KDbField::List *KDbFieldList::fields()
+{
+    return &d->fields;
+}
+
+const KDbField::List* KDbFieldList::fields() const
+{
+    return &d->fields;
 }
 
 int KDbFieldList::fieldCount() const
 {
-    return m_fields.count();
+    return d->fields.count();
 }
 
 bool KDbFieldList::isEmpty() const
 {
-    return m_fields.isEmpty();
+    return d->fields.isEmpty();
 }
 
 void KDbFieldList::clear()
 {
-    m_fields_by_name.clear();
-    delete m_autoinc_fields;
-    m_autoinc_fields = nullptr;
-    m_fields.clear();
-    m_sqlFields.clear();
+    d->fieldsByName.clear();
+    d->clearAutoincFields();
+    d->fields.clear();
+    d->sqlFields.clear();
 }
 
 bool KDbFieldList::insertField(int index, KDbField *field)
@@ -75,110 +126,101 @@ bool KDbFieldList::insertField(int index, KDbField *field)
     if (!field) {
         return false;
     }
-    if (index > m_fields.count()) {
-        kdbCritical() << "index (" << index << ") out of range";
+    if (index > d->fields.count()) {
+        kdbWarning() << "index (" << index << ") out of range";
         return false;
     }
-    m_fields.insert(index, field);
-    if (!field->name().isEmpty())
-        m_fields_by_name.insert(field->name().toLower(), field);
-    m_sqlFields.clear();
-    delete m_autoinc_fields;
-    m_autoinc_fields = nullptr;
+    d->fields.insert(index, field);
+    if (!field->name().isEmpty()) {
+        d->fieldsByName.insert(field->name().toLower(), field);
+    }
+    d->sqlFields.clear();
+    d->clearAutoincFields();
     return true;
 }
 
-void KDbFieldList::renameField(const QString& oldName, const QString& newName)
+bool KDbFieldList::renameField(const QString& oldName, const QString& newName)
 {
-    KDbField *field = m_fields_by_name.value(oldName.toLower());
+    KDbField *field = d->fieldsByName.value(oldName.toLower());
     if (!field) {
-        kdbCritical() << "no field found" << QString::fromLatin1("\"%1\"").arg(oldName);
-        return;
+        kdbWarning() << "Fiels" << oldName << "not found";
+        return false;
     }
-    renameFieldInternal(field, newName.toLower());
+    return d->renameFieldInternal(field, newName.toLower());
 }
 
-void KDbFieldList::renameField(KDbField *field, const QString& newName)
+bool KDbFieldList::renameField(KDbField *field, const QString& newName)
 {
-    if (!field || field != m_fields_by_name.value(field->name().toLower())) {
-        kdbCritical() << "no field found"
+    if (!field || field != d->fieldsByName.value(field->name().toLower())) {
+        kdbWarning() << "No field found"
                       << QString::fromLatin1("\"%1\"").arg(field ? field->name() : QString());
-        return;
+        return false;
     }
-    renameFieldInternal(field, newName.toLower());
+    return d->renameFieldInternal(field, newName.toLower());
 }
-
-void KDbFieldList::renameFieldInternal(KDbField *field, const QString& newNameLower)
-{
-    m_fields_by_name.remove(field->name().toLower());
-    field->setName(newNameLower);
-    m_fields_by_name.insert(newNameLower, field);
-}
-
 
 bool KDbFieldList::addField(KDbField *field)
 {
-    return insertField(m_fields.count(), field);
+    return insertField(d->fields.count(), field);
 }
 
 bool KDbFieldList::removeField(KDbField *field)
 {
-    Q_ASSERT(field);
-    if (!field)
+    if (!field) {
         return false;
-    if (m_fields_by_name.remove(field->name().toLower()) < 1)
+    }
+    if (d->fieldsByName.remove(field->name().toLower()) < 1) {
         return false;
-    m_fields.removeAt(m_fields.indexOf(field));
-    m_sqlFields.clear();
-    delete m_autoinc_fields;
-    m_autoinc_fields = nullptr;
+    }
+    d->fields.removeAt(d->fields.indexOf(field));
+    d->sqlFields.clear();
+    d->clearAutoincFields();
     return true;
 }
 
 bool KDbFieldList::moveField(KDbField *field, int newIndex)
 {
     Q_ASSERT(field);
-    if (!field || !m_fields.removeOne(field)) {
+    if (!field || !d->fields.removeOne(field)) {
         return false;
     }
-    if (newIndex > m_fields.count()) {
-        newIndex = m_fields.count();
+    if (newIndex > d->fields.count()) {
+        newIndex = d->fields.count();
     }
-    m_fields.insert(newIndex, field);
-    m_sqlFields.clear();
-    delete m_autoinc_fields;
-    m_autoinc_fields = nullptr;
+    d->fields.insert(newIndex, field);
+    d->sqlFields.clear();
+    d->clearAutoincFields();
     return true;
 }
 
 KDbField* KDbFieldList::field(int id)
 {
-    return m_fields.value(id);
+    return d->fields.value(id);
 }
 
 const KDbField* KDbFieldList::field(int id) const
 {
-    return m_fields.value(id);
+    return d->fields.value(id);
 }
 
 KDbField* KDbFieldList::field(const QString& name)
 {
-    return m_fields_by_name.value(name.toLower());
+    return d->fieldsByName.value(name.toLower());
 }
 
 const KDbField* KDbFieldList::field(const QString& name) const
 {
-    return m_fields_by_name.value(name.toLower());
+    return d->fieldsByName.value(name.toLower());
 }
 
 bool KDbFieldList::hasField(const KDbField& field) const
 {
-    return m_fields.contains(const_cast<KDbField*>(&field));
+    return d->fields.contains(const_cast<KDbField*>(&field));
 }
 
 int KDbFieldList::indexOf(const KDbField& field) const
 {
-    return m_fields.indexOf(const_cast<KDbField*>(&field));
+    return d->fields.indexOf(const_cast<KDbField*>(&field));
 }
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
@@ -199,7 +241,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
 #define _ADD_FIELD(fname) \
     { \
         if (fname.isEmpty()) return fl; \
-        KDbField *f = m_fields_by_name.value(fname.toLower()); \
+        KDbField *f = d->fieldsByName.value(fname.toLower()); \
         if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(fname); delete fl; return 0; } \
     }
 
@@ -256,7 +298,7 @@ KDbFieldList* KDbFieldList::subList(const QStringList& list)
 #define _ADD_FIELD(fname) \
     { \
         if (fname.isEmpty()) return fl; \
-        KDbField *f = m_fields_by_name.value(QLatin1String(fname.toLower())); \
+        KDbField *f = d->fieldsByName.value(QLatin1String(fname.toLower())); \
         if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
     }
 
@@ -291,7 +333,7 @@ KDbFieldList* KDbFieldList::subList(const QList<int>& list)
 QStringList KDbFieldList::names() const
 {
     QStringList r;
-    foreach(KDbField *f, m_fields) {
+    for (KDbField *f : d->fields) {
         r += f->name().toLower();
     }
     return r;
@@ -299,22 +341,17 @@ QStringList KDbFieldList::names() const
 
 KDbField::ListIterator KDbFieldList::fieldsIterator() const
 {
-    return m_fields.constBegin();
+    return d->fields.constBegin();
 }
 
 KDbField::ListIterator KDbFieldList::fieldsIteratorConstEnd() const
 {
-    return m_fields.constEnd();
-}
-
-const KDbField::List* KDbFieldList::fields() const
-{
-    return &m_fields;
+    return d->fields.constEnd();
 }
 
 bool KDbFieldList::isOwner() const
 {
-    return m_fields.autoDelete();
+    return d->fields.autoDelete();
 }
 
 //static
@@ -351,24 +388,23 @@ KDbEscapedString KDbFieldList::sqlFieldsList(KDbConnection *conn,
                                  const QString& separator, const QString& tableOrAlias,
                                  KDb::IdentifierEscapingType escapingType) const
 {
-    if (!m_sqlFields.isEmpty())
-        return m_sqlFields;
+    if (!d->sqlFields.isEmpty())
+        return d->sqlFields;
 
-    m_sqlFields = KDbFieldList::sqlFieldsList(m_fields, conn, separator, tableOrAlias, escapingType);
-    return m_sqlFields;
+    d->sqlFields = KDbFieldList::sqlFieldsList(d->fields, conn, separator, tableOrAlias, escapingType);
+    return d->sqlFields;
 }
 
 KDbField::List* KDbFieldList::autoIncrementFields() const
 {
-    if (m_autoinc_fields)
-        return m_autoinc_fields;
+    if (d->autoincFields)
+        return d->autoincFields;
 
-    m_autoinc_fields = new KDbField::List();
-    m_autoinc_fields->setAutoDelete(false);
-    foreach(KDbField *f, m_fields) {
+    d->autoincFields = new KDbField::List(false);
+    for (KDbField *f : d->fields) {
         if (f->isAutoIncrement()) {
-            m_autoinc_fields->append(f);
+            d->autoincFields->append(f);
         }
     }
-    return m_autoinc_fields;
+    return d->autoincFields;
 }

@@ -426,7 +426,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
     sql = KDbEscapedString("CREATE TABLE ")
             + KDb::escapeIdentifier(driver, tableSchema.name()) + " (";
     bool first = true;
-    foreach(KDbField *field, tableSchema.m_fields) {
+    for (const KDbField *field : *tableSchema.fields()) {
         if (first)
             first = false;
         else

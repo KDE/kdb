@@ -197,7 +197,7 @@ void KDbIndexSchema::setForeignKey(bool set)
         setUnique(false);
     }
     if (fieldCount() == 1) {
-        m_fields.first()->setForeignKey(true);
+        fields()->first()->setForeignKey(true);
     }
 }
 

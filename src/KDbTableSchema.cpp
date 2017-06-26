@@ -246,16 +246,17 @@ void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
 bool KDbTableSchema::insertField(int index, KDbField *field)
 {
     Q_ASSERT(field);
+    KDbField::List *fieldsList = fields();
     KDbFieldList::insertField(index, field);
-    if (!field || index > m_fields.count()) {
+    if (!field || index > fieldsList->count()) {
         return false;
     }
     field->setTable(this);
     field->setOrder(index);
     //update order for next next fields
-    const int fieldCount = m_fields.count();
+    const int fieldCount = fieldsList->count();
     for (int i = index + 1; i < fieldCount; i++) {
-        m_fields.at(i)->setOrder(i);
+        fieldsList->at(i)->setOrder(i);
     }
 
     //Check for auto-generated indices:
@@ -314,7 +315,7 @@ void KDbTableSchema::clear()
 QDebug KDbTableSchema::debugFields(QDebug dbg) const
 {
     dbg.nospace() << static_cast<const KDbFieldList&>(*this);
-    foreach(const KDbField *f, m_fields) {
+    for (const KDbField *f : *fields()) {
         const KDbLookupFieldSchema *lookupSchema = lookupFieldSchema(*f);
         if (lookupSchema)
             dbg.nospace() << '\n' << f->name() << *lookupSchema;
@@ -360,7 +361,7 @@ KDbField* KDbTableSchema::anyNonPKField()
 {
     if (!d->anyNonPKField) {
         KDbField *f = nullptr;
-        for (QListIterator<KDbField*> it(m_fields); it.hasPrevious();) {
+        for (QListIterator<KDbField*> it(*fields()); it.hasPrevious();) {
             f = it.previous();
             if (!f->isPrimaryKey() && (!d->pkey || !d->pkey->hasField(*f)))
                 break;
@@ -413,7 +414,7 @@ QVector<KDbLookupFieldSchema*> KDbTableSchema::lookupFields() const
     d->lookupFieldsList.clear();
     d->lookupFieldsList.resize(d->lookupFields.count());
     int i = 0;
-    foreach(KDbField* f, m_fields) {
+    for (KDbField* f : *fields()) {
         QHash<const KDbField*, KDbLookupFieldSchema*>::ConstIterator itMap = d->lookupFields.constFind(f);
         if (itMap != d->lookupFields.constEnd()) {
             d->lookupFieldsList[i] = itMap.value();

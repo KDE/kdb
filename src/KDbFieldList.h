@@ -59,7 +59,9 @@ public:
     /*! Adds @a field at the and of field list. */
     bool addField(KDbField *field);
 
-    /*! Inserts @a field into a specified position (@a index).
+    /*! Inserts @a field into a specified @a index position.
+
+     @c false is returned if @a field is @c nullptr or @a index is invalid.
 
      Note: You can reimplement this method but you should still call
      this implementation in your subclass. */
@@ -99,10 +101,16 @@ public:
     /*! @return list of field names for this list. */
     QStringList names() const;
 
+    //! @return iterator for fields
     KDbField::ListIterator fieldsIterator() const;
 
+    //! @return iterator for fields
     KDbField::ListIterator fieldsIteratorConstEnd() const;
 
+    //! @return list of fields
+    KDbField::List *fields();
+
+    //! @overload
     const KDbField::List* fields() const;
 
     /*! @return list of autoincremented fields. The list is owned by this KDbFieldList object. */
@@ -166,24 +174,21 @@ public:
                                        const QString& tableOrAlias = QString(),
                                        KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping);
 
-    /*! @internal Renames field @a oldName to @a newName.
-     Do not use this for physical renaming columns. Use KDbAlterTableHandler instead. */
-    void renameField(const QString& oldName, const QString& newName);
+    /*! Renames field @a oldName to @a newName.
 
-    /*! @internal
-     @overload void renameField(const QString& oldName, const QString& newName) */
-    void renameField(KDbField *field, const QString& newName);
+     @c false is returned if field with @a oldName name does not exist or field with @a newName name
+     already exists.
 
-protected:
-    KDbField::List m_fields;
-    mutable QHash<QString, KDbField*> m_fields_by_name; //!< Fields collected by name. Not used by KDbQuerySchema.
-    mutable KDbField::List *m_autoinc_fields;
+     @note Do not use this for physical renaming columns. Use KDbAlterTableHandler instead.
+    */
+    bool renameField(const QString& oldName, const QString& newName);
+
+    //! @overload
+    bool renameField(KDbField *field, const QString& newName);
 
 private:
-    void renameFieldInternal(KDbField *field, const QString& newNameLower);
-
-    //! cached
-    mutable KDbEscapedString m_sqlFields;
+    class Private;
+    Private * const d;
 };
 
 //! Sends information about field list  @a list to debug output @a dbg.
