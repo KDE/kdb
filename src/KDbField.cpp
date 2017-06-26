@@ -115,7 +115,7 @@ FieldTypeGroupNames::FieldTypeGroupNames()
 
 //-------------------------------------------------------
 
-class KDbField::Private
+class Q_DECL_HIDDEN KDbField::Private
 {
 public:
     Private(KDbFieldList *aParent = nullptr, int aOrder = -1)
