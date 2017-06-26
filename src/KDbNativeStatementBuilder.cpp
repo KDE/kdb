@@ -217,7 +217,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
                     KDbEscapedString internalUniqueQueryAlias
-                        = kdb_subquery_prefix + connection->escapeString(lookupQuery->name()) + '_'
+                        = kdb_subquery_prefix + KDb::escapeString(connection, lookupQuery->name()) + '_'
                         + QString::number(internalUniqueQueryAliasNumber++);
                     KDbNativeStatementBuilder builder(connection);
                     KDbEscapedString subSql;
