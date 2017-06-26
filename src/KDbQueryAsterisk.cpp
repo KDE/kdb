@@ -43,11 +43,10 @@ KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema &
 }
 
 KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema *table)
-    : KDbField()
+    : KDbField(query, -1)
     , d(new Private(table))
 {
     Q_ASSERT(query);
-    m_parent = query;
     setType(KDbField::Asterisk);
 }
 
@@ -64,17 +63,17 @@ KDbQueryAsterisk::~KDbQueryAsterisk()
 
 bool KDbQueryAsterisk::operator==(const KDbQueryAsterisk& other) const
 {
-    return d->table == other.d->table && m_parent == other.m_parent;
+    return d->table == other.d->table && parent() == other.parent();
 }
 
 KDbQuerySchema *KDbQueryAsterisk::query()
 {
-    return static_cast<KDbQuerySchema*>(m_parent);
+    return static_cast<KDbQuerySchema*>(parent());
 }
 
 const KDbQuerySchema *KDbQueryAsterisk::query() const
 {
-    return static_cast<const KDbQuerySchema*>(m_parent);
+    return static_cast<const KDbQuerySchema*>(parent());
 }
 
 const KDbTableSchema* KDbQueryAsterisk::table() const

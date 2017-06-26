@@ -1,7 +1,7 @@
 /* This file is part of the KDE project
    Copyright (C) 2002 Lucijan Busch <lucijan@gmx.at>
    Copyright (C) 2002 Joseph Wenninger <jowenn@kde.org>
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -33,10 +33,10 @@
 #include <assert.h>
 
 //! @todo make this configurable
-static int m_defaultMaxLength = 0; // unlimited
+static int g_defaultMaxLength = 0; // unlimited
 
 //-------------------------------------------------------
-//! @internal Used in m_typeNames member to handle translated type names
+//! @internal Used in s_typeNames member to handle translated type names
 class FieldTypeNames : public QVector<QString>
 {
 public:
@@ -115,78 +115,236 @@ FieldTypeGroupNames::FieldTypeGroupNames()
 
 //-------------------------------------------------------
 
-KDbField::KDbField()
+class KDbField::Private
 {
-    init();
+public:
+    Private(KDbFieldList *aParent = nullptr, int aOrder = -1)
+        : parent(aParent)
+        , type(KDbField::InvalidType)
+        , precision(0)
+        , options(KDbField::NoOptions)
+        , defaultValue(QString())
+        , order(aOrder)
+    {
+    }
+    Private(const QString &aName, KDbField::Type aType, KDbField::Options aOptions, int aPrecision,
+            const QVariant &aDefaultValue, const QString &aCaption, const QString &aDescription)
+        : parent(nullptr)
+        , type(aType)
+        , name(aName)
+        , caption(aCaption)
+        , description(aDescription)
+        , precision(aPrecision)
+        , options(aOptions)
+        , defaultValue(aDefaultValue)
+        , order(-1)
+    {
+    }
+    Private(const Private &o)
+    {
+        (*this) = o;
+        if (o.customProperties) {
+            customProperties = new CustomPropertiesMap(*o.customProperties);
+        }
+        if (!o.expr.isNull()) {//deep copy the expression
+    //! @todo  expr = new KDbExpression(o.expr);
+                expr = KDbExpression(o.expr.clone());
+        } else {
+            expr = KDbExpression();
+        }
+    }
+
+    ~Private() {
+        delete customProperties;
+    }
+
+    //! In most cases this points to a KDbTableSchema object that field is assigned
+    KDbFieldList *parent;
+    KDbField::Type type;
+    QString name;
+    QString caption;
+    QString description;
+    QString subType;
+    KDbField::Constraints constraints;
+    KDbField::MaxLengthStrategy maxLengthStrategy;
+    int maxLength; //!< also used for storing scale for floating point types
+    int precision;
+    int visibleDecimalPlaces = -1; //!< used in visibleDecimalPlaces()
+    KDbField::Options options;
+    QVariant defaultValue;
+    int order;
+    KDbExpression expr;
+    KDbField::CustomPropertiesMap* customProperties = nullptr;
+    QVector<QString> hints;
+};
+
+//-------------------------------------------------------
+
+KDbField::KDbField()
+    : d(new Private)
+{
+    setMaxLength(0); // do not move this line up!
+    setMaxLengthStrategy(DefinedMaxLength); // do not move this line up!
     setConstraints(NoConstraints);
 }
 
+KDbField::KDbField(KDbFieldList *aParent, int aOrder)
+    : d(new Private(aParent, aOrder))
+{
+    setMaxLength(0); // do not move this line up!
+    setMaxLengthStrategy(DefinedMaxLength); // do not move this line up!
+    setConstraints(NoConstraints);
+}
 
 KDbField::KDbField(KDbTableSchema *tableSchema)
+    : KDbField(tableSchema, tableSchema->fieldCount())
 {
-    init();
-    m_parent = tableSchema;
-    m_order = tableSchema->fieldCount();
-    setConstraints(NoConstraints);
 }
 
 KDbField::KDbField(KDbQuerySchema *querySchema, const KDbExpression& expr)
+    : KDbField(querySchema, querySchema->fieldCount())
 {
-    init();
-    m_parent = querySchema;
-    m_order = querySchema->fieldCount();
-    setConstraints(NoConstraints);
     setExpression(expr);
 }
 
 KDbField::KDbField(KDbQuerySchema *querySchema)
+    : KDbField(querySchema, querySchema->fieldCount())
 {
-    init();
-    m_parent = querySchema;
-    m_order = querySchema->fieldCount();
-    setConstraints(NoConstraints);
 }
 
-KDbField::KDbField(const QString& name, Type type,
-             Constraints constr, Options options, int maxLength, int precision,
-             QVariant defaultValue, const QString& caption, const QString& description)
-        : m_parent(nullptr)
-        , m_name(name.toLower())
-        , m_precision(precision)
-        , m_visibleDecimalPlaces(-1)
-        , m_options(options)
-        , m_defaultValue(defaultValue)
-        , m_order(-1)
-        , m_caption(caption)
-        , m_desc(description)
-        , m_customProperties(nullptr)
-        , m_type(type)
+KDbField::KDbField(const QString &name, Type type, Constraints constr, Options options,
+                   int maxLength, int precision, const QVariant &defaultValue,
+                   const QString &caption, const QString &description)
+    : d(new Private(name, type, options, precision, defaultValue, caption, description))
 {
-    m_expr = new KDbExpression();
     setMaxLength(maxLength);
     setConstraints(constr);
 }
 
 /*! Copy constructor. */
 KDbField::KDbField(const KDbField &f)
+    : d(new Private(*f.d))
 {
-    (*this) = f;
-    if (f.m_customProperties)
-        m_customProperties = new CustomPropertiesMap(f.customProperties());
-
-    if (!f.m_expr->isNull()) {//deep copy the expression
-//! @todo  m_expr = new KDbExpression(*f.m_expr);
-            m_expr = new KDbExpression(f.m_expr->clone());
-    }
-    else {
-        m_expr = new KDbExpression();
-    }
 }
 
 KDbField::~KDbField()
 {
-    delete m_customProperties;
-    delete m_expr;
+    delete d;
+}
+
+KDbFieldList *KDbField::parent()
+{
+    return d->parent;
+}
+
+const KDbFieldList *KDbField::parent() const
+{
+    return d->parent;
+}
+
+void KDbField::setParent(KDbFieldList *parent)
+{
+    d->parent = parent;
+}
+
+QString KDbField::name() const
+{
+    return d->name;
+}
+
+KDbField::Options KDbField::options() const
+{
+    return d->options;
+}
+
+void KDbField::setOptions(Options options)
+{
+    d->options = options;
+}
+
+QString KDbField::subType() const
+{
+    return d->subType;
+}
+
+void KDbField::setSubType(const QString& subType)
+{
+    d->subType = subType;
+}
+
+QVariant KDbField::defaultValue() const
+{
+    return d->defaultValue;
+}
+
+int KDbField::precision() const
+{
+    return d->precision;
+}
+
+int KDbField::scale() const
+{
+    return d->maxLength;
+}
+
+int KDbField::visibleDecimalPlaces() const
+{
+    return d->visibleDecimalPlaces;
+}
+
+KDbField::Constraints KDbField::constraints() const
+{
+    return d->constraints;
+}
+
+int KDbField::order() const
+{
+    return d->order;
+}
+
+void KDbField::setOrder(int order)
+{
+    d->order = order;
+}
+
+QString KDbField::caption() const
+{
+    return d->caption;
+}
+
+void KDbField::setCaption(const QString& caption)
+{
+    d->caption = caption;
+}
+
+QString KDbField::captionOrName() const
+{
+    return d->caption.isEmpty() ? d->name : d->caption;
+}
+
+QString KDbField::description() const
+{
+    return d->description;
+}
+
+void KDbField::setDescription(const QString& description)
+{
+    d->description = description;
+}
+
+QVector<QString> KDbField::enumHints() const
+{
+    return d->hints;
+}
+
+QString KDbField::enumHint(int num)
+{
+    return (num < d->hints.size()) ? d->hints.at(num) : QString();
+}
+
+void KDbField::setEnumHints(const QVector<QString> &hints)
+{
+    d->hints = hints;
 }
 
 // static
@@ -212,26 +370,12 @@ KDbField* KDbField::copy()
     return new KDbField(*this);
 }
 
-void KDbField::init()
-{
-    m_parent = nullptr;
-    m_type = InvalidType;
-    m_precision = 0;
-    m_visibleDecimalPlaces = -1;
-    m_options = NoOptions;
-    m_defaultValue = QVariant(QString());
-    m_order = -1;
-    m_customProperties = nullptr;
-    m_expr = new KDbExpression();
-    setMaxLength(0); // do not move this line up!
-    setMaxLengthStrategy(DefinedMaxLength); // do not move this line up!
-}
-
 KDbField::Type KDbField::type() const
 {
-    if (!m_expr->isNull())
-        return m_expr->type();
-    return m_type;
+    if (!d->expr.isNull()) {
+        return d->expr.type();
+    }
+    return d->type;
 }
 
 QVariant::Type KDbField::variantType(Type type)
@@ -433,56 +577,52 @@ KDbField::TypeGroup KDbField::typeGroup(Type type)
 
 KDbTableSchema* KDbField::table()
 {
-    return dynamic_cast<KDbTableSchema*>(m_parent);
+    return dynamic_cast<KDbTableSchema*>(d->parent);
 }
 
 const KDbTableSchema* KDbField::table() const
 {
-    return dynamic_cast<const KDbTableSchema*>(m_parent);
+    return dynamic_cast<const KDbTableSchema*>(d->parent);
 }
 
-void
-KDbField::setTable(KDbTableSchema *tableSchema)
+void KDbField::setTable(KDbTableSchema *tableSchema)
 {
-    m_parent = tableSchema;
+    d->parent = tableSchema;
 }
 
 KDbQuerySchema* KDbField::query()
 {
-    return dynamic_cast<KDbQuerySchema*>(m_parent);
+    return dynamic_cast<KDbQuerySchema*>(d->parent);
 }
 
 const KDbQuerySchema* KDbField::query() const
 {
-    return dynamic_cast<const KDbQuerySchema*>(m_parent);
+    return dynamic_cast<const KDbQuerySchema*>(d->parent);
 }
 
-void
-KDbField::setQuery(KDbQuerySchema *querySchema)
+void KDbField::setQuery(KDbQuerySchema *querySchema)
 {
-    m_parent = querySchema;
+    d->parent = querySchema;
 }
 
-void
-KDbField::setName(const QString& name)
+void KDbField::setName(const QString& name)
 {
-    m_name = name.toLower();
+    d->name = name.toLower();
 }
 
-void
-KDbField::setType(Type t)
+void KDbField::setType(Type t)
 {
-    if (!m_expr->isNull()) {
-        kdbWarning() << "could not set type" << KDbField::typeName(t)
-                << "because the field has expression assigned!";
+    if (!d->expr.isNull()) {
+        kdbWarning() << "Could not set type" << KDbField::typeName(t)
+                     << "because the field has expression assigned!";
         return;
     }
-    m_type = t;
+    d->type = t;
 }
 
 void KDbField::setConstraints(Constraints c)
 {
-    m_constraints = c;
+    d->constraints = c;
     //pkey must be unique notnull
     if (isPrimaryKey()) {
         setPrimaryKey(true);
@@ -497,82 +637,79 @@ void KDbField::setConstraints(Constraints c)
 
 int KDbField::defaultMaxLength()
 {
-    return m_defaultMaxLength;
+    return g_defaultMaxLength;
 }
 
 void KDbField::setDefaultMaxLength(int maxLength)
 {
-    m_defaultMaxLength = maxLength;
+    g_defaultMaxLength = maxLength;
 }
 
 KDbField::MaxLengthStrategy KDbField::maxLengthStrategy() const
 {
-    return m_maxLengthStrategy;
+    return d->maxLengthStrategy;
 }
 
 void KDbField::setMaxLengthStrategy(MaxLengthStrategy strategy)
 {
-    m_maxLengthStrategy = strategy;
+    d->maxLengthStrategy = strategy;
 }
 
 int KDbField::maxLength() const
 {
-    return m_maxLength;
+    return d->maxLength;
 }
 
-void
-KDbField::setMaxLength(int maxLength)
+void KDbField::setMaxLength(int maxLength)
 {
-    m_maxLength = maxLength;
-    m_maxLengthStrategy = DefinedMaxLength;
+    d->maxLength = maxLength;
+    d->maxLengthStrategy = DefinedMaxLength;
 }
 
-void
-KDbField::setPrecision(int p)
+void KDbField::setPrecision(int p)
 {
-    if (!isFPNumericType())
+    if (!isFPNumericType()) {
         return;
-    m_precision = p;
+    }
+    d->precision = p;
 }
 
-void
-KDbField::setScale(int s)
+void KDbField::setScale(int s)
 {
-    if (!isFPNumericType())
+    if (!isFPNumericType()) {
         return;
-    m_maxLength = s;
+    }
+    d->maxLength = s;
 }
 
-void
-KDbField::setVisibleDecimalPlaces(int p)
+void KDbField::setVisibleDecimalPlaces(int p)
 {
-    if (!KDb::supportsVisibleDecimalPlacesProperty(type()))
+    if (!KDb::supportsVisibleDecimalPlacesProperty(type())) {
         return;
-    m_visibleDecimalPlaces = p < 0 ? -1 : p;
+    }
+    d->visibleDecimalPlaces = p < 0 ? -1 : p;
 }
 
-void
-KDbField::setUnsigned(bool u)
+void KDbField::setUnsigned(bool u)
 {
     if (!isIntegerType()) {
         return;
     }
-    m_options |= Unsigned;
-    if (!u)
-        m_options ^= Unsigned;
+    d->options |= Unsigned;
+    if (!u) {
+        d->options ^= Unsigned;
+    }
 }
 
-void
-KDbField::setDefaultValue(const QVariant& def)
+void KDbField::setDefaultValue(const QVariant& def)
 {
-    m_defaultValue = def;
+    d->defaultValue = def;
 }
 
-bool
-KDbField::setDefaultValue(const QByteArray& def)
+bool KDbField::setDefaultValue(const QByteArray& def)
 {
     if (def.isNull()) {
-        m_defaultValue = QVariant();
+        d->defaultValue = QVariant();
         return true;
     }
 
@@ -580,27 +717,35 @@ KDbField::setDefaultValue(const QByteArray& def)
     switch (type()) {
     case Byte: {
         unsigned int v = def.toUInt(&ok);
-        if (!ok || v > 255)
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(v);
+        if (!ok || v > 255) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(v);
+        }
         break;
     }
     case ShortInteger: {
         int v = def.toInt(&ok);
-        if (!ok || (!(m_options & Unsigned) && (v < -32768 || v > 32767)) || ((m_options & Unsigned) && (v < 0 || v > 65535)))
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(v);
+        if (!ok || (!(d->options & Unsigned) && (v < -32768 || v > 32767))
+            || ((d->options & Unsigned) && (v < 0 || v > 65535)))
+        {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(v);
+        }
         break;
     }
     case Integer: {//4 bytes
         long v = def.toLong(&ok);
-//! @todo    if (!ok || (!(m_options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))) || ((m_options & Unsigned) && (v < 0 || v > 0x100000000)))
-        if (!ok || (!(m_options & Unsigned) && (-v > (int)0x07FFFFFFF || v > (int)(0x080000000 - 1))))
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant((qint64)v);
+        //! @todo    if (!ok || (!(d->options & Unsigned) && (-v > 0x080000000 || v >
+        //! (0x080000000-1))) || ((d->options & Unsigned) && (v < 0 || v > 0x100000000)))
+        if (!ok || (!(d->options & Unsigned)
+                    && (-v > (int)0x07FFFFFFF || v > (int)(0x080000000 - 1))))
+        {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant((qint64)v);
+        }
         break;
     }
     case BigInteger: {//8 bytes
@@ -608,105 +753,115 @@ KDbField::setDefaultValue(const QByteArray& def)
         /*
               qint64 long v = def.toLongLong(&ok);
         //! @todo 2-part decoding
-              if (!ok || (!(m_options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))))
-                m_defaultValue = QVariant();
+              if (!ok || (!(d->options & Unsigned) && (-v > 0x080000000 || v > (0x080000000-1))))
+                d->defaultValue = QVariant();
               else
-                if (m_options & Unsigned)
-                  m_defaultValue=QVariant((quint64) v);
+                if (d->options & Unsigned)
+                  d->defaultValue=QVariant((quint64) v);
                 else
-                  m_defaultValue = QVariant((qint64)v);*/
+                  d->defaultValue = QVariant((qint64)v);*/
         break;
     }
     case Boolean: {
         unsigned short v = def.toUShort(&ok);
-        if (!ok || v > 1)
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant((bool)v);
+        if (!ok || v > 1) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant((bool)v);
+        }
         break;
     }
     case Date: {//YYYY-MM-DD
         QDate date = QDate::fromString(QLatin1String(def), Qt::ISODate);
-        if (!date.isValid())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(date);
+        if (!date.isValid()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(date);
+        }
         break;
     }
     case DateTime: {//YYYY-MM-DDTHH:MM:SS
         QDateTime dt = QDateTime::fromString(QLatin1String(def), Qt::ISODate);
-        if (!dt.isValid())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(dt);
+        if (!dt.isValid()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(dt);
+        }
         break;
     }
     case Time: {//HH:MM:SS
         QTime time = QTime::fromString(QLatin1String(def), Qt::ISODate);
-        if (!time.isValid())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(time);
+        if (!time.isValid()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(time);
+        }
         break;
     }
     case Float: {
         float v = def.toFloat(&ok);
-        if (!ok || ((m_options & Unsigned) && (v < 0.0)))
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(v);
+        if (!ok || ((d->options & Unsigned) && (v < 0.0))) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(v);
+        }
         break;
     }
     case Double: {
         double v = def.toDouble(&ok);
-        if (!ok || ((m_options & Unsigned) && (v < 0.0)))
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(v);
+        if (!ok || ((d->options & Unsigned) && (v < 0.0))) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(v);
+        }
         break;
     }
     case Text: {
-        if (def.isNull() || def.length() > maxLength())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(QLatin1String(def));
+        if (def.isNull() || def.length() > maxLength()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(QLatin1String(def));
+        }
         break;
     }
     case LongText: {
-        if (def.isNull())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(QLatin1String(def));
+        if (def.isNull()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(QLatin1String(def));
+        }
         break;
     }
     case BLOB: {
 //! @todo
-        if (def.isNull())
-            m_defaultValue = QVariant();
-        else
-            m_defaultValue = QVariant(def);
+        if (def.isNull()) {
+            d->defaultValue = QVariant();
+        } else {
+            d->defaultValue = QVariant(def);
+        }
         break;
     }
     default:
-        m_defaultValue = QVariant();
+        d->defaultValue = QVariant();
     }
-    return m_defaultValue.isNull();
+    return d->defaultValue.isNull();
 }
 
-void
-KDbField::setAutoIncrement(bool a)
+void KDbField::setAutoIncrement(bool a)
 {
-    if (a && !isAutoIncrementAllowed())
+    if (a && !isAutoIncrementAllowed()) {
         return;
-    if (isAutoIncrement() != a)
-        m_constraints ^= KDbField::AutoInc;
+    }
+    if (isAutoIncrement() != a) {
+        d->constraints ^= KDbField::AutoInc;
+    }
 }
 
-void
-KDbField::setPrimaryKey(bool p)
+void KDbField::setPrimaryKey(bool p)
 {
-    if (isPrimaryKey() != p)
-        m_constraints ^= KDbField::PrimaryKey;
+    if (isPrimaryKey() != p) {
+        d->constraints ^= KDbField::PrimaryKey;
+    }
     if (p) {//also set implied constraints
         setUniqueKey(true);
         setNotNull(true);
@@ -718,11 +873,10 @@ KDbField::setPrimaryKey(bool p)
     }
 }
 
-void
-KDbField::setUniqueKey(bool u)
+void KDbField::setUniqueKey(bool u)
 {
     if (isUniqueKey() != u) {
-        m_constraints ^= KDbField::Unique;
+        d->constraints ^= KDbField::Unique;
         if (u) { //also set implied constraints
             setNotNull(true);
             setIndexed(true);
@@ -730,30 +884,32 @@ KDbField::setUniqueKey(bool u)
     }
 }
 
-void
-KDbField::setForeignKey(bool f)
+void KDbField::setForeignKey(bool f)
 {
-    if (isForeignKey() != f)
-        m_constraints ^= KDbField::ForeignKey;
+    if (isForeignKey() != f) {
+        d->constraints ^= KDbField::ForeignKey;
+    }
 }
 
-void
-KDbField::setNotNull(bool n)
+void KDbField::setNotNull(bool n)
 {
-    if (isNotNull() != n)
-        m_constraints ^=KDbField::NotNull;
+    if (isNotNull() != n) {
+        d->constraints ^=KDbField::NotNull;
+    }
 }
 
 void KDbField::setNotEmpty(bool n)
 {
-    if (isNotEmpty() != n)
-        m_constraints ^= KDbField::NotEmpty;
+    if (isNotEmpty() != n) {
+        d->constraints ^= KDbField::NotEmpty;
+    }
 }
 
 void KDbField::setIndexed(bool s)
 {
-    if (isIndexed() != s)
-        m_constraints ^= KDbField::Indexed;
+    if (isIndexed() != s) {
+        d->constraints ^= KDbField::Indexed;
+    }
     if (!s) {//also set implied constraints
         setPrimaryKey(false);
         setUniqueKey(false);
@@ -842,45 +998,49 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, KDbField::TypeGroup typeGroup)
 
 bool KDbField::isExpression() const
 {
-    return !m_expr->isNull();
+    return !d->expr.isNull();
 }
 
 KDbExpression KDbField::expression()
 {
-    return *m_expr;
+    return d->expr;
 }
 
 const KDbExpression KDbField::expression() const
 {
-    return *m_expr;
+    return d->expr;
 }
 
 void KDbField::setExpression(const KDbExpression& expr)
 {
-    Q_ASSERT(!m_parent || dynamic_cast<KDbQuerySchema*>(m_parent));
-    if (*m_expr == expr)
+    Q_ASSERT(!d->parent || dynamic_cast<KDbQuerySchema*>(d->parent));
+    if (d->expr == expr) {
         return;
-    *m_expr = expr;
+    }
+    d->expr = expr;
 }
 
 QVariant KDbField::customProperty(const QByteArray& propertyName,
                                const QVariant& defaultValue) const
 {
-    if (!m_customProperties)
+    if (!d->customProperties) {
         return defaultValue;
-    return m_customProperties->value(propertyName, defaultValue);
+    }
+    return d->customProperties->value(propertyName, defaultValue);
 }
 
 void KDbField::setCustomProperty(const QByteArray& propertyName, const QVariant& value)
 {
-    if (propertyName.isEmpty())
+    if (propertyName.isEmpty()) {
         return;
-    if (!m_customProperties)
-        m_customProperties = new CustomPropertiesMap();
-    m_customProperties->insert(propertyName, value);
+    }
+    if (!d->customProperties) {
+        d->customProperties = new CustomPropertiesMap();
+    }
+    d->customProperties->insert(propertyName, value);
 }
 
 KDbField::CustomPropertiesMap KDbField::customProperties() const
 {
-    return m_customProperties ? *m_customProperties : CustomPropertiesMap();
+    return d->customProperties ? *d->customProperties : CustomPropertiesMap();
 }

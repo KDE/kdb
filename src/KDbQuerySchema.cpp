@@ -87,8 +87,8 @@ KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema)
         KDbField *copiedField;
         if (dynamic_cast<KDbQueryAsterisk*>(f)) {
             copiedField = f->copy();
-            if (static_cast<const KDbFieldList *>(f->m_parent) == &querySchema) {
-                copiedField->m_parent = this;
+            if (static_cast<const KDbFieldList *>(f->parent()) == &querySchema) {
+                copiedField->setParent(this);
             }
         }
         else {

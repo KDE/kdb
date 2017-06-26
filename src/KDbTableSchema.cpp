@@ -251,11 +251,12 @@ bool KDbTableSchema::insertField(int index, KDbField *field)
         return false;
     }
     field->setTable(this);
-    field->m_order = index;
+    field->setOrder(index);
     //update order for next next fields
     const int fieldCount = m_fields.count();
-    for (int i = index + 1; i < fieldCount; i++)
-        m_fields.at(i)->m_order = i;
+    for (int i = index + 1; i < fieldCount; i++) {
+        m_fields.at(i)->setOrder(i);
+    }
 
     //Check for auto-generated indices:
     KDbIndexSchema *idx = nullptr;

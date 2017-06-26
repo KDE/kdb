@@ -159,18 +159,21 @@ public:
 
     /*! Creates a database field with specified properties.
      For meaning of @a maxLength argument please refer to setMaxLength(). */
-    KDbField(const QString& name, Type type,
-          Constraints constr = NoConstraints,
-          Options options = NoOptions,
-          int maxLength = 0, int precision = 0,
-          QVariant defaultValue = QVariant(),
-          const QString& caption = QString(),
-          const QString& description = QString());
+    KDbField(const QString &name, Type type, Constraints constr = NoConstraints,
+             Options options = NoOptions, int maxLength = 0, int precision = 0,
+             const QVariant &defaultValue = QVariant(), const QString &caption = QString(),
+             const QString &description = QString());
 
     /*! Constructs a deep copy of field @a f. */
     KDbField(const KDbField &f);
 
     virtual ~KDbField();
+
+    //! @return parent for this field (table, query, etc.)
+    KDbFieldList *parent();
+
+    //! @overload
+    const KDbFieldList *parent() const;
 
     //! @return number of normal types available, i.e. types > InvalidType and <= LastType.
     static int typesCount();
@@ -241,9 +244,7 @@ public:
     static QString typeGroupString(TypeGroup typeGroup);
 
     /*! @return the name of this field */
-    inline QString name() const {
-        return m_name;
-    }
+    QString name() const;
 
     /*! @return table schema of table that owns this field
      or null if it has no table assigned.
@@ -317,8 +318,8 @@ public:
         return KDbField::isNumericType(type());
     }
 
-    /*! static version of isNumericType() method
-     *! @return true if the field is of any numeric type (integer or floating point)*/
+    /*! Static version of isNumericType() method
+     @return true if the field is of any numeric type (integer or floating point)*/
     static bool isNumericType(Type type);
 
     /*! @return true if the field is of any integer type */
@@ -326,8 +327,8 @@ public:
         return KDbField::isIntegerType(type());
     }
 
-    /*! static version of isIntegerType() method
-     *! @return true if the field is of any integer type */
+    /*! Static version of isIntegerType() method
+     @return true if the field is of any integer type */
     static bool isIntegerType(Type type);
 
     /*! @return true if the field is of any floating point numeric type */
@@ -336,7 +337,7 @@ public:
     }
 
     /*! static version of isFPNumericType() method
-     *! @return true if the field is of any floating point numeric type */
+     @return true if the field is of any floating point numeric type */
     static bool isFPNumericType(Type type);
 
     /*! @return true if the field is of any date or time related type */
@@ -344,8 +345,8 @@ public:
         return KDbField::isDateTimeType(type());
     }
 
-    /*! static version of isDateTimeType() method
-     *! @return true if the field is of any date or time related type */
+    /*! Static version of isDateTimeType() method
+     @return true if the field is of any date or time related type */
     static bool isDateTimeType(Type type);
 
     /*! @return true if the field is of any text type */
@@ -353,17 +354,15 @@ public:
         return KDbField::isTextType(type());
     }
 
-    /*! static version of isTextType() method
-     *! @return true if the field is of any text type */
+    /*! Static version of isTextType() method
+     @return true if the field is of any text type */
     static bool isTextType(Type type);
 
-    inline Options options() const {
-        return m_options;
-    }
+    /*! @return options defined for this field. */
+    Options options() const;
 
-    inline void setOptions(Options options) {
-        m_options = options;
-    }
+    /*! Sets options for this field. */
+    void setOptions(Options options);
 
     //! Converts field's type to QVariant equivalent as accurate as possible
     inline QVariant::Type variantType() const {
@@ -405,21 +404,15 @@ public:
      Subtype is a string providing additional hint for field's type.
      E.g. for BLOB type, it can be a MIME type or certain QVariant type name,
      for example: "QPixmap", "QColor" or "QFont" */
-    inline QString subType() const {
-        return m_subType;
-    }
+    QString subType() const;
 
     /*! Sets (optional) subtype for this field.
      @see subType() */
-    inline void setSubType(const QString& subType) {
-        m_subType = subType;
-    }
+    void setSubType(const QString& subType);
 
     //! @return default value for this field. Null value means there
     //! is no default value declared. The variant value is compatible with field's type.
-    inline QVariant defaultValue() const {
-        return m_defaultValue;
-    }
+    QVariant defaultValue() const;
 
     /*! @return default maximum length of text.
         Default is 0, i.e unlimited length (if the engine supports it). */
@@ -473,9 +466,7 @@ public:
 
     /*! @return precision for numeric and other fields that have both length (scale)
      and precision (floating point types). */
-    inline int precision() const {
-        return m_precision;
-    }
+    int precision() const;
 
     /*! @return scale for numeric and other fields that have both length (scale)
      and precision (floating point types).
@@ -484,9 +475,7 @@ public:
      of significant digits in the whole number, that is, the number of digits
      to both sides of the decimal point. So the number 23.5141 has a precision
      of 6 and a scale of 4. Integers can be considered to have a scale of zero. */
-    inline int scale() const {
-        return m_maxLength;
-    }
+    int scale() const;
 
 //! @todo should we keep extended properties here or move them to a QVariant dictionary?
     /*! @return number of decimal places that should be visible to the user,
@@ -504,39 +493,27 @@ public:
        If the fractional part is shorter than N, additional zeros are appended.
        For example, "12.345" becomes "12.345000" if N=6.
     */
-    inline int visibleDecimalPlaces() const {
-        return m_visibleDecimalPlaces;
-    }
+    int visibleDecimalPlaces() const;
 
     /*! @return the constraints defined for this field. */
-    inline Constraints constraints() const {
-        return m_constraints;
-    }
+    Constraints constraints() const;
 
     /*! @return order of this field in containing table (counting starts from 0)
     (-1 if unspecified). */
-    inline int order() const {
-        return m_order;
-    }
+    int order() const;
 
     /*! @return caption of this field. */
-    inline QString caption() const {
-        return m_caption;
-    }
+    QString caption() const;
 
     /*! @return caption of this field or - if empty - return its name. */
-    inline QString captionOrName() const {
-        return m_caption.isEmpty() ? m_name : m_caption;
-    }
+    QString captionOrName() const;
 
     /*! @return description text for this field. */
-    inline QString description() const {
-        return m_desc;
-    }
+    QString description() const;
 
     //! if the type has the unsigned attribute
     inline bool isUnsigned() const {
-        return m_options & Unsigned;
+        return options() & Unsigned;
     }
 
     /*! @return true if this field has EMPTY property (i.e. it is of type
@@ -647,14 +624,10 @@ public:
     void setIndexed(bool s);
 
     /*! Sets caption for this field to @a caption. */
-    inline void setCaption(const QString& caption) {
-        m_caption = caption;
-    }
+    void setCaption(const QString& caption);
 
     /*! Sets description for this field to @a description. */
-    inline void setDescription(const QString& description) {
-        m_desc = description;
-    }
+    void setDescription(const QString& description);
 
     /*! There can be added asterisks (KDbQueryAsterisk objects)
      to query schemas' field list. KDbQueryAsterisk subclasses KDbField class,
@@ -665,7 +638,7 @@ public:
      and every KDbField object returns false.
     */
     inline bool isQueryAsterisk() const {
-        return m_type == KDbField::Asterisk;
+        return type() == KDbField::Asterisk;
     }
 
     /*! @return KDbExpression object if the field value is an
@@ -694,16 +667,13 @@ public:
 
 //<TMP>
     /*! @return the hints for enum fields. */
-    inline QVector<QString> enumHints() const {
-        return m_hints;
-    }
-    inline QString enumHint(int num) {
-        return (num < m_hints.size()) ? m_hints.at(num) : QString();
-    }
-    /*! sets the hint for enum fields */
-    inline void setEnumHints(const QVector<QString> &hints) {
-        m_hints = hints;
-    }
+    QVector<QString> enumHints() const;
+
+    /*! @return hint name for enum value @a num. */
+    QString enumHint(int num);
+
+    /*! Sets the hint for enum fields */
+    void setEnumHints(const QVector<QString> &hints);
 //</TMP>
 
     /*! @return custom property @a propertyName.
@@ -721,6 +691,8 @@ public:
     CustomPropertiesMap customProperties() const;
 
 protected:
+    explicit KDbField(KDbFieldList *aParent, int aOrder = -1);
+
     /*! Creates a database field as a child of @a querySchema table
      Assigns @a expr expression to this field, if present.
      Used internally by query schemas, e.g. to declare asterisks or
@@ -731,38 +703,23 @@ protected:
     /*! @overload KDbField(KDbQuerySchema*, const KDbExpression&) */
     explicit KDbField(KDbQuerySchema *querySchema);
 
-    /*! @internal Used by constructors. */
-    void init();
+    //! Sets parent for this field.
+    void setParent(KDbFieldList *parent);
+
+    /*! Sets order of this field in containing table. Counting starts from 0. -1 if unspecified. */
+    void setOrder(int order);
 
     //! @return a deep copy of this object. Used in @ref KDbFieldList(const KDbFieldList& fl).
     virtual KDbField* copy();
 
-    KDbFieldList *m_parent; //!< In most cases this points to a KDbTableSchema
-    //!< object that field is assigned.
-    QString m_name;
-    QString m_subType;
-    Constraints m_constraints;
-    MaxLengthStrategy m_maxLengthStrategy;
-    int m_maxLength; //!< also used for storing scale for floating point types
-    int m_precision;
-    int m_visibleDecimalPlaces; //!< used in visibleDecimalPlaces()
-    Options m_options;
-    QVariant m_defaultValue;
-    int m_order;
-    QString m_caption;
-    QString m_desc;
-
-    KDbExpression* m_expr;
-    CustomPropertiesMap* m_customProperties;
-
 private:
-    QVector<QString> m_hints;
-    Type m_type;
-
     friend class KDbConnection;
     friend class KDbFieldList;
     friend class KDbTableSchema;
     friend class KDbQuerySchema;
+
+    class Private;
+    Private * const d;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(KDbField::Constraints)

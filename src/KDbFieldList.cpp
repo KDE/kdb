@@ -36,8 +36,9 @@ KDbFieldList::KDbFieldList(const KDbFieldList& fl, bool deepCopyFields)
         //deep copy for the fields
         foreach(KDbField *origField, fl.m_fields) {
             KDbField *f = origField->copy();
-            if (origField->m_parent == &fl)
-                f->m_parent = this;
+            if (origField->parent() == &fl) {
+                f->setParent(this);
+            }
             const bool addFieldOk = addField(f);
             Q_ASSERT(addFieldOk);
         }
