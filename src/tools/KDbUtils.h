@@ -57,8 +57,13 @@ inline type findParent(QObject* o, const char* className = nullptr)
 KDB_EXPORT QDateTime stringToHackedQTime(const QString& s);
 
 /*! Serializes @a map to the array pointed by @a array.
- KDbUtils::deserializeMap() can be used to deserialize this array back to map. */
+ KDbUtils::deserializeMap() can be used to deserialize this array back to map.
+ Does nothing if @a array is @c nullptr. */
 KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QByteArray *array);
+
+/*! Serializes @a map to the string pointed by @a string.
+ KDbUtils::deserializeMap() can be used to deserialize this array back to map.
+ Does nothing if @a string is @c nullptr. */
 KDB_EXPORT void serializeMap(const QMap<QString, QString>& map, QString *string);
 
 /*! @return a map deserialized from a byte array @a array.
@@ -75,9 +80,10 @@ KDB_EXPORT QMap<QString, QString> deserializeMap(const QString& string);
  Do not pass full paths here, but only filename strings. */
 KDB_EXPORT QString stringToFileName(const QString& string);
 
-/*! Performs a simple @a string  encryption using rot47-like algorithm.
+/*! Performs a simple @a string encryption using rot47-like algorithm.
  Each character's unicode value is increased by 47 + i (where i is index of the character).
  The resulting string still contains readable characters but some of them can be non-ASCII.
+ Does nothing if @a string is @c nullptr.
  @note Do not use this for data that can be accessed by attackers! */
 KDB_EXPORT void simpleCrypt(QString *string);
 
@@ -85,6 +91,7 @@ KDB_EXPORT void simpleCrypt(QString *string);
  using opposite operations to KexiUtils::simpleCrypt().
  @return true on success and false on failure. Failue means that one or more characters have unicode
  numbers smaller than value of 47 + i. On failure @a string is not altered.
+ Does nothing and returns @c false if @a string is @c nullptr.
 */
 KDB_EXPORT bool simpleDecrypt(QString *string);
 

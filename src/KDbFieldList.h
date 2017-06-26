@@ -76,7 +76,7 @@ public:
 
     /*! Moves fiels @a field from its current position to new position @a newIndex.
      If @a newIndex value is greater than fieldCount()-1, it is appended.
-     @return false if this field does not belong to this list. */
+     @return @c false if this field does not belong to this list or is @c nullptr. */
     virtual bool moveField(KDbField *field, int newIndex);
 
     /*! @return field id or @c nullptr if there is no such a field. */

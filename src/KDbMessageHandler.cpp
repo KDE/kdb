@@ -35,7 +35,6 @@ private:
 KDbMessageGuard::KDbMessageGuard(KDbResultable *resultable)
     : d(new Private)
 {
-    Q_ASSERT(resultable);
     d->result = nullptr;
     d->resultable = resultable;
     d->handler = nullptr;
@@ -44,7 +43,6 @@ KDbMessageGuard::KDbMessageGuard(KDbResultable *resultable)
 KDbMessageGuard::KDbMessageGuard(const KDbResult &result, KDbMessageHandler *handler)
  : d(new Private)
 {
-    Q_ASSERT(handler);
     d->result = &result;
     d->resultable = nullptr;
     d->handler = handler;

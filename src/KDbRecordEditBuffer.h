@@ -90,6 +90,7 @@ public:
     bool isEmpty() const;
 
     //! Inserts value @a val for db-aware buffer's column @a ci
+    //! Does nothing if @a ci is @c nullptr.
     void insert(KDbQueryColumnInfo* ci, const QVariant &val);
 
     //! Inserts value @a val for not-db-aware buffer's column @a fname
@@ -108,13 +109,16 @@ public:
      If there is no value assigned for the buffer, this method tries to remember and return
      default value obtained from @a ci if @a useDefaultValueIfPossible is true.
      Note that if the column is declared as unique (especially: primary key),
-     default value will not be used. */
+     default value will not be used.
+     Returns @c nullptr if @a ci is @c nullptr. */
     const QVariant* at(KDbQueryColumnInfo *ci, bool useDefaultValueIfPossible = true) const;
 
     //! Useful only for not-db-aware buffer. @return value for field @a field
+    //! Returns @c nullptr if there is no such field.
     const QVariant* at(const KDbField &field) const;
 
     //! Useful only for not-db-aware buffer. @return value for field @a fname
+    //! Returns @c nullptr if there is no such field.
     const QVariant* at(const QString& fname) const;
 
     //! Useful only for db-aware buffer: @return true if the value available as

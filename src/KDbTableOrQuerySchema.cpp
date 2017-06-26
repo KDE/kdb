@@ -70,7 +70,6 @@ KDbTableOrQuerySchema::KDbTableOrQuerySchema(KDbFieldList *tableOrQuery)
 {
     d->table = dynamic_cast<KDbTableSchema*>(tableOrQuery);
     d->query = dynamic_cast<KDbQuerySchema*>(tableOrQuery);
-    Q_ASSERT(tableOrQuery);
     if (!d->table && !d->query) {
         kdbWarning() << "tableOrQuery is neither table nor query!";
     }

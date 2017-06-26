@@ -649,14 +649,14 @@ public:
     //! @overload KDbExpression expression()
     const KDbExpression expression() const;
 
-    /*! Sets expression data @a expr. If there was
-     already expression set, it is removed before new assignment.
-     This KDbField object becames logical owner of @a expr object,
-     so do not use the expression for other objects (you can call ExpressioN::clone()).
+    /*! Sets expression data @a expr. If there was already expression set, it is removed before new
+     assignment.
+     This KDbField object becames logical owner of @a expr object, so do not use the expression
+     for other objects (you can call KDbExpression::clone()).
      Current field's expression is deleted, if exists.
 
-     Because the field defines an expression, it should be assigned to a query,
-     not to a table.
+     Because the field defines an expression, it should be assigned to a query, not to a table,
+     otherwise this call will not have any effect.
     */
     void setExpression(const KDbExpression& expr);
 

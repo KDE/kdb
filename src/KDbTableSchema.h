@@ -54,7 +54,8 @@ public:
     ~KDbTableSchema() override;
 
     /*! Inserts @a field into a specified position (@a index).
-     'order' property of @a field is set automatically. */
+     'order' property of @a field is set automatically.
+    @c false is returned if @a field is @c nullptr or @a index is invalid. */
     bool insertField(int index, KDbField *field) override;
 
     /*! Reimplemented for internal reasons. */

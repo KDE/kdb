@@ -114,6 +114,7 @@ public:
 
     const KDbFieldList* fields() const;
 
+    //! Sets fields for the statement. Does nothing if @a fields is @c nullptr.
     void setFields(KDbFieldList* fields);
 
     QStringList whereFieldNames() const;

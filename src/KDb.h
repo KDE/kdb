@@ -49,39 +49,43 @@ namespace KDb
 //! @see KDbConnection::databaseVersion() KDbConnection::serverVersion() KDbDriverMetaData::version()
 KDB_EXPORT KDbVersionInfo version();
 
-//! @overload bool deleteRecord(KDbConnection*, const KDbTableSchema&, const QString &, KDbField::Type, const QVariant &)
+/**
+ * @brief Deletes records using one generic criteria.
+ *
+ * @return @c true on success and @c false on failure and if @a conn is @c nullptr
+ */
 KDB_EXPORT bool deleteRecords(KDbConnection* conn, const QString &tableName,
                               const QString &keyname, KDbField::Type keytype, const QVariant &keyval);
 
-//! Deletes records using one generic criteria.
+//! @overload
 inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
                               const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
 {
     return deleteRecords(conn, table.name(), keyname, keytype, keyval);
 }
 
-//! @overload bool deleteRecords(KDbConnection*, const QString&, const QString&, KDbField::Type, const QVariant&);
+//! @overload
 inline bool deleteRecords(KDbConnection* conn, const QString &tableName,
                               const QString &keyname, const QString &keyval)
 {
     return deleteRecords(conn, tableName, keyname, KDbField::Text, keyval);
 }
 
-//! @overload bool deleteRecords(KDbConnection*, const QString&, const QString&, const QString&);
+//! @overload
 inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
                               const QString &keyname, const QString &keyval)
 {
     return deleteRecords(conn, table.name(), keyname, keyval);
 }
 
-//! @overload bool deleteRecords(KDbConnection*, const KDbTableSchema&, const QString&, const QString&);
+//! @overload
 inline bool deleteRecords(KDbConnection* conn, const KDbTableSchema &table,
                               const QString& keyname, int keyval)
 {
     return deleteRecords(conn, table, keyname, KDbField::Integer, keyval);
 }
 
-//! @overload bool deleteRecords(KDbConnection*, const KDbTableSchema&, const QString&, int);
+//! @overload
 inline bool deleteRecords(KDbConnection* conn, const QString &tableName,
                               const QString& keyname, int keyval)
 {
@@ -176,68 +180,106 @@ KDB_EXPORT QString simplifiedFieldTypeName(KDbField::Type type);
  @see KDbField::hasEmptyProperty() */
 KDB_EXPORT bool isEmptyValue(KDbField::Type type, const QVariant &value);
 
-/*! Sets string pointed by @a msg to an error message retrieved from @a resultable,
- and string pointed by @a details to details of this error (server message and result number).
- Does nothing if @a result is empty. In this case @a msg and @a details strings are not overwritten.
- If the string pointed by @a msg is not empty, @a result message is appended to the string
- pointed by @a details.
+/**
+ * @brief Sets HTML-formatted error message with extra details obtained from result object
+ *
+ * Sets string pointed by @a msg to an error message retrieved from @a resultable,
+ * and string pointed by @a details to details of this error (server message and result number).
+ * Does nothing if there is no error (resultable.result().isError() == false) or if @a msg or
+ * @a details is @c nullptr.
+ * In this case strings pointer by @a msg and @a details strings are not changed.
+ * If the string pointed by @a msg is not empty, it is not modified and message obtained from
+ * @a resultable is appended to the string pointed by @a details instead.
  */
 KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QString *details);
 
-/*! This methods works like above, but appends both a message and a description
- to string pointed by @a msg. */
+/**
+ * @overload
+ *
+ * This methods works similarly but appends both a message and a description to string pointed by
+ * @a msg.
+ */
 KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, QString *msg);
 
-/*! This methods works like above, but works on @a result's  members instead. */
+/**
+ * @overload
+ *
+ * This methods similarly but outputs message to @a info instead.
+ */
 KDB_EXPORT void getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info);
 
 /*! Function useful for building WHERE parts of SQL statements.
  Constructs an SQL string like "fielname = value" for specific @a drv driver,
- field type @a t, @a fieldName and @a value. If @a value is null, "fieldname is NULL"
+ field type @a t, @a fieldName and @a value. If @a value is null, "fieldname IS NULL"
  string is returned. */
 KDB_EXPORT KDbEscapedString sqlWhere(KDbDriver *drv, KDbField::Type t,
                                         const QString& fieldName, const QVariant& value);
 
-/*! Find an identifier for object @a objName of type @a objType.
- On success true is returned and *id is set to the value of the identifier.
- On failure false is returned. If there is no such object, @c cancelled value is returned. */
+/**
+ * @brief Finds an identifier for object @a objName of type @a objType
+ *
+ * On success true is returned and *id is set to the value of the identifier.
+ * On failure or if @a conn is @c nullptr, @c false is returned.
+ * If there is no object with specified name and type, @c cancelled value is returned.
+*/
 KDB_EXPORT tristate idForObjectName(KDbConnection* conn, int *id, const QString& objName,
                                     int objType);
 
+/**
+ * @brief Returns number of records returned by given SQL statement
+ *
+ * @return number of records that can be retrieved after executing @a sql statement within
+ * a connection @a conn. The statement should be of type SELECT. For SQL data sources it does not
+ * fetch any records, only "COUNT(*)" SQL aggregation is used at the backed.
+ * -1 is returned if any error occurred or if @a conn is @c nullptr.
+ */
 //! @todo perhaps use quint64 here?
-/*! @return number of records that can be retrieved after executing @a sql statement
- within a connection @a conn. The statement should be of type SELECT.
- For SQL data sources it does not fetch any records, only "COUNT(*)"
- SQL aggregation is used at the backed.
- -1 is returned if error occurred. */
 KDB_EXPORT int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
 
+/**
+ * @brief Returns number of records that contains given table
+ *
+ * @return number of records that can be retrieved from @a tableSchema.
+ * To obtain the result the table must be created or retrieved using a KDbConnection object,
+ * i.e. tableSchema.connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
+ * SQL aggregation is used at the backed.
+ * -1 is returned if error occurred or if tableSchema.connection() is @c nullptr.
+ */
 //! @todo perhaps use quint64 here?
-/*! @return number of records that can be retrieved from @a tableSchema.
- The table must be created or retrieved using a KDbConnection object,
- i.e. tableSchema.connection() must not return 0.
- For SQL data sources it does not fetch any records, only "COUNT(*)"
- SQL aggregation is used at the backed.
- -1 is returned if error occurred. */
 KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
 
-/*! @overload in rowCount(const KDbTableSchema& tableSchema)
- Operates on a query schema. @a params are optional values of parameters that will
- be inserted into places marked with [] before execution of the query. */
+/**
+ * @overload
+ *
+ * Operates on a query schema. @a params are optional values of parameters that will be inserted
+ * into [] placeholders before execution of query that counts the records.
+ * To obtain the result the query must be created or retrieved using a KDbConnection object,
+ * i.e. querySchema->connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
+ * SQL aggregation is used at the backed.
+ * -1 is returned if error occurred or if querySchema->connection() is @c nullptr.
+ */
 //! @todo perhaps use quint64 here?
 KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
                            const QList<QVariant>& params = QList<QVariant>());
 
-/*! @overload int rowCount(KDbQuerySchema& querySchema, const QList<QVariant>& params)
- Operates on a table or query schema. @a params are optional values of parameters that
- will be inserted into places marked with [] before execution of the query. */
+/**
+ * @overload
+ *
+ * Operates on a table or query schema. @a params is a list of optional parameters that
+ * will be inserted into [] placeholders before execution of query that counts the records.
+ *
+ * If @a tableOrQuery is @c nullptr or provides neither table nor query, -1 is returned.
+ */
 //! @todo perhaps use quint64 here?
 KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
                            const QList<QVariant>& params = QList<QVariant>());
 
-/*! @return a number of columns that can be retrieved from table or query schema.
- In case of query, expanded fields are counted. Can return -1 if @a tableOrQuery
- has neither table or query assigned. */
+/**
+ * @brief Returns number of columns within record set returned from specified table or query
+ *
+ * In case of query expanded fields list is counted.
+ * Returns -1 if @a tableOrQuery is @c nullptr or has neither table or query assigned.
+ */
 KDB_EXPORT int fieldCount(KDbTableOrQuerySchema* tableOrQuery);
 
 /**
@@ -272,6 +314,7 @@ enum SplitToTableAndFieldPartsOptions {
     (the default), or
  - '.' character is the first of last character of @a string (in this case table name
    or field name could become empty what is not allowed).
+ - @a tableName or @a fieldName is @c nullptr
 
  If @a option is SetFieldNameIfNoTableName and @a string does not contain '.',
  @a string is passed to @a fieldName and @a tableName is set to QString()
@@ -304,11 +347,21 @@ KDB_EXPORT bool supportsVisibleDecimalPlacesProperty(KDbField::Type type);
  @see KDb::numberToLocaleString() KDbField::visibleDecimalPlaces() */
 KDB_EXPORT QString numberToString(double value, int decimalPlaces);
 
-/*! Like KDb::numberToString() but formats the string using locale.toString().
- If @a locale if @c nullptr, desault QLocale is used.
+/**
+ * @brief Returns number converted to string using default locale
+ *
+ * This method is similar to KDb::numberToString() but the string is formatted using QLocale::toString().
+ *
+ * @see KDb::numberToString() KDbField::visibleDecimalPlaces()
+ */
+KDB_EXPORT QString numberToLocaleString(double value, int decimalPlaces);
 
- @see KDb::numberToString() KDbField::visibleDecimalPlaces() */
-KDB_EXPORT QString numberToLocaleString(double value, int decimalPlaces, const QLocale *locale = nullptr);
+/**
+ * @overload
+ *
+ * Returns number converted to string using specified locale.
+ */
+KDB_EXPORT QString numberToLocaleString(double value, int decimalPlaces, const QLocale &locale);
 
 //! @return true if @a propertyName is a builtin field property.
 KDB_EXPORT bool isBuiltinTableFieldProperty(const QByteArray& propertyName);
@@ -333,13 +386,17 @@ KDB_EXPORT KDbField::Type intToFieldType(int type);
 KDB_EXPORT KDbField::TypeGroup intToFieldTypeGroup(int typeGroup);
 
 /*! Gets property values for the lookup schema @a lookup.
- @a values is cleared before filling. This function is used e.g. for altering table design. */
+ @a values is not cleared before filling. This function is used e.g. for altering table design.
+ Nothing is performed if @a values is @c nullptr.
+ If @a lookup is @c nullptr, all returned values are null.
+*/
 KDB_EXPORT void getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values);
 
 /*! Gets property values for @a field.
  Properties from extended schema are included. @a values is cleared before filling.
  The same number of properties in the same order is returned.
  This function is used e.g. for altering table design.
+ Nothing is performed if @a values is @c nullptr.
  */
 KDB_EXPORT void getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *values);
 
@@ -347,23 +404,25 @@ KDB_EXPORT void getFieldProperties(const KDbField &field, QMap<QByteArray, QVari
  On failure contents of @a field is undefined.
  Properties from extended schema are also supported.
  This function is used e.g. by KDbAlterTableHandler when property information comes in form of text.
+ If @a field is @c nullptr nothing is performed and @c false is returned.
  */
 KDB_EXPORT bool setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& values);
 
-/*! Sets property value for @a field. @return true if the property has been found and
- the value is valid for this property. On failure contents of @a field is undefined.
- Properties from extended schema are also supported as well as
-   QVariant customProperty(const QString& propertyName) const;
+/*! Sets value of a single property for @a field. @return true if the property has been found and
+ the value is valid for this property. On failure contents of @a field is not modified.
+ Properties from extended schema are also supported as well as custom properties
+ (using KDbField::setCustomProperty()).
 
  This function is used e.g. by KDbAlterTableHandler when property information comes in form of text.
+ If @a field is @c nullptr nothing is performed and @c false is returned.
  */
-KDB_EXPORT bool setFieldProperty(KDbField *field, const QByteArray& propertyName,
-                                       const QVariant& value);
+KDB_EXPORT bool setFieldProperty(KDbField *field, const QByteArray &propertyName,
+                                 const QVariant &value);
 
 /*! @return property value loaded from a DOM @a node, written in a QtDesigner-like
  notation: &lt;number&gt;int&lt;/number&gt; or &lt;bool&gt;bool&lt;/bool&gt;, etc. Supported types are
  "string", "cstring", "bool", "number". For invalid values null QVariant is returned.
- You can check the validity of the returned value using QVariant::type(). */
+ Validity of the returned value can be checked using the @a ok parameter and QVariant::type(). */
 KDB_EXPORT QVariant loadPropertyValueFromDom(const QDomNode& node, bool *ok);
 
 /*! Convenience version of loadPropertyValueFromDom(). @return int value. */
@@ -372,20 +431,30 @@ KDB_EXPORT int loadIntPropertyValueFromDom(const QDomNode& node, bool* ok);
 /*! Convenience version of loadPropertyValueFromDom(). @return QString value. */
 KDB_EXPORT QString loadStringPropertyValueFromDom(const QDomNode& node, bool* ok);
 
-/*! Saves integer element for value @a value to @a doc document within parent element
- @a parentEl. The value will be enclosed in "number" element and "elementName" element.
- Example: saveNumberElementToDom(doc, parentEl, "height", 15) will create
+/*! Creates a new DOM element named @a elementName with numeric value @a value in @a doc document
+ within parent element @a parentEl. The value will be enclosed in "number" element and
+ "elementName" element.
+ Example: saveNumberElementToDom(doc, parentEl, "height", 15) creates:
  @code
   <height><number>15</number></height>
  @endcode
- @return the reference to element created with tag elementName. */
+ @return the reference to element created with tag elementName.
+ Null element is returned if @a doc or @a parentEl is @c nullptr or if @a elementName is empty.
+*/
 KDB_EXPORT QDomElement saveNumberElementToDom(QDomDocument *doc, QDomElement *parentEl,
-        const QString& elementName, int value);
+                                              const QString& elementName, int value);
 
-/*! Saves boolean element for value @a value to @a doc document within parent element
- @a parentEl. Like saveNumberElementToDom() but creates "bool" tags. True/false values will be
+/*! Creates a new DOM element named @a elementName with boolean value @a value in @a doc document
+ within parent element @a parentEl.
+ This method is like saveNumberElementToDom() but creates "bool" tags. True/false values will be
  saved as "true"/"false" strings.
- @return the reference to element created with tag elementName. */
+ Example: saveBooleanElementToDom(doc, parentEl, "visible", true) creates:
+ @code
+  <visible><bool>true</bool></visible>
+ @endcode
+ @return the reference to element created with tag elementName.
+ Null element is returned if @a doc or @a parentEl is @c nullptr or if @a elementName is empty.
+*/
 KDB_EXPORT QDomElement saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value);
 
@@ -727,8 +796,8 @@ KDB_EXPORT QStringList libraryPaths();
  the returned name as quickly as possible for creating new physical table.
  It is not 100% guaranteed that table with this name will not exist at an attempt of creation
  but it is very unlikely. The function checks for existence of a table with temporary name
- for connection @a conn. Empty string is returned if @a conn is not present or is not open
- or if checking for existence of table withg temporary name failed.
+ for connection @a conn. Empty string is returned if @a conn is @c nullptr or is not open
+ or if checking for existence of table with temporary name failed.
 */
 KDB_EXPORT QString temporaryTableName(KDbConnection *conn, const QString &baseName);
 

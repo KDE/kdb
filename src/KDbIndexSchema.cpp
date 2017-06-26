@@ -24,8 +24,6 @@
 #include "KDbTableSchema.h"
 #include "kdb_debug.h"
 
-#include <assert.h>
-
 class Q_DECL_HIDDEN KDbIndexSchema::Private
 {
 public:
@@ -114,9 +112,13 @@ KDbIndexSchema::~KDbIndexSchema()
 
 void KDbIndexSchema::setTable(KDbTableSchema *table)
 {
-    Q_ASSERT(!this->table());
-    Q_ASSERT(table);
-    d->tableSchema = table;
+    if (this->table()) {
+        kdbWarning() << "Table is already assigned to this index";
+        return;
+    }
+    if (table) {
+        d->tableSchema = table;
+    }
 }
 
 bool KDbIndexSchema::addField(KDbField *field)

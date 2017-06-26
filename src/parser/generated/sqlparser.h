@@ -130,7 +130,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 491 "KDbSqlParser.y" /* yacc.c:1909  */
+#line 490 "KDbSqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
     QByteArray* binaryValue;

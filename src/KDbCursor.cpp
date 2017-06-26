@@ -29,9 +29,6 @@
 #include "KDbRecordEditBuffer.h"
 #include "kdb_debug.h"
 
-#include <assert.h>
-#include <stdlib.h>
-
 class Q_DECL_HIDDEN KDbCursor::Private
 {
 public:
@@ -190,7 +187,9 @@ KDbRecordData* KDbCursor::storeCurrentRecord() const
 
 bool KDbCursor::storeCurrentRecord(KDbRecordData* data) const
 {
-    Q_ASSERT(data);
+    if (!data) {
+        return false;
+    }
     data->resize(m_fieldsToStoreInRecord);
     return drv_storeCurrentRecord(data);
 }

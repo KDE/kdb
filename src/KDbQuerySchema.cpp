@@ -54,24 +54,25 @@ KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
         , KDbObject(KDb::QueryObjectType)
         , d(new Private(this))
 {
-    Q_ASSERT(tableSchema);
-    d->masterTable = tableSchema;
-    d->conn = tableSchema->connection();
-    /*if (!d->masterTable) {
-      kdbWarning() << "!d->masterTable";
-      m_name.clear();
-      return;
-    }*/
-    addTable(d->masterTable);
-    //defaults:
-    //inherit name from a table
-    setName(d->masterTable->name());
-    //inherit caption from a table
-    setCaption(d->masterTable->caption());
+    if (tableSchema) {
+        d->masterTable = tableSchema;
+        d->conn = tableSchema->connection();
+        /*if (!d->masterTable) {
+          kdbWarning() << "!d->masterTable";
+          m_name.clear();
+          return;
+        }*/
+        addTable(d->masterTable);
+        //defaults:
+        //inherit name from a table
+        setName(d->masterTable->name());
+        //inherit caption from a table
+        setCaption(d->masterTable->caption());
 
-    // add explicit field list to avoid problems (e.g. with fields added outside of the app):
-    foreach(KDbField* f, *d->masterTable->fields()) {
-        addField(f);
+        // add explicit field list to avoid problems (e.g. with fields added outside of the app):
+        foreach(KDbField* f, *d->masterTable->fields()) {
+            addField(f);
+        }
     }
 }
 
@@ -104,7 +105,6 @@ KDbQuerySchema::KDbQuerySchema(KDbConnection *conn)
         , KDbObject(KDb::QueryObjectType)
         , d(new Private(this))
 {
-    Q_ASSERT(conn);
     d->conn = conn;
 }
 

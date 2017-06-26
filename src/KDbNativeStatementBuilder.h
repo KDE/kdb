@@ -73,8 +73,9 @@ public:
 
     /*! Generates a native "CREATE TABLE ..." statement string that can be used for creation
      of @a tableSchema in the database. The statement is written to @ref *target on success.
-     @a target must not be 0.
-     @return true on success. */
+     @return true on success.
+     If @a target is @c nullptr, @c false is returned.
+    */
     bool generateCreateTableStatement(KDbEscapedString *target,
                                       const KDbTableSchema& tableSchema) const;
 

@@ -26,13 +26,13 @@
  * Boston, MA 02110-1301, USA.
 */
 
+#include "KDbUtils.h"
 #include "KDb.h"
 #include "KDbConnection.h"
 #include "KDbDriverManager.h"
-#include "KDbUtils.h"
 #include "KDbUtils_p.h"
-#include "kdb_debug.h"
 #include "config-kdb.h"
+#include "kdb_debug.h"
 
 #include <QRegularExpression>
 #include <QDataStream>
@@ -149,7 +149,9 @@ QDateTime KDbUtils::stringToHackedQTime(const QString &s)
 
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)
 {
-    Q_ASSERT(array);
+    if (!array) {
+        return;
+    }
     QDataStream ds(array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
     ds << map;
@@ -157,7 +159,9 @@ void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array
 
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QString *string)
 {
-    Q_ASSERT(string);
+    if (!string) {
+        return;
+    }
     QByteArray array;
     QDataStream ds(&array, QIODevice::WriteOnly);
     ds.setVersion(QDataStream::Qt_3_1);
@@ -205,7 +209,9 @@ QString KDbUtils::stringToFileName(const QString& string)
 
 void KDbUtils::simpleCrypt(QString *string)
 {
-    Q_ASSERT(string);
+    if (!string) {
+        return;
+    }
     for (int i = 0; i < string->length(); i++) {
         ushort& unicode = (*string)[i].unicode();
         unicode += (47 + i);
@@ -214,7 +220,9 @@ void KDbUtils::simpleCrypt(QString *string)
 
 bool KDbUtils::simpleDecrypt(QString *string)
 {
-    Q_ASSERT(string);
+    if (!string) {
+        return false;
+    }
     QString result(*string);
     for (int i = 0; i < result.length(); i++) {
         ushort& unicode = result[i].unicode();

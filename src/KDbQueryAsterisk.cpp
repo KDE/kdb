@@ -46,7 +46,6 @@ KDbQueryAsterisk::KDbQueryAsterisk(KDbQuerySchema *query, const KDbTableSchema *
     : KDbField(query, -1)
     , d(new Private(table))
 {
-    Q_ASSERT(query);
     setType(KDbField::Asterisk);
 }
 

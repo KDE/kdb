@@ -30,8 +30,6 @@
 
 #include <QDateTime>
 
-#include <assert.h>
-
 //! @todo make this configurable
 static int g_defaultMaxLength = 0; // unlimited
 
@@ -1013,7 +1011,10 @@ const KDbExpression KDbField::expression() const
 
 void KDbField::setExpression(const KDbExpression& expr)
 {
-    Q_ASSERT(!d->parent || dynamic_cast<KDbQuerySchema*>(d->parent));
+    if (d->parent && !dynamic_cast<KDbQuerySchema*>(d->parent)) {
+        kdbWarning() << "Cannot set expression if parent is set and it is not a query";
+        return;
+    }
     if (d->expr == expr) {
         return;
     }

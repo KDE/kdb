@@ -163,6 +163,7 @@ public:
      @a visibleValueForLookupField allows to pass visible value (usually a text)
      for a lookup field (only reasonable if col->visibleLookupColumnInfo != 0).
      Note that @a newval may be changed in aboutToChangeCell() signal handler.
+     If either @a record or @a col or @a newval is @c nullptr, @c false is returned.
      @see KDbRecordEditBuffer */
     bool updateRecordEditBufferRef(KDbRecordData *record,
                                    int colnum, KDbTableViewColumn* col, QVariant* newval,

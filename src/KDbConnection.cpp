@@ -2271,7 +2271,9 @@ tristate KDbConnection::querySingleStringInternal(const KDbEscapedString *sql, Q
         deleteCursor(cursor);
         return false;
     }
-    *value = cursor->value(column).toString();
+    if (value) {
+        *value = cursor->value(column).toString();
+    }
     return deleteCursor(cursor);
 }
 
@@ -2307,7 +2309,9 @@ tristate KDbConnection::querySingleNumberInternal(const KDbEscapedString *sql, i
     const int _number = str.toInt(&ok);
     if (!ok)
         return false;
-    *number = _number;
+    if (number) {
+        *number = _number;
+    }
     return true;
 }
 
@@ -2352,17 +2356,23 @@ bool KDbConnection::queryStringListInternal(const KDbEscapedString *sql, QString
         deleteCursor(cursor);
         return false;
     }
-    list->clear();
+    if (list) {
+        list->clear();
+    }
+    QStringList listResult;
     while (!cursor->eof()) {
         const QString str(cursor->value(column).toString());
         if (!filterFunction || filterFunction(str)) {
-            list->append(str);
+            listResult.append(str);
         }
         if (!cursor->moveNext() && cursor->result().isError()) {
             m_result = cursor->result();
             deleteCursor(cursor);
             return false;
         }
+    }
+    if (list) {
+        *list = listResult;
     }
     return deleteCursor(cursor);
 }

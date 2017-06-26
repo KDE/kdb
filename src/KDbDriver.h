@@ -250,6 +250,7 @@ public:
     //! This works with PostgreSQL.
     //! Default implementation for RANDOM(X,Y) returns (X + FLOOR(F()*(Y-X+1))) where
     //! F is behavior()->RANDOM_FUNCTION. This works with PostgreSQL.
+    //! If @a args has neither zero nor two arguments, empty string is returned.
     virtual KDbEscapedString randomFunctionToString(
                                            const KDbNArgExpression &args,
                                            KDbQuerySchemaParameterValueListIterator* params,

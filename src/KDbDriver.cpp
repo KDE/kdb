@@ -30,8 +30,6 @@
 #include "KDbExpression.h"
 #include "kdb_debug.h"
 
-#include <assert.h>
-
 /*! @internal Used in KDbDriver::defaultSqlTypeName(int)
  when we do not have KDbDriver instance yet, or when we cannot get one */
 static const char* const KDb_defaultSqlTypeNames[] = {
@@ -360,7 +358,9 @@ KDbEscapedString KDbDriver::randomFunctionToString(
     if (!args.isNull() || args.argCount() < 1 ) {
         return KDbEscapedString(d->driverBehavior.RANDOM_FUNCTION + randomStatic);
     }
-    Q_ASSERT(args.argCount() == 2);
+    if (args.argCount() != 2) {
+        return KDbEscapedString();
+    }
     const KDbEscapedString x(args.arg(0).toString(this, params, callStack));
     const KDbEscapedString y(args.arg(1).toString(this, params, callStack));
     static KDbEscapedString floorRandomStatic("+FLOOR(");

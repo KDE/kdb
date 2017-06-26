@@ -48,13 +48,11 @@ public:
     KDbOrderByColumn(const KDbOrderByColumn &other);
 
     //! Creates information about a single query column @a column used for sorting.
-    //! @a column must not be 0.
     explicit KDbOrderByColumn(KDbQueryColumnInfo* column,
                               SortOrder order = SortOrder::Ascending, int pos = -1);
 
     //! Like above but used when the field @a field is not present on the list of columns.
     //! (e.g. SELECT a FROM t ORDER BY b; where T is a table with fields (a,b)).
-    //! @a field must not be 0.
     explicit KDbOrderByColumn(KDbField* field, SortOrder order = SortOrder::Ascending);
 
     ~KDbOrderByColumn();
@@ -145,8 +143,8 @@ public:
     /*! Appends multiple fields for sorting. @a querySchema
      is used to find appropriate field or alias name.
      @return false if there is at least one name for which a field or alias name does not exist
-     (all the newly appended fields are removed in this case) */
-    //! @note @a querySchema must not be 0.
+     (all the newly appended fields are removed in this case)
+     Returns @c false if @a querySchema is @c nullptr. */
     bool appendFields(KDbQuerySchema* querySchema,
                       const QString& field1, KDbOrderByColumn::SortOrder order1 = KDbOrderByColumn::SortOrder::Ascending,
                       const QString& field2 = QString(), KDbOrderByColumn::SortOrder order2 = KDbOrderByColumn::SortOrder::Ascending,
@@ -154,28 +152,28 @@ public:
                       const QString& field4 = QString(), KDbOrderByColumn::SortOrder order4 = KDbOrderByColumn::SortOrder::Ascending,
                       const QString& field5 = QString(), KDbOrderByColumn::SortOrder order5 = KDbOrderByColumn::SortOrder::Ascending);
 
-    /*! Appends column @a columnInfo. */
-    //! @note @a columnInfo must not be @c nullptr.
+    /*! Appends column @a columnInfo.
+     Does nothing if @a columnInfo is @c nullptr. */
     void appendColumn(KDbQueryColumnInfo* columnInfo,
                       KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending);
 
     /*! Appends a field @a field.
      Read documentation of @ref KDbOrderByColumn(KDbField* field, SortOrder order)
-     for more info. */
-    //! @note @a field must not be 0.
+     for more info.
+     Does nothing if @a field is @c nullptr. */
     void appendField(KDbField* field,
                      KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending);
 
     /*! Appends field with a name @a field.
      @return @c true on successful appending, and @c false if there is no such field or alias
-     name in the @a querySchema. */
-    //! @note @a querySchema must not be 0.
+     name in the @a querySchema.
+     Returns @c false if @a querySchema is @c nullptr. */
     bool appendField(KDbQuerySchema* querySchema, const QString& fieldName,
                      KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending);
 
     /*! Appends a column that is at position @a pos (counted from 0).
-     @return true on successful adding and false if there is no such position @a pos. */
-    //! @note @a querySchema must not be @c nullptr.
+     @return true on successful adding and false if there is no such position @a pos.
+     Returns @c false if @a querySchema is @c nullptr. */
     bool appendColumn(KDbQuerySchema* querySchema,
                       KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending,
                       int pos = -1);
@@ -197,7 +195,7 @@ public:
 
     const_iterator constEnd() const;
 
-    /*! @return a string like "name ASC, 2 DESC" usable for building an SQL statement.
+    /*! @return an SQL string like "name ASC, 2 DESC" usable for building an SQL statement.
      If @a includeTableNames is true (the default) fields are output in a form
      of "tablename.fieldname".
 

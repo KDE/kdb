@@ -23,8 +23,6 @@
 #include "KDbTransactionGuard.h"
 #include "kdb_debug.h"
 
-#include <assert.h>
-
 #ifdef KDB_TRANSACTIONS_DEBUG
 //helper for debugging
 int KDbTransaction_globalcount = 0;

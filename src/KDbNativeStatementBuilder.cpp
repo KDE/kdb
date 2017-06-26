@@ -418,7 +418,9 @@ bool KDbNativeStatementBuilder::generateSelectStatement(KDbEscapedString *target
 bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *target,
                                                              const KDbTableSchema& tableSchema) const
 {
-    Q_ASSERT(target);
+    if (!target) {
+        return false;
+    }
     // Each SQL identifier needs to be escaped in the generated query.
     const KDbDriver *driver = d->connection ? d->connection->driver() : nullptr;
     KDbEscapedString sql;

@@ -423,7 +423,6 @@
 #include <string.h>
 #include <string>
 #include <iostream>
-#include <assert.h>
 #include <limits.h>
 //! @todo OK?
 #ifdef Q_OS_WIN

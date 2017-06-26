@@ -207,7 +207,8 @@ public:
      @return a new KDbLookupFieldSchema object even if lookupEl contains no valid contents. */
     static KDbLookupFieldSchema* loadFromDom(const QDomElement& lookupEl);
 
-    /*! Saves data of lookup column schema to @a parentEl DOM element of @a doc document. */
+    /*! Saves data of lookup column schema to @a parentEl DOM element of @a doc document.
+     Does nothing if @a doc or @a parentEl is @c nullptr. */
     void saveToDom(QDomDocument *doc, QDomElement *parentEl);
 
     /*! Gets property values for the lookup schema.

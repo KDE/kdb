@@ -49,7 +49,10 @@ bool KDbRecordEditBuffer::isDBAware() const
 
 const QVariant* KDbRecordEditBuffer::at(KDbQueryColumnInfo* ci, bool useDefaultValueIfPossible) const
 {
-    Q_ASSERT(ci);
+    if (!ci) {
+        kdbWarning() << "no KDbQueryColumnInfo provided";
+        return nullptr;
+    }
     if (!m_dbBuffer) {
         kdbWarning() << "not db-aware buffer!";
         return nullptr;
@@ -78,8 +81,10 @@ const QVariant* KDbRecordEditBuffer::at(const KDbField &field) const
         return nullptr;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(field.name());
-    if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
+    if (*m_simpleBufferIt == m_simpleBuffer->constEnd()) {
+        kdbWarning() << "no such field:" << field;
         return nullptr;
+    }
     return &(*m_simpleBufferIt).value();
 }
 
@@ -90,8 +95,10 @@ const QVariant* KDbRecordEditBuffer::at(const QString& fname) const
         return nullptr;
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(fname);
-    if (*m_simpleBufferIt == m_simpleBuffer->constEnd())
+    if (*m_simpleBufferIt == m_simpleBuffer->constEnd()) {
+        kdbWarning() << "no such field:" << fname;
         return nullptr;
+    }
     return &(*m_simpleBufferIt).value();
 }
 
@@ -143,8 +150,7 @@ bool KDbRecordEditBuffer::isEmpty() const
 
 void KDbRecordEditBuffer::insert(KDbQueryColumnInfo *ci, const QVariant &val)
 {
-    Q_ASSERT(ci);
-    if (m_dbBuffer) {
+    if (ci && m_dbBuffer) {
         m_dbBuffer->insert(ci, val);
         m_defaultValuesDbBuffer->remove(ci);
     }

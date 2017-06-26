@@ -30,8 +30,6 @@
 
 #include <QMutableListIterator>
 
-#include <assert.h>
-
 KDbParser *globalParser = nullptr;
 KDbField *globalField = nullptr;
 QList<KDbField*> fieldList;

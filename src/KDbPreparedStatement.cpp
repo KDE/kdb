@@ -193,9 +193,10 @@ const KDbFieldList* KDbPreparedStatement::fields() const
 
 void KDbPreparedStatement::setFields(KDbFieldList* fields)
 {
-    Q_ASSERT(fields);
-    d->fields = fields;
-    d->dirty = true;
+    if (fields) {
+        d->fields = fields;
+        d->dirty = true;
+    }
 }
 
 QStringList KDbPreparedStatement::whereFieldNames() const

@@ -25,8 +25,6 @@
 #include "KDbQuerySchema.h"
 #include "kdb_debug.h"
 
-#include <assert.h>
-
 //! @internal
 class Q_DECL_HIDDEN KDbTableSchema::Private
 {
@@ -119,7 +117,6 @@ KDbTableSchema::KDbTableSchema(KDbConnection *conn, const QString & name)
         , KDbObject(KDb::TableObjectType)
         , d(new Private(this))
 {
-    Q_ASSERT(conn);
     setName(name);
     init(conn);
 }
@@ -245,7 +242,9 @@ void KDbTableSchema::setPrimaryKey(KDbIndexSchema *pkey)
 
 bool KDbTableSchema::insertField(int index, KDbField *field)
 {
-    Q_ASSERT(field);
+    if (!field) {
+        return false;
+    }
     KDbField::List *fieldsList = fields();
     KDbFieldList::insertField(index, field);
     if (!field || index > fieldsList->count()) {

@@ -217,7 +217,8 @@ public:
 
     /*! Puts current record's data into @a data (makes a deep copy of each field).
      If the cursor is not at valid record, the result is undefined.
-     @return true on success. */
+     @return true on success.
+     @c false is returned if @a data is @c nullptr. */
     bool storeCurrentRecord(KDbRecordData* data) const;
 
     bool updateRecord(KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId = false);

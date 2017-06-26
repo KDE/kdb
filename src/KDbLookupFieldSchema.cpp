@@ -475,8 +475,9 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
 
 void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
 {
-    Q_ASSERT(doc);
-    Q_ASSERT(parentEl);
+    if (!doc || !parentEl) {
+        return;
+    }
     QDomElement lookupColumnEl, recordSourceEl, recordSourceTypeEl, nameEl;
     if (!recordSource().name().isEmpty()) {
         lookupColumnEl = doc->createElement(QLatin1String("lookup-column"));

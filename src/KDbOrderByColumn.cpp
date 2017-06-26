@@ -69,13 +69,11 @@ KDbOrderByColumn::KDbOrderByColumn()
 KDbOrderByColumn::KDbOrderByColumn(KDbQueryColumnInfo* column, SortOrder order, int pos)
     : d(new Private(column, pos, nullptr, order))
 {
-    Q_ASSERT(column);
 }
 
 KDbOrderByColumn::KDbOrderByColumn(KDbField* field, SortOrder order)
     : d(new Private(nullptr, -1, field, order))
 {
-    Q_ASSERT(field);
 }
 
 KDbOrderByColumn::KDbOrderByColumn(const KDbOrderByColumn &other)
@@ -112,7 +110,6 @@ KDbOrderByColumn* KDbOrderByColumn::copy(KDbQuerySchema* fromQuery, KDbQuerySche
         }
         return new KDbOrderByColumn(columnInfo, d->order, d->pos);
     }
-    Q_ASSERT(d->field || d->column);
     return nullptr;
 }
 
@@ -235,7 +232,9 @@ bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
                                         const QString& field4, KDbOrderByColumn::SortOrder order4,
                                         const QString& field5, KDbOrderByColumn::SortOrder order5)
 {
-    Q_ASSERT(querySchema);
+    if (!querySchema) {
+        return false;
+    }
     int numAdded = 0;
 #define ADD_COL(fieldName, order) \
     if (ok && !fieldName.isEmpty()) { \
@@ -268,14 +267,17 @@ KDbOrderByColumnList::~KDbOrderByColumnList()
 void KDbOrderByColumnList::appendColumn(KDbQueryColumnInfo* columnInfo,
                                         KDbOrderByColumn::SortOrder order)
 {
-    Q_ASSERT(columnInfo);
-    append(new KDbOrderByColumn(columnInfo, order));
+    if (columnInfo) {
+        append(new KDbOrderByColumn(columnInfo, order));
+    }
 }
 
 bool KDbOrderByColumnList::appendColumn(KDbQuerySchema* querySchema,
                                         KDbOrderByColumn::SortOrder order, int pos)
 {
-    Q_ASSERT(querySchema);
+    if (!querySchema) {
+        return false;
+    }
     KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded());
     if (pos < 0 || pos >= fieldsExpanded.size()) {
         return false;
@@ -287,14 +289,17 @@ bool KDbOrderByColumnList::appendColumn(KDbQuerySchema* querySchema,
 
 void KDbOrderByColumnList::appendField(KDbField* field, KDbOrderByColumn::SortOrder order)
 {
-    Q_ASSERT(field);
-    append(new KDbOrderByColumn(field, order));
+    if (field) {
+        append(new KDbOrderByColumn(field, order));
+    }
 }
 
 bool KDbOrderByColumnList::appendField(KDbQuerySchema* querySchema,
                                        const QString& fieldName, KDbOrderByColumn::SortOrder order)
 {
-    Q_ASSERT(querySchema);
+    if (!querySchema) {
+        return false;
+    }
     KDbQueryColumnInfo *columnInfo = querySchema->columnInfo(fieldName);
     if (columnInfo) {
         append(new KDbOrderByColumn(columnInfo, order));

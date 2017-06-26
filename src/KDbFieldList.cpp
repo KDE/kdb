@@ -122,7 +122,6 @@ void KDbFieldList::clear()
 
 bool KDbFieldList::insertField(int index, KDbField *field)
 {
-    Q_ASSERT(field);
     if (!field) {
         return false;
     }
@@ -180,7 +179,6 @@ bool KDbFieldList::removeField(KDbField *field)
 
 bool KDbFieldList::moveField(KDbField *field, int newIndex)
 {
-    Q_ASSERT(field);
     if (!field || !d->fields.removeOne(field)) {
         return false;
     }

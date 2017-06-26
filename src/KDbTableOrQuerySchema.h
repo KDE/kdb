@@ -53,7 +53,7 @@ public:
      @since 3.1 */
     KDbTableOrQuerySchema(KDbConnection *conn, const QByteArray &name, Type type);
 
-    /*! Creates a new KDbTableOrQuerySchema variant object. @a tableOrQuery must be of
+    /*! Creates a new KDbTableOrQuerySchema variant object. @a tableOrQuery should be of
      class KDbTableSchema or KDbQuerySchema.
      Check whether a query or table has been found by testing (query() || table()) expression. */
     explicit KDbTableOrQuerySchema(KDbFieldList *tableOrQuery);

@@ -147,7 +147,7 @@ protected:
     KDbIndexSchema(const KDbIndexSchema& index, KDbTableSchema* parentTable);
 
     //! Assigns this index to @a table
-    //! table() must be @c nullptr and @a table must be not @a nullptr
+    //! table() must be @c nullptr and @a table must be not be @a nullptr.
     //! @since 3.1
     void setTable(KDbTableSchema *table);
 

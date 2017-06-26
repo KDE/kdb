@@ -341,24 +341,26 @@ KDbVersionInfo KDb::version()
 bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname, KDbField::Type keytype, const QVariant &keyval)
 {
-    Q_ASSERT(conn);
-    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
-                            .arg(conn->escapeIdentifier(tableName))
-                            .arg(conn->escapeIdentifier(keyname))
-                            .arg(conn->driver()->valueToSql(keytype, keyval)));
+    return conn
+        ? conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3")
+                               .arg(conn->escapeIdentifier(tableName))
+                               .arg(conn->escapeIdentifier(keyname))
+                               .arg(conn->driver()->valueToSql(keytype, keyval)))
+        : false;
 }
 
 bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname1, KDbField::Type keytype1, const QVariant& keyval1,
                         const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2)
 {
-    Q_ASSERT(conn);
-    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
-                            .arg(conn->escapeIdentifier(tableName))
-                            .arg(conn->escapeIdentifier(keyname1))
-                            .arg(conn->driver()->valueToSql(keytype1, keyval1))
-                            .arg(conn->escapeIdentifier(keyname2))
-                            .arg(conn->driver()->valueToSql(keytype2, keyval2)));
+    return conn
+        ? conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5")
+                               .arg(conn->escapeIdentifier(tableName))
+                               .arg(conn->escapeIdentifier(keyname1))
+                               .arg(conn->driver()->valueToSql(keytype1, keyval1))
+                               .arg(conn->escapeIdentifier(keyname2))
+                               .arg(conn->driver()->valueToSql(keytype2, keyval2)))
+        : false;
 }
 
 bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
@@ -366,22 +368,24 @@ bool KDb::deleteRecords(KDbConnection* conn, const QString &tableName,
                         const QString &keyname2, KDbField::Type keytype2, const QVariant& keyval2,
                         const QString &keyname3, KDbField::Type keytype3, const QVariant& keyval3)
 {
-    Q_ASSERT(conn);
-    return conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
-                            .arg(conn->escapeIdentifier(tableName))
-                            .arg(conn->escapeIdentifier(keyname1))
-                            .arg(conn->driver()->valueToSql(keytype1, keyval1))
-                            .arg(conn->escapeIdentifier(keyname2))
-                            .arg(conn->driver()->valueToSql(keytype2, keyval2))
-                            .arg(conn->escapeIdentifier(keyname3))
-                            .arg(conn->driver()->valueToSql(keytype3, keyval3)));
+    return conn
+        ? conn->executeSql(KDbEscapedString("DELETE FROM %1 WHERE %2=%3 AND %4=%5 AND %6=%7")
+                               .arg(conn->escapeIdentifier(tableName))
+                               .arg(conn->escapeIdentifier(keyname1))
+                               .arg(conn->driver()->valueToSql(keytype1, keyval1))
+                               .arg(conn->escapeIdentifier(keyname2))
+                               .arg(conn->driver()->valueToSql(keytype2, keyval2))
+                               .arg(conn->escapeIdentifier(keyname3))
+                               .arg(conn->driver()->valueToSql(keytype3, keyval3)))
+        : false;
 }
 
 bool KDb::deleteAllRecords(KDbConnection* conn, const QString &tableName)
 {
-    Q_ASSERT(conn);
-    return conn->executeSql(KDbEscapedString("DELETE FROM %1")
-                            .arg(conn->escapeIdentifier(tableName)));
+    return conn
+        ? conn->executeSql(
+              KDbEscapedString("DELETE FROM %1").arg(conn->escapeIdentifier(tableName)))
+        : false;
 }
 
 KDB_EXPORT quint64 KDb::lastInsertedAutoIncValue(QSharedPointer<KDbSqlResult> result,
@@ -436,7 +440,7 @@ KDbEscapedString KDb::sqlWhere(KDbDriver *drv, KDbField::Type t,
                             const QString& fieldName, const QVariant& value)
 {
     if (value.isNull())
-        return KDbEscapedString(fieldName) + " is NULL";
+        return KDbEscapedString(fieldName) + " IS NULL";
     return KDbEscapedString(fieldName) + '=' + drv->valueToSql(t, value);
 }
 
@@ -499,8 +503,14 @@ KDbField::Type KDb::defaultFieldTypeForGroup(KDbField::TypeGroup typeGroup)
 
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QString *details)
 {
-    Q_ASSERT(msg);
-    Q_ASSERT(details);
+    if (!msg) {
+        kdbWarning() << "missing 'msg' parameter";
+        return;
+    }
+    if (!details) {
+        kdbWarning() << "missing 'details' parameter";
+        return;
+    }
     const KDbResult result(resultable.result());
     if (!result.isError())
         return;
@@ -553,23 +563,27 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QStr
 
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg)
 {
-    Q_ASSERT(msg);
     getHTMLErrorMesage(resultable, msg, msg);
 }
 
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info)
 {
-    Q_ASSERT(info);
+    if (!info) {
+        kdbWarning() << "missing 'info' parameter";
+        return;
+    }
     getHTMLErrorMesage(resultable, &info->message, &info->description);
 }
 
 tristate KDb::idForObjectName(KDbConnection* conn, int *id, const QString& objName, int objType)
 {
-    Q_ASSERT(conn);
-    Q_ASSERT(id);
-    return conn->querySingleNumber(
-        KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_name=%1 AND o_type=%2")
-        .arg(conn->escapeString(objName)).arg(objType), id);
+    return conn
+        ? conn->querySingleNumber(
+              KDbEscapedString("SELECT o_id FROM kexi__objects WHERE o_name=%1 AND o_type=%2")
+                  .arg(conn->escapeString(objName))
+                  .arg(objType),
+              id)
+        : false;
 }
 
 //-----------------------------------------
@@ -588,8 +602,10 @@ tristate KDb::showConnectionTestDialog(QWidget *parent, const KDbConnectionData 
 int KDb::recordCount(KDbConnection* conn, const KDbEscapedString& sql)
 {
     int count = -1; //will be changed only on success of querySingleNumber()
-    conn->querySingleNumber(KDbEscapedString("SELECT COUNT() FROM (") + sql
-        + ") AS kdb__subquery", &count);
+    if (conn) {
+        (void)conn->querySingleNumber(
+            KDbEscapedString("SELECT COUNT() FROM (") + sql + ") AS kdb__subquery", &count);
+    }
     return count;
 }
 
@@ -630,19 +646,23 @@ int KDb::recordCount(KDbQuerySchema* querySchema, const QList<QVariant>& params)
 
 int KDb::recordCount(KDbTableOrQuerySchema* tableOrQuery, const QList<QVariant>& params)
 {
-    if (tableOrQuery->table())
-        return recordCount(*tableOrQuery->table());
-    if (tableOrQuery->query())
-        return recordCount(tableOrQuery->query(), params);
+    if (tableOrQuery) {
+        if (tableOrQuery->table())
+            return recordCount(*tableOrQuery->table());
+        if (tableOrQuery->query())
+            return recordCount(tableOrQuery->query(), params);
+    }
     return -1;
 }
 
 int KDb::fieldCount(KDbTableOrQuerySchema* tableOrQuery)
 {
-    if (tableOrQuery->table())
-        return tableOrQuery->table()->fieldCount();
-    if (tableOrQuery->query())
-        return tableOrQuery->query()->fieldsExpanded().count();
+    if (tableOrQuery) {
+        if (tableOrQuery->table())
+            return tableOrQuery->table()->fieldCount();
+        if (tableOrQuery->query())
+            return tableOrQuery->query()->fieldsExpanded().count();
+    }
     return -1;
 }
 
@@ -650,8 +670,9 @@ bool KDb::splitToTableAndFieldParts(const QString& string,
                                           QString *tableName, QString *fieldName,
                                           SplitToTableAndFieldPartsOptions option)
 {
-    Q_ASSERT(tableName);
-    Q_ASSERT(fieldName);
+    if (!tableName || !fieldName) {
+        return false;
+    }
     const int id = string.indexOf(QLatin1Char('.'));
     if (option & SetFieldNameIfNoTableName && id == -1) {
         tableName->clear();
@@ -701,13 +722,15 @@ QString KDb::numberToString(double value, int decimalPlaces)
     return ::numberToString(value, decimalPlaces, nullptr);
 }
 
-QString KDb::numberToLocaleString(double value, int decimalPlaces, const QLocale *locale)
+QString KDb::numberToLocaleString(double value, int decimalPlaces)
 {
-    if (locale) {
-        return ::numberToString(value, decimalPlaces, locale);
-    }
     QLocale defaultLocale;
     return ::numberToString(value, decimalPlaces, &defaultLocale);
+}
+
+QString KDb::numberToLocaleString(double value, int decimalPlaces, const QLocale &locale)
+{
+    return ::numberToString(value, decimalPlaces, &locale);
 }
 
 KDbField::Type KDb::intToFieldType(int type)
@@ -798,7 +821,9 @@ static QVariant visibleColumnValue(const KDbLookupFieldSchema *lookup)
 
 void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVariant> *values)
 {
-    Q_ASSERT(values);
+    if (!values) {
+        return;
+    }
     KDbLookupFieldSchemaRecordSource recordSource;
     if (lookup) {
         recordSource = lookup->recordSource();
@@ -825,7 +850,9 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
 
 void KDb::getFieldProperties(const KDbField &field, QMap<QByteArray, QVariant> *values)
 {
-    Q_ASSERT(values);
+    if (!values) {
+        return;
+    }
     values->clear();
     // normal values
     values->insert("type", field.type());
@@ -869,7 +896,9 @@ static bool containsLookupFieldSchemaProperties(const QMap<QByteArray, QVariant>
 
 bool KDb::setFieldProperties(KDbField *field, const QMap<QByteArray, QVariant>& values)
 {
-    Q_ASSERT(field);
+    if (!field) {
+        return false;
+    }
     QMap<QByteArray, QVariant>::ConstIterator it;
     if ((it = values.find("type")) != values.constEnd()) {
         if (!setIntToFieldType(field, *it))
@@ -1015,7 +1044,9 @@ bool KDb::isLookupFieldSchemaProperty(const QByteArray& propertyName)
 
 bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, const QVariant& value)
 {
-    Q_ASSERT(field);
+    if (!field) {
+        return false;
+    }
 #define SET_BOOLEAN_FLAG(flag, value) { \
         constraints |= KDbField::flag; \
         if (!value) \
@@ -1202,8 +1233,9 @@ QVariant KDb::loadPropertyValueFromDom(const QDomNode& node, bool* ok)
 QDomElement KDb::saveNumberElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, int value)
 {
-    Q_ASSERT(doc);
-    Q_ASSERT(parentEl);
+    if (!doc || !parentEl || elementName.isEmpty()) {
+        return QDomElement();
+    }
     QDomElement el(doc->createElement(elementName));
     parentEl->appendChild(el);
     QDomElement numberEl(doc->createElement(QLatin1String("number")));
@@ -1215,8 +1247,9 @@ QDomElement KDb::saveNumberElementToDom(QDomDocument *doc, QDomElement *parentEl
 QDomElement KDb::saveBooleanElementToDom(QDomDocument *doc, QDomElement *parentEl,
         const QString& elementName, bool value)
 {
-    Q_ASSERT(doc);
-    Q_ASSERT(parentEl);
+    if (!doc || !parentEl || elementName.isEmpty()) {
+        return QDomElement();
+    }
     QDomElement el(doc->createElement(elementName));
     parentEl->appendChild(el);
     QDomElement numberEl(doc->createElement(QLatin1String("bool")));
@@ -1944,8 +1977,9 @@ bool KDb::isDefaultValueAllowed(const KDbField &field)
 void KDb::getLimitsForFieldType(KDbField::Type type, qlonglong *minValue, qlonglong *maxValue,
                                 Signedness signedness)
 {
-    Q_ASSERT(minValue);
-    Q_ASSERT(maxValue);
+    if (!minValue || !maxValue) {
+        return;
+    }
     switch (type) {
     case KDbField::Byte:
 //! @todo always ok?
@@ -2085,7 +2119,6 @@ QStringList KDb::libraryPaths()
 
 QString KDb::temporaryTableName(KDbConnection *conn, const QString &baseName)
 {
-    Q_ASSERT(conn);
     if (!conn) {
         return QString();
     }

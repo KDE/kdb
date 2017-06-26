@@ -592,7 +592,9 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
         int colnum, KDbTableViewColumn* col, QVariant* newval, bool allowSignals,
         QVariant *visibleValueForLookupField)
 {
-    Q_ASSERT(newval);
+    if (!record || !newval) {
+        return false;
+    }
     d->result.clear();
     if (allowSignals)
         emit aboutToChangeCell(record, colnum, newval, &d->result);
