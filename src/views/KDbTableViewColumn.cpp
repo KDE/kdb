@@ -393,7 +393,7 @@ QDebug operator<<(QDebug dbg, const KDbTableViewColumn &column)
     }
     dbg.space() << "relatedData: KDbTableViewData(";
     const KDbTableViewData *relatedData = column.d->relatedData;
-    if (data) {
+    if (relatedData) {
         dbg.space() << "count:" << relatedData->count() << ")";
     } else {
         dbg.space() << "<NONE>)";
