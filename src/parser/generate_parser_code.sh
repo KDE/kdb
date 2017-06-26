@@ -279,6 +279,7 @@ cat << EOF > generated/KDbToken.cpp
 
 #include "KDbToken.h"
 #include "KDbDriver.h"
+#include "KDbDriver_p.h"
 #include "KDbDriverBehavior.h"
 #include "sqlparser.h"
 #include "parser/KDbParser_p.h"
@@ -321,10 +322,10 @@ QString KDbToken::toString(const KDbDriver *driver) const
     case ::NOT_EQUAL2: return QLatin1String("!=");
     case ::LESS_OR_EQUAL: return QLatin1String("<=");
     case ::GREATER_OR_EQUAL: return QLatin1String(">=");
-    case ::LIKE: return driver ? driver->behavior()->LIKE_OPERATOR : QLatin1String("LIKE");
+    case ::LIKE: return driver ? KDbDriverPrivate::behavior(driver)->LIKE_OPERATOR : QLatin1String("LIKE");
     case ::NOT_LIKE:
         return driver
-            ? (QString::fromLatin1("NOT ") + driver->behavior()->LIKE_OPERATOR)
+            ? (QString::fromLatin1("NOT ") + KDbDriverPrivate::behavior(driver)->LIKE_OPERATOR)
             : QString::fromLatin1("NOT LIKE");
     case ::SQL_IN: return QLatin1String("IN");
         // other logical operations: OR (or ||) AND (or &&) XOR
