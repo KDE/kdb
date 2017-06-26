@@ -1016,7 +1016,8 @@ QSharedPointer<KDbSqlResult> KDbConnection::insertRecordInternal(const QString &
     {
         // Fetching is needed to perform real execution at least for some backends.
         // Also we are not expecting record but let's delete if there's any.
-        (void)res->fetchRecord();
+        QSharedPointer<KDbSqlRecord> record = res->fetchRecord();
+        Q_UNUSED(record)
     }
     if (res->lastResult().isError()) {
         res.clear();
