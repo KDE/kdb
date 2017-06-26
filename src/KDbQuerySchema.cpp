@@ -47,7 +47,6 @@ KDbQuerySchema::KDbQuerySchema()
         , KDbObject(KDb::QueryObjectType)
         , d(new Private(this))
 {
-    init();
 }
 
 KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
@@ -58,7 +57,6 @@ KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
     Q_ASSERT(tableSchema);
     d->masterTable = tableSchema;
     d->conn = tableSchema->connection();
-    init();
     /*if (!d->masterTable) {
       kdbWarning() << "!d->masterTable";
       m_name.clear();
@@ -107,18 +105,12 @@ KDbQuerySchema::KDbQuerySchema(KDbConnection *conn)
         , d(new Private(this))
 {
     Q_ASSERT(conn);
-    init();
     d->conn = conn;
 }
 
 KDbQuerySchema::~KDbQuerySchema()
 {
     delete d;
-}
-
-void KDbQuerySchema::init()
-{
-//m_fields_by_name.setAutoDelete( true ); //because we're using QueryColumnInfoEntry objects
 }
 
 void KDbQuerySchema::clear()

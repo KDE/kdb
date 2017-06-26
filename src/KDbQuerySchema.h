@@ -705,8 +705,6 @@ protected:
     //! @internal associates @a conn with this query so it's possible to find tables
     explicit KDbQuerySchema(KDbConnection *conn);
 
-    void init();
-
     void computeFieldsExpanded() const;
 
     //! Used by fieldsExpanded(FieldsExpandedOptions)
