@@ -21,6 +21,7 @@
                 "Name[pt_BR]": "Equipe do Kexi",
                 "Name[sk]": "Tím Kexi",
                 "Name[sv]": "Kexi-gruppen",
+                "Name[tr]": "Kexi Ekibi",
                 "Name[uk]": "Команда Kexi",
                 "Name[x-test]": "xxKexi Teamxx",
                 "Name[zh_CN]": "Kexi 团队"
@@ -45,6 +46,7 @@
         "Description[pt_BR]": "Driver do KDb para lidar com bancos de dados Sybase e MSSQL",
         "Description[sk]": "KDb ovládač na spracovanie databáz Sybase a MSSQL",
         "Description[sv]": "Kdb-drivrutin för att hantera Sybase- och MSSQL-databaser",
+        "Description[tr]": "Sysbase ve MSSQL veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних Sybase і MSSQL",
         "Description[x-test]": "xxKDb driver for handling Sybase and MSSQL databasesxx",
         "Description[zh_CN]": "处理 Sybase 和 MSSQL 数据库的 KDb 驱动",

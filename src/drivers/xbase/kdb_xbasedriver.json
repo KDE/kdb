@@ -21,6 +21,7 @@
                 "Name[pt_BR]": "Equipe do Kexi",
                 "Name[sk]": "Tím Kexi",
                 "Name[sv]": "Kexi-gruppen",
+                "Name[tr]": "Kexi Ekibi",
                 "Name[uk]": "Команда Kexi",
                 "Name[x-test]": "xxKexi Teamxx",
                 "Name[zh_CN]": "Kexi 团队"
@@ -45,6 +46,7 @@
         "Description[pt_BR]": "Driver do KDb para lidar com bancos de dados xBase",
         "Description[sk]": "KDb ovládač na spracovanie databáz xBase",
         "Description[sv]": "Kdb-drivrutin för att hantera xBase-databaser",
+        "Description[tr]": "xBase veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних xBase",
         "Description[x-test]": "xxKDb driver for handling xBase databasesxx",
         "Description[zh_CN]": "处理 xBase 数据库的 KDb 驱动",
