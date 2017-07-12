@@ -110,11 +110,12 @@ void KDbParser::init()
     d->initialized = true;
 }
 
-bool KDbParser::parse(const KDbEscapedString &sql)
+bool KDbParser::parse(const KDbEscapedString &sql, KDbQuerySchema *query)
 {
     init();
     reset();
     d->sql = sql;
+    d->query = query;
 
     KDbParser *oldParser = globalParser;
     KDbField *oldField = globalField;

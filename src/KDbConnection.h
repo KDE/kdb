@@ -846,10 +846,14 @@ public:
     @return true on success. */
     bool storeNewObjectData(KDbObject* object);
 
-    /*! Added for convenience.
+    /*! Finds object data for object of type @a type and identifier @a id.
+     Added for convenience.
+     If @a type is KDb::AnyObjectType, object type is ignored during the find.
      @see setupObjectData(const KDbRecordData*, KDbObject*).
-     @return true on success, false on failure and cancelled when such object couldn't be found. */
-    tristate loadObjectData(int id, KDbObject* object);
+     @return true on success, false on failure and cancelled when such object couldn't be found.
+     @since 3.1
+    */
+    tristate loadObjectData(int type, int id, KDbObject* object);
 
     /*! Finds object data for object of type @a type and name @a name.
      If the object is found, resulted schema is stored in @a object and true is returned,
@@ -1234,16 +1238,6 @@ protected:
     /*! Helper: checks both if connection is established and database any is used;
       if not: error message is set up and false returned */
     bool checkIsDatabaseUsed();
-
-    /*! @return a full table schema for a table retrieved using 'kexi__*' system tables.
-     Connection keeps ownership of the returned object.
-     Used internally by tableSchema() methods. */
-    KDbTableSchema* setupTableSchema(const KDbRecordData& data) Q_REQUIRED_RESULT;
-
-    /*! @return a full query schema for a query using 'kexi__*' system tables.
-     Connection keeps ownership of the returned object.
-     Used internally by querySchema() methods. */
-    KDbQuerySchema* setupQuerySchema(const KDbRecordData& data) Q_REQUIRED_RESULT;
 
     /*! Update a record. */
     bool updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId = false);

@@ -1591,7 +1591,7 @@ yyreduce:
 #line 714 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "SELECT";
-    (yyval.querySchema) = KDbQuerySchema::Private::createQuery(globalParser->connection());
+    (yyval.querySchema) = KDbParserPrivate::get(globalParser)->createQuery();
 }
 #line 1597 "sqlparser.cpp" /* yacc.c:1646  */
     break;

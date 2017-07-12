@@ -267,7 +267,8 @@ public:
 
     bool storeNewObjectData(KDbObject* object);
 
-    tristate loadObjectData(int id, KDbObject* object);
+    //! @since 3.1
+    tristate loadObjectData(int type, int id, KDbObject* object);
 
     tristate loadObjectData(int type, const QString& name, KDbObject* object);
 
@@ -358,10 +359,6 @@ public:
     bool checkConnected();
 
     bool checkIsDatabaseUsed();
-
-    KDbTableSchema* setupTableSchema(const KDbRecordData& data);
-
-    KDbQuerySchema* setupQuerySchema(const KDbRecordData& data);
 
     bool updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId = false);
 

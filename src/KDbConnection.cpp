@@ -26,6 +26,7 @@
 #include "KDbLookupFieldSchema.h"
 #include "KDbNativeStatementBuilder.h"
 #include "KDbQuerySchema.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbRecordData.h"
 #include "KDbRecordEditBuffer.h"
 #include "KDbRelationship.h"
@@ -333,6 +334,85 @@ void KDbConnectionPrivate::clearQueries()
 {
     qDeleteAll(m_queries);
     m_queries.clear();
+}
+
+KDbTableSchema* KDbConnectionPrivate::setupTableSchema(KDbTableSchema *table)
+{
+    Q_ASSERT(table);
+    QScopedPointer<KDbTableSchema> newTable(table);
+    KDbCursor *cursor;
+    if (!(cursor = conn->executeQuery(
+            KDbEscapedString("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
+                             "f_options, f_default, f_order, f_caption, f_help "
+                             "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order")
+                            .arg(driver->valueToSql(KDbField::Integer, table->id())))))
+    {
+        return nullptr;
+    }
+    if (!cursor->moveFirst()) {
+        if (!cursor->result().isError() && cursor->eof()) {
+            conn->m_result = KDbResult(tr("Table has no fields defined."));
+        }
+        conn->deleteCursor(cursor);
+        return nullptr;
+    }
+
+    // For each field: load its schema
+    KDbRecordData fieldData;
+    bool ok = true;
+    while (!cursor->eof()) {
+//  kdbDebug()<<"@@@ f_name=="<<cursor->value(2).asCString();
+        if (!cursor->storeCurrentRecord(&fieldData)) {
+            ok = false;
+            break;
+        }
+        KDbField *f = conn->setupField(fieldData);
+        if (!f || !table->addField(f)) {
+            ok = false;
+            break;
+        }
+        cursor->moveNext();
+    }
+
+    if (!ok) {//error:
+        conn->deleteCursor(cursor);
+        return nullptr;
+    }
+
+    if (!conn->deleteCursor(cursor)) {
+        return nullptr;
+    }
+
+    if (!conn->loadExtendedTableSchemaData(table)) {
+        return nullptr;
+    }
+    //store locally:
+    insertTable(table);
+    return newTable.take();
+}
+
+KDbQuerySchema* KDbConnectionPrivate::setupQuerySchema(KDbQuerySchema *query)
+{
+    Q_ASSERT(query);
+    QScopedPointer<KDbQuerySchema> newQuery(query);
+    QString sql;
+    if (!conn->loadDataBlock(query->id(), &sql, QLatin1String("sql"))) {
+        conn->m_result = KDbResult(
+            ERR_OBJECT_NOT_FOUND,
+            tr("Could not find definition for query \"%1\". Deleting this query is recommended.")
+                .arg(query->name()));
+        return nullptr;
+    }
+    if (!parser()->parse(KDbEscapedString(sql), query)) {
+        conn->m_result = KDbResult(
+            ERR_SQL_PARSE_ERROR, tr("<p>Could not load definition for query \"%1\". "
+                                    "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
+                                    "<p>This query can be edited only in Text View.</p>")
+                                     .arg(query->name(), sql));
+        return nullptr;
+    }
+    insertQuery(query);
+    return newQuery.take();
 }
 
 //================================================
@@ -2072,15 +2152,25 @@ bool KDbConnection::setupObjectData(const KDbRecordData &data, KDbObject *object
     return true;
 }
 
-tristate KDbConnection::loadObjectData(int id, KDbObject* object)
+tristate KDbConnection::loadObjectData(int type, int id, KDbObject* object)
 {
     KDbRecordData data;
-    if (true != querySingleRecord(
-            KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(d->driver->valueToSql(KDbField::Integer, id)),
-            &data))
-    {
-        return cancelled;
+    if (type == KDb::AnyObjectType) {
+        if (true != querySingleRecord(KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, "
+                                                       "o_desc FROM kexi__objects WHERE o_id=%1")
+                                          .arg(d->driver->valueToSql(KDbField::Integer, id)),
+                                      &data)) {
+            return cancelled;
+        }
+    } else {
+        if (true != querySingleRecord(KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
+                                                       "FROM kexi__objects WHERE o_type=%1 AND o_id=%1")
+                                          .arg(d->driver->valueToSql(KDbField::Integer, type))
+                                          .arg(d->driver->valueToSql(KDbField::Integer, id)),
+                                      &data))
+        {
+            return cancelled;
+        }
     }
     return setupObjectData(data, object);
 }
@@ -2742,86 +2832,18 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
     return f;
 }
 
-KDbTableSchema* KDbConnection::setupTableSchema(const KDbRecordData &data)
-{
-    KDbTableSchema *t = new KDbTableSchema(this);
-    if (!setupObjectData(data, t)) {
-        delete t;
-        return nullptr;
-    }
-
-    KDbCursor *cursor;
-    if (!(cursor = executeQuery(
-            KDbEscapedString("SELECT t_id, f_type, f_name, f_length, f_precision, f_constraints, "
-                             "f_options, f_default, f_order, f_caption, f_help "
-                             "FROM kexi__fields WHERE t_id=%1 ORDER BY f_order")
-                            .arg(d->driver->valueToSql(KDbField::Integer, t->id())))))
-    {
-        delete t;
-        return nullptr;
-    }
-    if (!cursor->moveFirst()) {
-        if (!cursor->result().isError() && cursor->eof()) {
-            m_result = KDbResult(tr("Table has no fields defined."));
-        }
-        deleteCursor(cursor);
-        delete t;
-        return nullptr;
-    }
-
-    // For each field: load its schema
-    KDbRecordData fieldData;
-    bool ok = true;
-    while (!cursor->eof()) {
-//  kdbDebug()<<"@@@ f_name=="<<cursor->value(2).asCString();
-        if (!cursor->storeCurrentRecord(&fieldData)) {
-            ok = false;
-            break;
-        }
-        KDbField *f = setupField(fieldData);
-        if (!f || !t->addField(f)) {
-            ok = false;
-            break;
-        }
-        cursor->moveNext();
-    }
-
-    if (!ok) {//error:
-        deleteCursor(cursor);
-        delete t;
-        return nullptr;
-    }
-
-    if (!deleteCursor(cursor)) {
-        delete t;
-        return nullptr;
-    }
-
-    if (!loadExtendedTableSchemaData(t)) {
-        delete t;
-        return nullptr;
-    }
-    //store locally:
-    d->insertTable(t);
-    return t;
-}
-
 KDbTableSchema* KDbConnection::tableSchema(const QString& tableName)
 {
     KDbTableSchema *t = d->table(tableName);
     if (t)
         return t;
     //not found: retrieve schema
-    KDbRecordData data;
-    if (true != querySingleRecord(
-            KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                             "WHERE o_name=%1 AND o_type=%2")
-                             .arg(escapeString(tableName))
-                             .arg(d->driver->valueToSql(KDbField::Integer, KDb::TableObjectType)), &data))
-    {
+    QScopedPointer<KDbTableSchema> newTable(new KDbTableSchema);
+    clearResult();
+    if (true != loadObjectData(KDb::TableObjectType, tableName, newTable.data())) {
         return nullptr;
     }
-    return setupTableSchema(data);
+    return d->setupTableSchema(newTable.take());
 }
 
 KDbTableSchema* KDbConnection::tableSchema(int tableId)
@@ -2830,14 +2852,12 @@ KDbTableSchema* KDbConnection::tableSchema(int tableId)
     if (t)
         return t;
     //not found: retrieve schema
-    KDbRecordData data;
-    if (true != querySingleRecord(
-            KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(d->driver->valueToSql(KDbField::Integer, tableId)), &data))
-    {
+    QScopedPointer<KDbTableSchema> newTable(new KDbTableSchema);
+    clearResult();
+    if (true != loadObjectData(KDb::TableObjectType, tableId, newTable.data())) {
         return nullptr;
     }
-    return setupTableSchema(data);
+    return d->setupTableSchema(newTable.take());
 }
 
 tristate KDbConnection::loadDataBlock(int objectID, QString* dataString, const QString& dataID)
@@ -2912,57 +2932,19 @@ bool KDbConnection::removeDataBlock(int objectID, const QString& dataID)
                                        QLatin1String("o_sub_id"), KDbField::Text, dataID);
 }
 
-KDbQuerySchema* KDbConnection::setupQuerySchema(const KDbRecordData &data)
+KDbQuerySchema* KDbConnection::querySchema(const QString& aQueryName)
 {
-    bool ok = true;
-    const int objID = data[0].toInt(&ok);
-    if (!ok)
-        return nullptr;
-    QString sql;
-    if (!loadDataBlock(objID, &sql, QLatin1String("sql"))) {
-        m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
-                             tr("Could not find definition for query \"%1\". Deleting this query is recommended.").arg(data[2].toString()));
-        return nullptr;
-    }
-    KDbQuerySchema *query = nullptr;
-    if (d->parser()->parse(KDbEscapedString(sql))) {
-        query = d->parser()->query();
-    }
-    //error?
-    if (!query) {
-        m_result = KDbResult(ERR_SQL_PARSE_ERROR,
-                             tr("<p>Could not load definition for query \"%1\". "
-                                "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
-                                "<p>This query can be edited only in Text View.</p>")
-                                .arg(data[2].toString(), sql));
-        return nullptr;
-    }
-    if (!setupObjectData(data, query)) {
-        delete query;
-        return nullptr;
-    }
-    d->insertQuery(query);
-    return query;
-}
-
-KDbQuerySchema* KDbConnection::querySchema(const QString& queryName)
-{
-    QString m_queryName = queryName.toLower();
-    KDbQuerySchema *q = d->query(m_queryName);
+    QString queryName = aQueryName.toLower();
+    KDbQuerySchema *q = d->query(queryName);
     if (q)
         return q;
     //not found: retrieve schema
-    KDbRecordData data;
-    if (true != querySingleRecord(
-            KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects "
-                             "WHERE o_name=%1 AND o_type=%2")
-                             .arg(escapeString(m_queryName))
-                             .arg(d->driver->valueToSql(KDbField::Integer, int(KDb::QueryObjectType))),
-            &data))
-    {
+    QScopedPointer<KDbQuerySchema> newQuery(KDbQuerySchema::Private::createQuery(this));
+    clearResult();
+    if (true != loadObjectData(KDb::QueryObjectType, aQueryName, newQuery.data())) {
         return nullptr;
     }
-    return setupQuerySchema(data);
+    return d->setupQuerySchema(newQuery.take());
 }
 
 KDbQuerySchema* KDbConnection::querySchema(int queryId)
@@ -2971,16 +2953,12 @@ KDbQuerySchema* KDbConnection::querySchema(int queryId)
     if (q)
         return q;
     //not found: retrieve schema
+    QScopedPointer<KDbQuerySchema> newQuery(KDbQuerySchema::Private::createQuery(this));
     clearResult();
-    KDbRecordData data;
-    if (true != querySingleRecord(
-            KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc FROM kexi__objects WHERE o_id=%1")
-                             .arg(d->driver->valueToSql(KDbField::Integer, queryId)),
-            &data))
-    {
+    if (true != loadObjectData(KDb::QueryObjectType, queryId, newQuery.data())) {
         return nullptr;
     }
-    return setupQuerySchema(data);
+    return d->setupQuerySchema(newQuery.take());
 }
 
 bool KDbConnection::setQuerySchemaObsolete(const QString& queryName)

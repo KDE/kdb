@@ -84,6 +84,11 @@ void KDbParserPrivate::setQuerySchema(KDbQuerySchema *query)
     this->query = query;
 }
 
+KDbQuerySchema* KDbParserPrivate::createQuery()
+{
+    return query ? query : KDbQuerySchema::Private::createQuery(connection);
+}
+
 //-------------------------------------
 
 KDbParseInfo::KDbParseInfo(KDbQuerySchema *query)

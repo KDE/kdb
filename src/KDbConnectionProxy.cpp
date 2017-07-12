@@ -529,9 +529,9 @@ bool KDbConnectionProxy::storeNewObjectData(KDbObject* object)
     return d->connection->storeNewObjectData(object);
 }
 
-tristate KDbConnectionProxy::loadObjectData(int id, KDbObject* object)
+tristate KDbConnectionProxy::loadObjectData(int type, int id, KDbObject* object)
 {
-    return d->connection->loadObjectData(id, object);
+    return d->connection->loadObjectData(type, id, object);
 }
 
 tristate KDbConnectionProxy::loadObjectData(int type, const QString& name, KDbObject* object)
@@ -751,16 +751,6 @@ bool KDbConnectionProxy::checkConnected()
 bool KDbConnectionProxy::checkIsDatabaseUsed()
 {
     return d->connection->checkIsDatabaseUsed();
-}
-
-KDbTableSchema* KDbConnectionProxy::setupTableSchema(const KDbRecordData& data)
-{
-    return d->connection->setupTableSchema(data);
-}
-
-KDbQuerySchema* KDbConnectionProxy::setupQuerySchema(const KDbRecordData& data)
-{
-    return d->connection->setupQuerySchema(data);
 }
 
 bool KDbConnectionProxy::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDbRecordEditBuffer* buf, bool useRecordId)

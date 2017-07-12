@@ -128,9 +128,13 @@ public:
     ~KDbParser();
 
     /**
-     * Clears the parser's status and runs the parsing for a raw SQL statement @a sql .
+     * @brief Clears the parser's status and runs the parsing for a raw SQL statement
+     *
+     * If parsing of @a sql results in a proper query and @a query is present, it will be set to
+     * representation of the parsed query.
+     * @since 3.1
      */
-    bool parse(const KDbEscapedString &sql);
+    bool parse(const KDbEscapedString &sql, KDbQuerySchema *query = nullptr);
 
     /**
      * Reset the parser's status (table, query, error, statement, statement type).

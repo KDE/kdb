@@ -68,12 +68,21 @@ public:
      */
     void setError(const KDbParserError &err);
 
+    /**
+     * Creates a new query or provides the one provided by KDbParser::parse().
+     */
+    KDbQuerySchema* createQuery() Q_REQUIRED_RESULT;
+
     friend class KDbParser;
 
 private:
     KDbParser::StatementType statementType;
     KDbTableSchema *table;
+
+    //! Query created as a result of parse() (createQuery()); can be also predefined - passed as
+    //! argument of parse()
     KDbQuerySchema *query;
+
     KDbConnection *connection;
     KDbEscapedString sql;
     KDbParserError error;

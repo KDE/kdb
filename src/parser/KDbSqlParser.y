@@ -713,7 +713,7 @@ Select:
 SELECT
 {
     kdbDebug() << "SELECT";
-    $$ = KDbQuerySchema::Private::createQuery(globalParser->connection());
+    $$ = KDbParserPrivate::get(globalParser)->createQuery();
 }
 ;
 

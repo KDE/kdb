@@ -40,6 +40,7 @@ private:
 
 class KDbConnectionPrivate
 {
+    Q_DECLARE_TR_FUNCTIONS(KDbConnectionPrivate)
 public:
     KDbConnectionPrivate(KDbConnection* const conn, KDbDriver *drv,
                          const KDbConnectionData& _connData,
@@ -109,6 +110,18 @@ public:
     void setQueryObsolete(KDbQuerySchema* query);
 
     void clearQueries();
+
+    /*! @return a full table schema for a table retrieved using 'kexi__*' system tables.
+     Connection keeps ownership of the returned object.
+     Used internally by tableSchema() methods.
+     On failure deletes @a table and returns @c nullptr. */
+    KDbTableSchema* setupTableSchema(KDbTableSchema *table) Q_REQUIRED_RESULT;
+
+    /*! @return a full query schema for a query using 'kexi__*' system tables.
+     Connection keeps ownership of the returned object.
+     Used internally by querySchema() methods.
+     On failure deletes @a query and returns @c nullptr. */
+    KDbQuerySchema* setupQuerySchema(KDbQuerySchema *query) Q_REQUIRED_RESULT;
 
     KDbConnection* const conn; //!< The @a KDbConnection instance this @a KDbConnectionPrivate belongs to.
     KDbConnectionData connData; //!< the @a KDbConnectionData used within that connection.
