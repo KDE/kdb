@@ -55,13 +55,13 @@ public:
     virtual int fieldsCount() = 0;
 
     //! @return field @a index from this result
-    virtual KDbSqlField *field(int index) Q_REQUIRED_RESULT = 0;
+    virtual KDbSqlField *field(int index) /*Q_REQUIRED_RESULT*/ = 0;
 
     //! Creates a KDb field for field @a index and returns it
     //! On failure returns @c nullptr.
     //! @a tableName is the table name and may be used to retrieve information but may
     //! be ignored as well if the KDbSqlResult already has field metadata available.
-    virtual KDbField* createField(const QString &tableName, int index) Q_REQUIRED_RESULT = 0;
+    virtual KDbField* createField(const QString &tableName, int index) /*Q_REQUIRED_RESULT*/ = 0;
 
     /**
      * Fetches one record.
@@ -70,7 +70,7 @@ public:
      * on error.
      * Check lastResult() for detailed result. Ownership is transferred to the caller.
      */
-    virtual QSharedPointer<KDbSqlRecord> fetchRecord() Q_REQUIRED_RESULT = 0;
+    virtual QSharedPointer<KDbSqlRecord> fetchRecord() /*Q_REQUIRED_RESULT*/ = 0;
 
     //! Convenience method. Fetches one record and all values into @a data.
     //! @return record data object and passes its ownership

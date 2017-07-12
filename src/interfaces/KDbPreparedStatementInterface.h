@@ -51,7 +51,7 @@ protected:
         KDbPreparedStatement::Type type,
         const KDbField::List& selectFieldList,
         KDbFieldList* insertFieldList,
-        const KDbPreparedStatementParameters& parameters) Q_REQUIRED_RESULT = 0;
+        const KDbPreparedStatementParameters& parameters) /*Q_REQUIRED_RESULT*/ = 0;
 
     friend class KDbConnection;
     friend class KDbPreparedStatement;

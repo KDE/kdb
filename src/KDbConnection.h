@@ -382,7 +382,7 @@ public:
      (passing @a sql and @a options to its constructor).
     */
     virtual KDbCursor* prepareQuery(const KDbEscapedString& sql,
-                                    KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT = 0;
+                                    KDbCursor::Options options = KDbCursor::Option::None) /*Q_REQUIRED_RESULT*/ = 0;
 
     /*! @overload
      Prepares query described by @a query schema. @a params are values of parameters that
@@ -400,7 +400,7 @@ public:
      Prepares query described by @a query schema without parameters.
     */
     virtual KDbCursor* prepareQuery(KDbQuerySchema* query,
-                                    KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT = 0;
+                                    KDbCursor::Options options = KDbCursor::Option::None) /*Q_REQUIRED_RESULT*/ = 0;
 
     /*! @overload
      Statement is build from data provided by @a table schema, it is like "select * from table_name".*/
@@ -1009,7 +1009,7 @@ protected:
      *
      * @see prepareSql
      */
-    virtual KDbSqlResult* drv_prepareSql(const KDbEscapedString &sql) Q_REQUIRED_RESULT = 0;
+    virtual KDbSqlResult* drv_prepareSql(const KDbEscapedString &sql) /*Q_REQUIRED_RESULT*/ = 0;
 
     /**
      * Executes query for a raw SQL statement @a sql without returning resulting records.
@@ -1190,7 +1190,7 @@ protected:
 
     /*! Prepare an SQL statement and return a @a KDbPreparedStatementInterface-derived object.
      Ownership of the returned object is passed to the caller. */
-    virtual KDbPreparedStatementInterface* prepareStatementInternal() Q_REQUIRED_RESULT = 0;
+    virtual KDbPreparedStatementInterface* prepareStatementInternal() /*Q_REQUIRED_RESULT*/ = 0;
 
     /*! Internal, for handling autocommited transactions:
      begins transaction if one is supported.
