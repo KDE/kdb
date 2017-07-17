@@ -44,11 +44,11 @@ public:
 
     KDbConnectionOptions& operator=(const KDbConnectionOptions &other);
 
-    //! @return true if these options have exactly the same set ope options as @a other
+    //! @return true if these options have exactly the same values as @a other
     //! @since 3.1
     bool operator==(const KDbConnectionOptions &other) const;
 
-    //! @return true if thsese options differs in at least one option from @a other
+    //! @return true if these options differs in at least one value from @a other
     //! @since 3.1
     bool operator!=(const KDbConnectionOptions &other) const { return !operator==(other); }
 
