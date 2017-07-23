@@ -154,6 +154,8 @@ select NULL SIMILAR TO 4;
 select 3 NOT SIMILAR TO 4;
 select NULL SIMILAR TO NULL;
 select 'AB' || 'CD';
+select "AB" ||"CD";
+select 'AB'||"CD"a;
 select 'AB' || 'CD' || 'EF';
 select 'AB' + 'CD' || 'EF' + 'GH' || '';
 select NULL || NULL;
