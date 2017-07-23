@@ -50,7 +50,7 @@ KDbValidator::Result KDbObjectNameValidator::internalCheck(
             : !d->driver->isSystemObjectName(value.toString()))
         return KDbValidator::Ok;
     if (message) {
-        *message = tr("Could not use reserved name \"%1\" for objects. "
+        *message = tr("Cannot use reserved name \"%1\" for objects. "
                       "Please choose another name.")
                                  .arg(value.toString());
     }
