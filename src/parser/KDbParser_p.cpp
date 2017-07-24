@@ -431,7 +431,8 @@ KDbQuerySchema* buildSelectQuery(
                 || c == KDb::LogicalExpression
                 || c == KDb::RelationalExpression
                 || c == KDb::FunctionExpression
-                || c == KDb::AggregationExpression;
+                || c == KDb::AggregationExpression
+                || c == KDb::QueryParameterExpression;
 
             if (c == KDb::VariableExpression) {
                 if (columnExpr.toVariable().name() == QLatin1String("*")) {

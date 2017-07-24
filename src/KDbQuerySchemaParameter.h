@@ -39,7 +39,7 @@ public:
 class KDB_EXPORT KDbQuerySchemaParameterValueListIterator
 {
 public:
-    KDbQuerySchemaParameterValueListIterator(const QList<QVariant>& params);
+    explicit KDbQuerySchemaParameterValueListIterator(const QList<QVariant>& params);
     ~KDbQuerySchemaParameterValueListIterator();
 
     //! @return previous value

@@ -106,6 +106,9 @@ static bool selectStatementInternal(KDbEscapedString *target,
     number = 0;
     QList<KDbQuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
     KDbEscapedString kdb_subquery_prefix("__kdb_subquery_");
+    KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
+    KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
+        = parameters.isEmpty() ? nullptr : &paramValuesIt;
     foreach(KDbField *f, *querySchema->fields()) {
         if (querySchema->isColumnVisible(number)) {
             if (!sql.isEmpty())
@@ -120,7 +123,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 }
             } else {
                 if (f->isExpression()) {
-                    sql += f->expression().toString(driver);
+                    sql += f->expression().toString(driver, paramValuesItPtr);
                 } else {
                     if (!f->table()) {//sanity check
                         return false;
@@ -343,9 +346,6 @@ static bool selectStatementInternal(KDbEscapedString *target,
     }
     //EXPLICITLY SPECIFIED WHERE EXPRESSION
     if (!querySchema->whereExpression().isNull()) {
-        KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
-        KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
-            = parameters.isEmpty() ? nullptr : &paramValuesIt;
         if (wasWhere) {
 //! @todo () are not always needed
             s_where = '(' + s_where + ") AND ("

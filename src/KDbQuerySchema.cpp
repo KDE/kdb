@@ -21,6 +21,7 @@
 #include "KDbQuerySchema_p.h"
 #include "KDbQuerySchemaParameter.h"
 #include "KDbConnection.h"
+#include "KDbExpression.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbParser_p.h"
 #include "KDbRelationship.h"
@@ -1643,10 +1644,18 @@ const KDbOrderByColumnList* KDbQuerySchema::orderByColumnList() const
 
 QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
 {
-    if (whereExpression().isNull())
-        return QList<KDbQuerySchemaParameter>();
     QList<KDbQuerySchemaParameter> params;
-    whereExpression().getQueryParameters(&params);
+    const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded());
+    for (int i = 0; i < fieldsExpanded.count(); ++i) {
+        const KDbQueryColumnInfo *ci = fieldsExpanded[i];
+        if (!ci->field->expression().isNull()) {
+            ci->field->expression().getQueryParameters(&params);
+        }
+    }
+    KDbExpression where = whereExpression();
+    if (!where.isNull()) {
+        where.getQueryParameters(&params);
+    }
     return params;
 }
 
