@@ -290,7 +290,7 @@ SELECT foobar();
 ---------- CATEGORY: "WHERE" section --------------
 -- ERROR: Empty WHERE section
 select id from cars where;
--- ERROR: WHERE section without columns
+-- WHERE section without columns
 select from cars where TRUE;
 -- Complex expressions in WHERE section
 select id from cars where (id > 2 OR cars.owner IS NULL) AND 2 * id < 5;
@@ -327,3 +327,54 @@ SELECT name, surname, age, model FROM persons, cars WHERE persons.id = owner;
 SELECT persons.name, persons.surname, persons.age, cars.model FROM persons, cars WHERE persons.id = cars.owner ORDER BY 2, 1;
 -- Join persons and cars tables, sort using aliases
 SELECT persons.name as p_name, persons.surname, persons.age as p_age, cars.model FROM persons, cars WHERE persons.id = cars.owner ORDER BY p_age, p_name;
+
+---------- CATEGORY: Parameters -------
+-- Parameters in column expressions
+SELECT [p];
+SELECT [p q];
+SELECT [ą]; -- non-latin1 character
+SELECT ["];
+SELECT ['];
+SELECT [`];
+SELECT [\];
+SELECT [=];
+SELECT [*];
+SELECT [;];
+SELECT [,];
+SELECT [(];
+SELECT [)];
+SELECT [%];
+SELECT [p] + [q];
+SELECT [p] + [p];
+SELECT [p]||[q];
+SELECT [p], [q];
+SELECT [p], [p]; -- two the same parameters
+SELECT [SELECT]; -- keywords as parameter names allowed
+SELECT [p]a; -- [p] AS a
+SELECT[p]; -- no whitespace needed
+SELECT TRIM(name, [c]) FROM persons;
+SELECT [c] FROM persons;
+-- ERROR: unexpected character after parameter in column expression
+SELECT [p]a/2;
+SELECT [p][q];
+SELECT [p] [q];
+-- ERROR: unexpected character in parameter name
+SELECT [[];
+SELECT [\[];
+-- ERROR: empty parameter name
+SELECT [];
+-- ERROR: parameter in alias name
+SELECT [p] AS [q];
+-- ERROR: parameter in ORDER BY argument
+SELECT * FROM cars ORDER BY [x];
+-- Parameters in conditions
+SELECT name, surname, age, model FROM persons, cars WHERE persons.id = owner AND model = [Enter model];
+SELECT [Enter], name, surname, age, model FROM persons, cars WHERE persons.id = [Enter ID] AND [Enter model] = model;
+SELECT * FROM cars WHERE [Boolean condition];
+SELECT * FROM cars WHERE [a] < [b];
+SELECT FROM cars WHERE [a] < [b];
+SELECT LTRIM(name, [c]) FROM persons, cars WHERE persons.id = owner AND name = [Enter model];
+-- ERROR: unexpected character in parameter name in condition
+SELECT * FROM cars WHERE model = [Boolean condition]a;
+-- ERROR: empty parameter name in condition
+SELECT * FROM cars WHERE model = [];

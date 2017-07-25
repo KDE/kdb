@@ -701,6 +701,12 @@ Select
     if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
         return 0;
 }
+| Select Tables SelectOptions
+{
+    kdbDebug() << "Select Tables SelectOptions";
+    if (!($$ = buildSelectQuery( $1, 0, $2, $3 )))
+        return 0;
+}
 | Select ColViews Tables SelectOptions
 {
     kdbDebug() << "Select ColViews Tables SelectOptions";
