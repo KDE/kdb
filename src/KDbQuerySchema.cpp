@@ -1381,10 +1381,18 @@ const KDbOrderByColumnList* KDbQuerySchema::orderByColumnList() const
 
 QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
 {
-    if (whereExpression().isNull())
-        return QList<KDbQuerySchemaParameter>();
     QList<KDbQuerySchemaParameter> params;
-    whereExpression().getQueryParameters(&params);
+    const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded());
+    for (int i = 0; i < fieldsExpanded.count(); ++i) {
+        KDbQueryColumnInfo *ci = fieldsExpanded[i];
+        if (!ci->field()->expression().isNull()) {
+            ci->field()->expression().getQueryParameters(&params);
+        }
+    }
+    KDbExpression where = whereExpression();
+    if (!where.isNull()) {
+        where.getQueryParameters(&params);
+    }
     return params;
 }
 
