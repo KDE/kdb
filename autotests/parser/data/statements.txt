@@ -290,7 +290,7 @@ SELECT foobar();
 ---------- CATEGORY: "WHERE" section --------------
 -- ERROR: Empty WHERE section
 select id from cars where;
--- ERROR: WHERE section without columns
+-- WHERE section without columns
 select from cars where TRUE;
 -- Complex expressions in WHERE section
 select id from cars where (id > 2 OR cars.owner IS NULL) AND 2 * id < 5;
@@ -371,6 +371,8 @@ SELECT * FROM cars ORDER BY [x];
 SELECT name, surname, age, model FROM persons, cars WHERE persons.id = owner AND model = [Enter model];
 SELECT [Enter], name, surname, age, model FROM persons, cars WHERE persons.id = [Enter ID] AND [Enter model] = model;
 SELECT * FROM cars WHERE [Boolean condition];
+SELECT * FROM cars WHERE [a] < [b];
+SELECT FROM cars WHERE [a] < [b];
 SELECT LTRIM(name, [c]) FROM persons, cars WHERE persons.id = owner AND name = [Enter model];
 -- ERROR: unexpected character in parameter name in condition
 SELECT * FROM cars WHERE model = [Boolean condition]a;
