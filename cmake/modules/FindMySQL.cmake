@@ -21,15 +21,18 @@ set_package_properties(MySQL PROPERTIES
     DESCRIPTION "MySQL Client Library (libmysqlclient)" URL "http://www.mysql.com")
 
 if(WIN32)
+   set(ProgramFilesX86 "ProgramFiles(x86)")
    find_path(MYSQL_INCLUDE_DIR mysql.h
       PATHS
       $ENV{MYSQL_INCLUDE_DIR}
       $ENV{MYSQL_DIR}/include/mysql
       $ENV{ProgramW6432}/MySQL/*/include/mysql
       $ENV{ProgramFiles}/MySQL/*/include/mysql
+      $ENV{${ProgramFilesX}}/MySQL/*/include/mysql
       $ENV{SystemDrive}/MySQL/*/include/mysql
-      $ENV{ProgramW6432}/*/include/mysql # MariaDB
+      $ENV{ProgramW6432}/*/include/mysql
       $ENV{ProgramFiles}/*/include/mysql # MariaDB
+      $ENV{${ProgramFilesX}}/*/include/mysql # MariaDB
    )
 else()
    # use pkg-config to get the directories and then use these values
@@ -54,7 +57,7 @@ else()
 endif()
 
 if(WIN32)
-   string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_TOLOWER)
+   string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_TOLOWER)
 
    # path suffix for debug/release mode
    # binary_dist: mysql binary distribution
@@ -74,9 +77,11 @@ if(WIN32)
       $ENV{MYSQL_DIR}/client/${build_dist}
       $ENV{ProgramW6432}/MySQL/*/lib/${binary_dist}
       $ENV{ProgramFiles}/MySQL/*/lib/${binary_dist}
+      $ENV{${ProgramFilesX}}/MySQL/*/lib/${binary_dist}
       $ENV{SystemDrive}/MySQL/*/lib/${binary_dist}
       $ENV{ProgramW6432}/*/lib # MariaDB
       $ENV{ProgramFiles}/*/lib # MariaDB
+      $ENV{${ProgramFilesX}}/*/lib # MariaDB
    )
    find_library(_LIBMYSQL_LIBRARY NAMES libmysql
       PATHS ${MYSQL_LIB_PATHS}
