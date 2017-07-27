@@ -35,10 +35,11 @@ static int g_defaultMaxLength = 0; // unlimited
 
 //-------------------------------------------------------
 //! @internal Used in s_typeNames member to handle translated type names
-class FieldTypeNames : public QVector<QString>
+class FieldTypeNames
 {
 public:
     FieldTypeNames();
+    QVector<QString> data;
     QHash<QString, KDbField::Type> str2num;
     QStringList names;
 private:
@@ -46,10 +47,11 @@ private:
 };
 
 //! @internal Used in m_typeGroupNames member to handle translated type group names
-class FieldTypeGroupNames : public QVector<QString>
+class FieldTypeGroupNames
 {
 public:
     FieldTypeGroupNames();
+    QVector<QString> data;
     QHash<QString, KDbField::TypeGroup> str2num;
     QStringList names;
 private:
@@ -63,21 +65,19 @@ Q_GLOBAL_STATIC(FieldTypeNames, s_typeNames)
 Q_GLOBAL_STATIC(FieldTypeGroupNames, s_typeGroupNames)
 
 #define ADDTYPE(type, i18, str) \
-    (*this)[KDbField::type] = i18; \
-    (*this)[KDbField::type+KDbField::Null+1] = QLatin1String(str); \
+    data[KDbField::type] = i18; \
+    data[KDbField::type+KDbField::Null+1] = QStringLiteral(str); \
     str2num[ QString::fromLatin1(str).toLower() ] = KDbField::type; \
     names.append(i18)
 #define ADDGROUP(type, i18, str) \
-    (*this)[KDbField::type] = i18; \
-    (*this)[KDbField::type+KDbField::LastTypeGroup+1] = QLatin1String(str); \
+    data[KDbField::type] = i18; \
+    data[KDbField::type+KDbField::LastTypeGroup+1] = QStringLiteral(str); \
     str2num[ QString::fromLatin1(str).toLower() ] = KDbField::type; \
     names.append(i18)
 
 FieldTypeNames::FieldTypeNames()
-        : QVector<QString>()
+    : data((KDbField::Null + 1)*2)
 {
-    resize((KDbField::Null + 1)*2);
-
     ADDTYPE(InvalidType, KDbField::tr("Invalid Type"), "InvalidType");
     ADDTYPE(Byte, KDbField::tr("Byte"), "Byte");
     ADDTYPE(ShortInteger, KDbField::tr("Short Integer Number"), "ShortInteger");
@@ -98,10 +98,8 @@ FieldTypeNames::FieldTypeNames()
 //-------------------------------------------------------
 
 FieldTypeGroupNames::FieldTypeGroupNames()
-        : QVector<QString>()
+        : data((KDbField::LastTypeGroup + 1)*2)
 {
-    resize((KDbField::LastTypeGroup + 1)*2);
-
     ADDGROUP(InvalidGroup, KDbField::tr("Invalid Group"), "InvalidGroup");
     ADDGROUP(TextGroup, KDbField::tr("Text"), "TextGroup");
     ADDGROUP(IntegerGroup, KDbField::tr("Integer Number"), "IntegerGroup");
@@ -449,7 +447,7 @@ QVariant KDbField::convertToType(const QVariant &value, Type type)
 
 QString KDbField::typeName(Type type)
 {
-    return s_typeNames->value(type, QString::number(type));
+    return s_typeNames->data.value(type, QString::number(type));
 }
 
 QStringList KDbField::typeNames()
@@ -459,13 +457,14 @@ QStringList KDbField::typeNames()
 
 QString KDbField::typeString(Type type)
 {
-    return (type <= Null) ? s_typeNames->at(int(Null) + 1 + type)
-                              : (QLatin1String("Type") + QString::number(type));
+    return (type <= Null) ? s_typeNames->data.at(int(Null) + 1 + type)
+                          : (QLatin1String("Type") + QString::number(type));
 }
 
 QString KDbField::typeGroupName(TypeGroup typeGroup)
 {
-    return (typeGroup <= LastTypeGroup) ? s_typeGroupNames->at(typeGroup) : typeGroupString(typeGroup);
+    return (typeGroup <= LastTypeGroup) ? s_typeGroupNames->data.at(typeGroup)
+                                        : typeGroupString(typeGroup);
 }
 
 QStringList KDbField::typeGroupNames()
@@ -475,8 +474,8 @@ QStringList KDbField::typeGroupNames()
 
 QString KDbField::typeGroupString(TypeGroup typeGroup)
 {
-    return s_typeGroupNames->value(int(LastTypeGroup) + 1 + typeGroup,
-                                  QLatin1String("TypeGroup") + QString::number(typeGroup));
+    return s_typeGroupNames->data.value(int(LastTypeGroup) + 1 + typeGroup,
+                                        QLatin1String("TypeGroup") + QString::number(typeGroup));
 }
 
 KDbField::Type KDbField::typeForString(const QString& typeString)
