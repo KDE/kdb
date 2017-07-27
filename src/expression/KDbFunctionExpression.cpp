@@ -37,20 +37,22 @@
 //#define KDB_ENABLE_SQLITE_SPECIFIC_FUNCTIONS
 
 //! A set of names of aggregation SQL functions
-class BuiltInAggregates : public QSet<QString>
+class BuiltInAggregates
 {
 public:
     BuiltInAggregates()
+        : data({ QStringLiteral("SUM"),
+                 QStringLiteral("MIN"),
+                 QStringLiteral("MAX"),
+                 QStringLiteral("AVG"),
+                 QStringLiteral("COUNT"),
+                 QStringLiteral("STD"),
+                 QStringLiteral("STDDEV"),
+                 QStringLiteral("VARIANCE")
+               })
     {
-        insert(QLatin1String("SUM"));
-        insert(QLatin1String("MIN"));
-        insert(QLatin1String("MAX"));
-        insert(QLatin1String("AVG"));
-        insert(QLatin1String("COUNT"));
-        insert(QLatin1String("STD"));
-        insert(QLatin1String("STDDEV"));
-        insert(QLatin1String("VARIANCE"));
     }
+    const QSet<QString> data;
 };
 
 Q_GLOBAL_STATIC(BuiltInAggregates, _builtInAggregates)
@@ -376,12 +378,13 @@ private:
 
 //! A map of built-in SQL functions
 //! See https://community.kde.org/Kexi/Plugins/Queries/SQL_Functions for the status.
-class BuiltInFunctions : public QHash<QString, BuiltInFunctionDeclaration*>
+class BuiltInFunctions
 {
 public:
     BuiltInFunctions();
-    ~BuiltInFunctions() {
-        qDeleteAll(*this);
+    ~BuiltInFunctions()
+    {
+        qDeleteAll(m_functions);
     }
 
     //! @return function declaration's structure for name @a name
@@ -394,6 +397,7 @@ public:
 
     static int multipleArgs[];
 private:
+    QHash<QString, BuiltInFunctionDeclaration*> m_functions;
     QHash<QString, BuiltInFunctionDeclaration*> m_aliases;
     Q_DISABLE_COPY(BuiltInFunctions)
 };
@@ -401,7 +405,6 @@ private:
 int BuiltInFunctions::multipleArgs[] = { 0 };
 
 BuiltInFunctions::BuiltInFunctions()
-    : QHash<QString, BuiltInFunctionDeclaration*>()
 {
     BuiltInFunctionDeclaration *decl;
 #define _TYPES(name, ...) static int name[] = { __VA_ARGS__, KDbField::InvalidType }
@@ -427,7 +430,7 @@ BuiltInFunctions::BuiltInFunctions()
 
     static int* sig0[] = { nullptr };
 
-    insert(QLatin1String("ABS"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("ABS"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The abs(X) function returns the absolute value of the numeric argument X.
      Abs(X) returns NULL if X is NULL. Abs(X) returns 0.0 if X is a string or blob that
@@ -439,7 +442,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->copyReturnTypeFromArg = 0;
     _SIG(abs_1, argAnyNumberOrNull);
 
-    insert(QLatin1String("CEILING"), decl = new CeilingFloorFunctionDeclaration);
+    m_functions.insert(QLatin1String("CEILING"), decl = new CeilingFloorFunctionDeclaration);
     /* ceiling(X) returns the largest integer value not less than X. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_ceiling
     // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
@@ -450,7 +453,7 @@ BuiltInFunctions::BuiltInFunctions()
     // result: 4, -99
     _SIG(ceiling, argAnyNumberOrNull);
 
-    insert(QLatin1String("CHAR"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("CHAR"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The char(X1,X2,...,XN) function returns a string composed of characters having
      the unicode code point values of integers X1 through XN, respectively. */
@@ -460,7 +463,7 @@ BuiltInFunctions::BuiltInFunctions()
     static int char_min_args[] = { 0 };
     _SIG(char_N, argAnyIntOrNull, multipleArgs, char_min_args);
 
-    insert(QLatin1String("COALESCE"), decl = new CoalesceFunctionDeclaration);
+    m_functions.insert(QLatin1String("COALESCE"), decl = new CoalesceFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The coalesce() function returns a copy of its first non-NULL argument, or NULL if
      all arguments are NULL. Coalesce() must have at least 2 arguments. */
@@ -469,7 +472,7 @@ BuiltInFunctions::BuiltInFunctions()
     static int coalesce_min_args[] = { 2 };
     _SIG(coalesce_N, argAnyOrNull, multipleArgs, coalesce_min_args);
 
-    insert(QLatin1String("FLOOR"), decl = new CeilingFloorFunctionDeclaration);
+    m_functions.insert(QLatin1String("FLOOR"), decl = new CeilingFloorFunctionDeclaration);
     /* floor(X) returns the largest integer value not greater than X. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_floor
     // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
@@ -480,7 +483,7 @@ BuiltInFunctions::BuiltInFunctions()
     // result: 3, -100
     _SIG(floor, argAnyNumberOrNull);
 
-    insert(QLatin1String("GREATEST"), decl = new MinMaxFunctionDeclaration);
+    m_functions.insert(QLatin1String("GREATEST"), decl = new MinMaxFunctionDeclaration);
     m_aliases.insert(QLatin1String("MAX"), decl);
     // From https://www.sqlite.org/lang_corefunc.html
     // For SQLite MAX() is used.
@@ -512,7 +515,7 @@ BuiltInFunctions::BuiltInFunctions()
     static int greatest_min_args[] = { 2 };
     _SIG(greatest_N, argAnyOrNull, multipleArgs, greatest_min_args);
 
-    insert(QLatin1String("HEX"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("HEX"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_hex
     /* The hex() function interprets its argument as a BLOB and returns a string which is
@@ -526,7 +529,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::LongText;
     _SIG(hex_1, argAnyTextBLOBOrNull);
 
-    insert(QLatin1String("IFNULL"), decl = new CoalesceFunctionDeclaration);
+    m_functions.insert(QLatin1String("IFNULL"), decl = new CoalesceFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The ifnull() function returns a copy of its first non-NULL argument, or NULL if
      both arguments are NULL. Ifnull() must have exactly 2 arguments. The ifnull() function
@@ -536,7 +539,7 @@ BuiltInFunctions::BuiltInFunctions()
     // result: 17, NULL
     _SIG(ifnull_2, argAnyOrNull, argAnyOrNull);
 
-    insert(QLatin1String("INSTR"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("INSTR"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The instr(X,Y) function finds the first occurrence of string Y within string X and
      returns the number of prior characters plus 1, or 0 if Y is nowhere found within X.
@@ -554,7 +557,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::Integer;
     _SIG(instr_2, argAnyTextOrNull, argAnyTextOrNull);
 
-    insert(QLatin1String("LEAST"), decl = new MinMaxFunctionDeclaration);
+    m_functions.insert(QLatin1String("LEAST"), decl = new MinMaxFunctionDeclaration);
     m_aliases.insert(QLatin1String("MIN"), decl);
     // From https://www.sqlite.org/lang_corefunc.html
     // For SQLite uses MIN().
@@ -582,7 +585,7 @@ BuiltInFunctions::BuiltInFunctions()
     static int least_min_args[] = { 2 };
     _SIG(least_N, argAnyOrNull, multipleArgs, least_min_args);
 
-    insert(QLatin1String("LENGTH"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("LENGTH"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_length
     /* For a string value X, the length(X) function returns the number of characters (not
@@ -601,7 +604,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::Integer;
     _SIG(length_1, argAnyTextBLOBOrNull);
 
-    insert(QLatin1String("LOWER"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("LOWER"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The lower(X) function returns a copy of string X with all characters converted
      to lower case. */
@@ -614,7 +617,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::LongText;
     _SIG(lower_1, argAnyTextOrNull);
 
-    insert(QLatin1String("LTRIM"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("LTRIM"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The ltrim(X,Y) function returns a string formed by removing any and all characters
      that appear in Y from the left side of X. If the Y argument is omitted, ltrim(X)
@@ -631,7 +634,7 @@ BuiltInFunctions::BuiltInFunctions()
     _SIG(ltrim_1, argAnyTextOrNull);
     _SIG(ltrim_2, argAnyTextOrNull, argAnyTextOrNull);
 
-    insert(QLatin1String("NULLIF"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("NULLIF"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The nullif(X,Y) function returns its first argument if the arguments are different
      and NULL if the arguments are the same. The nullif(X,Y) function searches its
@@ -645,7 +648,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->copyReturnTypeFromArg = 0;
     _SIG(nullif_2, argAnyOrNull, argAnyOrNull);
 
-    insert(QLatin1String("RANDOM"), decl = new RandomFunctionDeclaration);
+    m_functions.insert(QLatin1String("RANDOM"), decl = new RandomFunctionDeclaration);
     /* RANDOM() returns a random floating-point value v in the range 0 <= v < 1.0.
      RANDOM(X,Y) - returns returns a random integer that is equal or greater than X
      and less than Y. */
@@ -669,7 +672,7 @@ BuiltInFunctions::BuiltInFunctions()
     _SIG0;
     _SIG(random_2, argAnyIntOrNull, argAnyIntOrNull);
 
-    insert(QLatin1String("ROUND"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("ROUND"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The round(X,Y) function returns a floating-point value X rounded to Y digits to the
      right of the decimal point. If the Y argument is omitted, it is assumed to be 0. */
@@ -682,7 +685,7 @@ BuiltInFunctions::BuiltInFunctions()
     _SIG(round_1, argAnyNumberOrNull);
     _SIG(round_2, argAnyNumberOrNull, argAnyIntOrNull);
 
-    insert(QLatin1String("RTRIM"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("RTRIM"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The rtrim(X,Y) function returns a string formed by removing any and all characters
      that appear in Y from the right side of X. If the Y argument is omitted, rtrim(X)
@@ -699,7 +702,7 @@ BuiltInFunctions::BuiltInFunctions()
     _SIG(rtrim_1, argAnyTextOrNull);
     _SIG(rtrim_2, argAnyTextOrNull, argAnyTextOrNull);
 
-    insert(QLatin1String("SOUNDEX"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("SOUNDEX"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The soundex(X) function returns a string that is the soundex encoding of the string
      X. The string "?000" is returned if the argument is NULL or contains non-ASCII
@@ -713,7 +716,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::Text;
     _SIG(soundex, argAnyTextOrNull);
 
-    insert(QLatin1String("SUBSTR"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("SUBSTR"), decl = new BuiltInFunctionDeclaration);
     // From https://www.sqlite.org/lang_corefunc.html
     /* The substr(X,Y) returns all characters through the end of the string X beginning with
     the Y-th. The left-most character of X is number 1. If Y is negative then the
@@ -727,7 +730,7 @@ BuiltInFunctions::BuiltInFunctions()
     _SIG(substr_3, argAnyTextOrNull, argAnyIntOrNull, argAnyIntOrNull);
     decl->copyReturnTypeFromArg = 0;
 
-     insert(QLatin1String("TRIM"), decl = new BuiltInFunctionDeclaration);
+     m_functions.insert(QLatin1String("TRIM"), decl = new BuiltInFunctionDeclaration);
      // From https://www.sqlite.org/lang_corefunc.html
      /* The trim(X,Y) function returns a string formed by removing any and all characters
       that appear in Y from both ends of X. If the Y argument is omitted, trim(X) removes
@@ -744,7 +747,7 @@ BuiltInFunctions::BuiltInFunctions()
      _SIG(trim_1, argAnyTextOrNull);
      _SIG(trim_2, argAnyTextOrNull, argAnyTextOrNull);
 
-     insert(QLatin1String("UNICODE"), decl = new BuiltInFunctionDeclaration);
+     m_functions.insert(QLatin1String("UNICODE"), decl = new BuiltInFunctionDeclaration);
      // From https://www.sqlite.org/lang_corefunc.html
      /* The unicode(X) function returns the numeric unicode code point corresponding to
       the first character of the string X. If the argument to unicode(X) is not a string
@@ -756,7 +759,7 @@ BuiltInFunctions::BuiltInFunctions()
      decl->defaultReturnType = KDbField::Integer;
      _SIG(unicode_1, argAnyTextOrNull);
 
-     insert(QLatin1String("UPPER"), decl = new BuiltInFunctionDeclaration);
+     m_functions.insert(QLatin1String("UPPER"), decl = new BuiltInFunctionDeclaration);
      // From https://www.sqlite.org/lang_corefunc.html
      /* The upper(X) function returns a copy of string X with all characters converted
       to upper case. */
@@ -770,7 +773,7 @@ BuiltInFunctions::BuiltInFunctions()
      _SIG(upper_1, argAnyTextOrNull);
 
 #ifdef KDB_ENABLE_SQLITE_SPECIFIC_FUNCTIONS
-    insert(QLatin1String("GLOB"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("GLOB"), decl = new BuiltInFunctionDeclaration);
     //! @todo GLOB(X,Y) is SQLite-specific and is not present in MySQL so we don't expose it; use GLOB operator instead.
     //! We may want to address it in raw SQL generation time.
     // From https://www.sqlite.org/lang_corefunc.html
@@ -782,7 +785,7 @@ BuiltInFunctions::BuiltInFunctions()
     decl->defaultReturnType = KDbField::Boolean;
     _SIG(glob_2, argAnyTextOrNull, argAnyOrNull /* will be casted to text */);
 
-    insert(QLatin1String("LIKE"), decl = new BuiltInFunctionDeclaration);
+    m_functions.insert(QLatin1String("LIKE"), decl = new BuiltInFunctionDeclaration);
     //! @todo LIKE(X,Y,[Z]) not present in MySQL so we don't expose it; use LIKE operator instead.
     //! We may want to address it in raw SQL generation time.
     // From https://www.sqlite.org/lang_corefunc.html
@@ -798,7 +801,7 @@ BuiltInFunctions::BuiltInFunctions()
 
 BuiltInFunctionDeclaration* BuiltInFunctions::value(const QString &name) const
 {
-    BuiltInFunctionDeclaration* f = QHash<QString, BuiltInFunctionDeclaration*>::value(name);
+    BuiltInFunctionDeclaration* f = m_functions.value(name);
     if (!f) {
         f = m_aliases.value(name);
     }
@@ -1343,13 +1346,13 @@ KDbFunctionExpression::~KDbFunctionExpression()
 // static
 bool KDbFunctionExpression::isBuiltInAggregate(const QString& function)
 {
-    return _builtInAggregates->contains(function.toUpper());
+    return _builtInAggregates->data.contains(function.toUpper());
 }
 
 // static
 QStringList KDbFunctionExpression::builtInAggregates()
 {
-    return _builtInAggregates->toList();
+    return _builtInAggregates->data.toList();
 }
 
 //static

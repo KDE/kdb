@@ -101,16 +101,18 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, KDbToken token)
 }
 
 //! @internal
-class KDbToken::List : public QList<KDbToken>
+class KDbToken::List
 {
 public:
-    List() {
+    List()
+    {
         for (int i = 0; i < KDbToken::maxTokenValue; ++i) {
             if (g_tokenName(i)) {
-                append(KDbToken(i));
+                data.append(KDbToken(i));
             }
         }
     }
+    QList<KDbToken> data;
 };
 
 Q_GLOBAL_STATIC(KDbToken::List, g_allTokens)
@@ -118,7 +120,7 @@ Q_GLOBAL_STATIC(KDbToken::List, g_allTokens)
 //static
 QList<KDbToken> KDbToken::allTokens()
 {
-    return *g_allTokens;
+    return g_allTokens->data;
 }
 
 const KDbToken KDbToken::SQL_TYPE(::SQL_TYPE);
