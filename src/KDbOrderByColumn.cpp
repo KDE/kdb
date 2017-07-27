@@ -208,21 +208,54 @@ KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
 
 //=======================================
 
+class Q_DECL_HIDDEN KDbOrderByColumnList::Private
+{
+public:
+    Private() {
+    }
+    ~Private() {
+        qDeleteAll(data);
+    }
+    QList<KDbOrderByColumn*> data;
+};
+
 KDbOrderByColumnList::KDbOrderByColumnList()
-        : QList<KDbOrderByColumn*>()
+        : d(new Private)
 {
 }
 
 KDbOrderByColumnList::KDbOrderByColumnList(const KDbOrderByColumnList& other,
-                                     KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery)
-        : QList<KDbOrderByColumn*>()
+                                           KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery)
+        : KDbOrderByColumnList()
 {
-    for (QList<KDbOrderByColumn*>::ConstIterator it(other.constBegin()); it != other.constEnd(); ++it) {
+    for (QList<KDbOrderByColumn *>::ConstIterator it(other.constBegin()); it != other.constEnd();
+         ++it)
+    {
         KDbOrderByColumn* order = (*it)->copy(fromQuery, toQuery);
         if (order) {
-            append(order);
+            d->data.append(order);
         }
     }
+}
+
+KDbOrderByColumnList::~KDbOrderByColumnList()
+{
+    delete d;
+}
+
+bool KDbOrderByColumnList::operator==(const KDbOrderByColumnList &other) const
+{
+    return d->data == other.d->data;
+}
+
+const KDbOrderByColumn* KDbOrderByColumnList::value(int index) const
+{
+    return d->data.value(index);
+}
+
+KDbOrderByColumn* KDbOrderByColumnList::value(int index)
+{
+    return d->data.value(index);
 }
 
 bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
@@ -254,21 +287,16 @@ bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
         return true;
     }
     for (int i = 0; i < numAdded; i++) {
-        removeLast();
+        d->data.removeLast();
     }
     return false;
-}
-
-KDbOrderByColumnList::~KDbOrderByColumnList()
-{
-    qDeleteAll(begin(), end());
 }
 
 void KDbOrderByColumnList::appendColumn(KDbQueryColumnInfo* columnInfo,
                                         KDbOrderByColumn::SortOrder order)
 {
     if (columnInfo) {
-        append(new KDbOrderByColumn(columnInfo, order));
+        d->data.append(new KDbOrderByColumn(columnInfo, order));
     }
 }
 
@@ -283,14 +311,14 @@ bool KDbOrderByColumnList::appendColumn(KDbQuerySchema* querySchema,
         return false;
     }
     KDbQueryColumnInfo* ci = fieldsExpanded[pos];
-    append(new KDbOrderByColumn(ci, order, pos));
+    d->data.append(new KDbOrderByColumn(ci, order, pos));
     return true;
 }
 
 void KDbOrderByColumnList::appendField(KDbField* field, KDbOrderByColumn::SortOrder order)
 {
     if (field) {
-        append(new KDbOrderByColumn(field, order));
+        d->data.append(new KDbOrderByColumn(field, order));
     }
 }
 
@@ -302,12 +330,12 @@ bool KDbOrderByColumnList::appendField(KDbQuerySchema* querySchema,
     }
     KDbQueryColumnInfo *columnInfo = querySchema->columnInfo(fieldName);
     if (columnInfo) {
-        append(new KDbOrderByColumn(columnInfo, order));
+        d->data.append(new KDbOrderByColumn(columnInfo, order));
         return true;
     }
     KDbField *field = querySchema->findTableField(fieldName);
     if (field) {
-        append(new KDbOrderByColumn(field, order));
+        d->data.append(new KDbOrderByColumn(field, order));
         return true;
     }
     kdbWarning() << "no such field" << fieldName;
@@ -316,32 +344,32 @@ bool KDbOrderByColumnList::appendField(KDbQuerySchema* querySchema,
 
 bool KDbOrderByColumnList::isEmpty() const
 {
-    return QList<KDbOrderByColumn*>::isEmpty();
+    return d->data.isEmpty();
 }
 
 int KDbOrderByColumnList::count() const
 {
-    return QList<KDbOrderByColumn*>::count();
+    return d->data.count();
 }
 
-KDbOrderByColumnList::iterator KDbOrderByColumnList::begin()
+QList<KDbOrderByColumn*>::Iterator KDbOrderByColumnList::begin()
 {
-    return QList<KDbOrderByColumn*>::begin();
+    return d->data.begin();
 }
 
-KDbOrderByColumnList::iterator KDbOrderByColumnList::end()
+QList<KDbOrderByColumn*>::Iterator KDbOrderByColumnList::end()
 {
-    return QList<KDbOrderByColumn*>::end();
+    return d->data.end();
 }
 
-KDbOrderByColumnList::const_iterator KDbOrderByColumnList::constBegin() const
+QList<KDbOrderByColumn*>::ConstIterator KDbOrderByColumnList::constBegin() const
 {
-    return QList<KDbOrderByColumn*>::constBegin();
+    return d->data.constBegin();
 }
 
-KDbOrderByColumnList::const_iterator KDbOrderByColumnList::constEnd() const
+QList<KDbOrderByColumn*>::ConstIterator KDbOrderByColumnList::constEnd() const
 {
-    return QList<KDbOrderByColumn*>::constEnd();
+    return d->data.constEnd();
 }
 
 QDebug operator<<(QDebug dbg, const KDbOrderByColumnList& list)
@@ -375,6 +403,6 @@ KDbEscapedString KDbOrderByColumnList::toSqlString(bool includeTableNames, KDbCo
 
 void KDbOrderByColumnList::clear()
 {
-    qDeleteAll(begin(), end());
-    QList<KDbOrderByColumn*>::clear();
+    qDeleteAll(d->data);
+    d->data.clear();
 }

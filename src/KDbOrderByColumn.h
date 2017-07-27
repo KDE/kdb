@@ -110,7 +110,7 @@ private:
 };
 
 //! @short KDbOrderByColumnList provides list of sorted columns for a query schema
-class KDB_EXPORT KDbOrderByColumnList : protected QList<KDbOrderByColumn*>
+class KDB_EXPORT KDbOrderByColumnList
 {
 public:
     /*! Constructs empty list of ordered columns. */
@@ -118,27 +118,24 @@ public:
 
     /*! A copy constructor. */
     KDbOrderByColumnList(const KDbOrderByColumnList& other,
-                      KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery);
+                         KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery);
 
     ~KDbOrderByColumnList();
 
-    class KDB_EXPORT const_iterator : public QList<KDbOrderByColumn*>::const_iterator
-    {
-    public:
-        inline const_iterator()
-                : QList<KDbOrderByColumn*>::const_iterator() {}
-        inline const_iterator(const QList<KDbOrderByColumn*>::const_iterator &o)
-                : QList<KDbOrderByColumn*>::const_iterator(o) {}
-    };
+    //! @return @c true if this object is equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    bool operator==(const KDbOrderByColumnList &other) const;
 
-    class KDB_EXPORT iterator : public QList<KDbOrderByColumn*>::iterator
-    {
-    public:
-        inline iterator()
-                : QList<KDbOrderByColumn*>::iterator() {}
-        inline iterator(const QList<KDbOrderByColumn*>::iterator &o)
-                : QList<KDbOrderByColumn*>::iterator(o) {}
-    };
+    //! @return @c true if this object is not equal to @a other; otherwise returns @c false.
+    //! @since 3.1
+    inline bool operator!=(const KDbOrderByColumnList &other) const { return !operator==(other); }
+
+    //! Returns column with given index.
+    //! @since 3.1
+    const KDbOrderByColumn* value(int index) const;
+
+    //! @overload
+    KDbOrderByColumn* value(int index);
 
     /*! Appends multiple fields for sorting. @a querySchema
      is used to find appropriate field or alias name.
@@ -187,13 +184,21 @@ public:
     /*! Removes all elements from the list (deletes them). */
     void clear();
 
-    iterator begin();
+    /*! Returns an STL-style iterator pointing to the first column in the list. */
+    QList<KDbOrderByColumn*>::Iterator begin();
 
-    iterator end();
+    /*! Returns an STL-style iterator pointing to the imaginary item after the last column
+     * in the list.
+     */
+    QList<KDbOrderByColumn*>::Iterator end();
 
-    const_iterator constBegin() const;
+    /*! Returns an const STL-style iterator pointing to the first column in the list. */
+    QList<KDbOrderByColumn*>::ConstIterator constBegin() const;
 
-    const_iterator constEnd() const;
+    /*! Returns a const STL-style iterator pointing to the imaginary item after the last column
+     * in the list.
+     */
+    QList<KDbOrderByColumn*>::ConstIterator constEnd() const;
 
     /*! @return an SQL string like "name ASC, 2 DESC" usable for building an SQL statement.
      If @a includeTableNames is true (the default) fields are output in a form
@@ -205,6 +210,8 @@ public:
                                  KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 private:
+    class Private;
+    Private * const d;
     Q_DISABLE_COPY(KDbOrderByColumnList)
 };
 
