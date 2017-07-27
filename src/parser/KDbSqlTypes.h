@@ -38,12 +38,8 @@ struct realType {
 };
 
 //! @internal
-struct OrderByColumnInternal {
-    class List : public QList<OrderByColumnInternal> {
-    public:
-        List() {}
-        ~List() {}
-    };
+struct OrderByColumnInternal
+{
     OrderByColumnInternal()
             : columnNumber(-1)
             , order(KDbOrderByColumn::SortOrder::Ascending) {
