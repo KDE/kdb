@@ -92,11 +92,6 @@ KDbQuerySchema *KDbParser::query()
     return s;
 }
 
-const KDbQuerySchema *KDbParser::query() const
-{
-    return const_cast<KDbParser*>(this)->query();
-}
-
 KDbConnection *KDbParser::connection()
 {
     return d->connection;

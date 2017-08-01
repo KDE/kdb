@@ -175,10 +175,6 @@ public:
      */
     KDbQuerySchema *query();
 
-    //! @overload
-    //! @since 3.1
-    const KDbQuerySchema *query() const;
-
     /**
      * @return a pointer to the used database connection or @c nullptr if it was not set.
      */
