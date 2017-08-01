@@ -28,12 +28,6 @@
 
 QTEST_GUILESS_MAIN(KDbTest)
 
-Q_DECLARE_METATYPE(KDbField::TypeGroup)
-Q_DECLARE_METATYPE(KDbField::Type)
-Q_DECLARE_METATYPE(KDb::Signedness)
-Q_DECLARE_METATYPE(QList<KDbField::Type>)
-Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
-
 void KDbTest::initTestCase()
 {
 }
