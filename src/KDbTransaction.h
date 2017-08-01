@@ -87,7 +87,11 @@ public:
      *
      * @c nullptr is returned for null transactions.
      */
-    KDbConnection* connection() const;
+    KDbConnection* connection();
+
+    //! @overload
+    //! @since 3.1
+    const KDbConnection* connection() const;
 
     /**
      * @brief Returns @c true if transaction is active (i.e. started)

@@ -61,7 +61,8 @@ public:
      In @a fromQuery and @a toQuery is needed if column() is assigned to this info.
      Then, column info within @a toQuery will be assigned to the new KDbOrderByColumn object,
      corresponding to column() from "this" KDbOrderByColumn object. */
-    KDbOrderByColumn* copy(KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery) const;
+    KDbOrderByColumn *copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
+                           KDbQuerySchema *toQuery) const;
 
     //! A column to sort.
     KDbQueryColumnInfo* column() const;
@@ -117,7 +118,7 @@ public:
     KDbOrderByColumnList();
 
     /*! A copy constructor. */
-    KDbOrderByColumnList(const KDbOrderByColumnList& other,
+    KDbOrderByColumnList(const KDbOrderByColumnList& other, KDbConnection *conn,
                          KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery);
 
     ~KDbOrderByColumnList();
@@ -142,7 +143,7 @@ public:
      @return false if there is at least one name for which a field or alias name does not exist
      (all the newly appended fields are removed in this case)
      Returns @c false if @a querySchema is @c nullptr. */
-    bool appendFields(KDbQuerySchema* querySchema,
+    bool appendFields(KDbConnection *conn, KDbQuerySchema* querySchema,
                       const QString& field1, KDbOrderByColumn::SortOrder order1 = KDbOrderByColumn::SortOrder::Ascending,
                       const QString& field2 = QString(), KDbOrderByColumn::SortOrder order2 = KDbOrderByColumn::SortOrder::Ascending,
                       const QString& field3 = QString(), KDbOrderByColumn::SortOrder order3 = KDbOrderByColumn::SortOrder::Ascending,
@@ -165,13 +166,13 @@ public:
      @return @c true on successful appending, and @c false if there is no such field or alias
      name in the @a querySchema.
      Returns @c false if @a querySchema is @c nullptr. */
-    bool appendField(KDbQuerySchema* querySchema, const QString& fieldName,
+    bool appendField(KDbConnection *conn, KDbQuerySchema* querySchema, const QString& fieldName,
                      KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending);
 
     /*! Appends a column that is at position @a pos (counted from 0).
      @return true on successful adding and false if there is no such position @a pos.
      Returns @c false if @a querySchema is @c nullptr. */
-    bool appendColumn(KDbQuerySchema* querySchema,
+    bool appendColumn(KDbConnection *conn, KDbQuerySchema* querySchema,
                       KDbOrderByColumn::SortOrder order = KDbOrderByColumn::SortOrder::Ascending,
                       int pos = -1);
 

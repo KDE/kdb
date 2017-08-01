@@ -57,6 +57,10 @@ public:
     //! @return connection for this data
     KDbConnection *connection();
 
+    //! @overload
+    //! @since 3.1
+    const KDbConnection *connection() const;
+
 #ifdef KDB_TRANSACTIONS_DEBUG
     //! Helper for debugging, returns value of global transaction data reference counter
     static int globalCount();

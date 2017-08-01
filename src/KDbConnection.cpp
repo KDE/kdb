@@ -32,6 +32,7 @@
 #include "KDbRelationship.h"
 #include "KDbSqlRecord.h"
 #include "KDbSqlResult.h"
+#include "KDbTableOrQuerySchema.h"
 #include "KDbTableSchemaChangeListener.h"
 #include "KDbTransactionData.h"
 #include "KDbTransactionGuard.h"
@@ -2939,7 +2940,7 @@ KDbQuerySchema* KDbConnection::querySchema(const QString& aQueryName)
     if (q)
         return q;
     //not found: retrieve schema
-    QScopedPointer<KDbQuerySchema> newQuery(KDbQuerySchema::Private::createQuery(this));
+    QScopedPointer<KDbQuerySchema> newQuery(new KDbQuerySchema);
     clearResult();
     if (true != loadObjectData(KDb::QueryObjectType, aQueryName, newQuery.data())) {
         return nullptr;
@@ -2953,7 +2954,7 @@ KDbQuerySchema* KDbConnection::querySchema(int queryId)
     if (q)
         return q;
     //not found: retrieve schema
-    QScopedPointer<KDbQuerySchema> newQuery(KDbQuerySchema::Private::createQuery(this));
+    QScopedPointer<KDbQuerySchema> newQuery(new KDbQuerySchema);
     clearResult();
     if (true != loadObjectData(KDb::QueryObjectType, queryId, newQuery.data())) {
         return nullptr;
@@ -3005,11 +3006,13 @@ void KDbConnection::setAvailableDatabaseName(const QString& dbName)
 }
 
 //! @internal used in updateRecord(), insertRecord(),
-inline static void updateRecordDataWithNewValues(KDbQuerySchema* query, KDbRecordData* data,
-                                                 const KDbRecordEditBuffer::DbHash& b,
-                                                 QHash<KDbQueryColumnInfo*, int>* columnsOrderExpanded)
+inline static void updateRecordDataWithNewValues(
+        KDbConnection *conn, KDbQuerySchema* query, KDbRecordData* data,
+        const KDbRecordEditBuffer::DbHash& b,
+        QHash<KDbQueryColumnInfo*, int>* columnsOrderExpanded)
 {
-    *columnsOrderExpanded = query->columnsOrder(KDbQuerySchema::ExpandedList);
+    *columnsOrderExpanded
+        = query->columnsOrder(conn, KDbQuerySchema::ColumnsOrderMode::ExpandedList);
     QHash<KDbQueryColumnInfo*, int>::ConstIterator columnsOrderExpandedIt;
     for (KDbRecordEditBuffer::DbHash::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
         columnsOrderExpandedIt = columnsOrderExpanded->constFind(it.key());
@@ -3071,9 +3074,9 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                   d->driver->valueToSql(currentField, it.value());
     }
     if (pkey) {
-        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder(this));
         //kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
-        if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
+        if (pkey->fieldCount() != query->pkeyFieldCount(this)) { //sanity check
             kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_UPDATE_NO_ENTIRE_MASTER_TABLES_PKEY,
                                  tr("Could not update record because it does not contain entire primary key of master table."));
@@ -3120,7 +3123,7 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     }
     //success: now also assign new values in memory:
     QHash<KDbQueryColumnInfo*, int> columnsOrderExpanded;
-    updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
+    updateRecordDataWithNewValues(this, query, data, b, &columnsOrderExpanded);
     return true;
 }
 
@@ -3157,7 +3160,8 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     KDbRecordEditBuffer::DbHash b = buf->dbBuffer();
 
     // add default values, if available (for any column without value explicitly set)
-    const KDbQueryColumnInfo::Vector fieldsExpanded(query->fieldsExpanded(KDbQuerySchema::Unique));
+    const KDbQueryColumnInfo::Vector fieldsExpanded(
+        query->fieldsExpanded(this, KDbQuerySchema::FieldsExpandedMode::Unique));
     int fieldsExpandedCount = fieldsExpanded.count();
     for (int i = 0; i < fieldsExpandedCount; i++) {
         KDbQueryColumnInfo *ci = fieldsExpanded.at(i);
@@ -3182,9 +3186,9 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             return false;
         }
         if (pkey) {
-            const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+            const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder(this));
             //   kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
-            if (pkey->fieldCount() != query->pkeyFieldCount()) { // sanity check
+            if (pkey->fieldCount() != query->pkeyFieldCount(this)) { // sanity check
                 kdbWarning() << "NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
                 m_result = KDbResult(ERR_INSERT_NO_ENTIRE_MASTER_TABLES_PKEY,
                                      tr("Could not insert record because it does not contain "
@@ -3235,10 +3239,10 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
     }
     //success: now also assign a new value in memory:
     QHash<KDbQueryColumnInfo*, int> columnsOrderExpanded;
-    updateRecordDataWithNewValues(query, data, b, &columnsOrderExpanded);
+    updateRecordDataWithNewValues(this, query, data, b, &columnsOrderExpanded);
 
     //fetch autoincremented values
-    KDbQueryColumnInfo::List *aif_list = query->autoIncrementFields();
+    KDbQueryColumnInfo::List *aif_list = query->autoIncrementFields(this);
     quint64 recordId = 0;
     if (pkey && !aif_list->isEmpty()) {
         //! @todo now only if PKEY is present, this should also work when there's no PKEY
@@ -3315,9 +3319,9 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
     sqlwhere.reserve(1024);
 
     if (pkey) {
-        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder());
+        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder(this));
         //kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
-        if (pkey->fieldCount() != query->pkeyFieldCount()) { //sanity check
+        if (pkey->fieldCount() != query->pkeyFieldCount(this)) { //sanity check
             kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
             m_result = KDbResult(ERR_DELETE_NO_ENTIRE_MASTER_TABLES_PKEY,
                                  tr("Could not delete record because it does not contain entire master table's primary key."));
@@ -3374,6 +3378,59 @@ bool KDbConnection::deleteAllRecords(KDbQuerySchema* query)
         return false;
     }
     return true;
+}
+
+int KDbConnection::recordCount(const KDbEscapedString& sql)
+{
+    int count = -1; //will be changed only on success of querySingleNumber()
+    const tristate result = querySingleNumber(
+        KDbEscapedString("SELECT COUNT() FROM (") + sql + ") AS kdb__subquery", &count);
+    if (~result) {
+        count = 0;
+    }
+    return count;
+}
+
+int KDbConnection::recordCount(const KDbTableSchema& tableSchema)
+{
+    //! @todo does not work with non-SQL data sources
+    int count = -1; // will be changed only on success of querySingleNumber()
+    const tristate result
+        = querySingleNumber(KDbEscapedString("SELECT COUNT(*) FROM ")
+                                + tableSchema.connection()->escapeIdentifier(tableSchema.name()),
+                            &count);
+    if (~result) {
+        count = 0;
+    }
+    return count;
+}
+
+int KDbConnection::recordCount(KDbQuerySchema* querySchema, const QList<QVariant>& params)
+{
+//! @todo does not work with non-SQL data sources
+    int count = -1; //will be changed only on success of querySingleNumber()
+    KDbNativeStatementBuilder builder(this);
+    KDbEscapedString subSql;
+    if (!builder.generateSelectStatement(&subSql, querySchema, params)) {
+        return -1;
+    }
+    const tristate result = querySingleNumber(
+        KDbEscapedString("SELECT COUNT(*) FROM (") + subSql + ") AS kdb__subquery", &count);
+    if (~result) {
+        count = 0;
+    }
+    return count;
+}
+
+int KDbConnection::recordCount(KDbTableOrQuerySchema* tableOrQuery, const QList<QVariant>& params)
+{
+    if (tableOrQuery) {
+        if (tableOrQuery->table())
+            return recordCount(*tableOrQuery->table());
+        if (tableOrQuery->query())
+            return recordCount(tableOrQuery->query(), params);
+    }
+    return -1;
 }
 
 KDbConnectionOptions* KDbConnection::options()

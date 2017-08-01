@@ -322,24 +322,27 @@ KDbTableViewData::KDbTableViewData(KDbCursor *c)
     d->cursor = c;
     d->containsRecordIdInfo = d->cursor->containsRecordIdInfo();
     if (d->cursor && d->cursor->query()) {
-        const KDbQuerySchema::FieldsExpandedOptions fieldsExpandedOptions
-        = d->containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
-          : KDbQuerySchema::WithInternalFields;
-        d->realColumnCount = d->cursor->query()->fieldsExpanded(fieldsExpandedOptions).count();
+        const KDbQuerySchema::FieldsExpandedMode fieldsExpandedMode
+        = d->containsRecordIdInfo ? KDbQuerySchema::FieldsExpandedMode::WithInternalFieldsAndRecordId
+                                  : KDbQuerySchema::FieldsExpandedMode::WithInternalFields;
+        d->realColumnCount = d->cursor->query()->fieldsExpanded(
+                    d->cursor->connection(), fieldsExpandedMode).count();
     } else {
         d->realColumnCount = d->columns.count() + (d->containsRecordIdInfo ? 1 : 0);
     }
 
     // Allocate KDbTableViewColumn objects for each visible query column
-    const KDbQueryColumnInfo::Vector fields = d->cursor->query()->fieldsExpanded();
+    const KDbQueryColumnInfo::Vector fields
+            = d->cursor->query()->fieldsExpanded(d->cursor->connection());
     const int fieldCount = fields.count();
     for (int i = 0;i < fieldCount;i++) {
         KDbQueryColumnInfo *ci = fields[i];
         if (ci->isVisible()) {
             KDbQueryColumnInfo *visibleLookupColumnInfo = nullptr;
             if (ci->indexForVisibleLookupValue() != -1) {
-                //Lookup field is defined
-                visibleLookupColumnInfo = d->cursor->query()->expandedOrInternalField(ci->indexForVisibleLookupValue());
+                // Lookup field is defined
+                visibleLookupColumnInfo = d->cursor->query()->expandedOrInternalField(
+                    d->cursor->connection(), ci->indexForVisibleLookupValue());
             }
             KDbTableViewColumn* col = new KDbTableViewColumn(*d->cursor->query(), ci, visibleLookupColumnInfo);
             addColumn(col);

@@ -25,7 +25,6 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         , masterTable(nullptr)
         , fakeRecordIdField(nullptr)
         , fakeRecordIdCol(nullptr)
-        , conn(nullptr)
         , maxIndexWithAlias(-1)
         , visibility(64)
         , fieldsExpanded(nullptr)
@@ -70,7 +69,6 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         pkeyFieldsOrder = nullptr;
         fakeRecordIdCol = nullptr;
         fakeRecordIdField = nullptr;
-        conn = nullptr;
         ownedVisibleColumns = nullptr;
         // </clear, so computeFieldsExpanded() will re-create it>
         if (!copy->whereExpr.isNull()) {
@@ -110,12 +108,6 @@ KDbQuerySchema::Private::~Private()
     delete visibleFieldsExpandedWithInternalAndRecordId;
     delete fieldsExpandedWithInternal;
     delete visibleFieldsExpandedWithInternal;
-}
-
-//static
-KDbQuerySchema* KDbQuerySchema::Private::createQuery(KDbConnection *conn)
-{
-    return new KDbQuerySchema(conn);
 }
 
 void KDbQuerySchema::Private::clear()

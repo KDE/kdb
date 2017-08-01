@@ -29,6 +29,7 @@
 
 class KDbConnection;
 class KDbLookupFieldSchema;
+class KDbFieldPrivate;
 
 /*! Provides information about native database table
   that can be stored using KDb database engine.
@@ -128,10 +129,6 @@ public:
     /*! Sends information about fields of this table schema to debug output @a dbg. */
     QDebug debugFields(QDebug dbg) const;
 
-    /*! @return connection object if table was created/retrieved using a connection,
-      otherwise 0. */
-    KDbConnection* connection() const;
-
     /*! @return true if this is internal KDb's table.
      Internal tables are hidden in applications (if desired) but are available
      for schema export/import functionality.
@@ -182,6 +179,10 @@ protected:
     /*! Automatically retrieves table schema via connection. */
     explicit KDbTableSchema(KDbConnection *conn, const QString & name = QString());
 
+    /*! @return connection object if table was created/retrieved using a connection,
+      otherwise @c nullptr. */
+    KDbConnection* connection() const;
+
     /*! For KDbConnection. */
     void setConnection(KDbConnection* conn);
 
@@ -197,6 +198,7 @@ private:
 
     friend class KDbConnection;
     friend class KDbNativeStatementBuilder;
+    friend class KDbFieldPrivate;
     Q_DISABLE_COPY(KDbTableSchema)
 };
 

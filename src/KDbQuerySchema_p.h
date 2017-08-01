@@ -99,10 +99,6 @@ public:
     KDbField *fakeRecordIdField; //! used to mark a place for record Id
     KDbQueryColumnInfo *fakeRecordIdCol; //! used to mark a place for record Id
 
-    //! Connection on which this query operates
-    //! @todo use equivalent of QPointer<KDbConnection>
-    KDbConnection* conn;
-
 protected:
     void tryRegenerateExprAliases();
 

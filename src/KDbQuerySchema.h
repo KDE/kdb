@@ -64,7 +64,7 @@ public:
 
     /*! Copy constructor. Creates deep copy of @a querySchema.
      KDbQueryAsterisk objects are deeply copied while only pointers to KDbField objects are copied. */
-    KDbQuerySchema(const KDbQuerySchema& querySchema);
+    KDbQuerySchema(const KDbQuerySchema& querySchema, KDbConnection *conn);
 
     ~KDbQuerySchema() override;
 
@@ -190,10 +190,6 @@ public:
      Does not destroy any objects though. Clears name and all other properties.
      @see KDbFieldList::clear() */
     void clear() override;
-
-    /*! If query was created using a connection,
-      returns this connection object, otherwise @c nullptr. */
-    KDbConnection* connection() const;
 
     /*! @return table that is master to this query.
      All potentially-editable columns within this query belong just to this table.
@@ -375,6 +371,14 @@ public:
     /*! @return list of KDbQueryAsterisk objects defined for this query */
     KDbField::List* asterisks() const;
 
+    //! Mode for field() and columnInfo()
+    //! @since 3.1
+    enum class ExpandMode {
+        Unexpanded, //!< All fields are returned even if duplicated
+        Expanded    //!< Expanded list of the query fields is computed so queries with asterisks
+                    //!< are processed well
+    };
+
     /*! @return field for @a identifier or @c nullptr if no field for this name
      was found within the query. fieldsExpanded() method is used
      to lookup expanded list of the query fields, so queries with asterisks
@@ -401,26 +405,19 @@ public:
 
      This method is also a product of inheritance from KDbFieldList.
      */
-    const KDbField* field(const QString& identifier) const override;
+    const KDbField *field(KDbConnection *conn, const QString &identifier,
+                          ExpandMode mode = ExpandMode::Expanded) const;
 
     /**
-     * @overload const KDbField* field(const QString& identifier) const
+     * @overload
      */
-    KDbField* field(const QString& identifier) override;
-
-    /**
-     * An overloaded method KDbField* field(const QString& identifier)
-     * where unexpanded list of fields is used to find a field.
-     */
-    const KDbField* unexpandedField(const QString& identifier) const;
-
-    /**
-     * @overload const KDbField* unexpandedField(const QString& identifier) const
-     */
-    KDbField* unexpandedField(const QString& identifier);
+    KDbField *field(KDbConnection *conn, const QString &identifier,
+                    ExpandMode mode = ExpandMode::Expanded);
 
     /*! @return field id or @c nullptr if there is no such a field. */
     KDbField* field(int id) override;
+
+    using KDbFieldList::field;
 
     /*! @overload KDbField* field(int id) */
     const KDbField* field(int id) const override;
@@ -437,10 +434,12 @@ public:
      calling columnInfo("name") for "SELECT t1.name, t2.name FROM t1, t2" statement
      will only return the column related to t1.name and not t2.name, so you'll need to
      explicitly specify "t2.name" as the identifier to get the second column. */
-    KDbQueryColumnInfo* columnInfo(const QString& identifier, bool expanded = true) const;
+    KDbQueryColumnInfo *columnInfo(KDbConnection *conn, const QString &identifier,
+                                   ExpandMode mode = ExpandMode::Expanded) const;
 
-    /*! Options used in fieldsExpanded() and visibleFieldsExpanded(). */
-    enum FieldsExpandedOptions {
+    //! Mode for fieldsExpanded() and visibleFieldsExpanded()
+    //! @since 3.1
+    enum class FieldsExpandedMode {
         Default,                      //!< All fields are returned even if duplicated
         Unique,                       //!< Unique list of fields is returned
         WithInternalFields,           //!< Like Default but internal fields (for lookup) are appended
@@ -490,29 +489,30 @@ public:
     @todo js: UPDATE CACHE!
     */
     inline KDbQueryColumnInfo::Vector fieldsExpanded(
-            FieldsExpandedOptions options = Default) const
+            KDbConnection *conn, FieldsExpandedMode mode = FieldsExpandedMode::Default) const
     {
-        return fieldsExpandedInternal(options, false);
+        return fieldsExpandedInternal(conn, mode, false);
     }
 
     /*! Like fieldsExpanded() but returns only visible fields. */
     inline KDbQueryColumnInfo::Vector visibleFieldsExpanded(
-            FieldsExpandedOptions options = Default) const
+            KDbConnection *conn, FieldsExpandedMode options = FieldsExpandedMode::Default) const
     {
-        return fieldsExpandedInternal(options, true);
+        return fieldsExpandedInternal(conn, options, true);
     }
 
     /*! @return list of internal fields used for lookup columns. */
-    KDbQueryColumnInfo::Vector internalFields() const;
+    KDbQueryColumnInfo::Vector internalFields(KDbConnection *conn) const;
 
     /*! @return info for expanded of internal field at index @a index.
      The returned field can be either logical or internal (for lookup),
      the latter case is @c true if @a index &gt;= fieldsExpanded().count().
      Equivalent of KDbQuerySchema::fieldsExpanded(WithInternalFields).at(index). */
-    KDbQueryColumnInfo* expandedOrInternalField(int index) const;
+    KDbQueryColumnInfo* expandedOrInternalField(KDbConnection *conn, int index) const;
 
-    /*! Options used in columnsOrder(). */
-    enum ColumnsOrderOptions {
+    //! Mode for columnsOrder()
+    //! @since 3.1
+    enum class ColumnsOrderMode {
         UnexpandedList,                 //!< A map for unexpanded list is created
         UnexpandedListWithoutAsterisks, //!< A map for unexpanded list is created, with asterisks skipped
         ExpandedList                    //!< A map for expanded list is created
@@ -547,7 +547,8 @@ public:
      - columnsOrder(UnexpandedListWithoutAsterisks) will return the following map:
        KDbQueryColumnInfo(id)->0,
     */
-    QHash<KDbQueryColumnInfo*, int> columnsOrder(ColumnsOrderOptions options = ExpandedList) const;
+    QHash<KDbQueryColumnInfo *, int> columnsOrder(KDbConnection *conn,
+                                                  ColumnsOrderMode mode = ColumnsOrderMode::ExpandedList) const;
 
     /*! @return table describing order of primary key (PKEY) fields within the query.
      Indexing is performed against vector returned by fieldsExpanded().
@@ -571,7 +572,7 @@ public:
      @see example for pkeyFieldCount().
     @todo js: UPDATE CACHE!
     */
-    QVector<int> pkeyFieldsOrder() const;
+    QVector<int> pkeyFieldsOrder(KDbConnection *conn) const;
 
     /*! @return number of master table's primary key fields included in this query.
      This method is useful to quickly check whether the vector returned by pkeyFieldsOrder()
@@ -591,13 +592,13 @@ public:
         and pkeyFieldsOrder() will return vector {-1, 1}, as second primary key's field
         is at position #1 and first field is not specified at all within the query.
     */
-    int pkeyFieldCount();
+    int pkeyFieldCount(KDbConnection *conn);
 
     /*! @return a list of field infos for all auto-incremented fields
      from master table of this query. This result is cached for efficiency.
      fieldsExpanded() is used for that.
     */
-    KDbQueryColumnInfo::List* autoIncrementFields() const;
+    KDbQueryColumnInfo::List* autoIncrementFields(KDbConnection *conn) const;
 
     /*! @return a preset statement (if any). */
     KDbEscapedString statement() const;
@@ -681,7 +682,7 @@ public:
 
     /*! @return query schema parameters. These are taked from the WHERE section
      (a tree of expression items). */
-    QList<KDbQuerySchemaParameter> parameters() const;
+    QList<KDbQuerySchemaParameter> parameters(KDbConnection *conn) const;
 
     //! @return @c true if this query is valid
     /*! Detailed validation is performed in the same way as parsing of query statements
@@ -702,14 +703,12 @@ public:
     class Private; // Protected not private because of the parser
 
 protected:
-    //! @internal associates @a conn with this query so it's possible to find tables
-    explicit KDbQuerySchema(KDbConnection *conn);
+    void computeFieldsExpanded(KDbConnection *conn) const;
 
-    void computeFieldsExpanded() const;
-
-    //! Used by fieldsExpanded(FieldsExpandedOptions)
-    //! and visibleFieldsExpanded(FieldsExpandedOptions options).
-    KDbQueryColumnInfo::Vector fieldsExpandedInternal(FieldsExpandedOptions options,
+    //! Used by fieldsExpanded(KDbConnection*, FieldsExpandedMode)
+    //! and visibleFieldsExpanded(KDbConnection*, FieldsExpandedMode).
+    KDbQueryColumnInfo::Vector fieldsExpandedInternal(KDbConnection *conn,
+                                                      FieldsExpandedMode mode,
                                                       bool onlyVisible) const;
 
     /** Internal method used by all insert*Field methods.
@@ -735,10 +734,17 @@ protected:
      */
     void setWhereExpressionInternal(const KDbExpression &expr);
 
+    Q_DISABLE_COPY(KDbQuerySchema)
     Private * const d;
 };
 
-//! Sends query schema information @a query to debug output @a dbg.
-KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbQuerySchema& query);
+//! A pair (connection, table-or-schema) for QDebug operator<<
+//! @since 3.1
+typedef std::tuple<KDbConnection*, const KDbQuerySchema&> KDbConnectionAndQuerySchema;
+
+//! Sends connection and query schema information @a connectionAndSchema to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg,
+                             const KDbConnectionAndQuerySchema &connectionAndSchema);
 
 #endif

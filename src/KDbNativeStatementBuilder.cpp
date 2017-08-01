@@ -164,7 +164,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
                 KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
                 if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
-                    KDbTableSchema *lookupTable = querySchema->connection()->tableSchema(recordSource.name());
+                    KDbTableSchema *lookupTable = connection->tableSchema(recordSource.name());
                     KDbFieldList* visibleColumns = nullptr;
                     KDbField *boundField = nullptr;
                     if (lookupTable
@@ -196,12 +196,13 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     }
                     delete visibleColumns;
                 } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
-                    KDbQuerySchema *lookupQuery = querySchema->connection()->querySchema(recordSource.name());
+                    KDbQuerySchema *lookupQuery = connection->querySchema(recordSource.name());
                     if (!lookupQuery) {
                         kdbWarning() << "!lookupQuery";
                         return false;
                     }
-                    const KDbQueryColumnInfo::Vector fieldsExpanded(lookupQuery->fieldsExpanded());
+                    const KDbQueryColumnInfo::Vector fieldsExpanded(
+                        lookupQuery->fieldsExpanded(connection));
                     if (lookupFieldSchema->boundColumn() >= fieldsExpanded.count()) {
                         kdbWarning() << "lookupFieldSchema->boundColumn() >= fieldsExpanded.count()";
                         return false;
@@ -365,11 +366,11 @@ static bool selectStatementInternal(KDbEscapedString *target,
         querySchema->orderByColumnList()->toSqlString(
             !singleTable/*includeTableName*/, connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping)
     );
-    const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder());
+    const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder(connection));
     if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
         //add automatic ORDER BY if there is no explicitly defined (especially helps when there are complex JOINs)
         KDbOrderByColumnList automaticPKOrderBy;
-        const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded());
+        const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(connection));
         foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
             if (pkeyFieldsIndex < 0) // no field mentioned in this query
                 continue;

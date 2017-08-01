@@ -77,7 +77,11 @@ public:
     Q_DECLARE_FLAGS(Options, Option)
 
     /*! @return connection used for the cursor */
-    KDbConnection* connection() const;
+    KDbConnection* connection();
+
+    //! @overload
+    //! @since 3.1
+    const KDbConnection* connection() const;
 
     /*! Opens the cursor using data provided on creation.
      The data might be either KDbQuerySchema or a raw SQL statement. */
@@ -327,6 +331,10 @@ private:
     class Private;
     Private * const d;
 };
+
+//! Sends information about object @a cursor to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg, KDbCursor& cursor);
 
 //! Sends information about object @a cursor to debug output @a dbg.
 KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbCursor& cursor);
