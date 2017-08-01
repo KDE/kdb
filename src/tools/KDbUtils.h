@@ -168,7 +168,7 @@ public:
         }
         return QHash<Key, T>::insert(key, value);
     }
-    // note: no need to override insertMulti(), unite(), take(), they does not replace items
+    // note: no need to override insertMulti(), unite(), take(), they do not replace items
 
 private:
     bool m_autoDelete;
