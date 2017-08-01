@@ -105,11 +105,11 @@ void KDbCursor::init(KDbConnection* conn)
     if (m_query) {
         //get list of all fields
         m_visibleFieldsExpanded = new KDbQueryColumnInfo::Vector();
-        *m_visibleFieldsExpanded = m_query->visibleFieldsExpanded(
-                    d->containsRecordIdInfo ? KDbQuerySchema::WithInternalFieldsAndRecordId
-                                            : KDbQuerySchema::WithInternalFields);
+        *m_visibleFieldsExpanded = m_query->visibleFieldsExpanded(conn,
+                    d->containsRecordIdInfo ? KDbQuerySchema::FieldsExpandedMode::WithInternalFieldsAndRecordId
+                                            : KDbQuerySchema::FieldsExpandedMode::WithInternalFields);
         m_logicalFieldCount = m_visibleFieldsExpanded->count()
-                              - m_query->internalFields().count() - (d->containsRecordIdInfo ? 1 : 0);
+                              - m_query->internalFields(conn).count() - (d->containsRecordIdInfo ? 1 : 0);
         m_fieldCount = m_visibleFieldsExpanded->count();
         m_fieldsToStoreInRecord = m_fieldCount;
     } else {
@@ -145,7 +145,12 @@ bool KDbCursor::readAhead() const
     return d->readAhead;
 }
 
-KDbConnection* KDbCursor::connection() const
+KDbConnection* KDbCursor::connection()
+{
+    return d->conn;
+}
+
+const KDbConnection* KDbCursor::connection() const
 {
     return d->conn;
 }
@@ -527,14 +532,14 @@ bool KDbCursor::deleteAllRecords()
     return d->conn->deleteAllRecords(m_query);
 }
 
-QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
+QDebug debug(QDebug dbg, KDbCursor& cursor, bool buildSql)
 {
     dbg.nospace() << "CURSOR(";
     if (!cursor.query()) {
         dbg.nospace() << "RAW SQL STATEMENT:" << cursor.rawSql().toString()
                       << "\n";
     }
-    else {
+    else if (buildSql) {
         KDbNativeStatementBuilder builder(cursor.connection());
         KDbEscapedString sql;
         QString sqlString;
@@ -560,6 +565,16 @@ QDebug operator<<(QDebug dbg, const KDbCursor& cursor)
     }
     dbg.nospace() << "AT=" << cursor.at() << ")";
     return dbg.space();
+}
+
+QDebug operator<<(QDebug dbg, KDbCursor &cursor)
+{
+    return debug(dbg, cursor, true /*buildSql*/);
+}
+
+QDebug operator<<(QDebug dbg, const KDbCursor &cursor)
+{
+    return debug(dbg, const_cast<KDbCursor&>(cursor), false /* !buildSql*/);
 }
 
 void KDbCursor::setOrderByColumnList(const QStringList& columnNames)

@@ -28,12 +28,6 @@
 
 QTEST_GUILESS_MAIN(KDbTest)
 
-Q_DECLARE_METATYPE(KDbField::TypeGroup)
-Q_DECLARE_METATYPE(KDbField::Type)
-Q_DECLARE_METATYPE(KDb::Signedness)
-Q_DECLARE_METATYPE(QList<KDbField::Type>)
-Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
-
 void KDbTest::initTestCase()
 {
 }
@@ -280,37 +274,6 @@ KDB_EXPORT KDbEscapedString sqlWhere(KDbDriver *drv, KDbField::Type t,
  On failure false is returned. If there is no such object, @c cancelled value is returned. */
 KDB_EXPORT tristate idForObjectName(KDbConnection* conn, int *id, const QString& objName,
                                     int objType);
-
-//! @todo perhaps use quint64 here?
-/*! @return number of records that can be retrieved after executing @a sql statement
- within a connection @a conn. The statement should be of type SELECT.
- For SQL data sources it does not fetch any records, only "COUNT(*)"
- SQL aggregation is used at the backed.
- -1 is returned if error occurred. */
-KDB_EXPORT int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
-
-//! @todo perhaps use quint64 here?
-/*! @return number of records that can be retrieved from @a tableSchema.
- The table must be created or retrieved using a KDbConnection object,
- i.e. tableSchema.connection() must not return 0.
- For SQL data sources it does not fetch any records, only "COUNT(*)"
- SQL aggregation is used at the backed.
- -1 is returned if error occurred. */
-KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
-
-/*! @overload in rowCount(const KDbTableSchema& tableSchema)
- Operates on a query schema. @a params are optional values of parameters that will
- be inserted into places marked with [] before execution of the query. */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
-                           const QList<QVariant>& params = QList<QVariant>());
-
-/*! @overload int rowCount(KDbQuerySchema& querySchema, const QList<QVariant>& params)
- Operates on a table or query schema. @a params are optional values of parameters that
- will be inserted into places marked with [] before execution of the query. */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
-                           const QList<QVariant>& params = QList<QVariant>());
 
 /*! @return a number of columns that can be retrieved from table or query schema.
  In case of query, expanded fields are counted. Can return -1 if @a tableOrQuery

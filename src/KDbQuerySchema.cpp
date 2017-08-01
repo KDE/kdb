@@ -21,6 +21,7 @@
 #include "KDbQuerySchema_p.h"
 #include "KDbQueryAsterisk.h"
 #include "KDbConnection.h"
+#include "KDbConnection_p.h"
 #include "kdb_debug.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbOrderByColumn.h"
@@ -45,18 +46,17 @@ QString escapeIdentifier(const QString& name, KDbConnection *conn,
 KDbQuerySchema::KDbQuerySchema()
         : KDbFieldList(false)//fields are not owned by KDbQuerySchema object
         , KDbObject(KDb::QueryObjectType)
-        , d(new Private(this))
+        , d(new KDbQuerySchemaPrivate(this))
 {
 }
 
 KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
         : KDbFieldList(false)//fields are not owned by KDbQuerySchema object
         , KDbObject(KDb::QueryObjectType)
-        , d(new Private(this))
+        , d(new KDbQuerySchemaPrivate(this))
 {
     if (tableSchema) {
         d->masterTable = tableSchema;
-        d->conn = tableSchema->connection();
         /*if (!d->masterTable) {
           kdbWarning() << "!d->masterTable";
           m_name.clear();
@@ -76,10 +76,10 @@ KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
     }
 }
 
-KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema)
+KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema, KDbConnection *conn)
         : KDbFieldList(querySchema, false /* !deepCopyFields */)
         , KDbObject(querySchema)
-        , d(new Private(this, querySchema.d))
+        , d(new KDbQuerySchemaPrivate(this, querySchema.d))
 {
     //only deep copy query asterisks
     foreach(KDbField* f, *querySchema.fields()) {
@@ -96,16 +96,8 @@ KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema)
         addField(copiedField);
     }
     // this deep copy must be after the 'd' initialization because fieldsExpanded() is used there
-    d->orderByColumnList = new KDbOrderByColumnList(*querySchema.d->orderByColumnList,
-                                                 const_cast<KDbQuerySchema*>(&querySchema), this);
-}
-
-KDbQuerySchema::KDbQuerySchema(KDbConnection *conn)
-        : KDbFieldList(false)//fields are not owned by KDbQuerySchema object
-        , KDbObject(KDb::QueryObjectType)
-        , d(new Private(this))
-{
-    d->conn = conn;
+    d->orderByColumnList = new KDbOrderByColumnList(*querySchema.d->orderByColumnList, conn,
+                                                    const_cast<KDbQuerySchema*>(&querySchema), this);
 }
 
 KDbQuerySchema::~KDbQuerySchema()
@@ -316,19 +308,10 @@ bool KDbQuerySchema::addInvisibleAsterisk(KDbQueryAsterisk *asterisk)
     return addAsteriskInternal(asterisk, false);
 }
 
-KDbConnection* KDbQuerySchema::connection() const
+QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSchema)
 {
-    if (d->conn) {
-        return d->conn;
-    }
-    if (!d->tables.isEmpty()) {
-        return d->tables.first()->connection();
-    }
-    return nullptr;
-}
-
-QDebug operator<<(QDebug dbg, const KDbQuerySchema& query)
-{
+    KDbConnection* conn = std::get<0>(connectionAndSchema);
+    const KDbQuerySchema& query = std::get<1>(connectionAndSchema);
     //fields
     KDbTableSchema *mt = query.masterTable();
     dbg.nospace() << "QUERY";
@@ -348,7 +331,7 @@ QDebug operator<<(QDebug dbg, const KDbQuerySchema& query)
     int fieldsExpandedCount = 0;
     bool first;
     if (query.fieldCount() > 0) {
-        const KDbQueryColumnInfo::Vector fe(query.fieldsExpanded());
+        const KDbQueryColumnInfo::Vector fe(query.fieldsExpanded(conn));
         fieldsExpandedCount = fe.size();
         dbg.nospace() << fieldsExpandedCount << "):\n";
         first = true;
@@ -683,26 +666,17 @@ void KDbQuerySchema::setStatement(const KDbEscapedString& sql)
     d->sql = sql;
 }
 
-const KDbField* KDbQuerySchema::field(const QString& identifier) const
+const KDbField* KDbQuerySchema::field(KDbConnection *conn, const QString& identifier,
+                                      ExpandMode mode) const
 {
-    KDbQueryColumnInfo *ci = columnInfo(identifier, true /*expanded*/);
+    KDbQueryColumnInfo *ci = columnInfo(conn, identifier, mode);
     return ci ? ci->field() : nullptr;
 }
 
-KDbField* KDbQuerySchema::field(const QString& identifier)
+KDbField* KDbQuerySchema::field(KDbConnection *conn, const QString& identifier, ExpandMode mode)
 {
-    return const_cast<KDbField*>(static_cast<const KDbQuerySchema*>(this)->field(identifier));
-}
-
-const KDbField* KDbQuerySchema::unexpandedField(const QString& identifier) const
-{
-    KDbQueryColumnInfo *ci = columnInfo(identifier, false /*unexpanded*/);
-    return ci ? ci->field() : nullptr;
-}
-
-KDbField* KDbQuerySchema::unexpandedField(const QString& identifier)
-{
-    return const_cast<KDbField*>(static_cast<const KDbQuerySchema*>(this)->unexpandedField(identifier));
+    return const_cast<KDbField *>(
+        static_cast<const KDbQuerySchema *>(this)->field(conn, identifier, mode));
 }
 
 KDbField* KDbQuerySchema::field(int id)
@@ -715,58 +689,65 @@ const KDbField* KDbQuerySchema::field(int id) const
     return KDbFieldList::field(id);
 }
 
-KDbQueryColumnInfo* KDbQuerySchema::columnInfo(const QString& identifier, bool expanded) const
+KDbQueryColumnInfo *KDbQuerySchema::columnInfo(KDbConnection *conn, const QString &identifier,
+                                               ExpandMode mode) const
 {
-    computeFieldsExpanded();
-    return expanded ? d->columnInfosByNameExpanded.value(identifier)
-            : d->columnInfosByName.value(identifier);
+    const KDbQuerySchemaFieldsExpanded *cache = computeFieldsExpanded(conn);
+    return mode == ExpandMode::Expanded ? cache->columnInfosByNameExpanded.value(identifier)
+                                        : cache->columnInfosByName.value(identifier);
 }
 
 KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpandedInternal(
-        FieldsExpandedOptions options, bool onlyVisible) const
+        KDbConnection *conn, FieldsExpandedMode mode, bool onlyVisible) const
 {
-    computeFieldsExpanded();
-    KDbQueryColumnInfo::Vector *realFieldsExpanded = onlyVisible ? d->visibleFieldsExpanded
-                                                                 : d->fieldsExpanded;
-    if (options == WithInternalFields || options == WithInternalFieldsAndRecordId) {
+    if (!conn) {
+        kdbWarning() << "Connection required";
+        return KDbQueryColumnInfo::Vector();
+    }
+    KDbQuerySchemaFieldsExpanded *cache = computeFieldsExpanded(conn);
+    const KDbQueryColumnInfo::Vector *realFieldsExpanded
+        = onlyVisible ? &cache->visibleFieldsExpanded : &cache->fieldsExpanded;
+    if (mode == FieldsExpandedMode::WithInternalFields
+        || mode == FieldsExpandedMode::WithInternalFieldsAndRecordId)
+    {
         //a ref to a proper pointer (as we cache the vector for two cases)
-        KDbQueryColumnInfo::Vector*& tmpFieldsExpandedWithInternal =
-            (options == WithInternalFields) ?
-                (onlyVisible ? d->visibleFieldsExpandedWithInternal : d->fieldsExpandedWithInternal)
-              : (onlyVisible ? d->visibleFieldsExpandedWithInternalAndRecordId : d->fieldsExpandedWithInternalAndRecordId);
+        KDbQueryColumnInfo::Vector& tmpFieldsExpandedWithInternal =
+            (mode == FieldsExpandedMode::WithInternalFields) ?
+                (onlyVisible ? cache->visibleFieldsExpandedWithInternal : cache->fieldsExpandedWithInternal)
+              : (onlyVisible ? cache->visibleFieldsExpandedWithInternalAndRecordId : cache->fieldsExpandedWithInternalAndRecordId);
         //special case
-        if (!tmpFieldsExpandedWithInternal) {
+        if (tmpFieldsExpandedWithInternal.isEmpty()) {
             //glue expanded and internal fields and cache it
-            const int internalFieldCount = d->internalFields ? d->internalFields->size() : 0;
+            const int internalFieldCount = cache->internalFields.size();
             const int fieldsExpandedVectorSize = realFieldsExpanded->size();
             const int size = fieldsExpandedVectorSize + internalFieldCount
-                             + ((options == WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
-            tmpFieldsExpandedWithInternal = new KDbQueryColumnInfo::Vector(size);
+                + ((mode == FieldsExpandedMode::WithInternalFieldsAndRecordId) ? 1 : 0) /*ROWID*/;
+            tmpFieldsExpandedWithInternal.resize(size);
             for (int i = 0; i < fieldsExpandedVectorSize; ++i) {
-                (*tmpFieldsExpandedWithInternal)[i] = realFieldsExpanded->at(i);
+                tmpFieldsExpandedWithInternal[i] = realFieldsExpanded->at(i);
             }
             if (internalFieldCount > 0) {
                 for (int i = 0; i < internalFieldCount; ++i) {
-                    KDbQueryColumnInfo *info = d->internalFields->at(i);
-                    (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + i] = info;
+                    KDbQueryColumnInfo *info = cache->internalFields[i];
+                    tmpFieldsExpandedWithInternal[fieldsExpandedVectorSize + i] = info;
                 }
             }
-            if (options == WithInternalFieldsAndRecordId) {
+            if (mode == FieldsExpandedMode::WithInternalFieldsAndRecordId) {
                 if (!d->fakeRecordIdField) {
                     d->fakeRecordIdField = new KDbField(QLatin1String("rowID"), KDbField::BigInteger);
                     d->fakeRecordIdCol = new KDbQueryColumnInfo(d->fakeRecordIdField, QString(), true);
                 }
-                (*tmpFieldsExpandedWithInternal)[fieldsExpandedVectorSize + internalFieldCount] = d->fakeRecordIdCol;
+                tmpFieldsExpandedWithInternal[fieldsExpandedVectorSize + internalFieldCount] = d->fakeRecordIdCol;
             }
         }
-        return *tmpFieldsExpandedWithInternal;
+        return tmpFieldsExpandedWithInternal;
     }
 
-    if (options == Default) {
+    if (mode == FieldsExpandedMode::Default) {
         return *realFieldsExpanded;
     }
 
-    //options == Unique:
+    //mode == Unique:
     QSet<QString> columnsAlreadyFound;
     const int fieldsExpandedCount(realFieldsExpanded->count());
     KDbQueryColumnInfo::Vector result(fieldsExpandedCount);   //initial size is set
@@ -783,15 +764,15 @@ KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpandedInternal(
     return result;
 }
 
-KDbQueryColumnInfo::Vector KDbQuerySchema::internalFields() const
+KDbQueryColumnInfo::Vector KDbQuerySchema::internalFields(KDbConnection *conn) const
 {
-    computeFieldsExpanded();
-    return d->internalFields ? *d->internalFields : KDbQueryColumnInfo::Vector();
+    KDbQuerySchemaFieldsExpanded *cache = computeFieldsExpanded(conn);
+    return cache->internalFields;
 }
 
-KDbQueryColumnInfo* KDbQuerySchema::expandedOrInternalField(int index) const
+KDbQueryColumnInfo* KDbQuerySchema::expandedOrInternalField(KDbConnection *conn, int index) const
 {
-    return fieldsExpanded(WithInternalFields).value(index);
+    return fieldsExpanded(conn, FieldsExpandedMode::WithInternalFields).value(index);
 }
 
 inline static QString lookupColumnKey(KDbField *foreignField, KDbField* field)
@@ -803,20 +784,14 @@ inline static QString lookupColumnKey(KDbField *foreignField, KDbField* field)
                + QLatin1Char('.') + foreignField->name();
 }
 
-void KDbQuerySchema::computeFieldsExpanded() const
+KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnection *conn) const
 {
-    if (d->fieldsExpanded)
-        return;
-
-    if (!d->columnsOrder) {
-        d->columnsOrder = new QHash<KDbQueryColumnInfo*, int>();
-        d->columnsOrderWithoutAsterisks = new QHash<KDbQueryColumnInfo*, int>();
-    } else {
-        d->columnsOrder->clear();
-        d->columnsOrderWithoutAsterisks->clear();
+    KDbQuerySchemaFieldsExpanded *cache = conn->d->fieldsExpanded(this);
+    if (cache) {
+        return cache;
     }
-    if (d->ownedVisibleColumns)
-        d->ownedVisibleColumns->clear();
+    cache = new KDbQuerySchemaFieldsExpanded;
+    QScopedPointer<KDbQuerySchemaFieldsExpanded> guard(cache);
 
     //collect all fields in a list (not a vector yet, because we do not know its size)
     KDbQueryColumnInfo::List list; //temporary
@@ -835,7 +810,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                             isColumnVisible(fieldPosition));
                     list.append(ci);
                     kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
-                    d->columnsOrder->insert(ci, fieldPosition);
+                    cache->columnsOrder.insert(ci, fieldPosition);
                 }
             } else {//all-tables asterisk: iterate through table list
                 foreach(KDbTableSchema *table, d->tables) {
@@ -849,7 +824,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                                 isColumnVisible(fieldPosition));
                         list.append(ci);
                         kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
-                        d->columnsOrder->insert(ci, fieldPosition);
+                        cache->columnsOrder.insert(ci, fieldPosition);
                     }
                 }
             }
@@ -859,8 +834,8 @@ void KDbQuerySchema::computeFieldsExpanded() const
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
             kdbDebug() << "caching (unexpanded) column's order:" << *ci << "at position" << fieldPosition;
-            d->columnsOrder->insert(ci, fieldPosition);
-            d->columnsOrderWithoutAsterisks->insert(ci, fieldPosition);
+            cache->columnsOrder.insert(ci, fieldPosition);
+            cache->columnsOrderWithoutAsterisks.insert(ci, fieldPosition);
 
             //handle lookup field schema
             KDbLookupFieldSchema *lookupFieldSchema = f->table() ? f->table()->lookupFieldSchema(*f) : nullptr;
@@ -872,7 +847,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
             KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
             if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
-                KDbTableSchema *lookupTable = connection()->tableSchema(recordSource.name());
+                KDbTableSchema *lookupTable = conn->tableSchema(recordSource.name());
                 KDbFieldList* visibleColumns = nullptr;
                 KDbField *boundField = nullptr;
                 if (lookupTable
@@ -892,10 +867,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
                             KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                        if (!d->ownedVisibleColumns) {
-                            d->ownedVisibleColumns = new KDbField::List();
-                        }
-                        d->ownedVisibleColumns->append(visibleColumn);   // remember to delete later
+                        cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
                     }
 
                     lookup_list.append(
@@ -913,10 +885,11 @@ void KDbQuerySchema::computeFieldsExpanded() const
                 }
                 delete visibleColumns;
             } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
-                KDbQuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
+                KDbQuerySchema *lookupQuery = conn->querySchema(recordSource.name());
                 if (!lookupQuery)
                     continue;
-                const KDbQueryColumnInfo::Vector lookupQueryFieldsExpanded(lookupQuery->fieldsExpanded());
+                const KDbQueryColumnInfo::Vector lookupQueryFieldsExpanded(
+                    lookupQuery->fieldsExpanded(conn));
                 if (lookupFieldSchema->boundColumn() >= lookupQueryFieldsExpanded.count())
                     continue;
                 KDbQueryColumnInfo *boundColumnInfo = nullptr;
@@ -949,10 +922,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
                         KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                    if (!d->ownedVisibleColumns) {
-                        d->ownedVisibleColumns = new KDbField::List();
-                    }
-                    d->ownedVisibleColumns->append(visibleColumn);   // remember to delete later
+                    cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
                 }
 
                 lookup_list.append(
@@ -971,80 +941,68 @@ void KDbQuerySchema::computeFieldsExpanded() const
         }
     }
     //prepare clean vector for expanded list, and a map for order information
-    if (!d->fieldsExpanded) {
-        d->fieldsExpanded = new KDbQueryColumnInfo::Vector(list.count());
-        d->visibleFieldsExpanded = new KDbQueryColumnInfo::Vector(list.count());
-        d->columnsOrderExpanded = new QHash<KDbQueryColumnInfo*, int>();
-    } else {//for future:
-        qDeleteAll(*d->fieldsExpanded);
-        d->fieldsExpanded->clear();
-        d->fieldsExpanded->resize(list.count());
-        d->visibleFieldsExpanded->clear();
-        d->visibleFieldsExpanded->resize(list.count());
-        d->columnsOrderExpanded->clear();
-    }
+    cache->fieldsExpanded.resize(list.count());
+    cache->visibleFieldsExpanded.resize(list.count());
 
     /*fill (based on prepared 'list' and 'lookup_list'):
      -the vector
      -the map
      -"fields by name" dictionary
     */
-    d->columnInfosByName.clear();
-    d->columnInfosByNameExpanded.clear();
     i = -1;
     int visibleIndex = -1;
     foreach(KDbQueryColumnInfo* ci, list) {
         i++;
-        (*d->fieldsExpanded)[i] = ci;
+        cache->fieldsExpanded[i] = ci;
         if (ci->isVisible()) {
             ++visibleIndex;
-            (*d->visibleFieldsExpanded)[visibleIndex] = ci;
+            cache->visibleFieldsExpanded[visibleIndex] = ci;
         }
-        d->columnsOrderExpanded->insert(ci, i);
+        cache->columnsOrderExpanded.insert(ci, i);
         //remember field by name/alias/table.name if there's no such string yet in d->columnInfosByNameExpanded
         if (!ci->alias().isEmpty()) {
             //store alias and table.alias
-            if (!d->columnInfosByNameExpanded.contains(ci->alias())) {
-                d->columnInfosByNameExpanded.insert(ci->alias(), ci);
+            if (!cache->columnInfosByNameExpanded.contains(ci->alias())) {
+                cache->columnInfosByNameExpanded.insert(ci->alias(), ci);
             }
             QString tableAndAlias(ci->alias());
             if (ci->field()->table())
                 tableAndAlias.prepend(ci->field()->table()->name() + QLatin1Char('.'));
-            if (!d->columnInfosByNameExpanded.contains(tableAndAlias)) {
-                d->columnInfosByNameExpanded.insert(tableAndAlias, ci);
+            if (!cache->columnInfosByNameExpanded.contains(tableAndAlias)) {
+                cache->columnInfosByNameExpanded.insert(tableAndAlias, ci);
             }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName.contains(ci->alias())) {
-                    d->columnInfosByName.insert(ci->alias(), ci);
+                if (!cache->columnInfosByName.contains(ci->alias())) {
+                    cache->columnInfosByName.insert(ci->alias(), ci);
                 }
-                if (!d->columnInfosByName.contains(tableAndAlias)) {
-                    d->columnInfosByName.insert(tableAndAlias, ci);
+                if (!cache->columnInfosByName.contains(tableAndAlias)) {
+                    cache->columnInfosByName.insert(tableAndAlias, ci);
                 }
             }
         } else {
             //no alias: store name and table.name
-            if (!d->columnInfosByNameExpanded.contains(ci->field()->name())) {
-                d->columnInfosByNameExpanded.insert(ci->field()->name(), ci);
+            if (!cache->columnInfosByNameExpanded.contains(ci->field()->name())) {
+                cache->columnInfosByNameExpanded.insert(ci->field()->name(), ci);
             }
             QString tableAndName(ci->field()->name());
             if (ci->field()->table())
                 tableAndName.prepend(ci->field()->table()->name() + QLatin1Char('.'));
-            if (!d->columnInfosByNameExpanded.contains(tableAndName)) {
-                d->columnInfosByNameExpanded.insert(tableAndName, ci);
+            if (!cache->columnInfosByNameExpanded.contains(tableAndName)) {
+                cache->columnInfosByNameExpanded.insert(tableAndName, ci);
             }
             //the same for "unexpanded" list
             if (columnInfosOutsideAsterisks.contains(ci)) {
-                if (!d->columnInfosByName.contains(ci->field()->name())) {
-                    d->columnInfosByName.insert(ci->field()->name(), ci);
+                if (!cache->columnInfosByName.contains(ci->field()->name())) {
+                    cache->columnInfosByName.insert(ci->field()->name(), ci);
                 }
-                if (!d->columnInfosByName.contains(tableAndName)) {
-                    d->columnInfosByName.insert(tableAndName, ci);
+                if (!cache->columnInfosByName.contains(tableAndName)) {
+                    cache->columnInfosByName.insert(tableAndName, ci);
                 }
             }
         }
     }
-    d->visibleFieldsExpanded->resize(visibleIndex + 1);
+    cache->visibleFieldsExpanded.resize(visibleIndex + 1);
 
     //remove duplicates for lookup fields
     QHash<QString, int> lookup_dict; //used to fight duplicates and to update KDbQueryColumnInfo::indexForVisibleLookupValue()
@@ -1064,30 +1022,19 @@ void KDbQuerySchema::computeFieldsExpanded() const
     }
 
     //create internal expanded list with lookup fields
-    if (d->internalFields) {
-        qDeleteAll(*d->internalFields);
-        d->internalFields->clear();
-        d->internalFields->resize(lookup_list.count());
-    }
-    delete d->fieldsExpandedWithInternal; //clear cache
-    delete d->fieldsExpandedWithInternalAndRecordId; //clear cache
-    d->fieldsExpandedWithInternal = nullptr;
-    d->fieldsExpandedWithInternalAndRecordId = nullptr;
-    if (!lookup_list.isEmpty() && !d->internalFields) {//create on demand
-        d->internalFields = new KDbQueryColumnInfo::Vector(lookup_list.count());
-    }
+    cache->internalFields.resize(lookup_list.count());
     i = -1;
     foreach(KDbQueryColumnInfo *ci, lookup_list) {
         i++;
         //add it to the internal list
-        (*d->internalFields)[i] = ci;
-        d->columnsOrderExpanded->insert(ci, list.count() + i);
+        cache->internalFields[i] = ci;
+        cache->columnsOrderExpanded.insert(ci, list.count() + i);
     }
 
     //update KDbQueryColumnInfo::indexForVisibleLookupValue() cache for columns
     numberOfColumnsWithMultipleVisibleFields = 0;
-    for (i = 0; i < d->fieldsExpanded->size(); i++) {
-        KDbQueryColumnInfo* ci = d->fieldsExpanded->at(i);
+    for (i = 0; i < cache->fieldsExpanded.size(); i++) {
+        KDbQueryColumnInfo* ci = cache->fieldsExpanded[i];
 //! @todo KDbQuerySchema itself will also support lookup fields...
         KDbLookupFieldSchema *lookupFieldSchema
             = ci->field()->table() ? ci->field()->table()->lookupFieldSchema(*ci->field()) : nullptr;
@@ -1095,7 +1042,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
             continue;
         const KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
         if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
-            KDbTableSchema *lookupTable = connection()->tableSchema(recordSource.name());
+            KDbTableSchema *lookupTable = conn->tableSchema(recordSource.name());
             KDbFieldList* visibleColumns = nullptr;
             if (lookupTable
                     && lookupFieldSchema->boundColumn() < lookupTable->fieldCount()
@@ -1106,22 +1053,23 @@ void KDbQuerySchema::computeFieldsExpanded() const
                     const QString key(lookupColumnKey(ci->field(), visibleColumn));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
-                        ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
+                        ci->setIndexForVisibleLookupValue(cache->fieldsExpanded.size() + index);
                 } else {
                     const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
                                       .arg(++numberOfColumnsWithMultipleVisibleFields)
                                       .arg(ci->field()->table()->name(), ci->field()->name()));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
-                        ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
+                        ci->setIndexForVisibleLookupValue(cache->fieldsExpanded.size() + index);
                 }
             }
             delete visibleColumns;
         } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
-            KDbQuerySchema *lookupQuery = connection()->querySchema(recordSource.name());
+            KDbQuerySchema *lookupQuery = conn->querySchema(recordSource.name());
             if (!lookupQuery)
                 continue;
-            const KDbQueryColumnInfo::Vector lookupQueryFieldsExpanded(lookupQuery->fieldsExpanded());
+            const KDbQueryColumnInfo::Vector lookupQueryFieldsExpanded(
+                lookupQuery->fieldsExpanded(conn));
             if (lookupFieldSchema->boundColumn() >= lookupQueryFieldsExpanded.count())
                 continue;
             KDbQueryColumnInfo *boundColumnInfo = nullptr;
@@ -1138,7 +1086,7 @@ void KDbQuerySchema::computeFieldsExpanded() const
                     const QString key(lookupColumnKey(ci->field(), visibleColumn));
                     int index = lookup_dict.value(key, -99);
                     if (index != -99)
-                        ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
+                        ci->setIndexForVisibleLookupValue(cache->fieldsExpanded.size() + index);
                 }
             } else {
                 const QString key(QString::fromLatin1("[multiple_visible_fields_%1]_%2.%3")
@@ -1146,26 +1094,36 @@ void KDbQuerySchema::computeFieldsExpanded() const
                                   .arg(ci->field()->table()->name(), ci->field()->name()));
                 int index = lookup_dict.value(key, -99);
                 if (index != -99)
-                    ci->setIndexForVisibleLookupValue(d->fieldsExpanded->size() + index);
+                    ci->setIndexForVisibleLookupValue(cache->fieldsExpanded.size() + index);
             }
         } else {
             kdbWarning() << "unsupported record source type" << recordSource.typeName();
         }
     }
+    if (d->recentConnection != conn) {
+        if (d->recentConnection) {
+            // connection changed: remove old cache
+            d->recentConnection->d->insertFieldsExpanded(this, nullptr);
+        }
+        d->recentConnection = conn;
+    }
+    conn->d->insertFieldsExpanded(this, guard.take());
+    return cache;
 }
 
-QHash<KDbQueryColumnInfo*, int> KDbQuerySchema::columnsOrder(ColumnsOrderOptions options) const
+QHash<KDbQueryColumnInfo*, int> KDbQuerySchema::columnsOrder(KDbConnection *conn,
+                                                             ColumnsOrderMode mode) const
 {
-    if (!d->columnsOrder)
-        computeFieldsExpanded();
-    if (options == UnexpandedList)
-        return *d->columnsOrder;
-    else if (options == UnexpandedListWithoutAsterisks)
-        return *d->columnsOrderWithoutAsterisks;
-    return *d->columnsOrderExpanded;
+    KDbQuerySchemaFieldsExpanded *cache = computeFieldsExpanded(conn);
+    if (mode == ColumnsOrderMode::UnexpandedList) {
+        return cache->columnsOrder;
+    } else if (mode == ColumnsOrderMode::UnexpandedListWithoutAsterisks) {
+        return cache->columnsOrderWithoutAsterisks;
+    }
+    return cache->columnsOrderExpanded;
 }
 
-QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
+QVector<int> KDbQuerySchema::pkeyFieldsOrder(KDbConnection *conn) const
 {
     if (d->pkeyFieldsOrder)
         return *d->pkeyFieldsOrder;
@@ -1179,10 +1137,11 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
     kdbDebug() << *pkey;
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
-    const int fCount = fieldsExpanded().count();
     d->pkeyFieldCount = 0;
+    const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded(conn));
+    const int fCount = fieldsExpanded.count();
     for (int i = 0; i < fCount; i++) {
-        KDbQueryColumnInfo *fi = d->fieldsExpanded->at(i);
+        const KDbQueryColumnInfo *fi = fieldsExpanded[i];
         const int fieldIndex = fi->field()->table() == tbl ? pkey->indexOf(*fi->field()) : -1;
         if (fieldIndex != -1/* field found in PK */
                 && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
@@ -1196,9 +1155,9 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder() const
     return *d->pkeyFieldsOrder;
 }
 
-int KDbQuerySchema::pkeyFieldCount()
+int KDbQuerySchema::pkeyFieldCount(KDbConnection *conn)
 {
-    (void)pkeyFieldsOrder(); /* rebuild information */
+    (void)pkeyFieldsOrder(conn); /* rebuild information */
     return d->pkeyFieldCount;
 }
 
@@ -1215,7 +1174,7 @@ KDbRelationship* KDbQuerySchema::addRelationship(KDbField *field1, KDbField *fie
     return r;
 }
 
-KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields() const
+KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields(KDbConnection *conn) const
 {
     if (!d->autoincFields) {
         d->autoincFields = new KDbQueryColumnInfo::List();
@@ -1226,9 +1185,9 @@ KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields() const
         return d->autoincFields;
     }
     if (d->autoincFields->isEmpty()) {//no cache
-        KDbQueryColumnInfo::Vector fexp = fieldsExpanded();
-        for (int i = 0; i < fexp.count(); i++) {
-            KDbQueryColumnInfo *ci = fexp[i];
+        const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded(conn));
+        for (int i = 0; i < fieldsExpanded.count(); i++) {
+            KDbQueryColumnInfo *ci = fieldsExpanded[i];
             if (ci->field()->table() == mt && ci->field()->isAutoIncrement()) {
                 d->autoincFields->append(ci);
             }
@@ -1238,8 +1197,9 @@ KDbQueryColumnInfo::List* KDbQuerySchema::autoIncrementFields() const
 }
 
 // static
-KDbEscapedString KDbQuerySchema::sqlColumnsList(const KDbQueryColumnInfo::List& infolist, KDbConnection *conn,
-                                    KDb::IdentifierEscapingType escapingType)
+KDbEscapedString KDbQuerySchema::sqlColumnsList(const KDbQueryColumnInfo::List &infolist,
+                                                KDbConnection *conn,
+                                                KDb::IdentifierEscapingType escapingType)
 {
     KDbEscapedString result;
     result.reserve(256);
@@ -1261,7 +1221,7 @@ KDbEscapedString KDbQuerySchema::autoIncrementSqlFieldsList(KDbConnection *conn)
     if (   /*d->lastUsedDriverForAutoIncrementSQLFieldsList != driverWeakPointer
         ||*/ d->autoIncrementSqlFieldsList.isEmpty())
     {
-        d->autoIncrementSqlFieldsList = KDbQuerySchema::sqlColumnsList(*autoIncrementFields(), conn);
+        d->autoIncrementSqlFieldsList = KDbQuerySchema::sqlColumnsList(*autoIncrementFields(conn), conn);
         //d->lastUsedDriverForAutoIncrementSQLFieldsList = driverWeakPointer;
     }
     return d->autoIncrementSqlFieldsList;
@@ -1298,7 +1258,7 @@ bool KDbQuerySchema::setWhereExpression(const KDbExpression &expr, QString *erro
     }
     errorMessagePointer->clear();
     errorDescriptionPointer->clear();
-    Private::setWhereExpressionInternal(this, newWhereExpr);
+    KDbQuerySchemaPrivate::setWhereExpressionInternal(this, newWhereExpr);
     return true;
 }
 
@@ -1365,7 +1325,7 @@ KDbExpression KDbQuerySchema::whereExpression() const
 void KDbQuerySchema::setOrderByColumnList(const KDbOrderByColumnList& list)
 {
     delete d->orderByColumnList;
-    d->orderByColumnList = new KDbOrderByColumnList(list, nullptr, nullptr);
+    d->orderByColumnList = new KDbOrderByColumnList(list, nullptr, nullptr, nullptr);
 // all field names should be found, exit otherwise ..........?
 }
 
@@ -1379,10 +1339,10 @@ const KDbOrderByColumnList* KDbQuerySchema::orderByColumnList() const
     return d->orderByColumnList;
 }
 
-QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters() const
+QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters(KDbConnection *conn) const
 {
     QList<KDbQuerySchemaParameter> params;
-    const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded());
+    const KDbQueryColumnInfo::Vector fieldsExpanded(this->fieldsExpanded(conn));
     for (int i = 0; i < fieldsExpanded.count(); ++i) {
         KDbQueryColumnInfo *ci = fieldsExpanded[i];
         if (!ci->field()->expression().isNull()) {

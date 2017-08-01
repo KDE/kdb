@@ -86,7 +86,8 @@ KDbOrderByColumn::~KDbOrderByColumn()
     delete d;
 }
 
-KDbOrderByColumn* KDbOrderByColumn::copy(KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery) const
+KDbOrderByColumn *KDbOrderByColumn::copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
+                                         KDbQuerySchema *toQuery) const
 {
     if (d->field) {
         return new KDbOrderByColumn(d->field, d->order);
@@ -94,12 +95,12 @@ KDbOrderByColumn* KDbOrderByColumn::copy(KDbQuerySchema* fromQuery, KDbQuerySche
     if (d->column) {
         KDbQueryColumnInfo* columnInfo;
         if (fromQuery && toQuery) {
-            int columnIndex = fromQuery->columnsOrder().value(d->column);
+            int columnIndex = fromQuery->columnsOrder(conn).value(d->column);
             if (columnIndex < 0) {
                 kdbWarning() << "Index not found for column" << *d->column;
                 return nullptr;
             }
-            columnInfo = toQuery->expandedOrInternalField(columnIndex);
+            columnInfo = toQuery->expandedOrInternalField(conn, columnIndex);
             if (!columnInfo) {
                 kdbWarning() << "Column info not found at index" << columnIndex << "in toQuery";
                 return nullptr;
@@ -224,14 +225,14 @@ KDbOrderByColumnList::KDbOrderByColumnList()
 {
 }
 
-KDbOrderByColumnList::KDbOrderByColumnList(const KDbOrderByColumnList& other,
+KDbOrderByColumnList::KDbOrderByColumnList(const KDbOrderByColumnList& other, KDbConnection *conn,
                                            KDbQuerySchema* fromQuery, KDbQuerySchema* toQuery)
         : KDbOrderByColumnList()
 {
     for (QList<KDbOrderByColumn *>::ConstIterator it(other.constBegin()); it != other.constEnd();
          ++it)
     {
-        KDbOrderByColumn* order = (*it)->copy(fromQuery, toQuery);
+        KDbOrderByColumn* order = (*it)->copy(conn, fromQuery, toQuery);
         if (order) {
             d->data.append(order);
         }
@@ -258,7 +259,7 @@ KDbOrderByColumn* KDbOrderByColumnList::value(int index)
     return d->data.value(index);
 }
 
-bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
+bool KDbOrderByColumnList::appendFields(KDbConnection *conn, KDbQuerySchema* querySchema,
                                         const QString& field1, KDbOrderByColumn::SortOrder order1,
                                         const QString& field2, KDbOrderByColumn::SortOrder order2,
                                         const QString& field3, KDbOrderByColumn::SortOrder order3,
@@ -271,7 +272,7 @@ bool KDbOrderByColumnList::appendFields(KDbQuerySchema* querySchema,
     int numAdded = 0;
 #define ADD_COL(fieldName, order) \
     if (ok && !fieldName.isEmpty()) { \
-        if (!appendField( querySchema, fieldName, order )) \
+        if (!appendField(conn, querySchema, fieldName, order)) \
             ok = false; \
         else \
             numAdded++; \
@@ -300,13 +301,13 @@ void KDbOrderByColumnList::appendColumn(KDbQueryColumnInfo* columnInfo,
     }
 }
 
-bool KDbOrderByColumnList::appendColumn(KDbQuerySchema* querySchema,
+bool KDbOrderByColumnList::appendColumn(KDbConnection *conn, KDbQuerySchema* querySchema,
                                         KDbOrderByColumn::SortOrder order, int pos)
 {
     if (!querySchema) {
         return false;
     }
-    KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded());
+    const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(conn));
     if (pos < 0 || pos >= fieldsExpanded.size()) {
         return false;
     }
@@ -322,13 +323,13 @@ void KDbOrderByColumnList::appendField(KDbField* field, KDbOrderByColumn::SortOr
     }
 }
 
-bool KDbOrderByColumnList::appendField(KDbQuerySchema* querySchema,
+bool KDbOrderByColumnList::appendField(KDbConnection *conn, KDbQuerySchema* querySchema,
                                        const QString& fieldName, KDbOrderByColumn::SortOrder order)
 {
     if (!querySchema) {
         return false;
     }
-    KDbQueryColumnInfo *columnInfo = querySchema->columnInfo(fieldName);
+    KDbQueryColumnInfo *columnInfo = querySchema->columnInfo(conn, fieldName);
     if (columnInfo) {
         d->data.append(new KDbOrderByColumn(columnInfo, order));
         return true;

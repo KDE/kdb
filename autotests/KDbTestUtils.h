@@ -28,6 +28,12 @@
 #include <KDbDriverManager>
 #include <KDbConnection>
 
+Q_DECLARE_METATYPE(KDbField::TypeGroup)
+Q_DECLARE_METATYPE(KDbField::Type)
+Q_DECLARE_METATYPE(KDb::Signedness)
+Q_DECLARE_METATYPE(QList<KDbField::Type>)
+Q_DECLARE_METATYPE(KDb::BLOBEscapingType)
+
 //! @internal for KDB_VERIFY
 template<typename T>
 const T* KDB_POINTER_WRAPPER(const T &t) { return &t; }

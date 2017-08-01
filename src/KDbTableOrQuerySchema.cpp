@@ -110,23 +110,27 @@ KDbTableOrQuerySchema::~KDbTableOrQuerySchema()
     delete d;
 }
 
-int KDbTableOrQuerySchema::fieldCount() const
+int KDbTableOrQuerySchema::fieldCount(KDbConnection *conn) const
 {
     if (d->table)
         return d->table->fieldCount();
-    if (d->query)
-        return d->query->fieldsExpanded().size();
-    return 0;
+    if (d->query && conn)
+        return d->query->fieldsExpanded(conn).size();
+    return -1;
 }
 
-const KDbQueryColumnInfo::Vector KDbTableOrQuerySchema::columns(bool unique)
+const KDbQueryColumnInfo::Vector KDbTableOrQuerySchema::columns(KDbConnection * conn, ColumnsMode mode)
 {
-    if (d->table)
-        return d->table->query()->fieldsExpanded(unique ? KDbQuerySchema::Unique : KDbQuerySchema::Default);
-
-    if (d->query)
-        return d->query->fieldsExpanded(unique ? KDbQuerySchema::Unique : KDbQuerySchema::Default);
-
+    if (d->table) {
+        return d->table->query()->fieldsExpanded(conn, mode == ColumnsMode::Unique
+                                                     ? KDbQuerySchema::FieldsExpandedMode::Unique
+                                                     : KDbQuerySchema::FieldsExpandedMode::Default);
+    }
+    if (d->query) {
+        return d->query->fieldsExpanded(conn, mode == ColumnsMode::Unique
+                                            ? KDbQuerySchema::FieldsExpandedMode::Unique
+                                            : KDbQuerySchema::FieldsExpandedMode::Default);
+    }
     kdbWarning() << "no query or table specified!";
     return KDbQueryColumnInfo::Vector();
 }
@@ -158,34 +162,27 @@ KDbField* KDbTableOrQuerySchema::field(const QString& name)
     return nullptr;
 }
 
-KDbQueryColumnInfo* KDbTableOrQuerySchema::columnInfo(const QString& name)
+KDbQueryColumnInfo* KDbTableOrQuerySchema::columnInfo(KDbConnection *conn, const QString& name)
 {
     if (d->table)
-        return d->table->query()->columnInfo(name);
+        return d->table->query()->columnInfo(conn, name);
 
     if (d->query)
-        return d->query->columnInfo(name);
+        return d->query->columnInfo(conn, name);
 
     return nullptr;
 }
 
 //! Sends information about table or query schema @a schema to debug output @a dbg.
-QDebug operator<<(QDebug dbg, const KDbTableOrQuerySchema& schema)
+QDebug operator<<(QDebug dbg, const KDbConnectionAndSchema &connectionAndSchema)
 {
-    if (schema.table())
-        dbg.nospace() << *schema.table();
-    else if (schema.query())
-        dbg.nospace() << *schema.query();
+    if (std::get<1>(connectionAndSchema).table()) {
+        dbg.nospace() << *std::get<1>(connectionAndSchema).table();
+    } else if (std::get<1>(connectionAndSchema).query()) {
+        dbg.nospace() << KDbConnectionAndQuerySchema(std::get<0>(connectionAndSchema),
+                                                     *std::get<1>(connectionAndSchema).query());
+    }
     return dbg.space();
-}
-
-KDbConnection* KDbTableOrQuerySchema::connection() const
-{
-    if (d->table)
-        return d->table->connection();
-    else if (d->query)
-        return d->query->connection();
-    return nullptr;
 }
 
 KDbQuerySchema* KDbTableOrQuerySchema::query() const

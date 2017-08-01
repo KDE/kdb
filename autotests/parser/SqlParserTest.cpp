@@ -256,8 +256,9 @@ void SqlParserTest::testParse()
         } else {
             m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
             if (parser->query()) {
-                qDebug() << *parser->query();
-                m_errorStream << KDbUtils::debugString(*parser->query()) << endl;
+                const KDbConnectionAndQuerySchema connQuery(parser->connection(), *parser->query());
+                qDebug() << connQuery;
+                m_errorStream << KDbUtils::debugString(connQuery) << endl;
             }
         }
         QVERIFY2(ok, qPrintable(message));

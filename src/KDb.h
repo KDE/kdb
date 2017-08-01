@@ -35,7 +35,6 @@ class KDbDriver;
 class KDbEscapedString;
 class KDbLookupFieldSchema;
 class KDbMessageHandler;
-class KDbQuerySchema;
 class KDbResultable;
 class KDbResultInfo;
 class KDbTableOrQuerySchema;
@@ -224,63 +223,6 @@ KDB_EXPORT KDbEscapedString sqlWhere(KDbDriver *drv, KDbField::Type t,
 */
 KDB_EXPORT tristate idForObjectName(KDbConnection* conn, int *id, const QString& objName,
                                     int objType);
-
-/**
- * @brief Returns number of records returned by given SQL statement
- *
- * @return number of records that can be retrieved after executing @a sql statement within
- * a connection @a conn. The statement should be of type SELECT. For SQL data sources it does not
- * fetch any records, only "COUNT(*)" SQL aggregation is used at the backed.
- * -1 is returned if any error occurred or if @a conn is @c nullptr.
- */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(KDbConnection* conn, const KDbEscapedString& sql);
-
-/**
- * @brief Returns number of records that contains given table
- *
- * @return number of records that can be retrieved from @a tableSchema.
- * To obtain the result the table must be created or retrieved using a KDbConnection object,
- * i.e. tableSchema.connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
- * SQL aggregation is used at the backed.
- * -1 is returned if error occurred or if tableSchema.connection() is @c nullptr.
- */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
-
-/**
- * @overload
- *
- * Operates on a query schema. @a params are optional values of parameters that will be inserted
- * into [] placeholders before execution of query that counts the records.
- * To obtain the result the query must be created or retrieved using a KDbConnection object,
- * i.e. querySchema->connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
- * SQL aggregation is used at the backed.
- * -1 is returned if error occurred or if querySchema->connection() is @c nullptr.
- */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
-                           const QList<QVariant>& params = QList<QVariant>());
-
-/**
- * @overload
- *
- * Operates on a table or query schema. @a params is a list of optional parameters that
- * will be inserted into [] placeholders before execution of query that counts the records.
- *
- * If @a tableOrQuery is @c nullptr or provides neither table nor query, -1 is returned.
- */
-//! @todo perhaps use quint64 here?
-KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
-                           const QList<QVariant>& params = QList<QVariant>());
-
-/**
- * @brief Returns number of columns within record set returned from specified table or query
- *
- * In case of query expanded fields list is counted.
- * Returns -1 if @a tableOrQuery is @c nullptr or has neither table or query assigned.
- */
-KDB_EXPORT int fieldCount(KDbTableOrQuerySchema* tableOrQuery);
 
 /**
  * @brief Shows connection test dialog

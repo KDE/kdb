@@ -85,11 +85,24 @@ public:
     //! @return caption (if present) or name of the table/query
     QString captionOrName() const;
 
-    //! @return number of fields
-    int fieldCount() const;
+    /**
+     * @brief Returns number of columns within record set returned from specified table or query
+     *
+     * In case of query expanded fields list is counted.
+     * For tables @a conn is not required.
+     * Returns -1 if the object has neither table or query assigned.
+     * Returns -1 if the object has query assigned but @a conn is @c nullptr.
+     */
+    int fieldCount(KDbConnection *conn) const;
+
+    /*! Mode for columns(). */
+    enum class ColumnsMode {
+        NonUnique, //!< Non-unique columns are returned
+        Unique     //!< Unique columns are returned
+    };
 
     //! @return all columns for the table or the query
-    const KDbQueryColumnInfo::Vector columns(bool unique = false);
+    const KDbQueryColumnInfo::Vector columns(KDbConnection *conn, ColumnsMode mode = ColumnsMode::NonUnique);
 
     /*! @return a field of the table or the query schema for name @a name
      or 0 if there is no such field. */
@@ -97,10 +110,7 @@ public:
 
     /*! Like KDbField* field(const QString& name);
      but returns all information associated with field/column @a name. */
-    KDbQueryColumnInfo* columnInfo(const QString& name);
-
-    /*! @return connection object, for table or query or 0 if there's no table or query defined. */
-    KDbConnection* connection() const;
+    KDbQueryColumnInfo* columnInfo(KDbConnection *conn, const QString& name);
 
 private:
     class Private;
@@ -109,9 +119,12 @@ private:
     Q_DISABLE_COPY(KDbTableOrQuerySchema)
 };
 
-namespace KDb {
-//! Sends information about table or query schema @a schema to debug output @a dbg.
-KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbTableOrQuerySchema& schema);
-}
+//! A pair (connection, table-or-schema) for QDebug operator<<
+//! @since 3.1
+typedef std::tuple<KDbConnection*, const KDbTableOrQuerySchema&> KDbConnectionAndSchema;
+
+//! Sends information about table or query schema and connection @a connectionAndSchema to debug output @a dbg.
+//! @since 3.1
+KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbConnectionAndSchema &connectionAndSchema);
 
 #endif

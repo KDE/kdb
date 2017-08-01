@@ -163,9 +163,9 @@ public:
 
     /*! A rich field information for db-aware data. Specifies information for a column
      that should be visible instead of columnInfo. For example case see
-     @ref KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(KDbQuerySchema::FieldsExpandedOptions options = Default)
+     @ref KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpanded(KDbQuerySchema::FieldsExpandedMode mode = Default)
 
-     For not-db-aware data it is always 0. */
+     For not-db-aware data it is always @c nullptr. */
     KDbQueryColumnInfo* visibleLookupColumnInfo();
 
     //! @overload

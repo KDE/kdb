@@ -101,6 +101,11 @@ KDbConnection *KDbTransactionData::connection()
     return d->connection;
 }
 
+const KDbConnection *KDbTransactionData::connection() const
+{
+    return d->connection;
+}
+
 //---------------------------------------------------
 
 KDbTransaction::KDbTransaction()
@@ -165,9 +170,14 @@ bool KDbTransaction::operator==(const KDbTransaction& other) const
     return m_data == other.m_data;
 }
 
-KDbConnection* KDbTransaction::connection() const
+KDbConnection* KDbTransaction::connection()
 {
     return m_data ? m_data->connection() : nullptr;
+}
+
+const KDbConnection* KDbTransaction::connection() const
+{
+    return const_cast<KDbTransaction*>(this)->connection();
 }
 
 bool KDbTransaction::isActive() const

@@ -162,9 +162,14 @@ public:
      */
     KDbTableSchema *table();
 
+    //! @overload
+    //! @since 3.1
+    const KDbTableSchema *table() const;
+
     /**
-     * @return a pointer to a query schema if 'SELECT ...' statement was parsed
+     * @return a pointer to a new query schema created by parsing 'SELECT ...' statement
      * or @c nullptr for any other statements or on error.
+     * If existing query was supplied to parse() @c nullptr is returned.
      * @note A proper query schema is returned only once for each successful parse() call,
      * and the object is owned by the caller. In all other cases nullptr is returned.
      */
@@ -173,7 +178,11 @@ public:
     /**
      * @return a pointer to the used database connection or @c nullptr if it was not set.
      */
-    KDbConnection *connection() const;
+    KDbConnection *connection();
+
+    //! @overload
+    //! @since 3.1
+    const KDbConnection *connection() const;
 
     /**
      * @return detailed information about last error.

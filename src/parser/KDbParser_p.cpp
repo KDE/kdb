@@ -80,13 +80,15 @@ void KDbParserPrivate::setTableSchema(KDbTableSchema *table)
 
 void KDbParserPrivate::setQuerySchema(KDbQuerySchema *query)
 {
-    delete this->query;
+    if (this->query != query) {
+        delete this->query;
+    }
     this->query = query;
 }
 
 KDbQuerySchema* KDbParserPrivate::createQuery()
 {
-    return query ? query : KDbQuerySchema::Private::createQuery(connection);
+    return query ? query : new KDbQuerySchema;
 }
 
 //-------------------------------------
@@ -243,27 +245,23 @@ void setError(const QString& errDesc)
 
 //! @internal Parses @a data for parser @a p
 //! @todo Make it REENTRANT
-bool parseData(KDbParser *p, const KDbEscapedString &sql)
+bool parseData()
 {
-    globalParser = p;
-    globalParser->reset();
-    globalField = nullptr;
     fieldList.clear();
 
+    const KDbEscapedString sql(globalParser->statement());
     if (sql.isEmpty()) {
         KDbParserError err(KDbParser::tr("Error"),
                            KDbParser::tr("No query statement specified."),
                            globalToken, globalCurrentPos);
         KDbParserPrivate::get(globalParser)->setError(err);
         yyerror("");
-        globalParser = nullptr;
         return false;
     }
 
     const char *data = sql.constData();
     tokenize(data);
     if (!globalParser->error().type().isEmpty()) {
-        globalParser = nullptr;
         return false;
     }
 
@@ -291,7 +289,6 @@ bool parseData(KDbParser *p, const KDbEscapedString &sql)
         ok = false;
     }
     yylex_destroy();
-    globalParser = nullptr;
     return ok;
 }
 
@@ -488,7 +485,7 @@ KDbQuerySchema* buildSelectQuery(
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
                 return nullptr;
             }
-            KDbQuerySchema::Private::setWhereExpressionInternal(querySchema, options->whereExpr);
+            KDbQuerySchemaPrivate::setWhereExpressionInternal(querySchema, options->whereExpr);
         }
         //----- ORDER BY
         if (options->orderByColumns) {
@@ -499,15 +496,19 @@ KDbQuerySchema* buildSelectQuery(
             for (;count > 0; --it, --count)
                 /*opposite direction due to parser specifics*/
             {
-                //first, try to find a column name or alias (outside of asterisks)
-                KDbQueryColumnInfo *columnInfo = querySchema->columnInfo((*it).aliasOrName, false/*outside of asterisks*/);
+                // first, try to find a column name or alias (outside of asterisks)
+                KDbQueryColumnInfo *columnInfo = querySchema->columnInfo(
+                    globalParser->connection(), (*it).aliasOrName,
+                    KDbQuerySchema::ExpandMode::Unexpanded /*outside of asterisks*/);
                 if (columnInfo) {
                     orderByColumnList->appendColumn(columnInfo, (*it).order);
                 } else {
                     //failed, try to find a field name within all the tables
                     if ((*it).columnNumber != -1) {
-                        if (!orderByColumnList->appendColumn(querySchema,
-                                                            (*it).order, (*it).columnNumber - 1)) {
+                        if (!orderByColumnList->appendColumn(globalParser->connection(),
+                                                             querySchema, (*it).order,
+                                                             (*it).columnNumber - 1))
+                        {
                             setError(KDbParser::tr("Could not define sorting. Column at "
                                                    "position %1 does not exist.")
                                                    .arg((*it).columnNumber));

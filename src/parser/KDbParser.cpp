@@ -27,7 +27,7 @@
 
 #include <vector>
 
-bool parseData(KDbParser *p, const KDbEscapedString &sql);
+bool parseData();
 
 //! Cache
 class ParserStatic
@@ -80,6 +80,11 @@ KDbTableSchema *KDbParser::table()
     return t;
 }
 
+const KDbTableSchema *KDbParser::table() const
+{
+    return const_cast<KDbParser*>(this)->table();
+}
+
 KDbQuerySchema *KDbParser::query()
 {
     KDbQuerySchema *s = d->query;
@@ -87,7 +92,12 @@ KDbQuerySchema *KDbParser::query()
     return s;
 }
 
-KDbConnection *KDbParser::connection() const
+KDbConnection *KDbParser::connection()
+{
+    return d->connection;
+}
+
+const KDbConnection *KDbParser::connection() const
 {
     return d->connection;
 }
@@ -119,9 +129,14 @@ bool KDbParser::parse(const KDbEscapedString &sql, KDbQuerySchema *query)
 
     KDbParser *oldParser = globalParser;
     KDbField *oldField = globalField;
-    bool res = parseData(this, sql);
+    globalParser = this;
+    globalField = nullptr;
+    bool res = parseData();
     globalParser = oldParser;
     globalField = oldField;
+    if (query) { // if existing query was supplied to parse() nullptr should be returned by query()
+        d->query = nullptr;
+    }
     return res;
 }
 

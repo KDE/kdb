@@ -111,6 +111,16 @@ FieldTypeGroupNames::FieldTypeGroupNames()
 
 //-------------------------------------------------------
 
+class KDbFieldPrivate
+{
+public:
+    static KDbConnection *connection(const KDbTableSchema &table)
+    {
+        return table.connection();
+    }
+};
+
+
 class Q_DECL_HIDDEN KDbField::Private
 {
 public:
@@ -917,7 +927,7 @@ void KDbField::setIndexed(bool s)
 
 void debug(QDebug dbg, const KDbField& field, KDbFieldDebugOptions options)
 {
-    KDbConnection *conn = field.table() ? field.table()->connection() : nullptr;
+    const KDbConnection *conn = field.table() ? KDbFieldPrivate::connection(*field.table()) : nullptr;
     if (options & KDbFieldDebugAddName) {
         if (field.name().isEmpty()) {
             dbg.nospace() << "<NONAME> ";

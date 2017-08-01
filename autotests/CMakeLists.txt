@@ -42,6 +42,7 @@ ecm_add_tests(
     ConnectionTest.cpp
     DriverTest.cpp
     ExpressionsTest.cpp
+    QuerySchemaTest.cpp
     KDbTest.cpp
 
     LINK_LIBRARIES

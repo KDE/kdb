@@ -898,6 +898,64 @@ public:
 
     bool isInternalTableSchema(const QString& tableName);
 
+    /**
+     * @brief Returns number of records returned by given SQL statement
+     *
+     * @return number of records that can be retrieved after executing @a sql statement within
+     * a connection @a conn. The statement should be of type SELECT. For SQL data sources it does not
+     * fetch any records, only "COUNT(*)" SQL aggregation is used at the backed.
+     * -1 is returned if any error occurred or if @a conn is @c nullptr.
+     *
+     * @since 3.1
+     */
+    //! @todo perhaps use quint64 here?
+    KDB_EXPORT int recordCount(const KDbEscapedString& sql);
+
+    /**
+     * @brief Returns number of records that contains given table
+     *
+     * @return number of records that can be retrieved from @a tableSchema.
+     * To obtain the result the table must be created or retrieved using a KDbConnection object,
+     * i.e. tableSchema.connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
+     * SQL aggregation is used at the backed.
+     * -1 is returned if error occurred or if tableSchema.connection() is @c nullptr.
+     *
+     * @since 3.1
+     */
+    //! @todo perhaps use quint64 here?
+    //! @todo does not work with non-SQL data sources
+    KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
+
+    /**
+     * @overload
+     *
+     * Operates on a query schema. @a params are optional values of parameters that will be inserted
+     * into [] placeholders before execution of query that counts the records.
+     * To obtain the result the query must be created or retrieved using a KDbConnection object,
+     * i.e. querySchema->connection() must not return @c nullptr. For SQL data sources only "COUNT(*)"
+     * SQL aggregation is used at the backed.
+     * -1 is returned if error occurred or if querySchema->connection() is @c nullptr.
+     *
+     * @since 3.1
+     */
+    //! @todo perhaps use quint64 here?
+    KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
+                               const QList<QVariant>& params = QList<QVariant>());
+
+    /**
+     * @overload
+     *
+     * Operates on a table or query schema. @a params is a list of optional parameters that
+     * will be inserted into [] placeholders before execution of query that counts the records.
+     *
+     * If @a tableOrQuery is @c nullptr or provides neither table nor query, -1 is returned.
+     *
+     * @since 3.1
+     */
+    //! @todo perhaps use quint64 here?
+    KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
+                               const QList<QVariant>& params = QList<QVariant>());
+
     //! Identifier escaping function in the associated KDbDriver.
     /*! Calls the identifier escaping function in this connection to
      escape table and column names.  This should be used when explicitly
@@ -1252,6 +1310,8 @@ protected:
      To avoid having deleted table object on its list. */
     void removeMe(KDbTableSchema *ts);
 
+    // -- internal methods follow
+
     /*! @internal
      @return true if the cursor @a cursor contains column @a column,
      else, sets appropriate error with a message and returns false. */
@@ -1346,6 +1406,8 @@ private:
     friend class KDbCursor;
     friend class KDbDriver;
     friend class KDbProperties; //!< for setError()
+    friend class KDbQuerySchema;
+    friend class KDbQuerySchemaPrivate;
     friend class KDbTableSchemaChangeListener;
     friend class KDbTableSchema; //!< for removeMe()
 };

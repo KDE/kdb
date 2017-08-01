@@ -26,6 +26,7 @@
 #include "kdb_export.h"
 #include "KDbParser.h"
 #include "KDbProperties.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbVersionInfo.h"
 
 //! Interface for accessing connection's internal result, for use by drivers.
@@ -123,6 +124,12 @@ public:
      On failure deletes @a query and returns @c nullptr. */
     KDbQuerySchema* setupQuerySchema(KDbQuerySchema *query) Q_REQUIRED_RESULT;
 
+    //! @return cached fields expanded information for @a query
+    KDbQuerySchemaFieldsExpanded *fieldsExpanded(const KDbQuerySchema *query);
+
+    //! Inserts cached fields expanded information for @a query
+    void insertFieldsExpanded(const KDbQuerySchema *query, KDbQuerySchemaFieldsExpanded *cache);
+
     KDbConnection* const conn; //!< The @a KDbConnection instance this @a KDbConnectionPrivate belongs to.
     KDbConnectionData connData; //!< the @a KDbConnectionData used within that connection.
 
@@ -195,6 +202,7 @@ private:
     //! Query schemas retrieved on demand with querySchema()
     QHash<int, KDbQuerySchema*> m_queries;
     QHash<QString, KDbQuerySchema*> m_queriesByName;
+    KDbUtils::AutodeletedHash<const KDbQuerySchema*, KDbQuerySchemaFieldsExpanded*> m_fieldsExpandedCache;
     Q_DISABLE_COPY(KDbConnectionPrivate)
 };
 
