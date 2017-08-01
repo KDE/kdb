@@ -307,7 +307,7 @@ bool KDbOrderByColumnList::appendColumn(KDbConnection *conn, KDbQuerySchema* que
     if (!querySchema) {
         return false;
     }
-    KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(conn));
+    const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(conn));
     if (pos < 0 || pos >= fieldsExpanded.size()) {
         return false;
     }

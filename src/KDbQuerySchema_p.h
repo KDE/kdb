@@ -30,13 +30,13 @@
 class KDbConnection;
 
 //! @internal
-class Q_DECL_HIDDEN KDbQuerySchema::Private
+class KDbQuerySchemaPrivate
 {
     Q_DECLARE_TR_FUNCTIONS(KDbQuerySchema)
 public:
-    explicit Private(KDbQuerySchema* q, Private* copy = nullptr);
+    explicit KDbQuerySchemaPrivate(KDbQuerySchema* q, KDbQuerySchemaPrivate* copy = nullptr);
 
-    ~Private();
+    ~KDbQuerySchemaPrivate();
 
     //! @return a new query that's associated with @a conn. Used internally, e.g. by the parser.
     //! Uses an internal KDbQuerySchema(KDbConnection*) ctor.
@@ -126,29 +126,6 @@ public:
     /*! List of asterisks defined for this query  */
     KDbField::List asterisks;
 
-    /*! Temporary field vector for using in fieldsExpanded() */
-    KDbQueryColumnInfo::Vector *fieldsExpanded;
-
-    /*! Like fieldsExpanded but only visible column infos; infos are not owned. */
-    KDbQueryColumnInfo::Vector *visibleFieldsExpanded;
-
-    /*! Temporary field vector containing internal fields used for lookup columns. */
-    KDbQueryColumnInfo::Vector *internalFields;
-
-    /*! Temporary, used to cache sum of expanded fields and internal fields (+record Id) used for lookup columns.
-     Contains not auto-deleted items.*/
-    KDbQueryColumnInfo::Vector *fieldsExpandedWithInternalAndRecordId;
-
-    /*! Like fieldsExpandedWithInternalAndRecordId but only contains visible column infos; infos are not owned.*/
-    KDbQueryColumnInfo::Vector *visibleFieldsExpandedWithInternalAndRecordId;
-
-    /*! Temporary, used to cache sum of expanded fields and internal fields used for lookup columns.
-     Contains not auto-deleted items.*/
-    KDbQueryColumnInfo::Vector *fieldsExpandedWithInternal;
-
-    /*! Like fieldsExpandedWithInternal but only contains visible column infos; infos are not owned.*/
-    KDbQueryColumnInfo::Vector *visibleFieldsExpandedWithInternal;
-
     /*! A list of fields for ORDER BY section. @see KDbQuerySchema::orderByColumnList(). */
     KDbOrderByColumnList* orderByColumnList;
 
@@ -158,17 +135,6 @@ public:
     /*! A cache for autoIncrementSqlFieldsList(). */
     KDbEscapedString autoIncrementSqlFieldsList;
     QWeakPointer<const KDbDriver> lastUsedDriverForAutoIncrementSQLFieldsList;
-
-    /*! A hash for fast lookup of query columns' order (unexpanded version). */
-    QHash<KDbQueryColumnInfo*, int> *columnsOrder;
-
-    /*! A hash for fast lookup of query columns' order (unexpanded version without asterisks). */
-    QHash<KDbQueryColumnInfo*, int> *columnsOrderWithoutAsterisks;
-
-    /*! A hash for fast lookup of query columns' order.
-     This is exactly opposite information compared to vector returned
-     by fieldsExpanded() */
-    QHash<KDbQueryColumnInfo*, int> *columnsOrderExpanded;
 
     /*! order of PKEY fields (e.g. for updateRecord() ) */
     QVector<int> *pkeyFieldsOrder;
@@ -202,16 +168,69 @@ public:
     /*! WHERE expression */
     KDbExpression whereExpr;
 
+    /*! Set by insertField(): true, if aliases for expression columns should
+     be generated on next columnAlias() call. */
+    bool regenerateExprAliases;
+
+    //! Points to connection recently used for caching
+    //! @todo use equivalent of QPointer<KDbConnection>
+    KDbConnection *recentConnection = nullptr;
+};
+
+//! Information about expanded fields for a single query schema, used for caching
+class KDbQuerySchemaFieldsExpanded
+{
+public:
+    inline KDbQuerySchemaFieldsExpanded()
+    {
+    }
+
+    inline ~KDbQuerySchemaFieldsExpanded()
+    {
+        qDeleteAll(fieldsExpanded);
+        qDeleteAll(internalFields);
+    }
+
+    /*! Temporary field vector for using in fieldsExpanded() */
+    KDbQueryColumnInfo::Vector fieldsExpanded;
+
+    /*! Like fieldsExpanded but only visible column infos; infos are not owned. */
+    KDbQueryColumnInfo::Vector visibleFieldsExpanded;
+
+    /*! Temporary field vector containing internal fields used for lookup columns. */
+    KDbQueryColumnInfo::Vector internalFields;
+
+    /*! Temporary, used to cache sum of expanded fields and internal fields (+record Id) used for lookup columns.
+     Contains not auto-deleted items.*/
+    KDbQueryColumnInfo::Vector fieldsExpandedWithInternalAndRecordId;
+
+    /*! Like fieldsExpandedWithInternalAndRecordId but only contains visible column infos; infos are not owned.*/
+    KDbQueryColumnInfo::Vector visibleFieldsExpandedWithInternalAndRecordId;
+
+    /*! Temporary, used to cache sum of expanded fields and internal fields used for lookup columns.
+     Contains not auto-deleted items.*/
+    KDbQueryColumnInfo::Vector fieldsExpandedWithInternal;
+
+    /*! Like fieldsExpandedWithInternal but only contains visible column infos; infos are not owned.*/
+    KDbQueryColumnInfo::Vector visibleFieldsExpandedWithInternal;
+
+    /*! A hash for fast lookup of query columns' order (unexpanded version). */
+    QHash<KDbQueryColumnInfo*, int> columnsOrder;
+
+    /*! A hash for fast lookup of query columns' order (unexpanded version without asterisks). */
+    QHash<KDbQueryColumnInfo*, int> columnsOrderWithoutAsterisks;
+
+    /*! A hash for fast lookup of query columns' order.
+     This is exactly opposite information compared to vector returned
+     by fieldsExpanded() */
+    QHash<KDbQueryColumnInfo*, int> columnsOrderExpanded;
+
     QHash<QString, KDbQueryColumnInfo*> columnInfosByNameExpanded;
 
     QHash<QString, KDbQueryColumnInfo*> columnInfosByName; //!< Same as columnInfosByNameExpanded but asterisks are skipped
 
     //! field schemas created for multiple joined columns like a||' '||b||' '||c
-    KDbField::List *ownedVisibleColumns;
-
-    /*! Set by insertField(): true, if aliases for expression columns should
-     be generated on next columnAlias() call. */
-    bool regenerateExprAliases;
+    KDbField::List ownedVisibleColumns;
 };
 
 //! @return identifier string @a name escaped using @a conn connection and type @a escapingType

@@ -29,12 +29,14 @@
 #include "KDbToken.h"
 
 class KDbConnection;
-class KDbTableSchema;
-class KDbRelationship;
-class KDbQueryAsterisk;
-class KDbQuerySchemaParameter;
 class KDbOrderByColumn;
 class KDbOrderByColumnList;
+class KDbQueryAsterisk;
+class KDbQuerySchemaFieldsExpanded;
+class KDbQuerySchemaParameter;
+class KDbQuerySchemaPrivate;
+class KDbRelationship;
+class KDbTableSchema;
 
 //! @short KDbQuerySchema provides information about database query
 /*! The query that can be executed using KDb-compatible SQL database engine
@@ -700,10 +702,8 @@ public:
     //! @todo add tests
     bool validate(QString *errorMessage = nullptr, QString *errorDescription = nullptr);
 
-    class Private; // Protected not private because of the parser
-
 protected:
-    void computeFieldsExpanded(KDbConnection *conn) const;
+    KDbQuerySchemaFieldsExpanded *computeFieldsExpanded(KDbConnection *conn) const;
 
     //! Used by fieldsExpanded(KDbConnection*, FieldsExpandedMode)
     //! and visibleFieldsExpanded(KDbConnection*, FieldsExpandedMode).
@@ -734,8 +734,10 @@ protected:
      */
     void setWhereExpressionInternal(const KDbExpression &expr);
 
+    friend class KDbQuerySchemaPrivate;
+
     Q_DISABLE_COPY(KDbQuerySchema)
-    Private * const d;
+    KDbQuerySchemaPrivate * const d;
 };
 
 //! A pair (connection, table-or-schema) for QDebug operator<<

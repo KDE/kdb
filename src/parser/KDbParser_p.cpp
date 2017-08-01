@@ -485,7 +485,7 @@ KDbQuerySchema* buildSelectQuery(
                 setError(parseInfo.errorMessage(), parseInfo.errorDescription());
                 return nullptr;
             }
-            KDbQuerySchema::Private::setWhereExpressionInternal(querySchema, options->whereExpr);
+            KDbQuerySchemaPrivate::setWhereExpressionInternal(querySchema, options->whereExpr);
         }
         //----- ORDER BY
         if (options->orderByColumns) {

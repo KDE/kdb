@@ -1406,6 +1406,8 @@ private:
     friend class KDbCursor;
     friend class KDbDriver;
     friend class KDbProperties; //!< for setError()
+    friend class KDbQuerySchema;
+    friend class KDbQuerySchemaPrivate;
     friend class KDbTableSchemaChangeListener;
     friend class KDbTableSchema; //!< for removeMe()
 };

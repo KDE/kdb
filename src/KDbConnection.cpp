@@ -416,6 +416,16 @@ KDbQuerySchema* KDbConnectionPrivate::setupQuerySchema(KDbQuerySchema *query)
     return newQuery.take();
 }
 
+KDbQuerySchemaFieldsExpanded *KDbConnectionPrivate::fieldsExpanded(const KDbQuerySchema *query)
+{
+    return m_fieldsExpandedCache[query];
+}
+
+void KDbConnectionPrivate::insertFieldsExpanded(const KDbQuerySchema *query, KDbQuerySchemaFieldsExpanded *cache)
+{
+    m_fieldsExpandedCache.insert(query, cache);
+}
+
 //================================================
 
 namespace {

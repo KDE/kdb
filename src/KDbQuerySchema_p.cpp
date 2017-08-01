@@ -18,31 +18,22 @@
 */
 
 #include "KDbQuerySchema_p.h"
+#include "KDbConnection.h"
+#include "KDbConnection_p.h"
 #include "KDbOrderByColumn.h"
 
-KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
+KDbQuerySchemaPrivate::KDbQuerySchemaPrivate(KDbQuerySchema* q, KDbQuerySchemaPrivate* copy)
         : query(q)
         , masterTable(nullptr)
         , fakeRecordIdField(nullptr)
         , fakeRecordIdCol(nullptr)
         , maxIndexWithAlias(-1)
         , visibility(64)
-        , fieldsExpanded(nullptr)
-        , visibleFieldsExpanded(nullptr)
-        , internalFields(nullptr)
-        , fieldsExpandedWithInternalAndRecordId(nullptr)
-        , visibleFieldsExpandedWithInternalAndRecordId(nullptr)
-        , fieldsExpandedWithInternal(nullptr)
-        , visibleFieldsExpandedWithInternal(nullptr)
         , orderByColumnList(nullptr)
         , autoincFields(nullptr)
-        , columnsOrder(nullptr)
-        , columnsOrderWithoutAsterisks(nullptr)
-        , columnsOrderExpanded(nullptr)
         , pkeyFieldsOrder(nullptr)
         , pkeyFieldCount(0)
         , tablesBoundToColumns(64, -1) // will be resized if needed
-        , ownedVisibleColumns(nullptr)
         , regenerateExprAliases(false)
 {
     visibility.fill(false);
@@ -50,26 +41,12 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
         // deep copy
         *this = *copy;
         // <clear, so computeFieldsExpanded() will re-create it>
-        fieldsExpanded = nullptr;
-        visibleFieldsExpanded = nullptr;
-        internalFields = nullptr;
-        columnsOrder = nullptr;
-        columnsOrderWithoutAsterisks = nullptr;
-        columnsOrderExpanded = nullptr;
         orderByColumnList = nullptr;
         autoincFields = nullptr;
         autoIncrementSqlFieldsList.clear();
-        columnInfosByNameExpanded.clear();
-        columnInfosByName.clear();
-        ownedVisibleColumns = nullptr;
-        fieldsExpandedWithInternalAndRecordId = nullptr;
-        visibleFieldsExpandedWithInternalAndRecordId = nullptr;
-        fieldsExpandedWithInternal = nullptr;
-        visibleFieldsExpandedWithInternal = nullptr;
         pkeyFieldsOrder = nullptr;
         fakeRecordIdCol = nullptr;
         fakeRecordIdField = nullptr;
-        ownedVisibleColumns = nullptr;
         // </clear, so computeFieldsExpanded() will re-create it>
         if (!copy->whereExpr.isNull()) {
             whereExpr = copy->whereExpr.clone();
@@ -85,32 +62,19 @@ KDbQuerySchema::Private::Private(KDbQuerySchema* q, Private* copy)
     }
 }
 
-KDbQuerySchema::Private::~Private()
+KDbQuerySchemaPrivate::~KDbQuerySchemaPrivate()
 {
+    if (recentConnection) {
+        recentConnection->d->insertFieldsExpanded(query, nullptr);
+    }
     delete orderByColumnList;
     delete autoincFields;
-    delete columnsOrder;
-    delete columnsOrderWithoutAsterisks;
-    delete columnsOrderExpanded;
     delete pkeyFieldsOrder;
     delete fakeRecordIdCol;
     delete fakeRecordIdField;
-    delete ownedVisibleColumns;
-    if (fieldsExpanded) {
-        qDeleteAll(*fieldsExpanded);
-        delete fieldsExpanded;
-    }
-    if (internalFields) {
-        qDeleteAll(*internalFields);
-        delete internalFields;
-    }
-    delete fieldsExpandedWithInternalAndRecordId;
-    delete visibleFieldsExpandedWithInternalAndRecordId;
-    delete fieldsExpandedWithInternal;
-    delete visibleFieldsExpandedWithInternal;
 }
 
-void KDbQuerySchema::Private::clear()
+void KDbQuerySchemaPrivate::clear()
 {
     columnAliases.clear();
     tableAliases.clear();
@@ -127,47 +91,20 @@ void KDbQuerySchema::Private::clear()
     columnPositionsForAliases.clear();
 }
 
-void KDbQuerySchema::Private::clearCachedData()
+void KDbQuerySchemaPrivate::clearCachedData()
 {
     if (orderByColumnList) {
         orderByColumnList->clear();
     }
-    if (fieldsExpanded) {
-        delete columnsOrder;
-        columnsOrder = nullptr;
-        delete columnsOrderWithoutAsterisks;
-        columnsOrderWithoutAsterisks = nullptr;
-        delete columnsOrderExpanded;
-        columnsOrderExpanded = nullptr;
-        delete autoincFields;
-        autoincFields = nullptr;
-        autoIncrementSqlFieldsList.clear();
-        columnInfosByNameExpanded.clear();
-        columnInfosByName.clear();
-        delete ownedVisibleColumns;
-        ownedVisibleColumns = nullptr;
-        qDeleteAll(*fieldsExpanded);
-        delete fieldsExpanded;
-        fieldsExpanded = nullptr;
-        delete visibleFieldsExpanded; // NO qDeleteAll, items not owned
-        visibleFieldsExpanded = nullptr;
-        if (internalFields) {
-            qDeleteAll(*internalFields);
-            delete internalFields;
-            internalFields = nullptr;
-        }
-        delete fieldsExpandedWithInternalAndRecordId;
-        fieldsExpandedWithInternalAndRecordId = nullptr;
-        delete visibleFieldsExpandedWithInternalAndRecordId;
-        visibleFieldsExpandedWithInternalAndRecordId = nullptr;
-        delete fieldsExpandedWithInternal;
-        fieldsExpandedWithInternal = nullptr;
-        delete visibleFieldsExpandedWithInternal;
-        visibleFieldsExpandedWithInternal = nullptr;
+    if (recentConnection) {
+        recentConnection->d->insertFieldsExpanded(query, nullptr);
     }
+    delete autoincFields;
+    autoincFields = nullptr;
+    autoIncrementSqlFieldsList.clear();
 }
 
-void KDbQuerySchema::Private::setColumnAlias(int position, const QString& alias)
+void KDbQuerySchemaPrivate::setColumnAlias(int position, const QString& alias)
 {
     if (alias.isEmpty()) {
         columnAliases.remove(position);
@@ -177,7 +114,7 @@ void KDbQuerySchema::Private::setColumnAlias(int position, const QString& alias)
     }
 }
 
-void KDbQuerySchema::Private::tryRegenerateExprAliases()
+void KDbQuerySchemaPrivate::tryRegenerateExprAliases()
 {
     if (!regenerateExprAliases)
         return;
@@ -203,7 +140,7 @@ void KDbQuerySchema::Private::tryRegenerateExprAliases()
     regenerateExprAliases = false;
 }
 
-void KDbQuerySchema::Private::setColumnAliasInternal(int position, const QString& alias)
+void KDbQuerySchemaPrivate::setColumnAliasInternal(int position, const QString& alias)
 {
     columnAliases.insert(position, alias.toLower());
     columnPositionsForAliases.insert(alias.toLower(), position);
