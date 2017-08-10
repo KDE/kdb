@@ -327,7 +327,7 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
                                                                  #"fieldlist" (basically a list of
                                                                  #column names of a table/query,
                                                                  #"Field List" as in MSA)
-              <name>string</name> #table/query name, etc. or KEXISQL SELECT QUERY
+              <name>string</name> #table/query name, etc. or KDbSQL SELECT QUERY
               <values><value>...</value> #for "valuelist" type
                 <value>...</value>
               </values>

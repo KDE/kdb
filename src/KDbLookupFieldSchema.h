@@ -90,7 +90,7 @@ public:
         void setTypeByName(const QString& typeName);
 
         /*! @return a string for record source: table name, query name or anonymous query
-         provided as KEXISQL string. If recordSourceType() is a ValueList,
+         provided as KDbSQL string. If recordSourceType() is a ValueList,
          recordSourceValues() should be used instead. If recordSourceType() is a KDbFieldList,
          recordSource() should return table or query name. */
         QString name() const;
