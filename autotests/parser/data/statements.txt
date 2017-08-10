@@ -34,9 +34,9 @@ select 1id from persons;
 select *;
 -- Empty tables set
 select 1, 2;
--- Empty column set (KDBSQL EXTENSION)
+-- Empty column set (KDbSQL EXTENSION)
 select from cars;
--- Totally empty statement (KDBSQL EXTENSION)
+-- Totally empty statement (KDbSQL EXTENSION)
 select;
 -- Keywords and constants are case insensitive
 SElEcT * FroM cars;
@@ -60,7 +60,7 @@ select NULL;
 select TRUE;
 -- TODO: Date/Time
 
--- TRUE and FALSE constants (KDBSQL EXTENSION)
+-- TRUE and FALSE constants (KDbSQL EXTENSION)
 select TRUE, NOT FALSE;
 select NOT NOT TRUE;
 select NOT NULL;

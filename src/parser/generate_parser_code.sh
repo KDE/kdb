@@ -139,7 +139,7 @@ cat << EOF > generated/KDbToken.h
 
 class KDbDriver;
 
-/*! @brief A type-safe KDBSQL token
+/*! @brief A type-safe KDbSQL token
  It can be used in KDb expressions
  @see KDbExpression */
 class KDB_EXPORT KDbToken
