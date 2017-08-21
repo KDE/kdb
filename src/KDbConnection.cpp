@@ -1420,7 +1420,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, CreateTableOptions 
                 return false;
         }
     } else {
-        if (this->tableSchema(tableSchema->name())) {
+        if (!internalTable && this->tableSchema(tableSchema->name())) {
             clearResult();
             m_result = KDbResult(ERR_OBJECT_EXISTS,
                                  tr("Table \"%1\" already exists.").arg(tableSchema->name()));
