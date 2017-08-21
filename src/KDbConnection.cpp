@@ -2846,8 +2846,9 @@ KDbField* KDbConnection::setupField(const KDbRecordData &data)
 KDbTableSchema* KDbConnection::tableSchema(const QString& tableName)
 {
     KDbTableSchema *t = d->table(tableName);
-    if (t)
+    if (t || tableName.isEmpty()) {
         return t;
+    }
     //not found: retrieve schema
     QScopedPointer<KDbTableSchema> newTable(new KDbTableSchema);
     clearResult();
@@ -2947,8 +2948,9 @@ KDbQuerySchema* KDbConnection::querySchema(const QString& aQueryName)
 {
     QString queryName = aQueryName.toLower();
     KDbQuerySchema *q = d->query(queryName);
-    if (q)
+    if (q || queryName.isEmpty()) {
         return q;
+    }
     //not found: retrieve schema
     QScopedPointer<KDbQuerySchema> newQuery(new KDbQuerySchema);
     clearResult();
