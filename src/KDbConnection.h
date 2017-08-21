@@ -620,8 +620,8 @@ public:
     //! Options for creating table
     //! @since 3.1
     enum class CreateTableOption {
-        DropDestination = 1, //!< Drop destination table if exists
-        Default = 0
+        Default = 0,
+        DropDestination = 1 //!< Drop destination table if exists
     };
     Q_DECLARE_FLAGS(CreateTableOptions, CreateTableOption)
 
@@ -695,8 +695,8 @@ public:
     //! Options for altering table name
     //! @since 3.1
     enum class AlterTableNameOption {
-        DropDestination = 1, //!< Drop destination table if exists
-        Default = 0
+        Default = 0,
+        DropDestination = 1 //!< Drop destination table if exists
     };
     Q_DECLARE_FLAGS(AlterTableNameOptions, AlterTableNameOption)
 
