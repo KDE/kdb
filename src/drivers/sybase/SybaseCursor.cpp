@@ -130,9 +130,9 @@ void SybaseCursor::drv_getNextRecord()
     // no buffering , and we don't know how many rows are there in result set
 
     if (dbnextrow(d->dbProcess) != NO_MORE_ROWS)
-        m_fetchResult = FetchOK;
+        m_fetchResult = FetchResult::Ok;
     else {
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     }
 
 }

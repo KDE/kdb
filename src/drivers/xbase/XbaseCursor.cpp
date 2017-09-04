@@ -85,17 +85,17 @@ bool xBaseCursor::drv_close() {
 
 void xBaseCursor::drv_getNextRecord() {
   if (!d->internalCursor) {
-    m_fetchResult = FetchError;
+    m_fetchResult = FetchResult::Error;
     return;
   }
 
   if ( !d->internalCursor->moveNext() ) {
     if ( d->internalCursor->eof() )
-      m_fetchResult = FetchEnd;
+      m_fetchResult = FetchResult::End;
     else
-      m_fetchResult = FetchError;
+      m_fetchResult = FetchResult::Error;
   } else {
-    m_fetchResult = FetchOK;
+    m_fetchResult = FetchResult::Ok;
     m_fieldCount = d->internalCursor->fieldCount();
     m_fieldsToStoreInRecord = m_fieldCount;
   }

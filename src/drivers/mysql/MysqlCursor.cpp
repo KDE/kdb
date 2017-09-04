@@ -82,16 +82,16 @@ bool MysqlCursor::drv_close()
 void MysqlCursor::drv_getNextRecord()
 {
     if (at() >= d->numRows) {
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     }
     else if (at() < 0) {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     }
     else {  // 0 <= at() < d->numRows
         d->lengths = mysql_fetch_lengths(d->mysqlres);
-        m_fetchResult = FetchOK;
+        m_fetchResult = FetchResult::Ok;
     }
 }
 

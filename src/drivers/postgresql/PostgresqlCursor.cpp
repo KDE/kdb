@@ -97,15 +97,15 @@ bool PostgresqlCursor::drv_close()
 void PostgresqlCursor::drv_getNextRecord()
 {
     if (at() >= qint64(m_numRows)) {
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     }
     else if (at() < 0) {
         // control will reach here only when at() < 0 ( which is usually -1 )
         // -1 is same as "1 beyond the End"
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     }
     else { // 0 <= at() < m_numRows
-        m_fetchResult = FetchOK;
+        m_fetchResult = FetchResult::Ok;
     }
 }
 
@@ -115,11 +115,11 @@ void PostgresqlCursor::drv_getNextRecord()
 void PostgresqlCursor::drv_getPrevRecord()
 {
     if (at() < m_res->size() && at() >= 0) {
-        m_fetchResult = FetchOK;
+        m_fetchResult = FetchResult::Ok;
     } else if (at() >= m_res->size()) {
-        m_fetchResult = FetchEnd;
+        m_fetchResult = FetchResult::End;
     } else {
-        m_fetchResult = FetchError;
+        m_fetchResult = FetchResult::Error;
     }
 }
 #endif

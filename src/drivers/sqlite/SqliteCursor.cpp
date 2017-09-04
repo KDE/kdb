@@ -210,7 +210,7 @@ void SqliteCursor::drv_getNextRecord()
 {
     int res = sqlite3_step(d->prepared_st_handle);
     if (res == SQLITE_ROW) {
-        m_fetchResult = FetchOK;
+        m_fetchResult = FetchResult::Ok;
         m_fieldCount = sqlite3_data_count(d->prepared_st_handle);
 //#else //for SQLITE3 data fetching is delayed. Now we even do not take field count information
 //      // -- just set a flag that we've a data not fetched but available
@@ -218,16 +218,16 @@ void SqliteCursor::drv_getNextRecord()
     }
     else {
         if (res == SQLITE_DONE) {
-            m_fetchResult = FetchEnd;
+            m_fetchResult = FetchResult::End;
         } else {
             m_result.setServerErrorCode(res);
-            m_fetchResult = FetchError;
+            m_fetchResult = FetchResult::Error;
         }
     }
 
     //debug
     /*
-      if ((int)m_result == (int)FetchOK && d->curr_coldata) {
+      if ((int)m_result == (int)FetchResult::Ok && d->curr_coldata) {
         for (int i=0;i<m_fieldCount;i++) {
           sqliteDebug()<<"col."<< i<<": "<< d->curr_colname[i]<<" "<< d->curr_colname[m_fieldCount+i]
           << " = " << (d->curr_coldata[i] ? QString::fromLocal8Bit(d->curr_coldata[i]) : "(NULL)");

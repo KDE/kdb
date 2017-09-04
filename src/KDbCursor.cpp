@@ -97,7 +97,7 @@ void KDbCursor::init(KDbConnection* conn)
     m_at = 0;
     m_records_in_buf = 0;
     m_buffering_completed = false;
-    m_fetchResult = FetchInvalid;
+    m_fetchResult = FetchResult::Invalid;
 
     d->containsRecordIdInfo = (m_query && m_query->masterTable())
                               && d->conn->driver()->behavior()->ROW_ID_FIELD_RETURNS_LAST_AUTOINCREMENTED_VALUE == false;
@@ -423,7 +423,7 @@ void KDbCursor::clearBuffer()
 
 bool KDbCursor::getNextRecord()
 {
-    m_fetchResult = FetchInvalid; //by default: invalid result of record fetching
+    m_fetchResult = FetchResult::Invalid; //by default: invalid result of record fetching
 
     if (m_options & KDbCursor::Option::Buffered) {//this cursor is buffered:
 //  kdbDebug() << "m_at < m_records_in_buf :: " << (long)m_at << " < " << m_records_in_buf;
@@ -443,18 +443,18 @@ bool KDbCursor::getNextRecord()
 //     kdbDebug()<<"==== buffering: drv_getNextRecord() ====";
                     drv_getNextRecord();
                 }
-                if (m_fetchResult != FetchOK) {//there is no record
+                if (m_fetchResult != FetchResult::Ok) {//there is no record
                     m_buffering_completed = true; //no more records for buffer
-//     kdbDebug()<<"m_fetchResult != FetchOK ********";
+//     kdbDebug()<<"m_fetchResult != FetchResult::Ok ********";
                     d->validRecord = false;
                     m_afterLast = true;
                     m_at = -1; //position is invalid now and will not be used
-                    if (m_fetchResult == FetchError) {
+                    if (m_fetchResult == FetchResult::Error) {
                         m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,
                                              tr("Could not fetch next record."));
                         return false;
                     }
-                    return false; // in case of m_fetchResult = FetchEnd or m_fetchResult = FetchInvalid
+                    return false; // in case of m_fetchResult = FetchResult::End or m_fetchResult = FetchInvalid
                 }
                 //we have a record: store this record's values in the buffer
                 drv_appendCurrentRecordToBuffer();
@@ -466,12 +466,12 @@ bool KDbCursor::getNextRecord()
         if (!d->readAhead) {//we have no record that was read ahead
 //   kdbDebug()<<"==== no prefetched record ====";
             drv_getNextRecord();
-            if (m_fetchResult != FetchOK) {//there is no record
-//    kdbDebug()<<"m_fetchResult != FetchOK ********";
+            if (m_fetchResult != FetchResult::Ok) {//there is no record
+//    kdbDebug()<<"m_fetchResult != FetchResult::Ok ********";
                 d->validRecord = false;
                 m_afterLast = true;
                 m_at = -1;
-                if (m_fetchResult == FetchEnd) {
+                if (m_fetchResult == FetchResult::End) {
                     return false;
                 }
                 m_result = KDbResult(ERR_CURSOR_RECORD_FETCHING,

@@ -305,12 +305,12 @@ protected:
     int m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
     KDbCursor::Options m_options; //!< cursor options that describes its behavior
 
-    //! possible results of record fetching, used for m_fetchResult
-    enum FetchResult {
-        FetchInvalid, //!< used before starting the fetching, result is not known yet
-        FetchError, //!< error of fetching
-        FetchOK, //!< the data is fetched
-        FetchEnd //!< at the end of data
+    //! Possible results of record fetching, used for m_fetchResult
+    enum class FetchResult {
+        Invalid, //!< used before starting the fetching, result is not known yet
+        Error,   //!< error of fetching
+        Ok,      //!< the data is fetched
+        End      //!< at the end of data
     };
 
     FetchResult m_fetchResult; //!< result of a record fetching
