@@ -229,10 +229,10 @@ static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Ty
         }
         if (v.type() == QVariant::String) {
             return driver ? driver->escapeBLOB(v.toString().toUtf8())
-                          : KDbEscapedString(KDb::escapeBLOB(v.toString().toUtf8(), KDb::BLOBEscape0xHex));
+                          : KDbEscapedString(KDb::escapeBLOB(v.toString().toUtf8(), KDb::BLOBEscapingType::ZeroXHex));
         }
         return driver ? driver->escapeBLOB(v.toByteArray())
-                      : KDbEscapedString(KDb::escapeBLOB(v.toByteArray(), KDb::BLOBEscape0xHex));
+                      : KDbEscapedString(KDb::escapeBLOB(v.toByteArray(), KDb::BLOBEscapingType::ZeroXHex));
     }
     case KDbField::InvalidType:
         return KDbEscapedString("!INVALIDTYPE!");

@@ -183,7 +183,7 @@ KDbEscapedString MysqlDriver::escapeString(const QString& str) const
 
 KDbEscapedString MysqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscape0xHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapingType::ZeroXHex));
 }
 
 KDbEscapedString MysqlDriver::escapeString(const QByteArray& str) const

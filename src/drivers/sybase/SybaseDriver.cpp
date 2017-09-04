@@ -117,7 +117,7 @@ KDbEscapedString SybaseDriver::escapeString(const QString& str) const
 
 KDbEscapedString SybaseDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscape0xHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapingType::ZeroXHex));
 }
 
 KDbEscapedString SybaseDriver::escapeString(const QByteArray& str) const

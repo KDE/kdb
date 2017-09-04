@@ -134,7 +134,7 @@ KDbEscapedString SqliteDriver::escapeString(const QByteArray& str) const
 
 KDbEscapedString SqliteDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapeXHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapingType::XHex));
 }
 
 QString SqliteDriver::drv_escapeIdentifier(const QString& str) const

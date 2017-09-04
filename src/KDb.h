@@ -532,14 +532,14 @@ KDB_EXPORT KDbEscapedString escapeString(KDbConnection *conn, const QString& str
 KDB_EXPORT QString unescapeString(const QString& string, char quote, int *errorPosition = nullptr);
 
 //! Escaping types for BLOBS. Used in escapeBLOB().
-enum BLOBEscapingType {
-    BLOBEscapeXHex = 1,        //!< Escaping like X'1FAD', used by sqlite (hex numbers)
-    BLOBEscape0xHex,           //!< Escaping like 0x1FAD, used by mysql (hex numbers)
-    BLOBEscapeHex,             //!< Escaping like 1FAD without quotes or prefixes
-    BLOBEscapeOctal,           //!< Escaping like 'zk\\000$x', used by PostgreSQL
+enum class BLOBEscapingType {
+    XHex = 1,        //!< Escaping like X'1FAD', used by sqlite (hex numbers)
+    ZeroXHex,           //!< Escaping like 0x1FAD, used by mysql (hex numbers)
+    Hex,             //!< Escaping like 1FAD without quotes or prefixes
+    Octal,           //!< Escaping like 'zk\\000$x', used by PostgreSQL
                                //!< (only non-printable characters are escaped using octal numbers);
                                //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
-    BLOBEscapeByteaHex         //!< "bytea hex" escaping, e.g. E'\xDEADBEEF'::bytea used by PostgreSQL
+    ByteaHex         //!< "bytea hex" escaping, e.g. E'\xDEADBEEF'::bytea used by PostgreSQL
                                //!< (only non-printable characters are escaped using octal numbers);
                                //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
 };
@@ -565,7 +565,7 @@ KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length = -1);
  @a data is escaped in format X'*', where * is one or more hexadecimal digits.
  Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
- See BLOBEscapeXHex. */
+ See BLOBEscapingType::XHex. */
 KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *ok = nullptr);
 
 /*! @return byte array converted from @a data of length @a length.
@@ -574,7 +574,7 @@ KDB_EXPORT QByteArray xHexToByteArray(const char* data, int length = -1, bool *o
  @a data is escaped in format 0x*, where * is one or more hexadecimal digits.
  Both A-F and a-f letters are supported. Even and odd number of digits are supported.
  If @a ok is not 0, *ok is set to result of the conversion.
- See BLOBEscape0xHex. */
+ See BLOBEscapingType::ZeroXHex. */
 KDB_EXPORT QByteArray zeroXHexToByteArray(const char* data, int length = -1, bool *ok = nullptr);
 
 /*! @return int list converted from string list.
@@ -659,7 +659,7 @@ KDB_EXPORT QString defaultFileBasedDriverId();
 /*! Escapes and converts value @a v (for type @a ftype)
     to string representation required by KDbSQL commands.
     For Date/Time type KDb::dateTimeToSql() is used.
-    For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
+    For BLOB type KDb::escapeBlob() with BLOBEscapingType::ZeroXHex conversion type is used. */
 KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:

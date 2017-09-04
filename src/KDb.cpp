@@ -1592,14 +1592,14 @@ inline static char intToHexDigit(unsigned char val)
 QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
 {
     const int size = array.size();
-    if (size == 0 && type == BLOBEscape0xHex)
+    if (size == 0 && type == BLOBEscapingType::ZeroXHex)
         return QString();
     int escaped_length = size * 2;
-    if (type == BLOBEscape0xHex || type == BLOBEscapeOctal)
+    if (type == BLOBEscapingType::ZeroXHex || type == BLOBEscapingType::Octal)
         escaped_length += 2/*0x or X'*/;
-    else if (type == BLOBEscapeXHex)
+    else if (type == BLOBEscapingType::XHex)
         escaped_length += 3; //X' + '
-    else if (type == BLOBEscapeByteaHex)
+    else if (type == BLOBEscapingType::ByteaHex)
         escaped_length += (4 + 8); // E'\x + '::bytea
 
     QString str;
@@ -1608,17 +1608,17 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
         kdbWarning() << "no enough memory (cannot allocate" << escaped_length << "chars)";
         return QString();
     }
-    if (type == BLOBEscapeXHex)
+    if (type == BLOBEscapingType::XHex)
         str = QString::fromLatin1("X'");
-    else if (type == BLOBEscape0xHex)
+    else if (type == BLOBEscapingType::ZeroXHex)
         str = QString::fromLatin1("0x");
-    else if (type == BLOBEscapeOctal)
+    else if (type == BLOBEscapingType::Octal)
         str = QString::fromLatin1("'");
-    else if (type == BLOBEscapeByteaHex)
+    else if (type == BLOBEscapingType::ByteaHex)
         str = QString::fromLatin1("E'\\\\x");
 
     int new_length = str.length(); //after X' or 0x, etc.
-    if (type == BLOBEscapeOctal) {
+    if (type == BLOBEscapingType::Octal) {
         // only escape nonprintable characters as in Table 8-7:
         // http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
         // i.e. escape for bytes: < 32, >= 127, 39 ('), 92(\).
@@ -1641,9 +1641,9 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
             str[new_length++] = intToHexDigit(val % 16);
         }
     }
-    if (type == BLOBEscapeXHex || type == BLOBEscapeOctal) {
+    if (type == BLOBEscapingType::XHex || type == BLOBEscapingType::Octal) {
         str[new_length++] = '\'';
-    } else if (type == BLOBEscapeByteaHex) {
+    } else if (type == BLOBEscapingType::ByteaHex) {
         str[new_length++] = '\'';
         str[new_length++] = ':';
         str[new_length++] = ':';
@@ -1734,7 +1734,7 @@ QByteArray KDb::xHexToByteArray(const char* data, int length, bool *ok)
 
 /*! \return byte array converted from \a data of length \a length.
  \a data is escaped in format 0x*, where * is one or more bytes in hexadecimal format.
- See BLOBEscape0xHex. */
+ See BLOBEscapingType::ZeroXHex. */
 QByteArray KDb::zeroXHexToByteArray(const char* data, int length, bool *ok)
 {
     if (length < 0) {
@@ -1846,7 +1846,7 @@ QList<int> KDb::deserializeIntList(const QString &data, bool *ok)
 QString KDb::variantToString(const QVariant& v)
  {
     if (v.type() == QVariant::ByteArray) {
-        return KDb::escapeBLOB(v.toByteArray(), KDb::BLOBEscapeHex);
+        return KDb::escapeBLOB(v.toByteArray(), KDb::BLOBEscapingType::Hex);
     }
     else if (v.type() == QVariant::StringList) {
         return serializeList(v.toStringList());

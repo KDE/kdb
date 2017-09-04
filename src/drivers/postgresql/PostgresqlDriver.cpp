@@ -157,7 +157,7 @@ QByteArray PostgresqlDriver::drv_escapeIdentifier(const QByteArray& str) const
 
 KDbEscapedString PostgresqlDriver::escapeBLOB(const QByteArray& array) const
 {
-    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapeByteaHex));
+    return KDbEscapedString(KDb::escapeBLOB(array, KDb::BLOBEscapingType::ByteaHex));
 }
 
 KDbEscapedString PostgresqlDriver::hexFunctionToString(const KDbNArgExpression &args,

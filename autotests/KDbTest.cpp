@@ -679,11 +679,11 @@ void KDbTest::testEscapeBLOB()
     QFETCH(QString, escapedOctal);
     QFETCH(QString, escapedBytea);
 
-    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeXHex), escapedX);
-    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscape0xHex), escaped0x);
-    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeHex), escapedHex);
-    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeOctal), escapedOctal);
-    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapeByteaHex), escapedBytea);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapingType::XHex), escapedX);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapingType::ZeroXHex), escaped0x);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapingType::Hex), escapedHex);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapingType::Octal), escapedOctal);
+    QCOMPARE(KDb::escapeBLOB(blob, KDb::BLOBEscapingType::ByteaHex), escapedBytea);
 }
 
 void KDbTest::testPgsqlByteaToByteArray()
@@ -955,7 +955,7 @@ KDB_EXPORT QString defaultFileBasedDriverId();
 /*! Escapes and converts value @a v (for type @a ftype)
     to string representation required by KDbSQL commands.
     For Date/Time type KDb::dateTimeToSql() is used.
-    For BLOB type KDb::escapeBlob() with BLOBEscape0xHex conversion type is used. */
+    For BLOB type KDb::escapeBlob() with BLOBEscapingType::ZeroXHex conversion type is used. */
 KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:
