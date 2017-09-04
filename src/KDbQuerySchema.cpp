@@ -846,7 +846,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
             // -> build LEFT OUTER JOIN clause for this purpose (LEFT, not INNER because the binding can be broken)
             // "LEFT OUTER JOIN lookupTable ON thisTable.thisField=lookupTable.boundField"
             KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
-            if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
+            if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Type::Table) {
                 KDbTableSchema *lookupTable = conn->tableSchema(recordSource.name());
                 KDbFieldList* visibleColumns = nullptr;
                 KDbField *boundField = nullptr;
@@ -884,7 +884,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                               }*/
                 }
                 delete visibleColumns;
-            } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
+            } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Type::Query) {
                 KDbQuerySchema *lookupQuery = conn->querySchema(recordSource.name());
                 if (!lookupQuery)
                     continue;
@@ -1041,7 +1041,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
         if (!lookupFieldSchema || lookupFieldSchema->boundColumn() < 0)
             continue;
         const KDbLookupFieldSchemaRecordSource recordSource = lookupFieldSchema->recordSource();
-        if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Table) {
+        if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Type::Table) {
             KDbTableSchema *lookupTable = conn->tableSchema(recordSource.name());
             KDbFieldList* visibleColumns = nullptr;
             if (lookupTable
@@ -1064,7 +1064,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                 }
             }
             delete visibleColumns;
-        } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Query) {
+        } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Type::Query) {
             KDbQuerySchema *lookupQuery = conn->querySchema(recordSource.name());
             if (!lookupQuery)
                 continue;

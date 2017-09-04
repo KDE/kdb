@@ -33,7 +33,7 @@ class Q_DECL_HIDDEN KDbLookupFieldSchemaRecordSource::Private
 {
 public:
     Private()
-            : type(KDbLookupFieldSchemaRecordSource::NoType) {
+            : type(KDbLookupFieldSchemaRecordSource::Type::None) {
     }
     Private(const Private &other) {
         copy(other);
@@ -100,11 +100,11 @@ public:
             QLatin1String("valuelist"),
             QLatin1String("fieldlist")})
     {
-        typesForNames.insert(QLatin1String("table"), KDbLookupFieldSchemaRecordSource::Table);
-        typesForNames.insert(QLatin1String("query"), KDbLookupFieldSchemaRecordSource::Query);
-        typesForNames.insert(QLatin1String("sql"), KDbLookupFieldSchemaRecordSource::SQLStatement);
-        typesForNames.insert(QLatin1String("valuelist"), KDbLookupFieldSchemaRecordSource::ValueList);
-        typesForNames.insert(QLatin1String("fieldlist"), KDbLookupFieldSchemaRecordSource::KDbFieldList);
+        typesForNames.insert(QLatin1String("table"), KDbLookupFieldSchemaRecordSource::Type::Table);
+        typesForNames.insert(QLatin1String("query"), KDbLookupFieldSchemaRecordSource::Type::Query);
+        typesForNames.insert(QLatin1String("sql"), KDbLookupFieldSchemaRecordSource::Type::SQLStatement);
+        typesForNames.insert(QLatin1String("valuelist"), KDbLookupFieldSchemaRecordSource::Type::ValueList);
+        typesForNames.insert(QLatin1String("fieldlist"), KDbLookupFieldSchemaRecordSource::Type::KDbFieldList);
     }
     const std::vector<QString> typeNames;
     QHash<QString, KDbLookupFieldSchemaRecordSource::Type> typesForNames;
@@ -155,12 +155,12 @@ void KDbLookupFieldSchemaRecordSource::setName(const QString& name)
 QString KDbLookupFieldSchemaRecordSource::typeName() const
 {
     Q_ASSERT(size_t(d->type) < KDb_lookupFieldSchemaStatic->typeNames.size());
-    return KDb_lookupFieldSchemaStatic->typeNames[d->type];
+    return KDb_lookupFieldSchemaStatic->typeNames[static_cast<int>(d->type)];
 }
 
 void KDbLookupFieldSchemaRecordSource::setTypeByName(const QString& typeName)
 {
-    setType(KDb_lookupFieldSchemaStatic->typesForNames.value(typeName, NoType));
+    setType(KDb_lookupFieldSchemaStatic->typesForNames.value(typeName, Type::None));
 }
 
 QStringList KDbLookupFieldSchemaRecordSource::values() const
@@ -271,9 +271,10 @@ static bool setColumnWidths(KDbLookupFieldSchema *lookup, const QVariant &val)
 static bool setDisplayWidget(KDbLookupFieldSchema *lookup, const QVariant &val)
 {
     bool ok;
-    const int ival = val.toInt(&ok);
-    if (!ok || ival > KDbLookupFieldSchema::ListBox)
+    const uint ival = val.toUInt(&ok);
+    if (!ok || ival > static_cast<uint>(KDbLookupFieldSchema::DisplayWidget::ListBox)) {
         return false;
+    }
     lookup->setDisplayWidget(static_cast<KDbLookupFieldSchema::DisplayWidget>(ival));
     return true;
 }
@@ -319,7 +320,9 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
     dbg.space() << "maxVisibleRecords:";
     dbg.space() << lookup.maxVisibleRecords();
     dbg.space() << "displayWidget:";
-    dbg.space() << (lookup.displayWidget() == KDbLookupFieldSchema::ComboBox ? "ComboBox" : "ListBox");
+    dbg.space() << (lookup.displayWidget() == KDbLookupFieldSchema::DisplayWidget::ComboBox
+                        ? "ComboBox"
+                        : "ListBox");
     dbg.space() << "columnHeadersVisible:";
     dbg.space() << lookup.columnHeadersVisible();
     dbg.space() << "limitToList:";
@@ -462,10 +465,10 @@ KDbLookupFieldSchema *KDbLookupFieldSchema::loadFromDom(const QDomElement& looku
         else if (name == "display-widget") {
             const QByteArray displayWidgetName(el.text().toLatin1());
             if (displayWidgetName == "combobox") {
-                lookupFieldSchema->setDisplayWidget(KDbLookupFieldSchema::ComboBox);
+                lookupFieldSchema->setDisplayWidget(KDbLookupFieldSchema::DisplayWidget::ComboBox);
             }
             else if (displayWidgetName == "listbox") {
-                lookupFieldSchema->setDisplayWidget(KDbLookupFieldSchema::ListBox);
+                lookupFieldSchema->setDisplayWidget(KDbLookupFieldSchema::DisplayWidget::ListBox);
             }
         }
     }
@@ -551,7 +554,7 @@ void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
         lookupColumnEl.appendChild(displayWidgetEl);
         displayWidgetEl.appendChild(
             doc->createTextNode(
-                QLatin1String((displayWidget() == ListBox) ? "listbox" : "combobox")));
+                QLatin1String((displayWidget() == DisplayWidget::ListBox) ? "listbox" : "combobox")));
     }
 }
 

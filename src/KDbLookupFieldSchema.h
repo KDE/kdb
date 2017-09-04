@@ -42,7 +42,7 @@ class QVariant;
 #define KDB_LOOKUP_FIELD_DEFAULT_LIMIT_TO_LIST true
 
 //! default value for KDbLookupFieldSchema::displayWidget()
-#define KDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET KDbLookupFieldSchema::ComboBox
+#define KDB_LOOKUP_FIELD_DEFAULT_DISPLAY_WIDGET KDbLookupFieldSchema::DisplayWidget::ComboBox
 
 //! Record source information that can be specified for the lookup field schema
 //! @since 3.1
@@ -50,8 +50,8 @@ class KDB_EXPORT KDbLookupFieldSchemaRecordSource
 {
 public:
     //! Record source type
-    enum Type {
-        NoType,         //!< used for invalid schema
+    enum class Type {
+        None,         //!< used for invalid schema
         Table,        //!< table as lookup record source
         Query,        //!< named query as lookup record source
         SQLStatement, //!< anonymous query as lookup record source
@@ -189,7 +189,7 @@ public:
     void setLimitToList(bool set);
 
     //! used in displayWidget()
-    enum DisplayWidget {
+    enum class DisplayWidget {
         ComboBox = 0, //!< (the default) combobox widget should be displayed in forms for this lookup field
         ListBox = 1   //!< listbox widget should be displayed in forms for this lookup field
     };
