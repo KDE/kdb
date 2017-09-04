@@ -42,9 +42,11 @@ QString KDbConnectionData::toUserVisibleString(UserVisibleStringOptions options)
         }
         return tr("file: %1").arg(d->databaseName);
     }
-    return ((d->userName.isEmpty() || !(options & AddUserToUserVisibleString)) ? QString() : (d->userName + QLatin1Char('@')))
-           + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
-           + (d->port != 0 ? (QLatin1Char(':') + QString::number(d->port)) : QString());
+    return ((d->userName.isEmpty() || !(options & UserVisibleStringOption::AddUser))
+                ? QString()
+                : (d->userName + QLatin1Char('@')))
+        + (d->hostName.isEmpty() ? QLatin1String("localhost") : d->hostName)
+        + (d->port != 0 ? (QLatin1Char(':') + QString::number(d->port)) : QString());
 }
 
 bool KDbConnectionData::isPasswordNeeded() const

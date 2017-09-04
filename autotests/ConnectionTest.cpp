@@ -56,11 +56,11 @@ void ConnectionTest::testConnectionData()
     cdata.setDatabaseName(db);
     QCOMPARE(cdata.databaseName(), db);
     QCOMPARE(db, cdata.toUserVisibleString());
-    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption));
+    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None));
 
     cdata.setDriverId("INVALID.ID");
     QCOMPARE(db, cdata.toUserVisibleString()); // driver ID invalid: still just returns the db name
-    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption)); // like above
+    QCOMPARE(db, cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None)); // like above
 
     KDbDriverManager manager;
     //! @todo more drivers
@@ -79,7 +79,7 @@ void ConnectionTest::testConnectionData()
         cdata = KDbConnectionData();
         cdata.setDriverId("org.kde.kdb.mysql");
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("localhost"));
-        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None),
                  QLatin1String("localhost")); // like above
         cdata.setUserName("joe");
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@localhost"));
@@ -88,11 +88,11 @@ void ConnectionTest::testConnectionData()
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("example.com"));
         cdata.setUserName("joe");
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@example.com"));
-        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None),
                  QLatin1String("example.com"));
         cdata.setPort(12345);
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("joe@example.com:12345"));
-        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::NoUserVisibleStringOption),
+        QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None),
                  QLatin1String("example.com:12345"));
         KDbConnectionData copy(cdata);
         QCOMPARE(cdata, copy);

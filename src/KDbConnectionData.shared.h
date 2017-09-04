@@ -164,9 +164,9 @@ public:
     bool savePassword; //SDC: default=false
 
     //! Used in toUserVisibleString()
-    enum UserVisibleStringOption {
-        NoUserVisibleStringOption = 0x0,
-        AddUserToUserVisibleString = 0x1
+    enum class UserVisibleStringOption {
+        None = 0,
+        AddUser = 1
     };
     Q_DECLARE_FLAGS(UserVisibleStringOptions, UserVisibleStringOption)
 
@@ -183,9 +183,9 @@ public:
        is specified in the databaseName attribute
      - "<file>" if the driver is unknown or not specified and no databaseName is specified
 
-     User name is added if (@a options & AddUserToUserVisibleString) is true (the default).
+     User name is added if (@a options & UserVisibleStringOption::AddUser) is true (the default).
     */
-    QString toUserVisibleString(UserVisibleStringOptions options = AddUserToUserVisibleString) const;
+    QString toUserVisibleString(UserVisibleStringOptions options = UserVisibleStringOption::AddUser) const;
 
     /*! @return true if password is needed for performing connection.
     The password has to be provided by the user.
