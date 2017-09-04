@@ -347,8 +347,12 @@ QString debugString(const T& object)
 }
 
 //! Used by findExe().
-enum FindExeOption { NoFindExeOptions = 0,
-                     IgnoreExecBit = 1 };
+enum class FindExeOption {
+    //! No options
+    None = 0,
+    //! If set, the path returned may not have the executable bit set.
+    IgnoreExecBit = 1
+};
 Q_DECLARE_FLAGS(FindExeOptions, FindExeOption)
 
 /**
@@ -363,15 +367,13 @@ Q_DECLARE_FLAGS(FindExeOptions, FindExeOption)
  * @param path    The path which will be searched. If this is
  *                null (default), the @c $PATH environment variable will
  *                be searched.
- * @param options if the flags passed include IgnoreExecBit the path returned
- *                may not have the executable bit set.
+ * @param options Options, see FindExeOption.
  *
- * @return The path of the executable. If it was not found,
- *         it will return QString().
+ * @return The path of the executable. If it was not found, returns QString().
  */
 QString findExe(const QString& appname,
                 const QString& path = QString(),
-                FindExeOptions options = NoFindExeOptions);
+                FindExeOptions options = FindExeOption::None);
 
 //! A single property
 //! @note This property is general-purpose and not related to Qt Properties.

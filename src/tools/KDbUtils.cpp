@@ -505,7 +505,7 @@ QString KDbUtils::findExe(const QString& appname,
 
     // absolute or relative path?
     if (appname.contains(QDir::separator())) {
-        return checkExecutable(appname, options & IgnoreExecBit);
+        return checkExecutable(appname, options & FindExeOption::IgnoreExecBit);
     }
 
     QString p;
@@ -518,7 +518,7 @@ QString KDbUtils::findExe(const QString& appname,
         p += appname;
 
         // Check for executable in this tokenized path
-        result = checkExecutable(p, options & IgnoreExecBit);
+        result = checkExecutable(p, options & FindExeOption::IgnoreExecBit);
         if (!result.isEmpty()) {
             return result;
         }
@@ -527,7 +527,7 @@ QString KDbUtils::findExe(const QString& appname,
     // Not found in PATH, look into a bin dir
     p = QFile::decodeName(BIN_INSTALL_DIR "/");
     p += appname;
-    result = checkExecutable(p, options & IgnoreExecBit);
+    result = checkExecutable(p, options & FindExeOption::IgnoreExecBit);
     if (!result.isEmpty()) {
         return result;
     }
