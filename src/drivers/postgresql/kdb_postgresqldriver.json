@@ -48,7 +48,6 @@
         "Description[tr]": "PostgreSQL veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних PostgreSQL",
         "Description[x-test]": "xxKDb driver for handling PostgreSQL databasesxx",
-        "Description[zh_CN]": "处理 PostgreSQL 数据库的 KDb 驱动",
         "EnabledByDefault": true,
         "Icon": "",
         "Id": "org.kde.kdb.postgresql",
