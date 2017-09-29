@@ -217,7 +217,7 @@ bool KDbCursor::open()
         }
         KDbSelectStatementOptions options;
         options.setAlsoRetrieveRecordId(d->containsRecordIdInfo); /*get record Id if needed*/
-        KDbNativeStatementBuilder builder(d->conn);
+        KDbNativeStatementBuilder builder(d->conn, KDb::DriverEscaping);
         KDbEscapedString sql;
         if (!builder.generateSelectStatement(&sql, m_query, options, d->queryParameters)
             || sql.isEmpty())
@@ -540,7 +540,7 @@ QDebug debug(QDebug dbg, KDbCursor& cursor, bool buildSql)
                       << "\n";
     }
     else if (buildSql) {
-        KDbNativeStatementBuilder builder(cursor.connection());
+        KDbNativeStatementBuilder builder(cursor.connection(), KDb::DriverEscaping);
         KDbEscapedString sql;
         QString sqlString;
         if (builder.generateSelectStatement(&sql, cursor.query())) {

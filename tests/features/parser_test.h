@@ -42,7 +42,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
     }
     if (ok && q) {
         cout << qPrintable(KDbUtils::debugString(KDbConnectionAndQuerySchema(conn, *q))) << '\n';
-        KDbNativeStatementBuilder builder(conn);
+        KDbNativeStatementBuilder builder(conn, KDb::DriverEscaping);
         KDbEscapedString sql;
         if (builder.generateSelectStatement(&sql, q, variantParams)) {
             cout << "-STATEMENT:\n" << sql.toByteArray().constData() << '\n';

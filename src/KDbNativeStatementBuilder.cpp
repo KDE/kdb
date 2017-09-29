@@ -42,18 +42,20 @@ public:
     Private() {}
     //! @todo use equivalent of QPointer<KDbConnection>
     KDbConnection *connection;
+    KDb::IdentifierEscapingType dialect;
 
-    inline KDbDriver *driver() { return connection ? connection->driver() : nullptr; }
 private:
     Q_DISABLE_COPY(Private)
 };
 
 //================================================
 
-KDbNativeStatementBuilder::KDbNativeStatementBuilder(KDbConnection *connection)
+KDbNativeStatementBuilder::KDbNativeStatementBuilder(KDbConnection *connection,
+                                                     KDb::IdentifierEscapingType dialect)
     : d(new Private)
 {
     d->connection = connection;
+    d->dialect = dialect;
 }
 
 KDbNativeStatementBuilder::~KDbNativeStatementBuilder()
@@ -63,6 +65,7 @@ KDbNativeStatementBuilder::~KDbNativeStatementBuilder()
 
 static bool selectStatementInternal(KDbEscapedString *target,
                                     KDbConnection *connection,
+                                    KDb::IdentifierEscapingType dialect,
                                     KDbQuerySchema* querySchema,
                                     const KDbSelectStatementOptions& options,
                                     const QList<QVariant>& parameters)
@@ -74,7 +77,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 //  return QString();
 // Each SQL identifier needs to be escaped in the generated query.
 
-    const KDbDriver *driver = connection ? connection->driver() : nullptr;
+    const KDbDriver *driver = dialect == KDb::DriverEscaping ? connection->driver() : nullptr;
 
     if (!querySchema->statement().isEmpty()) {
 //! @todo replace with KDbNativeQuerySchema? It shouldn't be here.
@@ -192,7 +195,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 //! @todo Add possibility for joining the values at client side.
                         s_additional_fields += visibleColumns->sqlFieldsList(
                                                    connection, QLatin1String(" || ' ' || "), internalUniqueTableAlias,
-                                                   driver ? KDb::DriverEscaping : KDb::KDbEscaping);
+                                                   dialect);
                     }
                     delete visibleColumns;
                 } else if (recordSource.type() == KDbLookupFieldSchemaRecordSource::Type::Query) {
@@ -220,10 +223,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     //add LEFT OUTER JOIN
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
-                    KDbEscapedString internalUniqueQueryAlias
-                        = kdb_subquery_prefix + KDb::escapeString(connection, lookupQuery->name()) + '_'
-                        + QString::number(internalUniqueQueryAliasNumber++);
-                    KDbNativeStatementBuilder builder(connection);
+                    KDbEscapedString internalUniqueQueryAlias = kdb_subquery_prefix
+                        + KDb::escapeString(driver ? connection : nullptr, lookupQuery->name())
+                        + '_' + QString::number(internalUniqueQueryAliasNumber++);
+                    KDbNativeStatementBuilder builder(connection, dialect);
                     KDbEscapedString subSql;
                     if (!builder.generateSelectStatement(&subSql, lookupQuery, options,
                                                          parameters))
@@ -305,7 +308,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             if (!s_from.isEmpty())
                 s_from += ", ";
             KDbEscapedString subSql;
-            if (!selectStatementInternal(&subSql, connection, subQuery, options, parameters)) {
+            if (!selectStatementInternal(&subSql, connection, dialect, subQuery, options, parameters)) {
                 return false;
             }
             s_from += '(' + subSql + ") AS " + kdb_subquery_prefix
@@ -362,10 +365,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
     //(use wasWhere here)
 
     // ORDER BY
-    KDbEscapedString orderByString(
-        querySchema->orderByColumnList()->toSqlString(
-            !singleTable/*includeTableName*/, connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping)
-    );
+    KDbEscapedString orderByString(querySchema->orderByColumnList()->toSqlString(
+        !singleTable /*includeTableName*/, connection, dialect));
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder(connection));
     if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
         //add automatic ORDER BY if there is no explicitly defined (especially helps when there are complex JOINs)
@@ -382,8 +383,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
             KDbQueryColumnInfo *ci = fieldsExpanded[ pkeyFieldsIndex ];
             automaticPKOrderBy.appendColumn(ci);
         }
-        orderByString = automaticPKOrderBy.toSqlString(!singleTable/*includeTableName*/,
-                        connection, driver ? KDb::DriverEscaping : KDb::KDbEscaping);
+        orderByString = automaticPKOrderBy.toSqlString(!singleTable /*includeTableName*/,
+                                                       connection, dialect);
     }
     if (!orderByString.isEmpty())
         sql += (" ORDER BY " + orderByString);
@@ -398,14 +399,14 @@ bool KDbNativeStatementBuilder::generateSelectStatement(KDbEscapedString *target
                                                         const KDbSelectStatementOptions& options,
                                                         const QList<QVariant>& parameters) const
 {
-    return selectStatementInternal(target, d->connection, querySchema, options, parameters);
+    return selectStatementInternal(target, d->connection, d->dialect, querySchema, options, parameters);
 }
 
 bool KDbNativeStatementBuilder::generateSelectStatement(KDbEscapedString *target,
                                                         KDbQuerySchema* querySchema,
                                                         const QList<QVariant>& parameters) const
 {
-    return selectStatementInternal(target, d->connection, querySchema, KDbSelectStatementOptions(),
+    return selectStatementInternal(target, d->connection, d->dialect, querySchema, KDbSelectStatementOptions(),
                                    parameters);
 }
 
@@ -423,7 +424,7 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
         return false;
     }
     // Each SQL identifier needs to be escaped in the generated query.
-    const KDbDriver *driver = d->connection ? d->connection->driver() : nullptr;
+    const KDbDriver *driver = d->dialect == KDb::DriverEscaping ? d->connection->driver() : nullptr;
     KDbEscapedString sql;
     sql.reserve(4096);
     sql = KDbEscapedString("CREATE TABLE ")
@@ -439,21 +440,21 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
         const bool pk = field->isPrimaryKey() || (autoinc && driver && driver->behavior()->AUTO_INCREMENT_REQUIRES_PK);
 //! @todo warning: ^^^^^ this allows only one autonumber per table when AUTO_INCREMENT_REQUIRES_PK==true!
         const KDbField::Type type = field->type(); // cache: evaluating type of expressions can be expensive
-        if (autoinc && d->driver()->behavior()->SPECIAL_AUTO_INCREMENT_DEF) {
+        if (autoinc && d->connection->driver()->behavior()->SPECIAL_AUTO_INCREMENT_DEF) {
             if (pk)
-                v.append(d->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
-                 .append(d->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION);
+                v.append(d->connection->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
+                 .append(d->connection->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION);
             else
-                v.append(d->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
-                 .append(d->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
+                v.append(d->connection->driver()->behavior()->AUTO_INCREMENT_TYPE).append(' ')
+                 .append(d->connection->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
         } else {
-            if (autoinc && !d->driver()->behavior()->AUTO_INCREMENT_TYPE.isEmpty())
-                v += d->driver()->behavior()->AUTO_INCREMENT_TYPE;
+            if (autoinc && !d->connection->driver()->behavior()->AUTO_INCREMENT_TYPE.isEmpty())
+                v += d->connection->driver()->behavior()->AUTO_INCREMENT_TYPE;
             else
-                v += d->driver()->sqlTypeName(type, *field);
+                v += d->connection->driver()->sqlTypeName(type, *field);
 
             if (KDbField::isIntegerType(type) && field->isUnsigned()) {
-                v.append(' ').append(d->driver()->behavior()->UNSIGNED_TYPE_KEYWORD);
+                v.append(' ').append(d->connection->driver()->behavior()->UNSIGNED_TYPE_KEYWORD);
             }
 
             if (KDbField::isFPNumericType(type) && field->precision() > 0) {
@@ -464,15 +465,15 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             }
             else if (type == KDbField::Text) {
                 int realMaxLen;
-                if (d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH == 0) {
+                if (d->connection->driver()->behavior()->TEXT_TYPE_MAX_LENGTH == 0) {
                     realMaxLen = field->maxLength(); // allow to skip (N)
                 }
                 else { // max length specified by driver
                     if (field->maxLength() == 0) { // as long as possible
-                        realMaxLen = d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH;
+                        realMaxLen = d->connection->driver()->behavior()->TEXT_TYPE_MAX_LENGTH;
                     }
                     else { // not longer than specified by driver
-                        realMaxLen = qMin(d->driver()->behavior()->TEXT_TYPE_MAX_LENGTH, field->maxLength());
+                        realMaxLen = qMin(d->connection->driver()->behavior()->TEXT_TYPE_MAX_LENGTH, field->maxLength());
                     }
                 }
                 if (realMaxLen > 0) {
@@ -481,8 +482,8 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
             }
 
             if (autoinc) {
-                v.append(' ').append(pk ? d->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION
-                                        : d->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
+                v.append(' ').append(pk ? d->connection->driver()->behavior()->AUTO_INCREMENT_PK_FIELD_OPTION
+                                        : d->connection->driver()->behavior()->AUTO_INCREMENT_FIELD_OPTION);
             }
             else {
                 //! @todo here is automatically a single-field key created
@@ -494,8 +495,8 @@ bool KDbNativeStatementBuilder::generateCreateTableStatement(KDbEscapedString *t
 ///@todo IS this ok for all engines?: if (!autoinc && !field->isPrimaryKey() && field->isNotNull())
             if (!autoinc && !pk && field->isNotNull())
                 v += " NOT NULL"; //only add not null option if no autocommit is set
-            if (d->driver()->supportsDefaultValue(*field) && field->defaultValue().isValid()) {
-                KDbEscapedString valToSql(d->driver()->valueToSql(field, field->defaultValue()));
+            if (d->connection->driver()->supportsDefaultValue(*field) && field->defaultValue().isValid()) {
+                KDbEscapedString valToSql(d->connection->driver()->valueToSql(field, field->defaultValue()));
                 if (!valToSql.isEmpty()) //for sanity
                     v += " DEFAULT " + valToSql;
             }

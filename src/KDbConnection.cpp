@@ -1815,7 +1815,7 @@ bool KDbConnection::dropQuery(const QString& queryName)
 
 bool KDbConnection::drv_createTable(const KDbTableSchema& tableSchema)
 {
-    const KDbNativeStatementBuilder builder(this);
+    const KDbNativeStatementBuilder builder(this, KDb::DriverEscaping);
     KDbEscapedString sql;
     if (!builder.generateCreateTableStatement(&sql,tableSchema)) {
         return false;
@@ -2528,7 +2528,7 @@ tristate KDbConnection::resultExists(const KDbEscapedString &sql, QueryRecordOpt
 
 tristate KDbConnection::isEmpty(KDbTableSchema* table)
 {
-    const KDbNativeStatementBuilder builder(this);
+    const KDbNativeStatementBuilder builder(this, KDb::DriverEscaping);
     KDbEscapedString sql;
     if (!builder.generateSelectStatement(&sql, table)) {
         return cancelled;
@@ -3421,7 +3421,7 @@ int KDbConnection::recordCount(KDbQuerySchema* querySchema, const QList<QVariant
 {
 //! @todo does not work with non-SQL data sources
     int count = -1; //will be changed only on success of querySingleNumber()
-    KDbNativeStatementBuilder builder(this);
+    KDbNativeStatementBuilder builder(this, KDb::DriverEscaping);
     KDbEscapedString subSql;
     if (!builder.generateSelectStatement(&subSql, querySchema, params)) {
         return -1;

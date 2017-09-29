@@ -91,7 +91,7 @@ KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
     //qDebug() << *q.data();
 
     QList<QVariant> params;
-    KDbNativeStatementBuilder builder(m_utils.connection.data());
+    KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::DriverEscaping);
     KDbEscapedString querySql;
     *ok = builder.generateSelectStatement(&querySql, q.data(), params);
     //qDebug() << querySql;
