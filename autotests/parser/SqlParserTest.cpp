@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -70,32 +70,6 @@ bool SqlParserTest::openDatabase(const QString &path)
         return false;
     }
     return true;
-}
-
-KDbEscapedString SqlParserTest::parse(const KDbEscapedString& sql, bool *ok)
-{
-    KDbParser *parser = m_parser.data();
-
-    *ok = parser->parse(sql);
-    if (!*ok) {
-        //qDebug() << parser->error();
-        return KDbEscapedString();
-    }
-
-    QScopedPointer<KDbQuerySchema> q(parser->query());
-    if (!q) {
-        //qDebug() << parser->error();
-        *ok = false;
-        return KDbEscapedString();
-    }
-    //qDebug() << *q.data();
-
-    QList<QVariant> params;
-    KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::DriverEscaping);
-    KDbEscapedString querySql;
-    *ok = builder.generateSelectStatement(&querySql, q.data(), params);
-    //qDebug() << querySql;
-    return querySql;
 }
 
 static void eatComment(QString* string)
@@ -243,18 +217,17 @@ void SqlParserTest::testParse()
     }
     sql.chop(1);
     //qDebug() << "SQL:" << sql.toString() << expectError;
-    bool ok;
-    KDbEscapedString result = parse(sql, &ok);
-    KDbParser *parser = m_parser.data();
 
+    // 1. Parse
+    KDbParser *parser = m_parser.data();
+    bool ok = parser->parse(sql);
+    QScopedPointer<KDbQuerySchema> query(parser->query());
+    ok = ok && query;
     if (ok) {
         // sucess, so error cannot be expected
         ok = !expectError;
-        message = QString("Unexpected success in SQL statement: \"%1\"; Result: %2")
-                  .arg(sql.toString(), result.toString());
-        if (ok) {
-            qDebug() << "Result:" << result.toString();
-        } else {
+        message = "Unexpected success of parsing SQL statement";
+        if (!ok) {
             m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
             if (parser->query()) {
                 const KDbConnectionAndQuerySchema connQuery(parser->connection(), *parser->query());
@@ -267,7 +240,7 @@ void SqlParserTest::testParse()
     else {
         // failure, so error should be expected
         ok = expectError;
-        message = QString("%1; Failed SQL Statement:\n\"%2\"\n %3^\n")
+        message = QString("%1; Failed to parse SQL Statement:\n\"%2\"\n %3^\n")
                  .arg(KDbUtils::debugString(parser->error()),
                       sql.toString(),
                       QString(parser->error().position() - 1, QChar(' ')));
@@ -277,6 +250,28 @@ void SqlParserTest::testParse()
             m_errorStream << fname << ':' << lineNum << message << endl;
         }
         QVERIFY2(ok, qPrintable(message));
+    }
+
+    //! @todo support more drivers
+    if (query) {
+        // 2. Build native SQL for SQLite
+        QList<QVariant> params;
+        KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::DriverEscaping);
+        KDbEscapedString querySql;
+        ok = builder.generateSelectStatement(&querySql, query.data(), params);
+        QVERIFY2(ok, "Failed to generate native SQLite SQL statement from query");
+        //! @todo compare with template
+    }
+
+    if (query) {
+        // 3. Build KDbSQL
+        QList<QVariant> params;
+        KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::KDbEscaping);
+        KDbEscapedString querySql;
+        ok = builder.generateSelectStatement(&querySql, query.data(), params);
+        QVERIFY2(ok, "Failed to generate KDbSQL statement from query");
+        //! @todo compare with template
+
     }
 }
 

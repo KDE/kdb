@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2012-2017 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -41,7 +41,6 @@ private Q_SLOTS:
 private:
     //! Opens database needed for tests.
     bool openDatabase(const QString &path);
-    KDbEscapedString parse(const KDbEscapedString& sql, bool *ok);
 
     KDbTestUtils m_utils;
     QScopedPointer<KDbParser> m_parser;
