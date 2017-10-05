@@ -178,7 +178,7 @@ void SqlParserTest::testParse_data()
                     testName.clear();
                 }
                 ok = dbPath.isEmpty();
-                QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file already specified (%2)")
+                QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite file was already specified (%2)")
                     .arg(lineNum).arg(dbPath)));
                 dbPath = line.mid(QString("SQLITEFILE: ").length()).trimmed();
                 dbPath = dir + QDir::separator() + dbPath;
@@ -215,7 +215,7 @@ void SqlParserTest::testParse_data()
                 continue;
             }
             ok = !dbPath.isEmpty();
-            QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file not specified, "
+            QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite file was not specified, "
                                             "could not execute statement").arg(lineNum)));
 
             QTest::addRow("file %s:%d, category '%s', test '%s', sql '%s'%s", qPrintable(fname),
