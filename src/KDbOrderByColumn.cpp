@@ -189,7 +189,7 @@ KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
             }
             fieldName = KDbEscapedString(escapeIdentifier(d->column->aliasOrName(), conn, escapingType));
         }
-        if (d->column->field()->isTextType()) {
+        if (d->column->field()->isTextType() && escapingType == KDb::DriverEscaping) {
             collationString = conn->driver()->collationSql();
         }
     }
@@ -200,7 +200,7 @@ KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
         }
         fieldName = KDbEscapedString(escapeIdentifier(
             d->field ? d->field->name() : QLatin1String("??")/*error*/, conn, escapingType));
-        if (d->field && d->field->isTextType()) {
+        if (d->field && d->field->isTextType() && escapingType == KDb::DriverEscaping) {
             collationString = conn->driver()->collationSql();
         }
     }
