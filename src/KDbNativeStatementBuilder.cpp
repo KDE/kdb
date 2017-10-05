@@ -109,7 +109,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
     int internalUniqueQueryAliasNumber = 0; //used to build internalUniqueQueryAliases
     number = 0;
     QList<KDbQuerySchema*> subqueries_for_lookup_data; // subqueries will be added to FROM section
-    KDbEscapedString kdb_subquery_prefix("__kdb_subquery_");
+    const QString kdb_subquery_prefix = QStringLiteral("__kdb_subquery_");
     KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
     KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
         = parameters.isEmpty() ? nullptr : &paramValuesIt;
@@ -223,9 +223,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
                     //add LEFT OUTER JOIN
                     if (!s_additional_joins.isEmpty())
                         s_additional_joins += ' ';
-                    KDbEscapedString internalUniqueQueryAlias = kdb_subquery_prefix
-                        + KDb::escapeString(driver ? connection : nullptr, lookupQuery->name())
-                        + '_' + QString::number(internalUniqueQueryAliasNumber++);
+                    KDbEscapedString internalUniqueQueryAlias(KDb::escapeIdentifier(
+                        driver,
+                        kdb_subquery_prefix + lookupQuery->name() + QLatin1Char('_')
+                            + QString::number(internalUniqueQueryAliasNumber++)));
                     KDbNativeStatementBuilder builder(connection, dialect);
                     KDbEscapedString subSql;
                     if (!builder.generateSelectStatement(&subSql, lookupQuery, options,
@@ -311,8 +312,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
             if (!selectStatementInternal(&subSql, connection, dialect, subQuery, options, parameters)) {
                 return false;
             }
-            s_from += '(' + subSql + ") AS " + kdb_subquery_prefix
-                      + KDbEscapedString::number(subqueries_for_lookup_data_counter++);
+            s_from += '(' + subSql + ") AS "
+                + KDb::escapeIdentifier(
+                      driver,
+                      kdb_subquery_prefix + QString::number(subqueries_for_lookup_data_counter++));
         }
         sql += s_from;
     }
