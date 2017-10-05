@@ -272,6 +272,15 @@ void SqlParserTest::testParse()
         QVERIFY2(ok, "Failed to generate KDbSQL statement from query");
         //! @todo compare with template
 
+        // 3.1. Parse the generated KDbSQL again
+        ok = parser->parse(querySql);
+        QScopedPointer<KDbQuerySchema> secondQuery(parser->query());
+        ok = ok && secondQuery;
+        QVERIFY2(ok, "Failed to parse generated KDbSQL statement again");
+
+        // 3.2. Compare the original query from step #1 with this query
+        ok = *query == *secondQuery;
+        QVERIFY2(ok, "Original query differs from repeatedly parsed query");
     }
 }
 
