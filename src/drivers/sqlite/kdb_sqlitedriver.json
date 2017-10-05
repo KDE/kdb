@@ -36,6 +36,7 @@
         "Description[de]": "KDb-Treiber für SQLite",
         "Description[es]": "Controlador de KDb para manejar bases de datos SQLite",
         "Description[fi]": "KDb-ajuri SQLite-tietokantojen käsittelyyn",
+        "Description[fr]": "Pilote KDb de gestion des bases de données SQLite",
         "Description[gl]": "Controlador de KDb para manexar bases de datos SQLite.",
         "Description[ia]": "Driver de KDb per manear bases de datos deSQLite",
         "Description[it]": "Driver KDb per la gestione di banche dati SQLite",
