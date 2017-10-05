@@ -218,9 +218,10 @@ void SqlParserTest::testParse_data()
             QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite was file not specified, "
                                             "could not execute statement").arg(lineNum)));
 
-            QTest::newRow(qPrintable(QString("File: %1:%2; Category: \"%3\"; Test: \"%4\"%5")
-                          .arg(fname).arg(lineNum).arg(category, testName,
-                               expectError ? "; Error expected" : "")))
+            QTest::addRow("file %s:%d, category '%s', test '%s', sql '%s'%s", qPrintable(fname),
+                          lineNum, qPrintable(category), qPrintable(testName),
+                          qPrintable(sql.toString()),
+                          qPrintable(expectError ? ", error expected" : ""))
                 << fname << lineNum << sql << expectError;
         }
     }
