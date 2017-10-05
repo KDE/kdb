@@ -44,9 +44,9 @@ void KDbTestUtils::testDriverManagerInternal(bool forceEmpty)
 {
     DriverManagerInternal::self()->forceEmpty = forceEmpty;
     QStringList ids = manager.driverIds();
-    qDebug() << "DRIVERS:" << ids;
+    //qDebug() << "DRIVERS:" << ids;
     QVERIFY2(forceEmpty == manager.result().isError(), "Error in driver manager");
-    qDebug() << manager.result().message();
+    //qDebug() << manager.result().message();
     QVERIFY2(forceEmpty == ids.isEmpty(), "No db drivers found");
     if (forceEmpty) { // no drivers, so try to find one and expect failure
         ids << "org.kde.kdb.sqlite";
@@ -88,7 +88,7 @@ void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QSt
     foundMimeTypes.sort();
     QStringList expectedMimeTypes(mimeTypes);
     expectedMimeTypes.sort();
-    qDebug() << "mimeTypes:" << mimeTypes;
+    //qDebug() << "mimeTypes:" << mimeTypes;
     QCOMPARE(foundMimeTypes, expectedMimeTypes);
     QVERIFY(!KDb::defaultFileBasedDriverMimeType().isEmpty());
     QMimeDatabase mimeDb;
@@ -112,7 +112,7 @@ void KDbTestUtils::testSqliteDriverInternal()
 
 void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
 {
-    qDebug() << cdata;
+    //qDebug() << cdata;
 
     if (!driver) {
         //! @todo don't hardcode SQLite here

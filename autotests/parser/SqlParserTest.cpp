@@ -45,7 +45,7 @@ bool SqlParserTest::openDatabase(const QString &path)
     KDbConnectionData cdata;
     cdata.setDatabaseName(path);
     if (!m_utils.testConnect(cdata) || !m_utils.connection) {
-        qDebug() << m_utils.driver->result();
+        qWarning() << m_utils.driver->result();
         return false;
     }
     m_parser.reset(new KDbParser(m_utils.connection.data()));
@@ -64,7 +64,7 @@ bool SqlParserTest::openDatabase(const QString &path)
     }
 #endif
     if (!m_utils.testUse() || !m_utils.connection->isDatabaseUsed()) {
-        qDebug() << m_utils.connection->result();
+        qWarning() << m_utils.connection->result();
         bool result = m_utils.testDisconnect();
         Q_UNUSED(result);
         return false;
@@ -287,11 +287,11 @@ void SqlParserTest::testParse()
 void SqlParserTest::testTokens()
 {
     KDbToken t = KDbToken::LEFT;
-    qDebug() << t << t.toChar() << t.value() << t.isValid();
+    //qDebug() << t << t.toChar() << t.value() << t.isValid();
     t = '+';
-    qDebug() << t << t.toChar() << t.value() << t.isValid();
+    //qDebug() << t << t.toChar() << t.value() << t.isValid();
     t = KDbToken();
-    qDebug() << t << t.toChar() << t.value() << t.isValid();
+    //qDebug() << t << t.toChar() << t.value() << t.isValid();
 
     QCOMPARE(KDbToken::SQL_TYPE.value(), 258);
     QCOMPARE(KDbToken::AS.value(), 259);
