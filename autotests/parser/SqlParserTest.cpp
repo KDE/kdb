@@ -192,10 +192,9 @@ void SqlParserTest::testParse_data()
             QVERIFY2(ok, qPrintable(QString("Error at line %1: SQLite file was not specified, "
                                             "could not execute statement").arg(lineNum)));
 
-            QTest::addRow("file %s:%d, category '%s', test '%s', sql '%s'%s", qPrintable(fname),
-                          lineNum, qPrintable(category), qPrintable(testName),
-                          qPrintable(sql.toString()),
-                          qPrintable(expectError ? ", error expected" : ""))
+            QTest::newRow(qPrintable(QString("file %1:%2, category '%3', test '%4', sql '%5'%6")
+                          .arg(fname).arg(lineNum).arg(category).arg(testName).arg(sql.toString())
+                          .arg(expectError ? ", error expected" : "")))
                 << fname << lineNum << sql << expectError;
         }
     }
