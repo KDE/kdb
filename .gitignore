@@ -4,6 +4,7 @@
 *.rej
 *.patch
 *.autosave
+*.supp
 *.swp
 *.kate-swp
 CMakeLists.txt.user*
