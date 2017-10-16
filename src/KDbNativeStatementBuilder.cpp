@@ -376,8 +376,9 @@ static bool selectStatementInternal(KDbEscapedString *target,
     KDbEscapedString orderByString(querySchema->orderByColumnList()->toSqlString(
         !singleTable /*includeTableName*/, connection, dialect));
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder(connection));
-    if (orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
-        //add automatic ORDER BY if there is no explicitly defined (especially helps when there are complex JOINs)
+    if (dialect == KDb::DriverEscaping  && orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
+        // Native only: add automatic ORDER BY if there is no explicitly defined one
+        // (especially helps when there are complex JOINs)
         KDbOrderByColumnList automaticPKOrderBy;
         const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(connection));
         foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
