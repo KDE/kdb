@@ -286,7 +286,11 @@ static bool selectStatementInternal(KDbEscapedString *target,
         sql += s;
     }
 
-    sql.prepend("SELECT ");
+    if (sql.isEmpty()) {
+        sql.prepend("SELECT"); // "SELECT FROM ..." case
+    } else {
+        sql.prepend("SELECT ");
+    }
     QList<KDbTableSchema*>* tables = querySchema->tables();
     if ((tables && !tables->isEmpty()) || !subqueries_for_lookup_data.isEmpty()) {
         sql += " FROM ";
