@@ -119,8 +119,9 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 sql += ", ";
 
             if (f->isQueryAsterisk()) {
-                if (!singleTable && static_cast<KDbQueryAsterisk*>(f)->isSingleTableAsterisk()) { //single-table *
-                    sql.append(KDb::escapeIdentifier(driver, f->table()->name())).append(".*");
+                KDbQueryAsterisk *asterisk = static_cast<KDbQueryAsterisk*>(f);
+                if (!singleTable && asterisk->isSingleTableAsterisk()) { //single-table *
+                    sql.append(KDb::escapeIdentifier(driver, asterisk->table()->name())).append(".*");
                 }
                 else { //all-tables * (or simplified table.* when there's only one table)
                     sql += '*';
