@@ -392,6 +392,14 @@ KDbQuerySchema* buildSelectQuery(
             QString tableOrAliasName = KDb::iifNotEmpty(aliasString, tname);
             if (!aliasString.isEmpty()) {
 //    kdbDebug() << "- add alias for table: " << aliasString;
+                const int tablePosition = querySchema->tablePositionForAlias(aliasString);
+                if (tablePosition != -1 && tablePosition != i) {
+                    KDbTableSchema* tableForAlias = querySchema->tables()->at(tablePosition);
+                    setError(KDbParser::tr("Could not set alias \"%1\" for table \"%2\". "
+                                           "This alias is already set for table \"%3\".")
+                             .arg(aliasString).arg(tname).arg(tableForAlias->name()));
+                    break;
+                }
             }
             // 1. collect information about first repeated table name or alias
             //    (potential ambiguity)
