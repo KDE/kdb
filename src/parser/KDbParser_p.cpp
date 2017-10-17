@@ -469,7 +469,17 @@ KDbQuerySchema* buildSelectQuery(
             if (!aliasVariable.isNull()) {
 //    kdbDebug() << "ALIAS \"" << aliasVariable->name << "\" set for column "
 //     << columnNum;
-                querySchema->setColumnAlias(columnNum, aliasVariable.name());
+                const int currentColumn = querySchema->columnPositionForAlias(aliasVariable.name());
+                if (currentColumn != -1) {
+                    setError(KDbParser::tr("Could not set alias \"%1\" for column #%2. This alias is already set for column #%3.")
+                             .arg(aliasVariable.name()).arg(columnNum + 1).arg(currentColumn + 1));
+                    break;
+                }
+                if (!querySchema->setColumnAlias(columnNum, aliasVariable.name())) {
+                    setError(KDbParser::tr("Could not set alias \"%1\" for column #%2.")
+                             .arg(aliasVariable.name()).arg(columnNum + 1));
+                    break;
+                }
             }
         } // for
         if (!globalParser->error().message().isEmpty()) { // we could not return earlier (inside the loop)
