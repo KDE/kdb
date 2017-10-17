@@ -46,11 +46,15 @@ public:
 
     void clearCachedData();
 
-    void setColumnAlias(int position, const QString& alias);
+    bool setColumnAlias(int position, const QString& alias);
 
-    inline void setTableAlias(int position, const QString& alias) {
+    inline bool setTableAlias(int position, const QString& alias) {
+        if (tablePositionsForAliases.contains(alias.toLower())) {
+            return false;
+        }
         tableAliases.insert(position, alias.toLower());
         tablePositionsForAliases.insert(alias.toLower(), position);
+        return true;
     }
 
     inline int columnAliasesCount() {
@@ -102,7 +106,7 @@ public:
 protected:
     void tryRegenerateExprAliases();
 
-    void setColumnAliasInternal(int position, const QString& alias);
+    bool setColumnAliasInternal(int position, const QString& alias);
 
     /*! Used to mapping columns to its aliases for this query */
     QHash<int, QString> columnAliases;

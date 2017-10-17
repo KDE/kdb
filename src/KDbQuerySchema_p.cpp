@@ -21,6 +21,7 @@
 #include "KDbConnection.h"
 #include "KDbConnection_p.h"
 #include "KDbOrderByColumn.h"
+#include "kdb_debug.h"
 
 KDbQuerySchemaPrivate::KDbQuerySchemaPrivate(KDbQuerySchema* q, KDbQuerySchemaPrivate* copy)
         : query(q)
@@ -104,14 +105,14 @@ void KDbQuerySchemaPrivate::clearCachedData()
     autoIncrementSqlFieldsList.clear();
 }
 
-void KDbQuerySchemaPrivate::setColumnAlias(int position, const QString& alias)
+bool KDbQuerySchemaPrivate::setColumnAlias(int position, const QString& alias)
 {
     if (alias.isEmpty()) {
         columnAliases.remove(position);
         maxIndexWithAlias = -1;
-    } else {
-        setColumnAliasInternal(position, alias);
+        return true;
     }
+    return setColumnAliasInternal(position, alias);
 }
 
 void KDbQuerySchemaPrivate::tryRegenerateExprAliases()
@@ -134,15 +135,25 @@ void KDbQuerySchemaPrivate::tryRegenerateExprAliases()
                 columnAlias = KDb::stringToIdentifier(columnAlias); // sanity fix, translators make mistakes!
             } while (-1 != tablePositionForAlias(columnAlias));
 
-            setColumnAliasInternal(p, columnAlias);
+            (void)setColumnAliasInternal(p, columnAlias);
         }
     }
     regenerateExprAliases = false;
 }
 
-void KDbQuerySchemaPrivate::setColumnAliasInternal(int position, const QString& alias)
+bool KDbQuerySchemaPrivate::setColumnAliasInternal(int position, const QString& alias)
 {
-    columnAliases.insert(position, alias.toLower());
-    columnPositionsForAliases.insert(alias.toLower(), position);
-    maxIndexWithAlias = qMax(maxIndexWithAlias, position);
+    const int currentPos = columnPositionsForAliases.value(alias.toLower(), -1);
+    if (currentPos == position) {
+        return true; // already set
+    }
+    if (currentPos == -1) {
+        columnAliases.insert(position, alias.toLower());
+        columnPositionsForAliases.insert(alias.toLower(), position);
+        maxIndexWithAlias = qMax(maxIndexWithAlias, position);
+        return true;
+    }
+    kdbWarning() << "Alias" << alias << "for already set for column" << currentPos
+                 << ", cannot set to a new column. Remove old alias first.";
+    return false;
 }

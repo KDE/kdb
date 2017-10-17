@@ -546,19 +546,19 @@ bool KDbQuerySchema::hasColumnAlias(int position) const
     return d->hasColumnAlias(position);
 }
 
-void KDbQuerySchema::setColumnAlias(int position, const QString& alias)
+bool KDbQuerySchema::setColumnAlias(int position, const QString& alias)
 {
     if (position >= fieldCount()) {
         kdbWarning() << "position"  << position << "out of range!";
-        return;
+        return false;
     }
     const QString fixedAlias(alias.trimmed());
     KDbField *f = KDbFieldList::field(position);
     if (f->captionOrName().isEmpty() && fixedAlias.isEmpty()) {
         kdbWarning() << "position" << position << "could not remove alias when no name is specified for expression column!";
-        return;
+        return false;
     }
-    d->setColumnAlias(position, fixedAlias);
+    return d->setColumnAlias(position, fixedAlias);
 }
 
 int KDbQuerySchema::tableAliasesCount() const
@@ -624,16 +624,26 @@ bool KDbQuerySchema::hasTableAlias(int position) const
     return d->tableAliases.contains(position);
 }
 
+bool KDbQuerySchema::hasTableAlias(const QString &name) const
+{
+    return d->tablePositionForAlias(name) != -1;
+}
+
 int KDbQuerySchema::columnPositionForAlias(const QString& name) const
 {
     return d->columnPositionForAlias(name);
 }
 
-void KDbQuerySchema::setTableAlias(int position, const QString& alias)
+bool KDbQuerySchema::hasColumnAlias(const QString &name) const
+{
+    return d->columnPositionForAlias(name) != -1;
+}
+
+bool KDbQuerySchema::setTableAlias(int position, const QString& alias)
 {
     if (position >= d->tables.count()) {
         kdbWarning() << "position"  << position << "out of range!";
-        return;
+        return false;
     }
     const QString fixedAlias(alias.trimmed());
     if (fixedAlias.isEmpty()) {
@@ -641,9 +651,9 @@ void KDbQuerySchema::setTableAlias(int position, const QString& alias)
         if (!oldAlias.isEmpty()) {
             d->removeTablePositionForAlias(oldAlias);
         }
-    } else {
-        d->setTableAlias(position, fixedAlias);
+        return true;
     }
+    return d->setTableAlias(position, fixedAlias);
 }
 
 QList<KDbRelationship*>* KDbQuerySchema::relationships() const

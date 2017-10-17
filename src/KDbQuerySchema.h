@@ -253,11 +253,9 @@ public:
     */
     KDbField* findTableField(const QString &tableOrTableAndFieldName) const;
 
-    /*! @return alias of a column at @a position or null string
-     If there is no alias for this column
-     or if there is no such column within the query defined.
-     If the column is an expression and has no alias defined,
-     a new unique alias will be generated automatically on this call.
+    /*! @return alias of a column at @a position or empty string if there is no alias for this column
+     or if there is no such column within the query defined. If the column is an expression and has
+     no alias defined, a new unique alias will be generated automatically on this call.
     */
     QString columnAlias(int position) const;
 
@@ -273,7 +271,7 @@ public:
 
     /*! Sets @a alias for a column at @a position, within the query.
      Passing empty string to @a alias clears alias for a given column. */
-    void setColumnAlias(int position, const QString& alias);
+    bool setColumnAlias(int position, const QString& alias);
 
     /*! @return a table position (within FROM section),
      that is bound to column at @a columnPosition (within SELECT section).
@@ -348,15 +346,23 @@ public:
      or if there is no such table in the query defined, @c false is returned. */
     bool hasTableAlias(int position) const;
 
+    /*! Provided for convenience.
+     @return @c true if non empty table alias @a name is defined for a table. */
+    bool hasTableAlias(const QString &name) const;
+
     /*! @return column position that has defined alias @a name.
      If there is no such alias, -1 is returned. */
     int columnPositionForAlias(const QString& name) const;
+
+    /*! Provided for convenience.
+     @return @c true if non empty alias @a name is defined for any column. */
+    bool hasColumnAlias(const QString &name) const;
 
     /*! Sets @a alias for a table at @a position (within FROM section
      of the query).
      Passing empty sting to @a alias clears alias for a given table
      (only for specified @a position). */
-    void setTableAlias(int position, const QString& alias);
+    bool setTableAlias(int position, const QString& alias);
 
     /*! @return a list of relationships defined for this query */
     QList<KDbRelationship*>* relationships() const;
