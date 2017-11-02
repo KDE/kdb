@@ -909,7 +909,7 @@ public:
      * @since 3.1
      */
     //! @todo perhaps use quint64 here?
-    KDB_EXPORT int recordCount(const KDbEscapedString& sql);
+    int recordCount(const KDbEscapedString& sql);
 
     /**
      * @brief Returns number of records that contains given table
@@ -924,7 +924,7 @@ public:
      */
     //! @todo perhaps use quint64 here?
     //! @todo does not work with non-SQL data sources
-    KDB_EXPORT int recordCount(const KDbTableSchema& tableSchema);
+    int recordCount(const KDbTableSchema& tableSchema);
 
     /**
      * @overload
@@ -939,7 +939,7 @@ public:
      * @since 3.1
      */
     //! @todo perhaps use quint64 here?
-    KDB_EXPORT int recordCount(KDbQuerySchema* querySchema,
+    int recordCount(KDbQuerySchema* querySchema,
                                const QList<QVariant>& params = QList<QVariant>());
 
     /**
@@ -953,7 +953,7 @@ public:
      * @since 3.1
      */
     //! @todo perhaps use quint64 here?
-    KDB_EXPORT int recordCount(KDbTableOrQuerySchema* tableOrQuery,
+    int recordCount(KDbTableOrQuerySchema* tableOrQuery,
                                const QList<QVariant>& params = QList<QVariant>());
 
     //! Identifier escaping function in the associated KDbDriver.
