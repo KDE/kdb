@@ -62,7 +62,7 @@ public:
      Then, column info within @a toQuery will be assigned to the new KDbOrderByColumn object,
      corresponding to column() from "this" KDbOrderByColumn object. */
     KDbOrderByColumn *copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
-                           KDbQuerySchema *toQuery) const;
+                           KDbQuerySchema *toQuery) const Q_REQUIRED_RESULT;
 
     //! A column to sort.
     KDbQueryColumnInfo* column() const;
