@@ -153,20 +153,20 @@ QDebug operator<<(QDebug dbg, const KDbOrderByColumn& order)
         order.sortOrder() == KDbOrderByColumn::SortOrder::Ascending ? "ASCENDING" : "DESCENDING");
     if (order.column()) {
         if (order.position() > -1) {
-            dbg.nospace() << QString::fromLatin1("COLUMN_AT_POSITION_%1(").arg(order.position() + 1);
-            dbg.space() << *order.column() << ',';
-            dbg.space() << orderString << ')';
+            dbg.nospace() << qPrintable(QString::fromLatin1("COLUMN_AT_POSITION_%1(").arg(order.position() + 1))
+                          << *order.column() << ','
+                          << qPrintable(orderString) << ')';
             return dbg.space();
         }
         else {
             dbg.nospace() << "COLUMN(" << *order.column() << ',';
-            dbg.space() << orderString << ')';
+            dbg.nospace() << qPrintable(orderString) << ')';
             return dbg.space();
         }
     }
     if (order.field()) {
         dbg.nospace() << "FIELD(" << *order.field() << ',';
-        dbg.space() << orderString << ')';
+        dbg.nospace() << qPrintable(orderString) << ')';
         return dbg.space();
     }
     dbg.nospace() << "NONE";

@@ -402,7 +402,7 @@ QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSc
         }
     }
 
-    dbg.nospace() << "\n- TABLE ALIASES:\n";
+    dbg.nospace() << "- TABLE ALIASES:\n";
     if (query.tableAliasesCount() == 0) {
         dbg.nospace() << "<NONE>\n";
     }
@@ -421,8 +421,10 @@ QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSc
     if (!query.whereExpression().isNull()) {
         dbg.nospace() << " - WHERE EXPRESSION:\n" << query.whereExpression() << '\n';
     }
-    if (!query.orderByColumnList()->isEmpty()) {
-        dbg.space() << QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList()->count());
+    dbg.nospace() << qPrintable(QString::fromLatin1(" - ORDER BY (%1):\n").arg(query.orderByColumnList()->count()));
+    if (query.orderByColumnList()->isEmpty()) {
+        dbg.nospace() << "<NONE>\n";
+    } else {
         dbg.nospace() << *query.orderByColumnList();
     }
     return dbg.nospace();

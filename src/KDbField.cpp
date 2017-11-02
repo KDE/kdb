@@ -941,12 +941,12 @@ void debug(QDebug dbg, const KDbField& field, KDbFieldDebugOptions options)
         ? conn->driver()->sqlTypeName(field.type(), field) : KDbDriver::defaultSqlTypeName(field.type()));
     if (field.isFPNumericType() && field.precision() > 0) {
         if (field.scale() > 0)
-            dbg.nospace() << QString::fromLatin1("(%1,%2)").arg(field.precision()).arg(field.scale());
+            dbg.nospace() << qPrintable(QString::fromLatin1("(%1,%2)").arg(field.precision()).arg(field.scale()));
         else
-            dbg.nospace() << QString::fromLatin1("(%1)").arg(field.precision());
+            dbg.nospace() << qPrintable(QString::fromLatin1("(%1)").arg(field.precision()));
     }
     else if (field.type() == KDbField::Text && field.maxLength() > 0)
-        dbg.space() << QString::fromLatin1("(%1)").arg(field.maxLength());
+        dbg.space() << qPrintable(QString::fromLatin1("(%1)").arg(field.maxLength()));
 
     if (field.constraints() & KDbField::AutoInc)
         dbg.nospace() << " AUTOINC";
@@ -971,7 +971,7 @@ void debug(QDebug dbg, const KDbField& field, KDbFieldDebugOptions options)
     }
     const KDbField::CustomPropertiesMap customProperties(field.customProperties());
     if (!customProperties.isEmpty()) {
-        dbg.space() << QString::fromLatin1("CUSTOM PROPERTIES (%1): ").arg(customProperties.count());
+        dbg.space() << qPrintable(QString::fromLatin1("CUSTOM PROPERTIES (%1): ").arg(customProperties.count()));
         bool first = true;
         for (KDbField::CustomPropertiesMap::ConstIterator it(customProperties.constBegin());
                 it != customProperties.constEnd(); ++it)
