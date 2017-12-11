@@ -25,7 +25,15 @@
 #pragma warning(disable: 4200) // "nonstandard extension used : zero-sized array in struct/union"
 #endif
 
-#include <postgres.h>
+#ifdef __GNUC__
+# pragma GCC diagnostic push
+// remove c.h: warning: ISO C++ does not support ‘__int128’ for ‘int128’ [-Wpedantic]
+# pragma GCC diagnostic ignored "-Wpedantic"
+# include <postgres.h>
+# pragma GCC diagnostic pop
+#else
+# include <postgres.h>
+#endif
 #include <libpq-fe.h>
 #include <catalog/pg_type.h> // needed for BOOLOID, etc.
 
