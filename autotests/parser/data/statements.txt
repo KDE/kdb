@@ -203,17 +203,23 @@ select p.id from persons p;
 select persons.id from persons, persons p, persons p2;
 -- ERROR: Column "id" is defined in both tables (so "id" column is ambiguous)
 select id from persons p, cars p;
--- ERROR: Alias "p" is used twice for tables and both have "id" column (so "p" column is ambiguous)
+select id from persons p, cars c;
+-- ERROR: Table alias "p" is assigned twice
 select p.id from persons p, cars p;
+select 1 from persons p, cars p;
+select p.model from persons p, cars p;
+-- ERROR: Table alias "p" is assigned twice and both have "id" column referenced by "p.*" so "p.*" is ambiguous
 select p.* from persons p, cars p;
+-- ERROR: Table alias "persons" is assigned and "persons" table is also used; both have "id" column referenced by "persons.*" so "persons.*" is ambiguous
 select persons.* from persons, cars persons;
--- ERROR: Alias not allowed for asterisk
+-- ERROR: Table alias "p" is assigned twice and both have "id" column referenced by "*" so "*" is ambiguous
+select * from persons p, cars p;
+-- ERROR: Column alias not allowed for all-tables asterisk
 select * as c from cars;
+-- ERROR: Column alias not allowed for table asterisk
 select cars.* as c from cars;
 
 ---------- CATEGORY: Expressions with infix operators in columns of select statement --------------
--- Like "select p.id from persons p, cars p" but no error because we're not using fields from "p" tables
-select 1 from persons p, cars p;
 -- Complex expressions support, operators precedence, and brackets
 select NULL IS NOT NULL from cars;
 select 2+3*4 from cars;
