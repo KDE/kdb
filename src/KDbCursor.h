@@ -302,7 +302,7 @@ protected:
     int m_fieldsToStoreInRecord; //!< Used by storeCurrentRecord(), reimplement if needed
                                   //!< (e.g. PostgreSQL driver, when m_containsRecordIdInfo is true
                                   //!< sets m_fieldCount+1 here)
-    int m_logicalFieldCount;  //!< logical field count, i.e. without intrernal values like Record Id or lookup
+    int m_logicalFieldCount;  //!< logical field count, i.e. without internal values like Record Id or lookup
     KDbCursor::Options m_options; //!< cursor options that describes its behavior
 
     //! Possible results of record fetching, used for m_fetchResult
