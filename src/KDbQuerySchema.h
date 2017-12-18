@@ -211,8 +211,8 @@ public:
       @see masterTable() */
     void setMasterTable(KDbTableSchema *table);
 
-    /*! @return list of tables used in a query.
-     This also includes master table.
+    /*! @return list of tables used in this query.
+     It is never @c nullptr. The list also includes master table.
      @see masterTable() */
     QList<KDbTableSchema*>* tables() const;
 
@@ -364,7 +364,8 @@ public:
      (only for specified @a position). */
     bool setTableAlias(int position, const QString& alias);
 
-    /*! @return a list of relationships defined for this query */
+    /*! @return a list of relationships defined for this query.
+     It is never @c nullptr.*/
     QList<KDbRelationship*>* relationships() const;
 
     /*! Appends a new relationship defined by @a field1 and @a field2.
@@ -376,7 +377,8 @@ public:
      This functiuon does nothing if the arguments are invalid. */
     KDbRelationship* addRelationship(KDbField *field1, KDbField *field2);
 
-    /*! @return list of KDbQueryAsterisk objects defined for this query */
+    /*! @return list of KDbQueryAsterisk objects defined for this query.
+     It is never @c nullptr. */
     KDbField::List* asterisks() const;
 
     //! Mode for field() and columnInfo()
