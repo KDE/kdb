@@ -879,7 +879,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
                             KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                        cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
+                        cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                     }
 
                     lookup_list.append(
@@ -934,7 +934,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
                         KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                    cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
+                    cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                 }
 
                 lookup_list.append(
