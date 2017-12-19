@@ -221,6 +221,7 @@ void SqlParserTest::testParse()
     KDbParser *parser = m_parser.data();
     bool ok = parser->parse(sql);
     QScopedPointer<KDbQuerySchema> query(parser->query());
+    QCOMPARE(parser->query(), nullptr); // second call should always return nullptr
     ok = ok && query;
     if (ok) {
         // sucess, so error cannot be expected
@@ -274,6 +275,7 @@ void SqlParserTest::testParse()
         // 3.1. Parse the generated KDbSQL again
         ok = parser->parse(querySql);
         QScopedPointer<KDbQuerySchema> secondQuery(parser->query());
+        QCOMPARE(parser->query(), nullptr); // second call should always return nullptr
         ok = ok && secondQuery;
         QVERIFY2(ok, "Failed to parse generated KDbSQL statement again");
 
