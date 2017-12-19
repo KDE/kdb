@@ -179,6 +179,9 @@ public:
     //! Points to connection recently used for caching
     //! @todo use equivalent of QPointer<KDbConnection>
     KDbConnection *recentConnection = nullptr;
+
+    //! Owned fields created by KDbQuerySchema::addExpressionInternal()
+    KDbField::List ownedExpressionFields;
 };
 
 //! Information about expanded fields for a single query schema, used for caching

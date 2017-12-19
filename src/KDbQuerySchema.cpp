@@ -262,6 +262,7 @@ bool KDbQuerySchema::addExpressionInternal(const KDbExpression& expr, bool visib
     if (!ok) {
         delete field;
     }
+    d->ownedExpressionFields.append(field);
     return ok;
 }
 
