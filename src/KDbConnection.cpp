@@ -409,12 +409,14 @@ KDbQuerySchema* KDbConnectionPrivate::setupQuerySchema(KDbQuerySchema *query)
                 .arg(query->name()));
         return nullptr;
     }
+    const QString queryName(query->name());
     if (!parser()->parse(KDbEscapedString(sql), query)) {
+        newQuery.take(); // query is destroyed by the parser
         conn->m_result = KDbResult(
             ERR_SQL_PARSE_ERROR, tr("<p>Could not load definition for query \"%1\". "
                                     "SQL statement for this query is invalid:<br><tt>%2</tt></p>\n"
                                     "<p>This query can be edited only in Text View.</p>")
-                                     .arg(query->name(), sql));
+                                     .arg(queryName, sql));
         return nullptr;
     }
     insertQuery(query);
