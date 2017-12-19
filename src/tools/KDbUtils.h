@@ -168,6 +168,18 @@ public:
         }
         return QHash<Key, T>::insert(key, value);
     }
+    int remove(const Key &key) {
+        if (m_autoDelete) {
+            const QList<T> values(QHash<Key, T>::values(key));
+            const int result = QHash<Key, T>::remove(key);
+            for (T item : values) {
+                delete item;
+            }
+            return result;
+        } else {
+            return QHash<Key, T>::remove(key);
+        }
+    }
     // note: no need to override insertMulti(), unite(), take(), they do not replace items
 
 private:

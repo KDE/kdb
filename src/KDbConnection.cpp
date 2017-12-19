@@ -433,6 +433,12 @@ void KDbConnectionPrivate::insertFieldsExpanded(const KDbQuerySchema *query, KDb
     m_fieldsExpandedCache.insert(query, cache);
 }
 
+void KDbConnectionPrivate::removeFieldsExpanded(const KDbQuerySchema *query)
+{
+    kdbDebug() << "**CACHE REMOVE**" << query;
+    m_fieldsExpandedCache.remove(query);
+}
+
 //================================================
 
 namespace {

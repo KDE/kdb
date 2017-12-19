@@ -1115,7 +1115,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
     if (d->recentConnection != conn) {
         if (d->recentConnection) {
             // connection changed: remove old cache
-            d->recentConnection->d->insertFieldsExpanded(this, nullptr);
+            d->recentConnection->d->removeFieldsExpanded(this);
         }
         d->recentConnection = conn;
     }

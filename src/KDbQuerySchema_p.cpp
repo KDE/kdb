@@ -66,7 +66,7 @@ KDbQuerySchemaPrivate::KDbQuerySchemaPrivate(KDbQuerySchema* q, KDbQuerySchemaPr
 KDbQuerySchemaPrivate::~KDbQuerySchemaPrivate()
 {
     if (recentConnection) {
-        recentConnection->d->insertFieldsExpanded(query, nullptr);
+        recentConnection->d->removeFieldsExpanded(query);
     }
     delete orderByColumnList;
     delete autoincFields;
@@ -98,7 +98,7 @@ void KDbQuerySchemaPrivate::clearCachedData()
         orderByColumnList->clear();
     }
     if (recentConnection) {
-        recentConnection->d->insertFieldsExpanded(query, nullptr);
+        recentConnection->d->removeFieldsExpanded(query);
     }
     delete autoincFields;
     autoincFields = nullptr;
