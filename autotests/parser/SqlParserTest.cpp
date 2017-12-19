@@ -229,8 +229,8 @@ void SqlParserTest::testParse()
         message = "Unexpected success of parsing SQL statement";
         if (!ok) {
             m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
-            if (parser->query()) {
-                const KDbConnectionAndQuerySchema connQuery(parser->connection(), *parser->query());
+            if (query) {
+                const KDbConnectionAndQuerySchema connQuery(parser->connection(), *query);
                 qDebug() << connQuery;
                 m_errorStream << KDbUtils::debugString(connQuery) << endl;
             }
