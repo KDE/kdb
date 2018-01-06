@@ -23,7 +23,8 @@
                 "Name[sv]": "Kexi-gruppen",
                 "Name[tr]": "Kexi Ekibi",
                 "Name[uk]": "Команда Kexi",
-                "Name[x-test]": "xxKexi Teamxx"
+                "Name[x-test]": "xxKexi Teamxx",
+                "Name[zh_CN]": "Kexi 团队"
             }
         ],
         "Category": "",
@@ -49,6 +50,7 @@
         "Description[tr]": "xBase veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних xBase",
         "Description[x-test]": "xxKDb driver for handling xBase databasesxx",
+        "Description[zh_CN]": "处理 xBase 数据库的 KDb 驱动",
         "EnabledByDefault": true,
         "Icon": "",
         "Id": "org.kde.kdb.xbase",
