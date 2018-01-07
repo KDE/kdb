@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -23,7 +23,9 @@
 #include <KDbTristate>
 
 class KDbConnection;
+class KDbQuerySchema;
 class KDbTableSchema;
+class KDbTableSchemaChangeListenerPrivate;
 
 //! @short An interface allowing to listen for table schema changes
 /**
@@ -67,12 +69,24 @@ public:
      */
     void setName(const QString &name);
 
-    //! @todo will be more generic
-    /** Registers @a listener for receiving (listening) information about changes
-     in table schema @a table. Changes could be related to altering and removing. */
+    /** Registers @a listener for receiving (listening) information about changes in table schema
+     * @a table and all tables related to lookup fields. Changes can be related to altering and
+     * removing.
+     */
     static void registerForChanges(KDbConnection *conn,
                                    KDbTableSchemaChangeListener* listener,
                                    const KDbTableSchema* table);
+
+    /**
+     * Registers @a listener for receiving (listening) information about changes in query schema
+     * @a query and all tables that the query uses.
+     *
+     * All tables related to lookup fields of these tables are also checked.
+     * Changes can be related to table altering and removing.
+     */
+    static void registerForChanges(KDbConnection *conn,
+                                   KDbTableSchemaChangeListener* listener,
+                                   const KDbQuerySchema* query);
 
     /**
      * Unregisters @a listener for receiving (listening) information about changes
@@ -83,34 +97,84 @@ public:
                                      const KDbTableSchema* table);
 
     /**
+     * Unregisters all listeners for receiving (listening) information about changes
+     * in table schema @a table.
+     */
+    static void unregisterForChanges(KDbConnection *conn,
+                                     const KDbTableSchema* table);
+
+    /**
      * Unregisters @a listener for receiving (listening) information about changes
-     * in any table schema.
+     * in any table or query schema.
      */
     static void unregisterForChanges(KDbConnection *conn,
                                      KDbTableSchemaChangeListener* listener);
 
     /**
-     * @return list of all table schema listeners registered for receiving (listening)
-     * information about changes in table schema @a table.
+     * Unregisters @a listener for receiving (listening) information about changes
+     * in query schema @a query.
      */
-    static QList<KDbTableSchemaChangeListener*> listeners(
-            const KDbConnection *conn, const KDbTableSchema* table);
+    static void unregisterForChanges(KDbConnection *conn,
+                                     KDbTableSchemaChangeListener* listener,
+                                     const KDbQuerySchema* query);
 
     /**
-     * Closes all table schema listeners for table schema @a table.
-     * See KDbTableSchemaChangeListener::closeListener() for explanation
-     * of the operation of closing listener.
+     * Unregisters all listeners for receiving (listening) information about changes
+     * in query schema @a query.
+     */
+    static void unregisterForChanges(KDbConnection *conn,
+                                     const KDbQuerySchema* query);
+
+    /**
+     * @return list of all table schema listeners registered for receiving (listening)
+     * information about changes in table schema @a table and other tables or queries depending
+     * on @a table.
+     */
+    static QList<KDbTableSchemaChangeListener *> listeners(KDbConnection *conn,
+                                                           const KDbTableSchema *table);
+
+    /**
+     * @return list of all table schema listeners registered for receiving (listening)
+     * information about changes in query @a query and other tables or queries depending on @a query.
+     */
+    static QList<KDbTableSchemaChangeListener *> listeners(KDbConnection *conn,
+                                                           const KDbQuerySchema *query);
+
+    /**
+     * Closes all table schema listeners for table schema @a table except for the ones from
+     * the @a except list.
+     *
+     * See KDbTableSchemaChangeListener::closeListener() for explanation of the operation
+     * of closing listener.
+     *
      * @return true if all listenters for the table schema @a table have been successfully closed
      * (returned true) or @c false or @c cancelled if at least one listener returned
      * @c false or @c cancelled, respectively.
      * Regardless of returned value, closeListener() is called on all listeners for @a table.
      */
-    static tristate closeListeners(KDbConnection *conn, const KDbTableSchema* table);
+    static tristate closeListeners(KDbConnection *conn, const KDbTableSchema* table,
+                                   const QList<KDbTableSchemaChangeListener*> &except
+                                       = QList<KDbTableSchemaChangeListener*>());
+
+    /**
+     * Closes all table schema listeners for query schema @a query except for the ones from
+     * the @a except list.
+     *
+     * See KDbTableSchemaChangeListener::closeListener() for explanation of the operation
+     * of closing listener.
+     *
+     * @return true if all listenters for the table schema @a table have been successfully closed
+     * (returned true) or @c false or @c cancelled if at least one listener returned
+     * @c false or @c cancelled, respectively.
+     * Regardless of returned value, closeListener() is called on all listeners for @a table.
+     */
+    static tristate closeListeners(KDbConnection *conn, const KDbQuerySchema* query,
+                                   const QList<KDbTableSchemaChangeListener*> &except
+                                       = QList<KDbTableSchemaChangeListener*>());
 
 private:
     Q_DISABLE_COPY(KDbTableSchemaChangeListener)
-    class Private;
-    Private * const d;
+    KDbTableSchemaChangeListenerPrivate * const d;
 };
 
 #endif

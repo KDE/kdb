@@ -148,6 +148,8 @@ public:
 
     QHash<const KDbTableSchema*, QSet<KDbTableSchemaChangeListener*>* > tableSchemaChangeListeners;
 
+    QHash<const KDbQuerySchema*, QSet<KDbTableSchemaChangeListener*>* > queryTableSchemaChangeListeners;
+
     //! Used in KDbConnection::setQuerySchemaObsolete( const QString& queryName )
     //! to collect obsolete queries. THese are deleted on connection deleting.
     QSet<KDbQuerySchema*> obsoleteQueries;

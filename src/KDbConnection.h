@@ -38,6 +38,7 @@ class KDbRecordEditBuffer;
 class KDbServerVersionInfo;
 class KDbSqlResult;
 class KDbTableSchemaChangeListener;
+class KDbTableSchemaChangeListenerPrivate;
 class KDbTransactionGuard;
 class KDbVersionInfo;
 
@@ -1408,7 +1409,7 @@ private:
     friend class KDbProperties; //!< for setError()
     friend class KDbQuerySchema;
     friend class KDbQuerySchemaPrivate;
-    friend class KDbTableSchemaChangeListener;
+    friend class KDbTableSchemaChangeListenerPrivate;
     friend class KDbTableSchema; //!< for removeMe()
 };
 

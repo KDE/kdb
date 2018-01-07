@@ -61,6 +61,11 @@
 //! @since 3.1
 #cmakedefine KDB_TRANSACTIONS_DEBUG
 
+//! @def KDB_TABLESCHEMACHANGELISTENER_DEBUG
+//! @brief Debugging of the KDbTableSchemaChangeListener class
+//! @since 3.1
+#cmakedefine KDB_TABLESCHEMACHANGELISTENER_DEBUG
+
 //! @def KDB_DEBUG_GUI
 //! @brief Defined if a GUI for debugging is enabled
 #cmakedefine KDB_DEBUG_GUI

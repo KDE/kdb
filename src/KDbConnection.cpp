@@ -274,6 +274,7 @@ void KDbConnectionPrivate::insertTable(KDbTableSchema* tableSchema)
 
 void KDbConnectionPrivate::removeTable(const KDbTableSchema& tableSchema)
 {
+    KDbTableSchemaChangeListener::unregisterForChanges(conn, &tableSchema);
     m_tablesByName.remove(tableSchema.name());
     KDbTableSchema *toDelete = m_tables.take(tableSchema.id());
     delete toDelete;

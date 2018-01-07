@@ -2,6 +2,7 @@
 simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DRIVERMANAGER_DEBUG "Debugging of the Driver Manager class" OFF)
 simple_option(KDB_TRANSACTIONS_DEBUG "Debugging of the Transaction class" OFF)
+simple_option(KDB_TABLESCHEMACHANGELISTENER_DEBUG "Debugging of the KDbTableSchemaChangeListener class" OFF)
 
 # Public options (affecting public behavior or contents of KDb)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
