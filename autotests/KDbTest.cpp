@@ -1041,12 +1041,18 @@ void KDbTest::testTemporaryTableName()
     QVERIFY(!tempName2.isEmpty());
     QVERIFY(tempName2.contains(baseName));
     QVERIFY(tempName1 != tempName2);
+
     utils.connection->closeDatabase();
+    QTest::ignoreMessage(QtWarningMsg, "Missing database handle");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("!executeQuery().*"));
     QString tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
-    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created for closed connection");
+    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created when database is closed ");
+
     utils.connection->disconnect();
+    QTest::ignoreMessage(QtWarningMsg, "Missing database handle");
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression("!executeQuery().*"));
     tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
-    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created for closed connection");
+    QVERIFY2(tempName.isEmpty(), "Temporary name should not be created connection is missing");
 
     utils.connection->dropDatabase(utils.connection->data().databaseName());
 }
@@ -1105,11 +1111,24 @@ void KDbTest::deleteRecordWithOneConstraintsTest()
     QVERIFY(utils.testDisconnectAndDropDb());
 }
 
+static QRegularExpression resultRegExp(const QString &code, const QString &message,
+                                       const QString &sql, const QString &serverErrorCode,
+                                       const QString &serverMessage)
+{
+    return QRegularExpression(
+        QString::fromLatin1("KDbResult: CODE=%1 MESSAGE=\\\"%2\\\" ERR_SQL=KDbEscapedString:"
+                            "\\\"%3\\\"  SERVER_ERROR_CODE=%4 SERVER_MESSAGE=\\\"%5")
+                .arg(code.isEmpty() ? "[0-9]*" : code, message, sql,
+                     serverErrorCode.isEmpty() ? "[0-9]*" : serverErrorCode, serverMessage));
+}
+
 void KDbTest::deleteNonExistingRecordTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
     QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "id", 400));
     QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "name", "FooBar"));
+    QTest::ignoreMessage(QtWarningMsg, resultRegExp("260", "Error while executing SQL statement.",
+        "DELETE FROM \\[persons\\] WHERE \\[Foo\\]='FooBar'", "0", "no such column: Foo"));
     QVERIFY2(!KDb::deleteRecords(utils.connection.data(), "persons", "Foo", "FooBar"),
              "Passing a NonExisting Column - should fail because 'Foo' column does not exist, "
              "See also https://bugs.kde.org/376052");
@@ -1138,6 +1157,8 @@ void KDbTest::deleteRecordWithTwoConstraintsTest()
     QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
                                 20, "name", KDbField::Text, 56),
              "Two arguments, passing second integer instead of text but it is converted to text");
+    QTest::ignoreMessage(QtWarningMsg, resultRegExp("260", "Error while executing SQL statement.",
+        "DELETE FROM \\[persons\\] WHERE \\[age\\]=TRAP AND \\[name\\]='56'", "0", "no such column: TRAP"));
     QVERIFY2(!KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
                                  "TRAP", "name", KDbField::Text, 56),
              "Passing text instead of integer, conversion error expected");
@@ -1168,9 +1189,8 @@ void KDbTest::deleteAllRecordsTest()
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
     QVERIFY(KDb::deleteAllRecords(utils.connection.data(), "persons"));
 
-    QRegularExpression deleteAllErrorRegExp(
-        "KDbResult: .* MESSAGE=\\\"Error while executing SQL statement.\\\" ERR_SQL=KDbEscapedString:"
-        "\\\"DELETE FROM \\[.*\\]\\\"  SERVER_ERROR_CODE=0 SERVER_MESSAGE=\\\"no such table: ");
+    QRegularExpression deleteAllErrorRegExp = resultRegExp(
+        "", "Error while executing SQL statement.", "DELETE FROM \\[.*\\]", 0, "no such table: .*");
     QTest::ignoreMessage(QtWarningMsg, deleteAllErrorRegExp);
     QVERIFY2(!KDb::deleteAllRecords(utils.connection.data(), QString()),
              "Passing a null table name");

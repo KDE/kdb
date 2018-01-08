@@ -580,7 +580,15 @@ void ExpressionsTest::testUnaryExpression()
     u2 = KDbUnaryExpression('+', c1);
     u2.setArg(u);
     u.setArg(u2);
+
+    QTest::ignoreMessage(QtWarningMsg, R"w(Cycle detected in expression (depth 2):
+1: Unary -
+2: Unary +)w");
     QCOMPARE(u.toString(nullptr), KDbEscapedString("-+<CYCLE!>"));
+
+    QTest::ignoreMessage(QtWarningMsg, R"w(Cycle detected in expression (depth 2):
+1: Unary +
+2: Unary -)w");
     QCOMPARE(u2.toString(nullptr), KDbEscapedString("+-<CYCLE!>"));
 }
 
@@ -599,6 +607,8 @@ void ExpressionsTest::testBinaryExpression()
     QVERIFY(emptyBinary.left().isNull());
     QVERIFY(emptyBinary.right().isNull());
 
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because left argument is not specified");
     b = KDbBinaryExpression(KDbExpression(), '-', KDbExpression());
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
@@ -606,12 +616,16 @@ void ExpressionsTest::testBinaryExpression()
     //qDebug() << b.toString(nullptr);
     QCOMPARE(b.toString(nullptr), KDbEscapedString("<UNKNOWN!>"));
     c = KDbConstExpression(KDbToken::INTEGER_CONST, 10);
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because right argument is not specified");
     b = KDbBinaryExpression(c, '-', KDbExpression());
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
     QVERIFY(b.isNull()); // it's null because one arg is null
     //qDebug() << b.toString(nullptr);
     QCOMPARE(b.toString(nullptr), KDbEscapedString("<UNKNOWN!>"));
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because left argument is not specified");
     b = KDbBinaryExpression(KDbExpression(), '-', c);
     QVERIFY(b.left().isNull());
     QVERIFY(b.right().isNull());
@@ -639,6 +653,8 @@ void ExpressionsTest::testBinaryExpression()
     b = KDbBinaryExpression(
             KDbConstExpression(KDbToken::INTEGER_CONST, 1), '+', KDbConstExpression(KDbToken::INTEGER_CONST, 2));
     KDbEscapedString s = b.toString(nullptr);
+    QTest::ignoreMessage(QtWarningMsg,
+                         QRegularExpression("Expression BinaryExp(.*) cannot be set as own child"));
     b.setLeft(b); // should not work
     //qDebug() << b.toString(nullptr);
     QCOMPARE(s, b.toString(nullptr));
@@ -653,6 +669,9 @@ void ExpressionsTest::testBinaryExpression()
     b2 = KDbBinaryExpression(b, '-', c);
     //qDebug() << b2.toString(nullptr);
     QCOMPARE(b2.toString(nullptr), KDbEscapedString("1 + 2 - 10"));
+    QTest::ignoreMessage(QtWarningMsg, R"w(Cycle detected in expression (depth 2):
+1: Arithm -
+2: Arithm +)w");
     b.setRight(b2);
     //qDebug() << b2.toString(nullptr);
     QCOMPARE(b2.toString(nullptr), KDbEscapedString("1 + <CYCLE!> - 10"));
@@ -1117,6 +1136,19 @@ void ExpressionsTest::testUnaryExpressionValidate()
     u2 = KDbUnaryExpression('+', c1);
     u2.setArg(u);
     u.setArg(u2);
+    const char *warning = R"w(Cycle detected in expression (depth 2):
+1: Unary -
+2: Unary +)w";
+    QTest::ignoreMessage(QtWarningMsg, warning);
+    warning = R"w(Cycle detected in expression (depth 2):
+1: Unary +
+2: Unary -)w";
+    QTest::ignoreMessage(QtWarningMsg, warning);
+    warning = R"w(Cycle detected in expression (depth 2):
+1: Unary -
+2: Unary +)w";
+    QTest::ignoreMessage(QtWarningMsg, warning);
+    QTest::ignoreMessage(QtWarningMsg, warning);
     QVERIFY(!validate(&u));
     ////qDebug() << c << u << c1 << u2;
 
@@ -1180,12 +1212,16 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
 
     // invalid
     KDbConstExpression c(KDbToken::INTEGER_CONST, 7);
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because right argument is not specified");
     KDbBinaryExpression b(c, '+', KDbExpression());
     QCOMPARE(b.type(), KDbField::InvalidType);
     QVERIFY(!validate(&b));
     testCloneExpression(b);
     //qDebug() << b;
 
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because left argument is not specified");
     b = KDbBinaryExpression(KDbExpression(), '/', KDbExpression());
     QCOMPARE(b.type(), KDbField::InvalidType);
     QVERIFY(!validate(&b)); // unknown class
@@ -1193,11 +1229,16 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
     //qDebug() << b;
 
     // invalid left or right
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because left argument is not specified");
     KDbBinaryExpression b2(b, '*', c.clone());
     QCOMPARE(b2.type(), KDbField::InvalidType);
     QVERIFY(!validate(&b2)); // unknown class
     testCloneExpression(b2);
     //qDebug() << b2;
+
+    QTest::ignoreMessage(QtWarningMsg,
+                         "Setting KDbBinaryExpression to null because right argument is not specified");
     KDbBinaryExpression b3(c.clone(), '*', b);
     QCOMPARE(b3.type(), KDbField::InvalidType);
     QVERIFY(!validate(&b3)); // unknown class
