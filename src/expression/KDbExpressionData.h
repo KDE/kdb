@@ -126,7 +126,7 @@ protected:
 
     virtual bool validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack *callStack);
 
-    bool addToCallStack(QDebug *dbg, QList<const KDbExpressionData*> *callStack) const;
+    bool addToCallStack(QDebug *dbg, KDb::ExpressionCallStack *callStack) const;
 };
 
 //! Internal data class used to implement implicitly shared class KDbNArgExpression.

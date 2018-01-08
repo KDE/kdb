@@ -213,7 +213,7 @@ void KDbExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* param
     Q_UNUSED(params);
 }
 
-bool KDbExpressionData::addToCallStack(QDebug *dbg, QList<const KDbExpressionData*>* callStack) const
+bool KDbExpressionData::addToCallStack(QDebug *dbg, KDb::ExpressionCallStack* callStack) const
 {
     if (callStack->contains(this)) {
         if (dbg)
