@@ -119,7 +119,7 @@ QDebug operator<<(QDebug dbg, const KDbResult& result)
     } else {
         dbg.nospace() << "KDbResult: OK";
     }
-    return dbg.space();
+    return dbg;
 }
 /*
 KDbMessageHandler::ButtonCode KDbObject::askQuestion(

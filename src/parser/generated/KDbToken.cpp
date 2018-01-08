@@ -96,8 +96,7 @@ QString KDbToken::toString(KDbToken token, const KDbDriver *driver)
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, KDbToken token)
 {
-    dbg.nospace() << qPrintable(token.name());
-    return dbg.space();
+    return dbg.nospace() << qPrintable(token.name());
 }
 
 //! @internal

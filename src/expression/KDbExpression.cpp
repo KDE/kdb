@@ -240,7 +240,7 @@ QDebug KDbExpressionData::debug(QDebug dbg, KDb::ExpressionCallStack* callStack)
     }
     debugInternal(dbg, callStack);
     callStack->removeLast();
-    return dbg.space();
+    return dbg;
 }
 
 QDebug operator<<(QDebug dbg, const KDbExpressionData& expr)
