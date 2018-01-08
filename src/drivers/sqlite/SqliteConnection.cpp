@@ -384,7 +384,7 @@ bool SqliteConnection::loadExtension(const QString& path)
     if (!fileInfo.exists()) {
         m_result = KDbResult(ERR_OBJECT_NOT_FOUND,
                              SqliteConnection::tr("Could not find SQLite plugin file \"%1\".").arg(path));
-        //sqliteWarning() << "SqliteConnection::loadExtension(): Could not find SQLite extension";
+        //sqliteWarning() << "Could not find SQLite extension";
         return false;
     }
     if (!d->extensionsLoadingEnabled()) {

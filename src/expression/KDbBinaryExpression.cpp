@@ -361,11 +361,11 @@ static KDb::ExpressionClass classForArgs(const KDbExpression& leftExpr,
                                          const KDbExpression& rightExpr)
 {
     if (leftExpr.isNull()) {
-        kdbWarning() << "KDbBinaryExpression set to null because left argument is not specified";
+        kdbWarning() << "Setting KDbBinaryExpression to null because left argument is not specified";
         return KDb::UnknownExpression;
     }
     if (rightExpr.isNull()) {
-        kdbWarning() << "KDbBinaryExpression set to null because right argument is not specified";
+        kdbWarning() << "Setting KDbBinaryExpression to null because right argument is not specified";
         return KDb::UnknownExpression;
     }
     return KDbExpression::classForToken(token);

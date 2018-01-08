@@ -565,7 +565,7 @@ KDbFunctionExpression KDbExpression::toFunction() const
 void KDbExpression::setLeftOrRight(const KDbExpression& e, int index)
 {
     if (this == &e) {
-        kdbWarning() << "KDbExpression::setLeftOrRight(): Expression cannot be own child";
+        kdbWarning() << "Expression" << *this << "cannot be set as own child";
         return;
     }
     if (d->children.indexOf(e.d) == index) { // cannot set twice

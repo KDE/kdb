@@ -2519,7 +2519,7 @@ tristate KDbConnection::resultExists(const KDbEscapedString &sql, QueryRecordOpt
         return cancelled;
     }
     if (!cursor->moveFirst() || cursor->eof()) {
-        kdbWarning() << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
+        //kdbWarning() << "!cursor->moveFirst() || cursor->eof()" << m_result.sql();
         m_result = cursor->result();
         deleteCursor(cursor);
         return m_result.isError() ? cancelled : tristate(false);

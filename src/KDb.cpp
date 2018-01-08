@@ -504,11 +504,11 @@ KDbField::Type KDb::defaultFieldTypeForGroup(KDbField::TypeGroup typeGroup)
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg, QString *details)
 {
     if (!msg) {
-        kdbWarning() << "missing 'msg' parameter";
+        kdbWarning() << "Missing 'msg' parameter";
         return;
     }
     if (!details) {
-        kdbWarning() << "missing 'details' parameter";
+        kdbWarning() << "Missing 'details' parameter";
         return;
     }
     const KDbResult result(resultable.result());
@@ -569,7 +569,7 @@ void KDb::getHTMLErrorMesage(const KDbResultable& resultable, QString *msg)
 void KDb::getHTMLErrorMesage(const KDbResultable& resultable, KDbResultInfo *info)
 {
     if (!info) {
-        kdbWarning() << "missing 'info' parameter";
+        kdbWarning() << "Missing 'info' parameter";
         return;
     }
     getHTMLErrorMesage(resultable, &info->message, &info->description);
@@ -669,7 +669,6 @@ QString KDb::numberToLocaleString(double value, int decimalPlaces, const QLocale
 KDbField::Type KDb::intToFieldType(int type)
 {
     if (type < int(KDbField::InvalidType) || type > int(KDbField::LastType)) {
-        kdbWarning() << "invalid type" << type;
         return KDbField::InvalidType;
     }
     return static_cast<KDbField::Type>(type);
@@ -678,7 +677,6 @@ KDbField::Type KDb::intToFieldType(int type)
 KDbField::TypeGroup KDb::intToFieldTypeGroup(int typeGroup)
 {
     if (typeGroup < int(KDbField::InvalidGroup) || typeGroup > int(KDbField::LastTypeGroup)) {
-        kdbWarning() << "invalid type group" << typeGroup;
         return KDbField::InvalidGroup;
     }
     return static_cast<KDbField::TypeGroup>(typeGroup);
@@ -689,8 +687,12 @@ static bool setIntToFieldType(KDbField *field, const QVariant& value)
     Q_ASSERT(field);
     bool ok;
     const int intType = value.toInt(&ok);
-    if (!ok || KDbField::InvalidType == KDb::intToFieldType(intType)) {//for sanity
-        kdbWarning() << "invalid type";
+    if (!ok) {//for sanity
+        kdbWarning() << "Could not convert value" << value << "to field type";
+        return false;
+    }
+    if (KDbField::InvalidType == KDb::intToFieldType(intType)) {//for sanity
+        kdbWarning() << "Invalid field type" << intType;
         return false;
     }
     field->setType((KDbField::Type)intType);
@@ -1085,7 +1087,7 @@ bool KDb::setFieldProperty(KDbField *field, const QByteArray& propertyName, cons
         field->setCustomProperty(propertyName, value);
     }
 
-    kdbWarning() << "property" << propertyName << "not found!";
+    kdbWarning() << "Field property" << propertyName << "not found!";
     return false;
 #undef SET_BOOLEAN_FLAG
 #undef GET_INT
@@ -1156,7 +1158,7 @@ QVariant KDb::loadPropertyValueFromDom(const QDomNode& node, bool* ok)
     }
     else {
 //! @todo add more QVariant types
-        kdbWarning() << "KDb::loadPropertyValueFromDom(): unknown type '" << valueType << "'";
+        kdbWarning() << "Unknown property type" << valueType;
     }
     if (ok)
         *ok = false;
@@ -1230,7 +1232,7 @@ QVariant KDb::emptyValueForFieldType(KDbField::Type type)
         if (type == KDbField::Time)
             return QTime::currentTime();
     }
-    kdbWarning() << "no value for type" << KDbField::typeName(type);
+    kdbWarning() << "No empty value for field type" << KDbField::typeName(type);
     return QVariant();
 }
 
@@ -1283,7 +1285,7 @@ QVariant KDb::notEmptyValueForFieldType(KDbField::Type type)
         if (type == KDbField::Time)
             return QTime::currentTime();
     }
-    kdbWarning() << "no value for type" << KDbField::typeName(type);
+    kdbWarning() << "No non-empty value for field type" << KDbField::typeName(type);
     return QVariant();
 }
 
@@ -1605,7 +1607,7 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     QString str;
     str.reserve(escaped_length);
     if (str.capacity() < escaped_length) {
-        kdbWarning() << "no enough memory (cannot allocate" << escaped_length << "chars)";
+        kdbWarning() << "Not enough memory (cannot allocate" << escaped_length << "characters)";
         return QString();
     }
     if (type == BLOBEscapingType::XHex)
@@ -1692,7 +1694,7 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
                         array[output] = char((int(s[1] - '0') * 8 + int(s[2] - '0')) * 8 + int(s[3] - '0'));
                     s += 4;
                 } else {
-                    kdbWarning() << "no octal value after backslash";
+                    kdbWarning() << "Missing octal value after backslash";
                     s++;
                 }
             } else {
