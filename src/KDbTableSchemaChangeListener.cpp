@@ -85,7 +85,7 @@ public:
         if (listener) {
             listeners->remove(listener);
         } else {
-            listeners->clear();
+            delete conn->d->tableSchemaChangeListeners.take(table);
         }
     }
 

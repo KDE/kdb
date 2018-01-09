@@ -81,10 +81,9 @@ public:
 
     void insertTable(KDbTableSchema* tableSchema);
 
-    /*! Removes table schema pointed by tableSchema.id() and tableSchema.name()
-     from internal structures and destroys it. Does not make any change at the backend.
-     Note that the table schema being removed may be not the same as @a tableSchema. */
-    void removeTable(const KDbTableSchema& tableSchema);
+    /*! Removes table schema having identifier @a id from internal structures and destroys it.
+     Does not make any change at the backend. */
+    void removeTable(int id);
 
     void takeTable(KDbTableSchema* tableSchema);
 

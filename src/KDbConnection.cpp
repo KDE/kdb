@@ -272,12 +272,16 @@ void KDbConnectionPrivate::insertTable(KDbTableSchema* tableSchema)
     m_tablesByName.insert(tableSchema->name(), tableSchema);
 }
 
-void KDbConnectionPrivate::removeTable(const KDbTableSchema& tableSchema)
+void KDbConnectionPrivate::removeTable(int id)
 {
-    KDbTableSchemaChangeListener::unregisterForChanges(conn, &tableSchema);
-    m_tablesByName.remove(tableSchema.name());
-    KDbTableSchema *toDelete = m_tables.take(tableSchema.id());
-    delete toDelete;
+    QScopedPointer<KDbTableSchema> toDelete(m_tables.take(id));
+    if (!toDelete) {
+        kdbWarning() << "Could not find table to delete with id=" << id;
+        return;
+    }
+    KDbTableSchemaChangeListener::unregisterForChanges(conn, toDelete.data());
+    const int count = m_tablesByName.remove(toDelete->name());
+    Q_ASSERT_X(count == 1, "KDbConnectionPrivate::removeTable", "Table to remove not found");
 }
 
 void KDbConnectionPrivate::takeTable(KDbTableSchema* tableSchema)
@@ -1477,7 +1481,7 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, CreateTableOptions 
         if (!internalTable) {
             if (previousSchemaStillKept) {
                 //remove previous table schema
-                d->removeTable(*tableSchema);
+                d->removeTable(tableSchema->id());
             }
         }
         //store locally
@@ -1623,7 +1627,7 @@ tristate KDbConnection::dropTableInternal(KDbTableSchema* tableSchema, bool also
         tristate res = removeDataBlock(tableSchema->id(), QLatin1String("extended_schema"));
         if (!res)
             return false;
-        d->removeTable(*tableSchema);
+        d->removeTable(tableSchema->id());
     }
     return commitAutoCommitTransaction(tg.transaction());
 }
