@@ -48,7 +48,7 @@ public:
             listeners = new QSet<KDbTableSchemaChangeListener*>();
             conn->d->tableSchemaChangeListeners.insert(table, listeners);
         }
-        localDebug() << "listener=" << listener->name() << "table=" << table->name();
+        localDebug() << "listener=" << listener << listener->name() << "table=" << table << table->name();
         listeners->insert(listener);
     }
 
@@ -80,8 +80,8 @@ public:
         if (!listeners) {
             return;
         }
-        localDebug() << "listener=" << (listener ? listener->name() : QString::fromLatin1("<all>"))
-                     << "table=" << table->name();
+        localDebug() << "listener=" << listener << (listener ? listener->name() : QString::fromLatin1("<all>"))
+                     << "table=" << table << table->name();
         if (listener) {
             listeners->remove(listener);
         } else {
@@ -132,11 +132,12 @@ public:
                                     const KDbTableSchema *table2)
     {
         if (checkedTables->contains(table1)) {
-            localDebug() << "Table" << table1->name() << "already checked";
+            localDebug() << "Table" << table1 << table1->name() << "already checked";
             return false; // protection against infinite recursion
         }
         checkedTables->insert(table1);
-        localDebug() << "Checking if table" << table1->name() << "depends on table" << table2->name();
+        localDebug() << "Checking if table" << table1 << table1->name() << "depends on table"
+                     << table2 << table2->name();
         if (table1 == table2) {
             localDebug() << "Yes";
             return true;
@@ -169,6 +170,7 @@ public:
                 break;
             }
         }
+        localDebug() << "No";
         return false;
     }
 
