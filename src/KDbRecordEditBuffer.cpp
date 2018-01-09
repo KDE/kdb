@@ -82,7 +82,7 @@ const QVariant* KDbRecordEditBuffer::at(const KDbField &field) const
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(field.name());
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd()) {
-        kdbWarning() << "no such field:" << field;
+        //kdbWarning() << "no such field:" << field;
         return nullptr;
     }
     return &(*m_simpleBufferIt).value();
@@ -96,7 +96,7 @@ const QVariant* KDbRecordEditBuffer::at(const QString& fname) const
     }
     *m_simpleBufferIt = m_simpleBuffer->constFind(fname);
     if (*m_simpleBufferIt == m_simpleBuffer->constEnd()) {
-        kdbWarning() << "no such field:" << fname;
+        //kdbWarning() << "no such field:" << fname;
         return nullptr;
     }
     return &(*m_simpleBufferIt).value();
