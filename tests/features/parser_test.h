@@ -35,7 +35,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
     KDbParser parser(conn);
 
     const bool ok = parser.parse(st);
-    KDbQuerySchema *q = parser.query();
+    QScopedPointer<KDbQuerySchema> q(parser.query());
     QList<QVariant> variantParams;
     for(const QString &param : params) {
         variantParams.append(param.toLocal8Bit());
@@ -44,7 +44,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
         cout << qPrintable(KDbUtils::debugString(KDbConnectionAndQuerySchema(conn, *q))) << '\n';
         KDbNativeStatementBuilder builder(conn, KDb::DriverEscaping);
         KDbEscapedString sql;
-        if (builder.generateSelectStatement(&sql, q, variantParams)) {
+        if (builder.generateSelectStatement(&sql, q.data(), variantParams)) {
             cout << "-STATEMENT:\n" << sql.toByteArray().constData() << '\n';
         }
         else {
@@ -54,9 +54,7 @@ int parserTest(const KDbEscapedString &st, const QStringList &params)
         qDebug() << parser.error();
         r = 1;
     }
-    delete q;
-    q = nullptr;
-
+    q.reset();
 
     if (!conn->closeDatabase()) {
         qDebug() << conn->result();

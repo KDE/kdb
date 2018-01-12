@@ -80,11 +80,6 @@ KDbTableSchema *KDbParser::table()
     return t;
 }
 
-const KDbTableSchema *KDbParser::table() const
-{
-    return const_cast<KDbParser*>(this)->table();
-}
-
 KDbQuerySchema *KDbParser::query()
 {
     KDbQuerySchema *s = d->query;

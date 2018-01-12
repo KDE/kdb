@@ -179,6 +179,9 @@ public:
     //! Points to connection recently used for caching
     //! @todo use equivalent of QPointer<KDbConnection>
     KDbConnection *recentConnection = nullptr;
+
+    //! Owned fields created by KDbQuerySchema::addExpressionInternal()
+    KDbField::List ownedExpressionFields;
 };
 
 //! Information about expanded fields for a single query schema, used for caching
@@ -233,8 +236,8 @@ public:
 
     QHash<QString, KDbQueryColumnInfo*> columnInfosByName; //!< Same as columnInfosByNameExpanded but asterisks are skipped
 
-    //! field schemas created for multiple joined columns like a||' '||b||' '||c
-    KDbField::List ownedVisibleColumns;
+    //! Fields created for multiple joined columns like a||' '||b||' '||c
+    KDbField::List ownedVisibleFields;
 };
 
 //! @return identifier string @a name escaped using @a conn connection and type @a escapingType

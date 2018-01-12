@@ -129,6 +129,9 @@ public:
     //! Inserts cached fields expanded information for @a query
     void insertFieldsExpanded(const KDbQuerySchema *query, KDbQuerySchemaFieldsExpanded *cache);
 
+    //! Removes cached fields expanded information for @a query
+    void removeFieldsExpanded(const KDbQuerySchema *query);
+
     KDbConnection* const conn; //!< The @a KDbConnection instance this @a KDbConnectionPrivate belongs to.
     KDbConnectionData connData; //!< the @a KDbConnectionData used within that connection.
 

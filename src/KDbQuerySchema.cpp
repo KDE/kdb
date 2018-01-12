@@ -262,6 +262,7 @@ bool KDbQuerySchema::addExpressionInternal(const KDbExpression& expr, bool visib
     if (!ok) {
         delete field;
     }
+    d->ownedExpressionFields.append(field);
     return ok;
 }
 
@@ -879,7 +880,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                             .arg(++numberOfColumnsWithMultipleVisibleFields));
                         visibleColumn->setExpression(
                             KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                        cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
+                        cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                     }
 
                     lookup_list.append(
@@ -934,7 +935,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                         .arg(++numberOfColumnsWithMultipleVisibleFields));
                     visibleColumn->setExpression(
                         KDbConstExpression(KDbToken::CHARACTER_STRING_LITERAL, QVariant()/*not important*/));
-                    cache->ownedVisibleColumns.append(visibleColumn);   // remember to delete later
+                    cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                 }
 
                 lookup_list.append(
@@ -1115,7 +1116,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
     if (d->recentConnection != conn) {
         if (d->recentConnection) {
             // connection changed: remove old cache
-            d->recentConnection->d->insertFieldsExpanded(this, nullptr);
+            d->recentConnection->d->removeFieldsExpanded(this);
         }
         d->recentConnection = conn;
     }

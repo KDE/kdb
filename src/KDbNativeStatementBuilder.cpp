@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -88,7 +88,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
 //! @todo looking at singleTable is visually nice but a field name can conflict
 //!   with function or variable name...
     int number = 0;
-    bool singleTable = querySchema->tables()->count() <= 1;
+    QList<KDbTableSchema*>* tables = querySchema->tables();
+    bool singleTable = tables->count() <= 1;
     if (singleTable) {
         //make sure we will have single table:
         foreach(KDbField *f, *querySchema->fields()) {
@@ -122,9 +123,25 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 KDbQueryAsterisk *asterisk = static_cast<KDbQueryAsterisk*>(f);
                 if (!singleTable && asterisk->isSingleTableAsterisk()) { //single-table *
                     sql.append(KDb::escapeIdentifier(driver, asterisk->table()->name())).append(".*");
-                }
-                else { //all-tables * (or simplified table.* when there's only one table)
-                    sql += '*';
+                } else {
+                    /* All-tables asterisk
+                     NOTE: do not output in this form because there can be extra tables
+                     automatically added for obtaining lookup data what changes number of fields.
+                     Reliable solution to that: for tables T1..Tn output T1.*,..Tn.*
+                     Example for Northwind:
+                     - instead of: SELECT * FROM orders LEFT OUTER JOIN
+                                   customers ON orders.customerid=customers.customerid
+                     - use this: SELECT orders.*, customers.contactname FROM orders LEFT OUTER JOIN
+                                 customers ON orders.customerid=customers.customerid
+                    */
+                    KDbEscapedString s_tables;
+                    for (KDbTableSchema *table : *tables) {
+                        if (!s_tables.isEmpty()) {
+                            s_tables += ", ";
+                        }
+                        s_tables.append(KDb::escapeIdentifier(driver, table->name()) + QLatin1String(".*"));
+                    }
+                    sql += s_tables;
                 }
             } else {
                 if (f->isExpression()) {
@@ -278,6 +295,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
         sql += (", " + s_additional_fields);
 
     if (driver && options.alsoRetrieveRecordId()) { //append rowid column
+        //! @todo Check if the rowid isn't already part of regular SELECT columns, if so, don't add
         KDbEscapedString s;
         if (!sql.isEmpty())
             s = ", ";
@@ -292,21 +310,18 @@ static bool selectStatementInternal(KDbEscapedString *target,
     } else {
         sql.prepend("SELECT ");
     }
-    QList<KDbTableSchema*>* tables = querySchema->tables();
-    if ((tables && !tables->isEmpty()) || !subqueries_for_lookup_data.isEmpty()) {
+    if (!tables->isEmpty() || !subqueries_for_lookup_data.isEmpty()) {
         sql += " FROM ";
         KDbEscapedString s_from;
-        if (tables) {
-            number = 0;
-            foreach(KDbTableSchema *table, *tables) {
-                if (!s_from.isEmpty())
-                    s_from += ", ";
-                s_from += KDb::escapeIdentifier(driver, table->name());
-                const QString aliasString(querySchema->tableAlias(number));
-                if (!aliasString.isEmpty())
-                    s_from.append(" AS ").append(aliasString);
-                number++;
-            }
+        number = 0;
+        foreach(KDbTableSchema *table, *tables) {
+            if (!s_from.isEmpty())
+                s_from += ", ";
+            s_from += KDb::escapeIdentifier(driver, table->name());
+            const QString aliasString(querySchema->tableAlias(number));
+            if (!aliasString.isEmpty())
+                s_from.append(" AS ").append(aliasString);
+            number++;
         }
         // add subqueries for lookup data
         int subqueries_for_lookup_data_counter = 0;
