@@ -69,7 +69,6 @@ KDbEscapedString KDbUnaryExpressionData::toStringInternal(
                                         KDbQuerySchemaParameterValueListIterator* params,
                                         KDb::ExpressionCallStack* callStack) const
 {
-    Q_UNUSED(callStack);
     ExplicitlySharedExpressionDataPointer a = arg();
     KDbEscapedString aString = a.constData()
             ? a->toString(driver, params, callStack) : KDbEscapedString("<NULL>");

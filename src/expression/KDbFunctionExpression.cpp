@@ -279,7 +279,6 @@ class RandomFunctionDeclaration : public BuiltInFunctionDeclaration
 public:
     RandomFunctionDeclaration() {}
     KDbField::Type returnType(const KDbFunctionExpressionData* f, KDbParseInfo* parseInfo) const override {
-        Q_UNUSED(parseInfo);
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
         if (argsData->children.isEmpty()) {
             return KDbField::Double;

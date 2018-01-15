@@ -108,7 +108,6 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
                                         KDbQuerySchemaParameterValueListIterator* params,
                                         KDb::ExpressionCallStack* callStack) const
 {
-    Q_UNUSED(driver);
     Q_UNUSED(params);
     Q_UNUSED(callStack);
     switch (token.value()) {

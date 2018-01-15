@@ -239,9 +239,6 @@ static KDbAlterTableHandler::ActionDict* createActionDict(
 static void debugAction(KDbAlterTableHandler::ActionBase *action, int nestingLevel,
                         bool simulate, const QString& prependString = QString(), QString * debugTarget = nullptr)
 {
-    Q_UNUSED(simulate);
-    Q_UNUSED(nestingLevel);
-
     QString debugString;
     if (!debugTarget)
         debugString = prependString;
@@ -264,6 +261,9 @@ static void debugAction(KDbAlterTableHandler::ActionBase *action, int nestingLev
 #ifdef KDB_DEBUG_GUI
         if (simulate)
             KDb::alterTableActionDebugGUI(debugString, nestingLevel);
+#else
+        Q_UNUSED(simulate)
+        Q_UNUSED(nestingLevel)
 #endif
     }
 }

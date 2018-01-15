@@ -673,7 +673,6 @@ static inline void saveRecordGetValue(const QVariant **pval, KDbCursor *cursor,
 //! @todo if there're multiple views for this data, we need multiple buffers!
 bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repaint)
 {
-    Q_UNUSED(record);
     if (!d->pRecordEditBuffer)
         return true; //nothing to do
 
@@ -762,7 +761,6 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
 
 bool KDbTableViewData::saveRecordChanges(KDbRecordData *record, bool repaint)
 {
-    Q_UNUSED(record);
     d->result.clear();
     emit aboutToUpdateRecord(record, d->pRecordEditBuffer, &d->result);
     if (!d->result.success)
@@ -777,7 +775,6 @@ bool KDbTableViewData::saveRecordChanges(KDbRecordData *record, bool repaint)
 
 bool KDbTableViewData::saveNewRecord(KDbRecordData *record, bool repaint)
 {
-    Q_UNUSED(record);
     d->result.clear();
     emit aboutToInsertRecord(record, &d->result, repaint);
     if (!d->result.success)
@@ -792,7 +789,6 @@ bool KDbTableViewData::saveNewRecord(KDbRecordData *record, bool repaint)
 
 bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
 {
-    Q_UNUSED(record);
     d->result.clear();
     emit aboutToDeleteRecord(record, &d->result, repaint);
     if (!d->result.success)
@@ -842,7 +838,6 @@ void KDbTableViewData::deleteRecords(const QList<int> &recordsToDelete, bool rep
 
 void KDbTableViewData::insertRecord(KDbRecordData *record, int index, bool repaint)
 {
-    Q_UNUSED(record);
     insert(index = qMin(index, count()), record);
     emit recordInserted(record, index, repaint);
 }
