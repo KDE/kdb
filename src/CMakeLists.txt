@@ -57,13 +57,13 @@ endif()
 # Mark files as generated, set compile flags
 set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.cpp
     PROPERTIES
-        GENERATED TRUE
+        #TODO(GEN) GENERATED TRUE
         SKIP_AUTOMOC ON
         # YYERROR_VERBOSE=1 needed to get a token table for tokenName() even for release builds
         COMPILE_FLAGS "-DYYERROR_VERBOSE=1 ${EXTRA_PARSER_COMPILE_FLAGS} "
 )
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
-set_source_files_properties(${PARSER_SOURCE_DIR}/generated/KDbToken.h PROPERTIES GENERATED TRUE)
+# TODO(GEN) set_source_files_properties(${PARSER_SOURCE_DIR}/generated/sqlparser.h PROPERTIES GENERATED TRUE)
+# TODO(GEN) set_source_files_properties(${PARSER_SOURCE_DIR}/generated/KDbToken.h PROPERTIES GENERATED TRUE)
 set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cpp
     PROPERTIES
         GENERATED TRUE
@@ -73,7 +73,7 @@ set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/KDbConnectionData_sdc.cp
 set_source_files_properties(
     ${PARSER_SOURCE_DIR}/generated/sqlscanner.cpp
     PROPERTIES
-        GENERATED TRUE
+        #TODO(GEN) GENERATED TRUE
         SKIP_AUTOMOC ON
         COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} "
 )
