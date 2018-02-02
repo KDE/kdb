@@ -39,7 +39,7 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
 {
     KDbDriverBehavior *beh = behavior();
     beh->features = SingleTransactions | CursorForward | CursorBackward;
-//! @todo enable this when kexidb supports multiple: beh->features = MultipleTransactions | CursorForward | CursorBackward;
+//! @todo enable this when KDb supports multiple: beh->features = MultipleTransactions | CursorForward | CursorBackward;
 
     beh->UNSIGNED_TYPE_KEYWORD = QString();
     beh->ROW_ID_FIELD_NAME = QLatin1String("oid");

@@ -63,7 +63,7 @@ public:
     //! Generates native (driver-specific) GREATEST() and LEAST() function calls.
     //! Uses MAX() and MIN(), respectively.
     //! If arguments are of text type, to each argument default (unicode) collation
-    //! is assigned that is configured for SQLite by KexiDB.
+    //! is assigned that is configured for SQLite by KDb.
     //! Example: SELECT MAX('ą' COLLATE '', 'z' COLLATE '').
     KDbEscapedString greatestOrLeastFunctionToString(const QString &name, const KDbNArgExpression &args,
                                     KDbQuerySchemaParameterValueListIterator *params,

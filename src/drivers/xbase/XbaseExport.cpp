@@ -39,7 +39,7 @@ class KDbxBaseExportPrivate {
     xBaseExportPrivate() {
     }
 
-    //! Converts kexidb field types to xbase types
+    //! Converts KDbField types to xbase types
     char type(KDbField::Type fieldType);
 
     //! Appends record to xbase table
@@ -311,7 +311,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
 
   tables.sort();
 
-  // -- read table schemas and create them in memory (only for non-KexiDB-compat tables)
+  // -- read table schemas and create them in memory (only for non-KDb-compat tables)
   foreach (const QString& tableCaption, tables) {
     if (dest_isSystemObjectName( tableCaption )) {
       return false;

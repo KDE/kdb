@@ -30,7 +30,7 @@ class SybaseDriver : public KDbDriver
 public:
     /*!
      * Constructor sets database features and
-     * maps the types in KexiDB::KDbField::Type to the Sybase types.
+     * maps the types in KDbField::Type to the Sybase types.
      */
     SybaseDriver(QObject *parent, const QVariantList &args);
 
