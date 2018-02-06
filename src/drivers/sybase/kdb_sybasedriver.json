@@ -63,7 +63,7 @@
         "ServiceTypes": [
             "KDb/Driver"
         ],
-        "Version": "3.1",
+        "Version": "3.2",
         "Website": "http://kexi-project.org"
     },
     "X-KDb-FileBased": "true",
