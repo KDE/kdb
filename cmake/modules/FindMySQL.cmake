@@ -8,8 +8,9 @@
 #  MYSQL_EMBEDDED_LIB_DIR, path to the MYSQL_EMBEDDED_LIBRARIES
 #  MySQL_FOUND, If false, do not try to use MySQL.
 #  MySQL_Embedded_FOUND, If false, do not try to use MySQL Embedded.
+#  MYSQL_USING_MARIADB, If true MariaDB has been found and will be used as a replacement for MySQL
 
-# Copyright (c) 2006-2008, Jarosław Staniek <staniek@kde.org>
+# Copyright (c) 2006-2018, Jarosław Staniek <staniek@kde.org>
 #
 # Redistribution and use is allowed according to the terms of the BSD license.
 # For details see the accompanying COPYING-CMAKE-SCRIPTS file.
@@ -56,6 +57,7 @@ else()
    )
 endif()
 
+set(MYSQL_USING_MARIADB FALSE)
 if(WIN32)
    string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_TOLOWER)
 
@@ -89,8 +91,22 @@ if(WIN32)
    find_library(_MYSQLCLIENT_LIBRARY NAMES mysqlclient
       PATHS ${MYSQL_LIB_PATHS}
    )
-   set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
-else()
+   if(_LIBMYSQL_LIBRARY AND _MYSQLCLIENT_LIBRARY)
+      set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
+   else()
+      find_library(_LIBMYSQL_LIBRARY NAMES libmariadb
+         PATHS ${MYSQL_LIB_PATHS}
+      )
+      find_library(_MYSQLCLIENT_LIBRARY NAMES mariadbclient
+         PATHS ${MYSQL_LIB_PATHS}
+      )
+      if(_LIBMYSQL_LIBRARY AND _MYSQLCLIENT_LIBRARY)
+         # once we find one MariaDB component, always search for MariaDB, not MySQL components
+         set(MYSQL_USING_MARIADB TRUE)
+         set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
+      endif()
+   endif()
+else() # !win32
    find_library(_MYSQLCLIENT_LIBRARY NAMES mysqlclient
       PATHS
       $ENV{MYSQL_DIR}/libmysql_r/.libs
@@ -102,6 +118,7 @@ else()
       mysql
    )
    set(MYSQL_LIBRARIES ${_MYSQLCLIENT_LIBRARY})
+   # TODO: set MYSQL_USING_MARIADB if MariaDB found
 endif()
 
 if(_LIBMYSQL_LIBRARY)
@@ -134,8 +151,8 @@ endif()
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(MySQL
-                                  REQUIRED_VARS MYSQL_LIBRARIES MYSQL_INCLUDE_DIR MYSQL_LIB_DIR
-                                  VERSION_VAR MySQL_VERSION_STRING)
+    REQUIRED_VARS MYSQL_LIBRARIES MYSQL_INCLUDE_DIR MYSQL_LIB_DIR
+    VERSION_VAR MySQL_VERSION_STRING)
 if(MYSQL_EMBEDDED_LIBRARIES AND MYSQL_EMBEDDED_LIB_DIR AND HAVE_MYSQL_OPT_EMBEDDED_CONNECTION)
     find_package_handle_standard_args(MySQL_Embedded
                                   REQUIRED_VARS MYSQL_EMBEDDED_LIBRARIES MYSQL_INCLUDE_DIR
@@ -144,4 +161,11 @@ if(MYSQL_EMBEDDED_LIBRARIES AND MYSQL_EMBEDDED_LIB_DIR AND HAVE_MYSQL_OPT_EMBEDD
 endif()
 
 mark_as_advanced(MYSQL_INCLUDE_DIR MYSQL_LIBRARIES MYSQL_LIB_DIR
-                 MYSQL_EMBEDDED_LIBRARIES MYSQL_EMBEDDED_LIB_DIR HAVE_MYSQL_OPT_EMBEDDED_CONNECTION)
+                 MYSQL_EMBEDDED_LIBRARIES MYSQL_EMBEDDED_LIB_DIR HAVE_MYSQL_OPT_EMBEDDED_CONNECTION
+                 MYSQL_USING_MARIADB)
+
+if(NOT MYSQL_FIND_QUIETLY)
+   if(MYSQL_USING_MARIADB)
+      message(STATUS "Found MariaDB, using as replacement for MySQL")
+   endif()
+endif()

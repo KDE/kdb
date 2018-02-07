@@ -29,7 +29,6 @@
 
 #include <KPluginFactory>
 
-#include <mysql_version.h>
 #include <mysql.h>
 
 KDB_DRIVER_PLUGIN_FACTORY(MysqlDriver, "kdb_mysqldriver.json")
