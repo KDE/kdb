@@ -36,17 +36,7 @@ set_package_properties(Sqlite PROPERTIES TYPE RECOMMENDED
                        PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}")
 
 if(Sqlite_FOUND)
-    ##
-    ## Test for ICU
-    ##
-    find_package(ICU)
-    set_package_properties(ICU PROPERTIES TYPE RECOMMENDED PURPOSE "Required by ${BUILD_SQLITE_DB_DRIVER_DESC}")
-    if(ICU_FOUND)
-        ecm_optional_add_subdirectory(sqlite)
-    else()
-        add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because ICU not found)")
-        message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
-    endif()
+    ecm_optional_add_subdirectory(sqlite)
 else()
     add_feature_info(BUILD_SQLITE_DB_DRIVER FALSE "${BUILD_SQLITE_DB_DRIVER_DESC} (because SQLite3 not found)")
     message(STATUS "WARNING: Because of that ${BUILD_SQLITE_DB_DRIVER_DESC} will not be built.")
