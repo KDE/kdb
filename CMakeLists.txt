@@ -36,8 +36,8 @@ set(REQUIRED_KF5_VERSION 5.16.0)
 # TODO move Widgets-dependent part to a libKDbWidgets
 find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Core Widgets Xml)
 find_package(KF5 ${REQUIRED_KF5_VERSION} REQUIRED CoreAddons)
-find_package(ICU)
-set_package_properties(ICU PROPERTIES TYPE REQUIRED
+find_package(ICU REQUIRED i18n uc)
+set_package_properties(ICU PROPERTIES
                        PURPOSE "Required by KDb for unicode-aware string comparisons")
 
 get_git_revision_and_branch()
