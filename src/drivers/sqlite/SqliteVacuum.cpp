@@ -33,15 +33,35 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
+namespace {
 #ifdef Q_OS_WIN
-#include <windows.h>
+#include <Windows.h>
 void usleep(unsigned int usec)
 {
     Sleep(usec/1000);
 }
+
+//! @todo Use when it's in kdewin
+#define CONV(x) ((wchar_t*)x.utf16())
+int atomic_rename(const QString &in, const QString &out)
+{
+    // better than :waccess/_wunlink/_wrename
+# ifndef _WIN32_WCE
+    bool ok = (MoveFileExW(CONV(in), CONV(out),
+                           MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED) != 0);
+# else
+    bool ok = (MoveFileW(CONV(in), CONV(out)) != 0);
+# endif
+    return ok ? 0 : -1;
+}
 #else
 #include <unistd.h>
+int atomic_rename(const QString &in, const QString &out)
+{
+    return ::rename(QFile::encodeName(in).constData(), QFile::encodeName(out).constData());
+}
 #endif
+} // namespace
 
 SqliteVacuum::SqliteVacuum(const QString& filePath)
         : m_filePath(filePath)
@@ -234,10 +254,10 @@ void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     QFileInfo fi(m_filePath);
     const qint64 origSize = fi.size();
 
-    const QByteArray oldName(QFile::encodeName(m_tmpFilePath)), newName(QFile::encodeName(fi.absoluteFilePath()));
-    if (0 != ::rename(oldName.constData(), newName.constData())) {
-        m_result.setMessage(tr("Could not rename file \"%1\" to \"%2\".")
-                            .arg(m_tmpFilePath, fi.absoluteFilePath()));
+    const QString newName(fi.absoluteFilePath());
+    if (0 != atomic_rename(m_tmpFilePath, newName)) {
+        m_result= KDbResult(ERR_ACCESS_RIGHTS,
+                        tr("Could not rename file \"%1\" to \"%2\".").arg(m_tmpFilePath, newName));
         sqliteWarning() << m_result;
     }
 
