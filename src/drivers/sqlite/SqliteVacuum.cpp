@@ -33,15 +33,35 @@
 #include <QLocale>
 #include <QTemporaryFile>
 
+namespace {
 #ifdef Q_OS_WIN
-#include <windows.h>
+#include <Windows.h>
 void usleep(unsigned int usec)
 {
     Sleep(usec/1000);
 }
+
+//! @todo Use when it's in kdewin
+#define CONV(x) ((wchar_t*)x.utf16())
+int atomic_rename(const QString &in, const QString &out)
+{
+    // better than :waccess/_wunlink/_wrename
+# ifndef _WIN32_WCE
+    bool ok = (MoveFileExW(CONV(in), CONV(out),
+                           MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED) != 0);
+# else
+    bool ok = (MoveFileW(CONV(in), CONV(out)) != 0);
+# endif
+    return ok ? 0 : -1;
+}
 #else
 #include <unistd.h>
+int atomic_rename(const QString &in, const QString &out)
+{
+    return ::rename(QFile::encodeName(in).constData(), QFile::encodeName(out).constData());
+}
 #endif
+} // namespace
 
 SqliteVacuum::SqliteVacuum(const QString& filePath)
         : m_filePath(filePath)
@@ -64,7 +84,7 @@ SqliteVacuum::~SqliteVacuum()
         delete m_sqliteProcess;
     }
     if (m_dlg)
-        m_dlg->close();
+        m_dlg->reset();
     delete m_dlg;
     QFile::remove(m_tmpFilePath);
 }
@@ -121,10 +141,16 @@ tristate SqliteVacuum::run()
         return false;
     }
 
-    QTemporaryFile *tempFile = new QTemporaryFile(fi.absoluteFilePath());
-    tempFile->open();
-    m_tmpFilePath = tempFile->fileName();
-    delete tempFile;
+    {
+        QTemporaryFile tempFile(fi.absoluteFilePath());
+        if (!tempFile.open()) {
+            delete m_dumpProcess;
+            m_dumpProcess = nullptr;
+            m_result.setCode(ERR_OTHER);
+            return false;
+        }
+        m_tmpFilePath = tempFile.fileName();
+    }
     //sqliteDebug() << m_tmpFilePath;
     m_sqliteProcess->start(sqlite_app, QStringList() << m_tmpFilePath);
     if (!m_sqliteProcess->waitForStarted()) {
@@ -138,6 +164,7 @@ tristate SqliteVacuum::run()
 
     delete m_dlg;
     m_dlg = new QProgressDialog(nullptr); // krazy:exclude=qclasses
+    m_dlg->setWindowModality(Qt::WindowModal);
     m_dlg->setWindowTitle(tr("Compacting database"));
     m_dlg->setLabelText(
         QLatin1String("<qt>") + tr("Compacting database \"%1\"...")
@@ -164,7 +191,7 @@ tristate SqliteVacuum::run()
     }
 
     readFromStdErr();
-    return true;
+    return !m_result.isError();
 }
 
 void SqliteVacuum::readFromStdErr()
@@ -205,21 +232,31 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
         cancelClicked();
         m_result.setCode(ERR_OTHER);
     }
+}
+
+void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    //sqliteDebug() << exitCode << exitStatus;
+    if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
+        m_result.setCode(ERR_OTHER);
+    }
 
     if (m_dlg) {
-        m_dlg->close();
+        m_dlg->reset();
     }
 
     if (m_result.isError() || m_canceled) {
         return;
     }
+
+    // dump process and sqlite process finished by now so we can rename the result to the original name
     QFileInfo fi(m_filePath);
     const qint64 origSize = fi.size();
 
-    const QByteArray oldName(QFile::encodeName(m_tmpFilePath)), newName(QFile::encodeName(fi.absoluteFilePath()));
-    if (0 != ::rename(oldName.constData(), newName.constData())) {
-        m_result.setMessage(tr("Could not rename file \"%1\" to \"%2\".")
-                            .arg(m_tmpFilePath, fi.absoluteFilePath()));
+    const QString newName(fi.absoluteFilePath());
+    if (0 != atomic_rename(m_tmpFilePath, newName)) {
+        m_result= KDbResult(ERR_ACCESS_RIGHTS,
+                        tr("Could not rename file \"%1\" to \"%2\".").arg(m_tmpFilePath, newName));
         sqliteWarning() << m_result;
     }
 
@@ -229,16 +266,6 @@ void SqliteVacuum::dumpProcessFinished(int exitCode, QProcess::ExitStatus exitSt
         QMessageBox::information(nullptr, QString(), // krazy:exclude=qclasses
             tr("The database has been compacted. Current size decreased by %1% to %2 MB.")
                .arg(decrease).arg(QLocale().toString(double(newSize)/1000000.0, 'f', 2)));
-    }
-}
-
-void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
-{
-    //sqliteDebug() << exitCode << exitStatus;
-
-    if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
-        m_result.setCode(ERR_OTHER);
-        return;
     }
 }
 
