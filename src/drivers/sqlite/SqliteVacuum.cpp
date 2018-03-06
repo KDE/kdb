@@ -191,7 +191,7 @@ tristate SqliteVacuum::run()
     }
 
     readFromStdErr();
-    return true;
+    return !m_result.isError();
 }
 
 void SqliteVacuum::readFromStdErr()
@@ -239,7 +239,6 @@ void SqliteVacuum::sqliteProcessFinished(int exitCode, QProcess::ExitStatus exit
     //sqliteDebug() << exitCode << exitStatus;
     if (exitCode != 0 || exitStatus != QProcess::NormalExit) {
         m_result.setCode(ERR_OTHER);
-        return;
     }
 
     if (m_dlg) {
