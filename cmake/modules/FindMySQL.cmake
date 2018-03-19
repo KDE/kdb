@@ -21,19 +21,37 @@ include(FeatureSummary)
 set_package_properties(MySQL PROPERTIES
     DESCRIPTION "MySQL Client Library (libmysqlclient)" URL "http://www.mysql.com")
 
+set(MYSQL_USING_MARIADB FALSE)
+
 if(WIN32)
-   set(ProgramFilesX86 "ProgramFiles(x86)")
-   find_path(MYSQL_INCLUDE_DIR mysql.h
-      PATHS
+   set(ProgramFilesX "ProgramFiles(x86)")
+   set(MYSQL_INCLUDE_PATHS
       $ENV{MYSQL_INCLUDE_DIR}
-      $ENV{MYSQL_DIR}/include/mysql
-      $ENV{ProgramW6432}/MySQL/*/include/mysql
-      $ENV{ProgramFiles}/MySQL/*/include/mysql
-      $ENV{${ProgramFilesX}}/MySQL/*/include/mysql
-      $ENV{SystemDrive}/MySQL/*/include/mysql
-      $ENV{ProgramW6432}/*/include/mysql
-      $ENV{ProgramFiles}/*/include/mysql # MariaDB
-      $ENV{${ProgramFilesX}}/*/include/mysql # MariaDB
+      $ENV{MYSQL_DIR}/include
+      $ENV{ProgramW6432}/MySQL/*/include
+      $ENV{ProgramFiles}/MySQL/*/include
+      $ENV{${ProgramFilesX}}/MySQL/*/include
+      $ENV{SystemDrive}/MySQL/*/include
+      $ENV{ProgramW6432}/*/include
+      $ENV{ProgramFiles}/*/include # MariaDB
+      $ENV{${ProgramFilesX}}/*/include # MariaDB
+   )
+   set(MYSQL_INCLUDE_PATH_SUFFIXES mysql)
+   # First try to identify MariaDB.
+   # Once we find headers of MariaDB we will look for MariaDB and mot MySQL.
+   # This way we avoid mixing MariaDB and MySQL files.
+   find_path(_MARIADB_INCLUDE_DIR mariadb_version.h
+      PATHS ${MYSQL_INCLUDE_PATHS}
+      PATH_SUFFIXES ${MYSQL_INCLUDE_PATH_SUFFIXES}
+   )
+   if(_MARIADB_INCLUDE_DIR)
+      set(MYSQL_USING_MARIADB TRUE)
+      unset(_MARIADB_INCLUDE_DIR)
+   endif()
+   # now a real find
+   find_path(MYSQL_INCLUDE_DIR mysql.h
+      PATHS ${MYSQL_INCLUDE_PATHS}
+      PATH_SUFFIXES ${MYSQL_INCLUDE_PATH_SUFFIXES}
    )
 else()
    # use pkg-config to get the directories and then use these values
@@ -57,7 +75,6 @@ else()
    )
 endif()
 
-set(MYSQL_USING_MARIADB FALSE)
 if(WIN32)
    string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_TOLOWER)
 
@@ -73,27 +90,12 @@ if(WIN32)
       set(build_dist Release)
    endif()
 
-   set(MYSQL_LIB_PATHS
-      $ENV{MYSQL_DIR}/lib/${binary_dist}
-      $ENV{MYSQL_DIR}/libmysql/${build_dist}
-      $ENV{MYSQL_DIR}/client/${build_dist}
-      $ENV{ProgramW6432}/MySQL/*/lib/${binary_dist}
-      $ENV{ProgramFiles}/MySQL/*/lib/${binary_dist}
-      $ENV{${ProgramFilesX}}/MySQL/*/lib/${binary_dist}
-      $ENV{SystemDrive}/MySQL/*/lib/${binary_dist}
-      $ENV{ProgramW6432}/*/lib # MariaDB
-      $ENV{ProgramFiles}/*/lib # MariaDB
-      $ENV{${ProgramFilesX}}/*/lib # MariaDB
-   )
-   find_library(_LIBMYSQL_LIBRARY NAMES libmysql
-      PATHS ${MYSQL_LIB_PATHS}
-   )
-   find_library(_MYSQLCLIENT_LIBRARY NAMES mysqlclient
-      PATHS ${MYSQL_LIB_PATHS}
-   )
-   if(_LIBMYSQL_LIBRARY AND _MYSQLCLIENT_LIBRARY)
-      set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
-   else()
+   if(MYSQL_USING_MARIADB)
+       set(MYSQL_LIB_PATHS
+          $ENV{ProgramW6432}/*/lib # MariaDB
+          $ENV{ProgramFiles}/*/lib # MariaDB
+          $ENV{${ProgramFilesX}}/*/lib # MariaDB
+       )
       find_library(_LIBMYSQL_LIBRARY NAMES libmariadb
          PATHS ${MYSQL_LIB_PATHS}
       )
@@ -102,9 +104,27 @@ if(WIN32)
       )
       if(_LIBMYSQL_LIBRARY AND _MYSQLCLIENT_LIBRARY)
          # once we find one MariaDB component, always search for MariaDB, not MySQL components
-         set(MYSQL_USING_MARIADB TRUE)
          set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
       endif()
+   else() # mysql
+       set(MYSQL_LIB_PATHS
+          $ENV{MYSQL_DIR}/lib/${binary_dist}
+          $ENV{MYSQL_DIR}/libmysql/${build_dist}
+          $ENV{MYSQL_DIR}/client/${build_dist}
+          $ENV{ProgramW6432}/MySQL/*/lib/${binary_dist}
+          $ENV{ProgramFiles}/MySQL/*/lib/${binary_dist}
+          $ENV{${ProgramFilesX}}/MySQL/*/lib/${binary_dist}
+          $ENV{SystemDrive}/MySQL/*/lib/${binary_dist}
+       )
+       find_library(_LIBMYSQL_LIBRARY NAMES libmysql
+          PATHS ${MYSQL_LIB_PATHS}
+       )
+       find_library(_MYSQLCLIENT_LIBRARY NAMES mysqlclient
+          PATHS ${MYSQL_LIB_PATHS}
+       )
+       if(_LIBMYSQL_LIBRARY AND _MYSQLCLIENT_LIBRARY)
+          set(MYSQL_LIBRARIES ${_LIBMYSQL_LIBRARY} ${_MYSQLCLIENT_LIBRARY})
+       endif()
    endif()
 else() # !win32
    find_library(_MYSQLCLIENT_LIBRARY NAMES mysqlclient
@@ -164,8 +184,22 @@ mark_as_advanced(MYSQL_INCLUDE_DIR MYSQL_LIBRARIES MYSQL_LIB_DIR
                  MYSQL_EMBEDDED_LIBRARIES MYSQL_EMBEDDED_LIB_DIR HAVE_MYSQL_OPT_EMBEDDED_CONNECTION
                  MYSQL_USING_MARIADB)
 
-if(NOT MYSQL_FIND_QUIETLY)
-   if(MYSQL_USING_MARIADB)
-      message(STATUS "Found MariaDB, using as replacement for MySQL")
-   endif()
+if(MySQL_FOUND)
+   set(MySQL_FOUND 1 CACHE INTERNAL "" FORCE)
+    if(NOT MYSQL_FIND_QUIETLY)
+       if(MYSQL_USING_MARIADB)
+          message(STATUS "Found MariaDB, using as replacement for MySQL")
+       endif()
+    endif()
+else()
+   unset(MySQL_FOUND CACHE)
+   set(MySQL_FOUND FALSE)
+   unset(MYSQL_LIBRARIES)
+   unset(MYSQL_LIBRARIES CACHE)
+   unset(MYSQL_INCLUDE_DIR)
+   unset(MYSQL_INCLUDE_DIR CACHE)
+   unset(MYSQL_LIB_DIR)
+   unset(MYSQL_LIB_DIR CACHE)
+   unset(MySQL_VERSION_STRING)
+   unset(MySQL_VERSION_STRING CACHE)
 endif()
