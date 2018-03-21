@@ -57,6 +57,9 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
     beh->BOOLEAN_TRUE_LITERAL = QLatin1String("TRUE");
     beh->BOOLEAN_FALSE_LITERAL = QLatin1String("FALSE");
     beh->USE_TEMPORARY_DATABASE_FOR_CONNECTION_IF_NEEDED = true;
+    beh->GET_TABLE_NAMES_SQL = KDbEscapedString(
+        "SELECT table_name FROM information_schema.tables WHERE "
+        "table_type='BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema')");
 
     initDriverSpecificKeywords(m_keywords);
     initPgsqlToKDbMap();

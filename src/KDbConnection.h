@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -1001,6 +1001,25 @@ protected:
      In any case it is called after successful drv_connect().
      @return true on success. */
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version) = 0;
+
+    /**
+     * LOW LEVEL METHOD. For reimplementation: obtains a list containing names of all physical
+     * tables of this connection and sets @a tableNames.
+     *
+     * Default implementation executes low-level SQL defined by KDbDriverBehavior::GET_TABLE_NAMES_SQL
+     * string. If the string is empty, this implementation returns false.
+     *
+     * If the database driver is not able to offer such a list, do not reimplement this method.
+     * The method should return @c true only on successfull obtaining of table names.
+     *
+     * This method is used by tableNames() to filter out tables names that have been found in
+     * project's metadata but lack related physical tables.
+     *
+     * @since 3.2
+     *
+     * @see tableNames()
+     */
+    virtual bool drv_getTableNames(QStringList *tableNames);
 
     /*! LOW LEVEL METHOD. For implementation: returns true if table
      with name @a tableName exists in the database.
