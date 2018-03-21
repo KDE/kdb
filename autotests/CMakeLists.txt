@@ -43,12 +43,15 @@ ecm_add_tests(
     DateTimeTest.cpp
     DriverTest.cpp
     ExpressionsTest.cpp
+    MissingTableTest.cpp
     QuerySchemaTest.cpp
     KDbTest.cpp
 
     LINK_LIBRARIES
         kdbtestutils
 )
+
+target_compile_definitions(MissingTableTest PRIVATE -DFILES_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data" )
 
 if(NOT WIN32) #TODO enable for Windows when headers_test.sh is ported e.g. to python
     add_subdirectory(headers)
