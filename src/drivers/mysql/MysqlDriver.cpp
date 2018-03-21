@@ -21,11 +21,10 @@
 */
 
 #include "MysqlDriver.h"
-#include "MysqlConnection.h"
 #include "KDbDriverBehavior.h"
 #include "KDbExpression.h"
-#include "KDbField.h"
-#include "KDb.h"
+#include "KDbPreparedStatement.h"
+#include "MysqlConnection.h"
 
 #include <KPluginFactory>
 
@@ -54,6 +53,8 @@ MysqlDriver::MysqlDriver(QObject *parent, const QVariantList &args)
     //! @todo add configuration option
     beh->TEXT_TYPE_MAX_LENGTH = 255;
     beh->RANDOM_FUNCTION = QLatin1String("RAND");
+    beh->GET_TABLE_NAMES_SQL = KDbEscapedString("SHOW TABLES");
+
     initDriverSpecificKeywords(keywords);
 
     //predefined properties

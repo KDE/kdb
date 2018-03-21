@@ -69,6 +69,8 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
     beh->CONNECTION_REQUIRED_TO_CHECK_DB_EXISTENCE = false;
     beh->CONNECTION_REQUIRED_TO_CREATE_DB = false;
     beh->CONNECTION_REQUIRED_TO_DROP_DB = false;
+    beh->GET_TABLE_NAMES_SQL
+        = KDbEscapedString("SELECT name FROM sqlite_master WHERE type='table'");
 
     initDriverSpecificKeywords(keywords);
 
