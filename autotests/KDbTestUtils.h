@@ -22,11 +22,13 @@
 
 #include "kdbtestutils_export.h"
 
-#include <QPointer>
-#include <QTest>
+#include <KDbConnection>
+#include <KDbConnectionOptions>
 #include <KDbDriver>
 #include <KDbDriverManager>
-#include <KDbConnection>
+
+#include <QPointer>
+#include <QTest>
 
 class KDbNativeStatementBuilder;
 
@@ -143,8 +145,29 @@ public:
 
     KDBTEST_METHOD_DECL(testDriverManager, (), ());
     KDBTEST_METHOD_DECL(testSqliteDriver, (), ());
-    KDBTEST_METHOD_DECL(testConnect, (const KDbConnectionData &cdata), (cdata));
+
+    //! Connects to a database
+    //! @since 3.2
+    KDBTEST_METHOD_DECL(testConnect,
+                        (const KDbConnectionData &cdata,
+                         const KDbConnectionOptions &options = KDbConnectionOptions()),
+                        (cdata, options));
+
     KDBTEST_METHOD_DECL(testUse, (), ());
+
+    //! Convenience method that performs testConnect and testUse in one go
+    //! @since 3.2
+    KDBTEST_METHOD_DECL(testConnectAndUse,
+                        (const KDbConnectionData &cdata,
+                         const KDbConnectionOptions &options = KDbConnectionOptions()),
+                        (cdata, options));
+
+    //! Overload of testConnectAndUse for file-based databases
+    //! @since 3.2
+    KDBTEST_METHOD_DECL(testConnectAndUse,
+                        (const QString &path,
+                         const KDbConnectionOptions &options = KDbConnectionOptions()),
+                        (path, options));
 
     //! Creates database with name @a dbName
     //! Does not use the database.
