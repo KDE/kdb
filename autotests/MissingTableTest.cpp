@@ -64,6 +64,11 @@ void MissingTableTest::testListTables()
     bool ok;
     QStringList foundTableNames = m_utils.connection->tableNames(alsoSystemTables, &ok);
     QVERIFY(ok);
+
+    // call again with ok == nullptr
+    QCOMPARE(foundTableNames, m_utils.connection->tableNames(alsoSystemTables));
+
+    // make sure missing table is not present
     std::sort(foundTableNames.begin(), foundTableNames.end());
     const QStringList expectedTables(
         { "cars", "kexi__db", "kexi__fields", "kexi__objectdata", "kexi__objects" });
