@@ -1003,14 +1003,21 @@ protected:
     virtual bool drv_getServerVersion(KDbServerVersionInfo* version) = 0;
 
     /**
-     * LOW LEVEL METHOD. For reimplementation: obtains a list containing names of all physical
-     * tables of this connection and sets @a tableNames.
+     * LOW LEVEL METHOD. Obtains a list containing names of all physical
+     * tables of this connection and returns it.
      *
-     * Default implementation executes low-level SQL defined by KDbDriverBehavior::GET_TABLE_NAMES_SQL
-     * string. If the string is empty, this implementation returns false.
+     * @a ok must not be @c nullptr.
      *
-     * If the database driver is not able to offer such a list, do not reimplement this method.
-     * The method should return @c true only on successfull obtaining of table names.
+     * Default implementation covers functionality of SQL backends. It executes low-level SQL
+     * defined by KDbDriverBehavior::GET_TABLE_NAMES_SQL string. On failure of execution or if
+     * KDbDriverBehavior::GET_TABLE_NAMES_SQL is empty, @a ok is set to @c false. On success @a ok
+     * is set to @c true. Returning empty list is not an error.
+     *
+     * If the database driver is not able to offer such a list, do not reimplement this method, it
+     * will just always return false and users of KDb will need to take this into account.
+     *
+     * To reimplement the method, set @a ok to @c true only on successfull obtaining of table names,
+     * and to @c false otherwise.
      *
      * This method is used by tableNames() to filter out tables names that have been found in
      * project's metadata but lack related physical tables.
@@ -1019,7 +1026,7 @@ protected:
      *
      * @see tableNames()
      */
-    virtual bool drv_getTableNames(QStringList *tableNames);
+    virtual QStringList drv_getTableNames(bool *ok);
 
     /*! LOW LEVEL METHOD. For implementation: returns true if table
      with name @a tableName exists in the database.
