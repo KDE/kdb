@@ -591,9 +591,10 @@ bool KDbConnectionProxy::drv_getServerVersion(KDbServerVersionInfo* version)
     return d->connection->drv_getServerVersion(version);
 }
 
-bool KDbConnectionProxy::drv_getTableNames(QStringList *tableNames)
+QStringList KDbConnectionProxy::drv_getTableNames(bool *ok)
 {
-    return d->connection->drv_getTableNames(tableNames);
+    Q_ASSERT(ok);
+    return d->connection->drv_getTableNames(ok);
 }
 
 tristate KDbConnectionProxy::drv_containsTable(const QString &tableName)

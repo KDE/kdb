@@ -297,7 +297,7 @@ public:
     /**
      * @since 3.2
      */
-    bool drv_getTableNames(QStringList *tableNames) override;
+    QStringList drv_getTableNames(bool *ok) override;
 
     tristate drv_containsTable(const QString &tableName) override;
 
