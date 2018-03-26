@@ -3420,10 +3420,8 @@ int KDbConnection::recordCount(const KDbTableSchema& tableSchema)
 {
     //! @todo does not work with non-SQL data sources
     int count = -1; // will be changed only on success of querySingleNumber()
-    const tristate result
-        = querySingleNumber(KDbEscapedString("SELECT COUNT(*) FROM ")
-                                + tableSchema.connection()->escapeIdentifier(tableSchema.name()),
-                            &count);
+    const tristate result = querySingleNumber(
+        KDbEscapedString("SELECT COUNT(*) FROM ") + escapeIdentifier(tableSchema.name()), &count);
     if (~result) {
         count = 0;
     }
