@@ -1006,18 +1006,34 @@ QStringList KDbConnection::objectNames(int objectType, bool* ok)
 
 QStringList KDbConnection::tableNames(bool alsoSystemTables, bool* ok)
 {
+    QStringList result;
     bool success;
-    QStringList list = objectNames(KDb::TableObjectType, &success);
-    if (ok) {
-        *ok = success;
+    if (!ok) {
+        ok = &success;
     }
-    if (!success) {
+    QStringList list = objectNames(KDb::TableObjectType, ok);
+    if (!*ok) {
         m_result.prependMessage(tr("Could not retrieve list of table names."));
+        return QStringList();
     }
-    if (alsoSystemTables && success) {
+    if (alsoSystemTables) {
         list += kdbSystemTableNames();
     }
-    return list;
+    const QStringList physicalTableNames = drv_getTableNames(ok);
+    if (!*ok) {
+        m_result.prependMessage(tr("Could not retrieve list of physical table names."));
+        return QStringList();
+    }
+    QSet<QString> physicalTableNamesSet;
+    for (const QString &name : physicalTableNames) {
+        physicalTableNamesSet.insert(name.toLower());
+    }
+    for (const QString &name : list) {
+        if (physicalTableNamesSet.contains(name.toLower())) {
+            result += name;
+        }
+    }
+    return result;
 }
 
 tristate KDbConnection::containsTable(const QString &tableName)
@@ -1824,6 +1840,35 @@ bool KDbConnection::dropQuery(const QString& queryName)
         return false;
     }
     return dropQuery(qs);
+}
+
+QStringList KDbConnection::drv_getTableNames(bool *ok)
+{
+    Q_ASSERT(ok);
+    QStringList tableNames;
+    const KDbEscapedString sql(d->driver->behavior()->GET_TABLE_NAMES_SQL);
+    if (sql.isEmpty()) {
+        *ok = false;
+        return QStringList();
+    }
+    QSharedPointer<KDbSqlResult> result = prepareSql(sql);
+    if (!result) {
+        *ok = false;
+        return QStringList();
+    }
+    Q_FOREVER {
+        QSharedPointer<KDbSqlRecord> record = result->fetchRecord();
+        if (!record) {
+            if (result->lastResult().isError()) {
+                *ok = false;
+                return QStringList();
+            }
+            break;
+        }
+        tableNames.append(record->stringValue(0));
+    }
+    *ok = true;
+    return tableNames;
 }
 
 bool KDbConnection::drv_createTable(const KDbTableSchema& tableSchema)

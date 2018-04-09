@@ -110,7 +110,8 @@ void KDbTestUtils::testSqliteDriverInternal()
     QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()), "SQLite's MIME types should include the default file based one");
 }
 
-void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
+void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata,
+                                       const KDbConnectionOptions &options)
 {
     //qDebug() << cdata;
 
@@ -119,14 +120,14 @@ void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata)
         KDB_VERIFY(manager.resultable(), driver = manager.driver("org.kde.kdb.sqlite"), "Driver not found");
     }
 
-    KDbConnectionOptions connOptions;
+    KDbConnectionOptions connOptionsOverride(options);
     QStringList extraSqliteExtensionPaths;
     extraSqliteExtensionPaths << SQLITE_LOCAL_ICU_EXTENSION_PATH;
-    connOptions.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
+    connOptionsOverride.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
 
     connection.reset(); // remove previous connection if present
     const int connCount = driver->connections().count();
-    connection.reset(driver->createConnection(cdata, connOptions));
+    connection.reset(driver->createConnection(cdata, connOptionsOverride));
     KDB_VERIFY(driver, !connection.isNull(), "Failed to create connection");
     QVERIFY2(cdata.driverId().isEmpty(), "Connection data has filled driver ID");
     QCOMPARE(connection->data().driverId(), driver->metaData()->id());
@@ -153,6 +154,29 @@ void KDbTestUtils::testUseInternal()
     KDB_VERIFY(connection, connection->databaseExists(connection->data().databaseName()), "Database does not exists");
     KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
     KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
+}
+
+void KDbTestUtils::testConnectAndUseInternal(const KDbConnectionData &cdata,
+                                             const KDbConnectionOptions &options)
+{
+    if (!testConnect(cdata, options) || !connection) {
+        qWarning() << driver->result();
+        QFAIL("testConnect");
+    }
+    if (!testUse() || !connection->isDatabaseUsed()) {
+        qWarning() << connection->result();
+        bool result = testDisconnect();
+        Q_UNUSED(result);
+        QFAIL("testUse");
+    }
+}
+
+void KDbTestUtils::testConnectAndUseInternal(const QString &path,
+                                             const KDbConnectionOptions &options)
+{
+    KDbConnectionData cdata;
+    cdata.setDatabaseName(path);
+    testConnectAndUseInternal(cdata, options);
 }
 
 void KDbTestUtils::testCreateDbInternal(const QString &dbName)
