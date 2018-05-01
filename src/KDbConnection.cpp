@@ -2233,7 +2233,7 @@ tristate KDbConnection::loadObjectData(int type, int id, KDbObject* object)
         }
     } else {
         if (true != querySingleRecord(KDbEscapedString("SELECT o_id, o_type, o_name, o_caption, o_desc "
-                                                       "FROM kexi__objects WHERE o_type=%1 AND o_id=%1")
+                                                       "FROM kexi__objects WHERE o_type=%1 AND o_id=%2")
                                           .arg(d->driver->valueToSql(KDbField::Integer, type))
                                           .arg(d->driver->valueToSql(KDbField::Integer, id)),
                                       &data))
