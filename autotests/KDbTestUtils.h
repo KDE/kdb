@@ -54,6 +54,25 @@ T* KDB_POINTER_WRAPPER(const QPointer<T> &t) { return t.data(); }
 template<typename T>
 T* KDB_POINTER_WRAPPER(const QScopedPointer<T> &t) { return t.data(); }
 
+namespace QTest
+{
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const char *val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
+KDBTESTUTILS_EXPORT bool qCompare(const char *val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const QString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
+KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
+}
+
 //! Calls @a call and verifies status of @a resultable
 //! On error displays the status on debug and does the same as QVERIFY with @a errorMessage
 #define KDB_VERIFY(resultable, call, errorMessage) \

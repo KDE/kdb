@@ -18,21 +18,83 @@
 */
 
 #include "KDbTestUtils.h"
-
-#include <KDbDriverManager>
-#include <KDbDriverManager_p.h>
-#include <KDbDriverMetaData>
+#include "KDbUtils_p.h"
 #include <KDbConnection>
 #include <KDbConnectionData>
 #include <KDbConnectionOptions>
+#include <KDbDriverManager>
+#include <KDbDriverManager_p.h>
+#include <KDbDriverMetaData>
 #include <KDbProperties>
-#include "KDbUtils_p.h"
 
 #include <QFile>
 #include <QTest>
 #include <QMimeDatabase>
 
 #include "../tests/features/tables_test_p.h"
+
+namespace QTest
+{
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return val1 == val2
+        ? compare_helper(true, "COMPARE()", toString(qPrintable(val1.toString())),
+                         toString(qPrintable(val2.toString())), actual, expected, file, line)
+        : compare_helper(false, "Compared values are not the same",
+                         toString(qPrintable(val1.toString())),
+                         toString(qPrintable(val2.toString())), actual, expected, file, line);
+}
+
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const char *val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return val1 == val2
+        ? compare_helper(true, "COMPARE()", toString(qPrintable(val1.toString())),
+                         toString(val2), actual, expected, file, line)
+        : compare_helper(false, "Compared values are not the same",
+                         toString(qPrintable(val1.toString())),
+                         toString(val2), actual, expected, file, line);
+}
+
+KDBTESTUTILS_EXPORT bool qCompare(const char *val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return val1 == val2
+        ? compare_helper(true, "COMPARE()", toString(val1), toString(qPrintable(val2.toString())),
+                         actual, expected, file, line)
+        : compare_helper(false, "Compared values are not the same",
+                         toString(val1), toString(qPrintable(val2.toString())),
+                         actual, expected, file, line);
+}
+
+KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const QString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return val1 == KDbEscapedString(val2)
+        ? compare_helper(true, "COMPARE()", toString(qPrintable(val1.toString())),
+                         toString(val2), actual, expected, file, line)
+        : compare_helper(false, "Compared values are not the same",
+                         toString(qPrintable(val1.toString())),
+                         toString(val2), actual, expected, file, line);
+}
+
+KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return KDbEscapedString(val1) == val2
+        ? compare_helper(true, "COMPARE()", toString(val1), toString(qPrintable(val2.toString())),
+                         actual, expected, file, line)
+        : compare_helper(false, "Compared values are not the same",
+                         toString(val1), toString(qPrintable(val2.toString())),
+                         actual, expected, file, line);
+}
+}
 
 KDbTestUtils::KDbTestUtils()
     : connection(nullptr)
