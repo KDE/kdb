@@ -30,6 +30,8 @@
 #include <QPointer>
 #include <QTest>
 
+class KDbNativeStatementBuilder;
+
 Q_DECLARE_METATYPE(KDbField::TypeGroup)
 Q_DECLARE_METATYPE(KDbField::Type)
 Q_DECLARE_METATYPE(KDb::Signedness)
@@ -125,9 +127,21 @@ class KDBTESTUTILS_EXPORT KDbTestUtils : public QObject
 public:
     KDbTestUtils();
 
+    ~KDbTestUtils();
+
     KDbDriverManager manager;
     QPointer<KDbDriver> driver;
     QScopedPointer<KDbConnection> connection;
+
+    /**
+     * Returns builder for generating KDb SQL statements
+     */
+    KDbNativeStatementBuilder* kdbBuilder();
+
+    /**
+     * Returns builder for generating driver-native SQL statements
+     */
+    KDbNativeStatementBuilder* driverBuilder();
 
     KDBTEST_METHOD_DECL(testDriverManager, (), ());
     KDBTEST_METHOD_DECL(testSqliteDriver, (), ());
@@ -175,6 +189,11 @@ protected:
     void testDisconnectPrivate();
     void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
     void testDriverManagerInternal(bool forceEmpty);
+
+private:
+    Q_DISABLE_COPY(KDbTestUtils)
+    class Private;
+    Private * const d;
 };
 
 #endif

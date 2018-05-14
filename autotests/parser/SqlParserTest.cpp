@@ -249,9 +249,8 @@ void SqlParserTest::testParse()
     if (query) {
         // 2. Build native SQL for SQLite
         QList<QVariant> params;
-        KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::DriverEscaping);
         KDbEscapedString querySql;
-        ok = builder.generateSelectStatement(&querySql, query.data(), params);
+        ok = m_utils.driverBuilder()->generateSelectStatement(&querySql, query.data(), params);
         QVERIFY2(ok, "Failed to generate native SQLite SQL statement from query");
         //! @todo compare with template
     }
@@ -259,9 +258,8 @@ void SqlParserTest::testParse()
     if (query) {
         // 3. Build KDbSQL
         QList<QVariant> params;
-        KDbNativeStatementBuilder builder(m_utils.connection.data(), KDb::KDbEscaping);
         KDbEscapedString querySql;
-        ok = builder.generateSelectStatement(&querySql, query.data(), params);
+        ok = m_utils.kdbBuilder()->generateSelectStatement(&querySql, query.data(), params);
         QVERIFY2(ok, "Failed to generate KDbSQL statement from query");
         //! @todo compare with template
 
