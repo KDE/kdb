@@ -76,23 +76,27 @@ void IdentifierTest::testIsIdentifier()
 void IdentifierTest::escapeIdentifier_data()
 {
     QTest::addColumn<QString>("string");
-    QTest::addColumn<QString>("result");
-    QTest::newRow("empty") << "" << QString();
-    QTest::newRow("empty") << QString() << QString();
-    QTest::newRow("\"") << "\"" << "\"\"";
-    QTest::newRow("\"-\"") << "\"-\"" << "\"\"-\"\"";
-    QTest::newRow("\t") << "\t" << "\t";
-    QTest::newRow("alpha") << "a b" << "a b";
+    QTest::addColumn<QString>("result"); // quotes not always added
+    QTest::addColumn<QString>("resultWithForcedQuotes"); // quotes always added
+    QTest::newRow("empty") << "" << QString() << "\"\"";
+    QTest::newRow("empty") << QString() << QString() << "\"\"";
+    QTest::newRow("\"") << "\"" << "\"\"\"\"" << "\"\"\"\"";
+    QTest::newRow("\"-\"") << "\"-\"" << "\"\"\"-\"\"\"" << "\"\"\"-\"\"\"";
+    QTest::newRow("\t") << "\t" << "\"\t\"" << "\"\t\"";
+    QTest::newRow("id") << "id" << "id" << "\"id\"";
+    QTest::newRow("keyword") << "select" << "\"select\"" << "\"select\"";
+    QTest::newRow("alpha") << "a b" << "\"a b\"" << "\"a b\"";
 }
 
 void IdentifierTest::escapeIdentifier()
 {
     QFETCH(QString, string);
     QFETCH(QString, result);
+    QFETCH(QString, resultWithForcedQuotes);
     QCOMPARE(KDb::escapeIdentifier(string), result);
     QCOMPARE(KDb::escapeIdentifier(string.toLatin1()), result.toLatin1());
-    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string), QString::fromLatin1("\"%1\"").arg(result));
-    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string.toLatin1()), '"' + result.toLatin1() + '"');
+    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string), resultWithForcedQuotes);
+    QCOMPARE(KDb::escapeIdentifierAndAddQuotes(string.toLatin1()), resultWithForcedQuotes.toLatin1());
 }
 
 void IdentifierTest::cleanupTestCase()
