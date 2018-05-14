@@ -25,6 +25,7 @@
 #include <KDbDriverManager>
 #include <KDbDriverManager_p.h>
 #include <KDbDriverMetaData>
+#include <KDbNativeStatementBuilder>
 #include <KDbProperties>
 
 #include <QFile>
@@ -96,10 +97,41 @@ KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &v
 }
 }
 
+class KDbTestUtils::Private {
+public:
+    Private() {}
+    QScopedPointer<KDbNativeStatementBuilder> kdbBuilder;
+    QScopedPointer<KDbNativeStatementBuilder> driverBuilder;
+};
+
 KDbTestUtils::KDbTestUtils()
     : connection(nullptr)
+    , d(new Private)
 {
     QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
+}
+
+KDbTestUtils::~KDbTestUtils()
+{
+    delete d;
+}
+
+KDbNativeStatementBuilder* KDbTestUtils::kdbBuilder()
+{
+    Q_ASSERT(connection);
+    if (connection && !d->kdbBuilder) {
+        d->kdbBuilder.reset(new KDbNativeStatementBuilder(connection.data(), KDb::KDbEscaping));
+    }
+    return d->kdbBuilder.data();
+}
+
+KDbNativeStatementBuilder* KDbTestUtils::driverBuilder()
+{
+    Q_ASSERT(connection);
+    if (connection && !d->driverBuilder) {
+        d->driverBuilder.reset(new KDbNativeStatementBuilder(connection.data(), KDb::DriverEscaping));
+    }
+    return d->driverBuilder.data();
 }
 
 void KDbTestUtils::testDriverManagerInternal(bool forceEmpty)
