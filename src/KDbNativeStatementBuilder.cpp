@@ -172,7 +172,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                 }
                 const QString aliasString(querySchema->columnAlias(number));
                 if (!aliasString.isEmpty()) {
-                    sql.append(" AS ").append(aliasString);
+                    sql.append(" AS ").append(KDb::escapeIdentifier(driver, aliasString));
                 }
 //! @todo add option that allows to omit "AS" keyword
             }
@@ -200,10 +200,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
                             + QString::number(internalUniqueTableAliasNumber++));
                         s_additional_joins += KDbEscapedString("LEFT OUTER JOIN %1 AS %2 ON %3.%4=%5.%6")
                             .arg(KDb::escapeIdentifier(driver, lookupTable->name()))
-                            .arg(internalUniqueTableAlias)
+                            .arg(KDb::escapeIdentifier(driver, internalUniqueTableAlias))
                             .arg(KDb::escapeIdentifier(driver, querySchema->tableAliasOrName(f->table()->name())))
                             .arg(KDb::escapeIdentifier(driver, f->name()))
-                            .arg(internalUniqueTableAlias)
+                            .arg(KDb::escapeIdentifier(driver, internalUniqueTableAlias))
                             .arg(KDb::escapeIdentifier(driver, boundField->name()));
 
                         //add visibleField to the list of SELECTed fields //if it is not yet present there
@@ -320,7 +320,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             s_from += KDb::escapeIdentifier(driver, table->name());
             const QString aliasString(querySchema->tableAlias(number));
             if (!aliasString.isEmpty())
-                s_from.append(" AS ").append(aliasString);
+                s_from.append(" AS ").append(KDb::escapeIdentifier(driver, aliasString));
             number++;
         }
         // add subqueries for lookup data
