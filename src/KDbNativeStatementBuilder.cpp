@@ -389,7 +389,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
 
     // ORDER BY
     KDbEscapedString orderByString(querySchema->orderByColumnList()->toSqlString(
-        !singleTable /*includeTableName*/, connection, dialect));
+        !singleTable /*includeTableName*/, connection, querySchema, dialect));
     const QVector<int> pkeyFieldsOrder(querySchema->pkeyFieldsOrder(connection));
     if (dialect == KDb::DriverEscaping  && orderByString.isEmpty() && !pkeyFieldsOrder.isEmpty()) {
         // Native only: add automatic ORDER BY if there is no explicitly defined one
@@ -408,7 +408,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
             automaticPKOrderBy.appendColumn(ci);
         }
         orderByString = automaticPKOrderBy.toSqlString(!singleTable /*includeTableName*/,
-                                                       connection, dialect);
+                                                       connection, querySchema, dialect);
     }
     if (!orderByString.isEmpty())
         sql += (" ORDER BY " + orderByString);

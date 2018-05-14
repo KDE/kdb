@@ -751,6 +751,8 @@ KDbQueryColumnInfo::Vector KDbQuerySchema::fieldsExpandedInternal(
                 if (!d->fakeRecordIdField) {
                     d->fakeRecordIdField = new KDbField(QLatin1String("rowID"), KDbField::BigInteger);
                     d->fakeRecordIdCol = new KDbQueryColumnInfo(d->fakeRecordIdField, QString(), true);
+                    d->fakeRecordIdCol->d->querySchema = this;
+                    d->fakeRecordIdCol->d->connection = conn;
                 }
                 tmpFieldsExpandedWithInternal[fieldsExpandedVectorSize + internalFieldCount] = d->fakeRecordIdCol;
             }
@@ -823,6 +825,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                 foreach(KDbField *ast_f, *ast_fields) {
                     KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(ast_f, QString()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
+                    ci->d->querySchema = this;
+                    ci->d->connection = conn;
                     list.append(ci);
                     querySchemaDebug() << "caching (unexpanded) columns order:" << *ci
                                        << "at position" << fieldPosition;
@@ -838,6 +842,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
 //      list.append(tab_f);
                         KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(tab_f, QString()/*no field for asterisk!*/,
                                 isColumnVisible(fieldPosition));
+                        ci->d->querySchema = this;
+                        ci->d->connection = conn;
                         list.append(ci);
                         querySchemaDebug() << "caching (unexpanded) columns order:" << *ci
                                            << "at position" << fieldPosition;
@@ -848,6 +854,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
         } else {
             //a single field
             KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(f, columnAlias(fieldPosition), isColumnVisible(fieldPosition));
+            ci->d->querySchema = this;
+            ci->d->connection = conn;
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
             querySchemaDebug() << "caching (unexpanded) column's order:" << *ci << "at position"
@@ -888,8 +896,11 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                         cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                     }
 
-                    lookup_list.append(
-                        new KDbQueryColumnInfo(visibleColumn, QString(), true/*visible*/, ci/*foreign*/));
+                    KDbQueryColumnInfo *lookupCi = new KDbQueryColumnInfo(
+                        visibleColumn, QString(), true /*visible*/, ci /*foreign*/);
+                    lookupCi->d->querySchema = this;
+                    lookupCi->d->connection = conn;
+                    lookup_list.append(lookupCi);
                     /*
                               //add visibleField to the list of SELECTed fields if it is not yes present there
                               if (!findTableField( visibleField->table()->name()+"."+visibleField->name() )) {
@@ -943,8 +954,11 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                     cache->ownedVisibleFields.append(visibleColumn);   // remember to delete later
                 }
 
-                lookup_list.append(
-                    new KDbQueryColumnInfo(visibleColumn, QString(), true/*visible*/, ci/*foreign*/));
+                KDbQueryColumnInfo *lookupCi = new KDbQueryColumnInfo(
+                    visibleColumn, QString(), true /*visible*/, ci /*foreign*/);
+                lookupCi->d->querySchema = this;
+                lookupCi->d->connection = conn;
+                lookup_list.append(lookupCi);
                 /*
                         //add visibleField to the list of SELECTed fields if it is not yes present there
                         if (!findTableField( visibleField->table()->name()+"."+visibleField->name() )) {

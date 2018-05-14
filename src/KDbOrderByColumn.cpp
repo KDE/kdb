@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -27,7 +27,7 @@ class Q_DECL_HIDDEN KDbOrderByColumn::Private
 {
 public:
     Private()
-        : column(nullptr)
+        : columnIndex(-1)
         , pos(-1)
         , field(nullptr)
         , order(KDbOrderByColumn::SortOrder::Ascending)
@@ -36,9 +36,24 @@ public:
     Private(const Private &other) {
         copy(other);
     }
-#define KDbOrderByColumnPrivateArgs(o) std::tie(o.column, o.pos, o.field, o.order)
-    Private(KDbQueryColumnInfo* aColumn, int aPos, KDbField* aField, KDbOrderByColumn::SortOrder aOrder) {
-        KDbOrderByColumnPrivateArgs((*this)) = std::tie(aColumn, aPos, aField, aOrder);
+#define KDbOrderByColumnPrivateArgs(o) std::tie(o.querySchema, o.connection, o.columnIndex, o.pos, o.field, o.order)
+    Private(KDbQueryColumnInfo* aColumn, int aPos, KDbField* aField, KDbOrderByColumn::SortOrder aOrder)
+    {
+        const KDbQuerySchema *foundQuerySchema = nullptr;
+        KDbConnection *foundConnection = nullptr;
+        int foundColumnIndex = -1;
+        if (aColumn) {
+            foundQuerySchema =aColumn->querySchema();
+            foundConnection = aColumn->connection();
+            const KDbQueryColumnInfo::Vector fieldsExpanded = foundQuerySchema->fieldsExpanded(
+                    foundConnection, KDbQuerySchema::FieldsExpandedMode::WithInternalFields);
+            foundColumnIndex = fieldsExpanded.indexOf(aColumn);
+            if (foundColumnIndex < 0) {
+                kdbWarning() << "Column not found in query:" << *aColumn;
+            }
+        }
+        KDbOrderByColumnPrivateArgs((*this))
+            = std::tie(foundQuerySchema, foundConnection, foundColumnIndex, aPos, aField, aOrder);
     }
     void copy(const Private &other) {
         KDbOrderByColumnPrivateArgs((*this)) = KDbOrderByColumnPrivateArgs(other);
@@ -47,8 +62,18 @@ public:
         return KDbOrderByColumnPrivateArgs((*this)) == KDbOrderByColumnPrivateArgs(other);
     }
 
-    //! Column to sort, @c nullptr if field is non-0.
-    KDbQueryColumnInfo* column;
+    //! Query schema that owns the KDbQueryColumnInfo and thus also this KDbOrderByColumn object.
+    //! Cached for performance, can be cached since lifetime of the KDbOrderByColumn object depends
+    //! on the query. @c nullptr if columnIndex is not provided. @since 3.2
+    const KDbQuerySchema *querySchema = nullptr;
+
+    //! Connection used to compute expanded fields. Like querySchema, connection is cached for
+    //! performance and can be cached since lifetime of the KDbOrderByColumn object depends on the
+    //! connection. @c nullptr if columnIndex is not provided. @since 3.2
+    KDbConnection *connection = nullptr;
+
+    //! Index of column to sort, -1 if field is present. @since 3.2
+    int columnIndex;
 
     //! Value that indicates that column to sort (columnIndex) has been specified by providing its
     //! position, not name. For example, using "SELECT a, b FROM T ORDER BY 2".
@@ -96,22 +121,17 @@ KDbOrderByColumn *KDbOrderByColumn::copy(KDbConnection *conn, KDbQuerySchema *fr
     if (d->field) {
         return new KDbOrderByColumn(d->field, d->order);
     }
-    if (d->column) {
+    if (d->columnIndex >= 0) {
         KDbQueryColumnInfo* columnInfo;
         if (fromQuery && toQuery) {
-            int columnIndex = fromQuery->columnsOrder(conn).value(d->column);
-            if (columnIndex < 0) {
-                kdbWarning() << "Index not found for column" << *d->column;
-                return nullptr;
-            }
-            columnInfo = toQuery->expandedOrInternalField(conn, columnIndex);
+            columnInfo = toQuery->expandedOrInternalField(conn, d->columnIndex);
             if (!columnInfo) {
-                kdbWarning() << "Column info not found at index" << columnIndex << "in toQuery";
+                kdbWarning() << "Column info not found at index" << d->columnIndex << "in toQuery";
                 return nullptr;
             }
         }
         else {
-            columnInfo = d->column;
+            columnInfo = column();
         }
         return new KDbOrderByColumn(columnInfo, d->order, d->pos);
     }
@@ -120,7 +140,10 @@ KDbOrderByColumn *KDbOrderByColumn::copy(KDbConnection *conn, KDbQuerySchema *fr
 
 KDbQueryColumnInfo* KDbOrderByColumn::column() const
 {
-    return d->column;
+    if (d->columnIndex < 0 || !d->querySchema || !d->connection) {
+        return nullptr;
+    }
+    return d->querySchema->expandedOrInternalField(d->connection, d->columnIndex);
 }
 
 int KDbOrderByColumn::position() const
@@ -179,36 +202,65 @@ QDebug operator<<(QDebug dbg, const KDbOrderByColumn& order)
 
 KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
                                                KDbConnection *conn,
+                                               KDbQuerySchema *query,
                                                KDb::IdentifierEscapingType escapingType) const
 {
     const QByteArray orderString(d->order == KDbOrderByColumn::SortOrder::Ascending ? "" : " DESC");
     KDbEscapedString fieldName, tableName, collationString;
-    if (d->column) {
+    KDbQueryColumnInfo *col = column();
+    if (col) {
         if (d->pos > -1)
             return KDbEscapedString::number(d->pos + 1) + orderString;
         else {
-            if (includeTableName && d->column->alias().isEmpty()) {
-                tableName = KDbEscapedString(escapeIdentifier(d->column->field()->table()->name(), conn, escapingType));
+            if (includeTableName && col->field()->table() && col->alias().isEmpty()) {
+                tableName = KDbEscapedString(escapeIdentifier(col->field()->table()->name(), conn, escapingType));
                 tableName += '.';
             }
-            fieldName = KDbEscapedString(escapeIdentifier(d->column->aliasOrName(), conn, escapingType));
+            fieldName = KDbEscapedString(escapeIdentifier(col->aliasOrName(), conn, escapingType));
         }
-        if (d->column->field()->isTextType() && escapingType == KDb::DriverEscaping) {
+        if (conn && col->field()->isTextType() && escapingType == KDb::DriverEscaping) {
             collationString = conn->driver()->collationSql();
         }
     }
     else {
-        if (d->field && includeTableName) {
+        QString aliasOrName;
+        if (includeTableName && d->field && d->field->table()) {
             tableName = KDbEscapedString(escapeIdentifier(d->field->table()->name(), conn, escapingType));
             tableName += '.';
+        } else if (d->field && conn && query) {
+            if (d->field->isExpression()) {
+                const int indexOfField = query->indexOf(*d->field);
+                aliasOrName = query->columnAlias(indexOfField);
+                if (aliasOrName.isEmpty()) {
+                    kdbWarning() << "This field does not belong to specified query:" << *d->field
+                                 << endl << "cannot find alias";
+                    aliasOrName = QLatin1String("?unknown_field?");
+                }
+            } else {
+                KDbQueryColumnInfo *ci = query->columnInfo(conn, d->field->name());
+                if (ci) {
+                    aliasOrName = ci->aliasOrName();
+                }
+            }
         }
-        fieldName = KDbEscapedString(escapeIdentifier(
-            d->field ? d->field->name() : QLatin1String("??")/*error*/, conn, escapingType));
-        if (d->field && d->field->isTextType() && escapingType == KDb::DriverEscaping) {
+        if (aliasOrName.isEmpty()) {
+            // The field is not present on the SELECT list but is still correct,
+            // e.g. SELECT id FROM cars ORDER BY owner
+            aliasOrName = d->field ? d->field->name() : QLatin1String("?missing_field?")/*error*/;
+        }
+        fieldName = KDbEscapedString(escapeIdentifier(aliasOrName, conn, escapingType));
+        if (conn && d->field && d->field->isTextType() && escapingType == KDb::DriverEscaping) {
             collationString = conn->driver()->collationSql();
         }
     }
     return tableName + fieldName + collationString + orderString;
+}
+
+KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
+                                               KDbConnection *conn,
+                                               KDb::IdentifierEscapingType escapingType) const
+{
+    return toSqlString(includeTableName, conn, nullptr, escapingType);
 }
 
 //=======================================
@@ -395,15 +447,22 @@ QDebug operator<<(QDebug dbg, const KDbOrderByColumnList& list)
 }
 
 KDbEscapedString KDbOrderByColumnList::toSqlString(bool includeTableNames, KDbConnection *conn,
-                                       KDb::IdentifierEscapingType escapingType) const
+                                                   KDbQuerySchema *query,
+                                                   KDb::IdentifierEscapingType escapingType) const
 {
     KDbEscapedString string;
     for (QList<KDbOrderByColumn*>::ConstIterator it(constBegin()); it != constEnd(); ++it) {
         if (!string.isEmpty())
             string += ", ";
-        string += (*it)->toSqlString(includeTableNames, conn, escapingType);
+        string += (*it)->toSqlString(includeTableNames, conn, query, escapingType);
     }
     return string;
+}
+
+KDbEscapedString KDbOrderByColumnList::toSqlString(bool includeTableNames, KDbConnection *conn,
+                                                   KDb::IdentifierEscapingType escapingType) const
+{
+    return toSqlString(includeTableNames, conn, nullptr, escapingType);
 }
 
 void KDbOrderByColumnList::clear()

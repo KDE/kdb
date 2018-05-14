@@ -22,6 +22,7 @@
 
 #include "KDbDriver.h"
 #include "KDbExpression.h"
+#include "KDbQueryColumnInfo.h"
 #include "KDbQuerySchema.h"
 
 #include <QBitArray>
@@ -29,7 +30,34 @@
 
 class KDbConnection;
 
-//! @internal
+class Q_DECL_HIDDEN KDbQueryColumnInfo::Private
+{
+public:
+    Private(KDbField *f, const QString& a, bool v, KDbQueryColumnInfo *foreign)
+        : field(f)
+        , alias(a)
+        , visible(v)
+        , indexForVisibleLookupValue(-1)
+        , foreignColumn(foreign)
+    {
+    }
+
+    KDbConnection *connection = nullptr; //!< Used to relate KDbQueryColumnInfo with query. @since 3.2
+    const KDbQuerySchema *querySchema = nullptr; //!< Used to relate KDbQueryColumnInfo with query. @since 3.2
+    KDbField *field;
+    QString alias;
+
+    //! @c true if this column is visible to the user (and its data is fetched by the engine)
+    bool visible;
+
+    /*! Index of column with visible lookup value within the 'fields expanded' vector.
+     @see KDbQueryColumnInfo::indexForVisibleLookupValue() */
+    int indexForVisibleLookupValue;
+
+    //! Non-nullptr if this column is a visible column for @a foreignColumn
+    KDbQueryColumnInfo *foreignColumn;
+};
+
 class KDbQuerySchemaPrivate
 {
     Q_DECLARE_TR_FUNCTIONS(KDbQuerySchema)
