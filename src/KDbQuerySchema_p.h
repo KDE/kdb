@@ -240,7 +240,12 @@ public:
     KDbField::List ownedVisibleFields;
 };
 
-//! @return identifier string @a name escaped using @a conn connection and type @a escapingType
+/**
+ * Return identifier string @a name escaped using @a conn connection and type @a escapingType
+ *
+ * @a conn is only used for KDb::DriverEscaping type. If @a conn is missing for this type,
+ * identifier is escaped using double quotes (").
+ */
 QString escapeIdentifier(const QString& name, KDbConnection *conn,
                          KDb::IdentifierEscapingType escapingType);
 
