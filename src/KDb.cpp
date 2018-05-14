@@ -1325,14 +1325,21 @@ inline static T escapeIdentifier(const T& string, bool addQuotes)
     return newString;
 }
 
+static bool shouldAddQuotesToIdentifier(const QByteArray& string)
+{
+    return !string.isEmpty() && (!KDb::isIdentifier(string) || KDb::isKDbSqlKeyword(string));
+}
+
 QString KDb::escapeIdentifier(const QString& string)
 {
-    return ::escapeIdentifier<QString, QLatin1String, QLatin1Char, QChar>(string, false);
+    return ::escapeIdentifier<QString, QLatin1String, QLatin1Char, QChar>(
+        string, shouldAddQuotesToIdentifier(string.toLatin1()));
 }
 
 QByteArray KDb::escapeIdentifier(const QByteArray& string)
 {
-    return ::escapeIdentifier<QByteArray, QByteArray, char, char>(string, false);
+    return ::escapeIdentifier<QByteArray, QByteArray, char, char>(
+        string, shouldAddQuotesToIdentifier(string));
 }
 
 QString KDb::escapeIdentifierAndAddQuotes(const QString& string)
