@@ -238,7 +238,7 @@ public:
      The field does not need to be included on the list of query columns.
      Similarly, query aliases are not taken into account.
 
-     @a tableOrTableAndFieldName string may contain table name and field name
+     @a fieldOrTableAndFieldName string may contain table name and field name
      with '.' character between them, e.g. "mytable.myfield".
      This is recommended way to avoid ambiguity.
      0 is returned if the query has no such
@@ -251,7 +251,7 @@ public:
 
      @see KDb::splitToTableAndFieldParts()
     */
-    KDbField* findTableField(const QString &tableOrTableAndFieldName) const;
+    KDbField* findTableField(const QString &fieldOrTableAndFieldName) const;
 
     /*! @return alias of a column at @a position or empty string if there is no alias for this column
      or if there is no such column within the query defined. If the column is an expression and has

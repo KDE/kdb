@@ -58,7 +58,7 @@ public:
     ~KDbOrderByColumn();
 
     /*! @return copy of this KDbOrderByColumn object.
-     In @a fromQuery and @a toQuery is needed if column() is assigned to this info.
+     @a fromQuery and @a toQuery is needed if column() is assigned to this info.
      Then, column info within @a toQuery will be assigned to the new KDbOrderByColumn object,
      corresponding to column() from "this" KDbOrderByColumn object. */
     KDbOrderByColumn *copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
