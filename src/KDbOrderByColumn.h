@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -89,13 +89,26 @@ public:
     //! @since 3.1
     inline bool operator!=(const KDbOrderByColumn &other) const { return !operator==(other); }
 
-    /*! @return a string like "name ASC" usable for building an SQL statement.
-     If @a includeTableNames is true (the default) field is output in a form
-     of "tablename.fieldname" (but only if fieldname is not a name of alias).
+    /** Return an SQL string like "name ASC" or "2 DESC" usable for building an SQL statement
+     *
+     * If @a includeTableNames is @c true fields that are related to a table are
+     * printed as "tablename.fieldname".
+     *
+     * @a escapingType can be used to alter default escaping type.
+     * If @a conn is not provided for DriverEscaping, no escaping is performed.
+     * If @a query is provided, it can be used to obtain alias information.
+     *
+     * @since 3.2
+     */
+    KDbEscapedString toSqlString(bool includeTableName,
+                                 KDbConnection *conn, KDbQuerySchema *query,
+                                 KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
-     @a escapingType can be used to alter default escaping type.
-     If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    KDbEscapedString toSqlString(bool includeTableName = true,
+    /*! @overload
+
+     @deprecated since 3.2, use overload that also takes query schema
+    */
+    KDB_DEPRECATED KDbEscapedString toSqlString(bool includeTableName = true,
                                  KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
@@ -201,15 +214,29 @@ public:
      */
     QList<KDbOrderByColumn*>::ConstIterator constEnd() const;
 
-    /*! @return an SQL string like "name ASC, 2 DESC" usable for building an SQL statement.
-     If @a includeTableNames is true (the default) fields are output in a form
-     of "tablename.fieldname".
+    /** Return an SQL string like "name ASC, 2 DESC" usable for building an SQL statement
+     *
+     * If @a includeTableNames is @c true (the default) fields that are related to a table are
+     * printed as "tablename.fieldname".
+     *
+     * @a escapingType can be used to alter default escaping type.
+     * If @a conn is not provided for DriverEscaping, no escaping is performed.
+     * If @a query is provided, it can be used to obtain alias information.
+     *
+     * @since 3.2
+     */
+    KDbEscapedString toSqlString(bool includeTableNames,
+                                 KDbConnection *conn, KDbQuerySchema *query,
+                                 KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
 
-     @a escapingType can be used to alter default escaping type.
-     If @a conn is not provided for DriverEscaping, no escaping is performed. */
-    KDbEscapedString toSqlString(bool includeTableNames = true,
+    /*! @overload
+
+     @deprecated since 3.2, use overload that also takes query schema
+    */
+    KDB_DEPRECATED KDbEscapedString toSqlString(bool includeTableNames = true,
                                  KDbConnection *conn = nullptr,
                                  KDb::IdentifierEscapingType escapingType = KDb::DriverEscaping) const;
+
 private:
     class Private;
     Private * const d;
