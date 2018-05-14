@@ -49,12 +49,16 @@ public:
 
     //! Column to sort, @c nullptr if field is non-0.
     KDbQueryColumnInfo* column;
-    //! A helper for d->column that allows to know that sorting column
-    //! was defined by providing its position. -1 by default.
-    //! e.g. SELECT a, b FROM T ORDER BY 2
+
+    //! Value that indicates that column to sort (columnIndex) has been specified by providing its
+    //! position, not name. For example, using "SELECT a, b FROM T ORDER BY 2".
+    //! Value of -1 means that the column to sort has been specified by providing its name (or alias).
+    //! For example "SELECT a, b FROM T ORDER BY b". -1 is the default.
     int pos;
-    //! Used only in case when the second contructor is used.
+
+    //! Used only in case when the second constructor is used.
     KDbField* field;
+
     //! Sort order
     KDbOrderByColumn::SortOrder order;
 };

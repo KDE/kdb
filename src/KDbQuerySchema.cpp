@@ -513,10 +513,10 @@ bool KDbQuerySchema::contains(KDbTableSchema *table) const
     return d->tables.contains(table);
 }
 
-KDbField* KDbQuerySchema::findTableField(const QString &tableOrTableAndFieldName) const
+KDbField* KDbQuerySchema::findTableField(const QString &fieldOrTableAndFieldName) const
 {
     QString tableName, fieldName;
-    if (!KDb::splitToTableAndFieldParts(tableOrTableAndFieldName,
+    if (!KDb::splitToTableAndFieldParts(fieldOrTableAndFieldName,
                                         &tableName, &fieldName,
                                         KDb::SetFieldNameIfNoTableName)) {
         return nullptr;
