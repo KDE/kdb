@@ -111,7 +111,8 @@ public:
             if (t == KDbField::BigInteger) {
                 return QVariant(qint64(sqlite3_column_int64(prepared_st_handle, i)));
             } else if (KDbField::isIntegerType(t)) {
-                return QVariant(sqlite3_column_int(prepared_st_handle, i));
+                const int intVal = sqlite3_column_int(prepared_st_handle, i);
+                return f->isUnsigned() ? QVariant(static_cast<uint>(intVal)) : QVariant(intVal);
             } else if (t == KDbField::Boolean) {
                 return sqlite3_column_int(prepared_st_handle, i) != 0;
             } else if (KDbField::isFPNumericType(t)) { //WEIRD, YEAH?
@@ -126,7 +127,8 @@ public:
             } else if (t == KDbField::BigInteger) {
                 return QVariant(qint64(sqlite3_column_int64(prepared_st_handle, i)));
             } else if (KDbField::isIntegerType(t)) {
-                return QVariant(int(sqlite3_column_double(prepared_st_handle, i)));
+                const double doubleVal = sqlite3_column_double(prepared_st_handle, i);
+                return f->isUnsigned() ? QVariant(static_cast<uint>(doubleVal)) : QVariant(static_cast<int>(doubleVal));
             } else {
                 return QVariant(); //!< @todo
             }
