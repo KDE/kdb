@@ -71,7 +71,7 @@ QValidator::State KDbLongLongValidator::validate(QString &str, int &) const
         if ((d->min || d->max) && d->min >= 0)
             ok = false;
         else
-            return QValidator::Acceptable;
+            return QValidator::Intermediate;
     } else if (!newStr.isEmpty())
         val = newStr.toLongLong(&ok, d->base);
     else {
@@ -88,7 +88,7 @@ QValidator::State KDbLongLongValidator::validate(QString &str, int &) const
     if (d->max && d->min >= 0 && val < 0)
         return QValidator::Invalid;
 
-    return QValidator::Acceptable;
+    return QValidator::Intermediate;
 }
 
 void KDbLongLongValidator::fixup(QString &str) const

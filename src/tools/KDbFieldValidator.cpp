@@ -47,6 +47,7 @@ KDbFieldValidator::KDbFieldValidator(const KDbField &field, QWidget * parent)
         } else if (t == KDbField::Integer) {
             bottom = u ? 0 : -0x7fffffff - 1;
             top = u ? 0xffffffff : 0x7fffffff;
+            validator = new KDbLongLongValidator(bottom, top, nullptr);
         } else if (t == KDbField::BigInteger) {
 //! @todo handle unsigned (using ULongLongValidator)
             validator = new KDbLongLongValidator(nullptr);
