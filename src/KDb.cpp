@@ -1629,7 +1629,7 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     int new_length = str.length(); //after X' or 0x, etc.
     if (type == BLOBEscapingType::Octal) {
         // only escape nonprintable characters as in Table 8-7:
-        // http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
+        // https://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
         // i.e. escape for bytes: < 32, >= 127, 39 ('), 92(\).
         for (int i = 0; i < size; i++) {
             const unsigned char val = array[i];
@@ -1687,7 +1687,7 @@ QByteArray KDb::pgsqlByteaToByteArray(const char* data, int length)
         for (int input = 0; s < end; output++) {
             //  kdbDebug()<<(int)s[0]<<" "<<(int)s[1]<<" "<<(int)s[2]<<" "<<(int)s[3]<<" "<<(int)s[4];
             if (s[0] == '\\' && (s + 1) < end) {
-                //special cases as in http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
+                //special cases as in https://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
                 if (s[1] == '\'') {// \'
                     if (pass == 1)
                         array[output] = '\'';

@@ -52,7 +52,7 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
     beh->CLOSING_QUOTATION_MARK_BEGIN_FOR_IDENTIFIER = '"';
     beh->LIKE_OPERATOR = QLatin1String("ILIKE");
     // Use SQL compliant TRUE or FALSE as described
-    // at http://www.postgresql.org/docs/8.0/interactive/datatype-boolean.html
+    // at https://www.postgresql.org/docs/8.0/interactive/datatype-boolean.html
     // 1 or 0 does not work.
     beh->BOOLEAN_TRUE_LITERAL = QLatin1String("TRUE");
     beh->BOOLEAN_FALSE_LITERAL = QLatin1String("FALSE");
@@ -62,7 +62,7 @@ PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
     initPgsqlToKDbMap();
 
     //predefined properties
-    //http://www.postgresql.org/docs/9.5/static/libpq-misc.html#LIBPQ-PQLIBVERSION
+    //https://www.postgresql.org/docs/9.5/static/libpq-misc.html#LIBPQ-PQLIBVERSION
 //! @todo use QLibrary to resolve PQlibVersion
     beh->properties.insert("client_library_version", PQlibVersion());
     //! @todo pgsql default_server_encoding: should be a property of connection
@@ -129,7 +129,7 @@ KDbEscapedString PostgresqlDriver::escapeString(const QString& str) const
 {
     //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
-    //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
+    //see https://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
     return KDbEscapedString("E'")
            + KDbEscapedString(str).replace("\\", "\\\\").replace("'", "\\\'")
            + "'";
@@ -139,7 +139,7 @@ KDbEscapedString PostgresqlDriver::escapeString(const QByteArray& str) const
 {
     //Cannot use libpq escape functions as they require a db connection
     //to escape using the char encoding of the database
-    //see http://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
+    //see https://www.postgresql.org/docs/8.1/static/libpq-exec.html#LIBPQ-EXEC-ESCAPE-STRING
     return KDbEscapedString("'")
            + QByteArray(str).replace("\\", "\\\\").replace("'", "\\\'")
            + "'";

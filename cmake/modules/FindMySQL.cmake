@@ -19,7 +19,7 @@ include(CheckCXXSourceCompiles)
 include(MacroPushRequiredVars)
 include(FeatureSummary)
 set_package_properties(MySQL PROPERTIES
-    DESCRIPTION "MySQL Client Library (libmysqlclient)" URL "http://www.mysql.com")
+    DESCRIPTION "MySQL Client Library (libmysqlclient)" URL "https://www.mysql.com")
 
 set(MYSQL_USING_MARIADB FALSE)
 

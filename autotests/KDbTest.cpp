@@ -960,7 +960,7 @@ KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:
     ISO 8601 DateTime format - with "T" delimiter/
-    For specification see http://www.w3.org/TR/NOTE-datetime.
+    For specification see https://www.w3.org/TR/NOTE-datetime.
     Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
     @todo Add support for time zones */
 KDB_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);

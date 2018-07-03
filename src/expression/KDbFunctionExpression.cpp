@@ -444,7 +444,7 @@ BuiltInFunctions::BuiltInFunctions()
     m_functions.insert(QLatin1String("CEILING"), decl = new CeilingFloorFunctionDeclaration);
     /* ceiling(X) returns the largest integer value not less than X. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_ceiling
-    // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
+    // See also https://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
     // SQLite has no equivalent of ceiling() so this is used:
     // (CASE WHEN X = CAST(X AS INT) THEN CAST(X AS INT) WHEN X >= 0 THEN CAST(X AS INT) + 1 ELSE CAST(X AS INT) END)
     //! @todo add a custom function to SQLite to optimize/simplify things
@@ -474,7 +474,7 @@ BuiltInFunctions::BuiltInFunctions()
     m_functions.insert(QLatin1String("FLOOR"), decl = new CeilingFloorFunctionDeclaration);
     /* floor(X) returns the largest integer value not greater than X. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_floor
-    // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
+    // See also https://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
     // SQLite has no equivalent of floor() so this is used:
     // (CASE WHEN X >= 0 OR X = CAST(X AS INT) THEN CAST(X AS INT) ELSE CAST(X AS INT) - 1 END)
     //! @todo add a custom function to SQLite to optimize/simplify things
@@ -500,7 +500,7 @@ BuiltInFunctions::BuiltInFunctions()
     // For pgsql GREATEST() function ignores NULL values, it only returns NULL
     // if all the expressions evaluate to NULL. So this is used for MAX(v0,..,vN):
     // (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE GREATEST(v0,..,vN) END)
-    // See also http://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-GREATEST-LEAST
+    // See also https://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-GREATEST-LEAST
     //! @todo for pgsql CREATE FUNCTION can be used to speed up and simplify things
     // For mysql GREATEST() is used.
     // See https://dev.mysql.com/doc/refman/5.1/en/comparison-operators.html#function_greatest
@@ -520,7 +520,7 @@ BuiltInFunctions::BuiltInFunctions()
     /* The hex() function interprets its argument as a BLOB and returns a string which is
     the upper-case hexadecimal rendering of the content of that blob. */
     /* For pgsql UPPER(ENCODE(val, 'hex')) is used,
-       See http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-OTHER */
+       See https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-OTHER */
     // example: SELECT HEX(X'BEEF'), HEX('DEAD')
     // result: "BEEF", "44454144"
     //! @todo HEX(int) for SQLite is not the same as HEX(int) for MySQL so we disable it
@@ -546,7 +546,7 @@ BuiltInFunctions::BuiltInFunctions()
      interpreted as strings. If either X or Y are NULL in instr(X,Y) then the result
      is NULL. */
     //! @todo PostgreSQL does not have instr() but CREATE FUNCTION can be used,
-    //!       see http://www.postgresql.org/docs/9.5/static/plpgsql-porting.html
+    //!       see https://www.postgresql.org/docs/9.5/static/plpgsql-porting.html
     //! @todo support (BLOB, BLOB)?
     /* From the same docs:
      Or, if X and Y are both BLOBs, then instr(X,Y) returns one more than the number bytes
@@ -570,7 +570,7 @@ BuiltInFunctions::BuiltInFunctions()
     // For pgsql LEAST() function ignores NULL values, it only returns NULL
     // if all the expressions evaluate to NULL. So this is used for MAX(v0,..,vN):
     // (CASE WHEN (v0) IS NULL OR .. OR (vN) IS NULL THEN NULL ELSE LEAST(v0,..,vN) END)
-    // See also http://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-GREATEST-LEAST
+    // See also https://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-GREATEST-LEAST
     //! @todo for pgsql CREATE FUNCTION can be used to speed up and simplify things
     // For mysql LEAST() is used.
     // See https://dev.mysql.com/doc/refman/5.1/en/comparison-operators.html#function_least
@@ -610,7 +610,7 @@ BuiltInFunctions::BuiltInFunctions()
     // Note: SQLite such as 3.8 without ICU extension does not convert non-latin1 characters
     // too well; Kexi uses ICU extension by default so the results are very good.
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_lower
-    // See also http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
+    // See also https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
     // example: SELECT LOWER("MEGSZENTSÉGTELENÍTHETETLENSÉGESKEDÉSEITEKÉRT")
     // result: "megszentségteleníthetetlenségeskedéseitekért"
     decl->defaultReturnType = KDbField::LongText;
@@ -624,7 +624,7 @@ BuiltInFunctions::BuiltInFunctions()
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_ltrim
     //! @todo MySQL's LTRIM only supports one arg. TRIM() does not work too
     //! https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_trim
-    // See also http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
+    // See also https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
     // example: SELECT LTRIM("  John Smith")
     // result: "John Smith"
     // example: SELECT LTRIM("a b or c", "ab ")
@@ -641,7 +641,7 @@ BuiltInFunctions::BuiltInFunctions()
      uses that collating function for all string comparisons. If neither argument to
      nullif() defines a collating function then the BINARY is used. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/control-flow-functions.html#function_nullif
-    // See also http://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-NULLIF
+    // See also https://www.postgresql.org/docs/9.5/static/functions-conditional.html#FUNCTIONS-NULLIF
     // example: SELECT NULLIF("John", "Smith"), NULLIF(177, 177)
     // result: "John", NULL
     decl->copyReturnTypeFromArg = 0;
@@ -660,7 +660,7 @@ BuiltInFunctions::BuiltInFunctions()
     // Similarly, RANDOM(X,Y) for SQLite is equal
     // to (X + CAST((Y - X) * (RANDOM()+9223372036854775807)/18446744073709551615 AS INT)).
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_rand
-    // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-RANDOM-TABLE
+    // See also https://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-RANDOM-TABLE
     //! @note rand(X) (where X is a seed value to set) isn't portable between MySQL and PostgreSQL,
     //! and does not exist in SQLite, so we don't support it.
     // example: SELECT RANDOM(), RANDOM(2, 5)
@@ -676,7 +676,7 @@ BuiltInFunctions::BuiltInFunctions()
     /* The round(X,Y) function returns a floating-point value X rounded to Y digits to the
      right of the decimal point. If the Y argument is omitted, it is assumed to be 0. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/mathematical-functions.html#function_round
-    // See also http://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
+    // See also https://www.postgresql.org/docs/9.5/static/functions-math.html#FUNCTIONS-MATH-FUNC-TABLE
     //! @note round(X,Y) where Y < 0 is supported only by MySQL so we ignore this case
     // example: SELECT ROUND(-1.13), ROUND(-5.51), ROUND(5.51), ROUND(1.298, 1), ROUND(1.298, 0), ROUND(7)
     // result: -1, -6, 6, 1.3, 1, 7
@@ -692,7 +692,7 @@ BuiltInFunctions::BuiltInFunctions()
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_ltrim
     //! @todo MySQL's RTRIM only supports one arg. TRIM() does not work too
     //! https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_trim
-    // See also http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
+    // See also https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
     // example: SELECT RTRIM("John Smith   ")
     // result: "John Smith"
     // example: SELECT RTRIM("a b or c", "orc ")
@@ -707,7 +707,7 @@ BuiltInFunctions::BuiltInFunctions()
      X. The string "?000" is returned if the argument is NULL or contains non-ASCII
      alphabetic characters. */
     // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_soundex
-    // See also http://www.postgresql.org/docs/9.5/static/fuzzystrmatch.html#AEN165853
+    // See also https://www.postgresql.org/docs/9.5/static/fuzzystrmatch.html#AEN165853
     //! @todo we call drv_executeSql("CREATE EXTENSION IF NOT EXISTS fuzzystrmatch") on connection,
     //!       do that on first use of SOUNDEX()
     // example: SELECT SOUNDEX("John")
@@ -737,7 +737,7 @@ BuiltInFunctions::BuiltInFunctions()
      // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_trim
      //! @todo MySQL's TRIM only supports one arg. TRIM() does not work too
      //! https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_trim
-     // See also http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
+     // See also https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
      // example: SELECT TRIM("  John Smith   ")
      // result: "John Smith"
      // example: SELECT TRIM("a b or c", "orca ")
@@ -765,7 +765,7 @@ BuiltInFunctions::BuiltInFunctions()
      // Note: SQLite such as 3.8 without ICU extension does not convert non-latin1 characters
      // too well; Kexi uses ICU extension by default so the results are very good.
      // See also https://dev.mysql.com/doc/refman/5.1/en/string-functions.html#function_upper
-     // See also http://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
+     // See also https://www.postgresql.org/docs/9.5/static/functions-string.html#FUNCTIONS-STRING-SQL
      // example: SELECT UPPER("megszentségteleníthetetlenségeskedéseitekért")
      // result: "MEGSZENTSÉGTELENÍTHETETLENSÉGESKEDÉSEITEKÉRT"
      decl->defaultReturnType = KDbField::LongText;

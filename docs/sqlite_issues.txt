@@ -94,7 +94,7 @@ and the default value for the column.
 ---------------------------------------------------------------
 OPTIMIZATION:
 
-http://www.mail-archive.com/sqlite-users@sqlite.org/msg04117.html
+https://www.mail-archive.com/sqlite-users@sqlite.org/msg04117.html
 
 From: D. Richard Hipp [mailto:[EMAIL PROTECTED]
 Sent: Friday, October 08, 2004 5:59 PM

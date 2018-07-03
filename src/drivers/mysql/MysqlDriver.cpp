@@ -123,7 +123,7 @@ bool MysqlDriver::supportsDefaultValue(const KDbField &field) const
 
 KDbEscapedString MysqlDriver::escapeString(const QString& str) const
 {
-    //escape as in http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
+    //escape as in https://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 //! @todo support more characters, like %, _
 
     const int old_length = str.length();
@@ -188,7 +188,7 @@ KDbEscapedString MysqlDriver::escapeBLOB(const QByteArray& array) const
 KDbEscapedString MysqlDriver::escapeString(const QByteArray& str) const
 {
 //! @todo optimize using mysql_real_escape_string()?
-//! see http://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
+//! see https://dev.mysql.com/doc/refman/5.0/en/string-syntax.html
 
     return KDbEscapedString("'") + KDbEscapedString(str)
            .replace('\\', "\\\\")

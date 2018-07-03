@@ -62,7 +62,7 @@
             "KDb/Driver"
         ],
         "Version": "3.1",
-        "Website": "http://kexi-project.org"
+        "Website": "https://kexi-project.org"
     },
     "X-KDb-FileBased": "true",
     "X-KDb-ImportingEnabled": "false"

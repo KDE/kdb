@@ -77,7 +77,7 @@
 
 include(FeatureSummary)
 set_package_properties(PostgreSQL
-    PROPERTIES DESCRIPTION "C API to PostgreSQL (libpq)" URL "http://www.postgresql.org")
+    PROPERTIES DESCRIPTION "C API to PostgreSQL (libpq)" URL "https://www.postgresql.org")
 
 set(PostgreSQL_INCLUDE_PATH_DESCRIPTION "top-level directory containing the PostgreSQL include directories. E.g /usr/local/include/PostgreSQL/8.4 or C:/Program Files/PostgreSQL/8.4/include")
 set(PostgreSQL_INCLUDE_DIR_MESSAGE "Set the PostgreSQL_INCLUDE_DIR cmake cache entry to the ${PostgreSQL_INCLUDE_PATH_DESCRIPTION}")

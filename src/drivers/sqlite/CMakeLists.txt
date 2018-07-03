@@ -12,7 +12,7 @@ endif ()
 
 # Definitions used for the sqlite driver and the shell
 add_definitions(
-    # sqlite compile-time options, http://sqlite.org/compile.html
+    # sqlite compile-time options, https://sqlite.org/compile.html
     -DSQLITE_SECURE_DELETE
     -DSQLITE_ENABLE_COLUMN_METADATA # Some additional APIs that provide convenient access to meta-data
                                     # about tables and queries
@@ -26,8 +26,8 @@ add_definitions(
                           # to chose a better query plan under certain situations
     -DSQLITE_ENABLE_UPDATE_DELETE_LIMIT # Optional ORDER BY and LIMIT clause on UPDATE and DELETE statements
     -DSQLITE_ENABLE_UNLOCK_NOTIFY # Enables the sqlite3_unlock_notify() interface and its associated functionality
-                                  # (http://sqlite.org/unlock_notify.html)
-    -DSQLITE_SOUNDEX # Enables the soundex() SQL function (http://sqlite.org/lang_corefunc.html#soundex)
+                                  # (https://sqlite.org/unlock_notify.html)
+    -DSQLITE_SOUNDEX # Enables the soundex() SQL function (https://sqlite.org/lang_corefunc.html#soundex)
 
 # todo -DSQLITE_OMIT_DEPRECATED
 )

@@ -53,7 +53,7 @@ public:
     void storeResult(KDbResult *result);
 
     //! @return true if status of connection is "OK".
-    /*! From http://www.postgresql.org/docs/8.4/static/libpq-status.html:
+    /*! From https://www.postgresql.org/docs/8.4/static/libpq-status.html:
         "Only two of these are seen outside of an asynchronous connection procedure:
          CONNECTION_OK and CONNECTION_BAD." */
     inline bool connectionOK() { return CONNECTION_OK == PQstatus(conn); }

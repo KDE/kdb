@@ -156,7 +156,7 @@ int xBaseExportPrivate::fieldLength(KDbField* f)
     return f->maxLength();
   }
   // return the max possible (string)length of the types
-  // see http://linux.techass.com/projects/xdb/xbasedocs/xbase_c3.html
+  // see https://linux.techass.com/projects/xdb/xbasedocs/xbase_c3.html
   switch(type(t)) {
     case XB_CHAR_FLD:
       return 254;

@@ -16,7 +16,7 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 #)
 
 ########### generate parser/lexer files ###############
-# as described at http://public.kitware.com/pipermail/cmake/2002-September/003028.html
+# as described at https://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
 # Create target for the parser
 add_custom_target(parser echo "Creating parser/lexer files")

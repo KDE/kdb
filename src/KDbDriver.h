@@ -363,7 +363,7 @@ protected:
     /*! @return true if the database supports specifying default values for field @a field.
      @c true by default.
      For example MySQL does not support default values for BLOB, TEXT, GEOMETRY, and JSON types.
-     (http://dev.mysql.com/doc/refman/5.7/en/data-type-defaults.html). */
+     (https://dev.mysql.com/doc/refman/5.7/en/data-type-defaults.html). */
     virtual bool supportsDefaultValue(const KDbField &field) const { Q_UNUSED(field); return true; }
 
     /*! Used by the driver manager to set metaData for just loaded driver. */

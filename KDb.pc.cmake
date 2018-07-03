@@ -6,7 +6,7 @@ includedir=${prefix}/include
 Name: @PROJECT_NAME@@PROJECT_STABLE_VERSION_MAJOR@
 Description: A database connectivity and creation framework
 Version: @PROJECT_VERSION@
-URL: http://community.kde.org/KDb
+URL: https://community.kde.org/KDb
 Requires: Qt5Core Qt5Gui Qt5Widgets Qt5Xml icu-lo KF5CoreAddons
 Libs: -L${libdir}
 Cflags: -I${includedir}

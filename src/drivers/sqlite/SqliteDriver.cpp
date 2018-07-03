@@ -82,7 +82,7 @@ SqliteDriver::SqliteDriver(QObject *parent, const QVariantList &args)
     beh->typeNames[KDbField::BigInteger] = QLatin1String("BigInteger");
     beh->typeNames[KDbField::Boolean] = QLatin1String("Boolean");
     beh->typeNames[KDbField::Date] = QLatin1String("Date"); // In fact date/time types could be declared as datetext etc.
-    beh->typeNames[KDbField::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see http://sqlite.org/datatype3.html
+    beh->typeNames[KDbField::DateTime] = QLatin1String("DateTime"); // to force text affinity..., see https://sqlite.org/datatype3.html
     beh->typeNames[KDbField::Time] = QLatin1String("Time");
     beh->typeNames[KDbField::Float] = QLatin1String("Float");
     beh->typeNames[KDbField::Double] = QLatin1String("Double");

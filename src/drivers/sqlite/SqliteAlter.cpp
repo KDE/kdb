@@ -25,7 +25,7 @@
 #include <QHash>
 #include <QGlobalStatic>
 
-enum SqliteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (http://sqlite.org/datatype3.html)
+enum SqliteTypeAffinity { //as defined here: 2.1 Determination Of Column Affinity (https://sqlite.org/datatype3.html)
     NoAffinity = 0, IntAffinity = 1, TextAffinity = 2, BLOBAffinity = 3
 };
 
@@ -75,7 +75,7 @@ tristate SqliteConnection::drv_changeFieldProperty(KDbTableSchema *table, KDbFie
 }
 
 /*!
- From http://sqlite.org/datatype3.html :
+ From https://sqlite.org/datatype3.html :
  Version 3 enhances provides the ability to store integer and real numbers in a more compact
  format and the capability to store BLOB data.
 

@@ -35,7 +35,7 @@ public:
      * Constructor sets database features and
      * maps the types in KDbField::Type to the MySQL types.
      *
-     * See: http://dev.mysql.com/doc/mysql/en/Column_types.html
+     * See: https://dev.mysql.com/doc/mysql/en/Column_types.html
      */
     MysqlDriver(QObject *parent, const QVariantList &args);
 

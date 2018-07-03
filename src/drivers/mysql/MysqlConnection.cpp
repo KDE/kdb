@@ -52,7 +52,7 @@ bool MysqlConnection::drv_connect()
     }
 
     // Get lower_case_table_name value so we know if there's case sensitivity supported
-    // See http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
+    // See https://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html
     int intLowerCaseTableNames = 0;
     const tristate res = querySingleNumber(
         KDbEscapedString("SHOW VARIABLES LIKE 'lower_case_table_name'"), &intLowerCaseTableNames,
@@ -66,12 +66,12 @@ bool MysqlConnection::drv_connect()
 
 bool MysqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
-    // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
+    // https://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-info.html
     version->setString(QLatin1String(mysql_get_server_info(d->mysql)));
 
     // get the version info using 'version' built-in variable:
 //! @todo this is hardcoded for now; define api for retrieving variables and use this API...
-    // http://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-version.html
+    // https://dev.mysql.com/doc/refman/5.1/en/mysql-get-server-version.html
     QString versionString;
     tristate res = querySingleString(KDbEscapedString("SELECT @@version"), &versionString,
         /*column*/ 0,

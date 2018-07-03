@@ -11,7 +11,7 @@
 
 include(FeatureSummary)
 set_package_properties(ICU PROPERTIES DESCRIPTION "International Components for Unicode Library (ICU)"
-                       URL "http://icu-project.org")
+                       URL "https://icu-project.org")
 
 # Look for the header file.
 find_path(
