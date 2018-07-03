@@ -328,7 +328,7 @@ static void icuRegexpFunc(sqlite3_context *p, int nArg, sqlite3_value **apArg){
 **     lower('I', 'en_us') -> 'i'
 **     lower('I', 'tr_tr') -> 'ı' (small dotless i)
 **
-** http://www.icu-project.org/userguide/posix.html#case_mappings
+** https://www.icu-project.org/userguide/posix.html#case_mappings
 */
 static void icuCaseFunc16(sqlite3_context *p, int nArg, sqlite3_value **apArg){
   const UChar *zInput;

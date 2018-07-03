@@ -3,5 +3,5 @@
 To avoid big memory consuming, we will need to use backend-side (native) cursors
 with "DECLARE CURSOR" statement. Otherwise KDbCursor needs to be buffered.
 
-http://archives.postgresql.org/pgsql-interfaces/2000-09/msg00082.php
+https://archives.postgresql.org/pgsql-interfaces/2000-09/msg00082.php
 

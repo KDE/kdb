@@ -193,13 +193,13 @@ public:
 
     /*! Literal for boolean true. "1" by default
         which is typically expected by backends even while the standard says "TRUE":
-        http://troels.arvin.dk/db/rdbms/#data_types-boolean
+        https://troels.arvin.dk/db/rdbms/#data_types-boolean
     */
     QString BOOLEAN_TRUE_LITERAL;
 
     /*! Literal for boolean false. "0" by default
         which is typically expected by backends even while the standard says "TRUE":
-        http://troels.arvin.dk/db/rdbms/#data_types-boolean
+        https://troels.arvin.dk/db/rdbms/#data_types-boolean
     */
     QString BOOLEAN_FALSE_LITERAL;
 

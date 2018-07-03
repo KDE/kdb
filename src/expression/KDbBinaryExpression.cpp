@@ -102,7 +102,7 @@ KDbField::Type KDbBinaryExpressionData::typeInternal(KDb::ExpressionCallStack* c
         switch (token.value()) {
         //! @todo add general support, e.g. for "NULL AND (1 == 1)"; for now we only support
         //! constants because there's no evaluation and operations with NULL depend on whether we have TRUE or FALSE
-        //! See http://www.postgresql.org/docs/9.4/static/functions-logical.html
+        //! See https://www.postgresql.org/docs/9.4/static/functions-logical.html
         //!     https://dev.mysql.com/doc/refman/5.0/en/logical-operators.html
         case OR: {
             const KDbConstExpressionData *leftConst = left()->convertConst<KDbConstExpressionData>();

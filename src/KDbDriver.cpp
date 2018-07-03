@@ -244,7 +244,7 @@ static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Ty
 
 KDbEscapedString KDbDriver::valueToSql(KDbField::Type ftype, const QVariant& v) const
 {
-    //! note, it was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions.
+    //! note, it was compatible with SQLite: https://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions.
     return valueToSqlInternal(this, ftype, v);
 }
 
@@ -255,9 +255,9 @@ KDbEscapedString KDb::valueToSql(KDbField::Type ftype, const QVariant& v)
 
 KDbEscapedString KDb::dateTimeToSql(const QDateTime& v)
 {
-    /*! (was compatible with SQLite: http://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
+    /*! (was compatible with SQLite: https://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
         Now it's ISO 8601 DateTime format - with "T" delimiter:
-        http://www.w3.org/TR/NOTE-datetime
+        https://www.w3.org/TR/NOTE-datetime
         (e.g. "1994-11-05T13:15:30" not "1994-11-05 13:15:30")
         @todo add support for time zones?
     */

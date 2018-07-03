@@ -169,7 +169,7 @@ bool SqliteConnection::drv_useDatabaseInternal(bool *cancelled,
         // Set the secure-delete on, so SQLite overwrites deleted content with zeros.
         // The default setting is determined by the SQLITE_SECURE_DELETE compile-time option but we overwrite it here.
         // Works with 3.6.23. Earlier version just ignore this pragma.
-        // See http://www.sqlite.org/pragma.html#pragma_secure_delete
+        // See https://www.sqlite.org/pragma.html#pragma_secure_delete
 //! @todo add connection flags to the driver and global setting to control the "secure delete" pragma
         if (!drv_executeSql(KDbEscapedString("PRAGMA secure_delete = on"))) {
             drv_closeDatabaseSilently();

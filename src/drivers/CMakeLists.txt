@@ -28,7 +28,7 @@ endmacro()
 
 # find SQLite:
 set(SQLITE_MIN_VERSION 3.6.16)
-set(SQLITE_RECOMMENDED_VERSION 3.22.0)
+set(SQLITE_RECOMMENDED_VERSION 3.24.0)
 set(SQLITE_LOAD_EXTENSION_REQUIRED ON)
 set(BUILD_SQLITE_DB_DRIVER_DESC "SQLite database driver")
 find_package(Sqlite ${SQLITE_MIN_VERSION})
@@ -70,7 +70,7 @@ endif()
 #find_package(FreeTDS)
 #set_package_properties(FreeTDS PROPERTIES
 #                       DESCRIPTION "Open source implementation of the TDS (Tabular Data Stream) protocol"
-#                       URL "http://www.freetds.org"
+#                       URL "https://www.freetds.org"
 #                       TYPE OPTIONAL
 #                       PURPOSE "Required by ${BUILD_SYBASE_DB_DRIVER_DESC}"
 #)
@@ -84,7 +84,7 @@ endif()
 #find_package(XBase)
 #set_package_properties(XBase PROPERTIES
 #                       DESCRIPTION "XBase compatible C++ class library"
-#                       URL "http://linux.techass.com/projects/xdb"
+#                       URL "https://linux.techass.com/projects/xdb"
 #                       TYPE OPTIONAL
 #                       PURPOSE "Required by ${BUILD_XBASE_DB_DRIVER_DESC}"
 #)

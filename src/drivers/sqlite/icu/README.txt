@@ -34,8 +34,8 @@ SQLite. Documentation follows.
     "language specific". Refer to ICU documentation for the differences
     between the two. Specifically:
 
-       http://www.icu-project.org/userguide/caseMappings.html
-       http://www.icu-project.org/userguide/posix.html#case_mappings
+       https://www.icu-project.org/userguide/caseMappings.html
+       https://www.icu-project.org/userguide/posix.html#case_mappings
 
     To utilise "general" case mapping, the upper() or lower() scalar
     functions are invoked with one argument:

@@ -762,7 +762,7 @@ WHERE aExpr
 }
 ;
 
-/* todo: support "ORDER BY NULL" as described here http://dev.mysql.com/doc/refman/5.1/en/select.html */
+/* todo: support "ORDER BY NULL" as described here https://dev.mysql.com/doc/refman/5.1/en/select.html */
 /* todo: accept expr and position as well */
 OrderByClause:
 OrderByColumnId

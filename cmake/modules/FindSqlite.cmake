@@ -38,7 +38,7 @@
 #      ENABLE_COLUMN_METADATA ENABLE_FTS3 ENABLE_FTS3_PARENTHESIS ENABLE_MEMORY_MANAGEMENT
 #      ENABLE_RTREE ENABLE_UNLOCK_NOTIFY ENABLE_UPDATE_DELETE_LIMIT SECURE_DELETE SOUNDEX
 #      TEMP_STORE THREADSAFE OMIT_LOAD_EXTENSION.
-#      For complete list of options read http://www.sqlite.org/compile.html
+#      For complete list of options read https://www.sqlite.org/compile.html
 #      SQLITE_COMPILE_OPTIONS list is used for the check.
 #  SQLITE_INCLUDE_PATH      include directory for sqlite3.h
 #  SQLITE_EXT_INCLUDE_PATH      include directory for sqlite3ext.h
@@ -53,7 +53,7 @@ set(Sqlite_FOUND TRUE)
 
 include(FeatureSummary)
 set_package_properties(Sqlite
-    PROPERTIES DESCRIPTION "SQLite3 client library" URL "http://www.sqlite.org")
+    PROPERTIES DESCRIPTION "SQLite3 client library" URL "https://www.sqlite.org")
 
 if(SQLITE_INCLUDE_DIR AND SQLITE_LIBRARIES)
    if(SQLITE_LOAD_EXTENSION_REQUIRED AND SQLITE_LOAD_EXTENSION OR NOT SQLITE_LOAD_EXTENSION_REQUIRED)

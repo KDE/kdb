@@ -766,13 +766,13 @@ def process():
                 write(outfile, """/*! @note objects of this class are explicitly shared, what means they behave like regular
           C++ pointers, except that by doing reference counting and not deleting the shared
           data object until the reference count is 0, they avoid the dangling pointer problem.
-          See <a href="http://doc.qt.io/qt-5/qexplicitlyshareddatapointer.html#details">Qt documentation</a>.
+          See <a href="https://doc.qt.io/qt-5/qexplicitlyshareddatapointer.html#details">Qt documentation</a>.
  */
 """)
             else:
                 write(outfile, """/*! @note objects of this class are implicitly shared, what means they have value semantics
           by offering copy-on-write behaviour to maximize resource usage and minimize copying.
-          Only a pointer to the data is passed around. See <a href="http://doc.qt.io/qt-5/qshareddatapointer.html#details">Qt documentation</a>.
+          Only a pointer to the data is passed around. See <a href="https://doc.qt.io/qt-5/qshareddatapointer.html#details">Qt documentation</a>.
  */
 """)
 

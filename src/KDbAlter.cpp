@@ -135,7 +135,7 @@ struct KDb_AlterTableHandlerStatic {
     types.insert(QByteArray(name).toLower(), flag)
 
         /* useful links:
-          http://dev.mysql.com/doc/refman/5.0/en/create-table.html
+          https://dev.mysql.com/doc/refman/5.0/en/create-table.html
         */
         // ExtendedSchemaAlteringRequired is here because when the field is renamed,
         // we need to do the same rename in extended table schema: <field name="...">
@@ -444,9 +444,9 @@ tristate KDbAlterTableHandler::ChangeFieldPropertyAction::execute(KDbConnection*
         /*mysql:
          A. Get real field type (it's safer):
             let <TYPE> be the 2nd "Type" column from result of "DESCRIBE tablename oldfieldname"
-          ( http://dev.mysql.com/doc/refman/5.0/en/describe.html )
+          ( https://dev.mysql.com/doc/refman/5.0/en/describe.html )
          B. Run "ALTER TABLE tablename CHANGE oldfieldname newfieldname <TYPE>";
-          ( http://dev.mysql.com/doc/refman/5.0/en/alter-table.html )
+          ( https://dev.mysql.com/doc/refman/5.0/en/alter-table.html )
         */
     }
     if (m_propertyName == QLatin1String("type")) {

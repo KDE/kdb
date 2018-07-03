@@ -81,7 +81,7 @@ bool PostgresqlConnection::drv_connect()
 
 bool PostgresqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
-    // http://www.postgresql.org/docs/8.4/static/libpq-status.html
+    // https://www.postgresql.org/docs/8.4/static/libpq-status.html
     //postgresqlDebug() << "server_version:" << d->parameter("server_version");
     version->setString(QString::fromLatin1(parameter(d->conn, "server_version")));
     const int versionNumber = PQserverVersion(d->conn);
@@ -171,7 +171,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     //postgresqlDebug() << conninfo;
 
     //! @todo other parameters: connect_timeout, options, options, sslmode, sslcert, sslkey, sslrootcert, sslcrl, krbsrvname, gsslib, service
-    // http://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
+    // https://www.postgresql.org/docs/8.4/interactive/libpq-connect.html
     d->conn = PQconnectdb(conninfo.constData());
 
     if (!d->connectionOK()) {

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Inspiration from http://itk.org/gitweb?p=ITK.git;a=blob;f=Utilities/Maintenance/computeCodeCoverageLocally.sh;h=539e6c62c2dc2ba9f7c16b915120915fe192f67a;hb=HEAD
+# Inspiration from https://itk.org/gitweb?p=ITK.git;a=blob;f=Utilities/Maintenance/computeCodeCoverageLocally.sh;h=539e6c62c2dc2ba9f7c16b915120915fe192f67a;hb=HEAD
 
 CMAKE_BINARY_DIR=`grep ^CMAKE_BINARY_DIR Makefile | sed 's/.*\= //'`
 CMAKE_SOURCE_DIR=`grep ^CMAKE_SOURCE_DIR Makefile | sed 's/.*\= //'`

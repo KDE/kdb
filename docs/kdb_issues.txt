@@ -2,7 +2,7 @@
  IDEAS, ISSUES, PROPOSALS for KDb
  Copyright (C) 2003 Jarosław Staniek staniek at kde.org
  Started: 2003-08-01
- KDb home page: http://community.kde.org/KDb
+ KDb home page: https://community.kde.org/KDb
 
  Changes:
  2005-09-16 Global BLOBs Storage

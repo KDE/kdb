@@ -524,7 +524,7 @@ KDB_EXPORT KDbEscapedString escapeString(KDbConnection *conn, const QString& str
  *       The industry is moving away from it and EcmaScript 5 deprecates it.
  *
  * See also:
- * - http://dev.mysql.com/doc/refman/5.7/en/string-literals.html
+ * - https://dev.mysql.com/doc/refman/5.7/en/string-literals.html
  * - https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
  * - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types#Using_special_characters_in_strings
  * - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Lexical_grammar#String_literals
@@ -538,10 +538,10 @@ enum class BLOBEscapingType {
     Hex,             //!< Escaping like 1FAD without quotes or prefixes
     Octal,           //!< Escaping like 'zk\\000$x', used by PostgreSQL
                                //!< (only non-printable characters are escaped using octal numbers);
-                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
+                               //!< see https://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
     ByteaHex         //!< "bytea hex" escaping, e.g. E'\xDEADBEEF'::bytea used by PostgreSQL
                                //!< (only non-printable characters are escaped using octal numbers);
-                               //!< see http://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
+                               //!< see https://www.postgresql.org/docs/9.5/interactive/datatype-binary.html
 };
 
 /*! @return a string containing escaped, printable representation of @a array.
@@ -555,7 +555,7 @@ KDB_EXPORT QString escapeBLOB(const QByteArray& array, BLOBEscapingType type);
  If @a length is negative, the data is assumed to point to a null-terminated string
  and its length is determined dynamically.
  @a data is escaped in format used by PostgreSQL's bytea datatype
- described at http://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
+ described at https://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
  This function is used by PostgreSQL KDb and migration drivers. */
 KDB_EXPORT QByteArray pgsqlByteaToByteArray(const char* data, int length = -1);
 
@@ -664,7 +664,7 @@ KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
 /*! Converts value @a v to string representation required by KDbSQL commands:
     ISO 8601 DateTime format - with "T" delimiter/
-    For specification see http://www.w3.org/TR/NOTE-datetime.
+    For specification see https://www.w3.org/TR/NOTE-datetime.
     Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
     @todo Add support for time zones */
 KDB_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);

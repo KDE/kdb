@@ -100,7 +100,7 @@ public:
 
     //! Generates native (driver-specific) HEX() function call.
     //! Uses UPPER(ENCODE(val, 'hex')).
-    //! See http://www.postgresql.org/docs/9.3/static/functions-string.html#FUNCTIONS-STRING-OTHER */
+    //! See https://www.postgresql.org/docs/9.3/static/functions-string.html#FUNCTIONS-STRING-OTHER */
     KDbEscapedString hexFunctionToString(const KDbNArgExpression &args,
                                          KDbQuerySchemaParameterValueListIterator* params,
                                          KDb::ExpressionCallStack* callStack) const override;

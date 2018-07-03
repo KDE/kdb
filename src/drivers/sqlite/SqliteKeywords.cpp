@@ -21,7 +21,7 @@
 #include "SqliteDriver.h"
 
 //! The list is created by hand based on parse.c from SQLite 3.13.0.
-//! @todo Proces patterns like this from http://www.sqlite.org/draft/tokenreq.html
+//! @todo Proces patterns like this from https://www.sqlite.org/draft/tokenreq.html
 //! to extract tokens automatically:
 //! "SQLite shall recognize the *-character sequenence "*" in any combination of upper and lower case letters as the keyword token *."
 const char* const SqliteDriver::keywords[] = {
