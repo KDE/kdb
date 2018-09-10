@@ -1190,7 +1190,7 @@ void KDbTest::deleteAllRecordsTest()
     QVERIFY(KDb::deleteAllRecords(utils.connection.data(), "persons"));
 
     QRegularExpression deleteAllErrorRegExp = resultRegExp(
-        "", "Error while executing SQL statement.", "DELETE FROM \\[.*\\]", 0, "no such table: .*");
+        "", "Error while executing SQL statement.", "DELETE FROM \\[.*\\]", "0", "no such table: .*");
     QTest::ignoreMessage(QtWarningMsg, deleteAllErrorRegExp);
     QVERIFY2(!KDb::deleteAllRecords(utils.connection.data(), QString()),
              "Passing a null table name");

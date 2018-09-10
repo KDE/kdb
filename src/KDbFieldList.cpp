@@ -240,7 +240,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
     { \
         if (fname.isEmpty()) return fl; \
         KDbField *f = d->fieldsByName.value(fname.toLower()); \
-        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(fname); delete fl; return 0; } \
+        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(fname); delete fl; return nullptr; } \
     }
 
 static QString subListWarning1(const QString& fname)
@@ -297,7 +297,7 @@ KDbFieldList* KDbFieldList::subList(const QStringList& list)
     { \
         if (fname.isEmpty()) return fl; \
         KDbField *f = d->fieldsByName.value(QLatin1String(fname.toLower())); \
-        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(QLatin1String(fname)); delete fl; return 0; } \
+        if (!f || !fl->addField(f)) { kdbWarning() << subListWarning1(QLatin1String(fname)); delete fl; return nullptr; } \
     }
 
 KDbFieldList* KDbFieldList::subList(const QList<QByteArray>& list)

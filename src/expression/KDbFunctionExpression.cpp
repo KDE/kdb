@@ -420,7 +420,7 @@ BuiltInFunctions::BuiltInFunctions()
 
 //! Adds a signature named @a name with specified arguments to declaration decl
 #define _SIG(name, ...) \
-    static int* name[] = { __VA_ARGS__, 0 }; \
+    static int* name[] = { __VA_ARGS__, nullptr }; \
     decl->signatures.push_back(name)
 
 //! Adds a signature with no arguments to declaration decl

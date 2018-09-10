@@ -15,7 +15,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -1531,8 +1531,8 @@ yyreduce:
 #line 675 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "Select";
-    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[0].querySchema), 0 )))
-        return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[0].querySchema), nullptr )))
+        YYABORT;
 }
 #line 1538 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1543,7 +1543,7 @@ yyreduce:
     kdbDebug() << "Select ColViews=" << *(yyvsp[0].exprList);
 
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-1].querySchema), (yyvsp[0].exprList) )))
-        return 0;
+        YYABORT;
 }
 #line 1549 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1552,7 +1552,7 @@ yyreduce:
 #line 688 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), (yyvsp[-1].exprList), (yyvsp[0].exprList) )))
-        return 0;
+        YYABORT;
 }
 #line 1558 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1561,8 +1561,8 @@ yyreduce:
 #line 693 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "Select ColViews Tables";
-    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-1].querySchema), 0, (yyvsp[0].exprList) )))
-        return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-1].querySchema), nullptr, (yyvsp[0].exprList) )))
+        YYABORT;
 }
 #line 1568 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1571,8 +1571,8 @@ yyreduce:
 #line 699 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "Select ColViews Conditions";
-    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), (yyvsp[-1].exprList), 0, (yyvsp[0].selectOptions) )))
-        return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), (yyvsp[-1].exprList), nullptr, (yyvsp[0].selectOptions) )))
+        YYABORT;
 }
 #line 1578 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1581,8 +1581,8 @@ yyreduce:
 #line 705 "KDbSqlParser.y" /* yacc.c:1646  */
     {
     kdbDebug() << "Select Tables SelectOptions";
-    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), 0, (yyvsp[-1].exprList), (yyvsp[0].selectOptions) )))
-        return 0;
+    if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-2].querySchema), nullptr, (yyvsp[-1].exprList), (yyvsp[0].selectOptions) )))
+        YYABORT;
 }
 #line 1588 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -1592,7 +1592,7 @@ yyreduce:
     {
     kdbDebug() << "Select ColViews Tables SelectOptions";
     if (!((yyval.querySchema) = buildSelectQuery( (yyvsp[-3].querySchema), (yyvsp[-2].exprList), (yyvsp[-1].exprList), (yyvsp[0].selectOptions) )))
-        return 0;
+        YYABORT;
 }
 #line 1598 "sqlparser.cpp" /* yacc.c:1646  */
     break;
@@ -2688,7 +2688,7 @@ KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset) {
     if (t >= YYTRANSLATE(::SQL_TYPE)) {
         return yytname[t];
     }
-    return 0;
+    return nullptr;
 }
 
 //static

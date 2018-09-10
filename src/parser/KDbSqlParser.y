@@ -674,44 +674,44 @@ SelectStatement:
 Select
 {
     kdbDebug() << "Select";
-    if (!($$ = buildSelectQuery( $1, 0 )))
-        return 0;
+    if (!($$ = buildSelectQuery( $1, nullptr )))
+        YYABORT;
 }
 | Select ColViews
 {
     kdbDebug() << "Select ColViews=" << *$2;
 
     if (!($$ = buildSelectQuery( $1, $2 )))
-        return 0;
+        YYABORT;
 }
 | Select ColViews Tables
 {
     if (!($$ = buildSelectQuery( $1, $2, $3 )))
-        return 0;
+        YYABORT;
 }
 | Select Tables
 {
     kdbDebug() << "Select ColViews Tables";
-    if (!($$ = buildSelectQuery( $1, 0, $2 )))
-        return 0;
+    if (!($$ = buildSelectQuery( $1, nullptr, $2 )))
+        YYABORT;
 }
 | Select ColViews SelectOptions
 {
     kdbDebug() << "Select ColViews Conditions";
-    if (!($$ = buildSelectQuery( $1, $2, 0, $3 )))
-        return 0;
+    if (!($$ = buildSelectQuery( $1, $2, nullptr, $3 )))
+        YYABORT;
 }
 | Select Tables SelectOptions
 {
     kdbDebug() << "Select Tables SelectOptions";
-    if (!($$ = buildSelectQuery( $1, 0, $2, $3 )))
-        return 0;
+    if (!($$ = buildSelectQuery( $1, nullptr, $2, $3 )))
+        YYABORT;
 }
 | Select ColViews Tables SelectOptions
 {
     kdbDebug() << "Select ColViews Tables SelectOptions";
     if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
-        return 0;
+        YYABORT;
 }
 ;
 
