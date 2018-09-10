@@ -90,7 +90,7 @@ KDB_TESTING_EXPORT const char* g_tokenName(unsigned int offset) {
     if (t >= YYTRANSLATE(::SQL_TYPE)) {
         return yytname[t];
     }
-    return 0;
+    return nullptr;
 }
 
 //static

@@ -49,7 +49,7 @@ if(NOT HAVE_UNISTD_H)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
-    set(EXTRA_SCANNER_COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} -Wno-sign-compare -Wno-unused-function -Wno-deprecated-register")
+    set(EXTRA_SCANNER_COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} -Wno-sign-compare -Wno-unused-function -Wno-deprecated-register -Wno-zero-as-null-pointer-constant")
 elseif(MSVC)
     set(EXTRA_SCANNER_COMPILE_FLAGS "${EXTRA_SCANNER_COMPILE_FLAGS} /wd4018") # disable warning C4018: '<' : signed/unsigned mismatch
 endif()
