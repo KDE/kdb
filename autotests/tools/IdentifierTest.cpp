@@ -41,6 +41,7 @@ void IdentifierTest::testStringToIdentifier_data()
     QTest::newRow("special chars2") << " */$" << "_";
     QTest::newRow("Upper case") << "a A b2" << "a_A_b2";
     QTest::newRow("non-alpha") << "1" << "_1";
+    QTest::newRow("non-latin1") << QString::fromUtf8("Ñ©Æ ᑫኂ") << "NcAE_kexi";
 }
 
 void IdentifierTest::testStringToIdentifier()
