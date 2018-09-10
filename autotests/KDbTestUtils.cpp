@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2018 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -102,11 +102,33 @@ public:
     Private() {}
     QScopedPointer<KDbNativeStatementBuilder> kdbBuilder;
     QScopedPointer<KDbNativeStatementBuilder> driverBuilder;
+
+    KDbConnection *connection()
+    {
+        return m_connection.data();
+    }
+
+    void setConnection(KDbConnection *conn)
+    {
+        kdbBuilder.reset(); // dependency will be removed
+        m_connection.reset(conn);
+    }
+
+    KDbConnection* takeConnection()
+    {
+        if (!m_connection) {
+            return nullptr;
+        }
+        kdbBuilder.reset(); // dependency may be removed
+        return m_connection.take();
+    }
+
+private:
+    QScopedPointer<KDbConnection> m_connection;
 };
 
 KDbTestUtils::KDbTestUtils()
-    : connection(nullptr)
-    , d(new Private)
+    : d(new Private)
 {
     QCoreApplication::addLibraryPath(KDB_LOCAL_PLUGINS_DIR); // make plugins work without installing them
 }
@@ -116,20 +138,25 @@ KDbTestUtils::~KDbTestUtils()
     delete d;
 }
 
+KDbConnection* KDbTestUtils::connection()
+{
+    return d->connection();
+}
+
 KDbNativeStatementBuilder* KDbTestUtils::kdbBuilder()
 {
-    Q_ASSERT(connection);
-    if (connection && !d->kdbBuilder) {
-        d->kdbBuilder.reset(new KDbNativeStatementBuilder(connection.data(), KDb::KDbEscaping));
+    Q_ASSERT(connection());
+    if (connection() && !d->kdbBuilder) {
+        d->kdbBuilder.reset(new KDbNativeStatementBuilder(connection(), KDb::KDbEscaping));
     }
     return d->kdbBuilder.data();
 }
 
 KDbNativeStatementBuilder* KDbTestUtils::driverBuilder()
 {
-    Q_ASSERT(connection);
-    if (connection && !d->driverBuilder) {
-        d->driverBuilder.reset(new KDbNativeStatementBuilder(connection.data(), KDb::DriverEscaping));
+    Q_ASSERT(connection());
+    if (connection() && !d->driverBuilder) {
+        d->driverBuilder.reset(new KDbNativeStatementBuilder(connection(), KDb::DriverEscaping));
     }
     return d->driverBuilder.data();
 }
@@ -219,46 +246,46 @@ void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata,
     extraSqliteExtensionPaths << SQLITE_LOCAL_ICU_EXTENSION_PATH;
     connOptionsOverride.insert("extraSqliteExtensionPaths", extraSqliteExtensionPaths);
 
-    connection.reset(); // remove previous connection if present
+    d->setConnection(nullptr); // remove previous connection if present
     const int connCount = driver->connections().count();
-    connection.reset(driver->createConnection(cdata, connOptionsOverride));
-    KDB_VERIFY(driver, !connection.isNull(), "Failed to create connection");
+    d->setConnection(driver->createConnection(cdata, connOptionsOverride));
+    KDB_VERIFY(driver, connection(), "Failed to create connection");
     QVERIFY2(cdata.driverId().isEmpty(), "Connection data has filled driver ID");
-    QCOMPARE(connection->data().driverId(), driver->metaData()->id());
-    QVERIFY2(driver->connections().contains(connection.data()), "Driver does not list created connection");
+    QCOMPARE(connection()->data().driverId(), driver->metaData()->id());
+    QVERIFY2(driver->connections().contains(connection()), "Driver does not list created connection");
     QCOMPARE(driver->connections().count(), connCount + 1); // one more
 
-    const KDbUtils::Property extraSqliteExtensionPathsProperty = connection->options()->property("extraSqliteExtensionPaths");
+    const KDbUtils::Property extraSqliteExtensionPathsProperty = connection()->options()->property("extraSqliteExtensionPaths");
     QVERIFY2(!extraSqliteExtensionPathsProperty.isNull(), "extraSqliteExtensionPaths property not found");
     QCOMPARE(extraSqliteExtensionPathsProperty.value().type(), QVariant::StringList);
     QCOMPARE(extraSqliteExtensionPathsProperty.value().toStringList(), extraSqliteExtensionPaths);
 
-    const KDbUtils::Property readOnlyProperty = connection->options()->property("readOnly");
+    const KDbUtils::Property readOnlyProperty = connection()->options()->property("readOnly");
     QVERIFY2(!readOnlyProperty.isNull(), "readOnly property not found");
-    QCOMPARE(readOnlyProperty.value().toBool(), connection->options()->isReadOnly());
+    QCOMPARE(readOnlyProperty.value().toBool(), connection()->options()->isReadOnly());
 
     //! @todo Add extensive test for a read-only connection
 
-    KDB_VERIFY(connection, connection->connect(), "Failed to connect");
-    KDB_VERIFY(connection, connection->isConnected(), "Database not connected after call to connect()");
+    KDB_VERIFY(connection(), connection()->connect(), "Failed to connect");
+    KDB_VERIFY(connection(), connection()->isConnected(), "Database not connected after call to connect()");
 }
 
 void KDbTestUtils::testUseInternal()
 {
-    KDB_VERIFY(connection, connection->databaseExists(connection->data().databaseName()), "Database does not exists");
-    KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
-    KDB_VERIFY(connection, connection->isDatabaseUsed(), "Database not used after call to useDatabase()");
+    KDB_VERIFY(connection(), connection()->databaseExists(connection()->data().databaseName()), "Database does not exist");
+    KDB_VERIFY(connection(), connection()->useDatabase(), "Failed to use database");
+    KDB_VERIFY(connection(), connection()->isDatabaseUsed(), "Database not used after call to useDatabase()");
 }
 
 void KDbTestUtils::testConnectAndUseInternal(const KDbConnectionData &cdata,
                                              const KDbConnectionOptions &options)
 {
-    if (!testConnect(cdata, options) || !connection) {
+    if (!testConnect(cdata, options) || !connection()) {
         qWarning() << driver->result();
         QFAIL("testConnect");
     }
-    if (!testUse() || !connection->isDatabaseUsed()) {
-        qWarning() << connection->result();
+    if (!testUse() || !connection()->isDatabaseUsed()) {
+        qWarning() << connection()->result();
         bool result = testDisconnect();
         Q_UNUSED(result);
         QFAIL("testUse");
@@ -283,58 +310,58 @@ void KDbTestUtils::testCreateDbInternal(const QString &dbName)
     cdata.setDatabaseName(fullDbName);
 
     QVERIFY(testConnect(cdata));
-    QVERIFY(connection);
+    QVERIFY(connection());
 
     //! @todo KDbDriver::metaData
     {
-        QScopedPointer<KDbConnection> connGuard(connection.take());
+        QScopedPointer<KDbConnection> connGuard(d->takeConnection());
 
         if (connGuard->databaseExists(dbName)) {
             KDB_VERIFY(connGuard, connGuard->dropDatabase(fullDbName), "Failed to drop database");
         }
         KDB_VERIFY(connGuard, !connGuard->databaseExists(fullDbName), "Database exists");
         KDB_VERIFY(connGuard, connGuard->createDatabase(fullDbName), "Failed to create db");
-        KDB_VERIFY(connGuard, connGuard->databaseExists(fullDbName), "Database does not exists after creation");
-        connection.reset(connGuard.take());
+        KDB_VERIFY(connGuard, connGuard->databaseExists(fullDbName), "Database does not exist after creation");
+        d->setConnection(connGuard.take());
     }
 }
 
 void KDbTestUtils::testCreateDbWithTablesInternal(const QString &dbName)
 {
     QVERIFY(testCreateDb(dbName));
-    KDB_VERIFY(connection, connection->useDatabase(), "Failed to use database");
+    KDB_VERIFY(connection(), connection()->useDatabase(), "Failed to use database");
     testCreateTablesInternal();
 }
 
 void KDbTestUtils::testPropertiesInternal()
 {
     QStringList properties;
-    properties << connection->databaseProperties().names();
+    properties << connection()->databaseProperties().names();
     QVERIFY(properties.contains("kexidb_major_ver"));
     bool ok;
-    QVERIFY(connection->databaseProperties().value("kexidb_major_ver").toInt(&ok) >= 0);
+    QVERIFY(connection()->databaseProperties().value("kexidb_major_ver").toInt(&ok) >= 0);
     QVERIFY(ok);
     QVERIFY(properties.contains("kexidb_minor_ver"));
-    QVERIFY(connection->databaseProperties().value("kexidb_minor_ver").toInt(&ok) >= 0);
+    QVERIFY(connection()->databaseProperties().value("kexidb_minor_ver").toInt(&ok) >= 0);
     QVERIFY(ok);
 }
 
 void KDbTestUtils::testCreateTablesInternal()
 {
-    QVERIFY2(tablesTest_createTables(connection.data()) == 0, "Failed to create test data");
+    QVERIFY2(tablesTest_createTables(connection()) == 0, "Failed to create test data");
 }
 
 void KDbTestUtils::testDisconnectPrivate()
 {
-    if (!connection) {
+    if (!connection()) {
         return;
     }
-    KDB_VERIFY(connection, connection->closeDatabase(), "Failed to close database");
-    KDB_VERIFY(connection, !connection->isDatabaseUsed(), "Database still used after closing");
-    KDB_VERIFY(connection, connection->closeDatabase(), "Second closeDatabase() call  should not fail");
-    KDB_VERIFY(connection, connection->disconnect(), "Failed to disconnect database");
-    KDB_VERIFY(connection, !connection->isConnected(), "Database still connected after disconnecting");
-    KDB_VERIFY(connection, connection->disconnect(), "Second disconnect() call should not fail");
+    KDB_VERIFY(connection(), connection()->closeDatabase(), "Failed to close database");
+    KDB_VERIFY(connection(), !connection()->isDatabaseUsed(), "Database still used after closing");
+    KDB_VERIFY(connection(), connection()->closeDatabase(), "Second closeDatabase() call  should not fail");
+    KDB_VERIFY(connection(), connection()->disconnect(), "Failed to disconnect database");
+    KDB_VERIFY(connection(), !connection()->isConnected(), "Database still connected after disconnecting");
+    KDB_VERIFY(connection(), connection()->disconnect(), "Second disconnect() call should not fail");
 }
 
 void KDbTestUtils::testDisconnectInternal()
@@ -342,20 +369,20 @@ void KDbTestUtils::testDisconnectInternal()
     const int connCount = driver ? driver->connections().count() : 0;
     testDisconnectPrivate();
     QVERIFY(!QTest::currentTestFailed());
-    connection.reset();
+    d->setConnection(nullptr);
     QCOMPARE(driver ? driver->connections().count() : -1, connCount - 1); // one less
 }
 
 void KDbTestUtils::testDropDbInternal()
 {
-    QVERIFY(connection->dropDatabase(connection->data().databaseName()));
+    QVERIFY(connection()->dropDatabase(connection()->data().databaseName()));
 }
 
 void KDbTestUtils::testDisconnectAndDropDbInternal()
 {
-    QString dbName(connection.data()->data().databaseName());
+    QString dbName(connection()->data().databaseName());
     testDisconnectPrivate();
     QVERIFY(!QTest::currentTestFailed());
-    KDB_VERIFY(connection, connection->dropDatabase(dbName), "Failed to drop database");
-    connection.reset();
+    KDB_VERIFY(connection(), connection()->dropDatabase(dbName), "Failed to drop database");
+    d->setConnection(nullptr);
 }

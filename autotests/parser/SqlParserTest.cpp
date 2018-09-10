@@ -47,7 +47,7 @@ bool SqlParserTest::openDatabase(const QString &path)
     if (!m_utils.testConnectAndUse(path, options)) {
         return false;
     }
-    m_parser.reset(new KDbParser(m_utils.connection.data()));
+    m_parser.reset(new KDbParser(m_utils.connection()));
 #if 0
     if (m_conn->databaseExists(dbName)) {
         if (!m_conn->dropDatabase(dbName)) {

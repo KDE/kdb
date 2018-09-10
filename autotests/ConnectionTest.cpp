@@ -116,16 +116,16 @@ void ConnectionTest::testConnectToNonexistingDb()
     KDbConnectionData cdata;
     cdata.setDatabaseName(QLatin1String("/really-non-existing/path/fiuwehf2349f8h23c2jcoeqw"));
     QVERIFY(utils.testConnect(cdata));
-    QVERIFY(utils.connection);
-    KDB_VERIFY(utils.connection, !utils.connection->databaseExists(utils.connection->data().databaseName()),
+    QVERIFY(utils.connection());
+    KDB_VERIFY(utils.connection(), !utils.connection()->databaseExists(utils.connection()->data().databaseName()),
                     "Database should not exist");
-    KDB_EXPECT_FAIL(utils.connection, utils.connection->useDatabase(),
+    KDB_EXPECT_FAIL(utils.connection(), utils.connection()->useDatabase(),
                     ERR_OBJECT_NOT_FOUND, "Should fail to use database");
-    KDB_EXPECT_FAIL(utils.connection, utils.connection->isDatabaseUsed(),
+    KDB_EXPECT_FAIL(utils.connection(), utils.connection()->isDatabaseUsed(),
                     ERR_OBJECT_NOT_FOUND, "Database can't be used after call to useDatabase()");
-    QVERIFY2(utils.connection->closeDatabase(), "Closing after failed USE should work");
-    KDB_VERIFY(utils.connection, utils.connection->disconnect(), "Failed to disconnect database");
-    QVERIFY2(!utils.connection->isConnected(), "Should not be connected");
+    QVERIFY2(utils.connection()->closeDatabase(), "Closing after failed USE should work");
+    KDB_VERIFY(utils.connection(), utils.connection()->disconnect(), "Failed to disconnect database");
+    QVERIFY2(!utils.connection()->isConnected(), "Should not be connected");
 }
 
 void ConnectionTest::cleanupTestCase()
