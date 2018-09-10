@@ -183,6 +183,7 @@ void OrderByColumnTest::testOrderByColumnName()
     QCOMPARE(sql, validDriverSelect1);
 
     QCOMPARE(orderBy->count(), 2);
+    QTest::ignoreMessage(QtWarningMsg, "no such field \"\"");
     QVERIFY2(!orderBy->appendField(conn, &query, ""), "appendField for null");
     QCOMPARE(orderBy->count(), 2);
 
