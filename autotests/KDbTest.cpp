@@ -1034,27 +1034,27 @@ void KDbTest::testTemporaryTableName()
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
 
     QString baseName = QLatin1String("foobar");
-    QString tempName1 = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QString tempName1 = KDb::temporaryTableName(utils.connection(), baseName);
     QVERIFY(!tempName1.isEmpty());
     QVERIFY(tempName1.contains(baseName));
-    QString tempName2 = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QString tempName2 = KDb::temporaryTableName(utils.connection(), baseName);
     QVERIFY(!tempName2.isEmpty());
     QVERIFY(tempName2.contains(baseName));
     QVERIFY(tempName1 != tempName2);
 
-    utils.connection->closeDatabase();
+    utils.connection()->closeDatabase();
     QTest::ignoreMessage(QtWarningMsg, "Missing database handle");
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("!executeQuery().*"));
-    QString tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
+    QString tempName = KDb::temporaryTableName(utils.connection(), baseName);
     QVERIFY2(tempName.isEmpty(), "Temporary name should not be created when database is closed ");
 
-    utils.connection->disconnect();
+    utils.connection()->disconnect();
     QTest::ignoreMessage(QtWarningMsg, "Missing database handle");
     QTest::ignoreMessage(QtWarningMsg, QRegularExpression("!executeQuery().*"));
-    tempName = KDb::temporaryTableName(utils.connection.data(), baseName);
+    tempName = KDb::temporaryTableName(utils.connection(), baseName);
     QVERIFY2(tempName.isEmpty(), "Temporary name should not be created connection is missing");
 
-    utils.connection->dropDatabase(utils.connection->data().databaseName());
+    utils.connection()->dropDatabase(utils.connection()->data().databaseName());
 }
 
 //! @todo add tests
@@ -1088,26 +1088,26 @@ KDB_EXPORT QString identifierExpectedMessage(const QString &valueName,
 void KDbTest::deleteRecordWithOneConstraintsTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "id", 2));
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "id", "3"),
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "id", 2));
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "id", "3"),
             "Passing a valid Integer in String Format");
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "id", "Foo"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "name", "Jaroslaw"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "surname", "FooBar"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", 45));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "id", "Foo"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "name", "Jaroslaw"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "surname", "FooBar"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", 45));
     // and empty data.
-    KDbTableSchema *kdb_t = utils.connection.data()->tableSchema("persons");
+    KDbTableSchema *kdb_t = utils.connection()->tableSchema("persons");
     QVERIFY(kdb_t);
-    QVERIFY2(utils.connection.data()->insertRecord(kdb_t, 10, 20, QVariant(), "Bar"),
+    QVERIFY2(utils.connection()->insertRecord(kdb_t, 10, 20, QVariant(), "Bar"),
              "Inserting NULL data");
-    QVERIFY2(utils.connection.data()->insertRecord(kdb_t,15, 20, "", "Bar"),
+    QVERIFY2(utils.connection()->insertRecord(kdb_t,15, 20, "", "Bar"),
              "Inserting empty data");
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "name", QString()),
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "name", QString()),
             "Passing a null value instead of string");
     //
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "name", ""),
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "name", ""),
              "Passing an empty string");
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", "Nitish"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", "Nitish"));
     QVERIFY(utils.testDisconnectAndDropDb());
 }
 
@@ -1125,11 +1125,11 @@ static QRegularExpression resultRegExp(const QString &code, const QString &messa
 void KDbTest::deleteNonExistingRecordTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "id", 400));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "name", "FooBar"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "id", 400));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "name", "FooBar"));
     QTest::ignoreMessage(QtWarningMsg, resultRegExp("260", "Error while executing SQL statement.",
         "DELETE FROM \\[persons\\] WHERE \\[Foo\\]='FooBar'", "0", "no such column: Foo"));
-    QVERIFY2(!KDb::deleteRecords(utils.connection.data(), "persons", "Foo", "FooBar"),
+    QVERIFY2(!KDb::deleteRecords(utils.connection(), "persons", "Foo", "FooBar"),
              "Passing a NonExisting Column - should fail because 'Foo' column does not exist, "
              "See also https://bugs.kde.org/376052");
     QVERIFY(utils.testDisconnectAndDropDb());
@@ -1138,28 +1138,28 @@ void KDbTest::deleteNonExistingRecordTest()
 void KDbTest::deleteRecordWithTwoConstraintsTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "id", KDbField::Integer,
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "id", KDbField::Integer,
                                 2, "age", KDbField::Integer, 60),
              "Both fields are INTEGER");
-    KDbTableSchema *kdb_t = utils.connection.data()->tableSchema("persons");
+    KDbTableSchema *kdb_t = utils.connection()->tableSchema("persons");
     QVERIFY(kdb_t);
-    utils.connection.data()->insertRecord(kdb_t, 10, QVariant(), "Foo", "Bar") ;
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "id", KDbField::Integer,
+    utils.connection()->insertRecord(kdb_t, 10, QVariant(), "Foo", "Bar") ;
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "id", KDbField::Integer,
                                 10, "age", KDbField::Integer, QVariant()),
              "Passing NULL value for integer field");
-    QVERIFY(utils.connection.data()->insertRecord(kdb_t, 20, QVariant(), QVariant(), "Bar"));
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
+    QVERIFY(utils.connection()->insertRecord(kdb_t, 20, QVariant(), QVariant(), "Bar"));
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer,
                                 QVariant(), "name", KDbField::Text, QVariant()),
              "Passing 2 NULL values");
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer,
                                 20, "name", KDbField::Text, "Jaroslaw"),
              "One argument is Integer and another is Text");
-    QVERIFY2(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
+    QVERIFY2(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer,
                                 20, "name", KDbField::Text, 56),
              "Two arguments, passing second integer instead of text but it is converted to text");
     QTest::ignoreMessage(QtWarningMsg, resultRegExp("260", "Error while executing SQL statement.",
         "DELETE FROM \\[persons\\] WHERE \\[age\\]=TRAP AND \\[name\\]='56'", "0", "no such column: TRAP"));
-    QVERIFY2(!KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,
+    QVERIFY2(!KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer,
                                  "TRAP", "name", KDbField::Text, 56),
              "Passing text instead of integer, conversion error expected");
     QVERIFY(utils.testDisconnectAndDropDb());
@@ -1168,18 +1168,18 @@ void KDbTest::deleteRecordWithTwoConstraintsTest()
 void  KDbTest::deleteRecordWithThreeConstraintsTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
-    KDbTableSchema *kdb_t = utils.connection.data()->tableSchema("persons");
+    KDbTableSchema *kdb_t = utils.connection()->tableSchema("persons");
     QVERIFY(kdb_t);
     //One null value.
-    QVERIFY(utils.connection.data()->insertRecord(kdb_t, 10, QVariant(), "Foo", "Bar"));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer, QVariant(),
+    QVERIFY(utils.connection()->insertRecord(kdb_t, 10, QVariant(), "Foo", "Bar"));
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer, QVariant(),
                                 "name", KDbField::Text, "Foo", "surname", KDbField::Text, "Bar"));
     //Mix of null and empty values
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer, QVariant(),
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer, QVariant(),
                                 "name", KDbField::Text, "", "surname", KDbField::Text, ""));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer,27,
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer,27,
                                 "name", KDbField::Text, "Jaraslaw", "id", KDbField::Integer, 1));
-    QVERIFY(KDb::deleteRecords(utils.connection.data(), "persons", "age", KDbField::Integer, 60,
+    QVERIFY(KDb::deleteRecords(utils.connection(), "persons", "age", KDbField::Integer, 60,
                                 "name", KDbField::Text, "Lech", "id", KDbField::Integer, 2));
     QVERIFY(utils.testDisconnectAndDropDb());
 }
@@ -1187,19 +1187,19 @@ void  KDbTest::deleteRecordWithThreeConstraintsTest()
 void KDbTest::deleteAllRecordsTest()
 {
     QVERIFY(utils.testCreateDbWithTables("KDbTest"));
-    QVERIFY(KDb::deleteAllRecords(utils.connection.data(), "persons"));
+    QVERIFY(KDb::deleteAllRecords(utils.connection(), "persons"));
 
     QRegularExpression deleteAllErrorRegExp = resultRegExp(
         "", "Error while executing SQL statement.", "DELETE FROM \\[.*\\]", 0, "no such table: .*");
     QTest::ignoreMessage(QtWarningMsg, deleteAllErrorRegExp);
-    QVERIFY2(!KDb::deleteAllRecords(utils.connection.data(), QString()),
+    QVERIFY2(!KDb::deleteAllRecords(utils.connection(), QString()),
              "Passing a null table name");
     QTest::ignoreMessage(QtWarningMsg, deleteAllErrorRegExp);
-    QVERIFY2(!KDb::deleteAllRecords(utils.connection.data(), ""),
+    QVERIFY2(!KDb::deleteAllRecords(utils.connection(), ""),
              "Passing an empty table name");
-    QVERIFY(KDb::deleteAllRecords(utils.connection.data(), "cars"));
+    QVERIFY(KDb::deleteAllRecords(utils.connection(), "cars"));
     QTest::ignoreMessage(QtWarningMsg, deleteAllErrorRegExp);
-    QVERIFY2(!KDb::deleteAllRecords(utils.connection.data(), "NonExistingTable"),
+    QVERIFY2(!KDb::deleteAllRecords(utils.connection(), "NonExistingTable"),
              "Passing a nonexisting table name");
     QVERIFY(utils.testDisconnectAndDropDb());
 }

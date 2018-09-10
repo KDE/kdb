@@ -62,11 +62,11 @@ void MissingTableTest::testListTables()
 {
     const bool alsoSystemTables = true;
     bool ok;
-    QStringList foundTableNames = m_utils.connection->tableNames(alsoSystemTables, &ok);
+    QStringList foundTableNames = m_utils.connection()->tableNames(alsoSystemTables, &ok);
     QVERIFY(ok);
 
     // call again with ok == nullptr
-    QCOMPARE(foundTableNames, m_utils.connection->tableNames(alsoSystemTables));
+    QCOMPARE(foundTableNames, m_utils.connection()->tableNames(alsoSystemTables));
 
     // make sure missing table is not present
     std::sort(foundTableNames.begin(), foundTableNames.end());

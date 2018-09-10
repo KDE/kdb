@@ -45,7 +45,7 @@ void OrderByColumnTest::testSelect1Query()
     QVERIFY(orderBy->isEmpty());
     QCOMPARE(orderBy->count(), 0);
     orderBy->appendField(oneField);
-    KDbConnection *conn = utils.connection.data();
+    KDbConnection *conn = utils.connection();
 
     // automatic alias "expr1"
     KDbEscapedString sql;
@@ -81,12 +81,12 @@ void OrderByColumnTest::testOrderByIndex()
 {
     QVERIFY(utils.testCreateDbWithTables("OrderByColumnTest"));
     KDbQuerySchema query;
-    KDbTableSchema *carsTable = utils.connection->tableSchema("cars");
+    KDbTableSchema *carsTable = utils.connection()->tableSchema("cars");
     QVERIFY(carsTable);
     query.addTable(carsTable);
     query.addAsterisk(new KDbQueryAsterisk(&query));
     KDbOrderByColumnList* orderBy = query.orderByColumnList();
-    KDbConnection *conn = utils.connection.data();
+    KDbConnection *conn = utils.connection();
 
     // "SELECT * FROM cars ORDER BY model ASC, owner DESC"
     QVERIFY(query.orderByColumnList()->isEmpty());
@@ -107,7 +107,7 @@ void OrderByColumnTest::testOrderByColumnName()
 {
     QVERIFY(utils.testCreateDbWithTables("OrderByColumnTest"));
     KDbQuerySchema query;
-    KDbTableSchema *carsTable = utils.connection->tableSchema("cars");
+    KDbTableSchema *carsTable = utils.connection()->tableSchema("cars");
     QVERIFY(carsTable);
     query.addTable(carsTable);
     query.addAsterisk(new KDbQueryAsterisk(&query));
@@ -126,7 +126,7 @@ void OrderByColumnTest::testOrderByColumnName()
     QVERIFY(ownerField);
     orderBy->appendField(modelField);
     orderBy->appendField(ownerField);
-    KDbConnection *conn = utils.connection.data();
+    KDbConnection *conn = utils.connection();
     KDbEscapedString orderBySql = orderBy->toSqlString(true, conn, &query, KDb::KDbEscaping);
     QCOMPARE(orderBySql, "cars.model, cars.owner");
 

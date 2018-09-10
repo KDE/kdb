@@ -38,7 +38,7 @@ void QuerySchemaTest::testCaching()
 {
     QVERIFY(utils.testCreateDbWithTables("QuerySchemaTest"));
     KDbQuerySchema query;
-    KDbTableSchema *carsTable = utils.connection->tableSchema("cars");
+    KDbTableSchema *carsTable = utils.connection()->tableSchema("cars");
     QVERIFY(carsTable);
     query.addTable(carsTable);
     KDbField *idField = carsTable->field("id");
@@ -47,18 +47,18 @@ void QuerySchemaTest::testCaching()
     query.addField(idField);
     query.addAsterisk(new KDbQueryAsterisk(&query, *carsTable));
     QCOMPARE(query.fieldCount(), 2);
-    const KDbQueryColumnInfo::Vector expandedAll1 = query.fieldsExpanded(utils.connection.data());
+    const KDbQueryColumnInfo::Vector expandedAll1 = query.fieldsExpanded(utils.connection());
     QCOMPARE(expandedAll1.count(), 4);
     const KDbQueryColumnInfo::Vector expandedUnique1
-        = query.fieldsExpanded(utils.connection.data(), KDbQuerySchema::FieldsExpandedMode::Unique);
+        = query.fieldsExpanded(utils.connection(), KDbQuerySchema::FieldsExpandedMode::Unique);
     QCOMPARE(expandedUnique1.count(), 3);
     // remove the asterisk -> "SELECT id from cars"
     query.removeField(query.field(1));
     QCOMPARE(query.fieldCount(), 1);
-    const KDbQueryColumnInfo::Vector expandedAll2 = query.fieldsExpanded(utils.connection.data());
+    const KDbQueryColumnInfo::Vector expandedAll2 = query.fieldsExpanded(utils.connection());
     QCOMPARE(expandedAll2.count(), 1);
     const KDbQueryColumnInfo::Vector expandedUnique2
-        = query.fieldsExpanded(utils.connection.data(), KDbQuerySchema::FieldsExpandedMode::Unique);
+        = query.fieldsExpanded(utils.connection(), KDbQuerySchema::FieldsExpandedMode::Unique);
     QCOMPARE(expandedUnique2.count(), 1);
 }
 
