@@ -42,6 +42,9 @@ void IdentifierTest::testStringToIdentifier_data()
     QTest::newRow("Upper case") << "a A b2" << "a_A_b2";
     QTest::newRow("non-alpha") << "1" << "_1";
     QTest::newRow("non-latin1") << QString::fromUtf8("Ñ©Æ ᑫኂ") << "NcAE_kexi";
+    QTest::newRow("umlauts")
+            << QString::fromUtf8("Falsches Üben von Xylophonmusik quält jeden größeren Zwerg")
+            << "Falsches_Ueben_von_Xylophonmusik_quaelt_jeden_groesseren_Zwerg";
 }
 
 void IdentifierTest::testStringToIdentifier()
