@@ -4,7 +4,6 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
-                "Name[ast]": "L'equipu Kexi",
                 "Name[ca@valencia]": "L'equip del Kexi",
                 "Name[ca]": "L'equip del Kexi",
                 "Name[cs]": "Tým Kexi",
@@ -32,7 +31,6 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling PostgreSQL databases",
-        "Description[ast]": "Controladora KDb pa remanar bases de datos PostgreSQL",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades PostgreSQL",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades PostgreSQL",
         "Description[cs]": "Ovladač KDb pro práci s databázemi PostgreSQL",
