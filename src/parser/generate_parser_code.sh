@@ -69,6 +69,7 @@ cat << EOF > generated/sqlparser.h
 #ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
 
+#include "KDbDateTime.h"
 #include "KDbExpression.h"
 #include "KDbField.h"
 #include "KDbOrderByColumn.h"
@@ -156,9 +157,11 @@ public:
     //! Only characters that belong to the grammar are accepted:
 EOF
 (echo -n "    //! "; grep "\"'.'\","  generated/sqlparser.cpp \
-    | sed -e ":a;N;s/\"\('.'\)\",/\1/g;s/\n//g;s/\".*,//g;s/^ *//g;s/ *$//g;") >> generated/KDbToken.h
+    | sed -e "s/\"\('.'\)\",/\1/g;s/\"[0-9A-Za-z_$]*\",[ ]*//g;" | tr --delete '\n' \
+    | sed -e "s/ $//g;") >> generated/KDbToken.h
 
 cat << EOF >> generated/KDbToken.h
+
     //! Invalid KDbToken is created for character that is not accepted.
     KDbToken(char charToken);
 

@@ -45,7 +45,7 @@ public:
 
     //! Creates a single-character token
     //! Only characters that belong to the grammar are accepted:
-    //! ';' ',' '.' '>' '<' '=' '+' '-' '&' '|'  '/' '*' '%' '~' '(' ')'
+    //!   ';'  ',' '.' '>' '<' '=' '+' '-' '&' '|' '/'  '*' '%' '~' '#' ':' '(' ')'
     //! Invalid KDbToken is created for character that is not accepted.
     KDbToken(char charToken);
 
@@ -162,6 +162,10 @@ public:
     static const KDbToken NOT_SIMILAR_TO;
     static const KDbToken XOR;
     static const KDbToken UMINUS;
+    static const KDbToken TABS_OR_SPACES;
+    static const KDbToken DATE_TIME_INTEGER;
+    static const KDbToken TIME_AM;
+    static const KDbToken TIME_PM;
     //! Custom tokens are not used in parser but used as an extension in expression classes.
     static const KDbToken BETWEEN_AND;
     static const KDbToken NOT_BETWEEN_AND;

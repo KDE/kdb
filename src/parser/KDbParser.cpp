@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2003 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -218,9 +218,12 @@ int KDbParserError::position() const
 
 QDebug operator<<(QDebug dbg, const KDbParserError& error)
 {
+    QDebugStateSaver saver(dbg);
     if (error.type().isEmpty() && error.message().isEmpty()) {
-        return dbg.space() << "KDb:KDbParserError: None";
+        dbg.space() << "KDb:KDbParserError: None";
+    } else {
+        dbg.space() << "KDb:KDbParserError: type=" << error.type() << "message=" << error.message()
+                    << "pos=" << error.position() << ")";
     }
-    return dbg.space() << "KDb:KDbParserError: type=" << error.type() << "message=" << error.message()
-                       << "pos=" << error.position() << ")";
+    return dbg.maybeSpace();
 }

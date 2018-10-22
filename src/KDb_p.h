@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -20,7 +20,9 @@
 #ifndef KDB_P_H
 #define KDB_P_H
 
-#include <QCoreApplication>
+#include "KDbField.h"
+
+class KDbDriver;
 
 //! @internal Dummy class to get simply translation markup expressions
 //! of the form kdb::tr("foo") instead of the complicated and harder to read
@@ -30,5 +32,8 @@ class kdb
 {
     Q_DECLARE_TR_FUNCTIONS(KDb)
 };
+
+KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Type ftype,
+                                    const QVariant &v);
 
 #endif

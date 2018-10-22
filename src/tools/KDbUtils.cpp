@@ -144,7 +144,7 @@ QDateTime KDbUtils::stringToHackedQTime(const QString &s)
     }
     //  kdbDebug() << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate )
     //  ).toString(Qt::ISODate);
-    return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODate));
+    return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODateWithMs));
 }
 
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)

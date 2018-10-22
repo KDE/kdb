@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
    Copyright (c) 2006, 2007 Thomas Braxton <kde.braxton@gmail.com>
    Copyright (c) 1999 Preston Brown <pbrown@kde.org>
    Copyright (c) 1997 Matthias Kalle Dalheimer <kalle@kde.org>
@@ -21,22 +21,23 @@
 */
 
 #include "KDb.h"
-#include "KDbConnectionData.h"
 #include "KDbConnection.h"
+#include "KDbConnectionData.h"
 #include "KDbCursor.h"
-#include "kdb_debug.h"
+#include "KDbDateTime.h"
 #include "KDbDriverBehavior.h"
 #include "KDbDriverManager.h"
 #include "KDbDriver_p.h"
 #include "KDbLookupFieldSchema.h"
 #include "KDbMessageHandler.h"
 #include "KDbNativeStatementBuilder.h"
-#include "KDb_p.h"
 #include "KDbQuerySchema.h"
 #include "KDbRecordData.h"
 #include "KDbSqlResult.h"
 #include "KDbTableOrQuerySchema.h"
 #include "KDbVersionInfo.h"
+#include "KDb_p.h"
+#include "kdb_debug.h"
 #include "transliteration/transliteration_table.h"
 
 #include <QMap>
@@ -2201,6 +2202,109 @@ QString KDb::identifierExpectedMessage(const QString &valueName, const QVariant&
             .arg(valueName)
            + QLatin1String("</p><p>")
            + kdb::tr("\"%1\" is not a valid identifier.").arg(v.toString()) + QLatin1String("</p>");
+}
+
+//---------
+
+KDbEscapedString KDb::valueToSql(KDbField::Type ftype, const QVariant& v)
+{
+    return valueToSqlInternal(nullptr, ftype, v);
+}
+
+static QByteArray dateToSqlInternal(const QVariant& v, bool allowInvalidKDbDate)
+{
+    QByteArray result(QByteArrayLiteral("<INVALID_DATE>"));
+    if (v.canConvert<KDbDate>()) {
+        const KDbDate date(v.value<KDbDate>());
+        if (date.isValid() || allowInvalidKDbDate) {
+            result = date.toString(); // OK even if invalid or null
+        }
+    } else if (v.canConvert<QDate>()) {
+        const QDate date(v.toDate());
+        if (date.isValid()) {
+            result = date.toString(Qt::ISODate).toLatin1();
+        }
+    }
+    return result;
+}
+
+KDbEscapedString KDb::dateToSql(const QVariant& v)
+{
+    return KDbEscapedString('#') + dateToSqlInternal(v, true) + '#';
+}
+
+static QByteArray timeToSqlInternal(const QVariant& v, bool allowInvalidKDbTime)
+{
+    QByteArray result(QByteArrayLiteral("<INVALID_TIME>"));
+    if (v.canConvert<KDbTime>()) {
+        const KDbTime time(v.value<KDbTime>());
+        if (time.isValid() || allowInvalidKDbTime) {
+            result = time.toString(); // OK even if invalid or null
+        }
+    } else if (v.canConvert<QTime>()) {
+        const QTime time(v.toTime());
+        if (time.isValid()) {
+            if (time.msec() == 0) {
+                result = time.toString(Qt::ISODate).toLatin1();
+            } else {
+                result = time.toString(Qt::ISODateWithMs).toLatin1();
+            }
+        }
+    }
+    return result;
+}
+
+KDbEscapedString KDb::timeToSql(const QVariant& v)
+{
+    return KDbEscapedString('#') + timeToSqlInternal(v, true) + '#';
+}
+
+static QByteArray dateTimeToSqlInternal(const QVariant& v, char separator, bool allowInvalidKDbDateTime)
+{
+    QByteArray result(QByteArrayLiteral("<INVALID_DATETIME>"));
+    if (v.canConvert<KDbDateTime>()) {
+        const KDbDateTime dateTime(v.value<KDbDateTime>());
+        if (dateTime.isValid() || allowInvalidKDbDateTime) {
+            result = dateTime.toString(); // OK even if invalid or null
+        }
+    } else if (v.canConvert<QDateTime>()) {
+        const QDateTime dateTime(v.toDateTime());
+        if (dateTime.isValid()) {
+            result = dateTime.date().toString(Qt::ISODate).toLatin1() + separator;
+            const QTime time(dateTime.time());
+            if (time.msec() == 0) {
+                result += time.toString(Qt::ISODate).toLatin1();
+            } else {
+                result += time.toString(Qt::ISODateWithMs).toLatin1();
+            }
+        }
+    }
+    return result;
+}
+
+KDbEscapedString KDb::dateTimeToSql(const QVariant& v)
+{
+    return KDbEscapedString('#') + dateTimeToSqlInternal(v, ' ', true) + '#';
+}
+
+KDbEscapedString KDb::dateTimeToSql(const QDateTime& v)
+{
+    return KDb::dateTimeToIsoString(v);
+}
+
+KDbEscapedString KDb::dateToIsoString(const QVariant& v)
+{
+    return KDbEscapedString('\'') + dateToSqlInternal(v, false) + KDbEscapedString('\'');
+}
+
+KDbEscapedString KDb::timeToIsoString(const QVariant& v)
+{
+    return KDbEscapedString('\'') + timeToSqlInternal(v, false) + KDbEscapedString('\'');
+}
+
+KDbEscapedString KDb::dateTimeToIsoString(const QVariant& v)
+{
+    return KDbEscapedString('\'') + dateTimeToSqlInternal(v, 'T', false) + KDbEscapedString('\'');
 }
 
 //--------------------------------------------------------------------------------
