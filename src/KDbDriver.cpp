@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -185,7 +185,7 @@ bool KDbDriver::isSystemFieldName(const QString& name) const
     return drv_isSystemFieldName(name);
 }
 
-static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
+KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Type ftype, const QVariant& v)
 {
     if (v.isNull() || ftype == KDbField::Null) {
         return KDbEscapedString("NULL");
@@ -217,12 +217,11 @@ static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Ty
                                               : KDbDriverPrivate::behavior(driver)->BOOLEAN_TRUE_LITERAL)
             : KDbEscapedString(v.toInt() == 0 ? "FALSE" : "TRUE");
     case KDbField::Time:
-        return KDbEscapedString('\'') + v.toTime().toString(Qt::ISODate) + '\'';
+        return driver ? driver->timeToSql(v) : KDb::timeToSql(v);
     case KDbField::Date:
-        return KDbEscapedString('\'') + v.toDate().toString(Qt::ISODate) + '\'';
+        return driver ? driver->dateToSql(v) : KDb::dateToSql(v);
     case KDbField::DateTime:
-        return driver ? driver->dateTimeToSql(v.toDateTime())
-                      : KDb::dateTimeToSql(v.toDateTime());
+        return driver ? driver->dateTimeToSql(v) : KDb::dateTimeToSql(v);
     case KDbField::BLOB: {
         if (v.toByteArray().isEmpty()) {
             return KDbEscapedString("NULL");
@@ -244,29 +243,28 @@ static KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Ty
 
 KDbEscapedString KDbDriver::valueToSql(KDbField::Type ftype, const QVariant& v) const
 {
-    //! note, it was compatible with SQLite: https://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions.
+    //! @note it was compatible with SQLite: https://www.sqlite.org/lang_datefunc.html
     return valueToSqlInternal(this, ftype, v);
 }
 
-KDbEscapedString KDb::valueToSql(KDbField::Type ftype, const QVariant& v)
+KDbEscapedString KDbDriver::dateToSql(const QVariant &v) const
 {
-    return valueToSqlInternal(nullptr, ftype, v);
+    return KDb::dateToIsoString(v);
 }
 
-KDbEscapedString KDb::dateTimeToSql(const QDateTime& v)
+KDbEscapedString KDbDriver::timeToSql(const QVariant& v) const
 {
-    /*! (was compatible with SQLite: https://www.sqlite.org/cvstrac/wiki?p=DateAndTimeFunctions)
-        Now it's ISO 8601 DateTime format - with "T" delimiter:
-        https://www.w3.org/TR/NOTE-datetime
-        (e.g. "1994-11-05T13:15:30" not "1994-11-05 13:15:30")
-        @todo add support for time zones?
-    */
-    return KDbEscapedString('\'') + v.toString(Qt::ISODate) + KDbEscapedString('\'');
+    return KDb::timeToIsoString(v);
+}
+
+KDbEscapedString KDbDriver::dateTimeToSql(const QVariant& v) const
+{
+    return KDb::dateTimeToIsoString(v);
 }
 
 KDbEscapedString KDbDriver::dateTimeToSql(const QDateTime& v) const
 {
-    return KDb::dateTimeToSql(v);
+    return dateTimeToSql(QVariant(v));
 }
 
 QString KDbDriver::escapeIdentifier(const QString& str) const

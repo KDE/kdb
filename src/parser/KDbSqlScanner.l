@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2004 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -43,7 +43,10 @@ extern void setError(const QString& errName, const QString& errDesc);
 %option noyywrap
 %option never-interactive
 
+%x DATE_OR_TIME
+
 whitespace         [ \t\n]
+whitespace_1_line  [ \t]
 digit              [0-9]
 e_str1             (\\\'|\'\'|[^'])
 e_str2             (\\\"|\"\"|[^"])
@@ -59,6 +62,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 
 %%
 
+    int DATE_OR_TIME_caller = 0;
 
 "<>" {
     ECOUNT;
@@ -108,6 +112,53 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
     yylval.binaryValue = new QByteArray(yytext, yyleng);
     return REAL_CONST;
 }
+
+  /* --- DATE_OR_TIME --- */
+# {
+    ECOUNT;
+    sqlParserDebug() << "### begin DATE_OR_TIME" << yytext << "(" << yyleng << ")";
+    DATE_OR_TIME_caller = YYSTATE;
+    BEGIN(DATE_OR_TIME);
+    return '#';
+}
+
+<DATE_OR_TIME>{
+
+[-+/:] { // year prefix or / or - or : separator
+    ECOUNT;
+    return yytext[0];
+}
+
+{integer} { // year, month, day, hour, minute or second
+    ECOUNT;
+    yylval.binaryValue = new QByteArray(yytext, yyleng);
+    return DATE_TIME_INTEGER;
+}
+
+{whitespace_1_line}+ {
+    ECOUNT;
+    return TABS_OR_SPACES;
+}
+
+{whitespace_1_line}*(?i:AM) {
+    ECOUNT;
+    return TIME_AM;
+}
+
+{whitespace_1_line}*(?i:PM) {
+    ECOUNT;
+    return TIME_PM;
+}
+
+# {
+    ECOUNT;
+    sqlParserDebug() << "### begin DATE_OR_TIME" << yytext << "(" << yyleng << ")";
+    BEGIN(DATE_OR_TIME_caller);
+    return '#';
+}
+
+}
+  /* -- end of DATE_OR_TIME --- */
 
 ("AND"|"&&") {
     ECOUNT;

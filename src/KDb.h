@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -419,12 +419,12 @@ KDB_EXPORT QVariant emptyValueForFieldType(KDbField::Type type);
  Returns null QVariant for unsupported values like KDbField::InvalidType. */
 KDB_EXPORT QVariant notEmptyValueForFieldType(KDbField::Type type);
 
-/*! @return true if the @a word is an reserved KDbSQL keyword
+/*! @return true if the @a word is an reserved KDBSQL keyword
  See generated/sqlkeywords.cpp.
  @todo add function returning list of keywords. */
 KDB_EXPORT bool isKDbSqlKeyword(const QByteArray& word);
 
-//! @return @a string string with applied KDbSQL identifier escaping
+//! @return @a string string with applied KDBSQL identifier escaping
 /*! This escaping can be used for field, table, database names, etc.
     Use it for user-visible backend-independent statements.
     @see KDb::escapeIdentifierAndAddQuotes() */
@@ -433,7 +433,7 @@ KDB_EXPORT QString escapeIdentifier(const QString& string);
 //! @overload QString escapeIdentifier(const QString&)
 KDB_EXPORT QByteArray escapeIdentifier(const QByteArray& string);
 
-//! @return @a string string with applied KDbSQL identifier escaping and enclosed in " quotes
+//! @return @a string string with applied KDBSQL identifier escaping and enclosed in " quotes
 /*! This escaping can be used for field, table, database names, etc.
     Use it for user-visible backend-independent statements.
     @see KDb::escapeIdentifier */
@@ -442,7 +442,7 @@ KDB_EXPORT QString escapeIdentifierAndAddQuotes(const QString& string);
 //! @overload QString escapeIdentifierAndAddQuotes(const QString&)
 KDB_EXPORT QByteArray escapeIdentifierAndAddQuotes(const QByteArray& string);
 
-/*! @return escaped string @a string for the KDbSQL dialect,
+/*! @return escaped string @a string for the KDBSQL dialect,
             i.e. doubles single quotes ("'") and inserts the string into single quotes.
     Quotes "'" are prepended and appended.
     Also escapes \\n, \\r, \\t, \\\\, \\0.
@@ -454,7 +454,7 @@ KDB_EXPORT QString escapeString(const QString& string);
  * @brief Returns escaped string @a string
  *
  * If @a drv driver is present, it is used to perform escaping, otherwise escapeString() is used
- * so the KDbSQL dialect-escaping is performed.
+ * so the KDBSQL dialect-escaping is performed.
  *
  * @since 3.1.0
  */
@@ -464,13 +464,13 @@ KDB_EXPORT KDbEscapedString escapeString(KDbDriver *drv, const QString& string);
  * @brief Returns escaped string @a string
  *
  * If @a conn is present, its driver is used to perform escaping, otherwise escapeString() is used
- * so the KDbSQL dialect-escaping is performed.
+ * so the KDBSQL dialect-escaping is performed.
  *
  * @since 3.1.0
  */
 KDB_EXPORT KDbEscapedString escapeString(KDbConnection *conn, const QString& string);
 
-//! Unescapes characters in string @a string for the KDbSQL dialect.
+//! Unescapes characters in string @a string for the KDBSQL dialect.
 /** The operation depends on @a quote character, which can be be ' or ".
  * @a string is assumed to be properly constructed. This is assured by the lexer's grammar.
  * Used by lexer to recognize the CHARACTER_STRING_LITERAL token.
@@ -657,17 +657,138 @@ KDB_EXPORT QString defaultFileBasedDriverMimeType();
 KDB_EXPORT QString defaultFileBasedDriverId();
 
 /*! Escapes and converts value @a v (for type @a ftype)
-    to string representation required by KDbSQL commands.
+    to string representation required by KDBSQL commands.
     For Date/Time type KDb::dateTimeToSql() is used.
     For BLOB type KDb::escapeBlob() with BLOBEscapingType::ZeroXHex conversion type is used. */
 KDB_EXPORT KDbEscapedString valueToSql(KDbField::Type ftype, const QVariant& v);
 
-/*! Converts value @a v to string representation required by KDbSQL commands:
-    ISO 8601 DateTime format - with "T" delimiter/
-    For specification see https://www.w3.org/TR/NOTE-datetime.
-    Example: "1994-11-05T13:15:30" not "1994-11-05 13:15:30".
-    @todo Add support for time zones */
-KDB_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);
+/**
+ * Converts date/time value to its string representation in ISO 8601 DateTime format - with "T" delimiter
+ *
+ * @note This method is deprecated since 3.1.1, use KDb::dateTimeToIsoString() which has identical
+ * effect. The ISO format is no longer used for creating KDBSQL statements.
+ * Prior to this version it was used to generate date/time constants in
+ * KDb::valueToSql(KDbField::Type ftype, const QVariant& v) for KDbField::DateTime type.
+ * KDb::dateTimeToIsoString() is still used as default implementation for drivers
+ * in KDbDriver::dateTimeToSql().
+ *
+ * KDb 3.1.0 improved type safety for KDBSQL so Text type are no longer compatible with
+ * Date/Time types. By implementing wish https://bugs.kde.org/393094 format of date/time constants
+ * for KDBSQL has been strictly defined in a backend-independent way.
+ * See https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants for details.
+ */
+KDB_DEPRECATED_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);
+
+/**
+ * Converts date value to its string representation in ISO 8601 DateTime format
+ *
+ * The string is enclosed with single quotes "'". It is compatible with SQLite format for the
+ * date type. It is used as default implementation for drivers in KDbDriver::dateToSql().
+ *
+ * If the @a v value is convertible to KDbDate then KDbDate::toString() is used to obtain
+ * the result. Otherwise the value is converted to QDate and QDate::toString(Qt::ISODate) is
+ * used to obtain the result.
+ *
+ * "<INVALID_DATE>" string is returned for invalid (also null) date values.
+ *
+ * For specification of the ISO format see https://www.w3.org/TR/NOTE-datetime.
+ *
+ * Example value: "'1994-11-05'".
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString dateToIsoString(const QVariant& v);
+
+/**
+ * Converts time value to its string representation in ISO 8601 Time format
+ *
+ * The string is enclosed with single quotes "'". It is compatible with SQLite format for the
+ * time type. It is used as default implementation for drivers in KDbDriver::timeToSql().
+ *
+ * If the @a v value is convertible to KDbTime then KDbTime::toString() is used to obtain the result.
+ * Otherwise the value is converted to QTime and QTime::toString(Qt::ISODateWithMs)
+ * or QTime::toString(Qt::ISODate) is used to obtain the result.
+ * If the time's milliseconds value is zero, it is not included.
+ *
+ * "<INVALID_TIME>" string is returned for invalid (also null) time values.
+ *
+ * For specification of the ISO format see https://www.w3.org/TR/NOTE-datetime.
+ *
+ * Example values: "'13:15:30.123'", "'13:15:30'".
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString timeToIsoString(const QVariant& v);
+
+/**
+ * Converts date/time value to its string representation in ISO 8601 DateTime format - with "T" delimiter
+ *
+ * The string is enclosed with single quotes "'". It is compatible with SQLite format for the
+ * date/time type. It is used as default implementation for drivers in KDbDriver::dateTimeToSql().
+ *
+ * If the @a v value is convertible to KDbDateTime then KDbDateTime::toString() is used to obtain
+ * the result. Otherwise the value is converted to QDateTime and QDate::toString(Qt::ISODate) is
+ * used as well as QTime::toString(Qt::ISODateWithMs) or QTime::toString(Qt::ISODate) to obtain
+ * the result. If the time's milliseconds value is zero, it is not included.
+ *
+ * "<INVALID_DATETIME>" string is returned for invalid (also null) time values.
+ *
+ * For specification of the ISO format see https://www.w3.org/TR/NOTE-datetime.
+ *
+ * Example value: "'1994-11-05T13:15:30'", not "'1994-11-05 13:15:30'".
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString dateTimeToIsoString(const QVariant& v);
+
+/**
+ * Converts date value to its string representation required by KDBSQL commands
+ *
+ * The value can be of type QDate or KDbDate. If the value is not one of these types or is invalid
+ * QDate or is a null KDbDate then "<INVALID_DATE>" is returned. If the value is of type KDbDate
+ * that is not null then even if some components of the date are invalid, properly formatted string
+ * is returned.
+ *
+ * Example values: "#1994-11-05", "#1994-9-05#".
+ *
+ * See https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants for details.
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString dateToSql(const QVariant& v);
+
+/**
+ * Converts time value to its string representation required by KDBSQL commands
+ *
+ * The value can be of type QTime or KDbTime. If the value is not one of these types or is invalid
+ * QTime or is a null KDbTime then "<INVALID_TIME>" is returned. If the value is of type KDbTime
+ * that is not null then even if some components of the time are invalid, properly formatted string
+ * is returned. If the time's milliseconds value is zero, it is not included.
+ *
+ * See https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants for details.
+ *
+ * Example values: "#13:15#", "#13:9:30#", "#13:15:30.921#, "#7:20 AM#".
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString timeToSql(const QVariant& v);
+
+/**
+ * Converts date/time value to its string representation required by KDBSQL commands
+ *
+ * The value can be of type QDateTime or KDbDateTime. If the value is not one of these types or
+ * is invalid QDateTime or is a null KDbDateTime then "<INVALID_DATETIME>" is returned.
+ * If the value is of type KDbDateTime that is not null then even if some components of the
+ * date/time are invalid, properly formatted string is returned.
+ * If the time's milliseconds value is zero, it is not included.
+ *
+ * See https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants for details.
+ *
+ * Example values: "#1994-11-05 13:15#", "#1994-11-05 13:9:30#", "#1994-9-05 13:15:30.921#".
+ *
+ * @since 3.1.1
+ */
+KDB_EXPORT KDbEscapedString dateTimeToSql(const QVariant& v);
 
 #ifdef KDB_DEBUG_GUI
 //! A prototype of handler for GUI debugger
