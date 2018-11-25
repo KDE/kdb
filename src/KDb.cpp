@@ -2207,7 +2207,7 @@ QString KDb::identifierExpectedMessage(const QString &valueName, const QVariant&
 
 #ifdef KDB_DEBUG_GUI
 
-static KDb::DebugGUIHandler s_debugGUIHandler = 0;
+static KDb::DebugGUIHandler s_debugGUIHandler = nullptr;
 
 void KDb::setDebugGUIHandler(KDb::DebugGUIHandler handler)
 {
@@ -2220,7 +2220,7 @@ void KDb::debugGUI(const QString& text)
         s_debugGUIHandler(text);
 }
 
-static KDb::AlterTableActionDebugGUIHandler s_alterTableActionDebugHandler = 0;
+static KDb::AlterTableActionDebugGUIHandler s_alterTableActionDebugHandler = nullptr;
 
 void KDb::setAlterTableActionDebugHandler(KDb::AlterTableActionDebugGUIHandler handler)
 {
