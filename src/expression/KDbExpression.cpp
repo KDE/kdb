@@ -218,15 +218,17 @@ bool KDbExpressionData::addToCallStack(QDebug *dbg, KDb::ExpressionCallStack* ca
     if (callStack->contains(this)) {
         if (dbg)
             dbg->nospace() << "<CYCLE!>";
-        QString warning = QString::fromLatin1("Cycle detected in expression (depth %1):").arg(callStack->length());
+        QString warning;
+        QDebug debug(&warning);
+        debug.nospace() << "Cycle detected in expression (depth " << callStack->length() << "):";
         int level = 0;
         for (const KDbExpressionData *data : *callStack) {
-            QString objectString;
-            QDebug(&objectString) << qPrintable(expressionClassName(data->expressionClass)) << data->token;
-            warning += QString::fromLatin1("\n%1: %2").arg(level + 1).arg(objectString);
+            debug.nospace() << endl << level + 1 << ":";
+            debug.space().noquote() << expressionClassName(data->expressionClass);
+            debug.nospace() << data->token;
             ++level;
         }
-        kdbWarning() << qPrintable(warning);
+        kdbWarning().noquote() << warning;
         return false;
     }
     callStack->append(this);
