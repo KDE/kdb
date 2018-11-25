@@ -112,7 +112,7 @@ cat << EOF > generated/KDbToken.h
  * WARNING! All changes made in this file will be lost!
  ****************************************************************************/
 /* This file is part of the KDE project
-   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -259,7 +259,7 @@ cat << EOF > generated/KDbToken.cpp
  * WARNING! All changes made in this file will be lost!
  ****************************************************************************/
 /* This file is part of the KDE project
-   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -352,8 +352,9 @@ QString KDbToken::toString(KDbToken token, const KDbDriver *driver)
 
 KDB_EXPORT QDebug operator<<(QDebug dbg, KDbToken token)
 {
-    dbg.nospace() << qPrintable(token.name());
-    return dbg.space();
+    QDebugStateSaver saver(dbg);
+    dbg.nospace().noquote() << token.name();
+    return dbg.maybeSpace();
 }
 
 //! @internal
