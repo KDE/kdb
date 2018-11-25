@@ -1373,7 +1373,7 @@ void ExpressionsTest::testBinaryExpressionValidate_data()
     // date/time
     T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::DATE_CONST, QDate(2002, 1, 2), KDbField::Boolean);
     T(KDbToken::DATETIME_CONST, QDateTime(QDate(2001, 1, 2), QTime(1, 2, 3)), KDbToken::LESS_OR_EQUAL, KDbToken::DATE_CONST, QDateTime::currentDateTime(), KDbField::Boolean);
-    T(KDbToken::TIME_CONST, QTime(1, 2, 3), '<', KDbToken::DATE_CONST, QTime::currentTime(), KDbField::Boolean);
+    T(KDbToken::TIME_CONST, QTime(1, 2, 3), '<', KDbToken::TIME_CONST, QTime::currentTime(), KDbField::Boolean);
     T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::INTEGER_CONST, 17, KDbField::InvalidType);
     T(KDbToken::DATE_CONST, QDate(2001, 1, 2), '=', KDbToken::SQL_NULL, QVariant(), KDbField::Null);
     T(KDbToken::DATE_CONST, QDate(2001, 1, 2), KDbToken::OR, KDbToken::SQL_FALSE, false, KDbField::InvalidType);
