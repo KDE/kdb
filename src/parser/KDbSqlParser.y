@@ -410,7 +410,7 @@
 %type <querySchema> Select
 /*todo : list*/
 %type <querySchema> StatementList
-/*todo: not onlu select*/
+/*todo: not only select*/
 %type <querySchema> Statement
 
 %type <colType> SQL_TYPE
@@ -597,7 +597,7 @@ ColDefs ',' ColDef|ColDef
 ColDef:
 IDENTIFIER ColType
 {
-    kdbDebug() << "adding field " << *$1;
+    sqlParserDebug() << "adding field " << *$1;
     globalField->setName(*$1);
     globalParser->table()->addField(globalField);
     globalField = nullptr;
@@ -605,7 +605,7 @@ IDENTIFIER ColType
 }
 | IDENTIFIER ColType ColKeys
 {
-    kdbDebug() << "adding field " << *$1;
+    sqlParserDebug() << "adding field " << *$1;
     globalField->setName(*$1);
     delete $1;
     globalParser->table()->addField(globalField);
@@ -628,17 +628,17 @@ ColKey:
 PRIMARY KEY
 {
     globalField->setPrimaryKey(true);
-    kdbDebug() << "primary";
+    sqlParserDebug() << "primary";
 }
 | NOT SQL_NULL
 {
     globalField->setNotNull(true);
-    kdbDebug() << "not_null";
+    sqlParserDebug() << "not_null";
 }
 | AUTO_INCREMENT
 {
     globalField->setAutoIncrement(true);
-    kdbDebug() << "ainc";
+    sqlParserDebug() << "ainc";
 }
 ;
 
@@ -650,7 +650,7 @@ SQL_TYPE
 }
 | SQL_TYPE '(' INTEGER_CONST ')'
 {
-    kdbDebug() << "sql + length";
+    sqlParserDebug() << "sql + length";
     globalField = new KDbField();
     globalField->setPrecision($3);
     globalField->setType($1);
@@ -673,13 +673,13 @@ SQL_TYPE
 SelectStatement:
 Select
 {
-    kdbDebug() << "Select";
+    sqlParserDebug() << "Select";
     if (!($$ = buildSelectQuery( $1, nullptr )))
         YYABORT;
 }
 | Select ColViews
 {
-    kdbDebug() << "Select ColViews=" << *$2;
+    sqlParserDebug() << "Select ColViews=" << *$2;
 
     if (!($$ = buildSelectQuery( $1, $2 )))
         YYABORT;
@@ -691,25 +691,25 @@ Select
 }
 | Select Tables
 {
-    kdbDebug() << "Select ColViews Tables";
+    sqlParserDebug() << "Select ColViews Tables";
     if (!($$ = buildSelectQuery( $1, nullptr, $2 )))
         YYABORT;
 }
 | Select ColViews SelectOptions
 {
-    kdbDebug() << "Select ColViews Conditions";
+    sqlParserDebug() << "Select ColViews Conditions";
     if (!($$ = buildSelectQuery( $1, $2, nullptr, $3 )))
         YYABORT;
 }
 | Select Tables SelectOptions
 {
-    kdbDebug() << "Select Tables SelectOptions";
+    sqlParserDebug() << "Select Tables SelectOptions";
     if (!($$ = buildSelectQuery( $1, nullptr, $2, $3 )))
         YYABORT;
 }
 | Select ColViews Tables SelectOptions
 {
-    kdbDebug() << "Select ColViews Tables SelectOptions";
+    sqlParserDebug() << "Select ColViews Tables SelectOptions";
     if (!($$ = buildSelectQuery( $1, $2, $3, $4 )))
         YYABORT;
 }
@@ -718,7 +718,7 @@ Select
 Select:
 SELECT
 {
-    kdbDebug() << "SELECT";
+    sqlParserDebug() << "SELECT";
     $$ = KDbParserPrivate::get(globalParser)->createQuery();
 }
 ;
@@ -726,20 +726,20 @@ SELECT
 SelectOptions: /* todo: more options (having, group by, limit...) */
 WhereClause
 {
-    kdbDebug() << "WhereClause";
+    sqlParserDebug() << "WhereClause";
     $$ = new SelectOptionsInternal;
     $$->whereExpr = *$1;
     delete $1;
 }
 | ORDER BY OrderByClause
 {
-    kdbDebug() << "OrderByClause";
+    sqlParserDebug() << "OrderByClause";
     $$ = new SelectOptionsInternal;
     $$->orderByColumns = $3;
 }
 | WhereClause ORDER BY OrderByClause
 {
-    kdbDebug() << "WhereClause ORDER BY OrderByClause";
+    sqlParserDebug() << "WhereClause ORDER BY OrderByClause";
     $$ = new SelectOptionsInternal;
     $$->whereExpr = *$1;
     delete $1;
@@ -747,7 +747,7 @@ WhereClause
 }
 | ORDER BY OrderByClause WhereClause
 {
-    kdbDebug() << "OrderByClause WhereClause";
+    sqlParserDebug() << "OrderByClause WhereClause";
     $$ = new SelectOptionsInternal;
     $$->whereExpr = *$4;
     delete $4;
@@ -767,7 +767,7 @@ WHERE aExpr
 OrderByClause:
 OrderByColumnId
 {
-    kdbDebug() << "ORDER BY IDENTIFIER";
+    sqlParserDebug() << "ORDER BY IDENTIFIER";
     $$ = new QList<OrderByColumnInternal>;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
@@ -776,7 +776,7 @@ OrderByColumnId
 }
 | OrderByColumnId OrderByOption
 {
-    kdbDebug() << "ORDER BY IDENTIFIER OrderByOption";
+    sqlParserDebug() << "ORDER BY IDENTIFIER OrderByOption";
     $$ = new QList<OrderByColumnInternal>;
     OrderByColumnInternal orderByColumn;
     orderByColumn.setColumnByNameOrNumber( *$1 );
@@ -807,20 +807,20 @@ OrderByColumnId:
 IDENTIFIER
 {
     $$ = new QVariant( *$1 );
-    kdbDebug() << "OrderByColumnId: " << *$$;
+    sqlParserDebug() << "OrderByColumnId: " << *$$;
     delete $1;
 }
 | IDENTIFIER '.' IDENTIFIER
 {
     $$ = new QVariant( *$1 + QLatin1Char('.') + *$3 );
-    kdbDebug() << "OrderByColumnId: " << *$$;
+    sqlParserDebug() << "OrderByColumnId: " << *$$;
     delete $1;
     delete $3;
 }
 | INTEGER_CONST
 {
     $$ = new QVariant($1);
-    kdbDebug() << "OrderByColumnId: " << *$$;
+    sqlParserDebug() << "OrderByColumnId: " << *$$;
 }
 
 OrderByOption:
@@ -842,7 +842,7 @@ aExpr2
 aExpr2:
 aExpr3 AND aExpr2
 {
-//    kdbDebug() << "AND " << $3.debugString();
+//    sqlParserDebug() << "AND " << $3.debugString();
     $$ = new KDbBinaryExpression(*$1, KDbToken::AND, *$3);
     delete $1;
     delete $3;
@@ -1089,18 +1089,18 @@ aExpr9:
     $$ = new KDbVariableExpression( *$1 );
 
     //! @todo simplify this later if that's 'only one field name' expression
-    kdbDebug() << "  + identifier: " << *$1;
+    sqlParserDebug() << "  + identifier: " << *$1;
     delete $1;
 }
 | QUERY_PARAMETER
 {
     $$ = new KDbQueryParameterExpression( *$1 );
-    kdbDebug() << "  + query parameter:" << *$$;
+    sqlParserDebug() << "  + query parameter:" << *$$;
     delete $1;
 }
 | IDENTIFIER aExprList
 {
-    kdbDebug() << "  + function:" << *$1 << "(" << *$2 << ")";
+    sqlParserDebug() << "  + function:" << *$1 << "(" << *$2 << ")";
     $$ = new KDbFunctionExpression(*$1, *$2);
     delete $1;
     delete $2;
@@ -1109,14 +1109,14 @@ aExpr9:
 | IDENTIFIER '.' IDENTIFIER
 {
     $$ = new KDbVariableExpression( *$1 + QLatin1Char('.') + *$3 );
-    kdbDebug() << "  + identifier.identifier:" << *$1 << "." << *$3;
+    sqlParserDebug() << "  + identifier.identifier:" << *$1 << "." << *$3;
     delete $1;
     delete $3;
 }
 | SQL_NULL
 {
     $$ = new KDbConstExpression( KDbToken::SQL_NULL, QVariant() );
-    kdbDebug() << "  + NULL";
+    sqlParserDebug() << "  + NULL";
 //    $$ = new KDbField();
     //$$->setName(QString::null);
 }
@@ -1131,7 +1131,7 @@ aExpr9:
 | CHARACTER_STRING_LITERAL
 {
     $$ = new KDbConstExpression( KDbToken::CHARACTER_STRING_LITERAL, *$1 );
-    kdbDebug() << "  + constant " << $1;
+    sqlParserDebug() << "  + constant " << $1;
     delete $1;
 }
 | INTEGER_CONST
@@ -1149,12 +1149,12 @@ aExpr9:
 //! @todo ok?
 
     $$ = new KDbConstExpression( KDbToken::INTEGER_CONST, val );
-    kdbDebug() << "  + int constant: " << val.toString();
+    sqlParserDebug() << "  + int constant: " << val.toString();
 }
 | REAL_CONST
 {
     $$ = new KDbConstExpression( KDbToken::REAL_CONST, *$1 );
-    kdbDebug() << "  + real constant: " << *$1;
+    sqlParserDebug() << "  + real constant: " << *$1;
     delete $1;
 }
 |
@@ -1165,7 +1165,7 @@ aExpr10
 aExpr10:
 '(' aExpr ')'
 {
-    kdbDebug() << "(expr)";
+    sqlParserDebug() << "(expr)";
     $$ = new KDbUnaryExpression('(', *$2);
     delete $2;
 }
@@ -1205,30 +1205,30 @@ FROM FlatTableList
 /*
 | Tables LEFT JOIN IDENTIFIER SQL_ON ColExpression
 {
-    kdbDebug() << "LEFT JOIN: '" << *$4 << "' ON " << $6;
+    sqlParserDebug() << "LEFT JOIN: '" << *$4 << "' ON " << $6;
     addTable($4->toQString());
     delete $4;
 }
 | Tables LEFT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-    kdbDebug() << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7;
+    sqlParserDebug() << "LEFT OUTER JOIN: '" << $5 << "' ON " << $7;
     addTable($5);
 }
 | Tables INNER JOIN IDENTIFIER SQL_ON ColExpression
 {
-    kdbDebug() << "INNER JOIN: '" << *$4 << "' ON " << $6;
+    sqlParserDebug() << "INNER JOIN: '" << *$4 << "' ON " << $6;
     addTable($4->toQString());
     delete $4;
 }
 | Tables RIGHT JOIN IDENTIFIER SQL_ON ColExpression
 {
-    kdbDebug() << "RIGHT JOIN: '" << *$4 << "' ON " << $6;
+    sqlParserDebug() << "RIGHT JOIN: '" << *$4 << "' ON " << $6;
     addTable(*$4);
     delete $4;
 }
 | Tables RIGHT OUTER JOIN IDENTIFIER SQL_ON ColExpression
 {
-    kdbDebug() << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7;
+    sqlParserDebug() << "RIGHT OUTER JOIN: '" << *$5 << "' ON " << $7;
     addTable($5->toQString());
     delete $5;
 }*/
@@ -1260,7 +1260,7 @@ FlatTableList ',' FlatTable
 FlatTable:
 IDENTIFIER
 {
-    kdbDebug() << "FROM: '" << *$1 << "'";
+    sqlParserDebug() << "FROM: '" << *$1 << "'";
     $$ = new KDbVariableExpression(*$1);
 
     //! @todo this isn't ok for more tables:
@@ -1316,14 +1316,14 @@ ColViews ',' ColItem
     $$ = $1;
     $$->append(*$3);
     delete $3;
-    kdbDebug() << "ColViews: ColViews , ColItem";
+    sqlParserDebug() << "ColViews: ColViews , ColItem";
 }
 |ColItem
 {
     $$ = new KDbNArgExpression(KDb::FieldListExpression, KDbToken());
     $$->append(*$1);
     delete $1;
-    kdbDebug() << "ColViews: ColItem";
+    sqlParserDebug() << "ColViews: ColItem";
 }
 ;
 
@@ -1335,12 +1335,12 @@ ColExpression
 //    $$->setExpression( $1 );
 //    globalParser->query()->addField($$);
     $$ = $1;
-    kdbDebug() << " added column expr:" << *$1;
+    sqlParserDebug() << " added column expr:" << *$1;
 }
 | ColWildCard
 {
     $$ = $1;
-    kdbDebug() << " added column wildcard:" << *$1;
+    sqlParserDebug() << " added column wildcard:" << *$1;
 }
 | ColExpression AS IDENTIFIER
 {
@@ -1348,7 +1348,7 @@ ColExpression
         *$1, KDbToken::AS,
         KDbVariableExpression(*$3)
     );
-    kdbDebug() << " added column expr:" << *$$;
+    sqlParserDebug() << " added column expr:" << *$$;
     delete $1;
     delete $3;
 }
@@ -1358,7 +1358,7 @@ ColExpression
         *$1, KDbToken::AS_EMPTY,
         KDbVariableExpression(*$2)
     );
-    kdbDebug() << " added column expr:" << *$$;
+    sqlParserDebug() << " added column expr:" << *$$;
     delete $1;
     delete $2;
 }
@@ -1423,7 +1423,7 @@ ColWildCard:
 '*'
 {
     $$ = new KDbVariableExpression(QLatin1String("*"));
-    kdbDebug() << "all columns";
+    sqlParserDebug() << "all columns";
 
 //    KDbQueryAsterisk *ast = new KDbQueryAsterisk(globalParser->query(), dummy);
 //    globalParser->query()->addAsterisk(ast);
@@ -1434,13 +1434,13 @@ ColWildCard:
     QString s( *$1 );
     s += QLatin1String(".*");
     $$ = new KDbVariableExpression(s);
-    kdbDebug() << "  + all columns from " << s;
+    sqlParserDebug() << "  + all columns from " << s;
     delete $1;
 }
 /*| ERROR_DIGIT_BEFORE_IDENTIFIER
 {
     $$ = new KDbVariableExpression($1);
-    kdbDebug() << "  Invalid identifier! " << $1;
+    sqlParserDebug() << "  Invalid identifier! " << $1;
     setError(KDbParser::tr("Invalid identifier \"%1\"",$1));
 }*/
 ;

@@ -1281,7 +1281,7 @@ YY_RULE_SETUP
 #line 282 "KDbSqlScanner.l"
 {
     ECOUNT;
-    //kdbDebug() << "{string} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{string} yytext: '" << yytext << "' (" << yyleng << ")";
     int errorPosition;
     const QString unescaped(
         KDb::unescapeString(QString::fromUtf8(yytext+1, yyleng-2), yytext[0], &errorPosition));
@@ -1300,7 +1300,7 @@ case 44:
 YY_RULE_SETUP
 #line 299 "KDbSqlScanner.l"
 {
-    kdbDebug() << "{identifier} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{identifier} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     if (yytext[0]>='0' && yytext[0]<='9') {
         setError(KDbParser::tr("Invalid identifier"),
@@ -1316,7 +1316,7 @@ case 45:
 YY_RULE_SETUP
 #line 311 "KDbSqlScanner.l"
 {
-    kdbDebug() << "{query_parameter} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{query_parameter} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
     return QUERY_PARAMETER;
@@ -1334,7 +1334,7 @@ case 47:
 YY_RULE_SETUP
 #line 322 "KDbSqlScanner.l"
 {
-    kdbDebug() << "char: '" << yytext[0] << "'";
+    sqlParserDebug() << "char: '" << yytext[0] << "'";
     ECOUNT;
     return yytext[0];
 }
