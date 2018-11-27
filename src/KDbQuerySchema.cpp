@@ -184,16 +184,18 @@ bool KDbQuerySchema::insertFieldInternal(int position, KDbField *field,
         d->tablesBoundToColumns[i] = d->tablesBoundToColumns[i-1];
     d->tablesBoundToColumns[position] = bindToTable;
 
-    kdbDebug() << "bound to table" << bindToTable;
+#ifdef KDB_QUERYSCHEMA_DEBUG
+    querySchemaDebug() << "bound to table" << bindToTable;
     if (bindToTable == -1)
-        kdbDebug() << " <NOT SPECIFIED>";
+        querySchemaDebug() << " <NOT SPECIFIED>";
     else
-        kdbDebug() << " name=" << d->tables.at(bindToTable)->name()
-        << " alias=" << tableAlias(bindToTable);
+        querySchemaDebug() << " name=" << d->tables.at(bindToTable)->name()
+                           << " alias=" << tableAlias(bindToTable);
     QString s;
     for (int i = 0; i < fieldCount();i++)
         s += (QString::number(d->tablesBoundToColumns[i]) + QLatin1Char(' '));
-    kdbDebug() << "tablesBoundToColumns == [" << s << "]";
+    querySchemaDebug() << "tablesBoundToColumns == [" << s << "]";
+#endif
 
     if (field->isExpression())
         d->regenerateExprAliases = true;
@@ -242,7 +244,7 @@ bool KDbQuerySchema::removeField(KDbField *field)
     }
     d->clearCachedData();
     if (indexOfAsterisk >= 0) {
-        //kdbDebug() << "d->asterisks.removeAt:" << field;
+        //querySchemaDebug() << "d->asterisks.removeAt:" << field;
         //field->debug();
         d->asterisks.removeAt(indexOfAsterisk); //this will destroy this asterisk
     }
@@ -465,7 +467,7 @@ QList<KDbTableSchema*>* KDbQuerySchema::tables() const
 
 void KDbQuerySchema::addTable(KDbTableSchema *table, const QString& alias)
 {
-    kdbDebug() << (void *)table << "alias=" << alias;
+    querySchemaDebug() << (void *)table << "alias=" << alias;
     if (!table)
         return;
 
@@ -476,7 +478,7 @@ void KDbQuerySchema::addTable(KDbTableSchema *table, const QString& alias)
             num++;
             if (0 == t->name().compare(table->name(), Qt::CaseInsensitive)) {
                 if (tableAlias(num).isEmpty()) {
-                    kdbDebug() << "table" << table->name() << "without alias already added";
+                    querySchemaDebug() << "table" << table->name() << "without alias already added";
                     return;
                 }
             }
@@ -826,7 +828,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                     ci->d->querySchema = this;
                     ci->d->connection = conn;
                     list.append(ci);
-                    kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
+                    querySchemaDebug() << "caching (unexpanded) columns order:" << *ci
+                                       << "at position" << fieldPosition;
                     cache->columnsOrder.insert(ci, fieldPosition);
                 }
             } else {//all-tables asterisk: iterate through table list
@@ -842,7 +845,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                         ci->d->querySchema = this;
                         ci->d->connection = conn;
                         list.append(ci);
-                        kdbDebug() << "caching (unexpanded) columns order:" << *ci << "at position" << fieldPosition;
+                        querySchemaDebug() << "caching (unexpanded) columns order:" << *ci
+                                           << "at position" << fieldPosition;
                         cache->columnsOrder.insert(ci, fieldPosition);
                     }
                 }
@@ -854,7 +858,8 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
             ci->d->connection = conn;
             list.append(ci);
             columnInfosOutsideAsterisks.insert(ci, true);
-            kdbDebug() << "caching (unexpanded) column's order:" << *ci << "at position" << fieldPosition;
+            querySchemaDebug() << "caching (unexpanded) column's order:" << *ci << "at position"
+                               << fieldPosition;
             cache->columnsOrder.insert(ci, fieldPosition);
             cache->columnsOrderWithoutAsterisks.insert(ci, fieldPosition);
 
@@ -1161,7 +1166,7 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder(KDbConnection *conn) const
 
     //get order of PKEY fields (e.g. for records updating or inserting )
     KDbIndexSchema *pkey = tbl->primaryKey();
-    kdbDebug() << *pkey;
+    querySchemaDebug() << *pkey;
     d->pkeyFieldsOrder = new QVector<int>(pkey->fieldCount(), -1);
 
     d->pkeyFieldCount = 0;
@@ -1170,15 +1175,17 @@ QVector<int> KDbQuerySchema::pkeyFieldsOrder(KDbConnection *conn) const
     for (int i = 0; i < fCount; i++) {
         const KDbQueryColumnInfo *fi = fieldsExpanded[i];
         const int fieldIndex = fi->field()->table() == tbl ? pkey->indexOf(*fi->field()) : -1;
-        if (fieldIndex != -1/* field found in PK */
-                && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */) {
-            kdbDebug() << "FIELD" << fi->field()->name() << "IS IN PKEY AT POSITION #" << fieldIndex;
+        if (fieldIndex != -1 /* field found in PK */
+            && d->pkeyFieldsOrder->at(fieldIndex) == -1 /* first time */)
+        {
+            querySchemaDebug() << "FIELD" << fi->field()->name() << "IS IN PKEY AT POSITION #"
+                               << fieldIndex;
             (*d->pkeyFieldsOrder)[fieldIndex] = i;
             d->pkeyFieldCount++;
         }
     }
-    kdbDebug() << d->pkeyFieldCount
-    << " OUT OF " << pkey->fieldCount() << " PKEY'S FIELDS FOUND IN QUERY " << name();
+    querySchemaDebug() << d->pkeyFieldCount << " OUT OF " << pkey->fieldCount()
+                       << " PKEY'S FIELDS FOUND IN QUERY " << name();
     return *d->pkeyFieldsOrder;
 }
 

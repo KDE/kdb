@@ -21,6 +21,7 @@
 #define KDB_DEBUG_H
 
 #include "config-kdb.h"
+#include "config-kdb-private.h"
 
 #include <QLoggingCategory>
 Q_DECLARE_LOGGING_CATEGORY(KDB_LOG)
@@ -50,6 +51,18 @@ Q_DECLARE_LOGGING_CATEGORY(KDB_LOG)
 # define transactionsDebug(...) kdbDebug(__VA_ARGS__)
 #else
 # define transactionsDebug(...) if (1) {} else kdbDebug(__VA_ARGS__)
+#endif
+
+#ifdef KDB_QUERYSCHEMA_DEBUG
+# define querySchemaDebug(...) kdbDebug(__VA_ARGS__)
+#else
+# define querySchemaDebug(...) if (1) {} else kdbDebug(__VA_ARGS__)
+#endif
+
+#ifdef KDB_SQLPARSER_DEBUG
+# define sqlParserDebug(...) kdbDebug(__VA_ARGS__)
+#else
+# define sqlParserDebug(...) if (1) {} else kdbDebug(__VA_ARGS__)
 #endif
 
 #endif

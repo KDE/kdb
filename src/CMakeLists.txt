@@ -3,6 +3,8 @@ simple_option(KDB_EXPRESSION_DEBUG "Debugging of Expression classes" OFF)
 simple_option(KDB_DRIVERMANAGER_DEBUG "Debugging of the Driver Manager class" OFF)
 simple_option(KDB_TRANSACTIONS_DEBUG "Debugging of the Transaction class" OFF)
 simple_option(KDB_TABLESCHEMACHANGELISTENER_DEBUG "Debugging of the KDbTableSchemaChangeListener class" OFF)
+simple_option(KDB_QUERYSCHEMA_DEBUG "Debugging of the QuerySchema class" OFF)
+simple_option(KDB_SQLPARSER_DEBUG "Debugging of the SQL parser" OFF)
 
 # Public options (affecting public behavior or contents of KDb)
 simple_option(KDB_DEBUG_GUI "GUI for debugging" OFF)
@@ -464,3 +466,7 @@ add_subdirectory(drivers)
 enable_testing()
 
 configure_file(config-kdb.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb.h)
+configure_file(config-kdb-private.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config-kdb-private.h)
+target_sources(KDb
+    PRIVATE ${PROJECT_BINARY_DIR}/src/config-kdb-private.h
+)

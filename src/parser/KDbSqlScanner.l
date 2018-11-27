@@ -281,7 +281,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 
 {string} {
     ECOUNT;
-    //kdbDebug() << "{string} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{string} yytext: '" << yytext << "' (" << yyleng << ")";
     int errorPosition;
     const QString unescaped(
         KDb::unescapeString(QString::fromUtf8(yytext+1, yyleng-2), yytext[0], &errorPosition));
@@ -297,7 +297,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 }
 
 {identifier} {
-    kdbDebug() << "{identifier} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{identifier} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     if (yytext[0]>='0' && yytext[0]<='9') {
         setError(KDbParser::tr("Invalid identifier"),
@@ -309,7 +309,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 }
 
 {query_parameter} {
-    kdbDebug() << "{query_parameter} yytext: '" << yytext << "' (" << yyleng << ")";
+    sqlParserDebug() << "{query_parameter} yytext: '" << yytext << "' (" << yyleng << ")";
     ECOUNT;
     yylval.stringValue = new QString(QString::fromUtf8(yytext+1, yyleng-2));
     return QUERY_PARAMETER;
@@ -320,7 +320,7 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 }
 
 [\~\!\@\#\^\&\|\`\?,()\[\]\.;\:\+\-\*\/\%\^\<\>\=] {
-    kdbDebug() << "char: '" << yytext[0] << "'";
+    sqlParserDebug() << "char: '" << yytext[0] << "'";
     ECOUNT;
     return yytext[0];
 }
