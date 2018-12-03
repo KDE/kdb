@@ -26,7 +26,8 @@
                 "Name[tr]": "Kexi Ekibi",
                 "Name[uk]": "Команда Kexi",
                 "Name[x-test]": "xxKexi Teamxx",
-                "Name[zh_CN]": "Kexi 团队"
+                "Name[zh_CN]": "Kexi 团队",
+                "Name[zh_TW]": "Kexi 團隊"
             }
         ],
         "Category": "",
@@ -55,6 +56,7 @@
         "Description[uk]": "Драйвер KDb для роботи з базами даних MySQL",
         "Description[x-test]": "xxKDb driver for handling MySQL databasesxx",
         "Description[zh_CN]": "处理 MySQL 数据库的 KDb 驱动",
+        "Description[zh_TW]": "處理 MySQL 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
         "Icon": "",
         "Id": "org.kde.kdb.mysql",
@@ -84,6 +86,7 @@
         "Name[uk]": "MySQL",
         "Name[x-test]": "xxMySQLxx",
         "Name[zh_CN]": "MySQL",
+        "Name[zh_TW]": "MySQL",
         "ServiceTypes": [
             "KDb/Driver"
         ],
