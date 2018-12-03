@@ -21,6 +21,7 @@
 
 #include <QtTest>
 
+#include <KDbDateTime>
 #include <KDbExpression>
 #include "parser/generated/sqlparser.h"
 #include "parser/KDbParser_p.h"
@@ -1064,6 +1065,7 @@ void ExpressionsTest::testConstExpressionValidate()
     QCOMPARE(c.type(), KDbField::Date);
     QCOMPARE(c.value(), QVariant(date));
     QVERIFY(validate(&c));
+    testCloneExpression(c);
     //qDebug() << c;
     date = date.addDays(17);
     c.setValue(date);
@@ -1072,7 +1074,39 @@ void ExpressionsTest::testConstExpressionValidate()
     QVERIFY(c.isDateTimeType());
     QVERIFY(validate(&c));
     testCloneExpression(c);
-    //qDebug() << c;
+
+    KDbDate dateKDb(KDbYear("2018"), "11", "27");
+    c.setValue(QVariant::fromValue(dateKDb));
+    QCOMPARE(c.value(), QVariant::fromValue(dateKDb));
+    QVERIFY(c.isValid());
+    QVERIFY(c.isDateTimeType());
+    QVERIFY(validate(&c));
+    testCloneExpression(c);
+
+    // time
+    QTime time(QTime::currentTime());
+    c = KDbConstExpression(KDbToken::TIME_CONST, time);
+    QCOMPARE(c.type(), KDbField::Time);
+    QVERIFY(c.isValid());
+    QVERIFY(c.isDateTimeType());
+    QCOMPARE(c.value(), QVariant(time));
+    testCloneExpression(c);
+    QVERIFY(validate(&c));
+    time = time.addMSecs(1200123);
+    c.setValue(time);
+    QCOMPARE(c.value(), QVariant(time));
+    QVERIFY(c.isValid());
+    QVERIFY(c.isDateTimeType());
+    QVERIFY(validate(&c));
+    testCloneExpression(c);
+
+    KDbTime timeKDb("12", "34", "56", "789");
+    c.setValue(QVariant::fromValue(timeKDb));
+    QCOMPARE(c.value(), QVariant::fromValue(timeKDb));
+    QVERIFY(c.isValid());
+    QVERIFY(c.isDateTimeType());
+    QVERIFY(validate(&c));
+    testCloneExpression(c);
 
     // date/time
     QDateTime dateTime(QDateTime::currentDateTime());
@@ -1082,6 +1116,7 @@ void ExpressionsTest::testConstExpressionValidate()
     QVERIFY(c.isDateTimeType());
     QCOMPARE(c.value(), QVariant(dateTime));
     QVERIFY(validate(&c));
+    testCloneExpression(c);
     //qDebug() << c;
     dateTime = dateTime.addDays(-17);
     c.setValue(dateTime);
@@ -1091,24 +1126,18 @@ void ExpressionsTest::testConstExpressionValidate()
     QVERIFY(validate(&c));
     testCloneExpression(c);
     //qDebug() << c;
-
-    // time
-    QTime time(QTime::currentTime());
-    c = KDbConstExpression(KDbToken::TIME_CONST, time);
-    QCOMPARE(c.type(), KDbField::Time);
-    QVERIFY(c.isValid());
-    QVERIFY(c.isDateTimeType());
-    QCOMPARE(c.value(), QVariant(time));
-    //qDebug() << c;
-    QVERIFY(validate(&c));
-    time = time.addSecs(1200);
-    c.setValue(time);
-    QCOMPARE(c.value(), QVariant(time));
+    KDbDateTime dateTimeKDb(dateKDb, timeKDb);
+    c.setValue(QVariant::fromValue(dateTimeKDb));
+//    qDebug() << QVariant::fromValue(dateTimeKDb);
+//    qDebug() << QVariant::fromValue(dateTimeKDb).isValid();
+//    qDebug() << c.value();
+//    qDebug() << c.value().isValid();
+//    qDebug() << (QVariant::fromValue(dateTimeKDb) == c.value());
+    QCOMPARE(c.value(), QVariant::fromValue(dateTimeKDb));
     QVERIFY(c.isValid());
     QVERIFY(c.isDateTimeType());
     QVERIFY(validate(&c));
     testCloneExpression(c);
-    //qDebug() << c;
 
     // setValue()
     c = KDbConstExpression(KDbToken::INTEGER_CONST, 124);
