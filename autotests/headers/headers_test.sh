@@ -74,22 +74,25 @@ int main(int, char**)
 }
 EOT
 
-# files to include using <name>, forward headers + some *.h headers
-find_files()
+manifest=$builddir/install_manifest.txt
+
+find_headers()
 {
-    for subdir in "$@" ; do
-        find "$builddir/src/$subdir" -maxdepth 1 -type f -printf "%f\n"
+    for f in $(grep -E "/include/.*/[[:alpha:]]+\.h$" "$manifest") ; do
+        basename $f
     done
 }
 
-for f in `find_files $@ | grep -v "\.h\$" | grep -vE "(\\.|Makefile)" | sort`; do
-    fname=${f}_HeaderTest.cpp
-    echo "#include <$f>" > $test_app_dir/$fname
-    echo "    $fname" >> $test_app_dir/CMakeLists.txt
-done
+find_forwarding_headers()
+{
+    for f in $(grep -E "/include/.*/[[:alpha:]]+$" "$manifest") ; do
+        if grep -Eq "^#include \"[[:alpha:]]+\.h\"$" $f ; then
+            basename $f
+        fi
+    done
+}
 
-# files to include using <name>, these are .h files
-for f in `find_files $@ | grep "\.h\$" | grep -vE "(^ui_.*\.h|sqlparser\.h)" | sort`; do
+for f in $(find_forwarding_headers; find_headers | sort); do
     fname=${f}_HeaderTest.cpp
     echo "#include <$f>" > $test_app_dir/$fname
     echo "    $fname" >> $test_app_dir/CMakeLists.txt
