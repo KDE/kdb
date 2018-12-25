@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -204,6 +204,9 @@ QString KDbUtils::stringToFileName(const QString& string)
 {
     QString _string(string);
     _string.replace(QRegularExpression(QLatin1String("[\\\\/:\\*?\"<>|]")), QLatin1String(" "));
+    if (_string.startsWith(QLatin1Char('.'))) {
+        _string.prepend(QLatin1Char('_'));
+    }
     return _string.simplified();
 }
 
