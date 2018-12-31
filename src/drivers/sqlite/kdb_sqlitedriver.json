@@ -64,7 +64,9 @@
         "License": "LGPL",
         "MimeTypes": [
             "application/x-kexiproject-sqlite3",
-            "application/x-sqlite3"
+            "application/x-sqlite3",
+            "application/x-vnd.kde.kexi",
+            "application/vnd.sqlite3"
         ],
         "Name": "SQLite",
         "Name[ast]": "SQLite",

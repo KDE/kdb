@@ -95,6 +95,21 @@ KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &v
                          toString(val1), toString(qPrintable(val2.toString())),
                          actual, expected, file, line);
 }
+
+static char *toString(const QStringList &list)
+{
+    return toString(qPrintable(QStringLiteral("QStringList(%1)").arg(list.join(", "))));
+}
+
+KDBTESTUTILS_EXPORT bool qCompare(const QStringList &val1, const QStringList &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line)
+{
+    return val1 == val2 ? compare_helper(true, "COMPARE()", toString(val1), toString(val2), actual,
+                                         expected, file, line)
+                        : compare_helper(false, "Compared values are not the same", toString(val1),
+                                         toString(val2), actual, expected, file, line);
+}
 }
 
 class KDbTestUtils::Private {
@@ -197,7 +212,8 @@ void KDbTestUtils::testDriverManagerInternal()
     testDriverManagerInternal(false);
 }
 
-void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes)
+void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes,
+                              const QStringList &possiblyInvalidMimeTypes)
 {
     // find the metadata
     const KDbDriverMetaData* driverMetaData;
@@ -214,8 +230,14 @@ void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QSt
     QVERIFY(!KDb::defaultFileBasedDriverMimeType().isEmpty());
     QMimeDatabase mimeDb;
     foreach(const QString &mimeName, expectedMimeTypes) {
-        QVERIFY2(mimeDb.mimeTypeForName(mimeName).isValid(),
-                 qPrintable(QString("%1 MIME type not found in the MIME database").arg(mimeName)));
+        if (!mimeDb.mimeTypeForName(mimeName).isValid()) {
+            const QString msg = QStringLiteral("%1 MIME type not found in the MIME database").arg(mimeName);
+            if (possiblyInvalidMimeTypes.contains(mimeName)) {
+                qInfo() << qPrintable(msg);
+            } else {
+                QVERIFY2(mimeDb.mimeTypeForName(mimeName).isValid(), qPrintable(msg));
+            }
+        }
     }
     // find driver for the metadata
     KDB_VERIFY(manager.resultable(), driver = manager.driver(driverId), "Driver not found");
@@ -223,12 +245,12 @@ void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QSt
 
 void KDbTestUtils::testSqliteDriverInternal()
 {
-    QStringList mimeTypes;
-    mimeTypes << "application/x-kexiproject-sqlite3" << "application/x-sqlite3";
-    testDriver("org.kde.kdb.sqlite",
-               true, // file-based
-               mimeTypes);
-    QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()), "SQLite's MIME types should include the default file based one");
+    const QStringList mimeTypes { "application/x-kexiproject-sqlite3", "application/x-sqlite3",
+                                  "application/x-vnd.kde.kexi", "application/vnd.sqlite3" };
+    const QStringList possiblyInvalidMimeTypes { "application/vnd.sqlite3" };
+    testDriver("org.kde.kdb.sqlite", true /* file-based */, mimeTypes, possiblyInvalidMimeTypes);
+    QVERIFY2(mimeTypes.contains(KDb::defaultFileBasedDriverMimeType()),
+             "SQLite's MIME types should include the default file based one");
 }
 
 void KDbTestUtils::testConnectInternal(const KDbConnectionData &cdata,
