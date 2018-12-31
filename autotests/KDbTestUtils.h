@@ -73,6 +73,10 @@ KDBTESTUTILS_EXPORT bool qCompare(const KDbEscapedString &val1, const QString &v
 KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &val2,
                                   const char *actual, const char *expected, const char *file,
                                   int line);
+
+KDBTESTUTILS_EXPORT bool qCompare(const QStringList &val1, const QStringList &val2,
+                                  const char *actual, const char *expected, const char *file,
+                                  int line);
 }
 
 //! Calls @a call and verifies status of @a resultable
@@ -164,7 +168,8 @@ public:
 
 protected:
     void testDisconnectPrivate();
-    void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes);
+    void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes,
+                    const QStringList &possiblyInvalidMimeTypes);
     void testDriverManagerInternal(bool forceEmpty);
 
 private:
