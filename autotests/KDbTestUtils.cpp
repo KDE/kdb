@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2015 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2019 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -185,32 +185,43 @@ void KDbTestUtils::testDriverManagerInternal()
     testDriverManagerInternal(false);
 }
 
-void KDbTestUtils::testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes,
+void KDbTestUtils::testDriver(const QString &driverId, bool fileBased,
+                              const QStringList &expectedMimeTypes,
                               const QStringList &possiblyInvalidMimeTypes)
 {
     // find the metadata
     const KDbDriverMetaData* driverMetaData;
-    KDB_VERIFY(manager.resultable(), driverMetaData = manager.driverMetaData(driverId), "Driver metadata not found");
+    KDB_VERIFY(manager.resultable(), driverMetaData = manager.driverMetaData(driverId),
+               qPrintable(QStringLiteral("Driver metadata not found for id=%1").arg(driverId)));
     QCOMPARE(driverMetaData->id(), driverId);
     QCOMPARE(driverMetaData->isFileBased(), fileBased);
     // test the mimetypes
-    QStringList foundMimeTypes(driverMetaData->mimeTypes());
-    foundMimeTypes.sort();
-    QStringList expectedMimeTypes(mimeTypes);
-    expectedMimeTypes.sort();
-    //qDebug() << "mimeTypes:" << mimeTypes;
-    QCOMPARE(foundMimeTypes, expectedMimeTypes);
-    QVERIFY(!KDb::defaultFileBasedDriverMimeType().isEmpty());
+    const QStringList foundMimeTypes(driverMetaData->mimeTypes());
+    QVERIFY2(!KDb::defaultFileBasedDriverMimeType().isEmpty(),
+             qPrintable(QStringLiteral("id=%1").arg(driverId)));
     QMimeDatabase mimeDb;
-    foreach(const QString &mimeName, expectedMimeTypes) {
+    for (const QString &mimeName : expectedMimeTypes) {
         if (!mimeDb.mimeTypeForName(mimeName).isValid()) {
-            const QString msg = QStringLiteral("%1 MIME type not found in the MIME database").arg(mimeName);
+            const QString msg = QStringLiteral("MIME type %1 not found in the MIME database").arg(mimeName);
             if (possiblyInvalidMimeTypes.contains(mimeName)) {
                 qInfo() << qPrintable(msg);
+                continue; // ignore
             } else {
                 QVERIFY2(mimeDb.mimeTypeForName(mimeName).isValid(), qPrintable(msg));
             }
         }
+        const QStringList ids = manager.driverIdsForMimeType(mimeName);
+        QVERIFY2(!ids.isEmpty(),
+                 qPrintable(QStringLiteral("No drivers found for MIME type=%1").arg(mimeName)));
+        QVERIFY2(ids.contains(driverId),
+                 qPrintable(QStringLiteral("No driver with id=%1 found for MIME type=%2")
+                                .arg(driverId, mimeName)));
+    }
+    // each found mime type expected?
+    for (const QString &mimeName : foundMimeTypes) {
+        QVERIFY2(expectedMimeTypes.contains(mimeName),
+                 qPrintable(QStringLiteral("Unexpected MIME type=%1 found for driver with id=%2")
+                                .arg(mimeName, driverId)));
     }
     // find driver for the metadata
     KDB_VERIFY(manager.resultable(), driver = manager.driver(driverId), "Driver not found");
