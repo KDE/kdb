@@ -176,7 +176,7 @@ QStringList DriverManagerInternal::driverIdsForMimeType(const QString &mimeType)
         return QStringList();
     }
     QMimeDatabase mimedb;
-    const QMimeType mime = mimedb.mimeTypeForName(mimeType);
+    const QMimeType mime = mimedb.mimeTypeForName(mimeType.toLower());
     if (!mime.isValid()) {
         return QStringList();
     }
