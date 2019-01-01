@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2015-2018 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2015-2019 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -195,7 +195,7 @@ public:
 
 protected:
     void testDisconnectPrivate();
-    void testDriver(const QString &driverId, bool fileBased, const QStringList &mimeTypes,
+    void testDriver(const QString &driverId, bool fileBased, const QStringList &expectedMimeTypes,
                     const QStringList &possiblyInvalidMimeTypes);
     void testDriverManagerInternal(bool forceEmpty);
 
