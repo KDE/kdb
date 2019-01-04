@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -163,8 +163,48 @@ public:
         return valueToSql((field ? field->type() : KDbField::InvalidType), v);
     }
 
-    /*! @todo not compatible with all drivers - reimplement */
-    virtual KDbEscapedString dateTimeToSql(const QDateTime& v) const;
+    /**
+     * Converts date value to string
+     *
+     * Default implementation uses KDb::dateToSql().
+     *
+     * Not compatible with all drivers - reimplement.
+     *
+     * @since 3.1.1
+     */
+    virtual KDbEscapedString dateToSql(const QVariant &v) const;
+
+    /**
+     * Converts time value to string
+     *
+     * Default implementation uses KDb::timeToIsoString().
+     *
+     * Not compatible with all drivers - reimplement.
+     *
+     * @since 3.1.1
+     */
+    virtual KDbEscapedString timeToSql(const QVariant &v) const;
+
+    /**
+     * Converts date/time value to string
+     *
+     * Default implementation uses KDb::dateTimeToIsoString().
+     *
+     * Not compatible with all drivers - reimplement.
+     *
+     * @since 3.1.1
+     */
+    virtual KDbEscapedString dateTimeToSql(const QVariant &v) const;
+
+    /**
+     * Converts date/time value to string
+     *
+     * Default implementation uses dateTimeToSql(QVariant).
+     * Deprecated, use dateTimeToSql(QVariant).
+     *
+     * Not compatible with all drivers - reimplement.
+     */
+    KDB_DEPRECATED virtual KDbEscapedString dateTimeToSql(const QDateTime& v) const;
 
     /*! Driver-specific SQL string escaping.
      Implement escaping for any character like " or ' as your

@@ -106,6 +106,7 @@ set(kdb_LIB_SRCS
    tools/transliteration/generate_transliteration_table.sh
    tools/transliteration/transliteration_table.readme
 
+   KDbDateTime.cpp
    KDbEscapedString.cpp
    KDbResult.cpp
    KDbQueryAsterisk.cpp
@@ -290,6 +291,7 @@ ecm_generate_headers(kdb_FORWARDING_HEADERS
         KDbConnectionOptions
         KDbConnectionProxy
         KDbCursor
+        KDbDateTime
         KDbDriver
         KDbDriverBehavior
         KDbDriverManager

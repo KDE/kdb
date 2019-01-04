@@ -40,6 +40,7 @@ generate_export_header(kdbtestutils)
 ecm_add_tests(
     ConnectionOptionsTest.cpp
     ConnectionTest.cpp
+    DateTimeTest.cpp
     DriverTest.cpp
     ExpressionsTest.cpp
     QuerySchemaTest.cpp

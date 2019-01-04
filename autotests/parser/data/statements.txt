@@ -57,10 +57,255 @@ select '\"';
 select 3.14159;
 select 3.;
 select NULL;
-select TRUE;
--- TODO: Date/Time
+-- Date Constants (KDbSQL EXTENSION)
+-- https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants
+-- Date Constants: AD
+select #2018-09-17#;
+select #09/17/2018#;
+select #2018-9-17#;
+select #9/17/2018#;
+select #2018-9-07#;
+select #9/07/2018#;
+select #2018-9-7#;
+select #9/7/2018#;
+select #2018-09-7#;
+select #09/7/2018#;
+select #1900-01-01#;
+select #01/01/1900#;
+select #1500-02-02#;
+select #02/02/1500#;
+select #0001-01-21#;
+select #01/21/0001#;
+-- ERROR: Date Constants: Invalid month
+select #2018-00-17#;
+select #00/17/2018#;
+select #2018-0-17#;
+select #0/17/2018#;
+select #2018-13-17#;
+select #13/17/2018#;
+select #2018-99-17#;
+select #99/17/2018#;
+-- ERROR: Date Constants: Invalid day
+select #2018-01-00#;
+select #01/00/2018#;
+select #2018-01-0#;
+select #01/0/2018#;
+select #2018-02-29#;
+select #02/29/2018#;
+select #2018-01-32#;
+select #01/32/2018#;
+-- ERROR: Date Constants: too many digits
+select #2018-001-30#;
+select #001/30/2018#;
+select #2018-001-030#;
+select #001/030/2018#;
+select #2018-01-030#;
+select #01/030/2018#;
+-- ERROR: Date Constants: invalid characters/format
+select #2018-1a-30#;
+select #1a/30/2018#;
+select #2018--30#;
+select #/30/2018#;
+select #2018-a-30#;
+select #a/30/2018#;
+select #2018-01-3o#;
+select #01/3o/2018#;
+select #2018-01-30;
+select #01/30/2018;
+select #2018_01-30#;
+select #01/30_2018#;
+select #2018-01_30;
+select #01_30/2018#;
+select #2018_01_30;
+select #2018-01/30;
+select #20180130;
+select #2018;
+select #2018-;
+select #2018/;
+select #/2018;
+select #2018-01;
+select #01/2018;
+select #2018-01-;
+select #/01/2018;
+select #2018/01;
+select #-2018-01-;
+select #/01/2018;
+select #-2018;
+select ##-2018;
+select ##/2018;
+select #;
+select ##;
+select #2018-01-01-01#;
+select #01/01/01/2018#;
+select #++18119-10-30#;
+select #10/30/++18119#;
+select #+-18119-10-30#;
+select #10/30/+-18119#;
+select #-+18119-10-30#;
+select #10/30/-+18119#;
+select #--18119-10-30#;
+select #10/30/--18119#;
+select # 2018-03-08#;
+select #2018-03-08 #;
+select # 2018-03-08 #;
+select # 2018 -03-08 #;
+select #2018-03 -08#;
+select #2018 - 03 - 08#;
+select #201 -03-08 #;
+select #2018- 3-08 #;
+select #2018-03- 8 #;
+-- ERROR: Date Constant: at least 4 digit year required
+select #189-12-13#;
+select #12/13/189#;
+-- Date Constants: optional "+" prefix for years 1-9999
+select #+2018-12-02#;
+select #12/02/+2018#;
+select #+1500-02-02#;
+select #12/02/+1500#;
+select #+1500-3-2#;
+select #3/02/+1500#;
+select #+02012-12-13#;
+select #12/13/+02012#;
+-- Date Constants, year > 9999
+select #+123456789-12-13#;
+select #12/13/+123456789#;
+select #+000123456789-12-13#;
+select #12/13/+000123456789#;
+-- ERROR: Date Constant: More than 4-digit year so "+" prefix is required
+select #123456789-12-13#;
+select #12/13/123456789#;
+-- 1 BC Date Constants
+select #+0000-01-30#;
+select #01/30/+0000#;
+-- ERROR: Date Constant: 1 BC requires +0000 year
+select #0000-01-01#;
+select #01/01/0000#;
+select #-0000-01-01#;
+select #01/01/-0000#;
+select #+000-01-01#;
+select #01/01/+000#;
+select #-000-01-01#;
+select #01/01/-000#;
+select #+00-01-01#;
+select #01/01/+00#;
+select #-00-01-01#;
+select #01/01/-00#;
+select #+0-01-01#;
+select #01/01/+0#;
+select #-0-01-01#;
+select #01/01/-0#;
+-- 2 BC Date Constants
+select #-0001-03-04#;
+select #03/04/-0001#;
+select #-5001-03-04#;
+select #03/04/-5001#;
+-- <= 10000 BC Date Constants
+select #-9999-03-04#;
+select #04/03/-9999#;
+select #-10000-03-04#;
+select #04/03/-10000#;
+select #-543210000-03-04#;
+select #04/03/-543210000#;
+select #-00543210000-03-04#;
+select #04/03/-00543210000#;
+-- ERROR: Date Constant: MSA format
+select #24 Dec 2014#;
+select #24 December 2014#;
+select #December 24, 2014#;
+select #Dec 24, 2014#;
+
+-- Time Constants (KDbSQL EXTENSION)
+-- https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants
+-- Time Constants: 24h mode
+select #01:17:59#;
+select #01:07:59#;
+select #01:07:09#;
+select #1:07:09#;
+select #01:7:09#;
+select #01:07:9#;
+select #01:7:9#;
+select #1:7:09#;
+select #1:07:9#;
+select #1:7:9#;
+select #0:0:0#;
+select #23:11:29#;
+select #13:17:59#;
+select #23:11#;
+select #03:01#;
+select #3:01#;
+select #03:1#;
+select #3:1#;
+-- Time Constants: 12h mode
+select #11:11:29 AM#;
+select #11:11:29 PM#;
+select #11:11:29AM#;
+select #11:11:29PM#;
+select #11:11:29am#;
+select #11:11:29pm#;
+select #11:11:29   AM#;
+select #11:11:29   PM#;
+select #1:31:19 aM#;
+select #1:31:19 Am#;
+select #1:31:19 am#;
+select #1:31:19 pM#;
+select #1:31:19 pM#;
+select #11:11 AM#;
+select #11:11 PM#;
+select #11:11    AM#;
+select #11:11    PM#;
+select #11:11AM#;
+select #11:11PM#;
+select #11:11am#;
+select #11:11pm#;
+select #1:31 aM#;
+select #1:31 Am#;
+select #1:31 am#;
+select #1:31 pM#;
+select #1:31 pM#;
+-- ERROR: Time Constants: invalid characters/format
+select #001:17:59#;
+select #01:017:59#;
+select #01:017:059#;
+select #001:017:59#;
+select #01:017:059#;
+select #001:17:059#;
+select #001;017:059#;
+select #01:17:59;
+select #01::17:59#;
+select ##01::17:59#;
+select #01#;
+select #0#;
+select #11:17 #;
+select #11: 17#;
+select #11 : 17#;
+select #11 :17#;
+select #11::17#;
+select # 11:17#;
+select #11:17 AM #;
+select #1:17 PM #;
+select # 11:17 AM#;
+select # 11:17 AM #;
+select # 1:17 PM#;
+select # 1:17 PM #;
+select #o1:17#;
+select #1:17a#;
+select #1:17p#;
+select #1:17 p#;
+select #1:17 pr#;
+-- ERROR: Time Constants: invalid hour
+select #24:17:59#;
+select #28:17:59#;
+select #13:17:59 AM#;
+select #23:17:59 PM#;
+select #13:17 AM#;
+select #23:17 PM#;
+
+-- Date/Time Constants (KDbSQL EXTENSION)
+-- https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants
+-- TODO
 
 -- TRUE and FALSE constants (KDbSQL EXTENSION)
+select TRUE;
 select TRUE, NOT FALSE;
 select NOT NOT TRUE;
 select NOT NULL;
