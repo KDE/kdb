@@ -695,7 +695,7 @@ KDB_DEPRECATED_EXPORT KDbEscapedString dateTimeToSql(const QDateTime& v);
  *
  * Example value: "'1994-11-05'".
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString dateToIsoString(const QVariant& v);
 
@@ -716,7 +716,7 @@ KDB_EXPORT KDbEscapedString dateToIsoString(const QVariant& v);
  *
  * Example values: "'13:15:30.123'", "'13:15:30'".
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString timeToIsoString(const QVariant& v);
 
@@ -737,7 +737,7 @@ KDB_EXPORT KDbEscapedString timeToIsoString(const QVariant& v);
  *
  * Example value: "'1994-11-05T13:15:30'", not "'1994-11-05 13:15:30'".
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString dateTimeToIsoString(const QVariant& v);
 
@@ -753,7 +753,7 @@ KDB_EXPORT KDbEscapedString dateTimeToIsoString(const QVariant& v);
  *
  * See https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants for details.
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString dateToSql(const QVariant& v);
 
@@ -769,7 +769,7 @@ KDB_EXPORT KDbEscapedString dateToSql(const QVariant& v);
  *
  * Example values: "#13:15#", "#13:9:30#", "#13:15:30.921#, "#7:20 AM#".
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString timeToSql(const QVariant& v);
 
@@ -786,7 +786,7 @@ KDB_EXPORT KDbEscapedString timeToSql(const QVariant& v);
  *
  * Example values: "#1994-11-05 13:15#", "#1994-11-05 13:9:30#", "#1994-9-05 13:15:30.921#".
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 KDB_EXPORT KDbEscapedString dateTimeToSql(const QVariant& v);
 

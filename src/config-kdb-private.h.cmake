@@ -27,12 +27,12 @@
 
 //! @def KDB_QUERYSCHEMA_DEBUG
 //! @brief Defined if debugging of the Debugging of the QuerySchema class is enabled
-//! @since 3.1.1
+//! @since 3.2.0
 #cmakedefine KDB_QUERYSCHEMA_DEBUG
 
 //! @def KDB_SQLPARSER_DEBUG
 //! @brief Defined if debugging of the SQL parser is enabled
-//! @since 3.1.1
+//! @since 3.2.0
 #cmakedefine KDB_SQLPARSER_DEBUG
 
 #endif

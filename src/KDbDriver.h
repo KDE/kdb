@@ -170,7 +170,7 @@ public:
      *
      * Not compatible with all drivers - reimplement.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     virtual KDbEscapedString dateToSql(const QVariant &v) const;
 
@@ -181,7 +181,7 @@ public:
      *
      * Not compatible with all drivers - reimplement.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     virtual KDbEscapedString timeToSql(const QVariant &v) const;
 
@@ -192,7 +192,7 @@ public:
      *
      * Not compatible with all drivers - reimplement.
      *
-     * @since 3.1.1
+     * @since 3.2.0
      */
     virtual KDbEscapedString dateTimeToSql(const QVariant &v) const;
 
