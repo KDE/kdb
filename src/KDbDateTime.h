@@ -410,7 +410,9 @@ public:
     /**
      * Constructs a null date/time
      */
-    KDbDateTime() = default;
+    KDbDateTime() : KDbDateTime(KDbDate(), KDbTime())
+    {
+    }
 
     bool operator==(const KDbDateTime &other) const;
 
