@@ -37,7 +37,7 @@
  * See this page for specifications of the date/time formats supported:
  * https://community.kde.org/Kexi/Plugins/Queries/SQL_Constants#Date_constants
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 class KDB_EXPORT KDbYear
 {
@@ -152,7 +152,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbYear &year);
 /**
  * Generic date constant
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 class KDB_EXPORT KDbDate
 {
@@ -255,7 +255,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbDate &date);
 /**
  * Generic time constant
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 class KDB_EXPORT KDbTime
 {
@@ -398,7 +398,7 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbTime &time);
 /**
  * Generic date/time constant
  *
- * @since 3.1.1
+ * @since 3.2.0
  */
 class KDB_EXPORT KDbDateTime
 {
