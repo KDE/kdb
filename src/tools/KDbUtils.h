@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -74,10 +74,17 @@ KDB_EXPORT QMap<QString, QString> deserializeMap(const QByteArray& array);
  @a string need to contain data previously serialized using KexiUtils::serializeMap(). */
 KDB_EXPORT QMap<QString, QString> deserializeMap(const QString& string);
 
-/*! @return a valid filename converted from @a string by:
- - replacing \\, /, :, *, ?, ", <, >, |, \n \\t characters with a space
- - simplifing whitespace by removing redundant space characters using QString::simplified()
- Do not pass full paths here, but only filename strings. */
+/**
+ * Returns a valid filename converted from given string
+ *
+ * Following steps are performed:
+ * - replace \\, /, :, *, ?, ", <, >, |, \n \\t characters with a space,
+ * - simplify whitespace by removing redundant space characters using QString::simplified().
+ * - prepend '_' character if the first character is '.', so the file will not be considered hidden
+ *   (since 3.2.0).
+ *
+ * @note Do not pass full paths here but only filename strings.
+ */
 KDB_EXPORT QString stringToFileName(const QString& string);
 
 /*! Performs a simple @a string encryption using rot47-like algorithm.
