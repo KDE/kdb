@@ -5,6 +5,7 @@
 #ifndef KDBSQLPARSER_H
 #define KDBSQLPARSER_H
 
+#include "KDbDateTime.h"
 #include "KDbExpression.h"
 #include "KDbField.h"
 #include "KDbOrderByColumn.h"
@@ -121,7 +122,11 @@ extern int yydebug;
     SIMILAR_TO = 317,
     NOT_SIMILAR_TO = 318,
     XOR = 319,
-    UMINUS = 320
+    UMINUS = 320,
+    TABS_OR_SPACES = 321,
+    DATE_TIME_INTEGER = 322,
+    TIME_AM = 323,
+    TIME_PM = 324
   };
 #endif
 
@@ -130,12 +135,17 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 490 "KDbSqlParser.y" /* yacc.c:1909  */
+#line 505 "KDbSqlParser.y" /* yacc.c:1909  */
 
     QString* stringValue;
     QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
+    KDbDate* dateValue;
+    KDbYear* yearValue;
+    KDbTime* timeValue;
+    KDbTime::Period timePeriodValue;
+    KDbDateTime* dateTimeValue;
     KDbOrderByColumn::SortOrder sortOrderValue;
     KDbField::Type colType;
     KDbField *field;
@@ -147,7 +157,7 @@ union YYSTYPE
     QList<OrderByColumnInternal> *orderByColumns;
     QVariant *variantValue;
 
-#line 137 "KDbSqlParser.tab.h" /* yacc.c:1909  */
+#line 146 "KDbSqlParser.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

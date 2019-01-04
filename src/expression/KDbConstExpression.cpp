@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2012 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    Based on nexp.cpp : Parser module of Python-like language
    (C) 2001 Jarosław Staniek, MIMUW (www.mimuw.edu.pl)
@@ -80,11 +80,26 @@ KDbField::Type KDbConstExpressionData::typeInternal(KDb::ExpressionCallStack* ca
     case REAL_CONST:
         return KDbField::Double;
     case DATE_CONST:
-        return KDbField::Date;
+        if (value.canConvert<KDbDate>() && value.value<KDbDate>().isValid()) {
+            return KDbField::Date;
+        } else if (value.canConvert<QDate>() && value.toDate().isValid()) {
+            return KDbField::Date;
+        }
+        break;
     case DATETIME_CONST:
-        return KDbField::DateTime;
+        if (value.canConvert<KDbDateTime>() && value.value<KDbDateTime>().isValid()) {
+            return KDbField::DateTime;
+        } else if (value.canConvert<QDateTime>() && value.toDateTime().isValid()) {
+            return KDbField::DateTime;
+        }
+        break;
     case TIME_CONST:
-        return KDbField::Time;
+        if (value.canConvert<KDbTime>() && value.value<KDbTime>().isValid()) {
+            return KDbField::Time;
+        } else if (value.canConvert<QTime>() && value.toTime().isValid()) {
+            return KDbField::Time;
+        }
+        break;
     }
     return KDbField::InvalidType;
 }
@@ -125,10 +140,7 @@ KDbEscapedString KDbConstExpressionData::toStringInternal(
     case DATE_CONST:
         return KDb::valueToSql(driver, KDbField::Date, value);
     case DATETIME_CONST:
-        return driver ? driver->valueToSql(KDbField::DateTime, value)
-                : KDbEscapedString('\'')
-                + KDbEscapedString(value.toDateTime().date().toString(Qt::ISODate))
-                + ' ' + value.toDateTime().time().toString(Qt::ISODate) + '\'';
+        return KDb::valueToSql(driver, KDbField::Date, value);
     case TIME_CONST:
         return KDb::valueToSql(driver, KDbField::Time, value);
     case INTEGER_CONST:

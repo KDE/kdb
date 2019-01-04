@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -17,23 +17,26 @@
  * Boston, MA 02110-1301, USA.
 */
 
-#ifndef KDB_P_H
-#define KDB_P_H
+#ifndef KDB_DATETIMETEST_H
+#define KDB_DATETIMETEST_H
 
-#include "KDbField.h"
+#include <QObject>
 
-class KDbDriver;
-
-//! @internal Dummy class to get simply translation markup expressions
-//! of the form kdb::tr("foo") instead of the complicated and harder to read
-//! QCoreApplication::translate("KDb", "foo") which also runs the chance of
-//! typos in the class context argument
-class kdb
+/**
+ * A test for KDbYear, KDbDate, KDbTime, KDbDateTime classes
+ */
+class DateTimeTest : public QObject
 {
-    Q_DECLARE_TR_FUNCTIONS(KDb)
-};
+    Q_OBJECT
+private Q_SLOTS:
+    void initTestCase();
 
-KDbEscapedString valueToSqlInternal(const KDbDriver *driver, KDbField::Type ftype,
-                                    const QVariant &v);
+    void testYear();
+    void testDate();
+    void testTime();
+    void testDateTime();
+
+    void cleanupTestCase();
+};
 
 #endif

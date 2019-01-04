@@ -1,6 +1,6 @@
 /* This file is part of the KDE project
    Copyright (C) 2004 Lucijan Busch <lucijan@kde.org>
-   Copyright (C) 2004-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2004-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -370,6 +370,11 @@
 %token XOR
 //%token YEAR
 //%token YEARS_BETWEEN
+%token UMINUS
+%token TABS_OR_SPACES    // e.g. inside of date or time constants
+%token DATE_TIME_INTEGER // inside of date or time constants
+%token TIME_AM
+%token TIME_PM
 
 %type <stringValue> IDENTIFIER
 %type <stringValue> IDENTIFIER_DOT_ASTERISK
@@ -396,6 +401,14 @@
 %type <expr> aExpr8
 %type <expr> aExpr9
 %type <expr> aExpr10
+%type <dateValue> DateConst
+%type <dateValue> DateValue
+%type <yearValue> YearConst
+%type <timeValue> TimeConst
+%type <timeValue> TimeValue
+%type <dateTimeValue> DateTimeConst
+%type <binaryValue> TimeMs
+%type <timePeriodValue> TimePeriod
 %type <exprList> aExprList
 %type <exprList> aExprList2
 %type <expr> WhereClause
@@ -416,6 +429,7 @@
 %type <colType> SQL_TYPE
 %type <integerValue> INTEGER_CONST
 %type <binaryValue> REAL_CONST
+%type <binaryValue> DATE_TIME_INTEGER
 /*%type <integerValue> SIGNED_INTEGER */
 
 %{
@@ -448,6 +462,7 @@
 #include <QPoint>
 
 #include "KDbConnection.h"
+#include "KDbDateTime.h"
 #include "KDbExpression.h"
 #include "KDbField.h"
 #include "KDbOrderByColumn.h"
@@ -492,6 +507,11 @@ int yylex();
     QByteArray* binaryValue;
     qint64 integerValue;
     bool booleanValue;
+    KDbDate* dateValue;
+    KDbYear* yearValue;
+    KDbTime* timeValue;
+    KDbTime::Period timePeriodValue;
+    KDbDateTime* dateTimeValue;
     KDbOrderByColumn::SortOrder sortOrderValue;
     KDbField::Type colType;
     KDbField *field;
@@ -517,7 +537,6 @@ int yylex();
 //%nonassoc    NULL_P
 //%nonassoc    TRUE_P
 //%nonassoc    FALSE_P
-%token UMINUS
 
 // <-- To keep binary compatibility insert new tokens here.
 
@@ -1157,10 +1176,139 @@ aExpr9:
     sqlParserDebug() << "  + real constant: " << *$1;
     delete $1;
 }
+| DateConst
+{
+    $$ = new KDbConstExpression(KDbToken::DATE_CONST, QVariant::fromValue(*$1));
+    sqlParserDebug() << "  + date constant:" << *$1;
+    delete $1;
+}
+| TimeConst
+{
+    $$ = new KDbConstExpression(KDbToken::TIME_CONST, QVariant::fromValue(*$1));
+    sqlParserDebug() << "  + time constant:" << *$1;
+    delete $1;
+}
+| DateTimeConst
+{
+    $$ = new KDbConstExpression(KDbToken::DATETIME_CONST, QVariant::fromValue(*$1));
+    sqlParserDebug() << "  + datetime constant:" << *$1;
+    delete $1;
+}
 |
 aExpr10
 ;
 
+DateConst:
+'#' DateValue '#'
+{
+    $$ = $2;
+    sqlParserDebug() << "DateConst:" << *$$;
+}
+;
+
+DateValue:
+YearConst '-' DATE_TIME_INTEGER '-' DATE_TIME_INTEGER
+{
+    $$ = new KDbDate(*$1, *$3, *$5);
+    sqlParserDebug() << "DateValue:" << *$$;
+    delete $1;
+    delete $3;
+    delete $5;
+}
+| DATE_TIME_INTEGER '/' DATE_TIME_INTEGER '/' YearConst /* M/D/Y */
+{
+    $$ = new KDbDate(*$5, *$1, *$3);
+    sqlParserDebug() << "DateValue:" << *$$;
+    delete $1;
+    delete $3;
+    delete $5;
+}
+;
+
+YearConst:
+DATE_TIME_INTEGER
+{
+    $$ = new KDbYear(KDbYear::Sign::None, *$1);
+    sqlParserDebug() << "YearConst:" << *$$;
+    delete $1;
+}
+| '+' DATE_TIME_INTEGER
+{
+    $$ = new KDbYear(KDbYear::Sign::Plus, *$2);
+    sqlParserDebug() << "YearConst:" << *$$;
+    delete $2;
+}
+| '-' DATE_TIME_INTEGER
+{
+    $$ = new KDbYear(KDbYear::Sign::Minus, *$2);
+    sqlParserDebug() << "YearConst:" << *$$;
+    delete $2;
+}
+;
+
+TimeConst:
+'#' TimeValue '#'
+{
+    $$ = $2;
+    sqlParserDebug() << "TimeConst:" << *$$;
+}
+;
+
+TimeValue:
+DATE_TIME_INTEGER ':' DATE_TIME_INTEGER TimeMs TimePeriod
+{
+    $$ = new KDbTime(*$1, *$3, {}, *$4, $5);
+    sqlParserDebug() << "TimeValue:" << *$$;
+    delete $1;
+    delete $3;
+    delete $4;
+}
+| DATE_TIME_INTEGER ':' DATE_TIME_INTEGER ':' DATE_TIME_INTEGER TimeMs TimePeriod
+{
+    $$ = new KDbTime(*$1, *$3, *$5, *$6, $7);
+    sqlParserDebug() << "TimeValue:" << *$$;
+    delete $1;
+    delete $3;
+    delete $5;
+    delete $6;
+}
+;
+
+TimeMs:
+'.' DATE_TIME_INTEGER
+{
+    $$ = $2;
+}
+| %empty
+{
+    $$ = new QByteArray;
+}
+;
+
+TimePeriod:
+TIME_AM
+{
+    $$ = KDbTime::Period::Am;
+}
+| TIME_PM
+{
+    $$ = KDbTime::Period::Pm;
+}
+| %empty
+{
+    $$ = KDbTime::Period::None;
+}
+;
+
+DateTimeConst:
+'#' DateValue TABS_OR_SPACES TimeValue '#'
+{
+    $$ = new KDbDateTime(*$2, *$4);
+    sqlParserDebug() << "DateTimeConst:" << *$$;
+    delete $2;
+    delete $4;
+}
+;
 
 aExpr10:
 '(' aExpr ')'
