@@ -42,13 +42,12 @@ void SqlParserTest::initTestCase()
 
 bool SqlParserTest::openDatabase(const QString &path)
 {
-    KDbConnectionData cdata;
-    cdata.setDatabaseName(path);
-    if (!m_utils.testConnect(cdata) || !m_utils.connection) {
-        qWarning() << m_utils.driver->result();
+    KDbConnectionOptions options;
+    options.setReadOnly(true);
+    if (!m_utils.testConnectAndUse(path, options)) {
         return false;
     }
-    m_parser.reset(new KDbParser(m_utils.connection.data()));
+    m_parser.reset(new KDbParser(m_utils.connection()));
 #if 0
     if (m_conn->databaseExists(dbName)) {
         if (!m_conn->dropDatabase(dbName)) {
@@ -63,12 +62,6 @@ bool SqlParserTest::openDatabase(const QString &path)
         return false;
     }
 #endif
-    if (!m_utils.testUse() || !m_utils.connection->isDatabaseUsed()) {
-        qWarning() << m_utils.connection->result();
-        bool result = m_utils.testDisconnect();
-        Q_UNUSED(result);
-        return false;
-    }
     return true;
 }
 

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -18,37 +18,11 @@
 */
 
 #include "KDbQueryColumnInfo.h"
+#include "KDbQuerySchema_p.h"
 #include "KDbTableSchema.h"
 #include "KDbField.h"
 #include "KDbField_p.h"
 #include "kdb_debug.h"
-
-//! @internal
-class Q_DECL_HIDDEN KDbQueryColumnInfo::Private
-{
-public:
-    Private(KDbField *f, const QString& a, bool v, KDbQueryColumnInfo *foreign)
-        : field(f)
-        , alias(a)
-        , visible(v)
-        , indexForVisibleLookupValue(-1)
-        , foreignColumn(foreign)
-    {
-    }
-
-    KDbField *field;
-    QString alias;
-
-    //! @c true if this column is visible to the user (and its data is fetched by the engine)
-    bool visible;
-
-    /*! Index of column with visible lookup value within the 'fields expanded' vector.
-     @see KDbQueryColumnInfo::indexForVisibleLookupValue() */
-    int indexForVisibleLookupValue;
-
-    //! Non-nullptr if this column is a visible column for @a foreignColumn
-    KDbQueryColumnInfo *foreignColumn;
-};
 
 KDbQueryColumnInfo::KDbQueryColumnInfo(KDbField *f, const QString& alias, bool visible,
                                  KDbQueryColumnInfo *foreignColumn)
@@ -124,6 +98,21 @@ KDbQueryColumnInfo *KDbQueryColumnInfo::foreignColumn()
 const KDbQueryColumnInfo *KDbQueryColumnInfo::foreignColumn() const
 {
     return d->foreignColumn;
+}
+
+const KDbQuerySchema* KDbQueryColumnInfo::querySchema() const
+{
+    return d->querySchema;
+}
+
+KDbConnection* KDbQueryColumnInfo::connection()
+{
+    return d->connection;
+}
+
+const KDbConnection* KDbQueryColumnInfo::connection() const
+{
+    return d->connection;
 }
 
 QDebug operator<<(QDebug dbg, const KDbQueryColumnInfo& info)

@@ -2,12 +2,11 @@ add_library(kdb_sqlite_icu MODULE icu.cpp sqliteicu.h README.txt)
 
 generate_export_header(kdb_sqlite_icu)
 
-include_directories(${ICU_INCLUDE_DIRS})
-
 target_link_libraries(kdb_sqlite_icu
-                      ${SQLITE_LIBRARIES}
-                      ${ICU_LIBRARIES}
-                      ${ICU_I18N_LIBRARIES}
+    PRIVATE
+        ${SQLITE_LIBRARIES}
+        ICU::i18n
+        ICU::uc
 )
 set_target_properties(kdb_sqlite_icu PROPERTIES
                       PREFIX ""

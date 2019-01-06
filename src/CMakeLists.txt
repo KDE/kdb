@@ -213,7 +213,6 @@ set(kdb_INCLUDE_DIRS
 target_include_directories(KDb
     PUBLIC "$<BUILD_INTERFACE:${kdb_INCLUDE_DIRS}>"
     INTERFACE "$<INSTALL_INTERFACE:${KDB_INCLUDE_INSTALL_DIR}>"
-    PRIVATE ${ICU_INCLUDE_DIRS}
 )
 
 target_link_libraries(KDb
@@ -224,7 +223,7 @@ target_link_libraries(KDb
         KF5::CoreAddons
     PRIVATE
         Qt5::Xml
-        ${ICU_I18N_LIBRARY}
+        ICU::i18n
 )
 
 if(BUILD_TEST_COVERAGE)

@@ -294,6 +294,11 @@ public:
 
     bool drv_getServerVersion(KDbServerVersionInfo* version) override;
 
+    /**
+     * @since 3.2
+     */
+    QStringList drv_getTableNames(bool *ok) override;
+
     tristate drv_containsTable(const QString &tableName) override;
 
     bool drv_createTable(const KDbTableSchema& tableSchema) override;

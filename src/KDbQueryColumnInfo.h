@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2016 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -26,7 +26,9 @@
 #include <QVector>
 #include <QString>
 
+class KDbConnection;
 class KDbField;
+class KDbQuerySchema;
 
 //! @short Helper class that assigns additional information for the column in a query
 /*! The following information is assigned:
@@ -89,7 +91,29 @@ public:
     //! @overload KDbQueryColumnInfo *foreignColumn();
     const KDbQueryColumnInfo *foreignColumn() const;
 
+    /**
+     * Returns query schema for this column
+     *
+     * @since 3.2
+     */
+    const KDbQuerySchema* querySchema() const;
+
+    /**
+     * Returns connection for this column
+     *
+     * @since 3.2
+     */
+    KDbConnection* connection();
+
+    /**
+     * @overload
+     *
+     * @since 3.2
+     */
+    const KDbConnection* connection() const;
+
 private:
+    friend class KDbQuerySchema;
     class Private;
     Private * const d;
     Q_DISABLE_COPY(KDbQueryColumnInfo)

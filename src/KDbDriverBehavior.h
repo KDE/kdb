@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2017 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -218,6 +218,15 @@ public:
     /*! "RANDOM()" function name, used in Driver::randomFunctionToString() to construct native
      expressions. */
     QString RANDOM_FUNCTION;
+
+    /**
+     * SQL statement used to obtain list of physical table names.
+     * Used by default implementation of KDbConnection::drv_getTableNames(). Empty by default.
+     * If empty, default implementation of KDbConnection::drv_getTableNames() fails.
+     *
+     * @since 3.2
+     */
+    KDbEscapedString GET_TABLE_NAMES_SQL;
 
 private:
     void initInternalProperties();
