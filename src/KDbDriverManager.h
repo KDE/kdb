@@ -76,10 +76,18 @@ public:
       That drivers can be loaded by first use of driver() method. */
     QStringList driverIds();
 
-    /*! @return list of driver IDs for @a mimeType mime type.
-     Empty list is returned if no driver has been found.
-     Works only with drivers of file-based databases such as SQLite.
-     The lookup is case insensitive. */
+    /**
+     * Returns list of driver IDs for @a mimeType MIME type
+     *
+     * IDs of drivers for file-based databases are only returned.
+     * Empty list is returned if no driver has been found for the type or if the type is invalid.
+     * Driver supports the supplied MIME type if it is specified as supported in the driver's
+     * metadata. If a MIME type alias is supplied, proper type for this alias is resolved and driver
+     * IDs for that type are returned. Similarly, if proper MIME type is supplied, IDs are returned
+     * for drivers that support any alias for this type.
+     *
+     * The lookup is case insensitive.
+     */
     QStringList driverIdsForMimeType(const QString& mimeType);
 
     /*! @return HTML-formatted message about possible problems encountered.

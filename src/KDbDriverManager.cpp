@@ -30,6 +30,7 @@
 #include <KPluginFactory>
 
 #include <QApplication>
+#include <QMimeDatabase>
 #include <QTime>
 #include <QWidget>
 
@@ -102,6 +103,7 @@ void DriverManagerInternal::lookupDriversInternal()
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
     const QString expectedVersion = QString::fromLatin1("%1.%2")
             .arg(KDB_STABLE_VERSION_MAJOR).arg(KDB_STABLE_VERSION_MINOR);
+    QMimeDatabase mimedb;
     foreach(const QPluginLoader *loader, offers) {
         //QJsonObject json = loader->metaData();
         //drivermanagerDebug() << json;
@@ -123,7 +125,18 @@ void DriverManagerInternal::lookupDriversInternal()
             }
             continue;
         }
-        foreach (const QString& mimeType, metaData->mimeTypes()) {
+        QSet<QString> resolvedMimeTypes;
+        for (const QString &mimeType : metaData->mimeTypes()) {
+            const QMimeType mime = mimedb.mimeTypeForName(mimeType);
+            if (!mime.isValid()) {
+                kdbWarning() << "Driver with ID" << metaData->id()
+                             << "specifies the unknown MIME type"
+                             << mimeType;
+                continue;
+            }
+           resolvedMimeTypes.insert(mime.name());
+        }
+        for (const QString &mimeType : resolvedMimeTypes) {
             m_metadata_by_mimetype.insertMulti(mimeType, metaData.data());
         }
         m_driversMetaData.insert(metaData->id(), metaData.data());
@@ -162,7 +175,12 @@ QStringList DriverManagerInternal::driverIdsForMimeType(const QString &mimeType)
     if (!lookupDrivers()) {
         return QStringList();
     }
-    const QList<KDbDriverMetaData*> metaDatas(m_metadata_by_mimetype.values(mimeType.toLower()));
+    QMimeDatabase mimedb;
+    const QMimeType mime = mimedb.mimeTypeForName(mimeType.toLower());
+    if (!mime.isValid()) {
+        return QStringList();
+    }
+    const QList<KDbDriverMetaData*> metaDatas(m_metadata_by_mimetype.values(mime.name()));
     QStringList result;
     foreach (const KDbDriverMetaData* metaData, metaDatas) {
         result.append(metaData->id());
