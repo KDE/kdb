@@ -435,7 +435,7 @@ void KDbConnectionPrivate::insertFieldsExpanded(const KDbQuerySchema *query, KDb
 
 void KDbConnectionPrivate::removeFieldsExpanded(const KDbQuerySchema *query)
 {
-    kdbDebug() << "**CACHE REMOVE**" << query;
+    //kdbDebug() << "**CACHE REMOVE**" << query;
     m_fieldsExpandedCache.remove(query);
 }
 
