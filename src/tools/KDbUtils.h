@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2019 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -52,6 +52,52 @@ inline type findParent(QObject* o, const char* className = nullptr)
     }
     return nullptr;
 }
+
+/**
+ * Returns the time as a string using Qt::ISODateWithMs format
+ *
+ * If milliseconds is zero then they are not appended.
+ * Works also for Qt < 5.8 which does not offer QTime::toString(Qt::ISODateWithMs).
+ *
+ * @since 3.2
+ */
+KDB_EXPORT QString toISODateStringWithMs(const QTime &time);
+
+/**
+ * Returns the date/time as a string using Qt::ISODateWithMs format
+ *
+ * If milliseconds in time is zero then they are not appended.
+ * Works also for Qt < 5.8 which does not offer QDateTime::toString(Qt::ISODateWithMs).
+ *
+ * @since 3.2
+ */
+KDB_EXPORT QString toISODateStringWithMs(const QDateTime &dateTime);
+
+/**
+ * Returns the time represented by the string using the Qt::ISODateWithMs format
+ *
+ * Milliseconds are optional.
+ * Works also for Qt < 5.8 which does not offer QTime::fromString(QString, Qt::ISODateWithMs).
+ *
+ * @note Equal to QTime::fromString(string, Qt::ISODate) since the Qt::ISODate mode already
+ * supports milliseconds in case of fromString().
+ *
+ * @since 3.2
+ */
+KDB_EXPORT QTime timeFromISODateStringWithMs(const QString &string);
+
+/**
+ * Returns the date/time represented by the string using the Qt::ISODateWithMs format
+ *
+ * Milliseconds of time are optional.
+ * Works also for Qt < 5.8 which does not offer QDateTime::fromString(QString, Qt::ISODateWithMs).
+ *
+ * @note Equal to QDateTime::fromString(string, Qt::ISODate) since the Qt::ISODate mode already
+ * supports milliseconds in case of fromString().
+ *
+ * @since 3.2
+ */
+KDB_EXPORT QDateTime dateTimeFromISODateStringWithMs(const QString &string);
 
 //! QDateTime - a hack needed because QVariant(QTime) has broken isNull()
 KDB_EXPORT QDateTime stringToHackedQTime(const QString& s);
