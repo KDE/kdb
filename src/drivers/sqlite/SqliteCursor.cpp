@@ -100,7 +100,7 @@ public:
                 if (text.length() > 10) {
                     text[10] = QLatin1Char('T'); //for ISODate compatibility
                 }
-                return QDateTime::fromString(text, Qt::ISODateWithMs);
+                return KDbUtils::dateTimeFromISODateStringWithMs(text);
             } else if (t == KDbField::Boolean) {
                 return sqliteStringToBool(text);
             } else {

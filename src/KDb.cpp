@@ -2247,7 +2247,7 @@ static QByteArray timeToSqlInternal(const QVariant& v, bool allowInvalidKDbTime)
             if (time.msec() == 0) {
                 result = time.toString(Qt::ISODate).toLatin1();
             } else {
-                result = time.toString(Qt::ISODateWithMs).toLatin1();
+                result = KDbUtils::toISODateStringWithMs(time).toLatin1();
             }
         }
     }
@@ -2275,7 +2275,7 @@ static QByteArray dateTimeToSqlInternal(const QVariant& v, char separator, bool 
             if (time.msec() == 0) {
                 result += time.toString(Qt::ISODate).toLatin1();
             } else {
-                result += time.toString(Qt::ISODateWithMs).toLatin1();
+                result += KDbUtils::toISODateStringWithMs(time).toLatin1();
             }
         }
     }

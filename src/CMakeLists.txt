@@ -227,12 +227,12 @@ if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
 endif()
 
 set(QT_ISODATEWITHMS_MIN_VERSION 5.8.0)
-if(Qt5_VERSION VERSION_GREATER_EQUAL ${QT_ISODATEWITHMS_MIN_VERSION})
+if(Qt5_VERSION VERSION_LESS ${QT_ISODATEWITHMS_MIN_VERSION})
+    message(STATUS "Qt ${Qt5_VERSION} does not have Qt::ISODateWithMs APIs, minimal version is \
+${QT_ISODATEWITHMS_MIN_VERSION}. KDb's implementation will be compiled-in.")
+else()
     # Qt::ISODateWithMs APIs present
     target_compile_definitions(KDb PRIVATE -DHAVE_QT_ISODATEWITHMS)
-else()
-    message(STATUS "Qt ${Qt5_VERSION_MAJOR} does not have Qt::ISODateWithMs APIs, minimal version is \
-${QT_ISODATEWITHMS_MIN_VERSION}. KDb's implementation will be compiled.")
 endif()
 
 if(BUILD_TEST_COVERAGE)

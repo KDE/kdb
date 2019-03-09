@@ -186,7 +186,7 @@ static inline QTime timeFromData(const char *data, int len)
     if (hasTimeZone(s)) {
         s.chop(3); // skip timezone
     }
-    return QTime::fromString(s, Qt::ISODateWithMs);
+    return KDbUtils::timeFromISODateStringWithMs(s);
 }
 
 static inline QDateTime dateTimeFromData(const char *data, int len)
@@ -204,7 +204,7 @@ static inline QDateTime dateTimeFromData(const char *data, int len)
     if (s.at(s.length() - 3).isPunct()) { // fix ms, should be three digits
         s += QLatin1Char('0');
     }
-    return QDateTime::fromString(s, Qt::ISODateWithMs);
+    return KDbUtils::dateTimeFromISODateStringWithMs(s);
 }
 
 static inline QByteArray byteArrayFromData(const char *data)

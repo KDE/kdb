@@ -788,7 +788,7 @@ bool KDbField::setDefaultValue(const QByteArray& def)
         break;
     }
     case DateTime: {//YYYY-MM-DDTHH:MM:SS.ms
-        QDateTime dt = QDateTime::fromString(QLatin1String(def), Qt::ISODateWithMs);
+        const QDateTime dt = KDbUtils::dateTimeFromISODateStringWithMs(QString::fromLatin1(def));
         if (!dt.isValid()) {
             d->defaultValue = QVariant();
         } else {
@@ -797,7 +797,7 @@ bool KDbField::setDefaultValue(const QByteArray& def)
         break;
     }
     case Time: {//HH:MM:SS.ms
-        QTime time = QTime::fromString(QLatin1String(def), Qt::ISODateWithMs);
+        const QTime time = KDbUtils::timeFromISODateStringWithMs(QString::fromLatin1(def));
         if (!time.isValid()) {
             d->defaultValue = QVariant();
         } else {
