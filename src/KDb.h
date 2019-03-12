@@ -706,8 +706,7 @@ KDB_EXPORT KDbEscapedString dateToIsoString(const QVariant& v);
  * time type. It is used as default implementation for drivers in KDbDriver::timeToSql().
  *
  * If the @a v value is convertible to KDbTime then KDbTime::toString() is used to obtain the result.
- * Otherwise the value is converted to QTime and QTime::toString(Qt::ISODateWithMs)
- * or QTime::toString(Qt::ISODate) is used to obtain the result.
+ * Otherwise the value is converted to QTime and QTime::toString() is used to obtain the result.
  * If the time's milliseconds value is zero, it is not included.
  *
  * "<INVALID_TIME>" string is returned for invalid (also null) time values.
@@ -727,9 +726,9 @@ KDB_EXPORT KDbEscapedString timeToIsoString(const QVariant& v);
  * date/time type. It is used as default implementation for drivers in KDbDriver::dateTimeToSql().
  *
  * If the @a v value is convertible to KDbDateTime then KDbDateTime::toString() is used to obtain
- * the result. Otherwise the value is converted to QDateTime and QDate::toString(Qt::ISODate) is
- * used as well as QTime::toString(Qt::ISODateWithMs) or QTime::toString(Qt::ISODate) to obtain
- * the result. If the time's milliseconds value is zero, it is not included.
+ * the result. Otherwise the value is converted to QDateTime and QDateTime::toString() is
+ * used as well as QTime::toString() to obtain the result.
+ * If the time's milliseconds value is zero, it is not included.
  *
  * "<INVALID_DATETIME>" string is returned for invalid (also null) time values.
  *

@@ -1,5 +1,5 @@
 /* This file is part of the KDE project
-   Copyright (C) 2003-2018 Jarosław Staniek <staniek@kde.org>
+   Copyright (C) 2003-2019 Jarosław Staniek <staniek@kde.org>
 
    Portions of kstandarddirs.cpp:
    Copyright (C) 1999 Sirtaj Singh Kang <taj@kde.org>
@@ -137,14 +137,68 @@ bool KDbUtils::hasParent(QObject *par, QObject *o)
     return o == par;
 }
 
+QString KDbUtils::toISODateStringWithMs(const QTime& time)
+{
+#ifdef HAVE_QT_ISODATEWITHMS
+    return time.toString(Qt::ISODateWithMs);
+#else
+    QString result;
+    if (time.isValid()) {
+        result = QString::asprintf("%02d:%02d:%02d.%03d", time.hour(), time.minute(), time.second(),
+                                   time.msec());
+    }
+    return result;
+#endif
+}
+
+QString KDbUtils::toISODateStringWithMs(const QDateTime& dateTime)
+{
+#ifdef HAVE_QT_ISODATEWITHMS
+    return dateTime.toString(Qt::ISODateWithMs);
+#else
+    QString result;
+    if (!dateTime.isValid()) {
+        return result;
+    }
+    result = dateTime.toString(Qt::ISODate);
+    if (result.isEmpty()) { // failure
+        return result;
+    }
+    QString timeString = KDbUtils::toISODateStringWithMs(dateTime.time());
+    if (timeString.isEmpty()) { // failure
+        return QString();
+    }
+    const int offset = strlen("0000-00-00T");
+    const int timeLen = strlen("00:00:00");
+    result.replace(offset, timeLen, timeString); // replace time with time+ms
+    return result;
+#endif
+}
+
+QTime KDbUtils::timeFromISODateStringWithMs(const QString &string)
+{
+#ifdef HAVE_QT_ISODATEWITHMS
+    return QTime::fromString(string, Qt::ISODateWithMs);
+#else
+    return QTime::fromString(string, Qt::ISODate); // supports HH:mm:ss.zzzzz already
+#endif
+}
+
+QDateTime KDbUtils::dateTimeFromISODateStringWithMs(const QString &string)
+{
+#ifdef HAVE_QT_ISODATEWITHMS
+    return QDateTime::fromString(string, Qt::ISODateWithMs);
+#else
+    return QDateTime::fromString(string, Qt::ISODate); // supports HH:mm:ss.zzzzz already
+#endif
+}
+
 QDateTime KDbUtils::stringToHackedQTime(const QString &s)
 {
     if (s.isEmpty()) {
         return QDateTime();
     }
-    //  kdbDebug() << QDateTime( QDate(0,1,2), QTime::fromString( s, Qt::ISODate )
-    //  ).toString(Qt::ISODate);
-    return QDateTime(QDate(0, 1, 2), QTime::fromString(s, Qt::ISODateWithMs));
+    return QDateTime(QDate(0, 1, 2), KDbUtils::timeFromISODateStringWithMs(s));
 }
 
 void KDbUtils::serializeMap(const QMap<QString, QString>& map, QByteArray *array)

@@ -41,11 +41,6 @@ add_custom_command(
     #TODO(GEN)     ${PARSER_SOURCE_DIR}/generated/KDbToken.cpp
 )
 
-string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
-if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
-   add_definitions(-DYYDEBUG=1) # needed where sqlparser.h is used
-endif()
-
 if(NOT HAVE_UNISTD_H)
     set(EXTRA_SCANNER_COMPILE_FLAGS "-DYY_NO_UNISTD_H=1")
 endif()
@@ -225,6 +220,20 @@ target_link_libraries(KDb
         Qt5::Xml
         ICU::i18n
 )
+
+string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
+if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
+   target_compile_definitions(KDb PRIVATE -DYYDEBUG=1) # needed where sqlparser.h is used
+endif()
+
+set(QT_ISODATEWITHMS_MIN_VERSION 5.8.0)
+if(Qt5_VERSION VERSION_LESS ${QT_ISODATEWITHMS_MIN_VERSION})
+    message(STATUS "Qt ${Qt5_VERSION} does not have Qt::ISODateWithMs APIs, minimal version is \
+${QT_ISODATEWITHMS_MIN_VERSION}. KDb's implementation will be compiled-in.")
+else()
+    # Qt::ISODateWithMs APIs present
+    target_compile_definitions(KDb PRIVATE -DHAVE_QT_ISODATEWITHMS)
+endif()
 
 if(BUILD_TEST_COVERAGE)
     target_link_libraries(KDb
