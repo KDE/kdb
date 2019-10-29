@@ -18,6 +18,7 @@
 */
 
 #include "DateTimeTest.h"
+#include "KDbTestUtils.h"
 
 #include <QtTest>
 

@@ -79,6 +79,11 @@ KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const KDbEscapedString &v
 KDBTESTUTILS_EXPORT bool qCompare(const QStringList &val1, const QStringList &val2,
                                   const char *actual, const char *expected, const char *file,
                                   int line);
+
+KDBTESTUTILS_EXPORT bool qCompare(const QByteArray &val1, const char *val2, const char *actual,
+                                  const char *expected, const char *file, int line);
+KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const char *val2, const char *actual,
+                                  const char *expected, const char *file, int line);
 }
 
 //! Calls @a call and verifies status of @a resultable
