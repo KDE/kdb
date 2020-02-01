@@ -45,14 +45,16 @@ public:
     ~PostgresqlConnection() override;
 
     //! @return a new query based on a query statement
-    KDbCursor *prepareQuery(const KDbEscapedString &sql, KDbCursor::Options options
-                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(const KDbEscapedString &sql,
+                                              KDbCursor::Options options
+                                              = KDbCursor::Option::None) override;
 
     //! @return a new query based on a query object
-    KDbCursor *prepareQuery(KDbQuerySchema *query, KDbCursor::Options options
-                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(KDbQuerySchema *query,
+                                              KDbCursor::Options options
+                                              = KDbCursor::Option::None) override;
 
-    KDbPreparedStatementInterface *prepareStatementInternal() override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbPreparedStatementInterface *prepareStatementInternal() override;
 
     /*! Connection-specific string escaping.  */
     KDbEscapedString escapeString(const QString& str) const override;
@@ -83,7 +85,7 @@ private:
     //! Drops the given database
     bool drv_dropDatabase(const QString &dbName = QString()) override;
     //! Executes an SQL statement
-    KDbSqlResult* drv_prepareSql(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbSqlResult *drv_prepareSql(const KDbEscapedString &sql) override;
     bool drv_executeSql(const KDbEscapedString& sql) override;
 
     //! Implemented for KDbResultable

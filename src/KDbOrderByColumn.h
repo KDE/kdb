@@ -61,8 +61,8 @@ public:
      @a fromQuery and @a toQuery is needed if column() is assigned to this info.
      Then, column info within @a toQuery will be assigned to the new KDbOrderByColumn object,
      corresponding to column() from "this" KDbOrderByColumn object. */
-    KDbOrderByColumn *copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
-                           KDbQuerySchema *toQuery) const Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbOrderByColumn *copy(KDbConnection *conn, KDbQuerySchema *fromQuery,
+                                             KDbQuerySchema *toQuery) const;
 
     //! A column to sort.
     KDbQueryColumnInfo* column() const;

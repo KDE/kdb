@@ -39,12 +39,14 @@ class SqliteConnection : public KDbConnection
 public:
     ~SqliteConnection() override;
 
-    KDbCursor *prepareQuery(const KDbEscapedString &sql, KDbCursor::Options options
-                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
-    KDbCursor *prepareQuery(KDbQuerySchema *query, KDbCursor::Options options
-                            = KDbCursor::Option::None) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(const KDbEscapedString &sql,
+                                              KDbCursor::Options options
+                                              = KDbCursor::Option::None) override;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(KDbQuerySchema *query,
+                                              KDbCursor::Options options
+                                              = KDbCursor::Option::None) override;
 
-    KDbPreparedStatementInterface* prepareStatementInternal() override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbPreparedStatementInterface *prepareStatementInternal() override;
 
 protected:
     /*! Used by driver */

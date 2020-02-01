@@ -259,7 +259,7 @@ public:
 
     bool useTemporaryDatabaseIfNeeded(QString* name);
 
-    QSharedPointer<KDbSqlResult> prepareSql(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QSharedPointer<KDbSqlResult> prepareSql(const KDbEscapedString& sql);
 
     bool executeSql(const KDbEscapedString& sql);
 
@@ -316,7 +316,7 @@ public:
 
     KDbField* setupField(const KDbRecordData& data);
 
-    KDbSqlResult* drv_prepareSql(const KDbEscapedString& sql) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbSqlResult *drv_prepareSql(const KDbEscapedString &sql) override;
 
     bool drv_executeSql(const KDbEscapedString& sql) override;
 

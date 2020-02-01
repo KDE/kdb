@@ -115,13 +115,13 @@ public:
      Connection keeps ownership of the returned object.
      Used internally by tableSchema() methods.
      On failure deletes @a table and returns @c nullptr. */
-    KDbTableSchema* setupTableSchema(KDbTableSchema *table) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbTableSchema *setupTableSchema(KDbTableSchema *table);
 
     /*! @return a full query schema for a query using 'kexi__*' system tables.
      Connection keeps ownership of the returned object.
      Used internally by querySchema() methods.
      On failure deletes @a query and returns @c nullptr. */
-    KDbQuerySchema* setupQuerySchema(KDbQuerySchema *query) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbQuerySchema *setupQuerySchema(KDbQuerySchema *query);
 
     //! @return cached fields expanded information for @a query
     KDbQuerySchemaFieldsExpanded *fieldsExpanded(const KDbQuerySchema *query);

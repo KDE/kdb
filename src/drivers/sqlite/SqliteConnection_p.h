@@ -140,13 +140,15 @@ public:
         return sqlite3_column_count(prepared_st);
     }
 
-    inline KDbSqlField *field(int index) override Q_REQUIRED_RESULT {
+    inline Q_REQUIRED_RESULT KDbSqlField *field(int index) override
+    {
         return prepared_st ? new SqliteSqlField(prepared_st, index) : nullptr;
     }
 
-    KDbField *createField(const QString &tableName, int index) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbField *createField(const QString &tableName, int index) override;
 
-    inline QSharedPointer<KDbSqlRecord> fetchRecord() override Q_REQUIRED_RESULT {
+    inline Q_REQUIRED_RESULT QSharedPointer<KDbSqlRecord> fetchRecord() override
+    {
         SqliteSqlRecord *record;
         const int res = sqlite3_step(prepared_st);
         if (res == SQLITE_ROW) {
