@@ -76,7 +76,7 @@ public:
     //! @return record data object and passes its ownership
     //! @c nullptr is returned on error or when there is no record to fetch.
     //! Check lastResult() for errors.
-    KDbRecordData* fetchRecordData() Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbRecordData *fetchRecordData();
 
     //! @return result of last operation on this SQL result
     virtual KDbResult lastResult() = 0;

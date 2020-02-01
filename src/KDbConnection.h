@@ -394,8 +394,8 @@ public:
      (passing @a query and @a options to it's constructor).
      Kexi SQL and driver-specific escaping is performed on table names.
     */
-    KDbCursor* prepareQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(KDbQuerySchema *query, const QList<QVariant> &params,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! @overload
      Prepares query described by @a query schema without parameters.
@@ -404,9 +404,10 @@ public:
                                     KDbCursor::Options options = KDbCursor::Option::None) /*Q_REQUIRED_RESULT*/ = 0;
 
     /*! @overload
-     Statement is build from data provided by @a table schema, it is like "select * from table_name".*/
-    KDbCursor* prepareQuery(KDbTableSchema* table,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+     Statement is build from data provided by @a table schema, it is like "select * from
+     table_name".*/
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(KDbTableSchema *table,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! Executes SELECT query described by a raw SQL statement @a sql.
      @return opened cursor created for results of this query
@@ -416,8 +417,8 @@ public:
      Identifiers in @a sql that are the same as keywords
      in KDbSQL dialect or the backend's SQL have to be escaped.
      */
-    KDbCursor* executeQuery(const KDbEscapedString& sql,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *executeQuery(const KDbEscapedString &sql,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! @overload executeQuery(const KDbEscapedString&, int)
      @a params are values of parameters that
@@ -425,19 +426,19 @@ public:
 
      Statement is build from data provided by @a query schema.
      Kexi SQL and driver-specific escaping is performed on table names. */
-    KDbCursor* executeQuery(KDbQuerySchema* query, const QList<QVariant>& params,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *executeQuery(KDbQuerySchema *query, const QList<QVariant> &params,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! @overload */
-    KDbCursor* executeQuery(KDbQuerySchema* query,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *executeQuery(KDbQuerySchema *query,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! @overload
      Executes query described by @a query schema without parameters.
      Statement is build from data provided by @a table schema,
      it is like "select * from table_name".*/
-    KDbCursor* executeQuery(KDbTableSchema* table,
-                            KDbCursor::Options options = KDbCursor::Option::None) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *executeQuery(KDbTableSchema *table,
+                                              KDbCursor::Options options = KDbCursor::Option::None);
 
     /*! Deletes cursor @a cursor previously created by functions like executeQuery()
      for this connection.
@@ -819,7 +820,7 @@ public:
      * @note Only use this method if a non-portable raw query is required.
      *       In other cases use prepareQuery() or executeQuery() and the KDbCursor object.
      */
-    QSharedPointer<KDbSqlResult> prepareSql(const KDbEscapedString& sql) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT QSharedPointer<KDbSqlResult> prepareSql(const KDbEscapedString& sql);
 
     /**
      * Executes a new native (raw, backend-specific) SQL query
@@ -1080,7 +1081,7 @@ protected:
     /*! @return a new field table schema for a table retrieved from @a data.
      Ownership of the returned object is passed to the caller.
      Used internally by tableSchema(). */
-    KDbField* setupField(const KDbRecordData& data) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbField *setupField(const KDbRecordData &data);
 
     /**
      * Prepares query for a raw SQL statement @a sql with possibility of returning records.
@@ -1190,7 +1191,7 @@ protected:
      @todo Add support for nested transactions,
            e.g. KDbTransactionData* beginTransaction(KDbTransactionData *parent)
     */
-    virtual KDbTransactionData* drv_beginTransaction() Q_REQUIRED_RESULT;
+    virtual Q_REQUIRED_RESULT KDbTransactionData *drv_beginTransaction();
 
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just
@@ -1372,8 +1373,9 @@ protected:
     /*! @internal used by *Internal() methods.
      Executes query based on a raw SQL statement @a sql or @a query with optional @a params.
      Ownership of the returned object is passed to the caller.*/
-    KDbCursor* executeQueryInternal(const KDbEscapedString& sql, KDbQuerySchema* query,
-                                    const QList<QVariant>* params) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *executeQueryInternal(const KDbEscapedString &sql,
+                                                      KDbQuerySchema *query,
+                                                      const QList<QVariant> *params);
 
     /*! Loads extended schema information for table @a tableSchema,
      if present (see ExtendedTableSchemaInformation in Kexi Wiki).

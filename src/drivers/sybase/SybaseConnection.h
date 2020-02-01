@@ -34,10 +34,10 @@ class SybaseConnection : public KDbConnection
 public:
     virtual ~SybaseConnection();
 
-    KDbCursor *prepareQuery(const KDbEscapedString &sql,
-                            int cursor_options = 0) override Q_REQUIRED_RESULT;
-    KDbCursor *prepareQuery(KDbQuerySchema *query,
-                            int cursor_options = 0) override Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(const KDbEscapedString &sql,
+                                              int cursor_options = 0) override;
+    Q_REQUIRED_RESULT KDbCursor *prepareQuery(KDbQuerySchema *query,
+                                              int cursor_options = 0) override;
 
     KDbPreparedStatement prepareStatement(KDbPreparedStatement::StatementType type,
                                           KDbFieldList *fields) override;

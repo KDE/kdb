@@ -125,7 +125,7 @@ KDBTESTUTILS_EXPORT bool qCompare(const QString &val1, const char *val2, const c
 //! This way users of this method can call QVERIFY(utils.<name>());
 #define KDBTEST_METHOD_DECL(name, argsDecl, args) \
 public: \
-    bool name argsDecl Q_REQUIRED_RESULT { name ## Internal args ; return !QTest::currentTestFailed(); } \
+    Q_REQUIRED_RESULT bool name argsDecl { name ## Internal args ; return !QTest::currentTestFailed(); } \
 private Q_SLOTS: \
     void name ## Internal argsDecl
 

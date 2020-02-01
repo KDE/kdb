@@ -130,7 +130,7 @@ public:
      Returned list can be usable e.g. as argument for KDbConnection::insertRecord().
      0 is returned if at least one name cannot be found.
     */
-    KDbFieldList* subList(const QString& n1, const QString& n2 = QString(),
+    Q_REQUIRED_RESULT KDbFieldList *subList(const QString& n1, const QString& n2 = QString(),
                        const QString& n3 = QString(), const QString& n4 = QString(),
                        const QString& n5 = QString(), const QString& n6 = QString(),
                        const QString& n7 = QString(), const QString& n8 = QString(),
@@ -139,16 +139,16 @@ public:
                        const QString& n13 = QString(), const QString& n14 = QString(),
                        const QString& n15 = QString(), const QString& n16 = QString(),
                        const QString& n17 = QString(), const QString& n18 = QString()
-                      ) Q_REQUIRED_RESULT;
+                      );
 
     /*! Like above, but for QStringList. */
-    KDbFieldList* subList(const QStringList& list) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbFieldList *subList(const QStringList &list);
 
     /*! @overload subList(const QStringList&) */
-    KDbFieldList* subList(const QList<QByteArray>& list) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbFieldList *subList(const QList<QByteArray> &list);
 
     /*! Like above, but with a list of field indices */
-    KDbFieldList* subList(const QList<int>& list) Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbFieldList *subList(const QList<int> &list);
 
     /*! @return a string that is a result of all field names concatenated
      and with @a separator. This is usable e.g. as argument like "field1,field2"

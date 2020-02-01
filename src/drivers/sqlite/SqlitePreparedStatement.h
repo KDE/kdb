@@ -36,9 +36,10 @@ public:
 protected:
     bool prepare(const KDbEscapedString& sql) override;
 
-    QSharedPointer<KDbSqlResult> execute(KDbPreparedStatement::Type type,
+    Q_REQUIRED_RESULT QSharedPointer<KDbSqlResult> execute(
+            KDbPreparedStatement::Type type,
             const KDbField::List &selectFieldList, KDbFieldList *insertFieldList,
-            const KDbPreparedStatementParameters &parameters) override Q_REQUIRED_RESULT;
+            const KDbPreparedStatementParameters &parameters) override;
 
     bool bindValue(KDbField *field, const QVariant& value, int arg);
 

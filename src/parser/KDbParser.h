@@ -160,7 +160,7 @@ public:
      *
      * @todo Implement this
      */
-    KDbTableSchema *table() Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbTableSchema *table();
 
     /**
      * @return a pointer to a new query schema created by parsing 'SELECT ...' statement
@@ -169,7 +169,7 @@ public:
      * @note A proper query schema is returned only once for each successful parse() call,
      * and the object is owned by the caller. In all other cases nullptr is returned.
      */
-    KDbQuerySchema *query() Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbQuerySchema *query();
 
     /**
      * @return a pointer to the used database connection or @c nullptr if it was not set.

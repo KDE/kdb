@@ -33,10 +33,11 @@ public:
 
     bool prepare(const KDbEscapedString& sql) override;
 
-    QSharedPointer<KDbSqlResult> execute(KDbPreparedStatement::Type type,
+    Q_REQUIRED_RESULT QSharedPointer<KDbSqlResult> execute(
+            KDbPreparedStatement::Type type,
             const KDbField::List &selectFieldList,
             KDbFieldList *insertFieldList,
-            const KDbPreparedStatementParameters &parameters) override Q_REQUIRED_RESULT;
+            const KDbPreparedStatementParameters &parameters) override;
 
 private:
     Q_DISABLE_COPY(PostgresqlPreparedStatement)

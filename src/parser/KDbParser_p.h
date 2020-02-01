@@ -71,7 +71,7 @@ public:
     /**
      * Creates a new query or provides the one provided by KDbParser::parse().
      */
-    KDbQuerySchema* createQuery() Q_REQUIRED_RESULT;
+    Q_REQUIRED_RESULT KDbQuerySchema *createQuery();
 
     friend class KDbParser;
 
