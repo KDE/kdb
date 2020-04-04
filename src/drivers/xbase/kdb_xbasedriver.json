@@ -49,7 +49,7 @@
         "Description[gl]": "Controlador de KDb para manexar bases de datos xBase.",
         "Description[ia]": "Driver de KDb per manear bases de datos de xBase",
         "Description[it]": "Driver KDb per la gestione di banche dati xBase",
-        "Description[ko]": "xBase 데이터베이스를 처리하기 위한 KDb 드라이버",
+        "Description[ko]": "xBase 데이터베이스를 처리하는 KDb 드라이버",
         "Description[nl]": "KDb-stuurprogramma for behandeling van xBase databases",
         "Description[nn]": "KDb-drivar for xBase-databasar",
         "Description[pl]": "Sterownik KDb do obsługi baz danych xBase",
