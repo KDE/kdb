@@ -46,11 +46,24 @@ int cursorsTest()
     qDebug() << "KDbCursor::moveFirst() ---------------------";
     qDebug() << "-- KDbCursor::moveFirst() == " << cursor->moveFirst();
 
-    /*  qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
-      qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
-      qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
-      qDebug()<<"KDbCursor::moveNext() == "<<cursor->moveNext();
-      qDebug()<<"KDbCursor::eof() == "<<cursor->eof();*/
+    if (cursor_options & KDbCursor::Option::Buffered) {
+      qDebug() << "KDbCursor Buffered -------------------------";
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::moveNext() == " << cursor->moveNext();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::moveNext() == "<< cursor->moveNext();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::moveNext() == "<< cursor->moveNext();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::moveNext() == "<< cursor->moveNext();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::movePrev() == "<< cursor->movePrev();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::moveNext() == "<< cursor->moveNext();
+      qDebug() << "-- KDbCursor::value(0) == " << cursor->value(0);
+      qDebug() << "-- KDbCursor::eof() == " << cursor->eof();
+    }
+
     conn->deleteCursor(cursor);
 
     return 0;
