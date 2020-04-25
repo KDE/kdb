@@ -245,6 +245,9 @@ int main(int argc, char** argv)
         }
     }
 
+    const bool bufCursors = takeOption(args, "buffered-cursors");
+    QString queryParams = takeOptionWithArg(args, "query-params");
+
     drv_id = args.first();
     if (!drv_id.contains('.')) {
         drv_id.prepend(QLatin1String("org.kde.kdb."));
@@ -272,9 +275,6 @@ int main(int argc, char** argv)
         qDebug() << "main: MIME types for" << driver->metaData()->id() << ":"
                  << driver->metaData()->mimeTypes();
     }
-
-    const bool bufCursors = takeOption(args, "buffered-cursors");
-    QString queryParams = takeOptionWithArg(args, "query-params");
 
     //open connection
     if (args.count() >= 2)
