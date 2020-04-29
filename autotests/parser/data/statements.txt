@@ -320,6 +320,14 @@ select TRUE IS NULL;
 select TRUE <> TRUE OR FALSE == TRUE;
 -- ERROR: 'IS' is reserved keyword
 select TRUE IS NOT FALSE;
+-- ERROR: Identifier escaping: reserved keyword
+SELECT * FROM table;
+SELECT id FROM table;
+SELECT [id] FROM table;
+-- Identifier escaping
+SELECT * FROM [table];
+SELECT id FROM [table];
+SELECT [id] FROM [table];
 -- IS NULL/IS NOT NULL
 select 1 IS NOT NULL;
 select NULL IS NULL;
