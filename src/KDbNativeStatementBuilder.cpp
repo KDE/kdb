@@ -299,8 +299,10 @@ static bool selectStatementInternal(KDbEscapedString *target,
         KDbEscapedString s;
         if (!sql.isEmpty())
             s = ", ";
-        if (querySchema->masterTable())
-            s += KDbEscapedString(querySchema->tableAliasOrName(querySchema->masterTable()->name())) + '.';
+        if (querySchema->masterTable()) {
+            s += KDb::escapeIdentifier(driver, querySchema->tableAliasOrName(querySchema->masterTable()->name()));
+            s += '.';
+        }
         s += KDbDriverPrivate::behavior(driver)->ROW_ID_FIELD_NAME;
         sql += s;
     }
