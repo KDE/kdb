@@ -35,6 +35,16 @@ extern QByteArray globalToken;
 extern void setError(const QString& errDesc);
 extern void setError(const QString& errName, const QString& errDesc);
 
+/* Only quotes the input if it does not start with a quote character, otherwise
+ it would be too hard to read with some fonts. */
+static QString maybeQuote(const QString& string)
+{
+    QString first(string.left(1));
+    if (first == QLatin1Char('\'') || first == QLatin1Char('"') || first == QLatin1Char('`')) {
+        return string;
+    }
+    return QStringLiteral("\"%1\"").arg(string);
+}
 %}
 
 /* *** Please reflect changes to this file in ../driver_p.cpp *** */
@@ -152,9 +162,18 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
 
 # {
     ECOUNT;
-    sqlParserDebug() << "### begin DATE_OR_TIME" << yytext << "(" << yyleng << ")";
+    sqlParserDebug() << "### end DATE_OR_TIME" << yytext << "(" << yyleng << ")";
     BEGIN(DATE_OR_TIME_caller);
     return '#';
+}
+
+
+. { // fallback rule to avoid flex's default action that prints the character to stdout
+    // without notifying the scanner.
+    ECOUNT;
+    const QString string(QString::fromUtf8(yytext, yyleng));
+    setError(KDbParser::tr("Unexpected character %1 in date/time").arg(maybeQuote(string)));
+    return SCAN_ERROR;
 }
 
 }
@@ -374,6 +393,14 @@ real               ((({digit}*\.{digit}+)|({digit}+\.{digit}*)|({digit}+))([Ee][
     sqlParserDebug() << "char: '" << yytext[0] << "'";
     ECOUNT;
     return yytext[0];
+}
+
+. { // fallback rule to avoid flex's default action that prints the character to stdout
+    // without notifying the scanner.
+    ECOUNT;
+    const QString string(QString::fromUtf8(yytext, yyleng));
+    setError(KDbParser::tr("Unexpected character %1").arg(maybeQuote(string)));
+    return SCAN_ERROR;
 }
 
 %%
