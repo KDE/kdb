@@ -57,6 +57,7 @@
         "Description[pl]": "Sterownik KDb do obsługi baz danych Sybase oraz MSSQL",
         "Description[pt]": "Controlador do KDb para lidar com bases de dados Sybase e MSSQL",
         "Description[pt_BR]": "Driver do KDb para lidar com bancos de dados Sybase e MSSQL",
+        "Description[ru]": "Драйвер KDb для работы с базами данных Sybase и MSSQL",
         "Description[sk]": "KDb ovládač na spracovanie databáz Sybase a MSSQL",
         "Description[sv]": "Kdb-drivrutin för att hantera Sybase- och MSSQL-databaser",
         "Description[tr]": "Sysbase ve MSSQL veritabanlarını kullanabilmek için KDb sürücüsü",
