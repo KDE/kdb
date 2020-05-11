@@ -55,6 +55,7 @@
         "Description[pl]": "Sterownik KDb do obsługi baz danych MySQL",
         "Description[pt]": "Controlador do KDb para lidar com bases de dados MySQL",
         "Description[pt_BR]": "Driver do KDb para lidar com bancos de dados MySQL",
+        "Description[ru]": "Драйвер KDb для работы с базами данных MySQL",
         "Description[sk]": "KDb ovládač na spracovanie databáz MySQL",
         "Description[sv]": "Kdb-drivrutin för att hantera MySQL-databaser",
         "Description[tr]": "MySQL veritabanlarını kullanabilmek için KDb sürücüsü",
