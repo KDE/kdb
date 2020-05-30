@@ -448,12 +448,12 @@ install(
 # )
 
 if(BUILD_QCH)
-    kdb_add_qch(
+    ecm_add_qch(
         KDb_QCH
         NAME KDb
         BASE_NAME ${KDB_BASE_NAME}
         VERSION ${PROJECT_VERSION}
-        NAMESPACE org.kde.${KDB_BASE_NAME}
+        ORG_DOMAIN org.kde.${KDB_BASE_NAME}
         SOURCES
             Mainpage.dox
             ${kdb_HEADERS}
@@ -463,16 +463,20 @@ if(BUILD_QCH)
             Qt5Gui_QCH
             Qt5Widgets_QCH
             KF5CoreAddons_QCH
+        INCLUDE_DIRS
+            ${CMAKE_CURRENT_BINARY_DIR}
+            ${kdb_INCLUDE_DIRS}
         BLANK_MACROS
             KDB_EXPORT
             KDB_DEPRECATED
-        TAGFILE_INSTALL_DESTINATION ${KDB_QTQCH_FULL_INSTALL_DIR}
-        QCH_INSTALL_DESTINATION ${KDB_QTQCH_FULL_INSTALL_DIR}
+        TAGFILE_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        QCH_INSTALL_DESTINATION ${KDE_INSTALL_QTQCHDIR}
+        COMPONENT Devel
     )
     set(kdb_qch_targets KDb_QCH)
 endif()
 
-kdb_install_qch_export(
+ecm_install_qch_export(
     TARGETS ${kdb_qch_targets}
     FILE KDbQCHTargets.cmake
 ​    DESTINATION "${CMAKECONFIG_INSTALL_DIR}"
