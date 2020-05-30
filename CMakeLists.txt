@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
-find_package(ECM 1.8.0 REQUIRED NO_MODULE)
+
+set(REQUIRED_KF5_VERSION 5.45.0)
+find_package(ECM ${REQUIRED_KF5_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
@@ -19,6 +21,7 @@ include(ECMSetupVersion)
 include(KDEInstallDirs)
 include(KDECMakeSettings NO_POLICY_SCOPE)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
+include(ECMSetupQtPluginMacroNames)
 
 # Own
 include(KDbCreateSharedDataClasses)
