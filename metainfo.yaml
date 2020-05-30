@@ -1,0 +1,39 @@
+# kapidox info
+description: KDb is a database connectivity and creation framework, consisted of a general-purpose
+     C++ Qt library and set of plugins delivering support for various database vendors.
+#logo: TODO
+group: kexiframeworks
+type: functional
+
+platforms:
+    - name: Linux
+    - name: Windows
+#    - name: MacOSX
+#    - name: Android
+
+public_lib: true
+public_source_dirs:
+    - src
+libraries:
+    - cmake: KDb
+      qmake: KDb3
+cmakename: KDb
+
+maintainer:
+    - staniek
+
+# kapidox needs to have the group info with one of the covered projects currently
+# so placing here, taking KDb as the most core library of the group
+group_info:
+    # kapidox turns this into the group identifier "kexiframeworks" for use with "group:"
+    fancyname: KEXI Frameworks
+    maintainer:
+        - staniek
+    irc: kexi
+    mailinglist: kexi-devel
+    platforms:
+        - Linux
+        - Windows
+#    description: TODO
+#    logo: TODO
+#    long_description: TODO
