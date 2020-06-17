@@ -29,7 +29,6 @@
                 "Name[sv]": "Kexi-gruppen",
                 "Name[tr]": "Kexi Ekibi",
                 "Name[uk]": "Команда Kexi",
-                "Name[x-test]": "xxKexi Teamxx",
                 "Name[zh_CN]": "Kexi 团队",
                 "Name[zh_TW]": "Kexi 團隊"
             }
@@ -62,7 +61,6 @@
         "Description[sv]": "Kdb-drivrutin för att hantera SQLite-databaser",
         "Description[tr]": "SQLite veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних SQLite",
-        "Description[x-test]": "xxKDb driver for handling SQLite databasesxx",
         "Description[zh_CN]": "处理 SQLite 数据库的 KDb 驱动",
         "Description[zh_TW]": "處理 SQLite 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
@@ -99,7 +97,6 @@
         "Name[sv]": "SQLite",
         "Name[tr]": "SQLite",
         "Name[uk]": "SQLite",
-        "Name[x-test]": "xxSQLitexx",
         "Name[zh_CN]": "SQLite",
         "Name[zh_TW]": "SQLite",
         "ServiceTypes": [
