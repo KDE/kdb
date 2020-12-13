@@ -13,12 +13,12 @@ kdb_add_tests(OFF)
 kdb_add_examples(OFF)
 
 # ECM
+include(KDEInstallDirs)
 include(ECMGeneratePriFile)
 include(ECMInstallIcons)
 include(ECMOptionalAddSubdirectory)
 include(ECMPoQmTools)
 include(ECMSetupVersion)
-include(KDEInstallDirs)
 include(KDECMakeSettings NO_POLICY_SCOPE)
 include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
 include(ECMSetupQtPluginMacroNames)
