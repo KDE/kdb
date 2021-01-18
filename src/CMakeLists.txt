@@ -250,7 +250,7 @@ if(BUILD_TEST_COVERAGE)
 endif()
 
 # Create a Config.cmake and a ConfigVersion.cmake file and install them
-set(CMAKECONFIG_INSTALL_DIR "${CMAKECONFIG_INSTALL_PREFIX}/${KDB_BASE_NAME}")
+set(CMAKECONFIG_INSTALL_DIR "${KDE_INSTALL_CMAKEPACKAGEDIR}/${KDB_BASE_NAME}")
 
 ecm_setup_version(${PROJECT_VERSION}
     VARIABLE_PREFIX KDB
