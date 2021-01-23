@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
+                "Name[az]": "Kexi komandası",
                 "Name[ca@valencia]": "L'equip del Kexi",
                 "Name[ca]": "L'equip del Kexi",
                 "Name[cs]": "Tým Kexi",
@@ -38,6 +39,7 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling xBase databases",
+        "Description[az]": "xBase verilənlər bazasının işlənməsi üçün KDb sürücüsü",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades xBase",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades xBase",
         "Description[cs]": "Ovladač KDb pro práci s databázemi xBase",
@@ -73,6 +75,7 @@
         "License": "LGPL",
         "MimeTypes": [],
         "Name": "xBase",
+        "Name[az]": "xBase",
         "Name[ca@valencia]": "xBase",
         "Name[ca]": "xBase",
         "Name[cs]": "xBase",
