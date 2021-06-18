@@ -27,7 +27,7 @@
 
 #include "XbaseConnection.h"
 
-KDB_DRIVER_PLUGIN_FACTORY(xBaseDriver, "kdb_xbasedriver.json")
+K_PLUGIN_CLASS_WITH_JSON(xBaseDriver, "kdb_xbasedriver.json")
 
 class KDbxBaseDriverPrivate {
 

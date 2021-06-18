@@ -24,7 +24,7 @@ the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
 #include "KDbDriverBehavior.h"
 #include "KDb.h"
 
-KDB_DRIVER_PLUGIN_FACTORY(SybaseDriver, "kdb_sybasedriver.json")
+K_PLUGIN_CLASS_WITH_JSON(SybaseDriver, "kdb_sybasedriver.json")
 
 SybaseDriver::SybaseDriver(QObject *parent, const QVariantList &args)
     : KDbDriver(parent, args)

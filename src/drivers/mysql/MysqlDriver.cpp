@@ -30,7 +30,7 @@
 
 #include <mysql.h>
 
-KDB_DRIVER_PLUGIN_FACTORY(MysqlDriver, "kdb_mysqldriver.json")
+K_PLUGIN_CLASS_WITH_JSON(MysqlDriver, "kdb_mysqldriver.json")
 
 /*! @todo Implement buffered/unbuffered cursor, rather than buffer everything.
    Each MYSQL connection can only handle at most one unbuffered cursor,

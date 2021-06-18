@@ -32,7 +32,7 @@
 
 #include <sqlite3.h>
 
-KDB_DRIVER_PLUGIN_FACTORY(SqliteDriver, "kdb_sqlitedriver.json")
+K_PLUGIN_CLASS_WITH_JSON(SqliteDriver, "kdb_sqlitedriver.json")
 
 //! driver specific private data
 //! @internal

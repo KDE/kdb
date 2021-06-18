@@ -32,7 +32,7 @@
 
 #include <libpq-fe.h>
 
-KDB_DRIVER_PLUGIN_FACTORY(PostgresqlDriver, "kdb_postgresqldriver.json")
+K_PLUGIN_CLASS_WITH_JSON(PostgresqlDriver, "kdb_postgresqldriver.json")
 
 PostgresqlDriver::PostgresqlDriver(QObject *parent, const QVariantList &args)
         : KDbDriver(parent, args)

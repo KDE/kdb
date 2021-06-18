@@ -17,13 +17,6 @@ check_include_file(unistd.h HAVE_UNISTD_H)
 #    TODO  -DKDE_DEFAULT_DEBUG_AREA=44000
 #)
 
-ecm_setup_qtplugin_macro_names(
-    JSON_ARG2
-        KDB_DRIVER_PLUGIN_FACTORY
-    CONFIG_CODE_VARIABLE
-        PACKAGE_SETUP_AUTOMOC_VARIABLES
-)
-
 ########### generate parser/lexer files ###############
 # as described at https://public.kitware.com/pipermail/cmake/2002-September/003028.html
 
