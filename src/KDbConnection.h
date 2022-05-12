@@ -1191,7 +1191,7 @@ protected:
      @todo Add support for nested transactions,
            e.g. KDbTransactionData* beginTransaction(KDbTransactionData *parent)
     */
-    virtual Q_REQUIRED_RESULT KDbTransactionData *drv_beginTransaction();
+    Q_REQUIRED_RESULT virtual KDbTransactionData *drv_beginTransaction();
 
     /*! Note for driver developers: begins new transaction
      and returns handle to it. Default implementation just

@@ -166,7 +166,7 @@ public:
         return data ? mysql_num_fields(data) : 0;
     }
 
-    inline Q_REQUIRED_RESULT KDbSqlField *field(int index) override {
+    Q_REQUIRED_RESULT inline KDbSqlField *field(int index) override {
         if (!fields) {
             if (!data) {
                 return nullptr;
@@ -178,7 +178,7 @@ public:
 
     Q_REQUIRED_RESULT KDbField *createField(const QString &tableName, int index) override;
 
-    inline Q_REQUIRED_RESULT QSharedPointer<KDbSqlRecord> fetchRecord() override
+    Q_REQUIRED_RESULT inline QSharedPointer<KDbSqlRecord> fetchRecord() override
     {
         QSharedPointer<KDbSqlRecord> record;
         MYSQL_ROW row = data ? mysql_fetch_row(data) : nullptr;
