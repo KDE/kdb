@@ -155,14 +155,14 @@ public:
         return PQnfields(result);
     }
 
-    inline Q_REQUIRED_RESULT KDbSqlField *field(int index) override
+    Q_REQUIRED_RESULT inline KDbSqlField *field(int index) override
     {
         return new PostgresqlSqlField(result, index);
     }
 
     Q_REQUIRED_RESULT KDbField *createField(const QString &tableName, int index) override;
 
-    inline Q_REQUIRED_RESULT QSharedPointer<KDbSqlRecord> fetchRecord() override
+    Q_REQUIRED_RESULT inline QSharedPointer<KDbSqlRecord> fetchRecord() override
     {
         return QSharedPointer<KDbSqlRecord>(recordToFetch < recordsCount
                                                 ? new PostgresqlSqlRecord(result, recordToFetch++)
