@@ -1221,7 +1221,8 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
         }
     }
     if (!properArgCount) {
-        std::unique(argCounts.begin(), argCounts.end());
+        const std::vector<int>::iterator last = std::unique(argCounts.begin(), argCounts.end());
+        argCounts.erase(last, argCounts.end());
         std::sort(argCounts.begin(), argCounts.end()); // sort so we can easier check the case
         setIncorrectNumberOfArgumentsErrorMessage(parseInfo, count, argCounts, name);
         return false;

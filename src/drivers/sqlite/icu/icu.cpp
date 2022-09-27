@@ -420,6 +420,8 @@ static void icuLoadCollation(
   int nArg,
   sqlite3_value **apArg
 ){
+  (void)nArg;  /* Unused parameter */
+
   sqlite3 *db = (sqlite3 *)sqlite3_user_data(p);
   UErrorCode status = U_ZERO_ERROR;
   const char *zLocale;      /* Locale identifier - (eg. "jp_JP") */
