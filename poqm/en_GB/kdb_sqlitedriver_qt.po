@@ -1,0 +1,96 @@
+# Steve Allewell <steve.allewell@gmail.com>, 2016.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2016-09-11 17:29+0000\n"
+"Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
+"Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: SqliteAdmin.cpp:43
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not compact database \"%1\"."
+msgstr "Could not compact database \"%1\"."
+
+#: SqliteConnection.cpp:49
+msgctxt "SqliteConnection|"
+msgid "Extra paths for SQLite plugins"
+msgstr "Extra paths for SQLite plugins"
+
+#: SqliteConnection.cpp:273
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid ""
+"Could not delete file \"%1\". Check the file's permissions and whether it is "
+"already opened and locked by another application."
+msgstr ""
+"Could not delete file \"%1\". Check the file's permissions and whether it is "
+"already opened and locked by another application."
+
+#: SqliteConnection.cpp:375
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite plugin \"%1\"."
+msgstr "Could not load SQLite plugin \"%1\"."
+
+#: SqliteConnection.cpp:386
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not find SQLite plugin file \"%1\"."
+msgstr "Could not find SQLite plugin file \"%1\"."
+
+#: SqliteConnection.cpp:401
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite extension \"%1\"."
+msgstr "Could not load SQLite extension \"%1\"."
+
+#: SqliteVacuum.cpp:97
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find tool \"%1\"."
+msgstr "Could not find tool \"%1\"."
+
+#: SqliteVacuum.cpp:105
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find application \"%1\"."
+msgstr "Could not find application \"%1\"."
+
+#: SqliteVacuum.cpp:113
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not read file \"%1\"."
+msgstr "Could not read file \"%1\"."
+
+#: SqliteVacuum.cpp:168
+msgctxt "SqliteVacuum|"
+msgid "Compacting database"
+msgstr "Compacting database"
+
+#: SqliteVacuum.cpp:170
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Compacting database \"%1\"..."
+msgstr "Compacting database \"%1\"..."
+
+#: SqliteVacuum.cpp:259
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not rename file \"%1\" to \"%2\"."
+msgstr "Could not rename file \"%1\" to \"%2\"."
+
+#: SqliteVacuum.cpp:267
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid ""
+"The database has been compacted. Current size decreased by %1% to %2 MB."
+msgstr ""
+"The database has been compacted. Current size decreased by %1% to %2 MB."

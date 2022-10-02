@@ -1,0 +1,1426 @@
+# translation of kdb_qt.po to Slovak
+# Roman Paholik <wizzardsk@gmail.com>, 2015, 2016, 2017, 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: kdb_qt\n"
+"Report-Msgid-Bugs-To: http://bugs.kde.org\n"
+"POT-Creation-Date: 2015-05-14 09:14+0000\n"
+"PO-Revision-Date: 2022-04-09 19:31+0200\n"
+"Last-Translator: Roman Paholik <wizzardsk@gmail.com>\n"
+"Language-Team: Slovak <kde-sk@linux.sk>\n"
+"Language: sk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 21.12.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Qt-Contexts: true\n"
+
+#: expression/KDbBinaryExpression.cpp:64
+msgctxt "KDbBinaryExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Nekompatibilné typy argumentov"
+
+#: expression/KDbBinaryExpression.cpp:66
+#, qt-format
+msgctxt "KDbBinaryExpressionData|Binary expression arguments type error"
+msgid ""
+"Expression \"%1\" requires compatible types of arguments. Specified "
+"arguments are of type %2 and %3."
+msgstr ""
+"Výraz \"%1\" vyžaduje kompatibilný typ argumentov. Určené argumenty sú typu "
+"%2 a %3."
+
+#: expression/KDbFunctionExpression.cpp:213
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid "Incompatible types in %1() function"
+msgstr "Nekompatibilné typy vo funkcii %1()"
+
+#: expression/KDbFunctionExpression.cpp:215
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid ""
+"Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
+"arguments of type \"%4\"."
+msgstr ""
+"Argument #%1 typu \"%2\" vo funkcii %3() nie je kompatibilný s predošlými "
+"argumentami typu \"%4\"."
+
+#: expression/KDbFunctionExpression.cpp:298
+#, qt-format
+msgctxt "RandomFunctionDeclaration|"
+msgid "Invalid arguments of %1() function"
+msgstr "Neplatné argumenty funkcie %1()"
+
+#: expression/KDbFunctionExpression.cpp:300
+msgctxt "RandomFunctionDeclaration|"
+msgid ""
+"Value of the first argument should be less than value of the second argument."
+msgstr ""
+"Hodnota prvého argumentu by mala byť menšia ako hodnota druhého argumentu."
+
+#: expression/KDbFunctionExpression.cpp:940
+#: expression/KDbFunctionExpression.cpp:1190
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect number of arguments (%1)"
+msgstr "Nesprávny počet argumentov (%1)"
+
+#: expression/KDbFunctionExpression.cpp:945
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too many arguments.%1"
+msgstr "Priveľa argumentov.%1"
+
+#: expression/KDbFunctionExpression.cpp:949
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too few arguments.%1"
+msgstr "Primálo argumentov.%1"
+
+#: expression/KDbFunctionExpression.cpp:956
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function does not accept any arguments."
+msgstr "Funkcia %1%2() neprijíma žiadne argumenty."
+
+#: expression/KDbFunctionExpression.cpp:961
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires 1 argument."
+msgstr "Funkcia %1%2() vyžaduje 1 argument."
+
+#: expression/KDbFunctionExpression.cpp:968
+#: expression/KDbFunctionExpression.cpp:1007
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 argument(s)."
+msgid_plural "%1%2() function requires %3 argument(s)."
+msgstr[0] "Funkcia %1%2() vyžaduje %3 argument."
+msgstr[1] "Funkcia %1%2() vyžaduje %3 argument(y)."
+msgstr[2] "Funkcia %1%2() vyžaduje %3 argument(ov)."
+
+#: expression/KDbFunctionExpression.cpp:977
+#, qt-format
+msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
+msgid "%1%2() function requires 0 or 1 argument."
+msgstr "Funkcia %1%2() vyžaduje 0 alebo 1 argument."
+
+#: expression/KDbFunctionExpression.cpp:985
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 argument(s)."
+msgstr[0] "Funkcia %1%2() vyžaduje %3 alebo %4 argument(y)."
+msgstr[1] "Funkcia %1%2() vyžaduje %3 alebo %4 argumenty."
+msgstr[2] "Funkcia %1%2() vyžaduje %3 alebo %4 argumenty."
+
+#: expression/KDbFunctionExpression.cpp:993
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgstr[0] "Funkcia %1%2() vyžaduje %3 alebo %4 alebo %5 argument."
+msgstr[1] "Funkcia %1%2() vyžaduje %3 alebo %4 alebo %5 argument(y)."
+msgstr[2] "Funkcia %1%2() vyžaduje %3 alebo %4 alebo %5 argument(ov)."
+
+#: expression/KDbFunctionExpression.cpp:1003
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1 or %2"
+msgstr "%1 alebo %2"
+
+#: expression/KDbFunctionExpression.cpp:1021
+msgctxt "KDbFunctionExpressionData|"
+msgid " or "
+msgstr " alebo "
+
+#: expression/KDbFunctionExpression.cpp:1025
+#: expression/KDbFunctionExpression.cpp:1029
+#: expression/KDbFunctionExpression.cpp:1033
+#: expression/KDbFunctionExpression.cpp:1037
+#: expression/KDbFunctionExpression.cpp:1041
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"%1\""
+msgstr "\"%1\""
+
+#: expression/KDbFunctionExpression.cpp:1046
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"Number\""
+msgstr "\"Číslo\""
+
+#: expression/KDbFunctionExpression.cpp:1049
+msgctxt "KDbFunctionExpressionData|Any data type"
+msgid "\"Any\""
+msgstr "\"Hocičo\""
+
+#: expression/KDbFunctionExpression.cpp:1053
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect type of argument"
+msgstr "Nesprávny typ argumentu"
+
+#: expression/KDbFunctionExpression.cpp:1055
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Specified argument is of type \"%1\"."
+msgstr "Určený argument je typu \"%1\"."
+
+#: expression/KDbFunctionExpression.cpp:1059
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's first argument should be of type %2. %3"
+msgstr "Prvý argument funkcie %1() by mal byť typu %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1064
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's second argument should be of type %2. %3"
+msgstr "Druhý argument funkcie %1() by mal byť typu %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1069
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's third argument should be of type %2. %3"
+msgstr "Tretí argument funkcie %1() by mal byť typu %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1074
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fourth argument should be of type %2. %3"
+msgstr "Štvrtý argument funkcie %1() by mal byť typu %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1079
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fifth argument should be of type %2. %3"
+msgstr "Piaty argument funkcie %1() by mal byť typu %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1084
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's %2 argument should be of type %3. %4"
+msgstr "%2 argument funkcie %1() by mal byť typu %3. %4"
+
+#: expression/KDbFunctionExpression.cpp:1144
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too many arguments for function."
+msgstr "Priveľa argumentov pre funkciu."
+
+#: expression/KDbFunctionExpression.cpp:1146
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Maximum number of arguments for function %1() is %2."
+msgstr "Maximálny počet argumentov pre funkciu %1() je %2."
+
+#: expression/KDbFunctionExpression.cpp:1193
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least one argument."
+msgstr "Primálo argumentov. Funkcia %1() vyžaduje aspoň 1 argument."
+
+#: expression/KDbFunctionExpression.cpp:1198
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least two arguments."
+msgstr "Primálo argumentov. Funkcia %1() vyžaduje aspoň 2 argumenty."
+
+#: expression/KDbFunctionExpression.cpp:1203
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least three arguments."
+msgstr "Primálo argumentov. Funkcia %1() vyžaduje aspoň 3 argumenty."
+
+#: expression/KDbFunctionExpression.cpp:1208
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least %2 arguments."
+msgstr "Primálo argumentov. Funkcia %1() vyžaduje aspoň %2 argumenty."
+
+#: expression/KDbNArgExpression.cpp:70
+msgctxt "KDbNArgExpressionData|"
+msgid "Three arguments required"
+msgstr "Vyžadujú sa tri argumenty"
+
+#: expression/KDbNArgExpression.cpp:72
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
+msgid "%1 operator requires exactly three arguments."
+msgstr "Operátor %1 vyžaduje presne tri argumenty."
+
+#: expression/KDbNArgExpression.cpp:98
+msgctxt "KDbNArgExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Nekompatibilné typy argumentov"
+
+#: expression/KDbNArgExpression.cpp:100
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND arguments type error"
+msgid ""
+"Operator \"%1\" requires compatible types of arguments. Specified arguments "
+"are of type %2, %3, %4."
+msgstr ""
+"Operátor \"%1\" vyžaduje kompatibilný typ argumentov. Určené argumenty sú "
+"typu %2, %3, %4."
+
+#: expression/KDbVariableExpression.cpp:133
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous field name"
+msgstr "Nejednoznačné meno poľa"
+
+#: expression/KDbVariableExpression.cpp:135
+#, qt-format
+msgctxt "KDbVariableExpressionData|Note: translate also <tableName>"
+msgid ""
+"Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
+"%4\" notation to specify table name."
+msgstr ""
+"Obe tabuľky \"%1\" a \"%2\" majú definované pole \"%3\". Použite "
+"\"<nazovTabulky>.%4\" notáciu na určenie názvu tabuľky."
+
+#: expression/KDbVariableExpression.cpp:145
+#: expression/KDbVariableExpression.cpp:222
+msgctxt "KDbVariableExpressionData|"
+msgid "Field not found"
+msgstr "Pole nenájdené"
+
+#: expression/KDbVariableExpression.cpp:147
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not find table containing field \"%1\"."
+msgstr "Nemôžem nájsť tabuľku obsahujúcu pole \"%1\"."
+
+#: expression/KDbVariableExpression.cpp:172
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not access the table directly using its name"
+msgstr "Priamy prístup k tabuľke použitím jej mena nie je možný"
+
+#: expression/KDbVariableExpression.cpp:174
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid ""
+"Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
+"used."
+msgstr ""
+"Tabuľka \"%1\" je pokrytá aliasmi. Namiesto \"%2\", \"%2\", môžete použiť "
+"\"%3\"."
+
+#: expression/KDbVariableExpression.cpp:196
+msgctxt "KDbVariableExpressionData|"
+msgid "Table not found"
+msgstr "Tabuľka nenájdená"
+
+#: expression/KDbVariableExpression.cpp:197
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Unknown table \"%1\"."
+msgstr "Neznáma tabuľka \"%1\"."
+
+#: expression/KDbVariableExpression.cpp:211
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.*\" expression"
+msgstr "Nejednoznačné: \"%1\""
+
+#: expression/KDbVariableExpression.cpp:212
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined."
+msgstr "Viac ako jedna tabuľka alebo alias \"%1\" definovaný."
+
+#: expression/KDbVariableExpression.cpp:224
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Table \"%1\" has no \"%2\" field."
+msgstr "Tabuľka \"%1\" neobsahuje pole \"%2\"."
+
+#: expression/KDbVariableExpression.cpp:231
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.%2\" expression"
+msgstr "Nejednoznačný výraz \"%1.%2\""
+
+#: expression/KDbVariableExpression.cpp:233
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined containing \"%2\" field."
+msgstr ""
+"Viac ako jedna tabuľka alebo alias \"%1\" obsahujúci pole \"%2\" definovaný."
+
+#: KDb.cpp:179
+msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
+msgid "Test Connection"
+msgstr "Testovať pripojenie"
+
+#: KDb.cpp:180
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Testing connection to \"%1\" database server..."
+msgstr "Testuje sa pripojenie k databázovému serveru \"%1\"..."
+
+#: KDb.cpp:227
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server failed."
+msgstr "Test pripojenia k databázovému serveru \"%1\" zlyhalo."
+
+#: KDb.cpp:238
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid ""
+"Test connection to \"%1\" database server failed. The server is not "
+"responding."
+msgstr ""
+"Test pripojenia k databázovému serveru \"%1\" zlyhal. Server neodpovedá."
+
+#: KDb.cpp:244
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server established successfully."
+msgstr ""
+"Testovacie pripojenie k databázovému serveru \"%1\" bolo úspešne nadviazané."
+
+#: KDb.cpp:249
+msgctxt "ConnectionTestDialog|"
+msgid "Test Connection"
+msgstr "Testovať pripojenie"
+
+#: KDb.cpp:528
+msgctxt "KDb|"
+msgid "Message from server:"
+msgstr "Správa zo servera:"
+
+#: KDb.cpp:531
+msgctxt "KDb|"
+msgid "SQL statement:"
+msgstr "Príkaz SQL:"
+
+#: KDb.cpp:546
+msgctxt "KDb|"
+msgid "Server result code:"
+msgstr "Výstupný kód servera:"
+
+#: KDb.cpp:554
+msgctxt "KDb|"
+msgid "Server result:"
+msgstr "Výsledok servera:"
+
+#: KDb.cpp:1962
+msgctxt "KDbField|"
+msgid "Number"
+msgstr "Číslo"
+
+#: KDb.cpp:1965
+msgctxt "KDbField|"
+msgid "Image"
+msgstr "Obrázok"
+
+#: KDb.cpp:2201
+#, qt-format
+msgctxt "KDb|"
+msgid "Value of \"%1\" field must be an identifier."
+msgstr "Hodnota stĺpca \"%1\" musí byť identifikátor."
+
+#: KDb.cpp:2204
+#, qt-format
+msgctxt "KDb|"
+msgid "\"%1\" is not a valid identifier."
+msgstr "\"%1\" nie je platný identifikátor."
+
+#: KDbConnection.cpp:88
+msgctxt "KDbConnectionOptions|Read only connection"
+msgid "Read only"
+msgstr "Len na čítanie"
+
+#: KDbConnection.cpp:207
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid database contents. %1"
+msgstr "Neplatný obsah databázy. %1"
+
+#: KDbConnection.cpp:212
+msgctxt "KDbConnection|"
+msgid "It is a system object."
+msgstr "Toto je systémový objekt."
+
+#: KDbConnection.cpp:360
+msgctxt "KDbConnectionPrivate|"
+msgid "Table has no fields defined."
+msgstr "Tabuľka nemá definované žiadne polia."
+
+#: KDbConnection.cpp:408
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"Could not find definition for query \"%1\". Deleting this query is "
+"recommended."
+msgstr ""
+"Definícia otázky \"%1\" nebola nájdená. Táto otázka by mala byť odstránená."
+
+#: KDbConnection.cpp:416
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"<p>Could not load definition for query \"%1\". SQL statement for this query "
+"is invalid:<br><tt>%2</tt></p>\n"
+"<p>This query can be edited only in Text View.</p>"
+msgstr ""
+"<p>Definícia otázky \"%1\" nenájdená. Príkaz SQL pre túto otázku je neplatný:"
+"<br><tt>%2</tt></p>\n"
+"<p>Môžete otvoriť túto otázku iba v Textovom pohľade.</p>"
+
+#: KDbConnection.cpp:499
+msgctxt "KDbConnection|"
+msgid "Connection already established."
+msgstr "Pripojenie je už aktívne."
+
+#: KDbConnection.cpp:509
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not open \"%1\" project file."
+msgstr "Nie je možné otvoriť súbor projektu \"%1\"."
+
+#: KDbConnection.cpp:511
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not connect to \"%1\" database server."
+msgstr "Nie je možné sa pripojiť k databázovému serveru \"%1\"."
+
+#: KDbConnection.cpp:558
+msgctxt "KDbConnection|"
+msgid "Not connected to the database server."
+msgstr "Nepripojený k databázovému serveru."
+
+#: KDbConnection.cpp:569
+msgctxt "KDbConnection|"
+msgid "Currently no database is used."
+msgstr "Aktuálne nie je žiadna databáza použitá."
+
+#: KDbConnection.cpp:623
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "Databáza \"%1\" neexistuje."
+
+#: KDbConnection.cpp:643
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database file \"%1\" does not exist."
+msgstr "Databázový súbor \"%1\" neexistuje."
+
+#: KDbConnection.cpp:650
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not readable."
+msgstr "Databázový súbor \"%1\" sa nedá čítať."
+
+#: KDbConnection.cpp:657
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not writable."
+msgstr "Do databázového súboru \"%1\" sa nedá zapisovať."
+
+#: KDbConnection.cpp:686
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Database \"%1\" has been created but could not be closed after creation."
+msgstr "Databáza \"%1\" bola vytvorená ale nedá sa zatvoriť po vytvorení."
+
+#: KDbConnection.cpp:702
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" already exists."
+msgstr "Databáza \"%1\" už existuje."
+
+#: KDbConnection.cpp:707
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Could not create database \"%1\". This name is reserved for system database."
+msgstr ""
+"Nie je možné vytvoriť databázu \"%1\". Toto meno je rezervované pre "
+"systémovú databázu."
+
+#: KDbConnection.cpp:729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error creating database \"%1\" on the server."
+msgstr "Nastala chyba pri vytváraní databázy \"%1\" na serveri."
+
+#: KDbConnection.cpp:743
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" has been created but could not be opened."
+msgstr "Databáza \"%1\" bola vytvorená ale nedá sa otvoriť."
+
+#: KDbConnection.cpp:819
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Opening database \"%1\" failed."
+msgstr "Otváranie databázy \"%1\" zlyhalo."
+
+#: KDbConnection.cpp:904
+msgctxt "KDbConnection|"
+msgid "Could not find any database for temporary connection."
+msgstr "Žiadna databáza pre dočasné pripojenie nenájdená."
+
+#: KDbConnection.cpp:913
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error during starting temporary connection using \"%1\" database name."
+msgstr ""
+"Nastala chyba pri nadväzovaní dočasného spojenia s použitím mena databázy "
+"\"%1\"."
+
+#: KDbConnection.cpp:931 KDbConnection.cpp:949
+msgctxt "KDbConnection|"
+msgid "Could not delete database. Name is not specified."
+msgstr "Nie je možné vymazať databázu. Názov nie je zadaný."
+
+#: KDbConnection.cpp:955
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete system database \"%1\"."
+msgstr "Nie je možné odstrániť systémovú databázu \"%1\"."
+
+#: KDbConnection.cpp:1002
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object names."
+msgstr "Nie je možné získať zoznam názvov objektu."
+
+#: KDbConnection.cpp:1016
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of table names."
+msgstr "Nie je možné získať zoznam názvov tabuliek."
+
+#: KDbConnection.cpp:1024
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of physical table names."
+msgstr "Nie je možné získať zoznam názvov fyzických tabuliek."
+
+#: KDbConnection.cpp:1091
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object identifiers."
+msgstr "Nie je možné získať zoznam identifikátorov objektu."
+
+#: KDbConnection.cpp:1273
+msgctxt "KDbConnection|"
+msgid "SQL statement for execution is invalid or empty."
+msgstr "SQL vyhlásenie na spustenie je neplatné alebo prázdne."
+
+#: KDbConnection.cpp:1296
+msgctxt "KDbConnection|"
+msgid "Error while executing SQL statement."
+msgstr "Nastala chyba počas vykonávania SQL príkazu."
+
+#: KDbConnection.cpp:1393
+msgctxt "KDbConnection|"
+msgid "Creating table failed."
+msgstr "Vytvorenie tabuľky zlyhalo."
+
+#: KDbConnection.cpp:1406
+msgctxt "KDbConnection|"
+msgid "Could not create table without fields."
+msgstr "Nedá sa vytvoriť tabuľka bez polí."
+
+#: KDbConnection.cpp:1416
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as table name."
+msgstr "Systémové meno \"%1\" nomôže byť použité ako meno tabuľky."
+
+#: KDbConnection.cpp:1425
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
+msgstr "Systémové meno \"%1\" nomôže byť použité ako pole tabuľky \"%2\"."
+
+#: KDbConnection.cpp:1441
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not create the same table \"%1\" twice."
+msgstr "Nie je možné vytvoriť tú istú tabuľku \"%1\" dvakrát."
+
+#: KDbConnection.cpp:1455
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" already exists."
+msgstr "Tabuľka \"%1\" už existuje."
+
+#: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" does not exist."
+msgstr "Tabuľka \"%1\" neexistuje."
+
+#: KDbConnection.cpp:1579
+msgctxt "KDbConnection|"
+msgid "Could not delete object's data."
+msgstr "Nie je možné vymazať dáta objektu."
+
+#: KDbConnection.cpp:1607 KDbConnection.cpp:1620
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete table \"%1\". %2"
+msgstr "Nie je možné vymazať tabuľku \"%1\". %2"
+
+#: KDbConnection.cpp:1608
+msgctxt "KDbConnection|"
+msgid "Unexpected name or identifier."
+msgstr "Neočakávané meno alebo identifikátor."
+
+#: KDbConnection.cpp:1680
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not alter table \"%1\" using the same table as destination."
+msgstr "Nie je možné zmeniť tabuľku (alter) \"%1\" použitím tej istej tabuľky."
+
+#: KDbConnection.cpp:1706
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Unknown table \"%1\"."
+msgstr "Neznáma tabuľka \"%1\"."
+
+#: KDbConnection.cpp:1711
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid table name \"%1\"."
+msgstr "Neplatné meno tabuľky \"%1\"."
+
+#: KDbConnection.cpp:1718
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" using the same name."
+msgstr "Nepodarilo sa premenovať tabuľku \"%1\" použitím rovnakého názvu."
+
+#: KDbConnection.cpp:1729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
+msgstr ""
+"Nie je možné premenovať tabuľku \"%1\" na \"%2\". Tabuľka \"%3\" už existuje."
+
+#: KDbConnection.cpp:1839
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Query \"%1\" does not exist."
+msgstr "Otázka (query) \"%1\" neexistuje."
+
+#: KDbConnection.cpp:1946
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Transactions are not supported for \"%1\" driver."
+msgstr "Transakcie nie sú podporované pre ovládač \"%1\"."
+
+#: KDbConnection.cpp:1951
+msgctxt "KDbConnection|"
+msgid "Begin transaction failed."
+msgstr "Spustenie transakcie zlyhalo."
+
+#: KDbConnection.cpp:1968
+msgctxt "KDbConnection|"
+msgid "Transaction already started."
+msgstr "Transakcia je už spustená."
+
+#: KDbConnection.cpp:2010 KDbConnection.cpp:2047
+msgctxt "KDbConnection|"
+msgid "Transaction not started."
+msgstr "Transakcia nie je spustená."
+
+#: KDbConnection.cpp:2025
+msgctxt "KDbConnection|"
+msgid "Error on commit transaction."
+msgstr "Chyba pri potvrdení transakcie."
+
+#: KDbConnection.cpp:2062
+msgctxt "KDbConnection|"
+msgid "Error on rollback transaction."
+msgstr "Chyba pri vrátení späť z neúspešnej transakcie."
+
+#: KDbConnection.cpp:2213
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid object name \"%1\"."
+msgstr "Neplatné meno objektu \"%1\"."
+
+#: KDbConnection.cpp:2402
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Column \"%1\" does not exist in the query."
+msgstr "Stĺpec \"%1\" neexistuje pre zadanú otázku (query)."
+
+#: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
+msgctxt "KDbConnection|Extended schema for a table: loading error"
+msgid "Error while loading extended table schema."
+msgstr "Chyba počas čítania informácie rozšírenej schémy tabuľky."
+
+#: KDbConnection.cpp:2763
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid XML data: %1"
+msgstr "Zlý formát XML dát: %1"
+
+#: KDbConnection.cpp:2784
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Error in XML data: \"%1\" in line %2, column %3.\n"
+"XML data: %4"
+msgstr ""
+"Chyba dát XML: \"%1\" riadok %2, stĺpec %3.\n"
+"XML dáta: %4"
+
+#: KDbConnection.cpp:3113
+msgctxt "KDbConnection|"
+msgid "Could not update record because there is no master table defined."
+msgstr ""
+"Riadok nie je možné aktualizovať pretože žiadna master tabuľka nie je "
+"definovaná."
+
+#: KDbConnection.cpp:3120
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because master table has no primary key defined."
+msgstr ""
+"Riadok nie je možné aktualizovať pretože master tabuľka nemá definovaný "
+"primárny kľúč."
+
+#: KDbConnection.cpp:3152
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because it does not contain entire primary key of "
+"master table."
+msgstr ""
+"Riadok nie je možné aktualizovať pretože neobsahuje celý primárny kľúč "
+"master tabuľky."
+
+#: KDbConnection.cpp:3163 KDbConnection.cpp:3407
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Primary key's field \"%1\" cannot be empty."
+msgstr "Pole primárneho kľúča \"%1\" nesmie byť prázdne."
+
+#: KDbConnection.cpp:3191
+msgctxt "KDbConnection|"
+msgid "Record updating on the server failed."
+msgstr "Aktualizácia riadku na serveri zlyhala."
+
+#: KDbConnection.cpp:3213
+msgctxt "KDbConnection|"
+msgid "Could not insert record because there is no master table specified."
+msgstr ""
+"Nie je možné vložiť riadok pretože žiadna master tabuľka nie je definovaná."
+
+#: KDbConnection.cpp:3255
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because master table has no primary key specified."
+msgstr ""
+"Nie je možné vložiť riadok pretože master tabuľka nemá definovaný primárny "
+"kľúč."
+
+#: KDbConnection.cpp:3264
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Nie je možné vložiť riadok pretože neobsahuje celý primárny kľúč master "
+"tabuľky."
+
+#: KDbConnection.cpp:3307
+msgctxt "KDbConnection|"
+msgid "Record inserting on the server failed."
+msgstr "Vloženie riadku na serveri zlyhalo."
+
+#: KDbConnection.cpp:3371
+msgctxt "KDbConnection|"
+msgid "Could not delete record because there is no master table specified."
+msgstr ""
+"Nie je možné odstrániť riadok pretože žiadna master tabuľka nie je "
+"definovaná."
+
+#: KDbConnection.cpp:3380
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because there is no primary key for master table "
+"specified."
+msgstr ""
+"Nie je možné odstrániť riadok pretože master tabuľka nemá definovaný "
+"primárny kľúč."
+
+#: KDbConnection.cpp:3397
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Nie je možné odstrániť riadok pretože neobsahuje celý primárny kľúč master "
+"tabuľky."
+
+#: KDbConnection.cpp:3424 KDbConnection.cpp:3447
+msgctxt "KDbConnection|"
+msgid "Record deletion on the server failed."
+msgstr "Zmazanie riadku na serveri zlyhalo."
+
+#: KDbConnection.cpp:3543
+msgctxt "KDbConnection|"
+msgid "Unknown error."
+msgstr "Neznáma chyba."
+
+#: KDbConnectionData.cpp:41
+msgctxt "KDbConnectionData|"
+msgid "<file>"
+msgstr "<súbor>"
+
+#: KDbConnectionData.cpp:43
+#, qt-format
+msgctxt "KDbConnectionData|"
+msgid "file: %1"
+msgstr "súbor: %1"
+
+#: KDbCursor.cpp:215
+msgctxt "KDbCursor|"
+msgid "No query statement or schema defined."
+msgstr "Nebol definovaný príkaz otázky (query) alebo schéma."
+
+#: KDbCursor.cpp:227
+msgctxt "KDbCursor|"
+msgid "Could not generate query statement."
+msgstr "Nemôžem vygenerovať vyhlásenie dotazu."
+
+#: KDbCursor.cpp:242
+msgctxt "KDbCursor|"
+msgid "Error opening database cursor."
+msgstr "Nastala chyba pri otváraní kurzora databázy."
+
+#: KDbCursor.cpp:454 KDbCursor.cpp:478
+msgctxt "KDbCursor|"
+msgid "Could not fetch next record."
+msgstr "Nie je možné zatiahnuť ďalší záznam."
+
+#: KDbCursor.cpp:620
+msgctxt "KDbCursor|"
+msgid "No connection for cursor open operation specified."
+msgstr "Nebolo zadané pripojenie pre operáciu otvorenie kurzora."
+
+#: KDbDriver.cpp:85
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Invalid database driver's \"%1\" implementation."
+msgstr "Neplatná implementácia databázových ovládačov \"%1\"."
+
+#: KDbDriver.cpp:86
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Value of \"%1\" is not initialized for the driver."
+msgstr "Hodnota \"%1\" nie je inicializovaná pre ovládač."
+
+#: KDbDriver_p.cpp:61
+msgctxt "KDbDriver|"
+msgid "Client library version"
+msgstr "Verzia klientskej knižnice"
+
+#: KDbDriver_p.cpp:63
+msgctxt "KDbDriver|"
+msgid "Default character encoding on server"
+msgstr "Štandardné nastavenie kódovania znakov na serveri"
+
+#: KDbDriver_p.cpp:74
+msgctxt "KDbDriver|"
+msgid "File-based database driver"
+msgstr "Súborovo orientovaný ovládač databázy"
+
+#: KDbDriver_p.cpp:77
+msgctxt "KDbDriver|"
+msgid "File-based database's MIME types"
+msgstr "Súborovo založené databázové MIME type"
+
+#: KDbDriver_p.cpp:96
+msgctxt "KDbDriver|"
+msgid "Single transactions support"
+msgstr "Podpora jednoduchých transakcií"
+
+#: KDbDriver_p.cpp:98
+msgctxt "KDbDriver|"
+msgid "Multiple transactions support"
+msgstr "Podpora zložených transakcií"
+
+#: KDbDriver_p.cpp:100
+msgctxt "KDbDriver|"
+msgid "Nested transactions support"
+msgstr "Podpora vnorených transakcií"
+
+#: KDbDriver_p.cpp:102
+msgctxt "KDbDriver|"
+msgid "Ignored transactions support"
+msgstr "Podpora ignorovaných transakcií"
+
+#: KDbDriver_p.cpp:107
+msgctxt "KDbDriver|"
+msgid "KDb driver version"
+msgstr "Verzia ovládača KDb"
+
+#: KDbDriverManager.cpp:87
+msgctxt "DriverManagerInternal|"
+msgid "Could not find any database drivers."
+msgstr "Nie je možné nájsť žiadne ovládače databáz."
+
+#: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not find database driver \"%1\"."
+msgstr "Databázový ovládač \"%1\" nenájdený."
+
+#: KDbDriverManager.cpp:221
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not load database driver's plugin file \"%1\"."
+msgstr "Nemôžem načítať súbor pluginu databázového ovládača \"%1\"."
+
+#: KDbDriverManager.cpp:232
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
+msgstr "Nemôžem otvoriť databázový ovládač z \"%1\" zo súboru pluginu \"%2\"."
+
+#: KDbField.cpp:81
+msgctxt "KDbField|"
+msgid "Invalid Type"
+msgstr "Neplatný typ"
+
+#: KDbField.cpp:82
+msgctxt "KDbField|"
+msgid "Byte"
+msgstr "Bajt"
+
+#: KDbField.cpp:83
+msgctxt "KDbField|"
+msgid "Short Integer Number"
+msgstr "Krátke celé číslo"
+
+#: KDbField.cpp:84 KDbField.cpp:105
+msgctxt "KDbField|"
+msgid "Integer Number"
+msgstr "Celé číslo"
+
+#: KDbField.cpp:85
+msgctxt "KDbField|"
+msgid "Big Integer Number"
+msgstr "Veľké celé číslo"
+
+#: KDbField.cpp:86
+msgctxt "KDbField|"
+msgid "Yes/No Value"
+msgstr "Hodnota áno/nie"
+
+#: KDbField.cpp:87
+msgctxt "KDbField|"
+msgid "Date"
+msgstr "Dátum"
+
+#: KDbField.cpp:88
+msgctxt "KDbField|"
+msgid "Date and Time"
+msgstr "Dátum a čas"
+
+#: KDbField.cpp:89
+msgctxt "KDbField|"
+msgid "Time"
+msgstr "Čas"
+
+#: KDbField.cpp:90
+msgctxt "KDbField|"
+msgid "Single Precision Number"
+msgstr "Číslo s jednoduchou presnosťou"
+
+#: KDbField.cpp:91
+msgctxt "KDbField|"
+msgid "Double Precision Number"
+msgstr "Číslo s dvojitou presnosťou"
+
+#: KDbField.cpp:92 KDbField.cpp:104
+msgctxt "KDbField|"
+msgid "Text"
+msgstr "Text"
+
+#: KDbField.cpp:93
+msgctxt "KDbField|"
+msgid "Long Text"
+msgstr "Dlhý text"
+
+#: KDbField.cpp:94 KDbField.cpp:109
+msgctxt "KDbField|"
+msgid "Object"
+msgstr "Objekt"
+
+#: KDbField.cpp:103
+msgctxt "KDbField|"
+msgid "Invalid Group"
+msgstr "Neplatná skupina"
+
+#: KDbField.cpp:106
+msgctxt "KDbField|"
+msgid "Floating Point Number"
+msgstr "Reálne číslo (s desatinnou čiarkou)"
+
+#: KDbField.cpp:107
+msgctxt "KDbField|"
+msgid "Yes/No"
+msgstr "Áno/nie"
+
+#: KDbField.cpp:108
+msgctxt "KDbField|"
+msgid "Date/Time"
+msgstr "Dátum/Čas"
+
+#: KDbProperties.cpp:42 KDbProperties.cpp:53 KDbProperties.cpp:65
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set value of database property \"%1\"."
+msgstr "Nie je možné nastaviť hodnotu parametra databázy \"%1\"."
+
+#: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set caption for database property \"%1\"."
+msgstr "Nie je možné nastaviť nadpis parametra databázy \"%1\"."
+
+#: KDbProperties.cpp:118 KDbProperties.cpp:135
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not read database property \"%1\"."
+msgstr "Nie je možné čítať parameter databázy \"%1\"."
+
+#: KDbProperties.cpp:150
+msgctxt "KDbProperties|"
+msgid "Could not read database properties."
+msgstr "Nie je možné čítať parametre databázy."
+
+#: KDbQuerySchema_p.cpp:132
+#, qt-format
+msgctxt ""
+"KDbQuerySchema|short for 'expression' word, it will expand to 'expr1', "
+"'expr2', etc. Please use ONLY latin letters and DON'T use '.'"
+msgid "expr%1"
+msgstr "vyraz%1"
+
+#: KDbResult.cpp:56
+msgctxt "KDbResult|"
+msgid "Unspecified error encountered"
+msgstr "Nastala neznáma chyba"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "Invalid integer number"
+msgstr "Neplatné celé číslo"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "This integer number may be too large."
+msgstr "Toto celé číslo je možno priveľké."
+
+#: parser/generated/sqlscanner.cpp:1109
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1 in date/time"
+msgstr "Neočakávaný znak %1 v dátume/čase"
+
+#: parser/generated/sqlscanner.cpp:1404
+msgctxt "KDbParser|"
+msgid "Invalid string"
+msgstr "Neplatný reťazec"
+
+#: parser/generated/sqlscanner.cpp:1405
+msgctxt "KDbParser|"
+msgid "Invalid character in string"
+msgstr "Neplatný znak v reťazci"
+
+#: parser/generated/sqlscanner.cpp:1421
+msgctxt "KDbParser|"
+msgid "Invalid identifier"
+msgstr "Neplatný identifikátor"
+
+#: parser/generated/sqlscanner.cpp:1422
+msgctxt "KDbParser|"
+msgid "Identifiers should start with a letter or '_' character"
+msgstr "Identifikátory by mali začínať písmenom alebo znakom '_'"
+
+#: parser/generated/sqlscanner.cpp:1464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1"
+msgstr "Neočakávaný znak %1"
+
+#: parser/KDbParser_p.cpp:205
+msgctxt "KDbParser|"
+msgid "identifier was expected"
+msgstr "Bol očakávaný identifikátor"
+
+#: parser/KDbParser_p.cpp:215 parser/KDbParser_p.cpp:219
+msgctxt "KDbParser|"
+msgid "Syntax Error"
+msgstr "Syntaktická chyba"
+
+#: parser/KDbParser_p.cpp:216
+#, qt-format
+msgctxt "KDbParser|"
+msgid "\"%1\" is a reserved keyword."
+msgstr "\"%1\" je rezervované kľúčové slovo."
+
+#: parser/KDbParser_p.cpp:220
+msgctxt "KDbParser|"
+msgid "Syntax error."
+msgstr "Chyba syntaxe."
+
+#: parser/KDbParser_p.cpp:224 parser/KDbParser_p.cpp:254
+#: parser/KDbParser_p.cpp:273
+msgctxt "KDbParser|"
+msgid "Error"
+msgstr "Chyba"
+
+#: parser/KDbParser_p.cpp:225
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Error near \"%1\"."
+msgstr "Chyba pri \"%1\"."
+
+#: parser/KDbParser_p.cpp:240
+msgctxt "KDbParser|"
+msgid "Other error"
+msgstr "Iná chyba"
+
+#: parser/KDbParser_p.cpp:244
+msgctxt "KDbParser|"
+msgid "Implementation error"
+msgstr "Chyba implementácie"
+
+#: parser/KDbParser_p.cpp:255
+msgctxt "KDbParser|"
+msgid "No query statement specified."
+msgstr "Nebol definovaný príkaz otázky (query) alebo schéma."
+
+#: parser/KDbParser_p.cpp:274
+msgctxt "KDbParser|"
+msgid "Unexpected character."
+msgstr "Neočakávaný znak."
+
+#: parser/KDbParser_p.cpp:312
+msgctxt "KDbParser|"
+msgid "\"*\" could not be used if no tables are specified."
+msgstr "\"*\" nemôže byť použitá ak nie sú zadané žiadne tabuľky."
+
+#: parser/KDbParser_p.cpp:318
+msgctxt "KDbParser|"
+msgid "\"*\" could not be added."
+msgstr "\"*\" sa nedá pridať."
+
+#: parser/KDbParser_p.cpp:325
+msgctxt "KDbParser|"
+msgid "\"<table>.*\" could not be added."
+msgstr "\"<table>.*\" sa nedá pridať."
+
+#: parser/KDbParser_p.cpp:330
+msgctxt "KDbParser|"
+msgid "Could not add binding to a field."
+msgstr "Nemôžem pridať previazanie poľa."
+
+#: parser/KDbParser_p.cpp:389
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Table \"%1\" does not exist."
+msgstr "Tabuľka \"%1\" neexistuje."
+
+#: parser/KDbParser_p.cpp:398
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for table \"%2\". This alias is already set for "
+"table \"%3\"."
+msgstr ""
+"Nie je možné vytvoriť alias \"%1\" pre tabuľku \"%2\". Toto meno je už "
+"použité pre tabuľku \"%3\"."
+
+#: parser/KDbParser_p.cpp:430
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid alias definition for column \"%1\"."
+msgstr "Neplatná definícia aliasu pre stĺpec \"%1\"."
+
+#: parser/KDbParser_p.cpp:450
+msgctxt "KDbParser|"
+msgid "More than one asterisk \"*\" is not allowed."
+msgstr "Viac ako jedna hviezdička \"*\" nie je povolená."
+
+#: parser/KDbParser_p.cpp:464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid \"%1\" column definition."
+msgstr "Neplatná definícia stĺpca \"%1\"."
+
+#: parser/KDbParser_p.cpp:482
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for column #%2. This alias is already set for "
+"column #%3."
+msgstr ""
+"Nie je možné vytvoriť alias \"%1\" pre stĺpec #%2. Toto meno je už použité "
+"pre stĺpec #%3."
+
+#: parser/KDbParser_p.cpp:487
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not set alias \"%1\" for column #%2."
+msgstr "Nie je možné nastaviť alias \"%1\" pre stĺpec #%2."
+
+#: parser/KDbParser_p.cpp:530
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column at position %1 does not exist."
+msgstr "Triedenie sa nedá definovať. Stĺpec na pozícii \"%1\" neexistuje."
+
+#: parser/KDbParser_p.cpp:538
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
+msgstr ""
+"Triedenie sa nedá definovať. Meno stĺpca alebo alias \"%1\" neexistuje."
+
+#: tools/KDbObjectNameValidator.cpp:53
+#, qt-format
+msgctxt "KDbObjectNameValidator|"
+msgid ""
+"Cannot use reserved name \"%1\" for objects. Please choose another name."
+msgstr ""
+"Nemôžete rezervovať názov \"%1\" pre objekty. Prosím, vyberte iný názov."
+
+#: tools/KDbObjectNameValidator.cpp:58
+msgctxt "KDbObjectNameValidator|"
+msgid "Names of internal database objects start with \"kexi__\"."
+msgstr "Názvy vnútorných databázových objektov sa začínajú s \"kexi__\"."
+
+#: tools/KDbSimpleCommandLineApp.cpp:77
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database driver ID"
+msgstr "ID ovládača databázy"
+
+#: tools/KDbSimpleCommandLineApp.cpp:79
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database user name"
+msgstr "Meno databázového užívateľa"
+
+#: tools/KDbSimpleCommandLineApp.cpp:81
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Prompt for password"
+msgstr "Výzva na heslo"
+
+#: tools/KDbSimpleCommandLineApp.cpp:83
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Host (server) name"
+msgstr "Meno počítača (servera)"
+
+#: tools/KDbSimpleCommandLineApp.cpp:84
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's port number"
+msgstr "Číslo portu servera"
+
+#: tools/KDbSimpleCommandLineApp.cpp:86
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's local socket filename"
+msgstr "Meno súboru pre lokálny soket servera"
+
+#: tools/KDbSimpleCommandLineApp.cpp:107
+#, qt-format
+msgctxt "KDbSimpleCommandLineApp|Enter password for <user>"
+msgid "Enter password for %1: "
+msgstr "Zadajte heslo pre %1: "
+
+#: tools/KDbValidator.cpp:102
+#, qt-format
+msgctxt "KDbValidator|"
+msgid "\"%1\" value has to be entered."
+msgstr "Musíte zadať hodnotu pre \"%1\"."
+
+#: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
+#, qt-format
+msgctxt "KDbTableViewData|"
+msgid "\"%1\" column requires a value to be entered."
+msgstr "Stĺpec \"%1\" musí mať zadanú hodnotu."
+
+#: views/KDbTableViewData.cpp:694
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT NULL."
+msgstr "Obmedzenie stĺpca je deklarované ako NOT NULL."
+
+#: views/KDbTableViewData.cpp:705
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT EMPTY."
+msgstr "Obmedzenie stĺpca je deklarované ako NOT EMPTY."
+
+#: views/KDbTableViewData.cpp:717
+msgctxt "KDbTableViewData|"
+msgid "Record inserting failed."
+msgstr "Vloženie riadku zlyhalo."
+
+#: views/KDbTableViewData.cpp:733
+msgctxt "KDbTableViewData|"
+msgid "Record changing failed."
+msgstr "Zmena riadku zlyhala."
+
+#: views/KDbTableViewData.cpp:800
+msgctxt "KDbTableViewData|"
+msgid "Record deleting failed."
+msgstr "Odstránenie riadku zlyhalo."
+
+#: views/KDbTableViewData.cpp:930
+msgctxt "KDbTableViewData|"
+msgid ""
+"Please correct data in this record or use the \"Cancel record changes\" "
+"function."
+msgstr ""
+"Prosím, opravte dáta v tomto zázname alebo použite funkciu \"Zrušiť zmeny v "
+"zázname\"."
+
+#~ msgctxt "KDbFunctionExpression|"
+#~ msgid "Incorrect number of arguments (%1)"
+#~ msgstr "Nesprávny počet argumentov (%1)"
+
+#~ msgctxt "KDbExpression|"
+#~ msgid "Table containing \"%1\" field not found."
+#~ msgstr "Tabuľka s poľom \"%1\" nenájdená."
+
+#~ msgctxt "KDbConnection|"
+#~ msgid "Table \"%1\" cannot be removed.\n"
+#~ msgstr "Tabuľku \"%1\" nie je možné odstrániť.\n"
+
+#, fuzzy
+#~| msgctxt "DriverManagerInternal|"
+#~| msgid "Could not find database driver \"%1\"."
+#~ msgctxt "KDbParser|"
+#~ msgid "Could not add all-tables asterisk \"*\"."
+#~ msgstr "Databázový ovládač \"%1\" nenájdený."
+
+#, fuzzy
+#~| msgctxt "DriverManagerInternal|"
+#~| msgid "Could not find database driver \"%1\"."
+#~ msgctxt "KDbParser|"
+#~ msgid "Could not add one-table asterisk \"*\"."
+#~ msgstr "Databázový ovládač \"%1\" nenájdený."
+
+#~ msgctxt "KDbParser|"
+#~ msgid "Could not define sorting - no column at position %1"
+#~ msgstr "Triedenie sa nedá definovať - na pozícii %1 nie je žiadny stĺpec"
+
+#~ msgctxt "KDbConnection|"
+#~ msgid "Database name required to create connection."
+#~ msgstr "Vyžaduje sa názov databázy na vytvorenie pripojenia."
+
+#, fuzzy
+#~| msgctxt "KDbExpression|"
+#~| msgid "%1() function requires 2 or 3 arguments."
+#~ msgctxt "KDbExpression|"
+#~ msgid "%1%2() function requires %3 or %4 argument."
+#~ msgstr "Funkcia %1() vyžaduje 2 alebo 3 argumenty."

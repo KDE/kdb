@@ -1,0 +1,95 @@
+# Kheyyam Gojayev <xxmn77@gmail.com>, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2021-01-22 12:55+0400\n"
+"Last-Translator: Kheyyam Gojayev <xxmn77@gmail.com>\n"
+"Language-Team: Azerbaijani <kde-i18n-doc@kde.org>\n"
+"Language: az\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 20.12.1\n"
+
+#: SqliteAdmin.cpp:43
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not compact database \"%1\"."
+msgstr "\"%1\" verilənlər bazası yığıla bilmədi."
+
+#: SqliteConnection.cpp:49
+msgctxt "SqliteConnection|"
+msgid "Extra paths for SQLite plugins"
+msgstr "SQLite qoşmaları üçün əlavə yollar"
+
+#: SqliteConnection.cpp:273
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid ""
+"Could not delete file \"%1\". Check the file's permissions and whether it is "
+"already opened and locked by another application."
+msgstr ""
+"\"%1\" faylı silinə bilmədi. Fayl icazələrini və onun başqa tətbiq "
+"tərəfindən açılıb-açılmadığını və ya kilidlənib-kilidlənmədiyinj yoxlayın."
+
+#: SqliteConnection.cpp:375
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite plugin \"%1\"."
+msgstr "\"%1\" SQLite qoşması yüklənmədi."
+
+#: SqliteConnection.cpp:386
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not find SQLite plugin file \"%1\"."
+msgstr "\"%1\" AQLite qoşması faylı tapılmadı."
+
+#: SqliteConnection.cpp:401
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite extension \"%1\"."
+msgstr "\"%1\" SQLite genişlənməsi yüklənə bilmədi."
+
+#: SqliteVacuum.cpp:97
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find tool \"%1\"."
+msgstr "\"%1\" aləti tapılmadı."
+
+#: SqliteVacuum.cpp:105
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find application \"%1\"."
+msgstr "\"%1\" tətbiqi tapılmadı."
+
+#: SqliteVacuum.cpp:113
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not read file \"%1\"."
+msgstr "\"%1\" Faylı oxunmadı."
+
+#: SqliteVacuum.cpp:168
+msgctxt "SqliteVacuum|"
+msgid "Compacting database"
+msgstr "Verilənlər bazasının sıxılması"
+
+#: SqliteVacuum.cpp:170
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Compacting database \"%1\"..."
+msgstr "\"%1\" verilənlər bazası sıxılır..."
+
+#: SqliteVacuum.cpp:259
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not rename file \"%1\" to \"%2\"."
+msgstr "\"%1\" faylı \"%2\" olaraq dəyişdirilə bilmədi."
+
+#: SqliteVacuum.cpp:267
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid ""
+"The database has been compacted. Current size decreased by %1% to %2 MB."
+msgstr "Verilənlər bazası sıxıldı. Cari ölçü %1% azalaraq %2 MB oldu."

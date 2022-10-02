@@ -1,0 +1,1395 @@
+# Alexander Potashev <aspotashev@gmail.com>, 2015, 2018.
+# Olesya Gerasimenko <translation-team@basealt.ru>, 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2022-09-30 12:19+0300\n"
+"Last-Translator: Olesya Gerasimenko <translation-team@basealt.ru>\n"
+"Language-Team: Basealt Translation Team\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 22.04.3\n"
+
+#: expression/KDbBinaryExpression.cpp:64
+msgctxt "KDbBinaryExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Несовместимые типы параметров"
+
+#: expression/KDbBinaryExpression.cpp:66
+#, qt-format
+msgctxt "KDbBinaryExpressionData|Binary expression arguments type error"
+msgid ""
+"Expression \"%1\" requires compatible types of arguments. Specified "
+"arguments are of type %2 and %3."
+msgstr ""
+"Для выражения «%1» требуются параметры совместимых типов. Указанные "
+"параметры относятся к типам %2 и %3."
+
+#: expression/KDbFunctionExpression.cpp:213
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid "Incompatible types in %1() function"
+msgstr "Несовместимые типы в функции %1()"
+
+#: expression/KDbFunctionExpression.cpp:215
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid ""
+"Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
+"arguments of type \"%4\"."
+msgstr ""
+"Параметр #%1 типа «%2» в функции %3() несовместим с предыдущими параметрами "
+"типа «%4»."
+
+#: expression/KDbFunctionExpression.cpp:298
+#, qt-format
+msgctxt "RandomFunctionDeclaration|"
+msgid "Invalid arguments of %1() function"
+msgstr "Недопустимые параметры функции %1()"
+
+#: expression/KDbFunctionExpression.cpp:300
+msgctxt "RandomFunctionDeclaration|"
+msgid ""
+"Value of the first argument should be less than value of the second argument."
+msgstr ""
+"Значение первого параметра должно быть меньше значения второго параметра."
+
+#: expression/KDbFunctionExpression.cpp:940
+#: expression/KDbFunctionExpression.cpp:1190
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect number of arguments (%1)"
+msgstr "Неверное количество параметров (%1)"
+
+#: expression/KDbFunctionExpression.cpp:945
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too many arguments.%1"
+msgstr "Слишком много параметров.%1"
+
+#: expression/KDbFunctionExpression.cpp:949
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too few arguments.%1"
+msgstr "Слишком мало параметров.%1"
+
+#: expression/KDbFunctionExpression.cpp:956
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function does not accept any arguments."
+msgstr "Функция %1%2() не принимает параметров."
+
+#: expression/KDbFunctionExpression.cpp:961
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires 1 argument."
+msgstr "Для функции %1%2() требуется 1 параметр."
+
+#: expression/KDbFunctionExpression.cpp:968
+#: expression/KDbFunctionExpression.cpp:1007
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 argument(s)."
+msgid_plural "%1%2() function requires %3 argument(s)."
+msgstr[0] "Для функции %1%2() требуются параметры (%3)."
+msgstr[1] "Для функции %1%2() требуются параметры (%3)."
+msgstr[2] "Для функции %1%2() требуются параметры (%3)."
+
+#: expression/KDbFunctionExpression.cpp:977
+#, qt-format
+msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
+msgid "%1%2() function requires 0 or 1 argument."
+msgstr "Для функции %1%2() требуется 0 или 1 параметр."
+
+#: expression/KDbFunctionExpression.cpp:985
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 argument(s)."
+msgstr[0] "Для функции %1%2() требуются параметры (%3 или %4)."
+msgstr[1] "Для функции %1%2() требуются параметры (%3 или %4)."
+msgstr[2] "Для функции %1%2() требуются параметры (%3 или %4)."
+
+#: expression/KDbFunctionExpression.cpp:993
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgstr[0] "Для функции %1%2() требуются параметры (%3 или %4, или %5)."
+msgstr[1] "Для функции %1%2() требуются параметры (%3 или %4, или %5)."
+msgstr[2] "Для функции %1%2() требуются параметры (%3 или %4, или %5)."
+
+#: expression/KDbFunctionExpression.cpp:1003
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1 or %2"
+msgstr "%1 или %2"
+
+#: expression/KDbFunctionExpression.cpp:1021
+msgctxt "KDbFunctionExpressionData|"
+msgid " or "
+msgstr " или "
+
+#: expression/KDbFunctionExpression.cpp:1025
+#: expression/KDbFunctionExpression.cpp:1029
+#: expression/KDbFunctionExpression.cpp:1033
+#: expression/KDbFunctionExpression.cpp:1037
+#: expression/KDbFunctionExpression.cpp:1041
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"%1\""
+msgstr "«%1»"
+
+#: expression/KDbFunctionExpression.cpp:1046
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"Number\""
+msgstr "«Число»"
+
+#: expression/KDbFunctionExpression.cpp:1049
+msgctxt "KDbFunctionExpressionData|Any data type"
+msgid "\"Any\""
+msgstr "«Любой»"
+
+#: expression/KDbFunctionExpression.cpp:1053
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect type of argument"
+msgstr "Недопустимый тип параметра"
+
+#: expression/KDbFunctionExpression.cpp:1055
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Specified argument is of type \"%1\"."
+msgstr "Указанный параметр относится к типу «%1»."
+
+#: expression/KDbFunctionExpression.cpp:1059
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's first argument should be of type %2. %3"
+msgstr "Первый параметр функции %1() должен относиться к типу %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1064
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's second argument should be of type %2. %3"
+msgstr "Второй параметр функции %1() должен относиться к типу %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1069
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's third argument should be of type %2. %3"
+msgstr "Третий параметр функции %1() должен относиться к типу %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1074
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fourth argument should be of type %2. %3"
+msgstr "Четвёртый параметр функции %1() должен относиться к типу %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1079
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fifth argument should be of type %2. %3"
+msgstr "Пятый параметр функции %1() должен относиться к типу %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1084
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's %2 argument should be of type %3. %4"
+msgstr "%2 по счёту параметр функции %1() должен относиться к типу %3. %4"
+
+#: expression/KDbFunctionExpression.cpp:1144
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too many arguments for function."
+msgstr "Слишком много параметров для функции."
+
+#: expression/KDbFunctionExpression.cpp:1146
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Maximum number of arguments for function %1() is %2."
+msgstr "Максимальное число параметров для функции %1() — %2."
+
+#: expression/KDbFunctionExpression.cpp:1193
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least one argument."
+msgstr ""
+"Слишком мало параметров. Функция %1() требует не менее одного параметра."
+
+#: expression/KDbFunctionExpression.cpp:1198
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least two arguments."
+msgstr ""
+"Слишком мало параметров. Функция %1() требует не менее двух параметров."
+
+#: expression/KDbFunctionExpression.cpp:1203
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least three arguments."
+msgstr ""
+"Слишком мало параметров. Функция %1() требует не менее трёх параметров."
+
+#: expression/KDbFunctionExpression.cpp:1208
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least %2 arguments."
+msgstr ""
+"Слишком мало параметров. Необходимое количество параметров для функции %1(): "
+"не менее %2."
+
+#: expression/KDbNArgExpression.cpp:70
+msgctxt "KDbNArgExpressionData|"
+msgid "Three arguments required"
+msgstr "Необходимы три параметра"
+
+#: expression/KDbNArgExpression.cpp:72
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
+msgid "%1 operator requires exactly three arguments."
+msgstr "Для оператора %1 требуются ровно три параметра."
+
+#: expression/KDbNArgExpression.cpp:98
+msgctxt "KDbNArgExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Несовместимые типы параметров"
+
+#: expression/KDbNArgExpression.cpp:100
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND arguments type error"
+msgid ""
+"Operator \"%1\" requires compatible types of arguments. Specified arguments "
+"are of type %2, %3, %4."
+msgstr ""
+"Для оператора «%1» требуются параметры совместимых типов. Указанные "
+"параметры относятся к типам %2, %3, %4."
+
+#: expression/KDbVariableExpression.cpp:133
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous field name"
+msgstr "Неоднозначное имя поля"
+
+#: expression/KDbVariableExpression.cpp:135
+#, qt-format
+msgctxt "KDbVariableExpressionData|Note: translate also <tableName>"
+msgid ""
+"Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
+"%4\" notation to specify table name."
+msgstr ""
+"Таблицы «%1» и «%2» обе содержат поле «%3». Для указания имени таблицы "
+"воспользуйтесь записью «<tableName>.%4»."
+
+#: expression/KDbVariableExpression.cpp:145
+#: expression/KDbVariableExpression.cpp:222
+msgctxt "KDbVariableExpressionData|"
+msgid "Field not found"
+msgstr "Поле не найдено"
+
+#: expression/KDbVariableExpression.cpp:147
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not find table containing field \"%1\"."
+msgstr "Не удалось таблицу, содержащую поле «%1»."
+
+#: expression/KDbVariableExpression.cpp:172
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not access the table directly using its name"
+msgstr "Не удалось получить доступ к таблице напрямую, используя её имя"
+
+#: expression/KDbVariableExpression.cpp:174
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid ""
+"Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
+"used."
+msgstr ""
+"Для таблицы с именем «%1» возможно использовать псевдонимы. Вместо «%2» "
+"можно использовать «%3»."
+
+#: expression/KDbVariableExpression.cpp:196
+msgctxt "KDbVariableExpressionData|"
+msgid "Table not found"
+msgstr "Таблица не найдена"
+
+#: expression/KDbVariableExpression.cpp:197
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Unknown table \"%1\"."
+msgstr "Неизвестная таблица «%1»."
+
+#: expression/KDbVariableExpression.cpp:211
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.*\" expression"
+msgstr "Неоднозначное выражение «%1.*»"
+
+#: expression/KDbVariableExpression.cpp:212
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined."
+msgstr "Задано больше одной таблицы или псевдонима «%1»."
+
+#: expression/KDbVariableExpression.cpp:224
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Table \"%1\" has no \"%2\" field."
+msgstr "В таблице «%1» нет поля «%2»."
+
+#: expression/KDbVariableExpression.cpp:231
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.%2\" expression"
+msgstr "Неоднозначное выражение «%1.%2»"
+
+#: expression/KDbVariableExpression.cpp:233
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined containing \"%2\" field."
+msgstr "Задано больше одной таблицы или псевдонима «%1», содержащих поле «%2»."
+
+#: KDb.cpp:179
+msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
+msgid "Test Connection"
+msgstr "Тестовое соединение"
+
+#: KDb.cpp:180
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Testing connection to \"%1\" database server..."
+msgstr "Тестовое соединение с сервером базы данных «%1»…"
+
+#: KDb.cpp:227
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server failed."
+msgstr ""
+"Не удалось установить тестовое соединение с сервером базы данных «%1». "
+
+#: KDb.cpp:238
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid ""
+"Test connection to \"%1\" database server failed. The server is not "
+"responding."
+msgstr ""
+"Не удалось установить тестовое соединение с сервером базы данных «%1». "
+"Сервер не отвечает."
+
+#: KDb.cpp:244
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server established successfully."
+msgstr "Тестовое соединение с сервером базы данных «%1» успешно установлено."
+
+#: KDb.cpp:249
+msgctxt "ConnectionTestDialog|"
+msgid "Test Connection"
+msgstr "Тестовое соединение"
+
+#: KDb.cpp:528
+msgctxt "KDb|"
+msgid "Message from server:"
+msgstr "Сообщение от сервера:"
+
+#: KDb.cpp:531
+msgctxt "KDb|"
+msgid "SQL statement:"
+msgstr "SQL-выражение:"
+
+#: KDb.cpp:546
+msgctxt "KDb|"
+msgid "Server result code:"
+msgstr "Код ответа сервера:"
+
+#: KDb.cpp:554
+msgctxt "KDb|"
+msgid "Server result:"
+msgstr "Ответ сервера:"
+
+#: KDb.cpp:1962
+msgctxt "KDbField|"
+msgid "Number"
+msgstr "Число"
+
+#: KDb.cpp:1965
+msgctxt "KDbField|"
+msgid "Image"
+msgstr "Изображение"
+
+#: KDb.cpp:2201
+#, qt-format
+msgctxt "KDb|"
+msgid "Value of \"%1\" field must be an identifier."
+msgstr "Значением поля «%1» должен быть идентификатор."
+
+#: KDb.cpp:2204
+#, qt-format
+msgctxt "KDb|"
+msgid "\"%1\" is not a valid identifier."
+msgstr "«%1» не является корректным идентификатором."
+
+#: KDbConnection.cpp:88
+msgctxt "KDbConnectionOptions|Read only connection"
+msgid "Read only"
+msgstr "Только для чтения"
+
+#: KDbConnection.cpp:207
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid database contents. %1"
+msgstr "Недопустимое содержимое базы данных. %1"
+
+#: KDbConnection.cpp:212
+msgctxt "KDbConnection|"
+msgid "It is a system object."
+msgstr "Это системный объект."
+
+#: KDbConnection.cpp:360
+msgctxt "KDbConnectionPrivate|"
+msgid "Table has no fields defined."
+msgstr "Не заданы поля в таблице."
+
+#: KDbConnection.cpp:408
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"Could not find definition for query \"%1\". Deleting this query is "
+"recommended."
+msgstr ""
+"Не удалось найти определение для запроса «%1». Рекомендуется удалить этот "
+"запрос."
+
+#: KDbConnection.cpp:416
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"<p>Could not load definition for query \"%1\". SQL statement for this query "
+"is invalid:<br><tt>%2</tt></p>\n"
+"<p>This query can be edited only in Text View.</p>"
+msgstr ""
+"<p>Не удалось загрузить определение для запроса «%1». Недопустимое SQL-"
+"выражение для этого запроса:<br><tt>%2</tt></p>\n"
+"<p>Этот запрос возможно редактировать только в текстовом представлении.</p>"
+
+#: KDbConnection.cpp:499
+msgctxt "KDbConnection|"
+msgid "Connection already established."
+msgstr "Соединение уже установлено."
+
+#: KDbConnection.cpp:509
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not open \"%1\" project file."
+msgstr "Не удалось открыть файл проекта «%1»."
+
+#: KDbConnection.cpp:511
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not connect to \"%1\" database server."
+msgstr "Не удалось подключиться к серверу баз данных «%1»."
+
+#: KDbConnection.cpp:558
+msgctxt "KDbConnection|"
+msgid "Not connected to the database server."
+msgstr "Нет подключения к серверу баз данных."
+
+#: KDbConnection.cpp:569
+msgctxt "KDbConnection|"
+msgid "Currently no database is used."
+msgstr "В данный момент нет используемых баз данных."
+
+#: KDbConnection.cpp:623
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "База данных «%1» не существует."
+
+#: KDbConnection.cpp:643
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database file \"%1\" does not exist."
+msgstr "Файл базы данных «%1» не существует."
+
+#: KDbConnection.cpp:650
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not readable."
+msgstr "Файл базы данных «%1» недоступен для чтения."
+
+#: KDbConnection.cpp:657
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not writable."
+msgstr "Файл базы данных «%1» недоступен для записи."
+
+#: KDbConnection.cpp:686
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Database \"%1\" has been created but could not be closed after creation."
+msgstr "База данных «%1» создана, но её не удалось закрыть после создания."
+
+#: KDbConnection.cpp:702
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" already exists."
+msgstr "База данных «%1» уже существует."
+
+#: KDbConnection.cpp:707
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Could not create database \"%1\". This name is reserved for system database."
+msgstr ""
+"Не удалось создать базу данных «%1». Это имя зарезервировано для системной "
+"базы данных."
+
+#: KDbConnection.cpp:729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error creating database \"%1\" on the server."
+msgstr "Ошибка создания базы данных «%1» на сервере."
+
+#: KDbConnection.cpp:743
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" has been created but could not be opened."
+msgstr "База данных «%1» создана, но её не удалось открыть."
+
+#: KDbConnection.cpp:819
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Opening database \"%1\" failed."
+msgstr "Не удалось открыть базу данных «%1»."
+
+#: KDbConnection.cpp:904
+msgctxt "KDbConnection|"
+msgid "Could not find any database for temporary connection."
+msgstr "Не удалось найти базу данных для временного соединения."
+
+#: KDbConnection.cpp:913
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error during starting temporary connection using \"%1\" database name."
+msgstr ""
+"Ошибка при запуске временного соединения с использованием имени базы данных "
+"«%1»."
+
+#: KDbConnection.cpp:931 KDbConnection.cpp:949
+msgctxt "KDbConnection|"
+msgid "Could not delete database. Name is not specified."
+msgstr "Не удалось удалить базу данных. Не указано имя."
+
+#: KDbConnection.cpp:955
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete system database \"%1\"."
+msgstr "Не удалось удалить системную базу данных «%1»."
+
+#: KDbConnection.cpp:1002
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object names."
+msgstr "Не удалось получить список имён объектов."
+
+#: KDbConnection.cpp:1016
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of table names."
+msgstr "Не удалось получить список имён таблиц."
+
+#: KDbConnection.cpp:1024
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of physical table names."
+msgstr "Не удалось получить список имён физических таблиц."
+
+#: KDbConnection.cpp:1091
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object identifiers."
+msgstr "Не удалось получить список идентификаторов объектов."
+
+#: KDbConnection.cpp:1273
+msgctxt "KDbConnection|"
+msgid "SQL statement for execution is invalid or empty."
+msgstr "SQL-выражение для выполнения является недопустимым или пустым."
+
+#: KDbConnection.cpp:1296
+msgctxt "KDbConnection|"
+msgid "Error while executing SQL statement."
+msgstr "Ошибка при выполнении SQL-выражения."
+
+#: KDbConnection.cpp:1393
+msgctxt "KDbConnection|"
+msgid "Creating table failed."
+msgstr "Не удалось создать таблицу."
+
+#: KDbConnection.cpp:1406
+msgctxt "KDbConnection|"
+msgid "Could not create table without fields."
+msgstr "Не удалось создать таблицу без полей."
+
+#: KDbConnection.cpp:1416
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as table name."
+msgstr "Системное имя «%1» нельзя использовать в качестве имени таблицы."
+
+#: KDbConnection.cpp:1425
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
+msgstr ""
+"Системное имя «%1» нельзя использовать в качестве имени одного из полей в "
+"таблице «%2»."
+
+#: KDbConnection.cpp:1441
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not create the same table \"%1\" twice."
+msgstr "Невозможно дважды создать ту же таблицу «%1»."
+
+#: KDbConnection.cpp:1455
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" already exists."
+msgstr "Таблица «%1» уже существует."
+
+#: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" does not exist."
+msgstr "Таблица «%1» не существует."
+
+#: KDbConnection.cpp:1579
+msgctxt "KDbConnection|"
+msgid "Could not delete object's data."
+msgstr "Не удалось удалить данные объекта."
+
+#: KDbConnection.cpp:1607 KDbConnection.cpp:1620
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete table \"%1\". %2"
+msgstr "Не удалось удалить таблицу «%1». %2"
+
+#: KDbConnection.cpp:1608
+msgctxt "KDbConnection|"
+msgid "Unexpected name or identifier."
+msgstr "Неожиданное имя или идентификатор."
+
+#: KDbConnection.cpp:1680
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not alter table \"%1\" using the same table as destination."
+msgstr ""
+"Не удалось изменить таблицу «%1», используя ту же самую таблицу как место "
+"назначения."
+
+#: KDbConnection.cpp:1706
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Unknown table \"%1\"."
+msgstr "Неизвестная таблица «%1»."
+
+#: KDbConnection.cpp:1711
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid table name \"%1\"."
+msgstr "Недопустимое имя таблицы «%1»."
+
+#: KDbConnection.cpp:1718
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" using the same name."
+msgstr "Не удалось переименовать таблицу «%1», используя то же самое имя."
+
+#: KDbConnection.cpp:1729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
+msgstr ""
+"Не удалось переименовать таблицу «%1» в «%2». Таблица «%3» уже существует."
+
+#: KDbConnection.cpp:1839
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Query \"%1\" does not exist."
+msgstr "Запрос «%1» не существует."
+
+#: KDbConnection.cpp:1946
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Transactions are not supported for \"%1\" driver."
+msgstr "Для драйвера «%1» не предусмотрена поддержка транзакций."
+
+#: KDbConnection.cpp:1951
+msgctxt "KDbConnection|"
+msgid "Begin transaction failed."
+msgstr "Не удалось начать транзакцию."
+
+#: KDbConnection.cpp:1968
+msgctxt "KDbConnection|"
+msgid "Transaction already started."
+msgstr "Транзакция уже начата."
+
+#: KDbConnection.cpp:2010 KDbConnection.cpp:2047
+msgctxt "KDbConnection|"
+msgid "Transaction not started."
+msgstr "Транзакция не начата."
+
+#: KDbConnection.cpp:2025
+msgctxt "KDbConnection|"
+msgid "Error on commit transaction."
+msgstr "Ошибка при фиксации транзакции."
+
+#: KDbConnection.cpp:2062
+msgctxt "KDbConnection|"
+msgid "Error on rollback transaction."
+msgstr "Ошибка при откате транзакции."
+
+#: KDbConnection.cpp:2213
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid object name \"%1\"."
+msgstr "Недопустимое имя объекта «%1»."
+
+#: KDbConnection.cpp:2402
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Column \"%1\" does not exist in the query."
+msgstr "В запросе нет столбца «%1»."
+
+#: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
+msgctxt "KDbConnection|Extended schema for a table: loading error"
+msgid "Error while loading extended table schema."
+msgstr "Ошибка при загрузке расширенной схемы таблицы."
+
+#: KDbConnection.cpp:2763
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid XML data: %1"
+msgstr "Недопустимые данные XML: %1"
+
+#: KDbConnection.cpp:2784
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Error in XML data: \"%1\" in line %2, column %3.\n"
+"XML data: %4"
+msgstr ""
+"Ошибка в данных XML: «%1» в строке %2, столбец %3.\n"
+"Данные XML: %4"
+
+#: KDbConnection.cpp:3113
+msgctxt "KDbConnection|"
+msgid "Could not update record because there is no master table defined."
+msgstr "Не удалось обновить запись, так как не задана главная таблица."
+
+#: KDbConnection.cpp:3120
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because master table has no primary key defined."
+msgstr ""
+"Не удалось обновить запись, так как в главной таблице не задан первичный "
+"ключ."
+
+#: KDbConnection.cpp:3152
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because it does not contain entire primary key of "
+"master table."
+msgstr ""
+"Не удалось обновить запись, так как она не содержит весь первичный ключ "
+"главной таблицы."
+
+#: KDbConnection.cpp:3163 KDbConnection.cpp:3407
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Primary key's field \"%1\" cannot be empty."
+msgstr "Поле первичного ключа «%1» не может быть пустым."
+
+#: KDbConnection.cpp:3191
+msgctxt "KDbConnection|"
+msgid "Record updating on the server failed."
+msgstr "Не удалось обновить запись на сервере."
+
+#: KDbConnection.cpp:3213
+msgctxt "KDbConnection|"
+msgid "Could not insert record because there is no master table specified."
+msgstr "Не удалось вставить запись, так как не задана главная таблица."
+
+#: KDbConnection.cpp:3255
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because master table has no primary key specified."
+msgstr ""
+"Не удалось вставить запись, так как в главной таблице не указан первичный "
+"ключ."
+
+#: KDbConnection.cpp:3264
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Не удалось вставить запись, так как она не содержит весь первичный ключ "
+"главной таблицы."
+
+#: KDbConnection.cpp:3307
+msgctxt "KDbConnection|"
+msgid "Record inserting on the server failed."
+msgstr "Не удалось вставить запись на сервере."
+
+#: KDbConnection.cpp:3371
+msgctxt "KDbConnection|"
+msgid "Could not delete record because there is no master table specified."
+msgstr "Не удалось удалить запись, так как не задана главная таблица."
+
+#: KDbConnection.cpp:3380
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because there is no primary key for master table "
+"specified."
+msgstr ""
+"Не удалось удалить запись, так как не задан первичный ключ главной таблицы."
+
+#: KDbConnection.cpp:3397
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Не удалось удалить запись, так как она не содержит весь первичный ключ "
+"главной таблицы."
+
+#: KDbConnection.cpp:3424 KDbConnection.cpp:3447
+msgctxt "KDbConnection|"
+msgid "Record deletion on the server failed."
+msgstr "Не удалось удалить запись на сервере."
+
+#: KDbConnection.cpp:3543
+msgctxt "KDbConnection|"
+msgid "Unknown error."
+msgstr "Неизвестная ошибка."
+
+#: KDbConnectionData.cpp:41
+msgctxt "KDbConnectionData|"
+msgid "<file>"
+msgstr "<file>"
+
+#: KDbConnectionData.cpp:43
+#, qt-format
+msgctxt "KDbConnectionData|"
+msgid "file: %1"
+msgstr "файл: %1"
+
+#: KDbCursor.cpp:215
+msgctxt "KDbCursor|"
+msgid "No query statement or schema defined."
+msgstr "Не задано ни выражение запроса, ни схема."
+
+#: KDbCursor.cpp:227
+msgctxt "KDbCursor|"
+msgid "Could not generate query statement."
+msgstr "Не удалось создать выражение запроса."
+
+#: KDbCursor.cpp:242
+msgctxt "KDbCursor|"
+msgid "Error opening database cursor."
+msgstr "Ошибка открытия курсора базы данных."
+
+#: KDbCursor.cpp:454 KDbCursor.cpp:478
+msgctxt "KDbCursor|"
+msgid "Could not fetch next record."
+msgstr "Не удалось получить следующую запись."
+
+#: KDbCursor.cpp:620
+msgctxt "KDbCursor|"
+msgid "No connection for cursor open operation specified."
+msgstr "Не указано соединение для операции открытия курсора."
+
+#: KDbDriver.cpp:85
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Invalid database driver's \"%1\" implementation."
+msgstr "Недопустимая реализация драйвера базы данных «%1»."
+
+#: KDbDriver.cpp:86
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Value of \"%1\" is not initialized for the driver."
+msgstr "Значение «%1» не инициализировано для драйвера."
+
+#: KDbDriver_p.cpp:61
+msgctxt "KDbDriver|"
+msgid "Client library version"
+msgstr "Версия клиентской библиотеки"
+
+#: KDbDriver_p.cpp:63
+msgctxt "KDbDriver|"
+msgid "Default character encoding on server"
+msgstr "Стандартная кодировка символов на сервере"
+
+#: KDbDriver_p.cpp:74
+msgctxt "KDbDriver|"
+msgid "File-based database driver"
+msgstr "Драйвер файловой базы данных"
+
+#: KDbDriver_p.cpp:77
+msgctxt "KDbDriver|"
+msgid "File-based database's MIME types"
+msgstr "Типы MIME файловой базы данных"
+
+#: KDbDriver_p.cpp:96
+msgctxt "KDbDriver|"
+msgid "Single transactions support"
+msgstr "Поддержка одиночных транзакций"
+
+#: KDbDriver_p.cpp:98
+msgctxt "KDbDriver|"
+msgid "Multiple transactions support"
+msgstr "Поддержка нескольких транзакций"
+
+#: KDbDriver_p.cpp:100
+msgctxt "KDbDriver|"
+msgid "Nested transactions support"
+msgstr "Поддержка вложенных транзакций"
+
+#: KDbDriver_p.cpp:102
+msgctxt "KDbDriver|"
+msgid "Ignored transactions support"
+msgstr "Поддержка пропущенных транзакций"
+
+#: KDbDriver_p.cpp:107
+msgctxt "KDbDriver|"
+msgid "KDb driver version"
+msgstr "Версия драйвера KDb"
+
+#: KDbDriverManager.cpp:87
+msgctxt "DriverManagerInternal|"
+msgid "Could not find any database drivers."
+msgstr "Не удалось найти ни одного драйвера базы данных."
+
+#: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not find database driver \"%1\"."
+msgstr "Не удалось найти драйвер базы данных «%1»."
+
+#: KDbDriverManager.cpp:221
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not load database driver's plugin file \"%1\"."
+msgstr "Не удалось загрузить файл модуля драйвера базы данных «%1»."
+
+#: KDbDriverManager.cpp:232
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
+msgstr "Не удалось открыть драйвер базы данных «%1» из файла модуля «%2»."
+
+#: KDbField.cpp:81
+msgctxt "KDbField|"
+msgid "Invalid Type"
+msgstr "Недопустимый тип"
+
+#: KDbField.cpp:82
+msgctxt "KDbField|"
+msgid "Byte"
+msgstr "Байт"
+
+#: KDbField.cpp:83
+msgctxt "KDbField|"
+msgid "Short Integer Number"
+msgstr "Короткое целое число"
+
+#: KDbField.cpp:84 KDbField.cpp:105
+msgctxt "KDbField|"
+msgid "Integer Number"
+msgstr "Целое число"
+
+#: KDbField.cpp:85
+msgctxt "KDbField|"
+msgid "Big Integer Number"
+msgstr "Длинное целое число"
+
+#: KDbField.cpp:86
+msgctxt "KDbField|"
+msgid "Yes/No Value"
+msgstr "Значение «да/нет»"
+
+#: KDbField.cpp:87
+msgctxt "KDbField|"
+msgid "Date"
+msgstr "Дата"
+
+#: KDbField.cpp:88
+msgctxt "KDbField|"
+msgid "Date and Time"
+msgstr "Дата и время"
+
+#: KDbField.cpp:89
+msgctxt "KDbField|"
+msgid "Time"
+msgstr "Время"
+
+#: KDbField.cpp:90
+msgctxt "KDbField|"
+msgid "Single Precision Number"
+msgstr "Число с одинарной точностью"
+
+#: KDbField.cpp:91
+msgctxt "KDbField|"
+msgid "Double Precision Number"
+msgstr "Число с двойной точностью"
+
+#: KDbField.cpp:92 KDbField.cpp:104
+msgctxt "KDbField|"
+msgid "Text"
+msgstr "Текст"
+
+#: KDbField.cpp:93
+msgctxt "KDbField|"
+msgid "Long Text"
+msgstr "Длинный текст"
+
+#: KDbField.cpp:94 KDbField.cpp:109
+msgctxt "KDbField|"
+msgid "Object"
+msgstr "Объект"
+
+#: KDbField.cpp:103
+msgctxt "KDbField|"
+msgid "Invalid Group"
+msgstr "Недопустимая группа"
+
+#: KDbField.cpp:106
+msgctxt "KDbField|"
+msgid "Floating Point Number"
+msgstr "Число с плавающей запятой"
+
+#: KDbField.cpp:107
+msgctxt "KDbField|"
+msgid "Yes/No"
+msgstr "Да/нет"
+
+#: KDbField.cpp:108
+msgctxt "KDbField|"
+msgid "Date/Time"
+msgstr "Дата и время"
+
+#: KDbProperties.cpp:42 KDbProperties.cpp:53 KDbProperties.cpp:65
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set value of database property \"%1\"."
+msgstr "Не удалось указать значение свойства базы данных «%1»."
+
+#: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set caption for database property \"%1\"."
+msgstr "Не удалось указать заголовок для свойства базы данных «%1»."
+
+#: KDbProperties.cpp:118 KDbProperties.cpp:135
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not read database property \"%1\"."
+msgstr "Не удалось выполнить чтение свойства базы данных «%1»."
+
+#: KDbProperties.cpp:150
+msgctxt "KDbProperties|"
+msgid "Could not read database properties."
+msgstr "Не удалось выполнить чтение свойств базы данных."
+
+#: KDbQuerySchema_p.cpp:132
+#, qt-format
+msgctxt ""
+"KDbQuerySchema|short for 'expression' word, it will expand to 'expr1', "
+"'expr2', etc. Please use ONLY latin letters and DON'T use '.'"
+msgid "expr%1"
+msgstr "expr%1"
+
+#: KDbResult.cpp:56
+msgctxt "KDbResult|"
+msgid "Unspecified error encountered"
+msgstr "Произошла неизвестная ошибка"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "Invalid integer number"
+msgstr "Недопустимое целое число"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "This integer number may be too large."
+msgstr "Это целое число, возможно, является слишком большим."
+
+#: parser/generated/sqlscanner.cpp:1109
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1 in date/time"
+msgstr "Неожиданный символ %1 в дате и времени"
+
+#: parser/generated/sqlscanner.cpp:1404
+msgctxt "KDbParser|"
+msgid "Invalid string"
+msgstr "Недопустимая строка"
+
+#: parser/generated/sqlscanner.cpp:1405
+msgctxt "KDbParser|"
+msgid "Invalid character in string"
+msgstr "Недопустимый символ в строке"
+
+#: parser/generated/sqlscanner.cpp:1421
+msgctxt "KDbParser|"
+msgid "Invalid identifier"
+msgstr "Недопустимый идентификатор"
+
+#: parser/generated/sqlscanner.cpp:1422
+msgctxt "KDbParser|"
+msgid "Identifiers should start with a letter or '_' character"
+msgstr "Идентификаторы должны начинаться с буквы или символа «_»"
+
+#: parser/generated/sqlscanner.cpp:1464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1"
+msgstr "Неожиданный символ %1"
+
+#: parser/KDbParser_p.cpp:205
+msgctxt "KDbParser|"
+msgid "identifier was expected"
+msgstr "ожидался идентификатор"
+
+#: parser/KDbParser_p.cpp:215 parser/KDbParser_p.cpp:219
+msgctxt "KDbParser|"
+msgid "Syntax Error"
+msgstr "Синтаксическая ошибка"
+
+#: parser/KDbParser_p.cpp:216
+#, qt-format
+msgctxt "KDbParser|"
+msgid "\"%1\" is a reserved keyword."
+msgstr "«%1» — зарезервированное ключевое слово."
+
+#: parser/KDbParser_p.cpp:220
+msgctxt "KDbParser|"
+msgid "Syntax error."
+msgstr "Синтаксическая ошибка."
+
+#: parser/KDbParser_p.cpp:224 parser/KDbParser_p.cpp:254
+#: parser/KDbParser_p.cpp:273
+msgctxt "KDbParser|"
+msgid "Error"
+msgstr "Ошибка."
+
+#: parser/KDbParser_p.cpp:225
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Error near \"%1\"."
+msgstr "Ошибка вблизи «%1»."
+
+#: parser/KDbParser_p.cpp:240
+msgctxt "KDbParser|"
+msgid "Other error"
+msgstr "Другая ошибка"
+
+#: parser/KDbParser_p.cpp:244
+msgctxt "KDbParser|"
+msgid "Implementation error"
+msgstr "Ошибка реализации"
+
+#: parser/KDbParser_p.cpp:255
+msgctxt "KDbParser|"
+msgid "No query statement specified."
+msgstr "Не указано выражение запроса."
+
+#: parser/KDbParser_p.cpp:274
+msgctxt "KDbParser|"
+msgid "Unexpected character."
+msgstr "Неожиданный символ."
+
+#: parser/KDbParser_p.cpp:312
+msgctxt "KDbParser|"
+msgid "\"*\" could not be used if no tables are specified."
+msgstr "Нельзя использовать «*», если не указано ни одной таблицы."
+
+#: parser/KDbParser_p.cpp:318
+msgctxt "KDbParser|"
+msgid "\"*\" could not be added."
+msgstr "Нельзя добавить «*»."
+
+#: parser/KDbParser_p.cpp:325
+msgctxt "KDbParser|"
+msgid "\"<table>.*\" could not be added."
+msgstr "Нельзя добавить «<table>.*»."
+
+#: parser/KDbParser_p.cpp:330
+msgctxt "KDbParser|"
+msgid "Could not add binding to a field."
+msgstr "Не удалось добавить привязку к полю."
+
+#: parser/KDbParser_p.cpp:389
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Table \"%1\" does not exist."
+msgstr "Таблица «%1» не существует."
+
+#: parser/KDbParser_p.cpp:398
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for table \"%2\". This alias is already set for "
+"table \"%3\"."
+msgstr ""
+"Не удалось указать псевдоним «%1» для таблицы «%2». Этот псевдоним уже "
+"указан для таблицы «%3»."
+
+#: parser/KDbParser_p.cpp:430
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid alias definition for column \"%1\"."
+msgstr "Недопустимое определение псевдонима для столбца «%1»."
+
+#: parser/KDbParser_p.cpp:450
+msgctxt "KDbParser|"
+msgid "More than one asterisk \"*\" is not allowed."
+msgstr "Допускается не более одной звёздочки «*»."
+
+#: parser/KDbParser_p.cpp:464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid \"%1\" column definition."
+msgstr "Недопустимое определение столбца «%1»."
+
+#: parser/KDbParser_p.cpp:482
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for column #%2. This alias is already set for "
+"column #%3."
+msgstr ""
+"Не удалось указать псевдоним «%1» для столбца #%2. Этот псевдоним уже указан "
+"для столбца #%3."
+
+#: parser/KDbParser_p.cpp:487
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not set alias \"%1\" for column #%2."
+msgstr "Не удалось указать псевдоним «%1» для столбца #%2."
+
+#: parser/KDbParser_p.cpp:530
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column at position %1 does not exist."
+msgstr "Не удалось определить сортировку. Столбца в позиции %1 не существует."
+
+#: parser/KDbParser_p.cpp:538
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
+msgstr ""
+"Не удалось определить сортировку. Имя или псевдоним столбца «%1» не "
+"существует."
+
+#: tools/KDbObjectNameValidator.cpp:53
+#, qt-format
+msgctxt "KDbObjectNameValidator|"
+msgid ""
+"Cannot use reserved name \"%1\" for objects. Please choose another name."
+msgstr ""
+"Нельзя использовать зарезервированное имя «%1» для объектов. Выберите другое "
+"имя."
+
+#: tools/KDbObjectNameValidator.cpp:58
+msgctxt "KDbObjectNameValidator|"
+msgid "Names of internal database objects start with \"kexi__\"."
+msgstr "Имена объектов внутренней базы данных начинаются с «kexi__»."
+
+#: tools/KDbSimpleCommandLineApp.cpp:77
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database driver ID"
+msgstr "Идентификатор драйвера базы данных"
+
+#: tools/KDbSimpleCommandLineApp.cpp:79
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database user name"
+msgstr "Имя пользователя базы данных"
+
+#: tools/KDbSimpleCommandLineApp.cpp:81
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Prompt for password"
+msgstr "Запрос пароля"
+
+#: tools/KDbSimpleCommandLineApp.cpp:83
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Host (server) name"
+msgstr "Имя хоста (сервера)"
+
+#: tools/KDbSimpleCommandLineApp.cpp:84
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's port number"
+msgstr "Номер порта сервера"
+
+#: tools/KDbSimpleCommandLineApp.cpp:86
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's local socket filename"
+msgstr "Имя файла локального сокета сервера"
+
+#: tools/KDbSimpleCommandLineApp.cpp:107
+#, qt-format
+msgctxt "KDbSimpleCommandLineApp|Enter password for <user>"
+msgid "Enter password for %1: "
+msgstr "Укажите пароль для %1: "
+
+#: tools/KDbValidator.cpp:102
+#, qt-format
+msgctxt "KDbValidator|"
+msgid "\"%1\" value has to be entered."
+msgstr "Необходимо указать значение «%1»."
+
+#: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
+#, qt-format
+msgctxt "KDbTableViewData|"
+msgid "\"%1\" column requires a value to be entered."
+msgstr "Столбец «%1» требует указания значения."
+
+#: views/KDbTableViewData.cpp:694
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT NULL."
+msgstr "Поля этого столбца не могут иметь значение NULL."
+
+#: views/KDbTableViewData.cpp:705
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT EMPTY."
+msgstr "Поля этого столбца не могут быть пустыми."
+
+#: views/KDbTableViewData.cpp:717
+msgctxt "KDbTableViewData|"
+msgid "Record inserting failed."
+msgstr "Не удалось вставить запись."
+
+#: views/KDbTableViewData.cpp:733
+msgctxt "KDbTableViewData|"
+msgid "Record changing failed."
+msgstr "Не удалось изменить запись."
+
+#: views/KDbTableViewData.cpp:800
+msgctxt "KDbTableViewData|"
+msgid "Record deleting failed."
+msgstr "Не удалось удалить запись."
+
+#: views/KDbTableViewData.cpp:930
+msgctxt "KDbTableViewData|"
+msgid ""
+"Please correct data in this record or use the \"Cancel record changes\" "
+"function."
+msgstr ""
+"Исправьте данные в этой записи или воспользуйтесь функцией «Отменить "
+"изменение записи»."
+
+#, fuzzy
+#~ msgctxt "KDbParser|"
+#~ msgid "Could not add all-tables asterisk \"*\"."
+#~ msgstr "Не удалось найти ни одного драйвера баз данных."

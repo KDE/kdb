@@ -1,0 +1,19 @@
+# Steve Allewell <steve.allewell@gmail.com>, 2016.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2016-09-11 17:32+0000\n"
+"Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
+"Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: PostgresqlConnection.cpp:282
+msgctxt "PostgresqlConnection|"
+msgid "Escaping string failed. Invalid multibyte encoding."
+msgstr "Escaping string failed. Invalid multibyte encoding."

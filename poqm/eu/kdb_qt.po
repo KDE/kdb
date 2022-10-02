@@ -1,0 +1,1393 @@
+# Translation for kdb_qt.po to Euskara/Basque (eu).
+# Copyright (C) 2020, This file is copyright:
+# This file is distributed under the same license as the original file.
+# KDE euskaratzeko proiektuko arduraduna <xalba@eusklnet.net>.
+#
+# Translators:
+# Iñigo Salvador Azurmendi <xalba@euskalnet.net>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2020-08-17 21:06+0200\n"
+"Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
+"Language-Team: Basque <kde-i18n-eu@kde.org>\n"
+"Language: eu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 20.08.0\n"
+
+#: expression/KDbBinaryExpression.cpp:64
+msgctxt "KDbBinaryExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Argumentu mota bateraezinak"
+
+#: expression/KDbBinaryExpression.cpp:66
+#, qt-format
+msgctxt "KDbBinaryExpressionData|Binary expression arguments type error"
+msgid ""
+"Expression \"%1\" requires compatible types of arguments. Specified "
+"arguments are of type %2 and %3."
+msgstr ""
+"\"%1\" adierazpenak argumentu mota bateragarriak behar ditu. Zehaztutako "
+"argumentuak %2 eta %3 motakoak dira."
+
+#: expression/KDbFunctionExpression.cpp:213
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid "Incompatible types in %1() function"
+msgstr "Mota bateraezinak %1() funtzioan"
+
+#: expression/KDbFunctionExpression.cpp:215
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid ""
+"Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
+"arguments of type \"%4\"."
+msgstr ""
+"%1 zk. argumentua, \"%2\" motakoa %3() funtzioan, ez da bateragarria \"%4\" "
+"motako aurreko argumentuekin."
+
+#: expression/KDbFunctionExpression.cpp:298
+#, qt-format
+msgctxt "RandomFunctionDeclaration|"
+msgid "Invalid arguments of %1() function"
+msgstr "%1() funtzioko argumentu baliogabeak"
+
+#: expression/KDbFunctionExpression.cpp:300
+msgctxt "RandomFunctionDeclaration|"
+msgid ""
+"Value of the first argument should be less than value of the second argument."
+msgstr ""
+"Lehenengo argumentuko balioa bigarren argumentuko balioa baino txikiagoa "
+"izan behar du."
+
+#: expression/KDbFunctionExpression.cpp:940
+#: expression/KDbFunctionExpression.cpp:1190
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect number of arguments (%1)"
+msgstr "Argumentu kopuru ezegokia (%1)"
+
+#: expression/KDbFunctionExpression.cpp:945
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too many arguments.%1"
+msgstr "Argumentu gehiegi.%1"
+
+#: expression/KDbFunctionExpression.cpp:949
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too few arguments.%1"
+msgstr "Argumentu gutxiegi.%1"
+
+#: expression/KDbFunctionExpression.cpp:956
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function does not accept any arguments."
+msgstr "%1%2() funtzioak ez du argumenturik onartzen."
+
+#: expression/KDbFunctionExpression.cpp:961
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires 1 argument."
+msgstr "%1%2() funtzioak argumentu 1 behar du."
+
+#: expression/KDbFunctionExpression.cpp:968
+#: expression/KDbFunctionExpression.cpp:1007
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 argument(s)."
+msgid_plural "%1%2() function requires %3 argument(s)."
+msgstr[0] "%1%2() funtzioak argumentu %3 behar du."
+msgstr[1] "%1%2() funtzioak %3 argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:977
+#, qt-format
+msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
+msgid "%1%2() function requires 0 or 1 argument."
+msgstr "%1%2() funtzioak 0 edo 1 argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:985
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 argument(s)."
+msgstr[0] "%1%2() funtzioak %3 edo %4 argumentu behar ditu."
+msgstr[1] "%1%2() funtzioak %3 edo %4 argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:993
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgstr[0] "%1%2() funtzioak %3 edo %4 edo %5 argumentu behar ditu."
+msgstr[1] "%1%2() funtzioak %3 edo %4 edo %5 argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:1003
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1 or %2"
+msgstr "%1 edo %2"
+
+#: expression/KDbFunctionExpression.cpp:1021
+msgctxt "KDbFunctionExpressionData|"
+msgid " or "
+msgstr "edo"
+
+#: expression/KDbFunctionExpression.cpp:1025
+#: expression/KDbFunctionExpression.cpp:1029
+#: expression/KDbFunctionExpression.cpp:1033
+#: expression/KDbFunctionExpression.cpp:1037
+#: expression/KDbFunctionExpression.cpp:1041
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"%1\""
+msgstr "\"%1\""
+
+#: expression/KDbFunctionExpression.cpp:1046
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"Number\""
+msgstr "«Zenbakia»"
+
+#: expression/KDbFunctionExpression.cpp:1049
+msgctxt "KDbFunctionExpressionData|Any data type"
+msgid "\"Any\""
+msgstr "«Edozein»"
+
+#: expression/KDbFunctionExpression.cpp:1053
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect type of argument"
+msgstr "Okerreko argumentu mota"
+
+#: expression/KDbFunctionExpression.cpp:1055
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Specified argument is of type \"%1\"."
+msgstr "Zehaztutako argumentua \"%1\" motakoa da."
+
+#: expression/KDbFunctionExpression.cpp:1059
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's first argument should be of type %2. %3"
+msgstr "%1() funtzioko lehen argumentua %2 motakoa izan beharko litzateke. %3"
+
+#: expression/KDbFunctionExpression.cpp:1064
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's second argument should be of type %2. %3"
+msgstr ""
+"%1() funtzioko bigarren argumentua %2 motakoa izan beharko litzateke. %3"
+
+#: expression/KDbFunctionExpression.cpp:1069
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's third argument should be of type %2. %3"
+msgstr ""
+"%1() funtzioko hirugarren argumentua %2 motakoa izan beharko litzateke. %3"
+
+#: expression/KDbFunctionExpression.cpp:1074
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fourth argument should be of type %2. %3"
+msgstr ""
+"%1() funtzioko laugarren argumentua %2 motakoa izan beharko litzateke. %3"
+
+#: expression/KDbFunctionExpression.cpp:1079
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fifth argument should be of type %2. %3"
+msgstr ""
+"%1() funtzioko bosgarren argumentua %2 motakoa izan beharko litzateke. %3"
+
+#: expression/KDbFunctionExpression.cpp:1084
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's %2 argument should be of type %3. %4"
+msgstr "%1() funtzioko %2. argumentua %3 motakoa izan beharko litzateke. %4"
+
+#: expression/KDbFunctionExpression.cpp:1144
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too many arguments for function."
+msgstr "Funtzioarentzako argumentu gehiegi."
+
+#: expression/KDbFunctionExpression.cpp:1146
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Maximum number of arguments for function %1() is %2."
+msgstr "%1() funtzioak gehienez onartzen duen argumentu kopurua %2 da."
+
+#: expression/KDbFunctionExpression.cpp:1193
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least one argument."
+msgstr "Argumentu gutxiegi. %1() funtzioak gutxienez argumentu bat behar du."
+
+#: expression/KDbFunctionExpression.cpp:1198
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least two arguments."
+msgstr "Argumentu gutxiegi. %1() funtzioak gutxienez bi argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:1203
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least three arguments."
+msgstr ""
+"Argumentu gutxiegi. %1() funtzioak gutxienez hiru argumentu behar ditu."
+
+#: expression/KDbFunctionExpression.cpp:1208
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least %2 arguments."
+msgstr "Argumentu gutxiegi. %1() funtzioak gutxienez %2 argumentu behar ditu."
+
+#: expression/KDbNArgExpression.cpp:70
+msgctxt "KDbNArgExpressionData|"
+msgid "Three arguments required"
+msgstr "Hiru argumentu behar dira"
+
+#: expression/KDbNArgExpression.cpp:72
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
+msgid "%1 operator requires exactly three arguments."
+msgstr "%1 eragileak zehazki hiru argumentu behar ditu."
+
+#: expression/KDbNArgExpression.cpp:98
+msgctxt "KDbNArgExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Argumentu mota bateraezinak"
+
+#: expression/KDbNArgExpression.cpp:100
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND arguments type error"
+msgid ""
+"Operator \"%1\" requires compatible types of arguments. Specified arguments "
+"are of type %2, %3, %4."
+msgstr ""
+"\"%1\" eragileak argumentu mota bateragarriak behar ditu. Zehaztutako "
+"argumentuak %2, %3 eta %4 motakoak dira."
+
+#: expression/KDbVariableExpression.cpp:133
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous field name"
+msgstr "Eremu-izen anbiguoa"
+
+#: expression/KDbVariableExpression.cpp:135
+#, qt-format
+msgctxt "KDbVariableExpressionData|Note: translate also <tableName>"
+msgid ""
+"Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
+"%4\" notation to specify table name."
+msgstr ""
+"Biek, \"%1\" eta \"%2\" taulek definitu dute \"%3\" eremua. Erabili "
+"\"<taulaIzena>.%4\" notazioa taula izena zehazteko."
+
+#: expression/KDbVariableExpression.cpp:145
+#: expression/KDbVariableExpression.cpp:222
+msgctxt "KDbVariableExpressionData|"
+msgid "Field not found"
+msgstr "Eremua ez da aurkitu"
+
+#: expression/KDbVariableExpression.cpp:147
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not find table containing field \"%1\"."
+msgstr "Ezin izan da aurkitu \"%1\" eremua duen taula."
+
+#: expression/KDbVariableExpression.cpp:172
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not access the table directly using its name"
+msgstr "Ezin izan da taula zuzenean atzitu bere izena erabiliz"
+
+#: expression/KDbVariableExpression.cpp:174
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid ""
+"Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
+"used."
+msgstr ""
+"\"%1\" taula izenak ezizenak ditu. \"%2\" erabili ordez, \"%3\" erabili "
+"daiteke."
+
+#: expression/KDbVariableExpression.cpp:196
+msgctxt "KDbVariableExpressionData|"
+msgid "Table not found"
+msgstr "Taula ez da aurkitu"
+
+#: expression/KDbVariableExpression.cpp:197
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Unknown table \"%1\"."
+msgstr "Taula ezezaguna \"%1\"."
+
+#: expression/KDbVariableExpression.cpp:211
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.*\" expression"
+msgstr "\"%1.*\" adierazpen anbiguoa"
+
+#: expression/KDbVariableExpression.cpp:212
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined."
+msgstr "\"%1\" taula edo ezizen bat baino gehiago definitu da."
+
+#: expression/KDbVariableExpression.cpp:224
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Table \"%1\" has no \"%2\" field."
+msgstr "\"%1\" taulak ez du \"%2\" eremurik."
+
+#: expression/KDbVariableExpression.cpp:231
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.%2\" expression"
+msgstr "\"%1.%2\" adierazpen anbiguoa"
+
+#: expression/KDbVariableExpression.cpp:233
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined containing \"%2\" field."
+msgstr "\"%2\" eremua duen \"%1\" taula edo ezizen bat baino gehiago dago."
+
+#: KDb.cpp:179
+msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
+msgid "Test Connection"
+msgstr "Probako konexioa"
+
+#: KDb.cpp:180
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Testing connection to \"%1\" database server..."
+msgstr "\"%1\" datu-base zerbitzarira konexioa probatzen..."
+
+#: KDb.cpp:227
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server failed."
+msgstr "\"%1\" datu-base zerbitzarira probako konexioak huts egin du."
+
+#: KDb.cpp:238
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid ""
+"Test connection to \"%1\" database server failed. The server is not "
+"responding."
+msgstr ""
+"\"%1\" datu-base zerbitzarira probako konexioak huts egin du. Zerbitzariak "
+"ez du erantzuten."
+
+#: KDb.cpp:244
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server established successfully."
+msgstr "\"%1\" datu-base zerbitzarira probako konexioa ondo ezarri da."
+
+#: KDb.cpp:249
+msgctxt "ConnectionTestDialog|"
+msgid "Test Connection"
+msgstr "Probako konexioa"
+
+#: KDb.cpp:528
+msgctxt "KDb|"
+msgid "Message from server:"
+msgstr "Zerbitzariko mezua:"
+
+#: KDb.cpp:531
+msgctxt "KDb|"
+msgid "SQL statement:"
+msgstr "SQL adierazpena:"
+
+#: KDb.cpp:546
+msgctxt "KDb|"
+msgid "Server result code:"
+msgstr "Zerbitzariko emaitza kodea:"
+
+#: KDb.cpp:554
+msgctxt "KDb|"
+msgid "Server result:"
+msgstr "Zerbitzariko emaitza:"
+
+#: KDb.cpp:1962
+msgctxt "KDbField|"
+msgid "Number"
+msgstr "Zenbakia"
+
+#: KDb.cpp:1965
+msgctxt "KDbField|"
+msgid "Image"
+msgstr "Irudia"
+
+#: KDb.cpp:2201
+#, qt-format
+msgctxt "KDb|"
+msgid "Value of \"%1\" field must be an identifier."
+msgstr "\"%1\" eremuko balioa identifikatzaile bat izan behar da."
+
+#: KDb.cpp:2204
+#, qt-format
+msgctxt "KDb|"
+msgid "\"%1\" is not a valid identifier."
+msgstr "\"%1\" ez da identifikatzaile balioduna."
+
+#: KDbConnection.cpp:88
+msgctxt "KDbConnectionOptions|Read only connection"
+msgid "Read only"
+msgstr "Irakurtzeko soilik"
+
+#: KDbConnection.cpp:207
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid database contents. %1"
+msgstr "Datu-base eduki baliogabea. %1"
+
+#: KDbConnection.cpp:212
+msgctxt "KDbConnection|"
+msgid "It is a system object."
+msgstr "Sistema objektu bat da."
+
+#: KDbConnection.cpp:360
+msgctxt "KDbConnectionPrivate|"
+msgid "Table has no fields defined."
+msgstr "Taulak ez dauka definituta eremurik."
+
+#: KDbConnection.cpp:408
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"Could not find definition for query \"%1\". Deleting this query is "
+"recommended."
+msgstr ""
+"Ezin da aurkitu \"%1\" itaunaren definizioa. Itaun hau ezabatzea gomendatzen "
+"da."
+
+#: KDbConnection.cpp:416
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"<p>Could not load definition for query \"%1\". SQL statement for this query "
+"is invalid:<br><tt>%2</tt></p>\n"
+"<p>This query can be edited only in Text View.</p>"
+msgstr ""
+"<p>Ezin da aurkitu \"%1\" itaunaren definizioa. Itaun honen adierazpena "
+"baliogabea da: <br><tt>%2</tt></p>\n"
+"<p>Itaun hau editatu daiteke soilik Testu Ikuspegian.</p>"
+
+#: KDbConnection.cpp:499
+msgctxt "KDbConnection|"
+msgid "Connection already established."
+msgstr "Konexioa jada ezarrita dago."
+
+#: KDbConnection.cpp:509
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not open \"%1\" project file."
+msgstr "Ezin izan da \"%1\" proiektu fitxategia ireki."
+
+#: KDbConnection.cpp:511
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not connect to \"%1\" database server."
+msgstr "Ezin izan da konektatu \"%1\" datu-base zerbitzarira."
+
+#: KDbConnection.cpp:558
+msgctxt "KDbConnection|"
+msgid "Not connected to the database server."
+msgstr "Ez dago datu-base zerbitzarira konektatuta."
+
+#: KDbConnection.cpp:569
+msgctxt "KDbConnection|"
+msgid "Currently no database is used."
+msgstr "Une honetan ez da datu-baserik erabiltzen."
+
+#: KDbConnection.cpp:623
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "\"%1\" datu-basea ez da existitzen."
+
+#: KDbConnection.cpp:643
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database file \"%1\" does not exist."
+msgstr "\"%1\" datu-base fitxategia ez da existitzen."
+
+#: KDbConnection.cpp:650
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not readable."
+msgstr "\"%1\" datu-base fitxategia ezin da irakurri."
+
+#: KDbConnection.cpp:657
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not writable."
+msgstr "\"%1\" datu-base fitxategia ezin da idatzi."
+
+#: KDbConnection.cpp:686
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Database \"%1\" has been created but could not be closed after creation."
+msgstr "\"%1\" datu-basea sortu da baino sortu ondoren ezin izan da itxi."
+
+#: KDbConnection.cpp:702
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" already exists."
+msgstr "\"%1\" datu-basea jada existitzen da."
+
+#: KDbConnection.cpp:707
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Could not create database \"%1\". This name is reserved for system database."
+msgstr ""
+"Ezin izan da \"%1\" datu-basea sortu. Izen hau sistemako datu-baserako "
+"erreserbatua dago."
+
+#: KDbConnection.cpp:729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error creating database \"%1\" on the server."
+msgstr "Errorea \"%1\" zerbitzarian datu-basea sortzean."
+
+#: KDbConnection.cpp:743
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" has been created but could not be opened."
+msgstr "\"%1\" datu-basea sortu da baino ezin da ireki."
+
+#: KDbConnection.cpp:819
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Opening database \"%1\" failed."
+msgstr "\"%1\" datu-basea irekitzea huts egin du."
+
+#: KDbConnection.cpp:904
+msgctxt "KDbConnection|"
+msgid "Could not find any database for temporary connection."
+msgstr "Ezin da datu-base bat ere aurkitu aldi baterako konexio baterako."
+
+#: KDbConnection.cpp:913
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error during starting temporary connection using \"%1\" database name."
+msgstr ""
+"Errorea \"%1\" datu-base izena erabiliz aldi baterako konexioa abiatzean."
+
+#: KDbConnection.cpp:931 KDbConnection.cpp:949
+msgctxt "KDbConnection|"
+msgid "Could not delete database. Name is not specified."
+msgstr "Ezin izan da datu-basea ezabatu. Izena ez da zehaztu."
+
+#: KDbConnection.cpp:955
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete system database \"%1\"."
+msgstr "Ezin izan da ezabatu \"%1\" sistemako datu-basea."
+
+#: KDbConnection.cpp:1002
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object names."
+msgstr "Ezin izan da berreskuratu objektu izenen zerrenda."
+
+#: KDbConnection.cpp:1016
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of table names."
+msgstr "Ezin izan da berreskuratu taula izenen zerrenda."
+
+#: KDbConnection.cpp:1024
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of physical table names."
+msgstr "Ezin izan da berreskuratu taula fisikoen izenen zerrenda."
+
+#: KDbConnection.cpp:1091
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object identifiers."
+msgstr "Ezin izan da eskuratu objektu-identifikatzaileen zerrenda."
+
+#: KDbConnection.cpp:1273
+msgctxt "KDbConnection|"
+msgid "SQL statement for execution is invalid or empty."
+msgstr "Exekutatu beharreko SQL adierazpena baliogabea da edo hutsik dago."
+
+#: KDbConnection.cpp:1296
+msgctxt "KDbConnection|"
+msgid "Error while executing SQL statement."
+msgstr "Errorea SQL adierazpena exekutatzean."
+
+#: KDbConnection.cpp:1393
+msgctxt "KDbConnection|"
+msgid "Creating table failed."
+msgstr "Taula sortzea huts egin du."
+
+#: KDbConnection.cpp:1406
+msgctxt "KDbConnection|"
+msgid "Could not create table without fields."
+msgstr "Ezin da taula sortu eremurik gabe."
+
+#: KDbConnection.cpp:1416
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as table name."
+msgstr "\"%1\" sistemako izena ezin da erabili taula-izan gisa."
+
+#: KDbConnection.cpp:1425
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
+msgstr ""
+"Sistemako \"%1\" izena ezin da erabili \"%2\" taulako eremuetako baterako."
+
+#: KDbConnection.cpp:1441
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not create the same table \"%1\" twice."
+msgstr "Ezin da sortu \"%1\" taula bera bitan."
+
+#: KDbConnection.cpp:1455
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" already exists."
+msgstr "\"%1\" taula jada existitzen da."
+
+#: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" does not exist."
+msgstr "\"%1\" taula ez da existitzen."
+
+#: KDbConnection.cpp:1579
+msgctxt "KDbConnection|"
+msgid "Could not delete object's data."
+msgstr "Ezin izan dira ezabatu objektuen datuak."
+
+#: KDbConnection.cpp:1607 KDbConnection.cpp:1620
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete table \"%1\". %2"
+msgstr "Ezin izan da ezabatu \"%1\" taula. %2"
+
+#: KDbConnection.cpp:1608
+msgctxt "KDbConnection|"
+msgid "Unexpected name or identifier."
+msgstr "Ustekabeko izena edo identifikatzailea."
+
+#: KDbConnection.cpp:1680
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not alter table \"%1\" using the same table as destination."
+msgstr "Ezin izan da \"%1\" taula aldatu taula bera jomuga gisa erabiliz."
+
+#: KDbConnection.cpp:1706
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Unknown table \"%1\"."
+msgstr "\"%1\" taula ezezaguna."
+
+#: KDbConnection.cpp:1711
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid table name \"%1\"."
+msgstr "\"%1\" taula izen baliogabea."
+
+#: KDbConnection.cpp:1718
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" using the same name."
+msgstr "Ezin izan da \"%1\" taula berrizendatu izen bera erabiliz."
+
+#: KDbConnection.cpp:1729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
+msgstr ""
+"Ezin izan da \"%1\" taula \"%2\" berrizendatu. \"%3\" taula jada existitzen "
+"da."
+
+#: KDbConnection.cpp:1839
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Query \"%1\" does not exist."
+msgstr "\"%1\" itauna ez da existitzen."
+
+#: KDbConnection.cpp:1946
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Transactions are not supported for \"%1\" driver."
+msgstr "Transakzioak ez ditu \"%1\" gidariak onartzen."
+
+#: KDbConnection.cpp:1951
+msgctxt "KDbConnection|"
+msgid "Begin transaction failed."
+msgstr "Transakzioaren hasierak huts egin du."
+
+#: KDbConnection.cpp:1968
+msgctxt "KDbConnection|"
+msgid "Transaction already started."
+msgstr "Transakzioa hasi da dagoeneko."
+
+#: KDbConnection.cpp:2010 KDbConnection.cpp:2047
+msgctxt "KDbConnection|"
+msgid "Transaction not started."
+msgstr "Transakzioa ez da hasi."
+
+#: KDbConnection.cpp:2025
+msgctxt "KDbConnection|"
+msgid "Error on commit transaction."
+msgstr "Errorea transakzioa baliozkotzean."
+
+#: KDbConnection.cpp:2062
+msgctxt "KDbConnection|"
+msgid "Error on rollback transaction."
+msgstr "Errorea transakzioa atzeraka kentzean."
+
+#: KDbConnection.cpp:2213
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid object name \"%1\"."
+msgstr "\"%1\" objektu-izen baliogabea."
+
+#: KDbConnection.cpp:2402
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Column \"%1\" does not exist in the query."
+msgstr "\"%1\" zutabea itaunean ez da existitzen."
+
+#: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
+msgctxt "KDbConnection|Extended schema for a table: loading error"
+msgid "Error while loading extended table schema."
+msgstr "Errorea taula hedatuaren eskema zamatzean."
+
+#: KDbConnection.cpp:2763
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid XML data: %1"
+msgstr "XML datu baliogabeak: %1"
+
+#: KDbConnection.cpp:2784
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Error in XML data: \"%1\" in line %2, column %3.\n"
+"XML data: %4"
+msgstr ""
+"Errorea XML datuetan: \"%1\" %2 lerroan, %3 zutabea.\n"
+"XML datuak: %4"
+
+#: KDbConnection.cpp:3113
+msgctxt "KDbConnection|"
+msgid "Could not update record because there is no master table defined."
+msgstr ""
+"Ezin izan da erregistroa eguneratu taula nagusirik definiturik ez dagoelako."
+
+#: KDbConnection.cpp:3120
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because master table has no primary key defined."
+msgstr ""
+"Ezin izan da erregistroa eguneratu taula nagusiak lehen mailako gakorik "
+"definiturik ez daukalako."
+
+#: KDbConnection.cpp:3152
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because it does not contain entire primary key of "
+"master table."
+msgstr ""
+"Ezin izan da erregistroa eguneratu taula nagusiko lehen mailako gako osorik "
+"ez daukalako."
+
+#: KDbConnection.cpp:3163 KDbConnection.cpp:3407
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Primary key's field \"%1\" cannot be empty."
+msgstr "\"%1\" lehen mailako gako eremua ezin da hutsik egon."
+
+#: KDbConnection.cpp:3191
+msgctxt "KDbConnection|"
+msgid "Record updating on the server failed."
+msgstr "Zerbitzarian erregistro eguneratzea huts egin du."
+
+#: KDbConnection.cpp:3213
+msgctxt "KDbConnection|"
+msgid "Could not insert record because there is no master table specified."
+msgstr "Ezin izan da erregistroa txertatu taula nagusirik zehaztu ez delako."
+
+#: KDbConnection.cpp:3255
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because master table has no primary key specified."
+msgstr ""
+"Ezin izan da erregistroa txertatu taula nagusiak lehen mailako gakorik "
+"zehaztuta ez daukalako."
+
+#: KDbConnection.cpp:3264
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Ezin izan da erregistroa txertatu taula nagusiko lehen mailako gako osorik "
+"ez daukalako."
+
+#: KDbConnection.cpp:3307
+msgctxt "KDbConnection|"
+msgid "Record inserting on the server failed."
+msgstr "Zerbitzarian erregistro sartzea huts egin du."
+
+#: KDbConnection.cpp:3371
+msgctxt "KDbConnection|"
+msgid "Could not delete record because there is no master table specified."
+msgstr "Ezin izan da erregistroa ezabatu taula nagusirik zehaztu ez delako."
+
+#: KDbConnection.cpp:3380
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because there is no primary key for master table "
+"specified."
+msgstr ""
+"Ezin izan da erregistroa ezabatu taula nagusiko lehen mailako gakorik "
+"zehaztu ez delako."
+
+#: KDbConnection.cpp:3397
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Ezin izan da erregistroa ezabatu taula nagusiko lehen mailako gako osorik ez "
+"daukalako."
+
+#: KDbConnection.cpp:3424 KDbConnection.cpp:3447
+msgctxt "KDbConnection|"
+msgid "Record deletion on the server failed."
+msgstr "Zerbitzarian erregistro ezabatzea hus egin du."
+
+#: KDbConnection.cpp:3543
+msgctxt "KDbConnection|"
+msgid "Unknown error."
+msgstr "Errore ezezaguna."
+
+#: KDbConnectionData.cpp:41
+msgctxt "KDbConnectionData|"
+msgid "<file>"
+msgstr "<fitxategia>"
+
+#: KDbConnectionData.cpp:43
+#, qt-format
+msgctxt "KDbConnectionData|"
+msgid "file: %1"
+msgstr "fitxategia: %1"
+
+#: KDbCursor.cpp:215
+msgctxt "KDbCursor|"
+msgid "No query statement or schema defined."
+msgstr "Ez da itaun adierazpenik edo eskemarik definitu."
+
+#: KDbCursor.cpp:227
+msgctxt "KDbCursor|"
+msgid "Could not generate query statement."
+msgstr "Ezin izan da itaun adierazpena sortu."
+
+#: KDbCursor.cpp:242
+msgctxt "KDbCursor|"
+msgid "Error opening database cursor."
+msgstr "Errorea datu-baseko kurtsorea irekitzean."
+
+#: KDbCursor.cpp:454 KDbCursor.cpp:478
+msgctxt "KDbCursor|"
+msgid "Could not fetch next record."
+msgstr "Ezin izan da hurrengo erregistroa ekarri."
+
+#: KDbCursor.cpp:620
+msgctxt "KDbCursor|"
+msgid "No connection for cursor open operation specified."
+msgstr "Ez da zehaztu kurtsorea irekitzeko eragiketarako konexiorik."
+
+#: KDbDriver.cpp:85
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Invalid database driver's \"%1\" implementation."
+msgstr "Datu-base gidariko \"%1\" inplementazio baliogabea."
+
+#: KDbDriver.cpp:86
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Value of \"%1\" is not initialized for the driver."
+msgstr "\"%1\"-(r)en ez da gidariarentzat hasieratu."
+
+#: KDbDriver_p.cpp:61
+msgctxt "KDbDriver|"
+msgid "Client library version"
+msgstr "Bezero liburutegi bertsioa"
+
+#: KDbDriver_p.cpp:63
+msgctxt "KDbDriver|"
+msgid "Default character encoding on server"
+msgstr "Karaktere kodeketa estandarra zerbitzarian"
+
+#: KDbDriver_p.cpp:74
+msgctxt "KDbDriver|"
+msgid "File-based database driver"
+msgstr "Fitxategi-oinarriko datu-base gidaria"
+
+#: KDbDriver_p.cpp:77
+msgctxt "KDbDriver|"
+msgid "File-based database's MIME types"
+msgstr "Fitxategi-oinarriko datu-baseen MIME motak"
+
+#: KDbDriver_p.cpp:96
+msgctxt "KDbDriver|"
+msgid "Single transactions support"
+msgstr "Transakzio bakunen euskarria"
+
+#: KDbDriver_p.cpp:98
+msgctxt "KDbDriver|"
+msgid "Multiple transactions support"
+msgstr "Transakzio aniztunen euskarria"
+
+#: KDbDriver_p.cpp:100
+msgctxt "KDbDriver|"
+msgid "Nested transactions support"
+msgstr "Habiaratutako transakzioen euskarria"
+
+#: KDbDriver_p.cpp:102
+msgctxt "KDbDriver|"
+msgid "Ignored transactions support"
+msgstr "Ez-ikusitako transakzioen euskarria"
+
+#: KDbDriver_p.cpp:107
+msgctxt "KDbDriver|"
+msgid "KDb driver version"
+msgstr "KDb gidari bertsioa"
+
+#: KDbDriverManager.cpp:87
+msgctxt "DriverManagerInternal|"
+msgid "Could not find any database drivers."
+msgstr "Ezin izan da aurkitu datu-base gidaririk."
+
+#: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not find database driver \"%1\"."
+msgstr "Ezin izan da aurkitu datu-baseko \"%1\" gidaria."
+
+#: KDbDriverManager.cpp:221
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not load database driver's plugin file \"%1\"."
+msgstr "Ezin izan da zamatu datu-base gidariaren \"%1\" plugin-fitxategia."
+
+#: KDbDriverManager.cpp:232
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
+msgstr ""
+"Ezin izan da ireki \"%1\" datu-base gidaria \"%2\" plugin fitxategitik."
+
+#: KDbField.cpp:81
+msgctxt "KDbField|"
+msgid "Invalid Type"
+msgstr "Mota baliogabea"
+
+#: KDbField.cpp:82
+msgctxt "KDbField|"
+msgid "Byte"
+msgstr "Byte"
+
+#: KDbField.cpp:83
+msgctxt "KDbField|"
+msgid "Short Integer Number"
+msgstr "Zenbaki osoa, laburra"
+
+#: KDbField.cpp:84 KDbField.cpp:105
+msgctxt "KDbField|"
+msgid "Integer Number"
+msgstr "Zenbaki osoa"
+
+#: KDbField.cpp:85
+msgctxt "KDbField|"
+msgid "Big Integer Number"
+msgstr "Zenbaki osoa, handia"
+
+#: KDbField.cpp:86
+msgctxt "KDbField|"
+msgid "Yes/No Value"
+msgstr "Bai/Ez balioa"
+
+#: KDbField.cpp:87
+msgctxt "KDbField|"
+msgid "Date"
+msgstr "Data"
+
+#: KDbField.cpp:88
+msgctxt "KDbField|"
+msgid "Date and Time"
+msgstr "Data eta ordua"
+
+#: KDbField.cpp:89
+msgctxt "KDbField|"
+msgid "Time"
+msgstr "Ordua"
+
+#: KDbField.cpp:90
+msgctxt "KDbField|"
+msgid "Single Precision Number"
+msgstr "Doitasun bakuneko zenbakia"
+
+#: KDbField.cpp:91
+msgctxt "KDbField|"
+msgid "Double Precision Number"
+msgstr "Doitasun bikoitzeko zenbakia"
+
+#: KDbField.cpp:92 KDbField.cpp:104
+msgctxt "KDbField|"
+msgid "Text"
+msgstr "Testua"
+
+#: KDbField.cpp:93
+msgctxt "KDbField|"
+msgid "Long Text"
+msgstr "Testu luzea"
+
+#: KDbField.cpp:94 KDbField.cpp:109
+msgctxt "KDbField|"
+msgid "Object"
+msgstr "Objektua"
+
+#: KDbField.cpp:103
+msgctxt "KDbField|"
+msgid "Invalid Group"
+msgstr "Talde baliogabea"
+
+#: KDbField.cpp:106
+msgctxt "KDbField|"
+msgid "Floating Point Number"
+msgstr "Koma-higikorreko zenbakia"
+
+#: KDbField.cpp:107
+msgctxt "KDbField|"
+msgid "Yes/No"
+msgstr "Bai/Ez"
+
+#: KDbField.cpp:108
+msgctxt "KDbField|"
+msgid "Date/Time"
+msgstr "Data/Ordua"
+
+#: KDbProperties.cpp:42 KDbProperties.cpp:53 KDbProperties.cpp:65
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set value of database property \"%1\"."
+msgstr "Ezin izan da ezarri datu-baseko \"%1\" propietateko balioa."
+
+#: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set caption for database property \"%1\"."
+msgstr "Ezin izan da ezarri datu-baseko \"%1\" propietateko epigrafea."
+
+#: KDbProperties.cpp:118 KDbProperties.cpp:135
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not read database property \"%1\"."
+msgstr "Ezin izan da irakurri datu-baseko \"%1\" propietatea"
+
+#: KDbProperties.cpp:150
+msgctxt "KDbProperties|"
+msgid "Could not read database properties."
+msgstr "Ezin izan dira irakurri datu-baseko propietateak."
+
+#: KDbQuerySchema_p.cpp:132
+#, qt-format
+msgctxt ""
+"KDbQuerySchema|short for 'expression' word, it will expand to 'expr1', "
+"'expr2', etc. Please use ONLY latin letters and DON'T use '.'"
+msgid "expr%1"
+msgstr "adier%1"
+
+#: KDbResult.cpp:56
+msgctxt "KDbResult|"
+msgid "Unspecified error encountered"
+msgstr "Zehaztu gabeko errore bat aurkitu da"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "Invalid integer number"
+msgstr "Zenbaki oso baliogabea"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "This integer number may be too large."
+msgstr "Zenbaki oso hau handiegia izan daiteke."
+
+#: parser/generated/sqlscanner.cpp:1109
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1 in date/time"
+msgstr "Ustekabeko karakterea, %1, data/orduan"
+
+#: parser/generated/sqlscanner.cpp:1404
+msgctxt "KDbParser|"
+msgid "Invalid string"
+msgstr "Kate baliogabea"
+
+#: parser/generated/sqlscanner.cpp:1405
+msgctxt "KDbParser|"
+msgid "Invalid character in string"
+msgstr "Karaktere baliogabea katean"
+
+#: parser/generated/sqlscanner.cpp:1421
+msgctxt "KDbParser|"
+msgid "Invalid identifier"
+msgstr "Identifikatzaile baliogabea"
+
+#: parser/generated/sqlscanner.cpp:1422
+msgctxt "KDbParser|"
+msgid "Identifiers should start with a letter or '_' character"
+msgstr ""
+"Identifikatzaileak letra batekin edo '_' karaktere batekin hasi behar dira"
+
+#: parser/generated/sqlscanner.cpp:1464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1"
+msgstr "Ustekabeko karakterea, %1"
+
+#: parser/KDbParser_p.cpp:205
+msgctxt "KDbParser|"
+msgid "identifier was expected"
+msgstr "identifikatzaile bat espero zen"
+
+#: parser/KDbParser_p.cpp:215 parser/KDbParser_p.cpp:219
+msgctxt "KDbParser|"
+msgid "Syntax Error"
+msgstr "Sintaxi errorea"
+
+#: parser/KDbParser_p.cpp:216
+#, qt-format
+msgctxt "KDbParser|"
+msgid "\"%1\" is a reserved keyword."
+msgstr "\"%1\" erreserbatutako gako-hitz bat da."
+
+#: parser/KDbParser_p.cpp:220
+msgctxt "KDbParser|"
+msgid "Syntax error."
+msgstr "Sintaxi errorea."
+
+#: parser/KDbParser_p.cpp:224 parser/KDbParser_p.cpp:254
+#: parser/KDbParser_p.cpp:273
+msgctxt "KDbParser|"
+msgid "Error"
+msgstr "Errorea"
+
+#: parser/KDbParser_p.cpp:225
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Error near \"%1\"."
+msgstr "Errorea \"%1\" ondoan."
+
+#: parser/KDbParser_p.cpp:240
+msgctxt "KDbParser|"
+msgid "Other error"
+msgstr "Beste errore bat"
+
+#: parser/KDbParser_p.cpp:244
+msgctxt "KDbParser|"
+msgid "Implementation error"
+msgstr "Inplementazio errorea"
+
+#: parser/KDbParser_p.cpp:255
+msgctxt "KDbParser|"
+msgid "No query statement specified."
+msgstr "Ez da itaun adierazpenik zehaztu."
+
+#: parser/KDbParser_p.cpp:274
+msgctxt "KDbParser|"
+msgid "Unexpected character."
+msgstr "Ustekabeko karakterea."
+
+#: parser/KDbParser_p.cpp:312
+msgctxt "KDbParser|"
+msgid "\"*\" could not be used if no tables are specified."
+msgstr "«*» ezin da erabili taularik zehazten ez bada."
+
+#: parser/KDbParser_p.cpp:318
+msgctxt "KDbParser|"
+msgid "\"*\" could not be added."
+msgstr "«*» ezin izan da gehitu."
+
+#: parser/KDbParser_p.cpp:325
+msgctxt "KDbParser|"
+msgid "\"<table>.*\" could not be added."
+msgstr "\"<taula>.*\" ezin izan da gehitu."
+
+#: parser/KDbParser_p.cpp:330
+msgctxt "KDbParser|"
+msgid "Could not add binding to a field."
+msgstr "Ezin izan zaio eremu bati lotura gehitu."
+
+#: parser/KDbParser_p.cpp:389
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Table \"%1\" does not exist."
+msgstr "\"%1\" taula ez da existitzen."
+
+#: parser/KDbParser_p.cpp:398
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for table \"%2\". This alias is already set for "
+"table \"%3\"."
+msgstr ""
+"Ezin izan zaio ezarri \"%1\" ezizena \"%2\" taulari. Ezizen hau dagoeneko "
+"ezarri zaio \"%3\" taulari."
+
+#: parser/KDbParser_p.cpp:430
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid alias definition for column \"%1\"."
+msgstr "\"%1\" zutabeko ezizen definizio baliogabea."
+
+#: parser/KDbParser_p.cpp:450
+msgctxt "KDbParser|"
+msgid "More than one asterisk \"*\" is not allowed."
+msgstr "Ez da onartzen «*» bat baino gehiago."
+
+#: parser/KDbParser_p.cpp:464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid \"%1\" column definition."
+msgstr "\"%1\" zutabe definizio baliogabea."
+
+#: parser/KDbParser_p.cpp:482
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for column #%2. This alias is already set for "
+"column #%3."
+msgstr ""
+"Ezin izan zaio ezarri \"%1\" ezizena %2 zk. zutabeari. Ezizen hau dagoeneko "
+"ezarri zaio %3 zk. zutabeari."
+
+#: parser/KDbParser_p.cpp:487
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not set alias \"%1\" for column #%2."
+msgstr "Ezin izan zaio ezarri \"%1\" ezizena %2 zk. zutabeari."
+
+#: parser/KDbParser_p.cpp:530
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column at position %1 does not exist."
+msgstr ""
+"Ezin izan da sailkapena definitu. %1 kokapeneko zutabea ez da existitzen."
+
+#: parser/KDbParser_p.cpp:538
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
+msgstr ""
+"Ezin izan da sailkapena definitu. \"%1\" zutabe izena edo ezizena ez da "
+"existitzen."
+
+#: tools/KDbObjectNameValidator.cpp:53
+#, qt-format
+msgctxt "KDbObjectNameValidator|"
+msgid ""
+"Cannot use reserved name \"%1\" for objects. Please choose another name."
+msgstr ""
+"Ezin da erabili erreserbatutako \"%1\" izena objektuetarako. Aukeratu beste "
+"izen bat."
+
+#: tools/KDbObjectNameValidator.cpp:58
+msgctxt "KDbObjectNameValidator|"
+msgid "Names of internal database objects start with \"kexi__\"."
+msgstr "Datu-base barneko objektuen izenak horrela hasten dira: \"kexi__\". "
+
+#: tools/KDbSimpleCommandLineApp.cpp:77
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database driver ID"
+msgstr "Datu-baseko gidari ID"
+
+#: tools/KDbSimpleCommandLineApp.cpp:79
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database user name"
+msgstr "Datu-baseko erabiltzaile-izena"
+
+#: tools/KDbSimpleCommandLineApp.cpp:81
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Prompt for password"
+msgstr "Eskatu pasahitza"
+
+#: tools/KDbSimpleCommandLineApp.cpp:83
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Host (server) name"
+msgstr "Ostalari (zerbitzari) izena"
+
+#: tools/KDbSimpleCommandLineApp.cpp:84
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's port number"
+msgstr "Zerbitzariko ataka zenbakia"
+
+#: tools/KDbSimpleCommandLineApp.cpp:86
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's local socket filename"
+msgstr "Zerbitzariaren hartune lokalaren fitxategi-izena"
+
+#: tools/KDbSimpleCommandLineApp.cpp:107
+#, qt-format
+msgctxt "KDbSimpleCommandLineApp|Enter password for <user>"
+msgid "Enter password for %1: "
+msgstr "Sartu %1(e)ko pasahitza:"
+
+#: tools/KDbValidator.cpp:102
+#, qt-format
+msgctxt "KDbValidator|"
+msgid "\"%1\" value has to be entered."
+msgstr "\"%1\" balioa sartu behar da."
+
+#: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
+#, qt-format
+msgctxt "KDbTableViewData|"
+msgid "\"%1\" column requires a value to be entered."
+msgstr "\"%1\" zutabeak balio bat sartzea behar du."
+
+#: views/KDbTableViewData.cpp:694
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT NULL."
+msgstr "Zutabeko murrizketa EZ NULU gisa deklaratua dago."
+
+#: views/KDbTableViewData.cpp:705
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT EMPTY."
+msgstr "Zutabeko murrizketa EZ HUTSIK gisa deklaratua dago."
+
+#: views/KDbTableViewData.cpp:717
+msgctxt "KDbTableViewData|"
+msgid "Record inserting failed."
+msgstr "Erregistroa txertatzea huts egin du."
+
+#: views/KDbTableViewData.cpp:733
+msgctxt "KDbTableViewData|"
+msgid "Record changing failed."
+msgstr "Erregistroa aldatzea huts egin du."
+
+#: views/KDbTableViewData.cpp:800
+msgctxt "KDbTableViewData|"
+msgid "Record deleting failed."
+msgstr "Erregistroa ezabatzea huts egin du."
+
+#: views/KDbTableViewData.cpp:930
+msgctxt "KDbTableViewData|"
+msgid ""
+"Please correct data in this record or use the \"Cancel record changes\" "
+"function."
+msgstr ""
+"Zuzendu erregistro honetako datuak edo erabili «Utzi erregistroko aldaketak» "
+"funtzioa."

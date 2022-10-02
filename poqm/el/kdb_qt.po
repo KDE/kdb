@@ -1,0 +1,1391 @@
+# Stelios <sstavra@gmail.com>, 2017, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2020-06-03 14:04+0300\n"
+"Last-Translator: Stelios <sstavra@gmail.com>\n"
+"Language-Team: Greek <kde-i18n-el@kde.org>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 18.12.3\n"
+
+#: expression/KDbBinaryExpression.cpp:64
+msgctxt "KDbBinaryExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Ασύμβατοι τύποι ορισμάτων"
+
+#: expression/KDbBinaryExpression.cpp:66
+#, qt-format
+msgctxt "KDbBinaryExpressionData|Binary expression arguments type error"
+msgid ""
+"Expression \"%1\" requires compatible types of arguments. Specified "
+"arguments are of type %2 and %3."
+msgstr ""
+"Η έκφραση «%1» απαιτεί συμβατούς τύπους ορισμάτων. Τα δοσμένα ορίσματα είναι "
+"τύπου %2 και %3."
+
+#: expression/KDbFunctionExpression.cpp:213
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid "Incompatible types in %1() function"
+msgstr "Ασύμβατοι τύποι στη συνάρτηση %1()"
+
+#: expression/KDbFunctionExpression.cpp:215
+#, qt-format
+msgctxt "MinMaxFunctionDeclaration|"
+msgid ""
+"Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
+"arguments of type \"%4\"."
+msgstr ""
+"Το όρισμα #%1 τύπου «%2» στη συνάρτηση %3() δεν είναι συμβατό με τα "
+"προηγούμενα ορίσματα τύπου «%4»."
+
+#: expression/KDbFunctionExpression.cpp:298
+#, qt-format
+msgctxt "RandomFunctionDeclaration|"
+msgid "Invalid arguments of %1() function"
+msgstr "Μη έγκυρα ορίσματα της συνάρτησης %1()"
+
+#: expression/KDbFunctionExpression.cpp:300
+msgctxt "RandomFunctionDeclaration|"
+msgid ""
+"Value of the first argument should be less than value of the second argument."
+msgstr ""
+"Η τιμή του πρώτου ορίσματος πρέπει να είναι μικρότερη από την τιμή του "
+"δεύτερου ορίσματος."
+
+#: expression/KDbFunctionExpression.cpp:940
+#: expression/KDbFunctionExpression.cpp:1190
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect number of arguments (%1)"
+msgstr "Λανθασμένο πλήθος ορισμάτων (%1)"
+
+#: expression/KDbFunctionExpression.cpp:945
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too many arguments.%1"
+msgstr "Πάρα πολλά ορίσματα.%1"
+
+#: expression/KDbFunctionExpression.cpp:949
+#, qt-format
+msgctxt "KDbFunctionExpressionData|don't use space before %1"
+msgid "Too few arguments.%1"
+msgstr "Πολύ λίγα ορίσματα.%1"
+
+#: expression/KDbFunctionExpression.cpp:956
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function does not accept any arguments."
+msgstr "Η συνάρτηση %1%2() δεν δέχεται ορίσματα."
+
+#: expression/KDbFunctionExpression.cpp:961
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires 1 argument."
+msgstr "Η συνάρτηση %1%2() απαιτεί 1 όρισμα."
+
+#: expression/KDbFunctionExpression.cpp:968
+#: expression/KDbFunctionExpression.cpp:1007
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 argument(s)."
+msgid_plural "%1%2() function requires %3 argument(s)."
+msgstr[0] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3."
+msgstr[1] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3."
+
+#: expression/KDbFunctionExpression.cpp:977
+#, qt-format
+msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
+msgid "%1%2() function requires 0 or 1 argument."
+msgstr "Η συνάρτηση %1%2() απαιτεί 0 ή 1 όρισμα."
+
+#: expression/KDbFunctionExpression.cpp:985
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 argument(s)."
+msgstr[0] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3 ή %4."
+msgstr[1] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3 ή %4."
+
+#: expression/KDbFunctionExpression.cpp:993
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
+msgstr[0] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3 ή %4 ή %5."
+msgstr[1] "Η συνάρτηση %1%2() απαιτεί πλήθος ορισμάτων %3 ή %4 ή %5."
+
+#: expression/KDbFunctionExpression.cpp:1003
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1 or %2"
+msgstr "%1 ή %2"
+
+#: expression/KDbFunctionExpression.cpp:1021
+msgctxt "KDbFunctionExpressionData|"
+msgid " or "
+msgstr " ή "
+
+#: expression/KDbFunctionExpression.cpp:1025
+#: expression/KDbFunctionExpression.cpp:1029
+#: expression/KDbFunctionExpression.cpp:1033
+#: expression/KDbFunctionExpression.cpp:1037
+#: expression/KDbFunctionExpression.cpp:1041
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"%1\""
+msgstr "«%1»"
+
+#: expression/KDbFunctionExpression.cpp:1046
+msgctxt "KDbFunctionExpressionData|"
+msgid "\"Number\""
+msgstr "«Πλήθος»"
+
+#: expression/KDbFunctionExpression.cpp:1049
+msgctxt "KDbFunctionExpressionData|Any data type"
+msgid "\"Any\""
+msgstr "«Οποιοσδήποτε»"
+
+#: expression/KDbFunctionExpression.cpp:1053
+msgctxt "KDbFunctionExpressionData|"
+msgid "Incorrect type of argument"
+msgstr "Λανθασμένος τύπος ορίσματος"
+
+#: expression/KDbFunctionExpression.cpp:1055
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Specified argument is of type \"%1\"."
+msgstr "Το δοσμένο όρισμα είναι τύπου «%1»."
+
+#: expression/KDbFunctionExpression.cpp:1059
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's first argument should be of type %2. %3"
+msgstr "Το πρώτο όρισμα της συνάρτησης %1() πρέπει να είναι τύπου %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1064
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's second argument should be of type %2. %3"
+msgstr "Το δεύτερο όρισμα της συνάρτησης %1() πρέπει να είναι τύπου %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1069
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's third argument should be of type %2. %3"
+msgstr "Το τρίτο όρισμα της συνάρτησης %1() πρέπει να είναι τύπου %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1074
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fourth argument should be of type %2. %3"
+msgstr "Το τέταρτο όρισμα της συνάρτησης %1() πρέπει να είναι τύπου %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1079
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's fifth argument should be of type %2. %3"
+msgstr "Το πέμπτο όρισμα της συνάρτησης %1() πρέπει να είναι τύπου %2. %3"
+
+#: expression/KDbFunctionExpression.cpp:1084
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "%1() function's %2 argument should be of type %3. %4"
+msgstr "Το %2 όρισμα της συνάρτησης %1 πρέπει να είναι τύπου %3. %4"
+
+#: expression/KDbFunctionExpression.cpp:1144
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too many arguments for function."
+msgstr "Πάρα πολλά ορίσματα για τη συνάρτηση."
+
+#: expression/KDbFunctionExpression.cpp:1146
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Maximum number of arguments for function %1() is %2."
+msgstr "Το μέγιστο πλήθος ορισμάτων για τη συνάρτηση %1() είναι %2."
+
+#: expression/KDbFunctionExpression.cpp:1193
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least one argument."
+msgstr "Πολύ λίγα ορίσματα. Η συνάρτηση %1() απαιτεί τουλάχιστον ένα όρισμα."
+
+#: expression/KDbFunctionExpression.cpp:1198
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least two arguments."
+msgstr "Πολύ λίγα ορίσματα. Η συνάρτηση %1() απαιτεί τουλάχιστον δύο ορίσματα."
+
+#: expression/KDbFunctionExpression.cpp:1203
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least three arguments."
+msgstr ""
+"Πολύ λίγα ορίσματα. Η συνάρτηση %1() απαιτεί τουλάχιστον τρία ορίσματα."
+
+#: expression/KDbFunctionExpression.cpp:1208
+#, qt-format
+msgctxt "KDbFunctionExpressionData|"
+msgid "Too few arguments. %1() function requires at least %2 arguments."
+msgstr "Πολύ λίγα ορίσματα. Η συνάρτηση %1() απαιτεί τουλάχιστον %2 ορίσματα."
+
+#: expression/KDbNArgExpression.cpp:70
+msgctxt "KDbNArgExpressionData|"
+msgid "Three arguments required"
+msgstr "Τρία ορίσματα απαιτούνται"
+
+#: expression/KDbNArgExpression.cpp:72
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
+msgid "%1 operator requires exactly three arguments."
+msgstr "Ο τελεστής %1 απαιτεί ακριβώς τρία ορίσματα."
+
+#: expression/KDbNArgExpression.cpp:98
+msgctxt "KDbNArgExpressionData|"
+msgid "Incompatible types of arguments"
+msgstr "Ασύμβατοι τύποι ορισμάτων"
+
+#: expression/KDbNArgExpression.cpp:100
+#, qt-format
+msgctxt "KDbNArgExpressionData|BETWEEN..AND arguments type error"
+msgid ""
+"Operator \"%1\" requires compatible types of arguments. Specified arguments "
+"are of type %2, %3, %4."
+msgstr ""
+"Ο τελεστής «%1» απαιτεί συμβατούς τύπους ορισμάτων. Τα δοσμένα ορίσματα "
+"είναι τύπου %2, %3, %4."
+
+#: expression/KDbVariableExpression.cpp:133
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous field name"
+msgstr "Ασαφές όνομα πεδίου"
+
+#: expression/KDbVariableExpression.cpp:135
+#, qt-format
+msgctxt "KDbVariableExpressionData|Note: translate also <tableName>"
+msgid ""
+"Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
+"%4\" notation to specify table name."
+msgstr ""
+"Και οι δύο πίνακες «%1» και «%2» έχουν ορίσει το πεδίο «%3». Χρησιμοποιείστε "
+"το συμβολισμό «<tableName>.%4» για να δηλώσετε το όνομα του πίνακα."
+
+#: expression/KDbVariableExpression.cpp:145
+#: expression/KDbVariableExpression.cpp:222
+msgctxt "KDbVariableExpressionData|"
+msgid "Field not found"
+msgstr "Το πεδίο δε βρέθηκε"
+
+#: expression/KDbVariableExpression.cpp:147
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not find table containing field \"%1\"."
+msgstr "Αδυναμία εύρεσης πίνακα που να περιέχει το πεδίο «%1»."
+
+#: expression/KDbVariableExpression.cpp:172
+msgctxt "KDbVariableExpressionData|"
+msgid "Could not access the table directly using its name"
+msgstr "Αδυναμία πρόσβασης σε πίνακα με απευθείας χρήση του ονόματός του"
+
+#: expression/KDbVariableExpression.cpp:174
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid ""
+"Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
+"used."
+msgstr ""
+"Το όνομα «%1» του πίνακα καλύπτεται από ψευδώνυμα. Αντί του «%2», το «%3» "
+"μπορεί να χρησιμοποιηθεί."
+
+#: expression/KDbVariableExpression.cpp:196
+msgctxt "KDbVariableExpressionData|"
+msgid "Table not found"
+msgstr "Ο πίνακας δε βρέθηκε"
+
+#: expression/KDbVariableExpression.cpp:197
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Unknown table \"%1\"."
+msgstr "Άγνωστος πίνακας «%1»."
+
+#: expression/KDbVariableExpression.cpp:211
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.*\" expression"
+msgstr "Ασαφής «%1.*» έκφραση"
+
+#: expression/KDbVariableExpression.cpp:212
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined."
+msgstr "Περισσότεροι του ενός «%1» πίνακες ή ψευδώνυμα έχουν ορισθεί."
+
+#: expression/KDbVariableExpression.cpp:224
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Table \"%1\" has no \"%2\" field."
+msgstr "Ο πίνακας «%1» δεν έχει «%2» πεδίο."
+
+#: expression/KDbVariableExpression.cpp:231
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "Ambiguous \"%1.%2\" expression"
+msgstr "Ασαφής «%1.%2» έκφραση"
+
+#: expression/KDbVariableExpression.cpp:233
+#, qt-format
+msgctxt "KDbVariableExpressionData|"
+msgid "More than one \"%1\" table or alias defined containing \"%2\" field."
+msgstr ""
+"Περισσότεροι του ενός «%1» πίνακες ή ψευδώνυμα που ορίσθηκαν περιέχουν το "
+"πεδίο «%2»."
+
+#: KDb.cpp:179
+msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
+msgid "Test Connection"
+msgstr "Δοκιμή σύνδεσης"
+
+#: KDb.cpp:180
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Testing connection to \"%1\" database server..."
+msgstr "Δοκιμή σύνδεσης στον «%1» εξυπηρετητή βάσεων δεδομένων..."
+
+#: KDb.cpp:227
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server failed."
+msgstr "Αποτυχία δοκιμής σύνδεσης στον «%1» εξυπηρετητή βάσεων δεδομένων"
+
+#: KDb.cpp:238
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid ""
+"Test connection to \"%1\" database server failed. The server is not "
+"responding."
+msgstr ""
+"Αποτυχία δοκιμής σύνδεσης στον «%1» εξυπηρετητή βάσεων δεδομένων. Ο "
+"εξυπηρετητής δεν ανταποκρίνεται."
+
+#: KDb.cpp:244
+#, qt-format
+msgctxt "ConnectionTestDialog|"
+msgid "Test connection to \"%1\" database server established successfully."
+msgstr ""
+"Η δοκιμή σύνδεσης στον «%1» εξυπηρετητή βάσεων δεδομένων ήταν επιτυχής."
+
+#: KDb.cpp:249
+msgctxt "ConnectionTestDialog|"
+msgid "Test Connection"
+msgstr "Δοκιμή σύνδεσης"
+
+#: KDb.cpp:528
+msgctxt "KDb|"
+msgid "Message from server:"
+msgstr "Μήνυμα από εξυπηρετητή:"
+
+#: KDb.cpp:531
+msgctxt "KDb|"
+msgid "SQL statement:"
+msgstr "SQL πρόταση:"
+
+#: KDb.cpp:546
+msgctxt "KDb|"
+msgid "Server result code:"
+msgstr "Κωδικός αποτελέσματος του εξυπηρετητή:"
+
+#: KDb.cpp:554
+msgctxt "KDb|"
+msgid "Server result:"
+msgstr "Αποτέλεσμα από εξυπηρετητή:"
+
+#: KDb.cpp:1962
+msgctxt "KDbField|"
+msgid "Number"
+msgstr "Αριθμός"
+
+#: KDb.cpp:1965
+msgctxt "KDbField|"
+msgid "Image"
+msgstr "Εικόνα"
+
+#: KDb.cpp:2201
+#, qt-format
+msgctxt "KDb|"
+msgid "Value of \"%1\" field must be an identifier."
+msgstr "Η τιμή του πεδίου «%1» πρέπει να είναι αναγνωριστικό."
+
+#: KDb.cpp:2204
+#, qt-format
+msgctxt "KDb|"
+msgid "\"%1\" is not a valid identifier."
+msgstr "Το «%1» δεν είναι έγκυρο αναγνωριστικό."
+
+#: KDbConnection.cpp:88
+msgctxt "KDbConnectionOptions|Read only connection"
+msgid "Read only"
+msgstr "Ανάγνωση μόνο"
+
+#: KDbConnection.cpp:207
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid database contents. %1"
+msgstr "Μη έγκυρα περιεχόμενα βάσης δεδομένων. %1"
+
+#: KDbConnection.cpp:212
+msgctxt "KDbConnection|"
+msgid "It is a system object."
+msgstr "Είναι αντικείμενο συστήματος."
+
+#: KDbConnection.cpp:360
+msgctxt "KDbConnectionPrivate|"
+msgid "Table has no fields defined."
+msgstr "Ο πίνακας δεν περιέχει πεδία."
+
+#: KDbConnection.cpp:408
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"Could not find definition for query \"%1\". Deleting this query is "
+"recommended."
+msgstr ""
+"Αδυναμία εύρεσης ορισμού για το ερώτημα «%1». Συνιστάτι η διαγραφή αυτού του "
+"ερωτήματος."
+
+#: KDbConnection.cpp:416
+#, qt-format
+msgctxt "KDbConnectionPrivate|"
+msgid ""
+"<p>Could not load definition for query \"%1\". SQL statement for this query "
+"is invalid:<br><tt>%2</tt></p>\n"
+"<p>This query can be edited only in Text View.</p>"
+msgstr ""
+"<p>Αδυναμία φόρτωσης ορισμού για το ερώτημα «%1». Η SQL πρόταση για το "
+"ερώτημα αυτό δεν είναι έγκυρη:<br><tt>%2</tt></p>\n"
+"<p>Η επεξεργασία αυτού του ερωτήματος μπορεί να γίνει μόνο στην προβολή "
+"κειμένου.</p>"
+
+#: KDbConnection.cpp:499
+msgctxt "KDbConnection|"
+msgid "Connection already established."
+msgstr "Η σύνδεση έχει ήδη γίνει."
+
+#: KDbConnection.cpp:509
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not open \"%1\" project file."
+msgstr "Αδυναμία ανοίγματος του «%1» αρχείου έργου."
+
+#: KDbConnection.cpp:511
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not connect to \"%1\" database server."
+msgstr "Αδυναμία σύνδεσης στον εξυπηρετητή βάσεων δεδομένων «%1»."
+
+#: KDbConnection.cpp:558
+msgctxt "KDbConnection|"
+msgid "Not connected to the database server."
+msgstr "Χωρίς σύνδεση στον εξυπηρετητή βάσεων δεδομένων."
+
+#: KDbConnection.cpp:569
+msgctxt "KDbConnection|"
+msgid "Currently no database is used."
+msgstr "Προς το παρόν καμία βάση δεδομένων δεν χρησιμοποιείται."
+
+#: KDbConnection.cpp:623
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "Η βάση δεδομένων «%1» δεν υπάρχει."
+
+#: KDbConnection.cpp:643
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "The database file \"%1\" does not exist."
+msgstr "Το αρχείο «%1» βάσης δεδομένων δεν υπάρχει."
+
+#: KDbConnection.cpp:650
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not readable."
+msgstr "Το αρχείο «%1» βάσης δεδομένων δεν είναι αναγνώσιμο."
+
+#: KDbConnection.cpp:657
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database file \"%1\" is not writable."
+msgstr "Το αρχείο «%1» βάσης δεδομένων δεν είναι εγγράψιμο."
+
+#: KDbConnection.cpp:686
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Database \"%1\" has been created but could not be closed after creation."
+msgstr ""
+"Η βάση δεδομένων «%1» έχει δημιουργηθεί αλλά δεν θα κλείσει αφού "
+"δημιουργηθεί."
+
+#: KDbConnection.cpp:702
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" already exists."
+msgstr "Η βάση δεδομένων «%1» υπάρχει ήδη."
+
+#: KDbConnection.cpp:707
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Could not create database \"%1\". This name is reserved for system database."
+msgstr ""
+"Αδυναμία δημιουργίας της βάσης δεδομένων «%1». Αυτό το όνομα έχει διατηρηθεί "
+"για τη βάση δεδομένων στου συστήματος."
+
+#: KDbConnection.cpp:729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error creating database \"%1\" on the server."
+msgstr "Σφάλμα δημιουργίας της βάσης δεδομένων «%1» στον εξυπηρετητή."
+
+#: KDbConnection.cpp:743
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Database \"%1\" has been created but could not be opened."
+msgstr "Η βάση δεδομένων «%1» έχει δημιουργηθεί αλλά δεν ανοίγει."
+
+#: KDbConnection.cpp:819
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Opening database \"%1\" failed."
+msgstr "Αποτυχία ανοίγματος της βάσης δεδομένων «%1»."
+
+#: KDbConnection.cpp:904
+msgctxt "KDbConnection|"
+msgid "Could not find any database for temporary connection."
+msgstr "Αδυναμία εύρεσης βάσης δεδομένων για προσωρινή σύνδεση."
+
+#: KDbConnection.cpp:913
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Error during starting temporary connection using \"%1\" database name."
+msgstr ""
+"Σφάλμα κατά την έναρξη προσωρινής σύνδεσης με χρήση του ονόματος «%1» βάσης "
+"δεδομένων."
+
+#: KDbConnection.cpp:931 KDbConnection.cpp:949
+msgctxt "KDbConnection|"
+msgid "Could not delete database. Name is not specified."
+msgstr "Αδυναμία διαγραφής βάσης δεδομένων. Το όνομα δεν έχει ορισθεί."
+
+#: KDbConnection.cpp:955
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete system database \"%1\"."
+msgstr "Αδυναμία διαγραφής της βάσης δεδομένων «%1» του συστήματος."
+
+#: KDbConnection.cpp:1002
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object names."
+msgstr "Αδυναμία ανάκτησης της λίστας με τα ονόματα αντικειμένων."
+
+#: KDbConnection.cpp:1016
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of table names."
+msgstr "Αδυναμία ανάκτησης της λίστας με τα ονόματα των πινάκων."
+
+#: KDbConnection.cpp:1024
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of physical table names."
+msgstr "Αδυναμία ανάκτησης της λίστας με τα ονόματα των φυσικών πινάκων."
+
+#: KDbConnection.cpp:1091
+msgctxt "KDbConnection|"
+msgid "Could not retrieve list of object identifiers."
+msgstr "Αδυναμία ανάκτησης της λίστας με τα αναγνωριστικά αντικειμένων."
+
+#: KDbConnection.cpp:1273
+msgctxt "KDbConnection|"
+msgid "SQL statement for execution is invalid or empty."
+msgstr "Η προς εκτέλεση SQL πρόταση είναι μη έγκυρη ή κενή."
+
+#: KDbConnection.cpp:1296
+msgctxt "KDbConnection|"
+msgid "Error while executing SQL statement."
+msgstr "Σφάλμα κατά την εκτέλεση της SQL πρότασης."
+
+#: KDbConnection.cpp:1393
+msgctxt "KDbConnection|"
+msgid "Creating table failed."
+msgstr "Αποτυχία δημιουργίας πίνακα."
+
+#: KDbConnection.cpp:1406
+msgctxt "KDbConnection|"
+msgid "Could not create table without fields."
+msgstr "Αδυναμία δημιουργίας πίνακα χωρίς πεδία."
+
+#: KDbConnection.cpp:1416
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as table name."
+msgstr "Αδυναμία χρήσης του ονόματος συστήματος «%1» ως όνομα πίνακα."
+
+#: KDbConnection.cpp:1425
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
+msgstr ""
+"Αδυναμία χρήσης του ονόματος συστήματος «%1» ως πεδίο στον πίνακα «%2»."
+
+#: KDbConnection.cpp:1441
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not create the same table \"%1\" twice."
+msgstr "Αδυναμία δημιουργίας του ίδιου πίνακα «%1» δύο φορές."
+
+#: KDbConnection.cpp:1455
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" already exists."
+msgstr "Ο πίνακας «%1» υπάρχει ήδη."
+
+#: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Table \"%1\" does not exist."
+msgstr "Ο πίνακας «%1» δεν υπάρχει."
+
+#: KDbConnection.cpp:1579
+msgctxt "KDbConnection|"
+msgid "Could not delete object's data."
+msgstr "Αδυναμία διαγραφής των δεδομένων του αντικειμένου."
+
+#: KDbConnection.cpp:1607 KDbConnection.cpp:1620
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not delete table \"%1\". %2"
+msgstr "Αδυναμία διαγραφής του πίνακα «%1». %2"
+
+#: KDbConnection.cpp:1608
+msgctxt "KDbConnection|"
+msgid "Unexpected name or identifier."
+msgstr "Μη αναμενόμενο όνομα ή αναγνωριστικό."
+
+#: KDbConnection.cpp:1680
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not alter table \"%1\" using the same table as destination."
+msgstr ""
+"Αδυναμία τροποποίησης του πίνακα «%1» με χρήση του ίδιου πίνακα ωε προορισμό."
+
+#: KDbConnection.cpp:1706
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Unknown table \"%1\"."
+msgstr "Άγνωστος πίνακας «%1»."
+
+#: KDbConnection.cpp:1711
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid table name \"%1\"."
+msgstr "Μη έγκυρο όνομα πίνακα «%1»."
+
+#: KDbConnection.cpp:1718
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" using the same name."
+msgstr "Αδυναμία μετονομασίας του πίνακα «%1» με χρήση του ίδιου ονόματος."
+
+#: KDbConnection.cpp:1729
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
+msgstr ""
+"Αδυναμία μετονομασίας του πίνακα «%1» σε «%2». Ο πίνακας «%3» υπάρχει ήδη."
+
+#: KDbConnection.cpp:1839
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Query \"%1\" does not exist."
+msgstr "Το ερώτημα «%1» δεν υπάρχει."
+
+#: KDbConnection.cpp:1946
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Transactions are not supported for \"%1\" driver."
+msgstr "Οι συναλλαγές δεν υποστηρίζονται για τον οδηγό «%1»."
+
+#: KDbConnection.cpp:1951
+msgctxt "KDbConnection|"
+msgid "Begin transaction failed."
+msgstr "Αποτυχία έναρξης συναλλαγής."
+
+#: KDbConnection.cpp:1968
+msgctxt "KDbConnection|"
+msgid "Transaction already started."
+msgstr "Η συναλλαγή έχει ήδη αρχίσει."
+
+#: KDbConnection.cpp:2010 KDbConnection.cpp:2047
+msgctxt "KDbConnection|"
+msgid "Transaction not started."
+msgstr "Η συναλλαγή δεν ξεκίνησε."
+
+#: KDbConnection.cpp:2025
+msgctxt "KDbConnection|"
+msgid "Error on commit transaction."
+msgstr "Σφάλμα στην πραγματοποίηση συναλλαγής."
+
+#: KDbConnection.cpp:2062
+msgctxt "KDbConnection|"
+msgid "Error on rollback transaction."
+msgstr "Σφάλμα στην αναίρεση συναλλαγής."
+
+#: KDbConnection.cpp:2213
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid object name \"%1\"."
+msgstr "Μη έγκυρο όνομα αντικειμένου «%1»."
+
+#: KDbConnection.cpp:2402
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Column \"%1\" does not exist in the query."
+msgstr "Η στήλη «%1» δεν υπάρχει στο ερώτημα."
+
+#: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
+msgctxt "KDbConnection|Extended schema for a table: loading error"
+msgid "Error while loading extended table schema."
+msgstr "Σφάλμα κατά τη φόρτωση εκτεταμένου σχεσιακού σχήματος."
+
+#: KDbConnection.cpp:2763
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Invalid XML data: %1"
+msgstr "Μη έγκυρα XML δεδομένα: %1"
+
+#: KDbConnection.cpp:2784
+#, qt-format
+msgctxt "KDbConnection|"
+msgid ""
+"Error in XML data: \"%1\" in line %2, column %3.\n"
+"XML data: %4"
+msgstr ""
+"Σφάλμα σε XML δεδομένα: «%1» στη γραμμή %2, στήλη %3.\n"
+"XML δεδομένα: %4"
+
+#: KDbConnection.cpp:3113
+msgctxt "KDbConnection|"
+msgid "Could not update record because there is no master table defined."
+msgstr "Αδυναμία ενημέρωσης εγγραφής επειδή δεν έχει ορισθεί κύριος πίνακας."
+
+#: KDbConnection.cpp:3120
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because master table has no primary key defined."
+msgstr ""
+"Αδυναμία ενημέρωσης εγγραφής επειδή δεν έχει ορισθεί πρωτεύον κλειδί στον "
+"κύριο πίνακα."
+
+#: KDbConnection.cpp:3152
+msgctxt "KDbConnection|"
+msgid ""
+"Could not update record because it does not contain entire primary key of "
+"master table."
+msgstr ""
+"Αδυναμία ενημέρωσης εγγραφής επειδή δεν περιέχει το πλήρες πρωτεύον κλειδί "
+"του κύριου πίνακα."
+
+#: KDbConnection.cpp:3163 KDbConnection.cpp:3407
+#, qt-format
+msgctxt "KDbConnection|"
+msgid "Primary key's field \"%1\" cannot be empty."
+msgstr "Το πεδίο του πρωτεύοντος κλειδιού «%1» δεν μπορεί να είναι κενό."
+
+#: KDbConnection.cpp:3191
+msgctxt "KDbConnection|"
+msgid "Record updating on the server failed."
+msgstr "Αποτυχία ενημέρωσης εγγραφής στον εξυπηερετητή."
+
+#: KDbConnection.cpp:3213
+msgctxt "KDbConnection|"
+msgid "Could not insert record because there is no master table specified."
+msgstr "Αδυναμία εισαγωγής εγγραφής επειδή δεν έχει ορισθεί κύριος πίνακας."
+
+#: KDbConnection.cpp:3255
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because master table has no primary key specified."
+msgstr ""
+"Αδυναμία εισαγωγής εγγραφής επειδή δεν έχει ορισθεί πρωτεύον κλειδί στον "
+"κύριο πίνακα."
+
+#: KDbConnection.cpp:3264
+msgctxt "KDbConnection|"
+msgid ""
+"Could not insert record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Αδυναμία εισαγωγής εγγραφής επειδή δεν περιέχει το πλήρες πρωτεύον κλειδί "
+"του κύριου πίνακα."
+
+#: KDbConnection.cpp:3307
+msgctxt "KDbConnection|"
+msgid "Record inserting on the server failed."
+msgstr "Αποτυχία εισαγωγής εγγραφής στον εξυπηρετητή."
+
+#: KDbConnection.cpp:3371
+msgctxt "KDbConnection|"
+msgid "Could not delete record because there is no master table specified."
+msgstr "Αδυναμία διαγραφής εγγραφής επειδή δεν έχει ορισθεί κύριος πίνακας."
+
+#: KDbConnection.cpp:3380
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because there is no primary key for master table "
+"specified."
+msgstr ""
+"Αδυναμία διαγραφής εγγραφής επειδή δεν έχει ορισθεί πρωτεύον κλειδί στον "
+"κύριο πίνακα."
+
+#: KDbConnection.cpp:3397
+msgctxt "KDbConnection|"
+msgid ""
+"Could not delete record because it does not contain entire master table's "
+"primary key."
+msgstr ""
+"Αδυναμία διαγραφής εγγραφής επειδή δεν περιέχει το πλήρες πρωτεύον κλειδί "
+"του κύριου πίνακα."
+
+#: KDbConnection.cpp:3424 KDbConnection.cpp:3447
+msgctxt "KDbConnection|"
+msgid "Record deletion on the server failed."
+msgstr "Αποτυχία διαγραφής εγγραφής στον εξυπηρετητή."
+
+#: KDbConnection.cpp:3543
+msgctxt "KDbConnection|"
+msgid "Unknown error."
+msgstr "Άγνωστο σφάλμα."
+
+#: KDbConnectionData.cpp:41
+msgctxt "KDbConnectionData|"
+msgid "<file>"
+msgstr "<file>"
+
+#: KDbConnectionData.cpp:43
+#, qt-format
+msgctxt "KDbConnectionData|"
+msgid "file: %1"
+msgstr "αρχείο: %1"
+
+#: KDbCursor.cpp:215
+msgctxt "KDbCursor|"
+msgid "No query statement or schema defined."
+msgstr "Δεν έχει ορισθεί ερώτημα ή σχήμα."
+
+#: KDbCursor.cpp:227
+msgctxt "KDbCursor|"
+msgid "Could not generate query statement."
+msgstr "Αδυναμία παραγωγής ερωτήματος."
+
+#: KDbCursor.cpp:242
+msgctxt "KDbCursor|"
+msgid "Error opening database cursor."
+msgstr "Σφάλμα στο άνοιγμα του δείκτη γραμμής της βάσης δεδομένων."
+
+#: KDbCursor.cpp:454 KDbCursor.cpp:478
+msgctxt "KDbCursor|"
+msgid "Could not fetch next record."
+msgstr "Αδυναμία ανάκτησης επόμενης εγγραφής."
+
+#: KDbCursor.cpp:620
+msgctxt "KDbCursor|"
+msgid "No connection for cursor open operation specified."
+msgstr "Δεν ορίσθηκε σύνδεση για ανοικτή λειοτυργία του δείκτη γραμμής."
+
+#: KDbDriver.cpp:85
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Invalid database driver's \"%1\" implementation."
+msgstr "Μη έγκυρη υλοποίηση του οδηγού «%1» βάσης δεδομένων."
+
+#: KDbDriver.cpp:86
+#, qt-format
+msgctxt "KDbDriver|"
+msgid "Value of \"%1\" is not initialized for the driver."
+msgstr "Η τιμή του «%1» δεν προετοιμάστηκε για τον οδηγό."
+
+#: KDbDriver_p.cpp:61
+msgctxt "KDbDriver|"
+msgid "Client library version"
+msgstr "Έκδοση βιβλιοθήκης πελάτη"
+
+#: KDbDriver_p.cpp:63
+msgctxt "KDbDriver|"
+msgid "Default character encoding on server"
+msgstr "Προκαθορισμένη κωδικοποίηση χαρακτήρων στον εξυπηρετητή"
+
+#: KDbDriver_p.cpp:74
+msgctxt "KDbDriver|"
+msgid "File-based database driver"
+msgstr "Οδηγός βάσης δεδομένων βαδισμένος σε αρχεία"
+
+#: KDbDriver_p.cpp:77
+msgctxt "KDbDriver|"
+msgid "File-based database's MIME types"
+msgstr "MIME τύποι βάση δεδομένων βασισμένοι σε αρχεία"
+
+#: KDbDriver_p.cpp:96
+msgctxt "KDbDriver|"
+msgid "Single transactions support"
+msgstr "Υποστήριξη μεμονωμένης συναλλαγής"
+
+#: KDbDriver_p.cpp:98
+msgctxt "KDbDriver|"
+msgid "Multiple transactions support"
+msgstr "Υποστήριξη πολλών συναλλαγών"
+
+#: KDbDriver_p.cpp:100
+msgctxt "KDbDriver|"
+msgid "Nested transactions support"
+msgstr "Υποστήριξη ένθετων συναλλαγών"
+
+#: KDbDriver_p.cpp:102
+msgctxt "KDbDriver|"
+msgid "Ignored transactions support"
+msgstr "Υποστήριξη αγνοημένων συναλλαγών"
+
+#: KDbDriver_p.cpp:107
+msgctxt "KDbDriver|"
+msgid "KDb driver version"
+msgstr "Έκδοση KDb οδηγού"
+
+#: KDbDriverManager.cpp:87
+msgctxt "DriverManagerInternal|"
+msgid "Could not find any database drivers."
+msgstr "Αδυναμία εύρεσης οδηγών βάσης δεδομένων."
+
+#: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not find database driver \"%1\"."
+msgstr "Αδυναμία εύρεσης του οδηγού «%1» της βάσης δεδομένων."
+
+#: KDbDriverManager.cpp:221
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not load database driver's plugin file \"%1\"."
+msgstr ""
+"Αδυναμία φόρτωσης του αρχείου προσθέτων «%1» του οδηγού της βάσης δεδομένων."
+
+#: KDbDriverManager.cpp:232
+#, qt-format
+msgctxt "DriverManagerInternal|"
+msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
+msgstr ""
+"Αδυναμία ανοίγματος του οδηγού «%1» της βάσης δεδομένων από το αρχείο "
+"προσθέτων «%2»."
+
+#: KDbField.cpp:81
+msgctxt "KDbField|"
+msgid "Invalid Type"
+msgstr "Μη έγκυρος τύπος"
+
+#: KDbField.cpp:82
+msgctxt "KDbField|"
+msgid "Byte"
+msgstr "Byte"
+
+#: KDbField.cpp:83
+msgctxt "KDbField|"
+msgid "Short Integer Number"
+msgstr "Μικρός ακέραιος"
+
+#: KDbField.cpp:84 KDbField.cpp:105
+msgctxt "KDbField|"
+msgid "Integer Number"
+msgstr "Ακέραιςο αριθμός"
+
+#: KDbField.cpp:85
+msgctxt "KDbField|"
+msgid "Big Integer Number"
+msgstr "Μεγάλος ακέραιος"
+
+#: KDbField.cpp:86
+msgctxt "KDbField|"
+msgid "Yes/No Value"
+msgstr "Τιμή Ναι/Όχι"
+
+#: KDbField.cpp:87
+msgctxt "KDbField|"
+msgid "Date"
+msgstr "Ημερομηνία"
+
+#: KDbField.cpp:88
+msgctxt "KDbField|"
+msgid "Date and Time"
+msgstr "Ημερομηνία και ώρα"
+
+#: KDbField.cpp:89
+msgctxt "KDbField|"
+msgid "Time"
+msgstr "Ώρα"
+
+#: KDbField.cpp:90
+msgctxt "KDbField|"
+msgid "Single Precision Number"
+msgstr "Αριθμός μονής ακρίβειας"
+
+#: KDbField.cpp:91
+msgctxt "KDbField|"
+msgid "Double Precision Number"
+msgstr "Αριθμός διπλής ακρίβειας"
+
+#: KDbField.cpp:92 KDbField.cpp:104
+msgctxt "KDbField|"
+msgid "Text"
+msgstr "Κείμενο"
+
+#: KDbField.cpp:93
+msgctxt "KDbField|"
+msgid "Long Text"
+msgstr "Μεγάλο κείμενο"
+
+#: KDbField.cpp:94 KDbField.cpp:109
+msgctxt "KDbField|"
+msgid "Object"
+msgstr "Αντικείμενο"
+
+#: KDbField.cpp:103
+msgctxt "KDbField|"
+msgid "Invalid Group"
+msgstr "Μη έγκυρη ομάδα"
+
+#: KDbField.cpp:106
+msgctxt "KDbField|"
+msgid "Floating Point Number"
+msgstr "Αριθμός κινητής υποδιαστολής"
+
+#: KDbField.cpp:107
+msgctxt "KDbField|"
+msgid "Yes/No"
+msgstr "Ναι/Όχι"
+
+#: KDbField.cpp:108
+msgctxt "KDbField|"
+msgid "Date/Time"
+msgstr "Ημερομηνία/Ώρα"
+
+#: KDbProperties.cpp:42 KDbProperties.cpp:53 KDbProperties.cpp:65
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set value of database property \"%1\"."
+msgstr "Αδυναμία ορισμού τιμής για την ιδιότητα «%1» της βάσης δεδομένων."
+
+#: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not set caption for database property \"%1\"."
+msgstr "Αδυναμία ορισμού τίτλου για την ιδιότητα «%1» της βάσης δεδομένων."
+
+#: KDbProperties.cpp:118 KDbProperties.cpp:135
+#, qt-format
+msgctxt "KDbProperties|"
+msgid "Could not read database property \"%1\"."
+msgstr "Αδυναμία ανάγνωσης της ιδιότητας «%1» της βάσης δεδομένων."
+
+#: KDbProperties.cpp:150
+msgctxt "KDbProperties|"
+msgid "Could not read database properties."
+msgstr "Αδυναμία ανάγνωσης των ιδιοτήτων της βάσης δεδομένων."
+
+#: KDbQuerySchema_p.cpp:132
+#, qt-format
+msgctxt ""
+"KDbQuerySchema|short for 'expression' word, it will expand to 'expr1', "
+"'expr2', etc. Please use ONLY latin letters and DON'T use '.'"
+msgid "expr%1"
+msgstr "expr%1"
+
+#: KDbResult.cpp:56
+msgctxt "KDbResult|"
+msgid "Unspecified error encountered"
+msgstr "Παρουσιάστηκε απροσδιόριστο σφάλμα"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "Invalid integer number"
+msgstr "Μη έγκυρος ακέραιαος"
+
+#: parser/generated/sqlscanner.cpp:1023
+msgctxt "KDbParser|"
+msgid "This integer number may be too large."
+msgstr "Αυτός ο ακέραιος ίσως είναι πολύ μεγάλος."
+
+#: parser/generated/sqlscanner.cpp:1109
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1 in date/time"
+msgstr "Μη αναμενόμενος χαρακτήρας %1 στην ημερομηνία/ώρα"
+
+#: parser/generated/sqlscanner.cpp:1404
+msgctxt "KDbParser|"
+msgid "Invalid string"
+msgstr "Μη έγκυρη συμβολοσειρά"
+
+#: parser/generated/sqlscanner.cpp:1405
+msgctxt "KDbParser|"
+msgid "Invalid character in string"
+msgstr "Μη έγκυρος χαρακτήρας σε συμβολοσειρά"
+
+#: parser/generated/sqlscanner.cpp:1421
+msgctxt "KDbParser|"
+msgid "Invalid identifier"
+msgstr "Μη έγκυρο αναγνωριστικό"
+
+#: parser/generated/sqlscanner.cpp:1422
+msgctxt "KDbParser|"
+msgid "Identifiers should start with a letter or '_' character"
+msgstr "Τα αναγνωριστικά ξεκινούν με γράμμα ή τον χαρακτήρα '_'"
+
+#: parser/generated/sqlscanner.cpp:1464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Unexpected character %1"
+msgstr "Μη αναμενόμενος χαρακτήρας %1"
+
+#: parser/KDbParser_p.cpp:205
+msgctxt "KDbParser|"
+msgid "identifier was expected"
+msgstr "αναμενόταν αναγνωριστικό"
+
+#: parser/KDbParser_p.cpp:215 parser/KDbParser_p.cpp:219
+msgctxt "KDbParser|"
+msgid "Syntax Error"
+msgstr "Συντακτικό σφάλμα"
+
+#: parser/KDbParser_p.cpp:216
+#, qt-format
+msgctxt "KDbParser|"
+msgid "\"%1\" is a reserved keyword."
+msgstr "Το «%1» είναι κατοχυρωμένη λέξη-κλειδί."
+
+#: parser/KDbParser_p.cpp:220
+msgctxt "KDbParser|"
+msgid "Syntax error."
+msgstr "Συντακτικό σφάλμα."
+
+#: parser/KDbParser_p.cpp:224 parser/KDbParser_p.cpp:254
+#: parser/KDbParser_p.cpp:273
+msgctxt "KDbParser|"
+msgid "Error"
+msgstr "Σφάλμα"
+
+#: parser/KDbParser_p.cpp:225
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Error near \"%1\"."
+msgstr "Σφάλμα κοντά στο «%1»."
+
+#: parser/KDbParser_p.cpp:240
+msgctxt "KDbParser|"
+msgid "Other error"
+msgstr "Άλλο σφάλμα"
+
+#: parser/KDbParser_p.cpp:244
+msgctxt "KDbParser|"
+msgid "Implementation error"
+msgstr "Σφάλμα υλοποίησης"
+
+#: parser/KDbParser_p.cpp:255
+msgctxt "KDbParser|"
+msgid "No query statement specified."
+msgstr "Δεν ορίσθηκε ερώτημα."
+
+#: parser/KDbParser_p.cpp:274
+msgctxt "KDbParser|"
+msgid "Unexpected character."
+msgstr "Μη αναμενόμενος χαρακτήρας."
+
+#: parser/KDbParser_p.cpp:312
+msgctxt "KDbParser|"
+msgid "\"*\" could not be used if no tables are specified."
+msgstr "Αδυναμία χρήσης του «*» αν δεν ορισθούν πίνακες."
+
+#: parser/KDbParser_p.cpp:318
+msgctxt "KDbParser|"
+msgid "\"*\" could not be added."
+msgstr "Αδυναμία προσθήκης «*»."
+
+#: parser/KDbParser_p.cpp:325
+msgctxt "KDbParser|"
+msgid "\"<table>.*\" could not be added."
+msgstr "Αδυναμία προσθήκης του «<table>.*»."
+
+#: parser/KDbParser_p.cpp:330
+msgctxt "KDbParser|"
+msgid "Could not add binding to a field."
+msgstr "Αδυναμόα προσθήκης δέσμευσης σε πεδίο."
+
+#: parser/KDbParser_p.cpp:389
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Table \"%1\" does not exist."
+msgstr "Ο πίνακας «%1» δεν υπάρχει."
+
+#: parser/KDbParser_p.cpp:398
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for table \"%2\". This alias is already set for "
+"table \"%3\"."
+msgstr ""
+"Αδυναμία ορισμού ψευδωνύμου «%1» για τον πίνακα «%2». Αυτό το ψευδώνυμο έχει "
+"ήδη ρυθμιστεί για τον πίνακα «%3»."
+
+#: parser/KDbParser_p.cpp:430
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid alias definition for column \"%1\"."
+msgstr "Μη έγκυρος ορισμός ψευδωνύμου για τη στήλη «%1»."
+
+#: parser/KDbParser_p.cpp:450
+msgctxt "KDbParser|"
+msgid "More than one asterisk \"*\" is not allowed."
+msgstr "Δεν επιτρέπονται περισσότεροι του ενός αστερίσκοι «*»."
+
+#: parser/KDbParser_p.cpp:464
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Invalid \"%1\" column definition."
+msgstr "Μη έγκυρος ορισμός στήλης «%1»."
+
+#: parser/KDbParser_p.cpp:482
+#, qt-format
+msgctxt "KDbParser|"
+msgid ""
+"Could not set alias \"%1\" for column #%2. This alias is already set for "
+"column #%3."
+msgstr ""
+"Αδυναμία ορισμού ψευδωνύμου «%1» για τη στήλη #%2. Αυτό το ψευδώνυμο έχει "
+"ήδη ρυθμιστεί για τη στήλη #%3."
+
+#: parser/KDbParser_p.cpp:487
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not set alias \"%1\" for column #%2."
+msgstr "Αδυναμία ορισμού ψευδωνύμου «%1» για τη στήλη #%2."
+
+#: parser/KDbParser_p.cpp:530
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column at position %1 does not exist."
+msgstr "Αδυναμία ορισμού ταξινόμησης. Η στήλη στη θέση %1 δεν υπάρχει."
+
+#: parser/KDbParser_p.cpp:538
+#, qt-format
+msgctxt "KDbParser|"
+msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
+msgstr ""
+"Αδυναμία ορισμού ταξινόμησης. Το όνομα ή ψευδώνυμο «%1» της στήλης δεν "
+"υπάρχει."
+
+#: tools/KDbObjectNameValidator.cpp:53
+#, qt-format
+msgctxt "KDbObjectNameValidator|"
+msgid ""
+"Cannot use reserved name \"%1\" for objects. Please choose another name."
+msgstr ""
+"Αδυναμία χρήσης του κατοχυρωμένου ονόματος «%1» για αντικείμενα. Επιλέξτε "
+"άλλο όνομα."
+
+#: tools/KDbObjectNameValidator.cpp:58
+msgctxt "KDbObjectNameValidator|"
+msgid "Names of internal database objects start with \"kexi__\"."
+msgstr ""
+"Τα ονόματα των αντικειμένων της εσωτερικής βάσης δεδομένων αρχίζουν με "
+"«kexi__»."
+
+#: tools/KDbSimpleCommandLineApp.cpp:77
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database driver ID"
+msgstr "Αναγνωριστικό οδηγού βάσης δεδομένων"
+
+#: tools/KDbSimpleCommandLineApp.cpp:79
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Database user name"
+msgstr "Όνομα χρήστη βάσης δεδομένων"
+
+#: tools/KDbSimpleCommandLineApp.cpp:81
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Prompt for password"
+msgstr "Προτροπή για κωδικό πρόσβασης"
+
+#: tools/KDbSimpleCommandLineApp.cpp:83
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Host (server) name"
+msgstr "Όνομα υπολογιστή (εξυπηρετητή)"
+
+#: tools/KDbSimpleCommandLineApp.cpp:84
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's port number"
+msgstr "Αριθμός θύρας εξυπηρετητή"
+
+#: tools/KDbSimpleCommandLineApp.cpp:86
+msgctxt "KDbSimpleCommandLineApp|"
+msgid "Server's local socket filename"
+msgstr "Όνομα αρχείου τοπικής υποδοχής στον εξυπηρετητή"
+
+#: tools/KDbSimpleCommandLineApp.cpp:107
+#, qt-format
+msgctxt "KDbSimpleCommandLineApp|Enter password for <user>"
+msgid "Enter password for %1: "
+msgstr "Δώστε κωδικό πρόσβασης για %1: "
+
+#: tools/KDbValidator.cpp:102
+#, qt-format
+msgctxt "KDbValidator|"
+msgid "\"%1\" value has to be entered."
+msgstr "Η τιμή «%1» πρέπει να εισαχθεί."
+
+#: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
+#, qt-format
+msgctxt "KDbTableViewData|"
+msgid "\"%1\" column requires a value to be entered."
+msgstr "Η στήλη «%1» απαιτεί τιμή για να εισαχθεί."
+
+#: views/KDbTableViewData.cpp:694
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT NULL."
+msgstr "Ο περιορισμός της στήλης δηλώνεται ως NOT NULL."
+
+#: views/KDbTableViewData.cpp:705
+msgctxt "KDbTableViewData|"
+msgid "The column's constraint is declared as NOT EMPTY."
+msgstr "Ο περιορισμός της στήλης δηλώνεται ως NOT EMPTY."
+
+#: views/KDbTableViewData.cpp:717
+msgctxt "KDbTableViewData|"
+msgid "Record inserting failed."
+msgstr "Αποτυχία εισαγωγής εγγραφής."
+
+#: views/KDbTableViewData.cpp:733
+msgctxt "KDbTableViewData|"
+msgid "Record changing failed."
+msgstr "Αποτυχία αλλαγής εγγραφής."
+
+#: views/KDbTableViewData.cpp:800
+msgctxt "KDbTableViewData|"
+msgid "Record deleting failed."
+msgstr "Αποτυχία διαγραφής εγγραφής."
+
+#: views/KDbTableViewData.cpp:930
+msgctxt "KDbTableViewData|"
+msgid ""
+"Please correct data in this record or use the \"Cancel record changes\" "
+"function."
+msgstr ""
+"Διορθώστε τα δεδομένα σε αυτήν την εγγραφή ή χρησιμοποιήστε τη συνάρτηση "
+"«Ακύρωση αλλαγών σε εγγραφή»."

@@ -1,0 +1,95 @@
+# Marek Laane <qiilaq69@gmail.com>, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2019-11-29 12:55+0200\n"
+"Last-Translator: Marek Laane <qiilaq69@gmail.com>\n"
+"Language-Team: Estonian <kde-et@lists.linux.ee>\n"
+"Language: et\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 19.08.1\n"
+
+#: SqliteAdmin.cpp:43
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not compact database \"%1\"."
+msgstr "Andmebaasi \"%1\" tihendamine nurjus."
+
+#: SqliteConnection.cpp:49
+msgctxt "SqliteConnection|"
+msgid "Extra paths for SQLite plugins"
+msgstr "SQLite'i pluginate lisaasukohad"
+
+#: SqliteConnection.cpp:273
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid ""
+"Could not delete file \"%1\". Check the file's permissions and whether it is "
+"already opened and locked by another application."
+msgstr ""
+"Faili \"%1\" kustutamine nurjus. Kontrolli faili õigusi ja seda, ega see ei "
+"ole juba avatud ja lukustatud mõnes muus rakenduses."
+
+#: SqliteConnection.cpp:375
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite plugin \"%1\"."
+msgstr "SQLite'i plugina \"%1\" laadimine nurjus."
+
+#: SqliteConnection.cpp:386
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not find SQLite plugin file \"%1\"."
+msgstr "SQLite'i plugina faili \"%1\" ei leitud."
+
+#: SqliteConnection.cpp:401
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite extension \"%1\"."
+msgstr "SQLite'i laienduse \"%1\" laadimine nurjus."
+
+#: SqliteVacuum.cpp:97
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find tool \"%1\"."
+msgstr "Tööriista \"%1\" ei leitud."
+
+#: SqliteVacuum.cpp:105
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find application \"%1\"."
+msgstr "Rakendust \"%1\" ei leitud."
+
+#: SqliteVacuum.cpp:113
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not read file \"%1\"."
+msgstr "Faili \"%1\" lugemine nurjus."
+
+#: SqliteVacuum.cpp:168
+msgctxt "SqliteVacuum|"
+msgid "Compacting database"
+msgstr "Andmebaasi tihendamine"
+
+#: SqliteVacuum.cpp:170
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Compacting database \"%1\"..."
+msgstr "Andmebaasi \"%1\" tihendamine ..."
+
+#: SqliteVacuum.cpp:259
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not rename file \"%1\" to \"%2\"."
+msgstr "Failile \"%1\" nime \"%2\" andmine nurjus."
+
+#: SqliteVacuum.cpp:267
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid ""
+"The database has been compacted. Current size decreased by %1% to %2 MB."
+msgstr "Andmebaas on tihendatud. Suurus vähenes %1% võrra %2 MB peale."

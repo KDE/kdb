@@ -1,0 +1,20 @@
+# Stelios <sstavra@gmail.com>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2017-11-08 16:12+0200\n"
+"Last-Translator: Stelios <sstavra@gmail.com>\n"
+"Language-Team: Greek <kde-i18n-el@kde.org>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: MysqlConnection.cpp:136
+#, qt-format
+msgctxt "MysqlConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "Η βάση δεδομένων «%1» δεν υπάρχει."

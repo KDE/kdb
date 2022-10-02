@@ -1,0 +1,20 @@
+# Stefan Asserhäll <stefan.asserhall@bredband.net>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2015-07-16 15:25+0200\n"
+"Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
+"Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 1.5\n"
+
+#: MysqlConnection.cpp:136
+#, qt-format
+msgctxt "MysqlConnection|"
+msgid "The database \"%1\" does not exist."
+msgstr "Databasen \"%1\" finns inte."
