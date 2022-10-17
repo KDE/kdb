@@ -619,7 +619,7 @@ msgstr "No s'ha pogut recuperar la llista de noms d'identificadors."
 #: KDbConnection.cpp:1273
 msgctxt "KDbConnection|"
 msgid "SQL statement for execution is invalid or empty."
-msgstr "La sentència SQL que s'ha d'executar no és vàlida o es troba buida."
+msgstr "La sentència SQL que s'executarà no és vàlida o es troba buida."
 
 #: KDbConnection.cpp:1296
 msgctxt "KDbConnection|"
