@@ -7,6 +7,12 @@ endif()
 
 set(KDB_PLUGIN_INSTALL_DIR ${KDE_INSTALL_PLUGINDIR}/${KDB_BASE_NAME_LOWER})
 
+# Instruct automoc about C++ preprocessor macros used to define Qt-style plugins:
+ecm_setup_qtplugin_macro_names(
+    JSON_ARG2
+       KDB_DRIVER_PLUGIN_FACTORY
+)
+
 # -----------------------
 macro(build_and_install_kdb_driver _name _srcs _extra_libs)
     set(_target kdb_${_name}driver)

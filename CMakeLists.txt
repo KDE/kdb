@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
+# Dependencies
+set(REQUIRED_QT_VERSION 5.4.0)
 set(REQUIRED_KF5_VERSION 5.45.0)
+
 find_package(ECM ${REQUIRED_KF5_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 include(SetKDbCMakePolicies NO_POLICY_SCOPE)
@@ -32,9 +35,6 @@ include(KDbMacros)
 
 simple_option(BUILD_QCH "Build API documentation in QCH format" OFF)
 
-# Dependencies
-set(REQUIRED_QT_VERSION 5.4.0)
-set(REQUIRED_KF5_VERSION 5.16.0)
 
 # Required components to build this framework
 # TODO move Widgets-dependent part to a libKDbWidgets
