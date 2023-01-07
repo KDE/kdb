@@ -51,7 +51,7 @@
         "Description[et]": "KDb draiver Sybase'i ja MSSQL-i andmebaaside käitlemiseks",
         "Description[eu]": "Sybase eta MSSQL datu-baseak maneiatzeko KDb gidaria",
         "Description[fi]": "KDb-ajuri Sybase- ja MSSQL-tietokantojen käsittelyyn",
-        "Description[fr]": "Pilote KDb de gestion des bases de données Sybase et MSSQL",
+        "Description[fr]": "Pilote « KDb » de gestion des bases de données « Sybase » et « MSSQL »",
         "Description[gl]": "Controlador de KDb para manexar bases de datos Sybase e MSSQL.",
         "Description[ia]": "Driver de KDb per manear bases de datos de MSSQL",
         "Description[it]": "Driver KDb per la gestione di banche dati Sybase e MSSQL",
