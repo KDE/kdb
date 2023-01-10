@@ -30,6 +30,8 @@
 #include "KDbExpression.h"
 #include "kdb_debug.h"
 
+#include <algorithm>
+
 /*! @internal Used in KDbDriver::defaultSqlTypeName(int)
  when we do not have KDbDriver instance yet, or when we cannot get one */
 static const char* const KDb_defaultSqlTypeNames[] = {
@@ -289,7 +291,7 @@ KDbUtils::Property KDbDriver::internalProperty(const QByteArray& name) const
 QList<QByteArray> KDbDriver::internalPropertyNames() const
 {
     QList<QByteArray> names(d->driverBehavior.properties.names());
-    qSort(names);
+    std::sort(names.begin(), names.end());
     return names;
 }
 
