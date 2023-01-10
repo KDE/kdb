@@ -1627,7 +1627,6 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
     else if (type == BLOBEscapingType::ByteaHex)
         str = QString::fromLatin1("E'\\\\x");
 
-    int new_length = str.length(); //after X' or 0x, etc.
     if (type == BLOBEscapingType::Octal) {
         // only escape nonprintable characters as in Table 8-7:
         // https://www.postgresql.org/docs/8.1/interactive/datatype-binary.html
@@ -1635,33 +1634,26 @@ QString KDb::escapeBLOB(const QByteArray& array, BLOBEscapingType type)
         for (int i = 0; i < size; i++) {
             const unsigned char val = array[i];
             if (val < 32 || val >= 127 || val == 39 || val == 92) {
-                str[new_length++] = QLatin1Char('\\');
-                str[new_length++] = QLatin1Char('\\');
-                str[new_length++] = QChar::fromLatin1('0' + val / 64);
-                str[new_length++] = QChar::fromLatin1('0' + (val % 64) / 8);
-                str[new_length++] = QChar::fromLatin1('0' + val % 8);
+                str.append(QLatin1Char('\\'));
+                str.append(QLatin1Char('\\'));
+                str.append(QChar::fromLatin1('0' + val / 64));
+                str.append(QChar::fromLatin1('0' + (val % 64) / 8));
+                str.append(QChar::fromLatin1('0' + val % 8));
             } else {
-                str[new_length++] = QChar::fromLatin1(val);
+                str.append(QChar::fromLatin1(val));
             }
         }
     } else {
         for (int i = 0; i < size; i++) {
             const unsigned char val = array[i];
-            str[new_length++] =  QChar::fromLatin1(intToHexDigit(val / 16));
-            str[new_length++] =  QChar::fromLatin1(intToHexDigit(val % 16));
+            str.append(QChar::fromLatin1(intToHexDigit(val / 16)));
+            str.append(QChar::fromLatin1(intToHexDigit(val % 16)));
         }
     }
     if (type == BLOBEscapingType::XHex || type == BLOBEscapingType::Octal) {
-        str[new_length++] = QLatin1Char('\'');
+        str.append(QLatin1Char('\''));
     } else if (type == BLOBEscapingType::ByteaHex) {
-        str[new_length++] = QLatin1Char('\'');
-        str[new_length++] = QLatin1Char(':');
-        str[new_length++] = QLatin1Char(':');
-        str[new_length++] = QLatin1Char('b');
-        str[new_length++] = QLatin1Char('y');
-        str[new_length++] = QLatin1Char('t');
-        str[new_length++] = QLatin1Char('e');
-        str[new_length++] = QLatin1Char('a');
+        str.append(QLatin1String("\'::bytea"));
     }
     return str;
 }

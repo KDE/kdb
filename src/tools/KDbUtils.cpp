@@ -298,7 +298,7 @@ QString KDbUtils::pointerToStringInternal(void* pointer, int size)
     unsigned char* cstr_pointer = (unsigned char*) & pointer;
     for (int i = 0; i < size; i++) {
         QString s;
-        s.sprintf("%2.2x", cstr_pointer[i]);
+        s.asprintf("%2.2x", cstr_pointer[i]);
         string.append(s);
     }
     return string;

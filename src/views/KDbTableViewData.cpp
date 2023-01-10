@@ -80,7 +80,7 @@ private:
 
 Q_GLOBAL_STATIC(CollatorInstance, KDb_collator)
 
-//! @internal A functor used in qSort() in order to sort by a given column
+//! @internal A functor used in std::sort() in order to sort by a given column
 class LessThanFunctor
 {
 private:
@@ -561,7 +561,7 @@ void KDbTableViewData::sort()
     if (d->sortColumn < 0 || d->sortColumn >= d->columns.count()) {
         return;
     }
-    qSort(begin(), end(), d->lessThanFunctor);
+    std::sort(begin(), end(), d->lessThanFunctor);
 }
 
 void KDbTableViewData::setReadOnly(bool set)
