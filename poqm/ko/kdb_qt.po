@@ -400,23 +400,23 @@ msgctxt "KDb|"
 msgid "Server result:"
 msgstr "서버 결과:"
 
-#: KDb.cpp:1962
+#: KDb.cpp:1954
 msgctxt "KDbField|"
 msgid "Number"
 msgstr "숫자"
 
-#: KDb.cpp:1965
+#: KDb.cpp:1957
 msgctxt "KDbField|"
 msgid "Image"
 msgstr "이미지"
 
-#: KDb.cpp:2201
+#: KDb.cpp:2193
 #, qt-format
 msgctxt "KDb|"
 msgid "Value of \"%1\" field must be an identifier."
 msgstr "\"%1\" 필드의 값은 식별자여야 합니다."
 
-#: KDb.cpp:2204
+#: KDb.cpp:2196
 #, qt-format
 msgctxt "KDb|"
 msgid "\"%1\" is not a valid identifier."
@@ -898,13 +898,13 @@ msgctxt "KDbCursor|"
 msgid "No connection for cursor open operation specified."
 msgstr "커서 열기 작업에 사용할 연결을 지정하지 않았습니다."
 
-#: KDbDriver.cpp:85
+#: KDbDriver.cpp:87
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Invalid database driver's \"%1\" implementation."
 msgstr "데이터베이스 드라이버의 \"%1\" 구현이 잘못되었습니다."
 
-#: KDbDriver.cpp:86
+#: KDbDriver.cpp:88
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Value of \"%1\" is not initialized for the driver."

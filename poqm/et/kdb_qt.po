@@ -399,23 +399,23 @@ msgctxt "KDb|"
 msgid "Server result:"
 msgstr "Serveri vastus:"
 
-#: KDb.cpp:1962
+#: KDb.cpp:1954
 msgctxt "KDbField|"
 msgid "Number"
 msgstr "Arv"
 
-#: KDb.cpp:1965
+#: KDb.cpp:1957
 msgctxt "KDbField|"
 msgid "Image"
 msgstr "Pilt"
 
-#: KDb.cpp:2201
+#: KDb.cpp:2193
 #, qt-format
 msgctxt "KDb|"
 msgid "Value of \"%1\" field must be an identifier."
 msgstr "Välja \"%1\" väärtus peab olema identifikaator."
 
-#: KDb.cpp:2204
+#: KDb.cpp:2196
 #, qt-format
 msgctxt "KDb|"
 msgid "\"%1\" is not a valid identifier."
@@ -881,13 +881,13 @@ msgctxt "KDbCursor|"
 msgid "No connection for cursor open operation specified."
 msgstr "Ühtegi ühendust kursori avamise toiminguks ei ole määratud."
 
-#: KDbDriver.cpp:85
+#: KDbDriver.cpp:87
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Invalid database driver's \"%1\" implementation."
 msgstr "Vigane andmebaasidraiveri \"%1\" teostus."
 
-#: KDbDriver.cpp:86
+#: KDbDriver.cpp:88
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Value of \"%1\" is not initialized for the driver."
