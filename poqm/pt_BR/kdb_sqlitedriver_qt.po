@@ -1,0 +1,120 @@
+# Translation of kbd_sqlitedriver_qt.po to Brazilian Portuguese
+# Copyright (C) 2015 This_file_is_part_of_KDE
+# This file is distributed under the same license as the PACKAGE package.
+#
+# André Marcelo Alvarenga <alvarenga@kde.org>, 2015.
+# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2018.
+msgid ""
+msgstr ""
+"Project-Id-Version: kbd_sqlitedriver_qt\n"
+"PO-Revision-Date: 2018-08-29 10:00-0300\n"
+"Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
+"Language-Team: Portuguese <kde-i18n-pt_BR@kde.org>\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Qt-Contexts: true\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: SqliteAdmin.cpp:43
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not compact database \"%1\"."
+msgstr "Não foi possível compactar o banco de dados \"%1\"."
+
+#: SqliteConnection.cpp:49
+msgctxt "SqliteConnection|"
+msgid "Extra paths for SQLite plugins"
+msgstr "Caminhos extras para os plugins SQLite"
+
+#: SqliteConnection.cpp:273
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid ""
+"Could not delete file \"%1\". Check the file's permissions and whether it is "
+"already opened and locked by another application."
+msgstr ""
+"Não foi possível remover o arquivo \"%1\". Verifique as permissões do "
+"arquivo e se ele já está aberto e bloqueado por outro aplicativo."
+
+#: SqliteConnection.cpp:375
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite plugin \"%1\"."
+msgstr "Não foi possível carregar o plugin SQLite \"%1\"."
+
+#: SqliteConnection.cpp:386
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not find SQLite plugin file \"%1\"."
+msgstr "Não foi possível encontrar o arquivo do plugin SQLite \"%1\"."
+
+#: SqliteConnection.cpp:401
+#, qt-format
+msgctxt "SqliteConnection|"
+msgid "Could not load SQLite extension \"%1\"."
+msgstr "Não foi possível carregar a extensão SQLite \"%1\"."
+
+#: SqliteVacuum.cpp:97
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find tool \"%1\"."
+msgstr "Não foi possível encontrar a ferramenta SQLite \"%1\"."
+
+#: SqliteVacuum.cpp:105
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not find application \"%1\"."
+msgstr "Não foi possível encontrar o aplicativo \"%1\""
+
+#: SqliteVacuum.cpp:113
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not read file \"%1\"."
+msgstr "Não foi possível ler o arquivo '\"%1\"."
+
+#: SqliteVacuum.cpp:168
+msgctxt "SqliteVacuum|"
+msgid "Compacting database"
+msgstr "Compactando o banco de dados"
+
+#: SqliteVacuum.cpp:170
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Compacting database \"%1\"..."
+msgstr "Compactando o banco de dados \"%1\"..."
+
+#: SqliteVacuum.cpp:259
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid "Could not rename file \"%1\" to \"%2\"."
+msgstr "Não foi possível renomear o arquivo \"%1\" para \"%2\"."
+
+#: SqliteVacuum.cpp:267
+#, qt-format
+msgctxt "SqliteVacuum|"
+msgid ""
+"The database has been compacted. Current size decreased by %1% to %2 MB."
+msgstr ""
+"O banco de dados foi compactado. O tamanho atual reduziu em %1% para %2 MB."
+
+#~ msgctxt "SqliteConnection|"
+#~ msgid "Extra SQLite extension paths"
+#~ msgstr "Caminhos da extensão extra do SQLite"
+
+#~ msgctxt "SqliteVacuum|"
+#~ msgid "Could not find tool <filename>%1</filename>."
+#~ msgstr "Não foi possível encontrar a ferramenta <filename>%1</filename>."
+
+#~ msgctxt "SqliteVacuum|"
+#~ msgid "Could not read file <filename>%1</filename>."
+#~ msgstr "Não foi possível ler o arquivo <filename>%1</filename>."
+
+#~ msgctxt "SqliteVacuum|"
+#~ msgid ""
+#~ "Could not rename file <filename>%1</filename> to <filename>%2</filename>."
+#~ msgstr ""
+#~ "Não foi possível renomear o arquivo <filename>%1</filename> para "
+#~ "<filename>%2</filename>."
