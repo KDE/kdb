@@ -1,16 +1,17 @@
 # Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2015, 2016, 2017.
-# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019.
+# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2019-03-03 14:04+0100\n"
+"PO-Revision-Date: 2023-04-24 07:26+0200\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
-"Language-Team: Galician <kde-i18n-doc@kde.org>\n"
+"Language-Team: Galician <proxecto@trasno.gal>\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 22.12.3\n"
 "X-Qt-Contexts: true\n"
 
 #: expression/KDbBinaryExpression.cpp:64
@@ -1124,12 +1125,10 @@ msgid "This integer number may be too large."
 msgstr "Este número enteiro pode ser demasiado grande."
 
 #: parser/generated/sqlscanner.cpp:1109
-#, fuzzy, qt-format
-#| msgctxt "KDbParser|"
-#| msgid "Unexpected character."
+#, qt-format
 msgctxt "KDbParser|"
 msgid "Unexpected character %1 in date/time"
-msgstr "Carácter inesperado."
+msgstr "Carácter inesperado %1 na data e hora."
 
 #: parser/generated/sqlscanner.cpp:1404
 msgctxt "KDbParser|"
@@ -1153,12 +1152,10 @@ msgstr ""
 "Os identificadores deben comezar por unha letra do alfabeto latino ou «_»."
 
 #: parser/generated/sqlscanner.cpp:1464
-#, fuzzy, qt-format
-#| msgctxt "KDbParser|"
-#| msgid "Unexpected character."
+#, qt-format
 msgctxt "KDbParser|"
 msgid "Unexpected character %1"
-msgstr "Carácter inesperado."
+msgstr "Carácter inesperado %1."
 
 #: parser/KDbParser_p.cpp:205
 msgctxt "KDbParser|"
@@ -1336,7 +1333,7 @@ msgstr "Número do porto no servidor"
 #: tools/KDbSimpleCommandLineApp.cpp:86
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Server's local socket filename"
-msgstr "Nome de ficheiro do socker local do servidor"
+msgstr "Nome de ficheiro do socket local do servidor"
 
 #: tools/KDbSimpleCommandLineApp.cpp:107
 #, qt-format
