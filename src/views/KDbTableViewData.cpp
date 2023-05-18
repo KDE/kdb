@@ -679,31 +679,31 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
     //check constraints:
     //-check if every NOT NULL and NOT EMPTY field is filled
     QList<KDbTableViewColumn*>::ConstIterator it_f(d->columns.constBegin());
-    int col = 0;
+    int colIndex = 0;
     const QVariant *pval = nullptr;
     QVariant val;
-    for (;it_f != d->columns.constEnd() && col < record->count();++it_f, ++col) {
+    for (;it_f != d->columns.constEnd() && colIndex < record->count();++it_f, ++colIndex) {
         KDbField *f = (*it_f)->field();
         if (f->isNotNull()) {
-            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
+            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, colIndex);
             //check it
             if (val.isNull() && !f->isAutoIncrement()) {
                 //NOT NULL violated
                 d->result.message = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
                                 + QLatin1String("\n\n") + KDbTableViewData::messageYouCanImproveData();
                 d->result.description = tr("The column's constraint is declared as NOT NULL.");
-                d->result.column = col;
+                d->result.column = colIndex;
                 return false;
             }
         }
         if (f->isNotEmpty()) {
-            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, col);
+            saveRecordGetValue(&pval, d->cursor, d->pRecordEditBuffer, &it_f, record, f, &val, colIndex);
             if (!f->isAutoIncrement() && (val.isNull() || KDb::isEmptyValue(f->type(), val))) {
                 //NOT EMPTY violated
                 d->result.message = tr("\"%1\" column requires a value to be entered.").arg(f->captionOrName())
                                 + QLatin1String("\n\n") + KDbTableViewData::messageYouCanImproveData();
                 d->result.description = tr("The column's constraint is declared as NOT EMPTY.");
-                d->result.column = col;
+                d->result.column = colIndex;
                 return false;
             }
         }
