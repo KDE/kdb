@@ -96,6 +96,9 @@ public:
     //! @return true if this token is not equal to @a other token
     inline bool operator!=(char charToken) const { return v != charToken; }
 
+    //! Assigns a token
+    inline void operator=(char charToken) { v = charToken; }
+
     static QList<KDbToken> allTokens();
 
     // -- constants go here --
