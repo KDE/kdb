@@ -222,7 +222,7 @@ public:
             const KDbGuiItem &buttonYes = KDbGuiItem(),
             const KDbGuiItem &buttonNo = KDbGuiItem(),
             const QString &dontShowAskAgainName = QString(),
-            KDbMessageHandler::Options options = nullptr,
+            KDbMessageHandler::Options options = {},
             KDbMessageHandler* msgHandler = nullptr);
 
     //! @return message redirection for this handler or 0 if there is no redirection.
