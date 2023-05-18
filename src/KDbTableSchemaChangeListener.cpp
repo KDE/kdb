@@ -506,7 +506,7 @@ QList<KDbTableSchemaChangeListener*> KDbTableSchemaChangeListener::listeners(
     }
     QSet<KDbTableSchemaChangeListener *> result;
     KDbTableSchemaChangeListenerPrivate::collectListeners(&result, conn, table);
-    return result.toList();
+    return result.values();
 }
 
 // static
@@ -523,7 +523,7 @@ QList<KDbTableSchemaChangeListener*> KDbTableSchemaChangeListener::listeners(
     }
     QSet<KDbTableSchemaChangeListener *> result;
     KDbTableSchemaChangeListenerPrivate::collectListeners(&result, conn, query);
-    return result.toList();
+    return result.values();
 }
 
 // static
@@ -540,7 +540,7 @@ tristate KDbTableSchemaChangeListener::closeListeners(KDbConnection *conn,
     }
     QSet<KDbTableSchemaChangeListener*> toClose(listeners(conn, table).toSet().subtract(except.toSet()));
     tristate result = true;
-    for (KDbTableSchemaChangeListener *listener : toClose) {
+    for (KDbTableSchemaChangeListener *listener : qAsConst(toClose)) {
         const tristate localResult = listener->closeListener();
         if (localResult != true) {
             result = localResult;
@@ -563,7 +563,7 @@ tristate KDbTableSchemaChangeListener::closeListeners(KDbConnection *conn,
     }
     QSet<KDbTableSchemaChangeListener*> toClose(listeners(conn, query).toSet().subtract(except.toSet()));
     tristate result = true;
-    for (KDbTableSchemaChangeListener *listener : toClose) {
+    for (KDbTableSchemaChangeListener *listener : qAsConst(toClose)) {
         const tristate localResult = listener->closeListener();
         if (localResult != true) {
             result = localResult;

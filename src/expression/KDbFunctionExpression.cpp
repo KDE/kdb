@@ -1163,69 +1163,71 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
     }
 
     // Find matching signature
-    const int count = args->children.count();
-    bool properArgCount = false;
-    std::vector<int> argCounts;
-    int i = 0;
-    argCounts.resize(decl->signatures.size());
     int **signature = nullptr;
     bool multipleArgs = false; // special case, e.g. for CHARS(v1, ... vN)
-    for(std::vector<int**>::const_iterator it(decl->signatures.begin());
-        it != decl->signatures.end(); ++it, ++i)
     {
-        signature = *it;
-        int **arg = signature;
-        int expectedCount = 0;
-        while(*arg && *arg != BuiltInFunctions::multipleArgs) {
-            ++arg;
-            ++expectedCount;
-        }
-        multipleArgs = *arg == BuiltInFunctions::multipleArgs;
-        if (multipleArgs) {
-            ++arg;
-            const int minArgs = arg[0][0];
-            properArgCount = count >= minArgs;
-            if (!properArgCount) {
-                parseInfo->setErrorMessage(
-                    tr("Incorrect number of arguments (%1)").arg(count));
-                if (minArgs == 1) {
-                    parseInfo->setErrorDescription(
-                        tr("Too few arguments. %1() function requires "
-                           "at least one argument.").arg(name));
-                }
-                else if (minArgs == 2) {
-                    parseInfo->setErrorDescription(
-                        tr("Too few arguments. %1() function requires "
-                           "at least two arguments.").arg(name));
-                }
-                else if (minArgs == 3) {
-                    parseInfo->setErrorDescription(
-                        tr("Too few arguments. %1() function requires "
-                           "at least three arguments.").arg(name));
-                }
-                else {
-                    parseInfo->setErrorDescription(
-                        tr("Too few arguments. %1() function requires "
-                           "at least %2 arguments.").arg(name).arg(minArgs));
-                }
-                return false;
+        const int count = args->children.count();
+        bool properArgCount = false;
+        std::vector<int> argCounts;
+        int i = 0;
+        argCounts.resize(decl->signatures.size());
+        for(std::vector<int**>::const_iterator it(decl->signatures.begin());
+            it != decl->signatures.end(); ++it, ++i)
+        {
+            signature = *it;
+            int **arg = signature;
+            int expectedCount = 0;
+            while(*arg && *arg != BuiltInFunctions::multipleArgs) {
+                ++arg;
+                ++expectedCount;
             }
-            break;
+            multipleArgs = *arg == BuiltInFunctions::multipleArgs;
+            if (multipleArgs) {
+                ++arg;
+                const int minArgs = arg[0][0];
+                properArgCount = count >= minArgs;
+                if (!properArgCount) {
+                    parseInfo->setErrorMessage(
+                        tr("Incorrect number of arguments (%1)").arg(count));
+                    if (minArgs == 1) {
+                        parseInfo->setErrorDescription(
+                            tr("Too few arguments. %1() function requires "
+                               "at least one argument.").arg(name));
+                    }
+                    else if (minArgs == 2) {
+                        parseInfo->setErrorDescription(
+                            tr("Too few arguments. %1() function requires "
+                               "at least two arguments.").arg(name));
+                    }
+                    else if (minArgs == 3) {
+                        parseInfo->setErrorDescription(
+                            tr("Too few arguments. %1() function requires "
+                               "at least three arguments.").arg(name));
+                    }
+                    else {
+                        parseInfo->setErrorDescription(
+                            tr("Too few arguments. %1() function requires "
+                               "at least %2 arguments.").arg(name).arg(minArgs));
+                    }
+                    return false;
+                }
+                break;
+            }
+            else if (count == expectedCount) { // arg # matches
+                properArgCount = true;
+                break;
+            }
+            else {
+                argCounts[i] = expectedCount;
+            }
         }
-        else if (count == expectedCount) { // arg # matches
-            properArgCount = true;
-            break;
+        if (!properArgCount) {
+            const std::vector<int>::iterator last = std::unique(argCounts.begin(), argCounts.end());
+            argCounts.erase(last, argCounts.end());
+            std::sort(argCounts.begin(), argCounts.end()); // sort so we can easier check the case
+            setIncorrectNumberOfArgumentsErrorMessage(parseInfo, count, argCounts, name);
+            return false;
         }
-        else {
-            argCounts[i] = expectedCount;
-        }
-    }
-    if (!properArgCount) {
-        const std::vector<int>::iterator last = std::unique(argCounts.begin(), argCounts.end());
-        argCounts.erase(last, argCounts.end());
-        std::sort(argCounts.begin(), argCounts.end()); // sort so we can easier check the case
-        setIncorrectNumberOfArgumentsErrorMessage(parseInfo, count, argCounts, name);
-        return false;
     }
 
     // Verify types
@@ -1352,7 +1354,7 @@ bool KDbFunctionExpression::isBuiltInAggregate(const QString& function)
 // static
 QStringList KDbFunctionExpression::builtInAggregates()
 {
-    return _builtInAggregates->data.toList();
+    return _builtInAggregates->data.values();
 }
 
 //static

@@ -278,13 +278,6 @@ void SqlParserTest::testParse()
 
 void SqlParserTest::testTokens()
 {
-    KDbToken t = KDbToken::LEFT;
-    //qDebug() << t << t.toChar() << t.value() << t.isValid();
-    t = '+';
-    //qDebug() << t << t.toChar() << t.value() << t.isValid();
-    t = KDbToken();
-    //qDebug() << t << t.toChar() << t.value() << t.isValid();
-
     QCOMPARE(KDbToken::SQL_TYPE.value(), 258);
     QCOMPARE(KDbToken::AS.value(), 259);
     QCOMPARE(KDbToken::AS_EMPTY.value(), 260);
