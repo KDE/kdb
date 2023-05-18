@@ -506,7 +506,7 @@ QList<KDbTableSchemaChangeListener*> KDbTableSchemaChangeListener::listeners(
     }
     QSet<KDbTableSchemaChangeListener *> result;
     KDbTableSchemaChangeListenerPrivate::collectListeners(&result, conn, table);
-    return result.toList();
+    return result.values();
 }
 
 // static
@@ -523,7 +523,7 @@ QList<KDbTableSchemaChangeListener*> KDbTableSchemaChangeListener::listeners(
     }
     QSet<KDbTableSchemaChangeListener *> result;
     KDbTableSchemaChangeListenerPrivate::collectListeners(&result, conn, query);
-    return result.toList();
+    return result.values();
 }
 
 // static
