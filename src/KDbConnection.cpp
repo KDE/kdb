@@ -221,7 +221,7 @@ void KDbConnectionPrivate::setupKDbSystemSchema()
         KDbInternalTableSchema *t_objects = new KDbInternalTableSchema(QLatin1String("kexi__objects"));
         t_objects->addField(new KDbField(QLatin1String("o_id"),
                                       KDbField::Integer, KDbField::PrimaryKey | KDbField::AutoInc, KDbField::Unsigned));
-        t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, nullptr, KDbField::Unsigned));
+        t_objects->addField(new KDbField(QLatin1String("o_type"), KDbField::Byte, {}, KDbField::Unsigned));
         t_objects->addField(new KDbField(QLatin1String("o_name"), KDbField::Text));
         t_objects->addField(new KDbField(QLatin1String("o_caption"), KDbField::Text));
         t_objects->addField(new KDbField(QLatin1String("o_desc"), KDbField::LongText));
@@ -238,8 +238,8 @@ void KDbConnectionPrivate::setupKDbSystemSchema()
     }
     {
         KDbInternalTableSchema *t_fields = new KDbInternalTableSchema(QLatin1String("kexi__fields"));
-        t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, nullptr, KDbField::Unsigned));
-        t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, nullptr, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("t_id"), KDbField::Integer, {}, KDbField::Unsigned));
+        t_fields->addField(new KDbField(QLatin1String("f_type"), KDbField::Byte, {}, KDbField::Unsigned));
         t_fields->addField(new KDbField(QLatin1String("f_name"), KDbField::Text));
         t_fields->addField(new KDbField(QLatin1String("f_length"), KDbField::Integer));
         t_fields->addField(new KDbField(QLatin1String("f_precision"), KDbField::Integer));
