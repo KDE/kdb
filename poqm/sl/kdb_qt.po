@@ -60,7 +60,7 @@ msgstr ""
 "Vrednost prvega argumenta mora biti manjša od vrednosti drugega argumenta."
 
 #: expression/KDbFunctionExpression.cpp:940
-#: expression/KDbFunctionExpression.cpp:1190
+#: expression/KDbFunctionExpression.cpp:1191
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect number of arguments (%1)"
@@ -216,25 +216,25 @@ msgctxt "KDbFunctionExpressionData|"
 msgid "Maximum number of arguments for function %1() is %2."
 msgstr "Največje število argumentov funkcije %1() je %2."
 
-#: expression/KDbFunctionExpression.cpp:1193
+#: expression/KDbFunctionExpression.cpp:1194
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least one argument."
 msgstr "Premalo argumentov. Funkcija %1() zahteva vsaj en argument."
 
-#: expression/KDbFunctionExpression.cpp:1198
+#: expression/KDbFunctionExpression.cpp:1199
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least two arguments."
 msgstr "Premalo argumentov. Funkcija %1() zahteva vsaj dva argumenta."
 
-#: expression/KDbFunctionExpression.cpp:1203
+#: expression/KDbFunctionExpression.cpp:1204
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least three arguments."
 msgstr "Premalo argumentov. Funkcija %1() zahteva vsaj tri argumente."
 
-#: expression/KDbFunctionExpression.cpp:1208
+#: expression/KDbFunctionExpression.cpp:1209
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least %2 arguments."
