@@ -58,7 +58,7 @@ msgid ""
 msgstr "O valor do primeiro argumento debería ser menor que o do segundo."
 
 #: expression/KDbFunctionExpression.cpp:940
-#: expression/KDbFunctionExpression.cpp:1190
+#: expression/KDbFunctionExpression.cpp:1191
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect number of arguments (%1)"
@@ -208,28 +208,28 @@ msgctxt "KDbFunctionExpressionData|"
 msgid "Maximum number of arguments for function %1() is %2."
 msgstr "O número máximo de argumentos da función %1() é %2."
 
-#: expression/KDbFunctionExpression.cpp:1193
+#: expression/KDbFunctionExpression.cpp:1194
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least one argument."
 msgstr ""
 "Argumentos insuficientes. A función %1() require polo menos un argumento."
 
-#: expression/KDbFunctionExpression.cpp:1198
+#: expression/KDbFunctionExpression.cpp:1199
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least two arguments."
 msgstr ""
 "Argumentos insuficientes. A función %1() require polo menos dous argumentos."
 
-#: expression/KDbFunctionExpression.cpp:1203
+#: expression/KDbFunctionExpression.cpp:1204
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least three arguments."
 msgstr ""
 "Argumentos insuficientes. A función %1() require polo menos tres argumentos."
 
-#: expression/KDbFunctionExpression.cpp:1208
+#: expression/KDbFunctionExpression.cpp:1209
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least %2 arguments."
