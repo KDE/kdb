@@ -64,7 +64,7 @@ msgstr ""
 "argumentet."
 
 #: expression/KDbFunctionExpression.cpp:940
-#: expression/KDbFunctionExpression.cpp:1190
+#: expression/KDbFunctionExpression.cpp:1191
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect number of arguments (%1)"
@@ -214,25 +214,25 @@ msgctxt "KDbFunctionExpressionData|"
 msgid "Maximum number of arguments for function %1() is %2."
 msgstr "Funksjonen %1() kan maks ta %2 argument."
 
-#: expression/KDbFunctionExpression.cpp:1193
+#: expression/KDbFunctionExpression.cpp:1194
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least one argument."
 msgstr "For få argument. Funksjonen %1() må få minst eitt argument."
 
-#: expression/KDbFunctionExpression.cpp:1198
+#: expression/KDbFunctionExpression.cpp:1199
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least two arguments."
 msgstr "For få argument. Funksjonen %1() må få minst to argument."
 
-#: expression/KDbFunctionExpression.cpp:1203
+#: expression/KDbFunctionExpression.cpp:1204
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least three arguments."
 msgstr "For få argument. Funksjonen %1() må få minst tre argument."
 
-#: expression/KDbFunctionExpression.cpp:1208
+#: expression/KDbFunctionExpression.cpp:1209
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least %2 arguments."
