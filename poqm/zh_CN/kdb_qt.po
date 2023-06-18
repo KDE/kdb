@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdeorg\n"
-"PO-Revision-Date: 2023-05-22 14:00\n"
+"PO-Revision-Date: 2023-06-17 04:11\n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -644,7 +644,7 @@ msgstr "无法删除表 \"%1\"。%2"
 #: KDbConnection.cpp:1608
 msgctxt "KDbConnection|"
 msgid "Unexpected name or identifier."
-msgstr "未预期的名称或标识符。"
+msgstr "意外的名称或标识符。"
 
 #: KDbConnection.cpp:1680
 #, qt-format
@@ -1162,7 +1162,7 @@ msgstr "未指定查询语句。"
 #: parser/KDbParser_p.cpp:274
 msgctxt "KDbParser|"
 msgid "Unexpected character."
-msgstr "未预期的字符。"
+msgstr "意外的字符。"
 
 #: parser/KDbParser_p.cpp:312
 msgctxt "KDbParser|"
