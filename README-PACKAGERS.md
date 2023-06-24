@@ -76,4 +76,4 @@ KDb's PostgreSQL driver uses pq client library version 9.x.
 
 ## More information
 
-KDb wiki page provides useful and most up-to-date information: http://community.kde.org/KDb/Build.
+KDb wiki page provides useful and most up-to-date information: https://community.kde.org/KDb/Build.

@@ -20,7 +20,7 @@ Usage: run './sqltest_int' without arguments for usage details.
 3. Important documents
 ----------------------
 KDb Drivers section of the Development wiki pages:
-http://community.kde.org/KDb/Drivers
+https://community.kde.org/KDb/Drivers
 
 
 4. Information for KDb drivers developers

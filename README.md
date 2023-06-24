@@ -3,9 +3,9 @@
 KDb is a database connectivity and creation framework, consisted of a general-purpose
 C++ Qt library and set of plugins delivering support for various database vendors.
 
-It is a part of the [KEXI project](http://www.kexi-project.org).
+It is a part of the [KEXI project](https://www.kexi-project.org).
 
-Home page: http://community.kde.org/KDb
+Home page: https://community.kde.org/KDb
 
 Project maintainer: Jarosław Staniek <staniek@kde.org>
 
@@ -15,7 +15,7 @@ Our real code repository [is located here](https://invent.kde.org/libraries/kdb)
 # Building KDb
 
 KDb uses the CMake build system. Up-to-date information is available
-[online](http://community.kde.org/KDb/Build).
+[online](https://community.kde.org/KDb/Build).
 
 # Donate Money
 
