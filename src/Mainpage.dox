@@ -4,7 +4,7 @@
  %KDb is a database connectivity and creation framework, consisted of a general-purpose
  C++ Qt library and set of plugins delivering support for various database vendors.
 
- Project's home page: http://community.kde.org/KDb
+ Project's home page: https://community.kde.org/KDb
 
 @authors
 - Jarosław Staniek <staniek@kde.org> - Maintainer, main author, Qt 5 port
