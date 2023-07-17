@@ -331,7 +331,7 @@ KDbFieldList* KDbFieldList::subList(const QList<int>& list)
 QStringList KDbFieldList::names() const
 {
     QStringList r;
-    for (KDbField *f : d->fields) {
+    for (KDbField *f : qAsConst(d->fields)) {
         r += f->name().toLower();
     }
     return r;

@@ -257,7 +257,8 @@ QMap<QString, QString> KDbUtils::deserializeMap(const QString& string)
 QString KDbUtils::stringToFileName(const QString& string)
 {
     QString _string(string);
-    _string.replace(QRegularExpression(QLatin1String("[\\\\/:\\*?\"<>|]")), QLatin1String(" "));
+    static const QRegularExpression re(QLatin1String("[\\\\/:\\*?\"<>|]"));
+    _string.replace(re, QLatin1String(" "));
     if (_string.startsWith(QLatin1Char('.'))) {
         _string.prepend(QLatin1Char('_'));
     }

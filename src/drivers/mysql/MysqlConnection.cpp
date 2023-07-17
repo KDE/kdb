@@ -77,7 +77,7 @@ bool MysqlConnection::drv_getServerVersion(KDbServerVersionInfo* version)
         /*column*/ 0,
         QueryRecordOptions(QueryRecordOption::Default) & ~QueryRecordOptions(QueryRecordOption::AddLimitTo1));
 
-    QRegularExpression versionRe(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
+    static const QRegularExpression versionRe(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
     QRegularExpressionMatch match  = versionRe.match(versionString);
     if (res == false) // sanity
         return false;

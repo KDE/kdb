@@ -82,7 +82,7 @@ KDbQuerySchema::KDbQuerySchema(const KDbQuerySchema& querySchema, KDbConnection 
         , d(new KDbQuerySchemaPrivate(this, querySchema.d))
 {
     //only deep copy query asterisks
-    foreach(KDbField* f, *querySchema.fields()) {
+    for (KDbField* f :  qAsConst(*querySchema.fields())) {
         KDbField *copiedField;
         if (dynamic_cast<KDbQueryAsterisk*>(f)) {
             copiedField = f->copy();

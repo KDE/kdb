@@ -160,7 +160,7 @@ int intValueInternal(KDbYear::Sign sign, const QByteArray &string)
         }
     }
 
-    static QRegularExpression digitsRegExp(QStringLiteral("^\\d+$"));
+    static const QRegularExpression digitsRegExp(QStringLiteral("^\\d+$"));
     if (!digitsRegExp.match(QString::fromLatin1(string)).hasMatch()) {
         // TODO message: only digits are accepted for year
         return INVALID_YEAR;

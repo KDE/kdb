@@ -68,7 +68,7 @@ bool SqliteConnection::drv_connect()
 bool SqliteConnection::drv_getServerVersion(KDbServerVersionInfo* version)
 {
     version->setString(QLatin1String(SQLITE_VERSION)); //defined in sqlite3.h
-    QRegularExpression re(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
+    static const QRegularExpression re(QLatin1String("^(\\d+)\\.(\\d+)\\.(\\d+)$"));
     QRegularExpressionMatch match  = re.match(version->string());
     if (match.hasMatch()) {
         version->setMajor(match.captured(1).toInt());
