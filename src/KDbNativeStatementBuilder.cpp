@@ -135,7 +135,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                                  customers ON orders.customerid=customers.customerid
                     */
                     KDbEscapedString s_tables;
-                    for (KDbTableSchema *table : *tables) {
+                    for (KDbTableSchema *table : qAsConst(*tables)) {
                         if (!s_tables.isEmpty()) {
                             s_tables += ", ";
                         }

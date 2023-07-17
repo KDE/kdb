@@ -397,7 +397,7 @@ KDbQuerySchema* buildSelectQuery(
                     KDbTableSchema* tableForAlias = querySchema->tables()->at(tablePosition);
                     setError(KDbParser::tr("Could not set alias \"%1\" for table \"%2\". "
                                            "This alias is already set for table \"%3\".")
-                             .arg(aliasString).arg(tname).arg(tableForAlias->name()));
+                             .arg(aliasString, tname, tableForAlias->name()));
                     break;
                 }
             }

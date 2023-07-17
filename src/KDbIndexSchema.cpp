@@ -43,7 +43,7 @@ public:
          * So all these relationships must be detached from details-side, corresponding
          * indices.
          */
-        for(KDbRelationship* rel : masterOwnedRelationships) {
+        for (KDbRelationship* rel : qAsConst(masterOwnedRelationships)) {
             if (rel->detailsIndex()) {
                 rel->detailsIndex()->detachRelationship(rel);
             }

@@ -222,7 +222,7 @@ bool KDbExpressionData::addToCallStack(QDebug *dbg, KDb::ExpressionCallStack* ca
         QDebug debug(&warning);
         debug.nospace() << "Cycle detected in expression (depth " << callStack->length() << "):";
         int level = 0;
-        for (const KDbExpressionData *data : *callStack) {
+        for (const KDbExpressionData *data : qAsConst(*callStack)) {
             debug.nospace() << endl << level + 1 << ":";
             debug.space().noquote() << expressionClassName(data->expressionClass);
             debug.nospace() << data->token;

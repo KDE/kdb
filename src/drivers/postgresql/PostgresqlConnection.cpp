@@ -183,6 +183,7 @@ bool PostgresqlConnection::drv_useDatabase(const QString &dbName, bool *cancelle
     // pgsql 8.1 changed the default to no oids but we need them
     PGresult* result = PQexec(d->conn, "SET DEFAULT_WITH_OIDS TO ON");
     int status = PQresultStatus(result);
+    Q_UNUSED(status)
     PQclear(result);
 
     // initialize encoding

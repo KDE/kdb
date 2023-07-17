@@ -1028,7 +1028,7 @@ QStringList KDbConnection::tableNames(bool alsoSystemTables, bool* ok)
     for (const QString &name : physicalTableNames) {
         physicalTableNamesSet.insert(name.toLower());
     }
-    for (const QString &name : list) {
+    for (const QString &name : qAsConst(list)) {
         if (physicalTableNamesSet.contains(name.toLower())) {
             result += name;
         }
@@ -3144,7 +3144,6 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
                   d->driver->valueToSql(currentField, it.value());
     }
     if (pkey) {
-        const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder(this));
         //kdbDebug() << pkey->fieldCount() << " ? " << query->pkeyFieldCount();
         if (pkey->fieldCount() != query->pkeyFieldCount(this)) { //sanity check
             kdbWarning() << " -- NO ENTIRE MASTER TABLE's PKEY SPECIFIED!";
@@ -3154,10 +3153,11 @@ bool KDbConnection::updateRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
         }
         if (!pkey->fields()->isEmpty()) {
             int i = 0;
-            foreach(KDbField *f, *pkey->fields()) {
+            const QVector<int> pkeyFieldsOrder(query->pkeyFieldsOrder(this));
+            for (KDbField *f : qAsConst(*pkey->fields())) {
                 if (!sqlwhere.isEmpty())
                     sqlwhere += " AND ";
-                QVariant val(data->at(pkeyFieldsOrder.at(i)));
+                const QVariant val(data->at(pkeyFieldsOrder.at(i)));
                 if (val.isNull() || !val.isValid()) {
                     m_result = KDbResult(ERR_UPDATE_NULL_PKEY_FIELD,
                                          tr("Primary key's field \"%1\" cannot be empty.").arg(f->name()));
