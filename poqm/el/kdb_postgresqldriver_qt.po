@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Lokalize 2.0\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr "Αποτυχία διαφυγής συμβολοσειράς. Μη έγκυρη κωδικοποίηση πολλών byte."

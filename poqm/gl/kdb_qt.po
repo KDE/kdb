@@ -785,7 +785,7 @@ msgstr ""
 "Non se puido actualizar o rexistro porque a táboa mestre non ten unha chave "
 "primaria definida."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

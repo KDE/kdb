@@ -782,7 +782,7 @@ msgstr ""
 "마스터 테이블에 기본 키가 정의되어 있지 않기 때문에 레코드를 업데이트할 수 없"
 "습니다."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

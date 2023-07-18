@@ -794,7 +794,7 @@ msgstr ""
 "Impossibile aggiornare il record poiché non è stata definita una chiave "
 "primaria della tabella principale."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

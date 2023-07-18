@@ -768,7 +768,7 @@ msgstr ""
 "Nelze aktualizovat záznam protože hlavní tabulka nemá definován primární "
 "klíč."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

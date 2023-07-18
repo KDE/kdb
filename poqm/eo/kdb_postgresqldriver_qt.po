@@ -18,7 +18,7 @@ msgstr ""
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr "Eskapigo de ĉeno malsukcesis. Nevalida plurbajta kodoprezento."

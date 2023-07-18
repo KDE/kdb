@@ -20,7 +20,7 @@ msgstr ""
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 "X-Generator: Lokalize 1.5\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr ""

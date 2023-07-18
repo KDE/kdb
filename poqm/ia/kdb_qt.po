@@ -792,7 +792,7 @@ msgstr ""
 "Il non pote actualisar record proque tabella master non ha definite ulle "
 "clave primari."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "
