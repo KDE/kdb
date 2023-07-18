@@ -803,7 +803,7 @@ msgstr ""
 "No s'ha pogut actualitzar el registre perquè la taula mestra no té definida "
 "la clau primària."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

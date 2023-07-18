@@ -20,7 +20,7 @@ msgstr ""
 "X-Accelerator-Marker: &\n"
 "X-Generator: Lokalize 1.5\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr "Ha fallat la cadena d'escapada. Codificació multibyte no vàlida."

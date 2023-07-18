@@ -793,7 +793,7 @@ msgstr ""
 "Ezin izan da erregistroa eguneratu taula nagusiak lehen mailako gakorik "
 "definiturik ez daukalako."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

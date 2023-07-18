@@ -794,7 +794,7 @@ msgstr ""
 "Не удалось обновить запись, так как в главной таблице не задан первичный "
 "ключ."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

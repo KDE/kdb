@@ -757,7 +757,7 @@ msgid ""
 "Could not update record because master table has no primary key defined."
 msgstr "因主表未定义主键，所以无法更新记录。"
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

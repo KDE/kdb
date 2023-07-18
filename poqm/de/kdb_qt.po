@@ -797,7 +797,7 @@ msgstr ""
 "Der Datensatz kann nicht aktualisiert werden, da für die Master-Tabelle kein "
 "Primärschlüssel definiert ist."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

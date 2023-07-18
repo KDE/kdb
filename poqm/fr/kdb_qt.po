@@ -807,7 +807,7 @@ msgstr ""
 "Impossible de mettre à jour l'enregistrement car la clé primaire de la table "
 "maître n'est pas définie."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

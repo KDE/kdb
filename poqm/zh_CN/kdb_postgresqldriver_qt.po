@@ -15,7 +15,7 @@ msgstr ""
 "X-Crowdin-File: /kf5-stable/messages/kdb/kdb_postgresqldriver_qt.pot\n"
 "X-Crowdin-File-ID: 6352\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr "转义字符串失败。无效的多字节编码。"

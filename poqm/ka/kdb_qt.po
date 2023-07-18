@@ -786,7 +786,7 @@ msgstr ""
 "ჩანაწერის განახლება შეუძლებელია, რადგან მთავარ ცხრილს ძირითადი გასაღები "
 "აღწერილი არ აქვს."
 
-#: KDbConnection.cpp:3152
+#: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "

@@ -13,7 +13,7 @@ msgstr ""
 "X-Qt-Contexts: true\n"
 "X-Generator: Poedit 3.1.1\n"
 
-#: PostgresqlConnection.cpp:282
+#: PostgresqlConnection.cpp:283
 msgctxt "PostgresqlConnection|"
 msgid "Escaping string failed. Invalid multibyte encoding."
 msgstr "დასრულების სტრიქონის შეცდომა. არასწორი მრავალბაიტიანი კოდირება."
