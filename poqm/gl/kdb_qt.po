@@ -274,7 +274,7 @@ msgid ""
 "Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
 "%4\" notation to specify table name."
 msgstr ""
-"Ambas as táboas «%1» e «%2» definiron o campo «%3». Utilice a notación "
+"Ambas as táboas «%1» e «%2» definiron o campo «%3». Use a notación "
 "«<tableName>.%4» para indicar o nome da táboa."
 
 #: expression/KDbVariableExpression.cpp:145
@@ -287,12 +287,12 @@ msgstr "Non se atopa o campo"
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not find table containing field \"%1\"."
-msgstr "Non se puido atopar unha táboa que conteña o campo «%1»."
+msgstr "Non foi posíbel atopar unha táboa que conteña o campo «%1»."
 
 #: expression/KDbVariableExpression.cpp:172
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not access the table directly using its name"
-msgstr "Non se puido acceder directamente á táboa utilizando o seu nome"
+msgstr "Non foi posíbel acceder directamente á táboa usando o seu nome"
 
 #: expression/KDbVariableExpression.cpp:174
 #, qt-format
@@ -454,8 +454,8 @@ msgid ""
 "Could not find definition for query \"%1\". Deleting this query is "
 "recommended."
 msgstr ""
-"Non se puido atopar a definición da consulta «%1». Recoméndase eliminar esta "
-"consulta."
+"Non foi posíbel atopar a definición da consulta «%1». Recoméndase eliminar "
+"esta consulta."
 
 #: KDbConnection.cpp:416
 #, qt-format
@@ -478,13 +478,13 @@ msgstr "A conexión xa se estabeleceu."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not open \"%1\" project file."
-msgstr "Non se puido abrir o ficheiro de proxecto «%1»."
+msgstr "Non foi posíbel abrir o ficheiro de proxecto «%1»."
 
 #: KDbConnection.cpp:511
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not connect to \"%1\" database server."
-msgstr "Non se puido conectar co servidor de base de datos «%1»."
+msgstr "Non foi posíbel conectar co servidor de base de datos «%1»."
 
 #: KDbConnection.cpp:558
 msgctxt "KDbConnection|"
@@ -494,7 +494,7 @@ msgstr "Non está conectado ao servidor de bases de datos."
 #: KDbConnection.cpp:569
 msgctxt "KDbConnection|"
 msgid "Currently no database is used."
-msgstr "Non está a ser utilizada ningunha base de datos."
+msgstr "Non está a ser usada ningunha base de datos."
 
 #: KDbConnection.cpp:623
 #, qt-format
@@ -539,8 +539,8 @@ msgctxt "KDbConnection|"
 msgid ""
 "Could not create database \"%1\". This name is reserved for system database."
 msgstr ""
-"Non se puido crear a base de datos «%1». Este nome está reservado para unha "
-"base de datos do sistema."
+"Non foi posíbel crear a base de datos «%1». Este nome está reservado para "
+"unha base de datos do sistema."
 
 #: KDbConnection.cpp:729
 #, qt-format
@@ -563,45 +563,46 @@ msgstr "Fallou o abrir da base de datos «%1»."
 #: KDbConnection.cpp:904
 msgctxt "KDbConnection|"
 msgid "Could not find any database for temporary connection."
-msgstr "Non se puido atopar ningunha base de datos para conexións temporais."
+msgstr ""
+"Non foi posíbel atopar ningunha base de datos para conexións temporais."
 
 #: KDbConnection.cpp:913
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error during starting temporary connection using \"%1\" database name."
 msgstr ""
-"Erro ao iniciar a conexión temporal utilizando o nome de base de datos «%1»."
+"Erro ao iniciar a conexión temporal usando o nome de base de datos «%1»."
 
 #: KDbConnection.cpp:931 KDbConnection.cpp:949
 msgctxt "KDbConnection|"
 msgid "Could not delete database. Name is not specified."
-msgstr "Non se puido eliminar a base de datos. Non se indicou o nome."
+msgstr "Non foi posíbel eliminar a base de datos. Non se indicou o nome."
 
 #: KDbConnection.cpp:955
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete system database \"%1\"."
-msgstr "Non se puido eliminar a base de datos do sistema «%1»."
+msgstr "Non foi posíbel eliminar a base de datos do sistema «%1»."
 
 #: KDbConnection.cpp:1002
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of object names."
-msgstr "Non se puido obter a lista de nomes de obxectos."
+msgstr "Non foi posíbel obter a lista de nomes de obxectos."
 
 #: KDbConnection.cpp:1016
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of table names."
-msgstr "Non se puido obter a lista de nomes de táboas."
+msgstr "Non foi posíbel obter a lista de nomes de táboas."
 
 #: KDbConnection.cpp:1024
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of physical table names."
-msgstr "Non se puido obter a lista de nomes de táboas físicas."
+msgstr "Non foi posíbel obter a lista de nomes de táboas físicas."
 
 #: KDbConnection.cpp:1091
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of object identifiers."
-msgstr "Non se puido obter a lista de identificadores de obxectos."
+msgstr "Non foi posíbel obter a lista de identificadores de obxectos."
 
 #: KDbConnection.cpp:1273
 msgctxt "KDbConnection|"
@@ -621,26 +622,26 @@ msgstr "Fallou a creación da táboa."
 #: KDbConnection.cpp:1406
 msgctxt "KDbConnection|"
 msgid "Could not create table without fields."
-msgstr "Non se puido crear unha táboa sen campos."
+msgstr "Non foi posíbel crear unha táboa sen campos."
 
 #: KDbConnection.cpp:1416
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as table name."
-msgstr "O nome de sistema «%1» non pode utilizarse como nome de táboa."
+msgstr "O nome de sistema «%1» non pode usarse como nome de táboa."
 
 #: KDbConnection.cpp:1425
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
 msgstr ""
-"Non se pode usar o nome de sistema «%1» como un dos campos na táboa «%2»."
+"Non é posíbel usar o nome de sistema «%1» como un dos campos na táboa «%2»."
 
 #: KDbConnection.cpp:1441
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not create the same table \"%1\" twice."
-msgstr "Non se puido crear a táboa \"%1\" dúas veces."
+msgstr "Non foi posíbel crear a táboa \"%1\" dúas veces."
 
 #: KDbConnection.cpp:1455
 #, qt-format
@@ -657,13 +658,13 @@ msgstr "A táboa «%1» non existe."
 #: KDbConnection.cpp:1579
 msgctxt "KDbConnection|"
 msgid "Could not delete object's data."
-msgstr "Non se puido eliminar os datos do obxecto."
+msgstr "Non foi posíbel eliminar os datos do obxecto."
 
 #: KDbConnection.cpp:1607 KDbConnection.cpp:1620
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete table \"%1\". %2"
-msgstr "Non se puido eliminar a táboa «%1». %2"
+msgstr "Non foi posíbel eliminar a táboa «%1». %2"
 
 #: KDbConnection.cpp:1608
 msgctxt "KDbConnection|"
@@ -675,7 +676,7 @@ msgstr "Nome ou identificador inesperado."
 msgctxt "KDbConnection|"
 msgid "Could not alter table \"%1\" using the same table as destination."
 msgstr ""
-"Non se puido alterar a táboa «%1» utilizando a mesma táboa como destino."
+"Non foi posíbel alterar a táboa «%1» usando a mesma táboa como destino."
 
 #: KDbConnection.cpp:1706
 #, qt-format
@@ -693,13 +694,14 @@ msgstr "Nome de táboa «%1» incorrecto."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" using the same name."
-msgstr "Non se puido renomear a táboa «%1» por ser o mesmo nome."
+msgstr "Non foi posíbel renomear a táboa «%1» por ser o mesmo nome."
 
 #: KDbConnection.cpp:1729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
-msgstr "Non se puido renomear a táboa «%1» para «%2». Xa existe a táboa «%3»."
+msgstr ""
+"Non foi posíbel renomear a táboa «%1» para «%2». Xa existe a táboa «%3»."
 
 #: KDbConnection.cpp:1839
 #, qt-format
@@ -775,15 +777,16 @@ msgstr ""
 msgctxt "KDbConnection|"
 msgid "Could not update record because there is no master table defined."
 msgstr ""
-"Non se puido actualizar o rexistro porque non hai unha táboa mestre definida."
+"Non foi posíbel actualizar o rexistro porque non hai unha táboa mestre "
+"definida."
 
 #: KDbConnection.cpp:3120
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because master table has no primary key defined."
 msgstr ""
-"Non se puido actualizar o rexistro porque a táboa mestre non ten unha chave "
-"primaria definida."
+"Non foi posíbel actualizar o rexistro porque a táboa mestre non ten unha "
+"chave primaria definida."
 
 #: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
@@ -791,7 +794,7 @@ msgid ""
 "Could not update record because it does not contain entire primary key of "
 "master table."
 msgstr ""
-"Non se puido actualizar o rexistro porque non contén todas as chaves "
+"Non foi posíbel actualizar o rexistro porque non contén todas as chaves "
 "primarias da táboa mestre."
 
 #: KDbConnection.cpp:3163 KDbConnection.cpp:3407
@@ -809,15 +812,15 @@ msgstr "Fallou a actualización do rexistro no servidor."
 msgctxt "KDbConnection|"
 msgid "Could not insert record because there is no master table specified."
 msgstr ""
-"Non se puido inserir o rexistro porque non hai unha táboa mestre indicada."
+"Non foi posíbel inserir o rexistro porque non hai unha táboa mestre indicada."
 
 #: KDbConnection.cpp:3255
 msgctxt "KDbConnection|"
 msgid ""
 "Could not insert record because master table has no primary key specified."
 msgstr ""
-"Non se puido inserir o rexistro porque a táboa mestre non ten ningunha chave "
-"primaria indicada."
+"Non foi posíbel inserir o rexistro porque a táboa mestre non ten ningunha "
+"chave primaria indicada."
 
 #: KDbConnection.cpp:3264
 msgctxt "KDbConnection|"
@@ -825,8 +828,8 @@ msgid ""
 "Could not insert record because it does not contain entire master table's "
 "primary key."
 msgstr ""
-"Non se puido inserir rexistro porque non contén a chave primaria completa da "
-"táboa mestre."
+"Non foi posíbel inserir rexistro porque non contén a chave primaria completa "
+"da táboa mestre."
 
 #: KDbConnection.cpp:3307
 msgctxt "KDbConnection|"
@@ -837,7 +840,8 @@ msgstr "Fallou a inserción de rexistro no servidor."
 msgctxt "KDbConnection|"
 msgid "Could not delete record because there is no master table specified."
 msgstr ""
-"Non se puido eliminar o rexistro porque non hai unha táboa mestre indicada."
+"Non foi posíbel eliminar o rexistro porque non hai unha táboa mestre "
+"indicada."
 
 #: KDbConnection.cpp:3380
 msgctxt "KDbConnection|"
@@ -845,8 +849,8 @@ msgid ""
 "Could not delete record because there is no primary key for master table "
 "specified."
 msgstr ""
-"Non se puido eliminar o rexistro xa que non hai unha clave principal para a "
-"táboa mestre indicada."
+"Non foi posíbel eliminar o rexistro xa que non hai unha clave principal para "
+"a táboa mestre indicada."
 
 #: KDbConnection.cpp:3397
 msgctxt "KDbConnection|"
@@ -854,7 +858,7 @@ msgid ""
 "Could not delete record because it does not contain entire master table's "
 "primary key."
 msgstr ""
-"Non se puido eliminar o rexistro xa que non contén a claves primaria "
+"Non foi posíbel eliminar o rexistro xa que non contén a claves primaria "
 "completa da táboa mestre."
 
 #: KDbConnection.cpp:3424 KDbConnection.cpp:3447
@@ -886,7 +890,7 @@ msgstr "Non se definiu ningunha instrución ou esquema de consulta."
 #: KDbCursor.cpp:227
 msgctxt "KDbCursor|"
 msgid "Could not generate query statement."
-msgstr "Non se puido xerar a instrución de consulta."
+msgstr "Non foi posíbel xerar a instrución de consulta."
 
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
@@ -896,7 +900,7 @@ msgstr "Erro ao acceder ao cursor da base de datos."
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
 msgid "Could not fetch next record."
-msgstr "Non se puido obter o seguinte rexistro."
+msgstr "Non foi posíbel obter o seguinte rexistro."
 
 #: KDbCursor.cpp:620
 msgctxt "KDbCursor|"
@@ -964,28 +968,28 @@ msgstr "Versión do controlador de KDb"
 #: KDbDriverManager.cpp:87
 msgctxt "DriverManagerInternal|"
 msgid "Could not find any database drivers."
-msgstr "Non se puido atopar ningún controlador de bases de datos."
+msgstr "Non foi posíbel atopar ningún controlador de bases de datos."
 
 #: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not find database driver \"%1\"."
-msgstr "Non se puido atopar o controlador da base de datos «%1»."
+msgstr "Non foi posíbel atopar o controlador da base de datos «%1»."
 
 #: KDbDriverManager.cpp:221
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not load database driver's plugin file \"%1\"."
 msgstr ""
-"Non se puido cargar o ficheiro de complemento «%1» do controlador da base de "
-"datos."
+"Non foi posíbel cargar o ficheiro de complemento «%1» do controlador da base "
+"de datos."
 
 #: KDbDriverManager.cpp:232
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
 msgstr ""
-"Non se puido cargar o controlador de base de datos «%1» do ficheiro de "
+"Non foi posíbel cargar o controlador de base de datos «%1» do ficheiro de "
 "complemento «%2»."
 
 #: KDbField.cpp:81
@@ -1082,24 +1086,24 @@ msgstr "Data/hora"
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set value of database property \"%1\"."
-msgstr "Non se puido definir o valor da propiedade da base de datos «%1»."
+msgstr "Non foi posíbel definir o valor da propiedade da base de datos «%1»."
 
 #: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set caption for database property \"%1\"."
-msgstr "Non se puido definir o título da propiedade da base de datos «%1»."
+msgstr "Non foi posíbel definir o título da propiedade da base de datos «%1»."
 
 #: KDbProperties.cpp:118 KDbProperties.cpp:135
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not read database property \"%1\"."
-msgstr "Non se puido ler a propiedade da base de datos «%1»."
+msgstr "Non foi posíbel ler a propiedade da base de datos «%1»."
 
 #: KDbProperties.cpp:150
 msgctxt "KDbProperties|"
 msgid "Could not read database properties."
-msgstr "Non se puideron ler as propiedades da base de datos."
+msgstr "Non foi posíbel ler as propiedades da base de datos."
 
 #: KDbQuerySchema_p.cpp:132
 #, qt-format
@@ -1218,17 +1222,17 @@ msgstr "«*» non se podería usar se non se indican táboas."
 #: parser/KDbParser_p.cpp:318
 msgctxt "KDbParser|"
 msgid "\"*\" could not be added."
-msgstr "Non se puido engadir «*»."
+msgstr "Non foi posíbel engadir «*»."
 
 #: parser/KDbParser_p.cpp:325
 msgctxt "KDbParser|"
 msgid "\"<table>.*\" could not be added."
-msgstr "Non se puido engadir «<table>.*»."
+msgstr "Non foi posíbel engadir «<table>.*»."
 
 #: parser/KDbParser_p.cpp:330
 msgctxt "KDbParser|"
 msgid "Could not add binding to a field."
-msgstr "Non se puido engadir unha ligazón de datos a un campo."
+msgstr "Non foi posíbel engadir unha ligazón de datos a un campo."
 
 #: parser/KDbParser_p.cpp:389
 #, qt-format
@@ -1243,7 +1247,7 @@ msgid ""
 "Could not set alias \"%1\" for table \"%2\". This alias is already set for "
 "table \"%3\"."
 msgstr ""
-"Non se puido definir o alias «%1» para a táboa «%2». O alias xa está "
+"Non foi posíbel definir o alias «%1» para a táboa «%2». O alias xa está "
 "definido para a táboa «%3»."
 
 #: parser/KDbParser_p.cpp:430
@@ -1270,27 +1274,27 @@ msgid ""
 "Could not set alias \"%1\" for column #%2. This alias is already set for "
 "column #%3."
 msgstr ""
-"Non se puido definir o alias «%1» para a columna número %2. O alias xa está "
-"definido para a columna número %3."
+"Non foi posíbel definir o alias «%1» para a columna número %2. O alias xa "
+"está definido para a columna número %3."
 
 #: parser/KDbParser_p.cpp:487
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not set alias \"%1\" for column #%2."
-msgstr "Non se puido definir o alias «%1» para a columna número %2."
+msgstr "Non foi posíbel definir o alias «%1» para a columna número %2."
 
 #: parser/KDbParser_p.cpp:530
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not define sorting. Column at position %1 does not exist."
-msgstr "Non se puido definir a orde. A columna na posición %1 non existe."
+msgstr "Non foi posíbel definir a orde. A columna na posición %1 non existe."
 
 #: parser/KDbParser_p.cpp:538
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
 msgstr ""
-"Non se puido definir a orde. O nome ou alcume de columna «%1» non existe."
+"Non foi posíbel definir a orde. O nome ou alcume de columna «%1» non existe."
 
 #: tools/KDbObjectNameValidator.cpp:53
 #, qt-format
