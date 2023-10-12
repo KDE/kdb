@@ -1317,7 +1317,7 @@ msgstr "Identificador do controlador de base de datos"
 #: tools/KDbSimpleCommandLineApp.cpp:79
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database user name"
-msgstr "Nome de usuario da base de datos"
+msgstr "Nome de usuaria da base de datos"
 
 #: tools/KDbSimpleCommandLineApp.cpp:81
 msgctxt "KDbSimpleCommandLineApp|"
