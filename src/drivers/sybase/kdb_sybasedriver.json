@@ -33,7 +33,6 @@
                 "Name[sv]": "Kexi-gruppen",
                 "Name[tr]": "Kexi Takımı",
                 "Name[uk]": "Команда Kexi",
-                "Name[x-test]": "xxKexi Teamxx",
                 "Name[zh_CN]": "Kexi 团队",
                 "Name[zh_TW]": "Kexi 團隊"
             }
@@ -70,7 +69,6 @@
         "Description[sv]": "Kdb-drivrutin för att hantera Sybase- och MSSQL-databaser",
         "Description[tr]": "Sysbase ve MSSQL veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних Sybase і MSSQL",
-        "Description[x-test]": "xxKDb driver for handling Sybase and MSSQL databasesxx",
         "Description[zh_CN]": "处理 Sybase 和 MSSQL 数据库的 KDb 驱动",
         "Description[zh_TW]": "處理 Sybase 和 MSSQL 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
@@ -108,7 +106,6 @@
         "Name[sv]": "Sybase",
         "Name[tr]": "Sybase",
         "Name[uk]": "Sybase",
-        "Name[x-test]": "xxSybasexx",
         "Name[zh_CN]": "Sybase",
         "Name[zh_TW]": "Sybase",
         "ServiceTypes": [
