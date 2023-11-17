@@ -8,7 +8,8 @@ type: functional
 platforms:
     - name: Linux
     - name: Windows
-#    - name: MacOSX
+    - name: macOS
+    - name: FreeBSD
 #    - name: Android
 
 public_lib: true
