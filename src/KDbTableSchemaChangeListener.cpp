@@ -22,6 +22,7 @@
 #include "KDbConnection_p.h"
 #include "KDbLookupFieldSchema.h"
 #include "kdb_debug.h"
+#include <qset.h>
 
 #ifdef KDB_TABLESCHEMACHANGELISTENER_DEBUG
 # define localDebug(...) kdbDebug(__VA_ARGS__)
@@ -538,7 +539,10 @@ tristate KDbTableSchemaChangeListener::closeListeners(KDbConnection *conn,
         kdbWarning() << "Missing table";
         return false;
     }
-    QSet<KDbTableSchemaChangeListener*> toClose(listeners(conn, table).toSet().subtract(except.toSet()));
+    const auto listenersList = listeners(conn, table);
+    QSet<KDbTableSchemaChangeListener *> listenersSet(listenersList.cbegin(), listenersList.cend());
+    const QSet<KDbTableSchemaChangeListener *> exceptSet(except.cbegin(), except.cend());
+    QSet<KDbTableSchemaChangeListener*> toClose(listenersSet.subtract(exceptSet));
     tristate result = true;
     for (KDbTableSchemaChangeListener *listener : qAsConst(toClose)) {
         const tristate localResult = listener->closeListener();
@@ -561,7 +565,10 @@ tristate KDbTableSchemaChangeListener::closeListeners(KDbConnection *conn,
         kdbWarning() << "Missing query";
         return false;
     }
-    QSet<KDbTableSchemaChangeListener*> toClose(listeners(conn, query).toSet().subtract(except.toSet()));
+    const auto listenersList = listeners(conn, query);
+    QSet<KDbTableSchemaChangeListener *> listenersSet(listenersList.cbegin(), listenersList.cend());
+    const QSet<KDbTableSchemaChangeListener *> exceptSet(except.cbegin(), except.cend());
+    QSet<KDbTableSchemaChangeListener*> toClose(listenersSet.subtract(exceptSet));
     tristate result = true;
     for (KDbTableSchemaChangeListener *listener : qAsConst(toClose)) {
         const tristate localResult = listener->closeListener();

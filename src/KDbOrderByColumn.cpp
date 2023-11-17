@@ -233,7 +233,7 @@ KDbEscapedString KDbOrderByColumn::toSqlString(bool includeTableName,
                 aliasOrName = query->columnAlias(indexOfField);
                 if (aliasOrName.isEmpty()) {
                     kdbWarning() << "This field does not belong to specified query:" << *d->field
-                                 << endl << "cannot find alias";
+                                 << Qt::endl << "cannot find alias";
                     aliasOrName = QLatin1String("?unknown_field?");
                 }
             } else {

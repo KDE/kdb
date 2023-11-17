@@ -223,11 +223,9 @@ public:
     }
     int remove(const Key &key) {
         if (m_autoDelete) {
-            const QList<T> values(QHash<Key, T>::values(key));
+            const T &value(QHash<Key, T>::value(key));
             const int result = QHash<Key, T>::remove(key);
-            for (T item : values) {
-                delete item;
-            }
+            delete value;
             return result;
         } else {
             return QHash<Key, T>::remove(key);

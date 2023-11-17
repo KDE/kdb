@@ -18,7 +18,7 @@ kdb_add_examples(OFF)
 # ECM
 include(KDEInstallDirs)
 include(KDECMakeSettings NO_POLICY_SCOPE)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
+include(KDECompilerSettings NO_POLICY_SCOPE)
 
 include(ECMGeneratePriFile)
 include(ECMInstallIcons)
@@ -28,6 +28,7 @@ include(ECMSetupVersion)
 include(ECMCoverageOption)
 include(ECMSetupQtPluginMacroNames)
 include(ECMAddQch)
+include(ECMDeprecationSettings)
 
 # Own
 include(KDbCreateSharedDataClasses)
@@ -47,6 +48,11 @@ set_package_properties(ICU PROPERTIES
 
 get_git_revision_and_branch()
 add_unfinished_features_option()
+
+ecm_set_disabled_deprecation_versions(
+    QT 5.15
+    KF 5.100.0
+)
 
 add_subdirectory(src)
 add_subdirectory(tools)

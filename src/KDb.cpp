@@ -53,6 +53,7 @@
 #include <QDir>
 #include <QProcess>
 #include <QtDebug>
+#include <QRandomGenerator>
 
 #include <limits>
 #include <memory>
@@ -2061,7 +2062,8 @@ QString KDb::temporaryTableName(KDbConnection *conn, const QString &baseName)
     while (true) {
         QString name = QLatin1String("tmp__") + baseName;
         for (int i = 0; i < 10; ++i) {
-            name += QString::number(int(double(qrand()) / RAND_MAX * 0x10), 16);
+            const auto value = QRandomGenerator::global()->generateDouble();
+            name += QString::number(int(value * 0x10), 16);
         }
         const tristate res = conn->containsTable(name);
         if (~res) {

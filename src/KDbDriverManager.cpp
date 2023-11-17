@@ -39,7 +39,6 @@ Q_GLOBAL_STATIC(DriverManagerInternal, s_self)
 DriverManagerInternal::DriverManagerInternal()
  : m_lookupDriversNeeded(true)
 {
-    qsrand(QTime::currentTime().msec()); // needed e.g. to create random table names
 }
 
 DriverManagerInternal::~DriverManagerInternal()
@@ -137,7 +136,7 @@ void DriverManagerInternal::lookupDriversInternal()
            resolvedMimeTypes.insert(mime.name());
         }
         for (const QString &mimeType : resolvedMimeTypes) {
-            m_metadata_by_mimetype.insertMulti(mimeType, metaData.data());
+            m_metadata_by_mimetype.insert(mimeType, metaData.data());
         }
         m_driversMetaData.insert(metaData->id(), metaData.data());
         metaData.take();
@@ -214,29 +213,21 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     }
 
     const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
-    KPluginFactory *factory = qobject_cast<KPluginFactory*>(metaData->instantiate());
-    if (!factory) {
+    KPluginFactory::Result<KDbDriver> pluginResult = KPluginFactory::instantiatePlugin<KDbDriver>(*metaData);
+
+    if (pluginResult) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
-                             tr("Could not load database driver's plugin file \"%1\".")
-                                .arg(metaData->fileName()));
-        QPluginLoader loader(metaData->fileName()); // use this to get the message
-        (void)loader.load();
-        m_result.setServerMessage(loader.errorString());
-        kdbWarning() << m_result.message() << m_result.serverMessage();
-        return nullptr;
-    }
-    driver = factory->create<KDbDriver>();
-    if (!driver) {
-        m_result = KDbResult(ERR_DRIVERMANAGER,
-                             tr("Could not open database driver \"%1\" from plugin file \"%2\".")
+                             tr("Could not open database driver \"%1\" from plugin file \"%2\". Error: \"%3\"")
                                 .arg(metaData->id(),
-                                     metaData->fileName()));
+                                     metaData->fileName(), pluginResult.errorString));
         kdbWarning() << m_result.message();
         return nullptr;
+    } else {
+        auto driver = pluginResult.plugin;
+        driver->setMetaData(metaData);
+        m_drivers.insert(id.toLower(), driver);
+        return driver;
     }
-    driver->setMetaData(metaData);
-    m_drivers.insert(id.toLower(), driver);
-    return driver;
 }
 
 // ---------------------------
