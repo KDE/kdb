@@ -9,6 +9,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
 project(KDb VERSION 3.2.90) # Update this: Alpha = 90, Beta 1 = 91, RC 1 = 94
+set(BUILD_TESTING ON)
 
 include(KDbAddTests)
 include(KDbAddExamples)

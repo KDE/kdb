@@ -215,7 +215,7 @@ KDbDriver* DriverManagerInternal::driver(const QString& id)
     const KDbDriverMetaData *metaData = m_driversMetaData.value(id.toLower());
     KPluginFactory::Result<KDbDriver> pluginResult = KPluginFactory::instantiatePlugin<KDbDriver>(*metaData);
 
-    if (pluginResult) {
+    if (!pluginResult) {
         m_result = KDbResult(ERR_DRIVERMANAGER,
                              tr("Could not open database driver \"%1\" from plugin file \"%2\". Error: \"%3\"")
                                 .arg(metaData->id(),

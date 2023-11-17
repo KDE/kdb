@@ -51,8 +51,8 @@ cat <<EOT > "$test_app_dir/CMakeLists.txt"
 # Test if all the installed headers can be included individually.
 # This is a compile-time test.
 
-cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-find_package(ECM 1.8.0 REQUIRED NO_MODULE)
+cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
+find_package(ECM 5.100.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH "$current_srcdir" "$srcdir/cmake/modules" \${ECM_MODULE_PATH})
 
 project(HeadersTest)
