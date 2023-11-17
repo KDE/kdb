@@ -204,7 +204,7 @@ void SqlParserTest::testParse()
     QString message;
     if (!sql.endsWith(';')) {
         message = QString("%1:%2: Missing ';' at the end of line").arg(fname).arg(lineNum);
-        m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
+        m_errorStream << fname << ':' << lineNum << ' ' << message << Qt::endl;
         QVERIFY2(sql.endsWith(';'), qPrintable(message));
     }
     sql.chop(1);
@@ -221,11 +221,11 @@ void SqlParserTest::testParse()
         ok = !expectError;
         message = "Unexpected success of parsing SQL statement";
         if (!ok) {
-            m_errorStream << fname << ':' << lineNum << ' ' << message << endl;
+            m_errorStream << fname << ':' << lineNum << ' ' << message << Qt::endl;
             if (query) {
                 const KDbConnectionAndQuerySchema connQuery(parser->connection(), *query);
                 qDebug() << connQuery;
-                m_errorStream << KDbUtils::debugString(connQuery) << endl;
+                m_errorStream << KDbUtils::debugString(connQuery) << Qt::endl;
             }
         }
         QVERIFY2(ok, qPrintable(message));
@@ -240,7 +240,7 @@ void SqlParserTest::testParse()
         if (ok) {
             qDebug() << parser->error();
         } else {
-            m_errorStream << fname << ':' << lineNum << message << endl;
+            m_errorStream << fname << ':' << lineNum << message << Qt::endl;
         }
         QVERIFY2(ok, qPrintable(message));
     }

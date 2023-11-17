@@ -22,9 +22,9 @@
 
 int drPropTest()
 {
-    QList<QByteArray> names = driver->internalPropertyNames();
+    const QList<QByteArray> names = driver->internalPropertyNames();
     qDebug() << QString("%1 properties found:").arg(names.count());
-    foreach(const QByteArray& propertyName, names) {
+    for(const QByteArray& propertyName : names) {
         KDbUtils::Property property = driver->internalProperty(propertyName);
         qDebug() << " - " << propertyName << ":"
         << " caption=" << property.caption()
