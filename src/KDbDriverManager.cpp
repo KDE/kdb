@@ -138,7 +138,7 @@ void DriverManagerInternal::lookupDriversInternal()
         for (const QString &mimeType : resolvedMimeTypes) {
             m_metadata_by_mimetype.insert(mimeType, metaData.data());
         }
-        m_driversMetaData.insert(metaData->id(), metaData.data());
+        m_driversMetaData.insert(metaData->pluginId(), metaData.data());
         metaData.take();
     }
     qDeleteAll(offers);

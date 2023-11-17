@@ -24,6 +24,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_CLANG)
    )
 endif()
 
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Network)
+find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Network)
 
-build_and_install_kdb_driver(postgresql "${kdb_postgresqldriver_SRCS}" "${PostgreSQL_LIBRARIES};Qt5::Network")
+build_and_install_kdb_driver(postgresql "${kdb_postgresqldriver_SRCS}" "${PostgreSQL_LIBRARIES};Qt${QT_MAJOR_VERSION}::Network")

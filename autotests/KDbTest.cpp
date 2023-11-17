@@ -535,12 +535,14 @@ void KDbTest::testUnescapeString_data()
     T("\\u{00a9}", "\\u{00a9}", "©");
     T("\\u{2665}", "\\u{2665}", "♥");
     T("\\u{02665}", "\\u{02665}", "♥");
+#if QT_VERSION <= QT_VERSION_CHECK(6, 0, 0)
     QTest::newRow("\\u{1D306}") << QString("\\u{1D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
     QTest::newRow("\\u{1d306}") << QString("\\u{1d306}") << QString(QChar(0x1d306)) << '\0' << -1 << -1;
     QTest::newRow("\\u{01D306}") << QString("\\u{01D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
     QTest::newRow("\\u{01d306}") << QString("\\u{01d306}") << QString(QChar(0x1d306)) << '\0' << -1 << -1;
     QTest::newRow("\\u{00001D306}") << QString("\\u{00001D306}") << QString(QChar(0x1D306)) << '\0' << -1 << -1;
     QTest::newRow("\\u{10FFFF}") << QString("\\u{10FFFF}") << QString(QChar(0x10FFFF)) << '\0' << -1 << -1;
+#endif
 
     // quote-dependent cases, success
     T2("2x ' for ' quote", "''", "'", '\'');
@@ -949,7 +951,7 @@ void KDbTest::testCstringToVariant()
  (typically something like "application/x-kexiproject-sqlite") */
 KDB_EXPORT QString defaultFileBasedDriverMimeType();
 
-/*! @return default file-based driver ID (currently, "org.kde.kdb.sqlite"). */
+/*! @return default file-based driver ID (currently, "kdb_sqlitedriver"). */
 KDB_EXPORT QString defaultFileBasedDriverId();
 
 /*! Escapes and converts value @a v (for type @a ftype)

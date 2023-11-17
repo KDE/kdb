@@ -75,7 +75,7 @@
         "Description[zh_TW]": "處理 MySQL 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
         "Icon": "",
-        "Id": "org.kde.kdb.mysql",
+        "Id": "kdb_mysqldriver",
         "License": "LGPL",
         "MimeTypes": [],
         "Name": "MySQL",

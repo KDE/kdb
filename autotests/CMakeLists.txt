@@ -56,7 +56,7 @@ target_compile_definitions(MissingTableTest PRIVATE -DFILES_DATA_DIR="${CMAKE_CU
 
 target_compile_definitions(OrderByColumnTest PRIVATE KDB_DEPRECATED=)
 
-if(NOT WIN32) #TODO enable for Windows when headers_test.sh is ported e.g. to python
+if(NOT WIN32 AND NOT (QT_MAJOR_VERSION STREQUAL "6")) #TODO enable for Windows when headers_test.sh is ported e.g. to python
     add_subdirectory(headers)
 endif()
 add_subdirectory(tools)

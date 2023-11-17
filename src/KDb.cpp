@@ -1971,7 +1971,7 @@ QString KDb::defaultFileBasedDriverMimeType()
 
 QString KDb::defaultFileBasedDriverId()
 {
-    return QLatin1String("org.kde.kdb.sqlite");
+    return QLatin1String("kdb_sqlitedriver");
 }
 
 // Try to convert from string to type T

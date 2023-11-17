@@ -75,7 +75,7 @@
         "Description[zh_TW]": "處理 SQLite 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
         "Icon": "",
-        "Id": "org.kde.kdb.sqlite",
+        "Id": "kdb_sqlitedriver",
         "License": "LGPL",
         "MimeTypes": [
             "application/x-kexiproject-sqlite3",

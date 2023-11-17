@@ -64,20 +64,20 @@ void ConnectionTest::testConnectionData()
 
     KDbDriverManager manager;
     //! @todo more drivers
-    if (manager.driver("org.kde.kdb.sqlite")) { // only if sqlite is present
-        qDebug() << "org.kde.kdb.sqlite driver found, testing...";
+    if (manager.driver("kdb_sqlitedriver")) { // only if sqlite is present
+        qDebug() << "kdb_sqlitedriver driver found, testing...";
         cdata = KDbConnectionData();
-        cdata.setDriverId("org.kde.kdb.sqlite");
+        cdata.setDriverId("kdb_sqlitedriver");
         QCOMPARE(cdata.toUserVisibleString(), KDbConnection::tr("<file>"));
         cdata.setDatabaseName("my.db");
         QCOMPARE(cdata.toUserVisibleString(), KDbConnection::tr("file: %1").arg("my.db"));
         KDbConnectionData copy(cdata);
         QCOMPARE(cdata, copy);
     }
-    if (manager.driver("org.kde.kdb.mysql")) { // only if mysql is present
-        qDebug() << "org.kde.kdb.mysql driver found, testing...";
+    if (manager.driver("kdb_mysqldriver")) { // only if mysql is present
+        qDebug() << "kdb_mysqldriver driver found, testing...";
         cdata = KDbConnectionData();
-        cdata.setDriverId("org.kde.kdb.mysql");
+        cdata.setDriverId("kdb_mysqldriver");
         QCOMPARE(cdata.toUserVisibleString(), QLatin1String("localhost"));
         QCOMPARE(cdata.toUserVisibleString(KDbConnectionData::UserVisibleStringOption::None),
                  QLatin1String("localhost")); // like above
