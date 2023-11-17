@@ -760,8 +760,9 @@ bool KDbConnection::createDatabase(const QString &dbName)
     d->setupKDbSystemSchema();
 
     //-physically create internal KDb tables
-    foreach(KDbInternalTableSchema* t, d->internalKDbTables()) {
-        if (!drv_createTable(*t))
+    const auto tables = d->internalKDbTables();
+    for(KDbInternalTableSchema* table : tables) {
+        if (!drv_createTable(*table))
             createDatabase_ERROR;
     }
 
@@ -862,7 +863,7 @@ bool KDbConnection::closeDatabase()
     if (d->driver->transactionsSupported()) {
         //rollback all transactions
         d->dontRemoveTransactions = true; //lock!
-        foreach(const KDbTransaction& tr, d->transactions) {
+        for(const KDbTransaction& tr : std::as_const(d->transactions)) {
             if (!rollbackTransaction(tr)) {//rollback as much as you can, don't stop on prev. errors
                 ret = false;
             } else {
@@ -1373,9 +1374,10 @@ bool KDbConnection::storeMainFieldSchema(KDbField *field)
     QList<QVariant>::ConstIterator valsIt = vals.constBegin();
     bool first = true;
     KDbEscapedString sql("UPDATE kexi__fields SET ");
-    foreach(KDbField *f, *fl->fields()) {
+    const auto fields = *fl->fields();
+    for(KDbField *field : fields) {
         sql.append((first ? QString() : QLatin1String(", ")) +
-                   f->name() + QLatin1Char('=') + d->driver->valueToSql(f, *valsIt));
+                   field->name() + QLatin1Char('=') + d->driver->valueToSql(field, *valsIt));
         if (first)
             first = false;
         ++valsIt;
@@ -1488,10 +1490,10 @@ bool KDbConnection::createTable(KDbTableSchema* tableSchema, CreateTableOptions 
         KDbFieldList *fl = createFieldListForKexi__Fields(ts);
         if (!fl)
             return false;
-
-        foreach(KDbField *f, *tableSchema->fields()) {
+        const auto fields = *tableSchema->fields();
+        for(const auto field : fields) {
             QList<QVariant> vals;
-            buildValuesForKexi__Fields(vals, f);
+            buildValuesForKexi__Fields(vals, field);
             if (!insertRecord(fl, vals))
                 createTable_ERR;
         }
@@ -2685,7 +2687,8 @@ bool KDbConnection::storeExtendedTableSchemaData(KDbTableSchema* tableSchema)
     bool extendedTableSchemaStringIsEmpty = true;
 
     //for each field:
-    foreach(KDbField* f, *tableSchema->fields()) {
+    const auto fields = *tableSchema->fields();
+    for(KDbField* f : fields) {
         QDomElement extendedTableSchemaFieldEl;
         const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
         if (f->visibleDecimalPlaces() >= 0/*nondefault*/ && KDb::supportsVisibleDecimalPlacesProperty(type)) {
@@ -3339,7 +3342,7 @@ bool KDbConnection::insertRecord(KDbQuerySchema* query, KDbRecordData* data, KDb
             return false;
         }
         int i = 0;
-        foreach(KDbQueryColumnInfo *ci, *aif_list) {
+        for(KDbQueryColumnInfo *ci : std::as_const(*aif_list)) {
 //   kdbDebug() << "AUTOINCREMENTED FIELD" << fi->field->name() << "==" << aif_data[i].toInt();
             ((*data)[ columnsOrderExpanded.value(ci)]
                 = aif_data.value(i)).convert(ci->field()->variantType()); //cast to get proper type
@@ -3398,7 +3401,8 @@ bool KDbConnection::deleteRecord(KDbQuerySchema* query, KDbRecordData* data, boo
             return false;
         }
         int i = 0;
-        foreach(KDbField *f, *pkey->fields()) {
+        const auto fields = *pkey->fields();
+        for(KDbField *f : fields) {
             if (!sqlwhere.isEmpty())
                 sqlwhere += " AND ";
             QVariant val(data->at(pkeyFieldsOrder.at(i)));

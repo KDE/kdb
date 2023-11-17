@@ -134,7 +134,7 @@ void ConnectionTestThread::emitError(const KDbResultable& KDbResultable)
     QString msg;
     QString details;
     KDb::getHTMLErrorMesage(KDbResultable, &msg, &details);
-    emit error(msg, details);
+    Q_EMIT error(msg, details);
 }
 
 void ConnectionTestThread::run()
@@ -770,11 +770,11 @@ void KDb::getProperties(const KDbLookupFieldSchema *lookup, QMap<QByteArray, QVa
         (lookup && !recordSource.values().isEmpty()) ? recordSource.values() : QVariant());
     values->insert("boundColumn", lookup ? lookup->boundColumn() : QVariant());
     values->insert("visibleColumn", visibleColumnValue(lookup));
-   QList<QVariant> variantList;
+    QList<QVariant> variantList;
     if (lookup) {
         const QList<int> columnWidths = lookup->columnWidths();
-        for(const QVariant& variant : columnWidths) {
-            variantList.append(variant);
+        for(int columnWidth : columnWidths) {
+            variantList.append(QVariant{ columnWidth });
         }
     }
     values->insert("columnWidths", lookup ? variantList : QVariant());
@@ -1766,7 +1766,7 @@ QByteArray KDb::zeroXHexToByteArray(const char* data, int length, bool *ok)
 QList<int> KDb::stringListToIntList(const QStringList &list, bool *ok)
 {
     QList<int> result;
-    foreach (const QString &item, list) {
+    for (const QString &item : list) {
         int val = item.toInt(ok);
         if (ok && !*ok) {
             return QList<int>();
@@ -2043,7 +2043,8 @@ QVariant KDb::cstringToVariant(const char* data, KDbField::Type type, bool *ok, 
 QStringList KDb::libraryPaths()
 {
     QStringList result;
-    foreach (const QString& path, qApp->libraryPaths()) {
+    const auto paths = qApp->libraryPaths();
+    for (const QString& path : paths) {
         const QString dir(path + QLatin1Char('/') + QLatin1String(KDB_BASE_NAME_LOWER));
         if (QDir(dir).exists() && QDir(dir).isReadable()) {
             result += dir;

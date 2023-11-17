@@ -105,11 +105,13 @@ QDebug operator<<(QDebug dbg, const KDbQueryAsterisk& asterisk)
     if (asterisk.isAllTableAsterisk()) {
         dbg.nospace() << "ALL-TABLES ASTERISK (*) ON TABLES(";
         bool first = true;
-        foreach(KDbTableSchema *table, *asterisk.query()->tables()) {
-            if (first)
+        const auto tables = *asterisk.query()->tables();
+        for(KDbTableSchema *table : tables) {
+            if (first) {
                 first = false;
-            else
+            } else {
                 dbg.nospace() << ',';
+            }
             dbg.space() << table->name();
         }
         dbg.space() << ')';

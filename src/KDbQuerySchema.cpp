@@ -70,8 +70,9 @@ KDbQuerySchema::KDbQuerySchema(KDbTableSchema *tableSchema)
         setCaption(d->masterTable->caption());
 
         // add explicit field list to avoid problems (e.g. with fields added outside of the app):
-        foreach(KDbField* f, *d->masterTable->fields()) {
-            addField(f);
+        const auto fields = *d->masterTable->fields();
+        for(KDbField* field : fields) {
+            addField(field);
         }
     }
 }
@@ -377,7 +378,8 @@ QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSc
     //tables
     dbg.nospace() << " - TABLES:\n";
     first = true;
-    foreach(KDbTableSchema *table, *query.tables()) {
+    const auto tables = *query.tables();
+    for(KDbTableSchema *table : tables) {
         if (first)
             first = false;
         else
@@ -394,7 +396,8 @@ QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSc
     }
     else {
         int i = -1;
-        foreach(KDbField *f, *query.fields()) {
+        const auto fields = *query.fields();
+        for(KDbField *f : fields) {
             i++;
             const QString alias(query.columnAlias(i));
             if (!alias.isEmpty()) {
@@ -411,7 +414,8 @@ QDebug operator<<(QDebug dbg, const KDbConnectionAndQuerySchema &connectionAndSc
     }
     else {
         int i = -1;
-        foreach(KDbTableSchema* table, *query.tables()) {
+        const auto tables = *query.tables();
+        for(KDbTableSchema* table : tables) {
             i++;
             const QString alias(query.tableAlias(i));
             if (!alias.isEmpty()) {
@@ -443,7 +447,7 @@ KDbTableSchema* KDbQuerySchema::masterTable() const
     //try to find master table if there's only one table (with possible aliasses)
     QString tableNameLower;
     int num = -1;
-    foreach(KDbTableSchema *table, d->tables) {
+    for(KDbTableSchema *table : std::as_const(d->tables)) {
         num++;
         if (!tableNameLower.isEmpty() && table->name().toLower() != tableNameLower) {
             //two or more different tables
@@ -474,7 +478,7 @@ void KDbQuerySchema::addTable(KDbTableSchema *table, const QString& alias)
     // only append table if: it has alias or it has no alias but there is no such table on the list
     if (alias.isEmpty() && d->tables.contains(table)) {
         int num = -1;
-        foreach(KDbTableSchema *t, d->tables) {
+        for(KDbTableSchema *t : std::as_const(d->tables)) {
             num++;
             if (0 == t->name().compare(table->name(), Qt::CaseInsensitive)) {
                 if (tableAlias(num).isEmpty()) {
@@ -502,7 +506,7 @@ void KDbQuerySchema::removeTable(KDbTableSchema *table)
 KDbTableSchema* KDbQuerySchema::table(const QString& tableName) const
 {
 //! @todo maybe use tables_byname?
-    foreach(KDbTableSchema *table, d->tables) {
+    for (KDbTableSchema *table : std::as_const(d->tables)) {
         if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             return table;
         }
@@ -524,7 +528,7 @@ KDbField* KDbQuerySchema::findTableField(const QString &fieldOrTableAndFieldName
         return nullptr;
     }
     if (tableName.isEmpty()) {
-        foreach(KDbTableSchema *table, d->tables) {
+        for (KDbTableSchema *table : std::as_const(d->tables)) {
             if (table->field(fieldName))
                 return table->field(fieldName);
         }
@@ -602,7 +606,7 @@ int KDbQuerySchema::tablePositionForAlias(const QString& name) const
 int KDbQuerySchema::tablePosition(const QString& tableName) const
 {
     int num = -1;
-    foreach(KDbTableSchema* table, d->tables) {
+    for(KDbTableSchema* table : std::as_const(d->tables)) {
         num++;
         if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             return num;
@@ -615,7 +619,7 @@ QList<int> KDbQuerySchema::tablePositions(const QString& tableName) const
 {
     QList<int> result;
     int num = -1;
-    foreach(KDbTableSchema* table, d->tables) {
+    for(KDbTableSchema* table : std::as_const(d->tables)) {
         num++;
         if (0 == table->name().compare(tableName, Qt::CaseInsensitive)) {
             result += num;
@@ -822,7 +826,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
         if (f->isQueryAsterisk()) {
             if (static_cast<KDbQueryAsterisk*>(f)->isSingleTableAsterisk()) {
                 const KDbField::List *ast_fields = static_cast<KDbQueryAsterisk*>(f)->table()->fields();
-                foreach(KDbField *ast_f, *ast_fields) {
+                for (KDbField *ast_f : *ast_fields) {
                     KDbQueryColumnInfo *ci = new KDbQueryColumnInfo(ast_f, QString()/*no field for asterisk!*/,
                             isColumnVisible(fieldPosition));
                     ci->d->querySchema = this;
@@ -833,10 +837,10 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                     cache->columnsOrder.insert(ci, fieldPosition);
                 }
             } else {//all-tables asterisk: iterate through table list
-                foreach(KDbTableSchema *table, d->tables) {
+                for (KDbTableSchema *table : std::as_const(d->tables)) {
                     //add all fields from this table
                     const KDbField::List *tab_fields = table->fields();
-                    foreach(KDbField *tab_f, *tab_fields) {
+                    for(KDbField *tab_f : *tab_fields) {
 //! @todo (js): perhaps not all fields should be appended here
 //      d->detailedVisibility += isFieldVisible(fieldPosition);
 //      list.append(tab_f);
@@ -930,7 +934,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
                 const QList<int> visibleColumns(lookupFieldSchema->visibleColumns());
                 bool ok = true;
                 // all indices in visibleColumns should be in [0..lookupQueryFieldsExpanded.size()-1]
-                foreach(int visibleColumn, visibleColumns) {
+                for(int visibleColumn : std::as_const(visibleColumns)) {
                     if (visibleColumn >= lookupQueryFieldsExpanded.count()) {
                         ok = false;
                         break;
@@ -983,7 +987,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
     */
     i = -1;
     int visibleIndex = -1;
-    foreach(KDbQueryColumnInfo* ci, list) {
+    for(KDbQueryColumnInfo* ci : std::as_const(list)) {
         i++;
         cache->fieldsExpanded[i] = ci;
         if (ci->isVisible()) {
@@ -1056,7 +1060,7 @@ KDbQuerySchemaFieldsExpanded *KDbQuerySchema::computeFieldsExpanded(KDbConnectio
     //create internal expanded list with lookup fields
     cache->internalFields.resize(lookup_list.count());
     i = -1;
-    foreach(KDbQueryColumnInfo *ci, lookup_list) {
+    for(KDbQueryColumnInfo *ci : std::as_const(lookup_list)) {
         i++;
         //add it to the internal list
         cache->internalFields[i] = ci;
@@ -1238,7 +1242,7 @@ KDbEscapedString KDbQuerySchema::sqlColumnsList(const KDbQueryColumnInfo::List &
     KDbEscapedString result;
     result.reserve(256);
     bool start = true;
-    foreach(KDbQueryColumnInfo* ci, infolist) {
+    for(KDbQueryColumnInfo* ci : infolist) {
         if (!start)
             result += ",";
         else
@@ -1393,9 +1397,10 @@ QList<KDbQuerySchemaParameter> KDbQuerySchema::parameters(KDbConnection *conn) c
 bool KDbQuerySchema::validate(QString *errorMessage, QString *errorDescription)
 {
     KDbParseInfoInternal parseInfo(this);
-    foreach(KDbField* f, *fields()) {
-        if (f->isExpression()) {
-            if (!f->expression().validate(&parseInfo)) {
+    const auto dbFields = *fields();
+    for(KDbField* field : dbFields) {
+        if (field->isExpression()) {
+            if (!field->expression().validate(&parseInfo)) {
                 setResult(parseInfo, errorMessage, errorDescription);
                 return false;
             }

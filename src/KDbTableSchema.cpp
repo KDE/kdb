@@ -145,7 +145,8 @@ void KDbTableSchema::init(const KDbTableSchema& ts, bool copyId)
         setId(-1);
 
     //deep copy all members
-    foreach(KDbIndexSchema* otherIdx, *ts.indices()) {
+    const auto indices = *ts.indices();
+    for(KDbIndexSchema* otherIdx : indices) {
         // fields from _this_ table will be assigned to the index
         KDbIndexSchema *idx = copyIndexFrom(*otherIdx);
         if (idx->isPrimaryKey()) {//assign pkey

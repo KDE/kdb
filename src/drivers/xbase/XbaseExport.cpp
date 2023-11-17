@@ -312,7 +312,7 @@ bool xBaseExport::performExport(Kexi::ObjectStatus* result) {
   tables.sort();
 
   // -- read table schemas and create them in memory (only for non-KDb-compat tables)
-  foreach (const QString& tableCaption, tables) {
+  for (const QString& tableCaption : std::as_const(tables)) {
     if (dest_isSystemObjectName( tableCaption )) {
       return false;
     }
@@ -360,8 +360,8 @@ bool xBaseExport::dest_connect() {
 }
 
 bool xBaseExport::dest_disconnect() {
-  QList<QString> pathNameList = d->tableNamePathMap.values();
-  foreach(const QString& pathName, pathNameList) {
+  const QList<QString> pathNameList = d->tableNamePathMap.values();
+  for(const QString& pathName : pathNameList) {
     QByteArray ba = pathName.toLatin1();
     xbDbf* tablePtr = d->xbase.GetDbfPtr(ba.constData());
     tablePtr->CloseDatabase();

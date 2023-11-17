@@ -242,7 +242,7 @@ static bool setVisibleColumns(KDbLookupFieldSchema *lookup, const QVariant &val)
         variantList = val.toList();
     }
     QList<int> visibleColumns;
-    foreach(const QVariant& variant, variantList) {
+    for(const QVariant& variant : std::as_const(variantList)) {
         bool ok;
         const int ival = variant.toInt(&ok);
         if (!ok) {
@@ -257,7 +257,8 @@ static bool setVisibleColumns(KDbLookupFieldSchema *lookup, const QVariant &val)
 static bool setColumnWidths(KDbLookupFieldSchema *lookup, const QVariant &val)
 {
     QList<int> widths;
-    foreach(const QVariant& variant, val.toList()) {
+    const auto variants = val.toList();
+    for(const QVariant& variant : variants) {
         bool ok;
         const int ival = variant.toInt(&ok);
         if (!ok)
@@ -308,7 +309,8 @@ QDebug operator<<(QDebug dbg, const KDbLookupFieldSchema& lookup)
     dbg.space() << "visibleColumns:";
 
     bool first = true;
-    foreach(int visibleColumn, lookup.visibleColumns()) {
+    const auto visibleColumns = lookup.visibleColumns();
+    for(int visibleColumn : visibleColumns) {
         if (first) {
             first = false;
             dbg.nospace();
@@ -518,7 +520,7 @@ void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
     if (!visibleColumns.isEmpty()) {
         QDomElement visibleColumnEl(doc->createElement(QLatin1String("visible-column")));
         lookupColumnEl.appendChild(visibleColumnEl);
-        foreach(int visibleColumn, visibleColumns) {
+        for(int visibleColumn : std::as_const(visibleColumns)) {
             QDomElement numberEl(doc->createElement(QLatin1String("number")));
             visibleColumnEl.appendChild(numberEl);
             numberEl.appendChild(doc->createTextNode(QString::number(visibleColumn)));
@@ -529,7 +531,7 @@ void KDbLookupFieldSchema::saveToDom(QDomDocument *doc, QDomElement *parentEl)
     if (!columnWidths.isEmpty()) {
         QDomElement columnWidthsEl(doc->createElement(QLatin1String("column-widths")));
         lookupColumnEl.appendChild(columnWidthsEl);
-        foreach(int columnWidth, columnWidths) {
+        for(int columnWidth : columnWidths) {
             QDomElement columnWidthEl(doc->createElement(QLatin1String("number")));
             columnWidthsEl.appendChild(columnWidthEl);
             columnWidthEl.appendChild(doc->createTextNode(QString::number(columnWidth)));

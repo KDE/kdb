@@ -156,7 +156,7 @@ void KDbTest::testFieldTypeNamesAndStringsForGroup()
     QFETCH(QList<QByteArray>, typeNames);
     QFETCH(QStringList, typeStrings);
     QStringList translatedNames;
-    foreach(const QByteArray &name, typeNames) {
+    for(const QByteArray &name : std::as_const(typeNames)) {
         translatedNames.append(KDbField::tr(name.constData()));
     }
     QCOMPARE(KDb::fieldTypeNamesForGroup(typeGroup), translatedNames);

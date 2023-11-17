@@ -140,7 +140,7 @@ private:
         }
 
         int len = qMin(as.length(), bs.length());
-        forever {
+        while (true) {
             unsigned short au = a->unicode();
             unsigned short bu = b->unicode();
             au = (au <= 0x17e ? charTable[au] : 0xffff);
@@ -384,7 +384,7 @@ KDbTableViewData::KDbTableViewData(KDbField::Type keyType, KDbField::Type valueT
 
 KDbTableViewData::~KDbTableViewData()
 {
-    emit destroying();
+    Q_EMIT destroying();
     clearInternal(false /* !processEvents */);
     qDeleteAll(d->columns);
     delete d;
@@ -600,7 +600,7 @@ bool KDbTableViewData::updateRecordEditBufferRef(KDbRecordData *record,
     }
     d->result.clear();
     if (allowSignals)
-        emit aboutToChangeCell(record, colnum, newval, &d->result);
+        Q_EMIT aboutToChangeCell(record, colnum, newval, &d->result);
     if (!d->result.success)
         return false;
 
@@ -741,7 +741,7 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
         KDbRecordEditBuffer::SimpleMap b = d->pRecordEditBuffer->simpleBuffer();
         for (KDbRecordEditBuffer::SimpleMap::ConstIterator it = b.constBegin();it != b.constEnd();++it) {
             int i = -1;
-            foreach(KDbTableViewColumn *col, d->columns) {
+            for(KDbTableViewColumn *col : std::as_const(d->columns)) {
                 i++;
                 if (col->field()->name() == it.key()) {
                     kdbDebug() << col->field()->name() << ": " << record->at(i).toString()
@@ -755,19 +755,19 @@ bool KDbTableViewData::saveRecord(KDbRecordData *record, bool insert, bool repai
     d->pRecordEditBuffer->clear();
 
     if (repaint)
-        emit recordRepaintRequested(record);
+        Q_EMIT recordRepaintRequested(record);
     return true;
 }
 
 bool KDbTableViewData::saveRecordChanges(KDbRecordData *record, bool repaint)
 {
     d->result.clear();
-    emit aboutToUpdateRecord(record, d->pRecordEditBuffer, &d->result);
+    Q_EMIT aboutToUpdateRecord(record, d->pRecordEditBuffer, &d->result);
     if (!d->result.success)
         return false;
 
     if (saveRecord(record, false /*update*/, repaint)) {
-        emit recordUpdated(record);
+        Q_EMIT recordUpdated(record);
         return true;
     }
     return false;
@@ -776,12 +776,12 @@ bool KDbTableViewData::saveRecordChanges(KDbRecordData *record, bool repaint)
 bool KDbTableViewData::saveNewRecord(KDbRecordData *record, bool repaint)
 {
     d->result.clear();
-    emit aboutToInsertRecord(record, &d->result, repaint);
+    Q_EMIT aboutToInsertRecord(record, &d->result, repaint);
     if (!d->result.success)
         return false;
 
     if (saveRecord(record, true /*insert*/, repaint)) {
-        emit recordInserted(record, repaint);
+        Q_EMIT recordInserted(record, repaint);
         return true;
     }
     return false;
@@ -790,7 +790,7 @@ bool KDbTableViewData::saveNewRecord(KDbRecordData *record, bool repaint)
 bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
 {
     d->result.clear();
-    emit aboutToDeleteRecord(record, &d->result, repaint);
+    Q_EMIT aboutToDeleteRecord(record, &d->result, repaint);
     if (!d->result.success)
         return false;
 
@@ -813,7 +813,7 @@ bool KDbTableViewData::deleteRecord(KDbRecordData *record, bool repaint)
         return false;
     }
     removeAt(index);
-    emit recordDeleted();
+    Q_EMIT recordDeleted();
     return true;
 }
 
@@ -833,13 +833,13 @@ void KDbTableViewData::deleteRecords(const QList<int> &recordsToDelete, bool rep
     }
 //DON'T CLEAR BECAUSE KexiTableViewPropertyBuffer will clear BUFFERS!
 //--> emit reloadRequested(); //! \todo more effective?
-    emit recordsDeleted(recordsToDelete);
+    Q_EMIT recordsDeleted(recordsToDelete);
 }
 
 void KDbTableViewData::insertRecord(KDbRecordData *record, int index, bool repaint)
 {
     insert(index = qMin(index, count()), record);
-    emit recordInserted(record, index, repaint);
+    Q_EMIT recordInserted(record, index, repaint);
 }
 
 void KDbTableViewData::clearInternal(bool processEvents)
@@ -870,7 +870,7 @@ bool KDbTableViewData::deleteAllRecords(bool repaint)
     }
 
     if (repaint)
-        emit reloadRequested();
+        Q_EMIT reloadRequested();
     return res;
 }
 
@@ -879,7 +879,7 @@ int KDbTableViewData::autoIncrementedColumn() const
     if (d->autoIncrementedColumn == -2) {
         //find such a column
         d->autoIncrementedColumn = -1;
-        foreach(KDbTableViewColumn *col, d->columns) {
+        for(KDbTableViewColumn *col: std::as_const(d->columns)) {
             d->autoIncrementedColumn++;
             if (col->field()->isAutoIncrement())
                 break;

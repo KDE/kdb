@@ -134,7 +134,7 @@ void KDbMultiValidator::addSubvalidator(QValidator* validator, bool owned)
 QValidator::State KDbMultiValidator::validate(QString & input, int & pos) const
 {
     State s;
-    foreach(QValidator* validator, d->subValidators) {
+    for(QValidator* validator : std::as_const(d->subValidators)) {
         s = validator->validate(input, pos);
         if (s == Intermediate || s == Invalid)
             return s;
@@ -144,7 +144,7 @@ QValidator::State KDbMultiValidator::validate(QString & input, int & pos) const
 
 void KDbMultiValidator::fixup(QString & input) const
 {
-    foreach(QValidator* validator, d->subValidators) {
+    for (QValidator* validator : std::as_const(d->subValidators)) {
         validator->fixup(input);
     }
 }
@@ -155,7 +155,7 @@ KDbValidator::Result KDbMultiValidator::internalCheck(
 {
     Result r;
     bool warning = false;
-    foreach(QValidator* validator, d->subValidators) {
+    for (QValidator* validator : std::as_const(d->subValidators)) {
         if (dynamic_cast<KDbValidator*>(validator))
             r = dynamic_cast<KDbValidator*>(validator)->internalCheck(valueName, value, message, details);
         else

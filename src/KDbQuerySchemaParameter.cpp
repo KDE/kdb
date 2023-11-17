@@ -37,7 +37,7 @@ QDebug operator<<(QDebug dbg, const KDbQuerySchemaParameter& parameter)
 QDebug operator<<(QDebug dbg, const QList<KDbQuerySchemaParameter>& list)
 {
     dbg.nospace() << QString::fromLatin1("QUERY PARAMETERS (%1):").arg(list.count());
-    foreach(const KDbQuerySchemaParameter& parameter, list) {
+    for(const KDbQuerySchemaParameter& parameter : list) {
         dbg.nospace() << " - " << parameter;
     }
     return dbg.space();

@@ -99,12 +99,12 @@ void DriverManagerInternal::lookupDriversInternal()
     clearResult();
 
     //drivermanagerDebug() << "Load all plugins";
-    QList<QPluginLoader*> offers
+    const QList<QPluginLoader*> offers
             = KDbJsonTrader::self()->query(QLatin1String("KDb/Driver"));
     const QString expectedVersion = QString::fromLatin1("%1.%2")
             .arg(KDB_STABLE_VERSION_MAJOR).arg(KDB_STABLE_VERSION_MINOR);
     QMimeDatabase mimedb;
-    foreach(const QPluginLoader *loader, offers) {
+    for(const QPluginLoader *loader : offers) {
         //QJsonObject json = loader->metaData();
         //drivermanagerDebug() << json;
         QScopedPointer<KDbDriverMetaData> metaData(new KDbDriverMetaData(*loader));
@@ -143,7 +143,6 @@ void DriverManagerInternal::lookupDriversInternal()
         metaData.take();
     }
     qDeleteAll(offers);
-    offers.clear();
 }
 
 QStringList DriverManagerInternal::driverIds()
@@ -182,7 +181,7 @@ QStringList DriverManagerInternal::driverIdsForMimeType(const QString &mimeType)
     }
     const QList<KDbDriverMetaData*> metaDatas(m_metadata_by_mimetype.values(mime.name()));
     QStringList result;
-    foreach (const KDbDriverMetaData* metaData, metaDatas) {
+    for (const KDbDriverMetaData* metaData : metaDatas) {
         result.append(metaData->id());
     }
     return result;
@@ -288,7 +287,8 @@ QString KDbDriverManager::possibleProblemsMessage() const
     QString str;
     str.reserve(1024);
     str = QLatin1String("<ul>");
-    foreach (const QString& problem, s_self->possibleProblems())
+    const auto problems = s_self->possibleProblems();
+    for (const QString& problem : problems)
         str += (QLatin1String("<li>") + problem + QLatin1String("</li>"));
     str += QLatin1String("</ul>");
     return str;
@@ -296,7 +296,8 @@ QString KDbDriverManager::possibleProblemsMessage() const
 
 bool KDbDriverManager::hasDatabaseServerDrivers()
 {
-    foreach(const QString& id, driverIds()) {
+    const auto ids = driverIds();
+    for(const QString& id : ids) {
         const KDbDriverMetaData *metaData = s_self->driverMetaData(id);
         if (!metaData->isFileBased()) {
             return true;

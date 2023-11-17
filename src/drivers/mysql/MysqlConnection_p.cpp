@@ -60,16 +60,16 @@ bool MysqlConnectionInternal::db_connect(const KDbConnectionData& data)
     if (hostName.isEmpty() || 0 == qstricmp(hostName.constData(), "localhost")) {
         if (data.useLocalSocketFile()) {
             if (data.localSocketFileName().isEmpty()) {
-                //! @todo move the list of default sockets to a generic method
-                QStringList sockets;
 #ifndef Q_OS_WIN
-                sockets
-                    << QLatin1String("/var/lib/mysql/mysql.sock")
-                    << QLatin1String("/var/run/mysqld/mysqld.sock")
-                    << QLatin1String("/var/run/mysql/mysql.sock")
-                    << QLatin1String("/tmp/mysql.sock");
+                //! @todo move the list of default sockets to a generic method
+                const QStringList sockets {
+                    QLatin1String("/var/lib/mysql/mysql.sock"),
+                    QLatin1String("/var/run/mysqld/mysqld.sock"),
+                    QLatin1String("/var/run/mysql/mysql.sock"),
+                    QLatin1String("/tmp/mysql.sock")
+                };
 
-                foreach(const QString& socket, sockets) {
+                for(const QString& socket : sockets) {
                     if (QFile(socket).exists()) {
                         localSocket = socket.toLatin1();
                         break;

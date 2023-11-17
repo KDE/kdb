@@ -227,7 +227,7 @@ public:
 
     //! Emits reloadRequested() signal to reload presenters.
     void reload() {
-        emit reloadRequested();
+        Q_EMIT reloadRequested();
     }
 
     inline KDbRecordData* at(int index) {

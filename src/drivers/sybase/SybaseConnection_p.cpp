@@ -113,11 +113,10 @@ bool SybaseConnectionInternal::db_connect(const KDbConnectionData& data)
     if (hostName.isEmpty() || 0 == hostName.compare(QLatin1String("localhost"), Qt::CaseInsensitive)) {
         if (data.useLocalSocketFile) {
             if (data.localSocketFileName.isEmpty()) {
-                QStringList sockets;
 #ifndef Q_OS_WIN
-                sockets.append("/tmp/s.sybase.2638");
+                const QStringList sockets { QLatin1String("/tmp/s.sybase.2638") };
 
-                foreach(const QString& socket, sockets) {
+                for(const QString& socket : sockets) {
                     if (QFile(socket).exists()) {
                         localSocket = socket.toLatin1();
                         break;

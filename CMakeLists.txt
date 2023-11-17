@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 
 # Dependencies
-set(REQUIRED_QT_VERSION 5.4.0)
-set(REQUIRED_KF5_VERSION 5.45.0)
+set(REQUIRED_QT_VERSION 5.15.0)
+set(REQUIRED_KF_VERSION 5.100.0)
 
-find_package(ECM ${REQUIRED_KF5_VERSION} REQUIRED NO_MODULE)
+find_package(ECM ${REQUIRED_KF_VERSION} REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${ECM_MODULE_PATH})
 include(SetKDbCMakePolicies NO_POLICY_SCOPE)
 
@@ -39,8 +39,8 @@ simple_option(BUILD_QCH "Build API documentation in QCH format" OFF)
 
 # Required components to build this framework
 # TODO move Widgets-dependent part to a libKDbWidgets
-find_package(Qt5 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Core Widgets Xml)
-find_package(KF5 ${REQUIRED_KF5_VERSION} REQUIRED CoreAddons)
+find_package(Qt${QT_MAJOR_VERSION} ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Core Widgets Xml)
+find_package(KF${QT_MAJOR_VERSION} ${REQUIRED_KF_VERSION} REQUIRED CoreAddons)
 find_package(ICU REQUIRED i18n uc)
 set_package_properties(ICU PROPERTIES
                        PURPOSE "Required by KDb for unicode-aware string comparisons")

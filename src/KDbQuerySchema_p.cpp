@@ -123,7 +123,8 @@ void KDbQuerySchemaPrivate::tryRegenerateExprAliases()
     int colNum = 0; //used to generate a name
     QString columnAlias;
     int p = -1;
-    foreach(KDbField* f, *query->fields()) {
+    const auto fields = *query->fields();
+    for(KDbField* f : fields) {
         p++;
         if (f->isExpression() && columnAliases.value(p).isEmpty()) {
             //missing

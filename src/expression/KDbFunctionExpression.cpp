@@ -138,7 +138,7 @@ public:
         //! @todo Most likely but can be also other type
         KDbField::Type t = KDbField::Integer;
         const KDbNArgExpressionData *argsData = f->args.constData()->convertConst<KDbNArgExpressionData>();
-        foreach(const ExplicitlySharedExpressionDataPointer &expr, argsData->children) {
+        for (const ExplicitlySharedExpressionDataPointer &expr : std::as_const(argsData->children)) {
             KDbQueryParameterExpressionData *queryParameterExpressionData = expr->convert<KDbQueryParameterExpressionData>();
             const KDbField::Type currentType = expr->type();
             if (!queryParameterExpressionData && currentType != KDbField::Null) {
@@ -146,7 +146,7 @@ public:
                 break;
             }
         }
-        foreach(const ExplicitlySharedExpressionDataPointer &expr, argsData->children) {
+        for (const ExplicitlySharedExpressionDataPointer &expr : std::as_const(argsData->children)) {
             KDbQueryParameterExpressionData *queryParameterExpressionData = expr->convert<KDbQueryParameterExpressionData>();
             if (queryParameterExpressionData) {
                 // Set query parameter type (if there are any) to deduced result type
@@ -1235,7 +1235,7 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
         int **arg = signature;
         int *typesForAllArgs = arg[0];
         int i = 0;
-        foreach(const ExplicitlySharedExpressionDataPointer &expr, args->children) {
+        for (const ExplicitlySharedExpressionDataPointer &expr : std::as_const(args->children)) {
             const KDbField::Type exprType = expr->type(); // cache: evaluating type of expressions can be expensive
             const bool isQueryParameter = expr->convertConst<KDbQueryParameterExpressionData>();
             if (!isQueryParameter) { // (query parameter always matches)
@@ -1251,7 +1251,7 @@ bool KDbFunctionExpressionData::validateInternal(KDbParseInfo *parseInfo,
     else { // typical signature: array of type-lists
         int **arg = signature;
         int i=0;
-        foreach(const ExplicitlySharedExpressionDataPointer &expr, args->children) {
+        for (const ExplicitlySharedExpressionDataPointer &expr : std::as_const(args->children)) {
             const KDbField::Type exprType = expr->type(); // cache: evaluating type of expressions can be expensive
             const bool isQueryParameter = expr->convertConst<KDbQueryParameterExpressionData>();
             if (!isQueryParameter) { // (query parameter always matches)
@@ -1401,7 +1401,8 @@ KDbEscapedString KDbFunctionExpression::greatestOrLeastFunctionUsingCaseToString
     if (args.argCount() >= 2) {
         KDbEscapedString whenSql;
         whenSql.reserve(256);
-        foreach(const ExplicitlySharedExpressionDataPointer &child, args.d.constData()->children) {
+        const auto children = args.d.constData()->children;
+        for(const ExplicitlySharedExpressionDataPointer &child : children) {
             if (!whenSql.isEmpty()) {
                 whenSql += " OR ";
             }

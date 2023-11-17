@@ -361,11 +361,12 @@ KDbPreparedStatementInterface* SqliteConnection::prepareStatementInternal()
 bool SqliteConnection::findAndLoadExtension(const QString & name)
 {
     QStringList pluginPaths;
-    foreach (const QString& path, KDb::libraryPaths()) {
+    const auto libraryPaths = KDb::libraryPaths();
+    for (const QString& path : std::as_const(libraryPaths)) {
         pluginPaths += path + QLatin1String("/sqlite3");
     }
     pluginPaths += options()->property("extraSqliteExtensionPaths").value().toStringList();
-    foreach (const QString& path, pluginPaths) {
+    for (const QString& path : std::as_const(pluginPaths)) {
         if (loadExtension(path + QLatin1Char('/') + name + QLatin1String(KDB_SHARED_LIB_EXTENSION))) {
             return true;
         }

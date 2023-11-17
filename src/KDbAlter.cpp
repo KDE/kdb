@@ -365,7 +365,7 @@ void KDbAlterTableHandler::ChangeFieldPropertyAction::simplifyActions(ActionDict
             //    is related to newName
             //    e.g. if there is setCaption("B", "captionA") action after rename("A","B"),
             //    replace setCaption action with setCaption("A", "captionA")
-            foreach(ActionBase* action, *actionsLikeThis) {
+            for(ActionBase* action : std::as_const(*actionsLikeThis)) {
                 dynamic_cast<FieldActionBase*>(action)->setFieldName(fieldName());
             }
         }
@@ -805,7 +805,7 @@ void KDbAlterTableHandler::setActions(const ActionList& actions)
 void KDbAlterTableHandler::debug()
 {
     kdbDebug() << "KDbAlterTableHandler's actions:";
-    foreach(ActionBase* action, d->actions) {
+    for(ActionBase* action : std::as_const(d->actions)) {
         action->debug();
     }
 }
@@ -836,7 +836,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
 
     // Find a sum of requirements...
     int allActionsCount = 0;
-    foreach(ActionBase* action, d->actions) {
+    for(ActionBase* action : std::as_const(d->actions)) {
         action->updateAlteringRequirements();
         action->m_order = allActionsCount++;
     }
@@ -959,7 +959,8 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     int lastUID = -1;
     KDbField *currentField = nullptr;
     QHash<QString, QString> fieldHash; // a map from new value to old value
-    foreach(KDbField* f, *newTable->fields()) {
+    const auto fields = *newTable->fields();
+    for(KDbField* f : fields) {
         fieldHash.insert(f->name(), f->name());
     }
     for (int i = 0; i < allActionsCount; i++) {
@@ -1039,7 +1040,8 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
         //insert list of dest. fields
         bool first = true;
         KDbEscapedString sourceFields;
-        foreach(KDbField* f, *newTable->fields()) {
+        const auto fields = *newTable->fields();
+        for(KDbField* f : fields) {
             QString renamedFieldName(fieldHash.value(f->name()));
             KDbEscapedString sourceSqlString;
             const KDbField::Type type = f->type(); // cache: evaluating type of expressions can be expensive
@@ -1108,7 +1110,7 @@ KDbTableSchema* KDbAlterTableHandler::execute(const QString& tableName, Executio
     if (!recreateTable) {
         if ((MainSchemaAlteringRequired & args->requirements) && !fieldsWithChangedMainSchema.isEmpty()) {
             //update main schema (kexi__fields) for changed fields
-            foreach(const QString& changeFieldPropertyActionName, fieldsWithChangedMainSchema) {
+            for(const QString& changeFieldPropertyActionName : std::as_const(fieldsWithChangedMainSchema)) {
                 KDbField *f = newTable->field(changeFieldPropertyActionName);
                 if (f) {
                     if (!d->conn->storeMainFieldSchema(f)) {

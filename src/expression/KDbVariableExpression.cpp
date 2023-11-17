@@ -123,7 +123,8 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
 
         //find first table that has this field
         KDbField *firstField = nullptr;
-        foreach(KDbTableSchema *table, *parseInfo->querySchema()->tables()) {
+        const auto tables = *parseInfo->querySchema()->tables();
+        for(KDbTableSchema *table : tables) {
             KDbField *f = table->field(fieldName);
             if (f) {
                 if (!firstField) {
@@ -160,7 +161,7 @@ bool KDbVariableExpressionData::validateInternal(KDbParseInfo *parseInfo_, KDb::
         const QList<int> tPositions = parseInfo->querySchema()->tablePositions(tableName);
         QString tableAlias;
         bool covered = true;
-        foreach(int position, tPositions) {
+        for (int position : tPositions) {
             tableAlias = parseInfo->querySchema()->tableAlias(position);
             if (tableAlias.isEmpty() || tableAlias.toLower() == tableName) {
                 covered = false; //uncovered

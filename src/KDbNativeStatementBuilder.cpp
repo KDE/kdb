@@ -92,8 +92,9 @@ static bool selectStatementInternal(KDbEscapedString *target,
     bool singleTable = tables->count() <= 1;
     if (singleTable) {
         //make sure we will have single table:
-        foreach(KDbField *f, *querySchema->fields()) {
-            if (querySchema->isColumnVisible(number) && f->table() && f->table()->lookupFieldSchema(*f)) {
+        const auto fields = *querySchema->fields();
+        for(KDbField *field : fields) {
+            if (querySchema->isColumnVisible(number) && field->table() && field->table()->lookupFieldSchema(*field)) {
                 //uups, no, there's at least one left join
                 singleTable = false;
                 break;
@@ -114,7 +115,8 @@ static bool selectStatementInternal(KDbEscapedString *target,
     KDbQuerySchemaParameterValueListIterator paramValuesIt(parameters);
     KDbQuerySchemaParameterValueListIterator *paramValuesItPtr
         = parameters.isEmpty() ? nullptr : &paramValuesIt;
-    foreach(KDbField *f, *querySchema->fields()) {
+    const auto fields = *querySchema->fields();
+    for(KDbField *f : fields) {
         if (querySchema->isColumnVisible(number)) {
             if (!sql.isEmpty())
                 sql += ", ";
@@ -264,7 +266,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
                         s_additional_fields += ", ";
                     const QList<int> visibleColumns(lookupFieldSchema->visibleColumns());
                     KDbEscapedString expression;
-                    foreach(int visibleColumnIndex, visibleColumns) {
+                    for(int visibleColumnIndex : visibleColumns) {
 //! @todo Add lookup schema option for separator other than ' ' or even option for placeholders like "Name ? ?"
 //! @todo Add possibility for joining the values at client side.
                         if (fieldsExpanded.count() <= visibleColumnIndex) {
@@ -316,7 +318,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
         sql += " FROM ";
         KDbEscapedString s_from;
         number = 0;
-        foreach(KDbTableSchema *table, *tables) {
+        for(KDbTableSchema *table : std::as_const(*tables)) {
             if (!s_from.isEmpty())
                 s_from += ", ";
             s_from += KDb::escapeIdentifier(driver, table->name());
@@ -327,7 +329,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
         }
         // add subqueries for lookup data
         int subqueries_for_lookup_data_counter = 0;
-        foreach(KDbQuerySchema* subQuery, subqueries_for_lookup_data) {
+        for(KDbQuerySchema* subQuery : std::as_const(subqueries_for_lookup_data)) {
             if (!s_from.isEmpty())
                 s_from += ", ";
             KDbEscapedString subSql;
@@ -353,13 +355,14 @@ static bool selectStatementInternal(KDbEscapedString *target,
 
     //WHERE
     bool wasWhere = false; //for later use
-    foreach(KDbRelationship *rel, *querySchema->relationships()) {
+    for(KDbRelationship *rel : std::as_const(*querySchema->relationships())) {
         if (s_where.isEmpty()) {
             wasWhere = true;
         } else
             s_where += " AND ";
         KDbEscapedString s_where_sub;
-        foreach(const KDbField::Pair &pair, *rel->fieldPairs()) {
+        const auto fieldPairs = *rel->fieldPairs();
+        for(const KDbField::Pair &pair : fieldPairs) {
             if (!s_where_sub.isEmpty())
                 s_where_sub += " AND ";
             s_where_sub +=
@@ -398,7 +401,7 @@ static bool selectStatementInternal(KDbEscapedString *target,
         // (especially helps when there are complex JOINs)
         KDbOrderByColumnList automaticPKOrderBy;
         const KDbQueryColumnInfo::Vector fieldsExpanded(querySchema->fieldsExpanded(connection));
-        foreach(int pkeyFieldsIndex, pkeyFieldsOrder) {
+        for(int pkeyFieldsIndex : std::as_const(pkeyFieldsOrder)) {
             if (pkeyFieldsIndex < 0) // no field mentioned in this query
                 continue;
             if (pkeyFieldsIndex >= fieldsExpanded.count()) {

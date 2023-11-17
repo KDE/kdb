@@ -226,7 +226,8 @@ KDB_EXPORT QDebug operator<<(QDebug dbg, const KDbFieldList& list)
     if (list.fields()->isEmpty())
         dbg.nospace() << "<NO FIELDS>";
     bool start = true;
-    foreach(const KDbField *field, *list.fields()) {
+    const auto fields = *list.fields();
+    for(const KDbField *field : fields) {
         if (!start)
             dbg.nospace() << '\n';
         else
@@ -314,7 +315,7 @@ KDbFieldList* KDbFieldList::subList(const QList<QByteArray>& list)
 KDbFieldList* KDbFieldList::subList(const QList<int>& list)
 {
     QScopedPointer<KDbFieldList> fl(new KDbFieldList(false));
-    foreach(int index, list) {
+    for(int index : list) {
         KDbField *f = field(index);
         if (!f) {
             kdbWarning() << QString::fromLatin1("could not find field at position %1").arg(index);
@@ -368,7 +369,7 @@ KDbEscapedString KDbFieldList::sqlFieldsList(const KDbField::List& list, KDbConn
                         : KDb::escapeIdentifier(tableOrAlias))
                    + QLatin1Char('.');
     }
-    foreach(KDbField *f, list) {
+    for(KDbField *f : list) {
         if (!start)
             result.append(separator);
         else

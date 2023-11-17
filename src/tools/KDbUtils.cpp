@@ -545,13 +545,13 @@ QString KDbUtils::findExe(const QString& appname,
                                   FindExeOptions options)
 {
 #ifdef Q_OS_WIN
-    QStringList executable_extensions = executableExtensions();
+    const QStringList executable_extensions = executableExtensions();
     if (!executable_extensions.contains(
             appname.section(QLatin1Char('.'), -1, -1, QString::SectionIncludeLeadingSep),
             Qt::CaseInsensitive))
     {
         QString found_exe;
-        foreach (const QString& extension, executable_extensions) {
+        for (const QString& extension : executable_extensions) {
             found_exe = findExe(appname + extension, path, options);
             if (!found_exe.isEmpty()) {
                 return found_exe;

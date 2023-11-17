@@ -203,7 +203,7 @@ void KDbTableViewColumn::setRelatedData(KDbTableViewData *data)
     //find a primary key
     const QList<KDbTableViewColumn*> *columns = data->columns();
     int id = -1;
-    foreach(KDbTableViewColumn* col, *columns) {
+    for(KDbTableViewColumn* col : std::as_const(*columns)) {
         id++;
         if (col->field()->isPrimaryKey()) {
             //found, remember

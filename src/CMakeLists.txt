@@ -212,12 +212,12 @@ target_include_directories(KDb
 
 target_link_libraries(KDb
     PUBLIC
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        KF5::CoreAddons
+        Qt${QT_MAJOR_VERSION}::Core
+        Qt${QT_MAJOR_VERSION}::Gui
+        Qt${QT_MAJOR_VERSION}::Widgets
+        KF${QT_MAJOR_VERSION}::CoreAddons
     PRIVATE
-        Qt5::Xml
+        Qt${QT_MAJOR_VERSION}::Xml
         ICU::i18n
 )
 

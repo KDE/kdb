@@ -106,18 +106,20 @@ bool KDbPreparedStatement::generateSelectStatementString(KDbEscapedString * s)
 //! @todo only tables and trivial queries supported for select...
     *s = "SELECT ";
     bool first = true;
-    foreach(KDbField *f, *d->fields->fields()) {
-        if (first)
+    const auto fields = *d->fields->fields();
+    for(KDbField *f : fields) {
+        if (first) {
             first = false;
-        else
+        } else {
             s->append(", ");
+        }
         s->append(f->name());
     }
     // create WHERE
     first = true;
     delete d->whereFields;
     d->whereFields = new KDbField::List();
-    foreach(const QString& whereItem, d->whereFieldNames) {
+    for(const QString& whereItem : std::as_const(d->whereFieldNames)) {
         if (first) {
             s->append(" WHERE ");
             first = false;
@@ -148,17 +150,18 @@ bool KDbPreparedStatement::generateInsertStatementString(KDbEscapedString * s)
     bool first = true;
     //we are using a selection of fields only
     const bool allTableFieldsUsed = dynamic_cast<KDbTableSchema*>(d->fields);
-    foreach(const KDbField* f, *d->fields->fields()) {
+    const auto fields = *d->fields->fields();
+    for(const KDbField* field : fields) {
         if (first) {
             s->append("?");
             if (!allTableFieldsUsed)
-                namesList = KDbEscapedString(f->name());
+                namesList = KDbEscapedString(field->name());
             first = false;
         } else {
             s->append(",?");
             if (!allTableFieldsUsed) {
                 namesList.append(", ");
-                namesList.append(f->name());
+                namesList.append(field->name());
             }
         }
     }

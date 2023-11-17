@@ -129,7 +129,8 @@ KDbEscapedString &KDbEscapedString::replace(const KDbEscapedString &before, cons
 QList<KDbEscapedString> KDbEscapedString::split(char sep) const
 {
     QList<KDbEscapedString> result;
-    foreach(const QByteArray& ba, QByteArray::split(sep))
+    const auto byteArrays = QByteArray::split(sep);
+    for(const QByteArray& ba : byteArrays)
         result.append(KDbEscapedString(ba));
     return result;
 }

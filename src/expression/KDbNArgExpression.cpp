@@ -60,7 +60,7 @@ KDbNArgExpressionData* KDbNArgExpressionData::clone()
 
 bool KDbNArgExpressionData::validateInternal(KDbParseInfo *parseInfo, KDb::ExpressionCallStack* callStack)
 {
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(ExplicitlySharedExpressionDataPointer data : std::as_const(children)) {
         if (!data->validate(parseInfo, callStack))
             return false;
     }
@@ -113,7 +113,7 @@ void KDbNArgExpressionData::debugInternal(QDebug dbg, KDb::ExpressionCallStack* 
 {
     dbg.nospace() << "NArgExp("
         << token.name() << ", class=" << expressionClassName(expressionClass);
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(ExplicitlySharedExpressionDataPointer data : std::as_const(children)) {
         dbg.nospace() << ", ";
         data->debug(dbg, callStack);
     }
@@ -138,7 +138,7 @@ KDbEscapedString KDbNArgExpressionData::toStringInternal(
 
     KDbEscapedString s;
     s.reserve(256);
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(ExplicitlySharedExpressionDataPointer data : std::as_const(children)) {
         if (!s.isEmpty())
             s += ", ";
         s += data->toString(driver, params, callStack);
@@ -149,14 +149,14 @@ KDbEscapedString KDbNArgExpressionData::toStringInternal(
 void KDbNArgExpressionData::getQueryParameters(QList<KDbQuerySchemaParameter>* params)
 {
     Q_ASSERT(params);
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(ExplicitlySharedExpressionDataPointer data : std::as_const(children)) {
         data->getQueryParameters(params);
     }
 }
 
 bool KDbNArgExpressionData::containsInvalidArgument() const
 {
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(const ExplicitlySharedExpressionDataPointer &data : std::as_const(children)) {
         const KDbField::Type type = data->type();
         if (type == KDbField::InvalidType) {
             return true;
@@ -167,7 +167,7 @@ bool KDbNArgExpressionData::containsInvalidArgument() const
 
 bool KDbNArgExpressionData::containsNullArgument() const
 {
-    foreach(ExplicitlySharedExpressionDataPointer data, children) {
+    for(const ExplicitlySharedExpressionDataPointer &data : std::as_const(children)) {
         const KDbField::Type type = data->type();
         if (type == KDbField::Null) {
             return true;

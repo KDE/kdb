@@ -117,7 +117,7 @@ QList<QPluginLoader *> KDbJsonTrader::query(const QString &servicetype,
     }
 
     QList<QPluginLoader *> list;
-    foreach(const QString &path, d->pluginPaths) {
+    for(const QString &path : std::as_const(d->pluginPaths)) {
         list += findPlugins(path, servicetype, mimetype);
     }
     return list;
