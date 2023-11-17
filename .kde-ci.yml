@@ -6,3 +6,6 @@ Dependencies:
   'require':
     'frameworks/extra-cmake-modules': '@stable'
     'frameworks/kcoreaddons': '@stable'
+
+Options:
+  require-passing-tests-on: [ '@all' ]
