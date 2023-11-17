@@ -20,8 +20,8 @@ add_definitions(
 
 include(ECMAddTests)
 
-find_package(Qt5Test)
-set_package_properties(Qt5Test PROPERTIES DESCRIPTION "Qt5Test library"
+find_package(Qt${QT_MAJOR_VERSION}Test)
+set_package_properties(Qt${QT_MAJOR_VERSION}Test PROPERTIES DESCRIPTION "Qt5Test library"
                        URL "https://www.qt.io" TYPE RECOMMENDED
                        PURPOSE "Required by tests")
 
@@ -32,7 +32,7 @@ add_library(kdbtestutils SHARED
 target_link_libraries(kdbtestutils
     PUBLIC
         KDb
-        Qt5::Test
+        Qt${QT_MAJOR_VERSION}::Test
 )
 generate_export_header(kdbtestutils)
 

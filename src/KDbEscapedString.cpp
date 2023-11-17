@@ -64,8 +64,13 @@ KDbEscapedString &KDbEscapedString::insert(int i, const KDbEscapedString &s)
 KDbEscapedString &KDbEscapedString::replace(int index, int len, const KDbEscapedString &s)
 {
     if (s.isValid()) {
-        if (m_valid)
+        if (m_valid) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            QByteArray::replace(index, len, QByteArrayView(s.constData(), s.size()));
+#else
             QByteArray::replace(index, len, s);
+#endif
+        }
     }
     else {
         QByteArray::clear();
@@ -77,8 +82,13 @@ KDbEscapedString &KDbEscapedString::replace(int index, int len, const KDbEscaped
 KDbEscapedString &KDbEscapedString::replace(char before, const KDbEscapedString &after)
 {
     if (after.isValid()) {
-        if (m_valid)
+        if (m_valid) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            QByteArray::replace(before, QByteArrayView(after.constData(), after.size()));
+#else
             QByteArray::replace(before, after);
+#endif
+        }
     }
     else {
         QByteArray::clear();
@@ -90,8 +100,13 @@ KDbEscapedString &KDbEscapedString::replace(char before, const KDbEscapedString 
 KDbEscapedString &KDbEscapedString::replace(const KDbEscapedString &before, const QByteArray &after)
 {
     if (before.isValid()) {
-        if (m_valid)
+        if (m_valid) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            QByteArray::replace(QByteArrayView(before.constData(), before.size()), after);
+#else
             QByteArray::replace(before, after);
+#endif
+        }
     }
     else {
         QByteArray::clear();
@@ -103,8 +118,13 @@ KDbEscapedString &KDbEscapedString::replace(const KDbEscapedString &before, cons
 KDbEscapedString &KDbEscapedString::replace(const QByteArray &before, const KDbEscapedString &after)
 {
     if (after.isValid()) {
-        if (m_valid)
+        if (m_valid) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            QByteArray::replace(before, QByteArrayView(after.constData(), after.size()));
+#else
             QByteArray::replace(before, after);
+#endif
+        }
     }
     else {
         QByteArray::clear();
@@ -116,8 +136,11 @@ KDbEscapedString &KDbEscapedString::replace(const QByteArray &before, const KDbE
 KDbEscapedString &KDbEscapedString::replace(const KDbEscapedString &before, const KDbEscapedString &after)
 {
     if (before.isValid() && after.isValid()) {
-        if (m_valid)
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            QByteArray::replace(QByteArrayView(before.constData(), before.size()), QByteArrayView(after.constData(), after.size()));
+#else
             QByteArray::replace(before, after);
+#endif
     }
     else {
         QByteArray::clear();

@@ -3,5 +3,5 @@ ecm_add_tests(
     StaticSetOfStringsTest.cpp
     UtilsTest.cpp
 
-    LINK_LIBRARIES KDb Qt5::Test
+    LINK_LIBRARIES KDb Qt${QT_MAJOR_VERSION}::Test
 )

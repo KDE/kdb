@@ -194,6 +194,8 @@ kdb_remove_extensions(
 
 generate_export_header(KDb)
 
+set(KDB_INCLUDE_INSTALL_DIR ${KDE_INSTALL_INCLUDEDIR}/KDb3)
+
 set(kdb_INCLUDE_DIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/expression
@@ -224,15 +226,6 @@ target_link_libraries(KDb
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 if("${CMAKE_BUILD_TYPE_LOWER}" MATCHES "debug")
    target_compile_definitions(KDb PRIVATE -DYYDEBUG=1) # needed where sqlparser.h is used
-endif()
-
-set(QT_ISODATEWITHMS_MIN_VERSION 5.8.0)
-if(Qt5_VERSION VERSION_LESS ${QT_ISODATEWITHMS_MIN_VERSION})
-    message(STATUS "Qt ${Qt5_VERSION} does not have Qt::ISODateWithMs APIs, minimal version is \
-${QT_ISODATEWITHMS_MIN_VERSION}. KDb's implementation will be compiled-in.")
-else()
-    # Qt::ISODateWithMs APIs present
-    target_compile_definitions(KDb PRIVATE -DHAVE_QT_ISODATEWITHMS)
 endif()
 
 if(BUILD_TEST_COVERAGE)
@@ -452,10 +445,10 @@ if(BUILD_QCH)
             ${kdb_HEADERS}
             ${kdb_HEADERS_FROM_BUILDDIR}
         LINK_QCHS
-            Qt5Core_QCH
-            Qt5Gui_QCH
-            Qt5Widgets_QCH
-            KF5CoreAddons_QCH
+            Qt${QT_MAJOR_VERSION}Core_QCH
+            Qt${QT_MAJOR_VERSION}Gui_QCH
+            Qt${QT_MAJOR_VERSION}Widgets_QCH
+            KF${QT_MAJOR_VERSION}CoreAddons_QCH
         INCLUDE_DIRS
             ${CMAKE_CURRENT_BINARY_DIR}
             ${kdb_INCLUDE_DIRS}

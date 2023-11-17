@@ -24,7 +24,6 @@
 
 #include "kdb_export.h"
 
-class QStringList;
 class QDomElement;
 class QDomDocument;
 class QVariant;

@@ -404,7 +404,7 @@ KDbEscapedString KDbConnectionProxy::recentSqlString() const
 #define A , const QVariant&
 #define H_INS_REC(args, ...) bool KDbConnectionProxy::insertRecord(KDbTableSchema* tableSchema args) \
 { \
-    return d->connection->insertRecord(tableSchema, __VA_ARGS__); \
+    return !d->connection->insertRecord(tableSchema, __VA_ARGS__).isNull(); \
 }
 #define H_INS_REC_ALL \
 H_INS_REC(A a1, a1) \
@@ -420,7 +420,7 @@ H_INS_REC_ALL
 #undef H_INS_REC
 #define H_INS_REC(args, ...) bool KDbConnectionProxy::insertRecord(KDbFieldList* fields args) \
 { \
-    return d->connection->insertRecord(fields, __VA_ARGS__); \
+    return !d->connection->insertRecord(fields, __VA_ARGS__).isNull(); \
 }
 
 H_INS_REC_ALL
@@ -430,12 +430,12 @@ H_INS_REC_ALL
 
 bool KDbConnectionProxy::insertRecord(KDbTableSchema* tableSchema, const QList<QVariant>& values)
 {
-    return d->connection->insertRecord(tableSchema, values);
+    return !d->connection->insertRecord(tableSchema, values).isNull();
 }
 
 bool KDbConnectionProxy::insertRecord(KDbFieldList* fields, const QList<QVariant>& values)
 {
-    return d->connection->insertRecord(fields, values);
+    return !d->connection->insertRecord(fields, values).isNull();
 }
 
 bool KDbConnectionProxy::createTable(KDbTableSchema* tableSchema, CreateTableOptions options)

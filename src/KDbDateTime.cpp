@@ -43,10 +43,12 @@ struct KDbDateTimeMetatypeInitializer {
         QMetaType::registerConverter<KDbTime, QTime>(std::bind(&KDbTime::toQTime, _1));
         QMetaType::registerConverter<KDbDateTime, QString>(byteArrayToString<KDbDateTime>());
         QMetaType::registerConverter<KDbDateTime, QDateTime>(std::bind(&KDbDateTime::toQDateTime, _1));
+#if QT_VERSION <= QT_VERSION_CHECK(6, 0, 0)
         QMetaType::registerComparators<KDbYear>();
         QMetaType::registerComparators<KDbDate>();
         QMetaType::registerComparators<KDbTime>();
         QMetaType::registerComparators<KDbDateTime>();
+#endif
     }
 };
 

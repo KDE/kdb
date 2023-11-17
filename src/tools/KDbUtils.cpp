@@ -139,58 +139,22 @@ bool KDbUtils::hasParent(QObject *par, QObject *o)
 
 QString KDbUtils::toISODateStringWithMs(const QTime& time)
 {
-#ifdef HAVE_QT_ISODATEWITHMS
     return time.toString(Qt::ISODateWithMs);
-#else
-    QString result;
-    if (time.isValid()) {
-        result = QString::asprintf("%02d:%02d:%02d.%03d", time.hour(), time.minute(), time.second(),
-                                   time.msec());
-    }
-    return result;
-#endif
 }
 
 QString KDbUtils::toISODateStringWithMs(const QDateTime& dateTime)
 {
-#ifdef HAVE_QT_ISODATEWITHMS
     return dateTime.toString(Qt::ISODateWithMs);
-#else
-    QString result;
-    if (!dateTime.isValid()) {
-        return result;
-    }
-    result = dateTime.toString(Qt::ISODate);
-    if (result.isEmpty()) { // failure
-        return result;
-    }
-    QString timeString = KDbUtils::toISODateStringWithMs(dateTime.time());
-    if (timeString.isEmpty()) { // failure
-        return QString();
-    }
-    const int offset = strlen("0000-00-00T");
-    const int timeLen = strlen("00:00:00");
-    result.replace(offset, timeLen, timeString); // replace time with time+ms
-    return result;
-#endif
 }
 
 QTime KDbUtils::timeFromISODateStringWithMs(const QString &string)
 {
-#ifdef HAVE_QT_ISODATEWITHMS
     return QTime::fromString(string, Qt::ISODateWithMs);
-#else
-    return QTime::fromString(string, Qt::ISODate); // supports HH:mm:ss.zzzzz already
-#endif
 }
 
 QDateTime KDbUtils::dateTimeFromISODateStringWithMs(const QString &string)
 {
-#ifdef HAVE_QT_ISODATEWITHMS
     return QDateTime::fromString(string, Qt::ISODateWithMs);
-#else
-    return QDateTime::fromString(string, Qt::ISODate); // supports HH:mm:ss.zzzzz already
-#endif
 }
 
 QDateTime KDbUtils::stringToHackedQTime(const QString &s)
@@ -271,7 +235,11 @@ void KDbUtils::simpleCrypt(QString *string)
         return;
     }
     for (int i = 0; i < string->length(); i++) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        char16_t& unicode = (*string)[i].unicode();
+#else
         ushort& unicode = (*string)[i].unicode();
+#endif
         unicode += (47 + i);
     }
 }
@@ -283,7 +251,11 @@ bool KDbUtils::simpleDecrypt(QString *string)
     }
     QString result(*string);
     for (int i = 0; i < result.length(); i++) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        char16_t& unicode = result[i].unicode();
+#else
         ushort& unicode = result[i].unicode();
+#endif
         if (unicode <= (47 + i)) {
             return false;
         }
@@ -313,7 +285,11 @@ void* KDbUtils::stringToPointerInternal(const QString& string, int size)
     array.resize(size);
     bool ok;
     for (int i = 0; i < size; i++) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        array[i] = (unsigned char)(QStringView(string).mid(i * 2, 2).toUInt(&ok, 16));
+#else
         array[i] = (unsigned char)(string.midRef(i * 2, 2).toUInt(&ok, 16));
+#endif
         if (!ok)
             return nullptr;
     }
@@ -490,7 +466,11 @@ static QString tildeExpand(const QString &fname)
         int pos = fname.indexOf( QLatin1Char('/') );
         QString ret = QDir::homePath(); // simplified
         if (pos > 0) {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            ret += QStringView(fname).mid(pos);
+#else
             ret += fname.midRef(pos);
+#endif
         }
         return ret;
     } else if (fname.length() > 1 && fname[0] == QLatin1Char(ESCAPE) && fname[1] == QLatin1Char('~')) {

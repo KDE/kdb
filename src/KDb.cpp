@@ -1492,7 +1492,7 @@ static bool handleUcodePoint(QString *result, int *from, int to, int stringLen, 
 //! @return true on success
 static bool handleEscape(QString *result, int *from, int *to, int stringLen, int *errorPosition)
 {
-    const QCharRef c2 = (*result)[*from];
+    const QChar c2 = (*result)[*from];
     if (c2 == QLatin1Char('x')) { // \xhh
         if (!handleXhh(result, from, *to, stringLen, errorPosition)) {
             return false;
@@ -1505,7 +1505,7 @@ static bool handleEscape(QString *result, int *from, int *to, int stringLen, int
             return false;
         }
         ++(*from);
-        const QCharRef c3 = (*result)[*from];
+        const QChar c3 = (*result)[*from];
         if (c3 == QLatin1Char('{')) { // \u{
             if (!handleUcodePoint(result, from, *to, stringLen, errorPosition)) {
                 return false;
@@ -1551,7 +1551,7 @@ QString KDb::unescapeString(const QString& string, char quote, int *errorPositio
     int to = 0;
     bool doubleQuoteExpected = false;
     while (from < stringLen) {
-        const QCharRef c = result[from];
+        const QChar c = result[from];
         if (doubleQuoteExpected) {
             if (c == quoteChar) {
                 result[to] = c;
@@ -1875,7 +1875,11 @@ QVariant KDb::stringToVariant(const QString& s, QVariant::Type type, bool* ok)
         ba.resize(len / 2 + len % 2);
         for (int i = 0; i < (len - 1); i += 2) {
             bool _ok;
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+            int c = QStringView(s).mid(i, 2).toInt(&_ok, 16);
+#else
             int c = s.midRef(i, 2).toInt(&_ok, 16);
+#endif
             if (!_ok) {
                 if (ok)
                     *ok = _ok;

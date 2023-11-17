@@ -118,27 +118,37 @@ public:
     inline char operator[](int i) const { return QByteArray::operator[](i); }
     inline char operator[](uint i) const { return QByteArray::operator[](i); }
 #endif
-    inline QByteRef operator[](int i) { return QByteArray::operator[](i); }
-    inline QByteRef operator[](uint i) { return QByteArray::operator[](i); }
 
     inline int indexOf(char c, int from = 0) const { return QByteArray::indexOf(c, from); }
     inline int indexOf(const char *c, int from = 0) const { return QByteArray::indexOf(c, from); }
     inline int indexOf(const QByteArray &a, int from = 0) const { return QByteArray::indexOf(a, from); }
     inline int indexOf(const KDbEscapedString &s, int from = 0) const {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        return s.isValid() ? QByteArray::indexOf(QByteArrayView(s.constData(), s.size()), from) : -1;
+#else
         return s.isValid() ? QByteArray::indexOf(s, from) : -1;
+#endif
     }
     inline int lastIndexOf(char c, int from = -1) const { return QByteArray::lastIndexOf(c, from); }
     inline int lastIndexOf(const char *c, int from = -1) const { return QByteArray::lastIndexOf(c, from); }
     inline int lastIndexOf(const QByteArray &a, int from = -1) const { return QByteArray::lastIndexOf(a, from); }
     inline int lastIndexOf(const KDbEscapedString &s, int from = 0) const {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        return s.isValid() ? QByteArray::lastIndexOf(QByteArrayView(s.constData(), s.size()), from) : -1;
+#else
         return s.isValid() ? QByteArray::lastIndexOf(s, from) : -1;
+#endif
     }
 
     inline int count(char c) const { return QByteArray::count(c); }
     inline int count(const char *a) const { return QByteArray::count(a); }
     inline int count(const QByteArray &a) const { return QByteArray::count(a); }
     inline int count(const KDbEscapedString &s) const {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        return s.isValid() ? QByteArray::count(QByteArrayView(s.constData(), s.size())) : -1;
+#else
         return s.isValid() ? QByteArray::count(s) : -1;
+#endif
     }
 
     inline KDbEscapedString left(int len) const {
@@ -152,7 +162,11 @@ public:
     }
 
     inline bool startsWith(const KDbEscapedString &s) const {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        return (m_valid && s.isValid()) ? QByteArray::startsWith(QByteArrayView(s.constData(), s.size())) : false;
+#else
         return (m_valid && s.isValid()) ? QByteArray::startsWith(s) : false;
+#endif
     }
     inline bool startsWith(const QByteArray &a) const {
         return m_valid ? QByteArray::startsWith(a) : false;
@@ -165,7 +179,11 @@ public:
     }
 
     inline bool endsWith(const KDbEscapedString &s) const {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        return (m_valid && s.isValid()) ? QByteArray::endsWith(QByteArrayView(s.constData(), s.size())) : false;
+#else
         return (m_valid && s.isValid()) ? QByteArray::endsWith(s) : false;
+#endif
     }
     inline bool endsWith(const QByteArray &a) const {
         return m_valid ? QByteArray::endsWith(a) : false;
@@ -473,9 +491,6 @@ public:
     KDbEscapedString arg(QChar a, int fieldWidth = 0, const QChar & fillChar = QLatin1Char( ' ' )) const;
     KDbEscapedString arg(char a, int fieldWidth = 0, const QChar & fillChar = QLatin1Char( ' ' )) const;
     KDbEscapedString arg(double a, int fieldWidth = 0, char format = 'g', int precision = -1, const QChar & fillChar = QLatin1Char( ' ' )) const;
-
-    typedef QByteArray::DataPtr DataPtr;
-    inline DataPtr &data_ptr() { return QByteArray::data_ptr(); }
 
 private:
     //! Used to create invalid string
