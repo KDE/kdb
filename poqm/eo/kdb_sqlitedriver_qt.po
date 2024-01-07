@@ -1,30 +1,33 @@
+# translation of kdb_sqlitedriver_qt.pot to Esperanto
+# Copyright (C) 2023 Free Software Foundation, Inc.
+# This file is distributed under the same license as the kdb package.
+# Oliver Kellogg <okellogg.sourceforge.net>, 2023.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: kdeorg\n"
-"PO-Revision-Date: 2024-01-06 03:34\n"
-"Language-Team: Chinese Simplified\n"
-"Language: zh_CN\n"
+"Project-Id-Version: kdb\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2023-11-05 13:43+0100\n"
+"PO-Revision-Date: 2024-01-06 08:14+0100\n"
+"Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
+"Language-Team: Esperanto <kde-i18n-eo.org>\n"
+"Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Qt-Contexts: true\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
-"X-Crowdin-Project: kdeorg\n"
-"X-Crowdin-Project-ID: 269464\n"
-"X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /kf5-trunk/messages/kdb/kdb_sqlitedriver_qt.pot\n"
-"X-Crowdin-File-ID: 6330\n"
+"X-Generator: translate-po (https://github.com/zcribe/translate-po)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 
 #: SqliteAdmin.cpp:43
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not compact database \"%1\"."
-msgstr "无法压缩数据库“%1”。"
+msgstr "Ne eblis kompakti datumbazon \"%1\"."
 
 #: SqliteConnection.cpp:49
 msgctxt "SqliteConnection|"
 msgid "Extra paths for SQLite plugins"
-msgstr "给 SQLite 插件的额外路径"
+msgstr "Kromaj vojoj por SQLite-kromaĵoj"
 
 #: SqliteConnection.cpp:273
 #, qt-format
@@ -32,64 +35,67 @@ msgctxt "SqliteConnection|"
 msgid ""
 "Could not delete file \"%1\". Check the file's permissions and whether it is "
 "already opened and locked by another application."
-msgstr "无法删除文件“%1”。请检查文件的权限，以及它是否被其他程序打开并锁定。"
+msgstr ""
+"Ne eblis forigi dosieron \"%1\". Kontrolu la permesojn de la dosiero kaj ĉu "
+"ĝi jam estas malfermita kaj ŝlosita de alia aplikaĵo."
 
 #: SqliteConnection.cpp:375
 #, qt-format
 msgctxt "SqliteConnection|"
 msgid "Could not load SQLite plugin \"%1\"."
-msgstr "无法加载 SQLite 插件“%1”。"
+msgstr "Ne eblis ŝargi SQLite-aldonaĵon \"%1\"."
 
 #: SqliteConnection.cpp:386
 #, qt-format
 msgctxt "SqliteConnection|"
 msgid "Could not find SQLite plugin file \"%1\"."
-msgstr "无法找到 SQLite 插件“%1”。"
+msgstr "Ne eblis trovi la kromprogramon de SQLite \"%1\"."
 
 #: SqliteConnection.cpp:401
 #, qt-format
 msgctxt "SqliteConnection|"
 msgid "Could not load SQLite extension \"%1\"."
-msgstr "无法加载 SQLite 扩展“%1”。"
+msgstr "Ne eblis ŝargi la etendon de SQLite \"%1\"."
 
 #: SqliteVacuum.cpp:97
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not find tool \"%1\"."
-msgstr "无法找到工具“%1”。"
+msgstr "Ne eblis trovi ilon \"%1\"."
 
 #: SqliteVacuum.cpp:105
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not find application \"%1\"."
-msgstr "无法找到应用程序“%1”。"
+msgstr "Ne eblis trovi aplikaĵon \"%1\"."
 
 #: SqliteVacuum.cpp:113
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not read file \"%1\"."
-msgstr "无法读取文件“%1”。"
+msgstr "Ne eblis legi dosieron \"%1\"."
 
 #: SqliteVacuum.cpp:168
 msgctxt "SqliteVacuum|"
 msgid "Compacting database"
-msgstr "正在压缩数据库"
+msgstr "Kompakta datumbazo"
 
 #: SqliteVacuum.cpp:170
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Compacting database \"%1\"..."
-msgstr "正在压缩数据库“%1”..."
+msgstr "Kompaktante datumbazon \"%1\"..."
 
 #: SqliteVacuum.cpp:259
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not rename file \"%1\" to \"%2\"."
-msgstr "无法重命名文件“%1”为“%2”。"
+msgstr "Ne eblis renomi dosieron \"%1\" al \"%2\"."
 
 #: SqliteVacuum.cpp:267
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid ""
 "The database has been compacted. Current size decreased by %1% to %2 MB."
-msgstr "此数据库已经被压缩。当前大小已经减少 %1% 到 %2 MB。"
+msgstr ""
+"La datumbazo estis kompaktita. Nuna grandeco malpliiĝis je %1% al %2 MB."
