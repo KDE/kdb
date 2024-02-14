@@ -1,23 +1,24 @@
+# SPDX-FileCopyrightText: 2024 Kisaragi Hiu <mail@kisaragi-hiu.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: kdb_qt\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-22 20:41+0800\n"
-"PO-Revision-Date: 2016-09-22 20:30+0800\n"
-"Last-Translator: Jeff Huang <s8321414@gmail.com>\n"
-"Language-Team: Traditional Chinese <zh-l10n@lists.linux.org.tw>\n"
+"PO-Revision-Date: 2024-02-13 20:33+0900\n"
+"Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
+"Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Translate Toolkit 1.10.0\n"
+"X-Generator: Lokalize 24.01.95\n"
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
 msgid "Incompatible types of arguments"
-msgstr ""
+msgstr "參數型態不相容"
 
 #: expression/KDbBinaryExpression.cpp:66
 #, qt-format
@@ -25,13 +26,13 @@ msgctxt "KDbBinaryExpressionData|Binary expression arguments type error"
 msgid ""
 "Expression \"%1\" requires compatible types of arguments. Specified "
 "arguments are of type %2 and %3."
-msgstr ""
+msgstr "表達式「%1」要求參數型態必須相容。指定的參數的型態是 %2 和 %3。"
 
 #: expression/KDbFunctionExpression.cpp:213
 #, qt-format
 msgctxt "MinMaxFunctionDeclaration|"
 msgid "Incompatible types in %1() function"
-msgstr ""
+msgstr "%1() 函式中的型態不相容"
 
 #: expression/KDbFunctionExpression.cpp:215
 #, qt-format
@@ -40,49 +41,51 @@ msgid ""
 "Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
 "arguments of type \"%4\"."
 msgstr ""
+"函式 %3() 中的第 %1 個參數（型態為「%2」）與在它之前的參數（型態為「%4」）不"
+"相容。"
 
 #: expression/KDbFunctionExpression.cpp:298
 #, qt-format
 msgctxt "RandomFunctionDeclaration|"
 msgid "Invalid arguments of %1() function"
-msgstr ""
+msgstr "%1() 函式的參數不相容"
 
 #: expression/KDbFunctionExpression.cpp:300
 msgctxt "RandomFunctionDeclaration|"
 msgid ""
 "Value of the first argument should be less than value of the second argument."
-msgstr ""
+msgstr "第一個參數的值必須小於第二個參數的值。"
 
 #: expression/KDbFunctionExpression.cpp:940
 #: expression/KDbFunctionExpression.cpp:1191
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect number of arguments (%1)"
-msgstr ""
+msgstr "參數數量不正確 (%1)"
 
 #: expression/KDbFunctionExpression.cpp:945
 #, qt-format
 msgctxt "KDbFunctionExpressionData|don't use space before %1"
 msgid "Too many arguments.%1"
-msgstr ""
+msgstr "太多參數。%1"
 
 #: expression/KDbFunctionExpression.cpp:949
 #, qt-format
 msgctxt "KDbFunctionExpressionData|don't use space before %1"
 msgid "Too few arguments.%1"
-msgstr ""
+msgstr "太少參數。%1"
 
 #: expression/KDbFunctionExpression.cpp:956
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function does not accept any arguments."
-msgstr ""
+msgstr "%1%2() 函式不接受任何參數。"
 
 #: expression/KDbFunctionExpression.cpp:961
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires 1 argument."
-msgstr ""
+msgstr "%1%2() 函式要求要有 1 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:968
 #: expression/KDbFunctionExpression.cpp:1007
@@ -90,41 +93,38 @@ msgstr ""
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 argument(s)."
 msgid_plural "%1%2() function requires %3 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1%2() 函式要求要有 %3 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:977
 #, qt-format
 msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
 msgid "%1%2() function requires 0 or 1 argument."
-msgstr ""
+msgstr "%1%2() 函式只接受 0 或 1 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:985
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 or %4 argument(s)."
 msgid_plural "%1%2() function requires %3 or %4 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1%2() 函式只接受 %3 或 %4 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:993
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
 msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1%2() 函式只接受 %3 或 %4 或 %5 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:1003
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1 or %2"
-msgstr ""
+msgstr "%1 或 %2"
 
 #: expression/KDbFunctionExpression.cpp:1021
 msgctxt "KDbFunctionExpressionData|"
 msgid " or "
-msgstr ""
+msgstr " 或 "
 
 #: expression/KDbFunctionExpression.cpp:1025
 #: expression/KDbFunctionExpression.cpp:1029
@@ -134,115 +134,115 @@ msgstr ""
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "\"%1\""
-msgstr ""
+msgstr "「%1」"
 
 #: expression/KDbFunctionExpression.cpp:1046
 msgctxt "KDbFunctionExpressionData|"
 msgid "\"Number\""
-msgstr ""
+msgstr "「數字」"
 
 #: expression/KDbFunctionExpression.cpp:1049
 msgctxt "KDbFunctionExpressionData|Any data type"
 msgid "\"Any\""
-msgstr ""
+msgstr "「任何」"
 
 #: expression/KDbFunctionExpression.cpp:1053
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect type of argument"
-msgstr ""
+msgstr "參數型態不正確"
 
 #: expression/KDbFunctionExpression.cpp:1055
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Specified argument is of type \"%1\"."
-msgstr ""
+msgstr "指定的參數的型態為「%1」。"
 
 #: expression/KDbFunctionExpression.cpp:1059
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's first argument should be of type %2. %3"
-msgstr ""
+msgstr "%1() 函式的第一個參數型態應為 %2。%3"
 
 #: expression/KDbFunctionExpression.cpp:1064
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's second argument should be of type %2. %3"
-msgstr ""
+msgstr "%1() 函式的第二個參數型態應為 %2。%3"
 
 #: expression/KDbFunctionExpression.cpp:1069
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's third argument should be of type %2. %3"
-msgstr ""
+msgstr "%1() 函式的第三個參數型態應為 %2。%3"
 
 #: expression/KDbFunctionExpression.cpp:1074
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's fourth argument should be of type %2. %3"
-msgstr ""
+msgstr "%1() 函式的第四個參數型態應為 %2。%3"
 
 #: expression/KDbFunctionExpression.cpp:1079
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's fifth argument should be of type %2. %3"
-msgstr ""
+msgstr "%1() 函式的第五個參數型態應為 %2。%3"
 
 #: expression/KDbFunctionExpression.cpp:1084
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's %2 argument should be of type %3. %4"
-msgstr ""
+msgstr "%1() 函式的第 %2 個參數型態應為 %3。%4"
 
 #: expression/KDbFunctionExpression.cpp:1144
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too many arguments for function."
-msgstr ""
+msgstr "函式太多參數。"
 
 #: expression/KDbFunctionExpression.cpp:1146
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Maximum number of arguments for function %1() is %2."
-msgstr ""
+msgstr "函式 %1() 最多的參數數量為 %2。"
 
 #: expression/KDbFunctionExpression.cpp:1194
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least one argument."
-msgstr ""
+msgstr "太少參數。%1() 函式要求必須要至少有 1 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:1199
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least two arguments."
-msgstr ""
+msgstr "太少參數。%1() 函式要求必須要至少有 2 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:1204
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least three arguments."
-msgstr ""
+msgstr "太少參數。%1() 函式要求必須要至少有 3 個參數。"
 
 #: expression/KDbFunctionExpression.cpp:1209
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least %2 arguments."
-msgstr ""
+msgstr "太少參數。%1() 函式要求必須要至少有 %2 個參數。"
 
 #: expression/KDbNArgExpression.cpp:70
 msgctxt "KDbNArgExpressionData|"
 msgid "Three arguments required"
-msgstr ""
+msgstr "需要三個參數"
 
 #: expression/KDbNArgExpression.cpp:72
 #, qt-format
 msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
 msgid "%1 operator requires exactly three arguments."
-msgstr ""
+msgstr "%1 運算子需要剛好三個參數。"
 
 #: expression/KDbNArgExpression.cpp:98
 msgctxt "KDbNArgExpressionData|"
 msgid "Incompatible types of arguments"
-msgstr ""
+msgstr "參數型態不相容"
 
 #: expression/KDbNArgExpression.cpp:100
 #, qt-format
@@ -250,12 +250,12 @@ msgctxt "KDbNArgExpressionData|BETWEEN..AND arguments type error"
 msgid ""
 "Operator \"%1\" requires compatible types of arguments. Specified arguments "
 "are of type %2, %3, %4."
-msgstr ""
+msgstr "運算子「%1」要求參數型態必須相容。指定的參數的型態是 %2、%3 、%4。"
 
 #: expression/KDbVariableExpression.cpp:133
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous field name"
-msgstr ""
+msgstr "模糊的欄位名稱"
 
 #: expression/KDbVariableExpression.cpp:135
 #, qt-format
@@ -264,23 +264,25 @@ msgid ""
 "Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
 "%4\" notation to specify table name."
 msgstr ""
+"表格「%1」和「%2」都有定義名為「%3」的欄位。請使用 \"<表格名稱>.%4\" 語法來指"
+"定表格名稱。"
 
 #: expression/KDbVariableExpression.cpp:145
 #: expression/KDbVariableExpression.cpp:222
 msgctxt "KDbVariableExpressionData|"
 msgid "Field not found"
-msgstr ""
+msgstr "找不到欄位"
 
 #: expression/KDbVariableExpression.cpp:147
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not find table containing field \"%1\"."
-msgstr ""
+msgstr "找不到包含欄位「%1」的表格。"
 
 #: expression/KDbVariableExpression.cpp:172
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not access the table directly using its name"
-msgstr ""
+msgstr "無法直接使用表格名稱來存取它"
 
 #: expression/KDbVariableExpression.cpp:174
 #, qt-format
@@ -288,24 +290,24 @@ msgctxt "KDbVariableExpressionData|"
 msgid ""
 "Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
 "used."
-msgstr ""
+msgstr "表格名稱「%1」有別名。可以使用「%3」而非「%2」。"
 
 #: expression/KDbVariableExpression.cpp:196
 msgctxt "KDbVariableExpressionData|"
 msgid "Table not found"
-msgstr ""
+msgstr "找不到表格"
 
 #: expression/KDbVariableExpression.cpp:197
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Unknown table \"%1\"."
-msgstr ""
+msgstr "未知的表格「%1」。"
 
 #: expression/KDbVariableExpression.cpp:211
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.*\" expression"
-msgstr ""
+msgstr "模糊的 \"%1.*\" 表達式"
 
 #: expression/KDbVariableExpression.cpp:212
 #, qt-format
@@ -323,7 +325,7 @@ msgstr ""
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.%2\" expression"
-msgstr ""
+msgstr "模糊的 \"%1.%2\" 表達式"
 
 #: expression/KDbVariableExpression.cpp:233
 #, qt-format
@@ -334,19 +336,19 @@ msgstr ""
 #: KDb.cpp:179
 msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
 msgid "Test Connection"
-msgstr ""
+msgstr "測試連線"
 
 #: KDb.cpp:180
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Testing connection to \"%1\" database server..."
-msgstr ""
+msgstr "正在測試到資料庫伺服器「%1」的連線..."
 
 #: KDb.cpp:227
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server failed."
-msgstr ""
+msgstr "到資料庫伺服器「%1」的測試連線已失敗。"
 
 #: KDb.cpp:238
 #, qt-format
@@ -354,23 +356,23 @@ msgctxt "ConnectionTestDialog|"
 msgid ""
 "Test connection to \"%1\" database server failed. The server is not "
 "responding."
-msgstr ""
+msgstr "到資料庫伺服器「%1」的測試連線已失敗。伺服器沒有回應。"
 
 #: KDb.cpp:244
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server established successfully."
-msgstr ""
+msgstr "到資料庫伺服器「%1」的測試連線已成功建立。"
 
 #: KDb.cpp:249
 msgctxt "ConnectionTestDialog|"
 msgid "Test Connection"
-msgstr ""
+msgstr "測試連線"
 
 #: KDb.cpp:528
 msgctxt "KDb|"
 msgid "Message from server:"
-msgstr ""
+msgstr "來自伺服器的訊息："
 
 #: KDb.cpp:531
 msgctxt "KDb|"
@@ -385,23 +387,23 @@ msgstr ""
 #: KDb.cpp:554
 msgctxt "KDb|"
 msgid "Server result:"
-msgstr ""
+msgstr "伺服器結果："
 
 #: KDb.cpp:1954
 msgctxt "KDbField|"
 msgid "Number"
-msgstr ""
+msgstr "數字"
 
 #: KDb.cpp:1957
 msgctxt "KDbField|"
 msgid "Image"
-msgstr ""
+msgstr "影像"
 
 #: KDb.cpp:2193
-#, qt-format
+#, fuzzy, qt-format
 msgctxt "KDb|"
 msgid "Value of \"%1\" field must be an identifier."
-msgstr ""
+msgstr "「%1」欄位的值必須是識別子。"
 
 #: KDb.cpp:2196
 #, qt-format
@@ -412,23 +414,23 @@ msgstr ""
 #: KDbConnection.cpp:88
 msgctxt "KDbConnectionOptions|Read only connection"
 msgid "Read only"
-msgstr ""
+msgstr "唯讀"
 
 #: KDbConnection.cpp:207
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid database contents. %1"
-msgstr ""
+msgstr "無效的資料庫內容。%1"
 
 #: KDbConnection.cpp:212
 msgctxt "KDbConnection|"
 msgid "It is a system object."
-msgstr ""
+msgstr "它是一個系統物件。"
 
 #: KDbConnection.cpp:360
 msgctxt "KDbConnectionPrivate|"
 msgid "Table has no fields defined."
-msgstr ""
+msgstr "表格沒有定義任何欄位。"
 
 #: KDbConnection.cpp:408
 #, qt-format
@@ -472,74 +474,74 @@ msgstr ""
 #: KDbConnection.cpp:569
 msgctxt "KDbConnection|"
 msgid "Currently no database is used."
-msgstr ""
+msgstr "目前沒有使用任何資料庫。"
 
 #: KDbConnection.cpp:623
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database \"%1\" does not exist."
-msgstr ""
+msgstr "資料庫「%1」不存在。"
 
 #: KDbConnection.cpp:643
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database file \"%1\" does not exist."
-msgstr ""
+msgstr "資料庫檔案「%1」不存在。"
 
 #: KDbConnection.cpp:650
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not readable."
-msgstr ""
+msgstr "資料庫檔案「%1」無法讀取。"
 
 #: KDbConnection.cpp:657
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not writable."
-msgstr ""
+msgstr "資料庫檔案「%1」無法寫入。"
 
 #: KDbConnection.cpp:686
 #, qt-format
 msgctxt "KDbConnection|"
 msgid ""
 "Database \"%1\" has been created but could not be closed after creation."
-msgstr ""
+msgstr "資料庫「%1」已建立，但在建立後無法關閉。"
 
 #: KDbConnection.cpp:702
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" already exists."
-msgstr ""
+msgstr "資料庫「%1」已存在。"
 
 #: KDbConnection.cpp:707
 #, qt-format
 msgctxt "KDbConnection|"
 msgid ""
 "Could not create database \"%1\". This name is reserved for system database."
-msgstr ""
+msgstr "無法建立資料庫「%1」。這個名稱已保留給系統資料庫使用。"
 
 #: KDbConnection.cpp:729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error creating database \"%1\" on the server."
-msgstr ""
+msgstr "在伺服器上建立資料庫「%1」時發生錯誤。"
 
 #: KDbConnection.cpp:743
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" has been created but could not be opened."
-msgstr ""
+msgstr "資料庫「%1」已建立，但無法開啟。"
 
 #: KDbConnection.cpp:819
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Opening database \"%1\" failed."
-msgstr ""
+msgstr "開啟資料庫「%1」已失敗。"
 
 #: KDbConnection.cpp:904
 msgctxt "KDbConnection|"
 msgid "Could not find any database for temporary connection."
-msgstr ""
+msgstr "找不到任何暫時連線用的資料庫。"
 
 #: KDbConnection.cpp:913
 #, qt-format
@@ -732,7 +734,7 @@ msgstr ""
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid XML data: %1"
-msgstr ""
+msgstr "無效的 XML 資料：%1"
 
 #: KDbConnection.cpp:2784
 #, qt-format
@@ -947,7 +949,7 @@ msgstr ""
 #: KDbField.cpp:82
 msgctxt "KDbField|"
 msgid "Byte"
-msgstr ""
+msgstr "位元組"
 
 #: KDbField.cpp:83
 msgctxt "KDbField|"
@@ -967,7 +969,7 @@ msgstr ""
 #: KDbField.cpp:86
 msgctxt "KDbField|"
 msgid "Yes/No Value"
-msgstr ""
+msgstr "是/否（真/假) 值"
 
 #: KDbField.cpp:87
 msgctxt "KDbField|"
@@ -977,7 +979,7 @@ msgstr ""
 #: KDbField.cpp:88
 msgctxt "KDbField|"
 msgid "Date and Time"
-msgstr ""
+msgstr "日期與時間"
 
 #: KDbField.cpp:89
 msgctxt "KDbField|"
@@ -1007,27 +1009,27 @@ msgstr ""
 #: KDbField.cpp:94 KDbField.cpp:109
 msgctxt "KDbField|"
 msgid "Object"
-msgstr ""
+msgstr "物件"
 
 #: KDbField.cpp:103
 msgctxt "KDbField|"
 msgid "Invalid Group"
-msgstr ""
+msgstr "無效的群組"
 
 #: KDbField.cpp:106
 msgctxt "KDbField|"
 msgid "Floating Point Number"
-msgstr ""
+msgstr "浮點數"
 
 #: KDbField.cpp:107
 msgctxt "KDbField|"
 msgid "Yes/No"
-msgstr ""
+msgstr "是/否"
 
 #: KDbField.cpp:108
 msgctxt "KDbField|"
 msgid "Date/Time"
-msgstr ""
+msgstr "日期/時間"
 
 #: KDbProperties.cpp:42 KDbProperties.cpp:53 KDbProperties.cpp:65
 #, qt-format
@@ -1132,23 +1134,23 @@ msgstr ""
 #: parser/KDbParser_p.cpp:273
 msgctxt "KDbParser|"
 msgid "Error"
-msgstr ""
+msgstr "錯誤"
 
 #: parser/KDbParser_p.cpp:225
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Error near \"%1\"."
-msgstr ""
+msgstr "於「%1」附近的錯誤。"
 
 #: parser/KDbParser_p.cpp:240
 msgctxt "KDbParser|"
 msgid "Other error"
-msgstr ""
+msgstr "其他錯誤"
 
 #: parser/KDbParser_p.cpp:244
 msgctxt "KDbParser|"
 msgid "Implementation error"
-msgstr ""
+msgstr "實作錯誤"
 
 #: parser/KDbParser_p.cpp:255
 msgctxt "KDbParser|"
@@ -1158,7 +1160,7 @@ msgstr ""
 #: parser/KDbParser_p.cpp:274
 msgctxt "KDbParser|"
 msgid "Unexpected character."
-msgstr ""
+msgstr "未預期的字元。"
 
 #: parser/KDbParser_p.cpp:312
 msgctxt "KDbParser|"
