@@ -4,14 +4,14 @@ msgstr ""
 "Project-Id-Version: kdb_qt\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-22 20:41+0800\n"
-"PO-Revision-Date: 2024-02-13 20:33+0900\n"
+"PO-Revision-Date: 2024-03-01 05:00+0900\n"
 "Last-Translator: Kisaragi Hiu <mail@kisaragi-hiu.com>\n"
 "Language-Team: Traditional Chinese <zh-l10n@lists.slat.org>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 24.01.95\n"
+"X-Generator: Lokalize 24.04.70\n"
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
@@ -377,12 +377,12 @@ msgstr "來自伺服器的訊息："
 #: KDb.cpp:531
 msgctxt "KDb|"
 msgid "SQL statement:"
-msgstr ""
+msgstr "SQL 敘述："
 
 #: KDb.cpp:546
 msgctxt "KDb|"
 msgid "Server result code:"
-msgstr ""
+msgstr "伺服器結果碼："
 
 #: KDb.cpp:554
 msgctxt "KDb|"
@@ -400,7 +400,7 @@ msgid "Image"
 msgstr "影像"
 
 #: KDb.cpp:2193
-#, fuzzy, qt-format
+#, qt-format
 msgctxt "KDb|"
 msgid "Value of \"%1\" field must be an identifier."
 msgstr "「%1」欄位的值必須是識別子。"
@@ -409,7 +409,7 @@ msgstr "「%1」欄位的值必須是識別子。"
 #, qt-format
 msgctxt "KDb|"
 msgid "\"%1\" is not a valid identifier."
-msgstr ""
+msgstr "「%1」不是有效的識別子。"
 
 #: KDbConnection.cpp:88
 msgctxt "KDbConnectionOptions|Read only connection"
@@ -438,7 +438,7 @@ msgctxt "KDbConnectionPrivate|"
 msgid ""
 "Could not find definition for query \"%1\". Deleting this query is "
 "recommended."
-msgstr ""
+msgstr "找不到查詢「%1」的定義。建議刪除此查詢。"
 
 #: KDbConnection.cpp:416
 #, qt-format
@@ -448,28 +448,30 @@ msgid ""
 "is invalid:<br><tt>%2</tt></p>\n"
 "<p>This query can be edited only in Text View.</p>"
 msgstr ""
+"<p>無法載入查詢「%1」的定義。此查詢的 SQL 敘述無效：<br><tt>%2</tt></p>\n"
+"<p>這個查詢只能在文字檢視中編輯。</p>"
 
 #: KDbConnection.cpp:499
 msgctxt "KDbConnection|"
 msgid "Connection already established."
-msgstr ""
+msgstr "連線已建立。"
 
 #: KDbConnection.cpp:509
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not open \"%1\" project file."
-msgstr ""
+msgstr "無法開啟「%1」專案檔。"
 
 #: KDbConnection.cpp:511
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not connect to \"%1\" database server."
-msgstr ""
+msgstr "無法連線到「%1」資料庫伺服器。"
 
 #: KDbConnection.cpp:558
 msgctxt "KDbConnection|"
 msgid "Not connected to the database server."
-msgstr ""
+msgstr "未連線到資料庫伺服器。"
 
 #: KDbConnection.cpp:569
 msgctxt "KDbConnection|"
@@ -622,65 +624,65 @@ msgstr ""
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Table \"%1\" already exists."
-msgstr ""
+msgstr "表格「%1」已存在。"
 
 #: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Table \"%1\" does not exist."
-msgstr ""
+msgstr "表格「%1」不存在。"
 
 #: KDbConnection.cpp:1579
 msgctxt "KDbConnection|"
 msgid "Could not delete object's data."
-msgstr ""
+msgstr "無法刪除物件的資料。"
 
 #: KDbConnection.cpp:1607 KDbConnection.cpp:1620
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete table \"%1\". %2"
-msgstr ""
+msgstr "無法刪除表格「%1」。%2"
 
 #: KDbConnection.cpp:1608
 msgctxt "KDbConnection|"
 msgid "Unexpected name or identifier."
-msgstr ""
+msgstr "非預期的名稱或識別子。"
 
 #: KDbConnection.cpp:1680
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not alter table \"%1\" using the same table as destination."
-msgstr ""
+msgstr "無法在使用同一個表格當做目標的時候修改表格「%1」。"
 
 #: KDbConnection.cpp:1706
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Unknown table \"%1\"."
-msgstr ""
+msgstr "未知的表格「%1」。"
 
 #: KDbConnection.cpp:1711
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid table name \"%1\"."
-msgstr ""
+msgstr "無效表格名稱「%1」。"
 
 #: KDbConnection.cpp:1718
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" using the same name."
-msgstr ""
+msgstr "無法將表格「%1」重新命名成同一個名稱。"
 
 #: KDbConnection.cpp:1729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
-msgstr ""
+msgstr "無法將表格「%1」重新命名為「%2」。表格「%3」已存在。"
 
 #: KDbConnection.cpp:1839
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Query \"%1\" does not exist."
-msgstr ""
+msgstr "查詢「%1」不存在。"
 
 #: KDbConnection.cpp:1946
 #, qt-format
@@ -723,7 +725,7 @@ msgstr ""
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Column \"%1\" does not exist in the query."
-msgstr ""
+msgstr "欄位「%1」不存在於查詢中。"
 
 #: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
 msgctxt "KDbConnection|Extended schema for a table: loading error"
@@ -747,20 +749,20 @@ msgstr ""
 #: KDbConnection.cpp:3113
 msgctxt "KDbConnection|"
 msgid "Could not update record because there is no master table defined."
-msgstr ""
+msgstr "無法更新紀錄，因為沒有定義主表格。"
 
 #: KDbConnection.cpp:3120
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because master table has no primary key defined."
-msgstr ""
+msgstr "無法更新紀錄，因為主表格沒有定義主鍵值。"
 
 #: KDbConnection.cpp:3151
 msgctxt "KDbConnection|"
 msgid ""
 "Could not update record because it does not contain entire primary key of "
 "master table."
-msgstr ""
+msgstr "無法更新紀錄，因為它不包含主表格的整個主鍵值。"
 
 #: KDbConnection.cpp:3163 KDbConnection.cpp:3407
 #, qt-format
@@ -771,80 +773,80 @@ msgstr ""
 #: KDbConnection.cpp:3191
 msgctxt "KDbConnection|"
 msgid "Record updating on the server failed."
-msgstr ""
+msgstr "伺服器上的紀錄更新失敗。"
 
 #: KDbConnection.cpp:3213
 msgctxt "KDbConnection|"
 msgid "Could not insert record because there is no master table specified."
-msgstr ""
+msgstr "無法插入紀錄，因為沒有指定主表格。"
 
 #: KDbConnection.cpp:3255
 msgctxt "KDbConnection|"
 msgid ""
 "Could not insert record because master table has no primary key specified."
-msgstr ""
+msgstr "無法插入紀錄，因為主表格沒有指定主鍵值。"
 
 #: KDbConnection.cpp:3264
 msgctxt "KDbConnection|"
 msgid ""
 "Could not insert record because it does not contain entire master table's "
 "primary key."
-msgstr ""
+msgstr "無法插入紀錄，因為它不包含主表格的整個主鍵值。"
 
 #: KDbConnection.cpp:3307
 msgctxt "KDbConnection|"
 msgid "Record inserting on the server failed."
-msgstr ""
+msgstr "伺服器上的紀錄插入失敗。"
 
 #: KDbConnection.cpp:3371
 msgctxt "KDbConnection|"
 msgid "Could not delete record because there is no master table specified."
-msgstr ""
+msgstr "無法刪除紀錄，因為沒有指定主表格。"
 
 #: KDbConnection.cpp:3380
 msgctxt "KDbConnection|"
 msgid ""
 "Could not delete record because there is no primary key for master table "
 "specified."
-msgstr ""
+msgstr "無法刪除紀錄，因為沒有指定主表格的主鍵值。"
 
 #: KDbConnection.cpp:3397
 msgctxt "KDbConnection|"
 msgid ""
 "Could not delete record because it does not contain entire master table's "
 "primary key."
-msgstr ""
+msgstr "無法刪除紀錄，因為它不包含主表格的整個主鍵值。"
 
 #: KDbConnection.cpp:3424 KDbConnection.cpp:3447
 msgctxt "KDbConnection|"
 msgid "Record deletion on the server failed."
-msgstr ""
+msgstr "伺服器上的紀錄刪除失敗。"
 
 #: KDbConnection.cpp:3543
 msgctxt "KDbConnection|"
 msgid "Unknown error."
-msgstr ""
+msgstr "未知的錯誤。"
 
 #: KDbConnectionData.cpp:41
 msgctxt "KDbConnectionData|"
 msgid "<file>"
-msgstr ""
+msgstr "<檔案>"
 
 #: KDbConnectionData.cpp:43
 #, qt-format
 msgctxt "KDbConnectionData|"
 msgid "file: %1"
-msgstr ""
+msgstr "檔案：%1"
 
 #: KDbCursor.cpp:215
 msgctxt "KDbCursor|"
 msgid "No query statement or schema defined."
-msgstr ""
+msgstr "未定義查詢敘述或綱要。"
 
 #: KDbCursor.cpp:227
 msgctxt "KDbCursor|"
 msgid "Could not generate query statement."
-msgstr ""
+msgstr "無法產生查詢敘述。"
 
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
@@ -854,7 +856,7 @@ msgstr ""
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
 msgid "Could not fetch next record."
-msgstr ""
+msgstr "無法抓取下一個紀錄。"
 
 #: KDbCursor.cpp:620
 msgctxt "KDbCursor|"
@@ -916,7 +918,7 @@ msgstr ""
 #: KDbDriver_p.cpp:107
 msgctxt "KDbDriver|"
 msgid "KDb driver version"
-msgstr ""
+msgstr "KDb 驅動程式版本"
 
 #: KDbDriverManager.cpp:87
 msgctxt "DriverManagerInternal|"
@@ -944,7 +946,7 @@ msgstr ""
 #: KDbField.cpp:81
 msgctxt "KDbField|"
 msgid "Invalid Type"
-msgstr ""
+msgstr "無效型態"
 
 #: KDbField.cpp:82
 msgctxt "KDbField|"
@@ -954,17 +956,17 @@ msgstr "位元組"
 #: KDbField.cpp:83
 msgctxt "KDbField|"
 msgid "Short Integer Number"
-msgstr ""
+msgstr "短整數"
 
 #: KDbField.cpp:84 KDbField.cpp:105
 msgctxt "KDbField|"
 msgid "Integer Number"
-msgstr ""
+msgstr "整數"
 
 #: KDbField.cpp:85
 msgctxt "KDbField|"
 msgid "Big Integer Number"
-msgstr ""
+msgstr "大整數"
 
 #: KDbField.cpp:86
 msgctxt "KDbField|"
@@ -974,7 +976,7 @@ msgstr "是/否（真/假) 值"
 #: KDbField.cpp:87
 msgctxt "KDbField|"
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: KDbField.cpp:88
 msgctxt "KDbField|"
@@ -984,27 +986,27 @@ msgstr "日期與時間"
 #: KDbField.cpp:89
 msgctxt "KDbField|"
 msgid "Time"
-msgstr ""
+msgstr "時間"
 
 #: KDbField.cpp:90
 msgctxt "KDbField|"
 msgid "Single Precision Number"
-msgstr ""
+msgstr "單精確浮點數"
 
 #: KDbField.cpp:91
 msgctxt "KDbField|"
 msgid "Double Precision Number"
-msgstr ""
+msgstr "雙精確浮點數"
 
 #: KDbField.cpp:92 KDbField.cpp:104
 msgctxt "KDbField|"
 msgid "Text"
-msgstr ""
+msgstr "文字"
 
 #: KDbField.cpp:93
 msgctxt "KDbField|"
 msgid "Long Text"
-msgstr ""
+msgstr "長文字"
 
 #: KDbField.cpp:94 KDbField.cpp:109
 msgctxt "KDbField|"
@@ -1035,7 +1037,7 @@ msgstr "日期/時間"
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set value of database property \"%1\"."
-msgstr ""
+msgstr "無法設定資料庫屬性「%1」的數值。"
 
 #: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
 #, qt-format
@@ -1060,7 +1062,7 @@ msgctxt ""
 "KDbQuerySchema|short for 'expression' word, it will expand to 'expr1', "
 "'expr2', etc. Please use ONLY latin letters and DON'T use '.'"
 msgid "expr%1"
-msgstr ""
+msgstr "expr%1"
 
 #: KDbResult.cpp:56
 msgctxt "KDbResult|"
@@ -1117,7 +1119,7 @@ msgstr ""
 #: parser/KDbParser_p.cpp:215 parser/KDbParser_p.cpp:219
 msgctxt "KDbParser|"
 msgid "Syntax Error"
-msgstr ""
+msgstr "語法錯誤"
 
 #: parser/KDbParser_p.cpp:216
 #, qt-format
@@ -1128,7 +1130,7 @@ msgstr ""
 #: parser/KDbParser_p.cpp:220
 msgctxt "KDbParser|"
 msgid "Syntax error."
-msgstr ""
+msgstr "語法錯誤。"
 
 #: parser/KDbParser_p.cpp:224 parser/KDbParser_p.cpp:254
 #: parser/KDbParser_p.cpp:273
@@ -1155,7 +1157,7 @@ msgstr "實作錯誤"
 #: parser/KDbParser_p.cpp:255
 msgctxt "KDbParser|"
 msgid "No query statement specified."
-msgstr ""
+msgstr "未指定查詢敘述。"
 
 #: parser/KDbParser_p.cpp:274
 msgctxt "KDbParser|"
@@ -1254,50 +1256,50 @@ msgstr ""
 #: tools/KDbSimpleCommandLineApp.cpp:77
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database driver ID"
-msgstr ""
+msgstr "資料庫驅動程式 ID"
 
 #: tools/KDbSimpleCommandLineApp.cpp:79
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database user name"
-msgstr ""
+msgstr "資料庫使用者名稱"
 
 #: tools/KDbSimpleCommandLineApp.cpp:81
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Prompt for password"
-msgstr ""
+msgstr "詢問密碼"
 
 #: tools/KDbSimpleCommandLineApp.cpp:83
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Host (server) name"
-msgstr ""
+msgstr "主機（伺服器）名稱"
 
 #: tools/KDbSimpleCommandLineApp.cpp:84
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Server's port number"
-msgstr ""
+msgstr "伺服器的連接埠編號"
 
 #: tools/KDbSimpleCommandLineApp.cpp:86
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Server's local socket filename"
-msgstr ""
+msgstr "伺服器的本地 socket 檔案名稱"
 
 #: tools/KDbSimpleCommandLineApp.cpp:107
 #, qt-format
 msgctxt "KDbSimpleCommandLineApp|Enter password for <user>"
 msgid "Enter password for %1: "
-msgstr ""
+msgstr "輸入 %1 的密碼："
 
 #: tools/KDbValidator.cpp:102
 #, qt-format
 msgctxt "KDbValidator|"
 msgid "\"%1\" value has to be entered."
-msgstr ""
+msgstr "必須輸入「%1」數值。"
 
 #: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
 #, qt-format
 msgctxt "KDbTableViewData|"
 msgid "\"%1\" column requires a value to be entered."
-msgstr ""
+msgstr "欄位「%1」必須要有輸入數值。"
 
 #: views/KDbTableViewData.cpp:694
 msgctxt "KDbTableViewData|"
@@ -1312,21 +1314,21 @@ msgstr ""
 #: views/KDbTableViewData.cpp:717
 msgctxt "KDbTableViewData|"
 msgid "Record inserting failed."
-msgstr ""
+msgstr "紀錄插入失敗。"
 
 #: views/KDbTableViewData.cpp:733
 msgctxt "KDbTableViewData|"
 msgid "Record changing failed."
-msgstr ""
+msgstr "紀錄變更失敗。"
 
 #: views/KDbTableViewData.cpp:800
 msgctxt "KDbTableViewData|"
 msgid "Record deleting failed."
-msgstr ""
+msgstr "紀錄刪除失敗。"
 
 #: views/KDbTableViewData.cpp:930
 msgctxt "KDbTableViewData|"
 msgid ""
 "Please correct data in this record or use the \"Cancel record changes\" "
 "function."
-msgstr ""
+msgstr "請改正這個紀錄中的資料，或是使用「取消紀錄變更」功能。"
