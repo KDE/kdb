@@ -87,7 +87,7 @@ msgstr "S'està compactant la base de dades"
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Compacting database \"%1\"..."
-msgstr "S'està compactant la base de dades «%1»..."
+msgstr "S'està compactant la base de dades «%1»…"
 
 #: SqliteVacuum.cpp:259
 #, qt-format
