@@ -362,7 +362,7 @@ msgstr "Prova de connexió"
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Testing connection to \"%1\" database server..."
-msgstr "S'està provant la connexió amb el servidor de base de dades «%1»..."
+msgstr "S'està provant la connexió amb el servidor de base de dades «%1»…"
 
 #: KDb.cpp:227
 #, qt-format
