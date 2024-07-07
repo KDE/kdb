@@ -1,10 +1,9 @@
 # Translation of kdb_qt to Norwegian Nynorsk
 #
-# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2020-05-23 17:21+0200\n"
+"PO-Revision-Date: 2024-07-06 16:15+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@lister.huftis.org>\n"
 "Language: nn\n"
@@ -12,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 20.04.0\n"
+"X-Generator: Lokalize 24.05.1\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: qtrich\n"
@@ -319,7 +318,7 @@ msgstr "Ukjend verktøy: «%1»."
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.*\" expression"
-msgstr "Tvetydig «%1.*»-uttrykk"
+msgstr "Tvitydig «%1.*»-uttrykk"
 
 #: expression/KDbVariableExpression.cpp:212
 #, qt-format
@@ -337,7 +336,7 @@ msgstr "Tabellen «%1» manglar eit «%2»-felt."
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.%2\" expression"
-msgstr "Tvetydig uttrykk «%1.%2»"
+msgstr "Tvitydig uttrykk «%1.%2»"
 
 #: expression/KDbVariableExpression.cpp:233
 #, qt-format
