@@ -1,9 +1,9 @@
-# giovanni <g.sora@tiscali.it>, 2017, 2020, 2021.
+# SPDX-FileCopyrightText: 2017, 2020, 2021, 2024 giovanni <g.sora@tiscali.it>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2021-02-02 22:08+0100\n"
-"Last-Translator: Giovanni Sora <g.sora@tiscali.it>\n"
+"PO-Revision-Date: 2024-09-09 15:12+0200\n"
+"Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
 "MIME-Version: 1.0\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 2.0\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
@@ -637,7 +637,7 @@ msgstr ""
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
 msgstr ""
-"Le nomine de systema \"%1\" nonn pote esser usate como un del campos in le "
+"Le nomine de systema \"%1\" non pote esser usate como un del campos in le "
 "tabella \"%2\"."
 
 #: KDbConnection.cpp:1441
