@@ -1,17 +1,17 @@
+# SPDX-FileCopyrightText: 2025 Adrián Chaves (Gallaecio)
 # Adrián Chaves Fernández <adriyetichaves@gmail.com>, 2015, 2016, 2017.
-# Adrián Chaves (Gallaecio) <adrian@chaves.io>, 2017, 2018, 2019, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2023-04-24 07:26+0200\n"
+"PO-Revision-Date: 2025-01-06 20:49+0100\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
-"Language-Team: Galician <proxecto@trasno.gal>\n"
+"Language-Team: Proxecto Trasno (proxecto@trasno.gal)\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.12.3\n"
+"X-Generator: Lokalize 24.12.0\n"
 "X-Qt-Contexts: true\n"
 
 #: expression/KDbBinaryExpression.cpp:64
@@ -895,7 +895,7 @@ msgstr "Non foi posíbel xerar a instrución de consulta."
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
 msgid "Error opening database cursor."
-msgstr "Erro ao acceder ao cursor da base de datos."
+msgstr "Erro ao abrir o cursor da base de datos."
 
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
