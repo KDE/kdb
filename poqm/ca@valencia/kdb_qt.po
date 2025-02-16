@@ -624,7 +624,7 @@ msgstr "La sentència SQL que s'executarà no és vàlida o es troba buida."
 #: KDbConnection.cpp:1296
 msgctxt "KDbConnection|"
 msgid "Error while executing SQL statement."
-msgstr "Error mentre s'executava una sentència SQL."
+msgstr "S'ha produït un error mentre s'executava una sentència SQL."
 
 #: KDbConnection.cpp:1393
 msgctxt "KDbConnection|"
