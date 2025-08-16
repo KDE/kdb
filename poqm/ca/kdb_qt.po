@@ -1,15 +1,15 @@
 # Translation of kdb_qt.po to Catalan
-# Copyright (C) 2015-2023 This_file_is_part_of_KDE
+# Copyright (C) 2015-2025 This_file_is_part_of_KDE
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Josep M. Ferrer <txemaq@gmail.com>, 2015, 2016, 2017, 2018, 2020, 2021, 2023.
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2020, 2021, 2023, 2025 Josep M. Ferrer <txemaq@gmail.com>
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2015, 2016, 2017, 2019, 2020, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: kdb\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"PO-Revision-Date: 2023-03-06 12:57+0100\n"
+"PO-Revision-Date: 2025-08-15 09:53+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -19,7 +19,7 @@ msgstr ""
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: &\n"
-"X-Generator: Lokalize 20.12.0\n"
+"X-Generator: Lokalize 25.04.3\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
@@ -1337,7 +1337,7 @@ msgstr "Nom d'usuari de la base de dades"
 #: tools/KDbSimpleCommandLineApp.cpp:81
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Prompt for password"
-msgstr "Indicatiu per a la contrasenya"
+msgstr "Indicador per a la contrasenya"
 
 #: tools/KDbSimpleCommandLineApp.cpp:83
 msgctxt "KDbSimpleCommandLineApp|"
