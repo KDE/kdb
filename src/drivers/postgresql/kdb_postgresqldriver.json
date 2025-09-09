@@ -34,7 +34,6 @@
                 "Name[sv]": "Kexi-gruppen",
                 "Name[tr]": "Kexi Takımı",
                 "Name[uk]": "Команда Kexi",
-                "Name[x-test]": "xxKexi Teamxx",
                 "Name[zh_CN]": "Kexi 团队",
                 "Name[zh_TW]": "Kexi 團隊"
             }
@@ -71,7 +70,6 @@
         "Description[sv]": "Kdb-drivrutin för att hantera PostgreSQL-databaser",
         "Description[tr]": "PostgreSQL veritabanlarını kullanabilmek için KDb sürücüsü",
         "Description[uk]": "Драйвер KDb для роботи з базами даних PostgreSQL",
-        "Description[x-test]": "xxKDb driver for handling PostgreSQL databasesxx",
         "Description[zh_CN]": "处理 PostgreSQL 数据库的 KDb 驱动",
         "Description[zh_TW]": "處理 PostgreSQL 資料庫的 KDb 驅動",
         "EnabledByDefault": true,
@@ -109,7 +107,6 @@
         "Name[sv]": "PostgreSQL",
         "Name[tr]": "PostgreSQL",
         "Name[uk]": "PostgreSQL",
-        "Name[x-test]": "xxPostgreSQLxx",
         "Name[zh_CN]": "PostgreSQL",
         "Name[zh_TW]": "PostgreSQL",
         "ServiceTypes": [
