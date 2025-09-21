@@ -1,8 +1,13 @@
-# Eloy Cuadra <ecuadra@eloihr.net>, 2015, 2016.
+# Spanish translations for kdb_sqlitedriver_qt.po package.
+# Copyright (C) 2015-2025 This file is copyright:
+# This file is distributed under the same license as the kdb package.
+#
+# SPDX-FileCopyrightText: 2015, 2016, 2025 Eloy Cuadra <ecuadra@eloihr.net>
 msgid ""
 msgstr ""
 "Project-Id-Version: kdb_sqlitedriver_qt\n"
-"PO-Revision-Date: 2016-09-16 13:04+0200\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"PO-Revision-Date: 2025-09-21 00:59+0100\n"
 "Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -11,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Qt-Contexts: true\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 1.5\n"
+"X-Generator: Lokalize 25.08.1\n"
 
 #: SqliteAdmin.cpp:43
 #, qt-format
@@ -79,7 +84,7 @@ msgstr "Compactando base de datos"
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Compacting database \"%1\"..."
-msgstr "Compactando base de datos «%1»..."
+msgstr "Compactando base de datos «%1»…"
 
 #: SqliteVacuum.cpp:259
 #, qt-format
@@ -93,24 +98,5 @@ msgctxt "SqliteVacuum|"
 msgid ""
 "The database has been compacted. Current size decreased by %1% to %2 MB."
 msgstr ""
-"Se ha compactado la base de datos. Su tamaño actual ha disminuido un %1% "
+"Se ha compactado la base de datos. Su tamaño actual ha disminuido un %1 % "
 "hasta %2 MB."
-
-#~ msgctxt "SqliteConnection|"
-#~ msgid "Extra SQLite extension paths"
-#~ msgstr "Rutas adicionales de extensiones de SQLite"
-
-#~ msgctxt "SqliteVacuum|"
-#~ msgid "Could not find tool <filename>%1</filename>."
-#~ msgstr "No se ha podido encontrar la herramienta <filename>%1</filename>."
-
-#~ msgctxt "SqliteVacuum|"
-#~ msgid "Could not read file <filename>%1</filename>."
-#~ msgstr "No se ha podido leer el archivo <filename>%1</filename>."
-
-#~ msgctxt "SqliteVacuum|"
-#~ msgid ""
-#~ "Could not rename file <filename>%1</filename> to <filename>%2</filename>."
-#~ msgstr ""
-#~ "No se ha podido cambiar el nombre del archivo <filename>%1</filename> a "
-#~ "<filename>%2</filename>."
