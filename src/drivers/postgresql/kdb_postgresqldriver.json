@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
+                "Name[ar]": "فريق كيس",
                 "Name[az]": "Kexi komandası",
                 "Name[ca@valencia]": "L'equip de Kexi",
                 "Name[ca]": "L'equip del Kexi",
@@ -41,6 +42,7 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling PostgreSQL databases",
+        "Description[ar]": "مشغل KDb الذي يتعامل مع قواعد بيانات بوستجري إس كيو إل",
         "Description[az]": "PostgreSQL verilənlər bazasının işlənməsi üçün KDb sürücüsü",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades PostgreSQL",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades PostgreSQL",
@@ -79,6 +81,7 @@
         "License": "LGPL",
         "MimeTypes": [],
         "Name": "PostgreSQL",
+        "Name[ar]": "بوستجري إس كيو إل",
         "Name[az]": "PostgreSQL",
         "Name[ca@valencia]": "PostgreSQL",
         "Name[ca]": "PostgreSQL",

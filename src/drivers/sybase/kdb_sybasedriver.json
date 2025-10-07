@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
+                "Name[ar]": "فريق كيس",
                 "Name[az]": "Kexi komandası",
                 "Name[ca@valencia]": "L'equip de Kexi",
                 "Name[ca]": "L'equip del Kexi",
@@ -41,6 +42,7 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling Sybase and MSSQL databases",
+        "Description[ar]": "مشغل KDb الذي يتعامل مع قواعد بيانات سايبيز و MSSQL",
         "Description[az]": "SyBase və MSSQL verilənlər bazasının işlənməsi üçün KDb sürücüsü",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades Sybase i MSSQL",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades Sybase i MSSQL",
@@ -79,6 +81,7 @@
         "License": "LGPL",
         "MimeTypes": [],
         "Name": "Sybase",
+        "Name[ar]": "سايبيز",
         "Name[az]": "Sybase",
         "Name[ca@valencia]": "Sybase",
         "Name[ca]": "Sybase",

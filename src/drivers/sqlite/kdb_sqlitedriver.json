@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
+                "Name[ar]": "فريق كيس",
                 "Name[az]": "Kexi komandası",
                 "Name[ca@valencia]": "L'equip de Kexi",
                 "Name[ca]": "L'equip del Kexi",
@@ -41,6 +42,7 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling SQLite databases",
+        "Description[ar]": "مشغل KDb الذي يتعامل مع قواعد بيانات SQLite",
         "Description[az]": "SQLite verilənlər bazasının işlənmsi üçün KDb sürücüsü",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades SQLite",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades SQLite",
@@ -82,6 +84,7 @@
             "application/x-sqlite3"
         ],
         "Name": "SQLite",
+        "Name[ar]": "إس كيو لايت",
         "Name[az]": "SQLite",
         "Name[ca@valencia]": "SQLite",
         "Name[ca]": "SQLite",
