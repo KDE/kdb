@@ -4,6 +4,7 @@
             {
                 "Email": "kexi@kde.org",
                 "Name": "Kexi Team",
+                "Name[ar]": "فريق كيس",
                 "Name[ast]": "L'equipu Kexi",
                 "Name[ca@valencia]": "L'equip de Kexi",
                 "Name[ca]": "L'equip del Kexi",
@@ -41,6 +42,7 @@
         "Category": "",
         "Dependencies": [],
         "Description": "KDb driver for handling MySQL databases",
+        "Description[ar]": "مشغل KDb الذي يتعامل مع قواعد بيانات ماي إس كيو إل",
         "Description[ast]": "Controladora KDb pa remanar bases de datos MySQL",
         "Description[ca@valencia]": "Controlador del KDb per a gestionar bases de dades MySQL",
         "Description[ca]": "Controlador del KDb per a gestionar bases de dades MySQL",
@@ -78,6 +80,7 @@
         "License": "LGPL",
         "MimeTypes": [],
         "Name": "MySQL",
+        "Name[ar]": "ماي إس كيو إل",
         "Name[ast]": "MySQL",
         "Name[ca@valencia]": "MySQL",
         "Name[ca]": "MySQL",
