@@ -1,4 +1,4 @@
-# Burkhard Lück <lueck@hube-lueck.de>, 2015, 2016.
+# SPDX-FileCopyrightText: 2015, 2016 Burkhard Lück <lueck@hube-lueck.de>
 msgid ""
 msgstr ""
 "Project-Id-Version: kdb_sqlitedriver_qt\n"
