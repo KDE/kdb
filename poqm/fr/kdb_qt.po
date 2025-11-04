@@ -4,8 +4,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdb_qt\n"
-"PO-Revision-Date: 2020-05-17 22:19+0200\n"
-"Last-Translator: Xavier Besnard <xavier.besnard@neuf.fr>\n"
+"PO-Revision-Date: 2023-01-06 11:23+0100\n"
+"Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
 "Language-Team: French <kde-francophone@kde.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -1163,7 +1163,7 @@ msgstr "Chaîne de caractère non valable"
 #: parser/generated/sqlscanner.cpp:1405
 msgctxt "KDbParser|"
 msgid "Invalid character in string"
-msgstr "Caractère non valable au sein de la chaîne"
+msgstr "Caractère non valable au sein de la chaine"
 
 #: parser/generated/sqlscanner.cpp:1421
 msgctxt "KDbParser|"
