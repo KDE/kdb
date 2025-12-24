@@ -1,8 +1,8 @@
-# Emir SARI <emir_sari@icloud.com>, 2022, 2023.
+# SPDX-FileCopyrightText: 2022, 2023, 2025 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2023-08-01 00:43+0300\n"
+"PO-Revision-Date: 2025-12-23 12:11+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Qt-Contexts: true\n"
-"X-Generator: Lokalize 23.11.70\n"
+"X-Generator: Lokalize 25.12.0\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
@@ -350,13 +350,13 @@ msgstr "Bağlantı Testi"
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Testing connection to \"%1\" database server..."
-msgstr "\"%1\" veritabanın bağlantı test ediliyor..."
+msgstr "\"%1\" veri tabanın bağlantı test ediliyor..."
 
 #: KDb.cpp:227
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server failed."
-msgstr "\"%1\" veritabanı sunucusuna bağlantı testi başarısız oldu."
+msgstr "\"%1\" veri tabanı sunucusuna bağlantı testi başarısız oldu."
 
 #: KDb.cpp:238
 #, qt-format
@@ -365,14 +365,14 @@ msgid ""
 "Test connection to \"%1\" database server failed. The server is not "
 "responding."
 msgstr ""
-"\"%1\" veritabanı sunucusuna bağlantı testi başarısız oldu. Sunucu yanıt "
+"\"%1\" veri tabanı sunucusuna bağlantı testi başarısız oldu. Sunucu yanıt "
 "vermiyor."
 
 #: KDb.cpp:244
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server established successfully."
-msgstr "\"%1\" veritabanı sunucusuna bağlantı testi başarıyla sağlandı."
+msgstr "\"%1\" veri tabanı sunucusuna bağlantı testi başarıyla sağlandı."
 
 #: KDb.cpp:249
 msgctxt "ConnectionTestDialog|"
@@ -430,7 +430,7 @@ msgstr "Salt okunur"
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid database contents. %1"
-msgstr "Geçersiz veritabanı içeriği. %1"
+msgstr "Geçersiz veri tabanı içeriği. %1"
 
 #: KDbConnection.cpp:212
 msgctxt "KDbConnection|"
@@ -478,7 +478,7 @@ msgstr "\"%1\" proje dosyası açılamadı."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not connect to \"%1\" database server."
-msgstr "\"%1\" veritabanı sunucusuna bağlantı kurulamadı."
+msgstr "\"%1\" veri tabanı sunucusuna bağlantı kurulamadı."
 
 #: KDbConnection.cpp:558
 msgctxt "KDbConnection|"
@@ -488,31 +488,31 @@ msgstr "Veri tabanı sunucusuna bağlant bulunmuyor."
 #: KDbConnection.cpp:569
 msgctxt "KDbConnection|"
 msgid "Currently no database is used."
-msgstr "Kullanımda olan mevcut bir veritabanı yok."
+msgstr "Kullanımda olan mevcut bir veri tabanı yok."
 
 #: KDbConnection.cpp:623
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database \"%1\" does not exist."
-msgstr "\"%1\" veritabanı mevcut değil."
+msgstr "\"%1\" veri tabanı mevcut değil."
 
 #: KDbConnection.cpp:643
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database file \"%1\" does not exist."
-msgstr "\"%1\" veritabanı dosyası mevcut değil."
+msgstr "\"%1\" veri tabanı dosyası mevcut değil."
 
 #: KDbConnection.cpp:650
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not readable."
-msgstr "\"%1\" veritabanı dosyası okunabilir değil."
+msgstr "\"%1\" veri tabanı dosyası okunabilir değil."
 
 #: KDbConnection.cpp:657
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not writable."
-msgstr "\"%1\" veritabanı dosyası yazılabilir değil."
+msgstr "\"%1\" veri tabanı dosyası yazılabilir değil."
 
 #: KDbConnection.cpp:686
 #, qt-format
@@ -520,13 +520,13 @@ msgctxt "KDbConnection|"
 msgid ""
 "Database \"%1\" has been created but could not be closed after creation."
 msgstr ""
-"\"%1\" veritabanı oluşturulmuş, ancak oluşturulduktan sonra kapatılmamış."
+"\"%1\" veri tabanı oluşturulmuş, ancak oluşturulduktan sonra kapatılmamış."
 
 #: KDbConnection.cpp:702
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" already exists."
-msgstr "\"%1\" veritabanı mevcut değil."
+msgstr "\"%1\" veri tabanı mevcut değil."
 
 #: KDbConnection.cpp:707
 #, qt-format
@@ -534,50 +534,50 @@ msgctxt "KDbConnection|"
 msgid ""
 "Could not create database \"%1\". This name is reserved for system database."
 msgstr ""
-"\"%1\" veritabanı oluşturulamadı. Bu isim sistem veri tabanı için ayrılmış "
+"\"%1\" veri tabanı oluşturulamadı. Bu isim sistem veri tabanı için ayrılmış "
 "durumda."
 
 #: KDbConnection.cpp:729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error creating database \"%1\" on the server."
-msgstr "\"%1\" veritabanı sunucuda oluşturulurken hata oluştu."
+msgstr "\"%1\" veri tabanı sunucuda oluşturulurken hata oluştu."
 
 #: KDbConnection.cpp:743
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" has been created but could not be opened."
-msgstr "\"%1\" veritabanı oluşuturulmuş, ancak açılmamış durumda."
+msgstr "\"%1\" veri tabanı oluşuturulmuş, ancak açılmamış durumda."
 
 #: KDbConnection.cpp:819
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Opening database \"%1\" failed."
-msgstr "\"%1\" veritabanı açılırken hata oluştu."
+msgstr "\"%1\" veri tabanı açılırken hata oluştu."
 
 #: KDbConnection.cpp:904
 msgctxt "KDbConnection|"
 msgid "Could not find any database for temporary connection."
-msgstr "Geçici bağlantı için bir veritabanı bulunamadı."
+msgstr "Geçici bağlantı için bir veri tabanı bulunamadı."
 
 #: KDbConnection.cpp:913
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error during starting temporary connection using \"%1\" database name."
 msgstr ""
-"\"%1\" veritabanı adı kullanılarak yapılan geçici bağlantı başlatılırken "
+"\"%1\" veri tabanı adı kullanılarak yapılan geçici bağlantı başlatılırken "
 "hata oluştu."
 
 #: KDbConnection.cpp:931 KDbConnection.cpp:949
 msgctxt "KDbConnection|"
 msgid "Could not delete database. Name is not specified."
-msgstr "Veritabanı oluşturulamadı. Ad belirtilmemiş."
+msgstr "Veri tabanı oluşturulamadı. Ad belirtilmemiş."
 
 #: KDbConnection.cpp:955
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete system database \"%1\"."
-msgstr "\"%1\" sistem veritabanı silinemedi."
+msgstr "\"%1\" sistem veri tabanı silinemedi."
 
 #: KDbConnection.cpp:1002
 msgctxt "KDbConnection|"
@@ -877,7 +877,7 @@ msgstr "Sorgu ifadesi oluşturulamadı."
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
 msgid "Error opening database cursor."
-msgstr "Veritabanı imleci açılırken hata oluştu."
+msgstr "Veri tabanı imleci açılırken hata oluştu."
 
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
@@ -893,7 +893,7 @@ msgstr "İmleç açma işlemi için bağlantı yok."
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Invalid database driver's \"%1\" implementation."
-msgstr "\"%1\" geçersiz veritabanı sürücüsü uygulaması."
+msgstr "\"%1\" geçersiz veri tabanı sürücüsü uygulaması."
 
 #: KDbDriver.cpp:88
 #, qt-format
@@ -914,12 +914,12 @@ msgstr "Sunucudaki varsayılan karakter kodlaması"
 #: KDbDriver_p.cpp:74
 msgctxt "KDbDriver|"
 msgid "File-based database driver"
-msgstr "Dosya tabanlı veritabanı sürücüsü"
+msgstr "Dosya tabanlı veri tabanı sürücüsü"
 
 #: KDbDriver_p.cpp:77
 msgctxt "KDbDriver|"
 msgid "File-based database's MIME types"
-msgstr "Dosya tabanlı veritabanının MIME türü"
+msgstr "Dosya tabanlı veri tabanının MIME türü"
 
 #: KDbDriver_p.cpp:96
 msgctxt "KDbDriver|"
@@ -949,13 +949,13 @@ msgstr "KDb sürücü sürümü"
 #: KDbDriverManager.cpp:87
 msgctxt "DriverManagerInternal|"
 msgid "Could not find any database drivers."
-msgstr "Herhangi bir veritabanı sürücüsü bulunamadı."
+msgstr "Herhangi bir veri tabanı sürücüsü bulunamadı."
 
 #: KDbDriverManager.cpp:168 KDbDriverManager.cpp:213
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not find database driver \"%1\"."
-msgstr "\"%1\" veritabanı sürücüsü bulunamadı."
+msgstr "\"%1\" veri tabanı sürücüsü bulunamadı."
 
 #: KDbDriverManager.cpp:221
 #, qt-format
@@ -967,7 +967,7 @@ msgstr "Sürücünün \"%1\" eklenti dosyası yüklenemedi."
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
-msgstr "\"%2\" eklenti dosyasından \"%1\" veritabanı sürücüsü açılamadı."
+msgstr "\"%2\" eklenti dosyasından \"%1\" veri tabanı sürücüsü açılamadı."
 
 #: KDbField.cpp:81
 msgctxt "KDbField|"
@@ -1063,24 +1063,24 @@ msgstr "Tarih/Saat"
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set value of database property \"%1\"."
-msgstr "\"%1\" veritabanı özelliğinin değeri ayarlanamadı."
+msgstr "\"%1\" veri tabanı özelliğinin değeri ayarlanamadı."
 
 #: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set caption for database property \"%1\"."
-msgstr "\"%1\" veritabanı özelliğinin başlığı ayarlanamadı."
+msgstr "\"%1\" veri tabanı özelliğinin başlığı ayarlanamadı."
 
 #: KDbProperties.cpp:118 KDbProperties.cpp:135
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not read database property \"%1\"."
-msgstr "\"%1\" veritabanı özelliği okunamadı."
+msgstr "\"%1\" veri tabanı özelliği okunamadı."
 
 #: KDbProperties.cpp:150
 msgctxt "KDbProperties|"
 msgid "Could not read database properties."
-msgstr "Veritabanı özellikleri okunamadı."
+msgstr "Veri tabanı özellikleri okunamadı."
 
 #: KDbQuerySchema_p.cpp:132
 #, qt-format
@@ -1283,17 +1283,17 @@ msgstr ""
 #: tools/KDbObjectNameValidator.cpp:58
 msgctxt "KDbObjectNameValidator|"
 msgid "Names of internal database objects start with \"kexi__\"."
-msgstr "\"kexi_\" ile başlayan dahili veritabanı nesnelerinin isimleri."
+msgstr "\"kexi_\" ile başlayan dahili veri tabanı nesnelerinin isimleri."
 
 #: tools/KDbSimpleCommandLineApp.cpp:77
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database driver ID"
-msgstr "Veritabanı sürücü ID"
+msgstr "Veri tabanı sürücü kimliği"
 
 #: tools/KDbSimpleCommandLineApp.cpp:79
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database user name"
-msgstr "Veritabanı kullanıcı ismi"
+msgstr "Veri tabanı kullanıcı ismi"
 
 #: tools/KDbSimpleCommandLineApp.cpp:81
 msgctxt "KDbSimpleCommandLineApp|"

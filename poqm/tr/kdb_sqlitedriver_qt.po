@@ -1,16 +1,23 @@
+# SPDX-FileCopyrightText: 2025 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
+"Project-Id-Version: \n"
+"PO-Revision-Date: 2025-12-23 12:11+0300\n"
+"Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
+"Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Qt-Contexts: true\n"
+"X-Generator: Lokalize 25.12.0\n"
 
 #: SqliteAdmin.cpp:43
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Could not compact database \"%1\"."
-msgstr "\"%1\" veritabanı sıkıştırılamadı."
+msgstr "\"%1\" veri tabanı sıkıştırılamadı."
 
 #: SqliteConnection.cpp:49
 msgctxt "SqliteConnection|"
@@ -66,13 +73,13 @@ msgstr "\"%1\" dosyası okunamadı."
 #: SqliteVacuum.cpp:168
 msgctxt "SqliteVacuum|"
 msgid "Compacting database"
-msgstr "Veritabanı sıkıştırma"
+msgstr "Veri tabanı sıkıştırma"
 
 #: SqliteVacuum.cpp:170
 #, qt-format
 msgctxt "SqliteVacuum|"
 msgid "Compacting database \"%1\"..."
-msgstr "\"%1\" veritabanı sıkıştırılıyor..."
+msgstr "\"%1\" veri tabanı sıkıştırılıyor..."
 
 #: SqliteVacuum.cpp:259
 #, qt-format
@@ -85,4 +92,4 @@ msgstr "\"%1\" dosyası \"%2\" olarak yeniden adlandırılamadı."
 msgctxt "SqliteVacuum|"
 msgid ""
 "The database has been compacted. Current size decreased by %1% to %2 MB."
-msgstr "Veritabanı sıkıştırıldı. %1 olan boyut artık %2 MB."
+msgstr "Veri tabanı sıkıştırıldı. %1 olan boyut artık %2 MB."

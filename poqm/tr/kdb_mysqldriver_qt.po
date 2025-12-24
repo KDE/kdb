@@ -1,8 +1,8 @@
-# Emir SARI <emir_sari@icloud.com>, 2022.
+# SPDX-FileCopyrightText: 2022, 2025 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2022-03-29 13:49+0300\n"
+"PO-Revision-Date: 2025-12-23 12:03+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -11,10 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Qt-Contexts: true\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 25.12.0\n"
 
 #: MysqlConnection.cpp:136
 #, qt-format
 msgctxt "MysqlConnection|"
 msgid "The database \"%1\" does not exist."
-msgstr "\"%1\" veritabanı mevcut değil."
+msgstr "\"%1\" veri tabanı mevcut değil."
