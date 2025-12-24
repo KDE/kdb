@@ -1,8 +1,8 @@
-# Emir SARI <emir_sari@icloud.com>, 2022, 2023.
+# SPDX-FileCopyrightText: 2022, 2023, 2025 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2023-08-01 00:43+0300\n"
+"PO-Revision-Date: 2025-12-23 12:06+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Qt-Contexts: true\n"
-"X-Generator: Lokalize 23.11.70\n"
+"X-Generator: Lokalize 25.12.0\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
@@ -1288,7 +1288,7 @@ msgstr "\"kexi_\" ile başlayan dahili veritabanı nesnelerinin isimleri."
 #: tools/KDbSimpleCommandLineApp.cpp:77
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database driver ID"
-msgstr "Veritabanı sürücü ID"
+msgstr "Veritabanı sürücü kimliği"
 
 #: tools/KDbSimpleCommandLineApp.cpp:79
 msgctxt "KDbSimpleCommandLineApp|"
