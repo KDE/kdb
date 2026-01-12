@@ -558,7 +558,8 @@ msgstr ""
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error creating database \"%1\" on the server."
-msgstr "S'ha produït un error en crear la base de dades «%1» al servidor."
+msgstr ""
+"S'ha produït un error mentre es creava la base de dades «%1» al servidor."
 
 #: KDbConnection.cpp:743
 #, qt-format
@@ -746,12 +747,12 @@ msgstr "Transacció no iniciada."
 #: KDbConnection.cpp:2025
 msgctxt "KDbConnection|"
 msgid "Error on commit transaction."
-msgstr "S'ha produït un error en cometre la transacció."
+msgstr "S'ha produït un error mentre es cometia la transacció."
 
 #: KDbConnection.cpp:2062
 msgctxt "KDbConnection|"
 msgid "Error on rollback transaction."
-msgstr "S'ha produït un error en desfer la transacció."
+msgstr "S'ha produït un error mentre es desfeia la transacció."
 
 #: KDbConnection.cpp:2213
 #, qt-format
@@ -769,8 +770,8 @@ msgstr "La columna «%1» no existix en la consulta."
 msgctxt "KDbConnection|Extended schema for a table: loading error"
 msgid "Error while loading extended table schema."
 msgstr ""
-"S'ha produït un error en carregar la informació de l'esquema de taula "
-"ampliada."
+"S'ha produït un error mentre es carregava la informació de l'esquema de "
+"taula ampliada."
 
 #: KDbConnection.cpp:2763
 #, qt-format
@@ -910,7 +911,7 @@ msgstr "No s'ha pogut generar la sentència de consulta."
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
 msgid "Error opening database cursor."
-msgstr "S'ha produït un error en obrir el cursor de la base de dades."
+msgstr "S'ha produït un error mentre s'obria el cursor de la base de dades."
 
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
