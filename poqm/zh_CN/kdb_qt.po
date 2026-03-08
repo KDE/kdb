@@ -1001,7 +1001,7 @@ msgstr "双精度数"
 #: KDbField.cpp:92 KDbField.cpp:104
 msgctxt "KDbField|"
 msgid "Text"
-msgstr "文字"
+msgstr "文本"
 
 #: KDbField.cpp:93
 msgctxt "KDbField|"
