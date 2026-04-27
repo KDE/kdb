@@ -629,13 +629,13 @@ msgstr "Nedá sa vytvoriť tabuľka bez polí."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as table name."
-msgstr "Systémové meno \"%1\" nomôže byť použité ako meno tabuľky."
+msgstr "Systémové meno \"%1\" nemôže byť použité ako meno tabuľky."
 
 #: KDbConnection.cpp:1425
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
-msgstr "Systémové meno \"%1\" nomôže byť použité ako pole tabuľky \"%2\"."
+msgstr "Systémové meno \"%1\" nemôže byť použité ako pole tabuľky \"%2\"."
 
 #: KDbConnection.cpp:1441
 #, qt-format
