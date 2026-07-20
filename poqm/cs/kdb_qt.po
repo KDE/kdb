@@ -1,16 +1,17 @@
+# SPDX-FileCopyrightText: 2026 Libor Filípek <libor.filipek@gmail.com>
 # Vít Pelčák <vit@pelcak.org>, 2015, 2016, 2017, 2018, 2020.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2020-05-24 19:11+0200\n"
-"Last-Translator: Vit Pelcak <vit@pelcak.org>\n"
+"PO-Revision-Date: 2026-07-19 11:43+0200\n"
+"Last-Translator: Libor Filípek <libor.filipek@gmail.com>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.04.0\n"
+"X-Generator: Lokalize 26.04.3\n"
 "X-Qt-Contexts: true\n"
 
 #: expression/KDbBinaryExpression.cpp:64
@@ -41,6 +42,8 @@ msgid ""
 "Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
 "arguments of type \"%4\"."
 msgstr ""
+"Argument #%1 typu \"%2\" ve funkci %3() není kompatibilní s předchozími "
+"argumenty typu \"%4\"."
 
 #: expression/KDbFunctionExpression.cpp:298
 #, qt-format
@@ -53,6 +56,7 @@ msgctxt "RandomFunctionDeclaration|"
 msgid ""
 "Value of the first argument should be less than value of the second argument."
 msgstr ""
+"Hodnota prvního argumentu by měla být menší než hodnota druhého argumentu."
 
 #: expression/KDbFunctionExpression.cpp:940
 #: expression/KDbFunctionExpression.cpp:1191
@@ -77,13 +81,13 @@ msgstr "Příliš málo argumentů.%1"
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function does not accept any arguments."
-msgstr ""
+msgstr "Funkce %1%2() nepřijímá žádné argumenty."
 
 #: expression/KDbFunctionExpression.cpp:961
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires 1 argument."
-msgstr ""
+msgstr "Funkce %1%2() vyžaduje 1 argument."
 
 #: expression/KDbFunctionExpression.cpp:968
 #: expression/KDbFunctionExpression.cpp:1007
@@ -91,33 +95,33 @@ msgstr ""
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 argument(s)."
 msgid_plural "%1%2() function requires %3 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Funkce %1%2() vyžaduje %3 argument."
+msgstr[1] "Funkce %1%2() vyžaduje %3 argumenty."
+msgstr[2] "Funkce %1%2() vyžaduje %3 argumentů."
 
 #: expression/KDbFunctionExpression.cpp:977
 #, qt-format
 msgctxt "KDbFunctionExpressionData|the function requires zero or one argument"
 msgid "%1%2() function requires 0 or 1 argument."
-msgstr ""
+msgstr "Funkce %1%2() vyžaduje 0 nebo 1 argument."
 
 #: expression/KDbFunctionExpression.cpp:985
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 or %4 argument(s)."
 msgid_plural "%1%2() function requires %3 or %4 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Funkce %1%2() vyžaduje %3 nebo %4 argument(y)."
+msgstr[1] "Funkce %1%2() vyžaduje %3 nebo %4 argument(y)."
+msgstr[2] "Funkce %1%2() vyžaduje %3 nebo %4 argument(y)."
 
 #: expression/KDbFunctionExpression.cpp:993
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1%2() function requires %3 or %4 or %5 argument(s)."
 msgid_plural "%1%2() function requires %3 or %4 or %5 argument(s)."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Funkce %1%2() vyžaduje %3 nebo %4 nebo %5 argument(y)."
+msgstr[1] "Funkce %1%2() vyžaduje %3 nebo %4 nebo %5 argument(y)."
+msgstr[2] "Funkce %1%2() vyžaduje %3 nebo %4 nebo %5 argument(y)."
 
 #: expression/KDbFunctionExpression.cpp:1003
 #, qt-format
@@ -153,54 +157,54 @@ msgstr "\"Cokoliv\""
 #: expression/KDbFunctionExpression.cpp:1053
 msgctxt "KDbFunctionExpressionData|"
 msgid "Incorrect type of argument"
-msgstr ""
+msgstr "Nesprávný typ argumentu"
 
 #: expression/KDbFunctionExpression.cpp:1055
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Specified argument is of type \"%1\"."
-msgstr ""
+msgstr "Zadaný argument je typu \"%1\"."
 
 #: expression/KDbFunctionExpression.cpp:1059
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's first argument should be of type %2. %3"
-msgstr ""
+msgstr "První argument funkce %1() by měl být typu %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1064
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's second argument should be of type %2. %3"
-msgstr ""
+msgstr "Druhý argument funkce %1() by měl být typu %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1069
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's third argument should be of type %2. %3"
-msgstr ""
+msgstr "Třetí argument funkce %1() by měl být typu %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1074
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's fourth argument should be of type %2. %3"
-msgstr ""
+msgstr "Čtvrtý argument funkce %1() by měl být typu %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1079
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's fifth argument should be of type %2. %3"
-msgstr ""
+msgstr "Pátý argument funkce %1() by měl být typu %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1084
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's %2 argument should be of type %3. %4"
-msgstr ""
+msgstr "%2 argument funkce %1() by měl být typu %3. %4"
 
 #: expression/KDbFunctionExpression.cpp:1144
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too many arguments for function."
-msgstr ""
+msgstr "Funkce má příliš mnoho argumentů."
 
 #: expression/KDbFunctionExpression.cpp:1146
 #, qt-format
@@ -212,25 +216,25 @@ msgstr "Maximální počet argumentů pro funkci %1() je %2."
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least one argument."
-msgstr ""
+msgstr "Příliš málo argumentů. Funkce %1() vyžaduje alespoň jeden argument."
 
 #: expression/KDbFunctionExpression.cpp:1199
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least two arguments."
-msgstr ""
+msgstr "Příliš málo argumentů. Funkce %1() vyžaduje alespoň dva argumenty."
 
 #: expression/KDbFunctionExpression.cpp:1204
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least three arguments."
-msgstr ""
+msgstr "Příliš málo argumentů. Funkce %1() vyžaduje alespoň tři argumenty."
 
 #: expression/KDbFunctionExpression.cpp:1209
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Too few arguments. %1() function requires at least %2 arguments."
-msgstr ""
+msgstr "Příliš málo argumentů. Funkce %1() vyžaduje alespoň %2 argumentů."
 
 #: expression/KDbNArgExpression.cpp:70
 msgctxt "KDbNArgExpressionData|"
@@ -241,7 +245,7 @@ msgstr "Požadovány tři argumenty"
 #, qt-format
 msgctxt "KDbNArgExpressionData|BETWEEN..AND error"
 msgid "%1 operator requires exactly three arguments."
-msgstr ""
+msgstr "Operátor %1 vyžaduje přesně tři argumenty."
 
 #: expression/KDbNArgExpression.cpp:98
 msgctxt "KDbNArgExpressionData|"
@@ -255,6 +259,8 @@ msgid ""
 "Operator \"%1\" requires compatible types of arguments. Specified arguments "
 "are of type %2, %3, %4."
 msgstr ""
+"Operátor \"%1\" vyžaduje kompatibilní typy argumentů. Zadané argumenty jsou "
+"typu %2, %3, %4."
 
 #: expression/KDbVariableExpression.cpp:133
 msgctxt "KDbVariableExpressionData|"
@@ -281,7 +287,7 @@ msgstr "Pole nebylo nalezeno"
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not find table containing field \"%1\"."
-msgstr ""
+msgstr "Nenašla se tabulka obsahující pole \"%1\"."
 
 #: expression/KDbVariableExpression.cpp:172
 msgctxt "KDbVariableExpressionData|"
@@ -295,6 +301,7 @@ msgid ""
 "Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
 "used."
 msgstr ""
+"Název tabulky \"%1\" je již obsazen aliasy. Místo \"%2\" lze použít \"%3\"."
 
 #: expression/KDbVariableExpression.cpp:196
 msgctxt "KDbVariableExpressionData|"
@@ -341,19 +348,19 @@ msgstr ""
 #: KDb.cpp:179
 msgctxt "ConnectionTestDialog|Dialog's title: testing database connection"
 msgid "Test Connection"
-msgstr "Otestovat spojení"
+msgstr "Otestovat připojení"
 
 #: KDb.cpp:180
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Testing connection to \"%1\" database server..."
-msgstr "Testuji připojení k databázovému serveru \"%1\"..."
+msgstr "Testování připojení k databázovému serveru \"%1\"..."
 
 #: KDb.cpp:227
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server failed."
-msgstr ""
+msgstr "Test připojení k databázovému serveru \"%1\" selhal."
 
 #: KDb.cpp:238
 #, qt-format
@@ -361,18 +368,19 @@ msgctxt "ConnectionTestDialog|"
 msgid ""
 "Test connection to \"%1\" database server failed. The server is not "
 "responding."
-msgstr "Test spojení na databázový server \"%1\" selhal. Server neodpovídá."
+msgstr ""
+"Test připojení k databázovému serveru \"%1\" selhal. Server neodpovídá."
 
 #: KDb.cpp:244
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server established successfully."
-msgstr ""
+msgstr "Test připojení k databázovému serveru \"%1\" proběhl úspěšně."
 
 #: KDb.cpp:249
 msgctxt "ConnectionTestDialog|"
 msgid "Test Connection"
-msgstr "Otestovat spojení"
+msgstr "Otestovat připojení"
 
 #: KDb.cpp:528
 msgctxt "KDb|"
@@ -387,7 +395,7 @@ msgstr "SQL dotaz:"
 #: KDb.cpp:546
 msgctxt "KDb|"
 msgid "Server result code:"
-msgstr ""
+msgstr "Výsledný kód serveru:"
 
 #: KDb.cpp:554
 msgctxt "KDb|"
@@ -443,7 +451,7 @@ msgctxt "KDbConnectionPrivate|"
 msgid ""
 "Could not find definition for query \"%1\". Deleting this query is "
 "recommended."
-msgstr ""
+msgstr "Nenašla se definice dotazu \"%1\". Doporučujeme tento dotaz smazat."
 
 #: KDbConnection.cpp:416
 #, qt-format
@@ -453,11 +461,14 @@ msgid ""
 "is invalid:<br><tt>%2</tt></p>\n"
 "<p>This query can be edited only in Text View.</p>"
 msgstr ""
+"<p>Nepodařilo se načíst definici dotazu \"%1\". SQL příkaz pro tento dotaz "
+"je neplatný:<br><tt>%2</tt></p>\n"
+"<p>Tento dotaz lze upravit pouze v textovém zobrazení.</p>"
 
 #: KDbConnection.cpp:499
 msgctxt "KDbConnection|"
 msgid "Connection already established."
-msgstr "Spojení bylo již navázáno."
+msgstr "Připojení bylo již navázáno."
 
 #: KDbConnection.cpp:509
 #, qt-format
@@ -570,27 +581,27 @@ msgstr "Nelze smazat systémovou databázi \"%1\"."
 #: KDbConnection.cpp:1002
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of object names."
-msgstr ""
+msgstr "Nepodařilo se načíst seznam názvů objektů."
 
 #: KDbConnection.cpp:1016
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of table names."
-msgstr ""
+msgstr "Nepodařilo se načíst seznam názvů tabulek."
 
 #: KDbConnection.cpp:1024
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of physical table names."
-msgstr ""
+msgstr "Nepodařilo se načíst seznam názvů fyzických tabulek."
 
 #: KDbConnection.cpp:1091
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of object identifiers."
-msgstr ""
+msgstr "Nepodařilo se načíst seznam identifikátorů objektů."
 
 #: KDbConnection.cpp:1273
 msgctxt "KDbConnection|"
 msgid "SQL statement for execution is invalid or empty."
-msgstr ""
+msgstr "Příkaz SQL určený k provedení je neplatný nebo prázdný."
 
 #: KDbConnection.cpp:1296
 msgctxt "KDbConnection|"
@@ -647,7 +658,7 @@ msgstr "Nelze smazat data objektu."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete table \"%1\". %2"
-msgstr ""
+msgstr "Nelze odstranit tabulku \"%1\". %2"
 
 #: KDbConnection.cpp:1608
 msgctxt "KDbConnection|"
@@ -858,7 +869,7 @@ msgstr "Není definován žádný dotaz nebo schéma."
 #: KDbCursor.cpp:227
 msgctxt "KDbCursor|"
 msgid "Could not generate query statement."
-msgstr ""
+msgstr "Nepodařilo se vytvořit dotaz."
 
 #: KDbCursor.cpp:242
 msgctxt "KDbCursor|"
@@ -868,7 +879,7 @@ msgstr "Chyba při otevírání databázového kurzoru."
 #: KDbCursor.cpp:454 KDbCursor.cpp:478
 msgctxt "KDbCursor|"
 msgid "Could not fetch next record."
-msgstr ""
+msgstr "Nepodařilo se načíst další záznam."
 
 #: KDbCursor.cpp:620
 msgctxt "KDbCursor|"
@@ -879,7 +890,7 @@ msgstr "Není připojení pro operaci specifikovanou kurzorem."
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Invalid database driver's \"%1\" implementation."
-msgstr ""
+msgstr "Neplatná implementace \"%1\" ovladače databáze."
 
 #: KDbDriver.cpp:88
 #, qt-format
@@ -905,7 +916,7 @@ msgstr "Ovladač souborové databáze"
 #: KDbDriver_p.cpp:77
 msgctxt "KDbDriver|"
 msgid "File-based database's MIME types"
-msgstr ""
+msgstr "MIME typy souborových databází"
 
 #: KDbDriver_p.cpp:96
 msgctxt "KDbDriver|"
@@ -925,7 +936,7 @@ msgstr "Podpora vnořených transakcí"
 #: KDbDriver_p.cpp:102
 msgctxt "KDbDriver|"
 msgid "Ignored transactions support"
-msgstr ""
+msgstr "Podpora ignorovaných transakcí"
 
 #: KDbDriver_p.cpp:107
 msgctxt "KDbDriver|"
@@ -947,7 +958,7 @@ msgstr "Nelze najít ovladač databáze \"%1\"."
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not load database driver's plugin file \"%1\"."
-msgstr ""
+msgstr "Nepodařilo se načíst soubor pluginu ovladače databáze \"%1\"."
 
 #: KDbDriverManager.cpp:232
 #, qt-format
@@ -1164,12 +1175,12 @@ msgstr "Jiná chyba"
 #: parser/KDbParser_p.cpp:244
 msgctxt "KDbParser|"
 msgid "Implementation error"
-msgstr ""
+msgstr "Chyba implementace"
 
 #: parser/KDbParser_p.cpp:255
 msgctxt "KDbParser|"
 msgid "No query statement specified."
-msgstr ""
+msgstr "Nebyl zadán žádný dotazovací příkaz."
 
 #: parser/KDbParser_p.cpp:274
 msgctxt "KDbParser|"
@@ -1189,12 +1200,12 @@ msgstr "\"*\" nelze přidat."
 #: parser/KDbParser_p.cpp:325
 msgctxt "KDbParser|"
 msgid "\"<table>.*\" could not be added."
-msgstr ""
+msgstr "\"<table>.*\" se nepodařilo přidat."
 
 #: parser/KDbParser_p.cpp:330
 msgctxt "KDbParser|"
 msgid "Could not add binding to a field."
-msgstr ""
+msgstr "Nepodařilo se přidat vazbu k poli."
 
 #: parser/KDbParser_p.cpp:389
 #, qt-format
@@ -1209,6 +1220,8 @@ msgid ""
 "Could not set alias \"%1\" for table \"%2\". This alias is already set for "
 "table \"%3\"."
 msgstr ""
+"Nelze nastavit alias \"%1\" pro tabulku \"%2\". Tento alias je již nastaven "
+"pro tabulku \"%3\"."
 
 #: parser/KDbParser_p.cpp:430
 #, qt-format
@@ -1219,7 +1232,7 @@ msgstr "Neplatná definice aliasu pro sloupec \"%1\"."
 #: parser/KDbParser_p.cpp:450
 msgctxt "KDbParser|"
 msgid "More than one asterisk \"*\" is not allowed."
-msgstr ""
+msgstr "Není povoleno použít více než jednu hvězdičku \"*\"."
 
 #: parser/KDbParser_p.cpp:464
 #, qt-format
@@ -1234,6 +1247,8 @@ msgid ""
 "Could not set alias \"%1\" for column #%2. This alias is already set for "
 "column #%3."
 msgstr ""
+"Nelze nastavit alias \"%1\" pro sloupec #%2. Tento alias je již nastaven pro "
+"sloupec #%3."
 
 #: parser/KDbParser_p.cpp:487
 #, qt-format
@@ -1245,13 +1260,13 @@ msgstr "Nelze nastavit alias \"%1\" pro sloupec #%2."
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not define sorting. Column at position %1 does not exist."
-msgstr ""
+msgstr "Nelze definovat řazení. Sloupec na pozici %1 neexistuje."
 
 #: parser/KDbParser_p.cpp:538
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
-msgstr ""
+msgstr "Nelze definovat řazení. Název sloupce nebo alias \"%1\" neexistuje."
 
 #: tools/KDbObjectNameValidator.cpp:53
 #, qt-format
@@ -1265,7 +1280,7 @@ msgstr ""
 #: tools/KDbObjectNameValidator.cpp:58
 msgctxt "KDbObjectNameValidator|"
 msgid "Names of internal database objects start with \"kexi__\"."
-msgstr ""
+msgstr "Názvy interních databázových objektů začínají předponou \"kexi__\"."
 
 #: tools/KDbSimpleCommandLineApp.cpp:77
 msgctxt "KDbSimpleCommandLineApp|"
@@ -1295,7 +1310,7 @@ msgstr "Číslo portu serveru"
 #: tools/KDbSimpleCommandLineApp.cpp:86
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Server's local socket filename"
-msgstr ""
+msgstr "Název souboru lokálního soketu serveru"
 
 #: tools/KDbSimpleCommandLineApp.cpp:107
 #, qt-format
@@ -1313,17 +1328,17 @@ msgstr "Hodnota \"%1\" nebyla zadána."
 #, qt-format
 msgctxt "KDbTableViewData|"
 msgid "\"%1\" column requires a value to be entered."
-msgstr ""
+msgstr "Do sloupce \"%1\" je nutné zadat hodnotu."
 
 #: views/KDbTableViewData.cpp:694
 msgctxt "KDbTableViewData|"
 msgid "The column's constraint is declared as NOT NULL."
-msgstr ""
+msgstr "Omezení sloupce je deklarováno jako NOT NULL."
 
 #: views/KDbTableViewData.cpp:705
 msgctxt "KDbTableViewData|"
 msgid "The column's constraint is declared as NOT EMPTY."
-msgstr ""
+msgstr "Omezení sloupce je deklarováno jako NOT EMPTY."
 
 #: views/KDbTableViewData.cpp:717
 msgctxt "KDbTableViewData|"
@@ -1346,3 +1361,5 @@ msgid ""
 "Please correct data in this record or use the \"Cancel record changes\" "
 "function."
 msgstr ""
+"Opravte prosím údaje v tomto záznamu nebo použijte funkci \"Zrušit změny v "
+"záznamu\"."
