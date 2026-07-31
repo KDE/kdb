@@ -303,7 +303,7 @@ msgid ""
 "used."
 msgstr ""
 "Der Tabellenname „%1“ wird durch einen Alias abgedeckt. Anstelle von „%2“ "
-"können Sie „%3“ benutzen."
+"können Sie „%3“ verwenden."
 
 #: expression/KDbVariableExpression.cpp:196
 msgctxt "KDbVariableExpressionData|"
@@ -498,7 +498,7 @@ msgstr "Keine Verbindung zum Datenbankserver."
 #: KDbConnection.cpp:569
 msgctxt "KDbConnection|"
 msgid "Currently no database is used."
-msgstr "Derzeit wird keine Datenbank benutzt."
+msgstr "Derzeit wird keine Datenbank verwendet."
 
 #: KDbConnection.cpp:623
 #, qt-format
@@ -1253,7 +1253,7 @@ msgid ""
 "table \"%3\"."
 msgstr ""
 "Der Alias „%1“ für Tabelle „%2“ kann nicht erstellt werden. Dieser Alias "
-"wird bereits für die Tabelle „%3“ benutzt."
+"wird bereits für die Tabelle „%3“ verwendet."
 
 #: parser/KDbParser_p.cpp:430
 #, qt-format
@@ -1280,7 +1280,7 @@ msgid ""
 "column #%3."
 msgstr ""
 "Der Alias „%1“ für Spalte #%2 kann nicht erstellt werden. Dieser Alias wird "
-"bereits für die Spalte #%3 benutzt."
+"bereits für die Spalte #%3 verwendet."
 
 #: parser/KDbParser_p.cpp:487
 #, qt-format
