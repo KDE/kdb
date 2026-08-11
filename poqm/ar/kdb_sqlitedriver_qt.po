@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2025 Zayed Al-Saidi <zayed.alsaidi@gmail.com>
+# SPDX-FileCopyrightText: 2025, 2026 Zayed Al-Saidi <zayed.alsaidi@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2025-10-05 20:59+0400\n"
+"PO-Revision-Date: 2026-08-10 18:08+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
 "Language: ar\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 25.12.3\n"
 "X-Qt-Contexts: true\n"
 
 #: SqliteAdmin.cpp:43
@@ -32,8 +32,7 @@ msgid ""
 "Could not delete file \"%1\". Check the file's permissions and whether it is "
 "already opened and locked by another application."
 msgstr ""
-"لم أقدر على حذف الملف «%1». تفحّص صلاحيات الملف و انظر إن فتحه تطبيق آخر "
-"وقفله."
+"لم أقدر على حذف الملف «%1». تفحّص أذون الملف و انظر إن فتحه تطبيق آخر وقفله."
 
 #: SqliteConnection.cpp:375
 #, qt-format
