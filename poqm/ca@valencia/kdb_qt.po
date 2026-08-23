@@ -199,7 +199,7 @@ msgstr "El quart argument de la funció %1() hauria de ser del tipus %2. %3"
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "%1() function's fifth argument should be of type %2. %3"
-msgstr "El cinquè argument de la funció %1() hauria de ser del tipus %2. %3"
+msgstr "El cinqué argument de la funció %1() hauria de ser del tipus %2. %3"
 
 #: expression/KDbFunctionExpression.cpp:1084
 #, qt-format
