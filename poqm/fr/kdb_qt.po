@@ -1158,7 +1158,7 @@ msgstr "Caractère inattendu %1 dans la date / heure"
 #: parser/generated/sqlscanner.cpp:1404
 msgctxt "KDbParser|"
 msgid "Invalid string"
-msgstr "Chaîne de caractère non valable"
+msgstr "Chaine de caractère non valable"
 
 #: parser/generated/sqlscanner.cpp:1405
 msgctxt "KDbParser|"
