@@ -1,8 +1,8 @@
-# SPDX-FileCopyrightText: 2022, 2023, 2025, 2026 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022-2023, 2025-2026 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"PO-Revision-Date: 2026-05-02 18:44+0300\n"
+"PO-Revision-Date: 2026-10-16 19:56+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Qt-Contexts: true\n"
-"X-Generator: Lokalize 25.12.3\n"
+"X-Generator: Lokalize 26.08.0\n"
 
 #: expression/KDbBinaryExpression.cpp:64
 msgctxt "KDbBinaryExpressionData|"
@@ -25,7 +25,7 @@ msgid ""
 "Expression \"%1\" requires compatible types of arguments. Specified "
 "arguments are of type %2 and %3."
 msgstr ""
-"\"%1\" ifadesi, uyumlu argüman türüne gereksinim duyar. Belirtilen türler %2 "
+"“%1” ifadesi, uyumlu argüman türüne gereksinim duyar. Belirtilen türler %2 "
 "ve %3."
 
 #: expression/KDbFunctionExpression.cpp:213
@@ -41,7 +41,7 @@ msgid ""
 "Argument #%1 of type \"%2\" in function %3() is not compatible with previous "
 "arguments of type \"%4\"."
 msgstr ""
-"%3() işlevindeki \"%2\" türünün #%1 argümanı, önceki \"%4\" argümantürüyle "
+"%3() işlevindeki “%2” türünün #%1 argümanı, önceki “%4” argüman türüyle "
 "uyumlu değil."
 
 #: expression/KDbFunctionExpression.cpp:298
@@ -137,17 +137,17 @@ msgstr " ya da "
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "\"%1\""
-msgstr "\"%1\""
+msgstr "“%1”"
 
 #: expression/KDbFunctionExpression.cpp:1046
 msgctxt "KDbFunctionExpressionData|"
 msgid "\"Number\""
-msgstr "\"Sayı\""
+msgstr "“Sayı”"
 
 #: expression/KDbFunctionExpression.cpp:1049
 msgctxt "KDbFunctionExpressionData|Any data type"
 msgid "\"Any\""
-msgstr "\"Herhangi\""
+msgstr "“Herhangi”"
 
 #: expression/KDbFunctionExpression.cpp:1053
 msgctxt "KDbFunctionExpressionData|"
@@ -158,7 +158,7 @@ msgstr "Yanlış değişken türü"
 #, qt-format
 msgctxt "KDbFunctionExpressionData|"
 msgid "Specified argument is of type \"%1\"."
-msgstr "Belirtilen değişken \"%1\" türünde."
+msgstr "Belirtilen değişken “%1” türünde."
 
 #: expression/KDbFunctionExpression.cpp:1059
 #, qt-format
@@ -254,7 +254,7 @@ msgid ""
 "Operator \"%1\" requires compatible types of arguments. Specified arguments "
 "are of type %2, %3, %4."
 msgstr ""
-"\"%1\" operatörü, uyumlu değişken türlerine gereksinim duyar. Belirtilen "
+"“%1” operatörü, uyumlu değişken türlerine gereksinim duyar. Belirtilen "
 "değişken türleri, %2, %3, %4."
 
 #: expression/KDbVariableExpression.cpp:133
@@ -269,8 +269,8 @@ msgid ""
 "Both table \"%1\" and \"%2\" have defined \"%3\" field. Use \"<tableName>."
 "%4\" notation to specify table name."
 msgstr ""
-"\"%1\" ve \"%2\" tablolarının her ikisi de \"%3\" alanını tanımlıyor. Tablo "
-"ismi parametresi \"<tableName>.%4\" kullanarak tablo ismini belirleyin."
+"“%1” ve “%2” tablolarının her ikisi de “%3” alanını tanımlıyor. Tablo adı "
+"parametresi “<tableName>.%4” kullanarak tablo adını belirleyin."
 
 #: expression/KDbVariableExpression.cpp:145
 #: expression/KDbVariableExpression.cpp:222
@@ -282,7 +282,7 @@ msgstr "Alan bulunamadı"
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Could not find table containing field \"%1\"."
-msgstr "\"%1\" alanını içeren tablo bulunamadı."
+msgstr "“%1” alanını içeren tablo bulunamadı."
 
 #: expression/KDbVariableExpression.cpp:172
 msgctxt "KDbVariableExpressionData|"
@@ -295,8 +295,7 @@ msgctxt "KDbVariableExpressionData|"
 msgid ""
 "Table name \"%1\" is covered by aliases. Instead of \"%2\", \"%3\" can be "
 "used."
-msgstr ""
-"Tablo adı \"%1\", takma ad kullanıyor. \"%2\" yerine \"%3\" kullanılabilir."
+msgstr "Tablo adı “%1”, takma ad kullanıyor. “%2” yerine “%3” kullanılabilir."
 
 #: expression/KDbVariableExpression.cpp:196
 msgctxt "KDbVariableExpressionData|"
@@ -307,38 +306,38 @@ msgstr "Tablo bulunamadı"
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Unknown table \"%1\"."
-msgstr "Bilinmeyen tablo \"%1\"."
+msgstr "Bilinmeyen tablo “%1”."
 
 #: expression/KDbVariableExpression.cpp:211
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.*\" expression"
-msgstr "Berlirsiz \"%1.*\" ifadesi"
+msgstr "Belirsiz “%1.*” ifadesi"
 
 #: expression/KDbVariableExpression.cpp:212
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "More than one \"%1\" table or alias defined."
-msgstr "Birden fazla \"%1\" tablo ismi veya takma isim olarak tanımlandı."
+msgstr "Birden fazla “%1” tablo adı veya takma adı olarak tanımlandı."
 
 #: expression/KDbVariableExpression.cpp:224
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Table \"%1\" has no \"%2\" field."
-msgstr "\"%1\" tablosunun \"%2\" alanı yok."
+msgstr "“%1” tablosunun “%2” alanı yok."
 
 #: expression/KDbVariableExpression.cpp:231
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "Ambiguous \"%1.%2\" expression"
-msgstr "\"%1.%2\" belirsiz bir ifade"
+msgstr "“%1.%2” belirsiz bir ifade"
 
 #: expression/KDbVariableExpression.cpp:233
 #, qt-format
 msgctxt "KDbVariableExpressionData|"
 msgid "More than one \"%1\" table or alias defined containing \"%2\" field."
 msgstr ""
-"\"%2\" alanını içeren, birden fazla \"%1\" tablo ismi veya takma isim olarak "
+"“%2” alanını içeren, birden fazla “%1” tablo adı veya takma adı olarak "
 "tanımlandı."
 
 #: KDb.cpp:179
@@ -350,13 +349,13 @@ msgstr "Bağlantı Testi"
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Testing connection to \"%1\" database server..."
-msgstr "\"%1\" veri tabanın bağlantı test ediliyor..."
+msgstr "“%1” veri tabanı sunucusunu bağlantısı sınanıyor…"
 
 #: KDb.cpp:227
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server failed."
-msgstr "\"%1\" veri tabanı sunucusuna bağlantı testi başarısız oldu."
+msgstr "“%1” veri tabanı sunucusuna bağlantı testi başarısız oldu."
 
 #: KDb.cpp:238
 #, qt-format
@@ -365,14 +364,14 @@ msgid ""
 "Test connection to \"%1\" database server failed. The server is not "
 "responding."
 msgstr ""
-"\"%1\" veri tabanı sunucusuna bağlantı testi başarısız oldu. Sunucu yanıt "
+"“%1” veri tabanı sunucusuna bağlantı testi başarısız oldu. Sunucu yanıt "
 "vermiyor."
 
 #: KDb.cpp:244
 #, qt-format
 msgctxt "ConnectionTestDialog|"
 msgid "Test connection to \"%1\" database server established successfully."
-msgstr "\"%1\" veri tabanı sunucusuna bağlantı testi başarıyla sağlandı."
+msgstr "“%1” veri tabanı sunucusuna bağlantı testi başarıyla sağlandı."
 
 #: KDb.cpp:249
 msgctxt "ConnectionTestDialog|"
@@ -413,13 +412,13 @@ msgstr "Resim"
 #, qt-format
 msgctxt "KDb|"
 msgid "Value of \"%1\" field must be an identifier."
-msgstr "\"%1\" alanının değeri, tanımlayıcı olmalıdır."
+msgstr "“%1” alanının değeri, tanımlayıcı olmalıdır."
 
 #: KDb.cpp:2196
 #, qt-format
 msgctxt "KDb|"
 msgid "\"%1\" is not a valid identifier."
-msgstr "\"%1\" geçerli bir tanımlayıcı değil."
+msgstr "“%1” geçerli bir tanımlayıcı değil."
 
 #: KDbConnection.cpp:88
 msgctxt "KDbConnectionOptions|Read only connection"
@@ -449,7 +448,7 @@ msgid ""
 "Could not find definition for query \"%1\". Deleting this query is "
 "recommended."
 msgstr ""
-"\"%1\" sorgusu için bir tanımlama bulunamadı. Bu sorgunun silinmesi önerilir."
+"“%1” sorgusu için bir tanımlama bulunamadı. Bu sorgunun silinmesi önerilir."
 
 #: KDbConnection.cpp:416
 #, qt-format
@@ -459,26 +458,26 @@ msgid ""
 "is invalid:<br><tt>%2</tt></p>\n"
 "<p>This query can be edited only in Text View.</p>"
 msgstr ""
-"<p>\"%1\" sorgusundaki tanımlamalar yüklenemedi. Sorgudaki SQL cümlesi "
+"<p>“%1” sorgusundaki tanımlamalar yüklenemedi. Sorgudaki SQL tümcesi "
 "geçersiz:<br><tt>%2</tt></p>\n"
-"<p>Sorguyu Metin Görünümü'nden düzeltilebilir.</p>"
+"<p>Sorgu, metin görünümünden düzeltilebilir.</p>"
 
 #: KDbConnection.cpp:499
 msgctxt "KDbConnection|"
 msgid "Connection already established."
-msgstr "Bağlantı zaten kuruldu."
+msgstr "Bağlantı hâlihazırda kuruldu."
 
 #: KDbConnection.cpp:509
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not open \"%1\" project file."
-msgstr "\"%1\" proje dosyası açılamadı."
+msgstr "“%1” proje dosyası açılamadı."
 
 #: KDbConnection.cpp:511
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not connect to \"%1\" database server."
-msgstr "\"%1\" veri tabanı sunucusuna bağlantı kurulamadı."
+msgstr "“%1” veri tabanı sunucusuna bağlantı kurulamadı."
 
 #: KDbConnection.cpp:558
 msgctxt "KDbConnection|"
@@ -494,25 +493,25 @@ msgstr "Kullanımda olan mevcut bir veri tabanı yok."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database \"%1\" does not exist."
-msgstr "\"%1\" veri tabanı mevcut değil."
+msgstr "“%1” veri tabanı mevcut değil."
 
 #: KDbConnection.cpp:643
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "The database file \"%1\" does not exist."
-msgstr "\"%1\" veri tabanı dosyası mevcut değil."
+msgstr "“%1” veri tabanı dosyası mevcut değil."
 
 #: KDbConnection.cpp:650
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not readable."
-msgstr "\"%1\" veri tabanı dosyası okunabilir değil."
+msgstr "“%1” veri tabanı dosyası okunabilir değil."
 
 #: KDbConnection.cpp:657
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database file \"%1\" is not writable."
-msgstr "\"%1\" veri tabanı dosyası yazılabilir değil."
+msgstr "“%1” veri tabanı dosyası yazılabilir değil."
 
 #: KDbConnection.cpp:686
 #, qt-format
@@ -520,13 +519,13 @@ msgctxt "KDbConnection|"
 msgid ""
 "Database \"%1\" has been created but could not be closed after creation."
 msgstr ""
-"\"%1\" veri tabanı oluşturulmuş, ancak oluşturulduktan sonra kapatılmamış."
+"“%1” veri tabanı oluşturulmuş, ancak oluşturulduktan sonra kapatılmamış."
 
 #: KDbConnection.cpp:702
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" already exists."
-msgstr "\"%1\" veri tabanı mevcut değil."
+msgstr "“%1” veri tabanı mevcut değil."
 
 #: KDbConnection.cpp:707
 #, qt-format
@@ -534,26 +533,26 @@ msgctxt "KDbConnection|"
 msgid ""
 "Could not create database \"%1\". This name is reserved for system database."
 msgstr ""
-"\"%1\" veri tabanı oluşturulamadı. Bu isim sistem veri tabanı için ayrılmış "
+"“%1” veri tabanı oluşturulamadı. Bu ad, sistem veri tabanı için ayrılmış "
 "durumda."
 
 #: KDbConnection.cpp:729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Error creating database \"%1\" on the server."
-msgstr "\"%1\" veri tabanı sunucuda oluşturulurken hata oluştu."
+msgstr "“%1” veri tabanı sunucuda oluşturulurken hata oluştu."
 
 #: KDbConnection.cpp:743
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Database \"%1\" has been created but could not be opened."
-msgstr "\"%1\" veri tabanı oluşuturulmuş, ancak açılmamış durumda."
+msgstr "“%1” veri tabanı oluşuturulmuş, ancak açılmamış durumda."
 
 #: KDbConnection.cpp:819
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Opening database \"%1\" failed."
-msgstr "\"%1\" veri tabanı açılırken hata oluştu."
+msgstr "“%1” veri tabanı açılırken hata oluştu."
 
 #: KDbConnection.cpp:904
 msgctxt "KDbConnection|"
@@ -565,8 +564,8 @@ msgstr "Geçici bağlantı için bir veri tabanı bulunamadı."
 msgctxt "KDbConnection|"
 msgid "Error during starting temporary connection using \"%1\" database name."
 msgstr ""
-"\"%1\" veri tabanı adı kullanılarak yapılan geçici bağlantı başlatılırken "
-"hata oluştu."
+"“%1” veri tabanı adı kullanılarak yapılan geçici bağlantı başlatılırken hata "
+"oluştu."
 
 #: KDbConnection.cpp:931 KDbConnection.cpp:949
 msgctxt "KDbConnection|"
@@ -577,17 +576,17 @@ msgstr "Veri tabanı oluşturulamadı. Ad belirtilmemiş."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete system database \"%1\"."
-msgstr "\"%1\" sistem veri tabanı silinemedi."
+msgstr "“%1” sistem veri tabanı silinemedi."
 
 #: KDbConnection.cpp:1002
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of object names."
-msgstr "Nesne isimlerinin listesi alınamadı."
+msgstr "Nesne adları listesi alınamadı."
 
 #: KDbConnection.cpp:1016
 msgctxt "KDbConnection|"
 msgid "Could not retrieve list of table names."
-msgstr "Tablo isimlerinin listesi alınamadı."
+msgstr "Tablo adları listesi alınamadı."
 
 #: KDbConnection.cpp:1024
 msgctxt "KDbConnection|"
@@ -623,32 +622,31 @@ msgstr "Alanlar olmadan tablo oluşturulamaz."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as table name."
-msgstr "\"%1\" sistem adı, tablo adı olarak kullanılamaz."
+msgstr "“%1” sistem adı, tablo adı olarak kullanılamaz."
 
 #: KDbConnection.cpp:1425
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "System name \"%1\" cannot be used as one of fields in \"%2\" table."
-msgstr ""
-"\"%1\" sistem adı, \"%2\" tablosunun alanlarının adı olarak kullanılamaz."
+msgstr "“%1” sistem adı, “%2” tablosunun alanlarının adı olarak kullanılamaz."
 
 #: KDbConnection.cpp:1441
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not create the same table \"%1\" twice."
-msgstr "\"%1\" isimli tablo, ikinci kez oluşturulamaz."
+msgstr "“%1” adlı tablo, ikinci kez oluşturulamaz."
 
 #: KDbConnection.cpp:1455
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Table \"%1\" already exists."
-msgstr "\"%1\" tablosu zaten mevcut."
+msgstr "“%1” tablosu hâlihazırda var."
 
 #: KDbConnection.cpp:1524 KDbConnection.cpp:1553 KDbConnection.cpp:1665
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Table \"%1\" does not exist."
-msgstr "\"%1\" tablosu mevcut değil."
+msgstr "“%1” tablosu mevcut değil."
 
 #: KDbConnection.cpp:1579
 msgctxt "KDbConnection|"
@@ -659,56 +657,56 @@ msgstr "Nesnenin verisi silinemedi."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not delete table \"%1\". %2"
-msgstr "\"%1\" tablosu silinemedi. %2"
+msgstr "“%1” tablosu silinemedi. %2"
 
 #: KDbConnection.cpp:1608
 msgctxt "KDbConnection|"
 msgid "Unexpected name or identifier."
-msgstr "Beklenmedik isim veya tanımlayıcı."
+msgstr "Beklenmedik ad veya tanımlayıcı."
 
 #: KDbConnection.cpp:1680
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not alter table \"%1\" using the same table as destination."
-msgstr "\"%1\" tablosu, hedef olarak aynı tablo kullanılarak değiştirilemedi."
+msgstr "“%1” tablosu, hedef olarak aynı tablo kullanılarak değiştirilemedi."
 
 #: KDbConnection.cpp:1706
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Unknown table \"%1\"."
-msgstr "Bilinmeyen tablo \"%1\"."
+msgstr "Bilinmeyen tablo “%1”."
 
 #: KDbConnection.cpp:1711
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid table name \"%1\"."
-msgstr "Geçersiz tablo ismi \"%1\"."
+msgstr "Geçersiz tablo adı “%1”."
 
 #: KDbConnection.cpp:1718
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" using the same name."
-msgstr "\"%1\" tablosu, aynı isim kullanılarak yeniden adlandırılamaz."
+msgstr "“%1” tablosu, aynı ad kullanılarak yeniden adlandırılamaz."
 
 #: KDbConnection.cpp:1729
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Could not rename table \"%1\" to \"%2\". Table \"%3\" already exists."
 msgstr ""
-"\"%1\" tablo ismi, \"%2\" olarak değiştirilemiyor. \"%3\" isimli tablo zaten "
+"“%1” tablo adı, “%2” olarak değiştirilemiyor. “%3” adlı tablo hâlihazırda "
 "var."
 
 #: KDbConnection.cpp:1839
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Query \"%1\" does not exist."
-msgstr "\"%1\" sorgusu mevcut değil."
+msgstr "“%1” sorgusu mevcut değil."
 
 #: KDbConnection.cpp:1946
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Transactions are not supported for \"%1\" driver."
-msgstr "Aktarımlar, \"%1\" sürücüsü için desteklenmiyor."
+msgstr "Aktarımlar, “%1” sürücüsü için desteklenmiyor."
 
 #: KDbConnection.cpp:1951
 msgctxt "KDbConnection|"
@@ -718,7 +716,7 @@ msgstr "İşlemlere başlama başarısız oldu."
 #: KDbConnection.cpp:1968
 msgctxt "KDbConnection|"
 msgid "Transaction already started."
-msgstr "İşlem zaten başlatılmış."
+msgstr "İşlem hâlihazırda başlatılmış."
 
 #: KDbConnection.cpp:2010 KDbConnection.cpp:2047
 msgctxt "KDbConnection|"
@@ -739,13 +737,13 @@ msgstr "İşlemi geri alma sırasında hata oluştu."
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Invalid object name \"%1\"."
-msgstr "\"%1\" geçersiz nesne adı."
+msgstr "“%1” geçersiz nesne adı."
 
 #: KDbConnection.cpp:2402
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Column \"%1\" does not exist in the query."
-msgstr "\"%1\" sütunu, sorgu içinde mevcut değil."
+msgstr "“%1” sütunu, sorgu içinde mevcut değil."
 
 #: KDbConnection.cpp:2754 KDbConnection.cpp:2759 KDbConnection.cpp:2764
 msgctxt "KDbConnection|Extended schema for a table: loading error"
@@ -765,7 +763,7 @@ msgid ""
 "Error in XML data: \"%1\" in line %2, column %3.\n"
 "XML data: %4"
 msgstr ""
-"XML verisinde hata: \"%1\", satır %2, sütun %3.\n"
+"XML verisinde hata: “%1”, satır %2, sütun %3.\n"
 "XML verisi: %4"
 
 #: KDbConnection.cpp:3113
@@ -792,7 +790,7 @@ msgstr ""
 #, qt-format
 msgctxt "KDbConnection|"
 msgid "Primary key's field \"%1\" cannot be empty."
-msgstr "Birincil anahtarın \"%1\" alanı boş olamaz."
+msgstr "Birincil anahtarın “%1” alanı boş olamaz."
 
 #: KDbConnection.cpp:3191
 msgctxt "KDbConnection|"
@@ -893,13 +891,13 @@ msgstr "İmleç açma işlemi için bağlantı yok."
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Invalid database driver's \"%1\" implementation."
-msgstr "\"%1\" geçersiz veri tabanı sürücüsü uygulaması."
+msgstr "“%1” geçersiz veri tabanı sürücüsü uygulaması."
 
 #: KDbDriver.cpp:88
 #, qt-format
 msgctxt "KDbDriver|"
 msgid "Value of \"%1\" is not initialized for the driver."
-msgstr "\"%1\" değeri, sürücü için başlatılmamış."
+msgstr "“%1” değeri, sürücü için başlatılmamış."
 
 #: KDbDriver_p.cpp:61
 msgctxt "KDbDriver|"
@@ -955,19 +953,19 @@ msgstr "Herhangi bir veri tabanı sürücüsü bulunamadı."
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not find database driver \"%1\"."
-msgstr "\"%1\" veri tabanı sürücüsü bulunamadı."
+msgstr "“%1” veri tabanı sürücüsü bulunamadı."
 
 #: KDbDriverManager.cpp:221
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not load database driver's plugin file \"%1\"."
-msgstr "Sürücünün \"%1\" eklenti dosyası yüklenemedi."
+msgstr "Sürücünün “%1” eklenti dosyası yüklenemedi."
 
 #: KDbDriverManager.cpp:232
 #, qt-format
 msgctxt "DriverManagerInternal|"
 msgid "Could not open database driver \"%1\" from plugin file \"%2\"."
-msgstr "\"%2\" eklenti dosyasından \"%1\" veri tabanı sürücüsü açılamadı."
+msgstr "“%2” eklenti dosyasından “%1” veri tabanı sürücüsü açılamadı."
 
 #: KDbField.cpp:81
 msgctxt "KDbField|"
@@ -982,17 +980,17 @@ msgstr "Bayt"
 #: KDbField.cpp:83
 msgctxt "KDbField|"
 msgid "Short Integer Number"
-msgstr "Kısa Tamsayı"
+msgstr "Kısa Tam Sayı"
 
 #: KDbField.cpp:84 KDbField.cpp:105
 msgctxt "KDbField|"
 msgid "Integer Number"
-msgstr "Tamsayı"
+msgstr "Tam Sayı"
 
 #: KDbField.cpp:85
 msgctxt "KDbField|"
 msgid "Big Integer Number"
-msgstr "Büyük Tamsayı"
+msgstr "Büyük Tam Sayı"
 
 #: KDbField.cpp:86
 msgctxt "KDbField|"
@@ -1063,19 +1061,19 @@ msgstr "Tarih/Saat"
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set value of database property \"%1\"."
-msgstr "\"%1\" veri tabanı özelliğinin değeri ayarlanamadı."
+msgstr "“%1” veri tabanı özelliğinin değeri ayarlanamadı."
 
 #: KDbProperties.cpp:82 KDbProperties.cpp:92 KDbProperties.cpp:103
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not set caption for database property \"%1\"."
-msgstr "\"%1\" veri tabanı özelliğinin başlığı ayarlanamadı."
+msgstr "“%1” veri tabanı özelliğinin başlığı ayarlanamadı."
 
 #: KDbProperties.cpp:118 KDbProperties.cpp:135
 #, qt-format
 msgctxt "KDbProperties|"
 msgid "Could not read database property \"%1\"."
-msgstr "\"%1\" veri tabanı özelliği okunamadı."
+msgstr "“%1” veri tabanı özelliği okunamadı."
 
 #: KDbProperties.cpp:150
 msgctxt "KDbProperties|"
@@ -1098,12 +1096,12 @@ msgstr "Belirtilmemiş bir hatayla karşılaşıldı"
 #: parser/generated/sqlscanner.cpp:1023
 msgctxt "KDbParser|"
 msgid "Invalid integer number"
-msgstr "Geçersiz tamsayı"
+msgstr "Geçersiz tam sayı"
 
 #: parser/generated/sqlscanner.cpp:1023
 msgctxt "KDbParser|"
 msgid "This integer number may be too large."
-msgstr "Bu tamsayı çok büyük olabilir."
+msgstr "Bu tam sayı pek büyük olabilir."
 
 #: parser/generated/sqlscanner.cpp:1109
 #, qt-format
@@ -1129,7 +1127,7 @@ msgstr "Geçersiz tanımlayıcı"
 #: parser/generated/sqlscanner.cpp:1422
 msgctxt "KDbParser|"
 msgid "Identifiers should start with a letter or '_' character"
-msgstr "Tanımlayıcıları bir harf veya '_' karakteriyle başlamalıdır"
+msgstr "Tanımlayıcıları bir harf veya “_” karakteriyle başlamalıdır"
 
 #: parser/generated/sqlscanner.cpp:1464
 #, qt-format
@@ -1151,7 +1149,7 @@ msgstr "Sözdizimi Hatası"
 #, qt-format
 msgctxt "KDbParser|"
 msgid "\"%1\" is a reserved keyword."
-msgstr "\"%1\", ayrılmış bir anahtar sözcüktür."
+msgstr "“%1”, ayrılmış bir anahtar sözcüktür."
 
 #: parser/KDbParser_p.cpp:220
 msgctxt "KDbParser|"
@@ -1168,7 +1166,7 @@ msgstr "Hata"
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Error near \"%1\"."
-msgstr "\"%1\" yakınlarında hata."
+msgstr "“%1” yakınlarında hata."
 
 #: parser/KDbParser_p.cpp:240
 msgctxt "KDbParser|"
@@ -1193,17 +1191,17 @@ msgstr "Beklenmedik karakter."
 #: parser/KDbParser_p.cpp:312
 msgctxt "KDbParser|"
 msgid "\"*\" could not be used if no tables are specified."
-msgstr "Belirtilmiş bir tablo yoksa, \"*\" kullanılmaz."
+msgstr "Belirtilmiş bir tablo yoksa, “*” kullanılmaz."
 
 #: parser/KDbParser_p.cpp:318
 msgctxt "KDbParser|"
 msgid "\"*\" could not be added."
-msgstr "\"*\" eklenemedi."
+msgstr "“*” eklenemedi."
 
 #: parser/KDbParser_p.cpp:325
 msgctxt "KDbParser|"
 msgid "\"<table>.*\" could not be added."
-msgstr "\"<tablo>.*\" eklenemedi."
+msgstr "“<tablo>.*” eklenemedi."
 
 #: parser/KDbParser_p.cpp:330
 msgctxt "KDbParser|"
@@ -1214,7 +1212,7 @@ msgstr "Bir alana bağıntı eklenemedi."
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Table \"%1\" does not exist."
-msgstr "\"%1\" tablosu mevcut değil."
+msgstr "“%1” tablosu mevcut değil."
 
 #: parser/KDbParser_p.cpp:398
 #, qt-format
@@ -1223,25 +1221,25 @@ msgid ""
 "Could not set alias \"%1\" for table \"%2\". This alias is already set for "
 "table \"%3\"."
 msgstr ""
-"\"%2\" tablosu için \"%1\" arması oluşturulamadı. Bu arma hâlihazırda \"%3\" "
+"“%2” tablosu için “%1” arması oluşturulamadı. Bu arma hâlihazırda “%3” "
 "tablosu için ayarlanmış."
 
 #: parser/KDbParser_p.cpp:430
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Invalid alias definition for column \"%1\"."
-msgstr "\"%1\" kolonu için takma isim tanımlaması geçersiz."
+msgstr "“%1” sütunu için takma ad tanımlaması geçersiz."
 
 #: parser/KDbParser_p.cpp:450
 msgctxt "KDbParser|"
 msgid "More than one asterisk \"*\" is not allowed."
-msgstr "Birden fazla yıldız işareti \"*\" kullanılamaz."
+msgstr "Birden fazla yıldız işareti “*” kullanılamaz."
 
 #: parser/KDbParser_p.cpp:464
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Invalid \"%1\" column definition."
-msgstr "\"%1\" geçersiz sütun tanımlaması."
+msgstr "“%1” geçersiz sütun tanımlaması."
 
 #: parser/KDbParser_p.cpp:482
 #, qt-format
@@ -1250,14 +1248,14 @@ msgid ""
 "Could not set alias \"%1\" for column #%2. This alias is already set for "
 "column #%3."
 msgstr ""
-"#%2 sütunu için \"%1\" arması oluşturulamadı. Bu arma hâlihazırda #%3 sütunu "
+"#%2 sütunu için “%1” arması oluşturulamadı. Bu arma hâlihazırda #%3 sütunu "
 "için ayarlanmış."
 
 #: parser/KDbParser_p.cpp:487
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not set alias \"%1\" for column #%2."
-msgstr "#%2 sütunu için \"%1\" arması ayarlanamadı."
+msgstr "#%2 sütunu için “%1” arması ayarlanamadı."
 
 #: parser/KDbParser_p.cpp:530
 #, qt-format
@@ -1269,8 +1267,7 @@ msgstr "Sıralama tanımlanamadı. %1 konumundaki kolon mevcut değil."
 #, qt-format
 msgctxt "KDbParser|"
 msgid "Could not define sorting. Column name or alias \"%1\" does not exist."
-msgstr ""
-"Sıralama tanımlanamadı. %1 konumundaki isim veya takma isim mevcut değil."
+msgstr "Sıralama tanımlanamadı. %1 konumundaki ad veya takma ad yok."
 
 #: tools/KDbObjectNameValidator.cpp:53
 #, qt-format
@@ -1278,12 +1275,12 @@ msgctxt "KDbObjectNameValidator|"
 msgid ""
 "Cannot use reserved name \"%1\" for objects. Please choose another name."
 msgstr ""
-"Nesneler için \"%1\" ayrılmış ismi kullanılamaz. Lütfen başka bir isim seçim."
+"Nesneler için “%1” ayrılmış adı kullanılamaz. Lütfen başka bir ad seçim."
 
 #: tools/KDbObjectNameValidator.cpp:58
 msgctxt "KDbObjectNameValidator|"
 msgid "Names of internal database objects start with \"kexi__\"."
-msgstr "\"kexi_\" ile başlayan dahili veri tabanı nesnelerinin isimleri."
+msgstr "“kexi_” ile başlayan dahili veri tabanı nesnelerinin adları."
 
 #: tools/KDbSimpleCommandLineApp.cpp:77
 msgctxt "KDbSimpleCommandLineApp|"
@@ -1293,7 +1290,7 @@ msgstr "Veri tabanı sürücü kimliği"
 #: tools/KDbSimpleCommandLineApp.cpp:79
 msgctxt "KDbSimpleCommandLineApp|"
 msgid "Database user name"
-msgstr "Veri tabanı kullanıcı ismi"
+msgstr "Veri tabanı kullanıcı adı"
 
 #: tools/KDbSimpleCommandLineApp.cpp:81
 msgctxt "KDbSimpleCommandLineApp|"
@@ -1325,13 +1322,13 @@ msgstr "%1 için parola girin: "
 #, qt-format
 msgctxt "KDbValidator|"
 msgid "\"%1\" value has to be entered."
-msgstr "\"%1\" değeri girilmelidir."
+msgstr "“%1” değeri girilmelidir."
 
 #: views/KDbTableViewData.cpp:692 views/KDbTableViewData.cpp:703
 #, qt-format
 msgctxt "KDbTableViewData|"
 msgid "\"%1\" column requires a value to be entered."
-msgstr "\"%1\" sütuna bir değer girilmesi gerekiyor."
+msgstr "“%1” sütuna bir değer girilmesi gerekiyor."
 
 #: views/KDbTableViewData.cpp:694
 msgctxt "KDbTableViewData|"
@@ -1364,5 +1361,5 @@ msgid ""
 "Please correct data in this record or use the \"Cancel record changes\" "
 "function."
 msgstr ""
-"Lütfen bu kayıttaki veriyi düzeltin veya \"Kayıt değişikliklerini iptal et\" "
+"Lütfen bu kayıttaki veriyi düzeltin veya “Kayıt değişikliklerini iptal et” "
 "işlevini kullanın."
